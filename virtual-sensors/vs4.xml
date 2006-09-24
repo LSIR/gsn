@@ -1,0 +1,55 @@
+<virtual-sensor name="TestSensorServer11" priority="11">
+   <processing-class>
+      <class-name>gsn.vsensor.ChartVirtualSensor</class-name>
+      <init-params>
+         <param name="input-Stream">DATA</param>
+         <param name="title">Light-Temperature Status</param>
+         <param name="type">ANY</param>
+         <param name="height">200</param>
+         <param name="width">300</param>
+         <param name="vertical-axis">Sensor Readings</param>
+         <param name="history-size">100</param>
+      </init-params>
+   </processing-class>
+   <author>Ali Salehi</author>
+   <email>salehi@epfl.ch</email>
+   <description>A sample vsensor</description>
+   <life-cycle pool-size="10"/>
+   <addressing>
+      <predicate key="geographical">BC121</predicate>
+   </addressing>
+   <output-structure>
+      <field name="DATA" type="binary:jpg"/>
+   </output-structure>
+   <storage history-size="100s" permanent-storage="true"/>
+   <input-streams>
+      <input-stream name="DATA" rate="100">
+         <stream-source alias="dummy" storage-size="1" sampling-rate="1"
+                        disconnect-buffer-size="10">
+            <address wrapper="dummy">
+               <predicate key="HOST">192.168.51.102</predicate>
+               <predicate key="PORT">80</predicate>
+            </address>
+            <query>select "DATA" from "WRAPPER"</query>
+         </stream-source>
+         <stream-source alias="dummy2" storage-size="1" sampling-rate="1"
+                        disconnect-buffer-size="10">
+            <address wrapper="sim">
+               <predicate key="HOST">192.168.51.102</predicate>
+               <predicate key="PORT">80</predicate>
+               <predicate key="RATE">4000</predicate>
+               <predicate key="SIZE">2</predicate>
+               <predicate key="burst-probability">0.000015</predicate>
+               <predicate key="burst-max-size">5</predicate>
+               <predicate key="range">100</predicate>
+               <predicate key="count-period">1000</predicate>
+               <predicate key="count">2</predicate>
+               <predicate key="log">0</predicate>
+            </address>
+            <query>select "DATA" from "WRAPPER"</query>
+         </stream-source>
+         <query>select "dummy.DATA" as "TEMPERATURE" ,"dummy2.DATA" as "LIGHT" from "dummy","dummy2"</query>
+       </input-stream>
+   </input-streams>
+</virtual-sensor>
+

@@ -1,0 +1,29 @@
+ <virtual-sensor name="TestSensorServer1" priority="11">
+      <processing-class>
+         <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+      </processing-class>
+      <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</author>
+      <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</email>
+      <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</description>
+      <life-cycle pool-size="10" />
+      <addressing>
+         <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</predicate>
+      </addressing>
+      <output-structure>
+         <field name="DATA" type="integer"/>
+      </output-structure>
+      <storage  permanent-storage="false" history-size="60s"/>
+      <input-streams>
+          <input-stream name="dummy" rate="100" >
+         <stream-source alias="dummy"   sampling-rate="1" storage-size="1"
+               disconnect-buffer-size="10"  >
+            <address wrapper="dummy">
+                <predicate key="HOST">localhost</predicate>
+                <predicate key="PORT">22001</predicate>
+            </address>
+            <query>select "DATA","TIMED" from "WRAPPER"</query>
+         </stream-source>
+         <query>select * from "dummy"</query>
+       </input-stream>
+     </input-streams>
+ </virtual-sensor>

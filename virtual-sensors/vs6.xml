@@ -1,0 +1,33 @@
+<virtual-sensor name="TestSVG" priority="11">
+   <processing-class>
+      <class-name>gsn.vsensor.WebInteractiveVirtualSensor</class-name>
+      <init-params>
+      		<param name="memory-size-in-seconds">1200</param>
+      </init-params>
+   </processing-class>
+   <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs6.xml</author>
+   <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs6.xml</email>
+   <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs6.xml</description>
+   <life-cycle pool-size="10"/>
+   <addressing>
+      <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs6.xml</predicate>
+   </addressing>
+   <output-structure>
+      <field name="PLOT" type="binary:svg"/>
+   </output-structure>
+   <storage permanent-storage="true"/>
+   <input-streams>
+      <input-stream name="data" rate="100">
+         <stream-source alias="wsn" sampling-rate="1" storage-size="1"
+                        disconnect-buffer-size="10">
+            <address wrapper="wsns">
+               <predicate key="HOST">127.0.0.1</predicate>
+               <predicate key="PORT">80</predicate>
+            </address>
+            <query>select NODE_ID as NODE_ID, PARENT_ID as PARENT_ID, TEMPREATURE as TEMPERATURE_VALUE, TIMED as TIMED from "WRAPPER"</query>
+         </stream-source>
+         <query>select * from "wsn"</query>
+      </input-stream>
+   </input-streams>
+</virtual-sensor>
+

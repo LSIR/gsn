@@ -1,0 +1,33 @@
+<virtual-sensor name="MemoryMonitorVS" priority="11">
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+    </processing-class>
+    <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</author>
+    <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</email>
+    <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</description>
+    <life-cycle pool-size="10"/>
+    <addressing>
+        <predicate key="geographical">Not Specified, please edit the file
+            $INSTALL_PATH/virtual-sensors/vs1.xml</predicate>
+    </addressing>
+    <output-structure>
+        <field name="HEAP" type="bigint"/>
+        <field name="NON_HEAP" type="bigint"/>
+        <field name="PENDING_FINALIZATION_COUNT" type="integer"/>
+    </output-structure>
+    <storage permanent-storage="false" history-size="1"/>
+    <input-streams>
+        <input-stream name="input1" rate="100">
+            <stream-source alias="source1" sampling-rate="1" storage-size="1"
+                           disconnect-buffer-size="10">
+                <address wrapper="memory-usage">
+                    <predicate key="HOST">localhost</predicate>
+                    <predicate key="PORT">22001</predicate>
+                    <predicate key="sampling-rate">1000</predicate>
+                </address>
+                <query>select "HEAP","NON_HEAP","PENDING_FINALIZATION_COUNT","TIMED" from "WRAPPER"</query>
+            </stream-source>
+            <query>select "HEAP","NON_HEAP","PENDING_FINALIZATION_COUNT","TIMED" from "source1"</query>
+        </input-stream>
+    </input-streams>
+</virtual-sensor>

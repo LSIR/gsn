@@ -1,0 +1,31 @@
+<virtual-sensor name="TestSensorServer5" priority="11">
+   <processing-class>
+      <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+   </processing-class>
+   <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</author>
+   <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</email>
+   <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</description>
+   <life-cycle pool-size="10"/>
+   <addressing>
+      <predicate key="geographical">INM035</predicate>
+   </addressing>
+   <output-structure>
+      <field name="DATA" type="binary:jpg"/>
+   </output-structure>
+   <storage history-size="1" permanent-storage="false"/>
+   <input-streams>
+      <input-stream name="DATA" rate="100">
+         <stream-source alias="source1" storage-size="1" sampling-rate="1"
+                        disconnect-buffer-size="10">
+            <address wrapper="remote">
+               <predicate key="HOST">localhost</predicate>
+               <predicate key="PORT">22001</predicate>
+               <predicate key="NAME">TestSensorServer4</predicate>
+            </address>
+            <query>select "WRAPPER.DATA" as DATA from "WRAPPER"  </query>
+         </stream-source>
+         <query>select "source1.DATA" from "source1"</query>
+      </input-stream>
+   </input-streams>
+</virtual-sensor>
+
