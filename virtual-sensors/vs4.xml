@@ -1,4 +1,4 @@
-<virtual-sensor name="TestSensorServer11" priority="11">
+<virtual-sensor name="TestSensorServer4" priority="11">
    <processing-class>
       <class-name>gsn.vsensor.ChartVirtualSensor</class-name>
       <init-params>

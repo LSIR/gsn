@@ -31,7 +31,7 @@
 
         <path id="classpath">
             <pathelement location="${build.dir}/jcoverage-classes/"/>
-            <pathelement location="${build.dir}/classes/"/>
+            <pathelement location="${build.dir}/"/>
             <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
             <fileset dir="${libdir}">
                 <include name="**/*.jar"/>
@@ -55,7 +55,7 @@
 
     <target name="clean" description="remove the previously compiled class files" depends="init">
         <delete includeEmptyDirs="yes" failonerror="no">
-            <fileset dir="${build.dir}/classes" includes="**/*.class,**/*.xml"/>
+            <fileset dir="${build.dir}" includes="**/*.class,**/*.xml"/>
             <fileset dir="${build.dir}" includes="**/*.xml"/>
             <fileset dir="${reports}" includes="**/*html,**/*htm,**/*xml"/>
             <fileset dir="${ready}" includes="**/*"/>
@@ -65,7 +65,7 @@
     </target>
     <target name="setup" depends="init">
         <mkdir dir="${reports}/todos"/>
-        <mkdir dir="${build.dir}/classes"/>
+        <mkdir dir="${build.dir}"/>
         <!--<mkdir dir="logs"/> -->
         <mkdir dir="${libdir}"/>
         <mkdir dir="${reports}/javadoc"/>
@@ -88,16 +88,16 @@
 
     <target name="build" depends="setup">
         <javac debug="true" srcdir="${src.dir}" optimize="off"
-               destdir="${build.dir}/classes" failonerror="false" source="1.5" classpathref="classpath"
+               destdir="${build.dir}" failonerror="false" source="1.5" classpathref="classpath"
                excludes="gsn/wrappers/cameras/usb/WebCamWrapper.java"/>
         <!-- The WebCamWrapper file is excluded since it dependes on the jmf.jar (Java Media Framework)
 which is available from SUN at  http://java.sun.com/products/java-media/jmf/index.jsp -->
         <echo>Compiling JIBX Mappings...</echo>
-        <java classname="org.jibx.binding.Compile" fork="yes" dir="${build.dir}/classes"
+        <java classname="org.jibx.binding.Compile" fork="yes" dir="${build.dir}"
               failonerror="true">
             <classpath refid="classpath"/>
-            <arg value="../../VirtualSensorDescription.xml"/>
-            <arg value="../../containerJIBX.xml"/>
+            <arg value="../VirtualSensorDescription.xml"/>
+            <arg value="../containerJIBX.xml"/>
         </java>
     </target>
 
@@ -110,7 +110,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
                 <welcomefile file="/sensors.jsp"/>
             </deploymentdescriptor>
         </webdoclet>
-        <java classname="gsn.registry.RegistryImp" fork="true" dir="${build.dir}/classes">
+        <java classname="gsn.registry.RegistryImp" fork="true" dir="${build.dir}">
             <classpath refid="classpath"/>
             <arg value="${basedir}/dswebapp/"/>
         	<arg value="${basedir}/log4j.directory.properties"/>
@@ -123,7 +123,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
 
     <target name="runcam" depends="xdoclet,build">
         <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"
-              dir="${build.dir}/classes">
+              dir="${build.dir}">
             <arg value="${config}"/>
             <arg value="${basedir}/log4j.properties"/>
             <arg value="${basedir}/${temp}"/>
@@ -134,7 +134,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
     </target>
 
     <target name="run" depends="xdoclet,build">
-        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${build.dir}/classes">
+        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${build.dir}">
             <classpath refid="classpath"/>
             <arg value="${config}"/>
             <arg value="${basedir}/log4j.properties"/>
@@ -148,14 +148,14 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
 
 
     <target name="rfidtest" depends="xdoclet,build">
-        <java classname="gsn.wrappers.RFIDSample" maxmemory="${maxMemoryUsage}" fork="true" dir="${build.dir}/classes">
+        <java classname="gsn.wrappers.RFIDSample" maxmemory="${maxMemoryUsage}" fork="true" dir="${build.dir}">
             <classpath refid="classpath"/>
         </java>
     </target>
 
     <target name="runSim" depends="build">
         <java classpathref="classpath" classname="gsn.simulation.Simulation" maxmemory="${maxMemoryUsage}" fork="true"
-              dir="${build.dir}/classes">
+              dir="${build.dir}">
             <arg value="${config}"/>
             <arg value="${basedir}/simulationLog4J.properties"/>
             <arg value="500"/>
@@ -167,7 +167,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
 
     <target name="stop" depends="build">
         <java classpathref="classpath" classname="gsn.StopSensorServer" maxmemory="8m" fork="true"
-              dir="${build.dir}/classes">
+              dir="${build.dir}">
             <arg value="${config}"/>
             <arg value="${basedir}/log4j.properties"/>
             <arg value="${basedir}/${temp}"/>
@@ -175,7 +175,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
     </target>
     <target name="jcoverage-build" depends="setup,build">
         <instrument todir="${build.dir}/jcoverage-classes">
-            <fileset dir="${build.dir}/classes">
+            <fileset dir="${build.dir}">
                 <include name="**/*.class"/>
             </fileset>
         </instrument>
@@ -207,7 +207,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
                errorproperty="errorOccuredInTests" haltonfailure="false">
             <classpath refid="classpath"/>
             <batchtest todir="${reports}/junit">
-                <fileset dir="${build.dir}/classes" includes="**/*Test*.class"/>
+                <fileset dir="${build.dir}" includes="**/*Test*.class"/>
             </batchtest>
         </junit>
     </target>
@@ -239,62 +239,28 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
 
     </target>
 
-    <!--
-     <target name="jspc">
-        <taskdef classname="org.apache.jasper.JspC" name="jasper2" classpathref="classpath"/>
-        <jasper2
-               validateXml="false"
-               uriroot="${webapp.dir}"
-               webXmlFragment="${webapp.dir}/WEB-INF/generated_web.xml"
-               outputDir="${webapp.dir}/WEB-INF/src" />
-     </target>
-     <target name="compileJSP" depends="jspc" >
-       <mkdir dir="${webapp.dir}/WEB-INF/classes"/>
-       <mkdir dir="${webapp.dir}/WEB-INF/lib"/>
-       <javac destdir="${webapp.dir}/WEB-INF/classes"
-             optimize="off"
-             debug="on" failonerror="false"
-             srcdir="${webapp.dir}/WEB-INF/src"
-             excludes="**/*.smap">
-             <classpath>
-                <pathelement location="${webapp.path}/WEB-INF/classes"/>
-                <path refid="classpath" />
-                <pathelement location="${build.dir}/classes"/>
-                <fileset dir="${webapp.dir}/WEB-INF/lib">
-                    <include name="*.jar"/>
-                  </fileset>
-             </classpath>
-        </javac>
-      </target>
-
-    <target name="compiler" depends="init">
-       <jflex destdir="${src.dir}" file="${src.dir}/gsn/compiler/lexers/addressLexer.jflex"/>
-    </target>-->
-
-    <target name="installer" depends="clean,xdoclet,build">
+   <target name="installer" depends="clean,xdoclet,build">
         <mkdir dir="${installer-result}"/>
-        <jar destfile="${installer-result}/${jar.file}" basedir="${build.dir}/classes/"
+        <jar destfile="${installer-result}/${jar.file}" basedir="${build.dir}"
              excludes="gsn/wrappers/general/SerialWrapper*class gsn/wrappers/general/UDPWrapper*class">
             <manifest>
                 <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
                 <attribute name="Main-Class" value="gsn.Main"/>
             </manifest>
         </jar>
-        <jar destfile="${installer-result}/serial-wrapper.jar" basedir="${build.dir}/classes/"
+        <jar destfile="${installer-result}/serial-wrapper.jar" basedir="${build.dir}"
              includes="gsn/wrappers/general/SerialWrapper*class">
             <manifest>
                 <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
             </manifest>
         </jar>
-        <jar destfile="${installer-result}/udp-wrapper.jar" basedir="${build.dir}/classes/"
+        <jar destfile="${installer-result}/udp-wrapper.jar" basedir="${build.dir}"
              includes="gsn/wrappers/general/UDPWrapper*class">
             <manifest>
                 <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
             </manifest>
         </jar>
 
-
-        <!-- <property name="izpack.dir" value="/home/ali/IzPack"        />-->
         <izpack input="${basedir}/installer/izpack-installer.xml"
                 output="${basedir}/${installer-result}/gsn-installer.jar"
                 basedir="${basedir}/installer"
@@ -304,7 +270,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
 
     <target name="pref" depends="build">
         <java classpathref="classpath" classname="gsn.tests.CreationTest" maxmemory="64m" fork="true"
-              dir="${build.dir}/classes">
+              dir="${build.dir}">
         </java>
     </target>
 

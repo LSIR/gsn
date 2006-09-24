@@ -1,23 +1,22 @@
 package gsn.wrappers ;
 
-import gsn.Main ;
-import gsn.Mappings ;
-import gsn.beans.DataField ;
-import gsn.shared.Registry ;
+import gsn.Main;
+import gsn.Mappings;
+import gsn.beans.DataField;
+import gsn.shared.Registry;
 import gsn.utils.TCPConnPool;
-import gsn.vsensor.Container ;
+import gsn.vsensor.Container;
 
-import java.sql.SQLException ;
-import java.util.ArrayList ;
-import java.util.Collection ;
-import java.util.Iterator ;
-import java.util.TreeMap ;
-import java.io.ObjectInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.TreeMap;
 
-import org.apache.commons.httpclient.Header ;
-import org.apache.commons.httpclient.methods.PostMethod ;
-import org.apache.log4j.Logger ;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.log4j.Logger;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
@@ -53,7 +52,10 @@ public class RemoteDS extends AbstractStreamProducer {
         Mappings.getContainer().addRemoteStreamSource(getDBAlias(), this);
         return result;
     }
-
+/**
+ * 
+ * @return Null if the RemoteDS can't obtain the data strcture from the remote VS.¯
+ */
     private ArrayList<DataField> askForStrcture() {
         String host = getAddressBeanActiveHostName();
         if (host.indexOf("http://") < 0)
@@ -77,22 +79,10 @@ public class RemoteDS extends AbstractStreamProducer {
         }
 
         if (postMethod.getResponseHeader(Container.RES_STATUS) == null
-                || postMethod.getResponseHeader(Container.RES_STATUS).equals(Container.REQUEST_HANDLED_SUCCESSFULLY)) {
+                || postMethod.getResponseHeader(Container.RES_STATUS).getValue().equals(Container.INVALID_REQUEST)) {
             logger.debug("The respond from server : " + postMethod.getResponseHeader(Container.RES_STATUS));
             return null;
         }
-//      ArrayList < DataField > outputStreamStruecture = new ArrayList < DataField > ( ) ;
-//      Header [ ] fieldName = postMethod.getResponseHeaders ( Container.RES_HEADER_DATA_FIELD_NAME ) ;
-//      Header [ ] fieldType = postMethod.getResponseHeaders ( Container.RES_HEADER_DATA_FIELD_TYPE ) ;
-//      System.out.println("fieldType.length = " + fieldType.length);
-//
-//       for ( int i = 0 ; i < fieldType.length ; i ++ ) {
-//         outputStreamStruecture.add ( new DataField ( fieldName [ i ].getValue ( ) , fieldType [ i ].getValue ( ) ) ) ;
-//         if ( logger.isDebugEnabled ( ) )
-//            logger.debug ( new StringBuilder ( )
-//                  .append ( "Remote Data Field :" ).append ( fieldName [ i ].getValue ( ) ).append ( " = " ).append ( fieldType [ i ].getValue ( ) )
-//                  .toString ( ) ) ;
-//      }
         ArrayList<DataField> outputStreamStruecture = null;
         ObjectInputStream ois = null;
         try {

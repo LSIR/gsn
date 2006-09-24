@@ -2,7 +2,6 @@ package gsn.vsensor ;
 
 import gsn.Mappings;
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.notifications.GSNNotification;
@@ -203,7 +202,6 @@ public class ContainerImpl extends HttpServlet implements Container {
             ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(res.getOutputStream()));
             oos.writeObject(datafields);
             oos.flush();
-            oos.close();
             if(logger.isDebugEnabled())
             	logger.debug("Respond sent to the requestee.");
             return;

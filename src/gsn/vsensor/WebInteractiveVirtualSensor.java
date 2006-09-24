@@ -68,8 +68,6 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
     }
 
     public void dataAvailable(String inputStreamName, StreamElement streamElement) {
-        System.out.println("WEBINTERACTIVE CALLED " + counter_pref++);
-
         if (inputStreamName.equalsIgnoreCase(INPUT_STREAM_NAME)) {
             int node_id = (Integer) streamElement.getData("NODE_ID");
             int parent_id = (Integer) streamElement.getData("PARENT_ID");
@@ -103,11 +101,7 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
         ArrayList<SVGEdge> edges = new ArrayList<SVGEdge>();
         SVGLayer edgesLayer = new SVGLayer("Edges", 0.8f);
         SVGLayer nodesLayer = new SVGLayer("Nodes", 1f);
-        // for ( SVGCircle node : nodes )
-        // System.out.println ( "Node ID : "+ (( SimpleNodeObject ) node.getObject
-        // ( ) ).getNodeID ( )+" PARENT ID : "+(( SimpleNodeObject )
-        // node.getObject ( ) ).getParentID ( ) ) ;
-        for (SVGCircle node : nodes)
+       for (SVGCircle node : nodes)
             for (SVGCircle parent : nodes)
                 if (node != parent && ((SimpleNodeObject) node.getObject()).getParentID() == ((SimpleNodeObject) parent.getObject()).getNodeID())
                 {
