@@ -55,6 +55,8 @@ public class ContainerConfig {
 
 	protected String registryBootstrapAddr;
 
+	public static final String FIELD_NAME_registryBootstrapAddr = "registryBootstrapAddr";
+
 	protected String containerFileName;
 
 	protected boolean jdbcOverwriteTables = Boolean.FALSE;
@@ -85,7 +87,7 @@ public class ContainerConfig {
 
 	protected boolean permanentStorage = false;
 
-	public static final String FIELD_NAME_permanentStorage = "permanentStorage";
+	public static final String FIELD_NAME_permanentStorageEnabled = "permanentStorage";
 
 	public boolean isPermanentStorage() {
 		return permanentStorage;
@@ -190,12 +192,25 @@ public class ContainerConfig {
 	/**
 	 * @return Returns the registryBootstrapAddr.
 	 */
+	private boolean isRegistryBootStrapAddrInitialized = false;
+/**
+ * Returns null if the Registery bootstrap is not valid (e.g., null, empty, ...)
+ * @return
+ */
 	public String getRegistryBootstrapAddr() {
-		if (registryBootstrapAddr == null)
-			this.registryBootstrapAddr = "";
-		else
-			this.registryBootstrapAddr = this.registryBootstrapAddr.trim();
+		if (!isRegistryBootStrapAddrInitialized) {
+			if (this.registryBootstrapAddr != null)
+				this.registryBootstrapAddr = this.registryBootstrapAddr.trim();
+			isRegistryBootStrapAddrInitialized=true;
+		}
 		return this.registryBootstrapAddr;
+	}
+
+	/**
+	 * @param registryBootstrapAddr the registryBootstrapAddr to set
+	 */
+	public void setRegistryBootstrapAddr(String registryBootstrapAddr) {
+		this.registryBootstrapAddr = registryBootstrapAddr;
 	}
 
 	/**

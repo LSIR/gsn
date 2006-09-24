@@ -306,6 +306,10 @@ public class VSensorLoader implements Runnable {
 	private synchronized void toDirectoryService(VSensorConfig configuration,
 			int action) {
 		PostMethod postMethod = directoryCommunicationCache.get(configuration);
+		if ( Main.getContainerConfig().getRegistryBootstrapAddr()==null) {
+			logger.warn("Can't contact the directory service, please fix the GSN Container Configuration File.");
+			return ; 
+		}
 		if (postMethod == null) {
 			String dirHost = Main.getContainerConfig()
 					.getRegistryBootstrapAddr();
@@ -371,6 +375,12 @@ public class VSensorLoader implements Runnable {
 
 	private ArrayList<VirtualSensorIdentityBean> resolveByDirecotryService(
 			ArrayList<KeyValue> predicates) {
+		ArrayList<VirtualSensorIdentityBean> result = new ArrayList<VirtualSensorIdentityBean>();
+
+		if ( Main.getContainerConfig().getRegistryBootstrapAddr()==null) {
+			logger.warn("Can't contact the directory service, please fix the GSN Container Configuration File.");
+			return result; 
+		}
 		String dirHost = Main.getContainerConfig().getRegistryBootstrapAddr();
 		if (dirHost.indexOf("http://") < 0)
 			dirHost = "http://" + dirHost;
@@ -392,7 +402,6 @@ public class VSensorLoader implements Runnable {
 		Header[] ports = postMethod.getResponseHeaders(Registry.VS_PORT);
 		Header[] names = postMethod.getResponseHeaders(Registry.VS_NAME);
 
-		ArrayList<VirtualSensorIdentityBean> result = new ArrayList<VirtualSensorIdentityBean>();
 		for (int i = 0; i < hosts.length; i++) {
 			result
 					.add(new VirtualSensorIdentityBean(names[i].getValue(),
@@ -410,7 +419,7 @@ public class VSensorLoader implements Runnable {
 		postMethod.addRequestHeader(Registry.REQUEST, Integer.toString(action));
 		postMethod.addRequestHeader(Registry.VS_NAME, configuration
 				.getVirtualSensorName());
-		postMethod.addRequestHeader(Registry.VS_PORT, Integer.toString(Main
+		postMethod.addRequestHeader(Registry.VS_PORT,Integer.toString(Main
 				.getContainerConfig().getContainerPort()));
 		for (KeyValue predicate : configuration.getAddressing()) {
 			postMethod.addRequestHeader(Registry.VS_PREDICATES_KEYS,

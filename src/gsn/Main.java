@@ -78,6 +78,7 @@ public final class Main {
 
         Server server = new Server();
         Connector connector = new SelectChannelConnector();
+        // TODO : Testing if the Container port is a valid integer.
         connector.setPort(containerConfig.getContainerPort());
         server.setConnectors(new Connector [ ]{connector});
         ServletHandler servletHandler = new ServletHandler();

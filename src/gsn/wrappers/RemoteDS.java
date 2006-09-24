@@ -124,7 +124,7 @@ public class RemoteDS extends AbstractStreamProducer {
                     .append("Wants to send message to : ").append(destination).append("  for DEREGISTERING the previous query").toString());
         PostMethod postMethod = new PostMethod(destination);
         postMethod.addRequestHeader(Container.REQUEST, Integer.toString(Container.DEREGISTER_PACKET));
-        postMethod.addRequestHeader(Registry.VS_PORT, Integer.toString(Main.getContainerConfig().getContainerPort()));
+        postMethod.addRequestHeader(Registry.VS_PORT,Integer.toString(Main.getContainerConfig().getContainerPort()));
         postMethod.addRequestHeader(Container.VS_QUERY, query);
         postMethod.addRequestHeader(Container.QUERY_VS_NAME, remoteVSName);
         postMethod.addRequestHeader(Container.NOTIFICATION_CODE, notificationCode);
