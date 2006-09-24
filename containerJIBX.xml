@@ -1,20 +1,21 @@
 <binding>
 	<mapping name="sensor-server" class="gsn.beans.ContainerConfig" >
-		<value name="name" field="name" usage="optional" />  
-		<value name="author" field="author" usage="optional"/>
-		<value name="email" field="email" usage="optional"/>
+		<value name="name" field="webName" usage="optional" />  
+		<value name="author" field="webAuthor" usage="optional"/>
+		<value name="email" field="webEmail" usage="optional"/>
+		<value name="description" field="webDescription" usage="optional" />  
 		<value name="mail-server" field="mailServer" usage="optional"/>
 		<value name="sms-server" field="smsServer" usage="optional"/>
 		<value name="sms-password" field="smsPassword" usage="optional"/>
-		<value name="description" field="description" usage="optional" />  
 		<value name="virtual-sensors-dir" field="virtualSensorsDir" />  
 		<value name="port" field="containerPort" />  
 		<structure name="storage">
-			<value name="driver" field="databaseDriver" style="attribute" />
-			<value name="user" field="databaseUserName" style="attribute" />
-			<value name="password" field="databasePassword" style="attribute" />
-			<value name="url" field="storageURL" style="attribute" />
-			<value name="overwrite-tables" field="overwriteTables" style="attribute" />
+			<value name="driver" field="jdbcDriver" style="attribute" />
+			<value name="user" field="jdbcUsername" style="attribute" />
+			<value name="password" field="jdbcPassword" style="attribute" />
+			<value name="url" field="jdbcURL" style="attribute" />
+			<value name="overwrite-tables" field="jdbcOverwriteTables" style="attribute" />
+			<value name="permanent-storage" field="permanentStorage" style="attribute" />
 		</structure>
 		<value name="webapp-location" field="webAppPath" />
 		<value name="directory-address" field="registryBootstrapAddr" />  

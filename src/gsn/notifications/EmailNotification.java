@@ -25,8 +25,8 @@ public class EmailNotification extends NotificationRequest {
    private String receiverEmailAddress ;
 
    /**
-    * Creates a notification for email. The input is address of the system
-    * receiving the email. <p/> The syntax is <code>blabla@foo.com</code>
+    * Creates a notification for webEmail. The input is address of the system
+    * receiving the webEmail. <p/> The syntax is <code>blabla@foo.com</code>
     */
 
    private transient String notificationCode ;
@@ -37,7 +37,7 @@ public class EmailNotification extends NotificationRequest {
 
    private String message ;
 
-   private static final String fromEmail = Main.getContainerConfig ( ).getEmail ( ) ;
+   private static final String fromEmail = Main.getContainerConfig ( ).getWebEmail ( ) ;
 
    private static final String mailServer = Main.getContainerConfig ( ).getMailServer ( ) ;
 
@@ -56,7 +56,7 @@ public class EmailNotification extends NotificationRequest {
    public boolean send ( ) {
 	  try {
          if ( ! GenericValidator.isEmail ( fromEmail ) ) {
-            logger.warn ( "There is a email notification request, but the email address in container's configuration is not a valid email address" ) ;
+            logger.warn ( "There is a webEmail notification request, but the webEmail address in container's configuration is not a valid webEmail address" ) ;
             return false ;
          }
          SimpleEmail email = new SimpleEmail ( ) ;
@@ -67,7 +67,7 @@ public class EmailNotification extends NotificationRequest {
          email.setSubject ( subject ) ;
          email.setContent ( message , "text/plain" ) ;
          if (logger.isDebugEnabled())
-  		   logger.debug("Wants to send email to "+email.getFromAddress());
+  		   logger.debug("Wants to send webEmail to "+email.getFromAddress());
   	   
          email.send ( ) ;
          

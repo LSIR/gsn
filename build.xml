@@ -238,30 +238,30 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
         </documentdoclet>
 
     </target>
-
-   <target name="installer" depends="clean,xdoclet,build">
-        <mkdir dir="${installer-result}"/>
-        <jar destfile="${installer-result}/${jar.file}" basedir="${build.dir}"
-             excludes="gsn/wrappers/general/SerialWrapper*class gsn/wrappers/general/UDPWrapper*class">
-            <manifest>
-                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
-                <attribute name="Main-Class" value="gsn.Main"/>
-            </manifest>
-        </jar>
-        <jar destfile="${installer-result}/serial-wrapper.jar" basedir="${build.dir}"
-             includes="gsn/wrappers/general/SerialWrapper*class">
-            <manifest>
-                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
-            </manifest>
-        </jar>
-        <jar destfile="${installer-result}/udp-wrapper.jar" basedir="${build.dir}"
-             includes="gsn/wrappers/general/UDPWrapper*class">
-            <manifest>
-                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
-            </manifest>
-        </jar>
-
-        <izpack input="${basedir}/installer/izpack-installer.xml"
+	   <target name="jar" depends="clean,xdoclet,build">
+	   	<mkdir dir="${installer-result}"/>
+	   	        <jar destfile="${installer-result}/${jar.file}" basedir="${build.dir}"
+	   	             excludes="gsn/wrappers/general/SerialWrapper*class gsn/wrappers/general/UDPWrapper*class">
+	   	            <manifest>
+	   	                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
+	   	                <attribute name="Main-Class" value="gsn.Main"/>
+	   	            </manifest>
+	   	        </jar>
+	   	        <jar destfile="${installer-result}/serial-wrapper.jar" basedir="${build.dir}"
+	   	             includes="gsn/wrappers/general/SerialWrapper*class">
+	   	            <manifest>
+	   	                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
+	   	            </manifest>
+	   	        </jar>
+	   	        <jar destfile="${installer-result}/udp-wrapper.jar" basedir="${build.dir}"
+	   	             includes="gsn/wrappers/general/UDPWrapper*class">
+	   	            <manifest>
+	   	                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
+	   	            </manifest>
+	   	        </jar>
+	   </target>
+   <target name="installer" depends="clean,xdoclet,build,jar">
+                <izpack input="${basedir}/installer/izpack-installer.xml"
                 output="${basedir}/${installer-result}/gsn-installer.jar"
                 basedir="${basedir}/installer"
                 izPackdir="${basedir}/izpack"/>

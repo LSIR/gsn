@@ -1,20 +1,20 @@
 package gsn.beans ;
 
-import gsn.utils.CaseInsensitiveComparator ;
-import gsn.utils.KeyValueImp ;
+import gsn.utils.CaseInsensitiveComparator;
 
-import java.io.Serializable ;
-import java.util.ArrayList ;
-import java.util.Collection ;
-import java.util.TreeMap ;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.TreeMap;
 
-import org.apache.commons.collections.KeyValue ;
-import org.apache.log4j.Logger ;
+import org.apache.commons.collections.KeyValue;
+import org.apache.log4j.Logger;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 public class VSensorConfig implements Serializable {
+	
 
    public static final int DEFAULT_PRIORITY = 100 ;
 
@@ -82,7 +82,7 @@ public class VSensorConfig implements Serializable {
    }
 
    /**
-    * @return Returns the email.
+    * @return Returns the webEmail.
     */
    public String getEmail ( ) {
       if ( email == null )
@@ -181,8 +181,8 @@ public class VSensorConfig implements Serializable {
    }
 
    /**
-    * @param email
-    *           The email to set.
+    * @param webEmail
+    *           The webEmail to set.
     */
    public void setEmail ( String email ) {
       this.email = email ;
@@ -396,7 +396,7 @@ public class VSensorConfig implements Serializable {
       }
       builder.append ( "]" ) ;
       return "VSensorConfig{" + "virtualSensorName='" + virtualSensorName + '\'' + ", priority=" + priority + ", mainClass='" + mainClass + '\'' + ", author='"
-            + author + '\'' + ", email='" + email + '\'' + ", description='" + description + '\'' + ", lifeCyclePoolSize=" + lifeCyclePoolSize
+            + author + '\'' + ", webEmail='" + email + '\'' + ", description='" + description + '\'' + ", lifeCyclePoolSize=" + lifeCyclePoolSize
             + ", outputStreamRate=" + outputStreamRate + ", addressing=" + addressing + ", outputStructure=" + outputStructure + ", storageHistorySize='"
             + storageHistorySize + '\'' + builder.toString ( ) + ", mainClassInitialParams=" + mainClassInitialParams + ", lastModified=" + lastModified
             + ", permanentStorage=" + permanentStorage + ", fileName='" + fileName + '\'' + ", logger=" + logger + ", nameInitialized=" + nameInitialized

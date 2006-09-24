@@ -69,8 +69,8 @@ public final class Main {
             logger.error("Please check the configuration file and try again.");
             System.exit(1);
         }
-        StorageManager.getInstance().initialize(containerConfig.getDatabaseDriver(), containerConfig.getDatabaseUserName(), containerConfig
-                .getDatabasePassword(), containerConfig.getStorageURL());
+        StorageManager.getInstance().initialize(containerConfig.getJdbcDriver(), containerConfig.getJdbcUsername(), containerConfig
+                .getJdbcPassword(), containerConfig.getJdbcURL());
         if (logger.isInfoEnabled())
             logger.info("The Container Configuration file loaded successfully.");
         Container container = new ContainerImpl();
@@ -84,8 +84,11 @@ public final class Main {
         servletHandler.addServletWithMapping("gsn.vsensor.ContainerImpl", "/gsn");
         WebAppContext webAppContext = new WebAppContext();
         webAppContext.setContextPath("/");
+        if (containerConfig.getWebAppPath()==null || containerConfig.getWebAppPath().trim().length()==0) {
+        	logger.warn("There is no web application specified for this GSN container");
+        }else {
         webAppContext.setResourceBase(containerConfig.getWebAppPath());
-        webAppContext.setServletHandler(servletHandler);
+        }webAppContext.setServletHandler(servletHandler);
         server.setHandler(webAppContext);
         server.setStopAtShutdown(true);
         server.setSendServerVersion(false);

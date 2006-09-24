@@ -230,7 +230,7 @@ public class VSensorLoader implements Runnable {
 						.getVirtualSensorName(), sensorInstance.getConfig()
 						.getOutputStructure(), sensorInstance.getConfig()
 						.isPermanentStorage(), Main.getContainerConfig()
-						.isOverwriteTables());
+						.isJdbcOverwriteTables());
 				sensorInstance.start();
 
 			} catch (SQLException e) {

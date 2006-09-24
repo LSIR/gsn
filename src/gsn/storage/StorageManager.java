@@ -492,7 +492,7 @@ public class StorageManager {
      *                       container's main configuration file.
      */
     public void dropTable(String tableName, boolean forceDropTable) {
-        if (! forceDropTable && ! getContainerConfig().isOverwriteTables())
+        if (! forceDropTable && ! getContainerConfig().isJdbcOverwriteTables())
             return;
         if (logger.isInfoEnabled())
             logger.info("Dropping table structure: " + tableName);

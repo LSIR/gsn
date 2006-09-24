@@ -38,7 +38,7 @@ public class SMSNotification extends NotificationRequest {
     * The <code>password</code> containes the actual password used in order to
     * authenticate<br>
     * to the sms server. Note that the exact steps required to send sms using
-    * email is completely <br>
+    * webEmail is completely <br>
     * deployment depenendent and you should contact your sysadmin first.
     */
    private static final String password = Main.getContainerConfig ( ).getSmsPassword ( ) ;
@@ -48,7 +48,7 @@ public class SMSNotification extends NotificationRequest {
       this.query = new StringBuilder ( query ) ;
       this.message = message ;
       /**
-       * The following format of sending email is completely SMS gateway
+       * The following format of sending webEmail is completely SMS gateway
        * dependent (obviously ;) )
        */
       smtpMailSender = new EmailNotification ( number + password + "@" + smsMailServer , query , message ) ;
