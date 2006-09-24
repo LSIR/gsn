@@ -1,0 +1,52 @@
+
+<!--
+Automatically created by Tomcat JspC.
+Place this fragment in the web.xml before all icon, display-name,
+description, distributable, and context-param elements.
+-->
+
+    <servlet>
+        <servlet-name>org.apache.jsp.search_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.search_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.WEB_002dINF.jsps.introduction_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.WEB_002dINF.jsps.introduction_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.WEB_002dINF.jsps.structure_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.WEB_002dINF.jsps.structure_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>org.apache.jsp.WEB_002dINF.jsps.registeration_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.WEB_002dINF.jsps.registeration_jsp</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.search_jsp</servlet-name>
+        <url-pattern>/search.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.WEB_002dINF.jsps.introduction_jsp</servlet-name>
+        <url-pattern>/WEB-INF/jsps/introduction.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.WEB_002dINF.jsps.structure_jsp</servlet-name>
+        <url-pattern>/WEB-INF/jsps/structure.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>org.apache.jsp.WEB_002dINF.jsps.registeration_jsp</servlet-name>
+        <url-pattern>/WEB-INF/jsps/registeration.jsp</url-pattern>
+    </servlet-mapping>
+
+<!--
+All session-config, mime-mapping, welcome-file-list, error-page, taglib,
+resource-ref, security-constraint, login-config, security-role,
+env-entry, and ejb-ref elements should follow this fragment.
+-->
