@@ -1,0 +1,7 @@
+  <!-- Standard Action Servlet Mapping -->
+  <!--
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+-->
