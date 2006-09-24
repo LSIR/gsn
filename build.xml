@@ -1,0 +1,312 @@
+<project name="template" default="build" basedir=".">
+
+    <target name="all" depends="clean,setup,build">
+    </target>
+
+    <target name="all.all" depends="test-report,docs"/>
+
+    <target name="init" description="initializes properties and initialization tasks">
+        <tstamp>
+            <format property="TODAY" pattern="yyyy-MMMM-d-'at'-hh-mm-aa" locale="en"/>
+        </tstamp>
+
+        <property environment="env"/>
+        <property name="build.dir" value="build"/>
+        <property name="webapp.dir" value="webapp"/>
+        <property name="dswebapp.dir" value="dswebapp"/>
+        <property name="merge.dir" value="metadata"/>
+        <property name="src.dir" value="src"/>
+        <property name="installer-result" value="installer-result"/>
+        <property name="libdir" value="lib"/>
+        <property name="reports" value="reports"/>
+        <property name="temp" value="temp"/>
+        <property name="ready" value="ready"/>
+        <property name="maxMemoryUsage" value="64m"/>
+        <property name="jar.file" value="gsn-core.jar"/>
+        <!--  Enable the following line when you want to use Java Media Framework.
+ You should unarchive the complete archive provide by sun and fix the
+ following line to point to you path. -->
+        <!-- 	<property name="jmf.dir"     value="/home/ali/JMF-2.1.1e"        /> -->
+
+
+        <path id="classpath">
+            <pathelement location="${build.dir}/jcoverage-classes/"/>
+            <pathelement location="${build.dir}/classes/"/>
+            <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+            <fileset dir="${libdir}">
+                <include name="**/*.jar"/>
+            </fileset>
+
+            <!--  Enable the following line if you want to use Java Media Frame Work.
+  Note that you should first set the jmf.dir path above -->
+            <!--    <fileset dir="${jmf.dir}">
+                         <include name="**/*.jar" />
+           </fileset> -->
+        </path>
+
+        <taskdef name="documentdoclet" classname="xdoclet.modules.doc.DocumentDocletTask" classpathref="classpath"/>
+        <taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpathref="classpath"/>
+        <taskdef resource="tasks.properties" classpath="${libdir}/jcoverage.jar"/>
+        <taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask" classpathref="classpath"/>
+        <!--      <taskdef name="ejbdoclet" classname="xdoclet.modules.ejb.EjbDocletTask" classpathref="classpath" />
+   <taskdef name="mockdoclet" classname="xdoclet.modules.mockobjects.MockObjectDocletTask" classpathref="classpath" /> -->
+
+    </target>
+
+    <target name="clean" description="remove the previously compiled class files" depends="init">
+        <delete includeEmptyDirs="yes" failonerror="no">
+            <fileset dir="${build.dir}/classes" includes="**/*.class,**/*.xml"/>
+            <fileset dir="${build.dir}" includes="**/*.xml"/>
+            <fileset dir="${reports}" includes="**/*html,**/*htm,**/*xml"/>
+            <fileset dir="${ready}" includes="**/*"/>
+            <fileset dir="logs" includes="**/*"/>
+            <fileset dir="${installer-result}" includes="**/*"/>
+        </delete>
+    </target>
+    <target name="setup" depends="init">
+        <mkdir dir="${reports}/todos"/>
+        <mkdir dir="${build.dir}/classes"/>
+        <!--<mkdir dir="logs"/> -->
+        <mkdir dir="${libdir}"/>
+        <mkdir dir="${reports}/javadoc"/>
+        <mkdir dir="${reports}/junit"/>
+        <mkdir dir="${ready}"/>
+        <mkdir dir="${temp}"/>
+    </target>
+
+    <target name="xdoclet" depends="setup">
+        <echo>XDoclet on GSN Web Interface</echo>
+        <webdoclet destdir="${webapp.dir}/WEB-INF/">
+            <fileset dir="${src.dir}">
+                <include name="**/gsn/web/*.java"/>
+            </fileset>
+            <deploymentdescriptor mergeDir="${basedir}/merges">
+                <welcomefile file="introduction.do"/>
+            </deploymentdescriptor>
+        </webdoclet>
+    </target>
+
+    <target name="build" depends="setup">
+        <javac debug="true" srcdir="${src.dir}" optimize="off"
+               destdir="${build.dir}/classes" failonerror="false" source="1.5" classpathref="classpath"
+               excludes="gsn/wrappers/cameras/usb/WebCamWrapper.java"/>
+        <!-- The WebCamWrapper file is excluded since it dependes on the jmf.jar (Java Media Framework)
+which is available from SUN at  http://java.sun.com/products/java-media/jmf/index.jsp -->
+        <echo>Compiling JIBX Mappings...</echo>
+        <java classname="org.jibx.binding.Compile" fork="yes" dir="${build.dir}/classes"
+              failonerror="true">
+            <classpath refid="classpath"/>
+            <arg value="../../VirtualSensorDescription.xml"/>
+            <arg value="../../containerJIBX.xml"/>
+        </java>
+    </target>
+
+    <target name="dir" depends="build">
+        <webdoclet destdir="${dswebapp.dir}/WEB-INF/" description="This task for Directory Service">
+            <fileset dir="${src.dir}">
+                <include name="**/registry/**"/>
+            </fileset>
+            <deploymentdescriptor mergeDir="${basedir}/merges">
+                <welcomefile file="/sensors.jsp"/>
+            </deploymentdescriptor>
+        </webdoclet>
+        <java classname="gsn.registry.RegistryImp" fork="true" dir="${build.dir}/classes">
+            <classpath refid="classpath"/>
+            <arg value="${basedir}/dswebapp/"/>
+        	<arg value="${basedir}/log4j.directory.properties"/>
+        	<arg value="1882"/>
+        	<arg value="127.0.0.1"/>
+   			<jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
+            <jvmarg value="-Dorg.mortbay.log.LogFactory.noDiscovery=false"/>
+        </java>
+    </target>
+
+    <target name="runcam" depends="xdoclet,build">
+        <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"
+              dir="${build.dir}/classes">
+            <arg value="${config}"/>
+            <arg value="${basedir}/log4j.properties"/>
+            <arg value="${basedir}/${temp}"/>
+            <env key="LD_LIBRARY_PATH"
+                 value="${jmf.dir}/lib:${env.JAVA_HOME}/jre/lib/i386:${env.JAVA_HOME}/jre/lib/i386/client:${env.JAVA_HOME}/jre/lib/i386/xawt"/>
+            <env key="LD_PRELOAD" value="${env.JAVA_HOME}/jre/lib/i386/libjawt.so"/>
+        </java>
+    </target>
+
+    <target name="run" depends="xdoclet,build">
+        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${build.dir}/classes">
+            <classpath refid="classpath"/>
+            <arg value="${config}"/>
+            <arg value="${basedir}/log4j.properties"/>
+            <arg value="${basedir}/${temp}"/>
+            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
+            <jvmarg value="-Dorg.mortbay.log.LogFactory.noDiscovery=false"/>
+            <!-- For profiling using JConsole <jvmarg value="-Dcom.sun.management.jmxremote"/> -->
+            <!-- For JDK5 profiling <jvmarg value="-Xrunhprof:heap=sites,depth=15,force=n"/> -->
+        </java>
+    </target>
+
+
+    <target name="rfidtest" depends="xdoclet,build">
+        <java classname="gsn.wrappers.RFIDSample" maxmemory="${maxMemoryUsage}" fork="true" dir="${build.dir}/classes">
+            <classpath refid="classpath"/>
+        </java>
+    </target>
+
+    <target name="runSim" depends="build">
+        <java classpathref="classpath" classname="gsn.simulation.Simulation" maxmemory="${maxMemoryUsage}" fork="true"
+              dir="${build.dir}/classes">
+            <arg value="${config}"/>
+            <arg value="${basedir}/simulationLog4J.properties"/>
+            <arg value="500"/>
+            <!-- Thread Counter -->
+            <arg value="38000"/>
+            <!-- The port for starting from -->
+        </java>
+    </target>
+
+    <target name="stop" depends="build">
+        <java classpathref="classpath" classname="gsn.StopSensorServer" maxmemory="8m" fork="true"
+              dir="${build.dir}/classes">
+            <arg value="${config}"/>
+            <arg value="${basedir}/log4j.properties"/>
+            <arg value="${basedir}/${temp}"/>
+        </java>
+    </target>
+    <target name="jcoverage-build" depends="setup,build">
+        <instrument todir="${build.dir}/jcoverage-classes">
+            <fileset dir="${build.dir}/classes">
+                <include name="**/*.class"/>
+            </fileset>
+        </instrument>
+    </target>
+
+    <target name="test-report" depends="jcoverage-build"
+            description="Runs JUnit tests, generates jcoverage,junit,todo reports">
+
+        <junit printsummary="true" fork="false" haltonerror="false"
+               errorproperty="errorOccuredInTests" haltonfailure="false">
+            <formatter type="xml" usefile="true"/>
+            <classpath refid="classpath"/>
+            <batchtest todir="${reports}/junit">
+                <fileset dir="${build.dir}/jcoverage-classes/" includes="**/*Test.class"/>
+            </batchtest>
+        </junit>
+
+        <report srcdir="${src.dir}" destdir="${reports}/jcoverage"/>
+        <junitreport todir="${reports}/junit">
+            <fileset dir="${reports}/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${reports}/junit"/>
+        </junitreport>
+    </target>
+
+    <target name="test" depends="build" description="Runs JUnit tests">
+        <junit printsummary="true" fork="false" haltonerror="false"
+               errorproperty="errorOccuredInTests" haltonfailure="false">
+            <classpath refid="classpath"/>
+            <batchtest todir="${reports}/junit">
+                <fileset dir="${build.dir}/classes" includes="**/*Test*.class"/>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="docs" depends="setup">
+        <javadoc classpathref="classpath"
+                 destdir="${reports}/javadoc"
+                 author="false"
+                 version="true"
+                 use="true"
+                 windowtitle="Global Sensor Networks Infrastructure">
+
+            <fileset dir="${src.dir}" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="**/*Test.java"/>
+                <exclude name="**/net/tinyos/**/*"/>
+            </fileset>
+
+            <doctitle>Global Sensor Networks</doctitle>
+            <bottom>ali DOT salehi AT epfl DOT ch</bottom>
+            <tag name="todo" scope="all" description="To do:"/>
+        </javadoc>
+        <documentdoclet destdir="${reports}/todos">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <info/>
+        </documentdoclet>
+
+    </target>
+
+    <!--
+     <target name="jspc">
+        <taskdef classname="org.apache.jasper.JspC" name="jasper2" classpathref="classpath"/>
+        <jasper2
+               validateXml="false"
+               uriroot="${webapp.dir}"
+               webXmlFragment="${webapp.dir}/WEB-INF/generated_web.xml"
+               outputDir="${webapp.dir}/WEB-INF/src" />
+     </target>
+     <target name="compileJSP" depends="jspc" >
+       <mkdir dir="${webapp.dir}/WEB-INF/classes"/>
+       <mkdir dir="${webapp.dir}/WEB-INF/lib"/>
+       <javac destdir="${webapp.dir}/WEB-INF/classes"
+             optimize="off"
+             debug="on" failonerror="false"
+             srcdir="${webapp.dir}/WEB-INF/src"
+             excludes="**/*.smap">
+             <classpath>
+                <pathelement location="${webapp.path}/WEB-INF/classes"/>
+                <path refid="classpath" />
+                <pathelement location="${build.dir}/classes"/>
+                <fileset dir="${webapp.dir}/WEB-INF/lib">
+                    <include name="*.jar"/>
+                  </fileset>
+             </classpath>
+        </javac>
+      </target>
+
+    <target name="compiler" depends="init">
+       <jflex destdir="${src.dir}" file="${src.dir}/gsn/compiler/lexers/addressLexer.jflex"/>
+    </target>-->
+
+    <target name="installer" depends="clean,xdoclet,build">
+        <mkdir dir="${installer-result}"/>
+        <jar destfile="${installer-result}/${jar.file}" basedir="${build.dir}/classes/"
+             excludes="gsn/wrappers/general/SerialWrapper*class gsn/wrappers/general/UDPWrapper*class">
+            <manifest>
+                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
+                <attribute name="Main-Class" value="gsn.Main"/>
+            </manifest>
+        </jar>
+        <jar destfile="${installer-result}/serial-wrapper.jar" basedir="${build.dir}/classes/"
+             includes="gsn/wrappers/general/SerialWrapper*class">
+            <manifest>
+                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
+            </manifest>
+        </jar>
+        <jar destfile="${installer-result}/udp-wrapper.jar" basedir="${build.dir}/classes/"
+             includes="gsn/wrappers/general/UDPWrapper*class">
+            <manifest>
+                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
+            </manifest>
+        </jar>
+
+
+        <!-- <property name="izpack.dir" value="/home/ali/IzPack"        />-->
+        <izpack input="${basedir}/installer/izpack-installer.xml"
+                output="${basedir}/${installer-result}/gsn-installer.jar"
+                basedir="${basedir}/installer"
+                izPackdir="${basedir}/izpack"/>
+
+    </target>
+
+    <target name="pref" depends="build">
+        <java classpathref="classpath" classname="gsn.tests.CreationTest" maxmemory="64m" fork="true"
+              dir="${build.dir}/classes">
+        </java>
+    </target>
+
+</project>
+
