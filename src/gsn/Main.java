@@ -3,6 +3,7 @@ package gsn ;
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
 import gsn.control.VSensorLoader;
+import gsn.pid.PIDUtils;
 import gsn.storage.StorageManager;
 import gsn.vsensor.Container;
 import gsn.vsensor.ContainerImpl;
@@ -35,7 +36,7 @@ public final class Main {
 
     private static final transient Logger logger = Logger.getLogger(Main.class);
 
-    public static void main(String [ ] args) {
+    public static void main(String [ ] args) throws IOException, RuntimeException {
         if (args.length < 2) {
             System.out.println("ERROR, Missing arguments, First:Container's config, Second:Log4j.properties");
         }
@@ -45,6 +46,12 @@ public final class Main {
             logger.error("In GSN one sample cofiguration file called sample.xml is provided.");
             System.exit(1);
         }
+        if (PIDUtils.isPIDExist(PIDUtils.GSN_PID)) {
+			System.out.println("Error : Another GSN Server is running.");
+			System.exit(1);
+		}else
+			PIDUtils.createPID(PIDUtils.GSN_PID);
+		
         Main main = new Main();
         PropertyConfigurator.configure(args[1]);
         try {
