@@ -1,5 +1,6 @@
 package gsn.registry ;
 
+import gsn.pid.PIDUtils;
 import gsn.shared.Registry ;
 import gsn.shared.VirtualSensorIdentityBean ;
 import gsn.utils.KeyValueImp ;
@@ -73,7 +74,11 @@ public class RegistryImp extends HttpServlet implements Registry {
 			System.exit(1);
 		}
 		PropertyConfigurator.configure(args[1]);
-
+		if (PIDUtils.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID)) {
+			System.out.println("Error : Another GSN Directory Service is running.");
+			System.exit(1);
+		}else
+			PIDUtils.createPID(PIDUtils.DIRECTORY_SERVICE_PID);
 		int port = -1;
 		try {
 			port = Integer.parseInt(args[2]);
