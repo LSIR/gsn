@@ -6,7 +6,7 @@
 	   /Users/alisalehi/workspace/GSN/virtual-sensors
    </virtual-sensors-dir>
    <port>22001</port>
-   <!--<storage user="ali" password="salehi" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://192.168.51.11:3306/gsn" overwrite-tables="true" />-->
+   <!--<storage user="ali" password="salehi" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://192.168.51.11:3306/gsn" overwrite-tables="true" permanent-storage="false"/>-->
     <storage user="ali" password="salehi" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://192.168.51.61:3306/gsn" overwrite-tables="true" />
     <webapp-location>
 	   /Users/alisalehi/workspace/GSN/webapp/
