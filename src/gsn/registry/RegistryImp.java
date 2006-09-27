@@ -31,7 +31,11 @@ import org.mortbay.jetty.webapp.WebAppContext ;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 public class RegistryImp extends HttpServlet implements Registry {
-
+/**
+ * FIXME : Possible BUG, Since two thread are accessing the registery, one is the directory service garbage collector and
+ * the others are the remote clients, there existsthe possiblity of the concurrent modification exception on the common shared
+ * object <code>registery</code>
+ */
    private static ArrayList < VirtualSensorIdentityBean > registry = new ArrayList < VirtualSensorIdentityBean > ( ) ;
 
    private static transient Logger logger = Logger.getLogger ( RegistryImp.class ) ;
@@ -100,7 +104,7 @@ public class RegistryImp extends HttpServlet implements Registry {
 			}
 		}
 			
-		Server server = new Server();
+		final Server server = new Server();
 	
 		Connector connector = new SelectChannelConnector();
 		connector.setPort(port);
@@ -121,12 +125,28 @@ public class RegistryImp extends HttpServlet implements Registry {
 		server.setSendServerVersion(false);
 		server.start();
 		
-		Thread garbageCollector = new Thread(new TheGarbageCollector(
-				new RegistryImp()));
-		garbageCollector.setPriority(Thread.MAX_PRIORITY);
+		final TheGarbageCollector garbageCollector = new TheGarbageCollector(
+						new RegistryImp());
 		garbageCollector.start();
 		if (logger.isInfoEnabled())
 			logger.info("[ok]");
+		Thread shutdown = new Thread(new Runnable() {
+			public void run() {
+				try {
+					while (true) {
+					if (PIDUtils.getFirstByteFrom(PIDUtils.DIRECTORY_SERVICE_PID)=='0')
+						break;
+					else
+						Thread.sleep(2500);
+					}
+					server.stop();
+					garbageCollector.stopPlease();
+					logger.warn("GSN Directory server is stopped.");
+				} catch (Exception e) {
+					logger.warn("Shutdowning the webserver failed.",e);
+				}
+			}});
+		shutdown.start();
 	}
 
    public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
@@ -185,28 +205,23 @@ public class RegistryImp extends HttpServlet implements Registry {
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-class TheGarbageCollector implements Runnable {
+class TheGarbageCollector extends Thread{
 
    private final transient Logger logger = Logger.getLogger ( TheGarbageCollector.class ) ;
 
-    private final int INTERVAL = 5 * 60 * 1000 ; // each 5 mins
+    private final int INTERVAL =  5*60 * 1000 ; // each 5 mins
 
-   // second
+  private RegistryImp registerImplemation ;
 
-   private RegistryImp registerImplemation ;
+private boolean toStop ;
 
    public TheGarbageCollector ( RegistryImp impl ) {
       this.registerImplemation = impl ;
-
+      this.toStop= false;
    }
 
    public void run ( ) {
-      while ( true ) {
-         try {
-            Thread.sleep ( INTERVAL ) ;
-         } catch ( InterruptedException e ) {
-            logger.error ( e.getMessage ( ) , e ) ;
-         }
+      while ( !toStop ) {
          ArrayList < VirtualSensorIdentityBean > registery = ( ArrayList < VirtualSensorIdentityBean > ) registerImplemation.getRegistry ( ).clone ( ) ;
          long current = System.currentTimeMillis ( ) ;
          Iterator < VirtualSensorIdentityBean > it = registery.iterator ( ) ;
@@ -218,6 +233,17 @@ class TheGarbageCollector implements Runnable {
                virtualSensorIdentityBean.setLatestVisit ( current ) ;
          }
          registerImplemation.setRegistry ( registery ) ;
+         try {
+             sleep ( INTERVAL ) ;
+          } catch ( InterruptedException e ) {
+         	 if (toStop)
+         		 return;
+         	 logger.error ( e.getMessage ( ) , e ) ;
+          }
       }
+   }
+   public void stopPlease() {
+	 toStop=true;
+	 interrupt();
    }
 }
