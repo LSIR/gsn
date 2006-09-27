@@ -6,7 +6,7 @@
 	   /Users/alisalehi/workspace/GSN/virtual-sensors
    </virtual-sensors-dir>
    <port>22001</port>
-   <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:MEM:." overwrite-tables="true" />
+   <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:MEM:." overwrite-tables="true" permanent-storage="false"/>
    <webapp-location>
 	   /Users/alisalehi/workspace/GSN/webapp/
    </webapp-location>
