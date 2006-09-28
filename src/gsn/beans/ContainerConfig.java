@@ -21,12 +21,6 @@ public class ContainerConfig {
 
 	public static final int DEFAULT_STORAGE_POOL_SIZE = 100;
 
-	public static final String DEFAULT_WRAPPER_PROPERTIES_FILE = "wrappers.properties";
-
-	public static final String DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
-
-	public static final String DEFAULT_WEB_APP_PATH = "webapp";
-
 	protected String webName;
 
 	public static final String FIELD_NAME_webName = "webName";
@@ -50,8 +44,6 @@ public class ContainerConfig {
 	protected String smsPassword;
 
 	protected int containerPort = DEFAULT_GSN_PORT;
-
-	protected String virtualSensorsDir;
 
 	protected String registryBootstrapAddr;
 
@@ -79,13 +71,7 @@ public class ContainerConfig {
 
 	protected int storagePoolSize = DEFAULT_STORAGE_POOL_SIZE;
 
-	protected String webAppPath;
-
-	protected String wrapperExtentionsPropertiesFile;
-
-	protected String notificationExtentionsPropertiesFile;
-
-	protected boolean permanentStorage = false;
+		protected boolean permanentStorage = false;
 
 	public static final String FIELD_NAME_permanentStorageEnabled = "permanentStorage";
 
@@ -170,26 +156,6 @@ public class ContainerConfig {
 	}
 
 	/**
-	 * @return Returns the notificationExtentionsPropertiesFile.
-	 */
-	public String getNotificationExtentionsPropertiesFile() {
-		return notificationExtentionsPropertiesFile.trim();
-	}
-
-	/**
-	 * @return Returns the pluginsDir.
-	 */
-	public String getVirtualSensorsDir() {
-		if (this.virtualSensorsDir == null
-				|| this.virtualSensorsDir.trim().length() == 0) {
-			this.virtualSensorsDir = DEFAULT_VIRTUAL_SENSOR_DIRECTORY;
-		} else
-			this.virtualSensorsDir = virtualSensorsDir.trim();
-		return this.virtualSensorsDir;
-
-	}
-
-	/**
 	 * @return Returns the registryBootstrapAddr.
 	 */
 	private boolean isRegistryBootStrapAddrInitialized = false;
@@ -222,59 +188,7 @@ public class ContainerConfig {
 		return storagePoolSize;
 	}
 
-	/**
-	 * @return Returns the webAppPath.
-	 */
-	public String getWebAppPath() {
-		if (this.webAppPath == null)
-			this.webAppPath = DEFAULT_WEB_APP_PATH;
-		else
-			this.webAppPath = this.webAppPath.trim();
-		return this.webAppPath;
-	}
-
-	/**
-	 * @return Returns the wrapperExtentionsPropertiesFile.
-	 */
-	public String getWrapperExtentionsPropertiesFile() {
-		if (this.wrapperExtentionsPropertiesFile == null
-				|| this.wrapperExtentionsPropertiesFile.trim().length() == 0)
-			this.wrapperExtentionsPropertiesFile = DEFAULT_WRAPPER_PROPERTIES_FILE;
-		else
-			this.wrapperExtentionsPropertiesFile = this.wrapperExtentionsPropertiesFile
-					.trim();
-		return this.wrapperExtentionsPropertiesFile;
-	}
-
-	public boolean isValied() {
-		File file = new File(getVirtualSensorsDir());
-		if (!file.exists() || !file.isDirectory()) {
-			logger.error(" The path in the <virtual-sensors-dir> at :"
-					+ getContainerFileName() + " is not valid.");
-			return false;
-		}
-		file = new File(getWebAppPath());
-		if (!file.exists() || !file.isDirectory()) {
-			logger.error(" The path in the <webapp-location> at :"
-					+ getContainerFileName() + " is not valid.");
-			return false;
-		}
-		file = new File(getWrapperExtentionsPropertiesFile());
-		if (!file.exists() || !file.isFile()) {
-			logger.error(" The path in the <wrapper-extentions> at :"
-					+ getContainerFileName() + " is not valid.");
-			return false;
-		}
-		if (getMailServer() != null
-				&& !ValidityTools.isAccessibleSocket(getMailServer(), getPort(
-						getMailServer(), ValidityTools.SMTP_PORT)))
-			return false;
-		if (getSmsServer() != null
-				&& !ValidityTools.isAccessibleSocket(getSmsServer(), getPort(
-						getSmsServer(), ValidityTools.SMTP_PORT)))
-			return false;
-		return true;
-	}
+	
 
 	private int getPort(String emailServer, int default_port) {
 		if (emailServer == null || emailServer.length() < 3) {
@@ -295,52 +209,6 @@ public class ContainerConfig {
 								e);
 			}
 		return default_port;
-
-	}
-
-	/**
-	 * @return Returns the smsPassword.
-	 */
-	public String getSmsPassword() {
-		return smsPassword;
-	}
-
-	/**
-	 * @param newSmsPassword
-	 *            The smsPassword to set.
-	 */
-	public void setSmsPassword(String newSmsPassword) {
-		this.smsPassword = newSmsPassword;
-	}
-
-	/**
-	 * @return Returns the smsServer.
-	 */
-	public String getSmsServer() {
-		return smsServer;
-	}
-
-	/**
-	 * @param newSmsServer
-	 *            The smsServer to set.
-	 */
-	public void setSmsServer(String newSmsServer) {
-		this.smsServer = newSmsServer;
-	}
-
-	/**
-	 * @return Returns the mailServer.
-	 */
-	public String getMailServer() {
-		return mailServer;
-	}
-
-	/**
-	 * @param mailServer
-	 *            The mailServer to set.
-	 */
-	public void setMailServer(String mailServer) {
-		this.mailServer = mailServer;
 	}
 
 	public String toString() {

@@ -32,7 +32,7 @@ public class SMSNotification extends NotificationRequest {
     * For more information on SMS Mail Server please refer to
     * <url>http://smslink.sourceforge.net</url>
     */
-   private static final String smsMailServer = Main.getContainerConfig ( ).getSmsServer ( ) ;
+   private static final String smsMailServer ="some server";
 
    /**
     * The <code>password</code> containes the actual password used in order to
@@ -41,7 +41,7 @@ public class SMSNotification extends NotificationRequest {
     * webEmail is completely <br>
     * deployment depenendent and you should contact your sysadmin first.
     */
-   private static final String password = Main.getContainerConfig ( ).getSmsPassword ( ) ;
+   private static final String password = "somepass";
 
    public SMSNotification ( String phone , String query , String message ) {
       this.number = phone ;

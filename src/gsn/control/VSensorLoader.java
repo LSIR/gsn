@@ -61,8 +61,8 @@ public class VSensorLoader implements Runnable {
 
 	private static int THREAD_COUNTER = 0;
 
-	public VSensorLoader(ContainerConfig containerConf, File pidFile) {
-		this(containerConf.getVirtualSensorsDir(), pidFile);
+	public VSensorLoader(File pidFile) {
+		this(Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY, pidFile);
 	}
 
 	public VSensorLoader(String pluginsDir, File pidFile) {
@@ -607,8 +607,7 @@ public class VSensorLoader implements Runnable {
 					logger.error("The wrapper >"
 							+ addressBean.getWrapper()
 							+ "< is not defined in the >"
-							+ Main.getContainerConfig()
-									.getWrapperExtentionsPropertiesFile()
+							+ Main.DEFAULT_WRAPPER_PROPERTIES_FILE									
 							+ "< file.");
 					continue;
 				}

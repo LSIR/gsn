@@ -35,6 +35,12 @@ import java.util.Iterator;
 public final class Main {
 
     private static final transient Logger logger = Logger.getLogger(Main.class);
+    public static final String DEFAULT_WRAPPER_PROPERTIES_FILE = "conf/wrappers.properties";
+
+	public static final String DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
+
+	public static final String DEFAULT_WEB_APP_PATH = "webapp";
+	
 
     public static void main(String [ ] args) throws IOException, RuntimeException {
         if (args.length < 2) {
@@ -72,10 +78,7 @@ public final class Main {
                 logger.debug(e.getMessage(), e);
             System.exit(1);
         }
-        if (! containerConfig.isValied()) {
-            logger.error("Please check the configuration file and try again.");
-            System.exit(1);
-        }
+       
         StorageManager.getInstance().initialize(containerConfig.getJdbcDriver(), containerConfig.getJdbcUsername(), containerConfig
                 .getJdbcPassword(), containerConfig.getJdbcURL());
         if (logger.isInfoEnabled())
@@ -92,11 +95,8 @@ public final class Main {
         servletHandler.addServletWithMapping("gsn.vsensor.ContainerImpl", "/gsn");
         WebAppContext webAppContext = new WebAppContext();
         webAppContext.setContextPath("/");
-        if (containerConfig.getWebAppPath()==null || containerConfig.getWebAppPath().trim().length()==0) {
-        	logger.warn("There is no web application specified for this GSN container");
-        }else {
-        webAppContext.setResourceBase(containerConfig.getWebAppPath());
-        }webAppContext.setServletHandler(servletHandler);
+        webAppContext.setResourceBase(DEFAULT_WEB_APP_PATH);
+        webAppContext.setServletHandler(servletHandler);
         server.setHandler(webAppContext);
         server.setStopAtShutdown(true);
         server.setSendServerVersion(false);
@@ -118,7 +118,7 @@ public final class Main {
             System.exit(1);
         }
         pidFile.deleteOnExit();
-        new VSensorLoader(containerConfig.getVirtualSensorsDir(), pidFile);
+        new VSensorLoader(DEFAULT_VIRTUAL_SENSOR_DIRECTORY, pidFile);
     }
 
     /**
@@ -136,16 +136,16 @@ public final class Main {
         containerConfig.setContainerConfigurationFileName(containerConfigurationFileName);
         if (logger.isInfoEnabled())
             logger.info(new StringBuilder()
-                    .append("Loading wrappers.properties at : ").append(containerConfig.getWrapperExtentionsPropertiesFile()).toString());
+                    .append("Loading wrappers.properties at : ").append(DEFAULT_WRAPPER_PROPERTIES_FILE ).toString());
         Configuration config = null;
 
         try {// Trying to load the wrapper specified in the configuration file of
             // the container.
-            config = new PropertiesConfiguration(containerConfig.getWrapperExtentionsPropertiesFile());
+            config = new PropertiesConfiguration(DEFAULT_WRAPPER_PROPERTIES_FILE);
         } catch (ConfigurationException e) {
             logger.error("The wrappers configuration file's syntax is not compatible.");
             logger.error(new StringBuilder()
-                    .append("Check the :").append(containerConfig.getWrapperExtentionsPropertiesFile())
+                    .append("Check the :").append(DEFAULT_WRAPPER_PROPERTIES_FILE)
                     .append(" file and make sure it's syntactically correct.").toString());
             logger.error("Sample wrappers extention properties file is provided in GSN distribution.");
             logger.error(e.getMessage(), e);
@@ -163,7 +163,7 @@ public final class Main {
                 if (wrappers.get(name) != null) {
                     logger.error("The wrapper name : " + name + " is used more than once in the properties file.");
                     logger.error(new StringBuilder()
-                            .append("Please check the ").append(containerConfig.getWrapperExtentionsPropertiesFile()).append(" file and try again.")
+                            .append("Please check the ").append(DEFAULT_WRAPPER_PROPERTIES_FILE).append(" file and try again.")
                             .toString());
                     System.exit(1);
                 }
@@ -171,7 +171,7 @@ public final class Main {
             } catch (ClassNotFoundException e) {
                 logger.error(new StringBuilder().append("Can't find the class associated with the wrapper : ").append(name).toString());
                 logger.error(new StringBuilder()
-                        .append("Check the ").append(containerConfig.getWrapperExtentionsPropertiesFile()).append(" file and try again.").toString());
+                        .append("Check the ").append(DEFAULT_WRAPPER_PROPERTIES_FILE).append(" file and try again.").toString());
                 logger.error(e.getMessage(), e);
                 System.exit(1);
             }

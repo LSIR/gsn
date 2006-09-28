@@ -37,9 +37,9 @@ public class EmailNotification extends NotificationRequest {
 
    private String message ;
 
-   private static final String fromEmail = Main.getContainerConfig ( ).getWebEmail ( ) ;
+   private static final String fromEmail = "some from mail";
 
-   private static final String mailServer = Main.getContainerConfig ( ).getMailServer ( ) ;
+   private static final String mailServer = "some mail server to use to send the sms mail.";
 
    private int emailCounter ;
 

@@ -1,6 +1,7 @@
 package gsn.notifications ;
 
 import gsn.beans.StreamElement ;
+import gsn.utils.ValidityTools;
 
 import org.antlr.stringtemplate.StringTemplate ;
 import org.apache.log4j.Logger ;
@@ -129,4 +130,12 @@ public class NotificationUtils {
       String resultMessage = template.toString ( ) ;
       return resultMessage ;
    }
+//   if (getMailServer() != null
+//			&& !ValidityTools.isAccessibleSocket(getMailServer(), getPort(
+//					getMailServer(), ValidityTools.SMTP_PORT)))
+//		return false;
+//	if (getSmsServer() != null
+//			&& !ValidityTools.isAccessibleSocket(getSmsServer(), getPort(
+//					getSmsServer(), ValidityTools.SMTP_PORT)))
+//		return false;
 }

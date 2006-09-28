@@ -31,8 +31,7 @@ public class TedsToVirtualSensor {
     /*
     * The directory in which the generated Virtual Sensor file should be stored.
     */
-    public static final String TARGET_VS_DIR = (Main.getContainerConfig().getVirtualSensorsDir().trim().endsWith("/") ? Main
-            .getContainerConfig().getVirtualSensorsDir().trim() : (Main.getContainerConfig().getVirtualSensorsDir().trim() + "/"));
+    public static final String TARGET_VS_DIR = (Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY+"/");
 
     /*
     * This function generates the virtual sensor file from the TEDS input.
