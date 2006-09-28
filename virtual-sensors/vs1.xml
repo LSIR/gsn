@@ -7,12 +7,14 @@
       <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</description>
       <life-cycle pool-size="10" />
       <addressing>
-         <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</predicate>
+     <!--    <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</predicate> -->
+         <predicate key="geographical">bc143.epfl.lausanne.suisse</predicate>
+         <predicate key="reding.type">tempareature</predicate>
       </addressing>
       <output-structure>
          <field name="DATA" type="integer"/>
       </output-structure>
-      <storage  permanent-storage="false" history-size="60s"/>
+      <storage  permanent-storage="true" history-size="60s"/>
       <input-streams>
           <input-stream name="dummy" rate="100" >
          <stream-source alias="dummy"   sampling-rate="1" storage-size="1"
