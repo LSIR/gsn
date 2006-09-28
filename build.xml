@@ -35,7 +35,6 @@
             <fileset dir="${libdir}">
                 <include name="**/*.jar"/>
             </fileset>
-
             <!--  Enable the following line if you want to use Java Media Frame Work.
   Note that you should first set the jmf.dir path above -->
             <!--    <fileset dir="${jmf.dir}">
@@ -162,14 +161,6 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
         </java>
     </target>
 
-    <target name="stop" depends="build">
-        <java classpathref="classpath" classname="gsn.StopSensorServer" maxmemory="8m" fork="true"
-              dir="${build.dir}">
-            <arg value="${config}"/>
-            <arg value="${conf.dir}/log4j.properties"/>
-            <arg value="${basedir}/${temp}"/>
-        </java>
-    </target>
     <target name="jcoverage-build" depends="setup,build">
         <instrument todir="${build.dir}/jcoverage-classes">
             <fileset dir="${build.dir}">
