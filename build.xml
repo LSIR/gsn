@@ -122,9 +122,6 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
     <target name="runcam" depends="build">
         <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"
               dir="${build.dir}">
-            <arg value="${config}"/>
-            <arg value="${conf.dir}/log4j.properties"/>
-            <arg value="${basedir}/${temp}"/>
             <env key="LD_LIBRARY_PATH"
                  value="${jmf.dir}/lib:${env.JAVA_HOME}/jre/lib/i386:${env.JAVA_HOME}/jre/lib/i386/client:${env.JAVA_HOME}/jre/lib/i386/xawt"/>
             <env key="LD_PRELOAD" value="${env.JAVA_HOME}/jre/lib/i386/libjawt.so"/>
@@ -134,9 +131,6 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
     <target name="run" depends="build">
         <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
             <classpath refid="classpath"/>
-            <arg value="${config}"/>
-            <arg value="${conf.dir}/log4j.properties"/>
-            <arg value="${basedir}/${temp}"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-Dorg.mortbay.log.LogFactory.noDiscovery=false"/>
             <!-- For profiling using JConsole <jvmarg value="-Dcom.sun.management.jmxremote"/> -->

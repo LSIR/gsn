@@ -35,6 +35,8 @@ import org.mortbay.jetty.webapp.WebAppContext;
  */
 public final class Main {
 
+    private static final String CONF_LOG4J_PROPERTIES = "conf/log4j.properties";
+
     private static final transient Logger logger = Logger.getLogger(Main.class);
 
     public static final String DEFAULT_WRAPPER_PROPERTIES_FILE = "conf/wrappers.properties";
@@ -44,27 +46,17 @@ public final class Main {
     public static final String DEFAULT_WEB_APP_PATH = "webapp";
 
     public static void main(String[] args) throws IOException, RuntimeException {
-	if (args.length < 2) {
-	    System.out
-		    .println("ERROR, Missing arguments, First:Container's config, Second:Log4j.properties");
-	}
-	if (args[0].trim().equalsIgnoreCase("${config}")) {
-	    logger.error("Please specify the Container's configuration file");
-	    logger
-		    .error("For example : ant run -Dconfig=/absolute/path/to/the/container/configurationFile.xml");
-	    logger
-		    .error("In GSN one sample cofiguration file called sample.xml is provided.");
-	    System.exit(1);
-	}
+	
+	
 	if (PIDUtils.isPIDExist(PIDUtils.GSN_PID)) {
 	    System.out.println("Error : Another GSN Server is running.");
 	    System.exit(1);
 	} else
 	    PIDUtils.createPID(PIDUtils.GSN_PID);
 
-	PropertyConfigurator.configure(args[1]);
+	PropertyConfigurator.configure(CONF_LOG4J_PROPERTIES);
 	try {
-	    initialize(args[0]);
+	    initialize("conf/gsn.xml");
 	} catch (JiBXException e) {
 	    logger.error(e.getMessage());
 	    logger.error(new StringBuilder().append(
