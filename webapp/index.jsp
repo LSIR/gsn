@@ -6,10 +6,10 @@
 	<body >
 <jsp:include page="header.html"/>
 <%
- 	String name = Main.getContainerConfig ( ).getName ( ) ;
-    String author = Main.getContainerConfig ( ).getAuthor ( )  ;
-    String email = Main.getContainerConfig ( ).getEmail ( ) ;
-    String description = Main.getContainerConfig ( ).getDescription ( ) ;
+ 	String name = Main.getContainerConfig ( ).getWebName ( ) ;
+    String author = Main.getContainerConfig ( ).getWebAuthor ( )  ;
+    String email = Main.getContainerConfig ( ).getWebEmail ( ) ;
+    String description = Main.getContainerConfig ( ).getWebDescription ( ) ;
     Iterator<VSensorConfig>  it = Mappings.getAllVSensorConfigs ( );
 %>
 
