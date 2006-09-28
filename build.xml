@@ -1,4 +1,4 @@
-<project name="template" default="build" basedir=".">
+<project name="gsn" default="build" basedir=".">
 
     <target name="all" depends="clean,setup,build">
     </target>
@@ -11,6 +11,7 @@
         </tstamp>
 
         <property environment="env"/>
+        <property name="conf.dir" value="${basedir}/conf"/>
         <property name="build.dir" value="build"/>
         <property name="webapp.dir" value="webapp"/>
         <property name="dswebapp.dir" value="dswebapp"/>
@@ -27,8 +28,6 @@
  You should unarchive the complete archive provide by sun and fix the
  following line to point to you path. -->
         <!-- 	<property name="jmf.dir"     value="/home/ali/JMF-2.1.1e"        /> -->
-
-
         <path id="classpath">
             <pathelement location="${build.dir}/jcoverage-classes/"/>
             <pathelement location="${build.dir}/"/>
@@ -44,12 +43,12 @@
            </fileset> -->
         </path>
 
-        <taskdef name="documentdoclet" classname="xdoclet.modules.doc.DocumentDocletTask" classpathref="classpath"/>
         <taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpathref="classpath"/>
         <taskdef resource="tasks.properties" classpath="${libdir}/jcoverage.jar"/>
-        <taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask" classpathref="classpath"/>
-        <!--      <taskdef name="ejbdoclet" classname="xdoclet.modules.ejb.EjbDocletTask" classpathref="classpath" />
-   <taskdef name="mockdoclet" classname="xdoclet.modules.mockobjects.MockObjectDocletTask" classpathref="classpath" /> -->
+<!--    <taskdef name="documentdoclet" classname="xdoclet.modules.doc.DocumentDocletTask" classpathref="classpath"/> 
+    	<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask" classpathref="classpath"/>
+        <taskdef name="ejbdoclet" classname="xdoclet.modules.ejb.EjbDocletTask" classpathref="classpath" />
+        <taskdef name="mockdoclet" classname="xdoclet.modules.mockobjects.MockObjectDocletTask" classpathref="classpath" /> -->
 
     </target>
 
@@ -66,14 +65,14 @@
     <target name="setup" depends="init">
         <mkdir dir="${reports}/todos"/>
         <mkdir dir="${build.dir}"/>
-        <!--<mkdir dir="logs"/> -->
+        <mkdir dir="logs"/>
         <mkdir dir="${libdir}"/>
         <mkdir dir="${reports}/javadoc"/>
         <mkdir dir="${reports}/junit"/>
         <mkdir dir="${ready}"/>
         <mkdir dir="${temp}"/>
     </target>
-
+<!--
     <target name="xdoclet" depends="setup">
         <echo>XDoclet on GSN Web Interface</echo>
         <webdoclet destdir="${webapp.dir}/WEB-INF/">
@@ -85,7 +84,7 @@
             </deploymentdescriptor>
         </webdoclet>
     </target>
-
+-->
     <target name="build" depends="setup">
         <javac debug="true" srcdir="${src.dir}" optimize="off"
                destdir="${build.dir}" failonerror="false" source="1.5" classpathref="classpath"
@@ -93,27 +92,27 @@
         <!-- The WebCamWrapper file is excluded since it dependes on the jmf.jar (Java Media Framework)
 which is available from SUN at  http://java.sun.com/products/java-media/jmf/index.jsp -->
         <echo>Compiling JIBX Mappings...</echo>
-        <java classname="org.jibx.binding.Compile" fork="yes" dir="${build.dir}"
+        <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
               failonerror="true">
             <classpath refid="classpath"/>
-            <arg value="../VirtualSensorDescription.xml"/>
-            <arg value="../containerJIBX.xml"/>
+        	<arg value="conf/containerJIBX.xml"/>
+        	<arg value="conf/VirtualSensorDescription.xml"/>            
         </java>
     </target>
 
     <target name="dir" depends="build">
-        <webdoclet destdir="${dswebapp.dir}/WEB-INF/" description="This task for Directory Service">
+      <!--  <webdoclet destdir="${dswebapp.dir}/WEB-INF/" description="This task for Directory Service">
             <fileset dir="${src.dir}">
                 <include name="**/registry/**"/>
             </fileset>
             <deploymentdescriptor mergeDir="${basedir}/merges">
                 <welcomefile file="/sensors.jsp"/>
             </deploymentdescriptor>
-        </webdoclet>
+        </webdoclet> -->
         <java classname="gsn.registry.RegistryImp" fork="true" dir="${build.dir}">
             <classpath refid="classpath"/>
             <arg value="${basedir}/dswebapp/"/>
-        	<arg value="${basedir}/log4j.directory.properties"/>
+        	<arg value="${conf.dir}/log4j.directory.properties"/>
         	<arg value="1882"/>
         	<arg value="127.0.0.1"/>
    			<jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
@@ -121,11 +120,11 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
         </java>
     </target>
 
-    <target name="runcam" depends="xdoclet,build">
+    <target name="runcam" depends="build">
         <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"
               dir="${build.dir}">
             <arg value="${config}"/>
-            <arg value="${basedir}/log4j.properties"/>
+            <arg value="${conf.dir}/log4j.properties"/>
             <arg value="${basedir}/${temp}"/>
             <env key="LD_LIBRARY_PATH"
                  value="${jmf.dir}/lib:${env.JAVA_HOME}/jre/lib/i386:${env.JAVA_HOME}/jre/lib/i386/client:${env.JAVA_HOME}/jre/lib/i386/xawt"/>
@@ -133,11 +132,11 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
         </java>
     </target>
 
-    <target name="run" depends="xdoclet,build">
-        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${build.dir}">
+    <target name="run" depends="build">
+        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
             <classpath refid="classpath"/>
             <arg value="${config}"/>
-            <arg value="${basedir}/log4j.properties"/>
+            <arg value="${conf.dir}/log4j.properties"/>
             <arg value="${basedir}/${temp}"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-Dorg.mortbay.log.LogFactory.noDiscovery=false"/>
@@ -147,7 +146,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
     </target>
 
 
-    <target name="rfidtest" depends="xdoclet,build">
+    <target name="rfidtest" depends="build">
         <java classname="gsn.wrappers.RFIDSample" maxmemory="${maxMemoryUsage}" fork="true" dir="${build.dir}">
             <classpath refid="classpath"/>
         </java>
@@ -157,11 +156,9 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
         <java classpathref="classpath" classname="gsn.simulation.Simulation" maxmemory="${maxMemoryUsage}" fork="true"
               dir="${build.dir}">
             <arg value="${config}"/>
-            <arg value="${basedir}/simulationLog4J.properties"/>
-            <arg value="500"/>
-            <!-- Thread Counter -->
-            <arg value="38000"/>
-            <!-- The port for starting from -->
+            <arg value="${conf.dir}/log4j.properties"/>
+            <arg value="500"/>  <!-- Thread Counter -->           
+            <arg value="38000"/> <!-- The port for starting from -->
         </java>
     </target>
 
@@ -169,7 +166,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
         <java classpathref="classpath" classname="gsn.StopSensorServer" maxmemory="8m" fork="true"
               dir="${build.dir}">
             <arg value="${config}"/>
-            <arg value="${basedir}/log4j.properties"/>
+            <arg value="${conf.dir}/log4j.properties"/>
             <arg value="${basedir}/${temp}"/>
         </java>
     </target>
@@ -238,7 +235,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
         </documentdoclet>
 
     </target>
-	   <target name="jar" depends="clean,xdoclet,build">
+	   <target name="jar" depends="clean,build">
 	   	<mkdir dir="${installer-result}"/>
 	   	        <jar destfile="${installer-result}/${jar.file}" basedir="${build.dir}"
 	   	             excludes="gsn/wrappers/general/SerialWrapper*class gsn/wrappers/general/UDPWrapper*class">
@@ -260,12 +257,11 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
 	   	            </manifest>
 	   	        </jar>
 	   </target>
-   <target name="installer" depends="clean,xdoclet,build,jar">
+   <target name="installer" depends="clean,build,jar">
                 <izpack input="${basedir}/installer/izpack-installer.xml"
                 output="${basedir}/${installer-result}/gsn-installer.jar"
                 basedir="${basedir}/installer"
                 izPackdir="${basedir}/izpack"/>
-
     </target>
 
     <target name="pref" depends="build">
