@@ -7,30 +7,30 @@ package gsn.wrappers.ieee1451;
  */
 public class Record extends ArgArray {
     /**
-     * Clone the given Record instance.
-     *
-     * @param value
-     */
+         * Clone the given Record instance.
+         * 
+         * @param value
+         */
     public Record(Record value) {
-        super();
-        value.cloneContentsTo(this);
+	super();
+	value.cloneContentsTo(this);
     }
 
     /**
-     * Clone the given ArgArray instance
-     *
-     * @param value
-     */
+         * Clone the given ArgArray instance
+         * 
+         * @param value
+         */
     public Record(ArgArray value) {
-        super();
-        value.cloneContentsTo(this);
+	super();
+	value.cloneContentsTo(this);
     }
 
     /**
-     * Creates a blank record with no comments.
-     *
-     */
+         * Creates a blank record with no comments.
+         * 
+         */
     public Record() {
 
     }
-} 
+}

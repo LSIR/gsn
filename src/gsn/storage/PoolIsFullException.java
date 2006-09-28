@@ -1,4 +1,4 @@
-package gsn.storage ;
+package gsn.storage;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
@@ -10,11 +10,11 @@ package gsn.storage ;
  */
 public class PoolIsFullException extends Exception {
 
-   public PoolIsFullException ( ) {
-      super ( "Pool is Full exception occured" ) ;
-   }
+    public PoolIsFullException() {
+	super("Pool is Full exception occured");
+    }
 
-   public PoolIsFullException ( String name ) {
-      super ( "Pool is Full exception occured for : " + name ) ;
-   }
+    public PoolIsFullException(String name) {
+	super("Pool is Full exception occured for : " + name);
+    }
 }

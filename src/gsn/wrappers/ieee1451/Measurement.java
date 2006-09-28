@@ -34,7 +34,6 @@
  */
 package gsn.wrappers.ieee1451;
 
-
 /**
  * This class represents a physical observation. It is typically created by a
  * channel in a BasicTIM FunctionBlock. While its current form is simply an
@@ -48,22 +47,22 @@ package gsn.wrappers.ieee1451;
  */
 public class Measurement extends ArgArray {
     public Measurement(Measurement value) {
-        super();
-        value.cloneContentsTo(this);
+	super();
+	value.cloneContentsTo(this);
     }
 
     public Measurement(ArgArray value) {
-        super();
-        value.cloneContentsTo(this);
+	super();
+	value.cloneContentsTo(this);
     }
 
     public Measurement() {
     }
 
     public Object clone() {
-        Measurement result = new Measurement();
-        this.cloneContentsTo(result);
-        return result;
+	Measurement result = new Measurement();
+	this.cloneContentsTo(result);
+	return result;
     }
 
 }
