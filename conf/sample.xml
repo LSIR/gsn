@@ -2,17 +2,8 @@
    <name>Container</name>
    <author>EPFL</author>
    <email>ali.salehi@epfl.ch</email>
-   <virtual-sensors-dir>
-	   /Users/alisalehi/workspace/GSN/virtual-sensors
-   </virtual-sensors-dir>
    <port>22001</port>
    <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:MEM:." overwrite-tables="true" permanent-storage="false"/>
-   <webapp-location>
-	   /Users/alisalehi/workspace/GSN/webapp/
-   </webapp-location>
    <directory-address>localhost:1882</directory-address> 
-   <wrapper-extentions>
-	   /Users/alisalehi/workspace/GSN/wrappers.properties
-   </wrapper-extentions>
 </sensor-server>
 
