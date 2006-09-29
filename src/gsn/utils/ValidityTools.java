@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 
@@ -15,18 +18,12 @@ public class ValidityTools {
     public static final transient Logger logger = Logger
 	    .getLogger(ValidityTools.class);
 
-    public static boolean isAccessibleSocket(String host, int port) {
+    public static boolean isAccessibleSocket(String host, int port) throws UnknownHostException {
 	try {
 	    Socket socket = new Socket(host, port);
 	    InputStream io = socket.getInputStream();
 	    io.close();
-	} catch (UnknownHostException e) {
-	    logger.warn(e.getMessage());
-	    logger.debug(e.getMessage(), e);
-	    return false;
 	} catch (IOException e) {
-	    logger.warn(e.getMessage());
-	    logger.debug(e.getMessage(), e);
 	    return false;
 	}
 	return true;
@@ -55,6 +52,11 @@ public class ValidityTools {
 		System.exit(1);
 	    }
 	}
+    }
+    public static  void isDBAccessible(String driverClass,String url,String user,String password) throws ClassNotFoundException, SQLException {
+	  Class.forName(driverClass);
+	  Connection con= DriverManager.getConnection (url ,user,password );
+	  con.close();
     }
 
 }

@@ -84,13 +84,13 @@ public class RegistryImp extends HttpServlet implements Registry {
 		    .println("You must specify the interface IP on which the directory service will listen (default localhost)");
 	    System.exit(1);
 	}
-	PropertyConfigurator.configure(args[1]);
 	if (PIDUtils.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID)) {
 	    System.out
 		    .println("Error : Another GSN Directory Service is running.");
 	    System.exit(1);
 	} else
 	    PIDUtils.createPID(PIDUtils.DIRECTORY_SERVICE_PID);
+	PropertyConfigurator.configure(args[1]);
 	int port = -1;
 	try {
 	    port = Integer.parseInt(args[2]);
