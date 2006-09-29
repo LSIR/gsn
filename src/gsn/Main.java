@@ -5,6 +5,7 @@ import gsn.beans.VSensorConfig;
 import gsn.control.VSensorLoader;
 import gsn.pid.PIDUtils;
 import gsn.storage.StorageManager;
+import gsn.utils.ValidityTools;
 import gsn.vsensor.Container;
 import gsn.vsensor.ContainerImpl;
 
@@ -35,18 +36,21 @@ import org.mortbay.jetty.webapp.WebAppContext;
  */
 public final class Main {
 
-    private static final String CONF_LOG4J_PROPERTIES = "conf/log4j.properties";
+    public static final String DEFAULT_GSN_LOG4J_PROPERTIES = "conf/log4j.properties";
 
-    private static final transient Logger logger = Logger.getLogger(Main.class);
+    public static final transient Logger logger = Logger.getLogger(Main.class);
 
     public static final String DEFAULT_WRAPPER_PROPERTIES_FILE = "conf/wrappers.properties";
+   
+    public static final String DEFAULT_GSN_CONF_FILE = "conf/gsn.xml";
 
     public static final String DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
 
     public static final String DEFAULT_WEB_APP_PATH = "webapp";
 
     public static void main(String[] args) throws IOException, RuntimeException {
-	
+	ValidityTools.checkAccessibilityOfFiles(DEFAULT_GSN_LOG4J_PROPERTIES,DEFAULT_WRAPPER_PROPERTIES_FILE,DEFAULT_GSN_CONF_FILE);
+	ValidityTools.checkAccessibilityOfDirs(DEFAULT_VIRTUAL_SENSOR_DIRECTORY,DEFAULT_WEB_APP_PATH);
 	
 	if (PIDUtils.isPIDExist(PIDUtils.GSN_PID)) {
 	    System.out.println("Error : Another GSN Server is running.");
@@ -54,7 +58,7 @@ public final class Main {
 	} else
 	    PIDUtils.createPID(PIDUtils.GSN_PID);
 
-	PropertyConfigurator.configure(CONF_LOG4J_PROPERTIES);
+	PropertyConfigurator.configure(DEFAULT_GSN_LOG4J_PROPERTIES);
 	try {
 	    initialize("conf/gsn.xml");
 	} catch (JiBXException e) {

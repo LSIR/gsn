@@ -97,7 +97,7 @@ public class VSensorLoader extends Thread {
     }
 
     public void loadPlugin() throws SQLException, JiBXException {
-	Modifications modifications = this.getUpdateStatus();
+	Modifications modifications = getUpdateStatus(pluginsDir);
 	Collection<String> removeIt = modifications.getRemove();
 	Collection<String> addIt = modifications.getAdd();
 	IBindingFactory bfact;
@@ -473,10 +473,6 @@ public class VSensorLoader extends Thread {
 	Mappings.getContainer().removeAllResourcesAssociatedWithVSName(
 		vsensorName);
 	this.storageManager.dropTable(config.getVirtualSensorName());
-    }
-
-    public Modifications getUpdateStatus() {
-	return VSensorLoader.getUpdateStatus(this.pluginsDir);
     }
 
     public static Modifications getUpdateStatus(String virtualSensorsPath) {

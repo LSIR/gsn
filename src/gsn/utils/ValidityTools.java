@@ -1,5 +1,6 @@
 package gsn.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -29,7 +30,31 @@ public class ValidityTools {
 	    return false;
 	}
 	return true;
+    }
+    public static void checkAccessibilityOfDirs(String... args) {
+	for (String name : args) {
+	    File f = new File(name);
+	    if (f.canRead() && f.canWrite() && f.isDirectory())
+		continue;
+	    else {
+		System.out.println("The required directory : "
+			+ f.getAbsolutePath() + " is not accessible.");
+		System.exit(1);
+	    }
+	}
+    }
 
+    public static void checkAccessibilityOfFiles(String... args) {
+	for (String name : args) {
+	    File f = new File(name);
+	    if (f.canRead() && f.canWrite() && f.isFile())
+		continue;
+	    else {
+		System.out.println("The required file : " + f.getAbsolutePath()
+			+ " is not accessible.");
+		System.exit(1);
+	    }
+	}
     }
 
 }

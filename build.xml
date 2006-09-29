@@ -21,7 +21,6 @@
         <property name="libdir" value="lib"/>
         <property name="reports" value="reports"/>
         <property name="temp" value="temp"/>
-        <property name="ready" value="ready"/>
         <property name="maxMemoryUsage" value="64m"/>
         <property name="jar.file" value="gsn-core.jar"/>
         <!--  Enable the following line when you want to use Java Media Framework.
@@ -56,20 +55,15 @@
             <fileset dir="${build.dir}" includes="**/*.class,**/*.xml"/>
             <fileset dir="${build.dir}" includes="**/*.xml"/>
             <fileset dir="${reports}" includes="**/*html,**/*htm,**/*xml"/>
-            <fileset dir="${ready}" includes="**/*"/>
-            <fileset dir="logs" includes="**/*"/>
             <fileset dir="${installer-result}" includes="**/*"/>
         </delete>
     </target>
     <target name="setup" depends="init">
-        <mkdir dir="${reports}/todos"/>
         <mkdir dir="${build.dir}"/>
         <mkdir dir="logs"/>
-        <mkdir dir="${libdir}"/>
-        <mkdir dir="${reports}/javadoc"/>
+    	<mkdir dir="${reports}/todos"/>
+    	<mkdir dir="${reports}/javadoc"/>
         <mkdir dir="${reports}/junit"/>
-        <mkdir dir="${ready}"/>
-        <mkdir dir="${temp}"/>
     </target>
 <!--
     <target name="xdoclet" depends="setup">
@@ -128,7 +122,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
         </java>
     </target>
 
-    <target name="run" depends="build">
+    <target name="gsn" depends="build">
         <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
             <classpath refid="classpath"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
