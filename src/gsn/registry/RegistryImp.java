@@ -153,6 +153,7 @@ public class RegistryImp extends HttpServlet implements Registry {
 		} catch (Exception e) {
 		    logger.warn("Shutdowning the webserver failed.", e);
 		}
+		System.exit(0);
 	    }
 	});
 	shutdown.start();
