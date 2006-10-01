@@ -51,6 +51,7 @@ public final class Main {
     public static void main(String[] args) throws IOException, RuntimeException {
 	ValidityTools.checkAccessibilityOfFiles(DEFAULT_GSN_LOG4J_PROPERTIES,DEFAULT_WRAPPER_PROPERTIES_FILE,DEFAULT_GSN_CONF_FILE);
 	ValidityTools.checkAccessibilityOfDirs(DEFAULT_VIRTUAL_SENSOR_DIRECTORY,DEFAULT_WEB_APP_PATH);
+	PropertyConfigurator.configure(DEFAULT_GSN_LOG4J_PROPERTIES);
 	
 	if (PIDUtils.isPIDExist(PIDUtils.GSN_PID)) {
 	    System.out.println("Error : Another GSN Server is running.");
@@ -58,7 +59,6 @@ public final class Main {
 	} else
 	    PIDUtils.createPID(PIDUtils.GSN_PID);
 
-	PropertyConfigurator.configure(DEFAULT_GSN_LOG4J_PROPERTIES);
 	try {
 	    initialize("conf/gsn.xml");
 	} catch (JiBXException e) {

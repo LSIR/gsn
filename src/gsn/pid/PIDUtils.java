@@ -1,12 +1,21 @@
 package gsn.pid;
 
+import gsn.registry.RegistryImp;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+
+import org.apache.log4j.Logger;
+
+import sun.util.logging.resources.logging;
 
 public class PIDUtils {
 
     public static final String DIRECTORY_SERVICE_PID = "gsn-dir.pid";
+    private static transient Logger logger = Logger
+    .getLogger(PIDUtils.class);
 
     public static final String GSN_PID = "gsn.pid";
 
@@ -19,7 +28,13 @@ public class PIDUtils {
 	    throw new RuntimeException("The " + tempFile.getAbsolutePath()
 		    + " file exists. Start failed.");
 	tempFile.createNewFile();
+	FileOutputStream f = new FileOutputStream(tempFile);
+	f.write(1);
+	f.flush();
+	f.close();
 	tempFile.deleteOnExit();
+	if (logger.isDebugEnabled())
+	    logger.debug("The PID file created >"+tempFile.getAbsolutePath()+"("+tempFile.exists()+")");
     }
 
     public static void killPID(String pid_file) {
