@@ -1,7 +1,10 @@
 package gsn.pid;
 
+import gsn.beans.InputStream;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -17,24 +20,32 @@ public class PIDUtils {
 
     public static File createPID(String pid_file) throws IOException,
 	    RuntimeException {
-
 	String tempDirPath = System.getProperty("java.io.tmpdir");
 	File tempFile = new File(tempDirPath + "/" + pid_file);
 	if (tempFile.exists())
 	    throw new RuntimeException("The " + tempFile.getAbsolutePath()
 		    + " file exists. Start failed.");
-	tempFile.createNewFile();
-	tempFile.deleteOnExit();
-	if (logger.isDebugEnabled())
-	    logger.debug("The PID file created >"+tempFile.getAbsolutePath()+"("+tempFile.exists()+")");
+	boolean output = tempFile.createNewFile();
+	tempFile.setLastModified(System.currentTimeMillis());
+	FileOutputStream is = new FileOutputStream(tempFile);
+	is.write('1');
+	is.close();
+	if (output) 
+	    tempFile.deleteOnExit();
+	if (logger.isDebugEnabled()) 
+	    logger.debug("The PID file created >"+tempFile.getAbsolutePath()+"("+output+")"+(tempFile.exists()));
 	return tempFile;
     }
 
-    public static void killPID(File tempFile) {
+    public static void killPID(File tempFile) throws IOException {
 	if (!tempFile.isFile())
 	    throw new RuntimeException("The " + tempFile.getAbsolutePath()
 		    + " file doesn't exists. Stop failed.");
-	tempFile.delete();
+	if (tempFile.exists()) {
+	    FileOutputStream is = new FileOutputStream(tempFile);
+	    is.write('0');
+	    is.close();
+	}
     }
 
     public static boolean isPIDExist(String pid_file) {
@@ -52,6 +63,10 @@ public class PIDUtils {
          *                 If can't read the file.
          */
     public static int getFirstByteFrom(File file) throws IOException {
+	if (!file.exists()) {
+	    logger.debug("PID File doesn't exist : "+file.getAbsolutePath());
+	    return -1;
+	}
 	FileInputStream fis = new FileInputStream (file);
 	int toReturn = -1;
 	if (fis.available() > 0)

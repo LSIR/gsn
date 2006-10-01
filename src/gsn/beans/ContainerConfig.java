@@ -1,7 +1,5 @@
 package gsn.beans;
 
-import java.util.StringTokenizer;
-
 import org.apache.log4j.Logger;
 
 /**

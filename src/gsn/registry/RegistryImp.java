@@ -156,6 +156,7 @@ public class RegistryImp extends HttpServlet implements Registry {
 	    }
 	});
 	shutdown.start();
+	
     }
 
     public void doPost(HttpServletRequest req, HttpServletResponse res)

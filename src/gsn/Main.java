@@ -99,7 +99,6 @@ public final class Main {
 
 	final Server server = new Server();
 	Connector connector = new SelectChannelConnector();
-	// TODO : Testing if the Container port is a valid integer.
 	connector.setPort(containerConfig.getContainerPort());
 	server.setConnectors(new Connector[] { connector });
 	ServletHandler servletHandler = new ServletHandler();
@@ -114,7 +113,6 @@ public final class Main {
 	server.setSendServerVersion(false);
 	try {
 	    server.start();
-	    // server.join ( ) ;
 	} catch (Exception e) {
 	    logger
 		    .error("Start of the HTTP server failed. The HTTP protocol is used in most of the communications.");
@@ -138,6 +136,7 @@ public final class Main {
 	    }
 	});
 	shutdown.start();
+	
     }
 
     /**
