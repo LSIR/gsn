@@ -2,12 +2,17 @@ package gsn.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 
@@ -19,12 +24,12 @@ public class ValidityTools {
 	    .getLogger(ValidityTools.class);
 
     public static boolean isAccessibleSocket(String host, int port) throws UnknownHostException {
-	try {
-	    Socket socket = new Socket(host, port);
-	    InputStream io = socket.getInputStream();
-	    io.close();
+	try {    		
+	    Socket socket = new Socket();
+	    InetSocketAddress inetSocketAddress = new  InetSocketAddress(host,port);
+	    socket.connect(inetSocketAddress,3000);
 	} catch (IOException e) {
-	    return false;
+	   return false;
 	}
 	return true;
     }
@@ -58,5 +63,37 @@ public class ValidityTools {
 	  Connection con= DriverManager.getConnection (url ,user,password );
 	  con.close();
     }
+    public static boolean isLocalhost(String host) {
+	String hostPrepared = host.trim().toLowerCase();
+	for (String addr : NETWORK_LOCAL_ADDRESS)
+	    if (addr.equals(hostPrepared))
+		return true;
+	if (host.indexOf("127.")>=0)
+	    return true;
+	return false;
+    }
+    
+    private static final ArrayList<String > NETWORK_LOCAL_ADDRESS = new ArrayList<String>();
+    static {
+    try {
+	    Enumeration<NetworkInterface> nets = NetworkInterface
+		    .getNetworkInterfaces();
+	    for (NetworkInterface netint : Collections.list(nets)) {
+		Enumeration<InetAddress> address = netint.getInetAddresses();
+		for (InetAddress addr : Collections.list(address)) {
+		    if (addr.isSiteLocalAddress()) {
+			NETWORK_LOCAL_ADDRESS.add(addr.getHostAddress().trim().toLowerCase());
+			NETWORK_LOCAL_ADDRESS.add(addr.getHostName().trim().toLowerCase());
+		    }
+		}
+		NETWORK_LOCAL_ADDRESS.add("localhost");
+		NETWORK_LOCAL_ADDRESS.add("127.0.0.1");
+		
+	    }
+    }catch (Exception e) {
+	e.printStackTrace();
+    }
+    }
+	    
 
 }

@@ -1,15 +1,11 @@
 package gsn.pid;
 
-import gsn.registry.RegistryImp;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
-import sun.util.logging.resources.logging;
 
 public class PIDUtils {
 
@@ -19,7 +15,7 @@ public class PIDUtils {
 
     public static final String GSN_PID = "gsn.pid";
 
-    public static void createPID(String pid_file) throws IOException,
+    public static File createPID(String pid_file) throws IOException,
 	    RuntimeException {
 
 	String tempDirPath = System.getProperty("java.io.tmpdir");
@@ -28,18 +24,13 @@ public class PIDUtils {
 	    throw new RuntimeException("The " + tempFile.getAbsolutePath()
 		    + " file exists. Start failed.");
 	tempFile.createNewFile();
-	FileOutputStream f = new FileOutputStream(tempFile);
-	f.write(1);
-	f.flush();
-	f.close();
 	tempFile.deleteOnExit();
 	if (logger.isDebugEnabled())
 	    logger.debug("The PID file created >"+tempFile.getAbsolutePath()+"("+tempFile.exists()+")");
+	return tempFile;
     }
 
-    public static void killPID(String pid_file) {
-	String tempDirPath = System.getProperty("java.io.tmpdir");
-	File tempFile = new File(tempDirPath + "/" + pid_file);
+    public static void killPID(File tempFile) {
 	if (!tempFile.isFile())
 	    throw new RuntimeException("The " + tempFile.getAbsolutePath()
 		    + " file doesn't exists. Stop failed.");
@@ -60,9 +51,8 @@ public class PIDUtils {
          * @throws IOException
          *                 If can't read the file.
          */
-    public static int getFirstByteFrom(String file) throws IOException {
-	String path = System.getProperty("java.io.tmpdir");
-	FileInputStream fis = new FileInputStream(path + "/" + file);
+    public static int getFirstByteFrom(File file) throws IOException {
+	FileInputStream fis = new FileInputStream (file);
 	int toReturn = -1;
 	if (fis.available() > 0)
 	    toReturn = fis.read();

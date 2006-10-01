@@ -5,6 +5,7 @@ import gsn.shared.Registry;
 import gsn.shared.VirtualSensorIdentityBean;
 import gsn.utils.KeyValueImp;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class RegistryImp extends HttpServlet implements Registry {
 		result.add(vsensor);
 	return result;
     }
-
+    private static File pidFile;
     public static void main(String[] args) throws Exception {
 	if (args.length < 4) {
 	    System.out
@@ -90,7 +91,7 @@ public class RegistryImp extends HttpServlet implements Registry {
 		    .println("Error : Another GSN Directory Service is running.");
 	    System.exit(1);
 	} else
-	    PIDUtils.createPID(PIDUtils.DIRECTORY_SERVICE_PID);
+	    pidFile = PIDUtils.createPID(PIDUtils.DIRECTORY_SERVICE_PID);
 	int port = -1;
 	try {
 	    port = Integer.parseInt(args[2]);
@@ -103,18 +104,15 @@ public class RegistryImp extends HttpServlet implements Registry {
 	if (logger.isInfoEnabled())
 	    logger.info("GSN-Registry-Server startup ");
 	System.getProperties().put("org.mortbay.level", "error");
-
 	String computerIP = args[3];
-	if (computerIP == null) { // TODO : CHECK TO SEE IF IT IS POINTING
-	    // TO LOCALHOST OR NOT.
+	if (computerIP == null) 
 	    if (!InetAddress.getByName(computerIP).isLinkLocalAddress()
 		    && !InetAddress.getByName(computerIP).isLoopbackAddress()) {
 		logger.fatal("The specified IP address (" + args[3]
 			+ ") is not pointing to the local machine.");
 		return;
 	    }
-	}
-
+	
 	final Server server = new Server();
 
 	Connector connector = new SelectChannelConnector();
@@ -145,13 +143,14 @@ public class RegistryImp extends HttpServlet implements Registry {
 	    public void run() {
 		try {
 		    while (PIDUtils
-			    .getFirstByteFrom(PIDUtils.DIRECTORY_SERVICE_PID) != '0')
+			    .getFirstByteFrom(pidFile) != '0')
 			Thread.sleep(2500);
 		    server.stop();
 		    garbageCollector.stopPlease();
 		    logger.warn("GSN Directory server is stopped.");
 		} catch (Exception e) {
 		    logger.warn("Shutdowning the webserver failed.", e);
+		    System.exit(1);
 		}
 		System.exit(0);
 	    }

@@ -48,6 +48,7 @@ public final class Main {
 
     public static final String DEFAULT_WEB_APP_PATH = "webapp";
 
+    private static File pidFile;
     public static void main(String[] args) throws IOException, RuntimeException {
 	ValidityTools.checkAccessibilityOfFiles(DEFAULT_GSN_LOG4J_PROPERTIES,DEFAULT_WRAPPER_PROPERTIES_FILE,DEFAULT_GSN_CONF_FILE);
 	ValidityTools.checkAccessibilityOfDirs(DEFAULT_VIRTUAL_SENSOR_DIRECTORY,DEFAULT_WEB_APP_PATH);
@@ -57,7 +58,7 @@ public final class Main {
 	    System.out.println("Error : Another GSN Server is running.");
 	    System.exit(1);
 	} else
-	    PIDUtils.createPID(PIDUtils.GSN_PID);
+	    pidFile=PIDUtils.createPID(PIDUtils.GSN_PID);
 
 	try {
 	    initialize("conf/gsn.xml");
@@ -125,9 +126,8 @@ public final class Main {
 	final Thread shutdown = new Thread(new Runnable() {
 	    public void run() {
 		try {
-		    while (PIDUtils.getFirstByteFrom(PIDUtils.GSN_PID) != '0')
+		    while (PIDUtils.getFirstByteFrom(pidFile) != '0')
 			Thread.sleep(2500);
-
 		    vsloader.stopPlease();
 		    server.stop();
 		    logger.warn("GSN server is stopping.");
@@ -136,7 +136,6 @@ public final class Main {
 		}
 		System.exit(0);
 	    }
-
 	});
 	shutdown.start();
     }

@@ -3,6 +3,7 @@ package gsn.pid;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 
 import junit.framework.JUnit4TestAdapter;
@@ -27,7 +28,7 @@ public class PIDUtilsTesting {
 
     @After
     public void killPIDsAfter() throws IOException {
-	PIDUtils.killPID(PIDUtils.DIRECTORY_SERVICE_PID);
+	PIDUtils.killPID(new File("/tmp/PIDUtils.DIRECTORY_SERVICE_PID"));
 	assertFalse(PIDUtils.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID));
     }
 
