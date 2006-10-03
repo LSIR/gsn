@@ -4,10 +4,10 @@ import gsn.pid.PIDUtils;
 import gsn.shared.Registry;
 import gsn.shared.VirtualSensorIdentityBean;
 import gsn.utils.KeyValueImp;
+import gsn.utils.ValidityTools;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -38,7 +38,9 @@ public class RegistryImp extends HttpServlet implements Registry {
          * <code>registery</code>
          */
     private static ArrayList<VirtualSensorIdentityBean> registry = new ArrayList<VirtualSensorIdentityBean>();
+
     public static final String DEFAULT_DIR_LOG4J_PROPERTIES = "conf/log4j.directory.properties";
+
     public static final String DEFAULT_DIRECTORY_SERVER_WEB_APP = "dswebapp";
 
     private static transient Logger logger;
@@ -84,7 +86,8 @@ public class RegistryImp extends HttpServlet implements Registry {
 		    .println("You must specify the interface IP on which the directory service will listen (default localhost)");
 	    System.exit(1);
 	}
-	System.out.println("Loading logging details from : "+DEFAULT_DIR_LOG4J_PROPERTIES);
+	System.out.println("Loading logging details from : "
+		+ DEFAULT_DIR_LOG4J_PROPERTIES);
 	PropertyConfigurator.configure(DEFAULT_DIR_LOG4J_PROPERTIES);
 	logger = Logger.getLogger(RegistryImp.class);
 	if (PIDUtils.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID)) {
@@ -106,16 +109,12 @@ public class RegistryImp extends HttpServlet implements Registry {
 	    logger.info("GSN-Registry-Server startup ");
 	System.getProperties().put("org.mortbay.level", "error");
 	String computerIP = args[1];
-	if (computerIP == null)
-	    if (!InetAddress.getByName(computerIP).isLinkLocalAddress()
-		    && !InetAddress.getByName(computerIP).isLoopbackAddress()) {
-		logger.fatal("The specified IP address (" + args[1]
-			+ ") is not pointing to the local machine.");
-		return;
-	    }
-
+	if (!ValidityTools.isLocalhost(computerIP)) {
+	    logger.fatal("The specified IP address (" + args[1]
+		    + ") is not pointing to the local machine.");
+	    return;
+	}
 	final Server server = new Server();
-
 	Connector connector = new SelectChannelConnector();
 	connector.setPort(port);
 	server.setConnectors(new Connector[] { connector });
