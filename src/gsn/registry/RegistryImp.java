@@ -38,9 +38,10 @@ public class RegistryImp extends HttpServlet implements Registry {
          * <code>registery</code>
          */
     private static ArrayList<VirtualSensorIdentityBean> registry = new ArrayList<VirtualSensorIdentityBean>();
+    public static final String DEFAULT_DIR_LOG4J_PROPERTIES = "conf/log4j.directory.properties";
+    public static final String DEFAULT_DIRECTORY_SERVER_WEB_APP = "dswebapp";
 
-    private static transient Logger logger = Logger
-	    .getLogger(RegistryImp.class);
+    private static transient Logger logger;
 
     public static ArrayList<VirtualSensorIdentityBean> getRegistry() {
 	return registry;
@@ -72,20 +73,20 @@ public class RegistryImp extends HttpServlet implements Registry {
 		result.add(vsensor);
 	return result;
     }
+
     private static File pidFile;
+
     public static void main(String[] args) throws Exception {
-	if (args.length < 4) {
-	    System.out
-		    .println("You must specify the webapp directory location as the first input parameter.");
-	    System.out
-		    .println("You must specify the log4j properties fiel as the 2nd input parameter.");
+	if (args.length < 2) {
 	    System.out
 		    .println("You must specify the port on which the directory service will listen (default 1882)");
 	    System.out
 		    .println("You must specify the interface IP on which the directory service will listen (default localhost)");
 	    System.exit(1);
 	}
-	PropertyConfigurator.configure(args[1]);
+	System.out.println("Loading logging details from : "+DEFAULT_DIR_LOG4J_PROPERTIES);
+	PropertyConfigurator.configure(DEFAULT_DIR_LOG4J_PROPERTIES);
+	logger = Logger.getLogger(RegistryImp.class);
 	if (PIDUtils.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID)) {
 	    System.out
 		    .println("Error : Another GSN Directory Service is running.");
@@ -94,25 +95,25 @@ public class RegistryImp extends HttpServlet implements Registry {
 	    pidFile = PIDUtils.createPID(PIDUtils.DIRECTORY_SERVICE_PID);
 	int port = -1;
 	try {
-	    port = Integer.parseInt(args[2]);
+	    port = Integer.parseInt(args[0]);
 	} catch (Exception e) {
-	    logger.error(
-		    "Can't part the port no. from input (" + args[2] + ")", e);
+	    logger.error("Can't parse the port no. from the input (" + args[0]
+		    + ")", e);
 	    return;
 	}
 
 	if (logger.isInfoEnabled())
 	    logger.info("GSN-Registry-Server startup ");
 	System.getProperties().put("org.mortbay.level", "error");
-	String computerIP = args[3];
-	if (computerIP == null) 
+	String computerIP = args[1];
+	if (computerIP == null)
 	    if (!InetAddress.getByName(computerIP).isLinkLocalAddress()
 		    && !InetAddress.getByName(computerIP).isLoopbackAddress()) {
-		logger.fatal("The specified IP address (" + args[3]
+		logger.fatal("The specified IP address (" + args[1]
 			+ ") is not pointing to the local machine.");
 		return;
 	    }
-	
+
 	final Server server = new Server();
 
 	Connector connector = new SelectChannelConnector();
@@ -121,7 +122,7 @@ public class RegistryImp extends HttpServlet implements Registry {
 
 	WebAppContext wac = new WebAppContext();
 	wac.setContextPath("/");
-	wac.setResourceBase(args[0]);
+	wac.setResourceBase(DEFAULT_DIRECTORY_SERVER_WEB_APP);
 	wac.setWelcomeFiles(new String[] { "index.jsp" });
 
 	ServletHandler servletHandler = new ServletHandler();
@@ -142,21 +143,25 @@ public class RegistryImp extends HttpServlet implements Registry {
 	Thread shutdown = new Thread(new Runnable() {
 	    public void run() {
 		try {
-		    while (PIDUtils
-			    .getFirstByteFrom(pidFile) != '0')
-			Thread.sleep(2500);
+		    while (true) {
+			int value = PIDUtils.getFirstIntFrom(pidFile);
+			if (value != '0')
+			    Thread.sleep(2500);
+			else
+			    break;
+		    }
 		    server.stop();
 		    garbageCollector.stopPlease();
-		    logger.warn("GSN Directory server is stopped.");
 		} catch (Exception e) {
 		    logger.warn("Shutdowning the webserver failed.", e);
 		    System.exit(1);
 		}
+		logger.warn("GSN Directory server is stopped.");
 		System.exit(0);
 	    }
 	});
 	shutdown.start();
-	
+
     }
 
     public void doPost(HttpServletRequest req, HttpServletResponse res)
@@ -202,8 +207,6 @@ public class RegistryImp extends HttpServlet implements Registry {
 			"The query resulted in ").append(vsQueryResult.size())
 			.append(" results.").toString());
 	    fillQueryRespond(res, vsQueryResult);
-	    // res.getOutputStream ().write (
-	    // SerializationUtils.serializeToByte ( result ) ) ;
 	    break;
 	default:
 	    if (logger.isInfoEnabled())

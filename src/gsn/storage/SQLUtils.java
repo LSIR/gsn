@@ -31,9 +31,7 @@ public class SQLUtils {
 
 	Matcher matcher = pattern2.matcher(sql);
 	while (matcher.find()) {
-	    // System.out.println ( matcher.group ( 1 ) ) ;
 	    String replacement = mapping.get(matcher.group(1).toUpperCase());
-	    // String replacement = mapping.get ( matcher.group ( 1 )) ;
 	    if (replacement != null)
 		matcher.appendReplacement(result, replacement);
 	}
@@ -42,9 +40,7 @@ public class SQLUtils {
 	matcher = pattern1.matcher(result.toString());
 	result = new StringBuffer();
 	while (matcher.find()) {
-	    // System.out.println ( "2 : "+matcher.group ( 1 ) ) ;
 	    String replacement = mapping.get(matcher.group(1).toUpperCase());
-	    // String replacement = mapping.get ( matcher.group ( 1 ) ) ;
 	    if (replacement != null)
 		matcher.appendReplacement(result, replacement);
 	}

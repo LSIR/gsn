@@ -1,10 +1,7 @@
 package gsn.pid;
 
-import gsn.beans.InputStream;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -62,7 +59,7 @@ public class PIDUtils {
          * @throws IOException
          *                 If can't read the file.
          */
-    public static int getFirstByteFrom(File file) throws IOException {
+    public static int getFirstIntFrom(File file) throws IOException {
 	if (!file.exists()) {
 	    logger.debug("PID File doesn't exist : "+file.getAbsolutePath());
 	    return -1;

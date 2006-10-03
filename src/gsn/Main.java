@@ -38,10 +38,10 @@ public final class Main {
 
     public static final String DEFAULT_GSN_LOG4J_PROPERTIES = "conf/log4j.properties";
 
-    public static final transient Logger logger = Logger.getLogger(Main.class);
+    public static transient Logger logger;
 
     public static final String DEFAULT_WRAPPER_PROPERTIES_FILE = "conf/wrappers.properties";
-   
+
     public static final String DEFAULT_GSN_CONF_FILE = "conf/gsn.xml";
 
     public static final String DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
@@ -49,16 +49,19 @@ public final class Main {
     public static final String DEFAULT_WEB_APP_PATH = "webapp";
 
     private static File pidFile;
+
     public static void main(String[] args) throws IOException, RuntimeException {
-	ValidityTools.checkAccessibilityOfFiles(DEFAULT_GSN_LOG4J_PROPERTIES,DEFAULT_WRAPPER_PROPERTIES_FILE,DEFAULT_GSN_CONF_FILE);
-	ValidityTools.checkAccessibilityOfDirs(DEFAULT_VIRTUAL_SENSOR_DIRECTORY,DEFAULT_WEB_APP_PATH);
+	ValidityTools.checkAccessibilityOfFiles(DEFAULT_GSN_LOG4J_PROPERTIES,
+		DEFAULT_WRAPPER_PROPERTIES_FILE, DEFAULT_GSN_CONF_FILE);
+	ValidityTools.checkAccessibilityOfDirs(
+		DEFAULT_VIRTUAL_SENSOR_DIRECTORY, DEFAULT_WEB_APP_PATH);
 	PropertyConfigurator.configure(DEFAULT_GSN_LOG4J_PROPERTIES);
-	
+	logger = Logger.getLogger(Main.class);
 	if (PIDUtils.isPIDExist(PIDUtils.GSN_PID)) {
 	    System.out.println("Error : Another GSN Server is running.");
 	    System.exit(1);
 	} else
-	    pidFile=PIDUtils.createPID(PIDUtils.GSN_PID);
+	    pidFile = PIDUtils.createPID(PIDUtils.GSN_PID);
 
 	try {
 	    initialize("conf/gsn.xml");
@@ -121,22 +124,27 @@ public final class Main {
 	}
 	final VSensorLoader vsloader = new VSensorLoader(
 		DEFAULT_VIRTUAL_SENSOR_DIRECTORY);
-	final Thread shutdown = new Thread(new Runnable() {
+	Thread shutdown = new Thread(new Runnable() {
 	    public void run() {
 		try {
-		    while (PIDUtils.getFirstByteFrom(pidFile) != '0')
-			Thread.sleep(2500);
+		    while (true) {
+			int value = PIDUtils.getFirstIntFrom(pidFile);
+			if (value != '0')
+			    Thread.sleep(2500);
+			else
+			    break;
+		    }
 		    vsloader.stopPlease();
 		    server.stop();
-		    logger.warn("GSN server is stopping.");
-		} catch (Exception e) {
+		 } catch (Exception e) {
 		    logger.warn("Shutdowning the webserver failed.", e);
+		    System.exit(1);
 		}
+		logger.warn("GSN server is stopped.");
 		System.exit(0);
 	    }
 	});
 	shutdown.start();
-	
     }
 
     /**
