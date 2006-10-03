@@ -17,7 +17,7 @@
         <property name="dswebapp.dir" value="dswebapp"/>
         <property name="merge.dir" value="metadata"/>
         <property name="src.dir" value="src"/>
-        <property name="installer-result" value="installer-result"/>
+        <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
         <property name="reports" value="reports"/>
         <property name="temp" value="temp"/>
@@ -55,7 +55,7 @@
             <fileset dir="${build.dir}" includes="**/*.class,**/*.xml"/>
             <fileset dir="${build.dir}" includes="**/*.xml"/>
             <fileset dir="${reports}" includes="**/*html,**/*htm,**/*xml"/>
-            <fileset dir="${installer-result}" includes="**/*"/>
+            <fileset dir="${jars}" includes="**/*"/>
         </delete>
     </target>
     <target name="setup" depends="init">
@@ -213,8 +213,8 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
 
     </target>
 	   <target name="jar" depends="clean,build">
-	   	<mkdir dir="${installer-result}"/>
-	   	        <jar destfile="${installer-result}/${jar.file}" basedir="${build.dir}" >
+	   	<mkdir dir="${jars}"/>
+	   	        <jar destfile="${jars}/${jar.file}" basedir="${build.dir}" >
 	   	            <manifest>
 	   	                <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
 	   	                <attribute name="Main-Class" value="gsn.Main"/>
@@ -223,7 +223,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
 	   </target>
    <target name="installer" depends="clean,build,jar">
                 <izpack input="${basedir}/installer/izpack-installer.xml"
-                output="${basedir}/${installer-result}/gsn-installer.jar"
+                output="${basedir}/${jars}/gsn-installer.jar"
                 basedir="${basedir}/installer"
                 izPackdir="${basedir}/izpack"/>
     </target>
