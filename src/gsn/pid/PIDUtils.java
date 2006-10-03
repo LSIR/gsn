@@ -35,9 +35,12 @@ public class PIDUtils {
     }
 
     public static void killPID(File tempFile) throws IOException {
-	if (!tempFile.isFile())
-	    throw new RuntimeException("The " + tempFile.getAbsolutePath()
+	if (!tempFile.isFile() || !tempFile.exists()) {
+	    logger.warn("Killing failed : "+"The " + tempFile.getAbsolutePath()
 		    + " file doesn't exists. Stop failed.");
+	    return;
+	}
+	   
 	if (tempFile.exists()) {
 	    FileOutputStream is = new FileOutputStream(tempFile);
 	    is.write('0');

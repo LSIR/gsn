@@ -134,6 +134,7 @@ public final class Main {
 			else
 			    break;
 		    }
+		    logger.warn("Shutdown request received.");
 		    vsloader.stopPlease();
 		    server.stop();
 		 } catch (Exception e) {
