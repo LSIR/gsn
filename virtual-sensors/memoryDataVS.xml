@@ -17,7 +17,7 @@
     </output-structure>
     <storage permanent-storage="false" history-size="1"/>
     <input-streams>
-        <input-stream name="input1" rate="100">
+        <input-stream name="input1">
             <stream-source alias="source1" sampling-rate="1" storage-size="1"
                            disconnect-buffer-size="10">
                 <address wrapper="memory-usage">
