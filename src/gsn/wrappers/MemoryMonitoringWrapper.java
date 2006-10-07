@@ -29,7 +29,7 @@ public class MemoryMonitoringWrapper extends AbstractStreamProducer {
     private int samplingRate = DEFAULT_SAMPLING_RATE;
 
     private final transient Logger logger = Logger
-	    .getLogger(DummyDataProducer.class);
+	    .getLogger(MemoryMonitoringWrapper.class);
 
     private static int threadCounter = 0;
 
