@@ -31,6 +31,8 @@ public class SystemTime extends AbstractStreamProducer implements
 
     private static final int INITIAL_DELAY = 5 * 1000;
 
+    private static final int CLOCK_PERIODS = 1*1000;
+
     private String[] EMPTY_FIELD_LIST = new String[] {};
 
     private Collection<DataField> collection = new ArrayList<DataField>();
@@ -53,7 +55,8 @@ public class SystemTime extends AbstractStreamProducer implements
 	    logger.error(e.getMessage(), e);
 	    return false;
 	}
-	timer = new Timer(INITIAL_DELAY, this);
+	timer = new Timer(CLOCK_PERIODS, this);
+	timer.setInitialDelay(INITIAL_DELAY);
 	timer.start();
 	return true;
     }
