@@ -178,14 +178,25 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
 
     <target name="test" depends="build" description="Runs JUnit tests">
         <junit printsummary="true" fork="false" haltonerror="false"
-               errorproperty="errorOccuredInTests" haltonfailure="false">
+               errorproperty="errorOccuredInTests" haltonfailure="false"
+        	failureproperty="tests.failed" showoutput="true">
             <classpath refid="classpath"/>
+
             <batchtest todir="${reports}/junit">
                 <fileset dir="${build.dir}" includes="**/*Test*.class"/>
             </batchtest>
         </junit>
-    </target>
+    	
+    	<fail if="tests.failed">
 
+	***********************************
+    		One or more test failed !
+    	***********************************
+
+    					</fail>
+    </target>
+	
+	
     <target name="docs" depends="setup">
         <javadoc classpathref="classpath"
                  destdir="${reports}/javadoc"
@@ -234,5 +245,6 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
         </java>
     </target>
 
+	
 </project>
 
