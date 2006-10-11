@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
  */
 public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 
-	private static final String PARAM_USER="user", PARAM_PASSWD="password", PARAM_URL="url", PARAM_TABLE_PREFIX="table-prefix";
-	private static final transient Logger logger = Logger.getLogger(ChartVirtualSensor.class);
+	public static final String PARAM_USER="user", PARAM_PASSWD="password", PARAM_URL="url", PARAM_TABLE_PREFIX="table-prefix";
+	private static final transient Logger logger = Logger.getLogger(StreamExporterVirtualSensor.class);
 	
 	StringBuilder sqlbuilder = new StringBuilder();
 	private String sqlstart, table_prefix = "GSN_EXPORT_";
@@ -46,16 +46,24 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 		boolean status = false;
 		if (super.initialize(map) == true) {
 			TreeMap<String, String> params = virtualSensorConfiguration.getMainClassInitialParams();
+			params.keySet();
 			try {
+				DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+				logger.debug("mysql driver loaded.");
+				logger.debug("url="+params.get(PARAM_URL)+
+								   ", user="+params.get(PARAM_USER)+
+								   ", passwd="+params.get(PARAM_PASSWD));
 				connection = DriverManager.getConnection(params.get(PARAM_URL), 
 											params.get(PARAM_USER),
 											params.get(PARAM_PASSWD));
+				logger.debug("jdbc connection established.");
 				if(params.get(PARAM_TABLE_PREFIX) != null)
 					table_prefix = params.get(PARAM_TABLE_PREFIX);
 				statement = connection.createStatement();
+				status = true;
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				logger.warn("Could not connect StreamExporterVS to jdbc source at url:" + params.get(PARAM_URL));
+				logger.warn("Could not connect StreamExporterVS to jdbc source at url: " + params.get(PARAM_URL));
 				logger.info(e);
 				status = false;
 			}
