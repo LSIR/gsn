@@ -3,6 +3,7 @@ package gsn.beans;
 import gsn.utils.GSNRuntimeException;
 
 import java.sql.Types;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -100,6 +101,10 @@ public class DataTypes {
 	    CHAR_NAME, INTEGER_NAME, BIGINT_NAME, BINARY_NAME, DOUBLE_NAME,
 	    TIME_NAME, TINYINT_NAME, SMALLINT_NAME };
 
+    public final static Object[] TYPE_SAMPLE_VALUES = { "A chain of chars",
+    	'c', new Integer(32), new Integer(66000), new Byte((byte) 12), new Double(3.141592),
+    	new Date().getTime(), new Integer(1), new Integer(9) };
+    
     public static int convertTypeNameToTypeID(final String type) {
 	if (type == null)
 	    throw new GSNRuntimeException(new StringBuilder(

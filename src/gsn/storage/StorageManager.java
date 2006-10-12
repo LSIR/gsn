@@ -9,6 +9,7 @@ import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
 
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -34,7 +35,93 @@ public class StorageManager {
 
     private static boolean hsql = false;
 
-    /**
+    public static enum DATABASE {
+    	MYSQL ("jdbc:mysql:"){ 
+    	    /*
+    	     * Returns the MySQL data type that can store this gsn
+    	     * datafield.
+    	     * @param field The datafield to be converted.
+    	     * @return convertedType the data type used by Mysql.
+    	     */
+    		public String convertGSNTypeToLocalType(DataField field) {
+    			String convertedType;
+    			switch (field.getDataTypeID()) {
+    			case DataTypes.CHAR:
+    			case DataTypes.VARCHAR:
+    				// Because the parameter for the varchar is not
+    				// optional.
+    				convertedType = field.getType();
+    				break;
+    			case DataTypes.BINARY:
+    				convertedType = "BLOB";
+    				break;
+    			default:
+    				convertedType = DataTypes.TYPE_NAMES[field.getDataTypeID()];
+    			break;
+    			}
+    			return convertedType;
+    		}
+    		/*
+    		 * Returns the jdbc mysql driver.
+    		 */
+    		public Driver getDriver() throws SQLException {
+    			return new com.mysql.jdbc.Driver();
+    		}
+    	}, 
+    	HSQL ("jdbc:hsql") {
+    	    /*
+    	     * Returns the HSQLDB data type that can store this gsn
+    	     * datafield.
+    	     * @param field The datafield to be converted.
+    	     * @return convertedType the data type used by hsql.
+    	     */
+    		public String convertGSNTypeToLocalType(DataField field) {
+    			//TODO: implement this method
+    			String convertedType = null;
+    			switch (field.getDataTypeID()) {
+    			case DataTypes.CHAR:
+    			case DataTypes.VARCHAR:
+    			    // Because the parameter for the varchar is not
+    			    // optional.
+    			    convertedType = field.getType();
+    			    break;
+    			default:
+    			    convertedType = DataTypes.TYPE_NAMES[field.getDataTypeID()];
+    			    break;
+    			}
+    			return convertedType;
+    		}
+    		
+    		/*
+    		 * Returns the jdbc hsqldb driver.
+    		 */
+    		public Driver getDriver() throws SQLException {
+    			//TODO: maybe we only need one driver per database.
+    			// so we can simply give it as constructor parameter (as jdbcPrefix ?)
+    			return new org.hsqldb.jdbcDriver();
+    		}
+    		;
+    	};
+
+    	private final String jdbcPrefix;
+    	private Driver driver;
+    	DATABASE(String jdbcPrefix) {
+    		this.jdbcPrefix = jdbcPrefix;
+    	}
+    	
+    	public String getJDBCPrefix() { return jdbcPrefix; }
+    	/*
+    	 * Converts from internal GSN data types to a supported DB data type.
+    	 * @param field The DataField to be converted
+    	 * @return convertedType The datatype name used by the target database.
+    	 */
+    	
+    	public abstract String convertGSNTypeToLocalType(DataField field);
+    	public abstract Driver getDriver() throws SQLException;  
+    	
+    };
+
+    	/**
          * Determinse if the database used is MySql.
          * 
          * @return Returns true if the database used is mysql.

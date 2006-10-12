@@ -113,7 +113,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
 	@Test public void testLogStatementIntoMySQLDB() {
 		
 		StreamExporterVirtualSensor vs = new StreamExporterVirtualSensor();
-		
+		// configure parameters
 		ArrayList<KeyValue> params = new ArrayList<KeyValue>();
 		params.add(new KeyValueImp(StreamExporterVirtualSensor.PARAM_URL, url));
 		params.add(new KeyValueImp(StreamExporterVirtualSensor.PARAM_USER, user));
@@ -121,6 +121,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
 		config.setMainClassInitialParams(params);
 		vs.initialize(hashMap);
 		
+		// configure datastream
 		Vector<DataField> fieldTypes = new Vector<DataField>();
 		Object[] data = null;
 		
@@ -134,8 +135,10 @@ public class TestStreamExporterVirtualSensor extends TestCase {
 		StreamElement streamElement = new StreamElement((Collection<DataField>)fieldTypes, 
 									(Serializable[]) data, timeStamp);
 		
+		// give datastream to vs
 		vs.dataAvailable(streamName, streamElement);
 		
+		// clean up and control
 		boolean result=true;
 		try {
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
