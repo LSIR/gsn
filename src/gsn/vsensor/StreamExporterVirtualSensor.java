@@ -4,10 +4,12 @@
  */
 package gsn.vsensor;
 
+
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.storage.StorageManager;
 import gsn.storage.StorageManager.DATABASE;
+
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.ParamParser;
 
@@ -55,7 +57,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 					for(DATABASE db: DATABASE.values())
 						if(params.get(PARAM_URL).startsWith(db.getJDBCPrefix())) {
 							DriverManager.registerDriver(db.getDriver());
-							logger.debug("driver for " + db.toString() + " loaded.");
+							logger.info("driver for " + db.toString() + " loaded.");
 						}
 					logger.debug("url="+params.get(PARAM_URL)+
 							", user="+params.get(PARAM_USER)+
@@ -70,8 +72,8 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 					status = true;
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
-					logger.warn("Could not connect StreamExporterVS to jdbc source at url: " + params.get(PARAM_URL));
-					logger.info(e);
+					logger.error("Could not connect StreamExporterVS to jdbc source at url: " + params.get(PARAM_URL));
+					logger.debug(e);
 					status = false;
 				}
 			}
@@ -129,7 +131,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 
 	private void exportValues(String tableName, StreamElement streamElement) {
 		sqlbuilder = new StringBuilder();
-		sqlbuilder.append("INSERT INTO");
+		sqlbuilder.append("INSERT INTO ");
 		sqlbuilder.append(tableName);
 		sqlbuilder.append(" (");
 		// (COLNAME1, COLNAME2,...) VALUES (bla1, bla2...) [, (bla1, bla2,...)
