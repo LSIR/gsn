@@ -1,5 +1,4 @@
 <virtual-sensor name="TestExportStream" priority="11">
-
    <processing-class>
       <class-name>gsn.vsensor.StreamExporterVirtualSensor</class-name>
       <init-params>
@@ -17,17 +16,11 @@
    wrapper into a mysql database called 'gsntest' running on localhost.   
    </description>
    <life-cycle pool-size="10"/>
-
-   <addressing>
-      <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs4.xml</predicate>
-   </addressing>
+   <addressing/>
    <output-structure />
-
-   <storage history-size="1s" permanent-storage="false"/>
-
-
+   <storage history-size="1s" />
    <input-streams>
-      <input-stream name="DATA" rate="100">
+      <input-stream name="DATA" >
          <stream-source alias="streamsource" storage-size="1" sampling-rate="1"
                         disconnect-buffer-size="10">
             <address wrapper="memory-usage">

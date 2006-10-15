@@ -1,0 +1,21 @@
+<virtual-sensor name="TemplateVirtualSensor" priority="10" >
+       	<processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<init-params/>
+	</processing-class>
+        <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/template.xml.</author>
+        <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/template.xml.</email>
+        <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/template.xml.</description>
+        <life-cycle pool-size="10" />
+        <addressing>
+		<predicate key="geographical">
+		   Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/template.xml.
+		</predicate>
+	</addressing>
+        <output-structure>
+	    <field name="tempreature" type="integer" />
+	    <field name="light" type="bigint" />
+        </output-structure>
+        <storage history-size="1s"/>
+        <input-streams/>
+</virtual-sensor> 
