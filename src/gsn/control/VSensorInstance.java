@@ -199,9 +199,9 @@ public class VSensorInstance {
 	    while (this.canRun) {
 		int effected = StorageManager.getInstance()
 			.executeUpdate(query);
-		if (this.logger.isInfoEnabled())
+		if (this.logger.isDebugEnabled())
 		    this.logger
-			    .info(new StringBuilder().append(effected).append(
+			    .debug(new StringBuilder().append(effected).append(
 				    " old rows dropped from ").append(
 				    this.virtualSensorConfiguration
 					    .getVirtualSensorName()).toString());

@@ -178,8 +178,8 @@ public class GSNNotification extends NotificationRequest {
 	if (host.indexOf("http://") < 0)
 	    host = "http://" + host;
 	String destination = host + ":" + port + "/gsn";
-	if (logger.isInfoEnabled())
-	    logger.info(new StringBuilder().append(
+	if (logger.isDebugEnabled())
+	    logger.debug(new StringBuilder().append(
 		    "Wants to send message to : ").append(destination)
 		    .toString());
 

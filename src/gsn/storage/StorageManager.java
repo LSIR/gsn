@@ -579,8 +579,8 @@ public class StorageManager {
          *                The name of the table to be dropped.
          */
     public void dropTable(String tableName) {
-	if (logger.isInfoEnabled())
-	    logger.info("Dropping table structure: " + tableName);
+	if (logger.isDebugEnabled())
+	    logger.debug("Dropping table structure: " + tableName);
 	String dropIndexStatement = null;
 	if (StorageManager.getInstance().isHsql())
 	    dropIndexStatement = new StringBuilder(" DROP INDEX ").append(

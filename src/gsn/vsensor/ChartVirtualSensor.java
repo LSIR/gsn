@@ -168,8 +168,8 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
 	/**
          * For debugging purposes.
          */
-	if (logger.isInfoEnabled())
-	    logger.info(new StringBuilder().append(
+	if (logger.isDebugEnabled())
+	    logger.debug(new StringBuilder().append(
 		    "Data received under the name: ").append(inputStreamName)
 		    .toString());
     }
@@ -271,10 +271,9 @@ class ChartInfo {
 		    false);
 	    chart.setBorderVisible(true);
 	    ready = true;
-	    if (logger.isInfoEnabled()) {
-		logger.info("The Chart Virtual Sensor is ready.");
-	    }
-	}
+	    if (logger.isDebugEnabled()) 
+		logger.debug("The Chart Virtual Sensor is ready.");
+	  }
     }
 
     /**
@@ -284,7 +283,6 @@ class ChartInfo {
          * @param streamElement
          */
     public synchronized void addData(StreamElement streamElement) {
-
 	for (int i = 0; i < streamElement.getFieldNames().length; i++) {
 	    TimeSeries timeSeries = dataForTheChart.get(streamElement
 		    .getFieldNames()[i]);

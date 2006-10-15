@@ -4,13 +4,10 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.storage.StorageManager;
 import gsn.utils.ParamParser;
 import gsn.vsensor.Container;
 import gsn.wrappers.AbstractStreamProducer;
-
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;

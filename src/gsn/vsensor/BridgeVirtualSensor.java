@@ -20,8 +20,8 @@ public class BridgeVirtualSensor extends AbstractVirtualSensor {
 
     public void dataAvailable(String inputStreamName, StreamElement data) {
 	dataProduced(data);
-	if (logger.isInfoEnabled())
-	    logger.info("Data received under the name: " + inputStreamName);
+	if (logger.isDebugEnabled())
+	    logger.debug("Data received under the name: " + inputStreamName);
     }
 
 }

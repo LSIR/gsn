@@ -538,8 +538,8 @@ public class VSensorLoader extends Thread {
          * sources.
          */
     public void createInputStreams(VSensorConfig vsensor, VirtualSensorPool pool) {
-	if (logger.isInfoEnabled())
-	    logger.info(new StringBuilder().append(
+	if (logger.isDebugEnabled())
+	    logger.debug(new StringBuilder().append(
 		    "Preparing input streams for: ").append(
 		    vsensor.getVirtualSensorName()).toString());
 	if (vsensor.getInputStreams().size() == 0)

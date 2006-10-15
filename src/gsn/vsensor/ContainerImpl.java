@@ -94,8 +94,8 @@ public class ContainerImpl extends HttpServlet implements Container {
 			.next();
 		StringBuilder query = interestedClient.getQuery();
 		interestedClient.setData(storageMan.executeQuery(query));
-		if (logger.isInfoEnabled())
-		    logger.info(new StringBuilder().append(
+		if (logger.isDebugEnabled())
+		    logger.debug(new StringBuilder().append(
 			    "Evaluating INTERESTED QUERY ").append(" : ")
 			    .append(query).append(">>> NEEDS NOTIFICATION = ")
 			    .append(interestedClient.needNotification())
@@ -180,8 +180,8 @@ public class ContainerImpl extends HttpServlet implements Container {
 
 		StorageManager.getInstance()
 			.insertData(notificiationCode, data);
-		if (logger.isInfoEnabled())
-		    logger.info(new StringBuilder().append(
+		if (logger.isDebugEnabled())
+		    logger.debug(new StringBuilder().append(
 			    "data received for notification code *").append(
 			    notificiationCode).toString());
 		remoteDS.remoteDataReceived();
