@@ -27,6 +27,16 @@ import org.apache.log4j.Logger;
  */
 public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
 
+    /**
+     * 
+     */
+    private static final Integer[] OUTPUT_FIELD_TYPES = new Integer[] { DataTypes.BINARY };
+
+    /**
+     * 
+     */
+    private static final String[] OUTPUT_FIELD_NAMES = new String[] { "PICTURE" };
+
     private int DEFAULT_RATE = 2000;
 
     private static int threadCounter = 0;
@@ -84,14 +94,8 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
 	if (logger.isDebugEnabled())
 	    logger.debug("AXISWirelessCameraWrapper is now running @" + rate
 		    + " Rate.");
-	try {
-	    getStorageManager().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
-	    return false;
-	}
-	this.start();
+	dataField.add(new DataField("PICTURE", "BINARY:JPEG",
+	"JPEG image from the temote network camera."));
 	return true;
     }
 
@@ -107,20 +111,16 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
 	    }
 	    if (code != 200)
 		continue;
-
 	    try {
 		received_image = postMethod.getResponseBody();
 	    } catch (IOException e1) {
 		e1.printStackTrace();
 	    }
 	    StreamElement streamElement = new StreamElement(
-		    new String[] { "DATA" },
-		    new Integer[] { DataTypes.BINARY },
+		    OUTPUT_FIELD_NAMES,   OUTPUT_FIELD_TYPES,
 		    new Serializable[] { received_image }, System
 			    .currentTimeMillis());
-	    // SimulationResult.addJustProducedFromDummyDataSource () ;
 	    publishData(streamElement);
-
 	}
     }
 
@@ -128,11 +128,9 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
 	super.finalize(context);
 	threadCounter--;
     }
-
+    private transient static final ArrayList<DataField> dataField = new ArrayList<DataField>();
+	
     public Collection<DataField> getProducedStreamStructure() {
-	ArrayList<DataField> dataField = new ArrayList<DataField>();
-	dataField.add(new DataField("DATA", "BINARY:JPEG",
-		"JPEG image from the temote network camera."));
 	return dataField;
     }
 

@@ -53,28 +53,19 @@ public class UDPWrapper extends AbstractStreamProducer {
          * between each packet
          */
     public boolean initialize(TreeMap context) {
-	boolean status = true;
-	super.initialize(context);
-	setName("UDPWrapper-Thread" + (++threadCounter));
-
-	try {
-	    StorageManager.getInstance().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
+	if (!super.initialize(context))
 	    return false;
-	}
 	addressBean = (AddressBean) context
 		.get(Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN);
-	port = Integer.parseInt(addressBean.getPredicateValue("port"));
-	// rate = Integer.parseInt(addressBean.getPredicateValue ( "rate" ));
 	try {
+	    port = Integer.parseInt(addressBean.getPredicateValue("port"));
 	    socket = new DatagramSocket(port);
-	} catch (SocketException e) {
-	    logger.warn("Couldn't open UDP socket : " + e.getMessage());
+	} catch (Exception e) {
+	    logger.warn(e.getMessage(), e);
+	    return false;
 	}
-	this.start();
-	return status;
+	setName("UDPWrapper-Thread" + (++threadCounter));
+	return true;
     }
 
     public void run() {

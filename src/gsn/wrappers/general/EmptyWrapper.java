@@ -20,19 +20,13 @@ public class EmptyWrapper extends AbstractStreamProducer {
 	    .getLogger(EmptyWrapper.class);
 
     private int threadCounter = 0;
-
+    private static final ArrayList<DataField> dataField = new ArrayList<DataField>();
     public boolean initialize(TreeMap context) {
-	super.initialize(context);
-	setName("EmptyWrapper-Thread" + (++threadCounter));
-	try {
-	    getStorageManager().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
+	if (!super.initialize(context))
 	    return false;
-	}
-	// TASK : TRYING TO CONNECT USING THE ADDRESS
-	this.start();
+	setName("EmptyWrapper-Thread" + (++threadCounter));
+	
+	dataField.add(new DataField("DATA", "int", "incremental int"));
 	return true;
     }
 
@@ -40,23 +34,10 @@ public class EmptyWrapper extends AbstractStreamProducer {
 	while (isActive()) {
 	    if (listeners.isEmpty())
 		continue;
-	    // StreamElement streamElement = new StreamElement(new String[]
-	    // {
-	    // "DATA", "DATA_BIN" }, new Integer[] { Types.INTEGER,
-	    // Types.BINARY
-	    // });
-	    // streamElement.addRowToRelation(new Serializable[] { counter,
-	    // testBinaryData
-	    // });
-	    // streamElement.setTimeStamp(System.currentTimeMillis());
-	    // // SimulationResult.addJustProducedFromDummyDataSource () ;
-	    // publishData(streamElement);
 	}
     }
 
     public Collection<DataField> getProducedStreamStructure() {
-	ArrayList<DataField> dataField = new ArrayList<DataField>();
-	dataField.add(new DataField("DATA", "int", "incremental int"));
 	return dataField;
     }
 

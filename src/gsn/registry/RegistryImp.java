@@ -122,8 +122,7 @@ public class RegistryImp extends HttpServlet implements Registry {
 	WebAppContext wac = new WebAppContext();
 	wac.setContextPath("/");
 	wac.setResourceBase(DEFAULT_DIRECTORY_SERVER_WEB_APP);
-	wac.setWelcomeFiles(new String[] { "index.jsp" });
-
+	
 	ServletHandler servletHandler = new ServletHandler();
 	servletHandler.addServletWithMapping("gsn.registry.RegistryImp",
 		"/registry");

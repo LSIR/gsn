@@ -15,9 +15,6 @@ import org.apache.log4j.Logger;
  */
 public class VSensorConfig implements Serializable {
 
-    /**
-         * 
-         */
     private static final long serialVersionUID = 1625382440863797197L;
 
     public static final int DEFAULT_PRIORITY = 100;
@@ -55,9 +52,7 @@ public class VSensorConfig implements Serializable {
 
     private transient Long lastModified;
 
-    private boolean permanentStorage;
-
-    private transient String fileName;
+   private transient String fileName;
 
     private transient final Logger logger = Logger
 	    .getLogger(VSensorConfig.class);
@@ -268,11 +263,7 @@ public class VSensorConfig implements Serializable {
 	return result;
     }
 
-    public boolean isPermanentStorage() {
-	return this.permanentStorage;
-    }
-
-    private boolean isGetMainClassInitParamsInitialized = false;
+   private boolean isGetMainClassInitParamsInitialized = false;
 
     private final TreeMap<String, String> mainClassInitParams = new TreeMap<String, String>(
 	    new CaseInsensitiveComparator());
@@ -437,8 +428,7 @@ public class VSensorConfig implements Serializable {
 		+ this.outputStructure + ", storageHistorySize='"
 		+ this.storageHistorySize + '\'' + builder.toString()
 		+ ", mainClassInitialParams=" + this.mainClassInitialParams
-		+ ", lastModified=" + this.lastModified + ", permanentStorage="
-		+ this.permanentStorage + ", fileName='" + this.fileName + '\''
+		+ ", lastModified=" + this.lastModified + ", fileName='" + this.fileName + '\''
 		+ ", logger=" + this.logger + ", nameInitialized="
 		+ this.nameInitialized + ", isStorageCountBased="
 		+ this.isStorageCountBased + ", parsedStorageSize="

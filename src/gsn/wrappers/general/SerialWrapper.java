@@ -295,16 +295,9 @@ public class SerialWrapper extends AbstractStreamProducer implements
          * serialport : the name of the serial port (/dev/ttyS0...)
          */
     public boolean initialize(TreeMap context) {
-	boolean status = true;
-	super.initialize(context);
-	setName("WNetSerialWrapper-Thread" + (++threadCounter));
-	try {
-	    getStorageManager().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
+	if (!super.initialize(context))
 	    return false;
-	}
+	setName("WNetSerialWrapper-Thread" + (++threadCounter));
 	addressBean = (AddressBean) context
 		.get(Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN);
 	serialPort = addressBean.getPredicateValue("serialport");
@@ -327,16 +320,14 @@ public class SerialWrapper extends AbstractStreamProducer implements
 	    logger
 		    .warn("Serial port wrapper couldn't connect to serial port : "
 			    + e.getMessage());
-	    status = false;
+	    return false;
 	}
 	inputBuffer = new byte[MAXBUFFERSIZE];
-	this.start();
-	return status;
+	return true;
     }
 
     public void run() {
 	while (isActive()) {
-
 	    if (listeners.isEmpty() || !isNew) {
 		continue;
 	    }
@@ -347,9 +338,7 @@ public class SerialWrapper extends AbstractStreamProducer implements
 			    .currentTimeMillis());
 	    publishData(streamElement);
 	    isNew = false;
-
 	}
-
     }
 
     public Collection<DataField> getProducedStreamStructure() {
@@ -365,8 +354,6 @@ public class SerialWrapper extends AbstractStreamProducer implements
     }
 
     public void serialEvent(SerialPortEvent e) {
-
-	int newData = 0;
 
 	if (logger.isDebugEnabled())
 	    logger

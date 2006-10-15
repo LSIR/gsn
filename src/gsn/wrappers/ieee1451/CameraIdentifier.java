@@ -33,8 +33,6 @@ public class CameraIdentifier extends AbstractStreamProducer {
 
     private int RATE = 15000;
 
-    private int TIMEOUT = 20000;
-
     private TedsToVSResult tedsResult;
 
     private final Logger logger = Logger.getLogger(CameraIdentifier.class);
@@ -68,8 +66,16 @@ public class CameraIdentifier extends AbstractStreamProducer {
 	    DataTypes.VARCHAR };
 
     public boolean initialize(TreeMap context) {
-	boolean toReturn = super.initialize(context);
-
+	if (!super.initialize(context))
+	    return false;
+	cachedOutputStructure.add(new DataField(ID_OUTPUT_FIELD, "VARCHAR(20)",
+		"Id of the detected transducer"));
+	cachedOutputStructure.add(new DataField(TEDS_OUTPUT_FIELD,
+		"VARCHAR(10000)", "TEDS-data"));
+	cachedOutputStructure.add(new DataField(STATUS_OUTPUT_FIELD,
+		"VARCHAR(20)", "status:added or removed"));
+	cachedOutputStructure.add(new DataField(VSFILE_OUTPUT_FIELD,
+		"VARCHAR(40)", "Virtual Sensor Filename"));
 	String pingCommand = "ping ";
 	String pingCommandParams = null;
 	if (System.getProperty("os.name").equals("Mac OS X"))
@@ -93,14 +99,10 @@ public class CameraIdentifier extends AbstractStreamProducer {
 
 	AddressBean addressBean = (AddressBean) context
 		.get(Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN);
-	if (addressBean.getPredicateValue("TIMEOUT") != null) {
-	    TIMEOUT = Integer.parseInt((String) addressBean
-		    .getPredicateValue("TIMEOUT"));
-	}
-	if (addressBean.getPredicateValue("RATE") != null) {
+	if (addressBean.getPredicateValue("RATE") != null)
 	    RATE = Integer.parseInt((String) addressBean
 		    .getPredicateValue("RATE"));
-	}
+
 	// ------INITIALIZING THE TEMPLATE DIRECTORY ---------
 	String templateDirPath = addressBean
 		.getPredicateValue("templates-directory");
@@ -139,20 +141,12 @@ public class CameraIdentifier extends AbstractStreamProducer {
 
 	setName("CameraIdentifier-Thread" + (++threadCounter));
 	try {
-	    getStorageManager().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
-	    return false;
-	}
-	try {
 	    Thread.sleep(4000);
 	} catch (InterruptedException e) {
 	    e.printStackTrace(); // To change body of catch statement use
 	    // File | Settings | File Templates.
 	}
-	this.start();
-	return toReturn;
+	return true;
     }
 
     public void run() {
@@ -163,8 +157,7 @@ public class CameraIdentifier extends AbstractStreamProducer {
 	try {
 	    Thread.sleep(InputStream.INITIAL_DELAY_5000MSC * 2);
 	} catch (InterruptedException e) {
-	    e.printStackTrace(); // To change body of catch statement use
-	    // File | Settings | File Templates.
+	    e.printStackTrace();
 	}
 	while (isActive()) {
 	    try {
@@ -250,20 +243,9 @@ public class CameraIdentifier extends AbstractStreamProducer {
 	}
     }
 
-    private transient Collection<DataField> cachedOutputStructure = null;
+    private static final transient Collection<DataField> cachedOutputStructure = new ArrayList<DataField>();
 
     public Collection<DataField> getProducedStreamStructure() {
-	if (cachedOutputStructure == null) {
-	    cachedOutputStructure = new ArrayList<DataField>();
-	    cachedOutputStructure.add(new DataField(ID_OUTPUT_FIELD,
-		    "VARCHAR(20)", "Id of the detected transducer"));
-	    cachedOutputStructure.add(new DataField(TEDS_OUTPUT_FIELD,
-		    "VARCHAR(10000)", "TEDS-data"));
-	    cachedOutputStructure.add(new DataField(STATUS_OUTPUT_FIELD,
-		    "VARCHAR(20)", "status:added or removed"));
-	    cachedOutputStructure.add(new DataField(VSFILE_OUTPUT_FIELD,
-		    "VARCHAR(40)", "Virtual Sensor Filename"));
-	}
 	return cachedOutputStructure;
     }
 

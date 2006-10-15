@@ -62,14 +62,6 @@ public class MemoryMonitoringWrapper extends AbstractStreamProducer {
 		samplingRate = DEFAULT_SAMPLING_RATE;
 	    }
 	}
-	try {
-	    StorageManager.getInstance().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
-	    return false;
-	}
-	this.start();
 	return true;
     }
 

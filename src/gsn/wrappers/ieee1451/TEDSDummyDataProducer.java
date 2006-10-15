@@ -51,9 +51,9 @@ public class TEDSDummyDataProducer extends AbstractStreamProducer {
     boolean rateBased = false;
 
     public boolean initialize(TreeMap context) {
-	super.initialize(context);
+	if (!super.initialize(context)) 
+	    return false;
 	setName("TEDSDummyRandomDataProducer-Thread" + (++threadCounter));
-
 	AddressBean addressBean = (AddressBean) context
 		.get(Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN);
 	/**
@@ -67,16 +67,9 @@ public class TEDSDummyDataProducer extends AbstractStreamProducer {
 	    tedsPredicatesList.add(new TEDSDataField(addressBean
 		    .getPredicateValue("field." + i)));
 	}
-
-	try {
-	    getStorageManager().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
-	    return false;
-	}
-
-	this.start();
+	for (TEDSDataField field : tedsPredicatesList) 
+	    dataField.add(new DataField(field.name, field.type,
+		    field.description));
 	return true;
     }
 
@@ -99,11 +92,6 @@ public class TEDSDummyDataProducer extends AbstractStreamProducer {
 
 	    Serializable[] dataFieldValues = (new TEDSDataField()
 		    .RandomData(dataFieldTypes));// new
-	    // Serializable[NumOfChannels];
-
-	    // logger.fatal(dataFieldNames);
-	    // logger.fatal(dataFieldTypes);
-	    // logger.fatal(dataFieldValues);
 	    StreamElement streamElement = new StreamElement(
 		    getProducedStreamStructure(), dataFieldValues, System
 			    .currentTimeMillis());
@@ -120,17 +108,8 @@ public class TEDSDummyDataProducer extends AbstractStreamProducer {
 	super.finalize(context);
 	threadCounter--;
     }
-
+    private static transient final ArrayList<DataField> dataField = new ArrayList<DataField>();
     public Collection<DataField> getProducedStreamStructure() {
-	ArrayList<DataField> dataField = new ArrayList<DataField>();
-	// logger.fatal("Hi...");
-	// logger.fatal(tedsPredicatesList);
-	for (TEDSDataField field : tedsPredicatesList) {
-	    dataField.add(new DataField(field.name, field.type,
-		    field.description));
-	    // System.out.println("'''''''''''''''''''''''''''''"+field.type);
-
-	}
 	return dataField;
     }
 
@@ -183,11 +162,8 @@ public class TEDSDummyDataProducer extends AbstractStreamProducer {
 		    break;
 
 		}
-
 	    }
 	    return result;
 	}
-
     }
-
 }

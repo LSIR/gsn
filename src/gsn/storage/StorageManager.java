@@ -13,7 +13,6 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -40,11 +39,10 @@ public class StorageManager {
     	
     	MYSQL ("jdbc:mysql:"){
     	    /*
-    	     * Returns the MySQL data type that can store this gsn
-    	     * datafield.
-    	     * @param field The datafield to be converted.
-    	     * @return convertedType the data type used by Mysql.
-    	     */
+                 * Returns the MySQL data type that can store this gsn
+                 * datafield. @param field The datafield to be converted.
+                 * @return convertedType the data type used by Mysql.
+                 */
     		public String convertGSNTypeToLocalType(DataField field) {
     			String convertedType;
     			switch (field.getDataTypeID()) {
@@ -64,21 +62,20 @@ public class StorageManager {
     			return convertedType;
     		}
     		/*
-    		 * Returns the jdbc mysql driver.
-    		 */
+                 * Returns the jdbc mysql driver.
+                 */
     		public void loadDriver() throws SQLException {
     			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
     		}
     	}, 
     	HSQL ("jdbc:hsql") {
     	    /*
-    	     * Returns the HSQLDB data type that can store this gsn
-    	     * datafield.
-    	     * @param field The datafield to be converted.
-    	     * @return convertedType the data type used by hsql.
-    	     */
+                 * Returns the HSQLDB data type that can store this gsn
+                 * datafield. @param field The datafield to be converted.
+                 * @return convertedType the data type used by hsql.
+                 */
     		public String convertGSNTypeToLocalType(DataField field) {
-    			//TODO: implement this method
+    			// TODO: implement this method
     			String convertedType = null;
     			switch (field.getDataTypeID()) {
     			case DataTypes.CHAR:
@@ -95,14 +92,14 @@ public class StorageManager {
     		}
     		
     		/*
-    		 * Returns the jdbc hsqldb driver.
-    		 */
+                 * Returns the jdbc hsqldb driver.
+                 */
     		public void loadDriver() throws SQLException {
-    			//TODO: maybe we only need one driver per database.
-    			// so we can simply give it as constructor parameter (as jdbcPrefix ?)
+    			// TODO: maybe we only need one driver per database.
+    			// so we can simply give it as constructor parameter (as
+                        // jdbcPrefix ?)
     			DriverManager.registerDriver(new org.hsqldb.jdbcDriver());
     		}
-    		;
     	};
 
     	private final String jdbcPrefix;
@@ -113,10 +110,10 @@ public class StorageManager {
     	
     	public String getJDBCPrefix() { return jdbcPrefix; }
     	/*
-    	 * Converts from internal GSN data types to a supported DB data type.
-    	 * @param field The DataField to be converted
-    	 * @return convertedType The datatype name used by the target database.
-    	 */
+         * Converts from internal GSN data types to a supported DB data type.
+         * @param field The DataField to be converted @return convertedType The
+         * datatype name used by the target database.
+         */
     	
     	public abstract String convertGSNTypeToLocalType(DataField field);
     	public abstract void loadDriver() throws SQLException;  
@@ -161,68 +158,11 @@ public class StorageManager {
     private StorageManager() {
     }
 
-    public void createTable(String tableName, Collection<DataField> structure)
-	    throws SQLException {
-	createTable(tableName, structure, false, false);
-    }
-
-    public void createTable(String tableName, Collection<DataField> structure,
-	    boolean storageEnabled, boolean overwrite) throws SQLException {
+    public void createTable(String tableName, Collection<DataField> structure ) throws SQLException {
 	Connection connection = null;
-	if (overwrite)
 	    dropTable(tableName);
-	else {
-	    try {
-		connection = connectionPool.borrowConnection();
-		ResultSet rs = connection.getMetaData().getCatalogs();
-		boolean exists = false;
-		while (rs.next())
-		    if (rs.getString(1).equals(tableName))
-			exists = true;
-		if (exists == true) {
-		    ResultSetMetaData rsmd = null;
-		    if (isMysqlDB())
-			rsmd = connection.createStatement().executeQuery(
-				new StringBuilder("select * from ").append(
-					tableName).append(" limit 0")
-					.toString()).getMetaData();
-		    if (isHsql()) {
-
-		    }
-		    for (DataField df : structure) {
-			for (int i = 0; i < rsmd.getColumnCount(); i++)
-			    if (rsmd.getColumnName(i).equals(df.getFieldName()))
-				if (DataTypes.convertFromJDBCToGSNFormat(rsmd
-					.getColumnType(i)) == df
-					.getDataTypeID())
-				    continue;
-				else {
-				    logger
-					    .error("The table >"
-						    + tableName
-						    + "< exists but the structure is not compatible with what GSN desires.");
-				    System.exit(1);
-				}
-
-			logger.error("The field >" + df.getFieldName()
-				+ "< is missing from table >" + tableName
-				+ "<.");
-			System.exit(1);
-		    }
-		}
-	    } catch (SQLException e) {
-		logger.error(e.getMessage(), e);
-	    } finally {
-		if (connection != null && !connection.isClosed())
-		    try {
-			connection.close();
-		    } catch (Exception e) {
-		    }
-	    }
-	}
-
-	String sqlCreateStatement = getCreateTableStatement(structure,
-		tableName, storageEnabled).replace("\"", "");
+		String sqlCreateStatement = getCreateTableStatement(structure,
+		tableName).replace("\"", "");
 	String sqlCreateIndexStatement = new StringBuilder("CREATE INDEX ")
 		.append(tableName).append("_INDEX ON ").append(tableName)
 		.append(" (TIMED DESC)").toString();
@@ -248,11 +188,6 @@ public class StorageManager {
 		logger.debug(sqlCreateStatement);
 	    connection.createStatement().execute(sqlCreateStatement);
 	    connection.createStatement().execute(sqlCreateIndexStatement);
-	    // if ( fileName != null && fileName.trim ().length () != 0 )
-	    // connection.createStatement ().execute ( "SET TABLE "
-	    // + tableName
-	    // + " SOURCE \""
-	    // + fileName + "\"" ) ;
 	} finally {
 	    if (connection != null && !connection.isClosed())
 		connection.close();
@@ -264,7 +199,7 @@ public class StorageManager {
          * be testable from that class.
          */
     protected String getCreateTableStatement(Collection<DataField> structure,
-	    String alias, boolean permanantStorageEnabled) {
+	    String alias) {
 	StringBuilder result = new StringBuilder("CREATE ");
 	if (isHsql())
 	    result.append(" CACHED ");
@@ -320,7 +255,6 @@ public class StorageManager {
 	    return type.toUpperCase().substring(0, index);
 	}
 	return type.toUpperCase();
-	// return type;
     }
 
     public void createView(String viewName, String selectQuery) {
@@ -639,30 +573,12 @@ public class StorageManager {
     }
 
     /**
-         * Drops the specified table. Note that the table is going to be droped
-         * only when the parameter <code>overwrite-tables</code> in the
-         * container's main configuration file is set to true.
-         * 
-         * @param tableName
-         *                The name of the table to be drop.
-         */
-
-    public void dropTable(String tableName) {
-	dropTable(tableName, false);
-    }
-
-    /**
          * This method drops the specified table. Note that
          * 
          * @param tableName :
          *                The name of the table to be dropped.
-         * @param forceDropTable :
-         *                Overwrite the parameter <code>overwrite-tables</code>
-         *                in the container's main configuration file.
          */
-    public void dropTable(String tableName, boolean forceDropTable) {
-	if (!forceDropTable && !getContainerConfig().isJdbcOverwriteTables())
-	    return;
+    public void dropTable(String tableName) {
 	if (logger.isInfoEnabled())
 	    logger.info("Dropping table structure: " + tableName);
 	String dropIndexStatement = null;

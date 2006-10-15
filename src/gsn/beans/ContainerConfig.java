@@ -46,8 +46,6 @@ public class ContainerConfig {
 
     protected String containerFileName;
 
-    protected boolean jdbcOverwriteTables = Boolean.FALSE;
-
     public static final String FIELD_NAME_jdbcOverwriteTables = "jdbcOverwriteTables";
 
     protected String jdbcDriver;
@@ -66,17 +64,7 @@ public class ContainerConfig {
 
     protected int storagePoolSize = DEFAULT_STORAGE_POOL_SIZE;
 
-    protected boolean permanentStorage = false;
-
     public static final String FIELD_NAME_permanentStorageEnabled = "permanentStorage";
-
-    public boolean isPermanentStorage() {
-	return this.permanentStorage;
-    }
-
-    public boolean isJdbcOverwriteTables() {
-	return this.jdbcOverwriteTables;
-    }
 
     public String getContainerFileName() {
 	return this.containerFileName;

@@ -54,9 +54,7 @@ public abstract class AbstractStreamProducer extends Thread implements
 
     private boolean isAlive;
 
-    private StorageManager storageMan;
-
-    private TableSizeEnforce tableSizeEnforce;
+       private TableSizeEnforce tableSizeEnforce;
 
     private static int TABLE_SIZE_ENFORCING_THREAD_COUNTER = 0;
 
@@ -79,13 +77,6 @@ public abstract class AbstractStreamProducer extends Thread implements
 	activeAddressBean = (AddressBean) initialContext
 		.get(Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN);
 
-	this.storageMan = (StorageManager) initialContext
-		.get(VSensorLoader.STORAGE_MANAGER);
-	if (storageMan == null) {
-	    logger
-		    .fatal("The Storage Manager shouldn't be null, possible a BUG.");
-	    return false;
-	}
 	if (activeAddressBean == null) {
 	    logger
 		    .fatal("The address bean supplied to initializer shouldn't be null, possible a BUG.");
@@ -139,10 +130,9 @@ public abstract class AbstractStreamProducer extends Thread implements
     }
 
     protected StorageManager getStorageManager() {
-	return storageMan;
+	return StorageManager.getInstance();
 
     }
-
     /**
          * The addressing is provided in the ("ADDRESS",Collection<KeyValue>).
          * If the DataSource can't initialize itself because of either internal

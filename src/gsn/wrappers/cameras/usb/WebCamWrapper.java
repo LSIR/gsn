@@ -114,19 +114,10 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
 
    // -----------------------------------START----------------------------------------
    public boolean initialize ( TreeMap initialContext ) {
-      boolean toReturn = super.initialize ( initialContext ) ;
+      if ( ! super.initialize ( initialContext ) )
+	         return false ;
       setName ( "WebCamWrapper-Thread:" + ( ++ threadCounter ) ) ;
-      try {
-         getStorageManager ( ).createTable ( getDBAlias ( ) , getProducedStreamStructure ( ) ) ;
-      } catch ( SQLException e ) {
-         logger.error ( e.getMessage ( ) , e ) ;
-         return false ;
-      }
-      toReturn &= webcamInitialization ( ) ;
-      if ( ! toReturn )
-         return false ;
-      this.start ( ) ;
-      return toReturn ;
+      return  webcamInitialization ( ) ;
    }
 
    private boolean webcamInitialization ( ) {
@@ -135,7 +126,6 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
       try {
          ds = Manager.createDataSource ( loc ) ;
       }
-
       catch ( NoDataSourceException e ) {
          // Did you load the module ?
          // Did you set the Env ?

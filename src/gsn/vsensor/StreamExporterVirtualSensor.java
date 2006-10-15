@@ -121,6 +121,55 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 		} catch (SQLException e) {
 			logger.error("Could not create table for export in remote database: " + e);
 		}
+//		    try {
+//		connection = connectionPool.borrowConnection();
+//		ResultSet rs = connection.getMetaData().getCatalogs();
+//		boolean exists = false;
+//		while (rs.next())
+//		    if (rs.getString(1).equals(tableName))
+//			exists = true;
+//		if (exists == true) {
+//		    ResultSetMetaData rsmd = null;
+//		    if (isMysqlDB())
+//			rsmd = connection.createStatement().executeQuery(
+//				new StringBuilder("select * from ").append(
+//					tableName).append(" limit 0")
+//					.toString()).getMetaData();
+//		    if (isHsql()) {
+//
+//		    }
+//		    for (DataField df : structure) {
+//			for (int i = 0; i < rsmd.getColumnCount(); i++)
+//			    if (rsmd.getColumnName(i).equals(df.getFieldName()))
+//				if (DataTypes.convertFromJDBCToGSNFormat(rsmd
+//					.getColumnType(i)) == df
+//					.getDataTypeID())
+//				    continue;
+//				else {
+//				    logger
+//					    .error("The table >"
+//						    + tableName
+//						    + "< exists but the structure is not compatible with what GSN desires.");
+//				    System.exit(1);
+//				}
+//
+//			logger.error("The field >" + df.getFieldName()
+//				+ "< is missing from table >" + tableName
+//				+ "<.");
+//			System.exit(1);
+//		    }
+//		}
+//	    } catch (SQLException e) {
+//		logger.error(e.getMessage(), e);
+//	    } finally {
+//		if (connection != null && !connection.isClosed())
+//		    try {
+//			connection.close();
+//		    } catch (Exception e) {
+//		    }
+//	    }
+		
+		
 	}
 
 	/*

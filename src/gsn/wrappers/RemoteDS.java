@@ -9,7 +9,6 @@ import gsn.vsensor.Container;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -25,7 +24,7 @@ public class RemoteDS extends AbstractStreamProducer {
 
     private final transient Logger logger = Logger.getLogger(RemoteDS.class);
 
-    private ArrayList<DataField> strcture = new ArrayList<DataField>();
+    private ArrayList<DataField> strcture = null;
 
     private String remoteVSName;
 
@@ -43,13 +42,6 @@ public class RemoteDS extends AbstractStreamProducer {
 	if (this.strcture == null) {
 	    logger
 		    .warn("The initialization of the ** virtual sensor failed due to *askForStrcture* failure.");
-	    return false;
-	}
-	try {
-	    getStorageManager().createTable(getDBAlias(), strcture, false,
-		    false);
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
 	    return false;
 	}
 	Mappings.getContainer().addRemoteStreamSource(getDBAlias(), this);

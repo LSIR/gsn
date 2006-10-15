@@ -48,18 +48,15 @@ public class SystemTime extends AbstractStreamProducer implements
 	if (toReturn == false)
 	    return false;
 	setName("DummyDataProducer-Thread" + (++threadCounter));
-	try {
-	    StorageManager.getInstance().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
-	    return false;
-	}
+	return true;
+    }
+
+    public void run() {
 	timer = new Timer(CLOCK_PERIODS, this);
 	timer.setInitialDelay(INITIAL_DELAY);
 	timer.start();
-	return true;
     }
+
 
     public Collection<DataField> getProducedStreamStructure() {
 	return collection;

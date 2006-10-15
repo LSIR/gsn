@@ -75,7 +75,7 @@ public class VSensorLoader extends Thread {
 
     private Thread directoryRefreshingThread;
 
-    public VSensorLoader(String pluginsDir) {
+      public VSensorLoader(String pluginsDir) {
 	this.pluginsDir = pluginsDir;
 	Thread thread = new Thread(this);
 	thread
@@ -87,6 +87,11 @@ public class VSensorLoader extends Thread {
     }
 
     public void run() {
+	if (storageManager == null) {
+	    logger.fatal("The Storage Manager shouldn't be null, possible a BUG.");
+	    return;
+	}
+
 	while (this.canRun) {
 	    try {
 		this.loadPlugin();
@@ -223,9 +228,7 @@ public class VSensorLoader extends Thread {
 	    try {
 		this.storageManager.createTable(sensorInstance.getConfig()
 			.getVirtualSensorName(), sensorInstance.getConfig()
-			.getOutputStructure(), sensorInstance.getConfig()
-			.isPermanentStorage(), Main.getContainerConfig()
-			.isJdbcOverwriteTables());
+			.getOutputStructure());
 		sensorInstance.start();
 	    } catch (SQLException e) {
 		if (e.getMessage().toLowerCase().contains(
@@ -623,8 +626,17 @@ public class VSensorLoader extends Thread {
 			    addressBean.getWrapper()).newInstance();
 		    boolean initializationResult = ds.initialize(context);
 		    if (initializationResult == false)
-			continue;// This address is not working, go
-		    // to the next address.
+			continue;// This address is not working, goto the
+                                        // next address.
+		    else {
+			try {
+			    storageManager.createTable(ds.getDBAlias(), ds.getProducedStreamStructure());
+			} catch (SQLException e) {
+			    logger.error(e.getMessage(), e);
+			    continue;
+			}
+			ds.start();
+		    }
 		} catch (InstantiationException e) {
 		    logger.error(e.getMessage(), e);
 		} catch (IllegalAccessException e) {
@@ -658,7 +670,8 @@ public class VSensorLoader extends Thread {
 	    VSensorInstance sensorInstance = Mappings
 		    .getVSensorInstanceByFileName(configFile);
 	    removeAllResources(sensorInstance);
-	    logger.warn("Removing the resources associated with : "+sensorInstance.getFilename()+" [done].");
+	    logger.warn("Removing the resources associated with : "
+		    + sensorInstance.getFilename() + " [done].");
 	}
 	try {
 	    this.storageManager.shutdown();

@@ -109,21 +109,21 @@ public class WSNSWrapper extends AbstractStreamProducer implements DataListener 
 		rate = RATE_DEFAULT_VALUE;
 	    }
 	}
-	try {
-	    StorageManager.getInstance().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
-	    return false;
-	}
-	nodes = initializeNodes(node_count);
-	for (int i = 0; i < node_count; i++)
-	    nodes[i].addDataListener(this);
-	this.start();
+	dataField.add(new DataField("NODE_ID", DataTypes.INTEGER_NAME,
+		"Node's identification."));
+	dataField.add(new DataField("PARENT_ID", DataTypes.INTEGER_NAME,
+		"Parent Node's identification."));
+	dataField.add(new DataField("TEMPREATURE", DataTypes.INTEGER_NAME,
+		"incremental int"));
+
 	return true;
     }
 
     public void run() {
+	nodes = initializeNodes(node_count);
+	for (int i = 0; i < node_count; i++)
+	    nodes[i].addDataListener(this);
+
 	long tempStepCounter = 0;
 	while (isActive()) {
 	    if (tempStepCounter <= step_counter || step_counter == -1) {
@@ -159,14 +159,9 @@ public class WSNSWrapper extends AbstractStreamProducer implements DataListener 
 	    node.stopNode();
     }
 
+    private static final ArrayList<DataField> dataField = new ArrayList<DataField>();
+
     public Collection<DataField> getProducedStreamStructure() {
-	ArrayList<DataField> dataField = new ArrayList<DataField>();
-	dataField.add(new DataField("NODE_ID", DataTypes.INTEGER_NAME,
-		"Node's identification."));
-	dataField.add(new DataField("PARENT_ID", DataTypes.INTEGER_NAME,
-		"Parent Node's identification."));
-	dataField.add(new DataField("TEMPREATURE", DataTypes.INTEGER_NAME,
-		"incremental int"));
 	return dataField;
     }
 

@@ -25,10 +25,10 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class SFWrapper extends AbstractStreamProducer implements
+public class TinyOS1Wrapper extends AbstractStreamProducer implements
 	MessageListener {
 
-    private final transient Logger logger = Logger.getLogger(SFWrapper.class);
+    private final transient Logger logger = Logger.getLogger(TinyOS1Wrapper.class);
 
     /**
          * A flag showing whether there exist a new data or not. This flag is
@@ -51,8 +51,7 @@ public class SFWrapper extends AbstractStreamProducer implements
     private ArrayList<String> getterMethodNames = new ArrayList<String>();
 
     public boolean initialize(TreeMap initialContext) {
-	boolean toReturn = super.initialize(initialContext);
-	if (!toReturn)
+	if (!super.initialize(initialContext))
 	    return false;
 	String host = getAddressBeanActiveHostName();
 	int port = getAddressBeanActivePort();
@@ -90,13 +89,6 @@ public class SFWrapper extends AbstractStreamProducer implements
 			    + host + ":" + port + "*");
 	setName("TinyOS-SerialForwarder-Thread:" + (++threadCounter));
 	try {
-	    getStorageManager().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
-	    return false;
-	}
-	try {
 	    mote = new MoteIF(host, port);
 	    if (mote == null) {
 		throw new Exception("MoteIF initialization failed");
@@ -106,9 +98,7 @@ public class SFWrapper extends AbstractStreamProducer implements
 	    return false;
 	}
 	mote.registerListener(new GSNMessage(), this);
-	mote.start();
-	this.start();
-	return toReturn;
+	return true;
     }
 
     public synchronized void messageReceived(int to, Message m) {
@@ -121,6 +111,7 @@ public class SFWrapper extends AbstractStreamProducer implements
     }
 
     public void run() {
+	mote.start();
 	try {
 	    while (isActive()) {
 		if (listeners.isEmpty() || isConsumed)
