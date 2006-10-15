@@ -4,18 +4,21 @@ package gsn.wrappers.ieee1451;
 
 import gsn.Main;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.apache.log4j.Logger;
 
 /**
  * @author Surender Reddy Yerva(yerva, surenderreddy.yerva-at-epfl.ch)<br>
  */
 
 public class TedsToVirtualSensor {
+   private final Logger             logger              = Logger.getLogger( TedsToVirtualSensor.class );
    
    /*
     * The directory in which the Virtual Sensor Template files are present.
@@ -79,37 +82,32 @@ public class TedsToVirtualSensor {
          }
          // System.out.println(vstmp.toString());
          
-         PrintWriter result; // Character output stream for writing data.
-         
-         try { // Create the output stream.
-            result = new PrintWriter( new FileWriter( TARGET_VS_DIR + ch0.name + ".xml" ) );
-         } catch ( IOException e ) {
-            System.out.println( "Error in VS File operation." );
-            System.out.println( e.toString( ) );
-            return new TedsToVSResult( -1 ); // End the program.
-         }
+         PrintWriter result = null; // Character output stream for writing data.
          
          try {
             // Writing the xml string generated from template file to the VS
             // xml file
+            File outputF = new File( TARGET_VS_DIR + ch0.name + ".xml");
+            if (!outputF.isFile( ))
+               outputF.createNewFile( );
+            outputF.deleteOnExit( );
+            result = new PrintWriter( new FileWriter( outputF ) );
             result.println( vstmp.toString( ) );
-            
          } catch ( Exception e ) {
             // Some problem reading the data from the input file.
-            System.out.println( "Error in generating the VirtualSensor File;" + e.getMessage( ) );
+            logger.warn( "Error in generating the VirtualSensor File.",e );
             return new TedsToVSResult( -1 ); // End the program.
          } finally {
             // Finish by closing the files,
             // whatever else may have happened.
-            result.close( );
+            if (result!=null)
+               result.close( );
          }
          
       } catch ( Exception e ) {
-         // TODO Auto-generated catch block
          e.printStackTrace( );
          return new TedsToVSResult( -1 ); // End the program.
       }
-      
       return new TedsToVSResult( ch0.name + ".xml" , 0 , sensorTEDS.toHtmlString( ) , ch0.name );
    }
    
