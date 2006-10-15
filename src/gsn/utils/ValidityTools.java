@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -65,34 +67,70 @@ public class ValidityTools {
 	  con.close();
     }
     
+    static Pattern hostAndPortPattern = Pattern.compile("(.+):(\\d+)$");
+
+    /*
+     * Returns the hostname part of a host:port String. This method is ipv6 compatible.
+     * @param hostandport A string containing a host and a port number, separated by a ":"
+     * @return host A string with the host name part (either name or ip address) of the input string.
+     */
+    public static String getHostName(String hostandport) {
+    	String hostname="";
+    	try {
+    		Matcher m = hostAndPortPattern.matcher(hostandport);
+    		m.matches();
+    		hostname = m.group(1).toLowerCase().trim();
+    	} catch(Exception e) { }
+    	return hostname;
+    }
+    /*
+     * Returns the port number of a host:port String. This method is ipv6 compatible.
+     */
+    public static int getPortNumber(String hostandport) {
+    	int port = -1;
+    	try {
+    		port = Integer.parseInt(hostAndPortPattern.matcher(hostandport).group(2).toLowerCase().trim());
+    	} catch(Exception e) { }
+    	return port;
+    }
     public static boolean isLocalhost(String host) {
     	//	 this allows us to be ipv6 compatible (we simply remove the port)
-    	host = host.split(":\\d+$")[0].toLowerCase().trim(); 
-
+    	host = getHostName(host);
+    	try {
+			InetAddress hostAddress = InetAddress.getByName(host);
+			for(InetAddress address: NETWORK_LOCAL_INETADDRESSES)
+				if(address.equals(hostAddress))
+					return true;
+			return false;
+		} catch (UnknownHostException e) {
+			logger.debug(e);
+			return false;
+		}
+    	/*
     	for (String addr : NETWORK_LOCAL_ADDRESS)
     		if (host.equals(addr.toLowerCase().trim()))
     			return true;
-
-    	return false;
+    	 */
     }
 
-    private static final ArrayList<String > NETWORK_LOCAL_ADDRESS = new ArrayList<String>();
+    public static final ArrayList<String > NETWORK_LOCAL_ADDRESS = new ArrayList<String>();
+    public static final ArrayList<InetAddress> NETWORK_LOCAL_INETADDRESSES = new ArrayList<InetAddress>();
     static {
-    try {
-	    Enumeration<NetworkInterface> nets = NetworkInterface
-		    .getNetworkInterfaces();
-	    for (NetworkInterface netint : Collections.list(nets)) {
-		Enumeration<InetAddress> address = netint.getInetAddresses();
-		for (InetAddress addr : Collections.list(address)) {
-		    if (! addr.isMulticastAddress()) {
-		    	NETWORK_LOCAL_ADDRESS.add(addr.getCanonicalHostName());
-		    }
-		}
-		//NETWORK_LOCAL_ADDRESS.add("localhost");
-		//NETWORK_LOCAL_ADDRESS.add("127.0.0.1");
-		
-	    }
-    }catch (Exception e) {
+    	try {
+    		Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+    		for (NetworkInterface netint : Collections.list(nets)) {
+    			Enumeration<InetAddress> address = netint.getInetAddresses();
+    			for (InetAddress addr : Collections.list(address)) {
+    				if (! addr.isMulticastAddress()) {
+    					NETWORK_LOCAL_ADDRESS.add(addr.getCanonicalHostName());
+    					NETWORK_LOCAL_INETADDRESSES.add(addr);
+    				}
+    			}
+    			//NETWORK_LOCAL_ADDRESS.add("localhost");
+    			//NETWORK_LOCAL_ADDRESS.add("127.0.0.1");
+
+    		}
+    	}catch (Exception e) {
 	e.printStackTrace();
     }
     }
