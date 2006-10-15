@@ -174,8 +174,7 @@ public abstract class AbstractStreamProducer extends Thread implements
 	isAlive = false;
 	if (isInfoEnabled)
 	    logger.info("Finalized called");
-	// TODO : RELEASING THE RESOURCE AUTOMATICALLY USING TIMEOUT.
-	getStorageManager().dropTable(getDBAlias(), true);
+	getStorageManager().dropTable(getDBAlias());
     }
 
     class TableSizeEnforce implements Runnable {
