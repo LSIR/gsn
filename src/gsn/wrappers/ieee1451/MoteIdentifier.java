@@ -14,7 +14,6 @@ import gsn.wrappers.wsn.GSNMessage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -87,8 +86,8 @@ public class MoteIdentifier extends AbstractStreamProducer implements
     private boolean isConsumed = true;
 
     public boolean initialize(TreeMap context) {
-	boolean toReturn = super.initialize(context);
-
+	if (!super.initialize(context))
+	    return false;
 	// mica related
 	micaTEDS.add(0, "MicaONE.xml");
 	micaTEDS.add(1, "MicaTWO.xml");
@@ -157,16 +156,16 @@ public class MoteIdentifier extends AbstractStreamProducer implements
 
 	mote = new MoteIF(host, port);
 	mote.registerListener(new TedsMessage(), this);
+	outputStructure.add(new DataField(ID_OUTPUT_FIELD, "varchar(20)",
+		"Id of the detected transducer"));
+	outputStructure.add(new DataField(TEDS_OUTPUT_FIELD, "VARCHAR(10000)",
+		"TEDS-data"));
+	outputStructure.add(new DataField(STATUS_OUTPUT_FIELD, "VARCHAR(20)",
+		"status:added or removed"));
+	outputStructure.add(new DataField(VSFILE_OUTPUT_FIELD, "VARCHAR(40)",
+		"Virtual Sensor Filename"));
 
-	try {
-	    getStorageManager().createTable(getDBAlias(),
-		    getProducedStreamStructure());
-	} catch (SQLException e) {
-	    logger.error(e.getMessage(), e);
-	    return false;
-	}
-	this.start();
-	return toReturn;
+	return true;
     }
 
     /**
@@ -191,15 +190,12 @@ public class MoteIdentifier extends AbstractStreamProducer implements
 	    // We care about the TEDS messages.
 	} else if (m instanceof TedsMessage) {
 	    if (((TedsMessage) m).dataLength() == 1) {
-		logger.warn("TedsMessage Received.");
 		if (logger.isDebugEnabled()) {
-		    logger.debug(m);
 		    logger.debug("TedsMessage Received.");
+		    logger.debug(m);
 		}
 		int tedsID = ((TedsMessage) m).get_TEDS_ID();
-		Boolean exists;
-		exists = lazyActiveMicas.get(tedsID) != null;
-		if (exists) {
+		if (lazyActiveMicas.get(tedsID) != null) {
 		    if (logger.isDebugEnabled())
 			logger
 				.debug("The sensor is alive and the virtual sensor file exists.");
@@ -208,7 +204,9 @@ public class MoteIdentifier extends AbstractStreamProducer implements
 		    isConsumed = false;
 		    generateStreamElement(TedsReader
 			    .readTedsFromXMLFile(micaTEDS.get(tedsID)), status);
-		    // System.out.println("True: File added");
+		    if (logger.isInfoEnabled())
+			logger.info("TEDS received and virtual sensor is generated with ID "
+					+ tedsID);
 		}
 		lazyActiveMicas.put(tedsID, Integer.toString(tedsID));
 	    }
@@ -229,7 +227,6 @@ public class MoteIdentifier extends AbstractStreamProducer implements
 		tedsResult = tedsToVirtualSensor.GenerateVS(teds);
 	    if (status == REMOVE_ACTION)
 		tedsResult = tedsToVirtualSensor.getTedsToVSResult(teds);
-
 	    StreamElement streamElement = new StreamElement(OUTPUT_FIELD_NAMES,
 		    OUTPUT_FIELD_TYPES, new Serializable[] {
 			    tedsResult.tedsID,
@@ -240,28 +237,14 @@ public class MoteIdentifier extends AbstractStreamProducer implements
 	    publishData(streamElement);
 	    isConsumed = true;
 	} catch (RuntimeException e1) {
-	    e1.printStackTrace();
-	    logger.error(new StringBuilder().append(" ********TEDS ERROR")
-		    .toString());
+	    logger.warn("*TEDS ERROR" + e1.getMessage(), e1);
 	}
-
     }
 
-    private transient Collection<DataField> outputStructureCache;
+    private static final transient Collection<DataField> outputStructure = new ArrayList<DataField>();
 
     public Collection<DataField> getProducedStreamStructure() {
-	if (outputStructureCache == null) {
-	    outputStructureCache = new ArrayList<DataField>();
-	    outputStructureCache.add(new DataField(ID_OUTPUT_FIELD,
-		    "varchar(20)", "Id of the detected transducer"));
-	    outputStructureCache.add(new DataField(TEDS_OUTPUT_FIELD,
-		    "VARCHAR(10000)", "TEDS-data"));
-	    outputStructureCache.add(new DataField(STATUS_OUTPUT_FIELD,
-		    "VARCHAR(20)", "status:added or removed"));
-	    outputStructureCache.add(new DataField(VSFILE_OUTPUT_FIELD,
-		    "VARCHAR(40)", "Virtual Sensor Filename"));
-	}
-	return outputStructureCache;
+	return outputStructure;
     }
 
     public void finalize(HashMap context) {

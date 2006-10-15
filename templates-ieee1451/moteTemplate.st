@@ -13,7 +13,7 @@
    <output-structure>
       $FIELD:{f| <field name="$f.name$"     type="$f.type$"/>}; separator="\n"$
    </output-structure>
-   <storage  permanent-storage="false" history-size="60s"/>
+   <storage  history-size="60s"/>
    <input-streams>
          <input-stream name="mote_data"  >
                 <stream-source alias="mote"  sampling-rate="1" storage-size="1" >
