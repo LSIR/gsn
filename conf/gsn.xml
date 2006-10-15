@@ -3,7 +3,7 @@
    <author>EPFL</author>
    <email>ali.salehi@epfl.ch</email>
    <port>22001</port>
-   <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:MEM:." overwrite-tables="true" permanent-storage="false"/>
+   <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:MEM:." />
    <directory-address>localhost:1882</directory-address> 
 </sensor-server>
 

@@ -10,8 +10,6 @@
 			<value name="user" field="jdbcUsername" style="attribute" />
 			<value name="password" field="jdbcPassword" style="attribute" />
 			<value name="url" field="jdbcURL" style="attribute" />
-			<value name="overwrite-tables" field="jdbcOverwriteTables" style="attribute" />
-			<value name="permanent-storage" field="permanentStorage" style="attribute" />
 		</structure>
 		<value name="directory-address" field="registryBootstrapAddr" />  
 	</mapping>

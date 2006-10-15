@@ -25,10 +25,8 @@
       <collection name="addressing"    field="addressing"  item-type="gsn.utils.KeyValueImp" />
       <collection name="output-structure"   field="outputStructure"  item-type="gsn.beans.DataField" />
       <structure name="storage" usage="optional" >
-	      <!--<value name="enable" field="storageEnable" usage="optional" style="attribute"/>-->
 	      <value name="history-size" field="storageHistorySize" style="attribute" usage="optional" />
-	      <value name="permanent-storage" field="permanentStorage" style="attribute" />
-      </structure>
+	   </structure>
       <collection name="input-streams"   field="inputStreams"  item-type="gsn.beans.InputStream" />
    </mapping>
 	
