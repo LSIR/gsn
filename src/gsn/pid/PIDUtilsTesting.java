@@ -12,28 +12,28 @@ import org.junit.After;
 import org.junit.Test;
 
 public class PIDUtilsTesting {
-
-    @Test
-    public void creationOfAPIDFile() throws IOException {
-	PIDUtils.createPID(PIDUtils.DIRECTORY_SERVICE_PID);
-	assertTrue(PIDUtils.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID));
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void doubleCreationOfAPIDFile() throws IOException {
-	PIDUtils.createPID(PIDUtils.DIRECTORY_SERVICE_PID);
-	assertTrue(PIDUtils.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID));
-	PIDUtils.createPID(PIDUtils.DIRECTORY_SERVICE_PID);
-    }
-
-    @After
-    public void killPIDsAfter() throws IOException {
-	PIDUtils.killPID(new File("/tmp/PIDUtils.DIRECTORY_SERVICE_PID"));
-	assertFalse(PIDUtils.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID));
-    }
-
-    public static junit.framework.Test suite() {
-	return new JUnit4TestAdapter(PIDUtilsTesting.class);
-    }
-
+   
+   @Test
+   public void creationOfAPIDFile ( ) throws IOException {
+      PIDUtils.createPID( PIDUtils.DIRECTORY_SERVICE_PID );
+      assertTrue( PIDUtils.isPIDExist( PIDUtils.DIRECTORY_SERVICE_PID ) );
+   }
+   
+   @Test( expected = RuntimeException.class )
+   public void doubleCreationOfAPIDFile ( ) throws IOException {
+      PIDUtils.createPID( PIDUtils.DIRECTORY_SERVICE_PID );
+      assertTrue( PIDUtils.isPIDExist( PIDUtils.DIRECTORY_SERVICE_PID ) );
+      PIDUtils.createPID( PIDUtils.DIRECTORY_SERVICE_PID );
+   }
+   
+   @After
+   public void killPIDsAfter ( ) throws IOException {
+      PIDUtils.killPID( new File( "/tmp/PIDUtils.DIRECTORY_SERVICE_PID" ) );
+      assertFalse( PIDUtils.isPIDExist( PIDUtils.DIRECTORY_SERVICE_PID ) );
+   }
+   
+   public static junit.framework.Test suite ( ) {
+      return new JUnit4TestAdapter( PIDUtilsTesting.class );
+   }
+   
 }

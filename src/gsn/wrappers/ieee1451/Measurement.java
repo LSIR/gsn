@@ -38,31 +38,29 @@ package gsn.wrappers.ieee1451;
  * This class represents a physical observation. It is typically created by a
  * channel in a BasicTIM FunctionBlock. While its current form is simply an
  * extension of ArgArray, xml generation and other serialization needs require
- * us to be able to distinguish between a Measurement and an ArgArray.
- * 
- * The names for the attributes should be taken from MeasAttr whenever possible.
+ * us to be able to distinguish between a Measurement and an ArgArray. The names
+ * for the attributes should be taken from MeasAttr whenever possible.
  * 
  * @see MeasAttr
- * 
  */
 public class Measurement extends ArgArray {
-    public Measurement(Measurement value) {
-	super();
-	value.cloneContentsTo(this);
-    }
-
-    public Measurement(ArgArray value) {
-	super();
-	value.cloneContentsTo(this);
-    }
-
-    public Measurement() {
-    }
-
-    public Object clone() {
-	Measurement result = new Measurement();
-	this.cloneContentsTo(result);
-	return result;
-    }
-
+   
+   public Measurement ( Measurement value ) {
+      super( );
+      value.cloneContentsTo( this );
+   }
+   
+   public Measurement ( ArgArray value ) {
+      super( );
+      value.cloneContentsTo( this );
+   }
+   
+   public Measurement ( ) {}
+   
+   public Object clone ( ) {
+      Measurement result = new Measurement( );
+      this.cloneContentsTo( result );
+      return result;
+   }
+   
 }

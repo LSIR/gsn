@@ -5,6 +5,6 @@ package gsn.utils;
  * To change this template use File | Settings | File Templates.
  */
 public interface ChangeListener {
-    public void changeHappended(String changeType, Object changedKey,
-	    Object changedValue);
+   
+   public void changeHappended ( String changeType , Object changedKey , Object changedValue );
 }

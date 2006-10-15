@@ -12,41 +12,41 @@ import java.security.spec.X509EncodedKeySpec;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 public class SecurtiyTest {
-
-    public static void main(String[] args) throws Exception {
-
-	FileInputStream keyfis = new FileInputStream(args[0]);
-	byte[] encKey = new byte[keyfis.available()];
-	keyfis.read(encKey);
-	keyfis.close();
-
-	X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(encKey);
-	KeyFactory keyFactory = KeyFactory.getInstance("DSA", "SUN");
-	PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
-
-	keyfis = new FileInputStream(args[1]);
-	encKey = new byte[keyfis.available()];
-	keyfis.read(encKey);
-	keyfis.close();
-
-	PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encKey);
-	keyFactory = KeyFactory.getInstance("DSA", "SUN");
-	PrivateKey privKey = keyFactory.generatePrivate(privKeySpec);
-
-	// Signing start.
-	Signature dsa = Signature.getInstance("SHA1withDSA", "SUN");
-	dsa.initSign(privKey);
-	dsa.update(new String("Select * from bla").getBytes());
-	byte[] signature = dsa.sign();
-	// System.out.println (new String (coded)) ;
-
-	// Verification start.
-	Signature sig = Signature.getInstance("SHA1withDSA", "SUN");
-	sig.initVerify(pubKey);
-	sig.update("Select * from bla".getBytes());
-
-	boolean verifies = sig.verify(signature);
-	System.out.println("signature verifies: " + verifies);
-
-    }
+   
+   public static void main ( String [ ] args ) throws Exception {
+      
+      FileInputStream keyfis = new FileInputStream( args[ 0 ] );
+      byte [ ] encKey = new byte [ keyfis.available( ) ];
+      keyfis.read( encKey );
+      keyfis.close( );
+      
+      X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec( encKey );
+      KeyFactory keyFactory = KeyFactory.getInstance( "DSA" , "SUN" );
+      PublicKey pubKey = keyFactory.generatePublic( pubKeySpec );
+      
+      keyfis = new FileInputStream( args[ 1 ] );
+      encKey = new byte [ keyfis.available( ) ];
+      keyfis.read( encKey );
+      keyfis.close( );
+      
+      PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec( encKey );
+      keyFactory = KeyFactory.getInstance( "DSA" , "SUN" );
+      PrivateKey privKey = keyFactory.generatePrivate( privKeySpec );
+      
+      // Signing start.
+      Signature dsa = Signature.getInstance( "SHA1withDSA" , "SUN" );
+      dsa.initSign( privKey );
+      dsa.update( new String( "Select * from bla" ).getBytes( ) );
+      byte [ ] signature = dsa.sign( );
+      // System.out.println (new String (coded)) ;
+      
+      // Verification start.
+      Signature sig = Signature.getInstance( "SHA1withDSA" , "SUN" );
+      sig.initVerify( pubKey );
+      sig.update( "Select * from bla".getBytes( ) );
+      
+      boolean verifies = sig.verify( signature );
+      System.out.println( "signature verifies: " + verifies );
+      
+   }
 }

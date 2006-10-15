@@ -36,32 +36,40 @@ package gsn.wrappers.ieee1451;
  */
 
 public class TypeAttr {
-    public static final String BOOLEAN = "Boolean"; // e.g boolean
-
-    public static final String INTEGER8 = "Integer8";// e.g. char
-
-    public static final String INTEGER16 = "Integer16";// e.g. short
-
-    public static final String INTEGER32 = "Integer32";// e.g. int
-
-    public static final String INTEGER64 = "Integer64";// e.g. long
-
-    public static final String FLOAT32 = "Float32";// e.g. float
-
-    public static final String FLOAT64 = "Float64";// e.g. double
-
-    public static final String LOCATION = "Location";
-
-    public static final String TIMEREPRESENTATION = "TimeRepresentation";
-
-    public static final String UNITS = "Units";
-
-    public static final String STRING = "String";
-
-    public static final String ENUM = "Enum";
-
-    public static final String OCTET = "Octet";
-
-    public static final String ARRAY = "Array";
-
+   
+   public static final String BOOLEAN            = "Boolean";           // e.g
+                                                                        // boolean
+                                                                         
+   public static final String INTEGER8           = "Integer8";           // e.g.
+                                                                           // char
+                                                                         
+   public static final String INTEGER16          = "Integer16";          // e.g.
+                                                                           // short
+                                                                         
+   public static final String INTEGER32          = "Integer32";          // e.g.
+                                                                           // int
+                                                                         
+   public static final String INTEGER64          = "Integer64";          // e.g.
+                                                                           // long
+                                                                         
+   public static final String FLOAT32            = "Float32";            // e.g.
+                                                                           // float
+                                                                         
+   public static final String FLOAT64            = "Float64";            // e.g.
+                                                                           // double
+                                                                         
+   public static final String LOCATION           = "Location";
+   
+   public static final String TIMEREPRESENTATION = "TimeRepresentation";
+   
+   public static final String UNITS              = "Units";
+   
+   public static final String STRING             = "String";
+   
+   public static final String ENUM               = "Enum";
+   
+   public static final String OCTET              = "Octet";
+   
+   public static final String ARRAY              = "Array";
+   
 }
