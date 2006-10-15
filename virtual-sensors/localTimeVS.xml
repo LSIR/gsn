@@ -13,7 +13,7 @@
         <output-structure>
 <!--	         <field name="tempreature" type="integer" /> -->
         </output-structure>
-        <storage permanent-storage="false" history-size="1m" />
+        <storage history-size="1m" />
         <input-streams>
            <input-stream name="input1">
             <stream-source alias="source1" sampling-rate="1" storage-size="1">

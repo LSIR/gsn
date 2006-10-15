@@ -15,7 +15,7 @@
    <output-structure>
       <field name="PLOT" type="binary:svg"/>
    </output-structure>
-   <storage permanent-storage="true"/>
+   <storage history-size="1"/>
    <input-streams>
       <input-stream name="data" rate="100">
          <stream-source alias="wsn" sampling-rate="1" storage-size="1"

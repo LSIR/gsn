@@ -15,7 +15,7 @@
         <field name="NON_HEAP" type="bigint"/>
         <field name="PENDING_FINALIZATION_COUNT" type="integer"/>
     </output-structure>
-    <storage permanent-storage="false" history-size="1"/>
+    <storage history-size="1"/>
     <input-streams>
         <input-stream name="input1">
             <stream-source alias="source1" sampling-rate="1" storage-size="1"
