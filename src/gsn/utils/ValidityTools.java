@@ -16,6 +16,7 @@ import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 
+
 public class ValidityTools {
 
     public static final int SMTP_PORT = 25;
@@ -63,16 +64,18 @@ public class ValidityTools {
 	  Connection con= DriverManager.getConnection (url ,user,password );
 	  con.close();
     }
-    public static boolean isLocalhost(String host) {
-	String hostPrepared = host.trim().toLowerCase();
-	for (String addr : NETWORK_LOCAL_ADDRESS)
-	    if (addr.equals(hostPrepared))
-		return true;
-	if (host.indexOf("127.")>=0)
-	    return true;
-	return false;
-    }
     
+    public static boolean isLocalhost(String host) {
+    	//	 this allows us to be ipv6 compatible (we simply remove the port)
+    	host = host.split(":\\d+$")[0].toLowerCase().trim(); 
+
+    	for (String addr : NETWORK_LOCAL_ADDRESS)
+    		if (host.equals(addr.toLowerCase().trim()))
+    			return true;
+
+    	return false;
+    }
+
     private static final ArrayList<String > NETWORK_LOCAL_ADDRESS = new ArrayList<String>();
     static {
     try {
@@ -81,13 +84,12 @@ public class ValidityTools {
 	    for (NetworkInterface netint : Collections.list(nets)) {
 		Enumeration<InetAddress> address = netint.getInetAddresses();
 		for (InetAddress addr : Collections.list(address)) {
-		    if (addr.isSiteLocalAddress()) {
-			NETWORK_LOCAL_ADDRESS.add(addr.getHostAddress().trim().toLowerCase());
-			NETWORK_LOCAL_ADDRESS.add(addr.getHostName().trim().toLowerCase());
+		    if (! addr.isMulticastAddress()) {
+		    	NETWORK_LOCAL_ADDRESS.add(addr.getCanonicalHostName());
 		    }
 		}
-		NETWORK_LOCAL_ADDRESS.add("localhost");
-		NETWORK_LOCAL_ADDRESS.add("127.0.0.1");
+		//NETWORK_LOCAL_ADDRESS.add("localhost");
+		//NETWORK_LOCAL_ADDRESS.add("127.0.0.1");
 		
 	    }
     }catch (Exception e) {
