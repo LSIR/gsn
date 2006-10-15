@@ -2,12 +2,12 @@
    <processing-class>
       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
    </processing-class>
-   <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</author>
-   <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</email>
-   <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</description>
+   <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/remoteTest.xml</author>
+   <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/remoteTest.xml</email>
+   <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/remoteTest.xml</description>
    <life-cycle pool-size="10"/>
    <addressing>
-      <predicate key="geographical">INM035</predicate>
+      <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/remoteTest.xml</predicate>
    </addressing>
    <output-structure>
       <field name="DATA" type="binary:jpg"/>

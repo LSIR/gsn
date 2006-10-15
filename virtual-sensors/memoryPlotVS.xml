@@ -11,12 +11,12 @@
          <param name="history-size">100</param>
       </init-params>
    </processing-class>
-   <author>Ali Salehi</author>
-   <email>salehi@epfl.ch</email>
-   <description>A sample vsensor</description>
-   <life-cycle pool-size="2"/>
+   <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/memoryPlotVS.xml</author>
+   <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/memoryPlotVS.xml</email>
+   <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/memoryPlotVS.xml</description>
+     <life-cycle pool-size="2"/>
    <addressing>
-      <predicate key="geographical">BC143</predicate>
+      <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/memoryPlotVS.xml</predicate>
    </addressing>
    <output-structure>
       <field name="DATA" type="binary:jpg"/>

@@ -3,16 +3,14 @@
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<init-params/>
 	</processing-class>
-        <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/min.xml.</author>
-        <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/min.xml.</email>
-        <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/min.xml.</description>
+        <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</author>
+        <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</email>
+        <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</description>
         <life-cycle pool-size="10" />
         <addressing>
-	        	<predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/min.xml.</predicate>
+	        	<predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</predicate>
     	  </addressing>
-        <output-structure>
-<!--	         <field name="tempreature" type="integer" /> -->
-        </output-structure>
+        <output-structure/>
         <storage history-size="1m" />
         <input-streams>
            <input-stream name="input1">

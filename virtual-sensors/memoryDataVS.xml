@@ -2,13 +2,13 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
     </processing-class>
-    <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</author>
-    <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</email>
-    <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs1.xml</description>
+    <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/memoryDataVS.xml</author>
+    <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/memoryDataVS.xml</email>
+    <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/memoryDataVS.xml</description>
     <life-cycle pool-size="10"/>
     <addressing>
         <predicate key="geographical">Not Specified, please edit the file
-            $INSTALL_PATH/virtual-sensors/vs1.xml</predicate>
+            $INSTALL_PATH/virtual-sensors/memoryDataVS.xml</predicate>
     </addressing>
     <output-structure>
         <field name="HEAP" type="bigint"/>
@@ -18,8 +18,7 @@
     <storage history-size="1"/>
     <input-streams>
         <input-stream name="input1">
-            <stream-source alias="source1" sampling-rate="1" storage-size="1"
-                           disconnect-buffer-size="10">
+            <stream-source alias="source1" sampling-rate="1" storage-size="1">
                 <address wrapper="memory-usage">
                     <predicate key="HOST">localhost</predicate>
                     <predicate key="PORT">22001</predicate>

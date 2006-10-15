@@ -5,12 +5,12 @@
       		<param name="memory-size-in-seconds">1200</param>
       </init-params>
    </processing-class>
-   <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs6.xml</author>
-   <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs6.xml</email>
-   <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs6.xml</description>
+   <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/networkPlotter.xml</author>
+   <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/networkPlotter.xml</email>
+   <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/networkPlotter.xml</description>
    <life-cycle pool-size="10"/>
    <addressing>
-      <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/vs6.xml</predicate>
+      <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/networkPlotter.xml</predicate>
    </addressing>
    <output-structure>
       <field name="PLOT" type="binary:svg"/>
@@ -18,8 +18,7 @@
    <storage history-size="1"/>
    <input-streams>
       <input-stream name="data" rate="100">
-         <stream-source alias="wsn" sampling-rate="1" storage-size="1"
-                        disconnect-buffer-size="10">
+         <stream-source alias="wsn" sampling-rate="1" storage-size="1">
             <address wrapper="wsns">
                <predicate key="HOST">127.0.0.1</predicate>
                <predicate key="PORT">80</predicate>

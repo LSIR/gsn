@@ -46,8 +46,6 @@ public class ContainerConfig {
 
     protected String containerFileName;
 
-    public static final String FIELD_NAME_jdbcOverwriteTables = "jdbcOverwriteTables";
-
     protected String jdbcDriver;
 
     protected String jdbcUsername;
@@ -63,8 +61,6 @@ public class ContainerConfig {
     public static final String FIELD_NAME_jdbcURL = "jdbcURL";
 
     protected int storagePoolSize = DEFAULT_STORAGE_POOL_SIZE;
-
-    public static final String FIELD_NAME_permanentStorageEnabled = "permanentStorage";
 
     public String getContainerFileName() {
 	return this.containerFileName;
