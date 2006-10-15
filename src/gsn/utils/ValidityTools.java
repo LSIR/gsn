@@ -88,7 +88,9 @@ public class ValidityTools {
    public static int getPortNumber ( String hostandport ) {
       int port = -1;
       try {
-         port = Integer.parseInt( hostAndPortPattern.matcher( hostandport ).group( 2 ).toLowerCase( ).trim( ) );
+  		Matcher m = hostAndPortPattern.matcher(hostandport);
+		m.matches();
+         port = Integer.parseInt( m.group( 2 ).toLowerCase( ).trim( ) );
       } catch ( Exception e ) {}
       return port;
    }
