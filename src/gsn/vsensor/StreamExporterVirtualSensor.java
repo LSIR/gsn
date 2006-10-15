@@ -56,7 +56,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 					// identify database
 					for(DATABASE db: DATABASE.values())
 						if(params.get(PARAM_URL).startsWith(db.getJDBCPrefix())) {
-							DriverManager.registerDriver(db.getDriver());
+							db.loadDriver();
 							logger.info("driver for " + db.toString() + " loaded.");
 						}
 					logger.debug("url="+params.get(PARAM_URL)+

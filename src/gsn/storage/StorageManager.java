@@ -10,6 +10,7 @@ import gsn.utils.GSNRuntimeException;
 
 import java.sql.Connection;
 import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -36,7 +37,8 @@ public class StorageManager {
     private static boolean hsql = false;
 
     public static enum DATABASE {
-    	MYSQL ("jdbc:mysql:"){ 
+    	
+    	MYSQL ("jdbc:mysql:"){
     	    /*
     	     * Returns the MySQL data type that can store this gsn
     	     * datafield.
@@ -64,8 +66,8 @@ public class StorageManager {
     		/*
     		 * Returns the jdbc mysql driver.
     		 */
-    		public Driver getDriver() throws SQLException {
-    			return new com.mysql.jdbc.Driver();
+    		public void loadDriver() throws SQLException {
+    			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
     		}
     	}, 
     	HSQL ("jdbc:hsql") {
@@ -95,10 +97,10 @@ public class StorageManager {
     		/*
     		 * Returns the jdbc hsqldb driver.
     		 */
-    		public Driver getDriver() throws SQLException {
+    		public void loadDriver() throws SQLException {
     			//TODO: maybe we only need one driver per database.
     			// so we can simply give it as constructor parameter (as jdbcPrefix ?)
-    			return new org.hsqldb.jdbcDriver();
+    			DriverManager.registerDriver(new org.hsqldb.jdbcDriver());
     		}
     		;
     	};
@@ -117,7 +119,7 @@ public class StorageManager {
     	 */
     	
     	public abstract String convertGSNTypeToLocalType(DataField field);
-    	public abstract Driver getDriver() throws SQLException;  
+    	public abstract void loadDriver() throws SQLException;  
     	
     };
 
