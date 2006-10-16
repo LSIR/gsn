@@ -52,7 +52,7 @@ public final class Main {
    
    public static void main ( String [ ] args ) throws IOException , RuntimeException {
       ValidityTools.checkAccessibilityOfFiles( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
-      ValidityTools.checkAccessibilityOfDirs( DEFAULT_VIRTUAL_SENSOR_DIRECTORY , DEFAULT_WEB_APP_PATH );
+      ValidityTools.checkAccessibilityOfDirs( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
       PropertyConfigurator.configure( DEFAULT_GSN_LOG4J_PROPERTIES );
       logger = Logger.getLogger( Main.class );
       if ( PIDUtils.isPIDExist( PIDUtils.GSN_PID ) ) {
