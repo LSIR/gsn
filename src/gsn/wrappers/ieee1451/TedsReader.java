@@ -1,5 +1,7 @@
 package gsn.wrappers.ieee1451;
 
+import gsn.Main;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,11 +12,10 @@ import com.thoughtworks.xstream.XStream;
 
 public class TedsReader {
    
-   public static String TARGET_DIR = "/Users/alisalehi/Desktop/TEDS/";
    
    public static void main ( String [ ] args ) {
       try {
-         TEDS teds = readTedsFromXMLFile( "micaONE.xml" );
+         TEDS teds = readTedsFromXMLFile(new File("micaONE.xml") );
          System.out.println( teds.toHtmlString( ) );
          
       } catch ( Exception e ) {
@@ -22,10 +23,10 @@ public class TedsReader {
       }
    }
    
-   public static TEDS readTedsFromXMLFile ( String fileName ) {
+   public static TEDS readTedsFromXMLFile (  File fileName ) {
       XStream xs = new XStream( );
       try {
-         TEDS teds = new TEDS( ( Object [ ][ ][ ] ) xs.fromXML( new FileInputStream( TARGET_DIR + fileName ) ) );
+         TEDS teds = new TEDS( ( Object [ ][ ][ ] ) xs.fromXML( new FileInputStream(  fileName ) ) );
          return teds;
       } catch ( FileNotFoundException e ) {
          e.printStackTrace( );
@@ -33,7 +34,7 @@ public class TedsReader {
       return null;
    }
    
-   public static TEDS readTedsFromBinaryFile ( String fileName ) {
+   public static TEDS readTedsFromBinaryFile ( String TARGET_DIR,String fileName ) {
       FileInputStream fos;
       try {
          fos = new FileInputStream( new File( TARGET_DIR + fileName ) );

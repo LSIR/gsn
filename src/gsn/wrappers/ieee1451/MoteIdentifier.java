@@ -80,6 +80,8 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
    
    private boolean                  isConsumed          = true;
    
+   private File                     templateFolder;
+   
    public boolean initialize ( TreeMap context ) {
       if ( !super.initialize( context ) ) return false;
       // mica related
@@ -95,9 +97,8 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
       if ( addressBean.getPredicateValue( "RATE" ) != null ) {
          RATE = Integer.parseInt( ( String ) addressBean.getPredicateValue( "RATE" ) );
       }
-      if ( addressBean.getPredicateValue( "templates-directory" ) == null ) {
-         logger.warn( "The MoteIdentifier couldn't initialize. The >templates-directory< parameter is missing from the set of the wrapper configuration parameters." );
-      }
+      if ( addressBean.getPredicateValue( "templates-directory" ) == null ) logger
+            .warn( "The MoteIdentifier couldn't initialize. The >templates-directory< parameter is missing from the set of the wrapper configuration parameters." );
       
       // ------INITIALIZING THE TEMPLATE DIRECTORY ---------
       String templateDirPath = addressBean.getPredicateValue( "templates-directory" );
@@ -111,7 +112,7 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
          return false;
       }
       
-      File templateFolder = new File( templateDirPath );
+      templateFolder = new File( templateDirPath );
       if ( !templateFolder.exists( ) || !templateFolder.isDirectory( ) || !templateFolder.canRead( ) ) {
          logger.warn( "The MoteIdentifier couldn't initialize. Can't read >" + templateFolder.getAbsolutePath( ) + "<." );
          return false;
@@ -172,7 +173,7 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
             } else {
                status = ADD_ACTION;
                isConsumed = false;
-               generateStreamElement( TedsReader.readTedsFromXMLFile( micaTEDS.get( tedsID ) ) , status );
+               generateStreamElement( TedsReader.readTedsFromXMLFile( new File( templateFolder.getAbsolutePath( ) + "/" + micaTEDS.get( tedsID ) ) ) , status );
                if ( logger.isInfoEnabled( ) ) logger.info( "TEDS received and virtual sensor is generated with ID " + tedsID );
             }
             lazyActiveMicas.put( tedsID , Integer.toString( tedsID ) );
@@ -240,7 +241,7 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
    public void changeHappended ( String changeType , Object changedKey , Object changeValue ) {
       if ( changeType == LazyTimedHashMap.ITEM_REMOVED ) {
          status = REMOVE_ACTION;
-         generateStreamElement( TedsReader.readTedsFromXMLFile( micaTEDS.get( ( Integer ) changedKey ) ) , status );
+         generateStreamElement( TedsReader.readTedsFromXMLFile( new File( templateFolder.getAbsolutePath( ) + "/" + micaTEDS.get( ( Integer ) changedKey ) ) ) , status );
          boolean success = ( new File( TedsToVirtualSensor.TARGET_VS_DIR + tedsResult.fileName ) ).delete( );
       }
    }

@@ -11,11 +11,12 @@ package gsn.wrappers.cameras.usb;
 // For more resources see :
 // http://www.geocities.com/marcoschmidt.geo/java-image-coding.html
 
+
+
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractStreamProducer;
-import gsn.wrappers.cameras.usb.ImageWrapper;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
+
 import javax.media.Buffer;
 import javax.media.CaptureDeviceInfo;
 import javax.media.CaptureDeviceManager;
@@ -54,6 +56,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
@@ -91,8 +94,7 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
    
    private int                           width;
    
-   private JFrame                        mainFrame     = new JFrame( "Webcam's current observations [GSN Project]." );
-   
+   private JFrame                        mainFrame     ;   
    private DataSource                    ds            = null;
    
    private Processor                     deviceProc    = null;
@@ -105,6 +107,8 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
     * for debugging purposes.
     */
    private static int                    threadCounter = 0;
+   
+   public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
    
    // -----------------------------------START----------------------------------------
    public boolean initialize ( TreeMap initialContext ) {
@@ -198,9 +202,10 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
             }
          }
       }
-      deviceProc.start( );
-      logger.info( "Before Streaming" );
       
+      deviceProc.start( );
+      System.out.println("Just before streaming.");
+      logger.info( "Before Streaming" );
       try {
          source = ( PushBufferDataSource ) deviceProc.getDataOutput( );
       } catch ( NotRealizedError nre ) {
@@ -221,7 +226,7 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
             YUVFormat rgbf = ( YUVFormat ) streams[ i ].getFormat( );
             converter = new BufferToImage( rgbf );
          }
-      
+      mainFrame= new JFrame( "Webcam's current observations [GSN Project]." );
       mainFrame.getContentPane( ).add( lable );
       mainFrame.setSize( getWidth( ) + 10 , getHeight( ) + 10 );
       if ( exitOnClose ) mainFrame.setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
@@ -252,7 +257,7 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
    private Image getImage ( ) {
       try {
          camStream.read( buff );
-      } catch ( IOException ioe ) {
+      } catch ( Exception ioe ) {
          logger.error( "Unable to capture frame from camera" );
          logger.error( ioe.getMessage( ) , ioe );
          return null;
@@ -308,9 +313,13 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
    }
    
    public static void main ( String [ ] args ) {
+      PropertyConfigurator.configure( DEFAULT_GSN_LOG4J_PROPERTIES );
       WebCamWrapper test = new WebCamWrapper( );
-      test.webcamInitialization( true );
-      test.start( );
+      boolean initialization = test.webcamInitialization( true );
+      if (initialization)
+         test.start( );
+      else 
+         System.out.println("Start Failed.");
    }
    
 }
