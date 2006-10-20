@@ -88,7 +88,7 @@ public class TinyOS1Wrapper extends AbstractStreamProducer implements MessageLis
       isConsumed = false;
    }
    
-   public ArrayList < DataField > getProducedStreamStructure ( ) {
+   public ArrayList < DataField > getOutputFormat ( ) {
       return outputDataFields;
    }
    
@@ -97,9 +97,9 @@ public class TinyOS1Wrapper extends AbstractStreamProducer implements MessageLis
       try {
          while ( isActive( ) ) {
             if ( listeners.isEmpty( ) || isConsumed ) continue;
-            StreamElement streamElement = new StreamElement( getProducedStreamStructure( ) , extractDataUsingFieldNames( latestReceivedMessage , getterMethodNames , getProducedStreamStructure( ) ) ,
+            StreamElement streamElement = new StreamElement( getOutputFormat( ) , extractDataUsingFieldNames( latestReceivedMessage , getterMethodNames , getOutputFormat( ) ) ,
                System.currentTimeMillis( ) );
-            publishData( streamElement );
+            postStreamElement( streamElement );
             isConsumed = true;
          }
       } catch ( Exception e ) {

@@ -195,7 +195,7 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
          if ( status == REMOVE_ACTION ) tedsResult = tedsToVirtualSensor.getTedsToVSResult( teds );
          StreamElement streamElement = new StreamElement( OUTPUT_FIELD_NAMES , OUTPUT_FIELD_TYPES , new Serializable [ ] { tedsResult.tedsID ,
                new StringBuilder( ).append( "</center>" ).append( tedsResult.tedsHtmlString ).append( "<center>" ).toString( ) , status , tedsResult.fileName } , System.currentTimeMillis( ) );
-         publishData( streamElement );
+         postStreamElement( streamElement );
          isConsumed = true;
       } catch ( RuntimeException e1 ) {
          logger.warn( "*TEDS ERROR" + e1.getMessage( ) , e1 );
@@ -204,7 +204,7 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
    
    private static final transient Collection < DataField > outputStructure = new ArrayList < DataField >( );
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return outputStructure;
    }
    

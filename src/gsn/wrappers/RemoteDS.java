@@ -162,7 +162,7 @@ public class RemoteDS extends AbstractStreamProducer {
       }
    }
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return strcture;
    }
    

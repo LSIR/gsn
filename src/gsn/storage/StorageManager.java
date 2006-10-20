@@ -317,6 +317,8 @@ public class StorageManager {
                case DataTypes.BINARY :
                   ps.setBytes( counter , ( byte [ ] ) se.getData( )[ counter - 1 ] );
                   break;
+               default :
+                  logger.error( "The type conversion is not supported for : " + se.getFieldNames( )[ counter - 1 ] + "(" + se.getFieldTypes( )[ counter - 1 ] + ")" );
             }
          }
          ps.setLong( counter , se.getTimeStamp( ) );
@@ -393,6 +395,8 @@ public class StorageManager {
       for ( String fieldName : se.getFieldNames( ) ) {
          if ( fieldsDefinedToBeStored == null ) { throw new GSNRuntimeException( "Unexpected virtual sensor removal" , GSNRuntimeException.UNEXPECTED_VIRTUAL_SENSOR_REMOVAL ); }
          if ( fieldsDefinedToBeStored.contains( fieldName ) ) toReturn.append( fieldName ).append( " ," );
+         else
+            logger.debug( "The field : " + fieldName + " is ignored." );
       }
       toReturn.append( " TIMED " ).append( " ) values (" );
       for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {

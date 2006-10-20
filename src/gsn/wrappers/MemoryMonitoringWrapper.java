@@ -30,7 +30,7 @@ public class MemoryMonitoringWrapper extends AbstractStreamProducer {
    
    private static int                threadCounter                         = 0;
    
-   private static final MemoryMXBean mbean                                 = ManagementFactory.getMemoryMXBean( );
+   private transient ArrayList < DataField > outputStructureCache      = new ArrayList < DataField >();
    
    private static final String       FIELD_NAME_HEAP                       = "HEAP";
    
@@ -39,6 +39,8 @@ public class MemoryMonitoringWrapper extends AbstractStreamProducer {
    private static final String       FIELD_NAME_PENDING_FINALIZATION_COUNT = "PENDING_FINALIZATION_COUNT";
    
    private static final String [ ]   FIELD_NAMES                           = new String [ ] { FIELD_NAME_HEAP , FIELD_NAME_NON_HEAP , FIELD_NAME_PENDING_FINALIZATION_COUNT };
+   
+   private static final MemoryMXBean mbean                                 = ManagementFactory.getMemoryMXBean( );
    
    public boolean initialize ( TreeMap context ) {
       boolean toReturn = super.initialize( context );
@@ -52,6 +54,10 @@ public class MemoryMonitoringWrapper extends AbstractStreamProducer {
             samplingRate = DEFAULT_SAMPLING_RATE;
          }
       }
+      outputStructureCache = new ArrayList < DataField >( );
+      outputStructureCache.add( new DataField( FIELD_NAME_HEAP , "bigint" , "Heap memory usage." ) );
+      outputStructureCache.add( new DataField( FIELD_NAME_NON_HEAP , "bigint" , "Nonheap memory usage." ) );
+      outputStructureCache.add( new DataField( FIELD_NAME_PENDING_FINALIZATION_COUNT , "int" , "The number of objects with pending finalization." ) );
       return true;
    }
    
@@ -70,7 +76,7 @@ public class MemoryMonitoringWrapper extends AbstractStreamProducer {
          
          StreamElement streamElement = new StreamElement( FIELD_NAMES , new Integer [ ] { DataTypes.BIGINT , DataTypes.BIGINT , DataTypes.INTEGER } , new Serializable [ ] { heapMemoryUsage ,
                nonHeapMemoryUsage , pendingFinalizationCount } , System.currentTimeMillis( ) );
-         publishData( streamElement );
+         postStreamElement( streamElement );
       }
    }
    
@@ -79,9 +85,6 @@ public class MemoryMonitoringWrapper extends AbstractStreamProducer {
       threadCounter--;
    }
    
-   private transient boolean                 isGetStructureInitialized = false;
-   
-   private transient ArrayList < DataField > outputStructureCache      = null;
    
    /**
     * The output fields exported by this virtual sensor.
@@ -89,13 +92,7 @@ public class MemoryMonitoringWrapper extends AbstractStreamProducer {
     * @return The strutcture of the output.
     */
    
-   public final Collection < DataField > getProducedStreamStructure ( ) {
-      if ( isGetStructureInitialized == false ) {
-         outputStructureCache = new ArrayList < DataField >( );
-         outputStructureCache.add( new DataField( FIELD_NAME_HEAP , "bigint" , "Heap memory usage." ) );
-         outputStructureCache.add( new DataField( FIELD_NAME_NON_HEAP , "bigint" , "Nonheap memory usage." ) );
-         outputStructureCache.add( new DataField( FIELD_NAME_PENDING_FINALIZATION_COUNT , "int" , "The number of objects with pending finalization." ) );
-      }
+   public final Collection < DataField > getOutputFormat ( ) {
       return outputStructureCache;
    }
    

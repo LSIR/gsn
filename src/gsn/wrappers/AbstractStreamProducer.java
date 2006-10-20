@@ -147,7 +147,7 @@ public abstract class AbstractStreamProducer extends Thread implements StreamPro
       return cachedDBAliasName;
    }
    
-   public abstract Collection < DataField > getProducedStreamStructure ( );
+   public abstract Collection < DataField > getOutputFormat ( );
    
    protected boolean isActive ( ) {
       return isAlive;
@@ -262,7 +262,7 @@ public abstract class AbstractStreamProducer extends Thread implements StreamPro
       }
    }
    
-   protected void publishData ( StreamElement streamElement ) {
+   protected void postStreamElement ( StreamElement streamElement ) {
       boolean result = getStorageManager( ).insertData( getDBAlias( ) , streamElement );
       if ( result == false ) {
          logger.warn( "Inserting the following data item failed : " + streamElement );

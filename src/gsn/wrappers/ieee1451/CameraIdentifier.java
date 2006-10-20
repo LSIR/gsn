@@ -184,7 +184,7 @@ public class CameraIdentifier extends AbstractStreamProducer {
          if ( status == REMOVE_ACTION ) tedsResult = tedsToVirtualSensor.getTedsToVSResult( teds );
          StreamElement streamElement = new StreamElement( OUTPUT_FIELD_NAMES , OUTPUT_FIELD_TYPES , new Serializable [ ] { tedsResult.tedsID , "</center>" + tedsResult.tedsHtmlString + "<center>" ,
                status , tedsResult.fileName } , System.currentTimeMillis( ) );
-         publishData( streamElement );
+         postStreamElement( streamElement );
       } catch ( RuntimeException e1 ) {
          // TODO Auto-generated catch block
          e1.printStackTrace( );
@@ -199,7 +199,7 @@ public class CameraIdentifier extends AbstractStreamProducer {
    
    private static final transient Collection < DataField > cachedOutputStructure = new ArrayList < DataField >( );
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return cachedOutputStructure;
    }
    

@@ -10,12 +10,11 @@ package gsn.wrappers.cameras.usb;
 
 // For more resources see :
 // http://www.geocities.com/marcoschmidt.geo/java-image-coding.html
-
-
-
+import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.vsensor.Container;
 import gsn.wrappers.AbstractStreamProducer;
 
 import java.awt.Graphics2D;
@@ -66,59 +65,74 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
  */
 public class WebCamWrapper extends AbstractStreamProducer implements ControllerListener {
    
-   public static final String            PICTURE_KEY   = "PICTURE";
+   public static final String            PICTURE_KEY                  = "PICTURE";
    
    /**
     * Shows the required interval between two consequitive snapshots. The below
     * time is in MSec.
     */
-   private final int                     INTERVAL      = 30;
+   private final int                     INTERVAL                     = 30;
    
-   private final ByteArrayOutputStream   baos          = new ByteArrayOutputStream( 16 * 1024 );
+   private final ByteArrayOutputStream   baos                         = new ByteArrayOutputStream( 16 * 1024 );
    
-   private Buffer                        buff          = new Buffer( );
+   private Buffer                        buff                         = new Buffer( );
    
-   private PushBufferStream              camStream;                                                                   // Global
-                                                                                                                       
-   private JPEGImageEncoder              codec         = JPEGCodec.createJPEGEncoder( baos );
+   private PushBufferStream              camStream;                                                             // Global
+                                                                                                                 
+   private JPEGImageEncoder              codec                        = JPEGCodec.createJPEGEncoder( baos );
    
-   private BufferToImage                 converter;                                                                   // Global
-                                                                                                                       
-   private JPanel                        lable         = new JPanel( );
+   private BufferToImage                 converter;                                                             // Global
+                                                                                                                 
+   private JPanel                        lable                        = new JPanel( );
    
-   private ImageWrapper                  reading;                                                                     // Contains
-                                                                                                                       
-   private Object                        stateLock     = new Object( );
+   private ImageWrapper                  reading;                                                               // Contains
+                                                                                                                 
+   private Object                        stateLock                    = new Object( );
    
    private int                           height;
    
    private int                           width;
    
-   private JFrame                        mainFrame     ;   
-   private DataSource                    ds            = null;
+   private JFrame                        mainFrame;
    
-   private Processor                     deviceProc    = null;
+   private DataSource                    ds                           = null;
    
-   private PushBufferDataSource          source        = null;
+   private Processor                     deviceProc                   = null;
    
-   private static final transient Logger logger        = Logger.getLogger( WebCamWrapper.class );
+   private PushBufferDataSource          source                       = null;
+   
+   private static final transient Logger logger                       = Logger.getLogger( WebCamWrapper.class );
    
    /**
     * for debugging purposes.
     */
-   private static int                    threadCounter = 0;
+   private static int                    threadCounter                = 0;
    
-   public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
+   public static final String            DEFAULT_GSN_LOG4J_PROPERTIES = "conf/log4j.properties";
    
    // -----------------------------------START----------------------------------------
    public boolean initialize ( TreeMap initialContext ) {
       if ( !super.initialize( initialContext ) ) return false;
       setName( "WebCamWrapper-Thread:" + ( ++threadCounter ) );
       dataField.add( new DataField( PICTURE_KEY , "binary:jpeg" , "The pictures observerd from the webcam." ) );
-      return webcamInitialization( false );
+      AddressBean addressBean = ( AddressBean ) initialContext.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      String liveView = addressBean.getPredicateValue( "live-view" );
+      boolean isLiveViewEnabled = false;
+      if ( liveView == null ) {
+         logger.warn( "The >liveView< parameter is missing for the WebCamWrappe,  initialization failed." );
+         return false;
+      } else {
+         try {
+            isLiveViewEnabled = Boolean.parseBoolean( liveView );
+         } catch ( Exception e ) {
+            logger.warn( "The >liveView< parameter is not a valid boolean (WebCamWrapper)" , e );
+            return false;
+         }
+      }
+      return webcamInitialization( isLiveViewEnabled );
    }
    
-   private boolean webcamInitialization ( boolean exitOnClose ) {
+   private boolean webcamInitialization ( boolean liveView ) {
       CaptureDeviceInfo device = CaptureDeviceManager.getDevice( "v4l:OV518 USB Camera:0" );
       MediaLocator loc = device.getLocator( );
       try {
@@ -204,7 +218,7 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
       }
       
       deviceProc.start( );
-      System.out.println("Just before streaming.");
+      System.out.println( "Just before streaming." );
       logger.info( "Before Streaming" );
       try {
          source = ( PushBufferDataSource ) deviceProc.getDataOutput( );
@@ -226,14 +240,14 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
             YUVFormat rgbf = ( YUVFormat ) streams[ i ].getFormat( );
             converter = new BufferToImage( rgbf );
          }
-      mainFrame= new JFrame( "Webcam's current observations [GSN Project]." );
-      mainFrame.getContentPane( ).add( lable );
-      mainFrame.setSize( getWidth( ) + 10 , getHeight( ) + 10 );
-      if ( exitOnClose ) mainFrame.setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
-      else
+      if ( liveView ) {
+         mainFrame = new JFrame( "Webcam's current observations [GSN Project]." );
+         mainFrame.getContentPane( ).add( lable );
+         mainFrame.setSize( getWidth( ) + 10 , getHeight( ) + 10 );
          mainFrame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
-      mainFrame.setResizable( false );
-      mainFrame.setVisible( true );
+         mainFrame.setResizable( false );
+         mainFrame.setVisible( true );
+      }
       return true;
    }
    
@@ -267,7 +281,7 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
    
    private transient final static ArrayList < DataField > dataField = new ArrayList < DataField >( );
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return dataField;
    }
    
@@ -297,7 +311,7 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
          if ( listeners.isEmpty( ) ) continue;
          if ( lastPicture++ % INTERVAL != 0 ) continue;
          StreamElement streamElement = getData( );
-         publishData( streamElement );
+         postStreamElement( streamElement );
       }
    }
    
@@ -308,7 +322,7 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
       deviceProc.deallocate( );
       deviceProc.close( );
       ds.disconnect( );
-      mainFrame.dispose( );
+      if ( mainFrame != null ) mainFrame.dispose( );
       threadCounter--;
    }
    
@@ -316,10 +330,9 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
       PropertyConfigurator.configure( DEFAULT_GSN_LOG4J_PROPERTIES );
       WebCamWrapper test = new WebCamWrapper( );
       boolean initialization = test.webcamInitialization( true );
-      if (initialization)
-         test.start( );
-      else 
-         System.out.println("Start Failed.");
+      if ( initialization ) test.start( );
+      else
+         System.out.println( "Start Failed." );
    }
    
 }

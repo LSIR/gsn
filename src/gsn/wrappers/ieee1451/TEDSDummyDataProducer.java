@@ -85,9 +85,9 @@ public class TEDSDummyDataProducer extends AbstractStreamProducer {
          }
          
          Serializable [ ] dataFieldValues = ( new TEDSDataField( ).RandomData( dataFieldTypes ) );// new
-         StreamElement streamElement = new StreamElement( getProducedStreamStructure( ) , dataFieldValues , System.currentTimeMillis( ) );
+         StreamElement streamElement = new StreamElement( getOutputFormat( ) , dataFieldValues , System.currentTimeMillis( ) );
          try {
-            publishData( streamElement );
+            postStreamElement( streamElement );
          } catch ( Exception e ) {
             logger.error( e.getMessage( ) , e );
          }
@@ -102,7 +102,7 @@ public class TEDSDummyDataProducer extends AbstractStreamProducer {
    
    private static transient final ArrayList < DataField > dataField = new ArrayList < DataField >( );
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return dataField;
    }
    

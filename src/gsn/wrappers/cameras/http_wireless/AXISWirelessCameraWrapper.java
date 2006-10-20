@@ -106,7 +106,7 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
             e1.printStackTrace( );
          }
          StreamElement streamElement = new StreamElement( OUTPUT_FIELD_NAMES , OUTPUT_FIELD_TYPES , new Serializable [ ] { received_image } , System.currentTimeMillis( ) );
-         publishData( streamElement );
+         postStreamElement( streamElement );
       }
    }
    
@@ -117,7 +117,7 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
    
    private transient static final ArrayList < DataField > dataField = new ArrayList < DataField >( );
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return dataField;
    }
    

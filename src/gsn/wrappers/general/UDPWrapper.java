@@ -73,14 +73,14 @@ public class UDPWrapper extends AbstractStreamProducer {
             
             StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { receivedPacket.getData( ) } , System
                   .currentTimeMillis( ) );
-            publishData( streamElement );
+            postStreamElement( streamElement );
          } catch ( IOException e ) {
             logger.warn( "Error while receiving data on UDP socket : " + e.getMessage( ) );
          }
       }
    }
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       ArrayList < DataField > dataField = new ArrayList < DataField >( );
       dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data received as a UDP packet." ) );
       return dataField;

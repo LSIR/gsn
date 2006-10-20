@@ -35,7 +35,7 @@ public class EmptyWrapper extends AbstractStreamProducer {
       }
    }
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return dataField;
    }
    

@@ -114,7 +114,7 @@ public class WSNSWrapper extends AbstractStreamProducer implements DataListener 
                }
                StreamElement streamElement = new StreamElement( new String [ ] { "NODE_ID" , "PARENT_ID" , "TEMPREATURE" } , new Integer [ ] { DataTypes.INTEGER , DataTypes.INTEGER ,
                      DataTypes.INTEGER } , new Serializable [ ] { dataPacket.getIdentifier( ) , dataPacket.getParent( ) , dataPacket.getValue( ) } , System.currentTimeMillis( ) );
-               publishData( streamElement );
+               postStreamElement( streamElement );
                if ( dataBuffer.size( ) > 0 ) continue;
             }
          }
@@ -132,7 +132,7 @@ public class WSNSWrapper extends AbstractStreamProducer implements DataListener 
    
    private static final ArrayList < DataField > dataField = new ArrayList < DataField >( );
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return dataField;
    }
    

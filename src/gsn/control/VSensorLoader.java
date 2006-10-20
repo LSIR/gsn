@@ -455,8 +455,13 @@ public class VSensorLoader extends Thread {
                                                                // the
                // next address.
                else {
+                  if (ds.getOutputFormat( )==null) {
+                     logger.warn( "The output format of the "+ds.getClass( ).getName( )+ " is null !!!" );
+                     logger.warn( "The initialization of the wrapper is failed." );
+                     continue;
+                  }
                   try {
-                     storageManager.createTable( ds.getDBAlias( ) , ds.getProducedStreamStructure( ) );
+                     storageManager.createTable( ds.getDBAlias( ) , ds.getOutputFormat( ) );
                   } catch ( SQLException e ) {
                      logger.error( e.getMessage( ) , e );
                      continue;

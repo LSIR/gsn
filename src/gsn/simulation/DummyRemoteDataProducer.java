@@ -79,7 +79,7 @@ public class DummyRemoteDataProducer extends AbstractStreamProducer {
       }
    }
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return null;
    }
 }

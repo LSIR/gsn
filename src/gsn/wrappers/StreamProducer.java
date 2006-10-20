@@ -42,7 +42,7 @@ public interface StreamProducer {
    
    public abstract String getDBAlias ( );
    
-   public abstract Collection < DataField > getProducedStreamStructure ( );
+   public abstract Collection < DataField > getOutputFormat ( );
    
    public abstract void finalize ( HashMap context );
    

@@ -168,7 +168,8 @@ public final class Main {
                logger.error( new StringBuilder( ).append( "Please check the " ).append( DEFAULT_WRAPPER_PROPERTIES_FILE ).append( " file and try again." ).toString( ) );
                System.exit( 1 );
             }
-            wrappers.put( name , Class.forName( className ) );
+            Class wrapperClass = Class.forName( className );
+            wrappers.put( name , wrapperClass );
          } catch ( ClassNotFoundException e ) {
             logger.error( new StringBuilder( ).append( "Can't find the class associated with the wrapper : " ).append( name ).toString( ) );
             logger.error( new StringBuilder( ).append( "Check the " ).append( DEFAULT_WRAPPER_PROPERTIES_FILE ).append( " file and try again." ).toString( ) );

@@ -306,12 +306,12 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
             continue;
          }
          StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
-         publishData( streamElement );
+         postStreamElement( streamElement );
          isNew = false;
       }
    }
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       ArrayList < DataField > dataField = new ArrayList < DataField >( );
       dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
       return dataField;

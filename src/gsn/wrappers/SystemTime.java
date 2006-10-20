@@ -54,14 +54,14 @@ public class SystemTime extends AbstractStreamProducer implements ActionListener
       timer.start( );
    }
    
-   public Collection < DataField > getProducedStreamStructure ( ) {
+   public Collection < DataField > getOutputFormat ( ) {
       return collection;
    }
    
    public void actionPerformed ( ActionEvent actionEvent ) {
       if ( listeners.isEmpty( ) ) return;
       StreamElement streamElement = new StreamElement( EMPTY_FIELD_LIST , EMPTY_FIELD_TYPES , EMPTY_DATA_PART , actionEvent.getWhen( ) );
-      publishData( streamElement );
+      postStreamElement( streamElement );
    }
    
    public void finalize ( HashMap context ) {

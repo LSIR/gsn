@@ -46,6 +46,13 @@ public final class StreamElement implements Serializable {
       
    }
    
+   public StreamElement ( final Collection < DataField > outputStructure , final Serializable [ ] data) {
+      this(outputStructure,data,System.currentTimeMillis( ));
+   }      
+      
+   public StreamElement ( final String [ ] dataFieldNames , final Integer [ ] dataFieldTypes , final Serializable [ ] data ) {
+      this(dataFieldNames,dataFieldTypes,data,System.currentTimeMillis( ));
+   }
    public StreamElement ( final String [ ] dataFieldNames , final Integer [ ] dataFieldTypes , final Serializable [ ] data , final long timeStamp ) {
       if ( dataFieldNames.length != dataFieldTypes.length ) throw new IllegalArgumentException(
          "The length of dataFileNames and dataFileTypes provided in the constructor of StreamElement doesn't match." );
