@@ -20,11 +20,21 @@ public interface Container {
    
    public static final int    ONE_SHOT_QUERY_EXECUTION_REQUEST  = 114;
    
-   public static final int    LIST_VIRTUAL_SENSORS              = 115;
+   public static final int    REQUEST_LIST_VIRTUAL_SENSORS              = 115;
    
-   public static final String RESPOND                           = "RESPOND";
+   public static final int    REQUEST_WEB_APP_INFORMATION               = 116;
+   
+   public static final String WEB_APP_NAME                      = "WEB_APP_NAME";
+   
+   public static final String RESPONSE                           = "RESPOND";
    
    public static final String RES_HEADER_DATA_FIELD_DESCRIPTION = "RES_HEADER_DATA_FIELD_DESCRIPTION";
+   
+   public static final String WEB_APP_AUTHOR                    = "WEB_APP_AUTHOR";
+   
+   public static final String WEB_APP_DESCRIPTION               = "WEB_APP_DESCRIPTION";
+   
+   public static final String WEB_APP_EMAIL                     = "WEB_APP_EMAIL";
    
    public final String        RES_HEADER_DATA_FIELD_TYPE        = "RES_HEADER_DATA_FIELD_TYPE";
    
@@ -36,7 +46,7 @@ public interface Container {
    
    public final String        INVALID_REQUEST                   = "INVALID_NOTIFICATION_CODE_RECEIVED";
    
-   public final String        RES_STATUS                        = "RES_STATUS";
+   public final String        RESPONSE_STATUS                        = "RES_STATUS";
    
    public final String        REQUEST_HANDLED_SUCCESSFULLY      = "VALID_NOTIFICATION_CODE_RECEIVED";
    

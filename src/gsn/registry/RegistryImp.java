@@ -76,8 +76,8 @@ public class RegistryImp extends HttpServlet implements Registry {
    
    public static void main ( String [ ] args ) throws Exception {
       if ( args.length < 2 ) {
-         System.out.println( "You must specify the port on which the directory service will listen (default 1882)" );
-         System.out.println( "You must specify the interface IP on which the directory service will listen (default localhost)" );
+         System.out.println( "You must specify the port on which the directory service will listen (e.g. 1882)" );
+         System.out.println( "You must specify the interface IP on which the directory service will listen.(e.g. localhost)" );
          System.exit( 1 );
       }
       System.out.println( "Loading logging details from : " + DEFAULT_DIR_LOG4J_PROPERTIES );

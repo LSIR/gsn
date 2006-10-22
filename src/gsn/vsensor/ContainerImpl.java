@@ -1,5 +1,6 @@
 package gsn.vsensor;
 
+import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
@@ -104,36 +105,71 @@ public class ContainerImpl extends HttpServlet implements Container {
       }
    }
    
-   public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
+   public void doGet ( HttpServletRequest request , HttpServletResponse res ) throws ServletException , IOException {
       int requestType = -1;
       try {
-         requestType = Integer.parseInt( ( String ) req.getHeader( Container.REQUEST ) );
+         requestType = Integer.parseInt( ( String ) request.getHeader( Container.REQUEST ) );
       } catch ( Exception e ) {
          logger.debug( "A request received with an invalid request Type" , e );
          return;
       }
-      if ( requestType == Container.LIST_VIRTUAL_SENSORS ) {
-         Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
-         StringBuilder sb = new StringBuilder( );
-         while ( vsIterator.hasNext( ) ) {
-            sb.append( vsIterator.next( ).getVirtualSensorName( ) );
-            sb.append( "," );
-         }
-         res.setHeader( Container.RES_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
-         res.setHeader( Container.RESPOND , sb.toString( ) );
+      switch ( requestType ) {
+         case Container.REQUEST_WEB_APP_INFORMATION :
+            res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
+            res.addHeader( Container.WEB_APP_AUTHOR , Main.getContainerConfig( ).getWebAuthor( ) );
+            res.addHeader( Container.WEB_APP_DESCRIPTION , Main.getContainerConfig( ).getWebDescription( ) );
+            res.addHeader( Container.WEB_APP_NAME , Main.getContainerConfig( ).getWebName( ) );
+            res.addHeader( Container.WEB_APP_EMAIL , Main.getContainerConfig( ).getWebEmail( ) );
+            break;
+         case Container.REQUEST_LIST_VIRTUAL_SENSORS :
+            Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
+            StringBuilder sb = new StringBuilder( );
+            while ( vsIterator.hasNext( ) )
+               sb.append( vsIterator.next( ).getVirtualSensorName( ) ).append( "," );
+            sb.deleteCharAt( sb.length( ) - 1 );
+            res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
+            res.setHeader( Container.RESPONSE , sb.toString( ) );
+            break;
+         case Container.ONE_SHOT_QUERY_EXECUTION_REQUEST :
+            String query = ( request.getHeader( Container.VS_QUERY ) );
+            if ( query == null ) {
+               res.setHeader( Container.RESPONSE_STATUS , Container.INVALID_REQUEST );
+               logger.info( "A request for an execution received without a query ?!!" );
+               return;
+            }
+            res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
+            Enumeration < StreamElement > rs = StorageManager.getInstance( ).executeQuery( new StringBuilder( query ) );
+            ObjectOutputStream oos = new ObjectOutputStream( new BufferedOutputStream( res.getOutputStream( ) ) );
+            while ( rs.hasMoreElements( ) ) {
+               oos.writeObject( rs.nextElement( ) );
+               oos.flush( );
+            }
+            oos.close( );
+         default :
+            break;
+      }
+      
+   }
+   
+   public void doPost ( HttpServletRequest request , HttpServletResponse res ) throws ServletException , IOException {
+      int requestType = -1;
+      try {
+         requestType = Integer.parseInt( ( String ) request.getHeader( Container.REQUEST ) );
+      } catch ( Exception e ) {
+         logger.debug( "A request received with an invalid request Type" , e );
          return;
       }
       
       if ( requestType == Container.DATA_PACKET ) {
-         String notificiationCode = req.getHeader( Container.NOTIFICATION_CODE );
+         String notificiationCode = request.getHeader( Container.NOTIFICATION_CODE );
          RemoteDS remoteDS = notificationCodeToRemoteDataSource.get( notificiationCode );
          if ( remoteDS == null ) { // This client is no more interested
             // in this notificationCode.
-            res.setHeader( Container.RES_STATUS , Container.INVALID_REQUEST );
+            res.setHeader( Container.RESPONSE_STATUS , Container.INVALID_REQUEST );
             if ( logger.isInfoEnabled( ) ) logger.info( "Invalid notification code recieved, query droped." );
          } else {
-            res.setHeader( Container.RES_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
-            ObjectInputStream objectInputStream = new ObjectInputStream( req.getInputStream( ) );
+            res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
+            ObjectInputStream objectInputStream = new ObjectInputStream( request.getInputStream( ) );
             Serializable deserializeFromString;
             try {
                deserializeFromString = ( Serializable ) objectInputStream.readObject( );
@@ -157,37 +193,21 @@ public class ContainerImpl extends HttpServlet implements Container {
          return;
       }
       
-      String prespectiveVirtualSensor = req.getHeader( Container.QUERY_VS_NAME );
+      String prespectiveVirtualSensor = request.getHeader( Container.QUERY_VS_NAME );
       if ( prespectiveVirtualSensor == null ) {
          logger.warn( "Bad request received for Data_strctutes" );
-         res.setHeader( Container.RES_STATUS , Container.INVALID_REQUEST );
+         res.setHeader( Container.RESPONSE_STATUS , Container.INVALID_REQUEST );
          return;
       }
       VSensorConfig sensorConfig = Mappings.getVSensorConfig( prespectiveVirtualSensor );
       if ( sensorConfig == null ) {
          logger.warn( "Requested virtual sensor doesn't exist >" + prespectiveVirtualSensor + "<." );
-         res.setHeader( Container.RES_STATUS , Container.INVALID_REQUEST );
+         res.setHeader( Container.RESPONSE_STATUS , Container.INVALID_REQUEST );
          return;
       }
-      if ( requestType == Container.ONE_SHOT_QUERY_EXECUTION_REQUEST ) {
-         String query = req.getHeader( Container.VS_QUERY );
-         if ( query == null ) {
-            res.setHeader( Container.RES_STATUS , Container.INVALID_REQUEST );
-            logger.info( "A request for an execution received without a query ?!!" );
-            return;
-         }
-         res.setHeader( Container.RES_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
-         Enumeration < StreamElement > rs = StorageManager.getInstance( ).executeQuery( new StringBuilder( query ) );
-         ObjectOutputStream oos = new ObjectOutputStream( new BufferedOutputStream( res.getOutputStream( ) ) );
-         while ( rs.hasMoreElements( ) ) {
-            oos.writeObject( rs.nextElement( ) );
-            oos.flush( );
-         }
-         oos.close( );
-         return;
-      }
+      
       if ( requestType == Container.DATA_STRCTURE_REQUEST ) {
-         res.setHeader( Container.RES_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
+         res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
          if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( prespectiveVirtualSensor ).append( "* received." ).toString( ) );
          ArrayList < DataField > datafields = sensorConfig.getOutputStructure( );
          ObjectOutputStream oos = new ObjectOutputStream( new BufferedOutputStream( res.getOutputStream( ) ) );
@@ -197,7 +217,7 @@ public class ContainerImpl extends HttpServlet implements Container {
          return;
       }
       if ( requestType == Container.REGISTER_PACKET || requestType == Container.DEREGISTER_PACKET ) {
-         GSNNotification interest = new GSNNotification( req );
+         GSNNotification interest = new GSNNotification( request );
          if ( requestType == Container.REGISTER_PACKET ) {
             prespectiveVirtualSensor = interest.getPrespectiveVirtualSensor( );
             if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "REGISTER REQUEST FOR " ).append( prespectiveVirtualSensor ).append( " received from :" ).append(

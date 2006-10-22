@@ -30,7 +30,7 @@ public class SimHttpListener extends HttpServlet {
       int requestType = Integer.parseInt( ( String ) req.getHeader( Container.REQUEST ) );
       switch ( requestType ) {
          case Container.DATA_PACKET :
-            res.setHeader( Container.RES_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
+            res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
             if ( req.getLocalPort( ) == ( Simulation.START_PORT_INDEX + 1 ) ) {
                if ( outputLog == null ) {
                   outputLog = new File( "SuperLight-ReceivedTimes.log" );

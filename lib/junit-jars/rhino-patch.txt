@@ -1,0 +1,24 @@
+Index: js/rhino/src/org/mozilla/javascript/Interpreter.java
+===================================================================
+RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Interpreter.java,v
+retrieving revision 1.130
+diff -u -r1.130 Interpreter.java
+--- js/rhino/src/org/mozilla/javascript/Interpreter.java        17 Feb 2003 08:50:55 -0000      1.130
++++ js/rhino/src/org/mozilla/javascript/Interpreter.java        17 Feb 2003 15:43:53 -0000
+@@ -2032,6 +2032,16 @@
+         --stackTop;
+         Object lhs = stack[stackTop];
+         if (lhs == DBL_MRK) lhs = doubleWrap(sDbl[stackTop]);
++        else if (lhs == undefined) {
++            // special code for better error message for get property from undefined
++            int j = pc-6;
++            while (j > 0 && iCode[j] != 0) j--;
++            int i = getShort(iCode, j);
++            if (i >= 0 && i < strings.length) {
++                lhs=strings[i];
++                throw NativeGlobal.typeError1( "msg.is.not.defined", ScriptRuntime.toString(lhs),scope );
++            }
++        }
+         stack[stackTop] = ScriptRuntime.getProp(lhs, name, scope);
+         break;
+     }

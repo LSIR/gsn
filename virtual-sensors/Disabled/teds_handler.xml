@@ -1,0 +1,50 @@
+<virtual-sensor name="TEDSDetectorVirtualSensor" priority="11">
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+        <init-params/>
+    </processing-class>
+    <author>Ali Salehi</author>
+    <email>ali.salehi@epfl.ch</email>
+    <description>A vsensor to detect the sensor networks (cameras and motes) using TEDS.</description>
+    <life-cycle pool-size="10"/>
+    <addressing>
+        <predicate key="geographical">INM035</predicate>
+    </addressing>
+    <output-structure>
+        <field name="ID" type="varchar(20)"/>
+        <field name="TEDS" type="varchar(10000)"/>
+        <field name="STATUS" type="varchar(20)"/>
+        <field name="VSFILE" type="varchar(40)"/>
+    </output-structure>
+    <storage permanent-storage="false" history-size="1m"/>
+    <input-streams>
+        <input-stream name="identified_cameras">
+            <stream-source alias="detected_cameras" storage-size="1" sampling-rate="1" >
+                <address wrapper="teds-cam">
+                    <predicate key="HOST">localhost</predicate>
+                    <predicate key="PORT">9001</predicate>
+                    <predicate key="RATE">7000</predicate>
+                    <predicate key="templates-directory">templates-ieee1451</predicate>
+                    <predicate key="template-file">camTemplate</predicate>
+                    <predicate key="TIMEOUT">12000</predicate>
+                </address>
+                <query>select * from "WRAPPER"</query>
+            </stream-source>
+            <query>select * from "detected_cameras"</query>
+        </input-stream>
+        <input-stream name="identified_motes">
+            <stream-source alias="detected_motes" storage-size="1"  sampling-rate="1" >
+                <address wrapper="teds-mote">
+                    <predicate key="HOST">192.168.51.13</predicate>
+                    <predicate key="PORT">9001</predicate>
+                    <predicate key="templates-directory">templates-ieee1451</predicate>
+                    <predicate key="template-file">moteTemplate</predicate>
+                    <predicate key="TIMEOUT">12000</predicate>
+                </address>
+                <query>select * from "WRAPPER"</query>
+            </stream-source>
+            <query>select * from "detected_motes"</query>
+        </input-stream>
+    </input-streams>
+</virtual-sensor>
+

@@ -25,6 +25,8 @@ public class PIDUtils {
       is.write( '1' );
       is.close( );
       if ( output ) tempFile.deleteOnExit( );
+      else
+         logger.warn( "The file " + tempFile.getAbsolutePath( ) + " is not marked for removal !." );
       if ( logger.isDebugEnabled( ) ) logger.debug( "The PID file created >" + tempFile.getAbsolutePath( ) + "(" + output + ")" + ( tempFile.exists( ) ) );
       return tempFile;
    }

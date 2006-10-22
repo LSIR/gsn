@@ -24,9 +24,6 @@ import java.util.Vector;
 import junit.framework.TestCase;
 
 import org.apache.commons.collections.KeyValue;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @author jerome
@@ -49,7 +46,6 @@ public class TestStreamExporterVirtualSensor extends TestCase {
     * 
     * @see junit.framework.TestCase#setUp()
     */
-   @Before
    public void setUp ( ) {
       hashMap = new HashMap( );
       hashMap.put( VirtualSensorPool.CONTAINER , new ContainerImpl( ) );
@@ -58,10 +54,8 @@ public class TestStreamExporterVirtualSensor extends TestCase {
       config.setFileName( "PlaceholderfileNameForJUNitTesting" );
       config.setAuthor( "Jerome Rousselot" );
       hashMap.put( VirtualSensorPool.VSENSORCONFIG , config );
-      
    }
    
-   @After
    public void tearDown ( ) {
       hashMap = null;
       config = null;
@@ -80,7 +74,6 @@ public class TestStreamExporterVirtualSensor extends TestCase {
     * Tries to instantiate a VS without the required arguments. Should always
     * fail.
     */
-   @Test
    public void testMissingAllEssentialParameters ( ) {
       StreamExporterVirtualSensor vs = new StreamExporterVirtualSensor( );
       assertFalse( vs.initialize( hashMap ) );
@@ -90,9 +83,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
     * Tries to connect to a (supposedly) existing mysql db on local host. See
     * class comments for more info. Should succeed.
     */
-   @Test
    public void testConnectToExistingMySQLDB ( ) {
-      
       StreamExporterVirtualSensor vs = new StreamExporterVirtualSensor( );
       ArrayList < KeyValue > params = new ArrayList < KeyValue >( );
       params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_URL , url ) );
@@ -106,9 +97,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
     * Tries to log a line into a Mysql table. The test stream generates data for
     * each possible data type.
     */
-   @Test
    public void testLogStatementIntoMySQLDB ( ) {
-      
       StreamExporterVirtualSensor vs = new StreamExporterVirtualSensor( );
       // configure parameters
       ArrayList < KeyValue > params = new ArrayList < KeyValue >( );
@@ -149,9 +138,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
          e.printStackTrace( );
          result = false;
       }
-      
       assertTrue( result );
-      
    }
    
 }

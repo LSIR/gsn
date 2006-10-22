@@ -68,8 +68,8 @@ public class RemoteDS extends AbstractStreamProducer {
          return null;
       }
       
-      if ( postMethod.getResponseHeader( Container.RES_STATUS ) == null || postMethod.getResponseHeader( Container.RES_STATUS ).getValue( ).equals( Container.INVALID_REQUEST ) ) {
-         logger.debug( "The respond from server : " + postMethod.getResponseHeader( Container.RES_STATUS ) );
+      if ( postMethod.getResponseHeader( Container.RESPONSE_STATUS ) == null || postMethod.getResponseHeader( Container.RESPONSE_STATUS ).getValue( ).equals( Container.INVALID_REQUEST ) ) {
+         logger.debug( "The respond from server : " + postMethod.getResponseHeader( Container.RESPONSE_STATUS ) );
          return null;
       }
       ArrayList < DataField > outputStreamStruecture = null;

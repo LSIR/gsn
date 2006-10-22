@@ -180,7 +180,7 @@ public class GSNNotification extends NotificationRequest {
          e.printStackTrace( );
       }
       try {
-         if ( statusCode != -1 ) if ( postMethod.getResponseHeader( Container.RES_STATUS ).getValue( ).equals( Container.INVALID_REQUEST ) ) statusCode = -10;
+         if ( statusCode != -1 ) if ( postMethod.getResponseHeader( Container.RESPONSE_STATUS ).getValue( ).equals( Container.INVALID_REQUEST ) ) statusCode = -10;
       } catch ( NullPointerException e ) {
          e.printStackTrace( );
       }
