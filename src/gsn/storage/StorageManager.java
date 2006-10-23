@@ -78,7 +78,6 @@ public class StorageManager {
           * the data type used by hsql.
           */
          public String convertGSNTypeToLocalType ( DataField field ) {
-            // TODO: implement this method
             String convertedType = null;
             switch ( field.getDataTypeID( ) ) {
                case DataTypes.CHAR :

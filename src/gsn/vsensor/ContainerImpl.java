@@ -3,6 +3,7 @@ package gsn.vsensor;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
+import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.notifications.GSNNotification;
@@ -15,6 +16,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -29,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
+import com.oreilly.servlet.MultipartResponse;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
@@ -124,8 +129,10 @@ public class ContainerImpl extends HttpServlet implements Container {
          case Container.REQUEST_LIST_VIRTUAL_SENSORS :
             Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
             StringBuilder sb = new StringBuilder( );
-            while ( vsIterator.hasNext( ) )
-               sb.append( vsIterator.next( ).getVirtualSensorName( ) ).append( "," );
+            while ( vsIterator.hasNext( ) ) {
+               VSensorConfig config = vsIterator.next( );
+               sb.append( config.getVirtualSensorName( ) ).append( ":" ).append( config.getWebapp( ) ).append( "," );
+            }
             sb.deleteCharAt( sb.length( ) - 1 );
             res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
             res.setHeader( Container.RESPONSE , sb.toString( ) );
@@ -137,14 +144,50 @@ public class ContainerImpl extends HttpServlet implements Container {
                logger.info( "A request for an execution received without a query ?!!" );
                return;
             }
-            res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
             Enumeration < StreamElement > rs = StorageManager.getInstance( ).executeQuery( new StringBuilder( query ) );
-            ObjectOutputStream oos = new ObjectOutputStream( new BufferedOutputStream( res.getOutputStream( ) ) );
+            MultipartResponse mpr = new MultipartResponse( res );
+            OutputStream outputStream = res.getOutputStream( );
             while ( rs.hasMoreElements( ) ) {
-               oos.writeObject( rs.nextElement( ) );
-               oos.flush( );
+               StreamElement se = rs.nextElement( );
+               for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {
+                  mpr.startResponse( se.getFieldNames( )[ i ] + "/" + DataTypes.TYPE_NAMES[ se.getFieldTypes( )[ i ] ] );
+                  PrintWriter outputWriter = res.getWriter( );
+                  outputWriter.print( se.getData( )[ i ] );
+                  // if (se.getFieldTypes( )[i]==DataTypes.BINARY)
+                  outputStream.write( ( byte [ ] ) se.getData( )[ i ] );
+                  // / else
+                  mpr.endResponse( );
+               }
             }
-            oos.close( );
+            mpr.finish( );
+            break;
+         case Container.REQUEST_OUTPUT_FORMAT :
+            String prespectiveVirtualSensor = request.getHeader( Container.QUERY_VS_NAME );
+            if ( prespectiveVirtualSensor == null ) {
+               logger.warn( "GET:Bad request received for Data_strctutes" );
+               res.setHeader( Container.RESPONSE_STATUS , Container.INVALID_REQUEST );
+               return;
+            }
+            VSensorConfig sensorConfig = Mappings.getVSensorConfig( prespectiveVirtualSensor );
+            if ( sensorConfig == null ) {
+               logger.warn( "Requested virtual sensor doesn't exist >" + prespectiveVirtualSensor + "<." );
+               res.setHeader( Container.RESPONSE_STATUS , Container.INVALID_REQUEST );
+               return;
+            }
+            if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( prespectiveVirtualSensor ).append( "* received." ).toString( ) );
+            StringBuilder types = new StringBuilder( );
+            StringBuilder names = new StringBuilder( );
+            StringBuilder descriptions = new StringBuilder( );
+            for ( DataField df : sensorConfig.getOutputStructure( ) ) {
+               types.append( df.getType( ) ).append( "," );
+               names.append( df.getFieldName( ) ).append( "," );
+               descriptions.append( df.getDescription( ) ).append( "," );
+            }
+            names.deleteCharAt( names.length( ) - 1 );
+            types.deleteCharAt( types.length( ) - 1 );
+            descriptions.deleteCharAt( descriptions.length( ) - 1 );
+            if ( logger.isDebugEnabled( ) ) logger.debug( "Respond sent to the requestee." );
+            break;
          default :
             break;
       }
@@ -206,7 +249,7 @@ public class ContainerImpl extends HttpServlet implements Container {
          return;
       }
       
-      if ( requestType == Container.DATA_STRCTURE_REQUEST ) {
+      if ( requestType == Container.REQUEST_OUTPUT_FORMAT ) {
          res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
          if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( prespectiveVirtualSensor ).append( "* received." ).toString( ) );
          ArrayList < DataField > datafields = sensorConfig.getOutputStructure( );

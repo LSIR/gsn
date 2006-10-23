@@ -152,21 +152,29 @@ public class VSensorLoader extends Thread {
             }
          }
          
-         String newVirtualSensorName = configuration.getVirtualSensorName( );
-         if ( Mappings.getVSensorConfig( newVirtualSensorName ) != null ) {
+         String vsName = configuration.getVirtualSensorName( );
+         if ( Mappings.getVSensorConfig( vsName ) != null ) {
             logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append( " failed because the virtual sensor name used by " )
-                  .append( configFile ).append( " is already used by : " ).append( Mappings.getVSensorConfig( newVirtualSensorName ).getFileName( ) ).toString( ) );
+                  .append( configFile ).append( " is already used by : " ).append( Mappings.getVSensorConfig( vsName ).getFileName( ) ).toString( ) );
             logger.error( "Note that the virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
             continue;
          }
-         if ( !StringUtils.isAlphanumericSpace( newVirtualSensorName ) ) {
+         if ( !StringUtils.isAlphanumericSpace( vsName ) ) {
             logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append(
                " failed because the virtual sensor name is not following the requirements : " ).toString( ) );
             logger.error( "The virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
             logger.error( "That the name of the virutal sensor should starting by alphabetical character and they can contain numerical characters afterwards." );
             continue;
          }
-         logger.warn( new StringBuilder( "adding : " ).append( newVirtualSensorName ).append( " virtual sensor[" ).append( configFile ).append( "]" ).toString( ) );
+//         if (configuration.getWebapp( )!=null && configuration.getWebapp( ).trim( ).length( )!=0) {
+//            File webappF = new File(configuration.getWebapp( ).trim( ));
+//            if (!webappF.isDirectory( )|| !webappF.canRead( )) {
+//               logger.error( "Can't located web specified webapp path >"+webappF.getAbsolutePath( )+"< isFile: "+webappF.isFile( )+", canRead : "+webappF.canRead( ) );
+//               logger.error( "Loading the virtual sensor : "+vsName+"failed." );
+//               continue;
+//            }
+//         }  
+         logger.warn( new StringBuilder( "adding : " ).append( vsName ).append( " virtual sensor[" ).append( configFile ).append( "]" ).toString( ) );
          VSensorInstance sensorInstance = new VSensorInstance( configFile , new File( configFile ).lastModified( ) , configuration );
          boolean testingResult = Mappings.addVSensorInstance( sensorInstance );
          if ( !testingResult ) {

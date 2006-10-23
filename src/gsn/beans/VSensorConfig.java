@@ -1,5 +1,6 @@
 package gsn.beans;
 
+import gsn.Main;
 import gsn.utils.CaseInsensitiveComparator;
 
 import java.io.Serializable;
@@ -55,6 +56,7 @@ public class VSensorConfig implements Serializable {
    
    private transient final Logger                 logger                                    = Logger.getLogger( VSensorConfig.class );
    
+   private String webapp=null;
    /**
     * @return Returns the addressing.
     */
@@ -346,6 +348,23 @@ public class VSensorConfig implements Serializable {
       return this.parsedStorageSize;
    }
    
+   /**
+    * @return the webapp path.
+    */
+   public String getWebapp ( ) {
+      if ( this.webapp == null || this.webapp.trim( ).length( )==0 ) {
+         return Main.DEFAULT_WEB_APP_PATH;
+      }
+      return webapp.trim( );
+   }
+
+   /**
+    * @param webapp the webapp path to set
+    */
+   public void setWebapp ( String webappPath ) {
+      this.webapp = webappPath;
+   }
+
    public String toString ( ) {
       final StringBuilder builder = new StringBuilder( "Input Stream [" );
       for ( final InputStream inputStream : this.getInputStreams( ) ) {
@@ -372,4 +391,5 @@ public class VSensorConfig implements Serializable {
          + ", mainClassInitialParams=" + this.mainClassInitialParams + ", lastModified=" + this.lastModified + ", fileName='" + this.fileName + '\'' + ", logger=" + this.logger + ", nameInitialized="
          + this.nameInitialized + ", isStorageCountBased=" + this.isStorageCountBased + ", parsedStorageSize=" + this.parsedStorageSize + '}';
    }
+   
 }

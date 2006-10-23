@@ -13,6 +13,7 @@ import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
+import com.oreilly.servlet.multipart.MultipartParser;
 
 /**
  * @author alisalehi
@@ -46,11 +47,11 @@ public class TestContainerImpl {
       WebConversation wc = new WebConversation();
       WebRequest     request = new GetMethodWebRequest( "http://localhost:22001/gsn" );
       request.setHeaderField( "REQUEST" , Container.ONE_SHOT_QUERY_EXECUTION_REQUEST+"" );
+      request.setHeaderField( "VS_QUERY" , "select * from LocalSystemTime" );
       WebResponse   response = wc.getResponse( request );
       assertEquals(response.getHeaderField( Container.RESPONSE_STATUS),Container.REQUEST_HANDLED_SUCCESSFULLY );
-      assertNotNull( response.getHeaderField( Container.RESPONSE ) );
+      assertNull( response.getHeaderField( Container.RESPONSE ) );
    }
-  
    @Before public void setup() {
       
    }

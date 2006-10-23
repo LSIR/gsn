@@ -16,7 +16,7 @@ public interface Container {
    
    public static final int    DATA_PACKET                       = 112;
    
-   public static final int    DATA_STRCTURE_REQUEST             = 113;
+   public static final int    REQUEST_OUTPUT_FORMAT             = 113;
    
    public static final int    ONE_SHOT_QUERY_EXECUTION_REQUEST  = 114;
    
@@ -36,9 +36,9 @@ public interface Container {
    
    public static final String WEB_APP_EMAIL                     = "WEB_APP_EMAIL";
    
-   public final String        RES_HEADER_DATA_FIELD_TYPE        = "RES_HEADER_DATA_FIELD_TYPE";
+   public final String        RESPONSE_FIELD_TYPES        = "FIELD_TYPES";
    
-   public final String        RES_HEADER_DATA_FIELD_NAME        = "RES_HEADER_DATA_FIELD_NAME";
+   public final String        RESPONSE_FIELD_NAMES        = "FIELD_NAMES";
    
    public final String        QUERY_VS_NAME                     = "QUERY_VS_NAME";
    

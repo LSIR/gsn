@@ -56,11 +56,11 @@ public class RemoteDS extends AbstractStreamProducer {
       String destination = new StringBuilder( ).append( host ).append( ":" ).append( getAddressBeanActivePort( ) ).append( "/gsn" ).toString( );
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Wants to ask for structure from : " ).append( destination ).toString( ) );
       PostMethod postMethod = new PostMethod( destination );
-      postMethod.setRequestHeader( Container.REQUEST , Integer.toString( Container.DATA_STRCTURE_REQUEST ) );
+      postMethod.setRequestHeader( Container.REQUEST , Integer.toString( Container.REQUEST_OUTPUT_FORMAT ) );
       postMethod.setRequestHeader( Container.QUERY_VS_NAME , remoteVSName );
       if ( logger.isDebugEnabled( ) ) {
          logger.debug( new StringBuilder( "Post request contains : " ).append( "QUERY_VS_NAME = " ).append( remoteVSName ).append( ";" ).append( "Request Type : " ).append(
-            Container.DATA_STRCTURE_REQUEST ).toString( ) );
+            Container.REQUEST_OUTPUT_FORMAT ).toString( ) );
       }
       int statusCode = TCPConnPool.executeMethod( postMethod );
       if ( statusCode == -1 ) {
