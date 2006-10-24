@@ -115,12 +115,12 @@ public class InputStream {
       }
       
       final long currentTimeMillis = System.currentTimeMillis( );
-      if ( this.needsDelay && currentTimeMillis - this.startTime <= INITIAL_DELAY_5000MSC ) {
-         if ( logger.isInfoEnabled( ) ) logger.info( "Called but *discarded* b/c of initial delay" );
-         // SimulationResult.addJustBeforeStartingToEvaluateQueries ();
-         // SimulationResult.addJustQueryEvaluationFinished ( - 1 );
-         return;
-      }
+//      if ( this.needsDelay && currentTimeMillis - this.startTime <= INITIAL_DELAY_5000MSC ) {
+//         if ( logger.isInfoEnabled( ) ) logger.info( "Called but *discarded* b/c of initial delay" );
+//         // SimulationResult.addJustBeforeStartingToEvaluateQueries ();
+//         // SimulationResult.addJustQueryEvaluationFinished ( - 1 );
+//         return;
+//      }
       this.needsDelay = false;
       if ( this.rate > 0 && ( currentTimeMillis - this.lastVisited ) < this.rate ) {
          if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );

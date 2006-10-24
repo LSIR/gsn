@@ -16,12 +16,16 @@ import gsn.wrappers.AbstractStreamProducer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TooManyListenersException;
 import java.util.TreeMap;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -32,33 +36,31 @@ import org.apache.log4j.Logger;
  * through serial port. <p/> The only needed parameter is the serial port
  * address, provided through xml. Default connection settings are 9600 8 N 1 (I
  * had some problems with javax.comm Linux when trying to use non-default
- * settings)
- * TODO parametrize connection settings through xml.
+ * settings) TODO parametrize connection settings through xml.
+ * 
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * @author Jerome Rousselot CSEM<br>
  */
 public class SerialWrapper extends AbstractStreamProducer implements SerialPortEventListener {
    
-   private static final String    RAW_PACKET    = "RAW_PACKET";
+   public  static final String     RAW_PACKET    = "RAW_PACKET";
    
-   private final transient Logger logger        = Logger.getLogger( SerialWrapper.class );
+   private final transient Logger  logger        = Logger.getLogger( SerialWrapper.class );
    
-   private SerialConnection       wnetPort;
+   private SerialConnection        wnetPort;
    
-   private int                    threadCounter = 0;
+   private int                     threadCounter = 0;
    
-   private static int             MAXBUFFERSIZE = 1024;
+   public InputStream              is;
    
-   private byte [ ]               inputBuffer;
+   private AddressBean             addressBean;
    
-   public InputStream             is;
+   private String                  serialPort;
    
-   private AddressBean            addressBean;
+   private ArrayList < DataField > dataField     = new ArrayList < DataField >( );
    
-   private String                 serialPort;
-
-   private ArrayList < DataField > dataField = new ArrayList < DataField >( );
-
+   private boolean                 onDemand      = false;
+   
    /*
     * Needs the following information from XML file : serialport : the name of
     * the serial port (/dev/ttyS0...)
@@ -68,23 +70,16 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
       setName( "SerialWrapper-Thread" + ( ++threadCounter ) );
       addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       serialPort = addressBean.getPredicateValue( "serialport" );
-      if (serialPort==null || serialPort.trim( ).length( )==0) {
-         logger.warn( "The >serialport> parameter is missing from the SerialWrapper, wrapper initialization failed." );
+      if ( serialPort == null || serialPort.trim( ).length( ) == 0 ) {
+         logger.warn( "The >serialport< parameter is missing from the SerialWrapper, wrapper initialization failed." );
          return false;
       }
       // TASK : TRYING TO CONNECT USING THE ADDRESS
       wnetPort = new SerialConnection( serialPort );
-      try {
-         wnetPort.openConnection( );
-         if ( wnetPort.isOpen( ) ) {
-            wnetPort.addEventListener( this );
-            is = wnetPort.getInputStream( );
-            if ( logger.isDebugEnabled( ) ) logger.debug( "Serial port wrapper successfully opened port and registered itself as listener." );
-         }
-      } catch ( SerialConnectionException e ) {
-         logger.warn( "Serial port wrapper couldn't connect to serial port : "+serialPort ,e );
-         return false;
-      }
+      if ( wnetPort.openConnection( ) == false ) return false;
+      wnetPort.addEventListener( this );
+      is = wnetPort.getInputStream( );
+      if ( logger.isDebugEnabled( ) ) logger.debug( "Serial port wrapper successfully opened port and registered itself as listener." );
       inputBuffer = new byte [ MAXBUFFERSIZE ];
       dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
       return true;
@@ -128,7 +123,7 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
        * timeout of 30 seconds on the portOpen to allow other applications to
        * reliquish the port if have it open and no longer need it.
        */
-      public void openConnection ( ) throws SerialConnectionException {
+      public boolean openConnection ( ) {
          // parameters = new SerialParameters("/dev/ttyS0", 9600, 0, 0,
          // 8, 1,
          // 1);
@@ -137,7 +132,8 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
          try {
             portId = CommPortIdentifier.getPortIdentifier( serialPort );
          } catch ( NoSuchPortException e ) {
-            throw new SerialConnectionException( e.getMessage( ) );
+            logger.error( e.getMessage( ) , e );
+            return false;
          }
          
          // Open the port represented by the CommPortIdentifier object.
@@ -146,11 +142,15 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
          // allow
          // a different application to reliquish the port if the user
          // wants to.
-         if ( portId.isCurrentlyOwned( ) ) System.out.println( "port owned by so else" );
+         if ( portId.isCurrentlyOwned( ) ) {
+            logger.error( "port owned by someone else" );
+            return false;
+         }
          try {
-            sPort = ( SerialPort ) portId.open( "GSNSerialConnection" , 30000 );
+            sPort = ( SerialPort ) portId.open( "GSNSerialConnection" , 30 * 1000 );
          } catch ( PortInUseException e ) {
-            throw new SerialConnectionException( e.getMessage( ) );
+            logger.error( e.getMessage( ) , e );
+            return false;
          }
          
          // Open the input and output streams for the connection. If they
@@ -161,7 +161,8 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
             is = sPort.getInputStream( );
          } catch ( IOException e ) {
             sPort.close( );
-            throw new SerialConnectionException( "Error opening i/o streams" );
+            logger.error( e.getMessage( ) , e );
+            return false;
          }
          sPort.notifyOnDataAvailable( true );
          sPort.notifyOnBreakInterrupt( false );
@@ -171,9 +172,11 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
          // input handling.
          try {
             sPort.enableReceiveTimeout( 30 );
-         } catch ( UnsupportedCommOperationException e ) {}
-         
+         } catch ( UnsupportedCommOperationException e ) {
+
+         }
          open = true;
+         return true;
       }
       
       /**
@@ -211,13 +214,12 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
          return open;
       }
       
-      public void addEventListener ( SerialPortEventListener listener ) throws SerialConnectionException {
+      public void addEventListener ( SerialPortEventListener listener ) {
          try {
             sPort.addEventListener( listener );
-            
          } catch ( TooManyListenersException e ) {
             sPort.close( );
-            throw new SerialConnectionException( "too many listeners added" );
+            logger.warn( e.getMessage( ) , e );
          }
       }
       
@@ -240,20 +242,25 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
          return os;
       }
       
-      /**
-       * Send a string.
-       */
-      public void sendString ( String s ) {
-         try {
-            os.write( s.getBytes( ) );
-         } catch ( IOException e ) {
-            System.err.println( "OutputStream write error: " + e );
-         }
-      }
    }
    
-
-   
+   public synchronized boolean sendToWrapper ( Object dataItem ) throws OperationNotSupportedException {
+      if (!wnetPort.isOpen( ))
+         throw new OperationNotSupportedException("The connection is closed.");
+      try {
+         if ( dataItem instanceof byte [ ] ) wnetPort.getOutputStream( ).write( ( byte [ ] ) dataItem );
+         else { // general case, writes using the printwriter.
+            PrintWriter pw = new PrintWriter( wnetPort.getOutputStream( ) );
+            pw.write( dataItem.toString( ) );
+            pw.flush( );
+            pw.close( );
+         }
+         return true;
+      } catch ( IOException e ) {
+         logger.warn( "OutputStream write error. " , e );
+         return false;
+      }
+   }
    
    public Collection < DataField > getOutputFormat ( ) {
       return dataField;
@@ -261,12 +268,17 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
    
    public void finalize ( HashMap context ) {
       super.finalize( context );
+      wnetPort.closeConnection( );
       threadCounter--;
    }
    
-   public void serialEvent ( SerialPortEvent e ) {
+   private static final int MAXBUFFERSIZE = 1024;
+   
+   private byte [ ]         inputBuffer;
+   
+   public synchronized void serialEvent ( SerialPortEvent e ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port event, reading..." );
-      if (!isActive( ) || listeners.isEmpty( )) {
+      if ( !isActive( ) || listeners.isEmpty( ) ) {
          if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper dropped the input b/c there is no listener there or the wrapper is inactive." );
          return;
       }
@@ -293,29 +305,8 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
          case SerialPortEvent.BI :
             // messageAreaIn.append("\n--- BREAK RECEIVED ---\n");
       }
-      if ( logger.isDebugEnabled( ) ) logger.debug(new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : ").append(  inputBuffer ).toString( ) );
+      if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : " ).append( inputBuffer ).toString( ) );
       StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
       postStreamElement( streamElement );
    }
 }
-class SerialConnectionException extends Exception {
-   
-   /**
-    * Constructs a <code>SerialConnectionException</code> with the
-    * specified detail message.
-    * 
-    * @param str the detail message.
-    */
-   public SerialConnectionException ( String str ) {
-      super( str );
-   }
-   
-   /**
-    * Constructs a <code>SerialConnectionException</code> with no detail
-    * message.
-    */
-   public SerialConnectionException ( ) {
-      super( );
-   }
-}
-

@@ -327,6 +327,7 @@ public class VSensorLoader extends Thread {
    
    private void removeAllResources ( VSensorInstance sensorInstance ) {
       VSensorConfig config = sensorInstance.getConfig( );
+      sensorInstance.shutdown( );
       final String vsensorName = config.getVirtualSensorName( );
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Releasing previously used resources used by [" ).append( vsensorName ).append( "]." ).toString( ) );
       for ( InputStream inputStream : config.getInputStreams( ) ) {
@@ -344,7 +345,6 @@ public class VSensorLoader extends Thread {
          }
          inputStream.finalize( );
       }
-      sensorInstance.shutdown( );
       // storageManager.renameTable(vsensorName,vsensorName+"Before"+System.currentTimeMillis());
       Mappings.getContainer( ).removeAllResourcesAssociatedWithVSName( vsensorName );
       this.storageManager.dropTable( config.getVirtualSensorName( ) );
