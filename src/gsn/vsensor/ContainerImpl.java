@@ -11,7 +11,6 @@ import gsn.notifications.NotificationRequest;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.wrappers.RemoteDS;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,19 +24,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Vector;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
 import com.oreilly.servlet.MultipartResponse;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * @web.servlet name="gsn" load-on-startup="true"
+ * @web.servlet name="gsn" load-on-startup="1"
  * @web.servlet-mapping url-pattern="/gsn"
  */
 public class ContainerImpl extends HttpServlet implements Container {

@@ -58,26 +58,33 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
    private String                 serialPort;
 
    private ArrayList < DataField > dataField = new ArrayList < DataField >( );
-   
-   public class SerialConnectionException extends Exception {
-      
-      /**
-       * Constructs a <code>SerialConnectionException</code> with the
-       * specified detail message.
-       * 
-       * @param str the detail message.
-       */
-      public SerialConnectionException ( String str ) {
-         super( str );
+
+   /*
+    * Needs the following information from XML file : serialport : the name of
+    * the serial port (/dev/ttyS0...)
+    */
+   public boolean initialize ( TreeMap context ) {
+      if ( !super.initialize( context ) ) return false;
+      setName( "SerialWrapper-Thread" + ( ++threadCounter ) );
+      addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      serialPort = addressBean.getPredicateValue( "serialport" );
+      // TASK : TRYING TO CONNECT USING THE ADDRESS
+      wnetPort = new SerialConnection( serialPort );
+      try {
+         wnetPort.openConnection( );
+         if ( wnetPort.isOpen( ) ) {
+            wnetPort.addEventListener( this );
+            is = wnetPort.getInputStream( );
+            if ( logger.isDebugEnabled( ) ) logger.debug( "Serial port wrapper successfully opened port and registered itself as listener." );
+         }
+      } catch ( SerialConnectionException e ) {
+         System.err.println( "Serial Port Connection Exception : " + e.getMessage( ) );
+         logger.warn( "Serial port wrapper couldn't connect to serial port : " ,e );
+         return false;
       }
-      
-      /**
-       * Constructs a <code>SerialConnectionException</code> with no detail
-       * message.
-       */
-      public SerialConnectionException ( ) {
-         super( );
-      }
+      inputBuffer = new byte [ MAXBUFFERSIZE ];
+      dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
+      return true;
    }
    
    /**
@@ -242,33 +249,7 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
       }
    }
    
-   /*
-    * Needs the following information from XML file : serialport : the name of
-    * the serial port (/dev/ttyS0...)
-    */
-   public boolean initialize ( TreeMap context ) {
-      if ( !super.initialize( context ) ) return false;
-      setName( "WNetSerialWrapper-Thread" + ( ++threadCounter ) );
-      addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
-      serialPort = addressBean.getPredicateValue( "serialport" );
-      // TASK : TRYING TO CONNECT USING THE ADDRESS
-      wnetPort = new SerialConnection( serialPort );
-      try {
-         wnetPort.openConnection( );
-         if ( wnetPort.isOpen( ) ) {
-            wnetPort.addEventListener( this );
-            is = wnetPort.getInputStream( );
-            if ( logger.isDebugEnabled( ) ) logger.debug( "Serial port wrapper successfully opened port and registered itself as listener." );
-         }
-      } catch ( SerialConnectionException e ) {
-         System.err.println( "Serial Port Connection Exception : " + e.getMessage( ) );
-         logger.warn( "Serial port wrapper couldn't connect to serial port : " ,e );
-         return false;
-      }
-      inputBuffer = new byte [ MAXBUFFERSIZE ];
-      dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
-      return true;
-   }
+
    
    
    public Collection < DataField > getOutputFormat ( ) {
@@ -314,3 +295,24 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
       postStreamElement( streamElement );
    }
 }
+class SerialConnectionException extends Exception {
+   
+   /**
+    * Constructs a <code>SerialConnectionException</code> with the
+    * specified detail message.
+    * 
+    * @param str the detail message.
+    */
+   public SerialConnectionException ( String str ) {
+      super( str );
+   }
+   
+   /**
+    * Constructs a <code>SerialConnectionException</code> with no detail
+    * message.
+    */
+   public SerialConnectionException ( ) {
+      super( );
+   }
+}
+
