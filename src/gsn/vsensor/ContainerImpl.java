@@ -183,9 +183,12 @@ public class ContainerImpl extends HttpServlet implements Container {
                names.append( df.getFieldName( ) ).append( "," );
                descriptions.append( df.getDescription( ) ).append( "," );
             }
-            names.deleteCharAt( names.length( ) - 1 );
-            types.deleteCharAt( types.length( ) - 1 );
+            names.deleteCharAt( names.length( ) - 1 ).append( "\n" );
+            types.deleteCharAt( types.length( ) - 1 ).append( "\n" );
             descriptions.deleteCharAt( descriptions.length( ) - 1 );
+            res.getWriter( ).print( names );
+            res.getWriter( ).print( types );
+            res.getWriter( ).print( descriptions );
             if ( logger.isDebugEnabled( ) ) logger.debug( "Respond sent to the requestee." );
             break;
          default :
