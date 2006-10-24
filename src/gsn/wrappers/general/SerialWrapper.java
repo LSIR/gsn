@@ -68,6 +68,10 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
       setName( "SerialWrapper-Thread" + ( ++threadCounter ) );
       addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       serialPort = addressBean.getPredicateValue( "serialport" );
+      if (serialPort==null || serialPort.trim( ).length( )==0) {
+         logger.warn( "The >serialport> parameter is missing from the SerialWrapper, wrapper initialization failed." );
+         return false;
+      }
       // TASK : TRYING TO CONNECT USING THE ADDRESS
       wnetPort = new SerialConnection( serialPort );
       try {
@@ -78,8 +82,7 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
             if ( logger.isDebugEnabled( ) ) logger.debug( "Serial port wrapper successfully opened port and registered itself as listener." );
          }
       } catch ( SerialConnectionException e ) {
-         System.err.println( "Serial Port Connection Exception : " + e.getMessage( ) );
-         logger.warn( "Serial port wrapper couldn't connect to serial port : " ,e );
+         logger.warn( "Serial port wrapper couldn't connect to serial port : "+serialPort ,e );
          return false;
       }
       inputBuffer = new byte [ MAXBUFFERSIZE ];
