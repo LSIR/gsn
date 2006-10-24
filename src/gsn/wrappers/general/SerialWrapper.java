@@ -260,10 +260,9 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
             is = wnetPort.getInputStream( );
             if ( logger.isDebugEnabled( ) ) logger.debug( "Serial port wrapper successfully opened port and registered itself as listener." );
          }
-         
       } catch ( SerialConnectionException e ) {
          System.err.println( "Serial Port Connection Exception : " + e.getMessage( ) );
-         logger.warn( "Serial port wrapper couldn't connect to serial port : " + e.getMessage( ) );
+         logger.warn( "Serial port wrapper couldn't connect to serial port : " ,e );
          return false;
       }
       inputBuffer = new byte [ MAXBUFFERSIZE ];
@@ -310,7 +309,7 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
          case SerialPortEvent.BI :
             // messageAreaIn.append("\n--- BREAK RECEIVED ---\n");
       }
-      if ( logger.isDebugEnabled( ) ) logger.debug( "Serial port wrapper processed a serial port event, stringbuffer is now : " + new String( inputBuffer ) );
+      if ( logger.isDebugEnabled( ) ) logger.debug(new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : ").append(  inputBuffer ).toString( ) );
       StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
       postStreamElement( streamElement );
    }
