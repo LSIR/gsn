@@ -13,7 +13,6 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.vsensor.Container;
 import gsn.wrappers.AbstractStreamProducer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,7 +22,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.TooManyListenersException;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -34,8 +32,8 @@ import org.apache.log4j.Logger;
  * through serial port. <p/> The only needed parameter is the serial port
  * address, provided through xml. Default connection settings are 9600 8 N 1 (I
  * had some problems with javax.comm Linux when trying to use non-default
- * settings) TODO parametrize connection settings through xml.
- * 
+ * settings)
+ * TODO parametrize connection settings through xml.
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * @author Jerome Rousselot CSEM<br>
  */
@@ -45,15 +43,12 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
    
    private final transient Logger logger        = Logger.getLogger( SerialWrapper.class );
    
-   private boolean                isNew         = false;
-   
    private SerialConnection       wnetPort;
    
    private int                    threadCounter = 0;
    
    private static int             MAXBUFFERSIZE = 1024;
    
-   // private StringBuffer inputBuffer = new StringBuffer();
    private byte [ ]               inputBuffer;
    
    public InputStream             is;
@@ -61,33 +56,9 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
    private AddressBean            addressBean;
    
    private String                 serialPort;
-   
-   /*
-    * @(#)SerialConnectionException.java 1.3 98/06/04 SMI
-    * @(#)SerialConnection.java 1.6 98/07/17 SMI Copyright (c) 1998 Sun
-    * Microsystems, Inc. All Rights Reserved. Sun grants you ("Licensee") a
-    * non-exclusive, royalty free, license to use, modify and redistribute this
-    * software in source and binary code form, provided that i) this copyright
-    * notice and license appear on all copies of the software; and ii) Licensee
-    * does not utilize the software in a manner which is disparaging to Sun.
-    * This software is provided "AS IS," without a warranty of any kind. ALL
-    * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
-    * ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
-    * OR NON-INFRINGEMENT, ARE HEREBY EXCLUDED. SUN AND ITS LICENSORS SHALL NOT
-    * BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING,
-    * MODIFYING OR DISTRIBUTING THE SOFTWARE OR ITS DERIVATIVES. IN NO EVENT
-    * WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST REVENUE, PROFIT OR DATA,
-    * OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE
-    * DAMAGES, HOWEVER CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY, ARISING
-    * OUT OF THE USE OF OR INABILITY TO USE SOFTWARE, EVEN IF SUN HAS BEEN
-    * ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. This software is not designed
-    * or intended for use in on-line control of aircraft, air traffic, aircraft
-    * navigation or aircraft communications; or in the design, construction,
-    * operation or maintenance of any nuclear facility. Licensee represents and
-    * warrants that it will not use or redistribute the Software for such
-    * purposes.
-    */
 
+   private ArrayList < DataField > dataField = new ArrayList < DataField >( );
+   
    public class SerialConnectionException extends Exception {
       
       /**
@@ -288,7 +259,6 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
             wnetPort.addEventListener( this );
             is = wnetPort.getInputStream( );
             if ( logger.isDebugEnabled( ) ) logger.debug( "Serial port wrapper successfully opened port and registered itself as listener." );
-            
          }
          
       } catch ( SerialConnectionException e ) {
@@ -297,23 +267,12 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
          return false;
       }
       inputBuffer = new byte [ MAXBUFFERSIZE ];
+      dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
       return true;
    }
    
-   public void run ( ) {
-      while ( isActive( ) ) {
-         if ( listeners.isEmpty( ) || !isNew ) {
-            continue;
-         }
-         StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
-         postStreamElement( streamElement );
-         isNew = false;
-      }
-   }
    
    public Collection < DataField > getOutputFormat ( ) {
-      ArrayList < DataField > dataField = new ArrayList < DataField >( );
-      dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
       return dataField;
    }
    
@@ -323,11 +282,13 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
    }
    
    public void serialEvent ( SerialPortEvent e ) {
-      
       if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port event, reading..." );
+      if (!isActive( ) || listeners.isEmpty( )) {
+         if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper dropped the input b/c there is no listener there or the wrapper is inactive." );
+         return;
+      }
       // Determine type of event.
       switch ( e.getEventType( ) ) {
-         
          // Read data until -1 is returned.
          case SerialPortEvent.DATA_AVAILABLE :
             /*
@@ -344,14 +305,13 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
                logger.warn( "Serial port wrapper couldn't read data : " + ex );
                return;
             }
-            isNew = true;
             break;
-         
          // If break event append BREAK RECEIVED message.
          case SerialPortEvent.BI :
             // messageAreaIn.append("\n--- BREAK RECEIVED ---\n");
       }
       if ( logger.isDebugEnabled( ) ) logger.debug( "Serial port wrapper processed a serial port event, stringbuffer is now : " + new String( inputBuffer ) );
+      StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
+      postStreamElement( streamElement );
    }
-   
 }
