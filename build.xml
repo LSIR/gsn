@@ -40,7 +40,6 @@
                          <include name="**/*.jar" />
            </fileset> 
         </path>
-        <taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpathref="classpath"/>
         <taskdef resource="tasks.properties" classpath="${libdir}/jcoverage.jar"/>
 <!--    <taskdef name="documentdoclet" classname="xdoclet.modules.doc.DocumentDocletTask" classpathref="classpath"/> 
     	<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask" classpathref="classpath"/>
