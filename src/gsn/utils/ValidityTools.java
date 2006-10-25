@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 public class ValidityTools {
    
    public static final int              SMTP_PORT = 25;
+   static Pattern hostAndPortPattern = Pattern.compile( "(.+):(\\d+)$" );
    
    public static final transient Logger logger    = Logger.getLogger( ValidityTools.class );
    
@@ -63,7 +64,6 @@ public class ValidityTools {
       con.close( );
    }
    
-   static Pattern hostAndPortPattern = Pattern.compile( "(.+):(\\d+)$" );
    
    /*
     * Returns the hostname part of a host:port String. This method is ipv6
