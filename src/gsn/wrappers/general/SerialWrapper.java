@@ -59,8 +59,6 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
    
    private ArrayList < DataField > dataField     = new ArrayList < DataField >( );
    
-   private boolean                 onDemand      = false;
-   
    /*
     * Needs the following information from XML file : serialport : the name of
     * the serial port (/dev/ttyS0...)
@@ -179,6 +177,7 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
          return true;
       }
       
+      
       /**
        * Close the port and clean up associated elements.
        */
@@ -243,7 +242,9 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
       }
       
    }
-   
+   public void run() {
+      
+   }
    public synchronized boolean sendToWrapper ( Object dataItem ) throws OperationNotSupportedException {
       if (!wnetPort.isOpen( ))
          throw new OperationNotSupportedException("The connection is closed.");

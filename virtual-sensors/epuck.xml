@@ -1,6 +1,6 @@
-<virtual-sensor name="SerialWrapper" priority="10" >
+<virtual-sensor name="EPuck" priority="10" >
     <processing-class>
-		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<class-name>gsn.vsensor.EPuckVS</class-name>
 		<init-params/>
 	</processing-class>
         <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/serialRaw.xml.</author>
@@ -10,7 +10,9 @@
         <addressing>
 	        	<predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</predicate>
     	  </addressing>
-        <output-structure/>
+        <output-structure>
+           <field name="RAW_PACKET" type="binary"/>
+        </output-structure>
         <storage history-size="1m" />
         <input-streams>
            <input-stream name="input1">

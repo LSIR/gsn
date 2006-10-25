@@ -26,5 +26,11 @@ public abstract class AbstractHCIProtocol {
 	 */
 	public abstract Vector<AbstractHCIQuery> getQueries();
 	
-	
+	public abstract AbstractHCIQuery getQuery(String queryName);
+   
+   /*
+    * Returns null if the query does not exists, and the raw bytes
+    * to send to the wrapper if the query has been found.
+    */
+   public abstract byte[] buildRawQuery(String queryName, Vector<Object> params);
 }
