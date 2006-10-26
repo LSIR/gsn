@@ -17,52 +17,19 @@ import gsn.utils.protocols.AbstractHCIQuery;
 public class SerComProtocol extends AbstractHCIProtocol {
    
    public static final String EPUCK_PROTOCOL="EPUCK_PROTOCOL";
-   
+   // wait time in ms for an answer to a query
+   public static final int EPUCK_DEFAULT_WAIT_TIME = 250;
+      
    // add here an easy-to-use-and-remember name for each query class of the protocol
    public static final String SET_SPEED="SET_SPEED", RESET="RESET";
-   
-   private HashMap<String, HCIQuery> queries;
-   
+      
    public SerComProtocol() {
-
-      queries = new HashMap<String, HCIQuery>();
-
+	   super(EPUCK_PROTOCOL);
       // Create and add here a query of each type
       // 1. Add RESET command
-      queries.put(RESET, new Reset());
+      addQuery(new Reset(RESET));
       //2. Add SET_SPEED command
-      queries.put( SET_SPEED , new SetSpeed());
-   
+      addQuery(new SetSpeed(SET_SPEED));
    }
-   
-// wait time in ms for an answer to a query
-   public static final int EPUCK_DEFAULT_WAIT_TIME = 250;
-   
-   public String getName ( ) {
-      return EPUCK_PROTOCOL;
-   }
-   
-   /* (non-Javadoc)
-    * @see gsn.utils.protocols.AbstractHCIProtocol#getQueries()
-    */
-   public Vector < AbstractHCIQuery > getQueries ( ) {
-      // TODO Auto-generated method stub
-      return new Vector<AbstractHCIQuery>(queries.values());
-   }
-   
-   public AbstractHCIQuery getQuery(String queryName) {
-      return queries.get(queryName);
-   }
- 
 
-   public byte[] buildRawQuery(String queryName, Vector<Object> params) {
-      HCIQuery query = queries.get(queryName);
-      if (query == null)
-         return null;
-      else {
-         return query.buildRawQuery( params );
-      }
-   }
- 
-   
 }

@@ -19,8 +19,18 @@ import org.apache.log4j.Logger;
 
 
 /**
- * @author alisalehi
- *
+ * This class implements a generic finite state machine
+ * for HostControllerInterface Protocols.
+ * For simple protocols that never wait for an answer
+ * from the controller, simply create a ProtocolManager
+ * instance with the appropriate Protocol object and
+ * then call the method sendQuery.
+ * 
+ *  Warning: other methods of this class may be refactored soon,
+ *  and more states could be added.
+ *  
+ *  @author Jérôme Rousselot <jerome.rousselot@csem.ch>
+ *  @see AbstractHCIProtocol
  */
 public class ProtocolManager {
    private static final transient Logger logger = Logger.getLogger( ProtocolManager.class );
@@ -99,16 +109,10 @@ public class ProtocolManager {
     * several groups then all the different String
     * matching these groups are returned.
     */
-   public synchronized String[] getAnswer(byte[] rawData) {
-      String[] answer = null;
+   public synchronized Object[] getAnswer(byte[] rawData) {
+      Object[] answer = null;
       if(currentState == ProtocolStates.WAITING) {
-         Pattern pattern = lastExecutedQuery.getAnswerPattern( lastParams );
-         Matcher matcher = pattern.matcher(new String(rawData));
-         if(matcher.matches()) {
-            answer= new String[matcher.groupCount()+1];
-            for(int i=0; i < matcher.groupCount()+1; i++)
-               answer[i] = matcher.group(i); // group zero = the whole pattern match
-         }
+    	  answer = lastExecutedQuery.getAnswers(rawData);
       }
       return answer;
    }

@@ -20,14 +20,23 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractHCIQuery {
 	
+	public String QUERY_NAME;
 	public static final int NO_WAIT_TIME = 0;
-	protected static Pattern answerPattern = Pattern.compile(".*\\z");
+	private String queryDescription;
+	private String[] paramsDescriptions;
 	
+	public AbstractHCIQuery(String name, String queryDescription, String[] paramsDescriptions) {
+		QUERY_NAME = name;
+		this.queryDescription = queryDescription;
+		this.paramsDescriptions = paramsDescriptions;
+	}
 	/*
 	 * This method returns the name of this query.
 	 * 
 	 */
-	public abstract String getName();
+	public String getName() {
+		return QUERY_NAME;
+	}
 	/*
 	 * This method takes a Vector of arguments as input and
 	 * produces the raw data to be sent to the wrapper.
@@ -41,12 +50,32 @@ public abstract class AbstractHCIQuery {
 	public abstract byte[] buildRawQuery(Vector<Object> params);
 	
 	/*
+	 * This method must return one String per parameter, matching
+	 * the order in which they should be provided to the method
+	 * buildRawQuery. Each String should describe for what this
+	 * parameter is used for, whether or not it is optional, and
+	 * what is its appropriate format.
+	 * Keep in mind that this text is provided as a help for the user.
+	 */
+	public String[] getParamsDescriptions() {
+		return paramsDescriptions;
+	}
+	
+	/*
+	 * This method must return a textual description of what
+	 * this query does, and any interesting information for
+	 * the user.
+	 */
+	public String getQueryDescription() {
+		return queryDescription;
+	}
+	/*
 	 * This method tells us whether we should wait for an answer
 	 * from the mote if we send a query with these parameters.
 	 * @param params A vector of Object containing the required
 	 * parameters for this query. This should be described in
 	 * the implementation.
-	 * 
+	 *
 	 */
 	public abstract boolean needsAnswer(Vector<Object> params);
 	
@@ -61,20 +90,6 @@ public abstract class AbstractHCIQuery {
 	 */
 	public abstract int getWaitTime(Vector<Object> params);
 
-	/*
-	 * This method returns a regex pattern that can match
-	 * the answer from this query. By default it is just a greedy
-	 * matcher: it tries to match as much data as it can.
-	 * The default should be ok for most applications, but
-	 * tuning this can make your software more robust.
-	 * @param params A vector of Object containing the required
-	 * parameters for the query. This should be described in
-	 * the implementation. This can be null.
-	 *
-	 */
-	
-	public Pattern getAnswerPattern(Vector<Object> params) {
-		return answerPattern;
-	}
+	public abstract Object[] getAnswers(byte[] rawAnswer);
 	
 }

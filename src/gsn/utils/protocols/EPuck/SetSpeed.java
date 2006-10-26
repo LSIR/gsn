@@ -3,6 +3,8 @@
  */
 package gsn.utils.protocols.EPuck;
 
+import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
+
 import java.util.Vector;
 
 
@@ -10,10 +12,13 @@ import java.util.Vector;
  * @author alisalehi
  *
  */
-public class SetSpeed extends HCIQuery {
-
-   public SetSpeed () {
-      super("SET_SPEED");
+public class SetSpeed extends AbstractHCIQueryWithoutAnswer {
+	
+	public static final String queryDescription = "Set the speed of the EPuck robot's two wheels.";
+	public static final String[] paramsDescriptions = {"Speed of the left wheel.","Speed of the right wheel."};
+   
+	public SetSpeed (String name) {
+      super(name, queryDescription, paramsDescriptions);
    }
    
    /*
