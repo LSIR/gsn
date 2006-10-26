@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -140,9 +141,14 @@ public class HCIProtocolGUIVS extends AbstractVirtualSensor {
 										paramsText=paramsText + ", " + param.getText();
 									}
 									paramsText = paramsText.substring(1);	
-									boolean b = protocolManager.sendQuery(query.getName(), queryParams, outputWrapper);
-									displayArea.append("\nSent query type="+query.getName() + ", params="+ paramsText + "\n");
+									if(outputWrapper != null) {
+										boolean b = protocolManager.sendQuery(query.getName(), queryParams, outputWrapper);
+										displayArea.append("\nSent query type="+query.getName() + ", params="+ paramsText + "\n");
+								} else
+									JOptionPane.showMessageDialog(gui, "Sorry, No wrapper available yet.", "Cannot send query", JOptionPane.ERROR);
 								}
+							} else {
+								JOptionPane.showMessageDialog(gui, "You should first choose a query.", "No query selected", JOptionPane.ERROR);
 							}
 						}
 						
