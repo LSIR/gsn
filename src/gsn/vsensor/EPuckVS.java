@@ -22,7 +22,10 @@ public class EPuckVS extends AbstractVirtualSensor {
    
    private ProtocolManager protocolManager;
    
+   private StreamProducer wrapper;
+   
    private VSensorConfig vsensor;
+   
    public boolean initialize ( HashMap map ) {
       boolean toReturn = super.initialize( map );
       if ( toReturn == false ) return false;
@@ -32,12 +35,13 @@ public class EPuckVS extends AbstractVirtualSensor {
       if(logger.isDebugEnabled( ))
          logger.debug( "Created protocolManager" );
       // send an initial reset command to put the robot in a clean state
-      StreamProducer wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
-      try {
-         wrapper.sendToWrapper( "d" );
-      } catch ( OperationNotSupportedException e ) {
-         e.printStackTrace();
-      }
+      wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+//      try {
+//         wrapper.sendToWrapper( "h\n" );
+//      } catch ( OperationNotSupportedException e ) {
+//         e.printStackTrace();
+//      }
+      System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>");
       //protocolManager.sendQuery( SerComProtocol.RESET , null ,  wrapper);
       //protocolManager.sendQuery( SerComProtocol.RESET , null ,  wrapper);
       if(logger.isDebugEnabled())
@@ -56,7 +60,7 @@ public class EPuckVS extends AbstractVirtualSensor {
          actionA = true;
          try {
             //wrapper.sendToWrapper( "h\n" );
-            wrapper.sendToWrapper( "f,2\n" );
+            wrapper.sendToWrapper( "d,1000,-1000\n" );
          } catch ( OperationNotSupportedException e ) {
             logger.error( e.getMessage( ) , e );
          }

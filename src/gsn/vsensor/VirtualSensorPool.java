@@ -39,7 +39,7 @@ public class VirtualSensorPool {
    
    private long lastModified = -1;
    
-   public VirtualSensorPool ( VSensorConfig config ) {
+   public VirtualSensorPool ( VSensorConfig config )  {
       if ( logger.isInfoEnabled( ) ) logger.info( ( new StringBuilder( "Preparing the pool for: " ) ).append( config.getVirtualSensorName( ) ).append( " with the max size of:" )
             .append( maxPoolSize ).toString( ) );
       this.config = config;
@@ -49,7 +49,7 @@ public class VirtualSensorPool {
       this.lastModified = new File(config.getFileName( )).lastModified( );
    }
    
-   public synchronized VirtualSensor borrowObject ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
+   public synchronized VirtualSensor borrowVS ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
       if ( currentPoolSize == maxPoolSize ) throw new PoolIsFullException( config.getVirtualSensorName( ) );
       currentPoolSize++;
       VirtualSensor newInstance = null;
@@ -62,7 +62,7 @@ public class VirtualSensorPool {
             hashMap.put( CONTAINER , Mappings.getContainer( ) );
             hashMap.put( VSENSORCONFIG , config );
             if ( newInstance.initialize( hashMap ) == false ) {
-               returnInstance( newInstance );
+               returnVS( newInstance );
                throw new VirtualSensorInitializationFailedException( );
             }
          } catch ( InstantiationException e ) {
@@ -77,7 +77,7 @@ public class VirtualSensorPool {
       return newInstance;
    }
    
-   public synchronized void returnInstance ( VirtualSensor o ) {
+   public synchronized void returnVS ( VirtualSensor o ) {
       if ( o == null ) return;
       idleInstances.add( o );
       currentPoolSize--;
@@ -97,10 +97,10 @@ public class VirtualSensorPool {
       if ( isDebugEnabled ) logger.debug( new StringBuilder( ).append( "The VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " is now closed." ).toString( ) );
    }
    
-   public void start ( ) {
+   public void start ( ) throws PoolIsFullException, VirtualSensorInitializationFailedException {
+      returnVS( borrowVS() ); //To initialize the first VS.
       sizeEnforce.start( );
    }
-
    
    /**
     * @return the config

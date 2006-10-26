@@ -246,9 +246,11 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
       
    }
    public synchronized boolean sendToWrapper ( Object dataItem ) throws OperationNotSupportedException {
+      if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port sending..." );
       if (!wnetPort.isOpen( ))
          throw new OperationNotSupportedException("The connection is closed.");
       try {
+         if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper performing a serial port sending." );
          if ( dataItem instanceof byte [ ] ) wnetPort.getOutputStream( ).write( ( byte [ ] ) dataItem );
          else { // general case, writes using the printwriter.
             PrintWriter pw = new PrintWriter( wnetPort.getOutputStream( ) );

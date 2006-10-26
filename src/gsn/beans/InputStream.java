@@ -1,10 +1,10 @@
 package gsn.beans;
 
-import gsn.control.VSensorLoader;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
+import gsn.vsensor.VSensorLoader;
 import gsn.vsensor.VirtualSensor;
 import gsn.vsensor.VirtualSensorInitializationFailedException;
 import gsn.vsensor.VirtualSensorPool;
@@ -135,7 +135,7 @@ public class InputStream {
          this.currentCount++;
          VirtualSensor sensor = null;
          try {
-            sensor = this.pool.borrowObject( );
+            sensor = this.pool.borrowVS( );
             if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
             final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL );
             int elementCounterForDebugging = -1;
@@ -156,7 +156,7 @@ public class InputStream {
             logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getName( ) + " because initialization of that virtual sensor failed" );
             e.printStackTrace( );
          } finally {
-            this.pool.returnInstance( sensor );
+            this.pool.returnVS( sensor );
          }
       }
    }

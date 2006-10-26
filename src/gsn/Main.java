@@ -2,12 +2,12 @@ package gsn;
 
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
-import gsn.control.VSensorLoader;
 import gsn.pid.PIDUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
 import gsn.vsensor.Container;
 import gsn.vsensor.ContainerImpl;
+import gsn.vsensor.VSensorLoader;
 
 import java.io.File;
 import java.io.FileInputStream;

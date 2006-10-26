@@ -3,9 +3,9 @@ package gsn.wrappers;
 import gsn.Main;
 import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
-import gsn.control.VSensorLoader;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
+import gsn.vsensor.VSensorLoader;
 
 import java.util.HashMap;
 import java.util.TreeMap;

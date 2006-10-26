@@ -28,6 +28,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.utils.protocols.AbstractHCIProtocol;
 import gsn.utils.protocols.AbstractHCIQuery;
 import gsn.utils.protocols.ProtocolManager;
@@ -48,10 +49,13 @@ public class HCIProtocolGUIVS extends AbstractVirtualSensor {
 	private StreamProducer outputWrapper = null;
 	private JHCIProtocolControl gui;
 
+   private VSensorConfig virtualSensorConfiguration;
+
 	public boolean initialize ( HashMap map ) {	
 		boolean toReturn = super.initialize( map );
 		if ( toReturn == false ) return false;
-		params = virtualSensorConfiguration.getMainClassInitialParams( );
+      virtualSensorConfiguration= ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
+      params = virtualSensorConfiguration.getMainClassInitialParams( );
 		ClassLoader loader = getClass().getClassLoader();
 		try {
 			Class protocolClass = loader.loadClass(params.get("HCIProtocolClass"));

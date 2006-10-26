@@ -4,9 +4,9 @@ import gsn.beans.AddressBean;
 import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
-import gsn.control.VSensorLoader;
 import gsn.shared.Registry;
 import gsn.utils.CaseInsensitiveComparator;
+import gsn.vsensor.VSensorLoader;
 import gsn.wrappers.DataListener;
 
 import java.io.FileInputStream;

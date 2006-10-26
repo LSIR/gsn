@@ -2,8 +2,8 @@ package gsn.simulation;
 
 import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
-import gsn.control.VSensorLoader;
 import gsn.shared.Registry;
+import gsn.vsensor.VSensorLoader;
 import gsn.wrappers.DataListener;
 
 import java.util.TreeMap;
