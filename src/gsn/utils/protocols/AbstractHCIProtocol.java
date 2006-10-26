@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+
 /**
  * This class provides a common framework to easily
  * implement a Host Controller Interface Protocol
@@ -30,17 +32,21 @@ import java.util.Vector;
  * @see AbstractHCIQuery
  */
 public abstract class AbstractHCIProtocol {
-
+	private static final transient Logger logger = Logger.getLogger( AbstractHCIProtocol.class );
 	private String protocolName;
 	private HashMap<String, AbstractHCIQuery> queries;
 	   
 	public AbstractHCIProtocol(String name) {
+		if(logger.isDebugEnabled())
+			logger.debug("Initializing protocol " + name);
 		protocolName = name;
 		queries = new HashMap<String, AbstractHCIQuery>();
 	}
 	
 	protected void addQuery(AbstractHCIQuery query) {
 		queries.put(query.getName(), query);
+		if(logger.isDebugEnabled())
+			logger.debug("added query: " + query.getName());
 	}
 	
 	/*
@@ -49,6 +55,8 @@ public abstract class AbstractHCIProtocol {
 	 */
 	
 	public Collection<AbstractHCIQuery> getQueries() {
+		if(logger.isDebugEnabled())
+			logger.debug("returning query values: " + queries.values());
 		return queries.values();
 	}
 	/*
@@ -73,8 +81,9 @@ public abstract class AbstractHCIProtocol {
 		if (query == null)
 			return null;
 		else {
+			if(logger.isDebugEnabled())
+				logger.debug("Protocol " + getName() + " has built a raw query of type " + query.getName());
 			return query.buildRawQuery( params );
 		}
 	}
-
 }
