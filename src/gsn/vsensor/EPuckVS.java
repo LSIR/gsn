@@ -1,6 +1,7 @@
 package gsn.vsensor;
 
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
 import gsn.wrappers.StreamProducer;
@@ -21,15 +22,22 @@ public class EPuckVS extends AbstractVirtualSensor {
    
    private ProtocolManager protocolManager;
    
+   private VSensorConfig vsensor;
    public boolean initialize ( HashMap map ) {
       boolean toReturn = super.initialize( map );
       if ( toReturn == false ) return false;
-      params = virtualSensorConfiguration.getMainClassInitialParams( );
+      vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
+      params = vsensor.getMainClassInitialParams( );
       protocolManager = new ProtocolManager(new SerComProtocol());
       if(logger.isDebugEnabled( ))
          logger.debug( "Created protocolManager" );
       // send an initial reset command to put the robot in a clean state
-      //StreamProducer wrapper = virtualSensorConfiguration.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      StreamProducer wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      try {
+         wrapper.sendToWrapper( "d" );
+      } catch ( OperationNotSupportedException e ) {
+         e.printStackTrace();
+      }
       //protocolManager.sendQuery( SerComProtocol.RESET , null ,  wrapper);
       //protocolManager.sendQuery( SerComProtocol.RESET , null ,  wrapper);
       if(logger.isDebugEnabled())
@@ -43,7 +51,7 @@ public class EPuckVS extends AbstractVirtualSensor {
       if(logger.isDebugEnabled( ))
          logger.debug( "I just received some data from the robot" );
       System.out.println(new String((byte[])data.getData( SerialWrapper.RAW_PACKET )));
-      StreamProducer wrapper = virtualSensorConfiguration.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      StreamProducer wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
       if ( actionA == false ) {
          actionA = true;
          try {
@@ -57,7 +65,7 @@ public class EPuckVS extends AbstractVirtualSensor {
 
    public void finalize ( HashMap map ) {
       try {
-         virtualSensorConfiguration.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( ).sendToWrapper( "R\n" );
+         vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( ).sendToWrapper( "R\n" );
       } catch ( OperationNotSupportedException e ) {
          logger.error( e.getMessage( ) , e );
       }

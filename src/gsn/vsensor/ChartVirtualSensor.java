@@ -2,6 +2,7 @@ package gsn.vsensor;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.ParamParser;
 
@@ -63,7 +64,8 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
        * This can now plot only for one input stream value.
        */
       if ( super.initialize( map ) == false ) return false;
-      TreeMap < String , String > params = virtualSensorConfiguration.getMainClassInitialParams( );
+      VSensorConfig vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
+      TreeMap < String , String > params = vsensor.getMainClassInitialParams( );
       ChartInfo chartInfo = new ChartInfo( );
       chartInfo.setInputStreamName( params.get( "input-stream" ) );
       

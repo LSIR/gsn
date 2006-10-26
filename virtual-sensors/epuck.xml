@@ -20,7 +20,7 @@
                 <address wrapper="serial">
                     <predicate key="HOST">localhost</predicate>
                     <predicate key="PORT">22001</predicate>
-                    <predicate key="serialport">/dev/tty.e-puck_0144-COM1-1</predicate>
+                    <predicate key="serialport">/dev/tty.PL2303-0000105D</predicate>
                 </address>
                 <query>select * from "WRAPPER"</query>
             </stream-source>

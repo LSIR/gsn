@@ -2,6 +2,7 @@ package gsn.vsensor;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.others.visualization.svg.SVGCircle;
 import gsn.others.visualization.svg.SVGEdge;
 import gsn.others.visualization.svg.SVGLayer;
@@ -48,10 +49,13 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
    private final String                  OUTPUT_FIELD_NAME = "PLOT";
    
    private int                           counter_pref      = 0;
+
+   private VSensorConfig vsensor;
    
    public boolean initialize ( HashMap map ) {
       if ( super.initialize( map ) == false ) return false;
-      TreeMap < String , String > params = virtualSensorConfiguration.getMainClassInitialParams( );
+      vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
+      TreeMap < String , String > params = vsensor.getMainClassInitialParams( );
       int memorySizeInSeconds = ParamParser.getInteger( params.get( "memory-size-in-seconds" ) , -1 );
       if ( memorySizeInSeconds == -1 ) {
          logger.error( "The parameter *memory-size-in-seconds* is missing from the virtual sensor processing class's initialization." );
@@ -81,9 +85,9 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
    public void dataFromWeb ( String data ) {
       String streamSourceAliasName = "ss_bla";
       try {
-         virtualSensorConfiguration.getInputStream( INPUT_STREAM_NAME ).getSource( streamSourceAliasName ).getActiveSourceProducer( ).sendToWrapper( data );
+         vsensor.getInputStream( INPUT_STREAM_NAME ).getSource( streamSourceAliasName ).getActiveSourceProducer( ).sendToWrapper( data );
       } catch ( OperationNotSupportedException e ) {
-         logger.warn( new StringBuilder( ).append( "The virtual sensor : " ).append( virtualSensorConfiguration.getVirtualSensorName( ) ).append(
+         logger.warn( new StringBuilder( ).append( "The virtual sensor : " ).append( vsensor.getVirtualSensorName( ) ).append(
             " want to send data to a stream source which doesn't support receiving data." ).toString( ) );
          logger.warn( e.getMessage( ) , e );
       }

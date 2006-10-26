@@ -25,11 +25,11 @@ public abstract class AbstractVirtualSensor implements VirtualSensor {
     * A reference to the Container implementation. Will be initialized via
     * <code>initialize</code> method.
     */
-   protected Container                    container;
+   private Container                    container;
    
-   protected VSensorConfig                virtualSensorConfiguration;
+   private VSensorConfig                virtualSensorConfiguration;
    
-   protected ArrayList < StreamElement >  producedData     = new ArrayList < StreamElement >( );
+   private ArrayList < StreamElement >  producedData     = new ArrayList < StreamElement >( );
    
    private long                           lastVisitiedTime = 0;
    
@@ -40,7 +40,7 @@ public abstract class AbstractVirtualSensor implements VirtualSensor {
       return true;
    }
    
-   protected void validateStreamElement ( StreamElement streamElement ) {
+   private void validateStreamElement ( StreamElement streamElement ) {
       if ( !compatibleStructure( streamElement.getFieldTypes( ) , virtualSensorConfiguration.getOutputStructure( ) ) ) {
          StringBuilder exceptionMessage = new StringBuilder( ).append( "The streamElement produced by :" ).append( virtualSensorConfiguration.getVirtualSensorName( ) ).append(
             " Virtual Sensor is not compatible with the defined streamElement.\n" );

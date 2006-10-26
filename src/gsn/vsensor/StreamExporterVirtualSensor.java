@@ -6,6 +6,7 @@ package gsn.vsensor;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager.DATABASE;
 
 import java.sql.Connection;
@@ -42,7 +43,8 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
    public boolean initialize ( HashMap map ) {
       boolean status = false;
       if ( super.initialize( map ) == true ) {
-         TreeMap < String , String > params = virtualSensorConfiguration.getMainClassInitialParams( );
+         VSensorConfig vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
+         TreeMap < String , String > params = vsensor.getMainClassInitialParams( );
          params.keySet( );
          if ( params.get( PARAM_URL ) != null && params.get( PARAM_USER ) != null && params.get( PARAM_PASSWD ) != null ) {
             try {

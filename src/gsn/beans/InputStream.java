@@ -8,7 +8,6 @@ import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.VirtualSensor;
 import gsn.vsensor.VirtualSensorInitializationFailedException;
 import gsn.vsensor.VirtualSensorPool;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -27,8 +26,6 @@ public class InputStream {
    private transient static final Logger               logger                = Logger.getLogger( InputStream.class );
    
    private transient StorageManager                    storageMan;
-   
-   private transient boolean                           needsDelay            = true;
    
    private String                                      inputStreamName;
    
@@ -58,10 +55,10 @@ public class InputStream {
     * For making one initial delay.
     */
    
-   public void initialize ( final HashMap context ) {
-      this.pool = ( VirtualSensorPool ) context.get( "VSENSOR-POOL" );
+   public boolean initialize ( final HashMap context ) {
       this.storageMan = ( StorageManager ) context.get( VSensorLoader.STORAGE_MANAGER );
-      if ( this.pool == null || this.storageMan == null ) logger.error( "Initialization failed" );
+      if ( this.storageMan == null ) logger.error( "Initialization failed" );
+      return true;
    }
    
    public String getQuery ( ) {
@@ -109,19 +106,17 @@ public class InputStream {
     */
    public void dataAvailable ( final String alias ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
+      if (this.pool==null) {
+         logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
+         return;
+      }
+
       if ( this.currentCount > this.getCount( ) ) {
          if ( logger.isInfoEnabled( ) ) logger.info( "Maximum count reached, the value *discarded*" );
          return;
       }
-      
+            
       final long currentTimeMillis = System.currentTimeMillis( );
-//      if ( this.needsDelay && currentTimeMillis - this.startTime <= INITIAL_DELAY_5000MSC ) {
-//         if ( logger.isInfoEnabled( ) ) logger.info( "Called but *discarded* b/c of initial delay" );
-//         // SimulationResult.addJustBeforeStartingToEvaluateQueries ();
-//         // SimulationResult.addJustQueryEvaluationFinished ( - 1 );
-//         return;
-//      }
-      this.needsDelay = false;
       if ( this.rate > 0 && ( currentTimeMillis - this.lastVisited ) < this.rate ) {
          if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
          // SimulationResult.addJustBeforeStartingToEvaluateQueries ( - 1
@@ -216,7 +211,20 @@ public class InputStream {
       this.streamSourceAliasNameToStreamSourceName = streamSourceAliasNameToStreamSourceName;
       this.isValidate = true;
       this.cachedValidationResult = toReturn;
-      
       return toReturn;
+   }
+   
+   /**
+    * @return the pool
+    */
+   public VirtualSensorPool getPool ( ) {
+      return pool;
+   }
+   
+   /**
+    * @param pool the pool to set
+    */
+   public void setPool ( VirtualSensorPool pool ) {
+      this.pool = pool;
    }
 }

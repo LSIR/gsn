@@ -3,6 +3,7 @@ package gsn.vsensor;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -107,8 +108,9 @@ public class DemoVSensor extends AbstractVirtualSensor {
    }
    
    public boolean initialize ( HashMap map ) {
+      VSensorConfig vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
       super.initialize( map );
-      for ( DataField field : virtualSensorConfiguration.getOutputStructure( ) )
+      for ( DataField field : vsensor.getOutputStructure( ) )
          fields.add( field.getFieldName( ) );
       return true;
    }

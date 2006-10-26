@@ -108,7 +108,7 @@ public class VSensorLoader extends Thread {
       for ( String configFile : removeIt ) {
          String name = Mappings.getConfigurationObject( configFile ).getVirtualSensorName( );
          logger.warn( new StringBuilder( ).append( "removing : " ).append( name ).toString( ) );
-         VSensorInstance sensorInstance = Mappings.getVSensorInstanceByFileName( configFile );
+         VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName( configFile );
          this.toDirectoryService( sensorInstance.getConfig( ) , Registry.DEREGISTER );
          Mappings.removeFilename( configFile );
          this.removeAllResources( sensorInstance );
@@ -166,44 +166,36 @@ public class VSensorLoader extends Thread {
             logger.error( "That the name of the virutal sensor should starting by alphabetical character and they can contain numerical characters afterwards." );
             continue;
          }
-//         if (configuration.getWebapp( )!=null && configuration.getWebapp( ).trim( ).length( )!=0) {
-//            File webappF = new File(configuration.getWebapp( ).trim( ));
-//            if (!webappF.isDirectory( )|| !webappF.canRead( )) {
-//               logger.error( "Can't located web specified webapp path >"+webappF.getAbsolutePath( )+"< isFile: "+webappF.isFile( )+", canRead : "+webappF.canRead( ) );
-//               logger.error( "Loading the virtual sensor : "+vsName+"failed." );
-//               continue;
-//            }
-//         }  
-         logger.warn( new StringBuilder( "adding : " ).append( vsName ).append( " virtual sensor[" ).append( configFile ).append( "]" ).toString( ) );
-         VSensorInstance sensorInstance = new VSensorInstance( configFile , new File( configFile ).lastModified( ) , configuration );
-         boolean testingResult = Mappings.addVSensorInstance( sensorInstance );
-         if ( !testingResult ) {
+         VirtualSensorPool virtualSensorPool = new VirtualSensorPool(configuration );
+         if (this.createInputStreams( configuration,virtualSensorPool ) == false) {
+            logger.error( "loading the >"+vsName+"< virtual sensor is stoped due to error(s) in preparing the input streams." );
             continue;
          }
-         this.createInputStreams( configuration , sensorInstance.getPool( ) );
          try {
-            this.storageManager.createTable( sensorInstance.getConfig( ).getVirtualSensorName( ) , sensorInstance.getConfig( ).getOutputStructure( ) );
-            sensorInstance.start( );
+            storageManager.createTable( configuration.getVirtualSensorName( ) , configuration.getOutputStructure( ) );
          } catch ( SQLException e ) {
             if ( e.getMessage( ).toLowerCase( ).contains( "table already exists" ) ) {
                logger.error( e.getMessage( ) );
                if ( logger.isInfoEnabled( ) ) logger.info( e.getMessage( ) , e );
-               logger.error( new StringBuilder( ).append( "Loading the virtual sensor specified in the file : " ).append( sensorInstance.getConfig( ).getFileName( ) ).append( " failed" ).toString( ) );
-               logger.error( new StringBuilder( ).append( "The table : " ).append( sensorInstance.getConfig( ).getVirtualSensorName( ) ).append( " is exists in the database specified in :" ).append(
+               logger.error( new StringBuilder( ).append( "Loading the virtual sensor specified in the file : " ).append( configuration.getFileName( ) ).append( " failed" ).toString( ) );
+               logger.error( new StringBuilder( ).append( "The table : " ).append( configuration.getVirtualSensorName( ) ).append( " is exists in the database specified in :" ).append(
                   Main.getContainerConfig( ).getContainerFileName( ) ).append( "." ).toString( ) );
                logger.error( "Solutions : " );
-               logger.error( new StringBuilder( ).append( "1. Change the virtual sensor name, in the : " ).append( sensorInstance.getConfig( ).getFileName( ) ).toString( ) );
+               logger.error( new StringBuilder( ).append( "1. Change the virtual sensor name, in the : " ).append(configuration.getFileName( ) ).toString( ) );
                logger.error( new StringBuilder( ).append( "2. Change the URL of the database in " ).append( Main.getContainerConfig( ).getContainerFileName( ) ).append(
                   " and choose another database." ).toString( ) );
                logger.error( new StringBuilder( ).append( "3. Rename/Move the table with the name : " ).append( Main.getContainerConfig( ).getContainerFileName( ) ).append( " in the database." )
                      .toString( ) );
                logger.error( new StringBuilder( ).append( "4. Change the overwrite-tables=\"true\" (be careful, this will overwrite all the data previously saved in " ).append(
-                  sensorInstance.getConfig( ).getVirtualSensorName( ) ).append( " table )" ).toString( ) );
+                  configuration.getVirtualSensorName( ) ).append( " table )" ).toString( ) );
             } else {
                logger.error( e.getMessage( ) , e );
             }
             continue;
          }
+         logger.warn( new StringBuilder( "adding : " ).append( vsName ).append( " virtual sensor[" ).append( configFile ).append( "]" ).toString( ) );
+         Mappings.addVSensorInstance(virtualSensorPool );
+         virtualSensorPool.start( );
          this.toDirectoryService( configuration , Registry.REGISTER );
       }
    }
@@ -325,9 +317,9 @@ public class VSensorLoader extends Thread {
       }
    }
    
-   private void removeAllResources ( VSensorInstance sensorInstance ) {
-      VSensorConfig config = sensorInstance.getConfig( );
-      sensorInstance.shutdown( );
+   private void removeAllResources ( VirtualSensorPool pool ) {
+      VSensorConfig config = pool.getConfig( );
+      pool.closePool( );
       final String vsensorName = config.getVirtualSensorName( );
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Releasing previously used resources used by [" ).append( vsensorName ).append( "]." ).toString( ) );
       for ( InputStream inputStream : config.getInputStreams( ) ) {
@@ -401,23 +393,27 @@ public class VSensorLoader extends Thread {
    
    /**
     * The properties file contains information on wrappers for stream sources.
+    * FIXME : The body of CreateInputStreams is incomplete b/c in the case of an error it should remove the resources.
     */
-   public void createInputStreams ( VSensorConfig vsensor , VirtualSensorPool pool ) {
+   public boolean createInputStreams ( VSensorConfig vsensor,VirtualSensorPool pool ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Preparing input streams for: " ).append( vsensor.getVirtualSensorName( ) ).toString( ) );
       if ( vsensor.getInputStreams( ).size( ) == 0 ) logger.warn( new StringBuilder( "There is no input streams defined for *" ).append( vsensor.getVirtualSensorName( ) ).append( "*" ).toString( ) );
       for ( Iterator < InputStream > inputStreamIterator = vsensor.getInputStreams( ).iterator( ) ; inputStreamIterator.hasNext( ) ; ) {
          InputStream inputStream = inputStreamIterator.next( );
          HashMap inputStreamContext = new HashMap( );
-         inputStreamContext.put( VSENSOR_POOL , pool );
          inputStreamContext.put( STORAGE_MANAGER , storageManager );
          for ( Iterator < StreamSource > dataSouce = inputStream.getSources( ).iterator( ) ; dataSouce.hasNext( ) ; ) {
-            prepareStreamSource( inputStream , dataSouce.next( ) , vsensor );
+            if (prepareStreamSource( inputStream , dataSouce.next( ) , vsensor ) == false)
+               return false;
          }
-         inputStream.initialize( inputStreamContext );
+         if( inputStream.initialize( inputStreamContext ) == false)
+            return false;
+         inputStream.setPool( pool );
       }
+      return true;
    }
    
-   private void prepareStreamSource ( InputStream inputStream , StreamSource streamSource , VSensorConfig vsensor ) {
+   private boolean prepareStreamSource ( InputStream inputStream , StreamSource streamSource , VSensorConfig vsensor ) {
       HashMap < String , String > rewritingMapping = new HashMap < String , String >( );
       TreeMap < String , Object > context = new TreeMap < String , Object >( new CaseInsensitiveComparator( ) );
       context.put( STREAM_SOURCE , streamSource );
@@ -458,13 +454,13 @@ public class VSensorLoader extends Thread {
                ds = ( AbstractStreamProducer ) Main.getWrapperClass( addressBean.getWrapper( ) ).newInstance( );
                boolean initializationResult = ds.initialize( context );
                if ( initializationResult == false ) continue;// This address
-                                                               // is not
-                                                               // working, goto
-                                                               // the
+               // is not
+               // working, goto
+               // the
                // next address.
                else {
-                  if (ds.getOutputFormat( )==null) {
-                     logger.warn( "The output format of the "+ds.getClass( ).getName( )+ " is null !!!" );
+                  if ( ds.getOutputFormat( ) == null ) {
+                     logger.warn( "The output format of the " + ds.getClass( ).getName( ) + " is null !!!" );
                      logger.warn( "The initialization of the wrapper is failed." );
                      continue;
                   }
@@ -490,18 +486,21 @@ public class VSensorLoader extends Thread {
          activeDataSources.put( addressBean , ds );
          break;
       }
-      if ( rewritingMapping.isEmpty( ) ) logger.error( new StringBuilder( ).append( "Can't prepate the data source: \"" ).append( streamSource.getAlias( ) ).append( "\" for inputStream: \"" ).append(
-         inputStream.getInputStreamName( ) ).append( "\" for Virtual Sensor: \"" ).append( vsensor.getVirtualSensorName( ) ).append( "\"" ).toString( ) );
+      if ( rewritingMapping.isEmpty( ) ) {
+         logger.error( new StringBuilder( ).append( "Can't prepate the data source: \"" ).append( streamSource.getAlias( ) ).append( "\" for inputStream: \"" ).append(
+            inputStream.getInputStreamName( ) ).append( "\" for Virtual Sensor: \"" ).append( vsensor.getVirtualSensorName( ) ).append( "\"" ).toString( ) );
+         return false;
+      }
+      return true;
    }
    
    public void stopPlease ( ) {
       this.canRun = false;
       this.interrupt( );
       for ( String configFile : Mappings.getAllKnownFileName( ) ) {
-         String name = Mappings.getConfigurationObject( configFile ).getVirtualSensorName( );
-         VSensorInstance sensorInstance = Mappings.getVSensorInstanceByFileName( configFile );
+         VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName( configFile );
          removeAllResources( sensorInstance );
-         logger.warn( "Removing the resources associated with : " + sensorInstance.getFilename( ) + " [done]." );
+         logger.warn( "Removing the resources associated with : " + sensorInstance.getConfig( ).getFileName( ) + " [done]." );
       }
       try {
          this.storageManager.shutdown( );

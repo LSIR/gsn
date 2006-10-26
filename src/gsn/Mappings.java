@@ -2,7 +2,6 @@ package gsn;
 
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
-import gsn.control.VSensorInstance;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.Container;
 import gsn.vsensor.VirtualSensorPool;
@@ -19,7 +18,7 @@ public final class Mappings {
    
    private static final TreeMap < String , VSensorConfig >               vsNameTOVSConfig               = new TreeMap < String , VSensorConfig >( new CaseInsensitiveComparator( ) );
    
-   private static final TreeMap < String , VSensorInstance >             fileNameToVSInstance           = new TreeMap < String , VSensorInstance >( new CaseInsensitiveComparator( ) );
+   private static final TreeMap < String , VirtualSensorPool >             fileNameToVSInstance           = new TreeMap < String , VirtualSensorPool >( new CaseInsensitiveComparator( ) );
    
    private static final TreeMap < String , TreeMap < String , Boolean >> vsNamesToOutputStructureFields = new TreeMap < String , TreeMap < String , Boolean >>( new CaseInsensitiveComparator( ) );
    
@@ -27,31 +26,28 @@ public final class Mappings {
    
    private static Container                                              container                      = null;
    
-   public static boolean addVSensorInstance ( VSensorInstance instance ) {
-      VirtualSensorPool sensorPool = new VirtualSensorPool( instance );
-      
+   public static boolean addVSensorInstance ( VirtualSensorPool sensorPool ) {
       try {
-         if ( logger.isInfoEnabled( ) ) logger.info( ( new StringBuilder( "Testing the pool for :" ) ).append( instance.getConfig( ).getVirtualSensorName( ) ).toString( ) );
+         if ( logger.isInfoEnabled( ) ) logger.info( ( new StringBuilder( "Testing the pool for :" ) ).append( sensorPool.getConfig( ).getVirtualSensorName( ) ).toString( ) );
          sensorPool.returnInstance( sensorPool.borrowObject( ) );
       } catch ( Exception e ) {
          logger.error( e.getMessage( ) , e );
          sensorPool.closePool( );
-         logger.error( "GSN can't load the virtual sensor specified at " + instance.getFilename( ) + " because the initialization of the virtual sensor failed (see above exception)." );
+         logger.error( "GSN can't load the virtual sensor specified at " + sensorPool.getConfig( ).getFileName( ) + " because the initialization of the virtual sensor failed (see above exception)." );
          logger.error( "Please fix the following error" );
          return false;
       }
-      instance.setPool( sensorPool );
       TreeMap < String , Boolean > vsNameToOutputStructureFields = new TreeMap < String , Boolean >( new CaseInsensitiveComparator( ) );
-      vsNamesToOutputStructureFields.put( instance.getConfig( ).getVirtualSensorName( ) , vsNameToOutputStructureFields );
-      for ( DataField fields : instance.getConfig( ).getOutputStructure( ) )
+      vsNamesToOutputStructureFields.put( sensorPool.getConfig( ).getVirtualSensorName( ) , vsNameToOutputStructureFields );
+      for ( DataField fields : sensorPool.getConfig( ).getOutputStructure( ) )
          vsNameToOutputStructureFields.put( fields.getFieldName( ) , Boolean.TRUE );
       vsNameToOutputStructureFields.put( "TIMED" , Boolean.TRUE );
-      vsNameTOVSConfig.put( instance.getConfig( ).getVirtualSensorName( ) , instance.getConfig( ) );
-      fileNameToVSInstance.put( instance.getFilename( ) , instance );
+      vsNameTOVSConfig.put( sensorPool.getConfig( ).getVirtualSensorName( ) , sensorPool.getConfig( ) );
+      fileNameToVSInstance.put( sensorPool.getConfig( ).getFileName( ) , sensorPool );
       return true;
    }
    
-   public static VSensorInstance getVSensorInstanceByFileName ( String fileName ) {
+   public static VirtualSensorPool getVSensorInstanceByFileName ( String fileName ) {
       return fileNameToVSInstance.get( fileName );
    }
    
@@ -95,7 +91,7 @@ public final class Mappings {
       return vsNameTOVSConfig.values( ).iterator( );
    }
    
-   public static VSensorInstance getVSensorInstanceByVSName ( String vsensorName ) {
+   public static VirtualSensorPool getVSensorInstanceByVSName ( String vsensorName ) {
       if ( vsensorName == null ) return null;
       VSensorConfig vSensorConfig = vsNameTOVSConfig.get( vsensorName );
       if ( vSensorConfig == null ) return null;
