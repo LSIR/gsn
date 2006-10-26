@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import gsn.utils.protocols.AbstractHCIProtocol;
 import gsn.utils.protocols.AbstractHCIQuery;
+import gsn.utils.protocols.BasicHCIQuery;
 
 
 /**
@@ -26,10 +27,13 @@ public class SerComProtocol extends AbstractHCIProtocol {
    public SerComProtocol() {
 	   super(EPUCK_PROTOCOL);
       // Create and add here a query of each type
-      // 1. Add RESET command
+      //0. Add always useful user-customisable query
+	   addQuery(new BasicHCIQuery());
+	   // 1. Add RESET command
       addQuery(new Reset(RESET));
       //2. Add SET_SPEED command
       addQuery(new SetSpeed(SET_SPEED));
+      
    }
 
 }
