@@ -1,6 +1,6 @@
 /**
  * 
- * @author Jerome Rousselot
+ * @author Jerome Rousselot 
   */
 
 
@@ -232,7 +232,10 @@ public class HCIProtocolGUIVS extends AbstractVirtualSensor {
 				parametersLabels = new JLabel[nbParameters];
 				parametersValues = new JTextArea[nbParameters];
 				for(int i = 0; i < nbParameters; i++) {
-					parametersLabels[i] = new JLabel("Parameter " + i + ": ");
+					if(query.getParamsDescriptions()[i] != null && ! query.getParamsDescriptions()[i].trim().equals(""))
+						parametersLabels[i] = new JLabel(query.getParamsDescriptions()[i]);
+					else
+						parametersLabels[i] = new JLabel("Parameter " + i + ": ");
 					parametersValues[i] = new JTextArea("enter value " + i + " here.");
 					parametersValues[i].setToolTipText(query.getParamsDescriptions()[i]);
 					builder.add(parametersLabels[i], cc.xy(1, i+1));
