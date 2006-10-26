@@ -1,7 +1,9 @@
 /**
  * 
  * @author Jerome Rousselot
- */
+  */
+
+
 package gsn.vsensor;
 
 import java.awt.Component;
@@ -126,54 +128,9 @@ public class HCIProtocolGUIVS extends AbstractVirtualSensor {
 		 * 
 		 */
 		private void initEvents() {
-			
-
-		}
-		/**
-		 * 
-		 */
-		private void initComponents() {
-			initJQueries();
-			initSendButton();
-			updateParametersPanel(null);
-			initStatusBar();
-
-			FormLayout layout = new FormLayout(
-					"center:pref, center:pref:grow, center:pref", // 3 cols
-					"top:pref, pref, fill:pref:grow, pref"); // 4 rows
-			DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-			CellConstraints cc = new CellConstraints();
-			
-			builder.add(labelQueries, cc.xy(1,1));
-			builder.add(jqueries, cc.xy(1,2));
-			//builder.add(labelQueryDescription, cc.xy(1,1));
-			builder.add(labelParameters, cc.xy(2,1));
-			builder.add(parametersPanel, cc.xy(2,2));
-			builder.add(buttonSendQuery, cc.xy(3, 1));
-			builder.add(displayArea, cc.xywh(1,3,3,1));
-			builder.add(statusBar, cc.xywh(1,4,3,1));
-			controlPanel=builder.getPanel();
-			getContentPane().add(controlPanel);
-
-		}
-		/**
-		 * 
-		 */
-		private void initStatusBar() {
-			statusBar = new JPanel();
-			statusBarLabel = new JLabel("");
-			statusBar.add(statusBarLabel);
-			
-		}
-		/**
-		 * 
-		 */
-		private void initSendButton() {
-			buttonSendQuery.addActionListener(
-					new ActionListener() {
-
+			buttonSendQuery.addActionListener( new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							AbstractHCIQuery query = (AbstractHCIQuery) jqueries.getSelectedItem();
+							AbstractHCIQuery query = protocol.getQuery((String) jqueries.getSelectedItem());
 							if(query != null) {
 								if(protocolManager.getCurrentState() == ProtocolManager.ProtocolStates.READY) {
 									Vector<Object> queryParams = new Vector<Object>();
@@ -191,38 +148,73 @@ public class HCIProtocolGUIVS extends AbstractVirtualSensor {
 						
 					});
 			
-		}
-		/**
-		 * 
-		 */
-		private void initJQueries() {
-//			if(protocol == null)
-//				logger.error("Why is the protocol null ?");
-//			else
-//				logger.debug(protocol.getName() + ": " + protocol.getQueries());
-			for(AbstractHCIQuery query: protocol.getQueries())
-				jqueries.addItem(query.getName());
-			jqueries.setToolTipText(Default_jqueries_tooltip_text);
 			jqueries.addActionListener(new ActionListener() {
-
 				public void actionPerformed(ActionEvent e) {
 					AbstractHCIQuery query = protocol.getQuery((String)jqueries.getSelectedItem());
 					if(query != null) {
 						jqueries.setToolTipText(query.getQueryDescription());
 						labelQueryDescription.setText(query.getQueryDescription());
-						updateParametersPanel(query);
-						getContentPane().invalidate();
+						getContentPane().remove(controlPanel);
+						controlPanel.removeAll();
+						parametersPanel.removeAll();
+						buildParametersPanel(query);
+						buildControlPanel();
+						getContentPane().add(controlPanel);
+						invalidate();
+						pack();
 						repaint();
 					} else {
 						jqueries.setToolTipText(Default_jqueries_tooltip_text);
 						labelQueryDescription.setText(null);
 					}
 				}
-			});	
+			});
+			
+			jqueries.setSelectedIndex(0);
+		}
+		/**
+		 * 
+		 */
+		private void initComponents() {
+			initJQueries();
+			buildParametersPanel(null);
+			initStatusBar();
+			buildControlPanel();
+			getContentPane().add(controlPanel);
+
 		}
 
-		private void updateParametersPanel(AbstractHCIQuery query) {
-			if(query != null) {
+		private void buildControlPanel() {
+
+			FormLayout layout = new FormLayout(
+					"center:pref, center:pref:grow, center:pref", // 3 cols
+					"top:pref, pref, fill:pref:grow, pref"); // 4 rows
+			DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+			CellConstraints cc = new CellConstraints();
+			
+			builder.add(labelQueries, cc.xy(1,1));
+			builder.add(jqueries, cc.xy(1,2));
+			//builder.add(labelQueryDescription, cc.xy(1,1));
+			builder.add(labelParameters, cc.xy(2,1));
+			builder.add(parametersPanel, cc.xy(2,2));
+			builder.add(buttonSendQuery, cc.xy(3, 1));
+			builder.add(displayArea, cc.xywh(1,3,3,1));
+			builder.add(statusBar, cc.xywh(1,4,3,1));
+			controlPanel=builder.getPanel();	
+		}
+		private void initStatusBar() {
+			statusBar = new JPanel();
+			statusBar.add(statusBarLabel);
+		}
+
+		private void initJQueries() {
+			for(AbstractHCIQuery query: protocol.getQueries())
+				jqueries.addItem(query.getName());
+			jqueries.setToolTipText(Default_jqueries_tooltip_text);
+		}
+
+		private void buildParametersPanel(AbstractHCIQuery query) {
+			if(query != null && query.getParamsDescriptions() != null) {
 				int nbParameters = query.getParamsDescriptions().length;
 				String rowsLayout = "pref";
 				for(int i = 1; i < nbParameters; i++)
@@ -235,7 +227,7 @@ public class HCIProtocolGUIVS extends AbstractVirtualSensor {
 				parametersValues = new JTextArea[nbParameters];
 				for(int i = 0; i < nbParameters; i++) {
 					parametersLabels[i] = new JLabel("Parameter " + i + ": ");
-					parametersValues[i] = new JTextArea();
+					parametersValues[i] = new JTextArea("enter value " + i + " here.");
 					parametersValues[i].setToolTipText(query.getParamsDescriptions()[i]);
 					builder.add(parametersLabels[i], cc.xy(1, i+1));
 					builder.add(parametersValues[i], cc.xy(2, i+1));
