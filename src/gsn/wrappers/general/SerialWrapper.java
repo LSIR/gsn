@@ -245,7 +245,7 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
    public void run() {
       
    }
-   public synchronized boolean sendToWrapper ( Object dataItem ) throws OperationNotSupportedException {
+   public boolean sendToWrapper ( Object dataItem ) throws OperationNotSupportedException {
       if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port sending..." );
       if (!wnetPort.isOpen( ))
          throw new OperationNotSupportedException("The connection is closed.");
@@ -279,7 +279,7 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
    
    private byte [ ]         inputBuffer;
    
-   public synchronized void serialEvent ( SerialPortEvent e ) {
+   public void serialEvent ( SerialPortEvent e ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port event, reading..." );
       if ( !isActive( ) || listeners.isEmpty( ) ) {
          if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper dropped the input b/c there is no listener there or the wrapper is inactive." );
