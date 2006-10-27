@@ -122,24 +122,17 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
        * reliquish the port if have it open and no longer need it.
        */
       public boolean openConnection ( ) {
-         // parameters = new SerialParameters("/dev/ttyS0", 9600, 0, 0,
-         // 8, 1,
-         // 1);
-         // Obtain a CommPortIdentifier object for the port you want to
-         // open.
+         // parameters = new SerialParameters("/dev/ttyS0", 9600, 0, 0, 8, 1, 1);
+         // Obtain a CommPortIdentifier object for the port you want to open.
          try {
             portId = CommPortIdentifier.getPortIdentifier( serialPort );
          } catch ( NoSuchPortException e ) {
-            logger.error( e.getMessage( ) , e );
+            logger.error( "Port doesn't exist : "+serialPort , e );
             return false;
          }
-         
          // Open the port represented by the CommPortIdentifier object.
-         // Give
-         // the open call a relatively long timeout of 30 seconds to
-         // allow
-         // a different application to reliquish the port if the user
-         // wants to.
+         // Give the open call a relatively long timeout of 30 seconds to
+         // allow a different application to reliquish the port if the user wants to.
          if ( portId.isCurrentlyOwned( ) ) {
             logger.error( "port owned by someone else" );
             return false;

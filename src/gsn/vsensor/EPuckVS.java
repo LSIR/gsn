@@ -35,16 +35,12 @@ public class EPuckVS extends AbstractVirtualSensor {
       protocolManager = new ProtocolManager(new SerComProtocol(), wrapper);
       if(logger.isDebugEnabled( ))
          logger.debug( "Created protocolManager" );
-      // send an initial reset command to put the robot in a clean state
-
-//      try {
-//         wrapper.sendToWrapper( "h\n" );
-//      } catch ( OperationNotSupportedException e ) {
-//         e.printStackTrace();
-//      }
-      System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-      //protocolManager.sendQuery( SerComProtocol.RESET , null ,  wrapper);
-      //protocolManager.sendQuery( SerComProtocol.RESET , null ,  wrapper);
+      try {
+         wrapper.sendToWrapper( "h\n" );
+      } catch ( OperationNotSupportedException e ) {
+         e.printStackTrace();
+      }
+//      protocolManager.sendQuery( SerComProtocol.RESET , null );
       if(logger.isDebugEnabled())
          logger.debug( "Initialization complete." );
       return true;
