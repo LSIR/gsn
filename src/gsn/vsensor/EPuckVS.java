@@ -31,11 +31,12 @@ public class EPuckVS extends AbstractVirtualSensor {
       if ( toReturn == false ) return false;
       vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
       params = vsensor.getMainClassInitialParams( );
-      protocolManager = new ProtocolManager(new SerComProtocol());
+      wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      protocolManager = new ProtocolManager(new SerComProtocol(), wrapper);
       if(logger.isDebugEnabled( ))
          logger.debug( "Created protocolManager" );
       // send an initial reset command to put the robot in a clean state
-      wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+
 //      try {
 //         wrapper.sendToWrapper( "h\n" );
 //      } catch ( OperationNotSupportedException e ) {
