@@ -10,6 +10,8 @@ public interface Container {
    
    public static final String REQUEST                           = "REQUEST";
    
+   public static final int    REQUEST_LIST_VIRTUAL_SENSORS              = 0;
+   
    public static final int    REGISTER_PACKET                   = 110;
    
    public static final int    DEREGISTER_PACKET                 = 111;
@@ -20,7 +22,7 @@ public interface Container {
    
    public static final int    ONE_SHOT_QUERY_EXECUTION_REQUEST  = 114;
    
-   public static final int    REQUEST_LIST_VIRTUAL_SENSORS              = 0;
+   public static final int REQUEST_ADDRESSING =  115;
    
    public static final String WEB_APP_NAME                      = "WEB_APP_NAME";
    
@@ -33,6 +35,7 @@ public interface Container {
    public static final String WEB_APP_DESCRIPTION               = "WEB_APP_DESCRIPTION";
    
    public static final String WEB_APP_EMAIL                     = "WEB_APP_EMAIL";
+
    
    public final String        RESPONSE_FIELD_TYPES        = "FIELD_TYPES";
    

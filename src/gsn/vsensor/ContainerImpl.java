@@ -10,8 +10,10 @@ import gsn.notifications.GSNNotification;
 import gsn.notifications.NotificationRequest;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
+import gsn.utils.KeyValueImp;
 import gsn.wrappers.RemoteDS;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,8 +30,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+
+import antlr.StringUtils;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
@@ -139,6 +144,9 @@ public class ContainerImpl extends HttpServlet implements Container {
 		Writer out = res.getWriter();
 		StringBuilder sb;
 		String vsName = request.getParameter("name");
+      VSensorConfig sensorConfig = null;
+      if (vsName!=null)
+            sensorConfig = Mappings.getVSensorConfig(vsName);
 		switch (requestType) {
 		case Container.REQUEST_LIST_VIRTUAL_SENSORS:
 			Iterator<VSensorConfig> vsIterator = Mappings
@@ -197,7 +205,6 @@ public class ContainerImpl extends HttpServlet implements Container {
 				//TODO : return error message since the vs name is missing.
 				return;
 			}
-			VSensorConfig sensorConfig = Mappings.getVSensorConfig(vsName);
 			if (sensorConfig == null) {
 				// TODO : ERROR "Requested virtual sensor doesn't exist >"+ prespectiveVirtualSensor + "<."
 				return;
@@ -211,7 +218,25 @@ public class ContainerImpl extends HttpServlet implements Container {
 			sb.append("</virtual-sensor>");
 			out.write(sb.toString());
 			break;
-		default:
+      case Container.REQUEST_ADDRESSING:
+         if (vsName==null) {
+            //TODO : return error message since the vs name is missing.
+            return;
+         }
+         if (sensorConfig == null) {
+            // TODO : ERROR "Requested virtual sensor doesn't exist >"+ prespectiveVirtualSensor + "<."
+            return;
+         }
+         if (logger.isInfoEnabled())
+            logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
+         sb = new StringBuilder("<virtual-sensor name=").append(vsName).append("\" last-modified=\"").append( new File(sensorConfig.getFileName( )).lastModified( ) ).append("\">\n");
+         for (KeyValue df : sensorConfig.getAddressing( )) 
+            sb.append("<predicate key=\"").append(StringEscapeUtils.escapeXml( df.getKey( ).toString( ))).append("\">").append( StringEscapeUtils.escapeXml(df.getValue( ).toString( ))).append("</predicate>\n");
+         sb.append("</virtual-sensor>");
+         out.write(sb.toString());
+         break;
+         
+      default:
 			// TODO : REQUEST IS NOT SUPPORTED.
 			break;
 		}
