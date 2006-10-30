@@ -30,6 +30,8 @@ public final class StreamElement implements Serializable {
    
    private Integer [ ]                            fieldTypes;
    
+   private long internalPrimayKey = -1;
+   
    public StreamElement ( final Collection < DataField > outputStructure , final Serializable [ ] data , final long timeStamp ) {
       this.fieldNames = new String [ outputStructure.size( ) ];
       this.fieldTypes = new Integer [ outputStructure.size( ) ];
@@ -90,8 +92,8 @@ public final class StreamElement implements Serializable {
                   + "th field is defined as " + DataTypes.TYPE_NAMES[ i ] + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
                break;
             case DataTypes.BINARY :
-               if ( data[ i ] instanceof String ) data[ i ] = ( ( String ) data[ i ] ).getBytes( );
-               if ( !( data[ i ] instanceof byte [ ] ) ) throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as "
+              // if ( data[ i ] instanceof String ) data[ i ] = ( ( String ) data[ i ] ).getBytes( );
+               if ( !( data[ i ] instanceof byte [ ]  || data[i] instanceof String) ) throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as "
                   + DataTypes.TYPE_NAMES[ i ] + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
                break;
          }
@@ -166,4 +168,12 @@ public final class StreamElement implements Serializable {
       }
       return this.fieldValues[ this.indexedFieldNames.get( fieldName ) ];
    }
+
+public long getInternalPrimayKey() {
+	return internalPrimayKey;
+}
+
+public void setInternalPrimayKey(long internalPrimayKey) {
+	this.internalPrimayKey = internalPrimayKey;
+}
 }

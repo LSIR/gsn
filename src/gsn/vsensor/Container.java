@@ -20,9 +20,7 @@ public interface Container {
    
    public static final int    ONE_SHOT_QUERY_EXECUTION_REQUEST  = 114;
    
-   public static final int    REQUEST_LIST_VIRTUAL_SENSORS              = 115;
-   
-   public static final int    REQUEST_WEB_APP_INFORMATION               = 116;
+   public static final int    REQUEST_LIST_VIRTUAL_SENSORS              = 0;
    
    public static final String WEB_APP_NAME                      = "WEB_APP_NAME";
    

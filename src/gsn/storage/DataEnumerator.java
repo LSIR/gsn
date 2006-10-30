@@ -42,13 +42,15 @@ public class DataEnumerator implements Enumeration {
    
    int                      indexofPK                = -1;
    
+   boolean linkBinaryData = false;
+   
    public DataEnumerator ( ) {
       hasNext = false;
    }
    
-   public DataEnumerator ( ResultSet rs ) throws SQLException {
+   public DataEnumerator ( ResultSet rs ,boolean binaryLinked) throws SQLException {
       if ( rs == null ) throw new IllegalStateException( "The provided ResultSet is Null." );
-      
+      this.linkBinaryData=binaryLinked;
       this.resultSet = rs;
       hasNext = resultSet.next( );
       Vector < String > fieldNames = new Vector < String >( );
@@ -71,50 +73,68 @@ public class DataEnumerator implements Enumeration {
       }
       dataFieldNames = fieldNames.toArray( new String [ ] {} );
       dataFieldTypes = fieldTypes.toArray( new Integer [ ] {} );
-      
+      if (indexofPK==-1 && linkBinaryData)
+   	   throw new RuntimeException("The specified query can't be used with binaryLinked paramter set to true."); 
    }
    
    private StreamElement streamElement = null;
+
    
    public boolean hasMoreElements ( ) {
       return hasNext;
    }
-   
-   public StreamElement nextElement ( ) {
+   public StreamElement nextElementLight ( ) {
+	   return null;
+   }
+   public StreamElement nextElement ( ) throws RuntimeException {
+       long timestamp = -1;
+	  long pkValue = -1;
+	    try {
+	  if (indexofPK!=-1)
+	   pkValue= resultSet.getLong(indexofPK);
       if ( hasNext == false ) return null;
-      try {
          Serializable [ ] output = new Serializable [ dataFieldNames.length ];
-         for ( int i = 1 , colIndex = 0 ; i <= resultSet.getMetaData( ).getColumnCount( ) ; i++ ) {
-            if ( i == indexOfTimedField || i == indexofPK ) continue;
-            switch ( dataFieldTypes[ colIndex ] ) {
+         for ( int actualColIndex = 1 , innerIndex = 0 ; actualColIndex <= resultSet.getMetaData( ).getColumnCount( ) ; actualColIndex++ ) {
+            if (actualColIndex == indexOfTimedField) {
+          	   timestamp=resultSet.getLong(actualColIndex);
+          	   continue;
+            }else
+            if (actualColIndex==indexofPK)
+            	continue;
+            else
+            switch ( dataFieldTypes[ innerIndex ] ) {
                case DataTypes.VARCHAR :
                case DataTypes.CHAR :
-                  output[ colIndex ] = resultSet.getString( i );
+                  output[ innerIndex ] = resultSet.getString( actualColIndex );
                   break;
                case DataTypes.INTEGER :
-                  output[ colIndex ] = resultSet.getInt( i );
+                  output[ innerIndex ] = resultSet.getInt( actualColIndex );
                   break;
                case DataTypes.TINYINT :
-                  output[ colIndex ] = resultSet.getByte( i );
+                  output[ innerIndex ] = resultSet.getByte( actualColIndex );
                   break;
                case DataTypes.SMALLINT :
-                  output[ colIndex ] = resultSet.getShort( i );
+                  output[ innerIndex ] = resultSet.getShort( actualColIndex );
                   break;
                case DataTypes.DOUBLE :
-                  output[ colIndex ] = resultSet.getDouble( i );
+                  output[ innerIndex ] = resultSet.getDouble( actualColIndex );
                   break;
                case DataTypes.BIGINT :
-                  output[ colIndex ] = resultSet.getLong( i );
+                  output[ innerIndex ] = resultSet.getLong( actualColIndex );
                   break;
                case DataTypes.BINARY :
-                  output[ colIndex ] = resultSet.getBytes( i );
+            	   if (linkBinaryData) 
+            		  output[innerIndex] = "/field?vs="+resultSet.getMetaData().getTableName(actualColIndex)+"&field="+resultSet.getMetaData().getColumnName(actualColIndex)+"&pk="+pkValue;
+            	   else
+            		   output[ innerIndex ] = resultSet.getBytes( actualColIndex );
                   break;
             }
-            colIndex++;
+            innerIndex++;
          }
-         if ( hasTimedFieldInResultSet ) streamElement = new StreamElement( dataFieldNames , dataFieldTypes , output , resultSet.getLong( StreamProducer.TIME_FIELD ) );
-         else
-            streamElement = new StreamElement( dataFieldNames , dataFieldTypes , output , System.currentTimeMillis( ) );
+         
+         streamElement = new StreamElement( dataFieldNames , dataFieldTypes , output , indexOfTimedField==-1?System.currentTimeMillis():timestamp );
+         if (indexofPK!=-1)
+        	streamElement.setInternalPrimayKey(pkValue); 
          hasNext = resultSet.next( );
          if ( hasNext == false ) resultSet.getStatement( ).getConnection( ).close( );
       } catch ( SQLException e ) {

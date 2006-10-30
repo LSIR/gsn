@@ -137,7 +137,7 @@ public class InputStream {
          try {
             sensor = this.pool.borrowVS( );
             if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
-            final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL );
+            final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL,false );
             int elementCounterForDebugging = -1;
             while ( resultOfTheQuery.hasMoreElements( ) ) {
                elementCounterForDebugging++;

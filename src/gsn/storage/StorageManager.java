@@ -410,33 +410,28 @@ public class StorageManager {
     * first row. Useful for image recovery of the web interface.
     * 
     * @param query The query to be executed.
-    * @return A Map, the key is the column name in the resultset of the executed
-    * query and the value is array of objects containing the results.
+    * @return A resultset with only one row and one column. The method returns null if the
+    * resultset.next() returns false for the first time (e.g., when the resultset is empty).
+    * In case the return value is not null, don't forget to close the result set.
     */
    
-   public byte [ ] getBinaryFieldByQuery ( StringBuilder query , String colName , long pk ) {
-      
-      byte [ ] toReturn = null;
+   public ResultSet getBinaryFieldByQuery ( StringBuilder query , String colName , long pk ) {
       PreparedStatement ps = null;
+      ResultSet resultSet = null;
       try {
          ps = obtainPreparedStatementForQuery( query );
          ps.setLong( 1 , pk );
          ResultSet rs = ps.executeQuery( );
-         if ( rs.next( ) ) {
-            toReturn = rs.getBytes( colName );
-         } else {
+         if ( rs.next( ) ) 
+            resultSet = rs;
+          else 
             logger.info( "ROW DOESN'T EXIST ANYMORE, This happens when the content of the history is removed because of the history size in VSD file." );
-         }
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
-      } finally {
-         try {
-            if ( ps != null ) ps.getConnection( ).close( );
-         } catch ( SQLException e ) {
+      } 
 
-         }
-      }
-      return toReturn;
+      
+      return resultSet;
    }
    
    /**
@@ -584,14 +579,14 @@ public class StorageManager {
       }
    }
    
-   public Enumeration < StreamElement > executeQuery ( StringBuilder query ) {
+   public Enumeration < StreamElement > executeQuery ( StringBuilder query ,boolean binaryFieldsLinked) {
       PreparedStatement ps = null;
       try {
          ps = obtainPreparedStatementForQuery( query );
       } catch ( SQLException e ) {
          logger.warn( e.getMessage( ) , e );
       }
-      return DataPacket.resultSetToStreamElements( ps );
+      return DataPacket.resultSetToStreamElements( ps,binaryFieldsLinked );
    }
    
    public int executeUpdate ( StringBuilder updateStatement ) {

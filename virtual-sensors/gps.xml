@@ -15,7 +15,7 @@
 	      <field name="longitude"   type="double" />
 	      <field name="temperature" type="double" />
 	      <field name="light"       type="int" />
-	      <field name="camera"      type="binary:jpeg" />
+	      <field name="camera"      type="binary:image/jpeg" />
        </output-structure>
         <storage history-size="1m"/>
         <input-streams>

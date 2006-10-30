@@ -13,7 +13,7 @@
       <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/networkPlotter.xml</predicate>
    </addressing>
    <output-structure>
-      <field name="PLOT" type="binary:svg"/>
+      <field name="PLOT" type="binary:image/svg+xml"/>
    </output-structure>
    <storage history-size="1"/>
    <input-streams>

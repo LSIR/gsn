@@ -21,14 +21,14 @@ public class DataPacket {
     * @param preparedStatement
     * @return Returns {@link DataEnumerator} or EMPTY_ENUM.
     */
-   public static DataEnumerator resultSetToStreamElements ( PreparedStatement preparedStatement ) {
+   public static DataEnumerator resultSetToStreamElements ( PreparedStatement preparedStatement,boolean binaryLinked ) {
       if ( preparedStatement == null ) {
          if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
          return EMPTY_ENUM;
       }
       try {
          ResultSet resultSet = preparedStatement.executeQuery( );
-         return new DataEnumerator( resultSet );
+         return new DataEnumerator( resultSet,binaryLinked );
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
          return EMPTY_ENUM;

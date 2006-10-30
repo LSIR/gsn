@@ -45,7 +45,7 @@ public class DataTypes {
    public final static String            BIGINT_NAME               = "BigInt";
    
    // NEXT FIELD
-   public final static String            BINARY_PATTERN_STRING     = "\\s*BINARY" + OPTIONAL_NUMBER_PARAMETER + "(\\s*:\\s*\\w*)?\\s*";
+   public final static String            BINARY_PATTERN_STRING     = "\\s*BINARY" + OPTIONAL_NUMBER_PARAMETER + "(\\s*:.*)?";
    
    public final static int               BINARY                    = 4;
    
