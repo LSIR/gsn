@@ -86,7 +86,7 @@
                   <% if (mimeType ==null) {%>
                   Not Specificed
                   <%} else if (mimeType.equalsIgnoreCase ( "jpeg")||mimeType.equalsIgnoreCase ( "png")||mimeType.equalsIgnoreCase ( "jpg")|| mimeType.equalsIgnoreCase ( "gif")) {%>
-                  <IMG SRC="field?vs=<%=vsName%>&identity=<%=primaryKey%>&field=<%=result.getMetaData ().getColumnName ( i )%>">
+                  <IMG SRC="field?vs=<%=vsName%>&pk=<%=primaryKey%>&field=<%=result.getMetaData ().getColumnName ( i )%>">
                   <%} else if (mimeType.equalsIgnoreCase ( "svg")) {%>
                    <EMBED type="image/svg+xml" width="400" height="400" src="field?vs=<%=vsName%>&identity=<%=primaryKey%>&field=<%=result.getMetaData ().getColumnName ( i )%>&type=svg"   PLUGINSPAGE="http://www.adobe.com/svg/viewer/install/" />
                   <%} %>
