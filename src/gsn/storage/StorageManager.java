@@ -424,9 +424,9 @@ public class StorageManager {
          ResultSet rs = ps.executeQuery( );
          if ( rs.next( ) ) 
             resultSet = rs;
-          else 
-            logger.info( "ROW DOESN'T EXIST ANYMORE, This happens when the content of the history is removed because of the history size in VSD file." );
-      } catch ( SQLException e ) {
+         else
+        	 resultSet.close();
+            } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
       } 
 

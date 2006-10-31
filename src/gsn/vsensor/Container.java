@@ -56,7 +56,23 @@ public interface Container {
    public final String        VS_QUERY                          = "VS_QUERY";
    
    public final String        STREAM_SOURCE_ACTIVE_ADDRESS_BEAN = "STREAM_SOURCE_ACTIVE_ADDRESS_BEAN";
+  
+   /**
+    * HTTP RETURN CODES : ---------------------------------------------------------------------
+    */
    
+   public static final int	  CORRECT_REQUEST					= 200;
+   
+   public static final int    UNSUPPORTED_REQUEST_ERROR			= 400;
+   
+   public static final int	  MISSING_VSNAME_ERROR				= 401;
+   
+   public static final int	  ERROR_INVALID_VSNAME				= 402;
+   
+   public static final int	  WRONG_VSFIELD_ERROR				= 403;
+  /**
+   * METHODS TO BE DEFINED IN ANY CONTAINER IMPLEMENTATION.
+   */ 
    public void publishData ( VirtualSensor sensor );
    
    public void addRemoteStreamSource ( String alias , RemoteDS remoteDS );

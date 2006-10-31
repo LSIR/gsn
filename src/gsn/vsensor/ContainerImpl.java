@@ -10,7 +10,6 @@ import gsn.notifications.GSNNotification;
 import gsn.notifications.NotificationRequest;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
-import gsn.utils.KeyValueImp;
 import gsn.wrappers.RemoteDS;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -43,8 +42,7 @@ import antlr.StringUtils;
  */
 public class ContainerImpl extends HttpServlet implements Container {
 
-	private static transient Logger logger = Logger
-			.getLogger(ContainerImpl.class);
+	private static transient Logger logger = Logger.getLogger(ContainerImpl.class);
 
 	/**
 	 * The <code> waitingVirtualSensors</code> contains the virtual sensors
@@ -129,7 +127,7 @@ public class ContainerImpl extends HttpServlet implements Container {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse res)
 			throws ServletException, IOException {
-		// TODO : response codes are missing.
+		res.setContentType("text/xml");
 		String rawRequest = request.getParameter(Container.REQUEST);
 		int requestType = -1;
 		if (rawRequest == null || rawRequest.trim().length() == 0)
@@ -139,6 +137,7 @@ public class ContainerImpl extends HttpServlet implements Container {
 				requestType = Integer.parseInt((String) rawRequest);
 			} catch (Exception e) {
 				logger.debug("A request received with an invalid request Type",e);
+				// TODO RESPONSE CODE;
 				return;
 			}
 		Writer out = res.getWriter();
@@ -151,7 +150,8 @@ public class ContainerImpl extends HttpServlet implements Container {
 		case Container.REQUEST_LIST_VIRTUAL_SENSORS:
 			Iterator<VSensorConfig> vsIterator = Mappings
 					.getAllVSensorConfigs();
-		    sb = new StringBuilder("<gsn " );
+			sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
+			sb = sb.append("\n<gsn " );
 			sb.append("name=\"").append(StringEscapeUtils.escapeXml(Main.getContainerConfig().getWebName())).append("\" ");
 			sb.append("author=\"").append(StringEscapeUtils.escapeXml(Main.getContainerConfig().getWebAuthor())).append("\" ");
 			sb.append("email=\"").append(StringEscapeUtils.escapeXml(Main.getContainerConfig().getWebEmail())).append("\" ");
@@ -184,7 +184,7 @@ public class ContainerImpl extends HttpServlet implements Container {
 				windowSize="1";
 			StringBuilder query = new StringBuilder("select "+vsFields+" from "+vsName+vsCondition+ " order by TIMED limit "+windowSize+" offset 0");
 			Enumeration<StreamElement> result = StorageManager.getInstance ( ).executeQuery(query,true) ;
-			sb = new StringBuilder("<result>\n");
+			sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<result>\n");
 			while (result.hasMoreElements()) {
 				StreamElement se = result.nextElement();
 				sb.append("<stream-element>\n");
@@ -202,16 +202,18 @@ public class ContainerImpl extends HttpServlet implements Container {
 			break;
 		case Container.REQUEST_OUTPUT_FORMAT:
 			if (vsName==null) {
-				//TODO : return error message since the vs name is missing.
+				res.sendError(Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing");
 				return;
 			}
 			if (sensorConfig == null) {
-				// TODO : ERROR "Requested virtual sensor doesn't exist >"+ prespectiveVirtualSensor + "<."
+				res.sendError(Container.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist.");
 				return;
 			}
 			if (logger.isInfoEnabled())
 				logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
-			sb = new StringBuilder("<virtual-sensor name=").append(vsName).append("\">\n");
+			res.setStatus(HttpServletResponse.SC_OK);
+			sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
+			sb.append("<virtual-sensor name=").append(vsName).append("\">\n");
 			for (DataField df : sensorConfig.getOutputStructure()) 
 				sb.append("<field name=\"").append(df.getFieldName()).append("\" ").append("type=\"").append(df.getType()).append("\" ").append("description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\" />\n");
 			sb.append("<field name=\"TIMED\" type=\"long\" description=\"The timestamp associated with the stream element\" />\n");
@@ -219,26 +221,27 @@ public class ContainerImpl extends HttpServlet implements Container {
 			out.write(sb.toString());
 			break;
       case Container.REQUEST_ADDRESSING:
-         if (vsName==null) {
-            //TODO : return error message since the vs name is missing.
-            return;
-         }
-         if (sensorConfig == null) {
-            // TODO : ERROR "Requested virtual sensor doesn't exist >"+ prespectiveVirtualSensor + "<."
-            return;
-         }
-         if (logger.isInfoEnabled())
+    	  if (vsName==null) {
+				res.sendError(Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing");
+				return;
+			}
+			if (sensorConfig == null) {
+				res.sendError(Container.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist.");
+				return;
+			}
+			if (logger.isInfoEnabled())
             logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
-         sb = new StringBuilder("<virtual-sensor name=").append(vsName).append("\" last-modified=\"").append( new File(sensorConfig.getFileName( )).lastModified( ) ).append("\">\n");
-         for (KeyValue df : sensorConfig.getAddressing( )) 
+     	res.setStatus(HttpServletResponse.SC_OK);
+	    sb = new StringBuilder("<virtual-sensor name=").append(vsName).append("\" last-modified=\"").append( new File(sensorConfig.getFileName( )).lastModified( ) ).append("\">\n");
+        for (KeyValue df : sensorConfig.getAddressing( )) 
             sb.append("<predicate key=\"").append(StringEscapeUtils.escapeXml( df.getKey( ).toString( ))).append("\">").append( StringEscapeUtils.escapeXml(df.getValue( ).toString( ))).append("</predicate>\n");
          sb.append("</virtual-sensor>");
          out.write(sb.toString());
          break;
          
       default:
-			// TODO : REQUEST IS NOT SUPPORTED.
-			break;
+		res.sendError(Container.UNSUPPORTED_REQUEST_ERROR , "The requested operation is not supported.");
+		return;
 		}
 
 	}

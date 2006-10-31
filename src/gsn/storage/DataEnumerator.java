@@ -124,7 +124,7 @@ public class DataEnumerator implements Enumeration {
                   break;
                case DataTypes.BINARY :
             	   if (linkBinaryData) 
-            		  output[innerIndex] = "/field?vs="+resultSet.getMetaData().getTableName(actualColIndex)+"&field="+resultSet.getMetaData().getColumnName(actualColIndex)+"&pk="+pkValue;
+            		  output[innerIndex] = "/field?vs="+resultSet.getMetaData().getTableName(actualColIndex)+"&amp;field="+resultSet.getMetaData().getColumnName(actualColIndex)+"&amp;pk="+pkValue;
             	   else
             		   output[ innerIndex ] = resultSet.getBytes( actualColIndex );
                   break;
