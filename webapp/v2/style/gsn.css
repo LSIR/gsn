@@ -1,0 +1,129 @@
+body,
+html {
+		margin:0;
+		padding:0;
+		background:#DFDFDF;
+		color:#000;
+		font:80% Verdana,Tahoma,Arial,sans-serif;
+		line-height:1.4em;
+	}
+body {
+		margin:10px;
+		min-width:750px;		
+		}
+#container {
+		margin:0 auto;
+		padding:1px;
+		width:750px;
+		background:#FFFFFF;
+		}
+#header {
+	    background-color:#FFEE00;
+	    padding:2px;
+	    margin:0;
+		}
+#header h1 {
+    	padding:30px 90px;
+    	margin:5px;
+    	height:25px;
+	    background:url("gsn-mark.png") no-repeat;
+    	}
+#header a {
+		text-decoration:none;
+		color:#000000;
+		}
+#nav {
+		background:#FFA84C;
+		padding:5px;
+		}
+#nav ul{
+		margin:0;
+		padding:0;
+		list-style:none;
+		}
+#nav li{
+		display:inline;
+		margin:0;
+		padding:0;
+		}
+#main {
+		xbackground:#9c9;
+		float:left;
+		width:490px;
+		padding:0 10px;
+		}
+#main h2, #main h3, #main p {
+		padding:0;
+    	}
+#sidebar {
+		xbackground:#99c;
+		float:right;
+		width:220px;
+		padding:0 10px 50px 10px;
+		}
+#sidebar ul {
+		margin-bottom:0;
+    	}
+#sidebar h3, #sidebar p {
+		padding:0 10px 0 0;
+    	}
+#footer {
+		xbackground:#cc9;
+		clear:both;
+		color:#808080;
+		}
+#footer p {
+		padding:10px 0 5px 0;
+		margin:0;
+		text-align:center;
+    	}
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	

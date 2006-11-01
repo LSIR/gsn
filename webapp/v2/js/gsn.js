@@ -1,0 +1,3 @@
+/*
+ * gsn javascript
+ */
