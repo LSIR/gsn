@@ -38,3 +38,4 @@ $(document).ready(function() {
 
 //]]></script>
 <div id="map" style="width: 100%; height: 500px;"></div>
+<div id="vs"></div>		

@@ -76,54 +76,51 @@ body {
 		padding:10px 0 5px 0;
 		margin:0;
 		text-align:center;
-    	}
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
+ }
+
+
+/* specific style */
+.vsbox {
+		clear:both;
+		margin:0;
+		margin-bottom:5px;
+		padding:1px;
+		background:#FFA84C;
+		}
+.vsbox h3 {
+		margin:3px;
+		padding:1px;
+		xdisplay:block;
+		}
+.vsbox h3 span {
+		margin-bottom:3px;
+		float:left;
+		}
+.vsbox h3 span.id,.vsbox h3 span.status {
+		font-size:0.7em;
+		float:none;
+		display:none;
+		}
+.vsbox h3 a {
+		float:right;
+		color:#000000;
+		margin:0 2px;
+		}		
+.vsbox p,.vsbox dl {
+	clear:both;
+	padding:1px;
+	margin:0;
+	background:#ffffff;
+}		
+.vsbox dt {
+	clear:both;
+	float:left;
+	font-weight:bold;
+	padding-right:5px;
+}
+.vsbox dd {
+	xfloat:left;
+}
+.clear {
+		clear:both;
+}	
