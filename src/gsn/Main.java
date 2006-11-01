@@ -82,16 +82,18 @@ public final class Main {
       if ( logger.isInfoEnabled( ) ) logger.info( "The Container Configuration file loaded successfully." );
       Container container = new ContainerImpl( );
       Mappings.setContainer( container );
-      
       final Server server = new Server( );
       Connector connector = new SelectChannelConnector( );
       connector.setPort( containerConfig.getContainerPort( ) );
       server.setConnectors( new Connector [ ] { connector } );
-      ServletHandler servletHandler = new ServletHandler( );
-      servletHandler.addServletWithMapping( "gsn.vsensor.ContainerImpl" , "/gsn" );
       WebAppContext webAppContext = new WebAppContext( );
+      HashMap webappInitParams = new HashMap ();
+      webappInitParams.put( "useFileMappedBuffer" , "false" );
+      webAppContext.setInitParams( webappInitParams );
       webAppContext.setContextPath( "/" );
       webAppContext.setResourceBase( DEFAULT_WEB_APP_PATH );
+      ServletHandler servletHandler = new ServletHandler( );
+      servletHandler.addServletWithMapping( "gsn.vsensor.ContainerImpl" , "/gsn" );
       webAppContext.setServletHandler( servletHandler );
       server.setHandler( webAppContext );
       server.setStopAtShutdown( true );
