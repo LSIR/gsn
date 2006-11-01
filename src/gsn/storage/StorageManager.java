@@ -424,13 +424,12 @@ public class StorageManager {
          ResultSet rs = ps.executeQuery( );
          if ( rs.next( ) ) 
             resultSet = rs;
-         else
-        	 resultSet.close();
-            } catch ( SQLException e ) {
+          else { 
+            rs.close();
+          }
+      } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
       } 
-
-      
       return resultSet;
    }
    

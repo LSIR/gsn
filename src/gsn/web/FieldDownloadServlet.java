@@ -6,6 +6,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
 import gsn.vsensor.Container;
+import gsn.vsensor.ContainerImpl;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -16,6 +17,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+
+import sun.util.logging.resources.logging;
 
 
 
@@ -28,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
  * @web.servlet-mapping url-pattern="/field"
  */
 public class FieldDownloadServlet extends HttpServlet {
+   
+   private static transient Logger                                      logger                             = Logger.getLogger( FieldDownloadServlet.class );
    
    static final String prefix  = "select * from ";
    
@@ -60,7 +67,6 @@ public class FieldDownloadServlet extends HttpServlet {
     	  res.sendError(res.SC_NOT_FOUND, "The requested data is marked as obsolete and is not available.");
     	  return;  
       }
-      res.setContentType("text/xml");
       res.getWriter().println("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
 	  boolean binary = false;
       for (DataField df : sensorConfig.getOutputStructure()) 
@@ -72,14 +78,17 @@ public class FieldDownloadServlet extends HttpServlet {
 					st.nextToken();//Ignoring the first token.
 					res.setContentType(st.nextToken());
 					binary=true;
-				}
+               //if ( type.equalsIgnoreCase( "svg" ) ) res.setContentType( "" );   
+            }
       try {
       if (binary)
     	  res.getOutputStream( ).write( rs.getBytes(colName) );  
-      else
-    	  res.getWriter().write(rs.getString(colName));
+      else {
+         res.setContentType("text/xml");
+         res.getWriter().write(rs.getString(colName));
+      }
       }catch (Exception e) {
-    	e.printStackTrace();
+    	 logger.info( e.getMessage( ),e );
 	  }finally {
 		  if (rs!=null)
 			try {
@@ -88,7 +97,6 @@ public class FieldDownloadServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 	  }
-      //if ( type.equalsIgnoreCase( "svg" ) ) res.setContentType( "" );   
    }
    
    public void doPost ( HttpServletRequest request , HttpServletResponse response ) throws ServletException , IOException {

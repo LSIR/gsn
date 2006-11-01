@@ -20,7 +20,7 @@ public interface Container {
    
    public static final int    REQUEST_OUTPUT_FORMAT             = 113;
    
-   public static final int    ONE_SHOT_QUERY_EXECUTION_REQUEST  = 114;
+   public static final int    REQUEST_ONE_SHOT_QUERY  = 114;
    
    public static final int REQUEST_ADDRESSING =  115;
    

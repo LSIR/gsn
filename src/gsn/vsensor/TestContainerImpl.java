@@ -45,7 +45,7 @@ public class TestContainerImpl {
    @Test public void oneShotQueryExecution() throws Exception {
       WebConversation wc = new WebConversation();
       WebRequest     request = new GetMethodWebRequest( "http://localhost:22001/gsn" );
-      request.setHeaderField( "REQUEST" , Container.ONE_SHOT_QUERY_EXECUTION_REQUEST+"" );
+      request.setHeaderField( "REQUEST" , Container.REQUEST_ONE_SHOT_QUERY+"" );
       request.setHeaderField( "VS_QUERY" , "select * from LocalSystemTime" );
       WebResponse   response = wc.getResponse( request );
       assertEquals(response.getHeaderField( Container.RESPONSE_STATUS),Container.REQUEST_HANDLED_SUCCESSFULLY );
