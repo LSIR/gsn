@@ -27,7 +27,8 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
+//import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
 
@@ -83,7 +84,8 @@ public final class Main {
       Container container = new ContainerImpl( );
       Mappings.setContainer( container );
       final Server server = new Server( );
-      Connector connector = new SelectChannelConnector( );
+      //Connector connector = new SelectChannelConnector( ); //using basic connector for windows bug
+      Connector connector = new SocketConnector();
       connector.setPort( containerConfig.getContainerPort( ) );
       server.setConnectors( new Connector [ ] { connector } );
       WebAppContext webAppContext = new WebAppContext( );
