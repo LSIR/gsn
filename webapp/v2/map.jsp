@@ -16,6 +16,16 @@ $(document).ready(function() {
 		map.addControl(new GMapTypeControl());
 		map.addControl(new GScaleControl());
 		map.addControl(new GOverviewMapControl());
+
+  		//attach event
+  		GEvent.addListener(map, "click", function(overlay, point) {
+			if(overlay) {	// when a marker is clicked
+				//console.debug(overlay.id);
+				GSN.addvs(overlay.id);
+			} else if(point) {	// when the background is clicked
+				map.closeInfoWindow();
+			}
+		});
 		
 		
 						
@@ -23,13 +33,16 @@ $(document).ready(function() {
 		//if ($("rsp",data).attr("stat")!="ok") {
 		//	console.error("Error: " , $("err",data).attr("msg")); 
 		//} else {
+			//var markers = new Array();
 			$("virtual-sensor",data).each(function(){
 				var lat = $("field[@name=LATITUDE]",$(this)).text();
 				var lon = $("field[@name=LONGITUDE]",$(this)).text();
 				map.setCenter(new GLatLng(lat,lon), 13);
 				var point = new GLatLng(lat,lon);
 				console.debug(point);
-  				map.addOverlay(new GMarker(point));
+  				var marker = new GMarker(point);
+  				marker.id = $(this).attr("name");
+				map.addOverlay(marker);
   			});
 		//}
 		}});
