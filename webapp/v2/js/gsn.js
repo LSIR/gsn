@@ -24,6 +24,16 @@ var GSN = {
 			//}
 		}});
 	},
+	menu: function (vsName) {
+		if ($("#map").size()>0){
+			//we are in the map context
+			$("#vs").empty();
+			GSN.addvs(vsName);
+		} else {
+			//we are in the normal context
+			GSN.addvs(vsName);
+		}
+	},
 	addvs: function (vsName) {
 		var vsdiv = "vs-"+vsName;
 		if ($("#"+vsdiv, $("#vs")).size()==0) {
@@ -41,15 +51,15 @@ var GSN = {
 //							,$.P({class:"clear"},"finish")
 							)
 							);
-			/*$.ajax({ type: "GET", url: "api.jsp?vs="+vsName, success: function(data){
-			if ($("rsp",data).attr("stat")!="ok") {
-				console.debug("Error: " + $("err",data).attr("msg")); 
-			} else {
-				$("virtualsensor",data).each(function(){
+			$.ajax({ type: "GET", url: "/gsn?name="+vsName, success: function(data){
+			//if ($("rsp",data).attr("stat")!="ok") {
+			//	console.debug("Error: " + $("err",data).attr("msg")); 
+			//} else {
+				$("virtual-sensor",data).each(function(){
 					GSN.updatevs($(this),$("#vs"))
 				})
-			}
-			}});*/
+			//}
+			}});
 		}
 	},
 	updatevs: function (vs,where){

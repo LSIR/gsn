@@ -21,7 +21,7 @@ $(document).ready(function() {
   		GEvent.addListener(map, "click", function(overlay, point) {
 			if(overlay) {	// when a marker is clicked
 				//console.debug(overlay.id);
-				GSN.addvs(overlay.id);
+				GSN.menu(overlay.id);
 			} else if(point) {	// when the background is clicked
 				map.closeInfoWindow();
 			}

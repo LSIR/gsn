@@ -50,7 +50,7 @@
         <ul><% 
         Iterator<VSensorConfig>  it = Mappings.getAllVSensorConfigs ( );
         while ( it.hasNext () ) { String vsName = it.next().getVirtualSensorName (); %>
-         <li><a href="javascript:GSN.addvs('<%=vsName%>');"><%=vsName%></a></li>
+         <li><a href="javascript:GSN.menu('<%=vsName%>');"><%=vsName%></a></li>
         <% } %></ul>
 	</div>
 	<div id="footer">
