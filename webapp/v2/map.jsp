@@ -19,16 +19,19 @@ $(document).ready(function() {
 		
 		
 						
-		$.ajax({ type: "GET", url: "api.jsp?vs=GPSVS", success: function(data){
-		if ($("rsp",data).attr("stat")!="ok") {
-			console.error("Error: " , $("err",data).attr("msg")); 
-		} else {
-			var lat = $("field[@name=latitude]",$("virtualsensor",data)).text();
-			var lon = $("field[@name=longitude]",$("virtualsensor",data)).text();
-			map.setCenter(new GLatLng(lat,lon), 13);
-			var point = new GLatLng(lat,lon);
-  			map.addOverlay(new GMarker(point));
-		}
+		$.ajax({ type: "GET", url: "/gsn", success: function(data){
+		//if ($("rsp",data).attr("stat")!="ok") {
+		//	console.error("Error: " , $("err",data).attr("msg")); 
+		//} else {
+			$("virtual-sensor",data).each(function(){
+				var lat = $("field[@name=LATITUDE]",$(this)).text();
+				var lon = $("field[@name=LONGITUDE]",$(this)).text();
+				map.setCenter(new GLatLng(lat,lon), 13);
+				var point = new GLatLng(lat,lon);
+				console.debug(point);
+  				map.addOverlay(new GMarker(point));
+  			});
+		//}
 		}});
 						
         
