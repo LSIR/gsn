@@ -21,8 +21,9 @@ public class SerComProtocol extends AbstractHCIProtocol {
    // wait time in ms for an answer to a query
    public static final int EPUCK_DEFAULT_WAIT_TIME = 250;
       
-   // add here an easy-to-use-and-remember name for each query class of the protocol
-   public static final String SET_SPEED="SET_SPEED", RESET="RESET";
+   // add here a short name for the created query. This name
+   // will be shown to the user so that he can choose between queries.
+   public static final String SET_SPEED="Set speed", RESET="Reset";
       
    public SerComProtocol() {
 	   super(EPUCK_PROTOCOL);

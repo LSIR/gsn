@@ -192,12 +192,12 @@ public class JHCIProtocolControl extends JFrame {
 			parametersLabels = new JLabel[nbParameters];
 			parametersValues = new JTextArea[nbParameters];
 			for(int i = 0; i < nbParameters; i++) {
-				if(query.getParamsDescriptions()[i] != null && ! query.getParamsDescriptions()[i].trim().equals(""))
-					parametersLabels[i] = new JLabel(query.getParamsDescriptions()[i]);
-				else
-					parametersLabels[i] = new JLabel("Parameter " + i + ": ");
+				parametersLabels[i] = new JLabel(query.getName());
+				if(query.getParamsDescriptions()[i] != null && ! query.getParamsDescriptions()[i].trim().equals("")) {
+					parametersLabels[i].setToolTipText(query.getParamsDescriptions()[i]);
+					parametersValues[i].setToolTipText(query.getParamsDescriptions()[i]);
+				}
 				parametersValues[i] = new JTextArea("enter value " + i + " here.");
-				parametersValues[i].setToolTipText(query.getParamsDescriptions()[i]);
 				builder.add(parametersLabels[i], cc.xy(1, i+1));
 				builder.add(parametersValues[i], cc.xy(2, i+1));
 			}
