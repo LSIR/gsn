@@ -35,14 +35,17 @@ $(document).ready(function() {
 		//} else {
 			//var markers = new Array();
 			$("virtual-sensor",data).each(function(){
+				//console.debug($("field[@name=LATITUDE]",$(this)).text());
+				if ($("field[@name=LATITUDE]",$(this)).text() != ""){
 				var lat = $("field[@name=LATITUDE]",$(this)).text();
 				var lon = $("field[@name=LONGITUDE]",$(this)).text();
 				map.setCenter(new GLatLng(lat,lon), 13);
 				var point = new GLatLng(lat,lon);
-				console.debug(point);
+				//console.debug(point);
   				var marker = new GMarker(point);
   				marker.id = $(this).attr("name");
 				map.addOverlay(marker);
+				}
   			});
 		//}
 		}});

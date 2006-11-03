@@ -8,15 +8,15 @@ var GSN = {
 			setTimeout('GSN.updateall(false);', $("#refreshall_timeout").attr("value" ));
 		} else if(!createvs) return;
   
-		console.info("updateall query");  
+		//console.info("updateall query");  
 		$.ajax({ type: "GET", url: "/gsn", success: function(data){
-			console.info("ajax successful");
+			//console.info("ajax successful");
 			//console.debug($("rsp",data).attr("stat"));
 			//if ($("rsp",data).attr("stat")!="ok") {
 				//console.debug("Error: " + $("err",data).attr("msg")); 
 			//} else {
 				//$("#vs").empty();
-				console.info("ajax");
+				//console.info("ajax");
 				$("virtual-sensor",data).each(function(){
 					if (createvs) GSN.addvs($(this).attr("name"))
 					GSN.updatevs($(this),$("#vs"))
@@ -37,7 +37,7 @@ var GSN = {
 	addvs: function (vsName) {
 		var vsdiv = "vs-"+vsName;
 		if ($("#"+vsdiv, $("#vs")).size()==0) {
-			console.debug("create vs:"+vsdiv);
+			//console.debug("create vs:"+vsdiv);
 			$("#vs").append($.DIV({"id":vsdiv,"class":"vsbox"},
 							$.H3({},$.SPAN({},vsName,
 								$.SPAN({"class":"id"},"0"),
@@ -64,7 +64,7 @@ var GSN = {
 	},
 	updatevs: function (vs,where){
 		var vsid = "vs-"+vs.attr("name");
-		console.debug("update: "+vsid);
+		//console.debug("update: "+vsid);
 		var id = $("#"+vsid+" span.id", where);
 		var status = $("#"+vsid+" span.status", where);
 		//if (status.text()!="live") return;
@@ -74,6 +74,7 @@ var GSN = {
 			var dl = $("#"+vsid+" > dl ", where);
 			var name = $(this).attr("name");
 			var value = $(this).text();
+			if (value == "") value = "empty";
 			if ($(this).attr("type").indexOf("image") != -1){
 //				var img = $.IMG({"id":"test","alt":"error"});
 				value = '<img src="'+value+'" alt="error" />';
@@ -96,7 +97,7 @@ var GSN = {
 		var id = $("#"+vsid+" > h3 > span > span.id");	
 		newid = parseInt(id.text()) + df;
 		id.empty().append(newid);
-		console.debug("nothing: "+newid);
+		//console.debug("nothing: "+newid);
 	},
 	freezevs: function (vsdiv) {
 		var status = $("#"+vsdiv+" span.status");
@@ -115,7 +116,7 @@ var GSN = {
 		}
 	},
 	removevs: function (vsid) {
-		console.debug(vsid);
+		//console.debug(vsid);
 		$("#"+vsid).remove();
 	}
 };

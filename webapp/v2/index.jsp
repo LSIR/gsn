@@ -17,6 +17,7 @@
 	<script type="text/javascript" src="js/jquery-latest.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/gsn.js"></script>
+		<script type="text/javascript" src="js/IEconsole.js"></script>
 </head>
 <body>
 
