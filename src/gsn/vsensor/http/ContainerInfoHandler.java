@@ -3,21 +3,15 @@ package gsn.vsensor.http;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Iterator;
-
-import javax.bluetooth.DataElement;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
 
