@@ -29,6 +29,7 @@ import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 //import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
 
@@ -89,9 +90,6 @@ public final class Main {
       connector.setPort( containerConfig.getContainerPort( ) );
       server.setConnectors( new Connector [ ] { connector } );
       WebAppContext webAppContext = new WebAppContext( );
-      HashMap webappInitParams = new HashMap ();
-      webappInitParams.put( "useFileMappedBuffer" , "false" );
-      webAppContext.setInitParams( webappInitParams );
       webAppContext.setContextPath( "/" );
       webAppContext.setResourceBase( DEFAULT_WEB_APP_PATH );
       ServletHandler servletHandler = new ServletHandler( );

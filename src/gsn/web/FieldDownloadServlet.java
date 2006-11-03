@@ -42,61 +42,62 @@ public class FieldDownloadServlet extends HttpServlet {
    
    public void doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
       String vsName = req.getParameter( "vs" );
-      if (vsName==null ||vsName.trim().length()==0) {
-			res.sendError(Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing");
-			return;
+      if ( vsName == null || vsName.trim( ).length( ) == 0 ) {
+         res.sendError( Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
+         return;
       }
       String primaryKey = req.getParameter( "pk" );
       String colName = req.getParameter( "field" );
-      if ( primaryKey == null || colName == null ||primaryKey.trim().length()==0 || colName.trim().length()==0  ) {
-    	  res.sendError(res.SC_BAD_REQUEST , "The pk and/or field parameters are missing.");
-		  return;
+      if ( primaryKey == null || colName == null || primaryKey.trim( ).length( ) == 0 || colName.trim( ).length( ) == 0 ) {
+         res.sendError( res.SC_BAD_REQUEST , "The pk and/or field parameters are missing." );
+         return;
       }
-      VSensorConfig sensorConfig = Mappings.getVSensorConfig(vsName.trim());
-      if (sensorConfig == null) {
-			res.sendError(Container.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist.");
-			return;
-	  }
-	
-      primaryKey=primaryKey.trim( );
-      colName=colName.trim( );
+      VSensorConfig sensorConfig = Mappings.getVSensorConfig( vsName.trim( ) );
+      if ( sensorConfig == null ) {
+         res.sendError( Container.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist." );
+         return;
+      }
+      
+      primaryKey = primaryKey.trim( );
+      colName = colName.trim( );
       
       StringBuilder query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
       ResultSet rs = StorageManager.getInstance( ).getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) );
-      if (rs==null) {
-    	  res.sendError(res.SC_NOT_FOUND, "The requested data is marked as obsolete and is not available.");
-    	  return;  
+      if ( rs == null ) {
+         res.sendError( res.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
+         try {
+            rs.getStatement( ).getConnection( ).close( );
+         } catch ( SQLException e ) {
+            e.printStackTrace( );
+         }
+         return;
       }
-      res.getWriter().println("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-	  boolean binary = false;
-      for (DataField df : sensorConfig.getOutputStructure()) 
-			if (df.getFieldName().toLowerCase().equals(colName.trim().toLowerCase()))
-				if (df.getDataTypeID()==DataTypes.BINARY) {
-					StringTokenizer st = new StringTokenizer(df.getType(),":");
-					if (st.countTokens()!=2)
-						return;
-					st.nextToken();//Ignoring the first token.
-					res.setContentType(st.nextToken());
-					binary=true;
-               //if ( type.equalsIgnoreCase( "svg" ) ) res.setContentType( "" );   
-            }
+      boolean binary = false;
+      for ( DataField df : sensorConfig.getOutputStructure( ) )
+         if ( df.getFieldName( ).toLowerCase( ).equals( colName.trim( ).toLowerCase( ) ) ) if ( df.getDataTypeID( ) == DataTypes.BINARY ) {
+            StringTokenizer st = new StringTokenizer( df.getType( ) , ":" );
+            binary = true;
+            if ( st.countTokens( ) != 2 ) break;
+            st.nextToken( );// Ignoring the first token.
+            res.setContentType( st.nextToken( ) );
+            // if ( type.equalsIgnoreCase( "svg" ) ) res.setContentType( "" );
+         }
       try {
-      if (binary)
-    	  res.getOutputStream( ).write( rs.getBytes(colName) );  
-      else {
-         res.setContentType("text/xml");
-         res.getWriter().write(rs.getString(colName));
+         if ( binary )
+            res.getOutputStream( ).write( rs.getBytes( colName ) );
+         else {
+            res.setContentType( "text/xml" );
+            res.getWriter( ).write( rs.getString( colName ) );
+         }
+      } catch ( Exception e ) {
+         logger.info( e.getMessage( ) , e );
+      } finally {
+         if ( rs != null ) try {
+            rs.getStatement( ).getConnection( ).close( );
+         } catch ( SQLException e ) {
+            e.printStackTrace( );
+         }
       }
-      }catch (Exception e) {
-    	 logger.info( e.getMessage( ),e );
-	  }finally {
-		  if (rs!=null)
-			try {
-				rs.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-	  }
    }
    
    public void doPost ( HttpServletRequest request , HttpServletResponse response ) throws ServletException , IOException {

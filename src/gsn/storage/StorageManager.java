@@ -578,14 +578,14 @@ public class StorageManager {
       }
    }
    
-   public Enumeration < StreamElement > executeQuery ( StringBuilder query ,boolean binaryFieldsLinked) {
+   public DataEnumerator executeQuery ( StringBuilder query ,boolean binaryFieldsLinked) {
       PreparedStatement ps = null;
       try {
          ps = obtainPreparedStatementForQuery( query );
       } catch ( SQLException e ) {
          logger.warn( e.getMessage( ) , e );
       }
-      return DataPacket.resultSetToStreamElements( ps,binaryFieldsLinked );
+      return new DataEnumerator(ps,binaryFieldsLinked );
    }
    
    public int executeUpdate ( StringBuilder updateStatement ) {

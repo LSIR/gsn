@@ -117,11 +117,14 @@ public class ContainerImpl extends HttpServlet implements Container {
          try {
             requestType = Integer.parseInt( ( String ) rawRequest );
          } catch ( Exception e ) {
+            logger.debug( e.getMessage( ),e );
             requestType = -1;
          }
       StringBuilder sb = new StringBuilder( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" );
       response.getWriter( ).write( sb.toString( ) );
       RequestHandler handler;
+      if (logger.isDebugEnabled( )) logger.debug("Received a request with code : "+requestType  );
+      
       switch ( requestType ) {
          case Container.REQUEST_ONE_SHOT_QUERY :
             handler = new OneShotQueryHandler( );

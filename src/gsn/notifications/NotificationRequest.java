@@ -1,12 +1,9 @@
 package gsn.notifications;
 
 import gsn.beans.StreamElement;
-import gsn.storage.DataPacket;
 import gsn.storage.SQLUtils;
-
 import java.util.ArrayList;
 import java.util.Enumeration;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -54,7 +51,7 @@ public abstract class NotificationRequest {
    }
    
    public boolean needNotification ( ) {
-      return data != DataPacket.EMPTY_ENUM;
+      return data.hasMoreElements( );    
    }
    
 }

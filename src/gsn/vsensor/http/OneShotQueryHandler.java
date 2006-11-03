@@ -4,6 +4,7 @@ import gsn.Mappings;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import gsn.vsensor.Container;
 
@@ -40,7 +41,7 @@ public class OneShotQueryHandler implements RequestHandler{
       String windowSize = request.getParameter( "window" );
       if ( windowSize == null || windowSize.trim( ).length( ) == 0 ) windowSize = "1";
       StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by TIMED limit " + windowSize + " offset 0" );
-      Enumeration < StreamElement > result = StorageManager.getInstance( ).executeQuery( query , true );
+      DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , true );
       StringBuilder sb = new StringBuilder("<result>\n");
       while ( result.hasMoreElements( ) ) {
          StreamElement se = result.nextElement( );
@@ -53,6 +54,7 @@ public class OneShotQueryHandler implements RequestHandler{
          sb.append( "<field name=\"TIMED\" >" ).append( se.getTimeStamp( ) ).append( "</field>\n" );
          sb.append( "</stream-element>\n" );
       }
+      result.close();
       sb.append( "</result>" );
       response.getWriter( ).write( sb.toString( ) );
    }
