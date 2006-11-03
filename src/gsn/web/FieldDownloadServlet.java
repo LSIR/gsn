@@ -6,23 +6,15 @@ import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
 import gsn.vsensor.Container;
-import gsn.vsensor.ContainerImpl;
-
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
-import sun.util.logging.resources.logging;
-
-
 
 //path="/WEB-INF/file_not_found.jpg"
 /**
@@ -65,11 +57,6 @@ public class FieldDownloadServlet extends HttpServlet {
       ResultSet rs = StorageManager.getInstance( ).getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) );
       if ( rs == null ) {
          res.sendError( res.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
-         try {
-            rs.getStatement( ).getConnection( ).close( );
-         } catch ( SQLException e ) {
-            e.printStackTrace( );
-         }
          return;
       }
       boolean binary = false;

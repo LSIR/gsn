@@ -425,7 +425,7 @@ public class StorageManager {
          if ( rs.next( ) ) 
             resultSet = rs;
           else { 
-            rs.close();
+            rs.getStatement( ).getConnection( ).close();
           }
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
