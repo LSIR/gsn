@@ -24,6 +24,8 @@ public interface Container {
    
    public static final int REQUEST_ADDRESSING =  115;
    
+   public static final int 	REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING = 116;
+   
    public static final String WEB_APP_NAME                      = "WEB_APP_NAME";
    
    public static final String RESPONSE                           = "RESPOND";

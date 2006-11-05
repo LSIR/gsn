@@ -9,6 +9,7 @@ import gsn.notifications.NotificationRequest;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.http.AddressingReqHandler;
+import gsn.vsensor.http.OneShotQueryWithAddressingHandler;
 import gsn.vsensor.http.ContainerInfoHandler;
 import gsn.vsensor.http.OneShotQueryHandler;
 import gsn.vsensor.http.OutputStructureHandler;
@@ -126,10 +127,14 @@ public class ContainerImpl extends HttpServlet implements Container {
       if (logger.isDebugEnabled( )) logger.debug("Received a request with code : "+requestType  );
       
       switch ( requestType ) {
-         case Container.REQUEST_ONE_SHOT_QUERY :
-            handler = new OneShotQueryHandler( );
-            if ( handler.isValid( request , response ) ) handler.handle( request , response );
-            break;
+      	case Container.REQUEST_ONE_SHOT_QUERY :
+          handler = new OneShotQueryHandler( );
+          if ( handler.isValid( request , response ) ) handler.handle( request , response );
+          break;
+      	case Container.REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING :
+          handler = new OneShotQueryWithAddressingHandler( );
+          if ( handler.isValid( request , response ) ) handler.handle( request , response );
+          break;
          case Container.REQUEST_LIST_VIRTUAL_SENSORS :
             handler = new ContainerInfoHandler( );
             if ( handler.isValid( request , response ) ) handler.handle( request , response );
