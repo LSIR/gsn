@@ -4,7 +4,8 @@ html {
 		padding:0;
 		background:#DFDFDF;
 		color:#000;
-		font:80% Verdana,Tahoma,Arial,sans-serif;
+		font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+		font-size:12px;
 		line-height:1.4em;
 	}
 body {
@@ -14,6 +15,11 @@ body {
 		margin: 0; 
 		padding: 0;	
 		}
+		
+h2 {
+	font-size:1.5em;
+	margin:1em 0;
+	}
 #container {
 		margin:10px auto;
 		padding:1px;
@@ -21,15 +27,13 @@ body {
 		background:#FFFFFF;
 		}
 #header {
+	    background:url("gsn-mark.png") no-repeat;
 	    background-color:#FFEE00;
-	    padding:2px;
-	    margin:0;
+	    height:80px;
 		}
 #header h1 {
-    	padding:30px 90px;
-    	margin:5px;
-    	height:25px;
-	    background:url("gsn-mark.png") no-repeat;
+    	padding:32px 90px;
+    	margin:0;
     	}
 #header a {
 		text-decoration:none;
@@ -38,7 +42,12 @@ body {
 #nav {
 		background:#FFA84C;
 		padding:5px;
+		font-weight:bold;
 		}
+#nav a {
+		color:#000000;
+		text-decoration:none;
+	}
 #nav ul{
 		margin:0;
 		padding:0;
@@ -94,6 +103,7 @@ body {
 		margin:3px;
 		padding:1px;
 		xdisplay:block;
+		font-size:1em;
 		}
 .vsbox h3 span {
 		margin-bottom:3px;
@@ -127,3 +137,8 @@ body {
 .clear {
 		clear:both;
 }	
+
+.error {
+	font-weight:bold;
+	color:#f00;
+}

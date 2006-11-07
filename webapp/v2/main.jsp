@@ -2,7 +2,7 @@
 <!--//<![CDATA[
 
 $(document).ready(function() {
-	console.debug("javascript main.jsp init");
+	GSN.debug("javascript main.jsp init");
 	$("#refreshall_timeout").bind("change",'GSN.updateall(false)');
 	//$("#refreshall_enable").attr("checked","checked");
 	GSN.updateall(true);
@@ -21,4 +21,4 @@ $(document).ready(function() {
 <option value="0">disable</option> 
 </select>
 </p></form>
-<div id="vs"></div>		
+<div id="vs"><div class="loading">Virtual sensors are currently loading...</div></div>		

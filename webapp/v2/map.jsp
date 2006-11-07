@@ -8,8 +8,11 @@
 var map;
 
 $(document).ready(function() {
-	if (GBrowserIsCompatible()) {
-		console.debug("init gmap");
+	if(typeof GBrowserIsCompatible == "undefined") {
+		$("#map").append($.P({"class":"error"},"Google maps isn't loaded! Maybe your internet connection is not working."));
+	} else if (GBrowserIsCompatible()) {
+		GSN.debug("init gmap");
+       
         map = new GMap2(document.getElementById("map"));
         //some fun
         map.addControl(new GLargeMapControl());
@@ -21,40 +24,30 @@ $(document).ready(function() {
   		GEvent.addListener(map, "click", function(overlay, point) {
 			if(overlay) {	// when a marker is clicked
 				//console.debug(overlay.id);
-				GSN.menu(overlay.id);
+				GSN.menu(overlay.vsname);
 			} else if(point) {	// when the background is clicked
 				map.closeInfoWindow();
 			}
 		});
-		
-		
-						
+				
 		$.ajax({ type: "GET", url: "/gsn", success: function(data){
-		//if ($("rsp",data).attr("stat")!="ok") {
-		//	console.error("Error: " , $("err",data).attr("msg")); 
-		//} else {
-			//var markers = new Array();
 			$("virtual-sensor",data).each(function(){
-				//console.debug($("field[@name=LATITUDE]",$(this)).text());
-				if ($("field[@name=LATITUDE]",$(this)).text() != ""){
 				var lat = $("field[@name=LATITUDE]",$(this)).text();
 				var lon = $("field[@name=LONGITUDE]",$(this)).text();
-				map.setCenter(new GLatLng(lat,lon), 13);
-				var point = new GLatLng(lat,lon);
-				//console.debug(point);
-  				var marker = new GMarker(point);
-  				marker.id = $(this).attr("name");
-				map.addOverlay(marker);
+				if (lat != "" && lon != ""){
+					map.setCenter(new GLatLng(lat,lon), 13);
+					var point = new GLatLng(lat,lon);
+					var marker = new GMarker(point);
+  					marker.vsname = $(this).attr("name");
+					map.addOverlay(marker);
 				}
   			});
-		//}
 		}});
-						
-        
    	}
 });
 
 
 //]]></script>
+<h2>Global Sensor Network Map</h2>
 <div id="map" style="width: 100%; height: 500px;"></div>
 <div id="vs"></div>		

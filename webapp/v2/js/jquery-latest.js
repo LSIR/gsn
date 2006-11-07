@@ -718,7 +718,7 @@ jQuery.extend({
 			return elem[fix[name]];
 		} else if( value == undefined && jQuery.browser.msie && elem.nodeName && elem.nodeName.toUpperCase() == 'FORM' && (name == 'action' || name == 'method') ) {
 			return elem.getAttributeNode(name).nodeValue;
-		} else if ( elem.getAttribute != undefined && elem.tagName ) { // IE elem.getAttribute passes even for style
+		} else if ( /*elem.getAttribute != undefined  &&*/ elem.tagName ) { // IE elem.getAttribute passes even for style
 			if ( value != undefined ) elem.setAttribute( name, value );
 			return elem.getAttribute( name );
 		} else {
