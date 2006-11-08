@@ -122,7 +122,7 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
             <classpath refid="classpath"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-Dorg.mortbay.log.LogFactory.noDiscovery=false"/>
-        	<jvmarg value="-server"/>
+        	<!-- <jvmarg value="-server"/> Sometimes on windows compaines about a missing dll.-->
         	<!-- For profiling using JConsole <jvmarg value="-Dcom.sun.management.jmxremote"/> -->
             <!-- For JDK5 profiling <jvmarg value="-Xrunhprof:heap=sites,depth=15,force=n"/> -->
         </java>

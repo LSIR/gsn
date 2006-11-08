@@ -9,7 +9,7 @@ import gsn.utils.ChangeListener;
 import gsn.utils.LazyTimedHashMap;
 import gsn.vsensor.Container;
 import gsn.wrappers.AbstractStreamProducer;
-import gsn.wrappers.wsn.GSNMessage;
+import gsn.wrappers.tinyos1x.GSNMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,9 +19,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import net.tinyos.message.Message;
-import net.tinyos.message.MessageListener;
-import net.tinyos.message.MoteIF;
+import net.tinyos1x.message.Message;
+import net.tinyos1x.message.MessageListener;
+import net.tinyos1x.message.MoteIF;
 
 import org.apache.log4j.Logger;
 

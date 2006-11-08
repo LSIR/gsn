@@ -9,6 +9,8 @@
     <addressing>
         <predicate key="geographical">Not Specified, please edit the file
             $INSTALL_PATH/virtual-sensors/memoryDataVS.xml</predicate>
+        <predicate key="LATITUDE">37.5419</predicate>
+        <predicate key="LONGITUDE">-122.1419</predicate>
     </addressing>
     <output-structure>
         <field name="HEAP" type="bigint"/>

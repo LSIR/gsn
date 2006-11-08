@@ -18,6 +18,7 @@
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
 	<script type="text/javascript" src="js/jquery-latest.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
+	<script type="text/javascript" src="js/IEconsole.js"></script>
 	<script type="text/javascript" src="js/gsn.js"></script>
 </head>
 <body>

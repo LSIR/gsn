@@ -5,7 +5,7 @@ package gsn.wrappers.ieee1451;
  * class implements a Java interface to the 'TedsMessage' message type.
  */
 
-public class TedsMessage extends net.tinyos.message.Message {
+public class TedsMessage extends net.tinyos1x.message.Message {
    
    /** The default size of this message type in bytes. */
    public static final int DEFAULT_MESSAGE_SIZE = 1;
@@ -63,7 +63,7 @@ public class TedsMessage extends net.tinyos.message.Message {
     * Create a new TedsMessage embedded in the given message at the given base
     * offset.
     */
-   public TedsMessage ( net.tinyos.message.Message msg , int base_offset ) {
+   public TedsMessage ( net.tinyos1x.message.Message msg , int base_offset ) {
       super( msg , base_offset , DEFAULT_MESSAGE_SIZE );
       amTypeSet( AM_TYPE );
    }
@@ -72,7 +72,7 @@ public class TedsMessage extends net.tinyos.message.Message {
     * Create a new TedsMessage embedded in the given message at the given base
     * offset and length.
     */
-   public TedsMessage ( net.tinyos.message.Message msg , int base_offset , int data_length ) {
+   public TedsMessage ( net.tinyos1x.message.Message msg , int base_offset , int data_length ) {
       super( msg , base_offset , data_length );
       amTypeSet( AM_TYPE );
    }

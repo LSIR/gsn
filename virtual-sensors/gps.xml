@@ -17,7 +17,7 @@
 	      <field name="light"       type="int" />
 	      <field name="camera"      type="binary:image/jpeg" />
        </output-structure>
-        <storage history-size="1m"/>
+        <storage history-size="30m"/>
         <input-streams>
           <input-stream name="sensor1">
             <stream-source alias="source1" storage-size="1"  sampling-rate="1" >

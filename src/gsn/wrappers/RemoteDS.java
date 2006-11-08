@@ -48,7 +48,6 @@ public class RemoteDS extends AbstractStreamProducer {
    
    /**
     * @return Null if the RemoteDS can't obtain the data strcture from the
-    * remote VS.¯
     */
    private ArrayList < DataField > askForStrcture ( ) {
       String host = getAddressBeanActiveHostName( );

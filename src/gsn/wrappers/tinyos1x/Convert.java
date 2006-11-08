@@ -1,4 +1,4 @@
-package gsn.wrappers.wsn;
+package gsn.wrappers.tinyos1x;
 
 /**
  * @author ari.saadi

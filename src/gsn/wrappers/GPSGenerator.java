@@ -6,7 +6,6 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
 import gsn.vsensor.Container;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
+
+import org.apache.commons.collections.KeyValue;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 
@@ -50,8 +51,7 @@ public class GPSGenerator extends AbstractStreamProducer {
    }
    
    public boolean initialize ( TreeMap context ) {
-      boolean toReturn = super.initialize( context );
-      if ( toReturn == false ) return false;
+      if ( ! super.initialize( context )) return false;
       setName( "GPSGenerator-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       if ( addressBean.getPredicateValue( "sampling-rate" ) != null ) {

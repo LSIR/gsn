@@ -1,4 +1,4 @@
-package gsn.wrappers.wsn;
+package gsn.wrappers.tinyos1x;
 
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
@@ -15,18 +15,18 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
-import net.tinyos.message.Message;
-import net.tinyos.message.MessageListener;
-import net.tinyos.message.MoteIF;
+import net.tinyos1x.message.Message;
+import net.tinyos1x.message.MessageListener;
+import net.tinyos1x.message.MoteIF;
 
 import org.apache.log4j.Logger;
 
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class TinyOS1Wrapper extends AbstractStreamProducer implements MessageListener {
+public class GenericWrapper extends AbstractStreamProducer implements MessageListener {
    
-   private final transient Logger  logger                = Logger.getLogger( TinyOS1Wrapper.class );
+   private final transient Logger  logger                = Logger.getLogger( GenericWrapper.class );
    
    /**
     * A flag showing whether there exist a new data or not. This flag is used
@@ -79,7 +79,7 @@ public class TinyOS1Wrapper extends AbstractStreamProducer implements MessageLis
          logger.error( e.getMessage( ) , e );
          return false;
       }
-      mote.registerListener( new GSNMessage( ) , this );
+      mote.registerListener(  new GSNMessage( ) , this );
       return true;
    }
    
