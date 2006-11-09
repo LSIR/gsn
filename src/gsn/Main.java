@@ -94,6 +94,7 @@ public final class Main {
       webAppContext.setResourceBase( DEFAULT_WEB_APP_PATH );
       ServletHandler servletHandler = new ServletHandler( );
       servletHandler.addServletWithMapping( "gsn.vsensor.ContainerImpl" , "/gsn" );
+      servletHandler.addServletWithMapping( "gsn.web.DataDownload" , "/data" );
       webAppContext.setServletHandler( servletHandler );
       server.setHandler( webAppContext );
       server.setStopAtShutdown( true );
