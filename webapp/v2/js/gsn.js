@@ -67,14 +67,17 @@ var GSN = {
 			}
 		}
 		,update: function (vs){
+
 			var vsdiv = "vsbox-"+vs.attr("name");
-			//var id = $("#"+vsid+" span.id", where);
+						//var id = $("#"+vsid+" span.id", where);
 			//var status = $("#"+vsid+" span.status", where);
 			
 			var dl = $("#"+vsdiv+" > dl ", $(this.container));
 			$("field",vs).each(function(){ 
 				var name = $(this).attr("name");
 				var value = $(this).text();
+				
+				if (name=="TIMED") return;
 			
 				//create the dt/dd line if it doesn't exist
 				if ($("."+name, dl).size()==0){
@@ -107,6 +110,14 @@ var GSN = {
 					}
 				}
 			});
+			
+			
+			var value = $("field[@name=TIMED]",vs).text();	
+			var date = new Date(parseInt(value));
+			value = date.getFullYear()+"/"+addleadingzero(date.getMonth()+1)+"/"+addleadingzero(date.getDate());
+	        value += "@"+addleadingzero(date.getHours())+":"+addleadingzero(date.getMinutes())+":"+addleadingzero(date.getSeconds());
+	    	dl.empty().append(value);
+			
 		}
 		,remove: function (vsName) {
 			var vsdiv = "vsbox-"+vsName;
@@ -137,3 +148,7 @@ var GSN = {
 	}*/
 };
  
+function addleadingzero(num){
+	var n = String(num);
+	return (n.length == 1 ? "0"+n : n);
+}
