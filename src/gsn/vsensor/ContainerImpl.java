@@ -110,6 +110,12 @@ public class ContainerImpl extends HttpServlet implements Container {
    
    public void doGet ( HttpServletRequest request , HttpServletResponse response ) throws ServletException , IOException {
       response.setContentType( "text/xml" );
+      //to be sure it isn't cached
+      response.setHeader("Expires", "Sat, 6 May 1995 12:00:00 GMT");
+      response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+      response.addHeader("Cache-Control", "post-check=0, pre-check=0");
+      response.setHeader("Pragma", "no-cache");
+      
       String rawRequest = request.getParameter( Container.REQUEST );
       int requestType = -1;
       if ( rawRequest == null || rawRequest.trim( ).length( ) == 0 ) {
