@@ -30,6 +30,28 @@ var GSN = {
 			});
 		}});
 	},
+	data: function(vsName){
+		$("form").empty();
+		$.ajax({
+			type: "GET",
+			url: "/gsn?REQUEST=113&name="+vsName,
+			success: function(msg) {
+				$("form").append("<h3 id=\"vname\">" + $("virtual-sensor", msg).attr("name") + "</h3>");
+				$("form").append("<p id=\"field\">Fields:</p>");
+				$("form").append("<select name=\"fields\" id=\"fields\" multiple size=\"0\"></select>");
+				$("field", $("virtual-sensor", msg)).each(function() {
+					if ($(this).attr("type").substr(0,3) != "bin") {
+						$("select").attr("size", parseInt($("select").attr("size")) + 1);
+						$("select").append("<option value=\""+$(this).attr("name")+"\">"+$(this).attr("name")+"</option>");
+					}
+				});
+				$("form").append("<input type=\"hidden\" name=\"vsName\" value=\""+vsName+"\">");
+				$("form").append("<br><br>Number of items : <input type=\"text\" name=\"nb\" size=\"3\">");
+				$("form").append("<br><br>Delimiter : <input type=\"text\" name=\"delimiter\" size=\"3\">");
+				$("form").append("<br><br><input type=\"submit\" name=\"submit\" value=\"Get datas\">");
+			}
+		});
+	},
 	menu: function (vsName) {
 		GSN.debug("menu:"+vsName);
 		if ($("#map").size()>0){

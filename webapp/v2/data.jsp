@@ -4,5 +4,7 @@ $(document).ready(function() {
 }); 
 //]]>-->
 </script>
-
-<p>not yet</p>
+<div id="datachooser">
+<form action="/data" method="POST">
+</form>
+</div>

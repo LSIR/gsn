@@ -53,9 +53,13 @@
 		<h3> Virtual sensors : </h3>
         <ul><% 
         Iterator<VSensorConfig>  it = Mappings.getAllVSensorConfigs ( );
-        while ( it.hasNext () ) { String vsName = it.next().getVirtualSensorName (); %>
+        while ( it.hasNext () ) { String vsName = it.next().getVirtualSensorName ();
+        	if (requestedpage.equals("data.jsp")) { %>
+         <li><a href="javascript:GSN.data('<%=vsName%>');"><%=vsName%></a></li>
+         <% } else { %>
          <li><a href="javascript:GSN.menu('<%=vsName%>');"><%=vsName%></a></li>
-        <% } %></ul>
+        <% }
+        } %></ul>
 	</div>
 	<div id="footer">
 		<p>Powered by <a href="http://globalsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</p	>
