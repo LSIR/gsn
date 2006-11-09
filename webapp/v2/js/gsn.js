@@ -116,7 +116,7 @@ var GSN = {
 			var date = new Date(parseInt(value));
 			value = date.getFullYear()+"/"+addleadingzero(date.getMonth()+1)+"/"+addleadingzero(date.getDate());
 	        value += "@"+addleadingzero(date.getHours())+":"+addleadingzero(date.getMinutes())+":"+addleadingzero(date.getSeconds());
-	    	dl.empty().append(value);
+	    	//dl.empty().append(value);
 			
 		}
 		,remove: function (vsName) {
