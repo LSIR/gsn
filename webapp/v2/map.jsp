@@ -61,6 +61,7 @@ $(document).ready(function() {
 <option value="1000">1sec</option> 
 <option value="0">disable</option> 
 </select>
+<input id="refreshall_autozoomandcenter" type="checkbox" checked="checked" />auto zoom and center
 </p></form>
 <div id="map" style="width: 100%; height: 500px;"></div>
 <div id="vs"></div>		

@@ -25,8 +25,12 @@ var GSN = {
 					GSN.vsbox.update($(this));
 						
 			});
-			if ($("#map").size()>0){
-				GSN.map.showAllMarkers();
+			if ($("#map").size()>0 && $("#refreshall_autozoomandcenter").attr("checked")){
+				//not following any sensor
+				if ($("#vs").children().size()==0)
+					GSN.map.showAllMarkers();
+				else
+					GSN.map.centerOnMarker($("#vs").children().get(0).id.substr(6));
 			}
 		}});
 	},
@@ -81,7 +85,7 @@ var GSN = {
 		}
 	},
 	debug: function (txt) {
-		if(typeof console != "undefined" && true) {
+		if(typeof console != "undefined" && false) {
 			console.debug(txt);
 		}	
 	},
@@ -101,7 +105,9 @@ var GSN = {
 								      	$.SPAN({"class":"timed"},"")
 									  	//$.A({"class":"freeze","href":"javascript:GSN.freezevs('"+vsdiv+"');"},"freeze")
 									    ),
-									  $.DL({})
+									  $.DL({"class":"dynamic"}),
+									  $.SPAN({},"addressing:"),
+									  $.DL({"class":"static"})
 									  ));
 			}
 		}
@@ -111,12 +117,15 @@ var GSN = {
 						//var id = $("#"+vsid+" span.id", where);
 			//var status = $("#"+vsid+" span.status", where);
 			GSN.debug("U:"+vsdiv);			
-			var dl = $("#"+vsdiv+" > dl ", $(this.container));
+			var dl = $("#"+vsdiv+" > dl.dynamic ", $(this.container));
 			if (dl.size()!=0){
 			  $("field",vs).each(function(){ 
 				var name = $(this).attr("name");
 				var value = $(this).text();
 				
+				if ($(this).attr("type")=="predicate")
+					dl = $("#"+vsdiv+" > dl.static ", $(this.container));
+					
 				if (name=="timed") return;
 			
 				//create the dt/dd line if it doesn't exist
@@ -153,11 +162,13 @@ var GSN = {
 			
 			
 			  var value = $("field[@name=timed]",vs).text();	
-			  var date = new Date(parseInt(value));
-			  value = date.getFullYear()+"/"+addleadingzero(date.getMonth()+1)+"/"+addleadingzero(date.getDate());
-	          value += "@"+addleadingzero(date.getHours())+":"+addleadingzero(date.getMinutes())+":"+addleadingzero(date.getSeconds());
-	    	  if ($("#"+vsdiv+" span.timed", $(this.container)).text() != value) {
-				$("#"+vsdiv+" span.timed", $(this.container)).empty().append(value);
+			  if (value != "") {
+			  	var date = new Date(parseInt(value));
+			  	value = date.getFullYear()+"/"+addleadingzero(date.getMonth()+1)+"/"+addleadingzero(date.getDate());
+	          	value += "@"+addleadingzero(date.getHours())+":"+addleadingzero(date.getMinutes())+":"+addleadingzero(date.getSeconds());
+	    	  	if ($("#"+vsdiv+" span.timed", $(this.container)).text() != value) {
+					$("#"+vsdiv+" span.timed", $(this.container)).empty().append(value);
+			  	}
 			  }
 			}
 			
@@ -173,7 +184,8 @@ var GSN = {
 		}
 		,remove: function (vsName) {
 			var vsdiv = "vsbox-"+vsName;
-			$("#"+vsdiv).id("#"+vsdiv+"-remove").animate({ opacity: 'hide' }, "slow", function(){ $("#"+vsdiv+"-remove").remove(); });
+			$("#"+vsdiv).remove();
+			//$("#"+vsdiv).id("#"+vsdiv+"-remove").animate({ opacity: 'hide' }, "slow", function(){ console.warn("remove: "+"#"+vsdiv+"-remove");$("#"+vsdiv+"-remove").remove(); });
 			
 		}
 	},
