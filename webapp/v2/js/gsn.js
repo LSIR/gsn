@@ -64,7 +64,10 @@ var GSN = {
 				});
 				$("form").append("<input type=\"hidden\" name=\"vsName\" value=\""+vsName+"\">");
 				$("form").append("<br><br>Number of items : <input type=\"text\" name=\"nb\" size=\"3\">");
-				$("form").append("<br><br>Delimiter : <input type=\"text\" name=\"delimiter\" size=\"3\">");
+				$("form").append("<br><br><input type=\"radio\" name=\"delimiter\" value=\"semicolon\" CHECKED> Semicolon (;)");
+				$("form").append("<br><input type=\"radio\" name=\"delimiter\" value=\"tab\"> Tab");
+				$("form").append("<br><input type=\"radio\" name=\"delimiter\" value=\"space\"> Space");
+				$("form").append("<br><input type=\"radio\" name=\"delimiter\" value=\"other\"> Other : <input type=\"text\" name=\"otherdelimiter\" size=\"3\">");
 				$("form").append("<br><br><input type=\"submit\" name=\"submit\" value=\"Get datas\">");
 			}
 		});

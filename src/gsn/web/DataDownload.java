@@ -37,35 +37,44 @@ public class DataDownload extends HttpServlet {
 	
 	public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 	      PrintWriter out = res.getWriter();
-	      if (req.getParameterValues("fields") == null || req.getParameter("vsName") == null 
-	    		|| req.getParameter("delimiter") == null || req.getParameter("nb") == null ) {
-	    	  out.println("Missing request parameter");
+	      if (req.getParameter("vsName")==null || req.getParameter("vsName").equals("")) {
+	    	  res.sendError( Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
 	    	  return;
 	      }
 	      res.setContentType("text/csv");
-	      String[] fields = req.getParameterValues("fields");
 	      String vsName = req.getParameter("vsName");
-	      String delimiter = req.getParameter("delimiter");
-	      if(delimiter.equals("")) {
-	    	  delimiter = ";";
+	      String delimiter = ";";
+	      if (req.getParameter("delimiter") != null && !req.getParameter("delimiter").equals("")) {
+	    	  String reqdelimiter = req.getParameter("delimiter");
+	    	  if (reqdelimiter.equals("tab")) {
+	    		  delimiter = "\t";
+	    	  } else if (reqdelimiter.equals("space")){
+	    		  delimiter = " ";
+	    	  } else if (reqdelimiter.equals("other") && req.getParameter("otherdelimiter") != null && !req.getParameter("otherdelimiter").equals("")) {
+	    		  delimiter = req.getParameter("otherdelimiter");
+	    	  }
 	      }
 	      String request = "";
-	      int nb = new Integer(req.getParameter("nb"));
-	      String limit;
 	      String line="";
-	      if (nb == 0) {
-	    	  limit = "";
-	      } else {
-	    	  limit = "LIMIT " + nb + " ";
+	      if (req.getParameter("fields") != null) {
+	    	  String[] fields = req.getParameterValues("fields");
+		      for (int i=0; i < fields.length; i++) {
+		    	  request += ", " + fields[i];
+		    	  line += delimiter + fields[i];
+		      }    
 	      }
-	      for (int i=0; i < fields.length; i++) {
-	    	  request += ", " + fields[i];
-	    	  line += delimiter + fields[i];
+	      String limit = "";
+	      
+	      if (req.getParameter("nb") != null && req.getParameter("nb") != "") {
+	    	  int nb = new Integer(req.getParameter("nb"));
+	    	  if (nb > 0) {
+	    		  limit = "LIMIT " + nb + "  offset 0";
+	    	  }
 	      }
 	      out.println(line.substring(delimiter.length()));
 	      if (! request.equals("")) {
 	    	  request = request.substring(2);
-	    	  StringBuilder query = new StringBuilder("select "+request+" from " + vsName + " order by TIMED "+limit+" offset 0");
+	    	  StringBuilder query = new StringBuilder("select "+request+" from " + vsName + " order by TIMED DESC "+limit+";");
 	    	  DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , false );
 	          while ( result.hasMoreElements( ) ) {
 	             StreamElement se = result.nextElement( );
