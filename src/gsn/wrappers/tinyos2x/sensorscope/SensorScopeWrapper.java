@@ -33,6 +33,7 @@ public class SensorScopeWrapper extends AbstractStreamProducer implements Messag
     * purposes.
     */
    private static int             threadCounter = 0;
+   
    public boolean initialize ( TreeMap initialContext ) {
       if ( !super.initialize( initialContext )) return false;
       String host = getAddressBeanActiveHostName( );
@@ -93,6 +94,7 @@ class SensorScopeDataMsgWrapper {
    public static final ArrayList < DataField > getStructure ( ) {
       if ( structure == null ) {
          structure = new ArrayList < DataField >( );
+         structure.add( new DataField( "nodeId" , DataTypes.INTEGER_NAME , "Node ID" ) );
          structure.add( new DataField( "sequenceNumber" , DataTypes.INTEGER_NAME , "Sequence Number" ) );
          structure.add( new DataField( "temperature" , DataTypes.DOUBLE_NAME , "Ambient Temperature (°C)" ) );
          structure.add( new DataField( "surfaceTemperature" , DataTypes.DOUBLE_NAME , "Surface Temperature (°C)" ) );
@@ -108,7 +110,7 @@ class SensorScopeDataMsgWrapper {
    }
    
    public StreamElement getStreamElement ( ) {
-      return new StreamElement( getStructure( ) , new Serializable [ ] { getSequenceNumber( ) , getTemperature( ) , getInfrared( ) , getSolarRadiation( ) , getHumidity( ) , getSoilMoisture( ) ,
+      return new StreamElement( getStructure( ) , new Serializable [ ] { getNodeID( ),getSequenceNumber( ) , getTemperature( ) , getInfrared( ) , getSolarRadiation( ) , getHumidity( ) , getSoilMoisture( ) ,
             getWatermark( ) , getRainMeter( ) , getWindSpeed( ) , getWindDirection( ) } , System.currentTimeMillis( ) );
    }
    
@@ -199,6 +201,9 @@ class SensorScopeDataMsgWrapper {
       }
    }
    
+   public int getNodeID ( ) {
+     return msg.get_nodeid( );
+   }
    public double getInfrared ( ) {
       double rawValue = msg.get_infraredtmp( );
       if ( rawValue != 0 ) {

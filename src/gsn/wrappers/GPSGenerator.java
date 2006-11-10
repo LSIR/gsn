@@ -93,10 +93,11 @@ public class GPSGenerator extends AbstractStreamProducer {
       return true;
    }
    
+   private static int step = 1;
    public void run ( ) {
-      double latitude = 37.4419;
-      double longitude = -122.1419;
       while ( isActive( ) ) {
+         double latitude = 37.4419+.01* (step++);
+         double longitude = -122.1419;
          try {
             Thread.sleep( samplingRate );
          } catch ( InterruptedException e ) {

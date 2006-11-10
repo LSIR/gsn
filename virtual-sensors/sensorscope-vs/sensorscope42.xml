@@ -1,0 +1,40 @@
+<virtual-sensor name="SensorScopeNode42" priority="10" >
+    <processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<init-params/>
+	</processing-class>
+        <author>Ali Salehi</author>
+        <email>ali.salehi@epfl.ch</email>
+        <description>A virtual sensor presenting the nodes inside the sensor scope</description>
+        <life-cycle pool-size="10" />
+        <addressing>
+	        	<predicate key="latitude">46.5215</predicate>
+	        	<predicate key="longitude">6.56703</predicate>
+    	  </addressing>
+        <output-structure>
+            <field name="nodeId" type="int"/>
+            <field name="sequenceNumber" type="int"/>
+            <field name="temperature" type="double"/>
+            <field name="surfaceTemperature" type="double"/>
+            <field name="solarRadiation" type="double"/>
+            <field name="relativeHumidity" type="double"/>
+            <field name="soilMoisture" type="double"/>
+            <field name="watermark" type="double"/>
+            <field name="rainMeter" type="double"/>
+            <field name="windSpeed" type="double"/>
+            <field name="windDirection" type="double"/>
+        </output-structure>
+        <storage history-size="1m" />
+        <input-streams>
+           <input-stream name="input1">
+            <stream-source alias="source1" sampling-rate="1" storage-size="1">
+                <address wrapper="sensorscope">
+                    <predicate key="HOST">eflumpc24.epfl.ch</predicate>
+                    <predicate key="PORT">2020</predicate>
+                </address>
+                <query>select * from "WRAPPER" where nodeID = 42 </query>
+            </stream-source>
+            <query>select * from "source1"</query>
+          </input-stream> 
+       </input-streams>
+</virtual-sensor> 

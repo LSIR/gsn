@@ -32,7 +32,7 @@ public class ContainerInfoHandler implements RequestHandler {
          VSensorConfig sensorConfig = vsIterator.next( );
          sb.append( "<virtual-sensor name=\"" ).append( sensorConfig.getVirtualSensorName( ) ).append( "\"" ).append( " last-modified=\"" ).append(
             new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\"" ).append( " >\n" );
-         StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getVirtualSensorName( ) + " order by TIMED limit 1 offset 0" );
+         StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getVirtualSensorName( ) + " order by TIMED DESC limit 1 offset 0" );
          DataEnumerator result = StorageManager.getInstance( ).executeQuery( query , true );
          StreamElement se = null;
          if ( result.hasMoreElements( ) ) se = result.nextElement( );

@@ -42,7 +42,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
          vsFields += " , pk, timed";
       String windowSize = request.getParameter( "window" );
       if ( windowSize == null || windowSize.trim( ).length( ) == 0 ) windowSize = "1";
-      StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by TIMED limit " + windowSize + " offset 0" );
+      StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by TIMED DESC limit " + windowSize + " offset 0" );
       DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , true );
       StringBuilder sb = new StringBuilder("<result>\n");
       while ( result.hasMoreElements( ) ) {

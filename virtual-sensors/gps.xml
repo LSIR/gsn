@@ -24,7 +24,7 @@
                 <address wrapper="gps-test">
                     <predicate key="HOST">192.168.51.13</predicate>
                     <predicate key="PORT">9001</predicate>
-                    <predicate key="TIMEOUT">12000</predicate>
+                    <predicate key="TIMEOUT">1000</predicate>
                     <predicate key="picture">images/coin.jpeg</predicate>
                 </address>
                 <query>select * from "WRAPPER"</query>
