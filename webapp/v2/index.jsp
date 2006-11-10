@@ -44,12 +44,6 @@
 		<p><%=description%></p>
 		<h3>Author : </h3>
 		<p><%=author%> (<%=email%>)</p>
-		<h3>Links : </h3>
-		<ul>
-			<li><a href="registeration.jsp">How to address the sensorIdentity(s)</a></li>
-			<li><a href="structure.jsp">Data structure of indivitual sensorIdentity</a></li>
-			<li><a href="search.jsp">Searching recent observations</a></li>
-		</ul>
 		<h3> Virtual sensors : </h3>
         <ul><% 
         Iterator<VSensorConfig>  it = Mappings.getAllVSensorConfigs ( );

@@ -14,9 +14,9 @@ $(document).ready(function() {
 <select id="refreshall_timeout" >
 <option value="3600000">1hour</option> 
 <option value="600000">10min</option> 
-<option value="60000">1min</option> 
+<option value="60000" selected="selected">1min</option> 
 <option value="30000">30sec</option> 
-<option value="5000" selected="selected">5sec</option> 
+<option value="5000">5sec</option> 
 <option value="1000">1sec</option> 
 <option value="0">disable</option> 
 </select>

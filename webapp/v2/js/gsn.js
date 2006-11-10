@@ -16,17 +16,24 @@ var GSN = {
 		$.ajax({ type: "GET", url: "/gsn", success: function(data){
 			if (firstupdate) $(".loading",$("#vs")).remove();
 			$("virtual-sensor",data).each(function(){
-					if (firstupdate) 
+					if (firstupdate) {
 						GSN.vsbox.add($(this).attr("name"));
+					}
 					GSN.vsbox.update($(this));
+						
 			});
 		}});
 	},
 	addandupdate: function(vsName){
 		$.ajax({ type: "GET", url: "/gsn?name="+vsName, success: function(data){
 			$("virtual-sensor[@name="+vsName+"]",data).each(function(){
-					GSN.vsbox.add($(this).attr("name"));
+					if ($("#vs").children().get(0).id!="vsbox-"+$(this).attr("name")) {
+						GSN.vsbox.remove($(this).attr("name"));
+						GSN.vsbox.add($(this).attr("name"));
+						$("#vs").prepend($("#vsbox-"+$(this).attr("name")));
+					}
 					GSN.vsbox.update($(this));
+					$("#vsbox-"+$(this).attr("name")).animate({ opacity: 'show' },"slow");
 			});
 		}});
 	},
@@ -56,10 +63,12 @@ var GSN = {
 		GSN.debug("menu:"+vsName);
 		if ($("#map").size()>0){
 			//we are in the map context
-			$("#vs").empty();
+			if ($("#vs").children().get(0).id != "vsbox-"+vsName) 
+				$("#vs").empty();
 			GSN.addandupdate(vsName);
 		} else {
 			//we are in the normal context
+			//$("#vs").empty();
 			GSN.addandupdate(vsName);
 		}
 	},
@@ -80,12 +89,12 @@ var GSN = {
 									  $.H3({},$.SPAN({},vsName),
 									  	//$.SPAN({"class":"id"},"0"),
 									  	//$.SPAN({"class":"status"},"live")),
-								      	$.A({"href":"javascript:GSN.vsbox.remove('"+vsName+"');"},"close")
+									  	$.A({"href":"javascript:GSN.vsbox.remove('"+vsName+"');"},"close"),
+								      	$.SPAN({"class":"timed"},"")
 									  	//$.A({"class":"freeze","href":"javascript:GSN.freezevs('"+vsdiv+"');"},"freeze")
 									    ),
 									  $.DL({})
 									  ));
-
 			}
 		}
 		,update: function (vs){
@@ -99,7 +108,7 @@ var GSN = {
 				var name = $(this).attr("name");
 				var value = $(this).text();
 				
-				if (name=="TIMED") return;
+				if (name=="timed") return;
 			
 				//create the dt/dd line if it doesn't exist
 				if ($("."+name, dl).size()==0){
@@ -122,7 +131,7 @@ var GSN = {
 						$("img",$("."+name, dl)).attr("src",value);
 				} else if ($(this).attr("type").indexOf("binary") != -1){
 					if ($("a",$("."+name, dl)).size()==0)
-						$("."+name, dl).empty().append('<a href="'+value+'">download binary</a>');
+						$("."+name, dl).empty().append('<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>');
 					else
 						$("a",$("."+name, dl)).attr("href",value);
 				} else {
@@ -134,16 +143,27 @@ var GSN = {
 			});
 			
 			
-			var value = $("field[@name=TIMED]",vs).text();	
+			var value = $("field[@name=timed]",vs).text();	
 			var date = new Date(parseInt(value));
 			value = date.getFullYear()+"/"+addleadingzero(date.getMonth()+1)+"/"+addleadingzero(date.getDate());
 	        value += "@"+addleadingzero(date.getHours())+":"+addleadingzero(date.getMinutes())+":"+addleadingzero(date.getSeconds());
-	    	//dl.empty().append(value);
+	    	if ($("#"+vsdiv+" span.timed", $(this.container)).text() != value) {
+				$("#"+vsdiv+" span.timed", $(this.container)).empty().append(value);
+			}
 			
+			//when map is enable
+			if ($("#map").size()>0){
+				var lat = $("field[@name=latitude]",vs).text();
+				var lon = $("field[@name=longitude]",vs).text();
+				if (lat != "" && lon != ""){
+					map.setCenter(new GLatLng(lat,lon), 13);
+				}
+			}
 		}
 		,remove: function (vsName) {
 			var vsdiv = "vsbox-"+vsName;
-			$("#"+vsdiv).remove();
+			$("#"+vsdiv).id("#"+vsdiv+"-remove").animate({ opacity: 'hide' }, "slow", function(){ $("#"+vsdiv+"-remove").remove(); });
+			
 		}
 	}
 	/*,changevs: function (vsid,df) {
