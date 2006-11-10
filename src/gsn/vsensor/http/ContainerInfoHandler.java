@@ -22,14 +22,19 @@ public class ContainerInfoHandler implements RequestHandler {
    
    public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
       response.setStatus( HttpServletResponse.SC_OK );
-      Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
       StringBuilder sb = new StringBuilder( "\n<gsn " );
       sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
       sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
       sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
       sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append( "\" >\n" );
+      
+      Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
       while ( vsIterator.hasNext( ) ) {
          VSensorConfig sensorConfig = vsIterator.next( );
+         //return only the requested sensor if specified
+         String reqName = request.getParameter("name");
+         if ( reqName != null && !sensorConfig.getVirtualSensorName().equals(reqName) ) continue;
+         
          sb.append( "<virtual-sensor name=\"" ).append( sensorConfig.getVirtualSensorName( ) ).append( "\"" ).append( " last-modified=\"" ).append(
             new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\"" ).append( " >\n" );
          StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getVirtualSensorName( ) + " order by TIMED DESC limit 1 offset 0" );
