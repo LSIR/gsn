@@ -37,7 +37,7 @@ public class ContainerInfoHandler implements RequestHandler {
          StreamElement se = null;
          if ( result.hasMoreElements( ) ) se = result.nextElement( );
          for ( DataField df : sensorConfig.getOutputStructure( ) ) {
-            sb.append( "<field name=\"" ).append( df.getFieldName( ) ).append( "\" " ).append( "type=\"" ).append( df.getType( ) ).append( "\" " );
+            sb.append( "<field name=\"" ).append( df.getFieldName( ).toLowerCase()).append( "\" " ).append( "type=\"" ).append( df.getType( ) ).append( "\" " );
             if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
                sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
             sb.append( " >" );
@@ -48,9 +48,9 @@ public class ContainerInfoHandler implements RequestHandler {
             sb.append( "</field>" );
          }
          result.close( );
-         sb.append( "<field name=\"TIMED\" type=\"long\" description=\"The timestamp associated with the stream element\" >" ).append( se == null ? "" : se.getTimeStamp( ) ).append( "</field>\n" );
+         sb.append( "<field name=\"timed\" type=\"long\" description=\"The timestamp associated with the stream element\" >" ).append( se == null ? "" : se.getTimeStamp( ) ).append( "</field>\n" );
          for ( KeyValue df : sensorConfig.getAddressing( ) )
-            sb.append( "<field name=\"" ).append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ) ) ).append( "\" type=\"predicate\" >" ).append(
+            sb.append( "<field name=\"" ).append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\" type=\"predicate\" >" ).append(
                StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) ).append( "</field>\n" );
          sb.append( "</virtual-sensor>\n" );
       }
