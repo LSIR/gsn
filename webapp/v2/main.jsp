@@ -1,10 +1,8 @@
 <script type="text/javascript">
 <!--//<![CDATA[
-
 $(document).ready(function() {
-	GSN.debug("javascript main.jsp init");
-	$("#refreshall_timeout").bind("change",'GSN.updateall(false)');
-	//$("#refreshall_enable").attr("checked","checked");
+	GSN.debug("main.jsp init");
+	$("#refreshall_timeout").bind("change",GSN.updateall);
 	GSN.updateall(true);
 });	
 //]]>-->

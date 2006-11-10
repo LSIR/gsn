@@ -29,23 +29,22 @@ $(document).ready(function() {
 			} else if(point) {	// when the background is clicked
 				map.closeInfoWindow();
 			}
-		});
-				
+		});			
+		
+		/*
 		$.ajax({ type: "GET", url: "/gsn", success: function(data){
-			var bounds = new GLatLngBounds();
 			$("virtual-sensor",data).each(function(){
 				var lat = $("field[@name=latitude]",$(this)).text();
 				var lon = $("field[@name=longitude]",$(this)).text();
 				if (lat != "" && lon != ""){
-					var point = new GLatLng(lat,lon);
-					bounds.extend(point);
-					map.setCenter(bounds.getCenter(), map.getBoundsZoomLevel(bounds,map.getSize()));
-					var marker = new GMarker(point);
-  					marker.vsname = $(this).attr("name");
-					map.addOverlay(marker);
+					GSN.map.addMarker($(this).attr("name"),lat,lon);
 				}
   			});
-		}});
+  			GSN.map.showAllMarkers();
+		}});*/
+		
+		$("#refreshall_timeout").bind("change",GSN.updateall);
+		GSN.updateall(true);
    	}
 });
 

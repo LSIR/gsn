@@ -165,3 +165,8 @@ a img { border :0;
 #map {
 	margin-bottom:5px;
 }
+
+.gpsenabled {
+	font-style: italic;
+	font-weight: bold;
+}

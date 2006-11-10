@@ -3,8 +3,11 @@
  */
  
 var GSN = { 
-	updateall: function(){
-		if ($(".loading",$("#vs")).size()!=0)
+	init: function(){
+		
+	}
+	,updateall: function(){
+		if ($(".loading",$("#vs")).size()!=0) 
 			firstupdate = true;
 		else
 			firstupdate = false;
@@ -22,6 +25,9 @@ var GSN = {
 					GSN.vsbox.update($(this));
 						
 			});
+			if ($("#map").size()>0){
+				GSN.map.showAllMarkers();
+			}
 		}});
 	},
 	addandupdate: function(vsName){
@@ -66,14 +72,16 @@ var GSN = {
 			if ($("#vs").children().get(0).id != "vsbox-"+vsName) 
 				$("#vs").empty();
 			GSN.addandupdate(vsName);
+			GSN.map.centerOnMarker(vsName);
 		} else {
 			//we are in the normal context
 			//$("#vs").empty();
 			GSN.addandupdate(vsName);
+
 		}
 	},
 	debug: function (txt) {
-		if(typeof console != "undefined" && false) {
+		if(typeof console != "undefined" && true) {
 			console.debug(txt);
 		}	
 	},
@@ -102,9 +110,10 @@ var GSN = {
 			var vsdiv = "vsbox-"+vs.attr("name");
 						//var id = $("#"+vsid+" span.id", where);
 			//var status = $("#"+vsid+" span.status", where);
-			
+			GSN.debug("U:"+vsdiv);			
 			var dl = $("#"+vsdiv+" > dl ", $(this.container));
-			$("field",vs).each(function(){ 
+			if (dl.size()!=0){
+			  $("field",vs).each(function(){ 
 				var name = $(this).attr("name");
 				var value = $(this).text();
 				
@@ -140,15 +149,16 @@ var GSN = {
 						$("."+name, dl).empty().append(value);
 					}
 				}
-			});
+			  });
 			
 			
-			var value = $("field[@name=timed]",vs).text();	
-			var date = new Date(parseInt(value));
-			value = date.getFullYear()+"/"+addleadingzero(date.getMonth()+1)+"/"+addleadingzero(date.getDate());
-	        value += "@"+addleadingzero(date.getHours())+":"+addleadingzero(date.getMinutes())+":"+addleadingzero(date.getSeconds());
-	    	if ($("#"+vsdiv+" span.timed", $(this.container)).text() != value) {
+			  var value = $("field[@name=timed]",vs).text();	
+			  var date = new Date(parseInt(value));
+			  value = date.getFullYear()+"/"+addleadingzero(date.getMonth()+1)+"/"+addleadingzero(date.getDate());
+	          value += "@"+addleadingzero(date.getHours())+":"+addleadingzero(date.getMinutes())+":"+addleadingzero(date.getSeconds());
+	    	  if ($("#"+vsdiv+" span.timed", $(this.container)).text() != value) {
 				$("#"+vsdiv+" span.timed", $(this.container)).empty().append(value);
+			  }
 			}
 			
 			//when map is enable
@@ -156,8 +166,9 @@ var GSN = {
 				var lat = $("field[@name=latitude]",vs).text();
 				var lon = $("field[@name=longitude]",vs).text();
 				if (lat != "" && lon != ""){
-					map.setCenter(new GLatLng(lat,lon), 13);
-				}
+					GSN.map.updateMarker(vs.attr("name"),lat,lon);
+				} /*else
+					GSN.map.showAllMarkers();*/
 			}
 		}
 		,remove: function (vsName) {
@@ -165,7 +176,49 @@ var GSN = {
 			$("#"+vsdiv).id("#"+vsdiv+"-remove").animate({ opacity: 'hide' }, "slow", function(){ $("#"+vsdiv+"-remove").remove(); });
 			
 		}
-	}
+	},
+	map: {
+		markers : new Array()
+		,addMarker: function(vsName,lat,lon){
+			if (!map.isLoaded())
+				map.setCenter(new GLatLng(lat,lon), 13);
+		
+			var marker = new GMarker(new GLatLng(lat,lon));
+  			marker.vsname = vsName;
+  			GSN.map.markers.push(marker);
+  			map.addOverlay(marker);
+  					
+  			//add gpsenable class
+  			$("#menu-"+vsName).addClass("gpsenabled");
+		}
+		,updateMarker: function(vsName,lat,lon){
+			var updated = false;
+			for (x in GSN.map.markers) {
+				var m = GSN.map.markers[x];
+				if (m.vsname == vsName) {
+					GSN.map.markers[x].setPoint(new GLatLng(lat,lon));	
+					updated = true;
+				}
+			}
+			if (!updated)
+				GSN.map.addMarker(vsName,lat,lon);
+		}
+		,centerOnMarker: function(vsName){
+			for (x in GSN.map.markers) {
+				var m = GSN.map.markers[x];
+				if (m.vsname == vsName) {		
+					map.panTo(GSN.map.markers[x].getPoint());	
+				}
+			}
+		},showAllMarkers: function(){
+			var bounds = new GLatLngBounds();
+			for (x in GSN.map.markers) {
+				bounds.extend(GSN.map.markers[x].getPoint());
+			}
+			map.setZoom(map.getBoundsZoomLevel(bounds,map.getSize()));
+			map.setCenter(bounds.getCenter());
+		}
+	} 
 	/*,changevs: function (vsid,df) {
 		var id = $("#"+vsid+" > h3 > span > span.id");	
 		newid = parseInt(id.text()) + df;

@@ -51,7 +51,7 @@
         	if (requestedpage.equals("data.jsp")) { %>
          <li><a href="javascript:GSN.data('<%=vsName%>');"><%=vsName%></a></li>
          <% } else { %>
-         <li><a href="javascript:GSN.menu('<%=vsName%>');"><%=vsName%></a></li>
+         <li><a href="javascript:GSN.menu('<%=vsName%>');" id="menu-<%=vsName%>"><%=vsName%></a></li>
         <% }
         } %></ul>
 	</div>
