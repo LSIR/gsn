@@ -106,9 +106,14 @@ var GSN = {
 									  	//$.A({"class":"freeze","href":"javascript:GSN.freezevs('"+vsdiv+"');"},"freeze")
 									    ),
 									  $.DL({"class":"dynamic"}),
-									  $.P({},"addressing:"),
-									  $.DL({"class":"static"})
+									  $.P({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','static');"},"addressing")),
+									  $.DL({"class":"static"}),
+									  $.P({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','structure');"},"structure")),
+									  $.DL({"class":"structure"})
 									  ));
+				$("#"+vsdiv+" > dl.static", $(this.container)).hide();
+				$("#"+vsdiv+" > dl.structure", $(this.container)).hide();
+				
 			}
 		}
 		,update: function (vs){
@@ -121,10 +126,20 @@ var GSN = {
 			if (dl.size()!=0){
 			  $("field",vs).each(function(){ 
 				var name = $(this).attr("name");
+				var type = $(this).attr("type");
 				var value = $(this).text();
 				
-				if ($(this).attr("type")=="predicate")
+				if (type=="predicate")
 					dl = $("#"+vsdiv+" > dl.static ", $(this.container));
+				else {
+					//add to structure
+					var struct = $("#"+vsdiv+" > dl.structure ", $(this.container));
+					if ($("."+name, struct).size()==0){
+						//create name:value
+						struct.append($.DT({},name));
+						struct.append($.DD({"class":name},type));
+					}
+				}
 					
 				if (name=="timed") return;
 			
@@ -187,6 +202,10 @@ var GSN = {
 			$("#"+vsdiv).remove();
 			//$("#"+vsdiv).id("#"+vsdiv+"-remove").animate({ opacity: 'hide' }, "slow", function(){ console.warn("remove: "+"#"+vsdiv+"-remove");$("#"+vsdiv+"-remove").remove(); });
 			
+		}
+		,toggle: function (vsName,dl){
+			var vsdiv = "vsbox-"+vsName;
+			$("#"+vsdiv+" > dl."+dl, $(this.container)).toggle();
 		}
 	},
 	map: {
