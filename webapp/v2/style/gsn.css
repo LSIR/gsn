@@ -135,7 +135,7 @@ a img { border :0;
 	font-weight:normal;
 }
 
-.vsbox dl {
+.vsbox p, .vsbox dl {
 	clear:both;
 	padding:3px;
 	margin:0;
@@ -153,6 +153,7 @@ a img { border :0;
 .vsbox dd img {
 	/*height:150px;*/
 }
+
 .clear {
 		clear:both;
 }	

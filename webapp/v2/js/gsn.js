@@ -106,7 +106,7 @@ var GSN = {
 									  	//$.A({"class":"freeze","href":"javascript:GSN.freezevs('"+vsdiv+"');"},"freeze")
 									    ),
 									  $.DL({"class":"dynamic"}),
-									  $.SPAN({},"addressing:"),
+									  $.P({},"addressing:"),
 									  $.DL({"class":"static"})
 									  ));
 			}
