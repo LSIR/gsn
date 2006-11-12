@@ -63,18 +63,34 @@ public class DataDownload extends HttpServlet {
 		    	  line += delimiter + fields[i];
 		      }    
 	      }
-	      String limit = "";
+	      out.println(line.substring(delimiter.length()));
 	      
-	      if (req.getParameter("nb") != null && req.getParameter("nb") != "") {
+	      String limit = "";
+	      	      if (req.getParameter("nb") != null && req.getParameter("nb") != "") {
 	    	  int nb = new Integer(req.getParameter("nb"));
 	    	  if (nb > 0) {
 	    		  limit = "LIMIT " + nb + "  offset 0";
 	    	  }
 	      }
-	      out.println(line.substring(delimiter.length()));
+	      String where = "";
+	      if (req.getParameter("critfield") != null) {
+	    	  String[] critfields = req.getParameterValues("critfield");
+	    	  String[] critop = req.getParameterValues("critop");
+	    	  String[] critval = req.getParameterValues("critval");
+	    	  for (int i=0; i < critfields.length ; i++) {
+	    		  if (critop[i].equals("LIKE")) {
+	    			  where += " AND " + critfields[i] + " LIKE '%" + critval[i] + "%'";
+	    		  } else {
+	    			  where += " AND " + critfields[i] + " " + critop[i] + " " + critval[i];
+	    		  }
+	    	  }
+	    	  where = where.substring(4);
+	    	  where = " WHERE " + where;
+	      }
+	      	      
 	      if (! request.equals("")) {
 	    	  request = request.substring(2);
-	    	  StringBuilder query = new StringBuilder("select "+request+" from " + vsName + " order by TIMED DESC "+limit+";");
+	    	  StringBuilder query = new StringBuilder("select "+request+" from " + vsName + where + " order by TIMED DESC "+limit+";");
 	    	  DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , false );
 	          while ( result.hasMoreElements( ) ) {
 	             StreamElement se = result.nextElement( );

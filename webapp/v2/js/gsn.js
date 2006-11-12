@@ -2,6 +2,9 @@
  * gsn javascript
  */
  
+var fields = new Array();
+var nb_crit = 0;
+ 
 var GSN = { 
 	init: function(){
 		
@@ -53,6 +56,7 @@ var GSN = {
 			type: "GET",
 			url: "/gsn?REQUEST=113&name="+vsName,
 			success: function(msg) {
+				fields = new Array();
 				$("form").append("<h3 id=\"vname\">" + $("virtual-sensor", msg).attr("name") + "</h3>");
 				$("form").append("<p id=\"field\">Fields:</p>");
 				$("form").append("<select name=\"fields\" id=\"fields\" multiple size=\"0\"></select>");
@@ -60,10 +64,12 @@ var GSN = {
 					if ($(this).attr("type").substr(0,3) != "bin") {
 						$("select").attr("size", parseInt($("select").attr("size")) + 1);
 						$("select").append("<option value=\""+$(this).attr("name")+"\">"+$(this).attr("name")+"</option>");
+						fields.push($(this).attr("name"));
 					}
 				});
 				$("form").append("<input type=\"hidden\" name=\"vsName\" value=\""+vsName+"\">");
 				$("form").append("<br><br>Number of items : <input type=\"text\" name=\"nb\" size=\"3\">");
+				$("form").append("<br><br><a href=\"javascript:GSN.add_criterium()\" id=\"morecrit\">+ Criteria</a>");
 				$("form").append("<br><br><input type=\"radio\" name=\"delimiter\" value=\"semicolon\" CHECKED> Semicolon (;)");
 				$("form").append("<br><input type=\"radio\" name=\"delimiter\" value=\"tab\"> Tab");
 				$("form").append("<br><input type=\"radio\" name=\"delimiter\" value=\"space\"> Space");
@@ -71,6 +77,32 @@ var GSN = {
 				$("form").append("<br><br><input type=\"submit\" name=\"submit\" value=\"Get datas\">");
 			}
 		});
+	},
+	add_criterium: function() {
+		nb_crit++;
+		newcrit = "<text id=\"where" + nb_crit + "\"> Where : </text><select name=\"critfield\" id=\"critfield" + nb_crit + "\" size=\"1\">";
+		for (var i=0; i< fields.length; i++) {
+			newcrit += "<option value=\"" + fields[i] + "\">" + fields[i] + "</option>";
+		}
+		newcrit += "</select> ";
+		var operators = new Array("&gt;", "&ge;", "&lt;", "&le;", "=", "LIKE");
+		newcrit += "<select name=\"critop\" size=\"1\" id=\"critop" + nb_crit + "\">";
+		for (i=0; i < operators.length; i++) {
+			newcrit += "<option value=\"" + operators[i] + "\" >" + operators[i] + "</option>";
+		}
+		newcrit += "</select> ";
+		newcrit += "<input type=\"text\" name=\"critval\" id=\"critval" + nb_crit + "\" size=\"10\">";
+		newcrit += "<a href=\"javascript:GSN.remove_crit("+nb_crit+")\" id=\"remove" + nb_crit + "\"> (remove)</a>";
+		newcrit += "<br id=\"br" + nb_crit + "\">";
+		$("#morecrit").before(newcrit);
+	},
+	remove_crit: function(critnb) {
+		$("#where"+critnb).remove();
+		$("#critfield"+critnb).remove();
+		$("#critop"+critnb).remove();
+		$("#critval"+critnb).remove();
+		$("#remove"+critnb).remove();
+		$("#br"+critnb).remove();
 	},
 	menu: function (vsName) {
 		GSN.debug("menu:"+vsName);
