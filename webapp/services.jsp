@@ -1,10 +1,6 @@
 <%@ page import="gsn.storage.*,gsn.notifications.*,gsn.web.*,gsn.vsensor.*,gsn.*,java.util.*" %>
 <html>
-	<header>
-	<title>Global Sensor Networks (GSN) Web Interface</title>
-	</header>
 	<body >
-<jsp:include page="header.html"/>
 <%  final String task = request.getParameter ( "task" );
     final Container container = Mappings.getContainer ( ) ;
 	if ( task != null &&task.trim ( ).equalsIgnoreCase ( "remove" ) ) { // REMOVE ACTION
@@ -287,4 +283,5 @@
 
 </td>
 </tr>
-<jsp:include page="footer.html"/>
+</body>
+</html>
