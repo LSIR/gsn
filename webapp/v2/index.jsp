@@ -40,7 +40,7 @@
 		<jsp:include flush="true" page='<%=requestedpage%>' />
 	</div>
 	<div id="sidebar">
-		<h3>Desctiption : </h3>
+		<h3>Description : </h3>
 		<p><%=description%></p>
 		<h3>Author : </h3>
 		<p><%=author%> (<%=email%>)</p>
