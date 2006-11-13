@@ -193,8 +193,8 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
       try {
          if ( status == ADD_ACTION ) tedsResult = tedsToVirtualSensor.GenerateVS( teds );
          if ( status == REMOVE_ACTION ) tedsResult = tedsToVirtualSensor.getTedsToVSResult( teds );
-         StreamElement streamElement = new StreamElement( OUTPUT_FIELD_NAMES , OUTPUT_FIELD_TYPES , new Serializable [ ] { tedsResult.tedsID ,
-               new StringBuilder( ).append( "</center>" ).append( tedsResult.tedsHtmlString ).append( "<center>" ).toString( ) , status , tedsResult.fileName } , System.currentTimeMillis( ) );
+         StreamElement streamElement = new StreamElement( OUTPUT_FIELD_NAMES , OUTPUT_FIELD_TYPES , new Serializable [ ] { tedsResult.tedsID ,tedsResult.tedsHtmlString 
+              , status , tedsResult.fileName } , System.currentTimeMillis( ) );
          postStreamElement( streamElement );
          isConsumed = true;
       } catch ( RuntimeException e1 ) {

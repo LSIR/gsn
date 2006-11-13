@@ -25,43 +25,51 @@ import org.apache.log4j.Logger;
 
 public class CameraIdentifier extends AbstractStreamProducer {
    
-   private ArrayList < String >           camIPs              = new ArrayList < String >( );
+   /**
+    * 
+    */
+   private static final Object [ ][ ] Channel1 = { { MeasAttr.NAME , "PICTURE" } , { MeasAttr.DESCRIPTION , "Camera Picture" } , { MeasAttr.DATA_TYPE , "binary:image/jpeg" } , { MeasAttr.METADATA_ID , "Channel 1" } };
+
+   private ArrayList < String >                            camIPs                = new ArrayList < String >( );
    
-   private ArrayList < Object [ ][ ][ ] > camTEDS             = new ArrayList < Object [ ][ ][ ] >( );
+   private ArrayList < Object [ ][ ][ ] >                  camTEDS               = new ArrayList < Object [ ][ ][ ] >( );
    
-   private ArrayList < String >           activeCams          = new ArrayList < String >( );
+   private ArrayList < String >                            activeCams            = new ArrayList < String >( );
    
-   private int                            RATE                = 15000;
+   private int                                             RATE                  = 15000;
    
-   private TedsToVSResult                 tedsResult;
+   private TedsToVSResult                                  tedsResult;
    
-   private final Logger                   logger              = Logger.getLogger( CameraIdentifier.class );
+   private final Logger                                    logger                = Logger.getLogger( CameraIdentifier.class );
    
-   private int                            threadCounter       = 0;
+   private int                                             threadCounter         = 0;
    
-   private String                         status              = NONE_ACTION;
+   private String                                          status                = NONE_ACTION;
    
-   private TedsToVirtualSensor            tedsToVirtualSensor;
+   private TedsToVirtualSensor                             tedsToVirtualSensor;
    
-   private static final String            NONE_ACTION         = "none";
+   private static final String                             NONE_ACTION           = "none";
    
-   private static final String            ADD_ACTION          = "added";
+   private static final String                             ADD_ACTION            = "added";
    
-   private static final String            REMOVE_ACTION       = "removed";
+   private static final String                             REMOVE_ACTION         = "removed";
    
-   private static final String            ID_OUTPUT_FIELD     = "ID";
+   private static final String                             ID_OUTPUT_FIELD       = "ID";
    
-   private static final String            TEDS_OUTPUT_FIELD   = "TEDS";
+   private static final String                             TEDS_OUTPUT_FIELD     = "TEDS";
    
-   private static final String            STATUS_OUTPUT_FIELD = "STATUS";
+   private static final String                             STATUS_OUTPUT_FIELD   = "STATUS";
    
-   private static final String            VSFILE_OUTPUT_FIELD = "VSFILE";
+   private static final String                             VSFILE_OUTPUT_FIELD   = "VSFILE";
    
-   private static final String [ ]        OUTPUT_FIELD_NAMES  = new String [ ] { ID_OUTPUT_FIELD , TEDS_OUTPUT_FIELD , STATUS_OUTPUT_FIELD , VSFILE_OUTPUT_FIELD };
+   private static final String [ ]                         OUTPUT_FIELD_NAMES    = new String [ ] { ID_OUTPUT_FIELD , TEDS_OUTPUT_FIELD , STATUS_OUTPUT_FIELD , VSFILE_OUTPUT_FIELD };
    
-   private static final Integer [ ]       OUTPUT_FIELD_TYPES  = new Integer [ ] { DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR };
+   private static final Integer [ ]                        OUTPUT_FIELD_TYPES    = new Integer [ ] { DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR };
+   
+   private static final transient Collection < DataField > cachedOutputStructure = new ArrayList < DataField >( );
    
    public boolean initialize ( TreeMap context ) {
+      
       if ( !super.initialize( context ) ) return false;
       cachedOutputStructure.add( new DataField( ID_OUTPUT_FIELD , "VARCHAR(20)" , "Id of the detected transducer" ) );
       cachedOutputStructure.add( new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) );
@@ -69,8 +77,10 @@ public class CameraIdentifier extends AbstractStreamProducer {
       cachedOutputStructure.add( new DataField( VSFILE_OUTPUT_FIELD , "VARCHAR(40)" , "Virtual Sensor Filename" ) );
       String pingCommand = "ping ";
       String pingCommandParams = null;
-      if ( System.getProperty( "os.name" ).equals( "Mac OS X" ) ) pingCommandParams = " -c1 -t1 ";
-      else if ( System.getProperty( "os.name" ).toLowerCase( ).indexOf( "linux" ) > 0 ) pingCommandParams = " -c1 -w1 ";
+      if ( System.getProperty( "os.name" ).equals( "Mac OS X" ) )
+         pingCommandParams = " -c1 -t1 ";
+      else if ( System.getProperty( "os.name" ).toLowerCase( ).indexOf( "linux" ) > 0 )
+         pingCommandParams = " -c1 -w1 ";
       else
          logger.error( "Not defined for your OS" );
       camIPs.add( 0 , pingCommand + pingCommandParams + "192.168.51.30" );
@@ -78,7 +88,8 @@ public class CameraIdentifier extends AbstractStreamProducer {
       camIPs.add( 2 , pingCommand + pingCommandParams + "192.168.51.32" );
       camIPs.add( 3 , pingCommand + pingCommandParams + "192.168.51.33" );
       camIPs.add( 4 , pingCommand + pingCommandParams + "192.168.51.34" );
-      // camIPs.add(5, pingCommand + pingCommandParams + "192.168.51.35");
+      camIPs.add( 5 , pingCommand + pingCommandParams + "192.168.51.35" );
+      
       camTEDS.add( 0 , tedsCam1 );
       camTEDS.add( 1 , tedsCam2 );
       camTEDS.add( 2 , tedsCam3 );
@@ -182,8 +193,8 @@ public class CameraIdentifier extends AbstractStreamProducer {
       try {
          if ( status == ADD_ACTION ) tedsResult = tedsToVirtualSensor.GenerateVS( teds );
          if ( status == REMOVE_ACTION ) tedsResult = tedsToVirtualSensor.getTedsToVSResult( teds );
-         StreamElement streamElement = new StreamElement( OUTPUT_FIELD_NAMES , OUTPUT_FIELD_TYPES , new Serializable [ ] { tedsResult.tedsID , "</center>" + tedsResult.tedsHtmlString + "<center>" ,
-               status , tedsResult.fileName } , System.currentTimeMillis( ) );
+         StreamElement streamElement = new StreamElement( OUTPUT_FIELD_NAMES , OUTPUT_FIELD_TYPES ,
+            new Serializable [ ] { tedsResult.tedsID , tedsResult.tedsHtmlString , status , tedsResult.fileName } , System.currentTimeMillis( ) );
          postStreamElement( streamElement );
       } catch ( RuntimeException e1 ) {
          // TODO Auto-generated catch block
@@ -197,8 +208,6 @@ public class CameraIdentifier extends AbstractStreamProducer {
       }
    }
    
-   private static final transient Collection < DataField > cachedOutputStructure = new ArrayList < DataField >( );
-   
    public Collection < DataField > getOutputFormat ( ) {
       return cachedOutputStructure;
    }
@@ -207,46 +216,46 @@ public class CameraIdentifier extends AbstractStreamProducer {
       super.finalize( context );
       threadCounter--;
    }
-   
+     
    private Object tedsCam1[][][] = {
                                  // chan0 - meta data about the TIM itself
-         { { MeasAttr.NAME , "CameraF" } , { MeasAttr.DESCRIPTION , "WirelessCamera" } , { MeasAttr.LOCATION , "INM 035" } , { MeasAttr.IP , "192.168.51.30" } , { MeasAttr.NUMBER_OF_CHANNELS , "1" } ,
+         { { MeasAttr.NAME , "CameraF" } , { MeasAttr.DESCRIPTION , "Axis 206w Wireless Camera" } , { MeasAttr.LOCATION , "INM 035" } , { MeasAttr.IP , "192.168.51.30" } , { MeasAttr.NUMBER_OF_CHANNELS , "1" } ,
          { MeasAttr.MANUFACTURER , "GSN-LSIR-LAB" } , { MeasAttr.METADATA_ID , "Channel 0" } } ,
          // chan1
-         { { MeasAttr.NAME , "CameraImage" } , { MeasAttr.DESCRIPTION , "Camera Picture" } , { MeasAttr.DATA_TYPE , "binary:JPEG" } , { MeasAttr.METADATA_ID , "Channel 1" } } , };
+         Channel1 , };
    
    private Object tedsCam2[][][] = {
                                  // chan0 - meta data about the TIM itself
-         { { MeasAttr.NAME , "CameraE" } , { MeasAttr.DESCRIPTION , "WirelessCamera" } , { MeasAttr.LOCATION , "INM 035" } , { MeasAttr.IP , "192.168.51.31" } , { MeasAttr.NUMBER_OF_CHANNELS , "1" } ,
+         { { MeasAttr.NAME , "CameraE" } , { MeasAttr.DESCRIPTION , "Axis 206w Wireless Camera" } , { MeasAttr.LOCATION , "INM 035" } , { MeasAttr.IP , "192.168.51.31" } , { MeasAttr.NUMBER_OF_CHANNELS , "1" } ,
          { MeasAttr.MANUFACTURER , "GSN-LSIR-LAB" } , { MeasAttr.METADATA_ID , "Channel 0" } } ,
          // chan1
-         { { MeasAttr.NAME , "IMAGE" } , { MeasAttr.DESCRIPTION , "Camera Picture" } , { MeasAttr.DATA_TYPE , "binary:JPEG" } , { MeasAttr.METADATA_ID , "Channel 1" } } , };
+         Channel1 , };
    
    private Object tedsCam3[][][] = {
                                  // chan0 - meta data about the TIM itself
-         { { MeasAttr.NAME , "CameraD" } , { MeasAttr.DESCRIPTION , "WirelessCamera" } , { MeasAttr.IP , "192.168.51.32" } , { MeasAttr.LOCATION , "INM 035" } , { MeasAttr.NUMBER_OF_CHANNELS , "1" } ,
+         { { MeasAttr.NAME , "CameraD" } , { MeasAttr.DESCRIPTION , "Axis 206w Wireless Camera"} , { MeasAttr.IP , "192.168.51.32" } , { MeasAttr.LOCATION , "INM 035" } , { MeasAttr.NUMBER_OF_CHANNELS , "1" } ,
          { MeasAttr.MANUFACTURER , "GSN-LSIR-LAB" } , { MeasAttr.METADATA_ID , "Channel 0" } } ,
          // chan1
-         { { MeasAttr.NAME , "IMAGE" } , { MeasAttr.DESCRIPTION , "Camera Picture" } , { MeasAttr.DATA_TYPE , "binary:JPEG" } , { MeasAttr.METADATA_ID , "Channel 1" } } , };
+         Channel1 , };
    
    private Object tedsCam4[][][] = {
                                  // chan0 - meta data about the TIM itself
-         { { MeasAttr.NAME , "CameraC" } , { MeasAttr.DESCRIPTION , "WirelessCamera:192.168.51.33" } , { MeasAttr.IP , "192.168.51.33" } , { MeasAttr.LOCATION , "INM 035" } ,
+         { { MeasAttr.NAME , "CameraC" } , { MeasAttr.DESCRIPTION , "Axis 206w Wireless Camera" } , { MeasAttr.IP , "192.168.51.33" } , { MeasAttr.LOCATION , "INM 035" } ,
          { MeasAttr.NUMBER_OF_CHANNELS , "1" } , { MeasAttr.MANUFACTURER , "GSN-LSIR-LAB" } , { MeasAttr.METADATA_ID , "Channel 0" } } ,
          // chan1
-         { { MeasAttr.NAME , "IMAGE" } , { MeasAttr.DESCRIPTION , "Camera Picture" } , { MeasAttr.DATA_TYPE , "binary:JPEG" } , { MeasAttr.METADATA_ID , "Channel 1" } } , };
+         Channel1 , };
    
    private Object tedsCam5[][][] = {
                                  // chan0 - meta data about the TIM itself
-         { { MeasAttr.NAME , "CameraB" } , { MeasAttr.DESCRIPTION , "WirelessCamera:192.168.51.34" } , { MeasAttr.IP , "192.168.51.34" } , { MeasAttr.LOCATION , "INM 035" } ,
+         { { MeasAttr.NAME , "CameraB" } , { MeasAttr.DESCRIPTION , "Axis 206w Wireless Camera" } , { MeasAttr.IP , "192.168.51.34" } , { MeasAttr.LOCATION , "INM 035" } ,
          { MeasAttr.NUMBER_OF_CHANNELS , "1" } , { MeasAttr.MANUFACTURER , "GSN-LSIR-LAB" } , { MeasAttr.METADATA_ID , "Channel 0" } } ,
          // chan1
-         { { MeasAttr.NAME , "IMAGE" } , { MeasAttr.DESCRIPTION , "Camera Picture" } , { MeasAttr.DATA_TYPE , "binary:JPEG" } , { MeasAttr.METADATA_ID , "Channel 1" } } , };
+         Channel1 , };
    
    private Object tedsCam6[][][] = {
                                  // chan0 - meta data about the TIM itself
-         { { MeasAttr.NAME , "CameraA" } , { MeasAttr.DESCRIPTION , "WirelessCamera:192.168.51.35" } , { MeasAttr.IP , "192.168.51.35" } , { MeasAttr.LOCATION , "INM 035" } ,
+         { { MeasAttr.NAME , "CameraA" } , { MeasAttr.DESCRIPTION , "Axis 206w Wireless Camera" } , { MeasAttr.IP , "192.168.51.35" } , { MeasAttr.LOCATION , "INM 035" } ,
          { MeasAttr.NUMBER_OF_CHANNELS , "1" } , { MeasAttr.MANUFACTURER , "GSN-LSIR-LAB" } , { MeasAttr.METADATA_ID , "Channel 0" } } ,
          // chan1
-         { { MeasAttr.NAME , "IMAGE" } , { MeasAttr.DESCRIPTION , "Camera Picture" } , { MeasAttr.DATA_TYPE , "binary:JPEG" } , { MeasAttr.METADATA_ID , "Channel 1" } } , };
+         Channel1 , };
 }

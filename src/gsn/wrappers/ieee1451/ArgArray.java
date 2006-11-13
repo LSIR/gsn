@@ -1285,15 +1285,7 @@ public class ArgArray {
          Object blah = e.nextElement( );
          String k = ( String ) blah;
          Object o = c.get( k );
-         
-         buf.append( "\n " );
-         
-         if ( o.getClass( ) == Measurement.class ) buf.append( "<DL><DT><b>" );
-         else
-            buf.append( "<li>" );
-         
-         buf.append( k );
-         buf.append( " : " );
+         buf.append( k ).append(" : " );
          if ( o.getClass( ).isArray( ) ) {
             if ( o instanceof int [ ] ) {
                int [ ] ia = ( int [ ] ) o;
@@ -1337,19 +1329,13 @@ public class ArgArray {
          } else {
             buf.append( o.getClass( ).getName( ) );
             if ( o.getClass( ) == Measurement.class ) {
-               buf.append( "</b>" );
-               buf.append( " : <DD>" );
                buf.append( ( ( Measurement ) o ).toHtmlString( ) );
-               buf.append( "</DL>" );
             } else {
                buf.append( " : " );
                buf.append( o.toString( ) );
-               buf.append( "</li>" );
-               
             }
          }
       }
-      buf.append( "\n" );
       return buf.toString( );
    }
    

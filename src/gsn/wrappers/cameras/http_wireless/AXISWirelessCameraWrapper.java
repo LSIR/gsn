@@ -42,15 +42,9 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
    
    private final transient Logger   logger             = Logger.getLogger( AXISWirelessCameraWrapper.class );
    
-   private Socket                   socket;
-   
-   private PrintWriter              outputStream;
-   
-   private BufferedInputStream      inputStream;
-   
    private String                   host;
    
-   PostMethod                       postMethod;
+   private PostMethod                       postMethod;
    
    private AddressBean              addressBean;
    
@@ -58,7 +52,7 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
    
    private int                      rate;
    
-   private int                      remotePort;
+   private transient final ArrayList < DataField > dataField = new ArrayList < DataField >( );
    
    /**
     * From XML file it needs the followings :
@@ -74,7 +68,7 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
       this.addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       host = this.addressBean.getPredicateValue( "host" );
       inputRate = this.addressBean.getPredicateValue( "rate" );
-      remotePort = Integer.parseInt( this.addressBean.getPredicateValue( "port" ) );
+      int remotePort = Integer.parseInt( this.addressBean.getPredicateValue( "port" ) );
       if ( inputRate == null || inputRate.trim( ).length( ) == 0 ) rate = DEFAULT_RATE;
       else
          rate = Integer.parseInt( inputRate );
@@ -86,7 +80,7 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
       postMethod.addParameter( "clock" , "1" );
       postMethod.addParameter( "date" , "1" );
       if ( logger.isDebugEnabled( ) ) logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
-      dataField.add( new DataField( "PICTURE" , "BINARY:JPEG" , "JPEG image from the temote network camera." ) );
+      dataField.add( new DataField( "picture" , "binary:image/jpeg" , "JPEG image from the remote networked camera." ) );
       return true;
    }
    
@@ -114,8 +108,6 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
       super.finalize( context );
       threadCounter--;
    }
-   
-   private transient static final ArrayList < DataField > dataField = new ArrayList < DataField >( );
    
    public Collection < DataField > getOutputFormat ( ) {
       return dataField;

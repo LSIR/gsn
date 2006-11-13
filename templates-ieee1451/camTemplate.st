@@ -24,7 +24,7 @@
                <predicate key="TotalFields">$CH0:{c|$c.NumberOfChannels$}$</predicate>
     		$FIELD:{f| <predicate key="field.$f.key$">$f.name$ | $f.type$ | $f.description$ | get_gsnHeader_$f.name$</predicate>}; separator="\n"$
    		    </address>
-            <query>select "DATA" as "$FIELD:{f|$f.name$}$" ,"TIMED" from "WRAPPER"</query>
+            <query>select "$FIELD:{f|$f.name$}$" ,"TIMED" from "WRAPPER"</query>
 			 </stream-source>
          <query>select * from "cam"</query>
        </input-stream>
