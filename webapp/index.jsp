@@ -29,7 +29,6 @@
 	<div id="nav">
 		<ul>
 			<li><a href=".">home</a></li>
-			<li><a href="?p=reg">registeration</a></li>
 			<li><a href="?p=data">data</a></li>
 			<li><a href="?p=map">map</a></li>
 			<!-- <li><a href="fullmap.jsp">fullmap</a></li> -->
