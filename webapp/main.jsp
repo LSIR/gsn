@@ -3,7 +3,7 @@
 $(document).ready(function() {
 	GSN.debug("main.jsp init");
 	$("#refreshall_timeout").bind("change",GSN.updateall);
-	GSN.updateall(true);
+	GSN.updateall();
 });	
 //]]>-->
 </script>
@@ -19,4 +19,7 @@ $(document).ready(function() {
 <option value="0">disable</option> 
 </select>
 </p></form>
-<div id="vs"><div class="loading">Virtual sensors are currently loading...</div></div>		
+<div id="vs">
+<div class="intro">Click right...</div>
+<div class="loading">Virtual sensors are currently loading...</div>
+</div>		
