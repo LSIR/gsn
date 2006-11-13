@@ -26,11 +26,11 @@
 	<div id="header">
 		<a href="."><h1><%=name%> :: GSN</h1></a>
 	</div>
-	<div id="nav">
+	<div id="navigation">
 		<ul>
-			<li><a href=".">home</a></li>
-			<li><a href="?p=data">data</a></li>
-			<li><a href="?p=map">map</a></li>
+			<li<%if (requestedpage.equals("main.jsp")){ %> class="selected"<%}%>><a href=".">home</a></li>
+			<li<%if (requestedpage.equals("data.jsp")){ %> class="selected"<%}%>><a href="?p=data">data</a></li>
+			<li<%if (requestedpage.equals("map.jsp")){ %> class="selected"<%}%>><a href="?p=map">map</a></li>
 			<!-- <li><a href="fullmap.jsp">fullmap</a></li> -->
 		</ul>
 	</div>

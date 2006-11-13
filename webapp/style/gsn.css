@@ -21,10 +21,13 @@ h2 {
 	margin:1em 0;
 	}
 
-a {
+a	{
+	color: #666666;
+	font-weight:bold;
 	text-decoration:none;
+	background-color:inherit;
 	}
-			
+a:hover{color: #000000 /*#2a5a8a*/; text-decoration:none; background-color:inherit;}
 a img { border :0;
 		vertical-align: middle;
 	  }
@@ -38,7 +41,9 @@ a img { border :0;
 #header {
 	    background:url("gsn-mark.png") no-repeat;
 	    background-color:#FFEE00;
-	    height:80px;
+	    xheight:80px;
+	    margin:0;
+	    padding:0;
 		}
 #header h1 {
     	padding:32px 90px;
@@ -48,25 +53,53 @@ a img { border :0;
 		text-decoration:none;
 		color:#000000;
 		}
-#nav {
-		background:#FFA84C;
-		padding:5px;
-		font-weight:bold;
-		}
-#nav a {
-		color:#000000;
-		text-decoration:none;
-	}
-#nav ul{
+#navigation{
+height:2.2em;
+line-height:2.2em;
+margin:0;
+padding:0;
+background:#ffa84c;
+color:#9e9e9e;
+}
+
+#navigation ul{
 		margin:0;
 		padding:0;
-		list-style:none;
-		}
-#nav li{
-		display:inline;
-		margin:0;
-		padding:0;
-		}
+}
+
+#navigation li{
+float:left;
+list-style-type:none;
+border-right:1px solid #ffffff;
+white-space:nowrap;
+}
+
+#navigation li a{
+display:block;
+padding:0 10px;
+font-size:0.8em;
+font-weight:strong;
+text-transform:uppercase;
+text-decoration:none;
+background-color:inherit;
+color: #000000;
+}
+
+* html #navigation a {width:1%;}
+
+#navigation .selected{
+background:#ffffff;
+color:#000000;
+text-decoration:none;
+}
+#navigation a:hover{
+/*background:#80b0da;*/
+/*color:#ffffff;*/
+background:#FFEE00; /*#ff6f00;*/
+color:#000000;
+text-decoration:none;
+}
+
 #main {
 		xbackground:#9c9;
 		float:left;
@@ -99,7 +132,6 @@ a img { border :0;
 		text-align:center;
  }
 
-
 /* specific style */
 .vsbox {
 		clear:both;
@@ -109,27 +141,15 @@ a img { border :0;
 		background:#FFA84C;
 		}
 .vsbox h3 {
-		margin:3px;
-		padding:1px;
-		xdisplay:block;
+		margin:0;
+		padding:10px;
+		xdisplay:inline-block;
 		font-size:1em;
 		}
-.vsbox h3 span {
-		margin-bottom:3px;
-		float:left;
-		}
-.vsbox h3 span.id,.vsbox h3 span.status {
-		font-size:0.7em;
-		float:none;
-		display:none;
-		}
-.vsbox h3 a {
-		float:right;
-		color:#000000;
-		margin:0 2px;
-		}		
+.vsbox h3 span {float:left;}
+.vsbox h3 span.id,.vsbox h3 span.status {display:none;}
+.vsbox h3 a {float:right;}		
 .vsbox h3 span.timed {
-	xfloat:right;
 	margin-left:5px;
 	font-size:0.8em;
 	font-weight:normal;
@@ -145,9 +165,13 @@ a img { border :0;
 	clear:both;
 	float:left;
 	font-weight:bold;
+	padding:0;
+	margin:0;
 	padding-right:5px;
 }
 .vsbox dd {
+	padding:0;
+	margin:0;
 	xfloat:left;
 }
 .vsbox dd img {
