@@ -38,7 +38,7 @@ a img { border :0;
 		width:750px;
 		background:#FFFFFF;
 		}
-#header {
+#header, #headerfm {
 	    background:url("gsn-mark.png") no-repeat;
 	    background-color:#FFEE00;
 	    xheight:80px;
@@ -49,7 +49,13 @@ a img { border :0;
     	padding:32px 90px;
     	margin:0;
     	}
-#header a {
+#headerfm h1 {
+		margin:0;
+		padding:10px;
+		text-align:right;
+		font-size:1.7em;
+}
+#header a,#headerfm a {
 		text-decoration:none;
 		color:#000000;
 		}
@@ -178,6 +184,9 @@ text-decoration:none;
 	/*height:150px;*/
 }
 
+.vsbox .static, .vsbox .structure {
+	display:none;
+}
 .clear {
 		clear:both;
 }	
@@ -195,3 +204,9 @@ text-decoration:none;
 	font-style: italic;
 	font-weight: bold;
 }
+
+.refreshing {
+	xdisplay:none;
+}
+
+v\:* { behavior:url(#default#VML); }

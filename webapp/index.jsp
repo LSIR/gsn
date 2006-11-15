@@ -24,14 +24,14 @@
 
 <div id="container">
 	<div id="header">
-		<a href="."><h1><%=name%> :: GSN</h1></a>
+		<h1><a href="."><%=name%> :: GSN</a></h1>
 	</div>
 	<div id="navigation">
 		<ul>
 			<li<%if (requestedpage.equals("main.jsp")){ %> class="selected"<%}%>><a href=".">home</a></li>
 			<li<%if (requestedpage.equals("data.jsp")){ %> class="selected"<%}%>><a href="?p=data">data</a></li>
 			<li<%if (requestedpage.equals("map.jsp")){ %> class="selected"<%}%>><a href="?p=map">map</a></li>
-			<!-- <li><a href="fullmap.jsp">fullmap</a></li> -->
+			<li><a href="fullmap.jsp">fullmap</a></li>
 		</ul>
 	</div>
 	<div id="main">
