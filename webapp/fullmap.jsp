@@ -52,7 +52,7 @@ $(document).ready(function() {
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
 
 <h2>Global Sensor Network</h2>
-<form><p>refresh every msec : 
+<!-- <form><p>refresh every msec : 
 <select id="refreshall_timeout" >
 <option value="3600000">1hour</option> 
 <option value="600000">10min</option> 
@@ -65,7 +65,7 @@ $(document).ready(function() {
 <input id="refreshall" type="button" value="refresh" /><br />
 <input id="refreshall_autozoomandcenter" type="checkbox" checked="checked" />auto zoom and center
 <input id="closeall" type="button" value="close all" />
-</p></form>
+</p></form> -->
 <div id="vs" style="overflow: auto;width:100%;height:50%	">
 <div class="loading">Virtual sensors are currently loading...</div>
 </div>		

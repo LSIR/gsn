@@ -140,11 +140,15 @@ var GSN = {
 									  	$.A({"href":"javascript:GSN.vsbox.remove('"+vsName+"');"},"close"),
 								      	$.SPAN({"class":"timed"},"loading...")
 									  	//$.A({"class":"freeze","href":"javascript:GSN.freezevs('"+vsdiv+"');"},"freeze")
-									    ),
+									    ),$.UL({"class":"tabnav"},
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','dynamic');","class":"tabdynamic"},"dynamic")),
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','static');","class":"tabstatic"},"addressing")),
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','structure');","class":"tabstructure"},"structure"))
+									      ),
 									  $.DL({"class":"dynamic"}),
-									  $.P({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','static');"},"addressing")),
+									  //$.P({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','static');"},"addressing")),
 									  $.DL({"class":"static"}),
-									  $.P({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','structure');"},"structure")),
+									  //$.P({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','structure');"},"structure")),
 									  $.DL({"class":"structure"})
 									  ));
 				//$("#"+vsdiv+" > dl.static", $(this.container)).hide();
@@ -152,6 +156,7 @@ var GSN = {
 				
 			}
 			$("#"+vsdiv).hide();
+			GSN.vsbox.toggle(vsName,'dynamic');
 		}
 		,update: function (vs){
 			//when map is enable
@@ -245,8 +250,10 @@ var GSN = {
 		}
 		,toggle: function (vsName,dl){
 			var vsdiv = "vsbox-"+vsName;
-			//$("#"+vsdiv+" > dl", $(this.container)).hide();
-			$("#"+vsdiv+" > dl."+dl, $(this.container)).toggle();
+			$("#"+vsdiv+" > dl", $(this.container)).hide();
+			$("#"+vsdiv+" > dl."+dl, $(this.container)).show();
+			$("#"+vsdiv+" a", $(this.container)).removeClass("active");
+			$("#"+vsdiv+" a.tab"+dl, $(this.container)).addClass("active");
 		}
 	},
 	map: {
