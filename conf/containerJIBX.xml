@@ -1,16 +1,20 @@
 <binding>
-	<mapping name="sensor-server" class="gsn.beans.ContainerConfig" >
-		<value name="name" field="webName" usage="optional" />  
-		<value name="author" field="webAuthor" usage="optional"/>
-		<value name="email" field="webEmail" usage="optional"/>
-		<value name="description" field="webDescription" usage="optional" />  
-		<value name="port" field="containerPort" />  
+	<mapping name="sensor-server"
+		class="gsn.gui.beans.GSNConfiguratorBean">
+		<value name="name" field="webName" usage="optional" />
+		<value name="author" field="webAuthor" usage="optional" />
+		<value name="email" field="webEmail" usage="optional" />
+		<value name="description" field="webDescription"
+			usage="optional" />
+		<value name="port" field="containerPort" />
 		<structure name="storage">
 			<value name="driver" field="jdbcDriver" style="attribute" />
 			<value name="user" field="jdbcUsername" style="attribute" />
-			<value name="password" field="jdbcPassword" style="attribute" />
+			<value name="password" field="jdbcPassword"
+				style="attribute" />
 			<value name="url" field="jdbcURL" style="attribute" />
 		</structure>
-		<value name="directory-address" field="registryBootstrapAddr" />  
+		<value name="directory-address" field="registryBootstrapAddr" />
 	</mapping>
+
 </binding>

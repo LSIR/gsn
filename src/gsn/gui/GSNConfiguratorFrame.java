@@ -184,8 +184,7 @@ public class GSNConfiguratorFrame extends JFrame {
 
 	}
 
-	public static void main(String[] args) throws FileNotFoundException,
-	JiBXException {
+	public static void main(String[] args)  {
 		ValidityTools.checkAccessibilityOfFiles(Main.DEFAULT_GSN_CONF_FILE,
 				Main.DEFAULT_GSN_LOG4J_PROPERTIES,
 		"conf/log4j.directory.properties");
@@ -199,9 +198,19 @@ public class GSNConfiguratorFrame extends JFrame {
 		} catch (UnsupportedLookAndFeelException e1) {
 			e1.printStackTrace();
 		}
+		
+		try {
 		new GSNConfiguratorFrame(Main.DEFAULT_GSN_CONF_FILE,
 				Main.DEFAULT_GSN_LOG4J_PROPERTIES,
 		"conf/log4j.directory.properties");
+		} catch(FileNotFoundException exception) {
+			System.out.println("Configuration file could not be found ! Stopping now (Error message: " + exception.getMessage());
+			exception.getStackTrace();
+		} catch(JiBXException exception) {
+			System.out.println("GSN Configurator encountered an error. Please report it to the gsn team at http://globalsn.sourceforge.net. Error message was: " + exception.getMessage());
+			exception.getStackTrace();
+			
+		}
 	}
 
 	/*
