@@ -1,7 +1,7 @@
 package gsn.gui;
 
 import gsn.Main;
-import gsn.gui.beans.GSNConfiguratorBean;
+import gsn.beans.ContainerConfig;
 import gsn.gui.forms.GSNConfiguratorPanel;
 import gsn.utils.ValidityTools;
 
@@ -96,7 +96,7 @@ public class GSNConfiguratorFrame extends JFrame {
 	public GSNConfiguratorFrame(String containerConfigXML, String gsnLog4j,
 			String dirLog4j) throws FileNotFoundException, JiBXException {
 		super("GSN Middleware GUI");
-		GSNConfiguratorBean bean = GSNConfiguratorBean
+      ContainerConfig bean = ContainerConfig
 		.getConfigurationFromFile(containerConfigXML, gsnLog4j,
 				dirLog4j);
 		configuratorPanel = new GSNConfiguratorPanel(bean);

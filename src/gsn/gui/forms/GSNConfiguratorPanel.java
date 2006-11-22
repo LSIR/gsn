@@ -1,7 +1,7 @@
 package gsn.gui.forms;
 
+import gsn.beans.ContainerConfig;
 import gsn.gui.AntRunner;
-import gsn.gui.beans.GSNConfiguratorBean;
 import gsn.pid.PIDUtils;
 import gsn.utils.ValidityTools;
 
@@ -41,7 +41,7 @@ public class GSNConfiguratorPanel {
     private static final int LOCK_FILE_POLLING_INTERVAL = 500; // in
                                                                 // milliseconds
 
-    private GSNConfiguratorBean bean;
+    private ContainerConfig bean;
 
     private JPanel panel;
 
@@ -78,13 +78,13 @@ public class GSNConfiguratorPanel {
 
     private StatusMonitor statusMonitor;
 
-    public GSNConfiguratorPanel(GSNConfiguratorBean bean) {
+    public GSNConfiguratorPanel(ContainerConfig bean) {
 	if (bean == null)
 	    throw new NullPointerException("The input bean shoudn't be null.");
 	this.bean = bean;
 	beanPresentationModel = new PresentationModel(bean);
 	directoryHostAddress = beanPresentationModel
-		.getModel(GSNConfiguratorBean.FIELD_NAME_registryBootstrapAddr);
+		.getModel(ContainerConfig.FIELD_NAME_registryBootstrapAddr);
 	initGUI();
 	initEvents();
 	statusMonitor = new StatusMonitor();
@@ -488,34 +488,34 @@ public class GSNConfiguratorPanel {
 
 	combo = BasicComponentFactory
 		.createComboBox(new SelectionInList(
-			GSNConfiguratorBean.JDBC_SYSTEMS,
+         ContainerConfig.JDBC_SYSTEMS,
 			beanPresentationModel
-				.getModel(GSNConfiguratorBean.FIELD_NAME_databaseSystem)));
+				.getModel(ContainerConfig.FIELD_NAME_databaseSystem)));
 	combo
 		.setToolTipText("GSN needs a database to store information. It is safe to use the default. Use MySQL on a separate server for high performance.");
 	panelBuilder.append("Storage", combo);
 
 	JTextField textfield;
 	textfield = BasicComponentFactory.createTextField(beanPresentationModel
-		.getModel(GSNConfiguratorBean.FIELD_NAME_jdbcUsername));
+		.getModel(ContainerConfig.FIELD_NAME_jdbcUsername));
 	textfield
 		.setToolTipText("The database user name that gsn should use to store its data.");
 	panelBuilder.append("User", textfield);
 
 	textfield = BasicComponentFactory.createTextField(beanPresentationModel
-		.getModel(GSNConfiguratorBean.FIELD_NAME_jdbcURL));
+		.getModel(ContainerConfig.FIELD_NAME_jdbcURL));
 	textfield
 		.setToolTipText("Enter here a JDBC URL to help gsn find the server.");
 	panelBuilder.append("URL", textfield);
 
 	textfield = BasicComponentFactory.createTextField(beanPresentationModel
-		.getModel(GSNConfiguratorBean.FIELD_NAME_jdbcPassword));
+		.getModel(ContainerConfig.FIELD_NAME_jdbcPassword));
 	textfield.setToolTipText("The password of the database user to use.");
 	panelBuilder.append("Password", textfield);
 	panelBuilder.appendSeparator("Execution");
 	panelBuilder.append("Directory Server",
 		networkInterface = new JComboBox(
-			GSNConfiguratorBean.NETWORK_ADDRESSES));
+         ContainerConfig.NETWORK_ADDRESSES));
 	networkInterface.setEditable(true);
 	networkInterface
 		.setToolTipText("Choose here on which IP address should the directory server be running if you intend to run one locally. You can also enter a remote gsn directory server address.");
@@ -530,7 +530,7 @@ public class GSNConfiguratorPanel {
 			"GSN Server Port",
 			textfield = BasicComponentFactory
 				.createIntegerField(beanPresentationModel
-					.getModel(GSNConfiguratorBean.FIELD_NAME_gsnPortNo)));
+					.getModel(ContainerConfig.FIELD_NAME_gsnPortNo)));
 	textfield
 		.setToolTipText("You can change here the port on which your GSN server should run.\n Use this if the port is already in use. Otherwise the default is safe.");
 	panelBuilder
@@ -542,9 +542,9 @@ public class GSNConfiguratorPanel {
 			"GSN Log Level",
 			combo = BasicComponentFactory
 				.createComboBox(new SelectionInList(
-					GSNConfiguratorBean.LOGGING_LEVELS,
+               ContainerConfig.LOGGING_LEVELS,
 					beanPresentationModel
-						.getModel(GSNConfiguratorBean.FIELD_NAME_gsnLoggingLevel))));
+						.getModel(ContainerConfig.FIELD_NAME_gsnLoggingLevel))));
 	combo
 		.setToolTipText("Choose the level of verbosity for GSN log output. Use DEBUG or INFO to troubleshoot, and WARN for normal operation.");
 	panelBuilder
@@ -553,7 +553,7 @@ public class GSNConfiguratorPanel {
 			textfield = BasicComponentFactory
 				.createIntegerField(
 					beanPresentationModel
-						.getModel(GSNConfiguratorBean.FIELD_NAME_maxGSNLogSizeInMB),
+						.getModel(ContainerConfig.FIELD_NAME_maxGSNLogSizeInMB),
 					1));
 	textfield
 		.setToolTipText("Set here the maximum allowed size of GSN log file.");
@@ -562,9 +562,9 @@ public class GSNConfiguratorPanel {
 			"Directory Log Level",
 			combo = BasicComponentFactory
 				.createComboBox(new SelectionInList(
-					GSNConfiguratorBean.LOGGING_LEVELS,
+               ContainerConfig.LOGGING_LEVELS,
 					beanPresentationModel
-						.getModel(GSNConfiguratorBean.FIELD_NAME_directoryLoggingLevel))));
+						.getModel(ContainerConfig.FIELD_NAME_directoryLoggingLevel))));
 	combo
 		.setToolTipText("Choose the level of verbosity for GSN Directory service log output. Use DEBUG or INFO to troubleshoot, and WARN for normal operation.");
 	panelBuilder
@@ -573,7 +573,7 @@ public class GSNConfiguratorPanel {
 			textfield = BasicComponentFactory
 				.createIntegerField(
 					beanPresentationModel
-						.getModel(GSNConfiguratorBean.FIELD_NAME_maxDirectoryLogSizeInMB),
+						.getModel(ContainerConfig.FIELD_NAME_maxDirectoryLogSizeInMB),
 					1));
 	textfield
 		.setToolTipText("Set here the maximum allowed size of GSN Directory log file.");
@@ -589,17 +589,17 @@ public class GSNConfiguratorPanel {
 	panelBuilder.appendSeparator("Web Interface Details");
 
 	textfield = BasicComponentFactory.createTextField(beanPresentationModel
-		.getModel(GSNConfiguratorBean.FIELD_NAME_webName));
+		.getModel(ContainerConfig.FIELD_NAME_webName));
 	textfield.setToolTipText("Please choose a name for your server.");
 	panelBuilder.append("Server Name", textfield);
 
 	textfield = BasicComponentFactory.createTextField(beanPresentationModel
-		.getModel(GSNConfiguratorBean.FIELD_NAME_webAuthor));
+		.getModel(ContainerConfig.FIELD_NAME_webAuthor));
 	textfield.setToolTipText("You can enter your name here.");
 	panelBuilder.append("Author", textfield);
 
 	textfield = BasicComponentFactory.createTextField(beanPresentationModel
-		.getModel(GSNConfiguratorBean.FIELD_NAME_webEmail));
+		.getModel(ContainerConfig.FIELD_NAME_webEmail));
 	textfield.setToolTipText("Enter your email address.");
 	panelBuilder.append("Email", textfield);
 	return panelBuilder.getPanel();

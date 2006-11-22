@@ -1,6 +1,6 @@
 <binding>
 	<mapping name="sensor-server"
-		class="gsn.gui.beans.GSNConfiguratorBean">
+		class="gsn.beans.ContainerConfig">
 		<value name="name" field="webName" usage="optional" />
 		<value name="author" field="webAuthor" usage="optional" />
 		<value name="email" field="webEmail" usage="optional" />
