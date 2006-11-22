@@ -112,7 +112,6 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
    
    // -----------------------------------START----------------------------------------
    public boolean initialize ( TreeMap initialContext ) {
-      if ( !super.initialize( initialContext ) ) return false;
       setName( "WebCamWrapper-Thread:" + ( ++threadCounter ) );
       dataField.add( new DataField( PICTURE_KEY , "binary:jpeg" , "The pictures observerd from the webcam." ) );
       AddressBean addressBean = ( AddressBean ) initialContext.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
@@ -305,7 +304,7 @@ public class WebCamWrapper extends AbstractStreamProducer implements ControllerL
       reading = new ImageWrapper( getImage( ) );
       BufferedImage bi;
       long lastPicture = 0;
-      while ( isAlive( ) ) {
+      while ( isActive( ) ) {
          reading.setImage( getImage( ) );
          graphics2D.drawImage( reading.getImage( ) , 0 , 0 , null );
          if ( listeners.isEmpty( ) ) continue;

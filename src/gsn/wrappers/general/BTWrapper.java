@@ -1,21 +1,11 @@
 package gsn.wrappers.general;
 
-import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
-import gnu.io.UnsupportedCommOperationException;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.vsensor.Container;
 import gsn.wrappers.AbstractStreamProducer;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,16 +13,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.TooManyListenersException;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-
 import de.avetana.bluetooth.connection.BadURLFormat;
 import de.avetana.bluetooth.connection.JSR82URL;
 import de.avetana.bluetooth.rfcomm.RFCommConnectionImpl;
-
-import javax.bluetooth.*;
 
 /**
  * This class connects to a bluetooth URL and tries to open a serial port
@@ -65,9 +50,9 @@ public class BTWrapper extends AbstractStreamProducer {
    /*
     * Needs the following information from XML file : url: the bluetooth
     * url to get access to the device.
+    * TODO : cleaning the parameter readings, e.g., what if the btURL is missing ?!!!
     */
    public boolean initialize ( TreeMap context ) {
-      if ( !super.initialize( context ) ) return false;
       setName( "WNetSerialWrapper-Thread" + ( ++threadCounter ) );
       addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       btUrl = addressBean.getPredicateValue( "url" );

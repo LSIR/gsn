@@ -58,8 +58,6 @@ public class WSNSWrapper extends AbstractStreamProducer implements DataListener 
    private int                      step_counter               = STEP_COUNTER_DEFAULT_VALUE;
    
    public boolean initialize ( TreeMap context ) {
-      boolean toReturn = super.initialize( context );
-      if ( !toReturn ) return false;
       setName( "WirelessSensorNetworkSimulatorWrapper-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       /**

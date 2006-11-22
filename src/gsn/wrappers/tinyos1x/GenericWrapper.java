@@ -49,10 +49,27 @@ public class GenericWrapper extends AbstractStreamProducer implements MessageLis
    private ArrayList < String >    getterMethodNames     = new ArrayList < String >( );
    
    public boolean initialize ( TreeMap initialContext ) {
-      if ( !super.initialize( initialContext ) ) return false;
-      String host = getAddressBeanActiveHostName( );
-      int port = getAddressBeanActivePort( );
       AddressBean addressBean = ( AddressBean ) initialContext.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      String host = addressBean.getPredicateValue( "host" );
+      int port =-1;
+      if (host ==null || host.trim( ).length( )==0) {
+         logger.warn( "The >host< parameter is missing from the RemoteDS wrapper." );
+         return false;
+      }
+      String portRaw = addressBean.getPredicateValue( "port" );
+      if (portRaw ==null || portRaw.trim( ).length( )==0) {
+         logger.warn( "The >port< parameter is missing from the RemoteDS wrapper." );
+         return false;
+      }
+      try {
+         port= Integer.parseInt( portRaw );
+         if (port>65000 || port<=0)
+            throw new Exception("Bad port No"+port);
+      }catch (Exception e) {
+         logger.warn( "The >port< parameter is not a valid integer for the RemoteDS wrapper." );
+         return false;
+      }
+     
       int indexCounter = 1;
       logger.warn( "configuring the SerialForwader Wrapper using the fields described in the virtual sensor file : " );
       while ( true ) {

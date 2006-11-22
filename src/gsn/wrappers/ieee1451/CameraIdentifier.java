@@ -69,8 +69,6 @@ public class CameraIdentifier extends AbstractStreamProducer {
    private static final transient Collection < DataField > cachedOutputStructure = new ArrayList < DataField >( );
    
    public boolean initialize ( TreeMap context ) {
-      
-      if ( !super.initialize( context ) ) return false;
       cachedOutputStructure.add( new DataField( ID_OUTPUT_FIELD , "VARCHAR(20)" , "Id of the detected transducer" ) );
       cachedOutputStructure.add( new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) );
       cachedOutputStructure.add( new DataField( STATUS_OUTPUT_FIELD , "VARCHAR(20)" , "status:added or removed" ) );

@@ -51,7 +51,6 @@ public class GPSGenerator extends AbstractStreamProducer {
    }
    
    public boolean initialize ( TreeMap context ) {
-      if ( ! super.initialize( context )) return false;
       setName( "GPSGenerator-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       if ( addressBean.getPredicateValue( "sampling-rate" ) != null ) {

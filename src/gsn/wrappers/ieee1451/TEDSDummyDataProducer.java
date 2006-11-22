@@ -50,7 +50,6 @@ public class TEDSDummyDataProducer extends AbstractStreamProducer {
    boolean                             rateBased     = false;
    
    public boolean initialize ( TreeMap context ) {
-      if ( !super.initialize( context ) ) return false;
       setName( "TEDSDummyRandomDataProducer-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       /**

@@ -2,18 +2,17 @@ package gsn.wrappers;
 
 import gsn.Main;
 import gsn.Mappings;
+import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.shared.Registry;
 import gsn.utils.TCPConnPool;
 import gsn.vsensor.Container;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
-
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.log4j.Logger;
 
@@ -30,8 +29,29 @@ public class RemoteDS extends AbstractStreamProducer {
    
    private ArrayList < StringBuffer > registeredWhereClauses = new ArrayList < StringBuffer >( );
    
+   private String                     host;
+   
+   private int                        port;
+   
    public boolean initialize ( TreeMap initialContext ) {
-      boolean result = super.initialize( initialContext );
+      AddressBean addressBean = ( AddressBean ) initialContext.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      host = addressBean.getPredicateValue( "host" );
+      if ( host == null || host.trim( ).length( ) == 0 ) {
+         logger.warn( "The >host< parameter is missing from the RemoteDS wrapper." );
+         return false;
+      }
+      String portRaw = addressBean.getPredicateValue( "port" );
+      if ( portRaw == null || portRaw.trim( ).length( ) == 0 ) {
+         logger.warn( "The >port< parameter is missing from the RemoteDS wrapper." );
+         return false;
+      }
+      try {
+         port = Integer.parseInt( portRaw );
+         if ( port > 65000 || port <= 0 ) throw new Exception( "Bad port No" + port );
+      } catch ( Exception e ) {
+         logger.warn( "The >port< parameter is not a valid integer for the RemoteDS wrapper." );
+         return false;
+      }
       this.remoteVSName = ( String ) initialContext.get( Registry.VS_NAME );
       if ( this.remoteVSName == null ) {
          logger.warn( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
@@ -43,16 +63,16 @@ public class RemoteDS extends AbstractStreamProducer {
          return false;
       }
       Mappings.getContainer( ).addRemoteStreamSource( getDBAlias( ) , this );
-      return result;
+      return true;
    }
    
    /**
     * @return Null if the RemoteDS can't obtain the data strcture from the
     */
    private ArrayList < DataField > askForStrcture ( ) {
-      String host = getAddressBeanActiveHostName( );
+      
       if ( host.indexOf( "http://" ) < 0 ) host = "http://" + host;
-      String destination = new StringBuilder( ).append( host ).append( ":" ).append( getAddressBeanActivePort( ) ).append( "/gsn" ).toString( );
+      String destination = new StringBuilder( ).append( host ).append( ":" ).append( port ).append( "/gsn" ).toString( );
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Wants to ask for structure from : " ).append( destination ).toString( ) );
       PostMethod postMethod = new PostMethod( destination );
       postMethod.setRequestHeader( Container.REQUEST , Integer.toString( Container.REQUEST_OUTPUT_FORMAT ) );
@@ -99,12 +119,12 @@ public class RemoteDS extends AbstractStreamProducer {
     */
    private void refreshRemotelyRegisteredQuery ( ) {
       String notificationCode = getDBAlias( );
-      String host = getAddressBeanActiveHostName( );
       String query = new StringBuffer( "SELECT * FROM " ).append( remoteVSName ).append( " WHERE " ).append( getWhereClausesAllTogher( ) ).append( " ORDER BY " ).append( remoteVSName ).append(
          ".TIMED DESC LIMIT 1 OFFSET 0" ).toString( ).replace( "\"" , "" );
       if ( host.indexOf( "http://" ) < 0 ) host = "http://" + host;
-      String destination = host + ":" + getAddressBeanActivePort( ) + "/gsn";
-      if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Wants to send message to : " ).append( destination ).append( "  for DEREGISTERING the previous query" ).toString( ) );
+      String destination = host + ":" + port + "/gsn";
+      if ( logger.isDebugEnabled( ) )
+         logger.debug( new StringBuilder( ).append( "Wants to send message to : " ).append( destination ).append( "  for DEREGISTERING the previous query" ).toString( ) );
       PostMethod postMethod = new PostMethod( destination );
       postMethod.addRequestHeader( Container.REQUEST , Integer.toString( Container.DEREGISTER_PACKET ) );
       postMethod.addRequestHeader( Registry.VS_PORT , Integer.toString( Main.getContainerConfig( ).getContainerPort( ) ) );
@@ -117,8 +137,8 @@ public class RemoteDS extends AbstractStreamProducer {
          logger.warn( "Message couldn't be sent to :" + postMethod.getHostConfiguration( ).getHostURL( ) );
       }
       
-      if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Wants to send message to : " ).append( destination ).append( " with the query ->" ).append( query ).append( "<-" )
-            .toString( ) );
+      if ( logger.isDebugEnabled( ) )
+         logger.debug( new StringBuilder( ).append( "Wants to send message to : " ).append( destination ).append( " with the query ->" ).append( query ).append( "<-" ).toString( ) );
       postMethod.setRequestHeader( Container.REQUEST , Integer.toString( Container.REGISTER_PACKET ) );
       
       statusCode = TCPConnPool.executeMethod( postMethod );
@@ -152,8 +172,8 @@ public class RemoteDS extends AbstractStreamProducer {
          DataListener dataListener = iterator.next( );
          boolean results = getStorageManager( ).isThereAnyResult( dataListener.getViewQuery( ) );
          if ( results ) {
-            if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "There are listeners, notify the " ).append( dataListener.getInputStream( ).getInputStreamName( ) ).append(
-               " inputStream" ).toString( ) );
+            if ( logger.isDebugEnabled( ) )
+               logger.debug( new StringBuilder( ).append( "There are listeners, notify the " ).append( dataListener.getInputStream( ).getInputStreamName( ) ).append( " inputStream" ).toString( ) );
             // TODO :DECIDE WHETHER TO INFORM THE CLIENT OR NOT (TIME
             // TRIGGERED. DATA TRIGGERED)
             dataListener.dataAvailable( );

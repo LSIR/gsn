@@ -43,8 +43,6 @@ public class MemoryMonitoringWrapper extends AbstractStreamProducer {
    private static final MemoryMXBean mbean                                 = ManagementFactory.getMemoryMXBean( );
    
    public boolean initialize ( TreeMap context ) {
-      boolean toReturn = super.initialize( context );
-      if ( toReturn == false ) return false;
       setName( "MemoryMonitoringWrapper-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       if ( addressBean.getPredicateValue( "sampling-rate" ) != null ) {

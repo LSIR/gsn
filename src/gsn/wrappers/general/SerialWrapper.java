@@ -11,6 +11,8 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.shared.Registry;
+import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.Container;
 import gsn.wrappers.AbstractStreamProducer;
 import java.io.IOException;
@@ -64,7 +66,6 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
     * the serial port (/dev/ttyS0...)
     */
    public boolean initialize ( TreeMap context ) {
-      if ( !super.initialize( context ) ) return false;
       setName( "SerialWrapper-Thread" + ( ++threadCounter ) );
       addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       serialPort = addressBean.getPredicateValue( "serialport" );
@@ -304,5 +305,16 @@ public class SerialWrapper extends AbstractStreamProducer implements SerialPortE
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : " ).append( inputBuffer ).toString( ) );
       StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
       postStreamElement( streamElement );
+   }
+   public static void main ( String [ ] args ) {
+      TreeMap < String , Object > context = new TreeMap < String , Object >( new CaseInsensitiveComparator( ) );
+      AddressBean addressBean = new AddressBean();
+      addressBean.addPredicate( "serialPort" , "/dev/ttyUSB0" );
+      context.put( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN , addressBean );
+      context.put( Registry.VS_HOST ,"Localhost");
+      context.put( Registry.VS_PORT  ,"22001");
+      SerialWrapper serialWrapper = new SerialWrapper();
+      serialWrapper.initialize( context );
+      
    }
 }

@@ -64,7 +64,6 @@ public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
     * </ul>
     */
    public boolean initialize ( TreeMap context ) {
-      super.initialize( context );
       this.addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       host = this.addressBean.getPredicateValue( "host" );
       inputRate = this.addressBean.getPredicateValue( "rate" );

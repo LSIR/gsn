@@ -42,8 +42,6 @@ public class SystemTime extends AbstractStreamProducer implements ActionListener
    private Timer                         timer;
    
    public boolean initialize ( TreeMap context ) {
-      boolean toReturn = super.initialize( context );
-      if ( toReturn == false ) return false;
       setName( "DummyDataProducer-Thread" + ( ++threadCounter ) );
       return true;
    }

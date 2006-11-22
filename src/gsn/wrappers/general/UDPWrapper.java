@@ -48,7 +48,6 @@ public class UDPWrapper extends AbstractStreamProducer {
     * should be listening to rate : time to sleep between each packet
     */
    public boolean initialize ( TreeMap context ) {
-      if ( !super.initialize( context ) ) return false;
       addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
       try {
          port = Integer.parseInt( addressBean.getPredicateValue( "port" ) );

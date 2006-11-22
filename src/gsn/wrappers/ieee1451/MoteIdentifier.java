@@ -83,7 +83,6 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
    private File                     templateFolder;
    
    public boolean initialize ( TreeMap context ) {
-      if ( !super.initialize( context ) ) return false;
       // mica related
       micaTEDS.add( 0 , "MicaONE.xml" );
       micaTEDS.add( 1 , "MicaTWO.xml" );
@@ -129,8 +128,6 @@ public class MoteIdentifier extends AbstractStreamProducer implements MessageLis
       lazyActiveMicas = new LazyTimedHashMap( TIMEOUT );
       lazyActiveMicas.addChangeListener( this );
       // Serial Forwarder Related
-      port = getAddressBeanActivePort( );
-      host = getAddressBeanActiveHostName( );
       if ( logger.isDebugEnabled( ) ) logger.debug( "The MoteIdentifier connects to the Serial Forwarder interface at *" + host + ":" + port + "*" );
       setName( "MoteIdentifier-Thread" + ( ++threadCounter ) );
       

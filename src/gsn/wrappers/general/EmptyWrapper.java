@@ -22,7 +22,6 @@ public class EmptyWrapper extends AbstractStreamProducer {
    private static final ArrayList < DataField > dataField     = new ArrayList < DataField >( );
    
    public boolean initialize ( TreeMap context ) {
-      if ( !super.initialize( context ) ) return false;
       setName( "EmptyWrapper-Thread" + ( ++threadCounter ) );
       
       dataField.add( new DataField( "DATA" , "int" , "incremental int" ) );

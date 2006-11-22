@@ -1,7 +1,10 @@
 package gsn.wrappers.tinyos2x.sensorscope;
+
+import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.vsensor.Container;
 import gsn.wrappers.AbstractStreamProducer;
 
 import java.io.Serializable;
@@ -26,7 +29,7 @@ public class SensorScopeWrapper extends AbstractStreamProducer implements Messag
    
    private final transient Logger logger        = Logger.getLogger( SensorScopeWrapper.class );
    
-   private MoteIF                         moteif;
+   private MoteIF                 moteif;
    
    /**
     * The varialbe <code>threadCounter</code> is just used for debugging
@@ -35,17 +38,33 @@ public class SensorScopeWrapper extends AbstractStreamProducer implements Messag
    private static int             threadCounter = 0;
    
    public boolean initialize ( TreeMap initialContext ) {
-      if ( !super.initialize( initialContext )) return false;
-      String host = getAddressBeanActiveHostName( );
-      int port = getAddressBeanActivePort( );
+      AddressBean addressBean = ( AddressBean ) initialContext.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      String host = addressBean.getPredicateValue( "host" );
+      int port;
+      if ( host == null || host.trim( ).length( ) == 0 ) {
+         logger.warn( "The >host< parameter is missing from the RemoteDS wrapper." );
+         return false;
+      }
+      String portRaw = addressBean.getPredicateValue( "port" );
+      if ( portRaw == null || portRaw.trim( ).length( ) == 0 ) {
+         logger.warn( "The >port< parameter is missing from the RemoteDS wrapper." );
+         return false;
+      }
+      try {
+         port = Integer.parseInt( portRaw );
+         if ( port > 65000 || port <= 0 ) throw new Exception( "Bad port No" + port );
+      } catch ( Exception e ) {
+         logger.warn( "The >port< parameter is not a valid integer for the RemoteDS wrapper." );
+         return false;
+      }
       if ( logger.isDebugEnabled( ) ) {
          logger.debug( "The SFWrapperDS connects to the Serial Forwarder interface at *" + host + ":" + port + "*" );
       }
       setName( "TinyOS2-SensorScope-Thread:" + ( ++threadCounter ) );
       try {
-         PhoenixSource reader = BuildSource.makePhoenix( BuildSource.makeSF(host,port ), null );
+         PhoenixSource reader = BuildSource.makePhoenix( BuildSource.makeSF( host , port ) , null );
          reader.start( );
-         moteif= new MoteIF( reader );
+         moteif = new MoteIF( reader );
       } catch ( Exception e ) {
          logger.error( e.getMessage( ) , e );
          return false;
@@ -68,6 +87,7 @@ public class SensorScopeWrapper extends AbstractStreamProducer implements Messag
       SensorScopeDataMsgWrapper parsed = new SensorScopeDataMsgWrapper( ( SensorScopeDataMsg ) message );
       if ( isActive( ) ) if ( !listeners.isEmpty( ) ) postStreamElement( parsed.getStreamElement( ) );
    }
+   
    public Collection < DataField > getOutputFormat ( ) {
       return SensorScopeDataMsgWrapper.getStructure( );
    }
@@ -110,8 +130,8 @@ class SensorScopeDataMsgWrapper {
    }
    
    public StreamElement getStreamElement ( ) {
-      return new StreamElement( getStructure( ) , new Serializable [ ] { getNodeID( ),getSequenceNumber( ) , getTemperature( ) , getInfrared( ) , getSolarRadiation( ) , getHumidity( ) , getSoilMoisture( ) ,
-            getWatermark( ) , getRainMeter( ) , getWindSpeed( ) , getWindDirection( ) } , System.currentTimeMillis( ) );
+      return new StreamElement( getStructure( ) , new Serializable [ ] { getNodeID( ) , getSequenceNumber( ) , getTemperature( ) , getInfrared( ) , getSolarRadiation( ) , getHumidity( ) ,
+            getSoilMoisture( ) , getWatermark( ) , getRainMeter( ) , getWindSpeed( ) , getWindDirection( ) } , System.currentTimeMillis( ) );
    }
    
    public int getSequenceNumber ( ) {
@@ -202,8 +222,9 @@ class SensorScopeDataMsgWrapper {
    }
    
    public int getNodeID ( ) {
-     return msg.get_nodeid( );
+      return msg.get_nodeid( );
    }
+   
    public double getInfrared ( ) {
       double rawValue = msg.get_infraredtmp( );
       if ( rawValue != 0 ) {

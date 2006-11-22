@@ -16,6 +16,8 @@ import gsn.utils.TCPConnPool;
 import gsn.wrappers.AbstractStreamProducer;
 import gsn.wrappers.DataListener;
 import gsn.wrappers.StreamProducer;
+import gsn.wrappers.TableSizeEnforce;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -207,6 +209,8 @@ public class VSensorLoader extends Thread {
     * This is used for register/deregistering a virtual sensor to the container.
     */
    private transient HashMap < VSensorConfig , PostMethod > directoryCommunicationCache = new HashMap < VSensorConfig , PostMethod >( );
+
+   private static int                         TABLE_SIZE_ENFORCING_THREAD_COUNTER = 0;
    
    private static final ArrayList < VSensorConfig >         EMPTY_ARRAYLIST             = new ArrayList < VSensorConfig >( );
    
@@ -355,7 +359,6 @@ public class VSensorLoader extends Thread {
          }
       } );
       TreeSet < String > add = new TreeSet < String >( new Comparator( ) {
-         
          public int compare ( Object o1 , Object o2 ) {
             String input1 = o1.toString( ).trim( );
             String input2 = o2.toString( ).trim( );
@@ -465,6 +468,11 @@ public class VSensorLoader extends Thread {
                   }
                   try {
                      storageManager.createTable( ds.getDBAlias( ) , ds.getOutputFormat( ) );
+                     TableSizeEnforce tsf = new TableSizeEnforce( ds );
+                     ds.setTableSizeEnforce( tsf );
+                     Thread tableSizeEnforcingThread = new Thread(  tsf );
+                     tableSizeEnforcingThread.setName( "TableSizeEnforceing-WRAPPER-Thread" + TABLE_SIZE_ENFORCING_THREAD_COUNTER++ );
+                     tableSizeEnforcingThread.start( );
                   } catch ( SQLException e ) {
                      logger.error( e.getMessage( ) , e );
                      continue;
