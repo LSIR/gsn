@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 
 public class GPSNMEAVS extends AbstractVirtualSensor {
    
-   private static final transient Logger logger = Logger.getLogger( EPuckVS.class );
+   private static final transient Logger logger = Logger.getLogger( GPSNMEAVS.class );
    
    private TreeMap < String , String >   params;
    
@@ -30,8 +30,6 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
    private VSensorConfig vsensor;
    
    public boolean initialize ( HashMap map ) {
-      boolean toReturn = super.initialize( map );
-      if ( toReturn == false ) return false;
       vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
       params = vsensor.getMainClassInitialParams( );
       wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
