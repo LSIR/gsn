@@ -15,8 +15,8 @@ import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.TCPConnPool;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.DataListener;
-import gsn.wrappers.Wrapper;
 import gsn.wrappers.TableSizeEnforce;
+import gsn.wrappers.Wrapper;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -46,32 +47,32 @@ import org.jibx.runtime.JiBXException;
  */
 public class VSensorLoader extends Thread {
    
-   public static final String                                            VSENSOR_POOL                        = "VSENSOR-POOL";
+   public static final String                                     VSENSOR_POOL                        = "VSENSOR-POOL";
    
-   public static final String                                            STORAGE_MANAGER                     = "STORAGE-MANAGER";
+   public static final String                                     STORAGE_MANAGER                     = "STORAGE-MANAGER";
    
-   public static final String                                            STREAM_SOURCE                       = "STREAM-SOURCE";
+   public static final String                                     STREAM_SOURCE                       = "STREAM-SOURCE";
    
-   public static final String                                            INPUT_STREAM                        = "INPUT-STREAM";
+   public static final String                                     INPUT_STREAM                        = "INPUT-STREAM";
    
-   private static transient Logger                                       logger                              = Logger.getLogger( VSensorLoader.class );
+   private static transient Logger                                logger                              = Logger.getLogger( VSensorLoader.class );
    
    /**
     * Mapping between the AddressBean and DataSources
     */
    private static final HashMap < AddressBean , AbstractWrapper > activeDataSources                   = new HashMap < AddressBean , AbstractWrapper >( );
    
-   private StorageManager                                                storageManager                      = StorageManager.getInstance( );
+   private StorageManager                                         storageManager                      = StorageManager.getInstance( );
    
-   private String                                                        pluginsDir;
+   private String                                                 pluginsDir;
    
-   private boolean                                                       canRun                              = true;
+   private boolean                                                canRun                              = true;
    
-   private static int                                                    VSENSOR_LOADER_THREAD_COUNTER       = 0;
+   private static int                                             VSENSOR_LOADER_THREAD_COUNTER       = 0;
    
-   private static int                                                    DIRECTORY_REFRESHING_THREAD_COUNTER = 0;
+   private static int                                             DIRECTORY_REFRESHING_THREAD_COUNTER = 0;
    
-   private Thread                                                        directoryRefreshingThread;
+   private Thread                                                 directoryRefreshingThread;
    
    public VSensorLoader ( String pluginsDir ) {
       this.pluginsDir = pluginsDir;
@@ -163,7 +164,7 @@ public class VSensorLoader extends Thread {
             logger.error( "That the name of the virutal sensor should starting by alphabetical character and they can contain numerical characters afterwards." );
             continue;
          }
-         VirtualSensorPool pool= new VirtualSensorPool( configuration );
+         VirtualSensorPool pool = new VirtualSensorPool( configuration );
          if ( this.createInputStreams( configuration , pool ) == false ) {
             logger.error( "loading the >" + vsName + "< virtual sensor is stoped due to error(s) in preparing the input streams." );
             continue;
@@ -208,11 +209,11 @@ public class VSensorLoader extends Thread {
    /**
     * This is used for register/deregistering a virtual sensor to the container.
     */
-   private transient HashMap < VSensorConfig , PostMethod > directoryCommunicationCache = new HashMap < VSensorConfig , PostMethod >( );
-
-   private static int                         TABLE_SIZE_ENFORCING_THREAD_COUNTER = 0;
+   private transient HashMap < VSensorConfig , PostMethod > directoryCommunicationCache         = new HashMap < VSensorConfig , PostMethod >( );
    
-   private static final ArrayList < VSensorConfig >         EMPTY_ARRAYLIST             = new ArrayList < VSensorConfig >( );
+   private static int                                       TABLE_SIZE_ENFORCING_THREAD_COUNTER = 0;
+   
+   private static final ArrayList < VSensorConfig >         EMPTY_ARRAYLIST                     = new ArrayList < VSensorConfig >( );
    
    private synchronized void toDirectoryService ( VSensorConfig configuration , int action ) {
       PostMethod postMethod = this.directoryCommunicationCache.get( configuration );
@@ -359,6 +360,7 @@ public class VSensorLoader extends Thread {
          }
       } );
       TreeSet < String > add = new TreeSet < String >( new Comparator( ) {
+         
          public int compare ( Object o1 , Object o2 ) {
             String input1 = o1.toString( ).trim( );
             String input2 = o2.toString( ).trim( );
@@ -435,8 +437,9 @@ public class VSensorLoader extends Thread {
                         .append( " FAILED." ).toString( ) );
                   continue;
                }
-               if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Resolving Address for Stream-Source:" ).append( streamSource.getAlias( ) ).append( " with addressing " )
-                     .append( addressBean ).append( " SUCCEED with " ).append( resolved.size( ) ).append( " candidate(s)." ).toString( ) );
+               if ( logger.isInfoEnabled( ) )
+                  logger.info( new StringBuilder( ).append( "Resolving Address for Stream-Source:" ).append( streamSource.getAlias( ) ).append( " with addressing " ).append( addressBean ).append(
+                     " SUCCEED with " ).append( resolved.size( ) ).append( " candidate(s)." ).toString( ) );
                /**
                 * TODO : Currently In here I'm using just first result returned
                 * from directory service and ignoring the rest.
@@ -458,7 +461,8 @@ public class VSensorLoader extends Thread {
             try {
                ds = ( AbstractWrapper ) Main.getWrapperClass( addressBean.getWrapper( ) ).newInstance( );
                boolean initializationResult = ds.initialize( context );
-               if ( initializationResult == false ) continue;// This address
+               if ( initializationResult == false )
+                  continue;// This address
                // is not working, goto the next address.
                else {
                   if ( ds.getOutputFormat( ) == null ) {
@@ -470,7 +474,7 @@ public class VSensorLoader extends Thread {
                      storageManager.createTable( ds.getDBAlias( ) , ds.getOutputFormat( ) );
                      TableSizeEnforce tsf = new TableSizeEnforce( ds );
                      ds.setTableSizeEnforce( tsf );
-                     Thread tableSizeEnforcingThread = new Thread(  tsf );
+                     Thread tableSizeEnforcingThread = new Thread( tsf );
                      tableSizeEnforcingThread.setName( "TableSizeEnforceing-WRAPPER-Thread" + TABLE_SIZE_ENFORCING_THREAD_COUNTER++ );
                      tableSizeEnforcingThread.start( );
                   } catch ( SQLException e ) {

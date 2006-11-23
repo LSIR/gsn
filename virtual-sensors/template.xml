@@ -17,5 +17,5 @@
 	    <field name="light" type="bigint" />
         </output-structure>
         <storage history-size="1s"/>
-        <input-streams/>
+        <streams/>
 </virtual-sensor> 

@@ -17,9 +17,9 @@
         <field name="VSFILE" type="varchar(40)"/>
     </output-structure>
     <storage permanent-storage="false" history-size="1m"/>
-    <input-streams>
-        <input-stream name="identified_cameras">
-            <stream-source alias="detected_cameras" storage-size="1" sampling-rate="1" >
+    <streams>
+        <stream name="identified_cameras">
+            <source alias="detected_cameras" storage-size="1" sampling-rate="1" >
                 <address wrapper="teds-cam">
                     <predicate key="HOST">localhost</predicate>
                     <predicate key="PORT">9001</predicate>
@@ -29,11 +29,11 @@
                     <predicate key="TIMEOUT">12000</predicate>
                 </address>
                 <query>select * from "WRAPPER"</query>
-            </stream-source>
+            </source>
             <query>select * from "detected_cameras"</query>
-        </input-stream>
-        <input-stream name="identified_motes">
-            <stream-source alias="detected_motes" storage-size="1"  sampling-rate="1" >
+        </stream>
+        <stream name="identified_motes">
+            <source alias="detected_motes" storage-size="1"  sampling-rate="1" >
                 <address wrapper="teds-mote">
                     <predicate key="HOST">192.168.51.13</predicate>
                     <predicate key="PORT">9001</predicate>
@@ -42,9 +42,9 @@
                     <predicate key="TIMEOUT">12000</predicate>
                 </address>
                 <query>select * from "WRAPPER"</query>
-            </stream-source>
+            </source>
             <query>select * from "detected_motes"</query>
-        </input-stream>
-    </input-streams>
+        </stream>
+    </streams>
 </virtual-sensor>
 

@@ -3,7 +3,6 @@ package gsn.vsensor;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.VSensorConfig;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -12,7 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
@@ -25,7 +23,7 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class DemoVSensor extends AbstractVirtualSensor {
+public class DemoVSensor extends AbstractProcessingClass {
    
    private static final transient Logger logger                  = Logger.getLogger( DemoVSensor.class );
    
@@ -107,11 +105,13 @@ public class DemoVSensor extends AbstractVirtualSensor {
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );
    }
    
-   public boolean initialize ( HashMap map ) {
-      VSensorConfig vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
-      super.initialize( map );
-      for ( DataField field : vsensor.getOutputStructure( ) )
+   public boolean initialize ( ) {
+      for ( DataField field : getVirtualSensorConfiguration( ).getOutputStructure( ) )
          fields.add( field.getFieldName( ) );
       return true;
+   }
+   
+   public void finalize ( ) {
+
    }
 }

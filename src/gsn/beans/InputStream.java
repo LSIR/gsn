@@ -4,8 +4,8 @@ import gsn.storage.PoolIsFullException;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
+import gsn.vsensor.AbstractProcessingClass;
 import gsn.vsensor.VSensorLoader;
-import gsn.vsensor.VirtualSensor;
 import gsn.vsensor.VirtualSensorInitializationFailedException;
 import gsn.vsensor.VirtualSensorPool;
 import java.util.ArrayList;
@@ -106,16 +106,16 @@ public class InputStream {
     */
    public void dataAvailable ( final String alias ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
-      if (this.pool==null) {
+      if ( this.pool == null ) {
          logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
          return;
       }
-
+      
       if ( this.currentCount > this.getCount( ) ) {
          if ( logger.isInfoEnabled( ) ) logger.info( "Maximum count reached, the value *discarded*" );
          return;
       }
-            
+      
       final long currentTimeMillis = System.currentTimeMillis( );
       if ( this.rate > 0 && ( currentTimeMillis - this.lastVisited ) < this.rate ) {
          if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
@@ -128,16 +128,17 @@ public class InputStream {
       
       if ( this.rewrittenSQL == null ) {
          this.rewrittenSQL = new StringBuilder( SQLUtils.rewriteQuery( this.getQuery( ).trim( ).toUpperCase( ) , this.rewritingData ).replace( "\"" , "" ) );
-         if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append(
-            this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" ).toString( ) );
+         if ( logger.isDebugEnabled( ) )
+            logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
+                  .toString( ) );
       }
       if ( StorageManager.getInstance( ).isThereAnyResult( this.rewrittenSQL ) ) {
          this.currentCount++;
-         VirtualSensor sensor = null;
+         AbstractProcessingClass sensor = null;
          try {
             sensor = this.pool.borrowVS( );
             if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
-            final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL,false );
+            final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL , false );
             int elementCounterForDebugging = -1;
             while ( resultOfTheQuery.hasMoreElements( ) ) {
                elementCounterForDebugging++;
@@ -153,7 +154,8 @@ public class InputStream {
             logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
             logger.warn( e.getMessage( ) , e );
          } catch ( final VirtualSensorInitializationFailedException e ) {
-            logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getName( ) + " because initialization of that virtual sensor failed" );
+            logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getVirtualSensorName( )
+               + " because initialization of that virtual sensor failed" );
             e.printStackTrace( );
          } finally {
             this.pool.returnVS( sensor );

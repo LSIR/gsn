@@ -76,7 +76,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
     */
    public void testMissingAllEssentialParameters ( ) {
       StreamExporterVirtualSensor vs = new StreamExporterVirtualSensor( );
-      assertFalse( vs.initialize( hashMap ) );
+      assertFalse( vs.initialize( ) );
    }
    
    /*
@@ -90,7 +90,8 @@ public class TestStreamExporterVirtualSensor extends TestCase {
       params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_USER , user ) );
       params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_PASSWD , passwd ) );
       config.setMainClassInitialParams( params );
-      assertTrue( vs.initialize( hashMap ) );
+      vs.setVirtualSensorConfiguration( config );
+      assertTrue( vs.initialize( ) );
    }
    
    /*
@@ -105,7 +106,8 @@ public class TestStreamExporterVirtualSensor extends TestCase {
       params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_USER , user ) );
       params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_PASSWD , passwd ) );
       config.setMainClassInitialParams( params );
-      vs.initialize( hashMap );
+      vs.setVirtualSensorConfiguration( config );
+      vs.initialize( );
       
       // configure datastream
       Vector < DataField > fieldTypes = new Vector < DataField >( );

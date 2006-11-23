@@ -2,7 +2,6 @@ package gsn.vsensor;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.VSensorConfig;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.ParamParser;
 
@@ -39,7 +38,7 @@ import org.jfree.data.time.TimeSeriesCollection;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * @author Jerome Rousselot (jeromerousselot@gmail.com)<br>
  */
-public class ChartVirtualSensor extends AbstractVirtualSensor {
+public class ChartVirtualSensor extends AbstractProcessingClass {
    
    private static final transient Logger               logger                             = Logger.getLogger( ChartVirtualSensor.class );
    
@@ -58,14 +57,12 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
    
    private int                                         counter_pref                       = 0;
    
-   public boolean initialize ( HashMap map ) {
+   public boolean initialize ( ) {
       /**
        * TODO : Checking if the user provides the arguements currectly. TODO :
        * This can now plot only for one input stream value.
        */
-      if ( super.initialize( map ) == false ) return false;
-      VSensorConfig vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
-      TreeMap < String , String > params = vsensor.getMainClassInitialParams( );
+      TreeMap < String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
       ChartInfo chartInfo = new ChartInfo( );
       chartInfo.setInputStreamName( params.get( "input-stream" ) );
       
@@ -154,6 +151,10 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
        * For debugging purposes.
        */
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );
+   }
+   
+   public void finalize ( ) {
+
    }
    
 }

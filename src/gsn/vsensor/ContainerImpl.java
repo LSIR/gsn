@@ -9,12 +9,13 @@ import gsn.notifications.NotificationRequest;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.http.AddressingReqHandler;
-import gsn.vsensor.http.OneShotQueryWithAddressingHandler;
 import gsn.vsensor.http.ContainerInfoHandler;
 import gsn.vsensor.http.OneShotQueryHandler;
+import gsn.vsensor.http.OneShotQueryWithAddressingHandler;
 import gsn.vsensor.http.OutputStructureHandler;
 import gsn.vsensor.http.RequestHandler;
 import gsn.wrappers.RemoteDS;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,10 +26,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Vector;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -61,9 +64,9 @@ public class ContainerImpl extends HttpServlet implements Container {
       notificationRequests = new TreeMap < String , ArrayList < NotificationRequest >>( new CaseInsensitiveComparator( ) );
    }
    
-   public void publishData ( VirtualSensor sensor ) {
+   public void publishData ( AbstractProcessingClass sensor ) {
       StreamElement data = sensor.getData( );
-      String name = sensor.getName( );
+      String name = sensor.getVirtualSensorConfiguration( ).getVirtualSensorName( );
       StorageManager storageMan = StorageManager.getInstance( );
       synchronized ( psLock ) {
          storageMan.insertDataNoDupError( name , data );
@@ -110,11 +113,11 @@ public class ContainerImpl extends HttpServlet implements Container {
    
    public void doGet ( HttpServletRequest request , HttpServletResponse response ) throws ServletException , IOException {
       response.setContentType( "text/xml" );
-      //to be sure it isn't cached
-      response.setHeader("Expires", "Sat, 6 May 1995 12:00:00 GMT");
-      response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-      response.addHeader("Cache-Control", "post-check=0, pre-check=0");
-      response.setHeader("Pragma", "no-cache");
+      // to be sure it isn't cached
+      response.setHeader( "Expires" , "Sat, 6 May 1995 12:00:00 GMT" );
+      response.setHeader( "Cache-Control" , "no-store, no-cache, must-revalidate" );
+      response.addHeader( "Cache-Control" , "post-check=0, pre-check=0" );
+      response.setHeader( "Pragma" , "no-cache" );
       
       String rawRequest = request.getParameter( Container.REQUEST );
       int requestType = -1;
@@ -124,23 +127,23 @@ public class ContainerImpl extends HttpServlet implements Container {
          try {
             requestType = Integer.parseInt( ( String ) rawRequest );
          } catch ( Exception e ) {
-            logger.debug( e.getMessage( ),e );
+            logger.debug( e.getMessage( ) , e );
             requestType = -1;
          }
       StringBuilder sb = new StringBuilder( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" );
       response.getWriter( ).write( sb.toString( ) );
       RequestHandler handler;
-      if (logger.isDebugEnabled( )) logger.debug("Received a request with code : "+requestType  );
+      if ( logger.isDebugEnabled( ) ) logger.debug( "Received a request with code : " + requestType );
       
       switch ( requestType ) {
-      	case Container.REQUEST_ONE_SHOT_QUERY :
-          handler = new OneShotQueryHandler( );
-          if ( handler.isValid( request , response ) ) handler.handle( request , response );
-          break;
-      	case Container.REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING :
-          handler = new OneShotQueryWithAddressingHandler( );
-          if ( handler.isValid( request , response ) ) handler.handle( request , response );
-          break;
+         case Container.REQUEST_ONE_SHOT_QUERY :
+            handler = new OneShotQueryHandler( );
+            if ( handler.isValid( request , response ) ) handler.handle( request , response );
+            break;
+         case Container.REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING :
+            handler = new OneShotQueryWithAddressingHandler( );
+            if ( handler.isValid( request , response ) ) handler.handle( request , response );
+            break;
          case Container.REQUEST_LIST_VIRTUAL_SENSORS :
             handler = new ContainerInfoHandler( );
             if ( handler.isValid( request , response ) ) handler.handle( request , response );

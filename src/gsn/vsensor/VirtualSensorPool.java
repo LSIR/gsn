@@ -1,13 +1,12 @@
 package gsn.vsensor;
 
-import gsn.Mappings;
 import gsn.beans.VSensorConfig;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -15,53 +14,52 @@ import org.apache.log4j.Logger;
  */
 public class VirtualSensorPool {
    
-   public static final String             VSENSORCONFIG   = "VSENSORCONFIG";
+   public static final String                    VSENSORCONFIG   = "VSENSORCONFIG";
    
-   public static final String             CONTAINER       = "CONTAINER";
+   public static final String                    CONTAINER       = "CONTAINER";
    
-   private static final transient Logger  logger          = Logger.getLogger( VirtualSensorPool.class );
+   private static final transient Logger         logger          = Logger.getLogger( VirtualSensorPool.class );
    
-   private static final transient boolean isDebugEnabled  = logger.isDebugEnabled( );
+   private static final transient boolean        isDebugEnabled  = logger.isDebugEnabled( );
    
-   private int                            maxPoolSize;
+   private int                                   maxPoolSize;
    
-   private int                            currentPoolSize = 0;
+   private int                                   currentPoolSize = 0;
    
-   private String                         processingClassName;
+   private String                                processingClassName;
    
-   private ArrayList < VirtualSensor >    allInstances    = new ArrayList < VirtualSensor >( );
+   private ArrayList < AbstractProcessingClass > allInstances    = new ArrayList < AbstractProcessingClass >( );
    
-   private ArrayList < VirtualSensor >    idleInstances   = new ArrayList < VirtualSensor >( );
+   private ArrayList < AbstractProcessingClass > idleInstances   = new ArrayList < AbstractProcessingClass >( );
    
-   private VSensorConfig                  config;
+   private VSensorConfig                         config;
    
-   private TableSizeEnforceThread sizeEnforce;
+   private TableSizeEnforceThread                sizeEnforce;
    
-   private long lastModified = -1;
+   private long                                  lastModified    = -1;
    
-   public VirtualSensorPool ( VSensorConfig config )  {
-      if ( logger.isInfoEnabled( ) ) logger.info( ( new StringBuilder( "Preparing the pool for: " ) ).append( config.getVirtualSensorName( ) ).append( " with the max size of:" )
-            .append( maxPoolSize ).toString( ) );
+   public VirtualSensorPool ( VSensorConfig config ) {
+      if ( logger.isInfoEnabled( ) )
+         logger.info( ( new StringBuilder( "Preparing the pool for: " ) ).append( config.getVirtualSensorName( ) ).append( " with the max size of:" ).append( maxPoolSize ).toString( ) );
       this.config = config;
       this.processingClassName = config.getProcessingClass( );
       this.maxPoolSize = config.getLifeCyclePoolSize( );
       this.sizeEnforce = new TableSizeEnforceThread( config );
-      this.lastModified = new File(config.getFileName( )).lastModified( );
+      this.lastModified = new File( config.getFileName( ) ).lastModified( );
    }
    
-   public synchronized VirtualSensor borrowVS ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
+   public synchronized AbstractProcessingClass borrowVS ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
       if ( currentPoolSize == maxPoolSize ) throw new PoolIsFullException( config.getVirtualSensorName( ) );
       currentPoolSize++;
-      VirtualSensor newInstance = null;
-      if ( idleInstances.size( ) > 0 ) newInstance = idleInstances.remove( 0 );
+      AbstractProcessingClass newInstance = null;
+      if ( idleInstances.size( ) > 0 )
+         newInstance = idleInstances.remove( 0 );
       else
          try {
-            newInstance = ( VirtualSensor ) Class.forName( processingClassName ).newInstance( );
+            newInstance = ( AbstractProcessingClass ) Class.forName( processingClassName ).newInstance( );
+            newInstance.setVirtualSensorConfiguration( config );
             allInstances.add( newInstance );
-            HashMap hashMap = new HashMap( );
-            hashMap.put( CONTAINER , Mappings.getContainer( ) );
-            hashMap.put( VSENSORCONFIG , config );
-            if ( newInstance.initialize( hashMap ) == false ) {
+            if ( newInstance.initialize( ) == false ) {
                returnVS( newInstance );
                throw new VirtualSensorInitializationFailedException( );
             }
@@ -72,33 +70,28 @@ public class VirtualSensorPool {
          } catch ( ClassNotFoundException e ) {
             logger.error( e.getMessage( ) , e );
          }
-      if ( isDebugEnabled ) logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " current busy instances : " ).append( currentPoolSize )
-            .toString( ) );
+      if ( isDebugEnabled )
+         logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " current busy instances : " ).append( currentPoolSize ).toString( ) );
       return newInstance;
    }
    
-   public synchronized void returnVS ( VirtualSensor o ) {
+   public synchronized void returnVS ( AbstractProcessingClass o ) {
       if ( o == null ) return;
       idleInstances.add( o );
       currentPoolSize--;
-      if ( isDebugEnabled ) logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " current busy instances : " ).append( currentPoolSize )
-            .toString( ) );
+      if ( isDebugEnabled )
+         logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " current busy instances : " ).append( currentPoolSize ).toString( ) );
    }
    
    public synchronized void closePool ( ) {
-      HashMap map = new HashMap( ); // The default context for closing a
-      closePool( map );
-   }
-   
-   public synchronized void closePool ( HashMap map ) {
       sizeEnforce.stopPlease( );
-      for ( VirtualSensor o : allInstances )
-         o.finalize( map );
+      for ( AbstractProcessingClass o : allInstances )
+         o.finalize( );
       if ( isDebugEnabled ) logger.debug( new StringBuilder( ).append( "The VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " is now closed." ).toString( ) );
    }
    
-   public void start ( ) throws PoolIsFullException, VirtualSensorInitializationFailedException {
-      returnVS( borrowVS() ); //To initialize the first VS.
+   public void start ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
+      returnVS( borrowVS( ) ); // To initialize the first VS.
       sizeEnforce.start( );
    }
    
@@ -108,7 +101,6 @@ public class VirtualSensorPool {
    public VSensorConfig getConfig ( ) {
       return config;
    }
-
    
    /**
     * @return the lastModified
@@ -116,19 +108,23 @@ public class VirtualSensorPool {
    public long getLastModified ( ) {
       return lastModified;
    }
+   
+   public void finalize ( ) {
+
+   }
 }
 
 class TableSizeEnforceThread extends Thread {
    
-   private final transient Logger logger            = Logger.getLogger( TableSizeEnforceThread.class );
-
+   private final transient Logger logger                              = Logger.getLogger( TableSizeEnforceThread.class );
+   
    private static int             TABLE_SIZE_ENFORCING_THREAD_COUNTER = 0;
-
-   private final int              RUNNING_INTERVALS = 10 * 1000;
+   
+   private final int              RUNNING_INTERVALS                   = 10 * 1000;
    
    private VSensorConfig          virtualSensorConfiguration;
    
-   private boolean                canRun            = true;
+   private boolean                canRun                              = true;
    
    public TableSizeEnforceThread ( VSensorConfig virtualSensor ) {
       this.virtualSensorConfiguration = virtualSensor;
@@ -141,17 +137,18 @@ class TableSizeEnforceThread extends Thread {
       String virtualSensorName = this.virtualSensorConfiguration.getVirtualSensorName( );
       StringBuilder query = null;
       if ( StorageManager.isHsql( ) ) {
-         if ( this.virtualSensorConfiguration.isStorageCountBased( ) ) query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append(
-            virtualSensorName ).append( ".TIMED not in ( select " ).append( virtualSensorName ).append( ".TIMED from " ).append( virtualSensorName ).append( " order by " ).append(
-            virtualSensorName ).append( ".TIMED DESC  LIMIT  " ).append( this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( " offset 0 )" );
+         if ( this.virtualSensorConfiguration.isStorageCountBased( ) )
+            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".TIMED not in ( select " ).append(
+               virtualSensorName ).append( ".TIMED from " ).append( virtualSensorName ).append( " order by " ).append( virtualSensorName ).append( ".TIMED DESC  LIMIT  " ).append(
+               this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( " offset 0 )" );
          else
             query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".TIMED < (NOW_MILLIS() -" ).append(
                this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( ")" );
       } else if ( StorageManager.isMysqlDB( ) ) {
-         if ( this.virtualSensorConfiguration.isStorageCountBased( ) ) query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append(
-            virtualSensorName ).append( ".TIMED <= ( SELECT * FROM ( SELECT TIMED FROM " ).append( virtualSensorName ).append( " group by " ).append( virtualSensorName )
-               .append( ".TIMED ORDER BY " ).append( virtualSensorName ).append( ".TIMED DESC LIMIT 1 offset " ).append( this.virtualSensorConfiguration.getParsedStorageSize( ) ).append(
-                  "  ) AS TMP_" ).append( ( int ) ( Math.random( ) * 100000000 ) ).append( " )" );
+         if ( this.virtualSensorConfiguration.isStorageCountBased( ) )
+            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".TIMED <= ( SELECT * FROM ( SELECT TIMED FROM " )
+                  .append( virtualSensorName ).append( " group by " ).append( virtualSensorName ).append( ".TIMED ORDER BY " ).append( virtualSensorName ).append( ".TIMED DESC LIMIT 1 offset " )
+                  .append( this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( "  ) AS TMP_" ).append( ( int ) ( Math.random( ) * 100000000 ) ).append( " )" );
          else
             query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".TIMED < (UNIX_TIMESTAMP() -" ).append(
                this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( ")" );
@@ -160,10 +157,10 @@ class TableSizeEnforceThread extends Thread {
       try {
          /**
           * Initial delay. Very important, dont remove it. The VSensorLoader
-          * when reloads a sensor (touching the configuration file), it
-          * creates the data strcture of the table in the last step thus this
-          * method should be executed after some initial delay (therefore
-          * making sure the structure is created by the loader).
+          * when reloads a sensor (touching the configuration file), it creates
+          * the data strcture of the table in the last step thus this method
+          * should be executed after some initial delay (therefore making sure
+          * the structure is created by the loader).
           */
          Thread.sleep( this.RUNNING_INTERVALS );
       } catch ( InterruptedException e ) {
@@ -174,8 +171,8 @@ class TableSizeEnforceThread extends Thread {
       if ( this.logger.isDebugEnabled( ) ) this.logger.debug( new StringBuilder( ).append( "Enforcing the limit size on the table by : " ).append( query ).toString( ) );
       while ( this.canRun ) {
          int effected = StorageManager.getInstance( ).executeUpdate( query );
-         if ( this.logger.isDebugEnabled( ) ) this.logger.debug( new StringBuilder( ).append( effected ).append( " old rows dropped from " ).append(
-            this.virtualSensorConfiguration.getVirtualSensorName( ) ).toString( ) );
+         if ( this.logger.isDebugEnabled( ) )
+            this.logger.debug( new StringBuilder( ).append( effected ).append( " old rows dropped from " ).append( this.virtualSensorConfiguration.getVirtualSensorName( ) ).toString( ) );
          try {
             Thread.sleep( this.RUNNING_INTERVALS );
          } catch ( InterruptedException e ) {

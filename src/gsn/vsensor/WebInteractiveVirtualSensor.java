@@ -14,7 +14,6 @@ import gsn.utils.ParamParser;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 import javax.naming.OperationNotSupportedException;
@@ -24,7 +23,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
+public class WebInteractiveVirtualSensor extends AbstractProcessingClass {
    
    private static final transient Logger logger            = Logger.getLogger( WebInteractiveVirtualSensor.class );
    
@@ -49,13 +48,11 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
    private final String                  OUTPUT_FIELD_NAME = "PLOT";
    
    private int                           counter_pref      = 0;
-
-   private VSensorConfig vsensor;
    
-   public boolean initialize ( HashMap map ) {
-      if ( super.initialize( map ) == false ) return false;
-      vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
-      TreeMap < String , String > params = vsensor.getMainClassInitialParams( );
+   private VSensorConfig                 vsensor;
+   
+   public boolean initialize ( ) {
+      TreeMap < String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
       int memorySizeInSeconds = ParamParser.getInteger( params.get( "memory-size-in-seconds" ) , -1 );
       if ( memorySizeInSeconds == -1 ) {
          logger.error( "The parameter *memory-size-in-seconds* is missing from the virtual sensor processing class's initialization." );
@@ -113,6 +110,10 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
       StringBuilder toReturn = new StringBuilder( );
       svgPage.drawOn( toReturn );
       return toReturn.toString( );
+   }
+   
+   public void finalize ( ) {
+
    }
    
 }

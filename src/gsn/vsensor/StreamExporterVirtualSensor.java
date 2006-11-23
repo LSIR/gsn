@@ -13,7 +13,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -24,7 +23,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Jerome Rousselot ( jeromerousselot@gmail.com )
  */
-public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
+public class StreamExporterVirtualSensor extends AbstractProcessingClass {
    
    public static final String            PARAM_USER    = "user" , PARAM_PASSWD = "password" , PARAM_URL = "url" , PARAM_TABLE_PREFIX = "table-prefix";
    
@@ -40,45 +39,34 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
    
    private Vector < String >             createdTables = new Vector < String >( );
    
-   public boolean initialize ( HashMap map ) {
-      boolean status = false;
-      if ( super.initialize( map ) == true ) {
-         VSensorConfig vsensor = ((VSensorConfig) map.get( VirtualSensorPool.VSENSORCONFIG ));
-         TreeMap < String , String > params = vsensor.getMainClassInitialParams( );
-         params.keySet( );
-         if ( params.get( PARAM_URL ) != null && params.get( PARAM_USER ) != null && params.get( PARAM_PASSWD ) != null ) {
-            try {
-               // identify database
-               for ( DATABASE db : DATABASE.values( ) )
-                  if ( params.get( PARAM_URL ).startsWith( db.getJDBCPrefix( ) ) ) {
-                     db.loadDriver( );
-                     logger.info( "driver for " + db.toString( ) + " loaded." );
-                  }
-               logger.debug( "url=" + params.get( PARAM_URL ) + ", user=" + params.get( PARAM_USER ) + ", passwd=" + params.get( PARAM_PASSWD ) );
-               connection = DriverManager.getConnection( params.get( PARAM_URL ) , params.get( PARAM_USER ) , params.get( PARAM_PASSWD ) );
-               logger.debug( "jdbc connection established." );
-               if ( params.get( PARAM_TABLE_PREFIX ) != null ) table_prefix = params.get( PARAM_TABLE_PREFIX );
-               statement = connection.createStatement( );
-               status = true;
-            } catch ( SQLException e ) {
-               // TODO Auto-generated catch block
-               logger.error( "Could not connect StreamExporterVS to jdbc source at url: " + params.get( PARAM_URL ) );
-               logger.debug( e );
-               status = false;
-            }
+   public boolean initialize ( ) {
+      VSensorConfig vsensor = getVirtualSensorConfiguration( );
+      TreeMap < String , String > params = vsensor.getMainClassInitialParams( );
+      params.keySet( );
+      if ( params.get( PARAM_URL ) != null && params.get( PARAM_USER ) != null && params.get( PARAM_PASSWD ) != null ) {
+         try {
+            // identify database
+            for ( DATABASE db : DATABASE.values( ) )
+               if ( params.get( PARAM_URL ).startsWith( db.getJDBCPrefix( ) ) ) {
+                  db.loadDriver( );
+                  logger.info( "driver for " + db.toString( ) + " loaded." );
+               }
+            logger.debug( "url=" + params.get( PARAM_URL ) + ", user=" + params.get( PARAM_USER ) + ", passwd=" + params.get( PARAM_PASSWD ) );
+            connection = DriverManager.getConnection( params.get( PARAM_URL ) , params.get( PARAM_USER ) , params.get( PARAM_PASSWD ) );
+            logger.debug( "jdbc connection established." );
+            if ( params.get( PARAM_TABLE_PREFIX ) != null ) table_prefix = params.get( PARAM_TABLE_PREFIX );
+            statement = connection.createStatement( );
+         } catch ( SQLException e ) {
+            // TODO Auto-generated catch block
+            logger.error( "Could not connect StreamExporterVS to jdbc source at url: " + params.get( PARAM_URL ) );
+            logger.debug( e );
+            return false;
          }
       }
-      return status;
+      return true;
    }
    
-   /*
-    * (non-Javadoc)
-    * 
-    * @see gsn.vsensor.VirtualSensor#dataAvailable(java.lang.String,
-    * gsn.beans.StreamElement)
-    */
    public void dataAvailable ( String inputStreamName , StreamElement streamElement ) {
-      // TODO Auto-generated method stub
       String tableName = table_prefix + inputStreamName;
       ensureTableExistence( tableName , streamElement.getFieldNames( ) , streamElement.getFieldTypes( ) );
       exportValues( tableName , streamElement );
@@ -93,7 +81,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
    private void ensureTableExistence ( String tableName , String [ ] fieldNames , Integer [ ] fieldTypes ) {
       sqlbuilder = new StringBuilder( );
       sqlbuilder.append( "CREATE TABLE IF NOT EXISTS " ); // Is this Mysql
-                                                            // specific ?
+      // specific ?
       sqlbuilder.append( tableName );
       sqlbuilder.append( " (" );
       // (COLNAME COLTYPE, COLNAME COLTYPE,...)
@@ -197,5 +185,9 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
       } catch ( SQLException e ) {
          logger.error( "Could not insert values into remote table for export: " + e );
       }
+   }
+   
+   public void finalize ( ) {
+
    }
 }

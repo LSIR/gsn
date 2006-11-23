@@ -16,17 +16,17 @@
       <field name="PLOT" type="binary:image/svg+xml"/>
    </output-structure>
    <storage history-size="1"/>
-   <input-streams>
-      <input-stream name="data" rate="100">
-         <stream-source alias="wsn" sampling-rate="1" storage-size="1">
+   <streams>
+      <stream name="data" rate="100">
+         <source alias="wsn" sampling-rate="1" storage-size="1">
             <address wrapper="wsns">
                <predicate key="HOST">127.0.0.1</predicate>
                <predicate key="PORT">80</predicate>
             </address>
             <query>select NODE_ID as NODE_ID, PARENT_ID as PARENT_ID, TEMPREATURE as TEMPERATURE_VALUE, TIMED as TIMED from "WRAPPER"</query>
-         </stream-source>
+         </source>
          <query>select * from "wsn"</query>
-      </input-stream>
-   </input-streams>
+      </stream>
+   </streams>
 </virtual-sensor>
 

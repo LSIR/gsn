@@ -28,7 +28,7 @@
       <structure name="storage" usage="optional" >
 	      <value name="history-size" field="storageHistorySize" style="attribute" usage="optional" />
 	   </structure>
-      <collection name="input-streams"   field="inputStreams"  item-type="gsn.beans.InputStream" />
+      <collection name="streams"   field="inputStreams"  item-type="gsn.beans.InputStream" />
    </mapping>
 	
    <mapping name="predicate" class="gsn.utils.KeyValueImp" >
@@ -36,12 +36,12 @@
    	<value field="value" style="text"/>
    </mapping>
 
-   <mapping name="input-stream" class="gsn.beans.InputStream" >
+   <mapping name="stream" class="gsn.beans.InputStream" >
       <value name="name"  field="inputStreamName"  style="attribute"/>
       <value name="rate"  field="rate"  style="attribute" usage="optional"/>
       <value name="count" field="count" style="attribute" usage="optional"/>
 	   <collection field="sources" >
-	      <structure name="stream-source" type="gsn.beans.StreamSource">
+	      <structure name="source" type="gsn.beans.StreamSource">
 	         <value  name="alias"  field="alias"  style="attribute"/>
 	         <value  name="storage-size" field="storageHistorySize" style="attribute" usage="optional" />
 	         <value  name="disconnect-buffer-size" field="disconnectedBufferSize" style="attribute" usage="optional" />

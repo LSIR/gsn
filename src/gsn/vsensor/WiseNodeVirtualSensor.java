@@ -4,19 +4,18 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
 /**
  * @author Jerome Rousselot (jerome.rousselot -at- csem.ch)<br>
  */
-public class WiseNodeVirtualSensor extends AbstractVirtualSensor {
+public class WiseNodeVirtualSensor extends AbstractProcessingClass {
    
    private static final transient Logger logger = Logger.getLogger( WiseNodeVirtualSensor.class );
    
-   public boolean initialize ( HashMap map ) {
-      return super.initialize( map );
+   public boolean initialize ( ) {
+      return true;
       /*
        * Collection<KeyValue> params =
        * virtualSensorConfiguration.getMainClassInitialParams (); for ( KeyValue
@@ -65,6 +64,10 @@ public class WiseNodeVirtualSensor extends AbstractVirtualSensor {
           */
          dataProduced( output );
       }
+   }
+   
+   public void finalize ( ) {
+
    }
    
 }
