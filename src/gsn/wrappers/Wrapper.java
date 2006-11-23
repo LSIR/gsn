@@ -12,7 +12,7 @@ import javax.naming.OperationNotSupportedException;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public interface StreamProducer {
+public interface Wrapper {
    
    public static final String TIME_FIELD = "TIMED";
    

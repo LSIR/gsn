@@ -5,7 +5,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.vsensor.Container;
-import gsn.wrappers.AbstractStreamProducer;
+import gsn.wrappers.AbstractWrapper;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class SensorScopeWrapper extends AbstractStreamProducer implements MessageListener {
+public class SensorScopeWrapper extends AbstractWrapper implements MessageListener {
    
    private final transient Logger logger        = Logger.getLogger( SensorScopeWrapper.class );
    

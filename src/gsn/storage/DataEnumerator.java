@@ -2,7 +2,7 @@ package gsn.storage;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.wrappers.StreamProducer;
+import gsn.wrappers.Wrapper;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -71,7 +71,7 @@ public class DataEnumerator implements Enumeration {
             int colTypeInJDBCFormat = resultSet.getMetaData( ).getColumnType( i );
             if ( colName.equalsIgnoreCase( "PK" ) ) {
                indexofPK = i;
-            } else if ( colName.equalsIgnoreCase( StreamProducer.TIME_FIELD ) ) {
+            } else if ( colName.equalsIgnoreCase( Wrapper.TIME_FIELD ) ) {
                indexOfTimedField = i;
             } else {
                fieldNames.add( colName );

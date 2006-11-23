@@ -6,7 +6,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.TCPConnPool;
 import gsn.vsensor.Container;
-import gsn.wrappers.AbstractStreamProducer;
+import gsn.wrappers.AbstractWrapper;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class AXISWirelessCameraWrapper extends AbstractStreamProducer {
+public class AXISWirelessCameraWrapper extends AbstractWrapper {
    
    /**
     * 

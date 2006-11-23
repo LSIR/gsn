@@ -6,7 +6,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
 import gsn.vsensor.Container;
-import gsn.wrappers.AbstractStreamProducer;
+import gsn.wrappers.AbstractWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
  * @author Surender Reddy (yerva, surenderreddy.yerva-at-epfl.ch)<br>
  */
 
-public class CameraIdentifier extends AbstractStreamProducer {
+public class CameraIdentifier extends AbstractWrapper {
    
    /**
     * 

@@ -1,7 +1,7 @@
 package gsn.beans;
 
 import gsn.wrappers.DataListener;
-import gsn.wrappers.StreamProducer;
+import gsn.wrappers.Wrapper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,7 +47,7 @@ public final class StreamSource {
    
    private transient DataListener        activeDataListener;
    
-   private transient StreamProducer      activeSourceProducer;
+   private transient Wrapper      activeSourceProducer;
    
    /**
     * FIXME: Big verification test, because the query rewriter heavily relies on
@@ -194,7 +194,7 @@ public final class StreamSource {
       return this.sqlQuery;
    }
    
-   public void setUsedDataSource ( final StreamProducer ds , final DataListener dbDataListener ) {
+   public void setUsedDataSource ( final Wrapper ds , final DataListener dbDataListener ) {
       this.activeSourceProducer = ds;
       this.activeDataListener = dbDataListener;
       
@@ -210,7 +210,7 @@ public final class StreamSource {
    /**
     * @return Returns the activeSourceProducer.
     */
-   public StreamProducer getActiveSourceProducer ( ) {
+   public Wrapper getActiveSourceProducer ( ) {
       return this.activeSourceProducer;
    }
    

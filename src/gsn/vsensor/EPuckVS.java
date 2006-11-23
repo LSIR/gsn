@@ -4,7 +4,7 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
-import gsn.wrappers.StreamProducer;
+import gsn.wrappers.Wrapper;
 import gsn.wrappers.general.SerialWrapper;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class EPuckVS extends AbstractVirtualSensor {
    
    private ProtocolManager protocolManager;
    
-   private StreamProducer wrapper;
+   private Wrapper wrapper;
    
    private VSensorConfig vsensor;
    
@@ -52,7 +52,7 @@ public class EPuckVS extends AbstractVirtualSensor {
       if(logger.isDebugEnabled( ))
          logger.debug( "I just received some data from the robot" );
       System.out.println(new String((byte[])data.getData( SerialWrapper.RAW_PACKET )));
-      StreamProducer wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      Wrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
       if ( actionA == false ) {
          actionA = true;
          try {

@@ -5,7 +5,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.vsensor.Container;
-import gsn.wrappers.AbstractStreamProducer;
+import gsn.wrappers.AbstractWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * @author Jerome Rousselot (jerome.rousselot@csem.ch), CSEM<br>
  */
-public class UDPWrapper extends AbstractStreamProducer {
+public class UDPWrapper extends AbstractWrapper {
    
    private static final String    RAW_PACKET    = "RAW_PACKET";
    

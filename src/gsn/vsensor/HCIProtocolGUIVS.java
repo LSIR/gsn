@@ -58,7 +58,7 @@ import gsn.utils.protocols.AbstractHCIProtocol;
 import gsn.utils.protocols.AbstractHCIQuery;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
-import gsn.wrappers.StreamProducer;
+import gsn.wrappers.Wrapper;
 /**
  * @author Jerome Rousselot <jerome.rousselot@csem.ch>
  *
@@ -71,7 +71,7 @@ public class HCIProtocolGUIVS extends AbstractVirtualSensor {
 
 	private ProtocolManager protocolManager;
 	private AbstractHCIProtocol protocol; 
-	private StreamProducer outputWrapper = null;
+	private Wrapper outputWrapper = null;
 	private JHCIProtocolControl gui;
 	private VSensorConfig vsensor;
 

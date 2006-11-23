@@ -15,7 +15,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.vsensor.Container;
-import gsn.wrappers.AbstractStreamProducer;
+import gsn.wrappers.AbstractWrapper;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -63,7 +63,7 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class WebCamWrapper extends AbstractStreamProducer implements ControllerListener {
+public class WebCamWrapper extends AbstractWrapper implements ControllerListener {
    
    public static final String            PICTURE_KEY                  = "PICTURE";
    

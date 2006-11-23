@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import javax.naming.OperationNotSupportedException;
 
 import gsn.vsensor.EPuckVS;
-import gsn.wrappers.StreamProducer;
+import gsn.wrappers.Wrapper;
 
 import org.apache.log4j.Logger;
 
@@ -39,7 +39,7 @@ public class ProtocolManager {
 	private ProtocolStates currentState;
 	private AbstractHCIQuery lastExecutedQuery = null;
 	private Vector < Object > lastParams;
-	private StreamProducer outputWrapper;
+	private Wrapper outputWrapper;
 
 	private Timer timer;
 	private TimerTask answerTimeout = new TimerTask() {
@@ -54,7 +54,7 @@ public class ProtocolManager {
 		READY, WAITING
 	}
 
-	public ProtocolManager(AbstractHCIProtocol protocol, StreamProducer outputWrapper) {
+	public ProtocolManager(AbstractHCIProtocol protocol, Wrapper outputWrapper) {
 		this.protocol = protocol;
 		this.outputWrapper = outputWrapper;
 		currentState = ProtocolStates.READY;
