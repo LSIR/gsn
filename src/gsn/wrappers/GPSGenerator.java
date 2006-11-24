@@ -1,11 +1,11 @@
 package gsn.wrappers;
 
+import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
-import gsn.vsensor.Container;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,17 +14,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
-
-import org.apache.commons.collections.KeyValue;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class GPSGenerator extends AbstractWrapper {
+public class GPSGenerator extends Wrapper {
    
    private static final int         DEFAULT_SAMPLING_RATE = 1000;
    
@@ -50,9 +46,9 @@ public class GPSGenerator extends AbstractWrapper {
       return outputStrcture;
    }
    
-   public boolean initialize ( TreeMap context ) {
+   public boolean initialize (  ) {
       setName( "GPSGenerator-Thread" + ( ++threadCounter ) );
-      AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      AddressBean addressBean = getActiveAddressBean( );
       if ( addressBean.getPredicateValue( "sampling-rate" ) != null ) {
          samplingRate = ParamParser.getInteger( addressBean.getPredicateValue( "rate" ) , DEFAULT_SAMPLING_RATE );
          if ( samplingRate <= 0 ) {
@@ -109,8 +105,7 @@ public class GPSGenerator extends AbstractWrapper {
       }
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize ( ) {
       threadCounter--;
    }
    

@@ -2,15 +2,12 @@ package gsn.storage;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.wrappers.Wrapper;
-
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -71,7 +68,7 @@ public class DataEnumerator implements Enumeration {
             int colTypeInJDBCFormat = resultSet.getMetaData( ).getColumnType( i );
             if ( colName.equalsIgnoreCase( "PK" ) ) {
                indexofPK = i;
-            } else if ( colName.equalsIgnoreCase( Wrapper.TIME_FIELD ) ) {
+            } else if ( colName.equalsIgnoreCase( "TIMED" ) ) {
                indexOfTimedField = i;
             } else {
                fieldNames.add( colName );

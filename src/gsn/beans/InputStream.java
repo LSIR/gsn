@@ -1,13 +1,13 @@
 package gsn.beans;
 
+import gsn.VSensorLoader;
+import gsn.VirtualSensorInitializationFailedException;
+import gsn.VirtualSensorPool;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractProcessingClass;
-import gsn.vsensor.VSensorLoader;
-import gsn.vsensor.VirtualSensorInitializationFailedException;
-import gsn.vsensor.VirtualSensorPool;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;

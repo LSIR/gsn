@@ -7,7 +7,6 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
-
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -15,13 +14,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
-
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 /**

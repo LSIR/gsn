@@ -5,22 +5,16 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
-
+import gsn.wrappers.Wrapper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeMap;
-
-import javax.naming.OperationNotSupportedException;
-
 import org.apache.log4j.Logger;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class WSNSWrapper extends AbstractWrapper implements DataListener {
+public class WSNSWrapper extends Wrapper implements DataListener {
    
    private final transient Logger   logger                     = Logger.getLogger( WSNSWrapper.class );
    
@@ -57,9 +51,9 @@ public class WSNSWrapper extends AbstractWrapper implements DataListener {
    
    private int                      step_counter               = STEP_COUNTER_DEFAULT_VALUE;
    
-   public boolean initialize ( TreeMap context ) {
+   public boolean initialize (  ) {
       setName( "WirelessSensorNetworkSimulatorWrapper-Thread" + ( ++threadCounter ) );
-      AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      AddressBean addressBean = getActiveAddressBean( );
       /**
        * Reading the initialization paramteters from the XML Configurations
        * provided.
@@ -158,10 +152,7 @@ public class WSNSWrapper extends AbstractWrapper implements DataListener {
       }
    }
    
-   public boolean sendToWrapper ( Object dataItem ) throws OperationNotSupportedException {
-      // Integer nodeId = dataItem;
-      return super.sendToWrapper( dataItem ); // To change body of overridden
-      // methods use File | Settings |
-      // File Templates.
+   public void finalize ( ) {
+      
    }
 }

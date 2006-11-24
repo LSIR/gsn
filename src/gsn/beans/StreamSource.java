@@ -1,13 +1,11 @@
 package gsn.beans;
 
-import gsn.wrappers.DataListener;
 import gsn.wrappers.Wrapper;
-
+import gsn.wrappers.DataListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 

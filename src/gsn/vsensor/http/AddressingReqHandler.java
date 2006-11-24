@@ -1,8 +1,8 @@
 package gsn.vsensor.http;
 
+import gsn.Container;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
-import gsn.vsensor.Container;
 import java.io.File;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;

@@ -1,21 +1,12 @@
-/**
- * 
- */
 package gsn.utils.protocols;
 
+import gsn.wrappers.Wrapper;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.naming.OperationNotSupportedException;
-
-import gsn.vsensor.EPuckVS;
-import gsn.wrappers.Wrapper;
-
 import org.apache.log4j.Logger;
 
 

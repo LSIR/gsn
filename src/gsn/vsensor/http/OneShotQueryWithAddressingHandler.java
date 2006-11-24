@@ -1,12 +1,12 @@
 package gsn.vsensor.http;
 
+import gsn.Container;
 import gsn.Mappings;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-import gsn.vsensor.Container;
 
 import java.io.File;
 import java.io.IOException;

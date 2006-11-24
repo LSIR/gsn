@@ -1,4 +1,4 @@
-package gsn.vsensor;
+package gsn;
 
 public class VirtualSensorInitializationFailedException extends Exception {
    

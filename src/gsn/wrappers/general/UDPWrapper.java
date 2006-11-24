@@ -4,9 +4,7 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
-
+import gsn.wrappers.Wrapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -14,9 +12,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -27,7 +22,7 @@ import org.apache.log4j.Logger;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * @author Jerome Rousselot (jerome.rousselot@csem.ch), CSEM<br>
  */
-public class UDPWrapper extends AbstractWrapper {
+public class UDPWrapper extends Wrapper {
    
    private static final String    RAW_PACKET    = "RAW_PACKET";
    
@@ -47,8 +42,8 @@ public class UDPWrapper extends AbstractWrapper {
     * Needs the following information from XML file : port : the udp port it
     * should be listening to rate : time to sleep between each packet
     */
-   public boolean initialize ( TreeMap context ) {
-      addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+   public boolean initialize (  ) {
+      addressBean = getActiveAddressBean( );
       try {
          port = Integer.parseInt( addressBean.getPredicateValue( "port" ) );
          socket = new DatagramSocket( port );
@@ -85,8 +80,7 @@ public class UDPWrapper extends AbstractWrapper {
       return dataField;
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize (  ) {
       threadCounter--;
    }
    

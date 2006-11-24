@@ -1,6 +1,6 @@
 package gsn.simulation;
 
-import gsn.vsensor.Container;
+import gsn.Container;
 
 import java.io.File;
 import java.io.FileNotFoundException;

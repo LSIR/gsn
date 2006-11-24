@@ -1,12 +1,12 @@
 package gsn.wrappers.ieee1451;
 
+import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
+import gsn.wrappers.Wrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -23,7 +22,7 @@ import org.apache.log4j.Logger;
  * @author Surender Reddy (yerva, surenderreddy.yerva-at-epfl.ch)<br>
  */
 
-public class CameraIdentifier extends AbstractWrapper {
+public class CameraIdentifier extends Wrapper {
    
    /**
     * 
@@ -68,7 +67,7 @@ public class CameraIdentifier extends AbstractWrapper {
    
    private static final transient Collection < DataField > cachedOutputStructure = new ArrayList < DataField >( );
    
-   public boolean initialize ( TreeMap context ) {
+   public boolean initialize ( ) {
       cachedOutputStructure.add( new DataField( ID_OUTPUT_FIELD , "VARCHAR(20)" , "Id of the detected transducer" ) );
       cachedOutputStructure.add( new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) );
       cachedOutputStructure.add( new DataField( STATUS_OUTPUT_FIELD , "VARCHAR(20)" , "status:added or removed" ) );
@@ -95,7 +94,7 @@ public class CameraIdentifier extends AbstractWrapper {
       camTEDS.add( 4 , tedsCam5 );
       camTEDS.add( 5 , tedsCam6 );
       
-      AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      AddressBean addressBean = getActiveAddressBean( );
       if ( addressBean.getPredicateValue( "RATE" ) != null ) RATE = Integer.parseInt( ( String ) addressBean.getPredicateValue( "RATE" ) );
       
       // ------INITIALIZING THE TEMPLATE DIRECTORY ---------
@@ -210,8 +209,7 @@ public class CameraIdentifier extends AbstractWrapper {
       return cachedOutputStructure;
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize ( ) {
       threadCounter--;
    }
      

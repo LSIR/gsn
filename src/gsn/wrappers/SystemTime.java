@@ -2,7 +2,6 @@ package gsn.wrappers;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -10,9 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
-
 import javax.swing.Timer;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -21,7 +18,7 @@ import org.apache.log4j.Logger;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 
-public class SystemTime extends AbstractWrapper implements ActionListener {
+public class SystemTime extends Wrapper implements ActionListener {
    
    private static final Serializable [ ] EMPTY_DATA_PART   = new Serializable [ ] {};
    
@@ -41,7 +38,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
    
    private Timer                         timer;
    
-   public boolean initialize ( TreeMap context ) {
+   public boolean initialize (  ) {
       setName( "DummyDataProducer-Thread" + ( ++threadCounter ) );
       return true;
    }
@@ -62,8 +59,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
       postStreamElement( streamElement );
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize ( ) {
       timer.stop( );
       threadCounter--;
       

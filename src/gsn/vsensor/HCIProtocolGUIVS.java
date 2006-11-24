@@ -6,9 +6,7 @@ import gsn.gui.JHCIProtocolControl;
 import gsn.utils.protocols.AbstractHCIProtocol;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.wrappers.Wrapper;
-
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 
 /**

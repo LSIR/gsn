@@ -5,17 +5,12 @@ import gsn.beans.VSensorConfig;
 import gsn.pid.PIDUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
-import gsn.vsensor.Container;
-import gsn.vsensor.ContainerImpl;
-import gsn.vsensor.VSensorLoader;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -29,7 +24,6 @@ import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 //import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
 
@@ -93,7 +87,7 @@ public final class Main {
       webAppContext.setContextPath( "/" );
       webAppContext.setResourceBase( DEFAULT_WEB_APP_PATH );
       ServletHandler servletHandler = new ServletHandler( );
-      servletHandler.addServletWithMapping( "gsn.vsensor.ContainerImpl" , "/gsn" );
+      servletHandler.addServletWithMapping( "gsn.ContainerImpl" , "/gsn" );
       servletHandler.addServletWithMapping( "gsn.web.DataDownload" , "/data" );
       webAppContext.setServletHandler( servletHandler );
       server.setHandler( webAppContext );
@@ -118,7 +112,7 @@ public final class Main {
                      break;
                }
                logger.warn( "Shutdown request received." );
-               vsloader.stopPlease( );
+               vsloader.stopLoading( );
                server.stop( );
             } catch ( Exception e ) {
                logger.warn( "Shutdowning the webserver failed." , e );

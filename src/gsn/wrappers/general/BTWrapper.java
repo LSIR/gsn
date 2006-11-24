@@ -1,11 +1,12 @@
 package gsn.wrappers.general;
 
+import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
+import gsn.wrappers.Wrapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,7 +28,7 @@ import de.avetana.bluetooth.rfcomm.RFCommConnectionImpl;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * @author Jerome Rousselot CSEM<br>
  */
-public class BTWrapper extends AbstractWrapper {
+public class BTWrapper extends Wrapper {
    
    private static final String    RAW_PACKET    = "RAW_PACKET";
    
@@ -52,9 +53,9 @@ public class BTWrapper extends AbstractWrapper {
     * url to get access to the device.
     * TODO : cleaning the parameter readings, e.g., what if the btURL is missing ?!!!
     */
-   public boolean initialize ( TreeMap context ) {
+   public boolean initialize (  ) {
       setName( "WNetSerialWrapper-Thread" + ( ++threadCounter ) );
-      addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      addressBean =getActiveAddressBean( );
       btUrl = addressBean.getPredicateValue( "url" );
       try {
 		connection = RFCommConnectionImpl.createRFCommConnection(new JSR82URL(btUrl));
@@ -102,8 +103,7 @@ public class BTWrapper extends AbstractWrapper {
       return dataField;
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize (  ) {
       threadCounter--;
    }
 }

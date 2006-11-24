@@ -1,9 +1,9 @@
 package gsn.notifications;
 
+import gsn.Container;
 import gsn.beans.StreamElement;
 import gsn.shared.Registry;
 import gsn.utils.TCPConnPool;
-import gsn.vsensor.Container;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

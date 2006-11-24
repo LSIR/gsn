@@ -1,25 +1,24 @@
 package gsn.wrappers;
 
+import gsn.Container;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.shared.Registry;
 import gsn.utils.TCPConnPool;
-import gsn.vsensor.Container;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.TreeMap;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.log4j.Logger;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class RemoteDS extends AbstractWrapper {
+public class RemoteDS extends Wrapper {
    
    private final transient Logger     logger                 = Logger.getLogger( RemoteDS.class );
    
@@ -33,8 +32,8 @@ public class RemoteDS extends AbstractWrapper {
    
    private int                        port;
    
-   public boolean initialize ( TreeMap initialContext ) {
-      AddressBean addressBean = ( AddressBean ) initialContext.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+   public boolean initialize (  ) {
+      AddressBean addressBean =getActiveAddressBean( );
       host = addressBean.getPredicateValue( "host" );
       if ( host == null || host.trim( ).length( ) == 0 ) {
          logger.warn( "The >host< parameter is missing from the RemoteDS wrapper." );
@@ -52,7 +51,7 @@ public class RemoteDS extends AbstractWrapper {
          logger.warn( "The >port< parameter is not a valid integer for the RemoteDS wrapper." );
          return false;
       }
-      this.remoteVSName = ( String ) initialContext.get( Registry.VS_NAME );
+      this.remoteVSName = addressBean.getPredicateValue( "name" );
       if ( this.remoteVSName == null ) {
          logger.warn( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
          return false;
@@ -191,5 +190,9 @@ public class RemoteDS extends AbstractWrapper {
          result.append( "(" ).append( whereClause ).append( ")" ).append( " OR " );
       }
       return result.delete( result.length( ) - " OR ".length( ) , result.length( ) ).toString( );
+   }
+
+   public void finalize ( ) {
+   //TODO   
    }
 }

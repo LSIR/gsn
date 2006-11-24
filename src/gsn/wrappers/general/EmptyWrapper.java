@@ -1,19 +1,16 @@
 package gsn.wrappers.general;
 
+import gsn.beans.AddressBean;
 import gsn.beans.DataField;
-import gsn.wrappers.AbstractWrapper;
-
+import gsn.wrappers.Wrapper;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class EmptyWrapper extends AbstractWrapper {
+public class EmptyWrapper extends Wrapper {
    
    private final transient Logger               logger        = Logger.getLogger( EmptyWrapper.class );
    
@@ -21,9 +18,9 @@ public class EmptyWrapper extends AbstractWrapper {
    
    private static final ArrayList < DataField > dataField     = new ArrayList < DataField >( );
    
-   public boolean initialize ( TreeMap context ) {
+   public boolean initialize (  ) {
       setName( "EmptyWrapper-Thread" + ( ++threadCounter ) );
-      
+      AddressBean addressBean = getActiveAddressBean( );
       dataField.add( new DataField( "DATA" , "int" , "incremental int" ) );
       return true;
    }
@@ -38,8 +35,7 @@ public class EmptyWrapper extends AbstractWrapper {
       return dataField;
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize ( ) {
       threadCounter--;
    }
    

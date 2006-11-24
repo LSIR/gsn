@@ -5,6 +5,7 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
+
 import gsn.wrappers.Wrapper;
 import gsn.wrappers.general.SerialWrapper;
 

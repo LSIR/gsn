@@ -3,8 +3,6 @@ package gsn;
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
 import gsn.utils.CaseInsensitiveComparator;
-import gsn.vsensor.Container;
-import gsn.vsensor.VirtualSensorPool;
 
 import java.util.Iterator;
 import java.util.TreeMap;

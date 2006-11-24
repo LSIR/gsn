@@ -1,8 +1,9 @@
-package gsn.vsensor;
+package gsn;
 
 import gsn.beans.VSensorConfig;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
+import gsn.vsensor.AbstractProcessingClass;
 
 import java.io.File;
 import java.util.ArrayList;

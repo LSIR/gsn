@@ -1,11 +1,11 @@
 package gsn.wrappers;
 
+import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
-import gsn.vsensor.Container;
 
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 /**
  * Date: Sep 4, 2006 Time: 4:07:58 PM
  */
-public class MemoryMonitoringWrapper extends AbstractWrapper {
+public class MemoryMonitoringWrapper extends Wrapper {
    
    private static final int          DEFAULT_SAMPLING_RATE                 = 1000;
    
@@ -42,9 +42,9 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
    
    private static final MemoryMXBean mbean                                 = ManagementFactory.getMemoryMXBean( );
    
-   public boolean initialize ( TreeMap context ) {
+   public boolean initialize (  ) {
       setName( "MemoryMonitoringWrapper-Thread" + ( ++threadCounter ) );
-      AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      AddressBean addressBean = getActiveAddressBean( );
       if ( addressBean.getPredicateValue( "sampling-rate" ) != null ) {
          samplingRate = ParamParser.getInteger( addressBean.getPredicateValue( "rate" ) , DEFAULT_SAMPLING_RATE );
          if ( samplingRate <= 0 ) {
@@ -78,8 +78,7 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
       }
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize ( ) {
       threadCounter--;
    }
    
@@ -93,5 +92,4 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
    public final Collection < DataField > getOutputFormat ( ) {
       return outputStructureCache;
    }
-   
 }

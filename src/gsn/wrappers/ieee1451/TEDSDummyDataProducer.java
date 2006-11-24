@@ -1,19 +1,17 @@
 package gsn.wrappers.ieee1451;
 
+import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
-
+import gsn.wrappers.Wrapper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -23,7 +21,7 @@ import org.apache.log4j.Logger;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 
-public class TEDSDummyDataProducer extends AbstractWrapper {
+public class TEDSDummyDataProducer extends Wrapper {
    
    private final Logger                logger        = Logger.getLogger( TEDSDummyDataProducer.class );
    
@@ -49,9 +47,9 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
     */
    boolean                             rateBased     = false;
    
-   public boolean initialize ( TreeMap context ) {
+   public boolean initialize ( ) {
       setName( "TEDSDummyRandomDataProducer-Thread" + ( ++threadCounter ) );
-      AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      AddressBean addressBean = getActiveAddressBean( );
       /**
        * Reading from the XML Configurations provided.
        */
@@ -94,8 +92,7 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
       
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize ( ) {
       threadCounter--;
    }
    

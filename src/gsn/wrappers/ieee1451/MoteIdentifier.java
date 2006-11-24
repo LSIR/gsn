@@ -1,5 +1,6 @@
 package gsn.wrappers.ieee1451;
 
+import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
@@ -7,22 +8,16 @@ import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
 import gsn.utils.ChangeListener;
 import gsn.utils.LazyTimedHashMap;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
+import gsn.wrappers.Wrapper;
 import gsn.wrappers.tinyos1x.GSNMessage;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
-
 import net.tinyos1x.message.Message;
 import net.tinyos1x.message.MessageListener;
 import net.tinyos1x.message.MoteIF;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -30,7 +25,7 @@ import org.apache.log4j.Logger;
  * @author Surender Reddy (yerva, surenderreddy.yerva-at-epfl.ch)<br>
  */
 
-public class MoteIdentifier extends AbstractWrapper implements MessageListener , ChangeListener {
+public class MoteIdentifier extends Wrapper implements MessageListener , ChangeListener {
    
    private ArrayList < String >     micaTEDS            = new ArrayList < String >( );
    
@@ -82,14 +77,14 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
    
    private File                     templateFolder;
    
-   public boolean initialize ( TreeMap context ) {
+   public boolean initialize (  ) {
       // mica related
       micaTEDS.add( 0 , "MicaONE.xml" );
       micaTEDS.add( 1 , "MicaTWO.xml" );
       micaTEDS.add( 2 , "MicaTHREE.xml" );
       micaTEDS.add( 3 , "MicaFOUR.xml" );
       
-      AddressBean addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      AddressBean addressBean = getActiveAddressBean( );
       if ( addressBean.getPredicateValue( "TIMEOUT" ) != null ) {
          TIMEOUT = Integer.parseInt( ( String ) addressBean.getPredicateValue( "TIMEOUT" ) );
       }
@@ -205,8 +200,7 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       return outputStructure;
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize (  ) {
       threadCounter--;
    }
    

@@ -4,6 +4,8 @@
  */
 package gsn.vsensor;
 
+import gsn.ContainerImpl;
+import gsn.VirtualSensorPool;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;

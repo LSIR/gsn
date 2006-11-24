@@ -1,11 +1,11 @@
 package gsn.wrappers.tinyos2x.sensorscope;
 
+import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
+import gsn.wrappers.Wrapper;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class SensorScopeWrapper extends AbstractWrapper implements MessageListener {
+public class SensorScopeWrapper extends Wrapper implements MessageListener {
    
    private final transient Logger logger        = Logger.getLogger( SensorScopeWrapper.class );
    
@@ -37,8 +37,8 @@ public class SensorScopeWrapper extends AbstractWrapper implements MessageListen
     */
    private static int             threadCounter = 0;
    
-   public boolean initialize ( TreeMap initialContext ) {
-      AddressBean addressBean = ( AddressBean ) initialContext.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+   public boolean initialize (  ) {
+      AddressBean addressBean = getActiveAddressBean( );
       String host = addressBean.getPredicateValue( "host" );
       int port;
       if ( host == null || host.trim( ).length( ) == 0 ) {
@@ -73,8 +73,7 @@ public class SensorScopeWrapper extends AbstractWrapper implements MessageListen
       return true;
    }
    
-   public synchronized void finalize ( HashMap context ) {
-      super.finalize( context );
+   public synchronized void finalize ( ) {
       moteif.deregisterListener( new SensorScopeDataMsg( ) , this );
       threadCounter--;
    }

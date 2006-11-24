@@ -1,6 +1,5 @@
-package gsn.vsensor;
+package gsn;
 
-import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
@@ -8,6 +7,7 @@ import gsn.notifications.GSNNotification;
 import gsn.notifications.NotificationRequest;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
+import gsn.vsensor.AbstractProcessingClass;
 import gsn.vsensor.http.AddressingReqHandler;
 import gsn.vsensor.http.ContainerInfoHandler;
 import gsn.vsensor.http.OneShotQueryHandler;

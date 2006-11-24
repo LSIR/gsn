@@ -1,5 +1,6 @@
 package gsn.web;
 
+import gsn.Container;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
@@ -7,7 +8,6 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-import gsn.vsensor.Container;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;

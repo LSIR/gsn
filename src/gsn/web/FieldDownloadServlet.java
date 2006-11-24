@@ -1,11 +1,11 @@
 package gsn.web;
 
+import gsn.Container;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
-import gsn.vsensor.Container;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;

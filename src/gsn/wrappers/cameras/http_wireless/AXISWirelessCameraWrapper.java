@@ -1,13 +1,12 @@
 package gsn.wrappers.cameras.http_wireless;
 
+import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.TCPConnPool;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
-
+import gsn.wrappers.Wrapper;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,7 +23,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class AXISWirelessCameraWrapper extends AbstractWrapper {
+public class AXISWirelessCameraWrapper extends Wrapper {
    
    /**
     * 
@@ -63,8 +62,8 @@ public class AXISWirelessCameraWrapper extends AbstractWrapper {
     * <br>
     * </ul>
     */
-   public boolean initialize ( TreeMap context ) {
-      this.addressBean = ( AddressBean ) context.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+   public boolean initialize (  ) {
+      this.addressBean =getActiveAddressBean( );
       host = this.addressBean.getPredicateValue( "host" );
       inputRate = this.addressBean.getPredicateValue( "rate" );
       int remotePort = Integer.parseInt( this.addressBean.getPredicateValue( "port" ) );
@@ -103,8 +102,7 @@ public class AXISWirelessCameraWrapper extends AbstractWrapper {
       }
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize (  ) {
       threadCounter--;
    }
    

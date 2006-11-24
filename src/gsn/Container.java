@@ -1,6 +1,7 @@
-package gsn.vsensor;
+package gsn;
 
 import gsn.notifications.NotificationRequest;
+import gsn.vsensor.AbstractProcessingClass;
 import gsn.wrappers.RemoteDS;
 
 /**

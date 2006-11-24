@@ -1,12 +1,12 @@
 package gsn.simulation;
 
+import gsn.VSensorLoader;
 import gsn.beans.AddressBean;
 import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.shared.Registry;
 import gsn.utils.CaseInsensitiveComparator;
-import gsn.vsensor.VSensorLoader;
 import gsn.wrappers.DataListener;
 
 import java.io.FileInputStream;
@@ -72,15 +72,14 @@ public class Simulation {
                         context1.put( Registry.VS_PORT , addressBean.getPredicateValue( Registry.VS_PORT ) );
                         context1.put( Registry.VS_NAME , addressBean.getPredicateValue( Registry.VS_NAME ) );
                         context1.put( DummyDataListener.CONTAINER_PORT , ( START_PORT_INDEX + i ) );
-                        boolean output = dummyRemoteDataSource.initialize( context1 );
+                        boolean output = dummyRemoteDataSource.initialize(  );
                         if ( !output ) {
                            logger.error( "dummyRemoteDataSource's initialization failed." );
                            System.exit( 1 );
                         }
                      }
                   }
-                  DataListener dbDataListener = new DummyDataListener( );
-                  dbDataListener.initialize( context1 );
+                  DataListener dbDataListener = new DummyDataListener(inputStream, streamSource);
                   dummyRemoteDataSource.addListener( dbDataListener );
                }
             }

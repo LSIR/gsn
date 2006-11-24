@@ -1,7 +1,5 @@
-package gsn.vsensor;
+package gsn;
 
-import gsn.Main;
-import gsn.Mappings;
 import gsn.beans.AddressBean;
 import gsn.beans.InputStream;
 import gsn.beans.Modifications;
@@ -13,11 +11,9 @@ import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.TCPConnPool;
-import gsn.wrappers.AbstractWrapper;
+import gsn.wrappers.Wrapper;
 import gsn.wrappers.DataListener;
 import gsn.wrappers.TableSizeEnforce;
-import gsn.wrappers.Wrapper;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -31,7 +27,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -60,13 +55,13 @@ public class VSensorLoader extends Thread {
    /**
     * Mapping between the AddressBean and DataSources
     */
-   private static final HashMap < AddressBean , AbstractWrapper > activeDataSources                   = new HashMap < AddressBean , AbstractWrapper >( );
+   private static final HashMap < AddressBean , Wrapper > activeDataSources                   = new HashMap < AddressBean ,  Wrapper >( );
    
    private StorageManager                                         storageManager                      = StorageManager.getInstance( );
    
    private String                                                 pluginsDir;
    
-   private boolean                                                canRun                              = true;
+   private boolean                                                isActive                              = true;
    
    private static int                                             VSENSOR_LOADER_THREAD_COUNTER       = 0;
    
@@ -89,9 +84,9 @@ public class VSensorLoader extends Thread {
          return;
       }
       
-      while ( this.canRun ) {
+      while ( isActive ) {
          try {
-            this.loadPlugin( );
+            loadPlugin( );
          } catch ( Exception e ) {
             logger.error( e.getMessage( ) , e );
          }
@@ -117,10 +112,10 @@ public class VSensorLoader extends Thread {
          Thread.sleep( 3000 );
       } catch ( InterruptedException e ) {
          logger.error( e.getMessage( ) , e );
-         if ( this.canRun == false ) return;
+         if ( this.isActive == false ) return;
       }
       configFilesLoop : for ( String configFile : addIt ) {
-         if ( this.canRun == false ) return;
+         if ( this.isActive == false ) return;
          bfact = BindingDirectory.getFactory( VSensorConfig.class );
          uctx = bfact.createUnmarshallingContext( );
          try {
@@ -339,8 +334,8 @@ public class VSensorLoader extends Thread {
                final AddressBean activeDataSourceAddressBean = activeDataSource.getActiveAddressBean( );
                activeDataSources.remove( activeDataSourceAddressBean );
                Mappings.getContainer( ).removeRemoteStreamSource( activeDataSource.getDBAlias( ) );
-               final HashMap finalizeContext = new HashMap( );
-               activeDataSource.finalize( finalizeContext );
+               activeDataSource.finalize(  );
+               activeDataSource.releaseResources();
             }
          }
          inputStream.finalize( );
@@ -423,12 +418,9 @@ public class VSensorLoader extends Thread {
    private boolean prepareStreamSource ( InputStream inputStream , StreamSource streamSource , VSensorConfig vsensor ) {
       HashMap < String , String > rewritingMapping = new HashMap < String , String >( );
       TreeMap < String , Object > context = new TreeMap < String , Object >( new CaseInsensitiveComparator( ) );
-      context.put( STREAM_SOURCE , streamSource );
-      context.put( INPUT_STREAM , inputStream );
-      context.put( STORAGE_MANAGER , this.storageManager );
       for ( AddressBean addressBean : streamSource.getAddressing( ) ) {
          context.put( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN , addressBean );
-         AbstractWrapper ds = activeDataSources.get( addressBean );
+         Wrapper ds = activeDataSources.get( addressBean );
          if ( ds == null ) {
             if ( !addressBean.isAbsoluteAddressSpecified( ) ) {// Dynamic-address
                ArrayList < VirtualSensorIdentityBean > resolved = this.resolveByDirecotryService( addressBean.getPredicates( ) );
@@ -459,8 +451,9 @@ public class VSensorLoader extends Thread {
                continue;
             }
             try {
-               ds = ( AbstractWrapper ) Main.getWrapperClass( addressBean.getWrapper( ) ).newInstance( );
-               boolean initializationResult = ds.initialize( context );
+               ds = ( Wrapper ) Main.getWrapperClass( addressBean.getWrapper( ) ).newInstance( );
+               ds.setActiveAddressBean( addressBean );
+               boolean initializationResult = ds.initialize(  );
                if ( initializationResult == false )
                   continue;// This address
                // is not working, goto the next address.
@@ -489,8 +482,7 @@ public class VSensorLoader extends Thread {
                logger.error( e.getMessage( ) , e );
             }
          }
-         DataListener dbDataListener = new DataListener( );
-         dbDataListener.initialize( context );
+         DataListener dbDataListener = new DataListener(inputStream,streamSource );
          String viewName = ds.addListener( dbDataListener );
          rewritingMapping.put( streamSource.getAlias( ) , viewName );
          streamSource.setUsedDataSource( ds , dbDataListener );
@@ -505,8 +497,8 @@ public class VSensorLoader extends Thread {
       return true;
    }
    
-   public void stopPlease ( ) {
-      this.canRun = false;
+   public void stopLoading ( ) {
+      this.isActive = false;
       this.interrupt( );
       for ( String configFile : Mappings.getAllKnownFileName( ) ) {
          VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName( configFile );

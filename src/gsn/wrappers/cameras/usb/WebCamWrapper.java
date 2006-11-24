@@ -10,13 +10,12 @@ package gsn.wrappers.cameras.usb;
 
 // For more resources see :
 // http://www.geocities.com/marcoschmidt.geo/java-image-coding.html
+import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
-
+import gsn.wrappers.Wrapper;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
-
 import javax.media.Buffer;
 import javax.media.CaptureDeviceInfo;
 import javax.media.CaptureDeviceManager;
@@ -53,17 +51,15 @@ import javax.media.util.BufferToImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class WebCamWrapper extends AbstractWrapper implements ControllerListener {
+public class WebCamWrapper extends Wrapper implements ControllerListener {
    
    public static final String            PICTURE_KEY                  = "PICTURE";
    
@@ -111,10 +107,10 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
    public static final String            DEFAULT_GSN_LOG4J_PROPERTIES = "conf/log4j.properties";
    
    // -----------------------------------START----------------------------------------
-   public boolean initialize ( TreeMap initialContext ) {
+   public boolean initialize ( ) {
       setName( "WebCamWrapper-Thread:" + ( ++threadCounter ) );
       dataField.add( new DataField( PICTURE_KEY , "binary:jpeg" , "The pictures observerd from the webcam." ) );
-      AddressBean addressBean = ( AddressBean ) initialContext.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+      AddressBean addressBean = getActiveAddressBean( );
       String liveView = addressBean.getPredicateValue( "live-view" );
       boolean isLiveViewEnabled = false;
       if ( liveView == null ) {
@@ -314,8 +310,7 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
       }
    }
    
-   public void finalize ( HashMap context ) {
-      super.finalize( context );
+   public void finalize ( ) {
       source.disconnect( );
       deviceProc.stop( );
       deviceProc.deallocate( );

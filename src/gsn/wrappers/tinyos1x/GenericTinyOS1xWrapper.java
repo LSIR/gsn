@@ -4,29 +4,23 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.vsensor.Container;
-import gsn.wrappers.AbstractWrapper;
-
+import gsn.wrappers.Wrapper;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
-
 import net.tinyos1x.message.Message;
 import net.tinyos1x.message.MessageListener;
 import net.tinyos1x.message.MoteIF;
-
 import org.apache.log4j.Logger;
 
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class GenericWrapper extends AbstractWrapper implements MessageListener {
+public class GenericTinyOS1xWrapper extends Wrapper implements MessageListener {
    
-   private final transient Logger  logger                = Logger.getLogger( GenericWrapper.class );
+   private final transient Logger  logger                = Logger.getLogger( GenericTinyOS1xWrapper.class );
    
    /**
     * A flag showing whether there exist a new data or not. This flag is used
@@ -48,8 +42,8 @@ public class GenericWrapper extends AbstractWrapper implements MessageListener {
    
    private ArrayList < String >    getterMethodNames     = new ArrayList < String >( );
    
-   public boolean initialize ( TreeMap initialContext ) {
-      AddressBean addressBean = ( AddressBean ) initialContext.get( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN );
+   public boolean initialize ( ) {
+      AddressBean addressBean = getActiveAddressBean( );
       String host = addressBean.getPredicateValue( "host" );
       int port =-1;
       if (host ==null || host.trim( ).length( )==0) {
@@ -170,8 +164,7 @@ public class GenericWrapper extends AbstractWrapper implements MessageListener {
       return toReturn.toArray( new Serializable [ ] {} );
    }
    
-   public synchronized void finalize ( HashMap context ) {
-      super.finalize( context );
+   public synchronized void finalize ( ) {
       threadCounter--;
    }
    
