@@ -11,6 +11,7 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.utils.KeyValueImp;
 import gsn.wrappers.Wrapper;
 import java.io.IOException;
 import java.io.InputStream;
@@ -480,17 +481,18 @@ public class SerialWrapper extends Wrapper implements SerialPortEventListener {
 
 	public static void main ( String[] args ) {
 		SerialWrapper serialWrapper = new SerialWrapper();
-		AddressBean addressBean = new AddressBean();
-		addressBean.addPredicate("serialport", "/dev/ttyUSB0");
-		addressBean.addPredicate("inputseparator", "(\n|\r|\f)");
-		addressBean.addPredicate("baudrate", "57600");
-		addressBean.addPredicate("flowcontrolmode", "FLOWCONTROL_NONE");
-		addressBean.addPredicate("databits", "8");
-		addressBean.addPredicate("stopbits", "1");
-		addressBean.addPredicate("parity", "PARITY_NONE");
-		addressBean.addPredicate( "host" , "localhost");
-      addressBean.addPredicate( "port" , "22001" );
-      serialWrapper.setActiveAddressBean( addressBean );		
+		ArrayList<KeyValueImp> predicates = new ArrayList<KeyValueImp>();
+      predicates.add(new KeyValueImp("serialport", "/dev/ttyUSB0"));
+      predicates.add(new KeyValueImp("inputseparator", "(\n|\r|\f)"));
+      predicates.add(new KeyValueImp("baudrate", "57600"));
+      predicates.add(new KeyValueImp("flowcontrolmode", "FLOWCONTROL_NONE"));
+      predicates.add(new KeyValueImp("databits", "8"));
+      predicates.add(new KeyValueImp("stopbits", "1"));
+      predicates.add(new KeyValueImp("parity", "PARITY_NONE"));
+      predicates.add(new KeyValueImp( "host" , "localhost"));
+      predicates.add(new KeyValueImp( "port" , "22001" ));
+      
+      serialWrapper.setActiveAddressBean( new AddressBean("SerialWrapper",predicates) );		
 		if ( !serialWrapper.initialize(  ) ) {
 		System.out.println("initialization failed\n");
 		} else {

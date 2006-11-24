@@ -278,7 +278,7 @@ public class VSensorLoader extends Thread {
       }
    }
    
-   private ArrayList < VirtualSensorIdentityBean > resolveByDirecotryService ( ArrayList < KeyValue > predicates ) {
+   private ArrayList < VirtualSensorIdentityBean > resolveByDirecotryService ( ArrayList < ? extends KeyValue > predicates ) {
       ArrayList < VirtualSensorIdentityBean > result = new ArrayList < VirtualSensorIdentityBean >( );
       
       if ( Main.getContainerConfig( ).getRegistryBootstrapAddr( ) == null ) {

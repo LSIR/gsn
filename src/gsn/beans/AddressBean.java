@@ -15,39 +15,19 @@ public final class AddressBean {
    
    private String                 wrapper;
    
-   private ArrayList < KeyValue > predicates;
+   private ArrayList <? extends KeyValue > predicates;
    
-   public AddressBean ( ) {}
-   
-   public AddressBean ( final String wrapper , final ArrayList < KeyValue > predicates ) {
+   public AddressBean ( final String wrapper , final ArrayList <? extends KeyValue > predicates ) {
       this.wrapper = wrapper;
       this.predicates = predicates;
-   }
-   
-   /**
-    * @param predicates The predicates to set.
-    */
-   public void setPredicates ( final ArrayList < KeyValue > predicates ) {
-      this.predicates = predicates;
-   }
-   
-   /**
-    * @param wrapper The wrapper to set.
-    */
-   public void setWrapper ( final String wrapper ) {
-      this.wrapper = wrapper;
    }
    
    public String getWrapper ( ) {
       return this.wrapper;
    }
    
-   public ArrayList < KeyValue > getPredicates ( ) {
+   public ArrayList < ? extends KeyValue > getPredicates ( ) {
       return this.predicates;
-   }
-   
-   public void addPredicate ( final String key , final String value ) {
-      this.predicates.add( new KeyValueImp( key , value ) );
    }
    
    /**
