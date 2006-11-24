@@ -20,9 +20,11 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.TooManyListenersException;
 import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Modified to used RXTX (http://users.frii.com/jarvi/rxtx/) which a LGPL
@@ -31,26 +33,18 @@ import org.apache.log4j.Logger;
  * http://users.frii.com/jarvi/rxtx/download.html Links GSN to a sensor network
  * through serial port. <p/> The only needed parameter is the serial port
  * address, provided through xml. Default connection settings are 9600 8 N 1
- *
- * Optional parameters for the XML file:
- * - inputseparator: if set, use this as divider between data 'packets'
- * - baudrate: set serialport baudrate (default: 9600)
- * - flowcontrolmode: set serialport flowcontrol mode
- *   possible values are:
- *    - FLOWCONTROL_NONE: Flow control off.
- *    - FLOWCONTROL_RTSCTS_IN: RTS/CTS flow control on input.
- *    - FLOWCONTROL_RTSCTS_OUT: RTS/CTS flow control on output.
- *    - FLOWCONTROL_XONXOFF_IN: XON/XOFF flow control on input.
- *    - FLOWCONTROL_XONXOFF_OUT: XON/XOFF flow control on output.
- * - databits: set serialport databits (5, 6, 7 or 8) default is 8
- * - stopbits: set serialport stopbits (1, 2 or 1.5) default is 1
- * - parity: set serialport parity
- *   possiblie values are:
- *    - PARITY_EVEN: EVEN parity scheme.
- *    - PARITY_MARK: MARK parity scheme.
- *    - PARITY_NONE: No parity bit. (default)
- *    - PARITY_ODD: ODD parity scheme.
- *    - PARITY_SPACE: SPACE parity scheme.
+ * Optional parameters for the XML file: - inputseparator: if set, use this as
+ * divider between data 'packets' - baudrate: set serialport baudrate (default:
+ * 9600) - flowcontrolmode: set serialport flowcontrol mode possible values are: -
+ * FLOWCONTROL_NONE: Flow control off. - FLOWCONTROL_RTSCTS_IN: RTS/CTS flow
+ * control on input. - FLOWCONTROL_RTSCTS_OUT: RTS/CTS flow control on output. -
+ * FLOWCONTROL_XONXOFF_IN: XON/XOFF flow control on input. -
+ * FLOWCONTROL_XONXOFF_OUT: XON/XOFF flow control on output. - databits: set
+ * serialport databits (5, 6, 7 or 8) default is 8 - stopbits: set serialport
+ * stopbits (1, 2 or 1.5) default is 1 - parity: set serialport parity possiblie
+ * values are: - PARITY_EVEN: EVEN parity scheme. - PARITY_MARK: MARK parity
+ * scheme. - PARITY_NONE: No parity bit. (default) - PARITY_ODD: ODD parity
+ * scheme. - PARITY_SPACE: SPACE parity scheme.
  * 
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * @author Jerome Rousselot CSEM<br>
@@ -58,7 +52,7 @@ import org.apache.log4j.Logger;
  */
 public class SerialWrapper extends Wrapper implements SerialPortEventListener {
    
-   public  static final String     RAW_PACKET    = "RAW_PACKET";
+   public static final String      RAW_PACKET    = "RAW_PACKET";
    
    private final transient Logger  logger        = Logger.getLogger( SerialWrapper.class );
    
@@ -71,48 +65,40 @@ public class SerialWrapper extends Wrapper implements SerialPortEventListener {
    private AddressBean             addressBean;
    
    private String                  serialPort;
-
-      private String		inputSeparator;
-
-      private boolean		useInputSeparator;
-
-      private int		flowControlMode;
-
-      private int		baudRate = 9600;
-
-      private int		dataBits = SerialPort.DATABITS_8;
-
-      private int		stopBits = SerialPort.STOPBITS_1;
-      
-      private int		parity = SerialPort.PARITY_NONE;
+   
+   private String                  inputSeparator;
+   
+   private boolean                 useInputSeparator;
+   
+   private int                     flowControlMode;
+   
+   private int                     baudRate      = 9600;
+   
+   private int                     dataBits      = SerialPort.DATABITS_8;
+   
+   private int                     stopBits      = SerialPort.STOPBITS_1;
+   
+   private int                     parity        = SerialPort.PARITY_NONE;
    
    private ArrayList < DataField > dataField     = new ArrayList < DataField >( );
    
    /*
     * Needs the following information from XML file : serialport : the name of
-    * the serial port (/dev/ttyS0...)
-    *
-    * Optional parameters for the XML file:
-    * - inputseparator: if set, use this as divider between data 'packets'
-    * - baudrate: set serialport baudrate (default: 9600)
-    * - flowcontrolmode: set serialport flowcontrol mode
-    *   possible values are:
-    *    - FLOWCONTROL_NONE: Flow control off.
-    *    - FLOWCONTROL_RTSCTS_IN: RTS/CTS flow control on input.
-    *    - FLOWCONTROL_RTSCTS_OUT: RTS/CTS flow control on output.
-    *    - FLOWCONTROL_XONXOFF_IN: XON/XOFF flow control on input.
-    *    - FLOWCONTROL_XONXOFF_OUT: XON/XOFF flow control on output.
-    * - databits: set serialport databits (5, 6, 7 or 8) default is 8
-    * - stopbits: set serialport stopbits (1, 2 or 1.5) default is 1
-    * - parity: set serialport parity
-    *   possiblie values are:
-    *    - PARITY_EVEN: EVEN parity scheme.
-    *    - PARITY_MARK: MARK parity scheme.
-    *    - PARITY_NONE: No parity bit. (default)
-    *    - PARITY_ODD: ODD parity scheme.
-    *    - PARITY_SPACE: SPACE parity scheme.
+    * the serial port (/dev/ttyS0...) Optional parameters for the XML file: -
+    * inputseparator: if set, use this as divider between data 'packets' -
+    * baudrate: set serialport baudrate (default: 9600) - flowcontrolmode: set
+    * serialport flowcontrol mode possible values are: - FLOWCONTROL_NONE: Flow
+    * control off. - FLOWCONTROL_RTSCTS_IN: RTS/CTS flow control on input. -
+    * FLOWCONTROL_RTSCTS_OUT: RTS/CTS flow control on output. -
+    * FLOWCONTROL_XONXOFF_IN: XON/XOFF flow control on input. -
+    * FLOWCONTROL_XONXOFF_OUT: XON/XOFF flow control on output. - databits: set
+    * serialport databits (5, 6, 7 or 8) default is 8 - stopbits: set serialport
+    * stopbits (1, 2 or 1.5) default is 1 - parity: set serialport parity
+    * possiblie values are: - PARITY_EVEN: EVEN parity scheme. - PARITY_MARK:
+    * MARK parity scheme. - PARITY_NONE: No parity bit. (default) - PARITY_ODD:
+    * ODD parity scheme. - PARITY_SPACE: SPACE parity scheme.
     */
-   public boolean initialize (  ) {
+   public boolean initialize ( ) {
       setName( "SerialWrapper-Thread" + ( ++threadCounter ) );
       addressBean = getActiveAddressBean( );
       serialPort = addressBean.getPredicateValue( "serialport" );
@@ -120,101 +106,89 @@ public class SerialWrapper extends Wrapper implements SerialPortEventListener {
          logger.warn( "The >serialport< parameter is missing from the SerialWrapper, wrapper initialization failed." );
          return false;
       }
-
-      inputSeparator = addressBean.getPredicateValue("inputseparator");
+      
+      inputSeparator = addressBean.getPredicateValue( "inputseparator" );
       if ( inputSeparator == null ) {
-	      useInputSeparator = false;
+         useInputSeparator = false;
       } else {
-	      useInputSeparator = true;
+         useInputSeparator = true;
       }
-
-      String newBaudRate = addressBean.getPredicateValue("baudrate");
-      if ( newBaudRate != null && newBaudRate.trim().length() > 0 ) {
-	      baudRate = Integer.parseInt(newBaudRate); // TODO: check validity of baudrate?
+      
+      String newBaudRate = addressBean.getPredicateValue( "baudrate" );
+      if ( newBaudRate != null && newBaudRate.trim( ).length( ) > 0 ) {
+         baudRate = Integer.parseInt( newBaudRate ); // TODO: check validity of
+                                                      // baudrate?
       }
-
-      String newDataBits = addressBean.getPredicateValue("databits");
-      if ( newDataBits != null && newDataBits.trim().length() > 0 ) {
-		switch ( Integer.parseInt(newDataBits) ) {
-			case 5:
-				dataBits = SerialPort.DATABITS_5;
-				break;
-			case 6:
-				dataBits = SerialPort.DATABITS_6;
-				break;
-			case 7:
-				dataBits = SerialPort.DATABITS_7;
-				break;
-			case 8:
-				dataBits = SerialPort.DATABITS_8;
-				break;
-		}
+      
+      String newDataBits = addressBean.getPredicateValue( "databits" );
+      if ( newDataBits != null && newDataBits.trim( ).length( ) > 0 ) {
+         switch ( Integer.parseInt( newDataBits ) ) {
+            case 5 :
+               dataBits = SerialPort.DATABITS_5;
+               break;
+            case 6 :
+               dataBits = SerialPort.DATABITS_6;
+               break;
+            case 7 :
+               dataBits = SerialPort.DATABITS_7;
+               break;
+            case 8 :
+               dataBits = SerialPort.DATABITS_8;
+               break;
+         }
       }
-
-      String newStopBits = addressBean.getPredicateValue("stopbits");
-      if ( newStopBits != null && newStopBits.trim().length() > 0 ) {
-		float newstopbits = Float.parseFloat(newStopBits);
-
-		if ( newstopbits == 1.0 )
-			stopBits = SerialPort.STOPBITS_1;
-		if ( newstopbits == 2.0 )
-			stopBits = SerialPort.STOPBITS_2;
-		if ( newstopbits == 1.5 )
-			stopBits = SerialPort.STOPBITS_1_5;
+      
+      String newStopBits = addressBean.getPredicateValue( "stopbits" );
+      if ( newStopBits != null && newStopBits.trim( ).length( ) > 0 ) {
+         float newstopbits = Float.parseFloat( newStopBits );
+         
+         if ( newstopbits == 1.0 ) stopBits = SerialPort.STOPBITS_1;
+         if ( newstopbits == 2.0 ) stopBits = SerialPort.STOPBITS_2;
+         if ( newstopbits == 1.5 ) stopBits = SerialPort.STOPBITS_1_5;
       }
-
-      String newParity = addressBean.getPredicateValue("parity");
-      if ( newParity != null && newParity.trim().length() > 0) {
-	      if ( newParity.equals("PARITY_EVEN") )
-		      parity = SerialPort.PARITY_EVEN;
-	      if ( newParity.equals("PARITY_MARK") )
-		      parity = SerialPort.PARITY_MARK;
-	      if ( newParity.equals("PARITY_NONE") )
-		      parity = SerialPort.PARITY_NONE;
-	      if ( newParity.equals("PARITY_ODD") )
-		      parity = SerialPort.PARITY_ODD;
-	      if ( newParity.equals("PARITY_SPACE") )
-		      parity = SerialPort.PARITY_SPACE;
+      
+      String newParity = addressBean.getPredicateValue( "parity" );
+      if ( newParity != null && newParity.trim( ).length( ) > 0 ) {
+         if ( newParity.equals( "PARITY_EVEN" ) ) parity = SerialPort.PARITY_EVEN;
+         if ( newParity.equals( "PARITY_MARK" ) ) parity = SerialPort.PARITY_MARK;
+         if ( newParity.equals( "PARITY_NONE" ) ) parity = SerialPort.PARITY_NONE;
+         if ( newParity.equals( "PARITY_ODD" ) ) parity = SerialPort.PARITY_ODD;
+         if ( newParity.equals( "PARITY_SPACE" ) ) parity = SerialPort.PARITY_SPACE;
       }
-
-      String newflowControlMode = addressBean.getPredicateValue("flowcontrolmode");
-      if ( newflowControlMode != null && newflowControlMode.trim().length() > 0 ) {
-	      flowControlMode = 0;
-
-	      String modes[] = newflowControlMode.split("\\|");
-
-	      for ( int i = 0; i < modes.length; i++ ) {
-		if ( modes[i].equals("FLOWCONTROL_NONE") )
-			flowControlMode |= SerialPort.FLOWCONTROL_NONE;
-		if ( modes[i].equals("FLOWCONTROL_RTSCTS_IN") )
-			flowControlMode |= SerialPort.FLOWCONTROL_RTSCTS_IN;
-		if ( modes[i].equals("FLOWCONTROL_RTSCTS_OUT") )
-			flowControlMode |= SerialPort.FLOWCONTROL_RTSCTS_OUT;
-		if ( modes[i].equals("FLOWCONTROL_XONXOFF_IN") )
-			flowControlMode |= SerialPort.FLOWCONTROL_XONXOFF_IN;
-		if ( modes[i].equals("FLOWCONTROL_XONXOFF_OUT") )
-			flowControlMode |= SerialPort.FLOWCONTROL_XONXOFF_OUT;
-	      }
-
-	      if ( flowControlMode == 0 ) {
-		      flowControlMode = -1; // don't set flow control mode if it is empty or is only composed of invalid arguments
-	      }
+      
+      String newflowControlMode = addressBean.getPredicateValue( "flowcontrolmode" );
+      if ( newflowControlMode != null && newflowControlMode.trim( ).length( ) > 0 ) {
+         flowControlMode = 0;
+         
+         String modes[] = newflowControlMode.split( "\\|" );
+         
+         for ( int i = 0 ; i < modes.length ; i++ ) {
+            if ( modes[ i ].equals( "FLOWCONTROL_NONE" ) ) flowControlMode |= SerialPort.FLOWCONTROL_NONE;
+            if ( modes[ i ].equals( "FLOWCONTROL_RTSCTS_IN" ) ) flowControlMode |= SerialPort.FLOWCONTROL_RTSCTS_IN;
+            if ( modes[ i ].equals( "FLOWCONTROL_RTSCTS_OUT" ) ) flowControlMode |= SerialPort.FLOWCONTROL_RTSCTS_OUT;
+            if ( modes[ i ].equals( "FLOWCONTROL_XONXOFF_IN" ) ) flowControlMode |= SerialPort.FLOWCONTROL_XONXOFF_IN;
+            if ( modes[ i ].equals( "FLOWCONTROL_XONXOFF_OUT" ) ) flowControlMode |= SerialPort.FLOWCONTROL_XONXOFF_OUT;
+         }
+         
+         if ( flowControlMode == 0 ) {
+            flowControlMode = -1; // don't set flow control mode if it is
+                                    // empty or is only composed of invalid
+                                    // arguments
+         }
       } else {
-	      flowControlMode = -1;
+         flowControlMode = -1;
       }
-
+      
       // TASK : TRYING TO CONNECT USING THE ADDRESS
       wnetPort = new SerialConnection( serialPort );
-      if ( wnetPort.openConnection( ) == false ) {
-	      return false;
-      }
+      if ( wnetPort.openConnection( ) == false ) { return false; }
       wnetPort.addEventListener( this );
       is = wnetPort.getInputStream( );
-
+      
       if ( logger.isDebugEnabled( ) ) {
-	      logger.debug( "Serial port wrapper successfully opened port and registered itself as listener." );
+         logger.debug( "Serial port wrapper successfully opened port and registered itself as listener." );
       }
-
+      
       inputBuffer = new byte [ MAXBUFFERSIZE ];
       dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
       return true;
@@ -261,23 +235,24 @@ public class SerialWrapper extends Wrapper implements SerialPortEventListener {
          try {
             portId = CommPortIdentifier.getPortIdentifier( serialPort );
          } catch ( NoSuchPortException e ) {
-            logger.error( "Port doesn't exist : "+serialPort , e );
+            logger.error( "Port doesn't exist : " + serialPort , e );
             return false;
          }
          // Open the port represented by the CommPortIdentifier object.
          // Give the open call a relatively long timeout of 30 seconds to
-         // allow a different application to reliquish the port if the user wants to.
+         // allow a different application to reliquish the port if the user
+         // wants to.
          if ( portId.isCurrentlyOwned( ) ) {
             logger.error( "port owned by someone else" );
             return false;
          }
          try {
             sPort = ( SerialPort ) portId.open( "GSNSerialConnection" , 30 * 1000 );
-
-	    sPort.setSerialPortParams(baudRate, dataBits, stopBits, parity);
-	    if ( flowControlMode != -1 ) {
-		    sPort.setFlowControlMode(flowControlMode);
-	    }
+            
+            sPort.setSerialPortParams( baudRate , dataBits , stopBits , parity );
+            if ( flowControlMode != -1 ) {
+               sPort.setFlowControlMode( flowControlMode );
+            }
          } catch ( PortInUseException e ) {
             logger.error( e.getMessage( ) , e );
             return false;
@@ -311,7 +286,6 @@ public class SerialWrapper extends Wrapper implements SerialPortEventListener {
          open = true;
          return true;
       }
-      
       
       /**
        * Close the port and clean up associated elements.
@@ -377,17 +351,18 @@ public class SerialWrapper extends Wrapper implements SerialPortEventListener {
       }
       
    }
+   
+   public void run ( ) {
 
-   public void run() {
-      
    }
+   
    public boolean sendToWrapper ( Object dataItem ) throws OperationNotSupportedException {
       if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port sending..." );
-      if (!wnetPort.isOpen( ))
-         throw new OperationNotSupportedException("The connection is closed.");
+      if ( !wnetPort.isOpen( ) ) throw new OperationNotSupportedException( "The connection is closed." );
       try {
          if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper performing a serial port sending." );
-         if ( dataItem instanceof byte [ ] ) wnetPort.getOutputStream( ).write( ( byte [ ] ) dataItem );
+         if ( dataItem instanceof byte [ ] )
+            wnetPort.getOutputStream( ).write( ( byte [ ] ) dataItem );
          else { // general case, writes using the printwriter.
             PrintWriter pw = new PrintWriter( wnetPort.getOutputStream( ) );
             pw.write( dataItem.toString( ) );
@@ -413,8 +388,8 @@ public class SerialWrapper extends Wrapper implements SerialPortEventListener {
    private static final int MAXBUFFERSIZE = 1024;
    
    private byte [ ]         inputBuffer;
-
-   private String		inputString;
+   
+   private String           inputString;
    
    public void serialEvent ( SerialPortEvent e ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port event, reading..." );
@@ -446,58 +421,55 @@ public class SerialWrapper extends Wrapper implements SerialPortEventListener {
             // messageAreaIn.append("\n--- BREAK RECEIVED ---\n");
       }
       if ( logger.isDebugEnabled( ) ) {
-	      logger.debug(
-			new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : " ).append(inputBuffer).toString());
+         logger.debug( new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : " ).append( inputBuffer ).toString( ) );
       }
-
+      
       if ( useInputSeparator ) {
-	      inputString = inputString + new String(inputBuffer);
-
-	      String[] dataChunks = inputString.split(inputSeparator);
-
-	      for ( int i = 0; i < dataChunks.length-1; i++ ) {
-		      if ( dataChunks[i].length() == 0 )
-			      continue;
-
-		      StreamElement streamElement = new StreamElement(
-				new String[] { RAW_PACKET },
-				new Integer[] { DataTypes.BINARY },
-				new Serializable[] { dataChunks[i].getBytes() },
-				System.currentTimeMillis()
-			);
-		      postStreamElement(streamElement);
-	      }
-	      inputString = dataChunks[dataChunks.length-1];
+         inputString = inputString + new String( inputBuffer );
+         
+         String [ ] dataChunks = inputString.split( inputSeparator );
+         
+         for ( int i = 0 ; i < dataChunks.length - 1 ; i++ ) {
+            if ( dataChunks[ i ].length( ) == 0 ) continue;
+            
+            StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { dataChunks[ i ].getBytes( ) } , System
+                  .currentTimeMillis( ) );
+            postStreamElement( streamElement );
+         }
+         inputString = dataChunks[ dataChunks.length - 1 ];
       } else {
-	      StreamElement streamElement = new StreamElement(
-			      new String[] { RAW_PACKET },
-			      new Integer[] { DataTypes.BINARY },
-			      new Serializable[] { inputBuffer },
-			      System.currentTimeMillis()
-		);
-	      postStreamElement(streamElement);
+         StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
+         postStreamElement( streamElement );
       }
    }
-
-	public static void main ( String[] args ) {
-		SerialWrapper serialWrapper = new SerialWrapper();
-		ArrayList<KeyValueImp> predicates = new ArrayList<KeyValueImp>();
-      predicates.add(new KeyValueImp("serialport", "/dev/ttyUSB0"));
-      predicates.add(new KeyValueImp("inputseparator", "(\n|\r|\f)"));
-      predicates.add(new KeyValueImp("baudrate", "57600"));
-      predicates.add(new KeyValueImp("flowcontrolmode", "FLOWCONTROL_NONE"));
-      predicates.add(new KeyValueImp("databits", "8"));
-      predicates.add(new KeyValueImp("stopbits", "1"));
-      predicates.add(new KeyValueImp("parity", "PARITY_NONE"));
-      predicates.add(new KeyValueImp( "host" , "localhost"));
-      predicates.add(new KeyValueImp( "port" , "22001" ));
-      
-      serialWrapper.setActiveAddressBean( new AddressBean("SerialWrapper",predicates) );		
-		if ( !serialWrapper.initialize(  ) ) {
-		System.out.println("initialization failed\n");
-		} else {
-		System.out.println("initialization successful\n");
-		}
-	}
+   
+   public static void main ( String [ ] args ) {
+      Properties properties = new Properties( );
+      properties.put( "log4j.rootLogger" , "DEBUG,console" );
+      properties.put( "log4j.appender.console" , "org.apache.log4j.ConsoleAppender" );
+      properties.put( "log4j.appender.console.Threshold" , "DEBUG" );
+      properties.put( "log4j.appender.console.layout" , "org.apache.log4j.PatternLayout" );
+      properties.put( "log4j.appender.console.layout.ConversionPattern" , "%-6p[%d] [%t] (%13F:%L) %3x - %m%n" );
+      PropertyConfigurator.configure( properties );
+      Logger logger = Logger.getLogger( SerialWrapper.class );
+      logger.info( "SerialWrapper Test Started" );
+      SerialWrapper serialWrapper = new SerialWrapper( );
+      ArrayList < KeyValueImp > predicates = new ArrayList < KeyValueImp >( );
+      predicates.add( new KeyValueImp( "serialport" , "/dev/ttyUSB0" ) );
+      predicates.add( new KeyValueImp( "inputseparator" , "(\n|\r|\f)" ) );
+      predicates.add( new KeyValueImp( "baudrate" , "57600" ) );
+      predicates.add( new KeyValueImp( "flowcontrolmode" , "FLOWCONTROL_NONE" ) );
+      predicates.add( new KeyValueImp( "databits" , "8" ) );
+      predicates.add( new KeyValueImp( "stopbits" , "1" ) );
+      predicates.add( new KeyValueImp( "parity" , "PARITY_NONE" ) );
+      predicates.add( new KeyValueImp( "host" , "localhost" ) );
+      predicates.add( new KeyValueImp( "port" , "22001" ) );
+      serialWrapper.setActiveAddressBean( new AddressBean( "SerialWrapper" , predicates ) );
+      if ( !serialWrapper.initialize( ) ) {
+         System.out.println( "initialization failed\n" );
+      } else {
+         System.out.println( "initialization successful\n" );
+      }
+   }
    
 }
