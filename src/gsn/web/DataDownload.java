@@ -143,7 +143,6 @@ public class DataDownload extends HttpServlet {
 	    	  if (responseCVS) {
 	    		  boolean firstLine = true;
 	    		  out.println(query);
-		    	  //out.println(line.substring(delimiter.length()));
 		          while ( result.hasMoreElements( ) ) {
 		             StreamElement se = result.nextElement( );
 		             if (firstLine) {
@@ -152,6 +151,7 @@ public class DataDownload extends HttpServlet {
 		            	if (wantTimeStamp) {
 		            		line += delimiter + "TIMED";
 		            	}
+		            	firstLine = false;
 		             }
 		             out.println(line.substring(delimiter.length()));
 		             line = "";
