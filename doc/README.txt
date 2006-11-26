@@ -20,7 +20,7 @@ running on a separate GSN server.
 
 Data can be sent to various output devices. This is called
 the notification subsystem. For example, a virtual sensor
-can send data to a sms notification subsystem.
+can send data to an sms gateway.
 
 
 How to use GSN
