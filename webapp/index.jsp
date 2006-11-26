@@ -19,6 +19,9 @@
 	<script type="text/javascript" src="js/jquery-latest.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/gsn.js"></script>
+	<% if(requestedpage.equals("data.jsp")) { %>
+	<script type="text/javascript" src="js/datePicker.js"></script>
+	<% } %>
 </head>
 <body>
 

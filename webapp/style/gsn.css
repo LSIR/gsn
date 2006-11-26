@@ -106,6 +106,28 @@ color:#000000;
 text-decoration:none;
 }
 
+#datechooser {
+	clear:both;
+	margin:1px;
+	border: 1px solid #FFA84C;
+	margin-bottom:8px;
+	background:#FFA84C;
+}
+
+#datachooser table {
+	width:100%;
+}
+
+#datachooser .step{
+	background-color:#ffa84c;
+	color:#000000;
+}
+
+#datachooser .data{
+	background-color:#ffffff;
+	color:#4c4c4c;
+}
+
 #main {
 		xbackground:#9c9;
 		float:left;

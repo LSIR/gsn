@@ -3,7 +3,11 @@
  */
 var map;
 var tinyred;
-var tinygreen; 
+var tinygreen;
+var fields = new Array();
+var fields_type = new Array();
+var criterias = new Array();
+var nb_crit = 0;
  
  
 var GSN = { 
@@ -81,30 +85,174 @@ var GSN = {
 		}});
 	},
 	data: function(vsName){
-		$("form").empty();
+		$("#dataSet").remove();
+		$("#criterias").empty();
+		$("#criterias").append("<tr><td class=\"step\">Step 1/5 : Selection of the Virtual Sensor</td></tr>");
+		$("#criterias").append("<tr><td class=\"data\" id=\"vsensor\">Selected virtual sensor : " + vsName + "</td></tr>");
+		$("#vsensor").append("<input type=\"hidden\" name=\"vsName\" id=\"vsName\" value=\""+vsName+"\">");
+		$("#criterias").append("<tr><td class=\"step\">Step 2/5 : Selection of the fields</td></tr>");
+		$("#criterias").append("<tr><td class=\"data\" id=\"fields\">Select fields<br/></td></tr>");
 		$.ajax({
 			type: "GET",
 			url: "/gsn?REQUEST=113&name="+vsName,
 			success: function(msg) {
-				$("form").append("<h3 id=\"vname\">" + $("virtual-sensor", msg).attr("name") + "</h3>");
-				$("form").append("<p id=\"field\">Fields:</p>");
-				$("form").append("<select name=\"fields\" id=\"fields\" multiple size=\"0\"></select>");
+				fields = new Array();
+				criterias = new Array();
 				$("field", $("virtual-sensor", msg)).each(function() {
 					if ($(this).attr("type").substr(0,3) != "bin") {
-						$("select").attr("size", parseInt($("select").attr("size")) + 1);
-						$("select").append("<option value=\""+$(this).attr("name")+"\">"+$(this).attr("name")+"</option>");
+						fields.push($(this).attr("name"));
+						fields_type.push($(this).attr("type"));
+						$("#fields").append("<input type=\"checkbox\" name=\"fields\" id=\"field\" value=\""+$(this).attr("name")+"\">"+$(this).attr("name")+"<br/>");
 					}
 				});
-				$("form").append("<input type=\"hidden\" name=\"vsName\" value=\""+vsName+"\">");
-				$("form").append("<br><br>Number of items : <input type=\"text\" name=\"nb\" size=\"3\">");
-				$("form").append("<br><br><input type=\"radio\" name=\"delimiter\" value=\"semicolon\" CHECKED> Semicolon (;)");
-				$("form").append("<br><input type=\"radio\" name=\"delimiter\" value=\"tab\"> Tab");
-				$("form").append("<br><input type=\"radio\" name=\"delimiter\" value=\"space\"> Space");
-				$("form").append("<br><input type=\"radio\" name=\"delimiter\" value=\"other\"> Other : <input type=\"text\" name=\"otherdelimiter\" size=\"3\">");
-				$("form").append("<br><br><input type=\"submit\" name=\"submit\" value=\"Get datas\">");
+				$("#fields").append("<br/><input type=\"checkbox\" name=\"all\" onClick=\"javascript:GSN.checkAllFields(this.checked)\">Check all<br/>");
+				$("#fields").append("<br><a href=\"javascript:GSN.nbDatas()\" id=\"nextStep\">Next step</a>");
 			}
 		});
 	},
+	checkAllFields: function(check){
+		$("input").each(function () {
+			if ($(this).attr("id") == "field") {
+				$(this).attr("checked", check);
+			}
+		});
+	},
+	nbDatas: function() {
+		$("#nextStep").remove();
+		$("#criterias").append("<tr><td class=\"step\">Step 3/5 : Selection of the Virtual Sensor</td></tr>");
+		$("#criterias").append("<tr><td class=\"data\" id=\"nbDatas\"></td></tr>");
+		$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"allDatas\" value=\"\" checked> All datas<br/>");
+		$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"someDatas\" value=\"\"> Last <input type=\"text\" name=\"nb\" value=\"\" id=\"nbOfDatas\" size=\"4\"/> values<br/>");
+		$("#nbDatas").append("<br><a href=\"javascript:GSN.addCriteria(true)\" id=\"nextStep\">Next step</a>");
+	},	
+	addCriteria: function(newStep) {
+		if (newStep) {
+			$("#nextStep").remove();
+			$("#criterias").append("<tr><td class=\"step\">Step 4/5 : Selection of the criterias</td></tr>");
+			$("#criterias").append("<tr><td class=\"data\" id=\"where\">");
+			$("#where").append("<a id=\"addCrit\" href=\"javascript:GSN.addCriteria(false)\">Add criteria</a>");
+			$("#where").append("<br/><br/><a id=\"nextStep\" href=\"javascript:GSN.selectDataDisplay()\">Next step</a></td></tr>");
+		} else {
+			nb_crit++;
+			newcrit = "<div id=\"where" + nb_crit + "\"></div>";
+    		$("#addCrit").before(newcrit);
+    		GSN.addCriteriaLine(nb_crit, "");
+    		criterias.push(nb_crit);
+		}
+	},
+	addCriteriaLine: function(nb_crit, field) {
+			newcrit = "";
+			if (criterias.length > 0) {
+				newcrit += "<select name=\"critJoin\" id=\"critJoin" + nb_crit + "\" size=\"1\">";
+				var critJoin = new Array("AND", "OR");
+				for (var i=0; i < critJoin.length; i++) {
+					newcrit += "<option value=\""+critJoin[i]+"\">"+critJoin[i]+"</option>";
+				}
+				newcrit += "</select>";
+			}
+			newcrit += "<select name=\"neg\" size=\"1\" id=\"neg" + nb_crit + "\">";
+			var neg = new Array("", "NOT");
+    		for (i=0; i < neg.length; i++) {
+    			newcrit += "<option value=\"" + neg[i] + "\" >" + neg[i] + "</option>";
+    		}
+    		newcrit += "</select> ";
+    		newcrit += "<select name=\"critfield\" id=\"critfield" + nb_crit + "\" size=\"1\" onChange=\"javascript:GSN.criteriaForType(this.value,"+nb_crit+")\">";
+    		for (var i=0; i< fields.length; i++) {
+    			newcrit += "<option value=\"" + fields[i] + "\">" + fields[i] + "</option>";
+    		}
+    		newcrit += "</select> ";
+    		var operators = new Array("&gt;", "&ge;", "&lt;", "&le;", "=", "LIKE");
+    		newcrit += "<select name=\"critop\" size=\"1\" id=\"critop" + nb_crit + "\">";
+    		for (i=0; i < operators.length; i++) {
+    			newcrit += "<option value=\"" + operators[i] + "\" >" + operators[i] + "</option>";
+    		}
+    		newcrit += "</select> ";
+    		newcrit += "<input type=\"text\" name=\"critval\" id=\"critval" + nb_crit + "\" size=\"18\">";
+    		newcrit += " <a href=\"javascript:GSN.removeCrit("+nb_crit+")\" id=\"remove" + nb_crit + "\"> (remove)</a>";
+    		$("#where"+nb_crit).append(newcrit);
+    		$("#critfield"+nb_crit).attr("value", field);
+	},
+	criteriaForType: function(field, nb_crit) {
+		if (field == "TIMED") {
+			$("#critval"+nb_crit).val("DD/MM/YYYY hh:mm:ss");
+		} else {
+			$("#critval"+nb_crit).val("");
+		}
+	},
+	removeCrit: function(critnb) {
+   		$("#where"+critnb).remove();
+   		var critTMP = new Array();
+   		for (var i=0; i<criterias.length; i++) {
+   			if (criterias[i] == critnb) {
+   				if (i == 0 && criterias.length > 0) {
+   					$("#critJoin"+criterias[i+1]).remove();
+   				}
+   			} else {
+   				critTMP.push(criterias[i]);
+   			}
+   		}
+   		criterias = critTMP;
+   	},
+   	selectDataDisplay: function() {
+   		$("#nextStep").remove();
+   		$("#criterias").append("<tr><td class=\"step\">Step 5/5 : Selection of the format</td></tr>");
+		$("#criterias").append("<tr><td class=\"data\" id=\"display\">");
+		$("#display").append("<input type=\"radio\" id=\"samePage\" value=\"samepage\" name=\"display\" checked>In this page<br/>");
+		//$("#display").append("<input type=\"radio\" id=\"popup\" value=\"popup\" name=\"display\">In a new window<br/>");
+		$("#display").append("<input type=\"radio\" id=\"CSV\" value=\"CSV\" name=\"display\">Download datas<br/>");
+		$("#display").append("<br/><a href=\"javascript:GSN.getDatas()\">Get datas</a><br/><br/>");
+   	},
+   	getDatas: function() {
+   		if ($("#samePage").attr("checked")) {
+   			request = "vsName="+$("#vsName").attr("value");;
+   			$("input").each(function () {
+				if ($(this).attr("id") == "field" && $(this).attr("checked")) {
+					request += "&fields=" + $(this).attr("value");
+				}
+			});
+			if ($("#someDatas").attr("checked") && $("#nbOfDatas").attr("value") != "") {
+				request += "&nb=" + $("#nbOfDatas").attr("value");
+			}
+			for (var i=0; i < criterias.length; i++) {
+				if (i > 0) {
+					request += "&critJoin="+$("#critJoin"+criterias[i]).val();
+				}
+				request += "&neg="+$("#neg"+criterias[i]).val();
+				request += "&critfield="+$("#critfield"+criterias[i]).val();
+				request += "&critop="+$("#critop"+criterias[i]).val();
+				request += "&critval="+$("#critval"+criterias[i]).val();
+			}
+			$.ajax({
+			type: "GET",
+			url: "/data?"+request,
+			success: function(msg) {
+				$("#dataSet").remove();
+				$("#datachooser").append($.TABLE({"size":"100%", "id":"dataSet"})); //"<table size=\"100%\" id=\"dataSet\">");
+				nbLine = 0;
+				$("line", $("data", msg)).each(function() {
+					nbLine++;
+					if (nbLine == 1) {
+						$("#dataSet").append($.TR({"id":"line"+nbLine, "class":"step"}));
+					} else {
+						$("#dataSet").append($.TR({"id":"line"+nbLine, "class":"data"}));
+					}
+					$("field", $(this)).each(function() {
+						$("#line"+nbLine).append($.TD({},$(this).text()));
+					});
+					
+				});
+			}
+		});
+		/*
+   		} else if ($("#popup").attr("checked")) {
+   			$("form").attr("target", "_blank");
+   			document.forms["formular"].submit();
+   		*/
+   		} else if ($("#CSV").attr("checked")) {
+   			$("#criterias").attr("target", "_self");
+   			document.forms["formular"].submit();
+   		}
+   	},
 	menu: function (vsName) {
 		GSN.debug("menu:"+vsName);
 		
