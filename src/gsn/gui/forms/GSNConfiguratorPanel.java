@@ -274,6 +274,7 @@ public class GSNConfiguratorPanel {
 	    gsnStart.setIcon(stopIcon);
 	    for (StartStopEventListener listener : listeners)
 		listener.notifyGSNStart();
+	    JOptionPane.showMessageDialog(null, "Congratulations! GSN has successfully started. You can use the web interface by visiting http://localhost:1882/index.jsp with your web browser.");
 	}
 
 	public void notifyGsnHasStopped() {
