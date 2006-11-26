@@ -95,51 +95,42 @@ public class VSensorLoader extends Thread {
    
    public void loadPlugin ( ) throws SQLException , JiBXException {
       Modifications modifications = getUpdateStatus( pluginsDir );
-      Collection < String > removeIt = modifications.getRemove( );
-      Collection < String > addIt = modifications.getAdd( );
-      IBindingFactory bfact;
-      IUnmarshallingContext uctx;
-      VSensorConfig configuration;
-      for ( String configFile : removeIt ) {
-         String name = Mappings.getConfigurationObject( configFile ).getVirtualSensorName( );
-         logger.warn( new StringBuilder( ).append( "removing : " ).append( name ).toString( ) );
-         VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName( configFile );
+      ArrayList < VSensorConfig > removeIt = modifications.getRemove( );
+      ArrayList < VSensorConfig > addIt = modifications.getAdd( );
+      for ( VSensorConfig configFile : removeIt ) {
+         logger.warn( new StringBuilder( ).append( "removing : " ).append( configFile.getVirtualSensorName( ) ).toString( ) );
+         VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName( configFile.getFileName( ) );
          this.toDirectoryService( sensorInstance.getConfig( ) , Registry.DEREGISTER );
-         Mappings.removeFilename( configFile );
+         Mappings.removeFilename( configFile.getFileName( ) );
          this.removeAllResources( sensorInstance );
       }
       try {
          Thread.sleep( 3000 );
       } catch ( InterruptedException e ) {
          logger.error( e.getMessage( ) , e );
+      }finally {
          if ( this.isActive == false ) return;
       }
-      configFilesLoop : for ( String configFile : addIt ) {
-         if ( this.isActive == false ) return;
-         bfact = BindingDirectory.getFactory( VSensorConfig.class );
-         uctx = bfact.createUnmarshallingContext( );
-         try {
-            configuration = ( VSensorConfig ) uctx.unmarshalDocument( new FileInputStream( configFile ) , null );
-         } catch ( JiBXException e ) {
-            logger.error( e.getMessage( ) , e );
-            logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append(
-               " failed because there is syntax error in the configuration file. Please check the configuration file and try again." ).toString( ) );
-            continue configFilesLoop;
-         } catch ( FileNotFoundException e ) {
-            logger.error( e.getMessage( ) , e );
-            logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append( " failed because the configuratio of I/O problems." ).toString( ) );
-            continue configFilesLoop;
-         }
-         configuration.setFileName( configFile );
-         if ( !configuration.validate( ) ) {
-            logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append( " failed because of one or more problems in configuration file." )
-                  .toString( ) );
-            logger.error( new StringBuilder( ).append( "Please check the file and try again" ).toString( ) );
-            continue configFilesLoop;
-         }
+      configFilesLoop : for ( VSensorConfig configuration : addIt ) {
+//         bfact = BindingDirectory.getFactory( VSensorConfig.class );
+//         uctx = bfact.createUnmarshallingContext( );
+//         try {
+//            configuration = ( VSensorConfig ) uctx.unmarshalDocument( new FileInputStream( configFile ) , null );
+//         } catch ( JiBXException e ) {
+//            logger.error( e.getMessage( ) , e );
+//            logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append(
+//               " failed because there is syntax error in the configuration file. Please check the configuration file and try again." ).toString( ) );
+//            continue configFilesLoop;
+//         } catch ( FileNotFoundException e ) {
+//            logger.error( e.getMessage( ) , e );
+//            logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append( " failed because the configuratio of I/O problems." ).toString( ) );
+//            continue configFilesLoop;
+//         }
+//         configuration.setFileName( configFile );
+         
          for ( InputStream is : configuration.getInputStreams( ) ) {
             if ( !is.validate( ) ) {
-               logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append( " failed because of one or more problems in configuration file." )
+               logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configuration.getFileName( ) ).append( " failed because of one or more problems in configuration file." )
                      .toString( ) );
                logger.error( new StringBuilder( ).append( "Please check the file and try again" ).toString( ) );
                continue configFilesLoop;
@@ -147,13 +138,13 @@ public class VSensorLoader extends Thread {
          }
          String vsName = configuration.getVirtualSensorName( );
          if ( Mappings.getVSensorConfig( vsName ) != null ) {
-            logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append( " failed because the virtual sensor name used by " )
-                  .append( configFile ).append( " is already used by : " ).append( Mappings.getVSensorConfig( vsName ).getFileName( ) ).toString( ) );
+            logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configuration.getFileName( ) ).append( " failed because the virtual sensor name used by " )
+                  .append( configuration.getFileName( ) ).append( " is already used by : " ).append( Mappings.getVSensorConfig( vsName ).getFileName( ) ).toString( ) );
             logger.error( "Note that the virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
             continue;
          }
          if ( !StringUtils.isAlphanumericSpace( vsName ) ) {
-            logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configFile ).append(
+            logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( configuration.getFileName( ) ).append(
                " failed because the virtual sensor name is not following the requirements : " ).toString( ) );
             logger.error( "The virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
             logger.error( "That the name of the virutal sensor should starting by alphabetical character and they can contain numerical characters afterwards." );
@@ -186,7 +177,7 @@ public class VSensorLoader extends Thread {
             }
             continue;
          }
-         logger.warn( new StringBuilder( "adding : " ).append( vsName ).append( " virtual sensor[" ).append( configFile ).append( "]" ).toString( ) );
+         logger.warn( new StringBuilder( "adding : " ).append( vsName ).append( " virtual sensor[" ).append( configuration.getFileName( ) ).append( "]" ).toString( ) );
          Mappings.addVSensorInstance( pool );
          try {
             pool.start( );
