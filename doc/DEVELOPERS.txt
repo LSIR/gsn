@@ -1,0 +1,72 @@
+*************************************
+* Quick Introduction for Developers *
+*************************************
+
+Checking out the code 
+=====================
+
+GSN code is publicly available from the sourceforge
+subversion repository server.
+
+You can check out GSN as an eclipse (http://www.eclipse.org)
+project by using the subclipse plugin (http://subclipse.tigris.org).
+
+Or with the following command-line:
+
+svn co https://svn.sourceforge.net/svnroot/globalsn globalsn
+ 
+
+Installing dependencies
+=======================
+Due to licensing terms, GSN cannot provide you the JMF
+library (Java Media Framework). However, this library is
+needed to compile GSN.
+
+You can download it from
+
+http://java.sun.com/products/java-media/jmf/2.1.1/download.html
+
+Simply put the JMF-2.1.1.e folder in the folder containing the
+src, conf, doc, icons, jars... folders.
+
+You will also need the ant building tool (http://ant.apache.org/)
+and the latest version of the JDK (at least JDK1.5 update 6, see
+http://java.sun.com ).
+
+Using the build system
+======================
+
+go to the folder containing gsn. There, run 
+
+ant build
+
+It should tell you that it compiles many files and show a success
+message.
+
+To test the build, run
+
+ant gui
+
+That's all !
+
+There are various other ant targets:
+
+test    runs unit tests for gsn.
+jar		builds a jar library containing gsn.
+
+Bugs
+====
+If you find a bug in gsn, please tell us on 
+http://sourceforge.net/tracker/?group_id=158046&atid=806259
+
+Contributing
+============
+If you like the project, you can make a difference !
+By reporting bugs, proposing new features, writing documentation,
+writing new virtual sensors, new wrappers, new database back-ends...
+
+If you don't like it, please tell us why !
+
+Thank you for your interest,
+
+The GSN Development Team
