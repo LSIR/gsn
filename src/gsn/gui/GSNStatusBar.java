@@ -4,6 +4,7 @@
  */
 package gsn.gui;
 
+import gsn.gui.forms.GSNConfiguratorPanel;
 import gsn.gui.forms.StartStopEventListener;
 
 import javax.swing.Icon;
@@ -21,7 +22,7 @@ public class GSNStatusBar extends JPanel implements StartStopEventListener {
 
     JLabel gsnstatus, dirstatus;
 
-    private static final String GSN_RUNNING = "GSN running.",
+    private static  String GSN_RUNNING = "GSN running.",
 	    GSN_STOPPED = "GSN stopped.",
 	    DIR_RUNNING = "Directory service enabled.",
 	    DIR_STOPPED = "Directory service disabled.";
@@ -49,27 +50,17 @@ public class GSNStatusBar extends JPanel implements StartStopEventListener {
          * @see gsn.gui.forms.StartStopEventListener#notifyGSNDirStart()
          */
     public void notifyGSNDirStart() {
-	dirstatus.setText(DIR_RUNNING);
+	dirstatus.setText(DIR_RUNNING+"(http://"+GSNConfiguratorPanel.getInstance( ).getDirectoryHostAddress( )+")");
 	dirstatus.setIcon(green);
     }
 
-    /*
-         * (non-Javadoc)
-         * 
-         * @see gsn.gui.forms.StartStopEventListener#notifyGSNDirStop()
-         */
     public void notifyGSNDirStop() {
 	dirstatus.setText(DIR_STOPPED);
 	dirstatus.setIcon(red);
     }
 
-    /*
-         * (non-Javadoc)
-         * 
-         * @see gsn.gui.forms.StartStopEventListener#notifyGSNStart()
-         */
     public void notifyGSNStart() {
-	gsnstatus.setText(GSN_RUNNING);
+	gsnstatus.setText(GSN_RUNNING+"(http://localhost:"+GSNConfiguratorPanel.getInstance( ).getGsnPortNo( )+")");
 	gsnstatus.setIcon(green);
     }
 

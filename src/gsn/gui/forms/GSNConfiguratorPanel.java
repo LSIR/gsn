@@ -22,6 +22,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -77,6 +78,8 @@ public class GSNConfiguratorPanel {
     private Timer timer;
 
     private StatusMonitor statusMonitor;
+    
+   private JFormattedTextField gsnPortNo;
 
     public GSNConfiguratorPanel(ContainerConfig bean) {
 	if (bean == null)
@@ -92,6 +95,7 @@ public class GSNConfiguratorPanel {
 	timer.start();
 	instance = this;
     }
+    
 
     /*
          * This class constantly monitors for the presence of the pid files.
@@ -274,7 +278,7 @@ public class GSNConfiguratorPanel {
 	    gsnStart.setIcon(stopIcon);
 	    for (StartStopEventListener listener : listeners)
 		listener.notifyGSNStart();
-	    JOptionPane.showMessageDialog(null, "Congratulations! GSN has successfully started. You can use the web interface by visiting http://localhost:1882/index.jsp with your web browser.");
+//	    JOptionPane.showMessageDialog(null, "Congratulations! GSN has successfully started. You can use the web interface by visiting http://localhost:1882/index.jsp with your web browser.");
 	}
 
 	public void notifyGsnHasStopped() {
@@ -529,7 +533,7 @@ public class GSNConfiguratorPanel {
 	panelBuilder
 		.append(
 			"GSN Server Port",
-			textfield = BasicComponentFactory
+			gsnPortNo = BasicComponentFactory
 				.createIntegerField(beanPresentationModel
 					.getModel(ContainerConfig.FIELD_NAME_gsnPortNo)));
 	textfield
@@ -621,4 +625,12 @@ public class GSNConfiguratorPanel {
     public void removeInterestInStartStopState(StartStopEventListener listener) {
 	listeners.remove(listener);
     }
+
+   
+   public String getDirectoryHostAddress ( ) {
+      return ( String ) directoryHostAddress.getValue( );
+   }
+   public String getGsnPortNo ( ) {
+      return beanPresentationModel.getModel(ContainerConfig.FIELD_NAME_gsnPortNo).getValue( ).toString( );
+   }
 }
