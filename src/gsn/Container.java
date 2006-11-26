@@ -1,7 +1,7 @@
 package gsn;
 
 import gsn.notifications.NotificationRequest;
-import gsn.vsensor.AbstractProcessingClass;
+import gsn.vsensor.AbstractVirtualSensor;
 import gsn.wrappers.RemoteDS;
 
 /**
@@ -77,7 +77,7 @@ public interface Container {
    /**
     * METHODS TO BE DEFINED IN ANY CONTAINER IMPLEMENTATION.
     */
-   public void publishData ( AbstractProcessingClass sensor );
+   public void publishData ( AbstractVirtualSensor sensor );
    
    public void addRemoteStreamSource ( String alias , RemoteDS remoteDS );
    

@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class BridgeVirtualSensor extends AbstractProcessingClass {
+public class BridgeVirtualSensor extends AbstractVirtualSensor {
    
    private static final transient Logger logger = Logger.getLogger( BridgeVirtualSensor.class );
    

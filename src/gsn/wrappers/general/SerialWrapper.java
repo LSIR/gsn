@@ -12,7 +12,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.KeyValueImp;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,7 +50,7 @@ import org.apache.log4j.PropertyConfigurator;
  * @author Jerome Rousselot CSEM<br>
  * @author Andreas Jaggi, andreas DOT jaggi AT waterwave DOT ch<br>
  */
-public class SerialWrapper extends Wrapper implements SerialPortEventListener {
+public class SerialWrapper extends AbstractWrapper implements SerialPortEventListener {
    
    public static final String      RAW_PACKET    = "RAW_PACKET";
    

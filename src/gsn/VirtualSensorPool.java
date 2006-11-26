@@ -3,7 +3,7 @@ package gsn;
 import gsn.beans.VSensorConfig;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
-import gsn.vsensor.AbstractProcessingClass;
+import gsn.vsensor.AbstractVirtualSensor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,9 +29,9 @@ public class VirtualSensorPool {
    
    private String                                processingClassName;
    
-   private ArrayList < AbstractProcessingClass > allInstances    = new ArrayList < AbstractProcessingClass >( );
+   private ArrayList < AbstractVirtualSensor > allInstances    = new ArrayList < AbstractVirtualSensor >( );
    
-   private ArrayList < AbstractProcessingClass > idleInstances   = new ArrayList < AbstractProcessingClass >( );
+   private ArrayList < AbstractVirtualSensor > idleInstances   = new ArrayList < AbstractVirtualSensor >( );
    
    private VSensorConfig                         config;
    
@@ -49,15 +49,15 @@ public class VirtualSensorPool {
       this.lastModified = new File( config.getFileName( ) ).lastModified( );
    }
    
-   public synchronized AbstractProcessingClass borrowVS ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
+   public synchronized AbstractVirtualSensor borrowVS ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
       if ( currentPoolSize == maxPoolSize ) throw new PoolIsFullException( config.getVirtualSensorName( ) );
       currentPoolSize++;
-      AbstractProcessingClass newInstance = null;
+      AbstractVirtualSensor newInstance = null;
       if ( idleInstances.size( ) > 0 )
          newInstance = idleInstances.remove( 0 );
       else
          try {
-            newInstance = ( AbstractProcessingClass ) Class.forName( processingClassName ).newInstance( );
+            newInstance = ( AbstractVirtualSensor ) Class.forName( processingClassName ).newInstance( );
             newInstance.setVirtualSensorConfiguration( config );
             allInstances.add( newInstance );
             if ( newInstance.initialize( ) == false ) {
@@ -76,7 +76,7 @@ public class VirtualSensorPool {
       return newInstance;
    }
    
-   public synchronized void returnVS ( AbstractProcessingClass o ) {
+   public synchronized void returnVS ( AbstractVirtualSensor o ) {
       if ( o == null ) return;
       idleInstances.add( o );
       currentPoolSize--;
@@ -86,7 +86,7 @@ public class VirtualSensorPool {
    
    public synchronized void closePool ( ) {
       sizeEnforce.stopPlease( );
-      for ( AbstractProcessingClass o : allInstances )
+      for ( AbstractVirtualSensor o : allInstances )
          o.finalize( );
       if ( isDebugEnabled ) logger.debug( new StringBuilder( ).append( "The VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " is now closed." ).toString( ) );
    }

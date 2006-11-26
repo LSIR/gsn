@@ -11,7 +11,7 @@ import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.TCPConnPool;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.DataListener;
 import gsn.wrappers.TableSizeEnforce;
 import java.io.File;
@@ -55,7 +55,7 @@ public class VSensorLoader extends Thread {
    /**
     * Mapping between the AddressBean and DataSources
     */
-   private static final HashMap < AddressBean , Wrapper > activeDataSources                   = new HashMap < AddressBean ,  Wrapper >( );
+   private static final HashMap < AddressBean , AbstractWrapper > activeDataSources                   = new HashMap < AddressBean ,  AbstractWrapper >( );
    
    private StorageManager                                         storageManager                      = StorageManager.getInstance( );
    
@@ -319,7 +319,7 @@ public class VSensorLoader extends Thread {
       for ( InputStream inputStream : config.getInputStreams( ) ) {
          for ( StreamSource streamSource : inputStream.getSources( ) ) {
             final DataListener activeDataListener = streamSource.getActiveDataListener( );
-            final Wrapper activeDataSource = streamSource.getActiveSourceProducer( );
+            final AbstractWrapper activeDataSource = streamSource.getActiveSourceProducer( );
             activeDataSource.removeListener( activeDataListener );
             if ( activeDataSource.getListenersSize( ) == 0 ) {
                final AddressBean activeDataSourceAddressBean = activeDataSource.getActiveAddressBean( );
@@ -411,7 +411,7 @@ public class VSensorLoader extends Thread {
       TreeMap < String , Object > context = new TreeMap < String , Object >( new CaseInsensitiveComparator( ) );
       for ( AddressBean addressBean : streamSource.getAddressing( ) ) {
          context.put( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN , addressBean );
-         Wrapper ds = activeDataSources.get( addressBean );
+         AbstractWrapper ds = activeDataSources.get( addressBean );
          if ( ds == null ) {
             if ( !addressBean.isAbsoluteAddressSpecified( ) ) {// Dynamic-address
                ArrayList < VirtualSensorIdentityBean > resolved = this.resolveByDirecotryService( addressBean.getPredicates( ) );
@@ -442,7 +442,7 @@ public class VSensorLoader extends Thread {
                continue;
             }
             try {
-               ds = ( Wrapper ) Main.getWrapperClass( addressBean.getWrapper( ) ).newInstance( );
+               ds = ( AbstractWrapper ) Main.getWrapperClass( addressBean.getWrapper( ) ).newInstance( );
                ds.setActiveAddressBean( addressBean );
                boolean initializationResult = ds.initialize(  );
                if ( initializationResult == false )

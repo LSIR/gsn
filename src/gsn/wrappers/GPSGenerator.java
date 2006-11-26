@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class GPSGenerator extends Wrapper {
+public class GPSGenerator extends AbstractWrapper {
    
    private static final int         DEFAULT_SAMPLING_RATE = 1000;
    

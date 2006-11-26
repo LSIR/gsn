@@ -1,12 +1,9 @@
 package gsn.beans;
 
-import gsn.VSensorLoader;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -122,6 +119,7 @@ public final class Modifications {
    }
    
    private void buildDependencyGraph ( ) {
+      
 
    }
    

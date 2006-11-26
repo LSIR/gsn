@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Jerome Rousselot ( jeromerousselot@gmail.com )
  */
-public class StreamExporterVirtualSensor extends AbstractProcessingClass {
+public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
    
    public static final String            PARAM_USER    = "user" , PARAM_PASSWD = "password" , PARAM_URL = "url" , PARAM_TABLE_PREFIX = "table-prefix";
    

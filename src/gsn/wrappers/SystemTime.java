@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 
-public class SystemTime extends Wrapper implements ActionListener {
+public class SystemTime extends AbstractWrapper implements ActionListener {
    
    private static final Serializable [ ] EMPTY_DATA_PART   = new Serializable [ ] {};
    

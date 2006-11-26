@@ -7,7 +7,7 @@ import gsn.notifications.GSNNotification;
 import gsn.notifications.NotificationRequest;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
-import gsn.vsensor.AbstractProcessingClass;
+import gsn.vsensor.AbstractVirtualSensor;
 import gsn.vsensor.http.AddressingReqHandler;
 import gsn.vsensor.http.ContainerInfoHandler;
 import gsn.vsensor.http.OneShotQueryHandler;
@@ -64,7 +64,7 @@ public class ContainerImpl extends HttpServlet implements Container {
       notificationRequests = new TreeMap < String , ArrayList < NotificationRequest >>( new CaseInsensitiveComparator( ) );
    }
    
-   public void publishData ( AbstractProcessingClass sensor ) {
+   public void publishData ( AbstractVirtualSensor sensor ) {
       StreamElement data = sensor.getData( );
       String name = sensor.getVirtualSensorConfiguration( ).getVirtualSensorName( );
       StorageManager storageMan = StorageManager.getInstance( );

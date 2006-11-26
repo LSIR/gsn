@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 /**
  * Date: Sep 4, 2006 Time: 4:07:58 PM
  */
-public class MemoryMonitoringWrapper extends Wrapper {
+public class MemoryMonitoringWrapper extends AbstractWrapper {
    
    private static final int          DEFAULT_SAMPLING_RATE                 = 1000;
    

@@ -6,7 +6,7 @@ import gsn.beans.VSensorConfig;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
 
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.general.SerialWrapper;
 
 import java.io.Serializable;
@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Clement Beffa ( clement.beffa@epfl.ch )
  */
-public class GPSNMEAVS extends AbstractProcessingClass {
+public class GPSNMEAVS extends AbstractVirtualSensor {
    
    private static final transient Logger logger = Logger.getLogger( GPSNMEAVS.class );
    
@@ -32,7 +32,7 @@ public class GPSNMEAVS extends AbstractProcessingClass {
    
    private ProtocolManager               protocolManager;
    
-   private Wrapper                       wrapper;
+   private AbstractWrapper                       wrapper;
    
    private VSensorConfig                 vsensor;
    
@@ -63,7 +63,7 @@ public class GPSNMEAVS extends AbstractProcessingClass {
       if ( logger.isDebugEnabled( ) ) logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getData(SerialWrapper.RAW_PACKET)));
       
       //needed? ######
-      Wrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      AbstractWrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
       
       //raw data from serial
       String s = new String( ( byte [ ] ) data.getData( SerialWrapper.RAW_PACKET ) );

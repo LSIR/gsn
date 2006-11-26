@@ -8,7 +8,7 @@ import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
 import gsn.utils.ChangeListener;
 import gsn.utils.LazyTimedHashMap;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.tinyos1x.GSNMessage;
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
  * @author Surender Reddy (yerva, surenderreddy.yerva-at-epfl.ch)<br>
  */
 
-public class MoteIdentifier extends Wrapper implements MessageListener , ChangeListener {
+public class MoteIdentifier extends AbstractWrapper implements MessageListener , ChangeListener {
    
    private ArrayList < String >     micaTEDS            = new ArrayList < String >( );
    

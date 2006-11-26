@@ -7,7 +7,7 @@ import gsn.storage.PoolIsFullException;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
-import gsn.vsensor.AbstractProcessingClass;
+import gsn.vsensor.AbstractVirtualSensor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -134,7 +134,7 @@ public class InputStream {
       }
       if ( StorageManager.getInstance( ).isThereAnyResult( this.rewrittenSQL ) ) {
          this.currentCount++;
-         AbstractProcessingClass sensor = null;
+         AbstractVirtualSensor sensor = null;
          try {
             sensor = this.pool.borrowVS( );
             if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );

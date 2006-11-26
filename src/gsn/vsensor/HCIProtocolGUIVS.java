@@ -5,14 +5,14 @@ import gsn.beans.VSensorConfig;
 import gsn.gui.JHCIProtocolControl;
 import gsn.utils.protocols.AbstractHCIProtocol;
 import gsn.utils.protocols.ProtocolManager;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 /**
  * @author Jerome Rousselot <jerome.rousselot@csem.ch>
  */
-public class HCIProtocolGUIVS extends AbstractProcessingClass {
+public class HCIProtocolGUIVS extends AbstractVirtualSensor {
    
    private static final transient Logger logger        = Logger.getLogger( HCIProtocolGUIVS.class );
    
@@ -22,7 +22,7 @@ public class HCIProtocolGUIVS extends AbstractProcessingClass {
    
    private AbstractHCIProtocol           protocol;
    
-   private Wrapper                       outputWrapper = null;
+   private AbstractWrapper                       outputWrapper = null;
    
    private JHCIProtocolControl           gui;
    

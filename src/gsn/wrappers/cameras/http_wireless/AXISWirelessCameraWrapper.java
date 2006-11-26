@@ -6,7 +6,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.TCPConnPool;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class AXISWirelessCameraWrapper extends Wrapper {
+public class AXISWirelessCameraWrapper extends AbstractWrapper {
    
    /**
     * 

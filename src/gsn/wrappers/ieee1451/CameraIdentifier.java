@@ -6,7 +6,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
  * @author Surender Reddy (yerva, surenderreddy.yerva-at-epfl.ch)<br>
  */
 
-public class CameraIdentifier extends Wrapper {
+public class CameraIdentifier extends AbstractWrapper {
    
    /**
     * 

@@ -13,9 +13,9 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public abstract class AbstractProcessingClass {
+public abstract class AbstractVirtualSensor {
    
-   private static final transient Logger logger           = Logger.getLogger( AbstractProcessingClass.class );
+   private static final transient Logger logger           = Logger.getLogger( AbstractVirtualSensor.class );
    
    private VSensorConfig                 virtualSensorConfiguration;
    

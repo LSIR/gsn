@@ -4,7 +4,7 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS)<br>
  */
-public class GenericTinyOS1xWrapper extends Wrapper implements MessageListener {
+public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageListener {
    
    private final transient Logger  logger                = Logger.getLogger( GenericTinyOS1xWrapper.class );
    

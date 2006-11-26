@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Jerome Rousselot (jerome.rousselot -at- csem.ch)<br>
  */
-public class WiseNodeVirtualSensor extends AbstractProcessingClass {
+public class WiseNodeVirtualSensor extends AbstractVirtualSensor {
    
    private static final transient Logger logger = Logger.getLogger( WiseNodeVirtualSensor.class );
    

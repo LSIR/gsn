@@ -4,7 +4,7 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.general.SerialWrapper;
 
 import java.util.TreeMap;
@@ -13,7 +13,7 @@ import javax.naming.OperationNotSupportedException;
 
 import org.apache.log4j.Logger;
 
-public class EPuckVS extends AbstractProcessingClass {
+public class EPuckVS extends AbstractVirtualSensor {
    
    private static final transient Logger logger = Logger.getLogger( EPuckVS.class );
    
@@ -21,7 +21,7 @@ public class EPuckVS extends AbstractProcessingClass {
    
    private ProtocolManager               protocolManager;
    
-   private Wrapper                       wrapper;
+   private AbstractWrapper                       wrapper;
    
    private VSensorConfig                 vsensor;
    
@@ -45,7 +45,7 @@ public class EPuckVS extends AbstractProcessingClass {
    public void dataAvailable ( String inputStreamName , StreamElement data ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "I just received some data from the robot" );
       System.out.println( new String( ( byte [ ] ) data.getData( SerialWrapper.RAW_PACKET ) ) );
-      Wrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      AbstractWrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
       if ( actionA == false ) {
          actionA = true;
          try {

@@ -23,7 +23,7 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class DemoVSensor extends AbstractProcessingClass {
+public class DemoVSensor extends AbstractVirtualSensor {
    
    private static final transient Logger logger                  = Logger.getLogger( DemoVSensor.class );
    

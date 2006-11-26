@@ -4,7 +4,7 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * @author Jerome Rousselot (jerome.rousselot@csem.ch), CSEM<br>
  */
-public class UDPWrapper extends Wrapper {
+public class UDPWrapper extends AbstractWrapper {
    
    private static final String    RAW_PACKET    = "RAW_PACKET";
    

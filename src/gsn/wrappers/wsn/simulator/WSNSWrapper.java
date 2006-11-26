@@ -5,7 +5,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class WSNSWrapper extends Wrapper implements DataListener {
+public class WSNSWrapper extends AbstractWrapper implements DataListener {
    
    private final transient Logger   logger                     = Logger.getLogger( WSNSWrapper.class );
    

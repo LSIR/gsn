@@ -14,13 +14,13 @@ import org.apache.log4j.Logger;
  */
 public class TableSizeEnforce implements Runnable {
    
-   private Wrapper     abstractStreamProducer;
+   private AbstractWrapper     abstractStreamProducer;
    
    private ArrayList < DataListener > listeners;
 
    private String tableName;
    
-   public TableSizeEnforce ( Wrapper abstractStreamProducer ) {
+   public TableSizeEnforce ( AbstractWrapper abstractStreamProducer ) {
       this.abstractStreamProducer = abstractStreamProducer;
       this.listeners=abstractStreamProducer.getListeners( );
       this.tableName = abstractStreamProducer.getDBAlias( );

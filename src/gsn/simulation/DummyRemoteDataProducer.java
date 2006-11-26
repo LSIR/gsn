@@ -5,7 +5,7 @@ import gsn.Main;
 import gsn.beans.DataField;
 import gsn.shared.Registry;
 import gsn.utils.TCPConnPool;
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.DataListener;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class DummyRemoteDataProducer extends Wrapper {
+public class DummyRemoteDataProducer extends AbstractWrapper {
    
    private static final transient Logger logger = Logger.getLogger( DummyDataListener.class );
    

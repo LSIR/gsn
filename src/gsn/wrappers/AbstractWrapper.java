@@ -17,14 +17,14 @@ import org.apache.log4j.Logger;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * Date: Aug 4, 2005 <br>
  */
-public abstract class Wrapper extends Thread  {
+public abstract class AbstractWrapper extends Thread  {
    
    /**
     * Used by the data source when it wants to insert the data into it's main
     * database. The AbstractDataSource should keep track of this data source so
     * that it can release it when <code>finialize</code> called.
     */
-   private final static transient Logger      logger         = Logger.getLogger( Wrapper.class );
+   private final static transient Logger      logger         = Logger.getLogger( AbstractWrapper.class );
    
    private static final transient boolean     isDebugEnabled = logger.isDebugEnabled( );
    

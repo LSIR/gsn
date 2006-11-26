@@ -38,7 +38,7 @@ import org.jfree.data.time.TimeSeriesCollection;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * @author Jerome Rousselot (jeromerousselot@gmail.com)<br>
  */
-public class ChartVirtualSensor extends AbstractProcessingClass {
+public class ChartVirtualSensor extends AbstractVirtualSensor {
    
    private static final transient Logger               logger                             = Logger.getLogger( ChartVirtualSensor.class );
    

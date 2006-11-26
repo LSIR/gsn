@@ -1,6 +1,6 @@
 package gsn.utils.protocols;
 
-import gsn.wrappers.Wrapper;
+import gsn.wrappers.AbstractWrapper;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Timer;
@@ -30,7 +30,7 @@ public class ProtocolManager {
 	private ProtocolStates currentState;
 	private AbstractHCIQuery lastExecutedQuery = null;
 	private Vector < Object > lastParams;
-	private Wrapper outputWrapper;
+	private AbstractWrapper outputWrapper;
 
 	private Timer timer;
 	private TimerTask answerTimeout = new TimerTask() {
@@ -45,7 +45,7 @@ public class ProtocolManager {
 		READY, WAITING
 	}
 
-	public ProtocolManager(AbstractHCIProtocol protocol, Wrapper outputWrapper) {
+	public ProtocolManager(AbstractHCIProtocol protocol, AbstractWrapper outputWrapper) {
 		this.protocol = protocol;
 		this.outputWrapper = outputWrapper;
 		currentState = ProtocolStates.READY;

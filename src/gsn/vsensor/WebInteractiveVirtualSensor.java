@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class WebInteractiveVirtualSensor extends AbstractProcessingClass {
+public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
    
    private static final transient Logger logger            = Logger.getLogger( WebInteractiveVirtualSensor.class );
    
