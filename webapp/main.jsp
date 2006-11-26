@@ -11,9 +11,10 @@ $(document).ready(function() {
 });	
 //]]>-->
 </script>
-<h2>Global Sensor Network</h2>
+<!-- <h2>Global Sensor Network</h2> -->
+<div class="intro">Welcome to Global Sensor Networks. All sensors are displayed by default, but you can easily close them with the close all button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
 <p>
-refresh every msec : 
+Auto-refresh every : 
 <select id="refreshall_timeout" >
 	<option value="3600000">1hour</option> 
 	<option value="600000">10min</option> 
@@ -28,6 +29,5 @@ refresh every msec :
 <span class="refreshing"><img src="style/ajax-loader.gif" alt="loading" title="" /></span>
 </p>
 <div id="vs">
-	<div class="intro">Welcome explaination... Click right...</div>
 	<div class="loading">Virtual sensors are currently loading...</div>
 </div>		

@@ -24,6 +24,11 @@
 <script type="text/javascript">
 <!--//<![CDATA[
 $(document).ready(function() {
+	//bind buttons to javascript functionality
+	$("#refreshall_timeout").bind("change",GSN.updateallchange);
+	$("#refreshall").bind("click",GSN.updateall);
+	$("#closeall").bind("click",GSN.closeall);
+
 	GSN.map.init();
 	GSN.updateall();
 
@@ -50,22 +55,21 @@ $(document).ready(function() {
 	
 	<div id="mainx" style="padding:0 2px;">
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
-
-<h2>Global Sensor Network</h2>
-<!-- <form><p>refresh every msec : 
+<p>Auto-refresh every: 
 <select id="refreshall_timeout" >
-<option value="3600000">1hour</option> 
-<option value="600000">10min</option> 
-<option value="60000" selected="selected">1min</option> 
-<option value="30000">30sec</option> 
-<option value="5000">5sec</option> 
-<option value="1000">1sec</option> 
-<option value="0">disable</option> 
+	<option value="3600000">1hour</option> 
+	<option value="600000">10min</option> 
+	<option value="60000" selected="selected">1min</option> 
+	<option value="30000">30sec</option> 
+	<option value="5000">5sec</option> 
+	<option value="1000">1sec</option> 
+	<option value="0">disable</option> 
 </select>
-<input id="refreshall" type="button" value="refresh" /><br />
+<input id="refreshall" type="button" value="refresh" />
+<span class="refreshing"><img src="style/ajax-loader.gif" alt="loading" title="" /></span>
+</p></p>
 <input id="refreshall_autozoomandcenter" type="checkbox" checked="checked" />auto zoom and center
-<input id="closeall" type="button" value="close all" />
-</p></form> -->
+</p>
 <div id="vs" style="overflow: auto;width:100%;height:50%	">
 <div class="loading">Virtual sensors are currently loading...</div>
 </div>		

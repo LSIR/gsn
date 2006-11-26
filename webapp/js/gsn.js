@@ -263,7 +263,7 @@ var GSN = {
 			GSN.addandupdate(vsName);
 			GSN.map.centerOnMarker(vsName);
 		} else {
-			$(".intro",$("#vs")).remove();
+			$(".intro").remove();
 			//we are in the normal context
 			//$("#vs").empty();
 			GSN.addandupdate(vsName);
@@ -417,6 +417,27 @@ var GSN = {
 		map.addControl(new GMapTypeControl());
 		map.addControl(new GScaleControl());
 		map.addControl(new GOverviewMapControl());
+
+/*
+
+				// custom map
+				//-----------
+				// copyright
+				var copyright = new GCopyright(1, new GLatLngBounds(new GLatLng(-90, -180), new GLatLng(90, 180)), 16, "©2006 EPFL");
+				// copyright collection
+				var copyrightCollection = new GCopyrightCollection('Imagery');
+				copyrightCollection.addCopyright(copyright);
+				// retrieve the tiles location
+				customGetTileUrl = function(a, b) {
+					return "http://sensorscope.epfl.ch/map/image/" + a.x + "_" + a.y + "_" + (17 - b) + ".jpg"
+				}
+				// tile layers
+				var tileLayers = [new GTileLayer(copyrightCollection, 16, 17)];
+				tileLayers[0].getTileUrl = customGetTileUrl;
+				// display the custom map
+				var customMap = new GMapType(tileLayers, new GMercatorProjection(18), "Aerial", {errorMessage:"Aerial imagery unavailable."});
+				map.addMapType(customMap);
+	*/			
 
 
 		// Create our "tiny" marker icon

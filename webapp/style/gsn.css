@@ -30,7 +30,11 @@ a	{
 a:hover{color: #000000 /*#2a5a8a*/; text-decoration:none; background-color:inherit;}
 a img { border :0;
 		vertical-align: middle;
-	  }
+}
+
+p {
+	margin: 0.5em 0;
+}
 
 #container {
 		margin:10px auto;
@@ -51,8 +55,8 @@ a img { border :0;
     	}
 #headerfm h1 {
 		margin:0;
-		padding:10px;
-		text-align:right;
+		padding:32px 0 32px 90px;
+    	xtext-align:right;
 		font-size:1.7em;
 }
 #header a,#headerfm a {
@@ -139,15 +143,23 @@ text-decoration:none;
     	}
 #sidebar {
 		xbackground:#99c;
-		float:right;
+		
+		float:left;
 		width:220px;
-		padding:0 10px 50px 10px;
+		margin:0;
+		padding:0;
+		text-align:left;
+		xpadding:0 10px 50px 10px;
 		}
 #sidebar ul {
 		margin-bottom:0;
     	}
+#sidebar h3 {
+		font-size:1.2em;
+}
 #sidebar h3, #sidebar p {
-		padding:0 10px 0 0;
+		margin:5px;
+		xpadding:0 10px 0 0;
     	}
 #footer {
 		xbackground:#cc9;
@@ -169,14 +181,14 @@ text-decoration:none;
 		background:#FFA84C;
 		}
 .vsbox h3 {
-		margin:0;
-		padding:10px;
+		margin:1px 10px;
+		padding:0;
 		xdisplay:inline-block;
-		font-size:1em;
+		font-size:1.2em;
 		}
 .vsbox h3 span {float:left;}
 .vsbox h3 span.id,.vsbox h3 span.status {display:none;}
-.vsbox h3 a {float:right;}		
+.vsbox h3 a {font-size:0.8em;float:right;}		
 .vsbox h3 span.timed {
 	margin-left:5px;
 	font-size:0.8em;
@@ -255,13 +267,13 @@ v\:* { behavior:url(#default#VML); }
 .tabnav a:link, .tabnav a:visited
 	{
 		float: left;
-		background: #f3f3f3;
+		background: #FFE0BF;
 		font-size: 10px;
 		line-height: 14px;
 		font-weight: bold;
 		padding: 2px 10px 2px 10px;
 		margin-right: 4px;
-		border: 1px solid #ccc;
+		border: 1px solid #FFE0BF;
 		text-decoration: none;
 		color: #666;
 	}
@@ -277,3 +289,52 @@ v\:* { behavior:url(#default#VML); }
 	{
 		background: #fff;
 	}
+
+.intro {
+	border-top: 2px solid #FFA84C;
+	border-bottom: 2px solid #FFA84C;
+	background: #FFE0BF;
+	margin: 5px 0;
+	padding:5px;
+}
+
+
+
+
+
+
+
+#vsmenu
+{
+list-style: none;
+margin: 0;
+padding: 0;
+border: none;
+}
+
+#vsmenu li
+{
+border-bottom: 1px solid #ffffff;
+margin: 0;
+}
+
+#vsmenu li a
+{
+display: block;
+padding: 5px 5px 5px 0.5em;
+border-left: 10px solid #FFE2BF;
+background-color: #FFF0DF;
+color: #FFA84C;
+text-decoration: none;
+width: 100%;
+}
+
+html>body #vsmenu li a { width: auto; }
+
+#vsmenu li a:hover
+{
+border-left: 10px solid #FFA84C;
+background-color: #FFB25F;
+color: #fff;
+}
+
