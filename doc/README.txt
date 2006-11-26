@@ -67,6 +67,21 @@ There you can see the output of various virtual sensors that
 are enabled by default with GSN.
 
 
+How to use GoogleMaps with GSN
+==============================
+
+GoogleMaps is a service offered free of charge by Google.
+To use it, you need to register at 
+http://www.google.com/apis/maps/signup.html
+
+You will receive a key. You should edit the 
+"webapp/fullmap.jsp" and "webapp/map.jsp" files, and replace 
+
+key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA
+
+with the key value you have received.
+
+
 For more information, don't hesitate to contact us !
 
 
