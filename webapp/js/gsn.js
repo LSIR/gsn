@@ -4,6 +4,7 @@
 var map;
 var tinyred;
 var tinygreen;
+
 var fields = new Array();
 var fields_type = new Array();
 var criterias = new Array();
@@ -11,11 +12,43 @@ var nb_crit = 0;
  
  
 var GSN = { 
-	init: function(){
+	debugmode: true
+	,init: function(){
+		GSN.debug("init:"+location.hash);
 		
+		var params=location.hash.substr(1).split(",");
+		$("#navigation li").each(function(){
+			if($("a",$(this)).text()==params[0])
+				$(this).addClass("selected");
+			else
+				$(this).removeClass("selected");
+		});
+		
+		$("#main > div").hide();
+		if (params[0]=="home")	{
+			$("#main .intro").show();
+			
+			$("#main #homediv").show();
+			
+			//load and display all the visual sensors
+			GSN.updateall();
+		} else if (params[0]=="data")	{
+			$("#main #datachooser").show();
+		} else if (params[0]=="map")	{
+			$("#main #homediv").show();
+			$("#main #mapdiv").show();
+			if(!GSN.map.loaded)
+				GSN.map.init();
+			GSN.updateall();
+		}
+	}
+	,nav: function (page) {
+		location.hash=page;
+		GSN.init();
+		return false;
 	}
 	,debug: function (txt) {
-		if(typeof console != "undefined" && true) {
+		if(typeof console != "undefined" && this.debugmode) {
 			console.debug(txt);
 		}	
 	}
@@ -34,23 +67,38 @@ var GSN = {
 			firstupdate = false;
   
   		$(".refreshing").show();
+  		
 		$.ajax({ type: "GET", url: "/gsn", success: function(data){
 			if (firstupdate) $(".loading",$("#vs")).remove();
 			var addedvs = 0;
+			
+			
+			if ($(document).title()=="GSN") {
+				var gsn = $("gsn",data);
+				$(document).title($(gsn).attr("name")+" :: GSN");
+				$("#gsn-name").empty().append($(gsn).attr("name")+" :: GSN");
+				$("#gsn-desc").empty().append($(gsn).attr("description"));
+				$("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+			}
+			$("#vsmenu").empty();
 			var start = new Date();
+			var vsname;
 			$("virtual-sensor",data).each(function(){
-					if (firstupdate /*&& addedvs < 5*/) {
-						addedvs++;
-						GSN.vsbox.add($(this).attr("name"));
-					}
-					GSN.vsbox.update($(this))
-					if (firstupdate)
-						$("#vsbox-"+$(this).attr("name")).fadeIn("slow");
+				vsname = $(this).attr("name");
+				$("#vsmenu").append($.LI({},$.A({"href":"javascript:GSN.menu('"+vsname+"');","id":"menu-"+vsname+""},vsname)));
+			
+				if (firstupdate /*&& addedvs < 5*/) {
+					addedvs++;
+					GSN.vsbox.add(vsname);
+				}
+				GSN.vsbox.update($(this))
+				if (firstupdate)
+					$("#vsbox-"+vsname).fadeIn("slow");
 						
 			});
 			var diff = new Date() - start;
 			GSN.debug("updateall time:"+diff/1000); 
-			if ($("#map").size()>0 && $("#refreshall_autozoomandcenter").attr("checked")){
+			if (GSN.map.loaded && $("#refreshall_autozoomandcenter").attr("checked")){
 				//not following any sensor
 				if ($("#vs").children().size()==1)
 					GSN.map.centerOnMarker($("#vs").children().get(0).id.substr(6));
@@ -308,7 +356,7 @@ var GSN = {
 		}
 		,update: function (vs){
 			//when map is enable
-			if ($("#map").size()>0){
+			if (GSN.map.loaded){
 				var lat = $("field[@name=latitude]",vs).text();
 				var lon = $("field[@name=longitude]",vs).text();
 				if (lat != "" && lon != ""){
@@ -405,7 +453,10 @@ var GSN = {
 		}
 	},
 	map: {
-		init : function(){
+		loaded: false
+		,init : function(){
+			this.loaded=true;
+		
 		if(typeof GBrowserIsCompatible == "undefined") {
 		$("#map").append($.P({"class":"error"},"Google maps isn't loaded! Maybe your internet connection is not working."));
 	} else if (GBrowserIsCompatible()) {
