@@ -5,13 +5,11 @@ import gsn.beans.AddressBean;
 import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
-import gsn.shared.Registry;
+import gsn.registry.RegistryImp;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.wrappers.DataListener;
-
 import java.io.FileInputStream;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jibx.runtime.BindingDirectory;
@@ -68,9 +66,9 @@ public class Simulation {
                      if ( addressBean.isAbsoluteAddressSpecified( ) ) {// Absolute
                         context1.put( VSensorLoader.STREAM_SOURCE , streamSource );
                         context1.put( VSensorLoader.INPUT_STREAM , inputStream );
-                        context1.put( Registry.VS_HOST , addressBean.getPredicateValue( Registry.VS_HOST ) );
-                        context1.put( Registry.VS_PORT , addressBean.getPredicateValue( Registry.VS_PORT ) );
-                        context1.put( Registry.VS_NAME , addressBean.getPredicateValue( Registry.VS_NAME ) );
+                        context1.put( RegistryImp.VS_HOST , addressBean.getPredicateValue( RegistryImp.VS_HOST ) );
+                        context1.put( RegistryImp.VS_PORT , addressBean.getPredicateValue( RegistryImp.VS_PORT ) );
+                        context1.put( RegistryImp.VS_NAME , addressBean.getPredicateValue( RegistryImp.VS_NAME ) );
                         context1.put( DummyDataListener.CONTAINER_PORT , ( START_PORT_INDEX + i ) );
                         boolean output = dummyRemoteDataSource.initialize(  );
                         if ( !output ) {

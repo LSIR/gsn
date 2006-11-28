@@ -5,7 +5,7 @@ import gsn.beans.InputStream;
 import gsn.beans.Modifications;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
-import gsn.shared.Registry;
+import gsn.registry.RegistryImp;
 import gsn.shared.VirtualSensorIdentityBean;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
@@ -100,7 +100,7 @@ public class VSensorLoader extends Thread {
       for ( VSensorConfig configFile : removeIt ) {
          logger.warn( new StringBuilder( ).append( "removing : " ).append( configFile.getVirtualSensorName( ) ).toString( ) );
          VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName( configFile.getFileName( ) );
-         this.toDirectoryService( sensorInstance.getConfig( ) , Registry.DEREGISTER );
+         this.toDirectoryService( sensorInstance.getConfig( ) , RegistryImp.DEREGISTER );
          Mappings.removeFilename( configFile.getFileName( ) );
          this.removeAllResources( sensorInstance );
       }
@@ -188,7 +188,7 @@ public class VSensorLoader extends Thread {
             logger.error( "Creating the virtual sensor >" + configuration.getVirtualSensorName( ) + "< failed." , e1 );
             continue;
          }
-         this.toDirectoryService( configuration , Registry.REGISTER );
+         this.toDirectoryService( configuration , RegistryImp.REGISTER );
       }
    }
    
@@ -214,8 +214,8 @@ public class VSensorLoader extends Thread {
          this.fillParameters( postMethod , configuration , action );
          this.directoryCommunicationCache.put( configuration , postMethod );
       }
-      if ( action == Registry.DEREGISTER ) {
-         postMethod.setRequestHeader( Registry.REQUEST , Integer.toString( Registry.DEREGISTER ) );
+      if ( action == RegistryImp.DEREGISTER ) {
+         postMethod.setRequestHeader( RegistryImp.REQUEST , Integer.toString( RegistryImp.DEREGISTER ) );
          this.directoryCommunicationCache.remove( configuration );
       }
       
@@ -249,7 +249,7 @@ public class VSensorLoader extends Thread {
             try {
                Iterator < VSensorConfig > keys = Mappings.getAllVSensorConfigs( );
                while ( keys.hasNext( ) && !this.toStop )
-                  VSensorLoader.this.toDirectoryService( keys.next( ) , Registry.REGISTER );
+                  VSensorLoader.this.toDirectoryService( keys.next( ) , RegistryImp.REGISTER );
             } catch ( ConcurrentModificationException e ) {
                continue;
             } finally {
@@ -279,19 +279,19 @@ public class VSensorLoader extends Thread {
       String dirHost = Main.getContainerConfig( ).getRegistryBootstrapAddr( );
       if ( dirHost.indexOf( "http://" ) < 0 ) dirHost = "http://" + dirHost;
       PostMethod postMethod = new PostMethod( dirHost + "/registry" );
-      postMethod.setRequestHeader( Registry.REQUEST , Integer.toString( Registry.QUERY ) );
+      postMethod.setRequestHeader( RegistryImp.REQUEST , Integer.toString( RegistryImp.QUERY ) );
       for ( KeyValue predicate : predicates ) {
-         postMethod.addRequestHeader( Registry.VS_PREDICATES_KEYS , ( String ) predicate.getKey( ) );
-         postMethod.addRequestHeader( Registry.VS_PREDICATES_VALUES , ( String ) predicate.getValue( ) );
+         postMethod.addRequestHeader( RegistryImp.VS_PREDICATES_KEYS , ( String ) predicate.getKey( ) );
+         postMethod.addRequestHeader( RegistryImp.VS_PREDICATES_VALUES , ( String ) predicate.getValue( ) );
       }
       postMethod.setFollowRedirects( false );
       int statusCode = TCPConnPool.executeMethod( postMethod , false );
       if ( statusCode == -1 ) {
          logger.error( "Can't connect to the directory serivce !!!" );
       }
-      Header [ ] hosts = postMethod.getResponseHeaders( Registry.VS_HOST );
-      Header [ ] ports = postMethod.getResponseHeaders( Registry.VS_PORT );
-      Header [ ] names = postMethod.getResponseHeaders( Registry.VS_NAME );
+      Header [ ] hosts = postMethod.getResponseHeaders( RegistryImp.VS_HOST );
+      Header [ ] ports = postMethod.getResponseHeaders( RegistryImp.VS_PORT );
+      Header [ ] names = postMethod.getResponseHeaders( RegistryImp.VS_NAME );
       
       for ( int i = 0 ; i < hosts.length ; i++ ) {
          result.add( new VirtualSensorIdentityBean( names[ i ].getValue( ) , hosts[ i ].getValue( ) , Integer.parseInt( ports[ i ].getValue( ) ) ) );
@@ -302,12 +302,12 @@ public class VSensorLoader extends Thread {
    }
    
    private void fillParameters ( PostMethod postMethod , VSensorConfig configuration , int action ) {
-      postMethod.addRequestHeader( Registry.REQUEST , Integer.toString( action ) );
-      postMethod.addRequestHeader( Registry.VS_NAME , configuration.getVirtualSensorName( ) );
-      postMethod.addRequestHeader( Registry.VS_PORT , Integer.toString( Main.getContainerConfig( ).getContainerPort( ) ) );
+      postMethod.addRequestHeader( RegistryImp.REQUEST , Integer.toString( action ) );
+      postMethod.addRequestHeader( RegistryImp.VS_NAME , configuration.getVirtualSensorName( ) );
+      postMethod.addRequestHeader( RegistryImp.VS_PORT , Integer.toString( Main.getContainerConfig( ).getContainerPort( ) ) );
       for ( KeyValue predicate : configuration.getAddressing( ) ) {
-         postMethod.addRequestHeader( Registry.VS_PREDICATES_KEYS , ( String ) predicate.getKey( ) );
-         postMethod.addRequestHeader( Registry.VS_PREDICATES_VALUES , ( String ) predicate.getValue( ) );
+         postMethod.addRequestHeader( RegistryImp.VS_PREDICATES_KEYS , ( String ) predicate.getKey( ) );
+         postMethod.addRequestHeader( RegistryImp.VS_PREDICATES_VALUES , ( String ) predicate.getValue( ) );
       }
    }
    
@@ -427,15 +427,15 @@ public class VSensorLoader extends Thread {
                 * TODO : Currently In here I'm using just first result returned
                 * from directory service and ignoring the rest.
                 */
-               context.put( Registry.VS_HOST , resolved.get( 0 ).getRemoteAddress( ) );
-               context.put( Registry.VS_PORT , Integer.toString( resolved.get( 0 ).getRemotePort( ) ) );
-               context.put( Registry.VS_NAME , resolved.get( 0 ).getVSName( ) );
+               context.put( RegistryImp.VS_HOST , resolved.get( 0 ).getRemoteAddress( ) );
+               context.put( RegistryImp.VS_PORT , Integer.toString( resolved.get( 0 ).getRemotePort( ) ) );
+               context.put( RegistryImp.VS_NAME , resolved.get( 0 ).getVSName( ) );
                context.put( Container.QUERY_VS_NAME , resolved.get( 0 ).getVSName( ) );
                
             } else if ( addressBean.isAbsoluteAddressSpecified( ) ) { // Absolute-address
-               context.put( Registry.VS_HOST , addressBean.getPredicateValue( Registry.VS_HOST ) );
-               context.put( Registry.VS_PORT , addressBean.getPredicateValue( Registry.VS_PORT ) );
-               context.put( Registry.VS_NAME , addressBean.getPredicateValue( Registry.VS_NAME ) );
+               context.put( RegistryImp.VS_HOST , addressBean.getPredicateValue( RegistryImp.VS_HOST ) );
+               context.put( RegistryImp.VS_PORT , addressBean.getPredicateValue( RegistryImp.VS_PORT ) );
+               context.put( RegistryImp.VS_NAME , addressBean.getPredicateValue( RegistryImp.VS_NAME ) );
             }
             if ( Main.getWrapperClass( addressBean.getWrapper( ) ) == null ) {
                logger.error( "The wrapper >" + addressBean.getWrapper( ) + "< is not defined in the >" + Main.DEFAULT_WRAPPER_PROPERTIES_FILE + "< file." );

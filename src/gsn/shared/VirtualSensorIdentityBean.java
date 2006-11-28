@@ -1,5 +1,6 @@
 package gsn.shared;
 
+import gsn.registry.RegistryImp;
 import gsn.utils.KeyValueImp;
 
 import java.util.ArrayList;
@@ -40,11 +41,11 @@ public class VirtualSensorIdentityBean {
    }
    
    public VirtualSensorIdentityBean ( HttpServletRequest req ) {
-      String name = req.getHeader( Registry.VS_NAME );
-      int port = Integer.parseInt( req.getHeader( Registry.VS_PORT ) );
+      String name = req.getHeader( RegistryImp.VS_NAME );
+      int port = Integer.parseInt( req.getHeader( RegistryImp.VS_PORT ) );
       String address = req.getRemoteAddr( );
-      Enumeration < String > keys = req.getHeaders( Registry.VS_PREDICATES_KEYS );
-      Enumeration < String > values = req.getHeaders( Registry.VS_PREDICATES_VALUES );
+      Enumeration < String > keys = req.getHeaders( RegistryImp.VS_PREDICATES_KEYS );
+      Enumeration < String > values = req.getHeaders( RegistryImp.VS_PREDICATES_VALUES );
       ArrayList < KeyValue > predicates = new ArrayList < KeyValue >( );
       if ( keys != null ) {
          while ( keys.hasMoreElements( ) ) {
@@ -117,6 +118,13 @@ public class VirtualSensorIdentityBean {
     */
    public void setLatestVisit ( long latestVisit ) {
       this.latestVisit = latestVisit;
+   }
+
+   private String guid;
+   public synchronized String getGUID ( ) {
+      if (guid ==null)
+         guid = new StringBuffer(getRemoteAddress( )).append(  ":").append(getRemotePort( ) ).append( "/").append(getVSName( )).toString( );
+      return guid;
    }
    
 }

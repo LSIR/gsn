@@ -1,25 +1,41 @@
 package gsn.registry;
 
 import gsn.pid.PIDUtils;
-import gsn.shared.Registry;
 import gsn.shared.VirtualSensorIdentityBean;
 import gsn.utils.KeyValueImp;
 import gsn.utils.ValidityTools;
-
+import gsn.vsensor.EPuckVS;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
-
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -29,47 +45,142 @@ import org.mortbay.jetty.webapp.WebAppContext;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class RegistryImp extends HttpServlet implements Registry {
+public class RegistryImp extends HttpServlet  {
    
    /**
-    * FIXME : Possible BUG, Since two thread are accessing the registery, one is
-    * the directory service garbage collector and the others are the remote
-    * clients, there existsthe possiblity of the concurrent modification
-    * exception on the common shared object <code>registery</code>
+    * 
     */
-   private static ArrayList < VirtualSensorIdentityBean > registry                         = new ArrayList < VirtualSensorIdentityBean >( );
+   private static final String _GUID = "_guid";
+
+   private static final int                       REFERESH_INTERVAL                = 5 * 60 * 1000;
    
-   public static final String                             DEFAULT_DIR_LOG4J_PROPERTIES     = "conf/log4j.directory.properties";
+   private Directory                       directory                        = new RAMDirectory( );
    
-   public static final String                             DEFAULT_DIRECTORY_SERVER_WEB_APP = "dswebapp";
+   public static final String              DEFAULT_DIR_LOG4J_PROPERTIES     = "conf/log4j.directory.properties";
    
-   private static transient Logger                        logger;
+   public static final String              DEFAULT_DIRECTORY_SERVER_WEB_APP = "dswebapp";
    
-   public static ArrayList < VirtualSensorIdentityBean > getRegistry ( ) {
-      return registry;
+   private static final transient Logger   logger                           = Logger.getLogger( RegistryImp.class );
+   
+   private static RegistryImp              singleton;
+   
+   private static final List < VSAddress > list                             = Collections.synchronizedList( new ArrayList < VSAddress >( ) );
+   
+   private RemoveOutdatedEntries           removeOutdatedEntriesThread      = new RemoveOutdatedEntries( );
+   
+   private Analyzer analyzer = new StandardAnalyzer();
+
+   private QueryParser queryParser;
+   
+   public static final String REQUEST              = "REQUEST";
+   
+   public static final int    REGISTER             = 100;
+   
+   public static final int    DEREGISTER           = 101;
+   
+   public static final int    QUERY                = 102;
+   
+   public static final String VS_NAME              = "NAME";
+   
+   public static final String VS_PORT              = "PORT";
+   
+   public static final String VS_PREDICATES_VALUES = "VSensorPredicatesValues";
+   
+   public static final String VS_PREDICATES_KEYS   = "VSensorPredicatesKeys";
+   
+   public static final String VS_HOST              = "HOST";
+
+   private static final String DEFAULT_FIELD = "address";
+    
+   public RegistryImp ( ) throws IOException {
+      this.singleton = this;
+      removeOutdatedEntriesThread.start( );
+      queryParser = new QueryParser(DEFAULT_FIELD,analyzer);
    }
    
-   public void addVirtualSensor ( VirtualSensorIdentityBean newVirtualSensorIdentity ) {
-      registry.remove( newVirtualSensorIdentity );
-      registry.add( newVirtualSensorIdentity );
+   public synchronized static RegistryImp getRegistry ( ) {
+      if ( singleton == null ) try {
+         singleton = new RegistryImp( );
+      } catch ( IOException e ) {
+         logger.fatal( e.getMessage( ) , e );
+         return null;
+      }
+      return singleton;
    }
    
-   public void removeVirtualSensor ( VirtualSensorIdentityBean vsensor ) {
-      registry.remove( vsensor );
+   private final transient static String SPACE_CHARACTER = " ";
+   
+   private static long                   counter         = 0;
+   
+   public synchronized void addVirtualSensor ( VirtualSensorIdentityBean newVS ) {
+      VSAddress vsAddr = new VSAddress( newVS );
+      removeVirtualSensor( newVS );
+      /**
+       * TODO, calling the remove method only when there is a change. To do so,
+       * I can add a LRU hashmap in which the key is GUID and the value is the
+       * hash code of the addressing and output predicates (concat). If there is
+       * no value in the map or the value is the same as what I computed for the
+       * new incoming virtual sensor, implies that there is no need for calling
+       * the remove.
+       */
+      list.remove( vsAddr );
+      try {
+         IndexWriter writer = new IndexWriter( directory , analyzer, true );
+         Document document = new Document( );
+         document.add( new Field( _GUID , newVS.getGUID( ) , Field.Store.NO , Field.Index.UN_TOKENIZED ) );
+         StringBuffer addresses = new StringBuffer( );
+         StringBuffer addressKeys = new StringBuffer( );
+         StringBuffer addressValues = new StringBuffer( );
+         addresses.append( newVS.getVSName( ) ).append( SPACE_CHARACTER );
+         for ( KeyValue predicate : newVS.getPredicates( ) ) {
+            addresses.append( predicate.getKey( ) ).append( SPACE_CHARACTER ).append( predicate.getValue( ) ).append( SPACE_CHARACTER );
+            addressKeys.append( predicate.getKey( ) ).append( SPACE_CHARACTER );
+            addressValues.append( predicate.getValue( ) ).append( SPACE_CHARACTER );
+         }
+         document.add( new Field( DEFAULT_FIELD , addresses.toString( ) , Field.Store.NO , Field.Index.TOKENIZED ) );
+         document.add( new Field( "key" , addressKeys.toString( ) , Field.Store.NO , Field.Index.TOKENIZED ) );
+         document.add( new Field( "value" , addressValues.toString( ) , Field.Store.NO , Field.Index.TOKENIZED ) );
+         document.add( new Field( "name" , newVS.getVSName( ) , Field.Store.NO , Field.Index.TOKENIZED ) );
+         document.add( new Field( "host" , newVS.getRemoteAddress( ) , Field.Store.NO , Field.Index.UN_TOKENIZED ) );
+         document.add( new Field( "port" , Integer.toString( newVS.getRemotePort( ) ) , Field.Store.NO , Field.Index.UN_TOKENIZED ) );
+         writer.addDocument( document );
+         counter++;
+         if ( counter % 100 == 0 ) writer.optimize( );
+         writer.close( );
+         list.add( vsAddr );
+      } catch ( IOException e ) {
+         logger.fatal( e.getMessage( ) , e );
+      }
    }
    
-   /**
-    * @param registry The registry to set.
-    */
-   static void setRegistry ( ArrayList < VirtualSensorIdentityBean > registry ) {
-      RegistryImp.registry = registry;
+   public synchronized void removeListOfVirtualSensors ( ArrayList < VSAddress > list ) {
+      if ( list == null || list.isEmpty( ) ) return;
+      IndexReader indexReader;
+      try {
+         indexReader = IndexReader.open( directory );
+         for ( VSAddress address : list )
+            indexReader.deleteDocuments( new Term( _GUID , address.getGUID( ) ) );
+         indexReader.close( );
+         counter++;
+      } catch ( IOException e ) {
+         logger.error( e.getMessage( ) , e );
+      }
    }
    
-   public ArrayList < VirtualSensorIdentityBean > findVSensor ( ArrayList < KeyValue > predicates ) {
-      ArrayList < VirtualSensorIdentityBean > result = new ArrayList < VirtualSensorIdentityBean >( );
-      for ( VirtualSensorIdentityBean vsensor : registry )
-         if ( vsensor.matches( predicates ) ) result.add( vsensor );
-      return result;
+   public synchronized void removeVirtualSensor ( VirtualSensorIdentityBean vsensor ) {
+      IndexReader indexReader;
+      try {
+         indexReader = IndexReader.open( directory );
+         indexReader.deleteDocuments( new Term( _GUID , vsensor.getGUID( ) ) );
+         indexReader.close( );
+         counter++;
+      } catch ( IOException e ) {
+         logger.error( e.getMessage( ) , e );
+      }
+   }
+   
+   public ArrayList < VirtualSensorIdentityBean > findVSensor ( String query ) {
+      return null;
    }
    
    private static File pidFile;
@@ -82,7 +193,6 @@ public class RegistryImp extends HttpServlet implements Registry {
       }
       System.out.println( "Loading logging details from : " + DEFAULT_DIR_LOG4J_PROPERTIES );
       PropertyConfigurator.configure( DEFAULT_DIR_LOG4J_PROPERTIES );
-      logger = Logger.getLogger( RegistryImp.class );
       if ( PIDUtils.isPIDExist( PIDUtils.DIRECTORY_SERVICE_PID ) ) {
          System.out.println( "Error : Another GSN Directory Service is running." );
          System.exit( 1 );
@@ -121,21 +231,20 @@ public class RegistryImp extends HttpServlet implements Registry {
       server.setSendServerVersion( false );
       server.start( );
       
-      final TheGarbageCollector garbageCollector = new TheGarbageCollector( new RegistryImp( ) );
-      garbageCollector.start( );
       if ( logger.isInfoEnabled( ) ) logger.info( "[ok]" );
-      Thread shutdown = new Thread( new Runnable( ) {
+      Thread shutdownObserver = new Thread( new Runnable( ) {
          
          public void run ( ) {
             try {
                while ( true ) {
                   int value = PIDUtils.getFirstIntFrom( pidFile );
-                  if ( value != '0' ) Thread.sleep( 2500 );
+                  if ( value != '0' )
+                     Thread.sleep( 2500 );
                   else
                      break;
                }
                server.stop( );
-               garbageCollector.stopPlease( );
+               RegistryImp.getRegistry( ).removeOutdatedEntriesThread.stopPlease( );
             } catch ( Exception e ) {
                logger.warn( "Shutdowning the webserver failed." , e );
                System.exit( 1 );
@@ -144,38 +253,52 @@ public class RegistryImp extends HttpServlet implements Registry {
             System.exit( 0 );
          }
       } );
-      shutdown.start( );
+      shutdownObserver.start( );
       
+   }
+   public Hits doQuery(String queryString) throws ParseException {
+      try {
+      IndexSearcher searcher = new IndexSearcher(directory);
+      Query query = queryParser.parse(queryString);
+      return searcher.search(query);
+      }catch (IOException e) {
+         logger.error( e.getMessage( ),e );
+         return null;
+      }    
    }
    
    public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
-      int requestType = Integer.parseInt( req.getHeader( Registry.REQUEST ) );
+      int requestType = Integer.parseInt( req.getHeader( RegistryImp.REQUEST ) );
       VirtualSensorIdentityBean sensorIdentityBean;
       switch ( requestType ) {
-         case Registry.REGISTER :
+         case RegistryImp.REGISTER :
             sensorIdentityBean = new VirtualSensorIdentityBean( req );
             if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Register request received for VSName : " ).append( sensorIdentityBean.getVSName( ) ).toString( ) );
             addVirtualSensor( sensorIdentityBean );
             break;
-         case Registry.DEREGISTER :
+         case  RegistryImp.DEREGISTER :
             sensorIdentityBean = new VirtualSensorIdentityBean( req );
             if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Deregister request received for VSName : " ).append( sensorIdentityBean.getVSName( ) ).toString( ) );
             removeVirtualSensor( sensorIdentityBean );
             break;
-         case Registry.QUERY :
-            if ( logger.isDebugEnabled( ) ) logger.debug( "Query request received containg the following predicates : " );
-            Enumeration keys = req.getHeaders( Registry.VS_PREDICATES_KEYS );
-            Enumeration values = req.getHeaders( Registry.VS_PREDICATES_VALUES );
-            ArrayList < KeyValue > predicates = new ArrayList < KeyValue >( );
-            while ( keys.hasMoreElements( ) ) {
-               String key = ( String ) keys.nextElement( );
-               String value = ( String ) values.nextElement( );
-               if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "[key=" ).append( key ).append( ",value=" ).append( value ).append( "]" ).toString( ) );
-               predicates.add( new KeyValueImp( key , value ) );
-            }
-            ArrayList < VirtualSensorIdentityBean > vsQueryResult = findVSensor( predicates );
-            if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "The query resulted in " ).append( vsQueryResult.size( ) ).append( " results." ).toString( ) );
-            fillQueryRespond( res , vsQueryResult );
+            /**
+             * Query received from other gsn instances to identify a source.
+             */
+         case RegistryImp.QUERY :
+            logger.error( "Not Implemeneted !!!" );
+//            if ( logger.isDebugEnabled( ) ) logger.debug( "Query request received containg the following predicates : " );
+//            Enumeration keys = req.getHeaders( RegistryImp.VS_PREDICATES_KEYS );
+//            Enumeration values = req.getHeaders( RegistryImp.VS_PREDICATES_VALUES );
+//            ArrayList < KeyValue > predicates = new ArrayList < KeyValue >( );
+//            while ( keys.hasMoreElements( ) ) {
+//               String key = ( String ) keys.nextElement( );
+//               String value = ( String ) values.nextElement( );
+//               if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "[key=" ).append( key ).append( ",value=" ).append( value ).append( "]" ).toString( ) );
+//               predicates.add( new KeyValueImp( key , value ) );
+//            }
+//            ArrayList < VirtualSensorIdentityBean > vsQueryResult = findVSensor( predicates );
+//            if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "The query resulted in " ).append( vsQueryResult.size( ) ).append( " results." ).toString( ) );
+//            fillQueryRespond( res , vsQueryResult );
             break;
          default :
             if ( logger.isInfoEnabled( ) ) logger.info( "Request received at the register with unknow request type !!!" );
@@ -184,56 +307,83 @@ public class RegistryImp extends HttpServlet implements Registry {
    
    private void fillQueryRespond ( HttpServletResponse res , ArrayList < VirtualSensorIdentityBean > vsensors ) {
       for ( VirtualSensorIdentityBean vsensor : vsensors ) {
-         res.addHeader( Registry.VS_NAME , vsensor.getVSName( ) );
-         res.addHeader( Registry.VS_PORT , Integer.toString( vsensor.getRemotePort( ) ) );
-         res.addHeader( Registry.VS_HOST , vsensor.getRemoteAddress( ) );
+         res.addHeader( RegistryImp.VS_NAME , vsensor.getVSName( ) );
+         res.addHeader( RegistryImp.VS_PORT , Integer.toString( vsensor.getRemotePort( ) ) );
+         res.addHeader( RegistryImp.VS_HOST , vsensor.getRemoteAddress( ) );
       }
    }
+   
+   class RemoveOutdatedEntries extends Thread {
+      
+      private final transient Logger logger   = Logger.getLogger( RemoveOutdatedEntries.class );
+      
+      private boolean                isActive = true;
+      
+      public void run ( ) {
+         ArrayList < VSAddress > removeList = new ArrayList < VSAddress >( );
+         while ( isActive ) {
+            long currentTime = System.currentTimeMillis( );
+            removeList.clear( );
+            while ( true ) {
+               VSAddress bean = list.get( 0 );
+               if ( ( currentTime - REFERESH_INTERVAL ) < bean.getTime( ) ) break;
+               removeList.add( list.remove( 0 ) );
+            }
+            RegistryImp.this.removeListOfVirtualSensors( removeList );
+            try {
+               sleep( REFERESH_INTERVAL / 2 );
+            } catch ( InterruptedException e ) {
+               logger.error( e.getMessage( ) , e );
+            }
+         }
+         
+      }
+      
+      public void stopPlease ( ) {
+         isActive = false;
+         interrupt( );
+      }
+   }
+   
 }
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
-class TheGarbageCollector extends Thread {
+class VSAddress {
    
-   private final transient Logger logger   = Logger.getLogger( TheGarbageCollector.class );
+   private long   time = System.currentTimeMillis( );
    
-   private final int              INTERVAL = 5 * 60 * 1000;                                // each
-                                                                                             // 5
-                                                                                             // mins
-                                                                                            
-   private RegistryImp            registerImplemation;
+   private String guid;
    
-   private boolean                toStop;
-   
-   public TheGarbageCollector ( RegistryImp impl ) {
-      this.registerImplemation = impl;
-      this.toStop = false;
+   /**
+    * @return the key
+    */
+   public String getGUID ( ) {
+      return guid;
    }
    
-   public void run ( ) {
-      while ( !toStop ) {
-         ArrayList < VirtualSensorIdentityBean > registery = ( ArrayList < VirtualSensorIdentityBean > ) registerImplemation.getRegistry( ).clone( );
-         long current = System.currentTimeMillis( );
-         Iterator < VirtualSensorIdentityBean > it = registery.iterator( );
-         while ( it.hasNext( ) ) {
-            VirtualSensorIdentityBean virtualSensorIdentityBean = it.next( );
-            if ( ( current - virtualSensorIdentityBean.getLatestVisit( ) ) > INTERVAL ) it.remove( );
-            else
-               virtualSensorIdentityBean.setLatestVisit( current );
-         }
-         registerImplemation.setRegistry( registery );
-         try {
-            sleep( INTERVAL );
-         } catch ( InterruptedException e ) {
-            if ( toStop ) return;
-            logger.error( e.getMessage( ) , e );
-         }
-      }
+   /**
+    * @return the Creation time of this object;
+    */
+   public long getTime ( ) {
+      return time;
    }
    
-   public void stopPlease ( ) {
-      toStop = true;
-      interrupt( );
+   public VSAddress ( VirtualSensorIdentityBean key ) {
+      this.guid = key.getGUID( );
    }
+   
+   public int hashCode ( ) {
+      return guid.hashCode( );
+   }
+   
+   public boolean equals ( Object obj ) {
+      if ( this == obj ) return true;
+      if ( obj == null ) return false;
+      if ( getClass( ) != obj.getClass( ) ) return false;
+      final VSAddress other = ( VSAddress ) obj;
+      if ( guid == null ) {
+         if ( other.guid != null ) return false;
+      } else if ( !guid.equals( other.guid ) ) return false;
+      return true;
+   }
+   
 }

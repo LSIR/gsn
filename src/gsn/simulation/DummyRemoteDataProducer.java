@@ -3,7 +3,7 @@ package gsn.simulation;
 import gsn.Container;
 import gsn.Main;
 import gsn.beans.DataField;
-import gsn.shared.Registry;
+import gsn.registry.RegistryImp;
 import gsn.utils.TCPConnPool;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.DataListener;
@@ -61,7 +61,7 @@ public class DummyRemoteDataProducer extends AbstractWrapper {
       
       PostMethod postMethod = new PostMethod( destination );
       postMethod.addRequestHeader( Container.REQUEST , Integer.toString( Container.REGISTER_PACKET ) );
-      postMethod.addRequestHeader( Registry.VS_PORT , Integer.toString( containerPort ) );
+      postMethod.addRequestHeader( RegistryImp.VS_PORT , Integer.toString( containerPort ) );
       ArrayList < String > tables = new ArrayList < String >( );
       tables.add( remoteVSName );
       StringBuffer generateQuery = QueryGenerator.generateQuery( "\"" + remoteVSName + ".DATA" + "\"" , tables , 2 , tables.size( ) , 10000000 );

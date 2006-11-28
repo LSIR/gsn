@@ -2,18 +2,15 @@ package gsn.notifications;
 
 import gsn.Container;
 import gsn.beans.StreamElement;
-import gsn.shared.Registry;
+import gsn.registry.RegistryImp;
 import gsn.utils.TCPConnPool;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.util.Enumeration;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -54,7 +51,7 @@ public class GSNNotification extends NotificationRequest {
       this.remoteAddress = req.getRemoteAddr( );
       this.notificationCode = req.getHeader( Container.NOTIFICATION_CODE );
       this.prespectiveVirtualSensor = req.getHeader( Container.QUERY_VS_NAME );
-      this.remotePort = Integer.parseInt( req.getHeader( Registry.VS_PORT ) );
+      this.remotePort = Integer.parseInt( req.getHeader( RegistryImp.VS_PORT ) );
       this.query = req.getHeader( Container.VS_QUERY );
       this.queryWithoutDoubleQuots = new StringBuilder( req.getHeader( Container.VS_QUERY ).trim( ).replace( "\"" , "" ) );
    }

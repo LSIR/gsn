@@ -5,7 +5,7 @@ import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
-import gsn.shared.Registry;
+import gsn.registry.RegistryImp;
 import gsn.utils.TCPConnPool;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -126,7 +126,7 @@ public class RemoteDS extends AbstractWrapper {
          logger.debug( new StringBuilder( ).append( "Wants to send message to : " ).append( destination ).append( "  for DEREGISTERING the previous query" ).toString( ) );
       PostMethod postMethod = new PostMethod( destination );
       postMethod.addRequestHeader( Container.REQUEST , Integer.toString( Container.DEREGISTER_PACKET ) );
-      postMethod.addRequestHeader( Registry.VS_PORT , Integer.toString( Main.getContainerConfig( ).getContainerPort( ) ) );
+      postMethod.addRequestHeader( RegistryImp.VS_PORT , Integer.toString( Main.getContainerConfig( ).getContainerPort( ) ) );
       postMethod.addRequestHeader( Container.VS_QUERY , query );
       postMethod.addRequestHeader( Container.QUERY_VS_NAME , remoteVSName );
       postMethod.addRequestHeader( Container.NOTIFICATION_CODE , notificationCode );
