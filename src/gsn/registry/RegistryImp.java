@@ -44,6 +44,8 @@ import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
+ * TODO, we need to keep the whole addressing stucture b/c we want to use google maps
+ * to show the outcome to the users.
  */
 public class RegistryImp extends HttpServlet  {
    
