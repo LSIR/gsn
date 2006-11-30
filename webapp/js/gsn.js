@@ -30,11 +30,14 @@ var GSN = {
 			
 			$("#main #homediv").show();
 			
+			$("#vs").append($.DIV({"class":"loading"}));
+			
 			//load and display all the visual sensors
 			GSN.updateall();
 		} else if (params[0]=="data")	{
 			$("#main #datachooser").show();
 		} else if (params[0]=="map")	{
+			$("#main #vs").empty();
 			$("#main #homediv").show();
 			$("#main #mapdiv").show();
 			if(!GSN.map.loaded)
@@ -304,12 +307,14 @@ var GSN = {
 	menu: function (vsName) {
 		GSN.debug("menu:"+vsName);
 		
-		if ($("#map").size()>0){
+		if ($("#map").parent().css("display")!="none"){
 			//we are in the map context
 			if ($("#vs").children().get(0).id != "vsbox-"+vsName) 
 				$("#vs").empty();
 			GSN.addandupdate(vsName);
 			GSN.map.centerOnMarker(vsName);
+		} else if ($("#datachooser").css("display")!="none"){
+			GSN.data(vsName);
 		} else {
 			$(".intro").remove();
 			//we are in the normal context
@@ -455,40 +460,37 @@ var GSN = {
 	map: {
 		loaded: false
 		,init : function(){
-			this.loaded=true;
-		
-		if(typeof GBrowserIsCompatible == "undefined") {
-		$("#map").append($.P({"class":"error"},"Google maps isn't loaded! Maybe your internet connection is not working."));
-	} else if (GBrowserIsCompatible()) {
-		GSN.debug("init gmap");
+			if(document.location.host != "localhost:22001") {
+				$("#map").empty().append($.P({"class":"error"},"By default, Google maps only works if your using the host : http://localhost:22001/ . If you need a different host, edit index.html and change the google maps API key."));
+			} else if(typeof GBrowserIsCompatible == "undefined") {
+				$("#map").empty().append($.P({"class":"error"},"Google maps isn't loaded! Maybe your internet connection is not working."));
+			} else if (GBrowserIsCompatible()) {
+				//load and initialize google map
+				this.loaded=true;
+				GSN.debug("init gmap");
        
-        map = new GMap2(document.getElementById("map"));
-        //some fun
-        map.addControl(new GLargeMapControl());
-		map.addControl(new GMapTypeControl());
-		map.addControl(new GScaleControl());
-		map.addControl(new GOverviewMapControl());
+        		map = new GMap2(document.getElementById("map"));
+        		//some fun
+        		map.addControl(new GLargeMapControl());
+				map.addControl(new GMapTypeControl());
+				map.addControl(new GScaleControl());
+				map.addControl(new GOverviewMapControl());
 
-/*
-
-				// custom map
-				//-----------
-				// copyright
+				/*
+				// custom epfl map
 				var copyright = new GCopyright(1, new GLatLngBounds(new GLatLng(-90, -180), new GLatLng(90, 180)), 16, "©2006 EPFL");
-				// copyright collection
 				var copyrightCollection = new GCopyrightCollection('Imagery');
 				copyrightCollection.addCopyright(copyright);
+				var tileLayers = [new GTileLayer(copyrightCollection, 16, 17)];
 				// retrieve the tiles location
 				customGetTileUrl = function(a, b) {
 					return "http://sensorscope.epfl.ch/map/image/" + a.x + "_" + a.y + "_" + (17 - b) + ".jpg"
 				}
-				// tile layers
-				var tileLayers = [new GTileLayer(copyrightCollection, 16, 17)];
 				tileLayers[0].getTileUrl = customGetTileUrl;
 				// display the custom map
 				var customMap = new GMapType(tileLayers, new GMercatorProjection(18), "Aerial", {errorMessage:"Aerial imagery unavailable."});
 				map.addMapType(customMap);
-	*/			
+				*/			
 
 
 		// Create our "tiny" marker icon
