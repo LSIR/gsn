@@ -46,6 +46,10 @@ public class DataEnumerator implements Enumeration {
       hasNext = false;
    }
    
+   public boolean IsNull() {
+	   return resultSet == null;
+   }
+   
 
    public DataEnumerator ( PreparedStatement preparedStatement , boolean binaryLinked ) {
       if ( preparedStatement == null ) {

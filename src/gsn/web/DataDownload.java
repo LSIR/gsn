@@ -40,6 +40,7 @@ public class DataDownload extends HttpServlet {
 	public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 	      boolean responseCVS = false;
 	      boolean wantTimeStamp = false;
+	      boolean commonReq = true;
 		  PrintWriter out = res.getWriter();
 	      if (req.getParameter("vsName")==null || req.getParameter("vsName").equals("")) {
 	    	  res.sendError( Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
@@ -48,8 +49,12 @@ public class DataDownload extends HttpServlet {
 	      if (req.getParameter("display") != null && req.getParameter("display").equals("CSV")) {
 	    	  responseCVS = true;
 		      res.setContentType("text/csv");
+	    	  //res.setContentType("text/html");
 	      } else {
 	    	  res.setContentType("text/xml");
+	      }
+	      if (req.getParameter("commonReq") != null && req.getParameter("commonReq").equals("false")) {
+	    	  commonReq = false;
 	      }
 	      String vsName = req.getParameter("vsName");
 	      String delimiter = ";";
@@ -64,15 +69,35 @@ public class DataDownload extends HttpServlet {
 	    	  }
 	      }
 	      String request = "";
+	      String expression = "";
 	      String line="";
-	      if (req.getParameter("fields") != null) {
-	    	  String[] fields = req.getParameterValues("fields");
-		      for (int i=0; i < fields.length; i++) {
-		    	  if (fields[i].equals("TIMED")) {
-		    		  wantTimeStamp = true;
+	      if (commonReq) {
+		      if (req.getParameter("fields") != null) {
+		    	  String[] fields = req.getParameterValues("fields");
+			      for (int i=0; i < fields.length; i++) {
+			    	  if (fields[i].equals("TIMED")) {
+			    		  wantTimeStamp = true;
+			    	  }
+			    	  request += ", " + fields[i];
+			      }    
+		      }
+	      } else {
+	    	  String field;
+	    	  if (req.getParameter("fields") == null) {
+	    		  out.println("Request ERROR");
+	    		  return;
+	    	  } else {
+	    		  field = req.getParameter("fields");
+	    	  }
+		      String aggregateFunction = "AVG";
+		      if (req.getParameter("aggregateFunction")!= null) {
+		    	  if (req.getParameter("aggregateFunction").equals("MIN")) {
+		    		  aggregateFunction = "MIN";
+		    	  } else if (req.getParameter("aggregateFunction").equals("MAX")) {
+		    		  aggregateFunction = "MAX";
 		    	  }
-		    	  request += ", " + fields[i];
-		      }    
+		      }
+		      request += "  " + aggregateFunction + "(" + field + ") ";
 	      }
 	      
 	      String limit = "";
@@ -84,61 +109,76 @@ public class DataDownload extends HttpServlet {
 	      }
 	      String where = "";
 	      if (req.getParameter("critfield") != null) {
-	    	  String[] critJoin = req.getParameterValues("critJoin");
-	    	  String[] neg = req.getParameterValues("neg");
-	    	  String[] critfields = req.getParameterValues("critfield");
-	    	  String[] critop = req.getParameterValues("critop");
-	    	  String[] critval = req.getParameterValues("critval");
-	    	  for (int i=0; i < critfields.length ; i++) {
-	    		  if (critop[i].equals("LIKE")) {
-	    			  if (i > 0) {
-	    				  where += " " + critJoin[i-1] + " " + neg[i] + " " + critfields[i] + " LIKE '%"; // + critval[i] + "%'";
-	    			  } else {
-	    				  where += neg[i] + " " + critfields[i] + " LIKE '%"; // + critval[i] + "%'";
-	    			  }
-	    			  if (critfields[i].equals("TIMED")) {
-	    				  try {
-	    					  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
-	    					  Date d = sdf.parse(critval[i]);
-		    				  where += d.getTime();
-	    				  } catch (Exception e) {
-	    					  where += "0";
-	    				  }
-	    			  } else {
-	    				  where += critval[i];
-	    			  }
-	    			  where += "%'";
-	    		  } else {
-	    			  if (i > 0) {
-	    				  where += " " + critJoin[i-1] + " " + neg[i] + " " + critfields[i] + " " + critop[i] + " "; //critval[i];
-	    			  } else {
-	    				  where += neg[i] + " " + critfields[i] + " " + critop[i] + " "; //critval[i];
-	    			  }
-	    			  if (critfields[i].equals("TIMED")) {
-	    				  try {
-	    					  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
-	    					  Date d = sdf.parse(critval[i]);
-	    					  //System.out.println(d.getTime());
-		    				  where += d.getTime();
-	    				  } catch (Exception e) {
-	    					  System.out.println(e.toString());
-	    					  where += "0";
-	    				  }
-	    			  } else {
-	    				  where += critval[i];
-	    			  }
-	    		  }
+	    	  try {
+		    	  String[] critJoin = req.getParameterValues("critJoin");
+		    	  String[] neg = req.getParameterValues("neg");
+		    	  String[] critfields = req.getParameterValues("critfield");
+		    	  String[] critop = req.getParameterValues("critop");
+		    	  String[] critval = req.getParameterValues("critval");
+		    	  for (int i=0; i < critfields.length ; i++) {
+		    		  if (critop[i].equals("LIKE")) {
+		    			  if (i > 0) {
+		    				  where += " " + critJoin[i-1] + " " + neg[i] + " " + critfields[i] + " LIKE '%"; // + critval[i] + "%'";
+		    			  } else {
+		    				  where += neg[i] + " " + critfields[i] + " LIKE '%"; // + critval[i] + "%'";
+		    			  }
+		    			  if (critfields[i].equals("TIMED")) {
+		    				  try {
+		    					  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
+		    					  Date d = sdf.parse(critval[i]);
+			    				  where += d.getTime();
+		    				  } catch (Exception e) {
+		    					  where += "0";
+		    				  }
+		    			  } else {
+		    				  where += critval[i];
+		    			  }
+		    			  where += "%'";
+		    		  } else {
+		    			  if (i > 0) {
+		    				  where += " " + critJoin[i-1] + " " + neg[i] + " " + critfields[i] + " " + critop[i] + " "; //critval[i];
+		    			  } else {
+		    				  where += neg[i] + " " + critfields[i] + " " + critop[i] + " "; //critval[i];
+		    			  }
+		    			  if (critfields[i].equals("TIMED")) {
+		    				  try {
+		    					  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
+		    					  Date d = sdf.parse(critval[i]);
+		    					  where += d.getTime();
+		    				  } catch (Exception e) {
+		    					  System.out.println(e.toString());
+		    					  where += "0";
+		    				  }
+		    			  } else {
+		    				  where += critval[i];
+		    			  }
+		    		  }
+		    	  }
+		    	  where = " WHERE " + where;
+	    	  } catch (NullPointerException npe) {
+	    		  where = " ";
 	    	  }
-	    	  //where = where.substring(4);
-	    	  where = " WHERE " + where;
 	      }
 	      	      
 	      if (! request.equals("")) {
 	    	  request = request.substring(2);
-	    	  StringBuilder query = new StringBuilder("select "+request+" from " + vsName + where + " order by TIMED DESC "+limit+";");
+	    	  if (!commonReq) {
+	    		  expression = request;
+	    	  }
+	    	  request = "select "+request+" from " + vsName + where;
+	    	  if (commonReq) {
+	    		  request += " order by TIMED DESC "+limit;
+	    	  }
+	    	  request += ";";
+	    	  StringBuilder query = new StringBuilder(request);
 	    	  //out.println(query);
 	    	  ///*
 	    	  DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , false );
+	    	  if (result.IsNull()) {
+	    		  res.setContentType("text/html");
+	    		  out.println("No data corresponds to your request");
+	    		  return;
+	    	  }
 	    	  line = "";
 	    	  if (responseCVS) {
 	    		  boolean firstLine = true;
@@ -172,7 +212,11 @@ public class DataDownload extends HttpServlet {
 	    			  if (firstLine) {
 	    				 out.println("\t<line>");
 	    				 for (int i = 0; i < se.getFieldNames().length; i++)
-	    					 out.println("\t\t<field>" + se.getFieldNames()[i].toString()+"</field>");
+	    					 if (commonReq) {
+		    					 out.println("\t\t<field>" + se.getFieldNames()[i].toString()+"</field>");
+	    					 } else {
+	    						 out.println("\t\t<field>"+expression+"</field>");
+	    					 }
 	    				 if (wantTimeStamp) {
 	    					 out.println("\t\t<field>TIMED</field>");
 	    				 }
@@ -192,8 +236,8 @@ public class DataDownload extends HttpServlet {
 			       }
 	    		  out.println("</data>");
 	    	  }
-	          result.close();
-	          //*/
+	    	result.close();
+	    	//*/
 	      } else {
 	    	  out.println("Please select some fields");
 	      }
