@@ -23,7 +23,6 @@ h2 {
 
 a	{
 	color: #666666;
-	font-weight:bold;
 	text-decoration:none;
 	background-color:inherit;
 	}
@@ -88,6 +87,7 @@ white-space:nowrap;
 display:block;
 padding:0 10px;
 font-size:0.8em;
+font-weight:bold;
 font-weight:strong;
 text-transform:uppercase;
 text-decoration:none;
@@ -141,6 +141,10 @@ text-decoration:none;
 #main h2, #main h3, #main p {
 		padding:0;
     	}
+    	
+#main > div {
+		display:none;
+		}
 #sidebar {
 		xbackground:#99c;
 		
@@ -180,6 +184,10 @@ text-decoration:none;
 		margin-bottom:8px;
 		background:#FFA84C;
 		}
+.followed {
+		background:#FF8400;
+		border: 1px solid #FF8400;
+		}
 .vsbox h3 {
 		margin:1px 10px;
 		padding:0;
@@ -188,7 +196,8 @@ text-decoration:none;
 		}
 .vsbox h3 span {float:left;}
 .vsbox h3 span.id,.vsbox h3 span.status {display:none;}
-.vsbox h3 a {font-size:0.8em;float:right;}		
+.vsbox h3 a .vsname {color:#000;text-decoration:underline;}		
+.vsbox h3 a.close {font-size:0.8em;float:right;}		
 .vsbox h3 span.timed {
 	margin-left:5px;
 	font-size:0.8em;
@@ -218,8 +227,7 @@ text-decoration:none;
 	/*height:150px;*/
 }
 
-.vsbox .static, .vsbox .structure {
-}
+.vsbox dl.static, .vsbox dl.structure {display:none}
 .clear {
 		clear:both;
 }	
@@ -229,13 +237,8 @@ text-decoration:none;
 	color:#f00;
 }
 
-#map {
+#vsmap {
 	margin-bottom:5px;
-}
-
-.gpsenabled {
-	font-style: italic;
-	font-weight: bold;
 }
 
 .refreshing {
@@ -327,6 +330,7 @@ background-color: #FFF0DF;
 color: #FFA84C;
 text-decoration: none;
 width: 100%;
+
 }
 
 html>body #vsmenu li a { width: auto; }
@@ -338,3 +342,112 @@ background-color: #FFB25F;
 color: #fff;
 }
 
+.gpsenabled {
+	font-style: italic;
+	font-weight: bold;
+}
+
+
+/* Date picker specific styles follow */
+
+a.date-picker {
+	width: 16px;
+	height: 16px;
+	border: none;
+	color: #fff;
+	padding: 0;
+	margin: 0;
+	float: left;
+	overflow: hidden;
+	cursor: pointer;
+	background: url(calendar.png) no-repeat; 
+}
+a.date-picker span {
+	margin: 0 0 0 -2000px;
+}
+div.date-picker-holder, div.date-picker-holder * {
+	margin: 0;
+	padding: 0;
+}
+div.date-picker-holder {
+	position: relative;
+}
+div.date-picker-holder input {
+	float: left;
+}
+div.popup-calendar {
+	display: none;
+	position: absolute;
+	z-index: 2;
+	top: 0;
+	left: -16px; /* value for IE */
+	padding: 4px;
+	border: 2px solid #FFA84C;
+	background: #fff;
+	color: #000;
+	overflow:hidden;
+	width: 163px;
+	font-size: 80%;
+}
+html>body div.popup-calendar {
+	left: 99px; /* value for decent browsers */
+}
+div.popup-calendar div.link-close {
+	float: right;
+}
+div.popup-calendar div.link-prev {
+	float: left;
+}
+div.popup-calendar h3 {
+	font-size: 1.3em;
+	margin: 2px 0 5px 3px;
+}
+div.popup-calendar div.link-next {
+	float: right;
+}
+div.popup-calendar div a {
+	padding: 1px 2px;
+	color: #000;
+}
+div.popup-calendar div a:hover {
+	background-color: #FFA84C;
+	color: #fff;
+}
+div.popup-calendar table {
+	margin: 0;
+}
+* html div.popup-calendar table {
+	display: inline;
+}
+div.popup-calendar table th, div.popup-calendar table td {
+	background: #eee;
+	width: 21px;
+	height: 17px;
+	text-align: center;
+}
+div.popup-calendar table td.inactive {
+	color: #aaa;
+	padding: 1px 0 0;
+}
+div.popup-calendar table th.weekend, div.popup-calendar table td.weekend {
+	background: #f6f6f6;
+}
+div.popup-calendar table td a {
+	display: block;
+	border: 1px solid #eee;
+	width: 19px;
+	height: 15px;
+	text-decoration: none;
+	color: #333;
+}
+div.popup-calendar table td.today a {
+	border-color: #aaa;
+}
+div.popup-calendar table td a.selected, div.popup-calendar table td a:hover {
+	background: #FFA84C; 
+	color: #fff;
+}
+input.date-picker {
+	width: 90px;
+	margin: 1px 5px 5px 0;
+}
