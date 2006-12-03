@@ -48,15 +48,7 @@ $(document).ready(function() {
 	<div id="main">
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
 		
-		<!-- map part -->
-		<div id="mapdiv">
-		<!-- <h2>Global Sensor Network Map</h2> -->
-			<p>Auto-zoom and focus the map <input id="refreshall_autozoomandcenter" type="checkbox" checked="checked" style="vertical-align:middle"/></p>
-			<div id="vsmap" style="width: 100%; height: 500px;"></div>
-		</div>
-		
-		<div id="homediv">
-		<div>
+		<div id="control">
 		  <div class="intro">Welcome to Global Sensor Networks. All sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
 		 <!-- <p><input type="text" class="date-picker" name="date1" id="date1" /><br/>	</p> -->
 		  <p>Auto-refresh every : 
@@ -75,9 +67,11 @@ $(document).ready(function() {
 			<span class="refreshing"><img src="style/ajax-loader.gif" alt="loading" title="" /></span>
 		  </p>
 		</div>
-		<div id="vs">
-			<div class="loading">Virtual sensors are currently loading...</div>
-		</div>		
+		
+		<div id="homediv">
+			<div id="vs">
+				<div class="loading">Virtual sensors are currently loading...</div>
+			</div>		
 		</div>
 		
 		<!-- data part -->
@@ -94,6 +88,13 @@ $(document).ready(function() {
 		</form>
 		</div>
 		
+		<!-- map part -->
+		<div id="mapdiv">
+		<!-- <h2>Global Sensor Network Map</h2> -->
+			<p>Auto-zoom and focus the map <input id="refreshall_autozoomandcenter" type="checkbox" checked="checked" style="vertical-align:middle"/></p>
+			<div id="vsmap" style="width: 100%; height: 500px;"></div>
+			<div id="vs4map"></div>
+		</div>
 
 	</div>
 	<div id="sidebar">

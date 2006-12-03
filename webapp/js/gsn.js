@@ -2,12 +2,6 @@
  * gsn javascript
  */
 var map;
-
-var fields = new Array();
-var fields_type = new Array();
-var criterias = new Array();
-var nb_crit = 0;
- 
  
 var GSN = { 
 	debugmode: true
@@ -33,8 +27,11 @@ var GSN = {
 		
 		$("#main > div").hide();
 		if (GSN.context=="home")	{
+			GSN.vsbox.container = "#vs";
+			$("#main #control").show();
 			$("#main #homediv").show();
-			$("#vs div").show();
+			$("#vs #showall").show();
+			$("#vs #closeall").show();
 			//load and display all the visual sensors
 			if (!GSN.loaded) GSN.updateall();
 		} else if (GSN.context=="data")	{
@@ -42,16 +39,16 @@ var GSN = {
 			$("#main #datachooser").show();
 			if (!GSN.loaded) GSN.updateall();
 		} else if (GSN.context=="map")	{
+			GSN.vsbox.container = "#vs4map";
 			$(".intro").remove();
+			$("#main #control").show();
 			$("#main #mapdiv").show();
-			$("#main #homediv").show();
-			$("#vs div").hide();
-			GSN.map.followMarker(null);
 			if(!GSN.map.loaded) {
 				GSN.map.init();
 				GSN.updateall();
 			}
 		} else if (GSN.context=="fullmap")	{
+			GSN.vsbox.container = "#vs";
 			GSN.map.followMarker(null);
 			if(!GSN.map.loaded) {
 				GSN.map.init();
@@ -70,29 +67,30 @@ var GSN = {
 		if (GSN.context=="home"){
 			GSN.addandupdate(vsName);
 		} else if (GSN.context=="map"){
-			$("#vs div").hide();
+			$("#vs4map").empty();
 			GSN.map.followMarker(vsName);
 			GSN.addandupdate(vsName);
 		} else if (GSN.context=="data"){
 			GSN.data.init(vsName);
 		} else if (GSN.context=="fullmap"){
 			$(".vsbox").removeClass("followed");
-			$("#vsbox-"+vsName).addClass("followed");
+			$(".vsbox-"+vsName).addClass("followed");
 			GSN.map.followMarker(vsName);
 			GSN.map.updateall();
 		}
 	}
 	,closeall: function (){
 		$(".intro").remove();
-		$("#vs div").hide();
+		$("#vs").empty();
+		GSN.map.followMarker(null);
 	}
 	,showall: function (){
 		$(".intro").remove();
-		$("#vs div").show();
+		alert("nop");
 	}
 	,loaded : false
 	,init : function(data) {
-		GSN.debug("gsn init");
+		var start = new Date();
 		this.loaded=true;
 		$(".loading").remove();
 
@@ -105,14 +103,17 @@ var GSN = {
 			$("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
 		}
 		
-		//build the leftside vs menu and the vsbox div
+		//build the leftside vs menu
 		$("#vsmenu").empty();
 		$("virtual-sensor",data).each(function(){
 			var vsname = $(this).attr("name");
 			$("#vsmenu").append($.LI({},$.A({"href":"javascript:GSN.menu('"+vsname+"');","id":"menu-"+vsname+""},vsname)));
-			//create vsbox
-			GSN.vsbox.add(vsname);
-		});	
+			//if ($("field[@name=latitude]",$(this)).text()!="") 
+			//	$("#menu-"+vsname).addClass("gpsenabled");
+		});
+		
+		var diff = new Date() - start;
+		GSN.debug("init time:"+diff/1000); 
 	}
 	,updatenb: 0
 	,updateallchange: function(){
@@ -125,19 +126,35 @@ var GSN = {
 		GSN.updatenb++;
 		
 		$(".refreshing").show();
+		
+		var firstload = !GSN.loaded;
   		
 		$.ajax({ type: "GET", url: "/gsn", success: function(data){
 			var start = new Date();
-			//initalisation of gsn info, vsmenu and vsbox
+						
+			//initalisation of gsn info, vsmenu
 			if (!GSN.loaded) GSN.init(data);
+			
+			
+			//create vsbox
+			if (firstload && GSN.context == "home") {
+				for (var i = 0; i < 10; ++i){
+					var n = $($("virtual-sensor",data).get(i)).attr("name");
+					if (n!=null) GSN.vsbox.add(n);
+				}
+			} else if (firstload && GSN.context == "fullmap") {
+				$("virtual-sensor",data).each(function(){
+					GSN.vsbox.add($(this).attr("name"));
+				});
+			}
 			
 			//update vsbox
 			$("virtual-sensor",data).each(function(){
-				GSN.vsbox.update($(this))
+				GSN.vsbox.update($(this));
 			});
 			
 			//update map
-			GSN.map.updateall();
+			GSN.map.autozoomandcenter();
 			
 			//next refresh
 			if($("#refreshall_timeout").attr("value") > 0)
@@ -150,10 +167,7 @@ var GSN = {
 		}});
 	}
 	,addandupdate: function(vsName){
-		$("#vsbox-"+vsName).hide();
-		$("#vs").prepend($("#vsbox-"+vsName));
-		$("#vsbox-"+vsName).fadeIn("slow");
-				
+		GSN.vsbox.bringToFront(vsName);
 		$.ajax({ type: "GET", url: "/gsn?name="+vsName, success: function(data){
 			$("virtual-sensor[@name="+vsName+"]",data).each(function(){
 					GSN.vsbox.update($(this));
@@ -168,9 +182,9 @@ var GSN = {
 		container: "#vs"
 		,add: function(vsName) {
 			//create the vs box
-			//GSN.debug("add:"+vsdiv);
 			var vsdiv = "vsbox-"+vsName;
-			$(this.container).append($.DIV({"id":vsdiv,"class":"vsbox"},
+			if ($("."+vsdiv, $(this.container)).size()!=0) return; //already exists
+			$(this.container).append($.DIV({"class":vsdiv+" vsbox"},
 									  $.H3({},$.SPAN({"class":"vsname"},vsName),
 									  	$.A({"href":"javascript:GSN.vsbox.remove('"+vsName+"');","class":"close"},"close"),
 								      	$.SPAN({"class":"timed"},"loading...")
@@ -183,7 +197,13 @@ var GSN = {
 									  $.DL({"class":"static"}),
 									  $.DL({"class":"structure"})
 			));
-			
+		}
+		,bringToFront: function(vsName) {
+			this.add(vsName);
+			var vsdiv = "vsbox-"+vsName;
+			$("."+vsdiv, $(this.container)).hide();
+			$(this.container).prepend($("."+vsdiv, $(this.container)));
+			$("."+vsdiv, $(this.container)).fadeIn("slow");
 		}
 		,update: function (vs){
 			//when map is enable
@@ -196,8 +216,9 @@ var GSN = {
 			}
 			
 			//update the vsbox
-			var vsd = $("#vsbox-"+vs.attr("name"), $(this.container));
-			if (vsd.css("display")=="none") return;
+			var vsd = $(".vsbox-"+vs.attr("name"), $(this.container));
+			if (vsd.size()==0) return;
+			//if (vsd.css("display")=="none") return;
 			
 			var vsdl = $("dl", vsd);
 			var dynamic = vsdl.get(0);
@@ -264,17 +285,16 @@ var GSN = {
 			}
 		}
 		,remove: function (vsName) {
-			GSN.debug("remove: "+vsName);
 			var vsdiv = "vsbox-"+vsName;
-			$("#"+vsdiv).hide();
+			$("."+vsdiv, $(this.container)).remove();
 			GSN.map.followMarker(null);
 		}
 		,toggle: function (vsName,dl){
 			var vsdiv = "vsbox-"+vsName;
-			$("#"+vsdiv+" > dl", $(this.container)).hide();
-			$("#"+vsdiv+" > dl."+dl, $(this.container)).show();
-			$("#"+vsdiv+" a", $(this.container)).removeClass("active");
-			$("#"+vsdiv+" a.tab"+dl, $(this.container)).addClass("active");
+			$("."+vsdiv+" > dl", $(this.container)).hide();
+			$("."+vsdiv+" > dl."+dl, $(this.container)).show();
+			$("."+vsdiv+" a", $(this.container)).removeClass("active");
+			$("."+vsdiv+" a.tab"+dl, $(this.container)).addClass("active");
 		}
 	},
 	map: {
@@ -362,7 +382,7 @@ var GSN = {
   				map.addOverlay(marker);
       		}
 		}
-		,updateall:function (){
+		,autozoomandcenter:function (){
 			if (GSN.map.loaded && $("#refreshall_autozoomandcenter").attr("checked")){
 				//not following any sensor
 				if (GSN.map.highlighted!=null)
@@ -384,7 +404,7 @@ var GSN = {
   			$("#menu-"+vsName).addClass("gpsenabled");
   			
   			if(GSN.context=="fullmap"){
-				var vs = $("#vsbox-"+vsName+" > h3 > span.vsname")
+				var vs = $(".vsbox-"+vsName+" > h3 > span.vsname")
 				$(vs).wrap("<a href=\"javascript:GSN.menu('"+$(vs).text()+"');\"></a>");
 			}
 		}
@@ -411,6 +431,7 @@ var GSN = {
 					if (m.vsname == vsName) {	
 						GSN.map.highlighted = x;
 						GSN.map.trickhighlighted();
+						GSN.map.autozoomandcenter();
 						return;
 					}
 				}
