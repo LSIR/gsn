@@ -101,6 +101,9 @@ public class AXISWirelessCameraWrapper extends AbstractWrapper {
          postStreamElement( streamElement );
       }
    }
+   public String getWrapperName() {
+    return "axis 206w wireless camera";
+}
    
    public void finalize (  ) {
       threadCounter--;

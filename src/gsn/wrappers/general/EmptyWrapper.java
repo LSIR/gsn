@@ -34,7 +34,9 @@ public class EmptyWrapper extends AbstractWrapper {
    public Collection < DataField > getOutputFormat ( ) {
       return dataField;
    }
-   
+   public String getWrapperName() {
+    return "empty template";
+}
    public void finalize ( ) {
       threadCounter--;
    }

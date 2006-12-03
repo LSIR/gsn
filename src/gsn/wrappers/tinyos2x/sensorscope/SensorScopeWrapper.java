@@ -1,25 +1,19 @@
 package gsn.wrappers.tinyos2x.sensorscope;
 
-import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
-
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
-
 import net.tinyos.message.Message;
 import net.tinyos.message.MessageListener;
 import net.tinyos.message.MoteIF;
 import net.tinyos.packet.BuildSource;
 import net.tinyos.packet.PhoenixSource;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -90,6 +84,10 @@ public class SensorScopeWrapper extends AbstractWrapper implements MessageListen
    public Collection < DataField > getOutputFormat ( ) {
       return SensorScopeDataMsgWrapper.getStructure( );
    }
+
+public String getWrapperName() {
+    return "SensorScope Wrapper";
+}
 }
 
 class SensorScopeDataMsgWrapper {

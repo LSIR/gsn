@@ -1,7 +1,7 @@
 package gsn.utils;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -17,23 +17,48 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-
+/**
+ * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
+ */
 public class ValidityTools {
    
    public static final int              SMTP_PORT = 25;
    static Pattern hostAndPortPattern = Pattern.compile( "(.+):(\\d+)$" );
    
    public static final transient Logger logger    = Logger.getLogger( ValidityTools.class );
-   
+   /**
+    * Checks to see if the specified address is accessible. 3sec is used as the default
+    * timeout period.
+    * @param host The host to connect to.
+    * @param port the port to connect to (e.g., host:port).
+    */
    public static boolean isAccessibleSocket ( String host , int port ) throws UnknownHostException {
-      try {
-         Socket socket = new Socket( );
+     return isAccessibleSocket(host, port, 3000);
+   }
+   
+     public static boolean isAccessibleSocket ( String host , int port, int timeOutInMSec ) throws UnknownHostException,RuntimeException{
+        Socket socket=null;
+        boolean toReturn = false;
+         try {
+          if (port <=0 || port >65535|| host==null || host.trim().length()==0){
+              logger.info("Bad parameters for validator tool"+"(port = "+port+", host="+(host==null));
+              throw new RuntimeException("The specified parameters are not valid") ;
+          }
+         socket = new Socket( );
          InetSocketAddress inetSocketAddress = new InetSocketAddress( host , port );
-         socket.connect( inetSocketAddress , 3000 );
-      } catch ( IOException e ) {
-         return false;
+         socket.connect( inetSocketAddress , timeOutInMSec );
+         toReturn=true;
+      }catch(ConnectException e){
+      
+      }catch ( Exception e ) {
+             logger.info(e.getMessage(),e);
+      }finally{
+          if (socket !=null )
+              try{
+                  socket.close();
+              }catch(Exception e){}
       }
-      return true;
+      return toReturn;
    }
    
    public static void checkAccessibilityOfDirs ( String ... args ) {

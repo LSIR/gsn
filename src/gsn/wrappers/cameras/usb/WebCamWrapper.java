@@ -319,6 +319,9 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
       if ( mainFrame != null ) mainFrame.dispose( );
       threadCounter--;
    }
+   public String getWrapperName() {
+    return "usb webcam camera ov511 ov516";
+}
    
    public static void main ( String [ ] args ) {
       PropertyConfigurator.configure( DEFAULT_GSN_LOG4J_PROPERTIES );

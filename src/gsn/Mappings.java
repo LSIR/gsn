@@ -6,6 +6,7 @@ import gsn.utils.CaseInsensitiveComparator;
 
 import java.util.Iterator;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -14,11 +15,11 @@ import org.apache.log4j.Logger;
  */
 public final class Mappings {
    
-   private static final TreeMap < String , VSensorConfig >               vsNameTOVSConfig               = new TreeMap < String , VSensorConfig >( new CaseInsensitiveComparator( ) );
+   private static final ConcurrentHashMap<String,VSensorConfig>              vsNameTOVSConfig               = new ConcurrentHashMap<String,VSensorConfig>( );
    
-   private static final TreeMap < String , VirtualSensorPool >             fileNameToVSInstance           = new TreeMap < String , VirtualSensorPool >( new CaseInsensitiveComparator( ) );
+   private static final ConcurrentHashMap < String , VirtualSensorPool >             fileNameToVSInstance           = new ConcurrentHashMap < String , VirtualSensorPool >(  );
    
-   private static final TreeMap < String , TreeMap < String , Boolean >> vsNamesToOutputStructureFields = new TreeMap < String , TreeMap < String , Boolean >>( new CaseInsensitiveComparator( ) );
+   private static final ConcurrentHashMap < String , TreeMap < String , Boolean >> vsNamesToOutputStructureFields = new ConcurrentHashMap < String , TreeMap < String , Boolean >>( );
    
    private static final transient Logger                                 logger                         = Logger.getLogger( Mappings.class );
    

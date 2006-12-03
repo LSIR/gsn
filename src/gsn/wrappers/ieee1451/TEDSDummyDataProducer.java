@@ -156,4 +156,8 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
          return result;
       }
    }
+
+public String getWrapperName() {
+    return "TEDS ieee 1451 ieee1451 simulator";
+}
 }

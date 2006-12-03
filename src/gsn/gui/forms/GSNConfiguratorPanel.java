@@ -2,9 +2,7 @@ package gsn.gui.forms;
 
 import gsn.beans.ContainerConfig;
 import gsn.gui.AntRunner;
-import gsn.pid.PIDUtils;
 import gsn.utils.ValidityTools;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +14,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -28,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.Timer;
-
 import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.binding.list.SelectionInList;
@@ -134,12 +130,13 @@ public class GSNConfiguratorPanel {
 	}
 
 	public void stopGsn() {
-	    try {
-		PIDUtils.killPID(new File(System.getProperty("java.io.tmpdir")
-			+ "/" + PIDUtils.GSN_PID));
-	    } catch (IOException e1) {
-		e1.printStackTrace();
-	    }
+//           FIXME
+//	    try {
+//		PIDUtils.killPID(new File(System.getProperty("java.io.tmpdir")
+//			+ "/" + PIDUtils.GSN_PID));
+//	    } catch (IOException e1) {
+//		e1.printStackTrace();
+//	    }
 	}
 
 	public void startDir() {
@@ -174,12 +171,13 @@ public class GSNConfiguratorPanel {
 	}
 
 	public void stopDir() {
-	    try {
-		PIDUtils.killPID(new File(System.getProperty("java.io.tmpdir")
-			+ "/" + PIDUtils.DIRECTORY_SERVICE_PID));
-	    } catch (IOException e1) {
-		e1.printStackTrace();
-	    }
+           // Fixme
+//	    try {
+//		PIDUtils.killPID(new File(System.getProperty("java.io.tmpdir")
+//			+ "/" + PIDUtils.DIRECTORY_SERVICE_PID));
+//	    } catch (IOException e1) {
+//		e1.printStackTrace();
+//	    }
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -190,23 +188,25 @@ public class GSNConfiguratorPanel {
 	}
 
 	private void checkDirStatus() {
-	    if (PIDUtils.isPIDExist(gsn.pid.PIDUtils.DIRECTORY_SERVICE_PID) != dirIsRunning) {
-		if (dirIsRunning) {
-		    notifyDirHasStopped();
-		} else {
-		    notifyDirHasStarted();
-		}
-	    }
+	   // FIXME 
+//           if (PIDUtils.isPIDExist(gsn.pid.PIDUtils.DIRECTORY_SERVICE_PID) != dirIsRunning) {
+//		if (dirIsRunning) {
+//		    notifyDirHasStopped();
+//		} else {
+//		    notifyDirHasStarted();
+//		}
+//	    }
 	}
 
 	private void checkGsnStatus() {
-	    if (PIDUtils.isPIDExist(PIDUtils.GSN_PID) != gsnIsRunning) {
-		if (gsnIsRunning) {
-		    notifyGsnHasStopped();
-		} else {
-		    notifyGsnHasStarted();
-		}
-	    }
+	   // FIXME
+//           if (PIDUtils.isPIDExist(PIDUtils.GSN_PID) != gsnIsRunning) {
+//		if (gsnIsRunning) {
+//		    notifyGsnHasStopped();
+//		} else {
+//		    notifyGsnHasStarted();
+//		}
+//	    }
 	}
 
 	private void updateDirLogView() {
@@ -335,10 +335,12 @@ public class GSNConfiguratorPanel {
 	directoryServiceStartStop.addActionListener(new ActionListener() {
 
 	    public boolean testBeforeRunningDirectory() {
-		if (!confirmConstraint(!PIDUtils
-			.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID),
-			"Another GSN Directory Server is already running on this machine."))
-		    return false;
+               //FIXME
+//		if (!confirmConstraint(!PIDUtils
+//			.isPIDExist(PIDUtils.DIRECTORY_SERVICE_PID),
+//			"Another GSN Directory Server is already running on this machine."))
+//		    return false;
+               
 		String dirHost = bean
 			.extractDirectoryServiceHost((String) networkInterface
 				.getSelectedItem());
@@ -397,9 +399,10 @@ public class GSNConfiguratorPanel {
 	gsnStart.addActionListener(new ActionListener() {
 
 	    public boolean testBeforeRunningDirectory() {
-		if (!confirmConstraint(!PIDUtils.isPIDExist(PIDUtils.GSN_PID),
-			"Another GSN Server is running."))
-		    return false;
+               // FIXME
+//		if (!confirmConstraint(!PIDUtils.isPIDExist(PIDUtils.GSN_PID),
+//			"Another GSN Server is running."))
+//		    return false;
 
 		int gsnPort = bean.getContainerPort();
 		if (!confirmConstraint((gsnPort > 0 || gsnPort < 65000),

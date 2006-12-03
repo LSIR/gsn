@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
 import javax.swing.Timer;
 import org.apache.log4j.Logger;
 
@@ -62,7 +60,10 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
    public void finalize ( ) {
       timer.stop( );
       threadCounter--;
-      
+  }
+   
+   public String getWrapperName() {
+       return "System Time";
    }
    
 }

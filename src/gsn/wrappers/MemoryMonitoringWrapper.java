@@ -92,4 +92,8 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
    public final Collection < DataField > getOutputFormat ( ) {
       return outputStructureCache;
    }
+
+public String getWrapperName() {
+    return "System memory consumption usage";
+}
 }

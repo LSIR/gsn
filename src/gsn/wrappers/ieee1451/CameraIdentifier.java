@@ -208,6 +208,9 @@ public class CameraIdentifier extends AbstractWrapper {
    public Collection < DataField > getOutputFormat ( ) {
       return cachedOutputStructure;
    }
+   public String getWrapperName() {
+    return "IEEE1451 IEEE 1451 camera wireless AXIS 206W";
+}
    
    public void finalize ( ) {
       threadCounter--;

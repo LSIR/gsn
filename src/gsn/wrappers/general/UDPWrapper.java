@@ -83,7 +83,9 @@ public class UDPWrapper extends AbstractWrapper {
    public void finalize (  ) {
       threadCounter--;
    }
-   
+   public String getWrapperName() {
+    return "network udp";
+}
    public static void main ( String [ ] args ) {
    // To check if the wrapper works properly.
    // this method is not going to be used by the system.

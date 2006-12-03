@@ -236,4 +236,8 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
          boolean success = ( new File( TedsToVirtualSensor.TARGET_VS_DIR + tedsResult.fileName ) ).delete( );
       }
    }
+
+public String getWrapperName() {
+    return "IEEE1451 IEEE 1451 mica mote";
+}
 }

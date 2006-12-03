@@ -102,6 +102,9 @@ public class BTWrapper extends AbstractWrapper {
       dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
       return dataField;
    }
+   public String getWrapperName() {
+    return "Bluetooth";
+}
    
    public void finalize (  ) {
       threadCounter--;

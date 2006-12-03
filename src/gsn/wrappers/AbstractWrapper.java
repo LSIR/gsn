@@ -196,4 +196,5 @@ public abstract class AbstractWrapper extends Thread  {
   
    public abstract boolean initialize ( ) ;
    public abstract void finalize();
+   public abstract String getWrapperName();
 }

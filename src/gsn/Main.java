@@ -2,7 +2,6 @@ package gsn;
 
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
-import gsn.pid.PIDUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
 import java.io.File;
@@ -51,11 +50,6 @@ public final class Main {
       ValidityTools.checkAccessibilityOfDirs( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
       PropertyConfigurator.configure( DEFAULT_GSN_LOG4J_PROPERTIES );
       logger = Logger.getLogger( Main.class );
-      if ( PIDUtils.isPIDExist( PIDUtils.GSN_PID ) ) {
-         System.out.println( "Error : Another GSN Server is running." );
-         System.exit( 1 );
-      } else
-         pidFile = PIDUtils.createPID( PIDUtils.GSN_PID );
       
       try {
          initialize( "conf/gsn.xml" );
@@ -101,28 +95,6 @@ public final class Main {
          System.exit( 1 );
       }
       final VSensorLoader vsloader = new VSensorLoader( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
-      Thread shutdown = new Thread( new Runnable( ) {
-         
-         public void run ( ) {
-            try {
-               while ( true ) {
-                  int value = PIDUtils.getFirstIntFrom( pidFile );
-                  if ( value != '0' ) Thread.sleep( 2500 );
-                  else
-                     break;
-               }
-               logger.warn( "Shutdown request received." );
-               vsloader.stopLoading( );
-               server.stop( );
-            } catch ( Exception e ) {
-               logger.warn( "Shutdowning the webserver failed." , e );
-               System.exit( 1 );
-            }
-            logger.warn( "GSN server is stopped." );
-            System.exit( 0 );
-         }
-      } );
-      shutdown.start( );
    }
    
    /**

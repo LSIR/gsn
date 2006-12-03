@@ -155,4 +155,8 @@ public class WSNSWrapper extends AbstractWrapper implements DataListener {
    public void finalize ( ) {
       
    }
+
+public String getWrapperName() {
+    return "Wireless Sensor Network Simulator";
+}
 }

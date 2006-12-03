@@ -109,4 +109,8 @@ public class GPSGenerator extends AbstractWrapper {
       threadCounter--;
    }
    
+   public String getWrapperName() {
+       return "GPS simulator";
+   }
+   
 }

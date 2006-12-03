@@ -471,5 +471,8 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
          System.out.println( "initialization successful\n" );
       }
    }
+   public String getWrapperName() {
+    return "serial port wrapper rs-232";
+}
    
 }

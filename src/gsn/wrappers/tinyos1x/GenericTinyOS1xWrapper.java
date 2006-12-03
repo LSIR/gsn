@@ -171,4 +171,8 @@ public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageLi
    public String toString ( ) {
       return "SFWrapper Service Provider";
    }
+
+public String getWrapperName() {
+   return "Generic TinyOS-1.x";
+}
 }
