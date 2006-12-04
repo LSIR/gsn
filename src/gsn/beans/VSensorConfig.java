@@ -44,6 +44,10 @@ public class VSensorConfig implements Serializable {
    
    private ArrayList < DataField >                outputStructure                           = new ArrayList < DataField >( );
    
+   private ArrayList < DataField >                webParameters                             = new ArrayList < DataField >( );
+   
+   private String                                 webParameterPassword                              = null;
+   
    private String                                 storageHistorySize;
    
    private final TreeMap < String , InputStream > inputStreamNameToInputStreamObjectMapping = new TreeMap < String , InputStream >( new CaseInsensitiveComparator( ) );
@@ -58,7 +62,8 @@ public class VSensorConfig implements Serializable {
    
    private transient final Logger                 logger                                    = Logger.getLogger( VSensorConfig.class );
    
-   private String webapp=null;
+   private String                                 webapp                                    = null;
+   
    /**
     * @return Returns the addressing.
     */
@@ -329,8 +334,10 @@ public class VSensorConfig implements Serializable {
       } else {
          try {
             final StringBuilder shs = new StringBuilder( storageHistorySize );
-            if ( mIndex > 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
-            else if ( hIndex > 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
+            if ( mIndex > 0 )
+               this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
+            else if ( hIndex > 0 )
+               this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
             else if ( sIndex > 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
             this.isStorageCountBased = false;
          } catch ( final NumberFormatException e ) {
@@ -354,29 +361,43 @@ public class VSensorConfig implements Serializable {
     * @return the webapp path.
     */
    public String getWebapp ( ) {
-      if ( this.webapp == null || this.webapp.trim( ).length( )==0 ) {
-         return Main.DEFAULT_WEB_APP_PATH;
-      }
+      if ( this.webapp == null || this.webapp.trim( ).length( ) == 0 ) { return Main.DEFAULT_WEB_APP_PATH; }
       return webapp.trim( );
    }
-
+   
    /**
     * @param webapp the webapp path to set
     */
    public void setWebapp ( String webappPath ) {
       this.webapp = webappPath;
    }
-   public StringBuffer getUsedSources(){
-      StringBuffer usedSources = new StringBuffer();
-      for (InputStream is : inputStreams)
-         for (StreamSource ss : is.getSources())
-            if (ss.getActiveSourceProducer() instanceof RemoteDS){
-               RemoteDS remote = (RemoteDS) ss.getActiveSourceProducer();
-               usedSources.append(remote.getRemoteHost()).append(":").append(remote.getRemotePort()).append("/").append(remote.getRemoveVSName()).append(" ");
-            }else{
-               usedSources.append(ss.getActiveSourceProducer().getWrapperName()).append(Registry.SPACE_CHARACTER);
+   
+   public StringBuffer getUsedSources ( ) {
+      StringBuffer usedSources = new StringBuffer( );
+      for ( InputStream is : inputStreams )
+         for ( StreamSource ss : is.getSources( ) )
+            if ( ss.getActiveSourceProducer( ) instanceof RemoteDS ) {
+               RemoteDS remote = ( RemoteDS ) ss.getActiveSourceProducer( );
+               usedSources.append( remote.getRemoteHost( ) ).append( ":" ).append( remote.getRemotePort( ) ).append( "/" ).append( remote.getRemoveVSName( ) ).append( " " );
+            } else {
+               usedSources.append( ss.getActiveSourceProducer( ).getWrapperName( ) ).append( Registry.SPACE_CHARACTER );
             }
       return usedSources;
+   }
+   
+   /**
+    * @return the securityCode
+    */
+   public String getSecurityCode ( ) {
+      return webParameterPassword;
+   }
+
+   
+   /**
+    * @return the webParameters
+    */
+   public ArrayList < DataField > getWebParameters ( ) {
+      return webParameters;
    }
 
    public String toString ( ) {
@@ -385,7 +406,8 @@ public class VSensorConfig implements Serializable {
          builder.append( "Input-Stream-Name" ).append( inputStream.getInputStreamName( ) );
          builder.append( "Input-Stream-Query" ).append( inputStream.getQuery( ) );
          builder.append( " Stream-Sources ( " );
-         if ( inputStream.getSources( ) == null ) builder.append( "null" );
+         if ( inputStream.getSources( ) == null )
+            builder.append( "null" );
          else
             for ( final StreamSource ss : inputStream.getSources( ) ) {
                builder.append( "Stream-Source Alias : " ).append( ss.getAlias( ) );

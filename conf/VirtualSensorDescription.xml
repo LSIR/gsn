@@ -17,6 +17,10 @@
        <value name="email" field="email"  usage="optional"/>
        <value name="description" field="description"  usage="optional"/>
        <value name="webapp" field="webapp"  usage="optional"/>
+       <structure name="web-input"  usage="optional">  
+          <value name="password"  field="webParameterPassword" style="attribute" usage="optional" />
+          <collection name="params"   field="webParameters"  item-type="gsn.beans.DataField" />
+       </structure>
        <structure name="life-cycle"  usage="optional">  
           <value name="pool-size"  field="lifeCyclePoolSize" style="attribute" />
        </structure>

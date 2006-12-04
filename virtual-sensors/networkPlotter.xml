@@ -17,7 +17,7 @@
    </output-structure>
    <storage history-size="1"/>
    <streams>
-      <stream name="data" rate="100">
+      <stream name="data" >
          <source alias="wsn" sampling-rate="1" storage-size="1">
             <address wrapper="wsns">
                <predicate key="HOST">127.0.0.1</predicate>

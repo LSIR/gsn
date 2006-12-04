@@ -24,6 +24,6 @@
                 <query>select * from "WRAPPER"</query>
             </source>
             <query>select * from "source1"</query>
-        </stream> 
+			</stream> 
         </streams>
 </virtual-sensor> 
