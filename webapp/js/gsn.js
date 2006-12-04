@@ -1,18 +1,20 @@
-/*
+/**
  * gsn javascript
  */
 var map;
  
 var GSN = { 
-	debugmode: true
+	debugmode: false
 	,debug: function (txt) {
 		if(typeof console != "undefined" && this.debugmode) {
 			console.debug(txt);
 		}	
 	}
-	,context: null
+	,context: null //home, data, map || fullmap
+	/**
+	* Initialize a page load (begin, tab click & back button)
+	*/
 	,load: function(){
-		//call during page load (begin, tab click & back button)
 		GSN.debug("init:"+location.hash);
 		var params=location.hash.substr(1).split(",");
 		
@@ -26,12 +28,12 @@ var GSN = {
 		});
 		
 		$("#main > div").hide();
+		//for each page context
 		if (GSN.context=="home")	{
 			GSN.vsbox.container = "#vs";
 			$("#main #control").show();
 			$("#main #homediv").show();
-			$("#vs #showall").show();
-			$("#vs #closeall").show();
+			$("#control #closeall").show();
 			//load and display all the visual sensors
 			if (!GSN.loaded) GSN.updateall();
 		} else if (GSN.context=="data")	{
@@ -42,6 +44,7 @@ var GSN = {
 			GSN.vsbox.container = "#vs4map";
 			$(".intro").remove();
 			$("#main #control").show();
+			$("#control #closeall").hide();
 			$("#main #mapdiv").show();
 			if(!GSN.map.loaded) {
 				GSN.map.init();
@@ -56,10 +59,16 @@ var GSN = {
 			}
 		}
 	}
+	/**
+	* Click on the top navigation bar
+	*/
 	,nav: function (page) {
 		$.historyLoad(page);
 		return false;
 	}
+	/**
+	* Click on the virtual sensor on the left bar
+	*/
 	,menu: function (vsName) {
 		$(".intro").remove();
 		
@@ -76,21 +85,22 @@ var GSN = {
 			$(".vsbox").removeClass("followed");
 			$(".vsbox-"+vsName).addClass("followed");
 			GSN.map.followMarker(vsName);
-			GSN.map.updateall();
+			GSN.map.autozoomandcenter();
 		}
 	}
+	/**
+	* Close all button
+	*/
 	,closeall: function (){
 		$(".intro").remove();
 		$("#vs").empty();
 		GSN.map.followMarker(null);
 	}
-	,showall: function (){
-		$(".intro").remove();
-		alert("nop");
-	}
 	,loaded : false
+	/**
+	* Initialize the gsn title and leftside menu
+	*/
 	,init : function(data) {
-		var start = new Date();
 		this.loaded=true;
 		$(".loading").remove();
 
@@ -111,15 +121,15 @@ var GSN = {
 			//if ($("field[@name=latitude]",$(this)).text()!="") 
 			//	$("#menu-"+vsname).addClass("gpsenabled");
 		});
-		
-		var diff = new Date() - start;
-		GSN.debug("init time:"+diff/1000); 
 	}
 	,updatenb: 0
 	,updateallchange: function(){
 		if($("#refreshall_timeout").attr("value") != 0)
 			GSN.updateall();
 	}
+	/**
+	* Ajax call to update all the sensor display on the page and the map
+	*/
 	,updateall: function(num,showall){
 		//to prevent multiple update instance
 		if (typeof num == "number" && num != GSN.updatenb) return;
@@ -136,7 +146,7 @@ var GSN = {
 			if (!GSN.loaded) GSN.init(data);
 			
 			
-			//create vsbox
+			//create vsbox on the first load
 			if (firstload && GSN.context == "home") {
 				for (var i = 0; i < 10; ++i){
 					var n = $($("virtual-sensor",data).get(i)).attr("name");
@@ -166,6 +176,9 @@ var GSN = {
 			GSN.debug("updateall time:"+diff/1000); 
 		}});
 	}
+	/**
+	* Add a vsbox if it doesn't exist, bring it to front and update it
+	*/
 	,addandupdate: function(vsName){
 		GSN.vsbox.bringToFront(vsName);
 		$.ajax({ type: "GET", url: "/gsn?name="+vsName, success: function(data){
@@ -174,14 +187,19 @@ var GSN = {
 			});
 			
 			//update map
-			GSN.map.updateall();
+			GSN.map.autozoomandcenter();
 		}});
 	}
+	/**
+	* vsbox, display the vs info
+	*/
 	,vsbox: {
 		//box showing all vs info
 		container: "#vs"
+		/**
+		* Create an empty vsbox
+		*/
 		,add: function(vsName) {
-			//create the vs box
 			var vsdiv = "vsbox-"+vsName;
 			if ($("."+vsdiv, $(this.container)).size()!=0) return; //already exists
 			$(this.container).append($.DIV({"class":vsdiv+" vsbox"},
@@ -198,6 +216,9 @@ var GSN = {
 									  $.DL({"class":"structure"})
 			));
 		}
+		/**
+		* Bring a vsbox at the beginning of the container
+		*/
 		,bringToFront: function(vsName) {
 			this.add(vsName);
 			var vsdiv = "vsbox-"+vsName;
@@ -205,8 +226,11 @@ var GSN = {
 			$(this.container).prepend($("."+vsdiv, $(this.container)));
 			$("."+vsdiv, $(this.container)).fadeIn("slow");
 		}
+		/**
+		* Update and show all the data of the vsbox
+		*/
 		,update: function (vs){
-			//when map is enable
+			//when map is enable, update marker
 			if (GSN.map.loaded){
 				var lat = $("field[@name=latitude]",vs).text();
 				var lon = $("field[@name=longitude]",vs).text();
@@ -227,7 +251,7 @@ var GSN = {
 			dl = dynamic;
 	
 			var name,type,value;
-	
+			//update the vsbox the first time, when it's empty
 			if ($(dynamic).children().size()==0 && $(static).children().size()==0){
 			  $("field",vs).each(function(){ 
 				name = $(this).attr("name");
@@ -259,6 +283,7 @@ var GSN = {
 			  });
 			  return true;
 			} else {
+				//update the vsbox when the value already exists
 				var dds = $("dd",dl);
 				var dd,field;
 				for (var i = 0; i<dds.size();i++){
@@ -284,11 +309,17 @@ var GSN = {
 				return false;
 			}
 		}
+		/**
+		* Remove the vsbox from the container
+		*/
 		,remove: function (vsName) {
 			var vsdiv = "vsbox-"+vsName;
 			$("."+vsdiv, $(this.container)).remove();
 			GSN.map.followMarker(null);
 		}
+		/**
+		* Vsbox tabs control
+		*/
 		,toggle: function (vsName,dl){
 			var vsdiv = "vsbox-"+vsName;
 			$("."+vsdiv+" > dl", $(this.container)).hide();
@@ -297,6 +328,9 @@ var GSN = {
 			$("."+vsdiv+" a.tab"+dl, $(this.container)).addClass("active");
 		}
 	},
+	/**
+	* All the map thing
+	*/
 	map: {
 		loaded: false //the #vsmap div is initialized
 		,tinyred: null
@@ -304,6 +338,9 @@ var GSN = {
 		,markers : new Array()
 		,highlighted : null
 		,highlightedmarker : null
+		/**
+		* Initialize the google map
+		*/
 		,init : function(){
 			if(typeof GBrowserIsCompatible == "undefined") {
 				//no internet
@@ -369,10 +406,17 @@ var GSN = {
   					GSN.map.zoomend(oldzoomlevel,newzoomlevel);
 				}); 		
    			}
-		}	
+		}
+		/**
+		* Callback after any zoom change
+		* Used for the tricked followed marker
+		*/	
 		,zoomend : function(oldzoomlevel,newzoomlevel){
 			GSN.map.trickhighlighted();
 		}
+		/**
+		* Followed marker and top of the others
+		*/
 		,trickhighlighted : function(){
 			if (GSN.map.highlighted != null) {
 				var hPoint = map.getCurrentMapType().getProjection().fromLatLngToPixel(GSN.map.markers[GSN.map.highlighted].getPoint(),map.getZoom());
@@ -382,6 +426,9 @@ var GSN = {
   				map.addOverlay(marker);
       		}
 		}
+		/**
+		* Auto-zoom and center on the visible sensors
+		*/
 		,autozoomandcenter:function (){
 			if (GSN.map.loaded && $("#refreshall_autozoomandcenter").attr("checked")){
 				//not following any sensor
@@ -391,6 +438,9 @@ var GSN = {
 					GSN.map.showAllMarkers();
 			}
 		}
+		/**
+		* Add marker
+		*/
 		,addMarker: function(vsName,lat,lon){
 			if (!map.isLoaded())
 				map.setCenter(new GLatLng(lat,lon), 13);
@@ -408,6 +458,9 @@ var GSN = {
 				$(vs).wrap("<a href=\"javascript:GSN.menu('"+$(vs).text()+"');\"></a>");
 			}
 		}
+		/**
+		* Update marker
+		*/
 		,updateMarker: function(vsName,lat,lon){
 			var updated = false;
 			for (x in GSN.map.markers) {
@@ -422,6 +475,10 @@ var GSN = {
 			if (!updated)
 				GSN.map.addMarker(vsName,lat,lon);
 		}
+		/**
+		* Highlight a marker
+		* Stop it if called with null name
+		*/
 		,followMarker: function(vsName){
 			if (!GSN.map.loaded) return;
 			
@@ -442,6 +499,9 @@ var GSN = {
 				map.removeOverlay(GSN.map.highlightedmarker);
 			}
 		}
+		/**
+		* Zoom out to see all marker
+		*/
 		,showAllMarkers: function(){
 			var bounds = new GLatLngBounds();
 			for (x in GSN.map.markers) {
@@ -451,6 +511,9 @@ var GSN = {
 			map.setCenter(bounds.getCenter());
 		}
 	}
+	/**
+	* Data part
+	*/	
 	,data : {
 	
 		fields : new Array(),
@@ -681,12 +744,18 @@ var GSN = {
 	   	}
 	}
 	,util: {
+		/**
+		* Pretty print of timestamp date
+		*/
 		printDate: function(date){
 			date = new Date(parseInt(date));
 			var value = date.getFullYear()+"/"+GSN.util.addleadingzero(date.getMonth()+1)+"/"+GSN.util.addleadingzero(date.getDate());
 	        value += "@"+GSN.util.addleadingzero(date.getHours())+":"+GSN.util.addleadingzero(date.getMinutes())+":"+GSN.util.addleadingzero(date.getSeconds());	       
 	        return value;
 	    }
+	    /**
+		* Add a zero if less then 10
+		*/
 		,addleadingzero : function (num){
 			var n = String(num);
 			return (n.length == 1 ? "0"+n : n);

@@ -19,7 +19,6 @@ $(document).ready(function() {
 	$("#refreshall_timeout").bind("change",GSN.updateallchange);
 	$("#refreshall").bind("click",GSN.updateall);
 	$("#closeall").bind("click",GSN.closeall);
-	$("#showall").bind("click",GSN.showall);
 	
 	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 	
@@ -49,7 +48,7 @@ $(document).ready(function() {
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
 		
 		<div id="control">
-		  <div class="intro">Welcome to Global Sensor Networks. All sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
+		  <div class="intro">Welcome to Global Sensor Networks. The first ten sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
 		 <!-- <p><input type="text" class="date-picker" name="date1" id="date1" /><br/>	</p> -->
 		  <p>Auto-refresh every : 
 			<select id="refreshall_timeout" >
@@ -62,7 +61,6 @@ $(document).ready(function() {
 			<option value="0">disable</option> 
 			</select>
 			<input id="refreshall" type="button" value="refresh" />
-			<input id="showall" type="button" value="show all" />
 			<input id="closeall" type="button" value="close all" />
 			<span class="refreshing"><img src="style/ajax-loader.gif" alt="loading" title="" /></span>
 		  </p>
