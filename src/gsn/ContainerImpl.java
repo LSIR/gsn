@@ -15,7 +15,6 @@ import gsn.vsensor.http.OneShotQueryWithAddressingHandler;
 import gsn.vsensor.http.OutputStructureHandler;
 import gsn.vsensor.http.RequestHandler;
 import gsn.wrappers.RemoteDS;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -26,12 +25,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Vector;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 
 /**

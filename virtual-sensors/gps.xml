@@ -6,10 +6,10 @@
    <author>ali.salehi@epfl.ch</author>
    <email>ali.salehi@epfl.ch</email>
    <description>Virtual sensor producing random locations and sensor readings for testing in GPS applications.</description>
-	<web-input password="test">
-	  <field name="reset"    type="byte" >Non-zero value means reseting.</field>
-	  <field name="reset"    type="*binary:2mb" >Files Size of 2MB max, The * means optional.</field>
-	</web-input>
+   <web-input password="test">
+       <field name="reset"    type="byte" >Non-zero value means reseting.</field>
+       <field name="reset"    type="*binary:2mb" >Files Size of 2MB max, The * means optional.</field>
+   </web-input>
 	<life-cycle pool-size="10" />
    <addressing>
 	   <predicate key="type">test-sensor</predicate>

@@ -56,6 +56,7 @@ public class RemoteDS extends AbstractWrapper {
          logger.warn( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
          return false;
       }
+      this.remoteVSName = this.remoteVSName.trim().toLowerCase();
       this.strcture = askForStrcture( );
       if ( this.strcture == null ) {
          logger.warn( "The initialization of the ** virtual sensor failed due to *askForStrcture* failure." );
@@ -69,7 +70,6 @@ public class RemoteDS extends AbstractWrapper {
     * @return Null if the RemoteDS can't obtain the data strcture from the
     */
    private ArrayList < DataField > askForStrcture ( ) {
-      
       if ( host.indexOf( "http://" ) < 0 ) host = "http://" + host;
       String destination = new StringBuilder( ).append( host ).append( ":" ).append( port ).append( "/gsn" ).toString( );
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Wants to ask for structure from : " ).append( destination ).toString( ) );
@@ -106,7 +106,6 @@ public class RemoteDS extends AbstractWrapper {
             logger.debug( e.getMessage( ) , e );
          }
       }
-      
       return outputStreamStruecture;
    }
    
@@ -135,11 +134,9 @@ public class RemoteDS extends AbstractWrapper {
       if ( statusCode == -1 ) {
          logger.warn( "Message couldn't be sent to :" + postMethod.getHostConfiguration( ).getHostURL( ) );
       }
-      
       if ( logger.isDebugEnabled( ) )
          logger.debug( new StringBuilder( ).append( "Wants to send message to : " ).append( destination ).append( " with the query ->" ).append( query ).append( "<-" ).toString( ) );
       postMethod.setRequestHeader( Container.REQUEST , Integer.toString( Container.REGISTER_PACKET ) );
-      
       statusCode = TCPConnPool.executeMethod( postMethod );
       if ( statusCode == -1 ) {
          logger.warn( "Message couldn't be sent to :" + postMethod.getHostConfiguration( ).getHostURL( ) );

@@ -129,7 +129,7 @@ public class VSensorConfig implements Serializable {
    
    public String getVirtualSensorName ( ) {
       if ( this.nameInitialized == false ) {
-         this.virtualSensorName = this.virtualSensorName.replace( " " , "" ).trim( );
+         this.virtualSensorName = this.virtualSensorName.replace( " " , "" ).trim( ).toLowerCase();
          this.nameInitialized = true;
       }
       return this.virtualSensorName;

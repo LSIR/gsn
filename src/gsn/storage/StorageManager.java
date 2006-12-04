@@ -162,7 +162,7 @@ public class StorageManager {
       Connection connection = null;
       dropTable( tableName );
       String sqlCreateStatement = getCreateTableStatement( structure , tableName ).replace( "\"" , "" );
-      String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName ).append( "_INDEX ON " ).append( tableName ).append( " (TIMED DESC)" ).toString( );
+      String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName.toLowerCase() ).append( "_INDEX ON " ).append( tableName.toLowerCase() ).append( " (TIMED DESC)" ).toString( );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create table statement is : " ).append( sqlCreateStatement ).toString( ) );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create index statement is : " ).append( sqlCreateIndexStatement ).toString( ) );
       TreeSet < String > fieldNames = new TreeSet < String >( new CaseInsensitiveComparator( ) );
@@ -184,7 +184,8 @@ public class StorageManager {
    
    /**
     * The method is protected b/c of the StorageManagerTest so that it can be
-    * testable from that class.
+    * testable from that class. The generated query is transformed to lower case before being
+    * returned.
     */
    protected String getCreateTableStatement ( Collection < DataField > structure , String alias ) {
       StringBuilder result = new StringBuilder( "CREATE " );
@@ -225,7 +226,7 @@ public class StorageManager {
          }
          result.append( " , " );
       }
-      return result.deleteCharAt( result.lastIndexOf( "," ) ).append( ")" ).toString( );
+      return result.deleteCharAt( result.lastIndexOf( "," ) ).append( ")" ).toString( ).toLowerCase();
    }
    
    private String sqlType ( String type ) {
@@ -235,12 +236,15 @@ public class StorageManager {
       return type.toUpperCase( );
    }
    
+   /*
+    * This method first transforms the query to lower case and then executes it.
+    */
    public void createView ( String viewName , String selectQuery ) {
       Connection connection = null;
       try {
          connection = connectionPool.borrowConnection( );
          StringBuilder viewStatement = new StringBuilder( "create view \"" );
-         viewStatement.append( viewName ).append( "\" AS " ).append( selectQuery );
+         viewStatement.append( viewName.toLowerCase() ).append( "\" AS " ).append( selectQuery.toLowerCase() );
          connection.createStatement( ).execute( viewStatement.toString( ).replace( "\"" , "" ) );
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
@@ -253,11 +257,14 @@ public class StorageManager {
    
    private static final int MAX_DB_CONNECTIONS = Main.getContainerConfig( ).getStoragePoolSize( );
    
+   /**
+    * This method first transforms the query to lower case and then executes it.
+    */
    private PreparedStatement obtainPreparedStatementForQuery ( StringBuilder sql ) throws SQLException {
       Connection connection = connectionPool.borrowConnection( );
       PreparedStatement toReturn = null;
       try {
-         toReturn = connection.prepareStatement( sql.toString( ) );
+         toReturn = connection.prepareStatement( sql.toString( ).toLowerCase() );
          if ( isDebugEnabled == true ) {
             logger.debug( new StringBuilder( ).append( "insertion prepared statement created: " ).append( sql ).toString( ) );
          }

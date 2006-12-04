@@ -34,7 +34,7 @@ public class FieldDownloadServlet extends HttpServlet {
    
    public void doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
       String vsName = req.getParameter( "vs" );
-      if ( vsName == null || vsName.trim( ).length( ) == 0 ) {
+      if ( vsName == null || (vsName =vsName.trim( ).toLowerCase()).length( ) == 0 ) {
          res.sendError( Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
          return;
       }
@@ -44,7 +44,7 @@ public class FieldDownloadServlet extends HttpServlet {
          res.sendError( res.SC_BAD_REQUEST , "The pk and/or field parameters are missing." );
          return;
       }
-      VSensorConfig sensorConfig = Mappings.getVSensorConfig( vsName.trim( ) );
+      VSensorConfig sensorConfig = Mappings.getVSensorConfig( vsName );
       if ( sensorConfig == null ) {
          res.sendError( Container.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist." );
          return;
@@ -52,7 +52,7 @@ public class FieldDownloadServlet extends HttpServlet {
       
       primaryKey = primaryKey.trim( );
       colName = colName.trim( );
-      
+      // TODO : Check to see if the requested column exists.
       StringBuilder query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
       ResultSet rs = StorageManager.getInstance( ).getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) );
       if ( rs == null ) {
