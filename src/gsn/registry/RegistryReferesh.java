@@ -1,7 +1,6 @@
 package gsn.registry;
 
 import gsn.registry.VSAddress;
-import gsn.registry.VSAddress;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.mina.common.IdleStatus;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
-
 
 /**
  * Created on December 3, 2006, 2:14 AM
@@ -149,5 +147,4 @@ public class RegistryReferesh implements IoHandler{
         newVSs.clear();        
       }
    }
-   
 }

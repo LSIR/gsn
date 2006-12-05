@@ -4,10 +4,10 @@ import gsn.Main;
 import gsn.registry.Registry;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.wrappers.RemoteDS;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.apache.commons.collections.KeyValue;
@@ -46,7 +46,7 @@ public class VSensorConfig implements Serializable {
    
    private String                                 storageHistorySize;
    
-   private final TreeMap < String , InputStream > inputStreamNameToInputStreamObjectMapping = new TreeMap < String , InputStream >( new CaseInsensitiveComparator( ) );
+   private final HashMap < String , InputStream > inputStreamNameToInputStreamObjectMapping = new HashMap < String , InputStream >();
    
    private final ArrayList < InputStream >        inputStreams                              = new ArrayList < InputStream >( );
    
@@ -222,7 +222,7 @@ public class VSensorConfig implements Serializable {
    
    private boolean                           isGetMainClassInitParamsInitialized = false;
    
-   private final TreeMap < String , String > mainClassInitParams                 = new TreeMap < String , String >( new CaseInsensitiveComparator( ) );
+   private final TreeMap < String , String > mainClassInitParams                 = new TreeMap  < String , String >( new CaseInsensitiveComparator());
    
    /**
     * Note that the key and value both are trimmed before being inserted into
@@ -234,7 +234,7 @@ public class VSensorConfig implements Serializable {
       if ( !this.isGetMainClassInitParamsInitialized ) {
          this.isGetMainClassInitParamsInitialized = true;
          for ( final KeyValue param : this.mainClassInitialParams ) {
-            this.mainClassInitParams.put( param.getKey( ).toString( ) , param.getValue( ).toString( ) );
+            this.mainClassInitParams.put( param.getKey( ).toString( ).toLowerCase( ) , param.getValue( ).toString( ) );
          }
       }
       return this.mainClassInitParams;

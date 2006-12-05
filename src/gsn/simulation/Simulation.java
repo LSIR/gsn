@@ -9,7 +9,7 @@ import gsn.registry.Registry;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.wrappers.DataListener;
 import java.io.FileInputStream;
-import java.util.TreeMap;
+import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jibx.runtime.BindingDirectory;
@@ -31,8 +31,7 @@ public class Simulation {
    private static final int              DELAY_BETWEEN_EACH_REGISTERATION_REQUESTS = 30000;
    
    public Simulation ( VSensorConfig configuration , int numOfThreads ) throws Exception {
-      Server servers[] = new Server [ numOfThreads ];
-      TreeMap < String , Object > context1 = new TreeMap < String , Object >( new CaseInsensitiveComparator( ) );
+      HashMap < String , Object > context1 = new HashMap <  String , Object >(  );
       int portCounter = 0;
       for ( int i = 0 ; i < numOfThreads ; i++ ) {
          // TODO: CHANGING FROM JETTY TO A LIGHTER SERVLET ENGINE.

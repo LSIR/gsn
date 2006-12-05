@@ -36,7 +36,7 @@ public final class Mappings {
          logger.error( "Please fix the following error" );
          return false;
       }
-      TreeMap < String , Boolean > vsNameToOutputStructureFields = new TreeMap < String , Boolean >( new CaseInsensitiveComparator( ) );
+      TreeMap < String , Boolean > vsNameToOutputStructureFields = new TreeMap < String , Boolean >( );
       vsNamesToOutputStructureFields.put( sensorPool.getConfig( ).getVirtualSensorName( ) , vsNameToOutputStructureFields );
       for ( DataField fields : sensorPool.getConfig( ).getOutputStructure( ) )
          vsNameToOutputStructureFields.put( fields.getFieldName( ) , Boolean.TRUE );

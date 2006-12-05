@@ -13,8 +13,8 @@
 	   <predicate key="type">test-sensor</predicate>
 	</addressing>
    <output-structure>
-	  <field name="latitude"    type="double" />
-	  <field name="longitude"   type="double" />
+	  <field name="latiTude"    type="double" />
+	  <field name="longiTude"   type="double" />
 	  <field name="temperature" type="double" />
 	  <field name="light"       type="int" />
 	  <field name="camera"      type="binary:image/jpeg" />

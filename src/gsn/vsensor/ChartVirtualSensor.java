@@ -2,9 +2,7 @@ package gsn.vsensor;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.ParamParser;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
@@ -53,7 +51,7 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
    
    private long                                        counter                            = 0;
    
-   private final static TreeMap < String , ChartInfo > input_stream_name_to_ChartInfo_map = new TreeMap < String , ChartInfo >( new CaseInsensitiveComparator( ) );
+   private final static HashMap < String , ChartInfo > input_stream_name_to_ChartInfo_map = new HashMap < String , ChartInfo >( );
    
    private int                                         counter_pref                       = 0;
    
@@ -62,7 +60,7 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
        * TODO : Checking if the user provides the arguements currectly. TODO :
        * This can now plot only for one input stream value.
        */
-      TreeMap < String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
+      TreeMap <  String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
       ChartInfo chartInfo = new ChartInfo( );
       chartInfo.setInputStreamName( params.get( "input-stream" ) );
       

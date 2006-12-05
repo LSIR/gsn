@@ -349,9 +349,7 @@ public class VSensorLoader extends Thread {
    
    private boolean prepareStreamSource ( InputStream inputStream , StreamSource streamSource , VSensorConfig vsensor ) {
       HashMap < String , String > rewritingMapping = new HashMap < String , String >( );
-      TreeMap < String , Object > context = new TreeMap < String , Object >( new CaseInsensitiveComparator ( ) );
       for ( AddressBean addressBean : streamSource.getAddressing ( ) ) {
-         context.put ( Container.STREAM_SOURCE_ACTIVE_ADDRESS_BEAN , addressBean );
          AbstractWrapper ds = activeDataSources.get ( addressBean );
          if ( ds == null ) {
             if ( !addressBean.isAbsoluteAddressSpecified ( ) ) {// Dynamic-address
@@ -374,9 +372,7 @@ public class VSensorLoader extends Thread {
                //               context.put( Container.QUERY_VS_NAME , resolved.get( 0 ).getVSName( ) );
                logger.fatal ("Dynamic resolving using directory is not implemented");
             } else if ( addressBean.isAbsoluteAddressSpecified ( ) ) { // Absolute-address
-               context.put ( Registry.VS_HOST , addressBean.getPredicateValue ( Registry.VS_HOST ) );
-               context.put ( Registry.VS_PORT , addressBean.getPredicateValue ( Registry.VS_PORT ) );
-               context.put ( Registry.VS_NAME , addressBean.getPredicateValue ( Registry.VS_NAME ) );
+               
             }
             if ( Main.getWrapperClass ( addressBean.getWrapper ( ) ) == null ) {
                logger.error ( "The wrapper >" + addressBean.getWrapper ( ) + "< is not defined in the >" + Main.DEFAULT_WRAPPER_PROPERTIES_FILE + "< file." );

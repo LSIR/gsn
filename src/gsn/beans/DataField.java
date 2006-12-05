@@ -45,9 +45,13 @@ public final class DataField implements Serializable {
    public String getDescription ( ) {
       return this.description;
    }
-   
+   transient boolean fieldNameConvertedToLowerCase = false;
    public String getFieldName ( ) {
-      return this.fieldName.toUpperCase( );
+      if (fieldNameConvertedToLowerCase==false) {
+         fieldNameConvertedToLowerCase=true;
+         this.fieldName=fieldName.toLowerCase( );
+      }
+      return this.fieldName;
    }
    
    public boolean equals ( final Object o ) {

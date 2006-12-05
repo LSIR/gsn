@@ -39,7 +39,7 @@ public class InputStream {
    
    private ArrayList < StreamSource >                  sources;
    
-   private TreeMap < String , StreamSource >           streamSourceAliasNameToStreamSourceName;
+   private HashMap < String , StreamSource >           streamSourceAliasNameToStreamSourceName;
    
    private transient long                              startTime;
    
@@ -200,7 +200,7 @@ public class InputStream {
    public boolean validate ( ) {
       if ( this.isValidate ) return this.cachedValidationResult;
       boolean toReturn = true;
-      final TreeMap < String , StreamSource > streamSourceAliasNameToStreamSourceName = new TreeMap < String , StreamSource >( new CaseInsensitiveComparator( ) );
+      final HashMap < String , StreamSource > streamSourceAliasNameToStreamSourceName = new HashMap < String , StreamSource >( );
       for ( final StreamSource ss : this.sources ) {
          if ( !ss.validate( ) ) {
             logger.error( new StringBuilder( ).append( "The Stream Source : " ).append( ss.getAlias( ) ).append( " specified in the Input Stream : " ).append( this.getInputStreamName( ) ).append(

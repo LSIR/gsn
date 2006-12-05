@@ -162,10 +162,11 @@ public class StorageManager {
       Connection connection = null;
       dropTable( tableName );
       String sqlCreateStatement = getCreateTableStatement( structure , tableName ).replace( "\"" , "" );
-      String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName.toLowerCase() ).append( "_INDEX ON " ).append( tableName.toLowerCase() ).append( " (TIMED DESC)" ).toString( );
+      String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName.toLowerCase( ) ).append( "_INDEX ON " ).append( tableName.toLowerCase( ) ).append( " (TIMED DESC)" )
+            .toString( );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create table statement is : " ).append( sqlCreateStatement ).toString( ) );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create index statement is : " ).append( sqlCreateIndexStatement ).toString( ) );
-      TreeSet < String > fieldNames = new TreeSet < String >( new CaseInsensitiveComparator( ) );
+      TreeSet < String > fieldNames = new TreeSet < String >(new CaseInsensitiveComparator() );
       
       for ( DataField fieldName : structure ) {
          fieldNames.add( fieldName.getFieldName( ) );
@@ -184,8 +185,8 @@ public class StorageManager {
    
    /**
     * The method is protected b/c of the StorageManagerTest so that it can be
-    * testable from that class. The generated query is transformed to lower case before being
-    * returned.
+    * testable from that class. The generated query is transformed to lower case
+    * before being returned.
     */
    protected String getCreateTableStatement ( Collection < DataField > structure , String alias ) {
       StringBuilder result = new StringBuilder( "CREATE " );
@@ -226,7 +227,7 @@ public class StorageManager {
          }
          result.append( " , " );
       }
-      return result.deleteCharAt( result.lastIndexOf( "," ) ).append( ")" ).toString( ).toLowerCase();
+      return result.deleteCharAt( result.lastIndexOf( "," ) ).append( ")" ).toString( ).toLowerCase( );
    }
    
    private String sqlType ( String type ) {
@@ -244,7 +245,7 @@ public class StorageManager {
       try {
          connection = connectionPool.borrowConnection( );
          StringBuilder viewStatement = new StringBuilder( "create view \"" );
-         viewStatement.append( viewName.toLowerCase() ).append( "\" AS " ).append( selectQuery.toLowerCase() );
+         viewStatement.append( viewName.toLowerCase( ) ).append( "\" AS " ).append( selectQuery.toLowerCase( ) );
          connection.createStatement( ).execute( viewStatement.toString( ).replace( "\"" , "" ) );
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
@@ -264,7 +265,7 @@ public class StorageManager {
       Connection connection = connectionPool.borrowConnection( );
       PreparedStatement toReturn = null;
       try {
-         toReturn = connection.prepareStatement( sql.toString( ).toLowerCase() );
+         toReturn = connection.prepareStatement( sql.toString( ).toLowerCase( ) );
          if ( isDebugEnabled == true ) {
             logger.debug( new StringBuilder( ).append( "insertion prepared statement created: " ).append( sql ).toString( ) );
          }
@@ -396,9 +397,14 @@ public class StorageManager {
       Collection < String > fieldsDefinedToBeStored = existingTablesToColumnMapping.get( tableName );
       for ( String fieldName : se.getFieldNames( ) ) {
          if ( fieldsDefinedToBeStored == null ) { throw new GSNRuntimeException( "Unexpected virtual sensor removal" , GSNRuntimeException.UNEXPECTED_VIRTUAL_SENSOR_REMOVAL ); }
-         if ( fieldsDefinedToBeStored.contains( fieldName ) ) toReturn.append( fieldName ).append( " ," );
-         else
-            logger.debug( "The field : " + fieldName + " is ignored." );
+         if ( fieldsDefinedToBeStored.contains( fieldName ) )
+            toReturn.append( fieldName ).append( " ," );
+         else if ( logger.isDebugEnabled( ) ) {
+            StringBuilder acceptedFields = new StringBuilder( "The field : " ).append( fieldName ).append( "is ignored, accepted fields are : " );
+            for ( String name : fieldsDefinedToBeStored )
+               acceptedFields.append( name ).append( ", " );
+            logger.debug( acceptedFields.toString( ) );
+         }
       }
       toReturn.append( " TIMED " ).append( " ) values (" );
       for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {
@@ -413,9 +419,10 @@ public class StorageManager {
     * first row. Useful for image recovery of the web interface.
     * 
     * @param query The query to be executed.
-    * @return A resultset with only one row and one column. The method returns null if the
-    * resultset.next() returns false for the first time (e.g., when the resultset is empty).
-    * In case the return value is not null, don't forget to close the result set.
+    * @return A resultset with only one row and one column. The method returns
+    * null if the resultset.next() returns false for the first time (e.g., when
+    * the resultset is empty). In case the return value is not null, don't
+    * forget to close the result set.
     */
    
    public ResultSet getBinaryFieldByQuery ( StringBuilder query , String colName , long pk ) {
@@ -425,14 +432,14 @@ public class StorageManager {
          ps = obtainPreparedStatementForQuery( query );
          ps.setLong( 1 , pk );
          ResultSet rs = ps.executeQuery( );
-         if ( rs.next( ) ) 
+         if ( rs.next( ) )
             resultSet = rs;
-          else { 
-            rs.getStatement( ).getConnection( ).close();
-          }
+         else {
+            rs.getStatement( ).getConnection( ).close( );
+         }
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
-      } 
+      }
       return resultSet;
    }
    
@@ -537,7 +544,8 @@ public class StorageManager {
       try {
          connection = connectionPool.borrowConnection( );
          String dropViewStatement;
-         if ( StorageManager.isMysqlDB( ) ) dropViewStatement = new StringBuilder( "drop view IF EXISTS " ).append( viewName ).toString( );
+         if ( StorageManager.isMysqlDB( ) )
+            dropViewStatement = new StringBuilder( "drop view IF EXISTS " ).append( viewName ).toString( );
          else
             dropViewStatement = new StringBuilder( "drop view " ).append( viewName ).toString( );
          
@@ -581,14 +589,14 @@ public class StorageManager {
       }
    }
    
-   public DataEnumerator executeQuery ( StringBuilder query ,boolean binaryFieldsLinked) {
+   public DataEnumerator executeQuery ( StringBuilder query , boolean binaryFieldsLinked ) {
       PreparedStatement ps = null;
       try {
          ps = obtainPreparedStatementForQuery( query );
       } catch ( SQLException e ) {
          logger.warn( e.getMessage( ) , e );
       }
-      return new DataEnumerator(ps,binaryFieldsLinked );
+      return new DataEnumerator( ps , binaryFieldsLinked );
    }
    
    public int executeUpdate ( StringBuilder updateStatement ) {
@@ -609,8 +617,10 @@ public class StorageManager {
    }
    
    public void initialize ( String databaseDriver , String databaseUserName , String databasePassword , String databaseURL ) {
-      if ( databaseDriver.trim( ).equalsIgnoreCase( "org.hsqldb.jdbcDriver" ) ) hsql = true;
-      else if ( databaseDriver.trim( ).equalsIgnoreCase( "com.mysql.jdbc.Driver" ) ) mysql = true;
+      if ( databaseDriver.trim( ).equalsIgnoreCase( "org.hsqldb.jdbcDriver" ) )
+         hsql = true;
+      else if ( databaseDriver.trim( ).equalsIgnoreCase( "com.mysql.jdbc.Driver" ) )
+         mysql = true;
       else {
          logger.error( new StringBuilder( ).append( "The GSN doesn't support the database driver : " ).append( databaseDriver ).toString( ) );
          logger.error( new StringBuilder( ).append( "Please check the storage element in the file : " ).append( getContainerConfig( ).getContainerFileName( ) ).toString( ) );

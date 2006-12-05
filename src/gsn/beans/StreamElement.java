@@ -39,7 +39,7 @@ public final class StreamElement implements Serializable {
       
       final DataField [ ] outputStructureArr = outputStructure.toArray( new DataField [ ] {} );
       for ( int i = 0 ; i < this.fieldNames.length ; i++ ) {
-         this.fieldNames[ i ] = outputStructureArr[ i ].getFieldName( );
+         this.fieldNames[ i ] = outputStructureArr[ i ].getFieldName( ).toLowerCase( );
          this.fieldTypes[ i ] = outputStructureArr[ i ].getDataTypeID( );
       }
       if ( this.fieldNames.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
