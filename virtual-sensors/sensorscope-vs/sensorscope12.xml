@@ -3,8 +3,6 @@
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<init-params/>
 	</processing-class>
-        <author>Ali Salehi</author>
-        <email>ali.salehi@epfl.ch</email>
         <description>A virtual sensor presenting the nodes inside the sensor scope</description>
         <life-cycle pool-size="10" />
         <addressing>

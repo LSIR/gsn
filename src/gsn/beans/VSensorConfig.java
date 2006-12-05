@@ -30,10 +30,6 @@ public class VSensorConfig implements Serializable {
    
    private String                                 mainClass;
    
-   private String                                 author;
-   
-   private String                                 email;
-   
    private String                                 description;
    
    private int                                    lifeCyclePoolSize                         = 10;
@@ -46,7 +42,7 @@ public class VSensorConfig implements Serializable {
    
    private ArrayList < DataField >                webParameters                             = new ArrayList < DataField >( );
    
-   private String                                 webParameterPassword                              = null;
+   private String                                 webParameterPassword                             = null;
    
    private String                                 storageHistorySize;
    
@@ -71,30 +67,15 @@ public class VSensorConfig implements Serializable {
       return this.addressing;
    }
    
-   /**
-    * @return Returns the author.
-    */
-   public String getAuthor ( ) {
-      if ( this.author == null ) this.author = "Not specified";
-      return this.author;
-   }
    
    /**
     * @return Returns the description.
     */
    public String getDescription ( ) {
-      if ( this.description == null ) this.description = "Not specified";
       return this.description;
    }
    
-   /**
-    * @return Returns the webEmail.
-    */
-   public String getEmail ( ) {
-      if ( this.email == null ) this.email = "Not specified";
-      return this.email;
-   }
-   
+  
    /**
     * @return Returns the inputStreams.
     */
@@ -168,24 +149,10 @@ public class VSensorConfig implements Serializable {
    }
    
    /**
-    * @param author The author to set.
-    */
-   public void setAuthor ( final String author ) {
-      this.author = author;
-   }
-   
-   /**
     * @param description The description to set.
     */
    public void setDescription ( final String description ) {
       this.description = description;
-   }
-   
-   /**
-    * @param webEmail The webEmail to set.
-    */
-   public void setEmail ( final String email ) {
-      this.email = email;
    }
    
    /**
@@ -388,7 +355,7 @@ public class VSensorConfig implements Serializable {
    /**
     * @return the securityCode
     */
-   public String getSecurityCode ( ) {
+   public String getWebParameterPassword ( ) {
       return webParameterPassword;
    }
 
@@ -421,8 +388,8 @@ public class VSensorConfig implements Serializable {
          builder.append( ")" );
       }
       builder.append( "]" );
-      return "VSensorConfig{" + "virtualSensorName='" + this.virtualSensorName + '\'' + ", priority=" + this.priority + ", mainClass='" + this.mainClass + '\'' + ", author='" + this.author + '\''
-         + ", webEmail='" + this.email + '\'' + ", description='" + this.description + '\'' + ", lifeCyclePoolSize=" + this.lifeCyclePoolSize + ", outputStreamRate=" + this.outputStreamRate
+      return "VSensorConfig{" + "virtualSensorName='" + this.virtualSensorName + '\'' + ", priority=" + this.priority + ", mainClass='" + this.mainClass + '\'' 
+         + ", description='" + this.description + '\'' + ", lifeCyclePoolSize=" + this.lifeCyclePoolSize + ", outputStreamRate=" + this.outputStreamRate
          + ", addressing=" + this.addressing + ", outputStructure=" + this.outputStructure + ", storageHistorySize='" + this.storageHistorySize + '\'' + builder.toString( )
          + ", mainClassInitialParams=" + this.mainClassInitialParams + ", lastModified=" + this.lastModified + ", fileName='" + this.fileName + '\'' + ", logger=" + this.logger + ", nameInitialized="
          + this.nameInitialized + ", isStorageCountBased=" + this.isStorageCountBased + ", parsedStorageSize=" + this.parsedStorageSize + '}';

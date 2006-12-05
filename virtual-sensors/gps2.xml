@@ -3,8 +3,6 @@
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<init-params/>
 	</processing-class>
-        <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</author>
-        <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</email>
         <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</description>
         <life-cycle pool-size="10" />
         <addressing>

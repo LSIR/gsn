@@ -3,8 +3,6 @@
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<init-params/>
 	</processing-class>
-   <author>ali.salehi@epfl.ch</author>
-   <email>ali.salehi@epfl.ch</email>
    <description>Virtual sensor producing random locations and sensor readings for testing in GPS applications.</description>
    <web-input password="test">
        <field name="reset"    type="byte" >Non-zero value means reseting.</field>

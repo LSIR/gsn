@@ -36,7 +36,11 @@ public class ContainerInfoHandler implements RequestHandler {
          if ( reqName != null && !sensorConfig.getVirtualSensorName().equals(reqName) ) continue;
          
          sb.append( "<virtual-sensor name=\"" ).append( sensorConfig.getVirtualSensorName( ) ).append( "\"" ).append( " last-modified=\"" ).append(
-            new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\"" ).append( " >\n" );
+            new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\" " );
+         if (sensorConfig!=null) {
+            sb.append("description=\"" ).append( StringEscapeUtils.escapeXml( sensorConfig.getDescription( ) )).append( "\""  );
+         }
+         sb.append( " >\n" );         
          StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getVirtualSensorName( ) + " order by TIMED DESC limit 1 offset 0" );
          DataEnumerator result = StorageManager.getInstance( ).executeQuery( query , true );
          StreamElement se = null;

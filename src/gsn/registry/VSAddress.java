@@ -19,6 +19,7 @@ public class VSAddress implements Serializable{
    private  String guid;
    private  String addressUses;
    private transient long   creationTime ;
+   private String description;
    
    
    public VSAddress (ContainerConfig cc, VSensorConfig vs) {
@@ -35,6 +36,7 @@ public class VSAddress implements Serializable{
          tempKeys.append ( predicate.getKey ( ) ).append ( Registry.SPACE_CHARACTER );
          tempValues.append ( predicate.getValue ( ) ).append ( Registry.SPACE_CHARACTER );
       }
+      this.description = (vs.getDescription( )==null?"":vs.getDescription( ));
       this.addresses=tempAddrs.toString ();
       this.addressKeys=tempKeys.toString ();
       this.addressValues=tempKeys.toString ();
@@ -98,5 +100,13 @@ public class VSAddress implements Serializable{
       sb.append ("Address Values : ").append (addressValues).append (",");
       sb.append ("Uses : ").append (addressUses).append ("]");
       return sb.toString ();
+   }
+
+   
+   /**
+    * @return the description
+    */
+   public String getDescription ( ) {
+      return description;
    }   
 }

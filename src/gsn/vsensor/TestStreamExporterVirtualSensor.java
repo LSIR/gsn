@@ -54,7 +54,6 @@ public class TestStreamExporterVirtualSensor extends TestCase {
       config = new VSensorConfig( );
       config.setVirtualSensorName( "JUnitTestStreamExporterVS" );
       config.setFileName( "PlaceholderfileNameForJUNitTesting" );
-      config.setAuthor( "Jerome Rousselot" );
       hashMap.put( VirtualSensorPool.VSENSORCONFIG , config );
    }
    
