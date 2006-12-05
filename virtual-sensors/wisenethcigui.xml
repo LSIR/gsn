@@ -5,8 +5,6 @@
 		<param name="HCIProtocolClass">ch.csem.e.ern.gsn.wisenethci.WiseNetHCIProtocol</param>
 		</init-params>
 	</processing-class>
-        <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/serialRaw.xml.</author>
-        <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/serialRaw.xml.</email>
         <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/serialRaw.xml.</description>
         <life-cycle pool-size="10" />
         <addressing>

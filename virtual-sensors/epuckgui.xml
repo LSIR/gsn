@@ -5,9 +5,7 @@
 		<param name="HCIProtocolClass">gsn.utils.protocols.EPuck.SerComProtocol</param>
 		</init-params>
 	</processing-class>
-        <author>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/serialRaw.xml.</author>
-        <email>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/serialRaw.xml.</email>
-        <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/serialRaw.xml.</description>
+         <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/serialRaw.xml.</description>
         <life-cycle pool-size="10" />
         <addressing>
 	        	<predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</predicate>
