@@ -5,15 +5,11 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
-
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.general.SerialWrapper;
-
 import java.io.Serializable;
 import java.util.TreeMap;
-
 import javax.naming.OperationNotSupportedException;
-
 import org.apache.log4j.Logger;
 
 
@@ -38,7 +34,7 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
    
    private static final String [ ] fieldNames = new String [ ] { "latitude" , "longitude" };
    
-   private static final Integer [ ] fieldTypes = new Integer [ ] { DataTypes.DOUBLE, DataTypes.DOUBLE};
+   private static final Byte [ ] fieldTypes = new Byte [ ] { DataTypes.DOUBLE, DataTypes.DOUBLE};
    
    private Serializable [ ] outputData = new Serializable [ fieldNames.length ];
    

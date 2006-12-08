@@ -26,7 +26,7 @@ public class GPSGenerator extends AbstractWrapper {
    
    private static final String [ ]  FIELD_NAMES           = new String [ ] { "latitude" , "longitude" , "temperature" , "light" , "camera" };
    
-   private static final Integer [ ] FIELD_TYPES           = new Integer [ ] { DataTypes.DOUBLE , DataTypes.DOUBLE , DataTypes.DOUBLE , DataTypes.INTEGER , DataTypes.BINARY };
+   private static final Byte [ ] FIELD_TYPES           = new Byte [ ] { DataTypes.DOUBLE , DataTypes.DOUBLE , DataTypes.DOUBLE , DataTypes.INTEGER , DataTypes.BINARY };
    
    private static final String [ ]  FIELD_DESCRIPTION     = new String [ ] { "Latitude Reading" , "Longitude Reading" , "Temperature Sensor" , "Light Sensor" , "Camera Picture" };
    
@@ -40,9 +40,9 @@ public class GPSGenerator extends AbstractWrapper {
    
    private byte [ ]                 picture;
    
-   private ArrayList < DataField >  outputStrcture        = new ArrayList < DataField >( );
+   private DataField[]  outputStrcture     ;
    
-   public Collection < DataField > getOutputFormat ( ) {
+   public DataField [] getOutputFormat ( ) {
       return outputStrcture;
    }
    
@@ -83,8 +83,10 @@ public class GPSGenerator extends AbstractWrapper {
          logger.warn( "The >picture< parameter is missing from the GPSGenerator wrapper." );
          return false;
       }
+      ArrayList<DataField > output = new ArrayList < DataField >();
       for ( int i = 0 ; i < FIELD_NAMES.length ; i++ )
-         outputStrcture.add( new DataField( FIELD_NAMES[ i ] , FIELD_TYPES_STRING[ i ] , FIELD_DESCRIPTION[ i ] ) );
+         output.add( new DataField( FIELD_NAMES[ i ] , FIELD_TYPES_STRING[ i ] , FIELD_DESCRIPTION[ i ] ) );
+      outputStrcture = output.toArray( new DataField[] {} );
       return true;
    }
    

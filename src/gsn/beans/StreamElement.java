@@ -3,8 +3,8 @@ package gsn.beans;
 import gsn.utils.CaseInsensitiveComparator;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
@@ -13,9 +13,6 @@ import org.apache.log4j.Logger;
  */
 public final class StreamElement implements Serializable {
    
-   /**
-    * 
-    */
    private static final long                      serialVersionUID  = 2000261462783698617L;
    
    private static final transient Logger          logger            = Logger.getLogger( StreamElement.class );
@@ -28,19 +25,18 @@ public final class StreamElement implements Serializable {
    
    private Serializable [ ]                       fieldValues;
    
-   private Integer [ ]                            fieldTypes;
+   private Byte[]                            fieldTypes;
    
    private long internalPrimayKey = -1;
    
-   public StreamElement ( final Collection < DataField > outputStructure , final Serializable [ ] data , final long timeStamp ) {
-      this.fieldNames = new String [ outputStructure.size( ) ];
-      this.fieldTypes = new Integer [ outputStructure.size( ) ];
+   public StreamElement (  DataField [] outputStructure , final Serializable [ ] data , final long timeStamp ) {
+      this.fieldNames = new String [ outputStructure.length ];
+      this.fieldTypes = new Byte [ outputStructure.length ];
       this.timeStamp = timeStamp;
       
-      final DataField [ ] outputStructureArr = outputStructure.toArray( new DataField [ ] {} );
-      for ( int i = 0 ; i < this.fieldNames.length ; i++ ) {
-         this.fieldNames[ i ] = outputStructureArr[ i ].getFieldName( ).toLowerCase( );
-         this.fieldTypes[ i ] = outputStructureArr[ i ].getDataTypeID( );
+      for ( byte i = 0 ; i < this.fieldNames.length ; i++ ) {
+         this.fieldNames[ i ] = outputStructure[ i ].getFieldName( ).toLowerCase( );
+         this.fieldTypes[ i ] = outputStructure[ i ].getDataTypeID( );
       }
       if ( this.fieldNames.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
       this.verifyTypesCompatibility( this.fieldTypes , data );
@@ -48,14 +44,33 @@ public final class StreamElement implements Serializable {
       
    }
    
-   public StreamElement ( final Collection < DataField > outputStructure , final Serializable [ ] data) {
-      this(outputStructure,data,System.currentTimeMillis( ));
-   }      
+   /**
+    * @param fieldNamesInStreamElement
+    * @param fieldValues2
+    * @param outputFormat
+    */
+   public StreamElement (DataField [ ] outputFormat, Vector < String > fieldNamesInStreamElement , Vector < Object > fieldValues , long timestamp ) {
+      this.fieldNames = fieldNamesInStreamElement.toArray( new String[] {} );
+      byte[] fieldTypes = new byte[fieldNames.length];
+      for (byte i=0;i<fieldNames.length;i++) {
+         boolean found = false;
+         for (byte j=0;j<outputFormat.length;j++)
+            if (outputFormat[j].getFieldName( ).equalsIgnoreCase( fieldNames[i] )) {
+               found = true;
+               fieldTypes[i] = outputFormat[j].getDataTypeID( );
+               break;
+            }
+         if (found == false)
+            throw new RuntimeException("Bad stream element received. There is no type defined for the field : "+fieldTypes[i]);
+      }
       
-   public StreamElement ( final String [ ] dataFieldNames , final Integer [ ] dataFieldTypes , final Serializable [ ] data ) {
+   }
+
+   
+   public StreamElement ( final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data ) {
       this(dataFieldNames,dataFieldTypes,data,System.currentTimeMillis( ));
    }
-   public StreamElement ( final String [ ] dataFieldNames , final Integer [ ] dataFieldTypes , final Serializable [ ] data , final long timeStamp ) {
+   public StreamElement ( final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data , final long timeStamp ) {
       if ( dataFieldNames.length != dataFieldTypes.length ) throw new IllegalArgumentException(
          "The length of dataFileNames and dataFileTypes provided in the constructor of StreamElement doesn't match." );
       if ( dataFieldNames.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
@@ -66,7 +81,8 @@ public final class StreamElement implements Serializable {
       this.fieldValues = data;
    }
    
-   private void verifyTypesCompatibility ( final Integer [ ] fieldTypes , final Serializable [ ] data ) throws IllegalArgumentException {
+
+   private void verifyTypesCompatibility ( final Byte [ ] fieldTypes , final Serializable [ ] data ) throws IllegalArgumentException {
       for ( int i = 0 ; i < data.length ; i++ ) {
          if ( data[ i ] == null ) continue;
          switch ( fieldTypes[ i ] ) {
@@ -112,7 +128,7 @@ public final class StreamElement implements Serializable {
       return this.fieldNames;
    }
    
-   public final Integer [ ] getFieldTypes ( ) {
+   public final Byte [ ] getFieldTypes ( ) {
       return this.fieldTypes;
    }
    
@@ -126,7 +142,7 @@ public final class StreamElement implements Serializable {
    
    public StringBuilder getFieldTypesInString ( ) {
       final StringBuilder stringBuilder = new StringBuilder( );
-      for ( final Integer i : this.getFieldTypes( ) )
+      for ( final byte i : this.getFieldTypes( ) )
          stringBuilder.append( DataTypes.TYPE_NAMES[ i ] ).append( " , " );
       return stringBuilder;
    }

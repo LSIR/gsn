@@ -80,7 +80,7 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
    
    private int                     parity        = SerialPort.PARITY_NONE;
    
-   private ArrayList < DataField > dataField     = new ArrayList < DataField >( );
+   private  DataField [] dataField     ;
    
    /*
     * Needs the following information from XML file : serialport : the name of
@@ -190,7 +190,7 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
       }
       
       inputBuffer = new byte [ MAXBUFFERSIZE ];
-      dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
+      dataField = new DataField[] { new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) };
       return true;
    }
    
@@ -376,7 +376,7 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
       }
    }
    
-   public Collection < DataField > getOutputFormat ( ) {
+   public DataField [] getOutputFormat ( ) {
       return dataField;
    }
    
@@ -432,13 +432,13 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
          for ( int i = 0 ; i < dataChunks.length - 1 ; i++ ) {
             if ( dataChunks[ i ].length( ) == 0 ) continue;
             
-            StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { dataChunks[ i ].getBytes( ) } , System
+            StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { dataChunks[ i ].getBytes( ) } , System
                   .currentTimeMillis( ) );
             postStreamElement( streamElement );
          }
          inputString = dataChunks[ dataChunks.length - 1 ];
       } else {
-         StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
+         StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
          postStreamElement( streamElement );
       }
    }

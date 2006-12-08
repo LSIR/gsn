@@ -38,7 +38,7 @@ public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageLi
     */
    private static int              threadCounter         = 0;
    
-   private ArrayList < DataField > outputDataFields      = new ArrayList < DataField >( );
+   private  DataField [] outputDataFields     ;
    
    private ArrayList < String >    getterMethodNames     = new ArrayList < String >( );
    
@@ -66,6 +66,7 @@ public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageLi
      
       int indexCounter = 1;
       logger.warn( "configuring the SerialForwader Wrapper using the fields described in the virtual sensor file : " );
+      ArrayList < DataField > outputFields = new ArrayList < DataField >();
       while ( true ) {
          StringBuilder builder = new StringBuilder( "field." ).append( indexCounter++ );
          String value = addressBean.getPredicateValue( builder.toString( ) );
@@ -78,9 +79,10 @@ public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageLi
          DataField dataField = new DataField( stringTokenizer.nextToken( ) , stringTokenizer.nextToken( ) , stringTokenizer.nextToken( ) );
          getterMethodNames.add( stringTokenizer.nextToken( ).trim( ) );
          logger.info( "Output field identified successfully in the serial forwarder wrapper with the following information" + dataField );
-         outputDataFields.add( dataField );
+         
+         outputFields.add( dataField );
       }
-      
+      outputDataFields= outputFields.toArray( new DataField[] {} );
       if ( logger.isDebugEnabled( ) ) logger.debug( "The SFWrapperDS connects to the Serial Forwarder interface at *" + host + ":" + port + "*" );
       setName( "TinyOS-SerialForwarder-Thread:" + ( ++threadCounter ) );
       try {
@@ -99,7 +101,7 @@ public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageLi
       isConsumed = false;
    }
    
-   public ArrayList < DataField > getOutputFormat ( ) {
+   public  DataField [] getOutputFormat ( ) {
       return outputDataFields;
    }
    
@@ -120,7 +122,7 @@ public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageLi
       }
    }
    
-   private Serializable [ ] extractDataUsingFieldNames ( Message inputMessage , ArrayList < String > getterMethods , ArrayList < DataField > expectedDataFields ) throws IllegalArgumentException ,
+   private Serializable [ ] extractDataUsingFieldNames ( Message inputMessage , ArrayList < String > getterMethods , DataField [] expectedDataFields ) throws IllegalArgumentException ,
       IllegalAccessException , InvocationTargetException {
       ArrayList < Serializable > toReturn = new ArrayList < Serializable >( );
       Method [ ] actualMethods = inputMessage.getClass( ).getMethods( );
@@ -129,7 +131,7 @@ public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageLi
          for ( Method method : actualMethods )
             if ( method.getName( ).equals( getterName ) ) {
                Serializable dataValue = ( Serializable ) method.invoke( inputMessage , new Object [ ] {} );
-               DataField definedField = expectedDataFields.get( indexCounter++ );
+               DataField definedField = expectedDataFields[ indexCounter++ ];
                Number number;
                switch ( definedField.getDataTypeID( ) ) {
                   case DataTypes.SMALLINT :

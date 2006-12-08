@@ -39,17 +39,17 @@ public class InputStream {
    
    private ArrayList < StreamSource >                  sources;
    
-   private HashMap < String , StreamSource >           streamSourceAliasNameToStreamSourceName;
+   private HashMap < CharSequence , StreamSource >           streamSourceAliasNameToStreamSourceName;
    
    private transient long                              startTime;
    
    private transient VirtualSensorPool                 pool;
    
-   private final transient HashMap < String , String > rewritingData         = new HashMap < String , String >( );
+   private final transient HashMap < CharSequence , CharSequence > rewritingData         = new HashMap < CharSequence , CharSequence >( );
    
    private transient long                              lastVisited           = 0;
    
-   private StringBuilder                               rewrittenSQL;
+   private CharSequence                               rewrittenSQL;
    
    /**
     * For making one initial delay.
@@ -104,7 +104,7 @@ public class InputStream {
     * 
     * @param alias The alias of the StreamSource which has new data.
     */
-   public void dataAvailable ( final String alias ) {
+   public void dataAvailable ( final CharSequence alias ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
       if ( this.pool == null ) {
          logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
@@ -127,7 +127,7 @@ public class InputStream {
       this.lastVisited = currentTimeMillis;
       
       if ( this.rewrittenSQL == null ) {
-         this.rewrittenSQL = new StringBuilder( SQLUtils.rewriteQuery( this.getQuery( ).trim( ).toUpperCase( ) , this.rewritingData ).replace( "\"" , "" ) );
+         this.rewrittenSQL = new StringBuilder( SQLUtils.rewriteQuery( this.getQuery( ).trim( ).toLowerCase( ), this.rewritingData ).replace( "\"" , "" ) );
          if ( logger.isDebugEnabled( ) )
             logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
                   .toString( ) );
@@ -163,7 +163,7 @@ public class InputStream {
       }
    }
    
-   public void addToRenamingMapping ( final String aliasName , final String viewName ) {
+   public void addToRenamingMapping ( final CharSequence aliasName , final CharSequence viewName ) {
       this.rewritingData.put( aliasName , viewName );
       this.startTime = System.currentTimeMillis( );
    }
@@ -200,7 +200,7 @@ public class InputStream {
    public boolean validate ( ) {
       if ( this.isValidate ) return this.cachedValidationResult;
       boolean toReturn = true;
-      final HashMap < String , StreamSource > streamSourceAliasNameToStreamSourceName = new HashMap < String , StreamSource >( );
+      final HashMap < CharSequence , StreamSource > streamSourceAliasNameToStreamSourceName = new HashMap < CharSequence , StreamSource >( );
       for ( final StreamSource ss : this.sources ) {
          if ( !ss.validate( ) ) {
             logger.error( new StringBuilder( ).append( "The Stream Source : " ).append( ss.getAlias( ) ).append( " specified in the Input Stream : " ).append( this.getInputStreamName( ) ).append(

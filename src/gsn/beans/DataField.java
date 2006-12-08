@@ -19,7 +19,7 @@ public final class DataField implements Serializable {
    
    private String            fieldName;
    
-   private int               dataTypeID       = -1;
+   private byte               dataTypeID       = -1;
    
    private String            type;
    
@@ -66,7 +66,7 @@ public final class DataField implements Serializable {
    /**
     * @return Returns the dataTypeID.
     */
-   public int getDataTypeID ( ) {
+   public byte getDataTypeID ( ) {
       if ( this.dataTypeID == -1 ) this.dataTypeID = DataTypes.convertTypeNameToTypeID( this.type );
       return this.dataTypeID;
    }

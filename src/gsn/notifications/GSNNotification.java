@@ -1,19 +1,8 @@
 package gsn.notifications;
 
-import gsn.Container;
 import gsn.beans.StreamElement;
-import gsn.registry.Registry;
-import gsn.utils.TCPConnPool;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import gsn.storage.DataEnumerator;
 import java.sql.PreparedStatement;
-import java.util.Enumeration;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 
 /**
@@ -43,17 +32,16 @@ public class GSNNotification extends NotificationRequest {
    
    private transient long              latestVisitTime;
    
-   private String                      notificationCode;
+   private int                         notificationCode;
    
    private StringBuilder               queryWithoutDoubleQuots;
    
-   public GSNNotification ( HttpServletRequest req ) {
-      this.remoteAddress = req.getRemoteAddr( );
-      this.notificationCode = req.getHeader( Container.NOTIFICATION_CODE );
-      this.prespectiveVirtualSensor = req.getHeader( Container.QUERY_VS_NAME );
-      this.remotePort = Integer.parseInt( req.getHeader( Registry.VS_PORT ) );
-      this.query = req.getHeader( Container.VS_QUERY );
-      this.queryWithoutDoubleQuots = new StringBuilder( req.getHeader( Container.VS_QUERY ).trim( ).replace( "\"" , "" ) );
+   public GSNNotification ( int port , String remoteHost , String virtualSensorName , String query , int notificationCode ) {
+      this.remotePort = port;
+      this.remoteAddress = remoteHost;
+      this.prespectiveVirtualSensor = virtualSensorName;
+      this.query = query;
+      this.notificationCode = notificationCode;
    }
    
    /**
@@ -66,20 +54,6 @@ public class GSNNotification extends NotificationRequest {
    
    public String getRawQuery ( ) {
       return query;
-   }
-   
-   public boolean send ( ) {
-      Enumeration < StreamElement > data = getData( );
-      StreamElement se;
-      while ( data.hasMoreElements( ) ) {
-         se = data.nextElement( );
-         int result = notifyPeerAboutData( getRemoteAddress( ) , getRemotePort( ) , getNotificationCode( ) , se );
-         if ( result != 0 && result != 200 ) {
-            logger.warn( new StringBuilder( ).append( "The result of HTTP response was :" ).append( result ).append( " ,Thus notification failed" ).toString( ) );
-            return false;
-         }
-      }
-      return true;
    }
    
    /**
@@ -106,7 +80,7 @@ public class GSNNotification extends NotificationRequest {
    /**
     * @return Returns the notificationCode.
     */
-   public String getNotificationCode ( ) {
+   public int getNotificationCode ( ) {
       return notificationCode;
    }
    
@@ -141,7 +115,7 @@ public class GSNNotification extends NotificationRequest {
    public boolean equals ( Object obj ) {
       if ( obj == null || !( obj instanceof GSNNotification ) ) return false;
       GSNNotification input = ( GSNNotification ) obj;
-      return input.notificationCode.equals( notificationCode );
+      return input.notificationCode == notificationCode;
    }
    
    public int hashCode ( ) {
@@ -161,36 +135,22 @@ public class GSNNotification extends NotificationRequest {
       return result.toString( );
    }
    
-   private int notifyPeerAboutData ( String host , int port , String notificationCode , Serializable data ) {
-      if ( host.indexOf( "http://" ) < 0 ) host = "http://" + host;
-      String destination = host + ":" + port + "/gsn";
-      if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Wants to send message to : " ).append( destination ).toString( ) );
-      
-      PostMethod postMethod = new PostMethod( destination );
-      postMethod.addRequestHeader( Container.NOTIFICATION_CODE , notificationCode );
-      postMethod.addRequestHeader( Container.REQUEST , Integer.toString( Container.DATA_PACKET ) );
-      int statusCode = -1;
-      try {
-         postMethod.setRequestEntity( new InputStreamRequestEntity( InputStreamAdapter( data ) ) );
-         statusCode = TCPConnPool.executeMethod( postMethod , true );
-      } catch ( Exception e ) {
-         e.printStackTrace( );
-      }
-      try {
-         if ( statusCode != -1 ) if ( postMethod.getResponseHeader( Container.RESPONSE_STATUS ).getValue( ).equals( Container.INVALID_REQUEST ) ) statusCode = -10;
-      } catch ( NullPointerException e ) {
-         e.printStackTrace( );
-      }
-      postMethod.releaseConnection( );
-      return statusCode;
+   private boolean notifyPeerAboutData ( StreamElement data ) {
+      if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Wants to send message to : " ).append( remoteAddress ).toString( ) );
+      logger.fatal( "Not implemented" );
+      return true;
    }
    
-   public static ByteArrayInputStream InputStreamAdapter ( Serializable so ) throws IOException {
-      ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream( );
-      ObjectOutputStream oos = new ObjectOutputStream( arrayOutputStream );
-      oos.writeObject( so );
-      oos.flush( );
-      oos.close( );
-      return new ByteArrayInputStream( arrayOutputStream.toByteArray( ) );
+   public boolean send ( DataEnumerator data ) {
+      StreamElement se;
+      while ( data.hasMoreElements( ) ) {
+         se = data.nextElement( );
+         boolean result = notifyPeerAboutData( se );
+         if ( result == false ) {
+            logger.warn( new StringBuilder( ).append( "The result of delivering data was false, the remote client is not interested anymore, query dropped." ).toString( ) );
+            return false;
+         }
+      }
+      return true;
    }
 }

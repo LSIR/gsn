@@ -81,7 +81,7 @@ public class SensorScopeWrapper extends AbstractWrapper implements MessageListen
       if ( isActive( ) ) if ( !listeners.isEmpty( ) ) postStreamElement( parsed.getStreamElement( ) );
    }
    
-   public Collection < DataField > getOutputFormat ( ) {
+   public  DataField [] getOutputFormat ( ) {
       return SensorScopeDataMsgWrapper.getStructure( );
    }
 
@@ -96,7 +96,17 @@ class SensorScopeDataMsgWrapper {
    
    private static final int               NO_VALUE      = Integer.MAX_VALUE;
    
-   private static ArrayList < DataField > structure     = null;
+   private static  DataField [] structure     = new DataField[] { new DataField( "nodeId" , DataTypes.INTEGER_NAME , "Node ID" ) 
+   , new DataField( "sequenceNumber" , DataTypes.INTEGER_NAME , "Sequence Number" ) 
+   , new DataField( "temperature" , DataTypes.DOUBLE_NAME , "Ambient Temperature (°C)" ) 
+   , new DataField( "surfaceTemperature" , DataTypes.DOUBLE_NAME , "Surface Temperature (°C)" ) 
+   , new DataField( "solarRadiation" , DataTypes.DOUBLE_NAME , "Solar Radiation (W/m²)" ) 
+  , new DataField( "relativeHumidity" , DataTypes.DOUBLE_NAME , "Relative Humidity (%)" ) 
+   , new DataField( "soilMoisture" , DataTypes.DOUBLE_NAME , "Soil Moisture (%)" ) 
+   , new DataField( "watermark" , DataTypes.DOUBLE_NAME , "Watermark (kPa)" ) 
+    ,new DataField( "rainMeter" , DataTypes.DOUBLE_NAME , "Rain Meter (mm)" ) 
+   ,new DataField( "windSpeed" , DataTypes.DOUBLE_NAME , "Wind Speed (m/s)" ) 
+    ,new DataField( "windDirection" , DataTypes.DOUBLE_NAME , "Wind Direction (°)" ) };
    
    private SensorScopeDataMsg             msg;
    
@@ -108,21 +118,7 @@ class SensorScopeDataMsgWrapper {
       msg = message;
    }
    
-   public static final ArrayList < DataField > getStructure ( ) {
-      if ( structure == null ) {
-         structure = new ArrayList < DataField >( );
-         structure.add( new DataField( "nodeId" , DataTypes.INTEGER_NAME , "Node ID" ) );
-         structure.add( new DataField( "sequenceNumber" , DataTypes.INTEGER_NAME , "Sequence Number" ) );
-         structure.add( new DataField( "temperature" , DataTypes.DOUBLE_NAME , "Ambient Temperature (°C)" ) );
-         structure.add( new DataField( "surfaceTemperature" , DataTypes.DOUBLE_NAME , "Surface Temperature (°C)" ) );
-         structure.add( new DataField( "solarRadiation" , DataTypes.DOUBLE_NAME , "Solar Radiation (W/m²)" ) );
-         structure.add( new DataField( "relativeHumidity" , DataTypes.DOUBLE_NAME , "Relative Humidity (%)" ) );
-         structure.add( new DataField( "soilMoisture" , DataTypes.DOUBLE_NAME , "Soil Moisture (%)" ) );
-         structure.add( new DataField( "watermark" , DataTypes.DOUBLE_NAME , "Watermark (kPa)" ) );
-         structure.add( new DataField( "rainMeter" , DataTypes.DOUBLE_NAME , "Rain Meter (mm)" ) );
-         structure.add( new DataField( "windSpeed" , DataTypes.DOUBLE_NAME , "Wind Speed (m/s)" ) );
-         structure.add( new DataField( "windDirection" , DataTypes.DOUBLE_NAME , "Wind Direction (°)" ) );
-      }
+   public static final  DataField [] getStructure ( ) {
       return structure;
    }
    

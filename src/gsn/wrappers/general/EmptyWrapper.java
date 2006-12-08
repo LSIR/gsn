@@ -16,12 +16,12 @@ public class EmptyWrapper extends AbstractWrapper {
    
    private int                                  threadCounter = 0;
    
-   private static final ArrayList < DataField > dataField     = new ArrayList < DataField >( );
+   private static   DataField [] dataField  ;
    
    public boolean initialize (  ) {
       setName( "EmptyWrapper-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
-      dataField.add( new DataField( "DATA" , "int" , "incremental int" ) );
+      dataField = new DataField[] { new DataField( "DATA" , "int" , "incremental int" ) };
       return true;
    }
    
@@ -31,7 +31,7 @@ public class EmptyWrapper extends AbstractWrapper {
       }
    }
    
-   public Collection < DataField > getOutputFormat ( ) {
+   public  DataField[] getOutputFormat ( ) {
       return dataField;
    }
    public String getWrapperName() {

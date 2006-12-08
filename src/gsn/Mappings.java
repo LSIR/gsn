@@ -23,7 +23,7 @@ public final class Mappings {
    
    private static final transient Logger                                 logger                         = Logger.getLogger( Mappings.class );
    
-   private static Container                                              container                      = null;
+   private static ContainerImpl                                              container                      = null;
    
    public static boolean addVSensorInstance ( VirtualSensorPool sensorPool ) {
       try {
@@ -78,11 +78,11 @@ public final class Mappings {
       return ( fileNameToVSInstance.get( fileName ) ).getConfig( );
    }
    
-   static void setContainer ( Container theContainer ) {
+   static void setContainer ( ContainerImpl theContainer ) {
       container = theContainer;
    }
    
-   public static Container getContainer ( ) {
+   public static ContainerImpl getContainer ( ) {
       return container;
    }
    

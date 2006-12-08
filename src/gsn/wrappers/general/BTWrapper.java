@@ -1,20 +1,14 @@
 package gsn.wrappers.general;
 
-import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import de.avetana.bluetooth.connection.BadURLFormat;
 import de.avetana.bluetooth.connection.JSR82URL;
@@ -85,7 +79,7 @@ public class BTWrapper extends AbstractWrapper {
     			  }
     			  StreamElement streamElement = new StreamElement( 
     					  new String [ ] { RAW_PACKET } , 
-    					  new Integer [ ] { DataTypes.BINARY } , 
+    					  new Byte [ ] { DataTypes.BINARY } , 
     					  new Serializable [ ] { inputBuffer } , 
     					  System.currentTimeMillis( ) );
     			  postStreamElement( streamElement );
@@ -97,10 +91,8 @@ public class BTWrapper extends AbstractWrapper {
       }
    }
    
-   public Collection < DataField > getOutputFormat ( ) {
-      ArrayList < DataField > dataField = new ArrayList < DataField >( );
-      dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) );
-      return dataField;
+   public  DataField[] getOutputFormat ( ) {
+      return new DataField[] {new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data from a sensor network." ) };
    }
    public String getWrapperName() {
     return "Bluetooth";

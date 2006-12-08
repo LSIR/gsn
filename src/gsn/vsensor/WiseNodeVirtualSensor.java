@@ -38,9 +38,7 @@ public class WiseNodeVirtualSensor extends AbstractVirtualSensor {
        */
       
       String [ ] fieldNames = new String [ ] { "Node" , "Temperature" };
-      Integer [ ] fieldTypes = new Integer [ 2 ];
-      fieldTypes[ 0 ] = DataTypes.INTEGER;
-      fieldTypes[ 1 ] = DataTypes.INTEGER;
+      Byte [ ] fieldTypes = new Byte[]{ DataTypes.INTEGER, DataTypes.INTEGER};
       Serializable [ ] outputData = new Serializable [ fieldNames.length ];
       
       byte [ ] buffer = ( byte [ ] ) data.getData( "RAW_PACKET" );

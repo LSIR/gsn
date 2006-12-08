@@ -20,6 +20,8 @@ import org.apache.log4j.Logger;
  */
 public class SimHttpListener extends HttpServlet {
    
+   private static final int START_PORT_INDEX = 29000;
+
    private transient File         outputLog = null;
    
    private OutputStream           dos       = null;
@@ -31,7 +33,7 @@ public class SimHttpListener extends HttpServlet {
       switch ( requestType ) {
          case Container.DATA_PACKET :
             res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
-            if ( req.getLocalPort( ) == ( Simulation.START_PORT_INDEX + 1 ) ) {
+            if ( req.getLocalPort( ) == ( START_PORT_INDEX + 1 ) ) {
                if ( outputLog == null ) {
                   outputLog = new File( "SuperLight-ReceivedTimes.log" );
                   try {

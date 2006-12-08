@@ -30,7 +30,8 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
    
    private static int                threadCounter                         = 0;
    
-   private transient ArrayList < DataField > outputStructureCache      = new ArrayList < DataField >();
+   private transient DataField [ ]   outputStructureCache                  = new DataField [ ] { new DataField( FIELD_NAME_HEAP , "bigint" , "Heap memory usage." ) ,
+         new DataField( FIELD_NAME_NON_HEAP , "bigint" , "Nonheap memory usage." ) , new DataField( FIELD_NAME_PENDING_FINALIZATION_COUNT , "int" , "The number of objects with pending finalization." ) };
    
    private static final String       FIELD_NAME_HEAP                       = "HEAP";
    
@@ -42,7 +43,7 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
    
    private static final MemoryMXBean mbean                                 = ManagementFactory.getMemoryMXBean( );
    
-   public boolean initialize (  ) {
+   public boolean initialize ( ) {
       setName( "MemoryMonitoringWrapper-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
       if ( addressBean.getPredicateValue( "sampling-rate" ) != null ) {
@@ -52,10 +53,6 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
             samplingRate = DEFAULT_SAMPLING_RATE;
          }
       }
-      outputStructureCache = new ArrayList < DataField >( );
-      outputStructureCache.add( new DataField( FIELD_NAME_HEAP , "bigint" , "Heap memory usage." ) );
-      outputStructureCache.add( new DataField( FIELD_NAME_NON_HEAP , "bigint" , "Nonheap memory usage." ) );
-      outputStructureCache.add( new DataField( FIELD_NAME_PENDING_FINALIZATION_COUNT , "int" , "The number of objects with pending finalization." ) );
       return true;
    }
    
@@ -72,7 +69,7 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
          long nonHeapMemoryUsage = mbean.getNonHeapMemoryUsage( ).getUsed( );
          int pendingFinalizationCount = mbean.getObjectPendingFinalizationCount( );
          
-         StreamElement streamElement = new StreamElement( FIELD_NAMES , new Integer [ ] { DataTypes.BIGINT , DataTypes.BIGINT , DataTypes.INTEGER } , new Serializable [ ] { heapMemoryUsage ,
+         StreamElement streamElement = new StreamElement( FIELD_NAMES , new Byte [ ] { DataTypes.BIGINT , DataTypes.BIGINT , DataTypes.INTEGER } , new Serializable [ ] { heapMemoryUsage ,
                nonHeapMemoryUsage , pendingFinalizationCount } , System.currentTimeMillis( ) );
          postStreamElement( streamElement );
       }
@@ -82,18 +79,17 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
       threadCounter--;
    }
    
-   
    /**
     * The output fields exported by this virtual sensor.
     * 
     * @return The strutcture of the output.
     */
    
-   public final Collection < DataField > getOutputFormat ( ) {
+   public final DataField [ ] getOutputFormat ( ) {
       return outputStructureCache;
    }
-
-public String getWrapperName() {
-    return "System memory consumption usage";
-}
+   
+   public String getWrapperName ( ) {
+      return "System memory consumption usage";
+   }
 }

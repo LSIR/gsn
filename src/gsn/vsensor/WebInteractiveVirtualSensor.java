@@ -74,7 +74,7 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
       }
       ArrayList < SVGCircle > arrayList = lazyTimedHashMap.getValues( );
       byte [ ] visualizedResults = visualaize( 400 , 400 , arrayList ).getBytes( );
-      StreamElement out = new StreamElement( new String [ ] { OUTPUT_FIELD_NAME } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { visualizedResults } , System.currentTimeMillis( ) );
+      StreamElement out = new StreamElement( new String [ ] { OUTPUT_FIELD_NAME } , new Byte[ ] { DataTypes.BINARY } , new Serializable [ ] { visualizedResults } , System.currentTimeMillis( ) );
       dataProduced( out );
       
    }

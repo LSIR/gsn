@@ -22,7 +22,7 @@ public class RemoteDS extends AbstractWrapper {
    
    private final transient Logger     logger                 = Logger.getLogger( RemoteDS.class );
    
-   private ArrayList < DataField >    strcture               = null;
+   private  DataField[]    strcture               = null;
    
    private String                     remoteVSName;
    
@@ -69,7 +69,7 @@ public class RemoteDS extends AbstractWrapper {
    /**
     * @return Null if the RemoteDS can't obtain the data strcture from the
     */
-   private ArrayList < DataField > askForStrcture ( ) {
+   private  DataField [] askForStrcture ( ) {
       if ( host.indexOf( "http://" ) < 0 ) host = "http://" + host;
       String destination = new StringBuilder( ).append( host ).append( ":" ).append( port ).append( "/gsn" ).toString( );
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Wants to ask for structure from : " ).append( destination ).toString( ) );
@@ -90,14 +90,11 @@ public class RemoteDS extends AbstractWrapper {
          logger.debug( "The respond from server : " + postMethod.getResponseHeader( Container.RESPONSE_STATUS ) );
          return null;
       }
-      ArrayList < DataField > outputStreamStruecture = null;
       ObjectInputStream ois = null;
       try {
          ois = new ObjectInputStream( postMethod.getResponseBodyAsStream( ) );
-         outputStreamStruecture = ( ArrayList < DataField > ) ois.readObject( );
+      // FIXME ": ALI   outputStreamStruecture = ( ArrayList < DataField > ) ois.readObject( );
       } catch ( IOException e ) {
-         logger.warn( e.getMessage( ) , e );
-      } catch ( ClassNotFoundException e ) {
          logger.warn( e.getMessage( ) , e );
       } finally {
          if ( ois != null ) try {
@@ -106,7 +103,7 @@ public class RemoteDS extends AbstractWrapper {
             logger.debug( e.getMessage( ) , e );
          }
       }
-      return outputStreamStruecture;
+      return null;
    }
    
    /**
@@ -116,8 +113,8 @@ public class RemoteDS extends AbstractWrapper {
     * adding the new version of the query.<br>
     */
    private void refreshRemotelyRegisteredQuery ( ) {
-      String notificationCode = getDBAlias( );
-      String query = new StringBuffer( "SELECT * FROM " ).append( remoteVSName ).append( " WHERE " ).append( getWhereClausesAllTogher( ) ).append( " ORDER BY " ).append( remoteVSName ).append(
+      int notificationCode = getDBAlias( );
+      CharSequence query = new StringBuffer( "SELECT * FROM " ).append( remoteVSName ).append( " WHERE " ).append( getWhereClausesAllTogher( ) ).append( " ORDER BY " ).append( remoteVSName ).append(
          ".TIMED DESC LIMIT 1 OFFSET 0" ).toString( ).replace( "\"" , "" );
       if ( host.indexOf( "http://" ) < 0 ) host = "http://" + host;
       String destination = host + ":" + port + "/gsn";
@@ -126,9 +123,7 @@ public class RemoteDS extends AbstractWrapper {
       PostMethod postMethod = new PostMethod( destination );
       postMethod.addRequestHeader( Container.REQUEST , Integer.toString( Container.DEREGISTER_PACKET ) );
       postMethod.addRequestHeader( Registry.VS_PORT , Integer.toString( Main.getContainerConfig( ).getContainerPort( ) ) );
-      postMethod.addRequestHeader( Container.VS_QUERY , query );
       postMethod.addRequestHeader( Container.QUERY_VS_NAME , remoteVSName );
-      postMethod.addRequestHeader( Container.NOTIFICATION_CODE , notificationCode );
       
       int statusCode = TCPConnPool.executeMethod( postMethod );
       if ( statusCode == -1 ) {
@@ -143,7 +138,7 @@ public class RemoteDS extends AbstractWrapper {
       }
    }
    
-   public String addListener ( DataListener dataListener ) {
+   public CharSequence addListener ( DataListener dataListener ) {
       StringBuffer completeMergedWhereClause = dataListener.getCompleteMergedWhereClause( remoteVSName );
       registeredWhereClauses.add( completeMergedWhereClause );
       refreshRemotelyRegisteredQuery( );
@@ -177,7 +172,7 @@ public class RemoteDS extends AbstractWrapper {
       }
    }
    
-   public Collection < DataField > getOutputFormat ( ) {
+   public  DataField [] getOutputFormat ( ) {
       return strcture;
    }
    

@@ -79,11 +79,11 @@ public interface Container {
     */
    public void publishData ( AbstractVirtualSensor sensor );
    
-   public void addRemoteStreamSource ( String alias , RemoteDS remoteDS );
+   public void addRemoteStreamSource ( int alias , RemoteDS remoteDS );
    
    public void addNotificationRequest ( String localVirtualSensorName , NotificationRequest notificationRequest );
    
-   public void removeRemoteStreamSource ( String alias );
+   public void removeRemoteStreamSource ( int code);
    
    public void removeAllResourcesAssociatedWithVSName ( String virtualSensorName );
    

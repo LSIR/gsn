@@ -71,13 +71,13 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
    
    private static final String [ ]  OUTPUT_FIELD_NAMES  = new String [ ] { ID_OUTPUT_FIELD , TEDS_OUTPUT_FIELD , STATUS_OUTPUT_FIELD , VSFILE_OUTPUT_FIELD };
    
-   private static final Integer [ ] OUTPUT_FIELD_TYPES  = new Integer [ ] { DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR };
+   private static final Byte [ ] OUTPUT_FIELD_TYPES  = new Byte [ ] { DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR };
    
    private boolean                  isConsumed          = true;
    
    private File                     templateFolder;
    
-   public boolean initialize (  ) {
+   public boolean initialize ( ) {
       // mica related
       micaTEDS.add( 0 , "MicaONE.xml" );
       micaTEDS.add( 1 , "MicaTWO.xml" );
@@ -91,8 +91,8 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       if ( addressBean.getPredicateValue( "RATE" ) != null ) {
          RATE = Integer.parseInt( ( String ) addressBean.getPredicateValue( "RATE" ) );
       }
-      if ( addressBean.getPredicateValue( "templates-directory" ) == null ) logger
-            .warn( "The MoteIdentifier couldn't initialize. The >templates-directory< parameter is missing from the set of the wrapper configuration parameters." );
+      if ( addressBean.getPredicateValue( "templates-directory" ) == null )
+         logger.warn( "The MoteIdentifier couldn't initialize. The >templates-directory< parameter is missing from the set of the wrapper configuration parameters." );
       
       // ------INITIALIZING THE TEMPLATE DIRECTORY ---------
       String templateDirPath = addressBean.getPredicateValue( "templates-directory" );
@@ -128,10 +128,8 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       
       mote = new MoteIF( host , port );
       mote.registerListener( new TedsMessage( ) , this );
-      outputStructure.add( new DataField( ID_OUTPUT_FIELD , "varchar(20)" , "Id of the detected transducer" ) );
-      outputStructure.add( new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) );
-      outputStructure.add( new DataField( STATUS_OUTPUT_FIELD , "VARCHAR(20)" , "status:added or removed" ) );
-      outputStructure.add( new DataField( VSFILE_OUTPUT_FIELD , "VARCHAR(40)" , "Virtual Sensor Filename" ) );
+      outputStructure = new DataField [ ] { new DataField( ID_OUTPUT_FIELD , "varchar(20)" , "Id of the detected transducer" ) , new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) ,
+            new DataField( STATUS_OUTPUT_FIELD , "VARCHAR(20)" , "status:added or removed" ) , new DataField( VSFILE_OUTPUT_FIELD , "VARCHAR(40)" , "Virtual Sensor Filename" ) };
       
       return true;
    }
@@ -185,8 +183,8 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       try {
          if ( status == ADD_ACTION ) tedsResult = tedsToVirtualSensor.GenerateVS( teds );
          if ( status == REMOVE_ACTION ) tedsResult = tedsToVirtualSensor.getTedsToVSResult( teds );
-         StreamElement streamElement = new StreamElement( OUTPUT_FIELD_NAMES , OUTPUT_FIELD_TYPES , new Serializable [ ] { tedsResult.tedsID ,tedsResult.tedsHtmlString 
-              , status , tedsResult.fileName } , System.currentTimeMillis( ) );
+         StreamElement streamElement = new StreamElement( OUTPUT_FIELD_NAMES , OUTPUT_FIELD_TYPES ,
+            new Serializable [ ] { tedsResult.tedsID , tedsResult.tedsHtmlString , status , tedsResult.fileName } , System.currentTimeMillis( ) );
          postStreamElement( streamElement );
          isConsumed = true;
       } catch ( RuntimeException e1 ) {
@@ -194,13 +192,13 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       }
    }
    
-   private static final transient Collection < DataField > outputStructure = new ArrayList < DataField >( );
+   private static transient DataField [ ] outputStructure;
    
-   public Collection < DataField > getOutputFormat ( ) {
+   public DataField [ ] getOutputFormat ( ) {
       return outputStructure;
    }
    
-   public void finalize (  ) {
+   public void finalize ( ) {
       threadCounter--;
    }
    
@@ -236,8 +234,8 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
          boolean success = ( new File( TedsToVirtualSensor.TARGET_VS_DIR + tedsResult.fileName ) ).delete( );
       }
    }
-
-public String getWrapperName() {
-    return "IEEE1451 IEEE 1451 mica mote";
-}
+   
+   public String getWrapperName ( ) {
+      return "IEEE1451 IEEE 1451 mica mote";
+   }
 }

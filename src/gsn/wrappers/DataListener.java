@@ -28,7 +28,9 @@ public class DataListener {
    
    protected StorageManager       storageManager    = StorageManager.getInstance( );
    
-   protected final String         viewName          = Main.tableNameGenerator( );
+   protected final int         viewName          = Main.tableNameGenerator( );
+   
+   protected final CharSequence         viewNameS          = Main.tableNameGeneratorInString( viewName );
    
    protected StringBuilder        viewQery;
    
@@ -39,7 +41,7 @@ public class DataListener {
    public DataListener ( InputStream is , StreamSource ss ) {
       this.inputStream = is;
       this.streamSource = ss;
-      this.inputStream.addToRenamingMapping( streamSource.getAlias( ) , getViewName( ) );
+      this.inputStream.addToRenamingMapping( streamSource.getAlias( ) , getViewNameInString( ) );
    }
    
    public boolean isCountBased ( ) {
@@ -63,30 +65,34 @@ public class DataListener {
       return inputStream;
    }
    
-   public String getViewName ( ) {
+   public int getViewName ( ) {
       return viewName;
    }
    
+   public CharSequence getViewNameInString() {
+      return viewNameS;
+   }
+   
    public StringBuilder getViewQuery ( ) {
-      if ( viewQery == null ) viewQery = new StringBuilder( "select * from " + getViewName( ).replace( "\"" , "" ) );
+      if ( viewQery == null ) viewQery = new StringBuilder( "select * from " + viewNameS.toString( ).replace( "\"" , "" ) );
       return viewQery;
    }
    
    public boolean equals ( Object obj ) {
       if ( obj == null || !( obj instanceof DataListener ) ) return false;
       DataListener ds = ( DataListener ) obj;
-      return ( ds.getViewName( ).equals( getViewName( ) ) );
+      return ( ds.getViewName( )== getViewName( ) );
    }
    
    public int hashCode ( ) {
-      return getViewName( ).hashCode( );
+      return getViewName( );
    }
    
    public void finalize ( HashMap map ) {
       
    }
    
-   public String getMergedQuery ( ) {
+   public CharSequence getMergedQuery ( ) {
       if ( cachedMergedQuery == null ) cachedMergedQuery = generateMergedSqlQuery( this );
       return cachedMergedQuery;
    }
@@ -168,13 +174,13 @@ public class DataListener {
     */
    public StringBuffer getCompleteMergedWhereClause ( String remoteVSName ) {
       if ( cachedWhereClause == null ) {
-         String mergedQuery = getMergedQuery( );
-         int indexOrOrderBy = mergedQuery.toUpperCase( ).indexOf( " ORDER " );
-         int indexOfWhereClause = mergedQuery.toUpperCase( ).indexOf( " WHERE " );
-         cachedWhereClause = new StringBuffer( mergedQuery.substring( indexOfWhereClause + " WHERE ".length( ) , ( indexOrOrderBy > 0 ? indexOrOrderBy : getMergedQuery( ).length( ) ) ) );
-         HashMap < String , String > rewritingMapping = new HashMap < String , String >( );
+         CharSequence mergedQuery = getMergedQuery( );
+         int indexOrOrderBy = mergedQuery.toString( ).toLowerCase( ).indexOf( " ORDER " );
+         int indexOfWhereClause = mergedQuery.toString( ).toLowerCase( ).indexOf( " WHERE " );
+         cachedWhereClause = new StringBuffer( mergedQuery.toString( ).substring( indexOfWhereClause + " WHERE ".length( ) , ( indexOrOrderBy > 0 ? indexOrOrderBy : getMergedQuery( ).length( ) ) ) );
+         HashMap < CharSequence , CharSequence > rewritingMapping = new HashMap < CharSequence , CharSequence >( );
          rewritingMapping.put( "WRAPPER" , remoteVSName );
-         cachedWhereClause = new StringBuffer( SQLUtils.rewriteQuery( cachedWhereClause.toString( ) , rewritingMapping ) );
+         cachedWhereClause = new StringBuffer( SQLUtils.rewriteQuery( cachedWhereClause , rewritingMapping ) );
          if ( logger.isDebugEnabled( ) )
             logger.debug( new StringBuilder( ).append( "The Complete Mereged Query's where part, rewritten for *" ).append( remoteVSName ).append( "* is " ).append( cachedWhereClause.toString( ) )
                   .toString( ) );

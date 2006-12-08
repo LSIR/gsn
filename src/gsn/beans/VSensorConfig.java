@@ -36,11 +36,11 @@ public class VSensorConfig implements Serializable {
    
    private int                                    outputStreamRate;
    
-   private ArrayList < KeyValue >                 addressing                                = new ArrayList < KeyValue >( );
+   private KeyValue[]                 addressing                             ;
    
-   private ArrayList < DataField >                outputStructure                           = new ArrayList < DataField >( );
+   private DataField []                outputStructure                        ;
    
-   private ArrayList < DataField >                webParameters                             = new ArrayList < DataField >( );
+   private DataField []                webParameters                            ;
    
    private String                                 webParameterPassword                             = null;
    
@@ -63,8 +63,18 @@ public class VSensorConfig implements Serializable {
    /**
     * @return Returns the addressing.
     */
-   public ArrayList < KeyValue > getAddressing ( ) {
+   public  KeyValue[] getAddressing ( ) {
       return this.addressing;
+   }
+   
+   public String[][] getRPCFriendlyAddressing() {
+      String[][] toReturn = new String[this.addressing.length][2] ;
+      for(int i=0;i<toReturn.length;i++)
+         for (KeyValue val : this.addressing) {
+            toReturn[i][0] = ( String ) val.getKey( );
+            toReturn[i][1] = ( String ) val.getValue( );
+         }
+      return toReturn;
    }
    
    
@@ -126,7 +136,7 @@ public class VSensorConfig implements Serializable {
    /**
     * @return Returns the outputStructure.
     */
-   public ArrayList < DataField > getOutputStructure ( ) {
+   public  DataField [] getOutputStructure ( ) {
       return this.outputStructure;
    }
    
@@ -144,7 +154,7 @@ public class VSensorConfig implements Serializable {
    /**
     * @param addressing The addressing to set.
     */
-   public void setAddressing ( final ArrayList < KeyValue > addressing ) {
+   public void setAddressing ( KeyValue [] addressing ) {
       this.addressing = addressing;
    }
    
@@ -193,7 +203,7 @@ public class VSensorConfig implements Serializable {
    /**
     * @param outputStructure The outputStructure to set.
     */
-   public void setOutputStructure ( final ArrayList < DataField > outputStructure ) {
+   public void setOutputStructure ( DataField[] outputStructure) {
       this.outputStructure = outputStructure;
    }
    
@@ -205,7 +215,7 @@ public class VSensorConfig implements Serializable {
    }
    
    public String [ ] getAddressingKeys ( ) {
-      final String result[] = new String [ this.getAddressing( ).size( ) ];
+      final String result[] = new String [ this.getAddressing( ).length ];
       int counter = 0;
       for ( final KeyValue predicate : this.getAddressing( ) )
          result[ counter++ ] = ( String ) predicate.getKey( );
@@ -213,7 +223,7 @@ public class VSensorConfig implements Serializable {
    }
    
    public String [ ] getAddressingValues ( ) {
-      final String result[] = new String [ this.getAddressing( ).size( ) ];
+      final String result[] = new String [ this.getAddressing( ).length ];
       int counter = 0;
       for ( final KeyValue predicate : this.getAddressing( ) )
          result[ counter++ ] = ( String ) predicate.getValue( );
@@ -339,8 +349,8 @@ public class VSensorConfig implements Serializable {
       this.webapp = webappPath;
    }
    
-   public StringBuffer getUsedSources ( ) {
-      StringBuffer usedSources = new StringBuffer( );
+   public String getUsedSources ( ) {
+      StringBuilder usedSources = new StringBuilder( );
       for ( InputStream is : inputStreams )
          for ( StreamSource ss : is.getSources( ) )
             if ( ss.getActiveSourceProducer( ) instanceof RemoteDS ) {
@@ -349,7 +359,7 @@ public class VSensorConfig implements Serializable {
             } else {
                usedSources.append( ss.getActiveSourceProducer( ).getWrapperName( ) ).append( Registry.SPACE_CHARACTER );
             }
-      return usedSources;
+      return usedSources.toString( );
    }
    
    /**
@@ -363,7 +373,7 @@ public class VSensorConfig implements Serializable {
    /**
     * @return the webParameters
     */
-   public ArrayList < DataField > getWebParameters ( ) {
+   public  DataField [] getWebParameters ( ) {
       return webParameters;
    }
 

@@ -41,7 +41,7 @@ public class DemoVSensor extends AbstractVirtualSensor {
    
    private static final String [ ]       OUTPUT_FIELDS           = new String [ ] { IMAGE_OUTPUT_FIELD };
    
-   private static final Integer [ ]      OUTPUT_TYPES            = new Integer [ ] { IMAGE_OUTPUT_FIELD_TYPE };
+   private static final Byte [ ]      OUTPUT_TYPES            = new Byte [ ] { IMAGE_OUTPUT_FIELD_TYPE };
    
    private static BufferedImage          cachedBufferedImage     = null;
    

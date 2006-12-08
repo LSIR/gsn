@@ -8,14 +8,12 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager.DATABASE;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.TreeMap;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -78,7 +76,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
     * @param tableName The table name to check for.
     */
 
-   private void ensureTableExistence ( String tableName , String [ ] fieldNames , Integer [ ] fieldTypes ) {
+   private void ensureTableExistence ( String tableName , String [ ] fieldNames , Byte [ ] fieldTypes ) {
       sqlbuilder = new StringBuilder( );
       sqlbuilder.append( "CREATE TABLE IF NOT EXISTS " ); // Is this Mysql
       // specific ?

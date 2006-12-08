@@ -47,7 +47,7 @@ public class DataTypes {
    // NEXT FIELD
    public final static String            BINARY_PATTERN_STRING     = "\\s*BINARY" + OPTIONAL_NUMBER_PARAMETER + "(\\s*:.*)?";
    
-   public final static int               BINARY                    = 4;
+   public final static byte               BINARY                    = 4;
    
    public final static String            BINARY_NAME               = "Binary";
    
@@ -94,14 +94,14 @@ public class DataTypes {
    public final static Object [ ]        TYPE_SAMPLE_VALUES        = { "A chain of chars" , 'c' , new Integer( 32 ) , new Integer( 66000 ) , new Byte( ( byte ) 12 ) , new Double( 3.141592 ) ,
          new Date( ).getTime( ) , new Integer( 1 ) , new Integer( 9 ) };
    
-   public static int convertTypeNameToTypeID ( final String type ) {
+   public static byte convertTypeNameToTypeID ( final String type ) {
       if ( type == null ) throw new GSNRuntimeException( new StringBuilder( "The type *null* is not recoginzed by GSN." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
-      for ( int i = 0 ; i < DataTypes.ALL_PATTERNS.length ; i++ )
+      for ( byte i = 0 ; i < DataTypes.ALL_PATTERNS.length ; i++ )
          if ( DataTypes.ALL_PATTERNS[ i ].matcher( type ).matches( ) ) return i;
       throw new GSNRuntimeException( new StringBuilder( "The type *" ).append( type ).append( "* is not recognized." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
    }
    
-   public static Integer convertFromJDBCToGSNFormat ( final int colTypeInJDBCFormat ) {
+   public static Byte convertFromJDBCToGSNFormat ( final int colTypeInJDBCFormat ) {
       switch ( colTypeInJDBCFormat ) {
          case Types.BIGINT :
             return BIGINT;

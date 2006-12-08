@@ -1,13 +1,16 @@
 package gsn.notifications;
 
+import gsn.Main;
+import gsn.storage.DataEnumerator;
+
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 public class DummyNotification extends NotificationRequest {
    
-   private String notificationCode;
    
-   public DummyNotification ( String notificationCode ) {
+   
+   public DummyNotification (  ) {
       this.notificationCode = notificationCode;
    }
    
@@ -15,12 +18,18 @@ public class DummyNotification extends NotificationRequest {
       throw new UnsupportedOperationException( "This method shouldn't be called by others." );
    }
    
-   public boolean send ( ) {
+   public boolean send ( DataEnumerator data) {
       throw new UnsupportedOperationException( "This method shouldn't be called by others." );
    }
    
-   public String getNotificationCode ( ) {
+   private int notificationCode = Main.tableNameGenerator( );
+   private CharSequence notificationCodeS = Main.tableNameGeneratorInString( notificationCode );
+   public int getNotificationCode ( ) {
       return notificationCode;
+   }
+   
+   public CharSequence getNotificationCodeInString() {
+      return notificationCodeS;
    }
    
 }

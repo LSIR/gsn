@@ -1,6 +1,5 @@
 package gsn.wrappers.ieee1451;
 
-import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
@@ -8,10 +7,7 @@ import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 /**
@@ -46,8 +42,11 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
     * the high probability of burst.<br>
     */
    boolean                             rateBased     = false;
+
+   private DataField [ ] outputDataStructure;
    
    public boolean initialize ( ) {
+      ArrayList < DataField > dataField = new ArrayList < DataField >( );
       setName( "TEDSDummyRandomDataProducer-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
       /**
@@ -61,6 +60,7 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
       }
       for ( TEDSDataField field : tedsPredicatesList )
          dataField.add( new DataField( field.name , field.type , field.description ) );
+      this.outputDataStructure=dataField.toArray( new DataField[] {} );
       return true;
    }
    
@@ -74,7 +74,7 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
       while ( isActive( ) ) {
          
          String [ ] dataFieldNames = new String [ NumOfChannels ];
-         Integer [ ] dataFieldTypes = new Integer [ NumOfChannels ];
+         Byte [ ] dataFieldTypes = new Byte [ NumOfChannels ];
          
          for ( int i = 0 ; i < NumOfChannels ; i++ ) {
             dataFieldNames[ i ] = tedsPredicatesList.get( i ).name;
@@ -96,10 +96,8 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
       threadCounter--;
    }
    
-   private static transient final ArrayList < DataField > dataField = new ArrayList < DataField >( );
-   
-   public Collection < DataField > getOutputFormat ( ) {
-      return dataField;
+   public  DataField [] getOutputFormat ( ) {
+      return outputDataStructure;
    }
    
    public class TEDSDataField {
@@ -108,7 +106,7 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
       
       public String type;
       
-      public int    dataType;
+      public byte    dataType;
       
       public String description;
       
@@ -124,7 +122,7 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
 
       }
       
-      public Serializable [ ] RandomData ( Integer [ ] dataTypes ) {
+      public Serializable [ ] RandomData ( Byte [ ] dataTypes ) {
          Serializable [ ] result = new Serializable [ dataTypes.length ];
          for ( int i = 0 ; i < dataTypes.length ; i++ ) {
             switch ( dataTypes[ i ] ) {

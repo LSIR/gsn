@@ -20,7 +20,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
    
    private static final Serializable [ ] EMPTY_DATA_PART   = new Serializable [ ] {};
    
-   private static final Integer [ ]      EMPTY_FIELD_TYPES = new Integer [ ] {};
+   private static final Byte [ ]      EMPTY_FIELD_TYPES = new Byte [ ] {};
    
    private static final int              INITIAL_DELAY     = 5 * 1000;
    
@@ -28,7 +28,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
    
    private String [ ]                    EMPTY_FIELD_LIST  = new String [ ] {};
    
-   private Collection < DataField >      collection        = new ArrayList < DataField >( );
+   private  DataField   []    collection        = new DataField[] {};
    
    private static int                    threadCounter     = 0;
    
@@ -47,7 +47,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
       timer.start( );
    }
    
-   public Collection < DataField > getOutputFormat ( ) {
+   public  DataField [] getOutputFormat ( ) {
       return collection;
    }
    

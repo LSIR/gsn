@@ -70,8 +70,7 @@ public final class Main {
       
       StorageManager.getInstance( ).initialize( containerConfig.getJdbcDriver( ) , containerConfig.getJdbcUsername( ) , containerConfig.getJdbcPassword( ) , containerConfig.getJdbcURL( ) );
       if ( logger.isInfoEnabled( ) ) logger.info( "The Container Configuration file loaded successfully." );
-      Container container = new ContainerImpl( );
-      Mappings.setContainer( container );
+      Mappings.setContainer(new ContainerImpl( ) );
       final Server server = new Server( );
       //Connector connector = new SelectChannelConnector( ); //using basic connector for windows bug
       Connector connector = new SocketConnector();
@@ -188,8 +187,16 @@ public final class Main {
       return result.toString( );
    }
    
-   public static String tableNameGenerator ( ) {
-      return randomTableNameGenerator( 15 );
+   public static int tableNameGenerator ( ) {
+      return randomTableNameGenerator( 15 ).hashCode( );
+   }
+   
+   public static CharSequence tableNameGeneratorInString(int code) {
+      StringBuilder sb = new StringBuilder("_");
+      if (code<0)
+         sb.append( "_" );
+      sb.append( code );
+      return sb;
    }
    
    /**

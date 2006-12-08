@@ -83,10 +83,6 @@ public class WSNSWrapper extends AbstractWrapper implements DataListener {
             rate = RATE_DEFAULT_VALUE;
          }
       }
-      dataField.add( new DataField( "NODE_ID" , DataTypes.INTEGER_NAME , "Node's identification." ) );
-      dataField.add( new DataField( "PARENT_ID" , DataTypes.INTEGER_NAME , "Parent Node's identification." ) );
-      dataField.add( new DataField( "TEMPREATURE" , DataTypes.INTEGER_NAME , "incremental int" ) );
-      
       return true;
    }
    
@@ -104,7 +100,7 @@ public class WSNSWrapper extends AbstractWrapper implements DataListener {
                synchronized ( dataBuffer ) {
                   dataPacket = dataBuffer.remove( 0 );
                }
-               StreamElement streamElement = new StreamElement( new String [ ] { "NODE_ID" , "PARENT_ID" , "TEMPREATURE" } , new Integer [ ] { DataTypes.INTEGER , DataTypes.INTEGER ,
+               StreamElement streamElement = new StreamElement( new String [ ] { "NODE_ID" , "PARENT_ID" , "TEMPREATURE" } , new Byte [ ] { DataTypes.INTEGER , DataTypes.INTEGER ,
                      DataTypes.INTEGER } , new Serializable [ ] { dataPacket.getIdentifier( ) , dataPacket.getParent( ) , dataPacket.getValue( ) } , System.currentTimeMillis( ) );
                postStreamElement( streamElement );
                if ( dataBuffer.size( ) > 0 ) continue;
@@ -122,9 +118,11 @@ public class WSNSWrapper extends AbstractWrapper implements DataListener {
          node.stopNode( );
    }
    
-   private static final ArrayList < DataField > dataField = new ArrayList < DataField >( );
-   
-   public Collection < DataField > getOutputFormat ( ) {
+   private static  final DataField[] dataField  = new DataField[] {new DataField( "NODE_ID" , DataTypes.INTEGER_NAME , "Node's identification." ) ,
+      new DataField( "PARENT_ID" , DataTypes.INTEGER_NAME , "Parent Node's identification." ) ,
+      new DataField( "TEMPREATURE" , DataTypes.INTEGER_NAME , "incremental int" )};
+     
+      public DataField [] getOutputFormat ( ) {
       return dataField;
    }
    

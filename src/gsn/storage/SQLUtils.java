@@ -19,24 +19,23 @@ public class SQLUtils {
     * @param sql
     * @param mapping (The keys should be in UPPER CASE)
     */
-   public static String rewriteQuery ( String sql , HashMap < String , String > mapping ) {
-      
+   public static String rewriteQuery ( CharSequence sql , HashMap < CharSequence , CharSequence > mapping ) {
       Pattern pattern1 = Pattern.compile( "(?<=\")(\\w+)(?=[\"])" , Pattern.CASE_INSENSITIVE );
       Pattern pattern2 = Pattern.compile( "(?<=\")(\\w+)(?=[\\.\"])" , Pattern.CASE_INSENSITIVE );
       StringBuffer result = new StringBuffer( );
       
       Matcher matcher = pattern2.matcher( sql );
       while ( matcher.find( ) ) {
-         String replacement = mapping.get( matcher.group( 1 ).toUpperCase( ) );
-         if ( replacement != null ) matcher.appendReplacement( result , replacement );
+         CharSequence replacement = mapping.get( matcher.group( 1 ).toUpperCase( ) );
+         if ( replacement != null ) matcher.appendReplacement( result , replacement.toString( ) );
       }
       matcher.appendTail( result );
       
       matcher = pattern1.matcher( result.toString( ) );
       result = new StringBuffer( );
       while ( matcher.find( ) ) {
-         String replacement = mapping.get( matcher.group( 1 ).toUpperCase( ) );
-         if ( replacement != null ) matcher.appendReplacement( result , replacement );
+        CharSequence replacement = mapping.get( matcher.group( 1 ).toUpperCase( ) );
+         if ( replacement != null ) matcher.appendReplacement( result , replacement.toString( ) );
       }
       matcher.appendTail( result );
       return result.toString( );

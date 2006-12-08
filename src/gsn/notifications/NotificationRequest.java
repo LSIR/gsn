@@ -1,9 +1,8 @@
 package gsn.notifications;
 
-import gsn.beans.StreamElement;
+import gsn.storage.DataEnumerator;
 import gsn.storage.SQLUtils;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import org.apache.log4j.Logger;
 
 /**
@@ -17,41 +16,27 @@ public abstract class NotificationRequest {
    
    private static transient Logger        logger                          = Logger.getLogger( NotificationRequest.class );
    
-   private Enumeration < StreamElement >  data;
-   
    public ArrayList < String > getPrespectiveVirtualSensors ( ) {
       if ( cachedPrespectiveVirtualSensors == null ) cachedPrespectiveVirtualSensors = SQLUtils.extractTableNamesUsedInQuery( getQuery( ) );
       return cachedPrespectiveVirtualSensors;
    }
    
-   public abstract boolean send ( );
+   public abstract boolean send (DataEnumerator data );
    
-   public abstract String getNotificationCode ( );
+   public abstract int getNotificationCode ( );
    
    public boolean equals ( Object obj ) {
       if ( obj == null || !( obj instanceof NotificationRequest ) ) return false;
       NotificationRequest input = ( NotificationRequest ) obj;
-      return getNotificationCode( ).equals( input.getNotificationCode( ) );
+      return getNotificationCode( )== input.getNotificationCode( );
    }
    
    public int hashCode ( ) {
-      return getNotificationCode( ).hashCode( );
+      return getNotificationCode( );
    }
    
    public String toString ( ) {
       return "The notification request with the code of *" + getNotificationCode( ) + "*";
-   }
-   
-   public void setData ( Enumeration < StreamElement > data ) {
-      this.data = data;
-   }
-   
-   public Enumeration < StreamElement > getData ( ) {
-      return data;
-   }
-   
-   public boolean needNotification ( ) {
-      return data.hasMoreElements( );    
    }
    
 }

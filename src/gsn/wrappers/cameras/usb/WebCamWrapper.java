@@ -106,10 +106,10 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
    
    public static final String            DEFAULT_GSN_LOG4J_PROPERTIES = "conf/log4j.properties";
    
+   private transient final static  DataField [] dataField = new DataField[] {new DataField( PICTURE_KEY , "binary:jpeg" , "The pictures observerd from the webcam." )};
    // -----------------------------------START----------------------------------------
    public boolean initialize ( ) {
       setName( "WebCamWrapper-Thread:" + ( ++threadCounter ) );
-      dataField.add( new DataField( PICTURE_KEY , "binary:jpeg" , "The pictures observerd from the webcam." ) );
       AddressBean addressBean = getActiveAddressBean( );
       String liveView = addressBean.getPredicateValue( "live-view" );
       boolean isLiveViewEnabled = false;
@@ -274,9 +274,9 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
       return converter.createImage( buff );
    }
    
-   private transient final static ArrayList < DataField > dataField = new ArrayList < DataField >( );
    
-   public Collection < DataField > getOutputFormat ( ) {
+   
+   public  DataField[] getOutputFormat ( ) {
       return dataField;
    }
    
@@ -287,7 +287,7 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
          if ( reading != null ) {
             codec.encode( reading.getBufferedImage( ) );
             
-            streamElement = new StreamElement( new String [ ] { PICTURE_KEY } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { baos.toByteArray( ) } , System.currentTimeMillis( ) );
+            streamElement = new StreamElement( new String [ ] { PICTURE_KEY } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { baos.toByteArray( ) } , System.currentTimeMillis( ) );
          }
       } catch ( Exception e ) {
          logger.error( e.getMessage( ) , e );

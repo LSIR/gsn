@@ -28,7 +28,7 @@ public class AXISWirelessCameraWrapper extends AbstractWrapper {
    /**
     * 
     */
-   private static final Integer [ ] OUTPUT_FIELD_TYPES = new Integer [ ] { DataTypes.BINARY };
+   private static final Byte [ ] OUTPUT_FIELD_TYPES = new Byte [ ] { DataTypes.BINARY };
    
    /**
     * 
@@ -51,7 +51,7 @@ public class AXISWirelessCameraWrapper extends AbstractWrapper {
    
    private int                      rate;
    
-   private transient final ArrayList < DataField > dataField = new ArrayList < DataField >( );
+   private transient final DataField [] outputStructure = new  DataField [] { new DataField( "picture" , "binary:image/jpeg" , "JPEG image from the remote networked camera." ) };
    
    /**
     * From XML file it needs the followings :
@@ -78,7 +78,6 @@ public class AXISWirelessCameraWrapper extends AbstractWrapper {
       postMethod.addParameter( "clock" , "1" );
       postMethod.addParameter( "date" , "1" );
       if ( logger.isDebugEnabled( ) ) logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
-      dataField.add( new DataField( "picture" , "binary:image/jpeg" , "JPEG image from the remote networked camera." ) );
       return true;
    }
    
@@ -109,8 +108,8 @@ public class AXISWirelessCameraWrapper extends AbstractWrapper {
       threadCounter--;
    }
    
-   public Collection < DataField > getOutputFormat ( ) {
-      return dataField;
+   public  DataField[] getOutputFormat ( ) {
+      return outputStructure;
    }
    
 }

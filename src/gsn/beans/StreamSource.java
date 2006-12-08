@@ -72,8 +72,8 @@ public final class StreamSource {
    /**
     * @return Returns the alias.
     */
-   public String getAlias ( ) {
-      return this.alias.toUpperCase( );
+   public CharSequence getAlias ( ) {
+      return this.alias.toLowerCase( );
    }
    
    /**

@@ -65,7 +65,7 @@ public class UDPWrapper extends AbstractWrapper {
             String dataRead = new String( receivedPacket.getData( ) );
             if ( logger.isDebugEnabled( ) ) logger.debug( "UDPWrapper received a packet : " + dataRead );
             
-            StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Integer [ ] { DataTypes.BINARY } , new Serializable [ ] { receivedPacket.getData( ) } , System
+            StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { receivedPacket.getData( ) } , System
                   .currentTimeMillis( ) );
             postStreamElement( streamElement );
          } catch ( IOException e ) {
@@ -74,10 +74,9 @@ public class UDPWrapper extends AbstractWrapper {
       }
    }
    
-   public Collection < DataField > getOutputFormat ( ) {
-      ArrayList < DataField > dataField = new ArrayList < DataField >( );
-      dataField.add( new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data received as a UDP packet." ) );
-      return dataField;
+   public  DataField [] getOutputFormat ( ) {
+      return new DataField[] {new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data received as a UDP packet." ) };
+     
    }
    
    public void finalize (  ) {

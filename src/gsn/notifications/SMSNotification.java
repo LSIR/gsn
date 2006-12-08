@@ -1,6 +1,7 @@
 package gsn.notifications;
 
 import gsn.Main;
+import gsn.storage.DataEnumerator;
 
 import org.apache.log4j.Logger;
 
@@ -59,16 +60,18 @@ public class SMSNotification extends NotificationRequest {
       return query;
    }
    
-   public boolean send ( ) {
-      smtpMailSender.setData( getData( ) );
-      return smtpMailSender.send( );
+   public boolean send (DataEnumerator data ) {
+      return smtpMailSender.send( data);
    }
    
-   private transient String notificationCode;
-   
-   public String getNotificationCode ( ) {
-      if ( notificationCode == null ) this.notificationCode = Main.tableNameGenerator( );
+   private int notificationCode = Main.tableNameGenerator( );
+   private CharSequence notificationCodeS = Main.tableNameGeneratorInString( notificationCode );
+   public int getNotificationCode ( ) {
       return notificationCode;
+   }
+   
+   public CharSequence getNotificationCodeInString() {
+      return notificationCodeS;
    }
    
    public String toString ( ) {

@@ -52,11 +52,11 @@ public abstract class AbstractWrapper extends Thread  {
       this.tableSizeEnforce = tableSizeEnforce;
    }
    
-   public String addListener ( DataListener dataListener ) {
-      HashMap < String , String > mapping = new HashMap < String , String >( );
-      mapping.put( "WRAPPER" , getDBAlias( ) );
-      String resultQuery = SQLUtils.rewriteQuery( dataListener.getMergedQuery( ) , mapping );
-      String viewName = dataListener.getViewName( );
+   public CharSequence addListener ( DataListener dataListener ) {
+      HashMap < CharSequence , CharSequence > mapping = new HashMap < CharSequence , CharSequence >( );
+      mapping.put( "WRAPPER" , aliasCodeS);
+      CharSequence resultQuery = SQLUtils.rewriteQuery( dataListener.getMergedQuery( ) , mapping );
+      CharSequence viewName = dataListener.getViewNameInString( );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The view name=" ).append( viewName ).append( " with the query=" ).append( resultQuery ).toString( ) );
       getStorageManager( ).createView( viewName , resultQuery );
       synchronized ( listeners ) {
@@ -74,7 +74,7 @@ public abstract class AbstractWrapper extends Thread  {
          listeners.remove( dataListener );
          tableSizeEnforce.updateInternalCaches( );
       }
-      getStorageManager( ).dropView( dataListener.getViewName( ) );
+      getStorageManager( ).dropView( dataListener.getViewNameInString( ) );
    }
    
    /**
@@ -126,13 +126,17 @@ public abstract class AbstractWrapper extends Thread  {
       this.activeAddressBean = activeAddressBean;
    }
    
-   private final transient String aliasName = Main.tableNameGenerator( );
+   private final transient int aliasCode = Main.tableNameGenerator( );
+   private final CharSequence aliasCodeS = Main.tableNameGeneratorInString( aliasCode );
    
-   public String getDBAlias ( ) {
-      return aliasName;
+   public int getDBAlias ( ) {
+      return aliasCode;
+   }
+   public CharSequence getDBAliasInStr() {
+      return aliasCodeS;
    }
    
-   public abstract Collection < DataField > getOutputFormat ( );
+   public abstract  DataField [] getOutputFormat ( );
    
    public boolean isActive ( ) {
       return isActive;
@@ -140,7 +144,7 @@ public abstract class AbstractWrapper extends Thread  {
    
    
    protected void postStreamElement ( StreamElement streamElement ) {
-      boolean result = getStorageManager( ).insertData( getDBAlias( ) , streamElement );
+      boolean result = getStorageManager( ).insertData( aliasCodeS , streamElement );
       if ( result == false ) {
          logger.warn( "Inserting the following data item failed : " + streamElement );
       } else
@@ -179,7 +183,7 @@ public abstract class AbstractWrapper extends Thread  {
    public void releaseResources ( ) {
       isActive = false;
       if ( isInfoEnabled ) logger.info( "Finalized called" );
-      getStorageManager( ).dropTable( getDBAlias( ) );
+      getStorageManager( ).dropTable( aliasCodeS );
    }
  public static final String TIME_FIELD = "TIMED";
    

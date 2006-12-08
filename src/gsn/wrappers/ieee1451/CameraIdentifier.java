@@ -63,15 +63,15 @@ public class CameraIdentifier extends AbstractWrapper {
    
    private static final String [ ]                         OUTPUT_FIELD_NAMES    = new String [ ] { ID_OUTPUT_FIELD , TEDS_OUTPUT_FIELD , STATUS_OUTPUT_FIELD , VSFILE_OUTPUT_FIELD };
    
-   private static final Integer [ ]                        OUTPUT_FIELD_TYPES    = new Integer [ ] { DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR };
+   private static final Byte [ ]                        OUTPUT_FIELD_TYPES    = new Byte [ ] { DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR };
    
-   private static final transient Collection < DataField > cachedOutputStructure = new ArrayList < DataField >( );
+   private static final transient  DataField [] cachedOutputStructure = new DataField[] {new DataField( ID_OUTPUT_FIELD , "VARCHAR(20)" , "Id of the detected transducer" ) 
+   , new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) 
+   , new DataField( STATUS_OUTPUT_FIELD , "VARCHAR(20)" , "status:added or removed" ) 
+   , new DataField( VSFILE_OUTPUT_FIELD , "VARCHAR(40)" , "Virtual Sensor Filename" ) };
    
    public boolean initialize ( ) {
-      cachedOutputStructure.add( new DataField( ID_OUTPUT_FIELD , "VARCHAR(20)" , "Id of the detected transducer" ) );
-      cachedOutputStructure.add( new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) );
-      cachedOutputStructure.add( new DataField( STATUS_OUTPUT_FIELD , "VARCHAR(20)" , "status:added or removed" ) );
-      cachedOutputStructure.add( new DataField( VSFILE_OUTPUT_FIELD , "VARCHAR(40)" , "Virtual Sensor Filename" ) );
+       
       String pingCommand = "ping ";
       String pingCommandParams = null;
       if ( System.getProperty( "os.name" ).equals( "Mac OS X" ) )
@@ -205,7 +205,7 @@ public class CameraIdentifier extends AbstractWrapper {
       }
    }
    
-   public Collection < DataField > getOutputFormat ( ) {
+   public DataField [] getOutputFormat ( ) {
       return cachedOutputStructure;
    }
    public String getWrapperName() {

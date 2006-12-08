@@ -30,7 +30,7 @@ public class DataEnumerator implements Enumeration {
    
    private String [ ]       dataFieldNames;
    
-   private Integer [ ]      dataFieldTypes;
+   private Byte [ ]      dataFieldTypes;
    
    private boolean          hasNext                  = false;
    
@@ -59,7 +59,7 @@ public class DataEnumerator implements Enumeration {
       }
       this.linkBinaryData = binaryLinked;
       Vector < String > fieldNames = new Vector < String >( );
-      Vector < Integer > fieldTypes = new Vector < Integer >( );
+      Vector < Byte > fieldTypes = new Vector < Byte >( );
       try {
          this.resultSet = preparedStatement.executeQuery( );
          hasNext = resultSet.next( );
@@ -80,7 +80,7 @@ public class DataEnumerator implements Enumeration {
             }
          }
          dataFieldNames = fieldNames.toArray( new String [ ] {} );
-         dataFieldTypes = fieldTypes.toArray( new Integer [ ] {} );
+         dataFieldTypes = fieldTypes.toArray( new Byte [ ] {} );
          if ( indexofPK == -1 && linkBinaryData ) throw new RuntimeException( "The specified query can't be used with binaryLinked paramter set to true." );
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );

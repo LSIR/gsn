@@ -1,6 +1,7 @@
 package gsn.notifications;
 
 import gsn.Main;
+import gsn.storage.DataEnumerator;
 
 import org.apache.commons.mail.SimpleEmail;
 import org.apache.commons.validator.GenericValidator;
@@ -29,8 +30,6 @@ public class EmailNotification extends NotificationRequest {
     * receiving the webEmail. <p/> The syntax is <code>blabla@foo.com</code>
     */
    
-   private transient String        notificationCode;
-   
    private String                  subject    = "GSN-Notification";
    
    private StringBuilder           query;
@@ -53,7 +52,7 @@ public class EmailNotification extends NotificationRequest {
       return query;
    }
    
-   public boolean send ( ) {
+   public boolean send (DataEnumerator data ) {
       try {
          if ( !GenericValidator.isEmail( fromEmail ) ) {
             logger.warn( "There is a webEmail notification request, but the webEmail address in container's configuration is not a valid webEmail address" );
@@ -78,9 +77,14 @@ public class EmailNotification extends NotificationRequest {
       return true;
    }
    
-   public String getNotificationCode ( ) {
-      if ( notificationCode == null ) this.notificationCode = Main.tableNameGenerator( );
+   private int notificationCode = Main.tableNameGenerator( );
+   private CharSequence notificationCodeS = Main.tableNameGeneratorInString( notificationCode );
+   public int getNotificationCode ( ) {
       return notificationCode;
+   }
+   
+   public CharSequence getNotificationCodeInString() {
+      return notificationCodeS;
    }
    
    public String toString ( ) {

@@ -18,12 +18,12 @@ public class TableSizeEnforce implements Runnable {
    
    private ArrayList < DataListener > listeners;
 
-   private String tableName;
+   private CharSequence tableName;
    
    public TableSizeEnforce ( AbstractWrapper abstractStreamProducer ) {
       this.abstractStreamProducer = abstractStreamProducer;
       this.listeners=abstractStreamProducer.getListeners( );
-      this.tableName = abstractStreamProducer.getDBAlias( );
+      this.tableName = abstractStreamProducer.getDBAliasInStr( );
    }
    
    /**

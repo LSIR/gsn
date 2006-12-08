@@ -5,10 +5,8 @@ import gsn.beans.InputStream;
 import gsn.beans.Modifications;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
-import gsn.registry.Registry;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
-import gsn.utils.CaseInsensitiveComparator;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.DataListener;
 import gsn.wrappers.TableSizeEnforce;
@@ -19,19 +17,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.mina.common.IdleStatus;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
-import org.apache.mina.transport.socket.nio.DatagramConnector;
-import org.apache.mina.transport.socket.nio.SocketConnector;
-import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
 import org.jibx.runtime.JiBXException;
 
 /**
@@ -62,14 +50,14 @@ public class VSensorLoader extends Thread {
    
    private static int                                             VSENSOR_LOADER_THREAD_COUNTER       = 0;
    
-   private DirectoryKeepAlive directoryRefreshing;
+   DirectoryRefresher directoryRefresher;
    
    public VSensorLoader ( String pluginsDir ) {
       this.pluginsDir = pluginsDir;
       Thread thread = new Thread ( this );
       thread.setName ( "VSensorLoader-Thread" + VSENSOR_LOADER_THREAD_COUNTER++ );
       thread.start ( );
-      this.directoryRefreshing = new DirectoryKeepAlive ( );
+      directoryRefresher= new DirectoryRefresher ( );
    }
    
    public void run ( ) {
@@ -170,88 +158,6 @@ public class VSensorLoader extends Thread {
    
    private static int                                       TABLE_SIZE_ENFORCING_THREAD_COUNTER = 0;
    
-   class DirectoryKeepAlive implements IoHandler{
-      DatagramConnector datagramConnector = new DatagramConnector ();
-      SocketConnector  socketConnector = new SocketConnector ();
-      SocketConnectorConfig cfg = new SocketConnectorConfig ();
-      //  int       INTERVAL = Registry.REFERESH_INTERVAL/2;
-      int       INTERVAL = 500;//for testing
-      int       CONNECTION_TIMEOUT = 5000;
-      int       INITIAL_DELAY = 5000;
-      Timer timer = new Timer ("Directory Refreshing Timer");
-      int errorCounter = 0;
-         
-      public DirectoryKeepAlive ( ){
-         socketConnector.setWorkerTimeout ( 1 );
-         cfg.setConnectTimeout ( CONNECTION_TIMEOUT );
-         cfg.getFilterChain ().addLast ( "codec",new ProtocolCodecFilter ( new ObjectSerializationCodecFactory () ) );
-         timer.scheduleAtFixedRate (new java.util.TimerTask () { 
-            public void run () {
-               if (DirectoryKeepAlive.this.errorCounter==3){
-                  logger.warn("After 3 unsuccessful tries, GSN stopped contacting the directory.");
-                  this.cancel();
-                  return;
-               }
-                  
-               Iterator<VSensorConfig> keys = Mappings.getAllVSensorConfigs ();
-               try {
-                  while (keys.hasNext ()) {
-                     VSensorConfig configuration = keys.next ();
-                     org.apache.mina.common.ConnectFuture connectFuture = socketConnector.connect (new java.net.InetSocketAddress (Main.getContainerConfig ().extractDirectoryServiceHost (),
-                             Main.getContainerConfig ().extractDirectoryServicePort ()),
-                             DirectoryKeepAlive.this,
-                             cfg);
-                     if (logger.isDebugEnabled ())
-                        logger.debug (new StringBuilder ("Wants to connect to directory service at ").append (Main.getContainerConfig ().extractDirectoryServiceHost ()).append (":").append (Main.getContainerConfig ().extractDirectoryServicePort ()));
-                     connectFuture.join ();
-                     org.apache.mina.common.IoSession session = connectFuture.getSession ();
-                     
-                     session.write (new gsn.registry.VSAddress (Main.getContainerConfig (),
-                             configuration));
-                     session.close ();
-                     DirectoryKeepAlive.this.errorCounter=0;
-                  }
-               } catch (Exception e) {
-                  logger.error ("Can't register the existing virtual sensors with the specified directory. (try "+ (++DirectoryKeepAlive.this.errorCounter)+")");
-                  logger.debug (e.getMessage (), e);
-              }
-            }
-         },  INITIAL_DELAY,INTERVAL);
-      }
-      
-      public void sessionCreated (IoSession session) throws Exception {
-         // logger.fatal(session ==null);
-         
-      }
-      
-      public void sessionOpened (IoSession session) throws Exception {
-         // not applicable to UDP
-      }
-      
-      public void sessionClosed (IoSession session) throws Exception {
-         // not applicable to UDP
-      }
-      
-      public void sessionIdle (IoSession session, IdleStatus status) throws Exception {
-         // not applicable to UDP
-      }
-      
-      public void exceptionCaught (IoSession session, Throwable cause) throws Exception {
-         cause.printStackTrace ();
-         session.close ();
-      }
-      
-      public void messageReceived (IoSession session, Object obj) throws Exception {
-      }
-      
-      public void messageSent (IoSession session, Object obj) throws Exception {
-         if (logger.isDebugEnabled ())
-            logger.debug (new StringBuilder ("Message sent to directory for refreshing the registeration for the ").append (obj).toString ());
-      }
-   }
-   
-   
-   
    private void removeAllResources ( VirtualSensorPool pool ) {
       VSensorConfig config = pool.getConfig ( );
       pool.closePool ( );
@@ -321,7 +227,6 @@ public class VSensorLoader extends Thread {
             if ( cur.getAbsolutePath ( ).equals ( pre ) && ( cur.lastModified ( ) == Mappings.getLastModifiedTime ( pre ) ) ) continue main;
          add.add ( cur.getAbsolutePath ( ) );
       }
-      
       Modifications result = new Modifications ( add , remove );
       return result;
    }
@@ -348,7 +253,7 @@ public class VSensorLoader extends Thread {
    }
    
    private boolean prepareStreamSource ( InputStream inputStream , StreamSource streamSource , VSensorConfig vsensor ) {
-      HashMap < String , String > rewritingMapping = new HashMap < String , String >( );
+      HashMap < CharSequence , CharSequence > rewritingMapping = new HashMap < CharSequence , CharSequence >( );
       for ( AddressBean addressBean : streamSource.getAddressing ( ) ) {
          AbstractWrapper ds = activeDataSources.get ( addressBean );
          if ( ds == null ) {
@@ -392,7 +297,7 @@ public class VSensorLoader extends Thread {
                      continue;
                   }
                   try {
-                     storageManager.createTable ( ds.getDBAlias ( ) , ds.getOutputFormat ( ) );
+                     storageManager.createTable ( ds.getDBAliasInStr( ) , ds.getOutputFormat ( ) );
                      TableSizeEnforce tsf = new TableSizeEnforce ( ds );
                      ds.setTableSizeEnforce ( tsf );
                      Thread tableSizeEnforcingThread = new Thread ( tsf );
@@ -411,7 +316,7 @@ public class VSensorLoader extends Thread {
             }
          }
          DataListener dbDataListener = new DataListener (inputStream,streamSource );
-         String viewName = ds.addListener ( dbDataListener );
+         CharSequence viewName = ds.addListener ( dbDataListener );
          rewritingMapping.put ( streamSource.getAlias ( ) , viewName );
          streamSource.setUsedDataSource ( ds , dbDataListener );
          activeDataSources.put ( addressBean , ds );
@@ -427,7 +332,7 @@ public class VSensorLoader extends Thread {
    
    public void stopLoading ( ) {
       this.isActive = false;
-      directoryRefreshing.timer.cancel ();
+      directoryRefresher.timer.cancel ();
       this.interrupt ( );
       for ( String configFile : Mappings.getAllKnownFileName ( ) ) {
          VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile );

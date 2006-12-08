@@ -112,7 +112,7 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
        */
       
       String [ ] fieldNames = input_stream_name_to_ChartInfo_map.keySet( ).toArray( new String [ ] {} );
-      Integer [ ] fieldTypes = new Integer [ fieldNames.length ];
+      Byte [ ] fieldTypes = new Byte [ fieldNames.length ];
       Serializable [ ] charts = new Serializable [ fieldNames.length ];
       for ( int i = 0 ; i < fieldTypes.length ; i++ ) {
          /**

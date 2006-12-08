@@ -69,15 +69,15 @@ public abstract class AbstractVirtualSensor {
       Mappings.getContainer( ).publishData( this );
    }
    
-   private static boolean compatibleStructure ( Integer [ ] fieldTypes , ArrayList < DataField > outputStructure ) {
-      if ( outputStructure.size( ) != fieldTypes.length ) {
+   private static boolean compatibleStructure ( Byte [ ] fieldTypes ,  DataField [] outputStructure ) {
+      if ( outputStructure.length != fieldTypes.length ) {
          logger.warn( "Validation problem, the number of field doesn't match the number of output data strcture of the virtual sensor" );
          return false;
       }
-      for ( int i = 0 ; i < outputStructure.size( ) ; i++ ) {
-         if ( fieldTypes[ i ] != outputStructure.get( i ).getDataTypeID( ) ) {
-            logger.warn( "Validation problem for output field >" + outputStructure.get( i ).getFieldName( ) + ", The field type declared as >" + DataTypes.TYPE_NAMES[ fieldTypes[ i ] ]
-               + "< within the stream element but it is defined as in the VSD as : " + DataTypes.TYPE_NAMES[ outputStructure.get( i ).getDataTypeID( ) ] );
+      for ( int i = 0 ; i < outputStructure.length ; i++ ) {
+         if ( fieldTypes[ i ] != outputStructure[ i ].getDataTypeID( ) ) {
+            logger.warn( "Validation problem for output field >" + outputStructure[ i ].getFieldName( ) + ", The field type declared as >" + DataTypes.TYPE_NAMES[ fieldTypes[ i ] ]
+               + "< within the stream element but it is defined as in the VSD as : " + DataTypes.TYPE_NAMES[ outputStructure[ i ].getDataTypeID( ) ] );
             return false;
          }
       }

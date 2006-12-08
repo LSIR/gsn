@@ -150,7 +150,7 @@ public class StorageManager {
    
    private static final transient boolean         isDebugEnabled                = logger.isDebugEnabled( );
    
-   private TreeMap < String , TreeSet < String >> existingTablesToColumnMapping = new TreeMap < String , TreeSet < String >>( new CaseInsensitiveComparator( ) );
+   private TreeMap < CharSequence , TreeSet < CharSequence >> existingTablesToColumnMapping = new TreeMap < CharSequence , TreeSet < CharSequence >>( new CaseInsensitiveComparator( ) );
    
    public static StorageManager getInstance ( ) {
       return ourInstance;
@@ -158,15 +158,15 @@ public class StorageManager {
    
    private StorageManager ( ) {}
    
-   public void createTable ( String tableName , Collection < DataField > structure ) throws SQLException {
+   public void createTable ( CharSequence tableName , DataField[] structure ) throws SQLException {
       Connection connection = null;
       dropTable( tableName );
       String sqlCreateStatement = getCreateTableStatement( structure , tableName ).replace( "\"" , "" );
-      String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName.toLowerCase( ) ).append( "_INDEX ON " ).append( tableName.toLowerCase( ) ).append( " (TIMED DESC)" )
+      String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName.toString( ).toLowerCase( ) ).append( "_INDEX ON " ).append( tableName.toString( ).toLowerCase( ) ).append( " (TIMED DESC)" )
             .toString( );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create table statement is : " ).append( sqlCreateStatement ).toString( ) );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create index statement is : " ).append( sqlCreateIndexStatement ).toString( ) );
-      TreeSet < String > fieldNames = new TreeSet < String >(new CaseInsensitiveComparator() );
+      TreeSet < CharSequence > fieldNames = new TreeSet < CharSequence >(new CaseInsensitiveComparator() );
       
       for ( DataField fieldName : structure ) {
          fieldNames.add( fieldName.getFieldName( ) );
@@ -188,7 +188,7 @@ public class StorageManager {
     * testable from that class. The generated query is transformed to lower case
     * before being returned.
     */
-   protected String getCreateTableStatement ( Collection < DataField > structure , String alias ) {
+   protected String getCreateTableStatement (  DataField [] structure , CharSequence alias ) {
       StringBuilder result = new StringBuilder( "CREATE " );
       if ( isHsql( ) ) result.append( " CACHED " );
       result.append( "TABLE " ).append( '\"' ).append( alias ).append( '\"' );
@@ -240,12 +240,12 @@ public class StorageManager {
    /*
     * This method first transforms the query to lower case and then executes it.
     */
-   public void createView ( String viewName , String selectQuery ) {
+   public void createView ( CharSequence viewName , CharSequence selectQuery ) {
       Connection connection = null;
       try {
          connection = connectionPool.borrowConnection( );
          StringBuilder viewStatement = new StringBuilder( "create view \"" );
-         viewStatement.append( viewName.toLowerCase( ) ).append( "\" AS " ).append( selectQuery.toLowerCase( ) );
+         viewStatement.append( viewName.toString( ).toLowerCase( ) ).append( "\" AS " ).append( selectQuery.toString( ).toLowerCase( ) );
          connection.createStatement( ).execute( viewStatement.toString( ).replace( "\"" , "" ) );
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
@@ -261,7 +261,7 @@ public class StorageManager {
    /**
     * This method first transforms the query to lower case and then executes it.
     */
-   private PreparedStatement obtainPreparedStatementForQuery ( StringBuilder sql ) throws SQLException {
+   private PreparedStatement obtainPreparedStatementForQuery ( CharSequence sql ) throws SQLException {
       Connection connection = connectionPool.borrowConnection( );
       PreparedStatement toReturn = null;
       try {
@@ -289,7 +289,7 @@ public class StorageManager {
     * @return True if the insert is done successfully. Any exceptions during the
     * insertion process causes this method to return false.
     */
-   public boolean insertData ( String tableName , StreamElement se , boolean duplicateErrorSuspend ) {
+   public boolean insertData ( CharSequence tableName , StreamElement se , boolean duplicateErrorSuspend ) {
       PreparedStatement ps = null;
       StringBuilder stringBuilder = null;
       try {
@@ -359,7 +359,7 @@ public class StorageManager {
     * @return True if the insert is done successfully. Any exceptions during the insertion process
     *         causes this method to return false.
     */
-   public boolean insertData ( String tableName , StreamElement se ) {
+   public boolean insertData ( CharSequence tableName , StreamElement se ) {
       return insertData( tableName , se , false );
    }
    
@@ -392,16 +392,16 @@ public class StorageManager {
     * @return A sql statement which can be used for inserting the provided
     * stream element into the specified table.
     */
-   private StringBuilder getInsertStatement ( String tableName , StreamElement se ) {
+   private StringBuilder getInsertStatement ( CharSequence tableName , StreamElement se ) {
       StringBuilder toReturn = new StringBuilder( "insert into " ).append( tableName ).append( " ( " );
-      Collection < String > fieldsDefinedToBeStored = existingTablesToColumnMapping.get( tableName );
+      Collection < CharSequence > fieldsDefinedToBeStored = existingTablesToColumnMapping.get( tableName );
       for ( String fieldName : se.getFieldNames( ) ) {
          if ( fieldsDefinedToBeStored == null ) { throw new GSNRuntimeException( "Unexpected virtual sensor removal" , GSNRuntimeException.UNEXPECTED_VIRTUAL_SENSOR_REMOVAL ); }
          if ( fieldsDefinedToBeStored.contains( fieldName ) )
             toReturn.append( fieldName ).append( " ," );
          else if ( logger.isDebugEnabled( ) ) {
             StringBuilder acceptedFields = new StringBuilder( "The field : " ).append( fieldName ).append( "is ignored, accepted fields are : " );
-            for ( String name : fieldsDefinedToBeStored )
+            for ( CharSequence name : fieldsDefinedToBeStored )
                acceptedFields.append( name ).append( ", " );
             logger.debug( acceptedFields.toString( ) );
          }
@@ -474,7 +474,7 @@ public class StorageManager {
       }
    }
    
-   public boolean isThereAnyResult ( StringBuilder sqlQuery ) {
+   public boolean isThereAnyResult ( CharSequence sqlQuery ) {
       boolean toreturn = false;
       PreparedStatement queryPreparedStatement = null;
       try {
@@ -512,10 +512,10 @@ public class StorageManager {
     * 
     * @param tableName : The name of the table to be dropped.
     */
-   public void dropTable ( String tableName ) {
+   public void dropTable ( CharSequence tableName ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "Dropping table structure: " + tableName );
       String dropIndexStatement = null;
-      if ( StorageManager.getInstance( ).isHsql( ) ) dropIndexStatement = new StringBuilder( " DROP INDEX " ).append( tableName.toUpperCase( ) ).append( "_INDEX IF EXISTS " ).toString( );
+      if ( StorageManager.getInstance( ).isHsql( ) ) dropIndexStatement = new StringBuilder( " DROP INDEX " ).append( tableName.toString( ).toLowerCase( ) ).append( "_INDEX IF EXISTS " ).toString( );
       // if (StorageManager.getInstance ().isMysqlDB ())
       // dropIndexStatement = new StringBuilder ( " DROP INDEX " ).append (
       // tableName.toUpperCase () ).append ( "_INDEX ON " ).append (
@@ -539,7 +539,7 @@ public class StorageManager {
       }
    }
    
-   public void dropView ( String viewName ) {
+   public void dropView ( CharSequence viewName ) {
       Connection connection = null;
       try {
          connection = connectionPool.borrowConnection( );
@@ -589,7 +589,7 @@ public class StorageManager {
       }
    }
    
-   public DataEnumerator executeQuery ( StringBuilder query , boolean binaryFieldsLinked ) {
+   public DataEnumerator executeQuery ( CharSequence query , boolean binaryFieldsLinked ) {
       PreparedStatement ps = null;
       try {
          ps = obtainPreparedStatementForQuery( query );
