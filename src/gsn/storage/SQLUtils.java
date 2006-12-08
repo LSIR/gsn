@@ -17,7 +17,7 @@ public class SQLUtils {
     * "ali.*" from "ali"
     * 
     * @param sql
-    * @param mapping (The keys should be in UPPER CASE)
+    * @param mapping 
     */
    public static String rewriteQuery ( CharSequence sql , HashMap < CharSequence , CharSequence > mapping ) {
       Pattern pattern1 = Pattern.compile( "(?<=\")(\\w+)(?=[\"])" , Pattern.CASE_INSENSITIVE );
@@ -26,7 +26,7 @@ public class SQLUtils {
       
       Matcher matcher = pattern2.matcher( sql );
       while ( matcher.find( ) ) {
-         CharSequence replacement = mapping.get( matcher.group( 1 ).toUpperCase( ) );
+         CharSequence replacement = mapping.get( matcher.group( 1 ).toLowerCase() );
          if ( replacement != null ) matcher.appendReplacement( result , replacement.toString( ) );
       }
       matcher.appendTail( result );
@@ -34,16 +34,17 @@ public class SQLUtils {
       matcher = pattern1.matcher( result.toString( ) );
       result = new StringBuffer( );
       while ( matcher.find( ) ) {
-        CharSequence replacement = mapping.get( matcher.group( 1 ).toUpperCase( ) );
+        CharSequence replacement = mapping.get( matcher.group( 1 ).toLowerCase() );
          if ( replacement != null ) matcher.appendReplacement( result , replacement.toString( ) );
       }
       matcher.appendTail( result );
-      return result.toString( );
+      return result.toString().replace("\"", "");
+    //  return result.toString( );
    }
    
    public static ArrayList < String > extractTableNamesUsedInQuery ( StringBuilder query ) {
       
-      StringBuffer input = new StringBuffer( query.toString( ).toUpperCase( ) );
+      StringBuffer input = new StringBuffer( query.toString( ).toLowerCase() );
       int indexEndOfFrom = input.indexOf( " FROM " ) + " FROM".length( );
       input.delete( 0 , indexEndOfFrom );
       int indexOfWhere = input.indexOf( " WHERE " );

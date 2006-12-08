@@ -80,7 +80,7 @@ public final class Main {
       webAppContext.setContextPath( "/" );
       webAppContext.setResourceBase( DEFAULT_WEB_APP_PATH );
       ServletHandler servletHandler = new ServletHandler( );
-      servletHandler.addServletWithMapping( "gsn.ContainerImpl" , "/gsn" );
+      servletHandler.addServletWithMapping( "gsn.registry.RegistryServlet" , "/gsn" );
       servletHandler.addServletWithMapping( "gsn.web.DataDownload" , "/data" );
       webAppContext.setServletHandler( servletHandler );
       server.setHandler( webAppContext );
@@ -195,7 +195,7 @@ public final class Main {
       StringBuilder sb = new StringBuilder("_");
       if (code<0)
          sb.append( "_" );
-      sb.append( code );
+      sb.append( Math.abs(code) );
       return sb;
    }
    

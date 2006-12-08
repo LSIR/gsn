@@ -104,6 +104,6 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
          return new String [ ] [ ] {};
       }
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( virtualSensorName ).append( "* received." ).toString( ) );
-      return sensorConfig.getRPCFriendlyAddressing( );
+      return sensorConfig.getRPCFriendlyOutputStructure( );
    }
 }

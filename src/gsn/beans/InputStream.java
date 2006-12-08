@@ -6,14 +6,11 @@ import gsn.VirtualSensorPool;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
-import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -156,7 +153,7 @@ public class InputStream {
          } catch ( final VirtualSensorInitializationFailedException e ) {
             logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getVirtualSensorName( )
                + " because initialization of that virtual sensor failed" );
-            e.printStackTrace( );
+           logger.error(e.getMessage(),e);
          } finally {
             this.pool.returnVS( sensor );
          }

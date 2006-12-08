@@ -244,8 +244,7 @@ public class StorageManager {
       Connection connection = null;
       try {
          connection = connectionPool.borrowConnection( );
-         StringBuilder viewStatement = new StringBuilder( "create view \"" );
-         viewStatement.append( viewName.toString( ).toLowerCase( ) ).append( "\" AS " ).append( selectQuery.toString( ).toLowerCase( ) );
+         StringBuilder viewStatement = new StringBuilder( "create view " ).append( viewName.toString( ).toLowerCase( ) ).append( " AS " ).append( selectQuery.toString( ).toLowerCase( ) );
          connection.createStatement( ).execute( viewStatement.toString( ).replace( "\"" , "" ) );
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
@@ -478,8 +477,9 @@ public class StorageManager {
       boolean toreturn = false;
       PreparedStatement queryPreparedStatement = null;
       try {
-         
          queryPreparedStatement = obtainPreparedStatementForQuery( sqlQuery );
+         if (queryPreparedStatement==null)
+            throw new RuntimeException("PPPPPPPPPPPPPPPPPPPPPPP + "+sqlQuery);
          ResultSet resultSet = queryPreparedStatement.executeQuery( );
          toreturn = resultSet.next( );
       } catch ( SQLException error ) {

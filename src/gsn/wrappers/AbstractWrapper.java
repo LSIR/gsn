@@ -54,7 +54,7 @@ public abstract class AbstractWrapper extends Thread  {
    
    public CharSequence addListener ( DataListener dataListener ) {
       HashMap < CharSequence , CharSequence > mapping = new HashMap < CharSequence , CharSequence >( );
-      mapping.put( "WRAPPER" , aliasCodeS);
+      mapping.put( "wrapper" , aliasCodeS);
       CharSequence resultQuery = SQLUtils.rewriteQuery( dataListener.getMergedQuery( ) , mapping );
       CharSequence viewName = dataListener.getViewNameInString( );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The view name=" ).append( viewName ).append( " with the query=" ).append( resultQuery ).toString( ) );

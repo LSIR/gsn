@@ -77,6 +77,15 @@ public class VSensorConfig implements Serializable {
       return toReturn;
    }
    
+      public String[][] getRPCFriendlyOutputStructure() {
+      String[][] toReturn = new String[this.outputStructure.length][2] ;
+      for(int i=0;i<outputStructure.length;i++){
+            toReturn[i][0] = ( String ) outputStructure[i].getFieldName();
+            toReturn[i][1] = ( String ) outputStructure[i].getType();
+         }
+      return toReturn;
+   }
+   
    
    /**
     * @return Returns the description.

@@ -253,7 +253,7 @@ public class VSensorLoader extends Thread {
    }
    
    private boolean prepareStreamSource ( InputStream inputStream , StreamSource streamSource , VSensorConfig vsensor ) {
-      HashMap < CharSequence , CharSequence > rewritingMapping = new HashMap < CharSequence , CharSequence >( );
+    HashMap < CharSequence , CharSequence > rewritingMapping = new HashMap < CharSequence , CharSequence >( );
       for ( AddressBean addressBean : streamSource.getAddressing ( ) ) {
          AbstractWrapper ds = activeDataSources.get ( addressBean );
          if ( ds == null ) {

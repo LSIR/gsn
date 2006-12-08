@@ -9,8 +9,6 @@
 package gsn;
 
 import gsn.beans.VSensorConfig;
-import gsn.registry.VSAddress;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;

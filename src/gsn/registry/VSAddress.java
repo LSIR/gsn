@@ -3,8 +3,6 @@ package gsn.registry;
 import java.util.Date;
 import java.util.Vector;
 
-import org.apache.commons.collections.KeyValue;
-
 /**
  * Created on December 3, 2006, 10:48 AM
  * 
