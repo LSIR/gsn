@@ -1,21 +1,12 @@
 package gsn.wrappers;
 
-import gsn.Container;
-import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
-import gsn.registry.Registry;
-import gsn.utils.TCPConnPool;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.Vector;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
@@ -67,7 +58,7 @@ public class RemoteDS extends AbstractWrapper {
       }
       this.remoteVSName = this.remoteVSName.trim ().toLowerCase ();
       try {
-         config.setServerURL ( new URL ( "http://" + host +":"+port+ "/gsn" ) );
+         config.setServerURL ( new URL ( "http://" + host +":"+port+ "/gsn-handler" ) );
          client.setConfig ( config );
       } catch ( MalformedURLException e1 ) {
          logger.warn ( "Remote Wrapper initialization failed : "+e1.getMessage ( ) , e1 );
@@ -93,7 +84,7 @@ public class RemoteDS extends AbstractWrapper {
      
       Object[] result =null;
       try{
-      result =  (Object[]) client.execute("GSN.getOutputStructure", params);
+      result =  (Object[]) client.execute("gsn.getOutputStructure", params);
       }catch(Exception e){
          logger.warn ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (destination).append(", ERROR : ").append(e.getMessage()).toString ( ) );
          logger.debug(e.getMessage(),e);

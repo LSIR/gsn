@@ -1,5 +1,8 @@
 package gsn.registry;
 
+import gsn.utils.KeyValueImp;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 
@@ -30,7 +33,7 @@ public class VSAddress {
    
    private String remoteHost;
    
-   private Vector<Vector<String>>  predicates;
+   private ArrayList<KeyValueImp> predicates;
    
    /**
     * @param port Port of the GSN server
@@ -39,26 +42,30 @@ public class VSAddress {
     * @param Addressing predicates
     * @param usedResources
     */
-   public VSAddress ( int port , String name , String description , Vector<Vector<String>> predicates , String usedSources,String remoteHost ) {
+   public VSAddress ( int port , String name , String description , Vector predicates , String usedSources,String remoteHost ) {
       this.remotePort = port;
       this.remoteVSName = name;
       StringBuffer tempAddrs = new StringBuffer( );
       StringBuffer tempKeys = new StringBuffer( );
       StringBuffer tempValues = new StringBuffer( );
       tempAddrs.append( name ).append( Registry.SPACE_CHARACTER );
-      for ( Vector<String > pred : predicates ) {
-         tempAddrs.append( pred.get( 0 ) ).append( Registry.SPACE_CHARACTER ).append(  pred.get( 1 )  ).append( Registry.SPACE_CHARACTER );
-         tempKeys.append(  pred.get( 0 )  ).append( Registry.SPACE_CHARACTER );
-         tempValues.append(  pred.get( 1 )  ).append( Registry.SPACE_CHARACTER );
+      ArrayList<KeyValueImp> tempPredicates = new ArrayList<KeyValueImp>();
+      for ( Object  pred : predicates ) {
+          Object[] prediate = (Object[]) pred;
+    	 tempAddrs.append( prediate[0].toString() ).append( Registry.SPACE_CHARACTER ).append(  prediate[ 1].toString()  ).append( Registry.SPACE_CHARACTER );
+         tempKeys.append(  prediate[ 0 ].toString()  ).append( Registry.SPACE_CHARACTER );
+         tempValues.append(  prediate[ 1 ].toString()  ).append( Registry.SPACE_CHARACTER );
+         tempPredicates.add(new KeyValueImp(prediate[0].toString(),prediate[1].toString()));
       }
-      this.predicates = predicates;
+      this.predicates = tempPredicates;
       this.description = ( description == null ? "" : description );
       this.addresses = tempAddrs.toString( );
       this.addressKeys = tempKeys.toString( );
       this.addressValues = tempKeys.toString( );
       this.addressUses = usedSources;
       this.remoteHost=remoteHost;
-   }
+      guid = new StringBuilder( remoteHost ).append( ":" ).append( remotePort ).append( "/" ).append( remoteVSName ).toString( );
+         }
    
    public final String getAddress ( ) {
       return addresses;
@@ -90,9 +97,6 @@ public class VSAddress {
       return System.currentTimeMillis( ) - creationTime;
    }
    
-   public void initGUID ( String ipAddress ) {
-      guid = new StringBuffer( ipAddress ).append( ":" ).append( remotePort ).append( "/" ).append( remoteVSName ).toString( );
-   }
    
    public int hashCode ( ) {
       return guid.hashCode( );
@@ -131,7 +135,7 @@ public class VSAddress {
    /**
     * @return the predicates
     */
-   public Vector<Vector<String>> getPredicates ( ) {
+   public ArrayList<KeyValueImp> getPredicates ( ) {
       return predicates;
    }
    

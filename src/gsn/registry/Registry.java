@@ -87,7 +87,7 @@ public class Registry {
       wac.setResourceBase( DEFAULT_DIRECTORY_SERVER_WEB_APP );
       
       ServletHandler servletHandler = new ServletHandler( );
-      servletHandler.addServletWithMapping( "gsn.registry.RegistryServlet" , "/registry" );
+      servletHandler.addServletWithMapping( "gsn.registry.MyXmlRPCServlet" , "/registry" );
       wac.setServletHandler( servletHandler );
       server.setHandler( wac );
       server.setStopAtShutdown( true );
