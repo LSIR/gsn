@@ -60,6 +60,8 @@ public class VSensorConfig implements Serializable {
    
    private String                                 webapp                                    = null;
    
+   private String generalPassword = null;
+   
    /**
     * @return Returns the addressing.
     */
@@ -414,4 +416,11 @@ public class VSensorConfig implements Serializable {
          + this.nameInitialized + ", isStorageCountBased=" + this.isStorageCountBased + ", parsedStorageSize=" + this.parsedStorageSize + '}';
    }
    
+   public String getGeneralPassword(){
+      return generalPassword;
+   }
+   
+   public void setGeneralPassword(String generalPassword){
+      this.generalPassword=generalPassword;
+   }
 }

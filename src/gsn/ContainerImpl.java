@@ -1,9 +1,6 @@
 package gsn;
 
-import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.VSensorConfig;
-import gsn.notifications.GSNNotification;
 import gsn.notifications.NotificationRequest;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
@@ -15,11 +12,7 @@ import gsn.vsensor.http.OneShotQueryWithAddressingHandler;
 import gsn.vsensor.http.OutputStructureHandler;
 import gsn.vsensor.http.RequestHandler;
 import gsn.wrappers.RemoteDS;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

@@ -1,9 +1,6 @@
 package gsn.utils;
 
 import java.io.IOException;
-
-import gsn.Main;
-import gsn.beans.ContainerConfig;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpException;
@@ -11,10 +8,6 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.log4j.Logger;
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.transport.vmpipe.VmPipeAddress;
-import org.apache.mina.transport.vmpipe.VmPipeConnector;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
@@ -23,24 +16,7 @@ import org.apache.mina.transport.vmpipe.VmPipeConnector;
 public class NetworkUtility {
    
    private static final transient Logger logger = Logger.getLogger( NetworkUtility.class );
-   
-   public static void initConn ( String host , int port , IoHandler handler , boolean block, int timeoutInMSC ) {
-      boolean isLocalHost = ValidityTools.isLocalhost( host ) && Main.getContainerConfig( ).getContainerPort( ) == port;
-      ConnectFuture future = null;
-      if ( isLocalHost ) {
-         VmPipeAddress address = new VmPipeAddress( ContainerConfig.DEFAULT_GSN_PORT );
-         VmPipeConnector connector = new VmPipeConnector( );
-         future = connector.connect( address , handler );
-      } else {
-         logger.fatal( "Not implemented yet !!!" );
-      }
-      if (block) {
-         if (timeoutInMSC>0) {
-            future.join( timeoutInMSC );
-         }
-      }
-   }
-   
+     
  private static transient MultiThreadedHttpConnectionManager httpConnectionManager;
    
    private static transient HttpClient                         httpClient;

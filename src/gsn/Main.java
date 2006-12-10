@@ -7,7 +7,25 @@ import gsn.utils.ValidityTools;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Iterator;
 import org.apache.commons.configuration.Configuration;
@@ -45,57 +63,56 @@ public final class Main {
    
    private static File            pidFile;
    
-   public static void main ( String [ ] args ) throws IOException , RuntimeException {
-      ValidityTools.checkAccessibilityOfFiles( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
-      ValidityTools.checkAccessibilityOfDirs( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
-      PropertyConfigurator.configure( DEFAULT_GSN_LOG4J_PROPERTIES );
-      logger = Logger.getLogger( Main.class );
+   public static void main ( String [ ] args ) throws IOException , RuntimeException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
+      ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
+      ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+      PropertyConfigurator.configure ( DEFAULT_GSN_LOG4J_PROPERTIES );
+      logger = Logger.getLogger ( Main.class );
       
       try {
-         initialize( "conf/gsn.xml" );
+         initialize ( "conf/gsn.xml" );
       } catch ( JiBXException e ) {
-         logger.error( e.getMessage( ) );
-         logger.error( new StringBuilder( ).append( "Can't parse the GSN configuration file : " ).append( args[ 0 ] ).toString( ) );
-         logger.error( "Please check the syntax of the file to be sure it is compatible with the requirements." );
-         logger.error( "You can find a sample configuration file from the GSN release." );
-         if ( logger.isDebugEnabled( ) ) logger.debug( e.getMessage( ) , e );
-         System.exit( 1 );
+         logger.error ( e.getMessage ( ) );
+         logger.error ( new StringBuilder ( ).append ( "Can't parse the GSN configuration file : " ).append ( args[ 0 ] ).toString ( ) );
+         logger.error ( "Please check the syntax of the file to be sure it is compatible with the requirements." );
+         logger.error ( "You can find a sample configuration file from the GSN release." );
+         if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
+         System.exit ( 1 );
       } catch ( FileNotFoundException e ) {
-         logger.error( new StringBuilder( ).append( "The the configuration file : " ).append( args[ 0 ] ).append( " doesn't exist." ).toString( ) );
-         logger.error( e.getMessage( ) );
-         logger.error( "Check the path of the configuration file and try again." );
-         if ( logger.isDebugEnabled( ) ) logger.debug( e.getMessage( ) , e );
-         System.exit( 1 );
+         logger.error ( new StringBuilder ( ).append ( "The the configuration file : " ).append ( args[ 0 ] ).append ( " doesn't exist." ).toString ( ) );
+         logger.error ( e.getMessage ( ) );
+         logger.error ( "Check the path of the configuration file and try again." );
+         if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
+         System.exit ( 1 );
       }
       
-      StorageManager.getInstance( ).initialize( containerConfig.getJdbcDriver( ) , containerConfig.getJdbcUsername( ) , containerConfig.getJdbcPassword( ) , containerConfig.getJdbcURL( ) );
-      if ( logger.isInfoEnabled( ) ) logger.info( "The Container Configuration file loaded successfully." );
-      Mappings.setContainer(new ContainerImpl( ) );
-      final Server server = new Server( );
+      StorageManager.getInstance ( ).initialize ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) );
+      if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
+      Mappings.setContainer (new ContainerImpl ( ) );
+      final Server server = new Server ( );
       //Connector connector = new SelectChannelConnector( ); //using basic connector for windows bug
-      Connector connector = new SocketConnector();
-      connector.setPort( containerConfig.getContainerPort( ) );
-      server.setConnectors( new Connector [ ] { connector } );
-      WebAppContext webAppContext = new WebAppContext( );
-      webAppContext.setContextPath( "/" );
-      webAppContext.setResourceBase( DEFAULT_WEB_APP_PATH );
-      ServletHandler servletHandler = new ServletHandler( );
-      servletHandler.addServletWithMapping( "gsn.registry.MyXmlRPCServlet" , "/gsn-handler" );
-      servletHandler.addServletWithMapping( "gsn.web.http.ControllerServlet" , "/gsn" );
-      
-      servletHandler.addServletWithMapping( "gsn.web.DataDownload" , "/data" );
-      webAppContext.setServletHandler( servletHandler );
-      server.setHandler( webAppContext );
-      server.setStopAtShutdown( true );
-      server.setSendServerVersion( false );
+      Connector httpConnector = new SocketConnector ();
+      httpConnector.setPort ( containerConfig.getContainerPort ( ) );
+      server.setConnectors ( new Connector [ ] { httpConnector } );
+      WebAppContext webAppContext = new WebAppContext ( );
+      webAppContext.setContextPath ( "/" );
+      webAppContext.setResourceBase ( DEFAULT_WEB_APP_PATH );
+      ServletHandler servletHandler = new ServletHandler ( );
+      servletHandler.addServletWithMapping ( "gsn.registry.MyXmlRPCServlet" , "/gsn-handler" );
+      servletHandler.addServletWithMapping ( "gsn.web.http.ControllerServlet" , "/gsn" );
+      servletHandler.addServletWithMapping ( "gsn.web.DataDownload" , "/data" );
+      webAppContext.setServletHandler ( servletHandler );
+      server.setHandler ( webAppContext );
+      server.setStopAtShutdown ( true );
+      server.setSendServerVersion ( false );
       try {
-         server.start( );
+         server.start ( );
       } catch ( Exception e ) {
-         logger.error( "Start of the HTTP server failed. The HTTP protocol is used in most of the communications." );
-         logger.error( e.getMessage( ) , e );
-         System.exit( 1 );
+         logger.error ( "Start of the HTTP server failed. The HTTP protocol is used in most of the communications." );
+         logger.error ( e.getMessage ( ) , e );
+         System.exit ( 1 );
       }
-      final VSensorLoader vsloader = new VSensorLoader( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+      final VSensorLoader vsloader = new VSensorLoader ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
    }
    
    /**
@@ -108,60 +125,110 @@ public final class Main {
    
    private static HashMap < String , VSensorConfig >    virtualSensors;
    
-   private static void initialize ( String containerConfigurationFileName ) throws JiBXException , FileNotFoundException {
-      containerConfig = loadConfiguration( containerConfigurationFileName );
-      containerConfig.setContainerConfigurationFileName( containerConfigurationFileName );
-      if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Loading wrappers.properties at : " ).append( DEFAULT_WRAPPER_PROPERTIES_FILE ).toString( ) );
+   private static void initialize ( String containerConfigurationFileName ) throws JiBXException , FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
+      containerConfig = loadConfiguration ( containerConfigurationFileName );
+      containerConfig.setContainerConfigurationFileName ( containerConfigurationFileName );
+      if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Loading wrappers.properties at : " ).append ( DEFAULT_WRAPPER_PROPERTIES_FILE ).toString ( ) );
       Configuration config = null;
       
       try {// Trying to load the wrapper specified in the configuration
          // file of
          // the container.
-         config = new PropertiesConfiguration( DEFAULT_WRAPPER_PROPERTIES_FILE );
+         config = new PropertiesConfiguration ( DEFAULT_WRAPPER_PROPERTIES_FILE );
       } catch ( ConfigurationException e ) {
-         logger.error( "The wrappers configuration file's syntax is not compatible." );
-         logger.error( new StringBuilder( ).append( "Check the :" ).append( DEFAULT_WRAPPER_PROPERTIES_FILE ).append( " file and make sure it's syntactically correct." ).toString( ) );
-         logger.error( "Sample wrappers extention properties file is provided in GSN distribution." );
-         logger.error( e.getMessage( ) , e );
-         System.exit( 1 );
+         logger.error ( "The wrappers configuration file's syntax is not compatible." );
+         logger.error ( new StringBuilder ( ).append ( "Check the :" ).append ( DEFAULT_WRAPPER_PROPERTIES_FILE ).append ( " file and make sure it's syntactically correct." ).toString ( ) );
+         logger.error ( "Sample wrappers extention properties file is provided in GSN distribution." );
+         logger.error ( e.getMessage ( ) , e );
+         System.exit ( 1 );
       }
       // Adding the wrappers to the GSN data structures.
-      String wrapperNames[] = config.getStringArray( "wrapper.name" );
-      String wrapperClasses[] = config.getStringArray( "wrapper.class" );
-      if ( logger.isInfoEnabled( ) ) logger.info( "Wrappers initialization ..." );
+      String wrapperNames[] = config.getStringArray ( "wrapper.name" );
+      String wrapperClasses[] = config.getStringArray ( "wrapper.class" );
+      if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
       for ( int i = 0 ; i < wrapperNames.length ; i++ ) {
          String name = wrapperNames[ i ];
          String className = wrapperClasses[ i ];
          try {
-            if ( wrappers.get( name ) != null ) {
-               logger.error( "The wrapper name : " + name + " is used more than once in the properties file." );
-               logger.error( new StringBuilder( ).append( "Please check the " ).append( DEFAULT_WRAPPER_PROPERTIES_FILE ).append( " file and try again." ).toString( ) );
-               System.exit( 1 );
+            if ( wrappers.get ( name ) != null ) {
+               logger.error ( "The wrapper name : " + name + " is used more than once in the properties file." );
+               logger.error ( new StringBuilder ( ).append ( "Please check the " ).append ( DEFAULT_WRAPPER_PROPERTIES_FILE ).append ( " file and try again." ).toString ( ) );
+               System.exit ( 1 );
             }
-            Class wrapperClass = Class.forName( className );
-            wrappers.put( name , wrapperClass );
+            Class wrapperClass = Class.forName ( className );
+            wrappers.put ( name , wrapperClass );
          } catch ( ClassNotFoundException e ) {
-            logger.error( new StringBuilder( ).append( "Can't find the class associated with the wrapper : " ).append( name ).toString( ) );
-            logger.error( new StringBuilder( ).append( "Check the " ).append( DEFAULT_WRAPPER_PROPERTIES_FILE ).append( " file and try again." ).toString( ) );
-            logger.error( e.getMessage( ) , e );
-            System.exit( 1 );
+            logger.error ( new StringBuilder ( ).append ( "Can't find the class associated with the wrapper : " ).append ( name ).toString ( ) );
+            logger.error ( new StringBuilder ( ).append ( "Check the " ).append ( DEFAULT_WRAPPER_PROPERTIES_FILE ).append ( " file and try again." ).toString ( ) );
+            logger.error ( e.getMessage ( ) , e );
+            System.exit ( 1 );
          }
-         if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Wrapper [" ).append( name ).append( "] added successfully." ).toString( ) );
+         if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Wrapper [" ).append ( name ).append ( "] added successfully." ).toString ( ) );
       }
+      initPKI (PUBLIC_KEY_FILE, PUBLIC_KEY_FILE);
+   }
+   private static final String PUBLIC_KEY_FILE=".public_key";
+   
+   private static final String PRIVATE_KEY_FILE=".private_key";
+   
+   public static void initPKI ( String publicKeyFile,String privateKeyFile ) throws NoSuchAlgorithmException , NoSuchProviderException , FileNotFoundException , IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
+      // TODO  : Use the pri/pub keys if they exist. (needs verification first).
+      KeyPairGenerator keyGen = KeyPairGenerator.getInstance ( "DSA" , "SUN" );
+      SecureRandom random = SecureRandom.getInstance ( "SHA1PRNG" , "SUN" );
+      keyGen.initialize ( 512 , random );
+      KeyPair pair = keyGen.generateKeyPair ( );
+      PrivateKey priv = pair.getPrivate ( );
+      PublicKey pub = pair.getPublic ( );
+      CertificateFactory certificateFactory =  CertificateFactory.getInstance ("X.509");
+  
+     
+      File privateF = new File (privateKeyFile);
+      File publicF = new File (publicKeyFile);
+      publicF.createNewFile ();
+      privateF.createNewFile ();
+      OutputStream output = new FileOutputStream (privateF );
+      output.write ( priv.getEncoded ( ) );
+      output.close ( );
+      output = new FileOutputStream ( publicF );
+      output.write ( pub.getEncoded ( ) );
+      output.close ( );
+      KeyStore ksca = KeyStore.getInstance ("JKS","SUN");
+      ksca.load (null);
+      logger.warn ("Public and Private keys are generated successfully.");
+   }
+   
+   private static PrivateKey readPrivateKey () throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException{
+      FileInputStream keyfis = new FileInputStream (PRIVATE_KEY_FILE);
+      byte[] encKey = new byte[keyfis.available ()];
+      keyfis.read (encKey);
+      keyfis.close ();
+      PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec (encKey);
+      KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
+      return keyFactory.generatePrivate (privKeySpec);
+   }
+   
+   private static PublicKey readPublicKey () throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
+      FileInputStream keyfis = new FileInputStream (PUBLIC_KEY_FILE);
+      byte[] encKey = new byte[keyfis.available ()];
+      keyfis.read (encKey);
+      keyfis.close ();
+      PKCS8EncodedKeySpec pubKeySpec = new PKCS8EncodedKeySpec (encKey);
+      KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
+      return keyFactory.generatePublic (pubKeySpec);
    }
    
    public static ContainerConfig loadConfiguration ( String containerConfigurationFileName ) throws JiBXException , FileNotFoundException {
-      return loadConfiguration( new File( containerConfigurationFileName ) );
+      return loadConfiguration ( new File ( containerConfigurationFileName ) );
    }
    
    public static ContainerConfig loadConfiguration ( File containerConfigurationFileName ) throws JiBXException , FileNotFoundException {
-      IBindingFactory bfact = BindingDirectory.getFactory( ContainerConfig.class );
-      IUnmarshallingContext uctx = bfact.createUnmarshallingContext( );
-      return ( ContainerConfig ) uctx.unmarshalDocument( new FileInputStream( containerConfigurationFileName ) , null );
+      IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
+      IUnmarshallingContext uctx = bfact.createUnmarshallingContext ( );
+      return ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( containerConfigurationFileName ) , null );
    }
    
    public static Class < ? > getWrapperClass ( String id ) {
-      return wrappers.get( id );
+      return wrappers.get ( id );
    }
    
    public final HashMap < String , VSensorConfig > getVirtualSensors ( ) {
@@ -169,9 +236,9 @@ public final class Main {
    }
    
    public static boolean justConsumes ( ) {
-      Iterator < VSensorConfig > vsconfigs = virtualSensors.values( ).iterator( );
-      while ( vsconfigs.hasNext( ) )
-         if ( !vsconfigs.next( ).needsStorage( ) ) return false;
+      Iterator < VSensorConfig > vsconfigs = virtualSensors.values ( ).iterator ( );
+      while ( vsconfigs.hasNext ( ) )
+         if ( !vsconfigs.next ( ).needsStorage ( ) ) return false;
       return true;
    }
    
@@ -181,23 +248,23 @@ public final class Main {
    
    public static String randomTableNameGenerator ( int length ) {
       byte oneCharacter;
-      StringBuffer result = new StringBuffer( length );
+      StringBuffer result = new StringBuffer ( length );
       for ( int i = 0 ; i < length ; i++ ) {
-         oneCharacter = ( byte ) ( ( Math.random( ) * ( 'z' - 'a' + 1 ) ) + 'a' );
-         result.append( ( char ) oneCharacter );
+         oneCharacter = ( byte ) ( ( Math.random ( ) * ( 'z' - 'a' + 1 ) ) + 'a' );
+         result.append ( ( char ) oneCharacter );
       }
-      return result.toString( );
+      return result.toString ( );
    }
    
    public static int tableNameGenerator ( ) {
-      return randomTableNameGenerator( 15 ).hashCode( );
+      return randomTableNameGenerator ( 15 ).hashCode ( );
    }
    
-   public static CharSequence tableNameGeneratorInString(int code) {
-      StringBuilder sb = new StringBuilder("_");
+   public static CharSequence tableNameGeneratorInString (int code) {
+      StringBuilder sb = new StringBuilder ("_");
       if (code<0)
-         sb.append( "_" );
-      sb.append( Math.abs(code) );
+         sb.append ( "_" );
+      sb.append ( Math.abs (code) );
       return sb;
    }
    
@@ -208,7 +275,7 @@ public final class Main {
       if ( Main.containerConfig == null ) {
          Main.containerConfig = containerConfig;
       } else {
-         throw new RuntimeException( "Trying to replace the container config object in main class." );
+         throw new RuntimeException ( "Trying to replace the container config object in main class." );
       }
    }
    

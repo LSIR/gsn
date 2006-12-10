@@ -2,6 +2,7 @@
     <mapping name="virtual-sensor" class="gsn.beans.VSensorConfig">
        <value name="name" field="virtualSensorName" style="attribute" />
        <value name="priority" field="priority" usage="optional" style="attribute" />  
+       <value name="password" field="generalPassword" style="attribute" usage="optional" />
        <structure name="processing-class" usage="optional" >
               <value name="class-name" field="mainClass"  />  
               <structure name="init-params" usage="optional" >

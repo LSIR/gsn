@@ -130,7 +130,12 @@ which is available from SUN at  http://java.sun.com/products/java-media/jmf/inde
       </java>
    </target>
 
-   
+   <target name="securityTest" depends="build">
+      <java classpathref="classpath" classname="gsn.tests.SecurtiyTest" maxmemory="${maxMemoryUsage}" fork="true"
+            dir="${build.dir}">
+         
+      </java>
+   </target>  
    
    <target name="rfidtest" depends="build">
       <java classname="gsn.wrappers.RFIDSample" maxmemory="${maxMemoryUsage}" fork="true" dir="${build.dir}">
