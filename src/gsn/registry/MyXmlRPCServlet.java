@@ -40,10 +40,9 @@ public class MyXmlRPCServlet extends XmlRpcServlet{
    protected PropertyHandlerMapping newPropertyHandlerMapping (java.net.URL url) throws java.io.IOException,  XmlRpcException{
       PropertyHandlerMapping mapping = new PropertyHandlerMapping ();
       /**
-       * Stupid bug ?, always setRequestProcessorFactoryFactory before starting to manupluate the mapping
+       * Stupid bug ?!!!, always setRequestProcessorFactoryFactory before starting to manupluate the mapping
        */
       mapping.setRequestProcessorFactoryFactory (factory);
-      
       if (Main.getContainerConfig ()==null)
          mapping.addHandler ("registry",RegistryRequestHandler.class);
       else
@@ -59,6 +58,4 @@ public class MyXmlRPCServlet extends XmlRpcServlet{
       }
    };
    
-   
-
 }
