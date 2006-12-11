@@ -1,4 +1,4 @@
-package gsn.web.http;
+package gsn.web;
 
 import gsn.Container;
 import gsn.vsensor.http.AddressingReqHandler;
