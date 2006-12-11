@@ -25,11 +25,11 @@ public final class StreamElement implements Serializable {
    
    private Serializable [ ]                       fieldValues;
    
-   private Byte[]                            fieldTypes;
+   private Byte [ ]                               fieldTypes;
    
-   private long internalPrimayKey = -1;
+   private long                                   internalPrimayKey = -1;
    
-   public StreamElement (  DataField [] outputStructure , final Serializable [ ] data , final long timeStamp ) {
+   public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data , final long timeStamp ) {
       this.fieldNames = new String [ outputStructure.length ];
       this.fieldTypes = new Byte [ outputStructure.length ];
       this.timeStamp = timeStamp;
@@ -44,35 +44,13 @@ public final class StreamElement implements Serializable {
       
    }
    
-   /**
-    * @param fieldNamesInStreamElement
-    * @param fieldValues2
-    * @param outputFormat
-    */
-   public StreamElement (DataField [ ] outputFormat, Vector < String > fieldNamesInStreamElement , Vector < Object > fieldValues , long timestamp ) {
-      this.fieldNames = fieldNamesInStreamElement.toArray( new String[] {} );
-      byte[] fieldTypes = new byte[fieldNames.length];
-      for (byte i=0;i<fieldNames.length;i++) {
-         boolean found = false;
-         for (byte j=0;j<outputFormat.length;j++)
-            if (outputFormat[j].getFieldName( ).equalsIgnoreCase( fieldNames[i] )) {
-               found = true;
-               fieldTypes[i] = outputFormat[j].getDataTypeID( );
-               break;
-            }
-         if (found == false)
-            throw new RuntimeException("Bad stream element received. There is no type defined for the field : "+fieldTypes[i]);
-      }
-      
-   }
-
-   
    public StreamElement ( final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data ) {
-      this(dataFieldNames,dataFieldTypes,data,System.currentTimeMillis( ));
+      this( dataFieldNames , dataFieldTypes , data , System.currentTimeMillis( ) );
    }
+   
    public StreamElement ( final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data , final long timeStamp ) {
-      if ( dataFieldNames.length != dataFieldTypes.length ) throw new IllegalArgumentException(
-         "The length of dataFileNames and dataFileTypes provided in the constructor of StreamElement doesn't match." );
+      if ( dataFieldNames.length != dataFieldTypes.length )
+         throw new IllegalArgumentException( "The length of dataFileNames and dataFileTypes provided in the constructor of StreamElement doesn't match." );
       if ( dataFieldNames.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
       this.timeStamp = timeStamp;
       this.fieldTypes = dataFieldTypes;
@@ -81,14 +59,14 @@ public final class StreamElement implements Serializable {
       this.fieldValues = data;
    }
    
-
    private void verifyTypesCompatibility ( final Byte [ ] fieldTypes , final Serializable [ ] data ) throws IllegalArgumentException {
       for ( int i = 0 ; i < data.length ; i++ ) {
          if ( data[ i ] == null ) continue;
          switch ( fieldTypes[ i ] ) {
             case DataTypes.SMALLINT :
-               if ( !( data[ i ] instanceof Short ) ) throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as "
-                  + DataTypes.TYPE_NAMES[ i ] + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
+               if ( !( data[ i ] instanceof Short ) )
+                  throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as " + DataTypes.TYPE_NAMES[ i ]
+                     + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
                break;
             case DataTypes.BIGINT :
                if ( !( data[ i ] instanceof Long ) ) { throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as "
@@ -104,13 +82,16 @@ public final class StreamElement implements Serializable {
                   + DataTypes.TYPE_NAMES[ i ] + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" ); }
                break;
             case DataTypes.DOUBLE :
-               if ( !( data[ i ] instanceof Double || data[ i ] instanceof Float ) ) throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 )
-                  + "th field is defined as " + DataTypes.TYPE_NAMES[ i ] + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
+               if ( !( data[ i ] instanceof Double || data[ i ] instanceof Float ) )
+                  throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as " + DataTypes.TYPE_NAMES[ i ]
+                     + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
                break;
             case DataTypes.BINARY :
-              // if ( data[ i ] instanceof String ) data[ i ] = ( ( String ) data[ i ] ).getBytes( );
-               if ( !( data[ i ] instanceof byte [ ]  || data[i] instanceof String) ) throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as "
-                  + DataTypes.TYPE_NAMES[ i ] + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
+               // if ( data[ i ] instanceof String ) data[ i ] = ( ( String )
+               // data[ i ] ).getBytes( );
+               if ( !( data[ i ] instanceof byte [ ] || data[ i ] instanceof String ) )
+                  throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as " + DataTypes.TYPE_NAMES[ i ]
+                     + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
                break;
          }
       }
@@ -164,7 +145,8 @@ public final class StreamElement implements Serializable {
     * negative, it is considered non valid and zero will be placed.
     */
    public void setTimeStamp ( long timeStamp ) {
-      if ( this.timeStamp <= 0 ) timeStamp = 0;
+      if ( this.timeStamp <= 0 )
+         timeStamp = 0;
       else
          this.timeStamp = timeStamp;
    }
@@ -184,12 +166,90 @@ public final class StreamElement implements Serializable {
       }
       return this.fieldValues[ this.indexedFieldNames.get( fieldName ) ];
    }
-
-public long getInternalPrimayKey() {
-	return internalPrimayKey;
-}
-
-public void setInternalPrimayKey(long internalPrimayKey) {
-	this.internalPrimayKey = internalPrimayKey;
-}
+   
+   public long getInternalPrimayKey ( ) {
+      return internalPrimayKey;
+   }
+   
+   public void setInternalPrimayKey ( long internalPrimayKey ) {
+      this.internalPrimayKey = internalPrimayKey;
+   }
+   
+   /**
+    * @return
+    */
+   public Object [ ] getDataInRPCFriendly ( ) {
+      Object [ ] toReturn = new Object [ fieldValues.length ];
+      for ( int i = 0 ; i < toReturn.length ; i++ ) {
+         switch ( fieldTypes[ i ] ) {
+            case DataTypes.DOUBLE :
+               toReturn[ i ] = fieldValues[ i ];
+               break;
+            case DataTypes.BIGINT :
+            case DataTypes.TIME :
+               toReturn[ i ] = Long.toString( ( Long ) fieldValues[ i ] );
+               break;
+            case DataTypes.TINYINT :
+            case DataTypes.SMALLINT :
+            case DataTypes.INTEGER :
+               toReturn[ i ] = new Integer( ( Integer ) fieldValues[ i ] );
+               break;
+            case DataTypes.CHAR :
+            case DataTypes.VARCHAR :
+            case DataTypes.BINARY :
+               toReturn[ i ] = fieldValues[ i ];
+               break;
+            default :
+               logger.error( "Type can't be converted : TypeID : " + fieldTypes[ i ] );
+         }
+      }
+      return toReturn;
+      
+   }
+   
+   public static StreamElement createElementFromXMLRPC ( DataField [ ] outputFormat , Object [ ] fieldNames , Object [ ] fieldValues ,  long timestamp ) {
+      Serializable [ ] values = new Serializable [ outputFormat.length ];
+      for ( int i = 0 ; i < fieldNames.length ; i++ ) {
+         switch ( findIndexInDataField( outputFormat , (String)fieldNames[i] ) ) {
+            case DataTypes.DOUBLE :
+               values[ i ] = ( Double ) fieldValues[ i ];
+               break;
+            case DataTypes.BIGINT :
+            case DataTypes.TIME :
+               values[ i ] = Long.parseLong( ( String ) fieldValues[ i ] );
+               break;
+            case DataTypes.TINYINT :
+               values[ i ] = Byte.parseByte( ( String ) fieldValues[ i ] );
+               break;
+            case DataTypes.SMALLINT :
+            case DataTypes.INTEGER :
+               values[ i ] = new Integer( ( Integer ) fieldValues[ i ] );
+               break;
+            case DataTypes.CHAR :
+            case DataTypes.VARCHAR :
+               values[ i ] = ( String ) fieldValues[ i ];
+               break;
+            case DataTypes.BINARY :
+               values[ i ] = ( byte [ ] ) fieldValues[ i ];
+               break;
+            case -1:
+            default :
+               logger.error( "The field name doesn't exit in the output structure : FieldName : "+(String)fieldNames[i]   );
+         }
+      }
+      return new StreamElement( outputFormat , values , timestamp );
+   }
+   /**
+    * Returns the type of the field in the output format or -1 if the field doesn't exit.
+    * @param outputFormat
+    * @param fieldName
+    * @return
+    */
+   private static byte findIndexInDataField(DataField[] outputFormat, String fieldName) {
+      for (int i=0;i<outputFormat.length;i++) 
+         if (outputFormat[i].getFieldName( ).equalsIgnoreCase( fieldName ))
+            return outputFormat[i].getDataTypeID( );
+      
+      return -1;
+   }
 }

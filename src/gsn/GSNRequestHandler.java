@@ -1,9 +1,8 @@
 package gsn;
 
+import java.util.Date;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
-
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.notifications.GSNNotification;
@@ -26,7 +25,8 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
       this.remoteAddress = pConfig.getRemoteAddress( );
    }
    
-   public boolean deliverData ( int notificationCode , Vector < String > fieldNamesInStreamElement , Vector < Object > fieldValues , long timeStamp ) {
+   public boolean deliverData ( int notificationCode ,  Object [] fieldNamesInStreamElement ,  Object [] fieldValues , String timeStampStr ) {
+      long timeStamp = Long.parseLong( timeStampStr );
       RemoteDS remoteDS = Mappings.getContainer( ).getRemoteDSForANotificationCode( notificationCode );
       if ( remoteDS == null ) { // This client is no more interested
          // in this notificationCode.
@@ -41,7 +41,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
          // */
          if ( timeStamp <= 0 ) timeStamp = System.currentTimeMillis( );
          StorageManager.getInstance( ).insertData( new StringBuilder( "_" ).append( notificationCode > 0 ? "" : "_" ).append( notificationCode ).toString( ) ,
-            new StreamElement( remoteDS.getOutputFormat( ) , fieldNamesInStreamElement , fieldValues , timeStamp ) );
+            StreamElement.createElementFromXMLRPC(remoteDS.getOutputFormat( ), fieldNamesInStreamElement , fieldValues , timeStamp ) );
          if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "data received for notification code *" ).append( notificationCode ).toString( ) );
          remoteDS.remoteDataReceived( );
          return true;

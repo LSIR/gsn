@@ -4,9 +4,16 @@ import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLUtils;
 import gsn.utils.CaseInsensitiveComparator;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.PreparedStatement;
+import java.util.Date;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
+import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
@@ -37,6 +44,10 @@ public class GSNNotification extends NotificationRequest {
    
    private int                         notificationCode;
    
+   private XmlRpcClient                    client             = new XmlRpcClient ( );
+   
+   private  XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
+   
   public GSNNotification ( int port , String remoteHost , String virtualSensorName , String query , int notificationCode ) {
       this.remotePort = port;
       this.remoteAddress = remoteHost;
@@ -44,8 +55,13 @@ public class GSNNotification extends NotificationRequest {
       TreeMap rewritingInfo = new TreeMap(new CaseInsensitiveComparator());
       rewritingInfo.put("wrapper", virtualSensorName);
       this.query = SQLUtils.newRewrite(query, rewritingInfo) ;
-      logger.fatal( "AFTER REWRITING : "+this.query );
       this.notificationCode = notificationCode;
+      try {
+         config.setServerURL ( new URL ( "http://" + remoteHost +":"+remotePort+ "/gsn-handler" ) );
+         client.setConfig ( config );
+      } catch ( MalformedURLException e1 ) {
+         logger.warn ( "GSNNotification initialization failed! : "+e1.getMessage ( ) , e1 );
+      }
    }
    
    /**
@@ -137,7 +153,19 @@ public class GSNNotification extends NotificationRequest {
    
    private boolean notifyPeerAboutData ( StreamElement data ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Wants to send message to : " ).append( remoteAddress ).toString( ) );
-      logger.fatal( "Not implemented" );
+      Object [ ] params = new Object [ ] {notificationCode,data.getFieldNames( ),data.getDataInRPCFriendly(),Long.toString( data.getTimeStamp( ) )};
+      boolean result = false;
+      try {
+         result =  (Boolean) client.execute ("gsn.deliverData", params);
+      } catch ( XmlRpcException e ) {
+         if (logger.isInfoEnabled( ))
+         logger.info("Couldn't notify the remote host : "+config.getServerURL( )+e.getMessage( ),e);
+         return false;
+      }
+      if (result==false) {
+         logger.fatal( "The remote is not interested anymore, the notification should be removed (not implemented)");
+         return false;
+      }
       return true;
    }
    

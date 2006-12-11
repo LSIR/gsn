@@ -19,28 +19,28 @@ public class DataTypes {
    // NEXT FIELD
    public final static String            VAR_CHAR_PATTERN_STRING   = "\\s*varchar" + REQUIRED_NUMBER_PARAMETER + "\\s*";
    
-   public final static int               VARCHAR                   = 0;
+   public final static byte               VARCHAR                   = 0;
    
    public final static String            VARCHAR_NAME              = "Varchar";
    
    // NEXT FIELD
    public final static String            CHAR_PATTERN_STRING       = "\\s*char" + REQUIRED_NUMBER_PARAMETER + "\\s*";
    
-   public final static int               CHAR                      = 1;
+   public final static byte               CHAR                      = 1;
    
    public final static String            CHAR_NAME                 = "Char";
    
    // NEXT FIELD
    public final static String            INTEGER_PATTERN_STRING    = "\\s*((INTEGER)|(INT))\\s*";
    
-   public final static int               INTEGER                   = 2;
+   public final static byte               INTEGER                   = 2;
    
    public final static String            INTEGER_NAME              = "Integer";
    
    // NEXT FIELD
    public final static String            BIGINT_PATTERN_STRING     = "\\s*BIGINT\\s*";
    
-   public final static int               BIGINT                    = 3;
+   public final static byte               BIGINT                    = 3;
    
    public final static String            BIGINT_NAME               = "BigInt";
    
@@ -54,28 +54,28 @@ public class DataTypes {
    // NEXT FIELD
    public final static String            DOUBLE_PATTERN_STRING     = "\\s*DOUBLE\\s*";
    
-   public final static int               DOUBLE                    = 5;
+   public final static byte               DOUBLE                    = 5;
    
    public final static String            DOUBLE_NAME               = "Double";
    
    // NEXT FIELD
    public final static String            TIME_PATTERN_STRING       = "\\s*TIME\\s*";
    
-   public final static int               TIME                      = 6;
+   public final static byte               TIME                      = 6;
    
    public final static String            TIME_NAME                 = "Time";
    
    // NEXT FIELD
    public final static String            TINYINT_PATTERN_STRING    = "\\s*TINYINT\\s*";
    
-   public final static int               TINYINT                   = 7;
+   public final static byte               TINYINT                   = 7;
    
    public final static String            TINYINT_NAME              = "TinyInt";
    
    // NEXT FIELD
    public final static String            SMALLINT_PATTERN_STRING   = "\\s*SMALLINT\\s*";
    
-   public final static int               SMALLINT                  = 8;
+   public final static byte               SMALLINT                  = 8;
    
    public final static String            SMALLINT_NAME             = "SmallInt";
    
@@ -128,5 +128,19 @@ public class DataTypes {
             break;
       }
       return null;
+   }
+   public Object[] streamElementToStandardXMLRPC(StreamElement se) {
+      Object[] toReturn = new Object[se.getData( ).length];
+      for (int i=0;i<se.getData( ).length;i++) {
+         switch ( se.getFieldTypes( )[i] ) {
+            case DataTypes.BIGINT :
+               
+               break;
+            
+            default :
+               break;
+         }
+      }
+      return toReturn;
    }
 }
