@@ -44,6 +44,7 @@ public class GSNNotification extends NotificationRequest {
       TreeMap rewritingInfo = new TreeMap(new CaseInsensitiveComparator());
       rewritingInfo.put("wrapper", virtualSensorName);
       this.query = SQLUtils.newRewrite(query, rewritingInfo) ;
+      logger.fatal( "AFTER REWRITING : "+this.query );
       this.notificationCode = notificationCode;
    }
    

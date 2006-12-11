@@ -106,7 +106,7 @@ public class RemoteDS extends AbstractWrapper {
    private void refreshRemotelyRegisteredQuery ( ) throws XmlRpcException {
       int notificationCode = getDBAlias ( );
       CharSequence query = new StringBuffer ( "SELECT * FROM " ).append ( remoteVSName ).append ( " WHERE " ).append ( getWhereClausesAllTogher ( ) ).append ( " ORDER BY " ).append ( remoteVSName ).append (
-              ".TIMED DESC LIMIT 1 OFFSET 0" ).toString ( ).replace ( "\"" , "" );
+              ".TIMED DESC LIMIT 1 OFFSET 0" ).toString ( );
       Object [ ] params = new Object [ ] {Main.getContainerConfig ().getContainerPort (),remoteVSName,query, notificationCode};
       if ( logger.isDebugEnabled ( ) )
          logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( host ).append (port).append ("/").append (remoteVSName).append ( " with the query ->" ).append ( query ).append ( "<-" ).toString ( ) );

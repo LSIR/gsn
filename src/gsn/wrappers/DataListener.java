@@ -179,11 +179,11 @@ public class DataListener {
    public StringBuffer getCompleteMergedWhereClause ( String remoteVSName ) {
       if ( cachedWhereClause == null ) {
          CharSequence mergedQuery = getMergedQuery( );
-         int indexOrOrderBy = mergedQuery.toString( ).toLowerCase( ).indexOf( " ORDER " );
-         int indexOfWhereClause = mergedQuery.toString( ).toLowerCase( ).indexOf( " WHERE " );
-         cachedWhereClause = new StringBuffer( mergedQuery.toString( ).substring( indexOfWhereClause + " WHERE ".length( ) , ( indexOrOrderBy > 0 ? indexOrOrderBy : getMergedQuery( ).length( ) ) ) );
+         int indexOrOrderBy = mergedQuery.toString( ).toLowerCase( ).indexOf( " order " );
+         int indexOfWhereClause = mergedQuery.toString( ).toLowerCase( ).indexOf( " where " );
+         cachedWhereClause = new StringBuffer( mergedQuery.toString( ).substring( indexOfWhereClause + " where ".length( ) , ( indexOrOrderBy > 0 ? indexOrOrderBy : getMergedQuery( ).length( ) ) ) );
          TreeMap < CharSequence , CharSequence > rewritingMapping = new TreeMap < CharSequence , CharSequence >(new CaseInsensitiveComparator() );
-         rewritingMapping.put( "WRAPPER" , remoteVSName );
+         rewritingMapping.put( "wrapper" , remoteVSName );
          cachedWhereClause = new StringBuffer( SQLUtils.newRewrite( cachedWhereClause , rewritingMapping ) );
          if ( logger.isDebugEnabled( ) )
             logger.debug( new StringBuilder( ).append( "The Complete Mereged Query's where part, rewritten for *" ).append( remoteVSName ).append( "* is " ).append( cachedWhereClause.toString( ) )

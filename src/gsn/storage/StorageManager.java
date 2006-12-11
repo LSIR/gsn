@@ -245,7 +245,6 @@ public class StorageManager {
       try {
          connection = connectionPool.borrowConnection( );
          StringBuilder viewStatement = new StringBuilder( "create view " ).append( viewName.toString( ) ).append( " AS ( " ).append( selectQuery.toString( ).toLowerCase( ) ).append(" ) ");
-         logger.fatal(viewStatement);
          connection.createStatement( ).execute( viewStatement.toString() );
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
@@ -265,12 +264,10 @@ public class StorageManager {
       Connection connection = connectionPool.borrowConnection( );
       PreparedStatement toReturn = null;
       try {
-         logger.fatal(sql.toString());
          toReturn = connection.prepareStatement( sql.toString( ).toLowerCase( ) );
          if ( isDebugEnabled == true ) {
             logger.debug( new StringBuilder( ).append( "insertion prepared statement created: " ).append( sql ).toString( ) );
          }
-         
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
          try {
