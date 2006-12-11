@@ -60,9 +60,8 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
       }
       GSNNotification interest = new GSNNotification( port , remoteAddress , virtualSensorName , query , notificationCode );
       if ( logger.isInfoEnabled( ) )
-         logger
-               .info( new StringBuilder( ).append( "REGISTER REQUEST FOR " ).append( virtualSensorName ).append( " received from :" ).append( interest.getRemoteAddress( ) ).append( ":" ).append(
-                  interest.getRemotePort( ) ).append( " under the code " ).append( interest.getNotificationCode( ) ).append( " With the query of *" ).append( interest.getQuery( ) ).append( "*" )
+         logger.info( new StringBuilder( ).append( "REGISTER REQUEST FOR " ).append( virtualSensorName ).append( " received from :" ).append( interest.getRemoteAddress( ) ).append( ":" ).append(
+                  interest.getRemotePort( ) ).append( " under the code " ).append( notificationCode ).append( " With the query of *" ).append( query ).append( "*" )
                      .toString( ) );
       Mappings.getContainer( ).addNotificationRequest( virtualSensorName , interest );
       if ( logger.isDebugEnabled( ) ) logger.debug( "Respond sent to the requestee." );

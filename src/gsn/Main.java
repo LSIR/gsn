@@ -41,6 +41,7 @@ import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 //import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
 
@@ -93,7 +94,19 @@ public final class Main {
       //Connector connector = new SelectChannelConnector( ); //using basic connector for windows bug
       Connector httpConnector = new SocketConnector ();
       httpConnector.setPort ( containerConfig.getContainerPort ( ) );
-      server.setConnectors ( new Connector [ ] { httpConnector } );
+      SslSocketConnector sslSocketConnector = null;
+      if (getContainerConfig().getSSLPort()>10){
+         sslSocketConnector = new SslSocketConnector();
+         sslSocketConnector.setKeystore("conf/gsn.jks");
+         sslSocketConnector.setKeyPassword(getContainerConfig().getSSLKeyPassword());
+         sslSocketConnector.setPassword(getContainerConfig().getSSLKeyStorePassword());
+         sslSocketConnector.setPort(getContainerConfig().getSSLPort());
+      }
+      
+      if (sslSocketConnector==null)
+         server.setConnectors ( new Connector [ ] { httpConnector } );
+      else
+         server.setConnectors ( new Connector [ ] { httpConnector,sslSocketConnector } );
       WebAppContext webAppContext = new WebAppContext ( );
       webAppContext.setContextPath ( "/" );
       webAppContext.setResourceBase ( DEFAULT_WEB_APP_PATH );
@@ -102,6 +115,8 @@ public final class Main {
       servletHandler.addServletWithMapping ( "gsn.web.http.ControllerServlet" , "/gsn" );
       servletHandler.addServletWithMapping ( "gsn.web.DataDownload" , "/data" );
       webAppContext.setServletHandler ( servletHandler );
+     /// webAppContext.setConnectorNames(new String[]{httpConnector.getName()});
+      
       server.setHandler ( webAppContext );
       server.setStopAtShutdown ( true );
       server.setSendServerVersion ( false );

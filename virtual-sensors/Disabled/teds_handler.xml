@@ -28,7 +28,7 @@
                     <predicate key="template-file">camTemplate</predicate>
                     <predicate key="TIMEOUT">12000</predicate>
                 </address>
-                <query>select * from "WRAPPER"</query>
+                <query>select * from wrapper</query>
             </source>
             <query>select * from "detected_cameras"</query>
         </stream>
@@ -41,7 +41,7 @@
                     <predicate key="template-file">moteTemplate</predicate>
                     <predicate key="TIMEOUT">12000</predicate>
                 </address>
-                <query>select * from "WRAPPER"</query>
+                <query>select * from wrapper</query>
             </source>
             <query>select * from "detected_motes"</query>
         </stream>

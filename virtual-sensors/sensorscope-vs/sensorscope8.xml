@@ -30,9 +30,9 @@
                     <predicate key="HOST">eflumpc24.epfl.ch</predicate>
                     <predicate key="PORT">2020</predicate>
                 </address>
-                <query>select * from "WRAPPER" where nodeID = 8 </query>
+                <query>select * from wrapper where nodeID = 8 </query>
             </source>
-            <query>select * from "source1"</query>
+            <query>select * from source1</query>
           </stream> 
        </streams>
 </virtual-sensor> 

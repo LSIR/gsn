@@ -6,11 +6,14 @@ import gsn.VirtualSensorPool;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
+import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -42,7 +45,7 @@ public class InputStream {
    
    private transient VirtualSensorPool                 pool;
    
-   private final transient HashMap < CharSequence , CharSequence > rewritingData         = new HashMap < CharSequence , CharSequence >( );
+   private final transient TreeMap< CharSequence , CharSequence > rewritingData         = new TreeMap < CharSequence , CharSequence >( new CaseInsensitiveComparator());
    
    private transient long                              lastVisited           = 0;
    
@@ -124,7 +127,7 @@ public class InputStream {
       this.lastVisited = currentTimeMillis;
       
       if ( this.rewrittenSQL == null ) {
-         this.rewrittenSQL = new StringBuilder( SQLUtils.rewriteQuery( this.getQuery( ).trim( ).toLowerCase( ), this.rewritingData ).replace( "\"" , "" ) );
+         this.rewrittenSQL = new StringBuilder( SQLUtils.newRewrite( this.getQuery( ).trim( ).toLowerCase( ), this.rewritingData ).toString() .replace( "\"" , "" ) );
          if ( logger.isDebugEnabled( ) )
             logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
                   .toString( ) );

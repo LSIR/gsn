@@ -21,9 +21,9 @@
                <predicate key="HOST">127.0.0.1</predicate>
                <predicate key="PORT">80</predicate>
             </address>
-            <query>select NODE_ID as NODE_ID, PARENT_ID as PARENT_ID, TEMPREATURE as TEMPERATURE_VALUE, TIMED as TIMED from "WRAPPER"</query>
+            <query>select NODE_ID as NODE_ID, PARENT_ID as PARENT_ID, TEMPREATURE as TEMPERATURE_VALUE, TIMED as TIMED from wrapper</query>
          </source>
-         <query>select * from "wsn"</query>
+         <query>select * from wsn</query>
       </stream>
    </streams>
 </virtual-sensor>

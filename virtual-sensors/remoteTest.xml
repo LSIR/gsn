@@ -12,16 +12,16 @@
    </output-structure>
    <storage history-size="1" />
    <streams>
-      <stream name="DATA" rate="100">
+      <stream name="DATA" >
          <source alias="source1" storage-size="1" sampling-rate="1">
             <address wrapper="remote">
                <predicate key="HOST">localhost</predicate>
                <predicate key="PORT">22001</predicate>
                <predicate key="NAME">MemoryPlotVS</predicate>
             </address>
-            <query>select DATA from "WRAPPER"</query>
+            <query>select DATA from wrapper</query>
          </source>
-         <query>select "source1.DATA" from "source1"</query>
+         <query>select source1.DATA from source1</query>
       </stream>
    </streams>
 </virtual-sensor>

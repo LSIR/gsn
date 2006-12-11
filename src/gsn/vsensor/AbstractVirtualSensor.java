@@ -5,9 +5,8 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
-
+import java.io.Serializable;
 import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -102,7 +101,7 @@ public abstract class AbstractVirtualSensor {
     */
    public abstract void finalize ( );
    
-   public void dataFromWeb ( String data ) {
+   public void dataFromWeb ( String[] paramNames, Serializable[] paramValues ) {
       return;
    }
    

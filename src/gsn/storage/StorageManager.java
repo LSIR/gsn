@@ -244,8 +244,9 @@ public class StorageManager {
       Connection connection = null;
       try {
          connection = connectionPool.borrowConnection( );
-         StringBuilder viewStatement = new StringBuilder( "create view " ).append( viewName.toString( ).toLowerCase( ) ).append( " AS " ).append( selectQuery.toString( ).toLowerCase( ) );
-         connection.createStatement( ).execute( viewStatement.toString( ).replace( "\"" , "" ) );
+         StringBuilder viewStatement = new StringBuilder( "create view " ).append( viewName.toString( ) ).append( " AS ( " ).append( selectQuery.toString( ).toLowerCase( ) ).append(" ) ");
+         logger.fatal(viewStatement);
+         connection.createStatement( ).execute( viewStatement.toString() );
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
       } finally {
@@ -264,6 +265,7 @@ public class StorageManager {
       Connection connection = connectionPool.borrowConnection( );
       PreparedStatement toReturn = null;
       try {
+         logger.fatal(sql.toString());
          toReturn = connection.prepareStatement( sql.toString( ).toLowerCase( ) );
          if ( isDebugEnabled == true ) {
             logger.debug( new StringBuilder( ).append( "insertion prepared statement created: " ).append( sql ).toString( ) );
@@ -274,7 +276,7 @@ public class StorageManager {
          try {
             if ( connection != null && !connection.isClosed( ) ) connection.close( );
          } catch ( Exception e1 ) {}
-      }
+     }
       return toReturn;
    }
    
@@ -478,8 +480,7 @@ public class StorageManager {
       PreparedStatement queryPreparedStatement = null;
       try {
          queryPreparedStatement = obtainPreparedStatementForQuery( sqlQuery );
-         if (queryPreparedStatement==null)
-            throw new RuntimeException("PPPPPPPPPPPPPPPPPPPPPPP + "+sqlQuery);
+         logger.fatal(sqlQuery);
          ResultSet resultSet = queryPreparedStatement.executeQuery( );
          toreturn = resultSet.next( );
       } catch ( SQLException error ) {

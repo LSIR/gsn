@@ -188,7 +188,7 @@ public final class StreamSource {
     * @return Returns the sqlQuery.
     */
    public String getSqlQuery ( ) {
-      if ( this.sqlQuery.trim( ).length( ) == 0 || this.sqlQuery == null ) this.sqlQuery = "select * from \"WRAPPER\"";
+      if ( this.sqlQuery.trim( ).length( ) == 0 || this.sqlQuery == null ) this.sqlQuery = "select * from wrapper ";
       return this.sqlQuery;
    }
    

@@ -24,9 +24,9 @@
                     <predicate key="PORT">22001</predicate>
                     <predicate key="sampling-rate">1000</predicate>
                 </address>
-                <query>select "HEAP","NON_HEAP","PENDING_FINALIZATION_COUNT","TIMED" from "WRAPPER"</query>
+                <query>select HEAP,NON_HEAP,PENDING_FINALIZATION_COUNT,TIMED from wrapper</query>
             </source>
-            <query>select "HEAP","NON_HEAP","PENDING_FINALIZATION_COUNT","TIMED" from "source1"</query>
+            <query>select HEAP,NON_HEAP,PENDING_FINALIZATION_COUNT,TIMED from source1</query>
         </stream>
     </streams>
 </virtual-sensor>

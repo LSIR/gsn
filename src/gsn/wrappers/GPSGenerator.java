@@ -112,7 +112,7 @@ public class GPSGenerator extends AbstractWrapper {
    }
    
    public String getWrapperName() {
-       return "GPS simulator";
+       return "GPS Generator";
    }
    
 }

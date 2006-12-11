@@ -1,5 +1,6 @@
 package gsn.wrappers;
 
+import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
@@ -8,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
+import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
@@ -31,7 +33,7 @@ public class RemoteDS extends AbstractWrapper {
    private XmlRpcClient                    client             = new XmlRpcClient ( );
    
    private  XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
-     
+   
    public boolean initialize (  ) {
       AddressBean addressBean =getActiveAddressBean ( );
       host = addressBean.getPredicateValue ( "host" );
@@ -69,7 +71,6 @@ public class RemoteDS extends AbstractWrapper {
          return false;
       }
       Mappings.getContainer ( ).addRemoteStreamSource ( getDBAlias ( ) , this );
-      
       return true;
    }
    
@@ -79,15 +80,13 @@ public class RemoteDS extends AbstractWrapper {
    private  DataField [] askForStrcture ( ) {
       String destination = new StringBuilder ( ).append ( host ).append ( ":" ).append ( port ).toString ( );
       if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Wants to ask for structure from : " ).append ( destination ).toString ( ) );
-     
       Object [ ] params = new Object [ ] {remoteVSName};
-     
       Object[] result =null;
       try{
-      result =  (Object[]) client.execute("gsn.getOutputStructure", params);
+         result =  (Object[]) client.execute ("gsn.getOutputStructure", params);
       }catch(Exception e){
-         logger.warn ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (destination).append(", ERROR : ").append(e.getMessage()).toString ( ) );
-         logger.debug(e.getMessage(),e);
+         logger.warn ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (destination).append (", ERROR : ").append (e.getMessage ()).toString ( ) );
+         logger.debug (e.getMessage (),e);
          return null;
       }
       if ( result.length==0) {
@@ -97,38 +96,43 @@ public class RemoteDS extends AbstractWrapper {
       DataField[] toReturn = new DataField [result.length];
       for (int i=0;i<result.length;i++){
          Object values [] = (Object[]) result[i];
-         toReturn[i]= new DataField(values[0].toString(),values[1].toString(),"");
+         toReturn[i]= new DataField (values[0].toString (),values[1].toString (),"");
       }
       return toReturn;
    }
    /**
     * First deregister then register
     */
-  private void refreshRemotelyRegisteredQuery ( ) {
-//      int notificationCode = getDBAlias ( );
-//      CharSequence query = new StringBuffer ( "SELECT * FROM " ).append ( remoteVSName ).append ( " WHERE " ).append ( getWhereClausesAllTogher ( ) ).append ( " ORDER BY " ).append ( remoteVSName ).append (
-//              ".TIMED DESC LIMIT 1 OFFSET 0" ).toString ( ).replace ( "\"" , "" );
-//      if ( logger.isDebugEnabled ( ) )
-//         logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( destination ).append ( "  for DEREGISTERING the previous query" ).toString ( ) );
-//      postMethod.addRequestHeader ( Container.REQUEST , Integer.toString ( Container.DEREGISTER_PACKET ) );
-//      postMethod.addRequestHeader ( Container.QUERY_VS_NAME , remoteVSName );
-//      
-//      if ( logger.isDebugEnabled ( ) )
-//         logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( destination ).append ( " with the query ->" ).append ( query ).append ( "<-" ).toString ( ) );
-//         logger.warn ( "Message couldn't be sent to :" + postMethod.getHostConfiguration ( ).getHostURL ( ) );
-//      
+   private void refreshRemotelyRegisteredQuery ( ) throws XmlRpcException {
+      int notificationCode = getDBAlias ( );
+      CharSequence query = new StringBuffer ( "SELECT * FROM " ).append ( remoteVSName ).append ( " WHERE " ).append ( getWhereClausesAllTogher ( ) ).append ( " ORDER BY " ).append ( remoteVSName ).append (
+              ".TIMED DESC LIMIT 1 OFFSET 0" ).toString ( ).replace ( "\"" , "" );
+      Object [ ] params = new Object [ ] {Main.getContainerConfig ().getContainerPort (),remoteVSName,query, notificationCode};
+      if ( logger.isDebugEnabled ( ) )
+         logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( host ).append (port).append ("/").append (remoteVSName).append ( " with the query ->" ).append ( query ).append ( "<-" ).toString ( ) );
+      Boolean bool = (Boolean) client.execute ("gsn.registerQuery", params);
+      if (bool==false) {
+         logger.warn ( new StringBuilder ( ).append ( "Query Registeration for the remote virtual sensor : ").append (remoteVSName).append (" failed.").toString ( ) );
+         return ;
+      }
    }
    
    public CharSequence addListener ( DataListener dataListener ) {
-      StringBuffer completeMergedWhereClause = dataListener.getCompleteMergedWhereClause ( remoteVSName );
-      registeredWhereClauses.add ( completeMergedWhereClause );
-      refreshRemotelyRegisteredQuery ( );
-      return super.addListener ( dataListener );
+      try {
+          StringBuffer completeMergedWhereClause = dataListener.getCompleteMergedWhereClause(remoteVSName);
+          registeredWhereClauses.add(completeMergedWhereClause);
+          refreshRemotelyRegisteredQuery();
+          return super.addListener(dataListener);
+      }
+      catch (XmlRpcException ex) {
+         logger.warn("Adding the data listener failed. "+ex.getMessage(), ex);
+      };
+      return null;
    }
    
    public void removeListener ( DataListener dataListener ) {
       registeredWhereClauses.remove ( dataListener.getCompleteMergedWhereClause ( remoteVSName ) );
-      if ( registeredWhereClauses.size ( ) > 0 ) refreshRemotelyRegisteredQuery ( );
+    // TEST REQUIRED, I'm not sure once the listener is removed, gsn answers with nak to the data packet.  if ( registeredWhereClauses.size ( ) > 0 ) refreshRemotelyRegisteredQuery ( );
       super.removeListener ( dataListener );
    }
    

@@ -7,7 +7,10 @@
 		<value name="description" field="webDescription"
 			usage="optional" />
 		<value name="port" field="containerPort" />
-		<structure name="storage">
+		<value name="ssl-port" field="sslPort" usage="optional"/>
+                <value name="ssl-key-store-password" field="sslKeyStorePassword" usage="optional"/>
+                <value name="ssl-key-password" field="sslKeyPassword" usage="optional"/>
+               <structure name="storage">
 			<value name="driver" field="jdbcDriver" style="attribute" />
 			<value name="user" field="jdbcUsername" style="attribute" />
 			<value name="password" field="jdbcPassword"

@@ -24,9 +24,9 @@
                     <predicate key="PORT">22001</predicate>
                     <predicate key="serialport">COM12</predicate>
                 </address>
-                <query>select * from "WRAPPER"</query>
+                <query>select * from wrapper</query>
             </stream-source>
-            <query>select * from "source1"</query>
+            <query>select * from source1</query>
         </input-stream> 
         </input-streams>
 </virtual-sensor> 

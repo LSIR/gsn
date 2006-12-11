@@ -2,7 +2,10 @@ package gsn.notifications;
 
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
+import gsn.storage.SQLUtils;
+import gsn.utils.CaseInsensitiveComparator;
 import java.sql.PreparedStatement;
+import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 /**
@@ -24,7 +27,7 @@ public class GSNNotification extends NotificationRequest {
     * <code>queryWithoutDoubleQuots</code><br>
     * except without using any double quotation.
     */
-   private String                      query;
+   private CharSequence                      query;
    
    private String                      prespectiveVirtualSensor;
    
@@ -34,13 +37,13 @@ public class GSNNotification extends NotificationRequest {
    
    private int                         notificationCode;
    
-   private StringBuilder               queryWithoutDoubleQuots;
-   
-   public GSNNotification ( int port , String remoteHost , String virtualSensorName , String query , int notificationCode ) {
+  public GSNNotification ( int port , String remoteHost , String virtualSensorName , String query , int notificationCode ) {
       this.remotePort = port;
       this.remoteAddress = remoteHost;
       this.prespectiveVirtualSensor = virtualSensorName;
-      this.query = query;
+      TreeMap rewritingInfo = new TreeMap(new CaseInsensitiveComparator());
+      rewritingInfo.put("wrapper", virtualSensorName);
+      this.query = SQLUtils.newRewrite(query, rewritingInfo) ;
       this.notificationCode = notificationCode;
    }
    
@@ -48,14 +51,10 @@ public class GSNNotification extends NotificationRequest {
     * @return Returns the query.
     */
    
-   public StringBuilder getQuery ( ) {
-      return queryWithoutDoubleQuots;
-   }
-   
-   public String getRawQuery ( ) {
+   public CharSequence getQuery ( ) {
       return query;
    }
-   
+ 
    /**
     * @return Returns the address.
     */

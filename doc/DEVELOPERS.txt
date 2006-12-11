@@ -54,6 +54,16 @@ There are various other ant targets:
 test    runs unit tests for gsn.
 jar		builds a jar library containing gsn.
 
+Enabling the SSL support
+========================
+If you want to use SSL for transmitting and/or receiving data from
+a virtual sensor, you need to Generate  Keys and Certificates : 
+
+  # The following command will generate a key pair and certificate directly into
+    a keystore (note that the keystore file name MUST be stored in conf/gsn.jks)
+   cd conf
+   keytool -keystore gsn.jks -alias gsn -genkey -keyalg RS
+
 Bugs
 ====
 If you find a bug in gsn, please tell us on 

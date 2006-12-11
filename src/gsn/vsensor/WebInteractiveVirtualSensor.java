@@ -79,10 +79,10 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
       
    }
    
-   public void dataFromWeb ( String data ) {
+   public void dataFromWeb ( String[] paramNames, Serializable[] paramValues ) {
       String streamSourceAliasName = "ss_bla";
       try {
-         vsensor.getInputStream( INPUT_STREAM_NAME ).getSource( streamSourceAliasName ).getActiveSourceProducer( ).sendToWrapper( data );
+         vsensor.getInputStream( INPUT_STREAM_NAME ).getSource( streamSourceAliasName ).getActiveSourceProducer( ).sendToWrapper( "SomeData" );
       } catch ( OperationNotSupportedException e ) {
          logger.warn( new StringBuilder( ).append( "The virtual sensor : " ).append( vsensor.getVirtualSensorName( ) ).append(
             " want to send data to a stream source which doesn't support receiving data." ).toString( ) );

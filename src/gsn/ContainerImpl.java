@@ -78,7 +78,7 @@ public class ContainerImpl extends HttpServlet implements Container {
          Iterator < NotificationRequest > registeredIterator = registered.iterator( );
          while ( registeredIterator.hasNext( ) ) {
             NotificationRequest interestedClient = registeredIterator.next( );
-            StringBuilder query = interestedClient.getQuery( );
+            CharSequence query = interestedClient.getQuery( );
             boolean result = interestedClient.send(  storageMan.executeQuery( query , false ) );
             //FIXME : The Asynchronous notification System.
          }

@@ -10,13 +10,13 @@ import org.apache.log4j.Logger;
  */
 public abstract class NotificationRequest {
    
-   public abstract StringBuilder getQuery ( );
+   public abstract CharSequence getQuery ( );
    
-   private transient ArrayList < String > cachedPrespectiveVirtualSensors = null;
+   private transient ArrayList < CharSequence > cachedPrespectiveVirtualSensors = null;
    
    private static transient Logger        logger                          = Logger.getLogger( NotificationRequest.class );
    
-   public ArrayList < String > getPrespectiveVirtualSensors ( ) {
+   public ArrayList < CharSequence > getPrespectiveVirtualSensors ( ) {
       if ( cachedPrespectiveVirtualSensors == null ) cachedPrespectiveVirtualSensors = SQLUtils.extractTableNamesUsedInQuery( getQuery( ) );
       return cachedPrespectiveVirtualSensors;
    }

@@ -253,7 +253,7 @@ public class VSensorLoader extends Thread {
    }
    
    private boolean prepareStreamSource ( InputStream inputStream , StreamSource streamSource , VSensorConfig vsensor ) {
-    HashMap < CharSequence , CharSequence > rewritingMapping = new HashMap < CharSequence , CharSequence >( );
+      HashMap < CharSequence , CharSequence > rewritingMapping = new HashMap < CharSequence , CharSequence >( );
       for ( AddressBean addressBean : streamSource.getAddressing ( ) ) {
          AbstractWrapper ds = activeDataSources.get ( addressBean );
          if ( ds == null ) {
@@ -297,7 +297,7 @@ public class VSensorLoader extends Thread {
                      continue;
                   }
                   try {
-                     storageManager.createTable ( ds.getDBAliasInStr( ) , ds.getOutputFormat ( ) );
+                     storageManager.createTable ( ds.getDBAliasInStr ( ) , ds.getOutputFormat ( ) );
                      TableSizeEnforce tsf = new TableSizeEnforce ( ds );
                      ds.setTableSizeEnforce ( tsf );
                      Thread tableSizeEnforcingThread = new Thread ( tsf );
@@ -317,6 +317,11 @@ public class VSensorLoader extends Thread {
          }
          DataListener dbDataListener = new DataListener (inputStream,streamSource );
          CharSequence viewName = ds.addListener ( dbDataListener );
+         if (viewName==null ){//
+            logger.error ( new StringBuilder ( ).append ( "Can't prepate the data source: \"" ).append ( streamSource.getAlias ( ) ).append ( "\" for inputStream: \"" ).append (
+                    inputStream.getInputStreamName ( ) ).append ( "\" for Virtual Sensor: \"" ).append ( vsensor.getVirtualSensorName ( ) ).append ( "\"" ).toString ( ) );
+            return false;
+         }
          rewritingMapping.put ( streamSource.getAlias ( ) , viewName );
          streamSource.setUsedDataSource ( ds , dbDataListener );
          activeDataSources.put ( addressBean , ds );

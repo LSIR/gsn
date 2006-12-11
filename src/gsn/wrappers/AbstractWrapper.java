@@ -6,10 +6,14 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
+import gsn.utils.CaseInsensitiveComparator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TreeMap;
+
 import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
 
@@ -52,10 +56,14 @@ public abstract class AbstractWrapper extends Thread  {
       this.tableSizeEnforce = tableSizeEnforce;
    }
    
+   /**
+    * Returns the view name created for this listener.
+    * Note that, GSN creates one view per listener.
+    */
    public CharSequence addListener ( DataListener dataListener ) {
-      HashMap < CharSequence , CharSequence > mapping = new HashMap < CharSequence , CharSequence >( );
+      TreeMap < CharSequence , CharSequence > mapping = new TreeMap< CharSequence , CharSequence >( new CaseInsensitiveComparator());
       mapping.put( "wrapper" , aliasCodeS);
-      CharSequence resultQuery = SQLUtils.rewriteQuery( dataListener.getMergedQuery( ) , mapping );
+      CharSequence resultQuery = SQLUtils.newRewrite( dataListener.getMergedQuery( ) , mapping );
       CharSequence viewName = dataListener.getViewNameInString( );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The view name=" ).append( viewName ).append( " with the query=" ).append( resultQuery ).toString( ) );
       getStorageManager( ).createView( viewName , resultQuery );

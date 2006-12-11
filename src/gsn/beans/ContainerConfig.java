@@ -88,6 +88,12 @@ public class ContainerConfig {
    
    protected int                         storagePoolSize                  = DEFAULT_STORAGE_POOL_SIZE;
    
+   private int sslPort ;
+   
+   private String sslKeyStorePassword;
+   
+   private String sslKeyPassword;
+           
    public String getContainerFileName ( ) {
       return this.containerFileName;
    }
@@ -536,4 +542,13 @@ public class ContainerConfig {
       return bean;
    }
    
+   public int getSSLPort(){
+      return sslPort;
+   }
+   public String getSSLKeyStorePassword(){
+      return sslKeyStorePassword;
+   }
+   public String getSSLKeyPassword(){
+      return sslKeyPassword;
+   }
 }

@@ -17,9 +17,9 @@
                     <predicate key="HOST">localhost</predicate>
                     <predicate key="PORT">22001</predicate>
                 </address>
-                <query>select * from "WRAPPER"</query>
+                <query>select * from wrapper</query>
             </source>
-            <query>select * from "source1"</query>
+            <query>select * from source1</query>
         </stream> 
         </streams>
 </virtual-sensor> 
