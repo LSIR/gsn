@@ -477,7 +477,6 @@ public class StorageManager {
       PreparedStatement queryPreparedStatement = null;
       try {
          queryPreparedStatement = obtainPreparedStatementForQuery( sqlQuery );
-         logger.fatal(sqlQuery);
          ResultSet resultSet = queryPreparedStatement.executeQuery( );
          toreturn = resultSet.next( );
       } catch ( SQLException error ) {

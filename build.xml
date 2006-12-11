@@ -75,11 +75,11 @@
         </webdoclet>
     </target>
 -->
-   <target name="build" depends="setup">
-      <javac debug="true" srcdir="${src.dir}" optimize="off"
-             destdir="${build.dir}" failonerror="true" source="1.5" classpathref="classpath"/>
-      <!-- The WebCamWrapper file is excluded since it dependes on the jmf.jar (Java Media Framework)
-which is available from SUN at  http://java.sun.com/products/java-media/jmf/index.jsp -->
+
+    <target name="build" depends="setup">
+      <copydir  dest="${build.dir}/org" src="${src.dir}/org"/>
+    	<javac debug="true" srcdir="${src.dir}" optimize="off"
+               destdir="${build.dir}" failonerror="true" source="1.5" classpathref="classpath"/>
       <echo>Compiling JIBX Mappings...</echo>
       <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
             failonerror="true">
