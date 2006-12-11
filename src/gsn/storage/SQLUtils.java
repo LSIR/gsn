@@ -47,7 +47,6 @@ public class SQLUtils {
       while ( matcher.find( ) ) {
          if ( matcher.group( 2 ) == null ) continue;
          String tableName = matcher.group( 3 );
-         // System.out.println(matcher.group(3));
          CharSequence replacement = renameMapping.get( tableName );
          // $4 means that the 4th group of the match should be appended to the
          // string (the forth group contains the field name).
@@ -55,8 +54,7 @@ public class SQLUtils {
       }
       String toReturn = matcher.appendTail( result ).toString( ).toLowerCase( );
       int indexOfFrom = toReturn.indexOf( " from " ) + " from ".length( );
-      System.out.println( toReturn );
-      int indexOfWhere = ( toReturn.lastIndexOf( " where " ) > 0 ? ( toReturn.lastIndexOf( " where " ) ) : toReturn.length( ) );
+       int indexOfWhere = ( toReturn.lastIndexOf( " where " ) > 0 ? ( toReturn.lastIndexOf( " where " ) ) : toReturn.length( ) );
       String selection = toReturn.substring( indexOfFrom , indexOfWhere );
       Pattern fromClausePattern = Pattern.compile( "\\s*(\\w+)\\s*" , Pattern.CASE_INSENSITIVE );
       Matcher fromClauseMather = fromClausePattern.matcher( selection );
@@ -76,7 +74,6 @@ public class SQLUtils {
       TreeMap < CharSequence , CharSequence > map = new TreeMap < CharSequence , CharSequence >( new CaseInsensitiveComparator( ) );
       map.put( "x" , "done" );
       CharSequence out = newRewrite( "select ali.fd x.x fdfd.fdfd r.*, * from x,x, bla, x where k" , map );
-      
       System.out.println( out.toString( ) );
    }
 }

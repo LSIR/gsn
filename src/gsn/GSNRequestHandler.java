@@ -40,7 +40,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
          // * stream element.<br>
          // */
          if ( timeStamp <= 0 ) timeStamp = System.currentTimeMillis( );
-         StorageManager.getInstance( ).insertData( new StringBuilder( "_" ).append( notificationCode > 0 ? "" : "_" ).append( notificationCode ).toString( ) ,
+         StorageManager.getInstance( ).insertData(Main.tableNameGeneratorInString( notificationCode ).toString( ) ,
             StreamElement.createElementFromXMLRPC(remoteDS.getOutputFormat( ), fieldNamesInStreamElement , fieldValues , timeStamp ) );
          if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "data received for notification code *" ).append( notificationCode ).toString( ) );
          remoteDS.remoteDataReceived( );

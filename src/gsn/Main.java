@@ -62,8 +62,6 @@ public final class Main {
    
    public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
    
-   private static File            pidFile;
-   
    public static void main ( String [ ] args ) throws IOException , RuntimeException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
       ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
       ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
@@ -112,9 +110,10 @@ public final class Main {
       webAppContext.setResourceBase ( DEFAULT_WEB_APP_PATH );
       ServletHandler servletHandler = new ServletHandler ( );
       servletHandler.addServletWithMapping ( "gsn.registry.MyXmlRPCServlet" , "/gsn-handler" );
-      servletHandler.addServletWithMapping ( "gsn.web.http.ControllerServlet" , "/gsn" );
+      servletHandler.addServletWithMapping ( "gsn.web.ControllerServlet" , "/gsn" );
       servletHandler.addServletWithMapping ( "gsn.web.DataDownload" , "/data" );
-      webAppContext.setServletHandler ( servletHandler );
+      servletHandler.addServletWithMapping ( "gsn.web.FieldDownloadServlet" , "/field" );
+       webAppContext.setServletHandler ( servletHandler );
      /// webAppContext.setConnectorNames(new String[]{httpConnector.getName()});
       
       server.setHandler ( webAppContext );
