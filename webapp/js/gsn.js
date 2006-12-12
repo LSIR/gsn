@@ -209,11 +209,13 @@ var GSN = {
 									    ),$.UL({"class":"tabnav"},
 									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','dynamic');","class":"tabdynamic active"},"dynamic")),
 									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','static');","class":"tabstatic"},"addressing")),
-									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','structure');","class":"tabstructure"},"structure"))
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','structure');","class":"tabstructure"},"structure")),
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','description');","class":"tabdescription"},"description"))									    	
 									      ),
 									  $.DL({"class":"dynamic"}),
 									  $.DL({"class":"static"}),
-									  $.DL({"class":"structure"})
+									  $.DL({"class":"structure"}),
+									  $.DL({"class":"description"})
 			));
 		}
 		/**
@@ -253,6 +255,7 @@ var GSN = {
 			var name,type,value;
 			//update the vsbox the first time, when it's empty
 			if ($(dynamic).children().size()==0 && $(static).children().size()==0){
+			  var gotDynamic,gotStatic = false;
 			  $("field",vs).each(function(){ 
 				name = $(this).attr("name");
 				type = $(this).attr("type");
@@ -264,10 +267,26 @@ var GSN = {
 			  		return;
 			  	}
 				
-				if (type=="predicate")
+				if (type=="predicate") {
 					dl = static;
-				else //add to structure
+					if (!gotStatic) {	
+						$("a.tabstatic", vsd).show();
+			  			if (!gotDynamic) {
+			  				$("a.tabstatic", vsd).addClass("active");
+			  				$("dl", vsd).hide();
+			  				$("dl.static", vsd).show();
+			  			}
+						gotStatic = true;
+					}
+				} else {
+					//add to structure
 					$(struct).append($.DT({},name),$.DD({"class":name},type));
+					if (!gotDynamic) {
+			  			$("a.tabdynamic", vsd).show();
+						$("a.tabstructure", vsd).show();
+						gotDynamic = true;
+					}
+				}
 							
 				//set the value
 				if (value == "") {
@@ -281,6 +300,18 @@ var GSN = {
 				} 
 				$(dl).append('<dt>'+name+'</dt><dd class="'+name+'">'+value+'</dd>');				
 			  });
+			  
+			  if (vs.attr("description")!="") {
+			 	$("dl.description", vsd).append($.DT({},""),$.DD({},vs.attr("description")));
+			 	$("a.tabdescription", vsd).show();
+			 	if (!gotStatic) {
+			  		$("a.tabdescription", vsd).addClass("active");
+			  		$("dl", vsd).hide();
+			  		$("dl.description", vsd).show();
+			  	}
+				
+			  }
+			 
 			  return true;
 			} else {
 				//update the vsbox when the value already exists
@@ -546,14 +577,14 @@ var GSN = {
 				type: "GET",
 				url: "/gsn?REQUEST=113&name="+vsName,
 				success: function(msg) {
-					fields = new Array();
-					fields_type = new Array();
-					criterias = new Array();
-					nb_crit = 0;
+					GSN.data.fields = new Array();
+					GSN.data.fields_type = new Array();
+					GSN.data.criterias = new Array();
+					GSN.data.nb_crit = 0;
 					$("field", $("virtual-sensor", msg)).each(function() {
 						if ($(this).attr("type").substr(0,3) != "bin") {
-							fields.push($(this).attr("name"));
-							fields_type.push($(this).attr("type"));
+							GSN.data.fields.push($(this).attr("name"));
+							GSN.data.fields_type.push($(this).attr("type"));
 							if (radio) {
 								if (($(this).attr("type") == "int") || ($(this).attr("type") == "long") || ($(this).attr("type") == "double")) {
 									$("#fields").append("<input type=\"radio\" name=\"fields\" id=\"field\" value=\""+$(this).attr("name")+"\">"+$(this).attr("name")+"<br/>");
@@ -599,16 +630,16 @@ var GSN = {
 				$("#where").append("<a id=\"addCrit\" href=\"javascript:GSN.data.addCriteria(false)\">Add criteria</a>");
 				$("#where").append("<br/><br/><a id=\"nextStep\" href=\"javascript:GSN.data.selectDataDisplay()\">Next step</a></td></tr>");
 			} else {
-				nb_crit++;
-				newcrit = "<div id=\"where" + nb_crit + "\"></div>";
+				GSN.data.nb_crit++;
+				newcrit = "<div id=\"where" + GSN.data.nb_crit + "\"></div>";
 	    		$("#addCrit").before(newcrit);
-	    		GSN.data.addCriteriaLine(nb_crit, "");
-	    		criterias.push(nb_crit);
+	    		GSN.data.addCriteriaLine(GSN.data.nb_crit, "");
+	    		GSN.data.criterias.push(GSN.data.nb_crit);
 			}
 		},
 		addCriteriaLine: function(nb_crit, field) {
 				newcrit = "";
-				if (criterias.length > 0) {
+				if (GSN.data.criterias.length > 0) {
 					newcrit += "<select name=\"critJoin\" id=\"critJoin" + nb_crit + "\" size=\"1\">";
 					var critJoin = new Array("AND", "OR");
 					for (var i=0; i < critJoin.length; i++) {
@@ -622,9 +653,9 @@ var GSN = {
 	    			newcrit += "<option value=\"" + neg[i] + "\" >" + neg[i] + "</option>";
 	    		}
 	    		newcrit += "</select> ";
-	    		newcrit += "<select name=\"critfield\" id=\"critfield" + nb_crit + "\" size=\"1\" onChange=\"javascript:GSN.criteriaForType(this.value,"+nb_crit+")\">";
-	    		for (var i=0; i< fields.length; i++) {
-	    			newcrit += "<option value=\"" + fields[i] + "\">" + fields[i] + "</option>";
+	    		newcrit += "<select name=\"critfield\" id=\"critfield" + nb_crit + "\" size=\"1\" onChange=\"javascript:GSN.data.criteriaForType(this.value,"+nb_crit+")\">";
+	    		for (var i=0; i< GSN.data.fields.length; i++) {
+	    			newcrit += "<option value=\"" + GSN.data.fields[i] + "\">" + GSN.data.fields[i] + "</option>";
 	    		}
 	    		newcrit += "</select> ";
 	    		var operators = new Array("&gt;", "&ge;", "&lt;", "&le;", "=", "LIKE");
@@ -637,10 +668,12 @@ var GSN = {
 	    		newcrit += " <a href=\"javascript:GSN.data.removeCrit("+nb_crit+")\" id=\"remove" + nb_crit + "\"> (remove)</a>";
 	    		$("#where"+nb_crit).append(newcrit);
 	    		$("#critfield"+nb_crit).attr("value", field);
+	    		GSN.data.criteriaForType(GSN.data.fields[0],nb_crit);
 		},
 		criteriaForType: function(field, nb_crit) {
 			if (field == "TIMED") {
-				$("#critval"+nb_crit).val("DD/MM/YYYY hh:mm:ss");
+				$("#critval"+nb_crit).val("dd/mm/yyyy hh:mm:ss");
+				$("#critval"+nb_crit).datePicker({startDate:'01/01/2006'});
 			} else {
 				$("#critval"+nb_crit).val("");
 			}
@@ -648,16 +681,16 @@ var GSN = {
 		removeCrit: function(critnb) {
 	   		$("#where"+critnb).remove();
 	   		var critTMP = new Array();
-	   		for (var i=0; i<criterias.length; i++) {
-	   			if (criterias[i] == critnb) {
-	   				if (i == 0 && criterias.length > 0) {
-	   					$("#critJoin"+criterias[i+1]).remove();
+	   		for (var i=0; i<GSN.data.criterias.length; i++) {
+	   			if (GSN.data.criterias[i] == critnb) {
+	   				if (i == 0 && GSN.data.criterias.length > 0) {
+	   					$("#critJoin"+GSN.data.criterias[i+1]).remove();
 	   				}
 	   			} else {
-	   				critTMP.push(criterias[i]);
+	   				critTMP.push(GSN.data.criterias[i]);
 	   			}
 	   		}
-	   		criterias = critTMP;
+	   		GSN.data.criterias = critTMP;
 	   	},
 	   	selectDataDisplay: function() {
 	   		$("#nextStep").remove();
@@ -680,7 +713,7 @@ var GSN = {
 	   		}
 	   	},
 	   	getDatas: function() {
-	   		if ($("#samePage").attr("checked")) {
+	   		if ($("#samePage").attr("checked") || $("#popup").attr("checked")) {
 	   			request = "vsName="+$("#vsName").attr("value");
 	   			if ($("#commonReq").attr("checked")) {
 	   				request += "&commonReq=true";
@@ -696,21 +729,21 @@ var GSN = {
 				if ($("#someDatas").attr("checked") && $("#nbOfDatas").attr("value") != "") {
 					request += "&nb=" + $("#nbOfDatas").attr("value");
 				}
-				for (var i=0; i < criterias.length; i++) {
+				for (var i=0; i < GSN.data.criterias.length; i++) {
 					if (i > 0) {
-						request += "&critJoin="+$("#critJoin"+criterias[i]).val();
+						request += "&critJoin="+$("#critJoin"+GSN.data.criterias[i]).val();
 					}
-					request += "&neg="+$("#neg"+criterias[i]).val();
-					request += "&critfield="+$("#critfield"+criterias[i]).val();
-					request += "&critop="+$("#critop"+criterias[i]).val();
-					request += "&critval="+$("#critval"+criterias[i]).val();
+					request += "&neg="+$("#neg"+GSN.data.criterias[i]).val();
+					request += "&critfield="+$("#critfield"+GSN.data.criterias[i]).val();
+					request += "&critop="+$("#critop"+GSN.data.criterias[i]).val();
+					request += "&critval="+$("#critval"+GSN.data.criterias[i]).val();
 				}
 				GSN.data.displayDatas(request);
-	   		} else if ($("#popup").attr("checked")) {
+	   		} /*else if ($("#popup").attr("checked")) {
 	   			$("form").attr("target", "_blank");
 	   			$("form").attr("action", "/showData.jsp");
 	   			document.forms["formular"].submit();
-	   		} else if ($("#CSV").attr("checked")) {
+	   		} */ else if ($("#CSV").attr("checked")) {
 	   			$("form").attr("action", "/data");
 	   			$("#criterias").attr("target", "_self");
 	   			document.forms["formular"].submit();
@@ -721,24 +754,38 @@ var GSN = {
 				type: "GET",
 				url: "/data?"+request,
 				success: function(msg) {
-					$("#dataSet").remove();
-					$("#datachooser").append($.TABLE({"size":"100%", "id":"dataSet"})); //"<table size=\"100%\" id=\"dataSet\">");
+					//should check no field selected...
+					if ($("data", msg).size() == 0) {
+						alert('No data corresponds to your request');
+						return;
+					}
+					
+					var target = "#datachooser";
+					if ($("#popup").attr("checked")){
+						var w = window.open("", "Data", "width=700,height=700,scrollbars=yes");
+						if (w == null) {
+							alert('Your browser security setting blocks popup. Please turn it off for this website.');
+							return;
+						}
+						target = w.document.body;
+					}
+
+					$("table#dataSet",$(target)).remove();
+					$(target).append($.TABLE({"size":"100%", "id":"dataSet"})); //"<table size=\"100%\" id=\"dataSet\">");
 					nbLine = 0;
 					$("line", $("data", msg)).each(function() {
 						nbLine++;
 						if (nbLine == 1) {
-							$("#dataSet").append($.TR({"id":"line"+nbLine, "class":"step"}));
+							$("table#dataSet",$(target)).append($.TR({"id":"line"+nbLine, "class":"step"}));
 						} else {
-							$("#dataSet").append($.TR({"id":"line"+nbLine, "class":"data"}));
+							$("table#dataSet",$(target)).append($.TR({"id":"line"+nbLine, "class":"data"}));
 						}
 						$("field", $(this)).each(function() {
-							$("#line"+nbLine).append($.TD({},$(this).text()));
+							$("table#dataSet tr#line"+nbLine,$(target)).append($.TD({},$(this).text()));
 						});
 						
 					});
-					if (nbLine == 0) {
-						alert('No data corresponds to your request');
-					}
+					
 				}
 			});
 	   	}

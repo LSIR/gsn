@@ -227,7 +227,13 @@ text-decoration:none;
 	/*height:150px;*/
 }
 
-.vsbox dl.static, .vsbox dl.structure {display:none}
+.vsbox a.tabdynamic, .vsbox a.tabstatic, .vsbox a.tabstructure,.vsbox a.tabdescription {
+	display:none;
+}
+
+.vsbox dl.static, .vsbox dl.structure,.vsbox dl.description {
+	display:none;
+}
 .clear {
 		clear:both;
 }	
@@ -357,13 +363,13 @@ a.date-picker {
 	color: #fff;
 	padding: 0;
 	margin: 0;
-	float: left;
+	yfloat: left;
 	overflow: hidden;
 	cursor: pointer;
 	background: url(calendar.png) no-repeat; 
 }
 a.date-picker span {
-	margin: 0 0 0 -2000px;
+	ymargin: 0 0 0 -2000px;
 }
 div.date-picker-holder, div.date-picker-holder * {
 	margin: 0;
@@ -371,9 +377,10 @@ div.date-picker-holder, div.date-picker-holder * {
 }
 div.date-picker-holder {
 	position: relative;
+	display:inline;
 }
 div.date-picker-holder input {
-	float: left;
+	yfloat: left;
 }
 div.popup-calendar {
 	display: none;
