@@ -25,6 +25,9 @@ jQuery.datePicker = function()
 	var _lastDate;
 
 	var _selectedDate;
+	var _selectedHour;
+	var _selectedMinute;
+	var _selectedSecond;
 	var _openCal;
 
 	var _zeroPad = function(num) {
@@ -56,12 +59,12 @@ jQuery.datePicker = function()
 		var dD = _zeroPad(d.getDate());
 		switch (dateFormat) {
 			case 'ymd':
-				return dY + dateSeparator + dM + dateSeparator + dD+" hh:mm:ss";
+				return dY + dateSeparator + dM + dateSeparator + dD;//+" hh:mm:ss";
 			case 'dmy':
-				return dD + dateSeparator + dM + dateSeparator + dY+" hh:mm:ss";
+				return dD + dateSeparator + dM + dateSeparator + dY;
 			case 'mdy':
 			default:
-				return dM + dateSeparator + dD + dateSeparator + dY+" hh:mm:ss";
+				return dM + dateSeparator + dD + dateSeparator + dY;
 		}
 	};
 
@@ -179,12 +182,24 @@ jQuery.datePicker = function()
 			}
 			tBody.append(thisRow);
 		}
-
+		var hoursSelect = jQuery("<select>").attr("class","hours").width("3em").change(function(e) {jQuery.datePicker.updatetheInput(this);return false;});
+		for (var i = 0; i<24; i++){
+			hoursSelect.append(jQuery("<option>").html(_zeroPad(i)));
+		}
+		var minutesSelect = jQuery("<select>").attr("class","minutes").width("3em").change(function(e) {jQuery.datePicker.updatetheInput(this);return false;});
+		var secondsSelect = jQuery("<select>").attr("class","seconds").width("3em").change(function(e) {jQuery.datePicker.updatetheInput(this);return false;});
+		for (var i = 0; i<60; i++){
+			minutesSelect.append(jQuery("<option>").html(_zeroPad(i)));
+			secondsSelect.append(jQuery("<option>").html(_zeroPad(i)));
+		}
+		
+		
+		var timeRow = jQuery("<p>").append(jQuery("<strong>").html("Time: ")).append(hoursSelect).append(minutesSelect).append(secondsSelect);
 		jCalDiv.append(
 			jQuery("<table>").attr('cellspacing',2).append("<thead>")
 			.find("thead").append(headRow).parent().append(tBody.children())
-		).append(prevLinkDiv).append(nextLinkDiv);
-
+		).append(timeRow).append(prevLinkDiv).append(nextLinkDiv);
+		
 		if (jQuery.browser.msie) {
 
 			// we put a styled iframe behind the calendar so HTML SELECT elements don't show through
@@ -213,6 +228,10 @@ jQuery.datePicker = function()
 		jQuery('div.popup-calendar', _openCal).empty();
 		jQuery('div.popup-calendar', _openCal).remove();
 		_openCal.append(c);
+		//fix hms, not proper
+		$("div.popup-calendar .hours",_openCal)[0].childNodes[_selectedHour].selected=true;
+		$("div.popup-calendar .minutes",_openCal)[0].childNodes[_selectedMinute].selected=true;
+		$("div.popup-calendar .seconds",_openCal)[0].childNodes[_selectedSecond].selected=true;
 	};
 	var _closeDatePicker = function()
 	{
@@ -265,14 +284,22 @@ jQuery.datePicker = function()
 			_lastDate = input._endDate;
 			_firstDayOfWeek = input._firstDayOfWeek;
 			_openCal = jQuery(this).findClosestParent('div.popup-calendar');
-			var d = jQuery(input).val();
+			var d = jQuery(input).val()+"  ";
+			hms = d.split(" ")[1];
+			d = d.split(" ")[0];
 			if (d != '') {
-				if (_dateToStr(_strToDate(d)) == d.split(" ")[0]+" hh:mm:ss") {
+				if (_dateToStr(_strToDate(d)) == d/*+" hh:mm:ss"*/) {
 					_selectedDate = d;
+					_selectedHour = hms.split(":")[0];
+					_selectedMinute = hms.split(":")[1];
+					_selectedSecond = hms.split(":")[2];
 					_draw(_getCalendarDiv(_strToDate(d)));
 				} else {
 					// invalid date in the input field - just default to this month
 					_selectedDate = false;
+					_selectedHour = hms.split(":")[0];
+					_selectedMinute = hms.split(":")[1];
+					_selectedSecond = hms.split(":")[2];
 					_draw(_getCalendarDiv());
 				}
 			} else {
@@ -295,11 +322,18 @@ jQuery.datePicker = function()
 		},
 		selectDate: function(d, ele)
 		{
-			selectedDate = d;
+			_selectedDate = d;
+			jQuery('div.popup-calendar a', _openCal).removeClass("selected");
+			jQuery(ele).addClass("selected");
+			//_closeDatePicker(ele);
+			jQuery.datePicker.updatetheInput(ele);
+		},
+		updatetheInput: function(ele)
+		{
+			var hms = jQuery('div.popup-calendar .hours', _openCal).val() +":"+jQuery('div.popup-calendar .minutes', _openCal).val()+":"+jQuery('div.popup-calendar .seconds', _openCal).val();
 			var $theInput = jQuery('input', jQuery(ele).findClosestParent('input'));
-			$theInput.val(d);
+			$theInput.val(_selectedDate+" "+hms);
 			$theInput.trigger('change');
-			_closeDatePicker(ele);
 		},
 		closeCalendar: function()
 		{

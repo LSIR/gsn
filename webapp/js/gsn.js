@@ -618,7 +618,7 @@ var GSN = {
 			$("#nextStep").remove();
 			$("#criterias").append("<tr><td class=\"step\">Step 3/5 : Selection of the Virtual Sensor</td></tr>");
 			$("#criterias").append("<tr><td class=\"data\" id=\"nbDatas\"></td></tr>");
-			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"allDatas\" value=\"\" checked> All datas<br/>");
+			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"allDatas\" value=\"\" checked> All data<br/>");
 			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"someDatas\" value=\"\"> Last <input type=\"text\" name=\"nb\" value=\"\" id=\"nbOfDatas\" size=\"4\"/> values<br/>");
 			$("#nbDatas").append("<br><a href=\"javascript:GSN.data.addCriteria(true)\" id=\"nextStep\">Next step</a>");
 		},	
@@ -672,7 +672,7 @@ var GSN = {
 		},
 		criteriaForType: function(field, nb_crit) {
 			if (field == "TIMED") {
-				$("#critval"+nb_crit).val("dd/mm/yyyy hh:mm:ss");
+				$("#critval"+nb_crit).val(GSN.util.printDate((new Date()).getTime()));
 				$("#critval"+nb_crit).datePicker({startDate:'01/01/2006'});
 			} else {
 				$("#critval"+nb_crit).val("");
@@ -698,8 +698,8 @@ var GSN = {
 			$("#criterias").append("<tr><td class=\"data\" id=\"display\">");
 			$("#display").append("<input type=\"radio\" id=\"samePage\" value=\"samepage\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\" checked>In this page<br/>");
 			$("#display").append("<input type=\"radio\" id=\"popup\" value=\"popup\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\">In a new window<br/>");
-			$("#display").append("<input type=\"radio\" id=\"CSV\" value=\"CSV\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\">Download datas<br/>");
-			$("#display").append("<br/><a id=\"getDatas\" href=\"javascript:GSN.data.getDatas()\">Get datas</a><br/><br/>");
+			$("#display").append("<input type=\"radio\" id=\"CSV\" value=\"CSV\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\">Download data<br/>");
+			$("#display").append("<br/><a id=\"getDatas\" href=\"javascript:GSN.data.getDatas()\">Get data</a><br/><br/>");
 	   	},
 	   	showFormatCSV: function() {
 	   		if ($("#CSV").attr("checked")) {
@@ -713,6 +713,8 @@ var GSN = {
 	   		}
 	   	},
 	   	getDatas: function() {
+	   		$("table#dataSet","#datachooser").remove();
+	   		$("#display").append($.SPAN({"class":"refreshing"},$.IMG({"src":"style/ajax-loader.gif","alt":"loading","title":""})));
 	   		if ($("#samePage").attr("checked") || $("#popup").attr("checked")) {
 	   			request = "vsName="+$("#vsName").attr("value");
 	   			if ($("#commonReq").attr("checked")) {
@@ -754,12 +756,20 @@ var GSN = {
 				type: "GET",
 				url: "/data?"+request,
 				success: function(msg) {
+					//remove indicator	
+					$("#display .refreshing").remove();					
+				
+	
 					//should check no field selected...
 					if ($("data", msg).size() == 0) {
+						alert(msg);
+						return;
+					}
+					else if ($("line", msg).size() == 0) {
 						alert('No data corresponds to your request');
 						return;
 					}
-					
+
 					var target = "#datachooser";
 					if ($("#popup").attr("checked")){
 						var w = window.open("", "Data", "width=700,height=700,scrollbars=yes");
@@ -772,20 +782,28 @@ var GSN = {
 
 					$("table#dataSet",$(target)).remove();
 					$(target).append($.TABLE({"size":"100%", "id":"dataSet"})); //"<table size=\"100%\" id=\"dataSet\">");
-					nbLine = 0;
-					$("line", $("data", msg)).each(function() {
-						nbLine++;
-						if (nbLine == 1) {
-							$("table#dataSet",$(target)).append($.TR({"id":"line"+nbLine, "class":"step"}));
-						} else {
-							$("table#dataSet",$(target)).append($.TR({"id":"line"+nbLine, "class":"data"}));
-						}
-						$("field", $(this)).each(function() {
-							$("table#dataSet tr#line"+nbLine,$(target)).append($.TD({},$(this).text()));
-						});
-						
-					});
 					
+					
+					var line,tr,rows;
+					var lines = $("line", msg);
+					for (var i = 0; i<lines.size();i++){
+						line = lines.get(i);
+						
+						if (i==0)
+							tr = $.TR({"id":"line"+i, "class":"step"});
+						else
+							tr = $.TR({"id":"line"+i, "class":"data"});
+						
+						rows = $("field", line);
+						for (var j = 0; j<rows.size();j++){
+							$(tr).append($.TD({},$(rows.get(j)).text()));
+						}
+						$("table#dataSet",$(target)).append(tr);
+					}
+					
+					if (w != null){
+						$("table#dataSet .step", $(target)).background("#ffa84c")
+					}
 				}
 			});
 	   	}
@@ -796,8 +814,8 @@ var GSN = {
 		*/
 		printDate: function(date){
 			date = new Date(parseInt(date));
-			var value = date.getFullYear()+"/"+GSN.util.addleadingzero(date.getMonth()+1)+"/"+GSN.util.addleadingzero(date.getDate());
-	        value += "@"+GSN.util.addleadingzero(date.getHours())+":"+GSN.util.addleadingzero(date.getMinutes())+":"+GSN.util.addleadingzero(date.getSeconds());	       
+			var value = GSN.util.addleadingzero(date.getDate())+"/"+GSN.util.addleadingzero(date.getMonth()+1)+"/"+date.getFullYear();
+	        value += " "+GSN.util.addleadingzero(date.getHours())+":"+GSN.util.addleadingzero(date.getMinutes())+":"+GSN.util.addleadingzero(date.getSeconds());	       
 	        return value;
 	    }
 	    /**

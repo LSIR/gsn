@@ -146,7 +146,7 @@ public class DataDownload extends HttpServlet {
 		    					  Date d = sdf.parse(critval[i]);
 		    					  where += d.getTime();
 		    				  } catch (Exception e) {
-		    					  System.out.println(e.toString());
+		    					  //System.out.println(e.toString());
 		    					  where += "0";
 		    				  }
 		    			  } else {
@@ -225,8 +225,14 @@ public class DataDownload extends HttpServlet {
 	    			  }
 		             line = "";
 		             out.println("\t<line>");
-		             for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ )
-		                   out.println("\t\t<field>"+se.getData( )[ i ].toString( )+"</field>");
+		             for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {
+		            	 
+		            	 /*if (se.getFieldNames()[i].toString().contains("TIMED"))
+		            	   out.println("\t\t<field>"+se.getFieldTypes( )[ i ].toString( )+"</field>");
+		                 else
+		                   */
+		            	 out.println("\t\t<field>"+se.getData( )[ i ].toString( )+"</field>"); 
+		             }
 		             if (wantTimeStamp) {
 		            	SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 					 	Date d = new Date (se.getTimeStamp());
@@ -239,6 +245,7 @@ public class DataDownload extends HttpServlet {
 	    	result.close();
 	    	//*/
 	      } else {
+	    	  res.setContentType("text/html");
 	    	  out.println("Please select some fields");
 	      }
 	   }

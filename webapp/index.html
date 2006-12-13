@@ -21,9 +21,7 @@ $(document).ready(function() {
 	$("#closeall").bind("click",GSN.closeall);
 	
 	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
-	
-	$('input.date-picker').datePicker({startDate:'01/01/2005'});
-	
+		
 	//load the requested page
 	$.historyInit(GSN.load);
 });	
@@ -49,7 +47,6 @@ $(document).ready(function() {
 		
 		<div id="control">
 		  <div class="intro">Welcome to Global Sensor Networks. The first ten sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
-		  <!--  <p><input type="text" class="date-picker" name="date1" id="date1" /><input type="text" name="time1" id="time1" /><input type="text" class="date-picker" name="date1" id="date1" /><br/>	</p> -->
 		  <p>Auto-refresh every : 
 			<select id="refreshall_timeout" >
 			<option value="3600000">1hour</option>
