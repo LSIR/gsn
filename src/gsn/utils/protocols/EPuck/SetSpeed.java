@@ -3,9 +3,12 @@
  */
 package gsn.utils.protocols.EPuck;
 
+import gsn.gui.JHCIProtocolControl;
 import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
 
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -14,6 +17,7 @@ import java.util.Vector;
  */
 public class SetSpeed extends AbstractHCIQueryWithoutAnswer {
 	
+	private static final transient Logger logger = Logger.getLogger( SetSpeed.class );
 	public static final String queryDescription = "Set the speed of the EPuck robot's two wheels.";
 	public static final String[] paramsDescriptions = {"Speed of the left wheel.","Speed of the right wheel."};
    
@@ -30,12 +34,17 @@ public class SetSpeed extends AbstractHCIQueryWithoutAnswer {
     */
    public byte[] buildRawQuery ( Vector < Object > params ) {
       byte[] query = null;
-      if(params.size() == 2 && (params.get(0) instanceof Integer) && (params.get(1) instanceof Integer)) {
+
+      if(params.size() == 2 && (params.get(0) instanceof String) && (params.get(1) instanceof String)) {
          Integer leftSpeed, rightSpeed;
-         leftSpeed = (Integer)params.get(1);
-         rightSpeed = (Integer)params.get(2);
-         String textLeftSpeed = leftSpeed.toString( );
-         String textRightSpeed = rightSpeed.toString( );
+         String textLeftSpeed, textRightSpeed;
+         //leftSpeed = (Integer)params.get(1);
+         //rightSpeed = (Integer)params.get(2);
+         //String textLeftSpeed = leftSpeed.toString( );
+         //String textRightSpeed = rightSpeed.toString( );
+         textLeftSpeed = (String) params.get(0);
+         textRightSpeed = (String) params.get(1);
+         
          query = new byte[3+textLeftSpeed.length()+textRightSpeed.length()];
          query[0] = 'D';
          query[1] = ',';
@@ -46,6 +55,8 @@ public class SetSpeed extends AbstractHCIQueryWithoutAnswer {
          byte[] bytesRightSpeed = textRightSpeed.getBytes();
          for(int i = 0; i < bytesRightSpeed.length; i++ )
             query[3+bytesLeftSpeed.length+i] = bytesRightSpeed[i];
+      } else {
+    	  logger.warn("Bad arguments for query ! (Number=" + params.size() + " and should be 2)" );
       }
       return query;
    }
