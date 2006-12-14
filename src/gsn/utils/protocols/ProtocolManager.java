@@ -64,9 +64,11 @@ public class ProtocolManager {
 		byte[] answer = null;
 		if(currentState == ProtocolStates.READY) {
 			AbstractHCIQuery query = protocol.getQuery( queryName );
-			if(logger.isDebugEnabled())
-				logger.debug( "Retrieved query " + queryName + ", trying to build raw query.");
+			
 			if(query != null) {
+				if(logger.isDebugEnabled())
+					logger.debug( "Retrieved query " + queryName + ", trying to build raw query.");
+
 				byte[] queryBytes = query.buildRawQuery( params );
 				if(queryBytes != null) {
 					try {
@@ -90,9 +92,12 @@ public class ProtocolManager {
 							logger.debug("Query could not be sent ! See error message.");
 						logger.error( e.getMessage( ) , e );
 						currentState = ProtocolStates.READY;
-					}            
+					}
 				}
+			} else {
+				logger.warn("Query " + queryName + " found but no bytes produced to send to device. Implementation may be missing.");
 			}
+
 		}
 		return answer;
 	}

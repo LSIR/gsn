@@ -136,7 +136,7 @@ public class JHCIProtocolControl extends JFrame {
 			}
 		});
 
-		jqueries.setSelectedIndex(0);
+		//jqueries.setSelectedIndex(0);
 	}
 	/**
 	 * 
@@ -193,11 +193,12 @@ public class JHCIProtocolControl extends JFrame {
 			parametersValues = new JTextArea[nbParameters];
 			for(int i = 0; i < nbParameters; i++) {
 				parametersLabels[i] = new JLabel(query.getName());
+				parametersValues[i] = new JTextArea("enter value " + i + " here.");
 				if(query.getParamsDescriptions()[i] != null && ! query.getParamsDescriptions()[i].trim().equals("")) {
 					parametersLabels[i].setToolTipText(query.getParamsDescriptions()[i]);
 					parametersValues[i].setToolTipText(query.getParamsDescriptions()[i]);
 				}
-				parametersValues[i] = new JTextArea("enter value " + i + " here.");
+				
 				builder.add(parametersLabels[i], cc.xy(1, i+1));
 				builder.add(parametersValues[i], cc.xy(2, i+1));
 			}
@@ -280,7 +281,8 @@ public class JHCIProtocolControl extends JFrame {
 		}
 
 		public void doLogTx(byte[] log) {
-			doLog(log, false);
+			if (log != null)
+				doLog(log, false);
 		}
 		public void doLogRx(String log) {
 			doLog(log, true);

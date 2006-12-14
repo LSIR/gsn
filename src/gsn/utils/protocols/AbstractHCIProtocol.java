@@ -59,6 +59,10 @@ public abstract class AbstractHCIProtocol {
 			logger.debug("returning query values: " + queries.values());
 		return queries.values();
 	}
+	
+	public Collection<String> getNames() {
+		return queries.keySet();
+	}
 	/*
 	 * Returns the name of the protocol represented
 	 * by this class.
@@ -69,7 +73,10 @@ public abstract class AbstractHCIProtocol {
 	}
 	
 	public AbstractHCIQuery getQuery(String queryName) {
-		return queries.get(queryName);
+		for(String key: queries.keySet())
+			if(key.equals(queryName))
+				return queries.get(key);
+		return null;
 	}
    
 	/*

@@ -12,14 +12,25 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 
 /**
- * This class is designed to call Ant targets from any Java application. 1.
- * Initialize a new Project by calling "init" 2. Feed Ant with some properties
- * by calling "setProperties" (optional) 3. Run an Ant target by calling
- * "runTarget" Example : try { //init init("/home/me/build.xml","/home/me/");
- * //properties HashMap m = new HashMap(); m.put("event", "test");
- * m.put("subject", "sujet java 3"); m.put("message", "message java 3");
- * setProperties(m, false); //run runTarget("test"); } catch (Exception e) {
- * e.printStackTrace(); }
+ * This class is designed to call Ant targets from any Java application.
+ *  1. Initialize a new Project by calling "init" 
+ *  2. Feed Ant with some properties
+ * by calling "setProperties" (optional) 
+ * 3. Run an Ant target by calling
+ * "runTarget" Example : 
+ * try { 
+ * 	//init 
+ * 	init("/home/me/build.xml","/home/me/");
+ * 	//properties 
+ * 	HashMap m = new HashMap();
+ * 	m.put("event", "test");
+ * 	m.put("subject", "sujet java 3"); 
+ * 	m.put("message", "message java 3");
+ * 	setProperties(m, false);
+ * 	//run runTarget("test"); 
+ * } catch (Exception e) {
+ * 	e.printStackTrace(); 
+ * }
  */
 
 public class AntRunner {

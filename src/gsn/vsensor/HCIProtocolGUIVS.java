@@ -44,6 +44,7 @@ public class HCIProtocolGUIVS extends AbstractVirtualSensor {
          logger.error( e );
          return false;
       }
+      vsensor = getVirtualSensorConfiguration();
       outputWrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
       protocolManager = new ProtocolManager( protocol , outputWrapper );
       if ( logger.isDebugEnabled( ) && protocol != null && protocolManager != null ) logger.debug( "Successfully loaded protocol class " + params.get( "HCIProtocolClass" ) );
