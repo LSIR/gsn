@@ -36,19 +36,19 @@ public class SensorScopeWrapper extends AbstractWrapper implements MessageListen
       String host = addressBean.getPredicateValue( "host" );
       int port;
       if ( host == null || host.trim( ).length( ) == 0 ) {
-         logger.warn( "The >host< parameter is missing from the RemoteDS wrapper." );
+         logger.warn( "The >host< parameter is missing from the RemoteWrapper wrapper." );
          return false;
       }
       String portRaw = addressBean.getPredicateValue( "port" );
       if ( portRaw == null || portRaw.trim( ).length( ) == 0 ) {
-         logger.warn( "The >port< parameter is missing from the RemoteDS wrapper." );
+         logger.warn( "The >port< parameter is missing from the RemoteWrapper wrapper." );
          return false;
       }
       try {
          port = Integer.parseInt( portRaw );
          if ( port > 65000 || port <= 0 ) throw new Exception( "Bad port No" + port );
       } catch ( Exception e ) {
-         logger.warn( "The >port< parameter is not a valid integer for the RemoteDS wrapper." );
+         logger.warn( "The >port< parameter is not a valid integer for the RemoteWrapper wrapper." );
          return false;
       }
       if ( logger.isDebugEnabled( ) ) {

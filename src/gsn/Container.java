@@ -2,7 +2,7 @@ package gsn;
 
 import gsn.notifications.NotificationRequest;
 import gsn.vsensor.AbstractVirtualSensor;
-import gsn.wrappers.RemoteDS;
+import gsn.wrappers.RemoteWrapper;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
@@ -79,7 +79,7 @@ public interface Container {
     */
    public void publishData ( AbstractVirtualSensor sensor );
    
-   public void addRemoteStreamSource ( int alias , RemoteDS remoteDS );
+   public void addRemoteStreamSource ( int alias , RemoteWrapper remoteWrapper );
    
    public void addNotificationRequest ( String localVirtualSensorName , NotificationRequest notificationRequest );
    

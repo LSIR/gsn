@@ -9,7 +9,7 @@ import gsn.notifications.GSNNotification;
 import gsn.registry.MyConfig;
 import gsn.registry.RequestInitializableRequestProcessor;
 import gsn.storage.StorageManager;
-import gsn.wrappers.RemoteDS;
+import gsn.wrappers.RemoteWrapper;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
@@ -27,8 +27,8 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
    
    public boolean deliverData ( int notificationCode ,  Object [] fieldNamesInStreamElement ,  Object [] fieldValues , String timeStampStr ) {
       long timeStamp = Long.parseLong( timeStampStr );
-      RemoteDS remoteDS = Mappings.getContainer( ).getRemoteDSForANotificationCode( notificationCode );
-      if ( remoteDS == null ) { // This client is no more interested
+      RemoteWrapper remoteWrapper = Mappings.getContainer( ).getRemoteDSForANotificationCode( notificationCode );
+      if ( remoteWrapper == null ) { // This client is no more interested
          // in this notificationCode.
          if ( logger.isInfoEnabled( ) ) logger.info( "Invalid notification code recieved, query droped." );
          return false;
@@ -41,9 +41,9 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
          // */
          if ( timeStamp <= 0 ) timeStamp = System.currentTimeMillis( );
          StorageManager.getInstance( ).insertData(Main.tableNameGeneratorInString( notificationCode ).toString( ) ,
-            StreamElement.createElementFromXMLRPC(remoteDS.getOutputFormat( ), fieldNamesInStreamElement , fieldValues , timeStamp ) );
+            StreamElement.createElementFromXMLRPC(remoteWrapper.getOutputFormat( ), fieldNamesInStreamElement , fieldValues , timeStamp ) );
          if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "data received for notification code *" ).append( notificationCode ).toString( ) );
-         remoteDS.remoteDataReceived( );
+         remoteWrapper.remoteDataReceived( );
          return true;
       }
    }

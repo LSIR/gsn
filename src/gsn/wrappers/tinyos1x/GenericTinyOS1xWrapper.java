@@ -47,12 +47,12 @@ public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageLi
       String host = addressBean.getPredicateValue( "host" );
       int port =-1;
       if (host ==null || host.trim( ).length( )==0) {
-         logger.warn( "The >host< parameter is missing from the RemoteDS wrapper." );
+         logger.warn( "The >host< parameter is missing from the RemoteWrapper wrapper." );
          return false;
       }
       String portRaw = addressBean.getPredicateValue( "port" );
       if (portRaw ==null || portRaw.trim( ).length( )==0) {
-         logger.warn( "The >port< parameter is missing from the RemoteDS wrapper." );
+         logger.warn( "The >port< parameter is missing from the RemoteWrapper wrapper." );
          return false;
       }
       try {
@@ -60,7 +60,7 @@ public class GenericTinyOS1xWrapper extends AbstractWrapper implements MessageLi
          if (port>65000 || port<=0)
             throw new Exception("Bad port No"+port);
       }catch (Exception e) {
-         logger.warn( "The >port< parameter is not a valid integer for the RemoteDS wrapper." );
+         logger.warn( "The >port< parameter is not a valid integer for the RemoteWrapper wrapper." );
          return false;
       }
      

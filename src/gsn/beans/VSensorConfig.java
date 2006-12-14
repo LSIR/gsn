@@ -3,7 +3,7 @@ package gsn.beans;
 import gsn.Main;
 import gsn.registry.Registry;
 import gsn.utils.CaseInsensitiveComparator;
-import gsn.wrappers.RemoteDS;
+import gsn.wrappers.RemoteWrapper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -364,8 +364,8 @@ public class VSensorConfig implements Serializable {
       StringBuilder usedSources = new StringBuilder( );
       for ( InputStream is : inputStreams )
          for ( StreamSource ss : is.getSources( ) )
-            if ( ss.getActiveSourceProducer( ) instanceof RemoteDS ) {
-               RemoteDS remote = ( RemoteDS ) ss.getActiveSourceProducer( );
+            if ( ss.getActiveSourceProducer( ) instanceof RemoteWrapper ) {
+               RemoteWrapper remote = ( RemoteWrapper ) ss.getActiveSourceProducer( );
                usedSources.append( remote.getRemoteHost( ) ).append( ":" ).append( remote.getRemotePort( ) ).append( "/" ).append( remote.getRemoveVSName( ) ).append( " " );
             } else {
                usedSources.append( ss.getActiveSourceProducer( ).getWrapperName( ) ).append( Registry.SPACE_CHARACTER );

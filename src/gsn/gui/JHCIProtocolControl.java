@@ -104,7 +104,8 @@ public class JHCIProtocolControl extends JFrame {
 						byte[] bytes = manager.sendQuery(query.getName(), queryParams);
 						displayArea.doLogTx("\nSent query type="+query.getName() + ", params="+ paramsText + "\n");
 						displayArea.doLogTx(bytes);
-
+						
+						
 						//	JOptionPane.showMessageDialog(gui, "Sorry, No wrapper available yet.", "Cannot send query", JOptionPane.ERROR);
 					}
 				} else {

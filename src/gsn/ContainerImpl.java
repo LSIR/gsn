@@ -11,7 +11,7 @@ import gsn.vsensor.http.OneShotQueryHandler;
 import gsn.vsensor.http.OneShotQueryWithAddressingHandler;
 import gsn.vsensor.http.OutputStructureHandler;
 import gsn.vsensor.http.RequestHandler;
-import gsn.wrappers.RemoteDS;
+import gsn.wrappers.RemoteWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public class ContainerImpl extends HttpServlet implements Container {
    
    private static final Class < ContainerImpl >                         notificationRequestsLock           = ContainerImpl.class;
    
-   private static final HashMap < Integer , RemoteDS >                   notificationCodeToRemoteDataSource = new HashMap < Integer , RemoteDS >( );
+   private static final HashMap < Integer , RemoteWrapper >                   notificationCodeToRemoteDataSource = new HashMap < Integer , RemoteWrapper >( );
    
    private static final Object                                          psLock                             = new Object( );
    
@@ -195,10 +195,10 @@ public class ContainerImpl extends HttpServlet implements Container {
       return results.toArray( new NotificationRequest [ ] {} );
    }
    
-   public void addRemoteStreamSource ( int notificationCode , RemoteDS remoteDS ) {
-      notificationCodeToRemoteDataSource.put( notificationCode , remoteDS );
+   public void addRemoteStreamSource ( int notificationCode , RemoteWrapper remoteWrapper ) {
+      notificationCodeToRemoteDataSource.put( notificationCode , remoteWrapper );
       if ( logger.isDebugEnabled( ) )
-         logger.debug( new StringBuilder( ).append( "Remote DataSource DBALIAS *" ).append( remoteDS.getDBAlias( ) ).append( "* with the code : *" ).append( notificationCode ).append( "* added." )
+         logger.debug( new StringBuilder( ).append( "Remote DataSource DBALIAS *" ).append( remoteWrapper.getDBAlias( ) ).append( "* with the code : *" ).append( notificationCode ).append( "* added." )
                .toString( ) );
    }
    
@@ -216,7 +216,7 @@ public class ContainerImpl extends HttpServlet implements Container {
    public void removeRemoteStreamSource ( int notificationCode ) {
       notificationCodeToRemoteDataSource.remove( notificationCode );
    }
-   public RemoteDS getRemoteDSForANotificationCode(int code) {
+   public RemoteWrapper getRemoteDSForANotificationCode(int code) {
       return notificationCodeToRemoteDataSource.get( code );
    }
    
