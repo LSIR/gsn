@@ -2,6 +2,11 @@
     <processing-class>
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<init-params/>
+	<output-structure>
+	 <field name="tempreature" type="integer" />
+	 <field name="light" type="bigint" />
+   </output-structure>
+   
 	</processing-class>
         <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/template.xml.</description>
         <life-cycle pool-size="10" />
@@ -10,10 +15,6 @@
 		   Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/template.xml.
 		</predicate>
 	</addressing>
-   <output-structure>
-	 <field name="tempreature" type="integer" />
-	 <field name="light" type="bigint" />
-   </output-structure>
     <storage history-size="1s"/>
     <streams/>
 </virtual-sensor> 

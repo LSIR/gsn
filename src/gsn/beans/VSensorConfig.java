@@ -40,7 +40,6 @@ public class VSensorConfig implements Serializable {
    
    private DataField []                outputStructure                        ;
    
-   private DataField []                webParameters                            ;
    
    private String                                 webParameterPassword                             = null;
    
@@ -62,6 +61,7 @@ public class VSensorConfig implements Serializable {
    
    private String generalPassword = null;
    
+   private WebInput[] webinput;
    /**
     * @return Returns the addressing.
     */
@@ -381,13 +381,6 @@ public class VSensorConfig implements Serializable {
    }
 
    
-   /**
-    * @return the webParameters
-    */
-   public  DataField [] getWebParameters ( ) {
-      return webParameters;
-   }
-
    public String toString ( ) {
       final StringBuilder builder = new StringBuilder( "Input Stream [" );
       for ( final InputStream inputStream : this.getInputStreams( ) ) {
@@ -423,4 +416,13 @@ public class VSensorConfig implements Serializable {
    public void setGeneralPassword(String generalPassword){
       this.generalPassword=generalPassword;
    }
+
+   
+   /**
+    * @return the webinput
+    */
+   public WebInput [ ] getWebinput ( ) {
+      return webinput;
+   }
+   
 }

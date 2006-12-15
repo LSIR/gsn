@@ -10,16 +10,17 @@
          <param name="vertical-axis">Sensor Readings</param>
          <param name="history-size">100</param>
       </init-params>
+   <output-structure>
+      <field name="DATA" type="binary:image/jpeg"/>
+   </output-structure>
+ 
    </processing-class>
   <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/memoryPlotVS.xml</description>
      <life-cycle pool-size="2"/>
    <addressing>
       <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/memoryPlotVS.xml</predicate>
    </addressing>
-   <output-structure>
-      <field name="DATA" type="binary:image/jpeg"/>
-   </output-structure>
-   <storage history-size="1" />
+    <storage history-size="1" />
    <streams>
       <stream name="DATA" rate="100">
          <source alias="source1" storage-size="1" sampling-rate="1">

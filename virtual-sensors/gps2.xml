@@ -2,6 +2,8 @@
     <processing-class>
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<init-params/>
+		     <output-structure/>
+   
 	</processing-class>
         <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</description>
         <life-cycle pool-size="10" />
@@ -10,7 +12,6 @@
 	        	<predicate key="LATITUDE">37.4</predicate>
 	        	<predicate key="LONGITUDE">-122.1</predicate>
     	  </addressing>
-        <output-structure/>
         <storage history-size="1m" />
         <streams>
            <stream name="input1">

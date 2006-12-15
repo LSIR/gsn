@@ -4,15 +4,16 @@
       <init-params>
       		<param name="memory-size-in-seconds">1200</param>
       </init-params>
+   <output-structure>
+      <field name="PLOT" type="binary:image/svg+xml"/>
+   </output-structure>
+  
    </processing-class>
    <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/networkPlotter.xml</description>
    <life-cycle pool-size="10"/>
    <addressing>
       <predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/networkPlotter.xml</predicate>
    </addressing>
-   <output-structure>
-      <field name="PLOT" type="binary:image/svg+xml"/>
-   </output-structure>
    <storage history-size="1"/>
    <streams>
       <stream name="data" >

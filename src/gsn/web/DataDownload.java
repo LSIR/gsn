@@ -1,27 +1,17 @@
 package gsn.web;
 
 import gsn.Container;
-import gsn.Mappings;
-import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.StringTokenizer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
 
 /**
  * @author Pierre-Alain Robert (PARO, pierre-alain.robert-at-epfl.ch)<br>

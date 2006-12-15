@@ -1,25 +1,32 @@
-<virtual-sensor name="GPSVS" priority="10" >
+<virtual-sensor name="GPSVS"  >
    <processing-class>
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<init-params/>
-	</processing-class>
-   <description>Virtual sensor producing random locations and sensor readings for testing in GPS applications.</description>
-   <web-input password="test">
-       <field name="reset"    type="byte" >Non-zero value means reseting.</field>
-       <field name="reset"    type="*binary:2mb" >Files Size of 2MB max, The * means optional.</field>
+ <web-input password="test">
+         <command name="test">
+          <field name="reset1"    type="byte" >Non-zero value means reseting.</field>
+          <field name="reset2"    type="*binary:2mb" >Files Size of 2MB max, The * means optional.</field>
+        </command>
+         <command name="test2">
+          <field name="reset1"    type="byte" >Non-zero value means reseting.</field>
+          <field name="reset2"    type="*binary:2mb" >Files Size of 2MB max, The * means optional.</field>
+        </command>
    </web-input>
-	<life-cycle pool-size="10" />
-   <addressing>
-	   <predicate key="type">test-sensor</predicate>
-	</addressing>
-   <output-structure>
+  <output-structure>
 	  <field name="latiTude"    type="double" />
 	  <field name="longiTude"   type="double" />
 	  <field name="temperature" type="double" />
 	  <field name="light"       type="int" />
 	  <field name="camera"      type="binary:image/jpeg" />
    </output-structure>
-   <storage history-size="1m"/>
+	</processing-class>
+   <description>Virtual sensor producing random locations and sensor readings for testing in GPS applications.</description>
+
+	<life-cycle pool-size="10" />
+   <addressing>
+	   <predicate key="type">test-sensor</predicate>
+	</addressing>
+    <storage history-size="1m"/>
    <streams>
       <stream name="sensor1">
         <source alias="source1" storage-size="1"  sampling-rate="1" >
