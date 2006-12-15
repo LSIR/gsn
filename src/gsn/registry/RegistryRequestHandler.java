@@ -4,6 +4,7 @@ import gsn.DirectoryRefresher;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;  
 import java.util.Vector;
 
@@ -19,9 +20,9 @@ public class RegistryRequestHandler implements RequestInitializableRequestProces
 
    private static transient Logger logger             = Logger.getLogger( RegistryRequestHandler.class );
    
-   private static  List < VSAddress >                     additionList           = Collections.synchronizedList( new ArrayList < VSAddress >( ) );
+   private static Hashtable<String,VSAddress> additionList = new Hashtable<String,VSAddress>();
    
-   private static  List < VSAddress >                    additionListTmp           = Collections.synchronizedList( new ArrayList < VSAddress >( ) );
+   private static Hashtable<String,VSAddress> additionListTmp = new Hashtable<String,VSAddress>();
 
    public void init ( MyConfig pConfig ) {
       this.remoteHost = pConfig.getRemoteAddress( );
@@ -29,14 +30,15 @@ public class RegistryRequestHandler implements RequestInitializableRequestProces
    
    public boolean addVirtualSensor ( int port, String vsName, String description, Vector<Vector<String>> predicates, String usedResources) throws Exception {
         synchronized ( additionList ) {
-         additionList.add( new VSAddress(port,vsName,description,predicates,usedResources,remoteHost) );
+        VSAddress newVS = new VSAddress(port,vsName,description,predicates,usedResources,remoteHost);
+        additionList.put(newVS.getGUID(), newVS);
       }
       return true;
    }
-   public static List<VSAddress> getList(){
+   public static Hashtable<String,VSAddress> getList(){
       synchronized ( additionList ) {
          additionListTmp.clear( );
-         List < VSAddress > tmp = additionList;
+         Hashtable<String,VSAddress> tmp = additionList;
          additionList = additionListTmp;
          additionListTmp = tmp;
          return tmp;
