@@ -40,8 +40,10 @@
             <include name="**/*.jar" />
          </fileset> 
       </path>
-      <taskdef resource="tasks.properties" classpath="${libdir}/jcoverage.jar"/>
-      <!--    <taskdef name="documentdoclet" classname="xdoclet.modules.doc.DocumentDocletTask" classpathref="classpath"/> 
+   	<available file="${jmf.dir}" property="jmf.exists"/>
+   	<fail unless="${jmf.exists}" message="The ${jmf.dir} is missing, please download  JMF from http://java.sun.com/products/java-media/jmf/2.1.1/download.html and place it in ${jmf.dir} directory." />
+		<!--  <taskdef resource="tasks.properties" classpath="${libdir}/jcoverage.jar"/>
+       <taskdef name="documentdoclet" classname="xdoclet.modules.doc.DocumentDocletTask" classpathref="classpath"/> 
     	<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask" classpathref="classpath"/>
         <taskdef name="ejbdoclet" classname="xdoclet.modules.ejb.EjbDocletTask" classpathref="classpath" />
         <taskdef name="mockdoclet" classname="xdoclet.modules.mockobjects.MockObjectDocletTask" classpathref="classpath" /> -->
