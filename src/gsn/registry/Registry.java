@@ -88,12 +88,13 @@ public class Registry {
       
       ServletHandler servletHandler = new ServletHandler( );
       servletHandler.addServletWithMapping( "gsn.registry.MyXmlRPCServlet" , "/registry" );
+      servletHandler.addServletWithMapping( "gsn.registry.SearchServlet" , "/search" );
       wac.setServletHandler( servletHandler );
       server.setHandler( wac );
       server.setStopAtShutdown( true );
       server.setSendServerVersion( false );
       
-      singleton = new RegistryReferesh( args.length == 3 ? args[ 2 ] : null );
+      singleton = new RegistryRefresh( args.length == 3 ? args[ 2 ] : null );
       thread = new Thread( singleton );
       thread.start( );
       server.start( );
@@ -101,7 +102,11 @@ public class Registry {
       if ( logger.isInfoEnabled( ) ) logger.info( "[ok]" );
    }
    
-   private static RegistryReferesh singleton;
+   public static RegistryRefresh getRegistryRefresh(){
+	   return singleton;
+   }
+   
+   private static RegistryRefresh singleton;
    
    private static Thread           thread;
    
