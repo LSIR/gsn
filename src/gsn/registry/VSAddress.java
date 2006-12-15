@@ -13,7 +13,7 @@ import java.util.Vector;
  */
 public class VSAddress {
    
-   private String         addresses;
+   private String         defaultField;
    
    private String         addressKeys;
    
@@ -59,7 +59,8 @@ public class VSAddress {
       }
       this.predicates = tempPredicates;
       this.description = ( description == null ? "" : description );
-      this.addresses = tempAddrs.toString( );
+      tempAddrs.append( this.description ).append( Registry.SPACE_CHARACTER );
+      this.defaultField = tempAddrs.toString( );
       this.addressKeys = tempKeys.toString( );
       this.addressValues = tempKeys.toString( );
       this.addressUses = usedSources;
@@ -67,8 +68,8 @@ public class VSAddress {
       guid = new StringBuilder( remoteHost ).append( ":" ).append( remotePort ).append( "/" ).append( remoteVSName ).toString( );
          }
    
-   public final String getAddress ( ) {
-      return addresses;
+   public final String getDefaultField ( ) {
+      return defaultField;
    }
    
    public final String getAddressKeys ( ) {
@@ -117,7 +118,7 @@ public class VSAddress {
       StringBuilder sb = new StringBuilder( );
       sb.append( "VSAddress [ GUID : " ).append( guid ).append( "," );
       sb.append( "Creation : " ).append( new Date( creationTime ) ).append( "," );
-      sb.append( "Address : " ).append( addresses ).append( "," );
+      sb.append( "Address : " ).append( defaultField ).append( "," );
       sb.append( "Address keys : " ).append( addressKeys ).append( "," );
       sb.append( "Address Values : " ).append( addressValues ).append( "," );
       sb.append( "Uses : " ).append( addressUses ).append( "]" );
