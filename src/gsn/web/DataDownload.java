@@ -217,11 +217,11 @@ public class DataDownload extends HttpServlet {
 		             out.println("\t<line>");
 		             for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {
 		            	 
-		            	 /*if (se.getFieldNames()[i].toString().contains("timed"))
-		            	   out.println("\t\t<field>"+se.getFieldTypes( )[ i ].toString( )+"</field>");
-		                 else
-		                   */
-		            	 out.println("\t\t<field>"+se.getData( )[ i ].toString( )+"</field>"); 
+		            	 if ( !commonReq && expression.contains("(timed)")) {
+		            		SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
+			            	out.println("\t\t<field>"+sdf.format(se.getData( )[i])+"</field>");
+		            	 } else
+		            		 out.println("\t\t<field>"+se.getData( )[ i ].toString( )+"</field>"); 
 		             }
 		             if (wantTimeStamp) {
 		            	SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");

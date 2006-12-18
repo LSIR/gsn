@@ -113,6 +113,7 @@ public final class Main {
       servletHandler.addServletWithMapping ( "gsn.web.ControllerServlet" , "/gsn" );
       servletHandler.addServletWithMapping ( "gsn.web.DataDownload" , "/data" );
       servletHandler.addServletWithMapping ( "gsn.web.FieldDownloadServlet" , "/field" );
+      servletHandler.addServletWithMapping ( "gsn.web.FieldUpload" , "/upload" );
        webAppContext.setServletHandler ( servletHandler );
      /// webAppContext.setConnectorNames(new String[]{httpConnector.getName()});
       
