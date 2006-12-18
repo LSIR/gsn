@@ -45,7 +45,7 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
       protocolManager = new ProtocolManager( new SerComProtocol( ) , wrapper );
       if ( logger.isDebugEnabled( ) ) logger.debug( "Created protocolManager" );
       try {
-         wrapper.sendToWrapper( "h\n" );
+         wrapper.sendToWrapper( "h\n" ,null,null);
       } catch ( OperationNotSupportedException e ) {
          e.printStackTrace( );
       }      
@@ -101,11 +101,7 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
    }
    
    public void finalize ( ) {
-      try {
-         vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( ).sendToWrapper( "R\n" );
-      } catch ( OperationNotSupportedException e ) {
-         logger.error( e.getMessage( ) , e );
-      }
+    
    }
    
 }

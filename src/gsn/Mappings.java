@@ -40,7 +40,7 @@ public final class Mappings {
       vsNamesToOutputStructureFields.put( sensorPool.getConfig( ).getVirtualSensorName( ) , vsNameToOutputStructureFields );
       for ( DataField fields : sensorPool.getConfig( ).getOutputStructure( ) )
          vsNameToOutputStructureFields.put( fields.getFieldName( ) , Boolean.TRUE );
-      vsNameToOutputStructureFields.put( "TIMED" , Boolean.TRUE );
+      vsNameToOutputStructureFields.put( "timed" , Boolean.TRUE );
       vsNameTOVSConfig.put( sensorPool.getConfig( ).getVirtualSensorName( ) , sensorPool.getConfig( ) );
       fileNameToVSInstance.put( sensorPool.getConfig( ).getFileName( ) , sensorPool );
       return true;

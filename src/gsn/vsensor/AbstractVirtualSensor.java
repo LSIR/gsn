@@ -101,8 +101,8 @@ public abstract class AbstractVirtualSensor {
     */
    public abstract void finalize ( );
    
-   public void dataFromWeb ( String[] paramNames, Serializable[] paramValues ) {
-      return;
+   public boolean dataFromWeb ( String action,String[] paramNames, Serializable[] paramValues ) {
+      return false;
    }
    
    /**

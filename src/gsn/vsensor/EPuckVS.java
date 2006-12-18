@@ -31,7 +31,7 @@ public class EPuckVS extends AbstractVirtualSensor {
       protocolManager = new ProtocolManager( new SerComProtocol( ) , wrapper );
       if ( logger.isDebugEnabled( ) ) logger.debug( "Created protocolManager" );
       try {
-         wrapper.sendToWrapper( "h\n" );
+         wrapper.sendToWrapper( "h\n",null,null );
       } catch ( OperationNotSupportedException e ) {
          e.printStackTrace( );
       }
@@ -50,7 +50,7 @@ public class EPuckVS extends AbstractVirtualSensor {
          actionA = true;
          try {
             // wrapper.sendToWrapper( "h\n" );
-            wrapper.sendToWrapper( "d,1000,-1000\n" );
+            wrapper.sendToWrapper( "d,1000,-1000\n",null,null );
          } catch ( OperationNotSupportedException e ) {
             logger.error( e.getMessage( ) , e );
          }
@@ -59,7 +59,7 @@ public class EPuckVS extends AbstractVirtualSensor {
    
    public void finalize ( ) {
       try {
-         vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( ).sendToWrapper( "R\n" );
+         vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( ).sendToWrapper( "R\n",null,null );
       } catch ( OperationNotSupportedException e ) {
          logger.error( e.getMessage( ) , e );
       }

@@ -98,7 +98,7 @@ public final class StreamElement implements Serializable {
    }
    
    public String toString ( ) {
-      final StringBuffer output = new StringBuffer( "TIMED = " );
+      final StringBuffer output = new StringBuffer( "timed = " );
       output.append( this.getTimeStamp( ) ).append( "\t" );
       for ( int i = 0 ; i < this.fieldNames.length ; i++ )
          output.append( "," ).append( this.fieldNames[ i ] ).append( "/" ).append( this.fieldTypes[ i ] ).append( " = " ).append( this.fieldValues[ i ] );

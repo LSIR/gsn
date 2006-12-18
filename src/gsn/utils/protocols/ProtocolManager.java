@@ -74,7 +74,7 @@ public class ProtocolManager {
 					try {
 						if(logger.isDebugEnabled())
 							logger.debug("Built query, it looks like: " + new String(queryBytes));
-						outputWrapper.sendToWrapper(queryBytes);
+						outputWrapper.sendToWrapper(null,null,new Object[] {queryBytes});
 						lastExecutedQuery = query;
 						lastParams = params;
 						answer = queryBytes;

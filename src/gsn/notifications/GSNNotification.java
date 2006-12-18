@@ -4,11 +4,9 @@ import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLUtils;
 import gsn.utils.CaseInsensitiveComparator;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.PreparedStatement;
-import java.util.Date;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;

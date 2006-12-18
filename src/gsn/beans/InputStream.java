@@ -99,7 +99,7 @@ public class InputStream {
    }
    
    /**
-    * This method is called by the Stream Source TIMED Stream-Source has new
+    * This method is called by the Stream Source timed Stream-Source has new
     * results.
     * 
     * @param alias The alias of the StreamSource which has new data.

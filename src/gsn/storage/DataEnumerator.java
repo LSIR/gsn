@@ -66,13 +66,13 @@ public class DataEnumerator implements Enumeration {
          
          // Initializing the fieldNames and fieldTypes.
          // Also setting the values for <code> hasTimedFieldInResultSet</code>
-         // if the TIMED field is present in the result set.
+         // if the timed field is present in the result set.
          for ( int i = 1 ; i <= resultSet.getMetaData( ).getColumnCount( ) ; i++ ) {
             String colName = resultSet.getMetaData( ).getColumnName( i );
             int colTypeInJDBCFormat = resultSet.getMetaData( ).getColumnType( i );
             if ( colName.equalsIgnoreCase( "PK" ) ) {
                indexofPK = i;
-            } else if ( colName.equalsIgnoreCase( "TIMED" ) ) {
+            } else if ( colName.equalsIgnoreCase( "timed" ) ) {
                indexOfTimedField = i;
             } else {
                fieldNames.add( colName );

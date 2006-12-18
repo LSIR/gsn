@@ -48,7 +48,7 @@ public class ContainerInfoHandler implements RequestHandler {
             sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
          }
          sb.append( ">\n" );         
-         StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getVirtualSensorName( ) + " order by TIMED DESC limit 1 offset 0" );
+         StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getVirtualSensorName( ) + " order by timed DESC limit 1 offset 0" );
          DataEnumerator result = StorageManager.getInstance( ).executeQuery( query , true );
          StreamElement se = null;
          if ( result.hasMoreElements( ) ) se = result.nextElement( );

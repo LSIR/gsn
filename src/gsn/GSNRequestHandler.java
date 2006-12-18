@@ -35,7 +35,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
       } else {
          // /**
          // * If the received stream element from remote stream producer
-         // * doesn't have the TIMED field inside, the<br>
+         // * doesn't have the timed field inside, the<br>
          // * container will automatically insert the receive time to the
          // * stream element.<br>
          // */

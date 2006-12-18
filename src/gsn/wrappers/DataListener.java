@@ -34,7 +34,7 @@ public class DataListener {
    
    protected final int         viewName          = Main.tableNameGenerator( );
    
-   protected final CharSequence         viewNameS          = Main.tableNameGeneratorInString( viewName );
+   protected final String         viewNameS          = Main.tableNameGeneratorInString( viewName ).toString( );
    
    protected StringBuilder        viewQery;
    
@@ -73,12 +73,12 @@ public class DataListener {
       return viewName;
    }
    
-   public CharSequence getViewNameInString() {
+   public String getViewNameInString() {
       return viewNameS;
    }
    
    public StringBuilder getViewQuery ( ) {
-      if ( viewQery == null ) viewQery = new StringBuilder( "select * from " + viewNameS.toString( ) );
+      if ( viewQery == null ) viewQery = new StringBuilder( "select * from ").append( viewNameS);
       return viewQery;
    }
    
@@ -107,19 +107,19 @@ public class DataListener {
       boolean needsWhere = ( toReturn.toString( ).indexOf( " where " ) <= 0 );
       
       if ( needsWhere ) // Applying the ** End Time **
-         toReturn.append( " where " ).append( " (wrapper.TIMED <=" ).append( streamSrc.getEndDate( ).getTime( ) ).append( ")" );
+         toReturn.append( " where " ).append( " (wrapper.timed <=" ).append( streamSrc.getEndDate( ).getTime( ) ).append( ")" );
       else {
-         toReturn.append( " AND (wrapper.TIMED <=" ).append( streamSrc.getEndDate( ).getTime( ) ).append( ")" );
+         toReturn.append( " AND (wrapper.timed <=" ).append( streamSrc.getEndDate( ).getTime( ) ).append( ")" );
       }
       // Applying the ** START TIME **
-      toReturn.append( " AND (wrapper.TIMED >=" ).append( streamSrc.getStartDate( ).getTime( ) ).append( ")" );
+      toReturn.append( " AND (wrapper.timed >=" ).append( streamSrc.getStartDate( ).getTime( ) ).append( ")" );
       // Applying the ** Sampling Rate **
       
       float rate = streamSrc.getSamplingRate( ) * 100;
       if ( rate == 0 )
          logger.warn( new StringBuilder( ).append( "The sampling rate is set to zero which means no results. (InputStream = " ).append( dataListener.getInputStream( ) ).append( ", StreamSource = " )
                .append( streamSrc.getAlias( ) ).toString( ) );
-      toReturn.append( " AND ( mod( abs(" ).append( System.currentTimeMillis( ) ).append( " - wrapper.TIMED) *11 , 100)< " ).append( rate ).append( ")" );
+      toReturn.append( " AND ( mod( abs(" ).append( System.currentTimeMillis( ) ).append( " - wrapper.timed) *11 , 100)< " ).append( rate ).append( ")" );
       
       // Applying the ** History Size **
       String historySize = streamSrc.getStorageSize( );
@@ -127,29 +127,29 @@ public class DataListener {
             // ** Count based
             // History Size **
             int value = Integer.parseInt( historySize );
-            toReturn.append( " order by wrapper.TIMED desc  limit  " ).append( value ).append( " offset 0" );
+            toReturn.append( " order by wrapper.timed desc  limit  " ).append( value ).append( " offset 0" );
          } else { // Applying the ** Timing based History Size **
             if ( StorageManager.isHsql( ) ) {
                if ( historySize.toLowerCase( ).trim( ).endsWith( "m" ) ) {
                   int miniute = Integer.parseInt( historySize.toLowerCase( ).replace( "m" , "" ) );
-                  toReturn.append( " AND ((NOW_MILLIS() - wrapper.TIMED ) <=" ).append( 1000 * 60 * miniute ).append( " )" );
+                  toReturn.append( " AND ((NOW_MILLIS() - wrapper.timed ) <=" ).append( 1000 * 60 * miniute ).append( " )" );
                } else if ( historySize.toLowerCase( ).trim( ).endsWith( "s" ) ) {
                   int seconds = Integer.parseInt( historySize.toLowerCase( ).trim( ).replace( "s" , "" ) );
-                  toReturn.append( " AND ((NOW_MILLIS() - wrapper.TIMED ) <=" ).append( 1000 * seconds ).append( " )" );
+                  toReturn.append( " AND ((NOW_MILLIS() - wrapper.timed ) <=" ).append( 1000 * seconds ).append( " )" );
                } else if ( historySize.toLowerCase( ).trim( ).endsWith( "h" ) ) {
                   int hours = Integer.parseInt( historySize.toLowerCase( ).trim( ).replace( "h" , "" ) );
-                  toReturn.append( " AND ((NOW_MILLIS() - wrapper.TIMED ) <=" ).append( 1000 * 60 * 60 * hours ).append( " )" );
+                  toReturn.append( " AND ((NOW_MILLIS() - wrapper.timed ) <=" ).append( 1000 * 60 * 60 * hours ).append( " )" );
                }
             } else if ( StorageManager.isMysqlDB( ) ) {
                if ( historySize.toLowerCase( ).trim( ).endsWith( "m" ) ) {
                   int miniute = Integer.parseInt( historySize.toLowerCase( ).replace( "m" , "" ) );
-                  toReturn.append( " AND ((UNIX_TIMESTAMP() - wrapper.TIMED ) <=" ).append( 1000 * 60 * miniute ).append( " )" );
+                  toReturn.append( " AND ((UNIX_TIMESTAMP() - wrapper.timed ) <=" ).append( 1000 * 60 * miniute ).append( " )" );
                } else if ( historySize.toLowerCase( ).trim( ).endsWith( "s" ) ) {
                   int seconds = Integer.parseInt( historySize.toLowerCase( ).trim( ).replace( "s" , "" ) );
-                  toReturn.append( " AND ((UNIX_TIMESTAMP() - wrapper.TIMED ) <=" ).append( 1000 * seconds ).append( " )" );
+                  toReturn.append( " AND ((UNIX_TIMESTAMP() - wrapper.timed ) <=" ).append( 1000 * seconds ).append( " )" );
                } else if ( historySize.toLowerCase( ).trim( ).endsWith( "h" ) ) {
                   int hours = Integer.parseInt( historySize.toLowerCase( ).trim( ).replace( "h" , "" ) );
-                  toReturn.append( " AND ((UNIX_TIMESTAMP() - wrapper.TIMED) <=" ).append( 1000 * 60 * 60 * hours ).append( " )" );
+                  toReturn.append( " AND ((UNIX_TIMESTAMP() - wrapper.timed) <=" ).append( 1000 * 60 * 60 * hours ).append( " )" );
                }
             }
             

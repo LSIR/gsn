@@ -139,19 +139,19 @@ class TableSizeEnforceThread extends Thread {
       StringBuilder query = null;
       if ( StorageManager.isHsql( ) ) {
          if ( this.virtualSensorConfiguration.isStorageCountBased( ) )
-            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".TIMED not in ( select " ).append(
-               virtualSensorName ).append( ".TIMED from " ).append( virtualSensorName ).append( " order by " ).append( virtualSensorName ).append( ".TIMED DESC  LIMIT  " ).append(
+            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed not in ( select " ).append(
+               virtualSensorName ).append( ".timed from " ).append( virtualSensorName ).append( " order by " ).append( virtualSensorName ).append( ".timed DESC  LIMIT  " ).append(
                this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( " offset 0 )" );
          else
-            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".TIMED < (NOW_MILLIS() -" ).append(
+            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (NOW_MILLIS() -" ).append(
                this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( ")" );
       } else if ( StorageManager.isMysqlDB( ) ) {
          if ( this.virtualSensorConfiguration.isStorageCountBased( ) )
-            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".TIMED <= ( SELECT * FROM ( SELECT TIMED FROM " )
-                  .append( virtualSensorName ).append( " group by " ).append( virtualSensorName ).append( ".TIMED ORDER BY " ).append( virtualSensorName ).append( ".TIMED DESC LIMIT 1 offset " )
+            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed <= ( SELECT * FROM ( SELECT timed FROM " )
+                  .append( virtualSensorName ).append( " group by " ).append( virtualSensorName ).append( ".timed ORDER BY " ).append( virtualSensorName ).append( ".timed DESC LIMIT 1 offset " )
                   .append( this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( "  ) AS TMP_" ).append( ( int ) ( Math.random( ) * 100000000 ) ).append( " )" );
          else
-            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".TIMED < (UNIX_TIMESTAMP() -" ).append(
+            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (UNIX_TIMESTAMP() -" ).append(
                this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( ")" );
       }
       if ( query == null ) return;

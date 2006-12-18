@@ -45,7 +45,7 @@ public final class AddressBean {
    }
    
    /**
-    * Returns true TIMEDever the set of predicates contain "port" and "host"
+    * Returns true timedever the set of predicates contain "port" and "host"
     * keys.
     * 
     * @return

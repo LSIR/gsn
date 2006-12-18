@@ -1,7 +1,9 @@
 package gsn;
 
 import gsn.beans.StreamElement;
+import gsn.notifications.InGSNNotification;
 import gsn.notifications.NotificationRequest;
+import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
@@ -11,6 +13,7 @@ import gsn.vsensor.http.OneShotQueryHandler;
 import gsn.vsensor.http.OneShotQueryWithAddressingHandler;
 import gsn.vsensor.http.OutputStructureHandler;
 import gsn.vsensor.http.RequestHandler;
+import gsn.wrappers.InVMPipeWrapper;
 import gsn.wrappers.RemoteWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,24 +38,20 @@ public class ContainerImpl extends HttpServlet implements Container {
    
    /**
     * The <code> waitingVirtualSensors</code> contains the virtual sensors that
-    * recently produced data. This variable is useful for batch processing TIMED
+    * recently produced data. This variable is useful for batch processing timed
     * couple virtual sensor produce data.
     */
    /*
     * In the <code>registeredQueries</code> the key is the local virtual
     * sensor name.
     */
-   private static TreeMap < String , ArrayList < NotificationRequest >> notificationRequests               = null;
+   private static TreeMap < String , ArrayList < NotificationRequest >> notificationRequests               = new TreeMap < String , ArrayList < NotificationRequest >>( new CaseInsensitiveComparator( ) );
    
    private static final Class < ContainerImpl >                         notificationRequestsLock           = ContainerImpl.class;
    
-   private static final HashMap < Integer , RemoteWrapper >                   notificationCodeToRemoteDataSource = new HashMap < Integer , RemoteWrapper >( );
+   private static final HashMap < Integer , RemoteWrapper >             notificationCodeToRemoteDataSource = new HashMap < Integer , RemoteWrapper >( );
    
    private static final Object                                          psLock                             = new Object( );
-   
-   public ContainerImpl ( ) {
-      notificationRequests = new TreeMap < String , ArrayList < NotificationRequest >>( new CaseInsensitiveComparator( ) );
-   }
    
    public void publishData ( AbstractVirtualSensor sensor ) {
       StreamElement data = sensor.getData( );
@@ -74,15 +73,30 @@ public class ContainerImpl extends HttpServlet implements Container {
       if ( logger.isDebugEnabled( ) )
          logger.debug( new StringBuilder( ).append( "There are queries " ).append( registered.size( ) ).append( " registered for >" ).append( name ).append( "<" ).toString( ) );
       ArrayList < NotificationRequest > notificationCandidates = new ArrayList < NotificationRequest >( );
+      ArrayList < DataEnumerator > notificationData = new ArrayList < DataEnumerator >( );
+      
       synchronized ( registered ) {
          Iterator < NotificationRequest > registeredIterator = registered.iterator( );
          while ( registeredIterator.hasNext( ) ) {
             NotificationRequest interestedClient = registeredIterator.next( );
-            CharSequence query = interestedClient.getQuery( );
-            boolean result = interestedClient.send(  storageMan.executeQuery( query , false ) );
-            //FIXME : The Asynchronous notification System.
+            DataEnumerator de = storageMan.executeQuery( interestedClient.getQuery( ) , false );
+            if ( logger.isDebugEnabled( ) )
+               logger.debug( new StringBuilder( "Evaluating the query : " ).append( interestedClient ).append( ", needs notification > " ).append( de.hasMoreElements( ) ) );
+            if ( de.hasMoreElements( ) ) {
+               notificationCandidates.add( interestedClient );
+               notificationData.add( de );
+            }
          }
       }
+      // IMPROVE : The Asynchronous notification System.
+      for ( int i = 0 ; i < notificationCandidates.size( ) ; i++ ) {
+         boolean notificationResult = notificationCandidates.get( i ).send( notificationData.get( i ) );
+         if ( notificationResult == false ) {
+            logger.info( "Query notification fail, query removed " + notificationCandidates.get( i ).toString( ) );
+            removeNotificationRequest( notificationCandidates.get( i ) );
+         }
+      }
+      
    }
    
    public void doGet ( HttpServletRequest request , HttpServletResponse response ) throws ServletException , IOException {
@@ -136,9 +150,8 @@ public class ContainerImpl extends HttpServlet implements Container {
       }
    }
    
-   
    public synchronized void addNotificationRequest ( String localVirtualSensorName , NotificationRequest notificationRequest ) {
-      localVirtualSensorName = localVirtualSensorName.toUpperCase( );
+      localVirtualSensorName = localVirtualSensorName.toLowerCase( );
       ArrayList < NotificationRequest > contents;
       if ( notificationRequests.get( localVirtualSensorName ) == null ) {
          contents = new ArrayList < NotificationRequest >( );
@@ -146,10 +159,16 @@ public class ContainerImpl extends HttpServlet implements Container {
       } else
          contents = notificationRequests.get( localVirtualSensorName );
       if ( logger.isDebugEnabled( ) ) {
-         logger.debug( "Notification request added to " + localVirtualSensorName );
+         logger.debug( new StringBuilder( "Notification request added to " ).append( localVirtualSensorName ).toString( ) );
       }
       synchronized ( contents ) {
-         contents.add( notificationRequest );
+         /**
+          * We want to hande InGSNNotification's faster.
+          */
+         if ( notificationRequest instanceof InGSNNotification )
+            contents.add( 0 , notificationRequest );
+         else
+            contents.add( notificationRequest );
       }
    }
    
@@ -198,8 +217,8 @@ public class ContainerImpl extends HttpServlet implements Container {
    public void addRemoteStreamSource ( int notificationCode , RemoteWrapper remoteWrapper ) {
       notificationCodeToRemoteDataSource.put( notificationCode , remoteWrapper );
       if ( logger.isDebugEnabled( ) )
-         logger.debug( new StringBuilder( ).append( "Remote DataSource DBALIAS *" ).append( remoteWrapper.getDBAlias( ) ).append( "* with the code : *" ).append( notificationCode ).append( "* added." )
-               .toString( ) );
+         logger.debug( new StringBuilder( ).append( "Remote DataSource DBALIAS *" ).append( remoteWrapper.getDBAlias( ) ).append( "* with the code : *" ).append( notificationCode )
+               .append( "* added." ).toString( ) );
    }
    
    public void removeAllResourcesAssociatedWithVSName ( String vsensorName ) {
@@ -216,7 +235,8 @@ public class ContainerImpl extends HttpServlet implements Container {
    public void removeRemoteStreamSource ( int notificationCode ) {
       notificationCodeToRemoteDataSource.remove( notificationCode );
    }
-   public RemoteWrapper getRemoteDSForANotificationCode(int code) {
+   
+   public RemoteWrapper getRemoteDSForANotificationCode ( int code ) {
       return notificationCodeToRemoteDataSource.get( code );
    }
    

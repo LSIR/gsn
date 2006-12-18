@@ -65,7 +65,7 @@ public class DataDownload extends HttpServlet {
 		      if (req.getParameter("fields") != null) {
 		    	  String[] fields = req.getParameterValues("fields");
 			      for (int i=0; i < fields.length; i++) {
-			    	  if (fields[i].equals("TIMED")) {
+			    	  if (fields[i].equals("timed")) {
 			    		  wantTimeStamp = true;
 			    	  }
 			    	  request += ", " + fields[i];
@@ -112,7 +112,7 @@ public class DataDownload extends HttpServlet {
 		    			  } else {
 		    				  where += neg[i] + " " + critfields[i] + " LIKE '%"; // + critval[i] + "%'";
 		    			  }
-		    			  if (critfields[i].equals("TIMED")) {
+		    			  if (critfields[i].equals("timed")) {
 		    				  try {
 		    					  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 		    					  Date d = sdf.parse(critval[i]);
@@ -130,7 +130,7 @@ public class DataDownload extends HttpServlet {
 		    			  } else {
 		    				  where += neg[i] + " " + critfields[i] + " " + critop[i] + " "; //critval[i];
 		    			  }
-		    			  if (critfields[i].equals("TIMED")) {
+		    			  if (critfields[i].equals("timed")) {
 		    				  try {
 		    					  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 		    					  Date d = sdf.parse(critval[i]);
@@ -157,7 +157,7 @@ public class DataDownload extends HttpServlet {
 	    	  }
 	    	  request = "select "+request+" from " + vsName + where;
 	    	  if (commonReq) {
-	    		  request += " order by TIMED DESC "+limit;
+	    		  request += " order by timed DESC "+limit;
 	    	  }
 	    	  request += ";";
 	    	  StringBuilder query = new StringBuilder(request);
@@ -179,7 +179,7 @@ public class DataDownload extends HttpServlet {
 		            	 for (int i=0; i < se.getFieldNames().length; i++)
 		            		 line += delimiter + se.getFieldNames()[i].toString();
 		            	if (wantTimeStamp) {
-		            		line += delimiter + "TIMED";
+		            		line += delimiter + "timed";
 		            	}
 		            	firstLine = false;
 		             }
@@ -208,7 +208,7 @@ public class DataDownload extends HttpServlet {
 	    						 out.println("\t\t<field>"+expression+"</field>");
 	    					 }
 	    				 if (wantTimeStamp) {
-	    					 out.println("\t\t<field>TIMED</field>");
+	    					 out.println("\t\t<field>timed</field>");
 	    				 }
 	    				 out.println("\t</line>");
 	    				 firstLine = false;
@@ -217,7 +217,7 @@ public class DataDownload extends HttpServlet {
 		             out.println("\t<line>");
 		             for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {
 		            	 
-		            	 /*if (se.getFieldNames()[i].toString().contains("TIMED"))
+		            	 /*if (se.getFieldNames()[i].toString().contains("timed"))
 		            	   out.println("\t\t<field>"+se.getFieldTypes( )[ i ].toString( )+"</field>");
 		                 else
 		                   */

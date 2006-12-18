@@ -8,12 +8,10 @@ import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
-
 import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
 
@@ -21,7 +19,7 @@ import org.apache.log4j.Logger;
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * Date: Aug 4, 2005 <br>
  */
-public abstract class AbstractWrapper extends Thread  {
+public abstract class AbstractWrapper extends Thread {
    
    /**
     * Used by the data source when it wants to insert the data into it's main
@@ -57,12 +55,12 @@ public abstract class AbstractWrapper extends Thread  {
    }
    
    /**
-    * Returns the view name created for this listener.
-    * Note that, GSN creates one view per listener.
+    * Returns the view name created for this listener. Note that, GSN creates
+    * one view per listener.
     */
    public CharSequence addListener ( DataListener dataListener ) {
-      TreeMap < CharSequence , CharSequence > mapping = new TreeMap< CharSequence , CharSequence >( new CaseInsensitiveComparator());
-      mapping.put( "wrapper" , aliasCodeS);
+      TreeMap < CharSequence , CharSequence > mapping = new TreeMap < CharSequence , CharSequence >( new CaseInsensitiveComparator( ) );
+      mapping.put( "wrapper" , aliasCodeS );
       CharSequence resultQuery = SQLUtils.newRewrite( dataListener.getMergedQuery( ) , mapping );
       CharSequence viewName = dataListener.getViewNameInString( );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The view name=" ).append( viewName ).append( " with the query=" ).append( resultQuery ).toString( ) );
@@ -118,9 +116,7 @@ public abstract class AbstractWrapper extends Thread  {
     */
    
    public final AddressBean getActiveAddressBean ( ) {
-      if (this.activeAddressBean==null) {
-         throw new RuntimeException("There is no active address bean associated with the wrapper.");
-      }
+      if ( this.activeAddressBean == null ) { throw new RuntimeException( "There is no active address bean associated with the wrapper." ); }
       return activeAddressBean;
    }
    
@@ -128,28 +124,27 @@ public abstract class AbstractWrapper extends Thread  {
     * @param activeAddressBean the activeAddressBean to set
     */
    public void setActiveAddressBean ( AddressBean activeAddressBean ) {
-      if (this.activeAddressBean!=null) {
-         throw new RuntimeException("There is already an active address bean associated with the wrapper.");
-      }
+      if ( this.activeAddressBean != null ) { throw new RuntimeException( "There is already an active address bean associated with the wrapper." ); }
       this.activeAddressBean = activeAddressBean;
    }
    
-   private final transient int aliasCode = Main.tableNameGenerator( );
-   private final CharSequence aliasCodeS = Main.tableNameGeneratorInString( aliasCode );
+   private final transient int aliasCode  = Main.tableNameGenerator( );
+   
+   private final CharSequence  aliasCodeS = Main.tableNameGeneratorInString( aliasCode );
    
    public int getDBAlias ( ) {
       return aliasCode;
    }
-   public CharSequence getDBAliasInStr() {
+   
+   public CharSequence getDBAliasInStr ( ) {
       return aliasCodeS;
    }
    
-   public abstract  DataField [] getOutputFormat ( );
+   public abstract DataField [ ] getOutputFormat ( );
    
    public boolean isActive ( ) {
       return isActive;
    }
-   
    
    protected void postStreamElement ( StreamElement streamElement ) {
       boolean result = getStorageManager( ).insertData( aliasCodeS , streamElement );
@@ -168,6 +163,7 @@ public abstract class AbstractWrapper extends Thread  {
             }
          }
    }
+   
    /**
     * This method is called whenever the wrapper wants to send a data item back
     * to the source where the data is coming from. For example, If the data is
@@ -183,17 +179,18 @@ public abstract class AbstractWrapper extends Thread  {
     * sending the data back to the source. Note that by default this method
     * throws this exception unless the wrapper overrides it.
     */
-  
-   public boolean sendToWrapper ( Object dataItem ) throws OperationNotSupportedException {
+   
+   public boolean sendToWrapper ( String action , String [ ] paramNames , Object [ ] paramValues ) throws OperationNotSupportedException {
       throw new OperationNotSupportedException( "This wrapper doesn't support sending data back to the source." );
    }
-
+   
    public void releaseResources ( ) {
       isActive = false;
       if ( isInfoEnabled ) logger.info( "Finalized called" );
       getStorageManager( ).dropTable( aliasCodeS );
    }
- public static final String TIME_FIELD = "TIMED";
+   
+   public static final String TIME_FIELD = "timed";
    
    /**
     * The addressing is provided in the ("ADDRESS",Collection<KeyValue>). If
@@ -205,8 +202,10 @@ public abstract class AbstractWrapper extends Thread  {
     * 
     * @return True if the initialization do successfully otherwise false;
     */
-  
-   public abstract boolean initialize ( ) ;
-   public abstract void finalize();
-   public abstract String getWrapperName();
+   
+   public abstract boolean initialize ( );
+   
+   public abstract void finalize ( );
+   
+   public abstract String getWrapperName ( );
 }

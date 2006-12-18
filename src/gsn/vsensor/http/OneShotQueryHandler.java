@@ -7,13 +7,9 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-
 import java.io.IOException;
-import java.util.Enumeration;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
@@ -40,7 +36,7 @@ public class OneShotQueryHandler implements RequestHandler{
          vsFields += " , pk, timed";
       String windowSize = request.getParameter( "window" );
       if ( windowSize == null || windowSize.trim( ).length( ) == 0 ) windowSize = "1";
-      StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by TIMED DESC limit " + windowSize + " offset 0" );
+      StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0" );
       DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , true );
       StringBuilder sb = new StringBuilder("<result>\n");
       while ( result.hasMoreElements( ) ) {
@@ -51,7 +47,7 @@ public class OneShotQueryHandler implements RequestHandler{
                sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( se.getData( )[ i ].toString( ) ).append( "</field>\n" );
             else
                sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) ).append( "</field>\n" );
-         sb.append( "<field name=\"TIMED\" >" ).append( se.getTimeStamp( ) ).append( "</field>\n" );
+         sb.append( "<field name=\"timed\" >" ).append( se.getTimeStamp( ) ).append( "</field>\n" );
          sb.append( "</stream-element>\n" );
       }
       result.close();

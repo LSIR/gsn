@@ -5,8 +5,6 @@ import gsn.beans.StreamElement;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import javax.swing.Timer;
 import org.apache.log4j.Logger;
 

@@ -42,7 +42,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
          vsFields += " , pk, timed";
       String windowSize = request.getParameter( "window" );
       if ( windowSize == null || windowSize.trim( ).length( ) == 0 ) windowSize = "1";
-      StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by TIMED DESC limit " + windowSize + " offset 0" );
+      StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0" );
       DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , true );
       StringBuilder sb = new StringBuilder("<result>\n");
       while ( result.hasMoreElements( ) ) {
@@ -53,7 +53,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
                sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( se.getData( )[ i ].toString( ) ).append( "</field>\n" );
             else
                sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) ).append( "</field>\n" );
-         sb.append( "<field name=\"TIMED\" >" ).append( se.getTimeStamp( ) ).append( "</field>\n" );
+         sb.append( "<field name=\"timed\" >" ).append( se.getTimeStamp( ) ).append( "</field>\n" );
          VSensorConfig sensorConfig = Mappings.getVSensorConfig( vsName );
          if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( vsName ).append( "* received." ).toString( ) );
          //StringBuilder sb = new StringBuilder( "<virtual-sensor name=\"" ).append( vsName ).append( "\" last-modified=\"" ).append( new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\">\n" );

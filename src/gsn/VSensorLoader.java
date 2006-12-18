@@ -257,7 +257,7 @@ public class VSensorLoader extends Thread {
       for ( AddressBean addressBean : streamSource.getAddressing ( ) ) {
          AbstractWrapper ds = activeDataSources.get ( addressBean );
          if ( ds == null ) {
-            if ( !addressBean.isAbsoluteAddressSpecified ( ) ) {// Dynamic-address
+//            if ( !addressBean.isAbsoluteAddressSpecified ( ) ) {// Dynamic-address
                //               ArrayList < VirtualSensorIdentityBean > resolved = this.resolveByDirecotryService( addressBean.getPredicates( ) );
                //               if ( resolved.size( ) == 0 ) {
                //                  logger.warn( new StringBuilder( ).append( "Resolving Dynamic Address for Stream-Source:" ).append( streamSource.getAlias( ) ).append( " with addressing " ).append( addressBean )
@@ -275,8 +275,9 @@ public class VSensorLoader extends Thread {
                //               context.put( Registry.VS_PORT , Integer.toString( resolved.get( 0 ).getRemotePort( ) ) );
                //               context.put( Registry.VS_NAME , resolved.get( 0 ).getVSName( ) );
                //               context.put( Container.QUERY_VS_NAME , resolved.get( 0 ).getVSName( ) );
-               logger.fatal ("Dynamic resolving using directory is not implemented");
-            } else if ( addressBean.isAbsoluteAddressSpecified ( ) ) { // Absolute-address
+//               logger.fatal ("Dynamic resolving using directory is not implemented");
+//            } else 
+               if ( addressBean.isAbsoluteAddressSpecified ( ) ) { // Absolute-address
                
             }
             if ( Main.getWrapperClass ( addressBean.getWrapper ( ) ) == null ) {

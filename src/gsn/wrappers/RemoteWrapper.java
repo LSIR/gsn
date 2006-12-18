@@ -105,9 +105,20 @@ public class RemoteWrapper extends AbstractWrapper {
     */
    private void refreshRemotelyRegisteredQuery ( ) throws XmlRpcException {
       int notificationCode = getDBAlias ( );
-      CharSequence query = new StringBuffer ( "SELECT * FROM " ).append ( remoteVSName ).append ( " WHERE " ).append ( getWhereClausesAllTogher ( ) ).append ( " ORDER BY " ).append ( remoteVSName ).append (
-              ".TIMED DESC LIMIT 1 OFFSET 0" ).toString ( );
-      Object [ ] params = new Object [ ] {Main.getContainerConfig ().getContainerPort (),remoteVSName,query, notificationCode};
+      StringBuilder query = new StringBuilder ( "SELECT * FROM " ).append ( remoteVSName ).append ( " WHERE " ).append ( getWhereClausesAllTogher ( ) ).append ( " ORDER BY " ).append ( remoteVSName ).append (
+              ".timed DESC " );
+      /**
+       * Ali : Q, why we need LIMIT 1 OFFSET 0 ?
+       * A: For each stream element produced the remote virtual
+       * sensor will evaluate the queries and since we want to first have the clone of the
+       * DB at our side and then perform the query. By clone, I mean any data time that
+       * satisfies the union of the user defined filtering conditions, minimum of the start
+       * time and maximum of the end time, and the rate limits. Note that we don't enforce
+       * the window predicates because we want to first store the useful data in the local
+       * machine and then use the windows to calculate the queries.
+       */
+      query.append( " LIMIT 1 OFFSET 0" );  
+      Object [ ] params = new Object [ ] {Main.getContainerConfig ().getContainerPort (),remoteVSName,query.toString( ), notificationCode};
       if ( logger.isDebugEnabled ( ) )
          logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( host ).append (port).append ("/").append (remoteVSName).append ( " with the query ->" ).append ( query ).append ( "<-" ).toString ( ) );
       Boolean bool = (Boolean) client.execute ("gsn.registerQuery", params);
@@ -116,7 +127,9 @@ public class RemoteWrapper extends AbstractWrapper {
          return ;
       }
    }
-   
+   /**
+    * Note that query translation is not needed, it is going to performed in the receiver's side.
+    */
    public CharSequence addListener ( DataListener dataListener ) {
       try {
           StringBuffer completeMergedWhereClause = dataListener.getCompleteMergedWhereClause(remoteVSName);

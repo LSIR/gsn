@@ -162,7 +162,7 @@ public class StorageManager {
       Connection connection = null;
       dropTable( tableName );
       String sqlCreateStatement = getCreateTableStatement( structure , tableName ).replace( "\"" , "" );
-      String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName.toString( ).toLowerCase( ) ).append( "_INDEX ON " ).append( tableName.toString( ).toLowerCase( ) ).append( " (TIMED DESC)" )
+      String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName.toString( ).toLowerCase( ) ).append( "_INDEX ON " ).append( tableName.toString( ).toLowerCase( ) ).append( " (timed DESC)" )
             .toString( );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create table statement is : " ).append( sqlCreateStatement ).toString( ) );
       if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create index statement is : " ).append( sqlCreateIndexStatement ).toString( ) );
@@ -192,8 +192,8 @@ public class StorageManager {
       StringBuilder result = new StringBuilder( "CREATE " );
       if ( isHsql( ) ) result.append( " CACHED " );
       result.append( "TABLE " ).append( '\"' ).append( alias ).append( '\"' );
-      if ( isHsql( ) ) result.append( " (PK BIGINT NOT NULL IDENTITY, TIMED BIGINT NOT NULL, " );
-      if ( isMysqlDB( ) ) result.append( " (PK BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT, TIMED BIGINT NOT NULL, " );
+      if ( isHsql( ) ) result.append( " (PK BIGINT NOT NULL IDENTITY, timed BIGINT NOT NULL, " );
+      if ( isMysqlDB( ) ) result.append( " (PK BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT, timed BIGINT NOT NULL, " );
       for ( DataField field : structure ) {
          result.append( '\"' ).append( field.getFieldName( ).toUpperCase( ) ).append( '\"' ).append( ' ' );
          if ( StorageManager.isMysqlDB( ) ) {
@@ -404,7 +404,7 @@ public class StorageManager {
             logger.debug( acceptedFields.toString( ) );
          }
       }
-      toReturn.append( " TIMED " ).append( " ) values (" );
+      toReturn.append( " timed " ).append( " ) values (" );
       for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {
          if ( fieldsDefinedToBeStored.contains( se.getFieldNames( )[ i ].toUpperCase( ) ) ) toReturn.append( " ? ," );
       }

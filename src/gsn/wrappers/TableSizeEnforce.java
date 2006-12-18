@@ -88,32 +88,32 @@ public class TableSizeEnforce implements Runnable {
       if ( StorageManager.isHsql( ) ) {
          if ( countBased )
             // result.append ( "( ( " ).append ( tableName ).append
-            // ( ".TIMED
+            // ( ".timed
             // not in ( select " ).append ( tableName ).append (
-            // ".TIMED from
+            // ".timed from
             // " ).append (
             // tableName ).append ( " order by " ).append (
             // tableName
-            // ).append ( ".TIMED DESC LIMIT " ).append (
+            // ).append ( ".timed DESC LIMIT " ).append (
             // historySize
             // ).append (
-            // " offset 0 )) AND (" + tableName + ".TIMED >=" +
+            // " offset 0 )) AND (" + tableName + ".timed >=" +
             // startDate.getTime () + ") AND (" + tableName +
-            // ".TIMED<=" +
+            // ".timed<=" +
             // endDate.getTime () + ") )" );
-            result.append( "( ( " ).append( tableName ).append( ".TIMED <= ( SELECT TIMED from " ).append( tableName ).append( " group by TIMED order by TIMED desc limit 1 offset " ).append(
-               historySize ).append( "  ) ) AND (" + tableName + ".TIMED >=" + startDate.getTime( ) + ") AND (" + tableName + ".TIMED<=" + endDate.getTime( ) + ") )" );
+            result.append( "( ( " ).append( tableName ).append( ".timed <= ( SELECT timed from " ).append( tableName ).append( " group by timed order by timed desc limit 1 offset " ).append(
+               historySize ).append( "  ) ) AND (" + tableName + ".timed >=" + startDate.getTime( ) + ") AND (" + tableName + ".timed<=" + endDate.getTime( ) + ") )" );
          else
-            result.append( "( ( " ).append( tableName ).append( ".TIMED < (NOW_MILLIS() -" ).append( historySize ).append(
-               ") ) AND (" + tableName + ".TIMED >=" + startDate.getTime( ) + ") AND (" + tableName + ".TIMED<=" + endDate.getTime( ) + ") )" );
+            result.append( "( ( " ).append( tableName ).append( ".timed < (NOW_MILLIS() -" ).append( historySize ).append(
+               ") ) AND (" + tableName + ".timed >=" + startDate.getTime( ) + ") AND (" + tableName + ".timed<=" + endDate.getTime( ) + ") )" );
       } else if ( StorageManager.isMysqlDB( ) ) {
          if ( countBased )
-            result.append( "( ( " ).append( tableName ).append( ".TIMED <= ( SELECT * from ( SELECT TIMED from " ).append( tableName ).append( " group by TIMED order by TIMED desc limit 1 offset " )
+            result.append( "( ( " ).append( tableName ).append( ".timed <= ( SELECT * from ( SELECT timed from " ).append( tableName ).append( " group by timed order by timed desc limit 1 offset " )
                   .append( historySize ).append( "  ) AS TMP_" ).append( ( int ) ( Math.random( ) * 10000000 ) ).append(
-                     " ) ) AND (" + tableName + ".TIMED >=" + startDate.getTime( ) + ") AND (" + tableName + ".TIMED<=" + endDate.getTime( ) + ") )" );
+                     " ) ) AND (" + tableName + ".timed >=" + startDate.getTime( ) + ") AND (" + tableName + ".timed<=" + endDate.getTime( ) + ") )" );
          else
-            result.append( "( ( " ).append( tableName ).append( ".TIMED < (UNIX_TIMESTAMP() -" ).append( historySize ).append(
-               ") ) AND (" + tableName + ".TIMED >=" + startDate.getTime( ) + ") AND (" + tableName + ".TIMED<=" + endDate.getTime( ) + ") )" );
+            result.append( "( ( " ).append( tableName ).append( ".timed < (UNIX_TIMESTAMP() -" ).append( historySize ).append(
+               ") ) AND (" + tableName + ".timed >=" + startDate.getTime( ) + ") AND (" + tableName + ".timed<=" + endDate.getTime( ) + ") )" );
       }
       
       return result;
