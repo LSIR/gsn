@@ -11,6 +11,7 @@ var GSN = {
 		}	
 	}
 	,context: null //home, data, map || fullmap
+	,msg: null  //if there is some msg to give back
 	/**
 	* Initialize a page load (begin, tab click & back button)
 	*/
@@ -27,28 +28,64 @@ var GSN = {
 				$(this).removeClass("selected");
 		});
 		
+		//take care of msg params
+		for (var i=1;i<params.length;i++){
+			val = params[i].split("=");
+			if (val[0]=="msg") {
+				GSN.msg = val[1]
+				params.splice(i,1);
+				$.historyLoad(params.join(","));
+				return;
+			}
+		}		
+		
 		$("#main > div").hide();
 		//for each page context
 		if (GSN.context=="home")	{
 			GSN.vsbox.container = "#vs";
 			$("#main #control").show();
+			$(".msg").hide();
+			$(".intro").show();
 			$("#main #homediv").show();
 			$("#control #closeall").show();
 			//load and display all the visual sensors
 			if (!GSN.loaded) GSN.updateall();
+			
+			if (GSN.msg != null) {
+				$(".msg").show();
+				$(".intro").hide();
+				if (GSN.msg=="upsucc")
+					$("#control .msg").empty().append("The upload to the virtual sensor went successfully!");
+				GSN.msg = null;
+			}
 		} else if (GSN.context=="data")	{
-			$(".intro").remove();
+			$(".msg").remove();
 			$("#main #datachooser").show();
 			if (!GSN.loaded) GSN.updateall();
 		} else if (GSN.context=="map")	{
 			GSN.vsbox.container = "#vs4map";
-			$(".intro").remove();
+			$(".intro").hide();
+			$(".msg").remove();
 			$("#main #control").show();
 			$("#control #closeall").hide();
 			$("#main #mapdiv").show();
 			if(!GSN.map.loaded) {
+				$("#refreshall_autozoomandcenter").attr("checked",true);
 				GSN.map.init();
 				GSN.updateall();
+			}
+			
+			//take care of params
+			if (params.length>1) {
+				var lat=lng=zoom=0;
+				for (var i=1;i<params.length;i++){
+					val = params[i].split("=");
+					if (val[0]=="lt") lat = val[1];
+					if (val[0]=="lo") lng = val[1];
+					if (val[0]=="z") zoom = parseInt(val[1]);
+				}
+				map.setCenter(new GLatLng(lat,lng),zoom);
+				$("#refreshall_autozoomandcenter").attr("checked",false);
 			}
 		} else if (GSN.context=="fullmap")	{
 			GSN.vsbox.container = "#vs";
@@ -210,12 +247,20 @@ var GSN = {
 									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','dynamic');","class":"tabdynamic active"},"dynamic")),
 									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','static');","class":"tabstatic"},"addressing")),
 									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','structure');","class":"tabstructure"},"structure")),
-									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','description');","class":"tabdescription"},"description"))									    	
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','description');","class":"tabdescription"},"description")),
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','upload');","class":"tabupload"},"upload"))									    	
 									      ),
 									  $.DL({"class":"dynamic"}),
 									  $.DL({"class":"static"}),
 									  $.DL({"class":"structure"}),
-									  $.DL({"class":"description"})
+									  $.DL({"class":"description"}),
+									  $.DL({"class":"upload"},
+									  	$.FORM({"action":"/upload","method":"post","enctype":"multipart/form-data"},
+									  		$.DL({"class":"input"}),
+									  		$.INPUT({"type":"submit","value":"upload"}),
+									  		$.P({},"* compulsary fields.")
+									  	)
+									  )
 			));
 		}
 		/**
@@ -250,14 +295,17 @@ var GSN = {
 			var dynamic = vsdl.get(0);
 			var static = vsdl.get(1);
 			var struct = vsdl.get(2);
+			var input = $("dl.input",vsdl.get(4));
 			dl = dynamic;
 	
-			var name,type,value;
+			var name,cat,type,value;
 			//update the vsbox the first time, when it's empty
 			if ($(dynamic).children().size()==0 && $(static).children().size()==0){
-			  var gotDynamic,gotStatic = false;
+			  var gotDynamic,gotStatic,gotInput = false;
 			  $("field",vs).each(function(){ 
 				name = $(this).attr("name");
+				cat = $(this).attr("category");
+				cmd = $(this).attr("command");
 				type = $(this).attr("type");
 				value = $(this).text();
 				
@@ -267,7 +315,13 @@ var GSN = {
 			  		return;
 			  	}
 				
-				if (type=="predicate") {
+				if (cat=="input") {
+					dl = input;
+					if (!gotInput) {	
+						$("a.tabupload", vsd).show();
+						gotInput = true;
+					}
+				} else if (cat=="predicate") {
 					dl = static;
 					if (!gotStatic) {	
 						$("a.tabstatic", vsd).show();
@@ -289,14 +343,28 @@ var GSN = {
 				}
 							
 				//set the value
-				if (value == "") {
-					value = "null";
-				} else if (type.indexOf("svg") != -1){
-					value = '<embed type="image/svg+xml" width="400" height="400" src="'+value+'" PLUGINSPAGE="http://www.adobe.com/svg/viewer/install/" />';
-				} else if (type.indexOf("image") != -1){
-					value = '<img src="'+value+'" alt="error" />';
-				} else if (type.indexOf("binary") != -1){
-					value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
+				if (cat == null) {
+					if (value == "") {
+						value = "null";
+					} else if (type.indexOf("svg") != -1){
+						value = '<embed type="image/svg+xml" width="400" height="400" src="'+value+'" PLUGINSPAGE="http://www.adobe.com/svg/viewer/install/" />';
+					} else if (type.indexOf("image") != -1){
+						value = '<img src="'+value+'" alt="error" />';
+					} else if (type.indexOf("binary") != -1){
+						value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
+					}
+				} else if (cat == "input") {
+					if (type.indexOf("binary") != -1){
+						value = '<input type="file" name="'+cmd+"-"+name+'"/>';
+					} else {
+						value = '<input type="text" name="'+cmd+"-"+name+'"/>';
+					}
+					if (type.substr(0,1)=="*")
+						name = "*"+name;
+					
+					if ($(this).attr("description")!="")
+						value += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';	
+					
 				} 
 				$(dl).append('<dt>'+name+'</dt><dd class="'+name+'">'+value+'</dd>');				
 			  });
@@ -311,7 +379,6 @@ var GSN = {
 			  	}
 				
 			  }
-			 
 			  return true;
 			} else {
 				//update the vsbox when the value already exists
@@ -429,14 +496,37 @@ var GSN = {
 		
   				//attach event
   				GEvent.addListener(map, "click", function(overlay, point) {
-					if(overlay)	//when a marker is clicked
+					if(overlay)	{
+						//when a marker is clicked
 						if(typeof overlay.vsname != "undefined") 
 							GSN.menu(overlay.vsname);
+					}
+					else
+						$("#refreshall_autozoomandcenter").attr("checked",false);
 				});		
 				GEvent.addListener(map, 'zoomend', function (oldzoomlevel,newzoomlevel) {
   					GSN.map.zoomend(oldzoomlevel,newzoomlevel);
-				}); 		
+  					GSN.map.userchange();
+				});
+				
+				GEvent.addListener(map, 'dragstart', function () {
+  					$("#refreshall_autozoomandcenter").attr("checked",false);
+				}); 
+				
+				GEvent.addListener(map, 'moveend', function () {
+  					GSN.map.userchange();
+				}); 
+				
+				map.setCenter(new GLatLng(0,0),1);
    			}
+		}
+		/**
+		* Callback after any map change zoom and map move
+		* Used for location #hash change
+		*/	
+		,userchange : function(){
+  			if (!$("#refreshall_autozoomandcenter").attr("checked"))
+				location.hash = "map"+",lt="+map.getCenter().lat()+",lo="+map.getCenter().lng()+",z="+map.getZoom();
 		}
 		/**
 		* Callback after any zoom change
@@ -696,6 +786,7 @@ var GSN = {
 	   		$("#nextStep").remove();
 	   		$("#criterias").append("<tr><td class=\"step\">Step 5/5 : Selection of the format</td></tr>");
 			$("#criterias").append("<tr><td class=\"data\" id=\"display\">");
+			$("#display").append($.DIV({"id":"showSQL"},$.A({"href":"javascript:GSN.data.getDatas(true);"},"Show SQL query")));
 			$("#display").append("<input type=\"radio\" id=\"samePage\" value=\"samepage\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\" checked>In this page<br/>");
 			$("#display").append("<input type=\"radio\" id=\"popup\" value=\"popup\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\">In a new window<br/>");
 			$("#display").append("<input type=\"radio\" id=\"CSV\" value=\"CSV\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\">Download data<br/>");
@@ -712,10 +803,11 @@ var GSN = {
 	   			$("#cvsFormat").remove();
 	   		}
 	   	},
-	   	getDatas: function() {
+	   	getDatas: function(sql) {
+	  		console.debug(sql);
 	   		$("table#dataSet","#datachooser").remove();
 	   		$("#display").append($.SPAN({"class":"refreshing"},$.IMG({"src":"style/ajax-loader.gif","alt":"loading","title":""})));
-	   		if ($("#samePage").attr("checked") || $("#popup").attr("checked")) {
+	   		if ($("#samePage").attr("checked") || $("#popup").attr("checked") || sql) {
 	   			request = "vsName="+$("#vsName").attr("value");
 	   			if ($("#commonReq").attr("checked")) {
 	   				request += "&commonReq=true";
@@ -740,7 +832,20 @@ var GSN = {
 					request += "&critop="+$("#critop"+GSN.data.criterias[i]).val();
 					request += "&critval="+$("#critval"+GSN.data.criterias[i]).val();
 				}
-				GSN.data.displayDatas(request);
+				if (sql) {
+					request += "&sql=true";
+					$.ajax({
+						type: "GET",
+						url: "/data?"+request,
+						success: function(msg) {
+							$("#display .refreshing").remove();					
+							$("#showSQL .query").remove();
+							$("#showSQL").append($.P({"class":"query"},unescape(msg)));
+						}
+					});
+					
+				}else
+					GSN.data.displayDatas(request);
 	   		} /*else if ($("#popup").attr("checked")) {
 	   			$("form").attr("target", "_blank");
 	   			$("form").attr("action", "/showData.jsp");

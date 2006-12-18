@@ -16,6 +16,10 @@ body {
 		padding: 0;	
 		}
 		
+form {
+	padding:0;
+	margin:0;
+	}
 h2 {
 	font-size:1.5em;
 	margin:1em 0;
@@ -217,21 +221,29 @@ text-decoration:none;
 	padding:0;
 	margin:0;
 	padding-right:5px;
+	width:100px;
+	height:1.3em;
+	text-align:right;
 }
 .vsbox dd {
 	padding:0;
 	margin:0;
+	line-height:1.3em;
 	xfloat:left;
 }
 .vsbox dd img {
 	/*height:150px;*/
 }
+.vsbox input[type=submit], .vsbox dl p {
+	margin-left:107px;
+}
+.vsbox dl p {	font-style: italic;}
 
-.vsbox a.tabdynamic, .vsbox a.tabstatic, .vsbox a.tabstructure,.vsbox a.tabdescription {
+.vsbox a.tabdynamic, .vsbox a.tabstatic, .vsbox a.tabstructure,.vsbox a.tabdescription,.vsbox a.tabupload {
 	display:none;
 }
 
-.vsbox dl.static, .vsbox dl.structure,.vsbox dl.description {
+.vsbox dl.static, .vsbox dl.structure,.vsbox dl.description,.vsbox dl.upload {
 	display:none;
 }
 .clear {
@@ -299,7 +311,7 @@ v\:* { behavior:url(#default#VML); }
 		background: #fff;
 	}
 
-.intro {
+.intro,.msg {
 	border-top: 2px solid #FFA84C;
 	border-bottom: 2px solid #FFA84C;
 	background: #FFE0BF;
@@ -307,11 +319,9 @@ v\:* { behavior:url(#default#VML); }
 	padding:5px;
 }
 
-
-
-
-
-
+.msg {
+	font-weight:bold;
+}
 
 #vsmenu
 {

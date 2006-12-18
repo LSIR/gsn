@@ -13,8 +13,8 @@
 <!--//<![CDATA[
 $(document).ready(function() {
 	//by default, load home
-	if (location.hash == "") location.hash = "home";	
-	
+	if (location.hash == "") location.hash = "home";
+
 	//bind every buttons to javascript functionality (only once)
 	$("#refreshall_timeout").bind("change",GSN.updateallchange);
 	$("#refreshall").bind("click",GSN.updateall);
@@ -24,6 +24,13 @@ $(document).ready(function() {
 		
 	//load the requested page
 	$.historyInit(GSN.load);
+	
+	$("#refreshall_autozoomandcenter").bind("click",function() { 
+		if ($("#refreshall_autozoomandcenter").attr("checked")) {
+			location.hash="map"; 
+			GSN.map.autozoomandcenter();
+		}
+	});
 });	
 //]]>-->
 </script>
@@ -46,6 +53,7 @@ $(document).ready(function() {
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
 		
 		<div id="control">
+		  <div class="msg"></div>
 		  <div class="intro">Welcome to Global Sensor Networks. The first ten sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
 		  <p>Auto-refresh every : 
 			<select id="refreshall_timeout" >
@@ -77,7 +85,7 @@ $(document).ready(function() {
 			<td class="step">Step 1/5 : Selection of the Virtual Sensor</td>
 		</tr>
 		<tr>
-			<td class="data" id="vsensor">Please select a virtual sensor</td>
+			<td class="data" id="vsensor">Please select a virtual sensor on right sidebar.</td>
 		</tr>
 		</table>
 		</form>
