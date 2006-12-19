@@ -237,6 +237,7 @@ text-decoration:none;
 .vsbox input[type=submit], .vsbox dl p {
 	margin-left:107px;
 }
+.vsbox select.cmd {margin-left:108px; width:146px;}
 .vsbox dl p {	font-style: italic;}
 
 .vsbox a.tabdynamic, .vsbox a.tabstatic, .vsbox a.tabstructure,.vsbox a.tabdescription,.vsbox a.tabupload {
@@ -248,6 +249,9 @@ text-decoration:none;
 }
 .clear {
 		clear:both;
+}	
+.hidden {
+		display:none;
 }	
 
 .error {

@@ -256,12 +256,14 @@ var GSN = {
 									  $.DL({"class":"description"}),
 									  $.DL({"class":"upload"},
 									  	$.FORM({"action":"/upload","method":"post","enctype":"multipart/form-data"},
+									  		$.SELECT({"class":"cmd","name":"cmd","onChange":"javascript:GSN.vsbox.toggleWebInput()"}),
 									  		$.DL({"class":"input"}),
 									  		$.INPUT({"type":"submit","value":"upload"}),
 									  		$.P({},"* compulsary fields.")
 									  	)
 									  )
 			));
+			$("."+vsdiv+" select.cmd", $(this.container)).bind( "change", function(event) { GSN.vsbox.toggleWebInput(event); } );
 		}
 		/**
 		* Bring a vsbox at the beginning of the container
@@ -299,6 +301,8 @@ var GSN = {
 			dl = dynamic;
 	
 			var name,cat,type,value;
+			var last_cmd,cmd;
+			var hiddenclass ="";
 			//update the vsbox the first time, when it's empty
 			if ($(dynamic).children().size()==0 && $(static).children().size()==0){
 			  var gotDynamic,gotStatic,gotInput = false;
@@ -354,10 +358,15 @@ var GSN = {
 						value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
 					}
 				} else if (cat == "input") {
+					if (last_cmd != cmd) {
+						if (last_cmd != null) hiddenclass = ' hidden';
+						$("select.cmd", vsd).append($.OPTION({},cmd));
+						last_cmd = cmd;
+					}
 					if (type.indexOf("binary") != -1){
-						value = '<input type="file" name="'+cmd+"-"+name+'"/>';
+						value = '<input type="file" name="'+cmd+"|"+name+'"/>';
 					} else {
-						value = '<input type="text" name="'+cmd+"-"+name+'"/>';
+						value = '<input type="text" name="'+cmd+"|"+name+'"/>';
 					}
 					if (type.substr(0,1)=="*")
 						name = "*"+name;
@@ -366,7 +375,7 @@ var GSN = {
 						value += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';	
 					
 				} 
-				$(dl).append('<dt>'+name+'</dt><dd class="'+name+'">'+value+'</dd>');				
+				$(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+cmd+hiddenclass+'">'+value+'</dd>');				
 			  });
 			  
 			  if (vs.attr("description")!="") {
@@ -424,6 +433,12 @@ var GSN = {
 			$("."+vsdiv+" > dl."+dl, $(this.container)).show();
 			$("."+vsdiv+" a", $(this.container)).removeClass("active");
 			$("."+vsdiv+" a.tab"+dl, $(this.container)).addClass("active");
+		}
+		,toggleWebInput: function (event){
+			$("dt",$(event.target).parent()).hide();
+			$("dd",$(event.target).parent()).hide();
+			$("dt."+event.target.value,$(event.target).parent()).show();
+			$("dd."+event.target.value,$(event.target).parent()).show();
 		}
 	},
 	/**
