@@ -163,6 +163,12 @@ public class DataDownload extends HttpServlet {
 	    	  StringBuilder query = new StringBuilder(request);
 	    	  //out.println(query);
 	    	  ///*
+	    	  if (req.getParameter("sql") != null) {
+	    		  res.setContentType("text/html");
+	    		  out.println(query);
+	    		  return;
+	    	  }
+	    	  
 	    	  DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , false );
 	    	  if (result.IsNull()) {
 	    		  res.setContentType("text/html");

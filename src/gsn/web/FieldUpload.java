@@ -43,16 +43,16 @@ public class FieldUpload extends HttpServlet {
 			return;
 		}
 		
-//		 Create a factory for disk-based file items
+		//Create a factory for disk-based file items
 		FileItemFactory factory = new DiskFileItemFactory();
 
-//		 Create a new file upload handler
+		// Create a new file upload handler
 		ServletFileUpload upload = new ServletFileUpload(factory);
 
-//		 Set overall request size constraint
+		//Set overall request size constraint
 		//upload.setSizeMax(1000);
 		
-//		 Parse the request
+		// Parse the request
 		List /* FileItem */ items;
 		try {
 			items = upload.parseRequest(req);
@@ -61,24 +61,39 @@ public class FieldUpload extends HttpServlet {
 			return;
 		}
 		
-//		 Process the uploaded items
+		// Process the uploaded items
 		Iterator iter = items.iterator();
+		String cmd = "";
 		while (iter.hasNext()) {
 		    FileItem item = (FileItem) iter.next();
-
-		    if (item.isFormField()) {
-		    	   String name = item.getFieldName();
+		    
+		    if (item.getFieldName().equals("cmd")){
+		    	//define which cmd block is sent
+		    	cmd = item.getString();
+		    } else if (item.getFieldName().split(";")[0].equals(cmd)) {
+		    	//only for the defined cmd
+		    	if (item.isFormField()) {
+		    		//normal field
+		    		String name = item.getFieldName();
 		    	    String value = item.getString();
-		    	    out.write("xx:"+name+":"+value+"\n");
-		    } else {
-		    	 String name = item.getFieldName();
+		    	    
+		    	    //do whatever with it
+		    	    out.write("field:"+name+":"+value+"\n");
+		    	} else {
+		    		//file field
+		    		String name = item.getFieldName();
 		    	    String fileName = item.getName();
 		    	    String contentType = item.getContentType();
 		    	    boolean isInMemory = item.isInMemory();
 		    	    long sizeInBytes = item.getSize();
-		    	    out.write("yy:"+name+":"+fileName+":"+contentType+":"+isInMemory+":"+sizeInBytes+"\n");
+		    	    
+		    	    //do whatever with it
+		    	    out.write("file:"+name+":"+fileName+":"+contentType+":"+isInMemory+":"+sizeInBytes+"\n");
+		    	}
 		    }
 		}
-	      //res.sendRedirect("/#home,msg=upsucc");
+		
+		//if no error, send a successful redirect
+	    //res.sendRedirect("/#home,msg=upsucc");
 	}
 }

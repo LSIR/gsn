@@ -1,5 +1,35 @@
-body,
-html {
+v\:* { behavior:url(#default#VML); }
+
+/* general style */
+form {
+	padding:0;
+	margin:0;
+}
+h2	{
+	font-size:1.5em;
+	margin:1em 0;
+}
+
+a	{
+	color: #666666;
+	text-decoration:none;
+	background-color:inherit;
+}
+a:hover{ 
+	color: #000000 /*#2a5a8a*/;
+	text-decoration:none; 
+	background-color:inherit;}
+a img { 
+	border :0;
+	vertical-align: middle;
+}
+
+p {
+	margin: 0.5em 0;
+}
+
+/* container layout */
+body, html {
 		margin:0;
 		padding:0;
 		background:#DFDFDF;
@@ -7,36 +37,14 @@ html {
 		font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 		font-size:12px;
 		line-height:1.4em;
-	}
+}
+
 body {
 		min-width:750px;	
 		width: 100%; 
 		height: 100%; 
 		margin: 0; 
 		padding: 0;	
-		}
-		
-form {
-	padding:0;
-	margin:0;
-	}
-h2 {
-	font-size:1.5em;
-	margin:1em 0;
-	}
-
-a	{
-	color: #666666;
-	text-decoration:none;
-	background-color:inherit;
-	}
-a:hover{color: #000000 /*#2a5a8a*/; text-decoration:none; background-color:inherit;}
-a img { border :0;
-		vertical-align: middle;
-}
-
-p {
-	margin: 0.5em 0;
 }
 
 #container {
@@ -44,18 +52,18 @@ p {
 		padding:1px;
 		width:750px;
 		background:#FFFFFF;
-		}
+}
 #header, #headerfm {
 	    background:url("gsn-mark.png") no-repeat;
 	    background-color:#FFEE00;
 	    xheight:80px;
 	    margin:0;
 	    padding:0;
-		}
+}
 #header h1 {
     	padding:32px 90px;
     	margin:0;
-    	}
+}
 #headerfm h1 {
 		margin:0;
 		padding:32px 0 32px 90px;
@@ -67,51 +75,53 @@ p {
 		color:#000000;
 		}
 #navigation{
-height:2.2em;
-line-height:2.2em;
-margin:0;
-padding:0;
-background:#ffa84c;
-color:#9e9e9e;
+	height:2.2em;
+	line-height:2.2em;
+	margin:0;
+	padding:0;
+	background:#ffa84c;
+	color:#9e9e9e;
 }
 
 #navigation ul{
-		margin:0;
-		padding:0;
+	margin:0;
+	padding:0;
 }
 
 #navigation li{
-float:left;
-list-style-type:none;
-border-right:1px solid #ffffff;
-white-space:nowrap;
+	float:left;
+	list-style-type:none;
+	border-right:1px solid #ffffff;
+	white-space:nowrap;
 }
 
 #navigation li a{
-display:block;
-padding:0 10px;
-font-size:0.8em;
-font-weight:bold;
-font-weight:strong;
-text-transform:uppercase;
-text-decoration:none;
-background-color:inherit;
-color: #000000;
+	display:block;
+	padding:0 10px;
+	font-size:0.8em;
+	font-weight:bold;
+	font-weight:strong;
+	text-transform:uppercase;
+	text-decoration:none;
+	background-color:inherit;
+	color: #000000;
 }
 
-* html #navigation a {width:1%;}
+* html #navigation a {
+	width:1%;
+}
 
 #navigation .selected{
-background:#ffffff;
-color:#000000;
-text-decoration:none;
+	background:#ffffff;
+	color:#000000;
+	text-decoration:none;
 }
 #navigation a:hover{
-/*background:#80b0da;*/
-/*color:#ffffff;*/
-background:#FFEE00; /*#ff6f00;*/
-color:#000000;
-text-decoration:none;
+	/*background:#80b0da;*/
+	/*color:#ffffff;*/
+	background:#FFEE00; /*#ff6f00;*/
+	color:#000000;
+	text-decoration:none;
 }
 
 #datechooser {
@@ -135,9 +145,11 @@ text-decoration:none;
 	background-color:#ffffff;
 	xcolor:#4c4c4c;
 }
+#datachooser .query{
+	font-style:italic;
+}
 
 #main {
-		xbackground:#9c9;
 		float:left;
 		width:490px;
 		padding:0 10px;
@@ -146,9 +158,6 @@ text-decoration:none;
 		padding:0;
     	}
     	
-#main > div {
-		display:none;
-		}
 #sidebar {
 		xbackground:#99c;
 		
@@ -180,24 +189,81 @@ text-decoration:none;
 		text-align:center;
  }
 
-/* specific style */
+#vsmap {
+	margin-bottom:5px;
+}
+
+
+
+#vsmenu
+{
+list-style: none;
+margin: 0;
+padding: 0;
+border: none;
+}
+
+#vsmenu li
+{
+border-bottom: 1px solid #ffffff;
+margin: 0;
+}
+
+#vsmenu li a
+{
+display: block;
+padding: 5px 5px 5px 0.5em;
+border-left: 10px solid #FFE2BF;
+background-color: #FFF0DF;
+color: #FFA84C;
+text-decoration: none;
+width: 100%;
+
+}
+
+html>body #vsmenu li a { width: auto; }
+
+#vsmenu li a:hover
+{
+border-left: 10px solid #FFA84C;
+background-color: #FFB25F;
+color: #fff;
+}
+
+.intro,.msg {
+	border-top: 2px solid #FFA84C;
+	border-bottom: 2px solid #FFA84C;
+	background: #FFE0BF;
+	margin: 5px 0;
+	padding:5px;
+}
+.msg {
+	font-weight:bold;
+}
+
+
+
+
+/* specific style for vsbox and core bellow */
+#main > div { display:none; }
+
 .vsbox {
 		clear:both;
 		margin:1px;
 		border: 1px solid #FFA84C;
 		margin-bottom:8px;
 		background:#FFA84C;
-		}
+}
 .followed {
 		background:#FF8400;
 		border: 1px solid #FF8400;
-		}
+}
 .vsbox h3 {
 		margin:1px 10px;
 		padding:0;
 		xdisplay:inline-block;
 		font-size:1.2em;
-		}
+}
 .vsbox h3 span {float:left;}
 .vsbox h3 span.id,.vsbox h3 span.status {display:none;}
 .vsbox h3 a .vsname {color:#000;text-decoration:underline;}		
@@ -247,40 +313,23 @@ text-decoration:none;
 .vsbox dl.static, .vsbox dl.structure,.vsbox dl.description,.vsbox dl.upload {
 	display:none;
 }
-.clear {
-		clear:both;
-}	
 .hidden {
-		display:none;
+	display:none;
+}
+.clear {
+	clear:both;
 }	
-
 .error {
 	font-weight:bold;
 	color:#f00;
 }
-
-#vsmap {
-	margin-bottom:5px;
-}
-
-.refreshing {
-	xdisplay:none;
-}
-
-v\:* { behavior:url(#default#VML); }
-
-
-
-.tabnav
-	{
+.tabnav{
 		float:none;
 		clear:both;
 		height: 20px;
 		margin: 0;
 		padding-left: 10px;
-		xbackground: url(/images/tab_bottom.gif) repeat-x bottom;
-	}
-
+}
 .tabnav li
 	{
 		margin: 0; 
@@ -315,58 +364,10 @@ v\:* { behavior:url(#default#VML); }
 		background: #fff;
 	}
 
-.intro,.msg {
-	border-top: 2px solid #FFA84C;
-	border-bottom: 2px solid #FFA84C;
-	background: #FFE0BF;
-	margin: 5px 0;
-	padding:5px;
-}
-
-.msg {
-	font-weight:bold;
-}
-
-#vsmenu
-{
-list-style: none;
-margin: 0;
-padding: 0;
-border: none;
-}
-
-#vsmenu li
-{
-border-bottom: 1px solid #ffffff;
-margin: 0;
-}
-
-#vsmenu li a
-{
-display: block;
-padding: 5px 5px 5px 0.5em;
-border-left: 10px solid #FFE2BF;
-background-color: #FFF0DF;
-color: #FFA84C;
-text-decoration: none;
-width: 100%;
-
-}
-
-html>body #vsmenu li a { width: auto; }
-
-#vsmenu li a:hover
-{
-border-left: 10px solid #FFA84C;
-background-color: #FFB25F;
-color: #fff;
-}
-
 .gpsenabled {
 	font-style: italic;
 	font-weight: bold;
 }
-
 
 /* Date picker specific styles follow */
 

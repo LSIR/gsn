@@ -364,9 +364,9 @@ var GSN = {
 						last_cmd = cmd;
 					}
 					if (type.indexOf("binary") != -1){
-						value = '<input type="file" name="'+cmd+"|"+name+'"/>';
+						value = '<input type="file" name="'+cmd+";"+name+'"/>';
 					} else {
-						value = '<input type="text" name="'+cmd+"|"+name+'"/>';
+						value = '<input type="text" name="'+cmd+";"+name+'"/>';
 					}
 					if (type.substr(0,1)=="*")
 						name = "*"+name;
@@ -776,7 +776,7 @@ var GSN = {
 	    		GSN.data.criteriaForType(GSN.data.fields[0],nb_crit);
 		},
 		criteriaForType: function(field, nb_crit) {
-			if (field == "TIMED") {
+			if (field == "timed") {
 				$("#critval"+nb_crit).val(GSN.util.printDate((new Date()).getTime()));
 				$("#critval"+nb_crit).datePicker({startDate:'01/01/2006'});
 			} else {
@@ -819,8 +819,7 @@ var GSN = {
 	   		}
 	   	},
 	   	getDatas: function(sql) {
-	  		console.debug(sql);
-	   		$("table#dataSet","#datachooser").remove();
+	  		$("table#dataSet","#datachooser").remove();
 	   		$("#display").append($.SPAN({"class":"refreshing"},$.IMG({"src":"style/ajax-loader.gif","alt":"loading","title":""})));
 	   		if ($("#samePage").attr("checked") || $("#popup").attr("checked") || sql) {
 	   			request = "vsName="+$("#vsName").attr("value");
