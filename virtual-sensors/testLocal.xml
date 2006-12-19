@@ -2,7 +2,7 @@
    <processing-class>
       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
    <output-structure>
-      <field name="DATA" type="binary:jpg"/>
+      <field name="DATA" type="binary:image/jpeg"/>
    </output-structure>
    </processing-class>
    <description>Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/remoteTest.xml</description>
@@ -19,7 +19,7 @@
             </address>
             <query>select DATA,Timed from wrapper</query>
          </source>
-         <query>select source1.DATA,Timed from source1</query>
+         <query>select source1.DATA from source1</query>
       </stream>
    </streams>
 </virtual-sensor>
