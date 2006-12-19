@@ -64,6 +64,20 @@ a virtual sensor, you need to Generate  Keys and Certificates :
    cd conf
    keytool -keystore gsn.jks -alias gsn -genkey -keyalg RS
 
+Running the webapp in apache
+========================
+If you want to run the webapp in apache, you will need to redirect the servlet to it. 
+
+Enable the following modules in httpd.conf :
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_http_module modules/mod_proxy_http.so
+LoadModule rewrite_module modules/mod_rewrite.so
+
+Add in the DocumentRoot directory part (<Directory "..."></Directory>) in httpd.conf or
+in a .htaccess file at the root, the following rules:
+RewriteEngine on
+RewriteRule ^(gsn-handler|gsn|field|data|upload)(|\?(.*))$ http://localhost:22001/$0 [P]
+
 Bugs
 ====
 If you find a bug in gsn, please tell us on 

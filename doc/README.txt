@@ -75,7 +75,7 @@ To use it, you need to register at
 http://www.google.com/apis/maps/signup.html
 
 You will receive a key. You should edit the 
-"webapp/fullmap.jsp" and "webapp/map.jsp" files, and replace 
+"webapp/fullmap.html" and "webapp/index.html" files, and replace 
 
 key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA
 
