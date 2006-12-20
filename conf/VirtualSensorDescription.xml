@@ -3,7 +3,7 @@
        <value name="name" field="virtualSensorName" style="attribute" />
        <value name="priority" field="priority" usage="optional" style="attribute" />  
        <value name="password" field="generalPassword" style="attribute" usage="optional" />
-       <structure name="processing-class" >
+       <structure name="processing-class" usage="optional" >
               <value name="class-name" field="mainClass"  />  
               <structure name="init-params" usage="optional" >
                 <collection field="mainClassInitialParams"  >
@@ -27,7 +27,7 @@
       <structure name="output-specification" usage="optional" >
           <value name="rate"  field="outputStreamRate" style="attribute"  />
       </structure>
-      <collection name="addressing"    field="addressing"  item-type="gsn.utils.KeyValueImp" />
+      <collection name="addressing"    field="addressing"  item-type="gsn.utils.KeyValueImp" usage="optional" />
       <structure name="storage" usage="optional" >
 	      <value name="history-size" field="storageHistorySize" style="attribute" usage="optional" />
 	   </structure>
@@ -72,11 +72,6 @@
 	<value name="name"  field="fieldName" style="attribute"/>
    	<value name="type" field="type" style="attribute"/>
    	<value field="description" style="text" usage="optional"/>
-   </mapping>
-   
-   <mapping name="command" class="gsn.beans.WebInput" >
-  	   <value      name="name"     field="name"        style="attribute"/>
-      <collection    field="parameters"  item-type="gsn.beans.DataField" />
    </mapping>
    
 </binding>
