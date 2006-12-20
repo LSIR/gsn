@@ -4,6 +4,14 @@ Thank you for downloading GSN!
 There are a few things good to know in order to get the most
 from GSN.
 
+Licensing terms
+===============
+GSN is licensed under the GNU GPL license, version 2. A complete copy
+of the text can be found in the file GPL-2.txt.
+Basically, it grants you the rights to use, redistribute and modify
+GSN. However, if you want to redistribute a modified version of GSN,
+you must provide the complete source code of your modifications.
+
 What is GSN
 ===========
 
