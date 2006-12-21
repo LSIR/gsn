@@ -2,6 +2,7 @@ package gsn.web;
 
 import gsn.beans.StreamElement;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -22,6 +24,8 @@ import org.apache.log4j.Logger;
  * @author Clément Beffa (clement.beffa@epfl.ch)<br>
  * @web.servlet name="FieldUpload" load-on-startup="true"
  * @web.servlet-mapping url-pattern="/upload"
+ * 
+ * @todo validation & security part
  */
 
 public class FieldUpload extends HttpServlet {
@@ -64,36 +68,39 @@ public class FieldUpload extends HttpServlet {
 		// Process the uploaded items
 		Iterator iter = items.iterator();
 		String cmd = "";
+		Base64 b64 = new Base64();
+		StringBuilder sb = new StringBuilder("<input>\n" );
 		while (iter.hasNext()) {
 		    FileItem item = (FileItem) iter.next();
 		    
-		    if (item.getFieldName().equals("cmd")){
+		    if (item.getFieldName().equals("vsname")){
+		    	//define which cmd block is sent
+		    	sb.append("<vsname>"+item.getString()+"</vsname>\n");
+		    } else if (item.getFieldName().equals("cmd")){
 		    	//define which cmd block is sent
 		    	cmd = item.getString();
+		    	sb.append("<command>"+item.getString()+"</command>\n");
+		    	sb.append("<fields>\n");
 		    } else if (item.getFieldName().split(";")[0].equals(cmd)) {
 		    	//only for the defined cmd
-		    	if (item.isFormField()) {
-		    		//normal field
-		    		String name = item.getFieldName();
-		    	    String value = item.getString();
-		    	    
-		    	    //do whatever with it
-		    	    out.write("field:"+name+":"+value+"\n");
-		    	} else {
-		    		//file field
-		    		String name = item.getFieldName();
-		    	    String fileName = item.getName();
-		    	    String contentType = item.getContentType();
-		    	    boolean isInMemory = item.isInMemory();
-		    	    long sizeInBytes = item.getSize();
-		    	    
-		    	    //do whatever with it
-		    	    out.write("file:"+name+":"+fileName+":"+contentType+":"+isInMemory+":"+sizeInBytes+"\n");
-		    	}
+		    	
+		    	sb.append("<field>\n");
+	    	    sb.append("<name>"+item.getFieldName().split(";")[1]+"</name>\n");
+	    	    if (item.isFormField()) {
+			    	sb.append("<value>"+item.getString()+"</value>\n");
+	    	    } else {
+	    	    	sb.append("<value>"+new String(b64.encode(item.get()))+"</value>\n");
+	    	    }
+	    	    sb.append("</field>\n");
 		    }
 		}
+		sb.append("</fields>\n");
+		sb.append("</input>\n" );
+		
+		
 		
 		//if no error, send a successful redirect
 	    //res.sendRedirect("/#home,msg=upsucc");
+		out.write(sb.toString());
 	}
 }

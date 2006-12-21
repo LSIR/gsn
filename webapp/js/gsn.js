@@ -256,6 +256,7 @@ var GSN = {
 									  $.DL({"class":"description"}),
 									  $.DL({"class":"upload"},
 									  	$.FORM({"action":"/upload","method":"post","enctype":"multipart/form-data"},
+									  		$.INPUT({"type":"hidden","name":"vsname","value":vsName}),
 									  		$.SELECT({"class":"cmd","name":"cmd","onChange":"javascript:GSN.vsbox.toggleWebInput()"}),
 									  		$.DL({"class":"input"}),
 									  		$.INPUT({"type":"submit","value":"upload"}),
