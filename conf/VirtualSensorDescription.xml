@@ -74,4 +74,8 @@
    	<value field="description" style="text" usage="optional"/>
    </mapping>
    
+   <mapping name="command" class="gsn.beans.WebInput"> 	 
+   		<value name="name" field="name" style="attribute"/>
+	    <collection    field="parameters"  item-type="gsn.beans.DataField" />
+   </mapping>
 </binding>
