@@ -1,0 +1,2319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<meta name="GENERATOR" content="TtH 3.67">
+ <style type="text/css"> div.p { margin-top: 7pt;}</style>
+ <style type="text/css"><!--
+ td div.comp { margin-top: -0.6ex; margin-bottom: -1ex;}
+ td div.comb { margin-top: -0.6ex; margin-bottom: -.6ex;}
+ td div.hrcomp { line-height: 0.9; margin-top: -0.8ex; margin-bottom: -1ex;}
+ td div.norm {line-height:normal;}
+ span.roman {font-family: serif; font-style: normal; font-weight: normal;} 
+ span.overacc2 {position: relative;  left: .8em; top: -1.2ex;}
+ span.overacc1 {position: relative;  left: .6em; top: -1.2ex;} --></style>
+ 
+
+                      
+
+ 
+<title> The Book of GSN</title>
+ 
+<h1 align="center">The Book of GSN </h1>
+
+<div class="p"><!----></div>
+
+<h3 align="center">Jérôme Rousselot and Ali Salehi </h3>
+
+<div class="p"><!----></div>
+
+<h1>Contents </h1>
+I&nbsp;&nbsp;&nbsp;User's Guide<br />
+<a href="#tth_chAp1"
+>1&nbsp; Introduction</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc1.1"
+>1.1&nbsp; Presentation</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc1.2"
+>1.2&nbsp; Installing GSN</a><br />
+<a href="#tth_chAp2"
+>2&nbsp; Configuring and running GSN</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1"
+>2.1&nbsp; The basics</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2"
+>2.2&nbsp; Some example configuration scenarios</a><br />
+<a href="#tth_chAp3"
+>3&nbsp; GSN Architecture</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.1"
+>3.1&nbsp; Generalities</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2"
+>3.2&nbsp; Data Acquisition</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.1"
+>3.2.1&nbsp; GSN Wrappers</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.2"
+>3.2.2&nbsp; Remote Wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.3"
+>3.2.3&nbsp; TinyOS 1.x</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.4"
+>3.2.4&nbsp; TinyOS 2.x</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.5"
+>3.2.5&nbsp; Serial Wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.6"
+>3.2.6&nbsp; UDP Wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.7"
+>3.2.7&nbsp; System Time</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.8"
+>3.2.8&nbsp; Axis Wireless Camera</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.9"
+>3.2.9&nbsp; USB Webcams</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2.10"
+>3.2.10&nbsp; Memory Monitor</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3"
+>3.3&nbsp; Data filtering and processing</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3.1"
+>3.3.1&nbsp; The SQL syntax</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3.2"
+>3.3.2&nbsp; Virtual Sensors</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3.2.1"
+>3.3.2.1&nbsp; Introduction</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3.2.2"
+>3.3.2.2&nbsp; The virtual-sensor xml configuration file</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3.2.3"
+>3.3.2.3&nbsp; Bridge Virtual Sensor</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3.2.4"
+>3.3.2.4&nbsp; Chart Virtual Sensor</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3.2.5"
+>3.3.2.5&nbsp; Stream Exporter</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.4"
+>3.4&nbsp; Data publishing</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.4.1"
+>3.4.1&nbsp; Web Interface</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.4.1.1"
+>3.4.1.1&nbsp; GoogleMaps integration</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.4.2"
+>3.4.2&nbsp; Email notifications</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.4.3"
+>3.4.3&nbsp; SMS notifications</a><br />
+II&nbsp;&nbsp;&nbsp;Developer's Guide<br />
+<a href="#tth_chAp4"
+>4&nbsp; Writing a Virtual Sensor</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc4.1"
+>4.1&nbsp; The AbstractVirtualSensor class</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc4.2"
+>4.2&nbsp; The StreamElement class</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc4.3"
+>4.3&nbsp; Writing your own graphical user interface</a><br />
+<a href="#tth_chAp5"
+>5&nbsp; Writing a Wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1"
+>5.1&nbsp; A quick how-to</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.1"
+>5.1.1&nbsp; initialize()</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.2"
+>5.1.2&nbsp; finalize()</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.3"
+>5.1.3&nbsp; getWrapperName()</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.4"
+>5.1.4&nbsp; getOutputFormat()</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.4.1"
+>5.1.4.1&nbsp; Wireless Sensor Network Example</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.4.2"
+>5.1.4.2&nbsp; Webcam Example</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.5"
+>5.1.5&nbsp; run()</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.5.1"
+>5.1.5.1&nbsp; Webcam example</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.5.2"
+>5.1.5.2&nbsp; Data driven systems </a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1.6"
+>5.1.6&nbsp; sendToWrapper()</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.2"
+>5.2&nbsp; A detailed description of the AbstractWrapper class</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.3"
+>5.3&nbsp; The life cycle of a wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.4"
+>5.4&nbsp; Questions and Answers</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.4.1"
+>5.4.1&nbsp; When is the sendToWrapper method called ? </a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.4.2"
+>5.4.2&nbsp; How does a virtual sensor decide when to send data to the wrapper ? </a><br />
+<a href="#tth_chAp6"
+>6&nbsp; Writing a Protocol Description</a><br />
+<a href="#tth_chAp7"
+>7&nbsp; Your own web interface</a><br />
+<a href="#tth_chAp8"
+>8&nbsp; Inter-GSN communications</a><br />
+<a href="#tth_chAp9"
+>9&nbsp; GSN Class Reference</a><br />
+<a href="#tth_sEcindex">Index</a><br />
+
+<div class="p"><!----></div>
+
+<h1>List of Tables </h1>
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.1"
+>3.1&nbsp;  Description of GSN wrappers</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.2"
+>3.2&nbsp;  Parameters for Remote wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.3"
+>3.3&nbsp;  Parameters for serial wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.4"
+>3.4&nbsp;  Parameters for UDP wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.5"
+>3.5&nbsp;  Parameters for System Time wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.6"
+>3.6&nbsp;  Parameters for Axis Wireless Camera wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.7"
+>3.7&nbsp;  Parameters for OV511 USB webcams</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.8"
+>3.8&nbsp;  Parameters for memory monitoring wrapper</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.9"
+>3.9&nbsp;  GSN built-in virtual sensors</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.10"
+>3.10&nbsp;  Parameters for Plotter VS</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_tAb3.11"
+>3.11&nbsp;  Parameters for Stream Exporter</a><br />
+
+
+
+
+
+
+
+
+<div class="p"><!----></div>
+<br /><h1>Part 1   <br />User's Guide</h1><br />
+
+<div class="p"><!----></div>
+ <h1><a name="tth_chAp1">
+Chapter 1 </a><br />Introduction</h1>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc1.1">
+1.1</a>&nbsp;&nbsp;Presentation</h2>
+
+<div class="p"><!----></div>
+GSN (for Global Sensor Networks<a name="Global Sensor Networks11">
+</a>) is
+a software project that started in 2005 at EPFL in the LSIR Lab by
+Ali Salehi, under the supervision of Karl Aberer. The initial goal
+was to provide a reusable software platform for the processing of
+data streams generated by wireless sensor networks. The project was
+succesful, and was later reoriented towards a generic stream processing
+platform.
+
+<div class="p"><!----></div>
+GSN acquires data, filters it with an intuitive, enriched SQL syntax,
+runs customisable algorithms on the results of the query, and outputs
+the generated data with its notification subsystem.
+
+<div class="p"><!----></div>
+GSN can be configured to acquire data from various data sources. The
+high number of data sources in GSN allows for sophisticated data processing
+scenarios. In the unlikely event that your data sources are not supported,
+it is very easy to write a wrapper to make your hardware work with
+GSN (you can find more information about this in chapter <a href="#cha:Writing-a-Wrapper">5</a>).
+
+<div class="p"><!----></div>
+GSN offers advanced data filtering functionnalities through an enhanced
+SQL syntax. It is assumed that the reader has some knowledge of the
+Standard Query Language (SQL). If not, we encourage you to read some
+documentation like ??? and ???. Using it for basic operations is fairly
+intuitive and you should be able to start using it from the examples
+provided in this document.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc1.2">
+1.2</a>&nbsp;&nbsp;Installing GSN</h2>
+
+<div class="p"><!----></div>
+Due to the quick development cycle of GSN, you should install the
+latest version. It can always be found at <a href="http://gsn.sourceforge.net/download/"><tt>http://gsn.sourceforge.net/download/</tt></a>.
+
+<div class="p"><!----></div>
+Before installing GSN, please download the latest version of the Java
+Development Kit<a name="Java Development Kit12">
+</a> from <a href="http://www.java.com"><tt>http://www.java.com</tt></a>.
+Some optional GSN components, such as the USB webcam wrapper, need
+third-party libraries that we are not allowed to redistribute. If
+you want to use these features, you will have to download and install
+these by yourself. We apologize for the inconvenience.
+
+<div class="p"><!----></div>
+GSN comes with an easy-to-use graphical installer. The default settings
+should be fine.
+
+<div class="p"><!----></div>
+ <h1><a name="tth_chAp2">
+Chapter 2 </a><br />Configuring and running GSN</h1>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc2.1">
+2.1</a>&nbsp;&nbsp;The basics</h2>
+
+<div class="p"><!----></div>
+GSN comes preconfigured with many virtual sensors activated.
+
+<div class="p"><!----></div>
+GSN requires two processes to run: the directory service and gsn itself.
+
+<div class="p"><!----></div>
+To start these processes from the command line, go to the directory
+where GSN is located and type:
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+ant&nbsp;dir
+</dd>
+</dl>
+This will start the directory service. If everything goes right, you
+should see something like this:
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+dir:
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[java]&nbsp;Loading&nbsp;logging&nbsp;details&nbsp;from&nbsp;:&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;conf/log4j.directory.properties
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[java]&nbsp;INFO&nbsp;&nbsp;[2006-12-14&nbsp;14:25:08,731]&nbsp;[main]
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Registry.java:69)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;GSN-Registry-Server&nbsp;startup&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[java]&nbsp;2006-12-14&nbsp;14:25:09.634::INFO:&nbsp;&nbsp;Logging&nbsp;to&nbsp;STDERR
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;via&nbsp;org.mortbay.log.StdErrLog
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[java]&nbsp;WARN&nbsp;&nbsp;[2006-12-14&nbsp;14:25:09,771]&nbsp;[main]
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(RegistryReferesh.java:44)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;Using&nbsp;RamDirectory&nbsp;which
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;not&nbsp;persistant.
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[java]&nbsp;2006-12-14&nbsp;14:25:09.796::INFO:&nbsp;&nbsp;jetty-6.0.1
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[java]&nbsp;2006-12-14&nbsp;14:25:10.475::INFO:&nbsp;&nbsp;Started&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SelectChannelConnector&nbsp;@&nbsp;0.0.0.0:1882
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[java]&nbsp;INFO&nbsp;&nbsp;[2006-12-14&nbsp;14:25:10,476]&nbsp;[main]
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Registry.java:101)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;[ok]
+</dd>
+</dl>
+You can now start gsn from another terminal:
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+ant&nbsp;gsn
+</dd>
+</dl>
+This will generate a very verbose output. Don't worry if the text
+goes too fast: all the information is stored in a log file (logs/gsn.log)
+that you can view with your favorite text editor. You can configure
+the log level by editing the file <tt>conf/log4j.properties</tt>.
+There are several log levels, from INFO (maximum logging) to WARN
+(minimum logging). If you want to reduce the log verbosity, change
+all DEBUG and INFO values to WARN. If you want to debug your configuration,
+simply do the opposite.
+
+<div class="p"><!----></div>
+GSN does much more than generating log statements, however. You can
+access the web interface of the directory service on <a href="http://127.0.0.1:1882"><tt>http://127.0.0.1:1882</tt></a>
+and the web interface of your gsn instance on <a href="http://127.0.0.1:22001"><tt>http://127.0.0.1:22001</tt></a>.
+
+<div class="p"><!----></div>
+You should see something like Figure <a href="#fig:GSN-Web-Interface">2.1</a>.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_fIg2.1">
+</a> <center>Figure 2.1: GSN Web Interface<a name="fig:GSN-Web-Interface">
+</a></center>
+
+<div class="p"><!----></div>
+
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc2.2">
+2.2</a>&nbsp;&nbsp;Some example configuration scenarios</h2>
+
+<div class="p"><!----></div>
+As can be seen on Figure <a href="#gsn-3-parts">2.2</a>, GSN is built around three
+subsystems: data acquisition, data processing and data output. Most
+of the time these three functionalities can run on the same computer.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_fIg2.2">
+</a> <center>Figure 2.2: The three autonomous components of GSN<a name="gsn-3-parts">
+</a></center>
+
+<div class="p"><!----></div>
+
+
+<div class="p"><!----></div>
+However, more complex scenarios can be imagined, and GSN servers can
+collaborate so that each of them only deals with one of these three
+functions. This can be done to distribute the load, to deploy GSN
+on remote, resource-constrained devices or to interconnect many data
+sources into complex data processing scenarios.
+
+<div class="p"><!----></div>
+For example, a user may deploy a network of wireless sensors in a
+building for intrusion detection. Data is collected through multiple,
+small computers connected to one of these sensors. Such data collection
+stations are often called <em>sinks</em>. Each sink receives data from
+the neighbouring sensors. To reduce hardware costs and power consumption,
+these sinks are resource constrained: no hard disk, only a serial
+port connector and a ethernet or wireless local area network connection.
+Each sink can run GSN configured to only acquire data. 
+
+<div class="p"><!----></div>
+A central GSN data processing server runs in the basement of the building
+or even in a remote location, possibly hosted in a colocation facility.
+This server knows about each of the data acquisition servers and registers
+to them as a data consumer. It will receive their data, analyzes the
+network packets, logs all erroneous packets in a separate database
+for off-line manual analysis and sends all statistics packets to the
+graph generator.
+
+<div class="p"><!----></div>
+A third GSN server gets the refined data and also runs the Apache
+web server for performance reasons. It allows identified web users
+to see plots of the number of erroneous messages in the last 24 hours
+(for application debugging and traffic spoofing detection), plots
+with the number of openings for each door and the time at which they
+occured and the photos of the last 25 persons who entered the building.
+It also shows a zoomable satellite picture of the enterprise campus
+to locate more easily the possible source of intrusion.
+
+<div class="p"><!----></div>
+An idea on how to configure GSN to do that is shown in Figure <a href="#fig:Intrusion-detection-example">2.3</a>.
+For the sake of simplicity, only one instance of each server type
+is represented.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_fIg2.3">
+</a> <center>Figure 2.3: <a name="fig:Intrusion-detection-example">
+</a>Intrusion detection example
+scenario</center>
+
+<div class="p"><!----></div>
+
+
+<div class="p"><!----></div>
+ <h1><a name="tth_chAp3">
+Chapter 3 </a><br /><a name="GSN Internals30">
+</a>GSN Architecture</h1>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc3.1">
+3.1</a>&nbsp;&nbsp;Generalities</h2>
+
+<div class="p"><!----></div>
+GSN is composed of three parts: data acquisition, data processing,
+and output dispatching (also called notification subsystem). Most
+users will probably focus on the second part, data processing.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_fIg3.1">
+</a> <center>Figure 3.1: GSN Architecture Overview</center>
+
+<div class="p"><!----></div>
+ 
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc3.2">
+3.2</a>&nbsp;&nbsp;Data Acquisition</h2>
+
+<div class="p"><!----></div>
+Before filtering and processing data, GSN needs to receive it. GSN
+considers two types of data sources: event-based and polling-based.
+In the first case, data is sent by the source and a GSN method is
+called when it arrives. Serial ports, network (TCP or UDP) connections,
+wireless webcams fall in this case. In the latter one, GSN periodically
+asks the source for new data. This is the case of an RSS feed or a
+POP3 email account.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.2.1">
+3.2.1</a>&nbsp;&nbsp;GSN Wrappers<a name="Wrappers32">
+</a></h3>
+
+<div class="p"><!----></div>
+GSN can receive data from various data sources. This is done by using
+so called <em>wrappers</em>. They are used to encapsulate the data received
+from the data source into the standard GSN data model, called a <em>StreamElement</em>.
+A StreamElement is an object representing a row of a SQL table.
+
+<div class="p"><!----></div>
+Each wrapper is a Java class that extends the <em>AbstractWrapper</em>
+parent class. Usually a wrapper initializes a specialized third-party
+library in its constructor. It also provides a method which is called
+each time the library receives data from the monitored device. This
+method will extract the interesting data, optionnally parse it, and
+create one or more StreamElement(s) with one or more columns. From
+this point on, the received data has been mapped to a SQL data structure
+with fields that have a name and a type. GSN is then able to filter
+this using its enhanced SQL-like syntax. You will learn more about
+that in section <a href="#sub:The-SQL-syntax">3.3.1</a>.
+
+<div class="p"><!----></div>
+A wrapper is implemented in a Java class. For simplicity, GSN uses
+short names to refer to these wrappers. These associations are defined
+in the file <tt>conf/wrappers.properties</tt>. For now on it is assumed
+that you use the default names provided at installation time.
+
+<div class="p"><!----></div>
+Each of the standard wrappers is described below with some documentation
+on how to use it.
+
+<div class="p"><!----></div>
+You can refer to Table <a href="#tab:Description-of-Wrappers">pageref</a> for
+a quick overview of the available wrappers.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_tAb3.1">
+</a> <center>Table 3.1: <a name="tab:Description-of-Wrappers">
+</a>Description of GSN wrappers</center>
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Wrapper</td><td align="right">Short name</td><td width="0">Description</td><td width="0">page</td></tr>
+<tr><td></td></tr>
+<tr><td align="center">Remote wrapper</td><td align="right"><tt>remote</tt></td><td width="0">Enables a virtual sensor to use another virtual sensor as its data
+source.</td><td width="0"><a href="#sub:Remote-Wrapper">pageref</a></td></tr>
+
+<tr><td align="center">TinyOS 1.x</td><td align="right"><tt>tinyos1x</tt></td><td width="0">Communicates with any device running the TinyOS 1.x operating system.</td><td width="0"><a href="#sub:TinyOS-1.x">pageref</a></td></tr>
+
+<tr><td align="center">TinyOS 2.x</td><td align="right"><tt>tinyos2x</tt></td><td width="0">Communicates with any device running the TinyOS 2.x operating system.</td><td width="0"><a href="#sub:TinyOS-2.x">pageref</a></td></tr>
+
+<tr><td align="center">Serial Wrapper</td><td align="right"><tt>serial</tt></td><td width="0">Reads and send data on the serial port (RS-232 interface), real or
+virtual (e.g. Serial Port Profile over BlueTooth wireless link).</td><td width="0"><a href="#sub:Serial-Wrapper">pageref</a></td></tr>
+
+<tr><td align="center">UDP Wrapper</td><td align="right"><tt>udp</tt></td><td width="0">Opens a UDP socket on a configured port and reads data on it.</td><td width="0"><a href="#sub:UDP-Wrapper">pageref</a></td></tr>
+
+<tr><td align="center">System Time</td><td align="right"><tt>system-time</tt></td><td width="0">Generates events from system clock every <em>t</em> milliseconds, with
+the system time at which the event was generated.</td><td width="0"><a href="#sub:System-Time">pageref</a></td></tr>
+
+<tr><td align="center">AXIS Wireless Camera</td><td align="right"><tt>wireless-cam</tt></td><td width="0">Polls an AXIS wireless camera periodically to grab a picture.</td><td width="0"><a href="#sub:Axis-Wireless-Camera">pageref</a></td></tr>
+
+<tr><td align="center">USB Webcams</td><td align="right"><tt>usb-cam</tt></td><td width="0">Polls a USB camera<a href="#tthFtNtAAB" name="tthFrefAAB"><sup>1</sup></a> periodically to grab a picture.</td><td width="0"><a href="#sub:USB-Webcams">pageref</a></td></tr>
+
+<tr><td align="center">Memory Monitor</td><td align="right"><tt>memory-usage</tt></td><td width="0">Periodically generates memory usage statistics. Current version gives
+information on Heap, non-heap and the number of objects awaiting finalization
+in the virtual machine running GSN.</td><td width="0"><a href="#sub:Memory-Monitor">pageref</a></td></tr>
+</table>
+
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.2.2">
+3.2.2</a>&nbsp;&nbsp;<a name="Remote Wrapper32">
+</a>Remote Wrapper<a name="sub:Remote-Wrapper">
+</a></h3>
+
+<div class="p"><!----></div>
+This is a special wrapper that allows GSN to treat a virtual sensor
+as a data source for another virtual sensor. This data source can
+be configured on the same GSN server (in this case, we say that they
+are defined in the same container), or it can be run on another computer
+(hence the name of this wrapper).
+
+<div class="p"><!----></div>
+This wrapper takes three mandatory parameters. <tt>HOST</tt> specifies
+the network address (DNS name or IP address) on which is running the
+GSN instance we want to connect to (when connecting to the same GSN
+instance, use the <tt>localhost</tt> name or the loopback address
+<tt>127.0.0.1</tt>). <tt>PORT</tt> is the port number on which this
+GSN instance is listening (the standard port for GSN is <tt>22001</tt>).
+<tt>name</tt> is the name of the virtual sensor to which we want to
+connect.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_tAb3.2">
+</a> <center>Table 3.2: Parameters for Remote wrapper</center>
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Parameter name</td><td align="center">Type</td><td align="right">Mandatory</td><td>Description</td><td width="0">Default</td></tr>
+<tr><td></td></tr>
+<tr><td align="center"><tt>HOST</tt></td><td align="center">Network name or IP address</td><td align="right">Yes</td><td>The network address on which the GSN instance that we want to connect
+to is running.</td><td width="0">None</td></tr>
+
+<tr><td align="center"><tt>PORT</tt></td><td align="center">Integer between 1 and 65535</td><td align="right">Yes</td><td>The TCP port on which the GSN instance that we want to connect to
+is running.</td><td width="0">None</td></tr>
+
+<tr><td align="center"><tt>name</tt></td><td align="center">String</td><td align="right">Yes</td><td>The name of the virtual sensor name we want to get data from.</td><td width="0">None</td></tr>
+</table>
+
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.2.3">
+3.2.3</a>&nbsp;&nbsp;<a name="TinyOS 1.x32">
+</a>TinyOS 1.x<a name="sub:TinyOS-1.x">
+</a></h3>
+
+<div class="p"><!----></div>
+The short name of this wrapper is <tt>tinyos1x</tt>.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.2.4">
+3.2.4</a>&nbsp;&nbsp;TinyOS 2.x<a name="TinyOS 2.x32">
+</a><a name="sub:TinyOS-2.x">
+</a></h3>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.2.5">
+3.2.5</a>&nbsp;&nbsp;<a name="Serial Wrapper32">
+</a>Serial Wrapper<a name="sub:Serial-Wrapper">
+</a></h3>
+
+<div class="p"><!----></div>
+The short name of this wrapper is <tt>serial</tt>.
+
+<div class="p"><!----></div>
+The mandatory parameters are <tt>HOST</tt>, <tt>PORT</tt> and <tt>serialport</tt>.
+The latest one specifies on which serial port the wrapper should listen.
+The syntax is platform dependent: on Windows systems it will be <tt>COM1</tt>,
+<tt>COM2</tt>... and on Unix systems this will be <tt>/dev/ttyS0</tt>,
+<tt>/dev/ttyS1</tt>...
+
+<div class="p"><!----></div>
+In its default mode of operation, each time it receives a byte sequence,
+it will be published in a StreamElement under the name <tt>RAW_PACKET</tt>
+and the type <tt>BINARY</tt>. It is up to the virtual sensor getting
+data from the wrapper to analyze the meaning of the received bytes.
+
+<div class="p"><!----></div>
+If the optional parameter <em>inputseparator</em> is defined, then the
+received data is not immediately published. Instead, the wrapper splits
+the data using the parameter value as a separator. The separator is
+never published. If there is remaining data after the last separator,
+it is stored in a temporary buffer. The next byte sequence to be received
+by the wrapper will be concatenated to the temporary buffer before
+attempting to split it.
+
+<div class="p"><!----></div>
+As an example, if the separator is <tt>:</tt> and the received data
+is <tt>abc:def:g</tt> , then two StreamElements (two rows) are generated.
+The first one contains <tt>abc</tt> in the <tt>RAW_PACKET</tt> field
+and the other one contains <tt>def</tt>. <tt>g</tt> is stored in the
+temporary buffer. Imagine that the wrapper now receives <tt>hijklm:</tt>
+. Then only one StreamElement will be generated, with the value <tt>ghijklm</tt>
+and the temporary buffer will be emptied.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_tAb3.3">
+</a> <center>Table 3.3: Parameters for serial wrapper</center>
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Parameter name</td><td align="center">Type</td><td align="center">Mandatory</td><td align="center">Description</td><td align="right">Default</td></tr>
+<tr><td></td></tr>
+<tr><td align="center"><tt>serialport</tt></td><td align="center">String</td><td align="center">Yes</td><td align="center">The serial port on which the wrapper should listen to.</td><td align="right">None</td></tr>
+
+<tr><td align="center"><tt>baudrate</tt></td><td align="center">Number</td><td align="center">No</td><td align="center">The speed at which the data is arriving on the port, in bits per second.</td><td align="right">9600</td></tr>
+
+<tr><td align="center"><tt>inputseparator</tt></td><td align="center">String</td><td align="center">No</td><td align="center">If this parameter is defined, the serial port wrapper will split incoming
+data using this value as a separator. The separator is not published.</td><td align="right">None</td></tr>
+</table>
+
+
+<div class="p"><!----></div>
+      <h3><a name="tth_sEc3.2.6">
+3.2.6</a>&nbsp;&nbsp;<a name="UDP Wrapper32">
+</a>UDP Wrapper<a name="sub:UDP-Wrapper">
+</a></h3>
+
+<div class="p"><!----></div>
+The short name of this wrapper is <tt>udp</tt>. It allows GSN to receive
+arbitrary data on a UDP port of the machine on which it is running.
+There is only one parameter, named <tt>port</tt>. Received data is
+published under the type <tt>BINARY</tt> and the name <tt>RAW_PACKET</tt>.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_tAb3.4">
+</a> <center>Table 3.4: Parameters for UDP wrapper</center>
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Parameter name</td><td align="center">Type</td><td align="right">Mandatory</td><td>Description</td><td width="0">Default</td></tr>
+<tr><td></td></tr>
+<tr><td align="center"><tt>port</tt></td><td align="center">Integer between 1 and 65535</td><td align="right">Yes</td><td>The UDP port on which the wrapper should listen to.</td><td width="0">None</td></tr>
+</table>
+
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.2.7">
+3.2.7</a>&nbsp;&nbsp;<a name="System Time32">
+</a>System Time<a name="sub:System-Time">
+</a></h3>
+
+<div class="p"><!----></div>
+The short name for this wrapper is <tt>system-time</tt>. It generates
+a StreamElement object every <tt>clock_periods</tt> milliseconds,
+with the timestamp at which the object was generated.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_tAb3.5">
+</a> <center>Table 3.5: Parameters for System Time wrapper</center>
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Parameter name</td><td align="center">Type</td><td align="right">Mandatory</td><td>Description</td><td width="0">Default</td></tr>
+<tr><td></td></tr>
+<tr><td align="center"><tt>clock_periods</tt></td><td align="center">Integer</td><td align="right">No</td><td>Time interval between two events.</td><td width="0">1000 ms</td></tr>
+</table>
+
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.2.8">
+3.2.8</a>&nbsp;&nbsp;<a name="Axis Wireless Camera32">
+</a>Axis Wireless Camera<a name="sub:Axis-Wireless-Camera">
+</a></h3>
+
+<div class="p"><!----></div>
+This wrapper polls an Axis wireless camera through HTTP for an image
+every 2 seconds. The short name is <tt>wireless-cam.</tt> You have
+to provide the host name of the camera with the parameter <tt>host</tt>,
+and you can redefine the polling rate with the parameter <tt>rate</tt>.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_tAb3.6">
+</a> <center>Table 3.6: Parameters for Axis Wireless Camera wrapper</center>
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Parameter name</td><td align="center">Type</td><td align="right">Mandatory</td><td>Description</td><td width="0">Default</td></tr>
+<tr><td></td></tr>
+<tr><td align="center"><tt>clock_periods</tt></td><td align="center">Integer</td><td align="right">No</td><td>Time interval between two events.</td><td width="0">1000 ms</td></tr>
+</table>
+
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.2.9">
+3.2.9</a>&nbsp;&nbsp;<a name="USB Webcams32">
+</a>USB Webcams<a name="sub:USB-Webcams">
+</a></h3>
+
+<div class="p"><!----></div>
+Because of a license incompatibility, the wrapper for OV511/518 wired
+usb cameras is not distributed with the standard installation of GSN.
+
+<div class="p"><!----></div>
+You can find the wrapper (the java files) from the svn repository
+of GSN at <a href="http://www.sourceforge.net/projects/gsn"><tt>http://www.sourceforge.net/projects/gsn</tt></a>.
+
+<div class="p"><!----></div>
+To use the ovcam511/518 wrapper with linux: 
+
+<div class="p"><!----></div>
+1. Get the driver from <a href="http://ovcam.org/ov511/"><tt>http://ovcam.org/ov511/</tt></a>, compile it
+and install it.
+
+<div class="p"><!----></div>
+2. Download the Java Media Framework for your platform and install
+it. At this stage, the JMF should detect your webcam. If it does not,
+most probably the ov511 driver was not correctly installed. Please
+refer to the documentation of your distribution.
+
+<div class="p"><!----></div>
+3. Once the webcam is detected by the JMF, On linux : sudo rmmod ov511;
+sudo modprobe ovcamchip;sudo modprobe ov511
+
+<div class="p"><!----></div>
+4. The system environment or the java execution environment (in Eclipse)
+must be configured:
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+LD_LIBRARY_PATH=/home/ali/download/JMF-2.1.1e/lib:
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;/usr/local/java/jdk1.5.0/jre/lib/i386:
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;/usr/local/java/jdk1.5.0/jre/lib/i386/client:
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;/usr/local/java/jdk1.5.0/jre/lib/i386/xawt
+
+<div class="p"><!----></div>
+LD_PRELOAD=/usr/local/java/jdk1.5.0/jre/lib/i386/libjawt.so
+</dd>
+</dl>
+The short name for this wrapper is <tt>usb-cam</tt>. You can configure
+it to run in live mode or not (mandatory parameter <tt>live-view</tt>).
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_tAb3.7">
+</a> <center>Table 3.7: Parameters for OV511 USB webcams</center>
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Parameter name</td><td align="center">Type</td><td align="right">Mandatory</td><td>Description</td><td width="0">Default</td></tr>
+<tr><td></td></tr>
+<tr><td align="center"><tt>live-view</tt></td><td align="center">Boolean (as String: <tt>true</tt> or <tt>false</tt>)</td><td align="right">Yes</td><td>Sets the web cam in live mode.</td><td width="0">None.</td></tr>
+</table>
+
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.2.10">
+3.2.10</a>&nbsp;&nbsp;<a name="Memory Monitor32">
+</a>Memory Monitor<a name="sub:Memory-Monitor">
+</a></h3>
+
+<div class="p"><!----></div>
+This wrapper queries periodically the virtual machine in which gsn
+is running. It produces statistics on memory usage. The query rate
+can be configured with the optional parameter rate. The short name
+for this wrapper is memory-usage.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_tAb3.8">
+</a> <center>Table 3.8: Parameters for memory monitoring wrapper</center>
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Parameter name</td><td align="right">Type</td><td>Mandatory</td><td width="0">Description</td><td align="center">Default</td></tr>
+<tr><td></td></tr>
+<tr><td align="center"><tt>rate</tt></td><td align="right">Integer</td><td>No</td><td width="0">Defines the rate at which data is produced.</td><td align="center">1000</td></tr>
+</table>
+
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc3.3">
+3.3</a>&nbsp;&nbsp;Data filtering and processing</h2>
+
+<div class="p"><!----></div>
+GSN provides two complementary mechanisms to work on your data.
+
+<div class="p"><!----></div>
+The first one is based on a SQL syntax enhanced with specialized semantics
+for timed sliding windows and event counting.
+
+<div class="p"><!----></div>
+The second one allows to manipulate data with specialized programs
+called <em>virtual sensors</em>. GSN comes with a library of virtual
+sensors that you can use without programming. If you have more sophisticated
+needs, you can write your own virtual sensors (See the Developer's
+Guide, chapter <a href="#cha:Writing-a-VS">4</a>).
+
+<div class="p"><!----></div>
+GSN always processes the data according to a virtual sensor configuration.
+If you only want to use the SQL filtering mechanism, without any data
+transformation, you can use the <em>BridgeVirtualSensor</em> (see section
+<a href="#sub:BridgeVirtualSensor">3.3.2.3</a>).
+
+<div class="p"><!----></div>
+If you don't want to use the SQL filtering mechanism, simply select
+all data from the wrapper.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.3.1">
+3.3.1</a>&nbsp;&nbsp;The SQL syntax<a name="sub:The-SQL-syntax">
+</a></h3>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.3.2">
+3.3.2</a>&nbsp;&nbsp;Virtual Sensors<a name="Virtual Sensors33">
+</a></h3>
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc3.3.2.1">
+3.3.2.1</a>&nbsp;&nbsp;Introduction</h4>
+
+<div class="p"><!----></div>
+Virtual sensors are small Java programs that register to GSN with
+a specific SQL query for their data input. This query is configured
+by the user. When GSN receives data that matches the filter at the
+entry of a virtual sensor, this data is sent to the virtual sensor,
+which usually performs some sort of operation depending of the received
+data, and finally publishes some data (it may also produce nothing).
+
+<div class="p"><!----></div>
+Virtual sensors are configured in the virtual-sensors directory. You
+can edit the configuration of a virtual sensor online while GSN is
+running, because GSN periodically scans this directory for updates.
+This can be very useful when you are learning how to use GSN: you
+can immediately see the effect of modifying a query.
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_tAb3.9">
+</a> <center>Table 3.9: <a name="tab:List-of-VS">
+</a>GSN built-in virtual sensors</center>
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Virtual Sensor</td><td align="right">Class name</td><td width="0">Description</td><td width="0">page</td></tr>
+<tr><td></td></tr>
+<tr><td align="center">Bridge</td><td align="right">gsn.vsensor. BridgeVirtualSensor</td><td width="0">This VS only acts as a bridge and does not modify data. It can be
+used to forward data directly from a wrapper to the notification system,
+or to only use SQL filtering.</td><td width="0"><a href="#sub:BridgeVirtualSensor">pageref</a></td></tr>
+
+<tr><td align="center">Chart</td><td align="right">gsn.vsensor. ChartVirtualSensor</td><td width="0">Generates graphs of received data.</td><td width="0"><a href="#ChartVirtualSensor">pageref</a></td></tr>
+
+<tr><td align="center">Stream Exporter</td><td align="right">gsn.vsensor. StreamExporterVirtualSensor</td><td width="0">Exports received data to any supported database.</td><td width="0"><a href="#sub:Stream-Exporter">pageref</a></td></tr>
+
+<tr><td align="center">Web Interaction</td><td align="right">gsn.vsensor.
+
+<div class="p"><!----></div>
+WebInteractiveVirtualSensor</td><td width="0"></td><td width="0"></td></tr>
+
+<tr><td align="center">Host Controller Interface Graphical User Interface</td><td align="right">gsn.vsensor.
+
+<div class="p"><!----></div>
+HCIProtocolGUIVS</td><td width="0">A Graphical User Interface for sending commands to a hardware device.
+Two protocols are currently supported.</td><td width="0"></td></tr>
+
+<tr><td align="center"></td><td align="right"></td><td width="0"></td><td width="0"></td></tr>
+
+<tr><td align="center"></td><td align="right"></td><td width="0"></td><td width="0"></td></tr>
+</table>
+
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc3.3.2.2">
+3.3.2.2</a>&nbsp;&nbsp;The virtual-sensor xml configuration file</h4>
+
+<div class="p"><!----></div>
+A virtual sensor configuration file starts with the <tt>virtual-sensor</tt>
+tag. It takes three parameters, <tt>name</tt>, <tt>priority</tt> and
+<tt>password</tt>. The first one is mandatory and arbitrary (the only
+constraint is that the name should be unique in this GSN configuration),
+and the two others are optional. 0 is the highest priority and 20
+is the lowest. The default priority is 10.
+
+<div class="p"><!----></div>
+The first tag inside virtual-sensor is usually <tt>processing-class</tt>.
+The first tag inside this group is <tt>class-name</tt>, and gives
+the class name of the Virtual Sensor to be used in this configuration.
+After this comes an optional <tt>init-params</tt> section.
+
+<div class="p"><!----></div>
+We will work with an example to better understand these concepts.
+We present here a configuration for the ChartVirtualSensor that gets
+data from another virtual sensor, named <tt>MemoryMonitorVS</tt>.
+These two configurations can be found in the default installation
+of GSN under the names <em>memoryDataVS.xml</em> and <em>memoryPlotVS.xml</em>.
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+&lt;virtual-sensor&nbsp;name="MemoryPlotVS"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&lt;processing-class&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;class-name&#62;gsn.vsensor.ChartVirtualSensor&lt;/class-name&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;init-params&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="input-Stream"&#62;DATA&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="title"&#62;GSN&nbsp;Memory&nbsp;Usage&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="type"&#62;ANY&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="height"&#62;200&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="width"&#62;300&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="vertical-axis"&#62;Sensor&nbsp;Readings&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="history-size"&#62;100&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/init-params&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&lt;/processing-class&#62;
+
+<div class="p"><!----></div>
+&lt;description&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;Not&nbsp;Specified,&nbsp;please&nbsp;edit&nbsp;the&nbsp;file&nbsp;$INSTALL_PATH/
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;virtual-sensors/memoryPlotVS.xml
+
+<div class="p"><!----></div>
+&lt;/description&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;life-cycle&nbsp;pool-size="2"/&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;addressing&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;predicate&nbsp;key="geographical"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;Specified,&nbsp;please&nbsp;edit&nbsp;the&nbsp;file
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$INSTALL_PATH/virtual-sensors/
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;memoryPlotVS.xml
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;/addressing&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;output-structure&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;field&nbsp;name="DATA"&nbsp;type="binary:image/jpeg"/&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;/output-structure&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;storage&nbsp;history-size="1"&nbsp;/&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;streams&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;stream&nbsp;name="DATA"&nbsp;rate="100"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;source&nbsp;alias="source1"&nbsp;storage-size="1"
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sampling-rate="1"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;address&nbsp;wrapper="remote"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;predicate&nbsp;key="HOST"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;localhost
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;predicate&nbsp;key="PORT"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;22001
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;predicate&nbsp;key="NAME"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MemoryMonitorVS
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/address&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;query&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;select&nbsp;HEAP,NON_HEAP,
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PENDING_FINALIZATION_COUNT,TIMED
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;wrapper
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/query&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/source&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;query&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;select&nbsp;*&nbsp;from&nbsp;source1
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/query&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/stream&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;/streams&#62;
+
+<div class="p"><!----></div>
+&lt;/virtual-sensor&#62;
+</dd>
+</dl>
+Let us analyze this long file piece by piece. The first part defines
+which class to use and configures it:
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+&lt;processing-class&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;class-name&#62;gsn.vsensor.ChartVirtualSensor&lt;/class-name&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;init-params&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="input-Stream"&#62;DATA&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="title"&#62;GSN&nbsp;Memory&nbsp;Usage&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="type"&#62;ANY&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="height"&#62;200&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="width"&#62;300&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="vertical-axis"&#62;Sensor&nbsp;Readings&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;param&nbsp;name="history-size"&#62;100&lt;/param&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/init-params&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&lt;/processing-class&#62;
+</dd>
+</dl>
+This virtual sensor generates graphs from the data it receives. We
+see here that the graph has a name, "GSN Memory Usage", that
+its size is 200*300 pixels, that the vertical axis shows the data
+readings and that the history-size is set to 100. This means that
+only the latest 100 received values will be plotted.
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+&lt;description&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;Not&nbsp;Specified,&nbsp;please&nbsp;edit&nbsp;the&nbsp;file&nbsp;$INSTALL_PATH/
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;virtual-sensors/memoryPlotVS.xml
+
+<div class="p"><!----></div>
+&lt;/description&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;life-cycle&nbsp;pool-size="2"/&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;addressing&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;predicate&nbsp;key="geographical"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;Specified,&nbsp;please&nbsp;edit&nbsp;the&nbsp;file&nbsp;$INSTALL_PATH/
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;virtual-sensors/memoryPlotVS.xml
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;/addressing&#62;
+</dd>
+</dl>
+The description field is shown to the user through the web interface,
+and you can also use it to help you remember what this specific configuration
+does.
+
+<div class="p"><!----></div>
+The <tt>life-cycle pool-size</tt> option is a performance parameter.
+It is usually safe to keep the default value. It defines the maximum
+number of instances of this virtual sensor (with this configuration).
+This can happen when the processing method of the virtual sensor takes
+a long time to complete, and / or when data arrives at high speed.
+If all instances are busy, then the data will be dropped.
+
+<div class="p"><!----></div>
+The <tt>addressing</tt> section is used to describe the location of
+the sensor. This will be used in the future to be able to search data
+with location predicates. It is an optional parameter and you can
+safely ignore it for now.
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+&lt;output-structure&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;field&nbsp;name="DATA"&nbsp;type="binary:image/jpeg"/&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;/output-structure&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&lt;storage&nbsp;history-size="1"&nbsp;/&#62;
+</dd>
+</dl>
+output-structure describes the data type produced by the virtual sensor.
+It defines a name and a type. Please consult the documentation of
+the virtual sensor that you want to use for more information.
+
+<div class="p"><!----></div>
+<tt>storage history-size</tt> defines the number of streamElements
+produced by this virtual sensor that we want to keep in memory, for
+the user's convenience. It does not impact the logical processing
+of data streams.
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+&lt;streams&#62;
+
+<div class="p"><!----></div>
+&lt;stream&nbsp;name="DATA"&nbsp;rate="100"&#62;
+
+<div class="p"><!----></div>
+&lt;source&nbsp;alias="source1"&nbsp;storage-size="1"&nbsp;sampling-rate="1"&#62;
+
+<div class="p"><!----></div>
+&lt;address&nbsp;wrapper="remote"&#62;
+
+<div class="p"><!----></div>
+&lt;predicate&nbsp;key="HOST"&#62;localhost&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&lt;predicate&nbsp;key="PORT"&#62;22001&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&lt;predicate&nbsp;key="NAME"&#62;MemoryMonitorVS&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&lt;/address&#62;
+
+<div class="p"><!----></div>
+&lt;query&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;select&nbsp;HEAP,NON_HEAP,
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;PENDING_FINALIZATION_COUNT,TIMED
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;from&nbsp;wrapper
+
+<div class="p"><!----></div>
+&lt;/query&#62;
+
+<div class="p"><!----></div>
+&lt;/source&#62;
+
+<div class="p"><!----></div>
+&lt;query&#62;select&nbsp;*&nbsp;from&nbsp;source1&lt;/query&#62;
+
+<div class="p"><!----></div>
+&lt;/stream&#62;
+
+<div class="p"><!----></div>
+&lt;/streams&#62;
+</dd>
+</dl>
+The streams section is very important. It tells GSN what data it should
+send to the virtual sensor you are using. A virtual sensor can receive
+data from one or more streams. In this case there is only one stream,
+that we name <tt>DATA</tt>. The <tt>rate</tt> parameter is a performance
+tuning parameter. It defines the minimum interval in milliseconds
+between two calls to this virtual sensor. If there is data available
+for the virtual sensor in less than this value, then the data is silently
+dropped.
+
+<div class="p"><!----></div>
+This xml structure allows to perform <tt>JOIN</tt> SQL operations
+on the incoming data streams, if more than one source is defined.
+
+<div class="p"><!----></div>
+Here there is only one source, and we select everything from it in
+<tt>select * from source1</tt>. Our source gets its data from the
+<tt>remote</tt> wrapper. This wrapper is used to get data from another
+virtual sensor. This other virtual sensor can be running in the same
+GSN instance or on a remote GSN server, hence the wrapper name. It
+takes three mandatory parameters: <tt>HOST</tt> and <tt>PORT</tt>
+tells how to contact the GSN instance and <tt>NAME</tt> specifies
+the virtual sensor from which we want to receive data from. The query
+specified after the addressing section is sent to the remote GSN server.
+Here we select some fields that are produced by the virtual sensor.
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc3.3.2.3">
+3.3.2.3</a>&nbsp;&nbsp;<a name="Bridge Virtual Sensor33">
+</a>Bridge Virtual Sensor<a name="sub:BridgeVirtualSensor">
+</a></h4>
+
+<div class="p"><!----></div>
+This virtual sensor immediately publishes any data that it receives
+without modifying it. The StreamElement object is not modified.
+
+<div class="p"><!----></div>
+It does not take any parameter. Its main use is to filter data with
+SQL without any other kind of operation on the data.
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc3.3.2.4">
+3.3.2.4</a>&nbsp;&nbsp;<a name="Chart Virtual Sensor33">
+</a>Chart Virtual Sensor<a name="ChartVirtualSensor">
+</a></h4>
+
+<div class="p"><!----></div>
+This virtual sensor generates graphs from the data it receives. This
+is a complex VS because it can be computationally intensive, especially
+if it is frequently called.
+
+<div class="p"><!----></div>
+
+
+<div class="p"><!----></div>
+#1Parameters for Plotter VS
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Parameter name</td><td align="center">Type</td><td align="right">Mandatory</td><td>Description</td><td width="0">Default</td></tr>
+<tr><td></td></tr>
+<tr><td align="center"><tt>input-stream</tt></td><td align="center">String</td><td align="right">Yes</td><td>The name of the stream to plot.</td><td width="0">None</td></tr>
+
+<tr><td align="center"><tt>title</tt></td><td align="center">String</td><td align="right">Yes</td><td>The graph title.</td><td width="0">None</td></tr>
+
+<tr><td align="center"><tt>vertical-axis</tt></td><td align="center">String</td><td align="right">Yes</td><td>A legend for the vertical axis.</td><td width="0">None</td></tr>
+
+<tr><td align="center"><tt>width</tt></td><td align="center">Integer</td><td align="right">No</td><td>Graph width in pixels</td><td width="0">640</td></tr>
+
+<tr><td align="center"><tt>height</tt></td><td align="center">Integer</td><td align="right">No</td><td>Graph height in pixels</td><td width="0">480</td></tr>
+</table>
+
+
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc3.3.2.5">
+3.3.2.5</a>&nbsp;&nbsp;Stream Exporter<a name="Stream Exporter33">
+</a><a name="sub:Stream-Exporter">
+</a></h4>
+
+<div class="p"><!----></div>
+This virtual sensor exports the data it receives to the database of
+your choice. This can be interesting when debugging your GSN configuration
+or to easily back up critical data on an independent machine. It can
+also be used to log unexpected events for later off-line, manual analysis.
+It can receive any number of input streams. Each one will be saved
+into a separate table named after the input stream.
+
+<div class="p"><!----></div>
+It requires a JDBC URL and a user name and password so that it knows
+where is the database server and how to authenticate. This virtual
+sensor prefixes all tables names with the string <tt>GSN_EXPORT_</tt>
+. This value can be overridden with the optional parameter <tt>PARAM_TABLE_PREFIX</tt>.
+
+<div class="p"><!----></div>
+
+
+<div class="p"><!----></div>
+#1Parameters for Stream Exporter
+
+<div class="p"><!----></div>
+
+<table border="1">
+<tr><td align="center">Parameter name</td><td align="center">Type</td><td align="right">Mandatory</td><td>Description</td><td width="0">Default</td></tr>
+<tr><td></td></tr>
+<tr><td align="center"><tt>url</tt></td><td align="center">String</td><td align="right">Yes</td><td>A JDBC url that specifies how to connect to the database server.</td><td width="0">None</td></tr>
+
+<tr><td align="center"><tt>user</tt></td><td align="center">String</td><td align="right">Yes</td><td>The user name for authentication with database server.</td><td width="0">None</td></tr>
+
+<tr><td align="center"><tt>password</tt></td><td align="center">String</td><td align="right">Yes</td><td>The password for authentication with database server.</td><td width="0">None</td></tr>
+
+<tr><td align="center"><tt>table-prefix</tt></td><td align="center">String</td><td align="right">No</td><td>A prefix to be added to the name of each table created on the remote
+database server.</td><td width="0"><tt>GSN_EXPORT_</tt></td></tr>
+</table>
+
+
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc3.4">
+3.4</a>&nbsp;&nbsp;Data publishing</h2>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.4.1">
+3.4.1</a>&nbsp;&nbsp;<a name="Web34">
+</a>Web Interface</h3>
+
+<div class="p"><!----></div>
+GSN ships with an elegant and easy to use web interface. The only
+thing you have to do is to open a web browser and go the following
+address: <a href="http://127.0.0.1:1882"><tt>http://127.0.0.1:1882</tt></a>. You can also visit <a href="http://127.0.0.1:22001"><tt>http://127.0.0.1:22001</tt></a>
+for the directory service web interface.
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc3.4.1.1">
+3.4.1.1</a>&nbsp;&nbsp;<a name="GoogleMaps34">
+</a>GoogleMaps integration</h4>
+
+<div class="p"><!----></div>
+GSN can associate your data with GPS positions and then display these
+on a world map retrieved from Google's GoogleMaps service. You need
+a special identification key from Google. For more information, please
+refer to the documentation file <tt>doc/README.txt</tt>, section "<em>How
+to use GoogleMaps with GSN</em>".
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.4.2">
+3.4.2</a>&nbsp;&nbsp;<a name="Email notifications34">
+</a>Email notifications</h3>
+
+<div class="p"><!----></div>
+In order to use email or SMS<a name="SMS34">
+</a> (Short Messaging System,
+text messages for GSM phones) notifications, you need to download
+two third-parties libraries that we are not allowed to distribute. 
+
+<div class="p"><!----></div>
+The first one is the <em>JavaBeans Activation Framework</em><a name="JavaBeans Activation Framework34">
+</a>
+(JAF), which you can find at <a href="http://java.sun.com/products/javabeans/jaf/index.jsp"><tt>http://java.sun.com/products/javabeans/jaf/index.jsp</tt></a>.
+After downloading it, you have to copy the file <tt>activation.jar</tt>
+in the <tt>lib</tt> directory.
+
+<div class="p"><!----></div>
+The second one is <em>JavaMail</em><a name="JavaMail34">
+</a>. This can be found
+at <a href="http://java.sun.com/products/javamail/downloads/index.html"><tt>http://java.sun.com/products/javamail/downloads/index.html</tt></a>.
+All included JAR files should be copied in the same <tt>lib</tt> directory.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc3.4.3">
+3.4.3</a>&nbsp;&nbsp;<a name="SMS notifications34">
+</a>SMS notifications</h3>
+
+<div class="p"><!----></div>
+<br /><h1>Part 2   <br /><a name="Developer34">
+</a>Developer's Guide</h1><br />
+
+<div class="p"><!----></div>
+ <h1><a name="tth_chAp4">
+Chapter 4 </a><br />Writing a Virtual Sensor<a name="cha:Writing-a-VS">
+</a></h1>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc4.1">
+4.1</a>&nbsp;&nbsp;The AbstractVirtualSensor<a name="AbstractVirtualSensor41">
+</a> class</h2>
+
+<div class="p"><!----></div>
+All virtual sensors subclass <tt>AbstractVirtualSensor</tt> (package
+<tt>gsn.vsensor</tt>). It requires its subclasses to implement the
+following three methods:
+
+<div class="p"><!----></div>
+
+<ul>
+<li> <tt>public boolean initialize()</tt>
+<div class="p"><!----></div>
+</li>
+
+<li> <tt>public void dataAvailable(String inputStreamName, StreamElement
+se)</tt>
+<div class="p"><!----></div>
+</li>
+
+<li> <tt>public void finalize()</tt>
+<div class="p"><!----></div>
+</li>
+</ul>
+<tt>initialize()</tt> is the first method to be called after object
+creation. It should configure the virtual sensor according to its
+parameters, if any, and return <tt>true</tt> in case of success, <tt>false</tt>
+if otherwise.
+
+<div class="p"><!----></div>
+<tt>finalize()</tt> is called when GSN destroys the virtual sensor.
+It should release all system resources in use by this virtual sensor.
+
+<div class="p"><!----></div>
+<tt>dataAvailable</tt> is called each time that GSN has data for this
+virtual sensor, according to its configuration. If the virtual sensor
+produces data, it should encapsulate this data in a <tt>StreamElement</tt>
+object and deliver it to GSN by calling <tt>dataProduced(StreamElement
+se)</tt>.
+
+<div class="p"><!----></div>
+Note that a Virtual Sensor should always use the same StreamElement
+structure for producing its data. Changing the structure type is not
+allowed and trying to do so will result in an error. However, a virtual
+sensor can be configured at initialization time what kind of StreamElement
+it will produce. This allows to produce different types of StreamElement
+by the same VS depending on its usage. But one instance of the VS
+will still be limited to produce the same structure type.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc4.2">
+4.2</a>&nbsp;&nbsp;The <a name="StreamElement42">
+</a>StreamElement class</h2>
+
+<div class="p"><!----></div>
+A StreamElement is a GSN class that encapsulates data. It has a data
+types structure (a DataField array), a data values structure (a Serializable
+array) and a timestamp.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc4.3">
+4.3</a>&nbsp;&nbsp;Writing your own graphical user interface<a name="graphical user interface43">
+</a></h2>
+
+<div class="p"><!----></div>
+A virtual sensor is not limited to raw data processing. You can call
+any other Java library, including Swing classes. An introduction to
+GUI programming is outside the scope of this document. You can have
+a look at the HCIProtocolGUIVS class to see how such an interface
+can be implemented.
+
+<div class="p"><!----></div>
+A simple way to go is to create the graphical components (like a JFrame)
+in the <tt>initialize()</tt> method and at the same time define the
+events logic (<tt>eventListeners</tt>...). In the <tt>dataAvailable()</tt>
+method, received data can be sent to graphical components to present
+the information to the user. Beware that there may be concurrency
+problems since your GUI is running with the Swing event thread while
+your virtual sensor is run by a GSN thread.
+
+<div class="p"><!----></div>
+ <h1><a name="tth_chAp5">
+Chapter 5 </a><br />Writing a Wrapper<a name="cha:Writing-a-Wrapper">
+</a></h1>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc5.1">
+5.1</a>&nbsp;&nbsp;A quick how-to</h2>
+
+<div class="p"><!----></div>
+All wrappers subclass <tt>gsn.wrapper.AbstractWrapper.</tt> Subclasses
+must implement four methods:
+
+<div class="p"><!----></div>
+
+<ol type="1">
+<li> <tt>boolean initialize()</tt>
+<div class="p"><!----></div>
+</li>
+
+<li> <tt>void finalize()</tt>
+<div class="p"><!----></div>
+</li>
+
+<li> <tt>String getWrapperName()</tt>
+<div class="p"><!----></div>
+</li>
+
+<li> <tt>DataField[] getOutputFormat()</tt>
+<div class="p"><!----></div>
+</li>
+</ol>
+In addition, you will always have to override the <tt>run()</tt> method,
+which does the "real job".
+
+<div class="p"><!----></div>
+Optionally, you may wish to override the following one:
+
+<div class="p"><!----></div>
+
+<ul>
+<li> <tt>boolean sendToWrapper(String action, String[] paramNames,
+Object[] paramValues) </tt>
+<div class="p"><!----></div>
+</li>
+</ul>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.1.1">
+5.1.1</a>&nbsp;&nbsp;initialize()</h3>
+
+<div class="p"><!----></div>
+This method is called after the wrapper object creation. For more
+information on the life cycle of a wrapper, see section .
+The complete method prototype is <tt>public boolean initialize()</tt>.
+
+<div class="p"><!----></div>
+In this method, the wrapper should try to initialize its connection
+to the actual data producing/receiving device(s) (e.g., wireless sensor
+networks or cameras). The wrapper should return <tt>true</tt> if it
+can successfully initialize the connection, <tt>false</tt> otherwise.
+
+<div class="p"><!----></div>
+GSN provides access to the wrapper parameters through the
+
+<div class="p"><!----></div>
+<tt>getActiveAddressBean().getPredicateValue("parameter-name")</tt> 
+
+<div class="p"><!----></div>
+method call.
+
+<div class="p"><!----></div>
+For example, if you have the following fragment in the virtual sensor
+configuration file:
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+&lt;stream-source&nbsp;...&nbsp;&#62;&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&lt;address&nbsp;wrapper="x"&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;predicate&nbsp;key="range"&#62;100&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;predicate&nbsp;key="log"&#62;0&lt;/predicate&#62;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&lt;/address&#62;&nbsp;
+</dd>
+</dl>
+You can access the initialization parameter named <em>x</em> with the
+following code :
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+if(getActiveAddressBean().getPredicateValue("x")&nbsp;!=&nbsp;null)
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;{...}&nbsp;
+
+<div class="p"><!----></div>
+</dd>
+</dl>     <h3><a name="tth_sEc5.1.2">
+5.1.2</a>&nbsp;&nbsp;finalize()</h3>
+
+<div class="p"><!----></div>
+In the <tt>public void finalize()</tt> method, you should release
+all the resources you acquired during the initialization procedure
+or during the life cycle of the wrapper. Note that this is the last
+chance for the wrapper to release all its reserved resources and after
+this call the wrapper instance virtually won't exist anymore. 
+
+<div class="p"><!----></div>
+For example, if you open a file in the initialization phase, you should
+close it in the finalization phase.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.1.3">
+5.1.3</a>&nbsp;&nbsp;getWrapperName()</h3>
+
+<div class="p"><!----></div>
+<tt>public String getWrapperName()</tt> returns a name for the wrapper.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.1.4">
+5.1.4</a>&nbsp;&nbsp;getOutputFormat()</h3>
+
+<div class="p"><!----></div>
+<tt>public abstract DataField[] getOutputFormat()</tt> returns a
+description of the data structure produced by this wrapper.
+
+<div class="p"><!----></div>
+This description is an array of <tt>DataField</tt> objects. A <tt>DataField</tt>
+object can be created with a call to the constructor <tt>public</tt>
+<tt>DataField(String name, String type, String Description)</tt>.
+The name is the field name, the type is one of GSN data types (<tt>TINYINT,
+SMALLINT, INTEGER, BIGINT, CHAR(#), BINARY[(#)], VARCHAR(#),
+DOUBLE, TIME</tt>. See <tt>gsn.beans.DataTypes</tt>) and <tt>Description</tt>
+is a text describing the field.
+
+<div class="p"><!----></div>
+The following examples should help you get started.
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc5.1.4.1">
+5.1.4.1</a>&nbsp;&nbsp;Wireless Sensor Network Example</h4>
+
+<div class="p"><!----></div>
+Assuming that you have a wrapper for a wireless sensor network which
+produces the average temperature and light value of the nodes in the
+network, you can implement <tt>getOutputFormat()</tt> like below :
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+public&nbsp;DataField[]&nbsp;getOutputFormat()&nbsp;{
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;DataField[]&nbsp;outputFormat&nbsp;=&nbsp;new&nbsp;DataField[2];
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;outputFormat[0]&nbsp;=&nbsp;new&nbsp;DataField("Temperature",&nbsp;"double",&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Average&nbsp;of&nbsp;temperature&nbsp;readings&nbsp;from&nbsp;the&nbsp;sensor&nbsp;network");&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;outputFormat[1]&nbsp;=&nbsp;new&nbsp;DataField("light",&nbsp;"double",&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Average&nbsp;of&nbsp;light&nbsp;readings&nbsp;from&nbsp;the&nbsp;sensor&nbsp;network");
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;return&nbsp;outputFormat;&nbsp;
+
+<div class="p"><!----></div>
+}
+</dd>
+</dl>
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc5.1.4.2">
+5.1.4.2</a>&nbsp;&nbsp;Webcam Example</h4>
+
+<div class="p"><!----></div>
+if you have a wrapper producing jpeg images as output (e.g., from
+wireless camera), the method is similar to below :
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+public&nbsp;DataField[]&nbsp;getOutputFormat()&nbsp;{
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;DataField[]&nbsp;outputFormat&nbsp;=&nbsp;new&nbsp;DataField[1];
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;outputFormat[0]&nbsp;=&nbsp;new&nbsp;DataField("Picture",&nbsp;"binary:jpeg",
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Picture&nbsp;from&nbsp;the&nbsp;Camera&nbsp;at&nbsp;room&nbsp;BC143");&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;return&nbsp;outputFormat;&nbsp;
+
+<div class="p"><!----></div>
+}
+</dd>
+</dl>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.1.5">
+5.1.5</a>&nbsp;&nbsp;run()</h3>
+
+<div class="p"><!----></div>
+Implementation of the <tt>run()</tt> method: as described before,
+the wrapper acts as a bridge between the actual hardware device(s)
+and GSN, thus in order for the wrapper to produce data, it should
+keep track of the newly produced data items. This method is responsible
+for forwarding (and possibly filtering or aggregating) the newly received
+data from the hardware to the GSN engine.
+
+<div class="p"><!----></div>
+You should not try to start the thread by yourself: GSN takes care
+of this.
+
+<div class="p"><!----></div>
+The method should be implemented like below :
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+try&nbsp;{&nbsp;
+
+<div class="p"><!----></div>
+//The&nbsp;delay&nbsp;needed&nbsp;for&nbsp;the&nbsp;GSN&nbsp;container&nbsp;to&nbsp;initialize&nbsp;itself.&nbsp;
+
+<div class="p"><!----></div>
+//Removing&nbsp;this&nbsp;line&nbsp;might&nbsp;cause&nbsp;hard&nbsp;to&nbsp;find&nbsp;random&nbsp;exceptions&nbsp;
+
+<div class="p"><!----></div>
+Thread.sleep&nbsp;(2000);&nbsp;
+
+<div class="p"><!----></div>
+}&nbsp;catch&nbsp;(InterruptedException&nbsp;e1)&nbsp;{&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;e1.printStackTrace();&nbsp;
+
+<div class="p"><!----></div>
+}
+
+<div class="p"><!----></div>
+while(isActive())&nbsp;{&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;if(listeners.isEmpty())
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;continue;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;if&nbsp;(isLatestReceivedDataProcessed&nbsp;==&nbsp;false)&nbsp;{&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;//Application&nbsp;dependent&nbsp;processing&nbsp;...&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;StreamElement&nbsp;streamElement&nbsp;=&nbsp;new&nbsp;StreamElement&nbsp;(&nbsp;...);&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;isLatestReceivedDataProcessed&nbsp;=&nbsp;true;&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;publishData&nbsp;(&nbsp;streamElement&nbsp;);&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;}
+
+<div class="p"><!----></div>
+}
+</dd>
+</dl>
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc5.1.5.1">
+5.1.5.1</a>&nbsp;&nbsp;Webcam example</h4>
+
+<div class="p"><!----></div>
+Assume that we have a wireless camera which runs a HTTP server and
+provides pictures whenever it receives a <tt>GET</tt> request. In
+this case we are in a data on demand scenario (most of the network
+cameras are like this). To get the data at the rate of 1 picture every
+5 seconds we can do the following :
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+while(isActive())&nbsp;{&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;byte[]&nbsp;received_image&nbsp;=&nbsp;null;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;if(listeners.isEmpty())
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;continue;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;received_image=&nbsp;getPictureFromCamera();
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;StreamElement&nbsp;streamElement&nbsp;=&nbsp;new&nbsp;StreamElement(
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new&nbsp;String[]&nbsp;{&nbsp;"PIC"&nbsp;},&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new&nbsp;Integer&nbsp;[]&nbsp;{&nbsp;Types.BINARY&nbsp;},
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new&nbsp;Serializable[]&nbsp;{received_image},&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.currentTimeMillis&nbsp;())
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;);
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;publishData(streamElement);
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;Thread.sleep(5*1000);&nbsp;//&nbsp;Sleeping&nbsp;5&nbsp;seconds&nbsp;
+
+<div class="p"><!----></div>
+}
+</dd>
+</dl>
+
+<div class="p"><!----></div>
+      <h4><a name="tth_sEc5.1.5.2">
+5.1.5.2</a>&nbsp;&nbsp;Data driven systems </h4>
+
+<div class="p"><!----></div>
+Compared to the previous example, we do sometimes deal with devices
+that are data driven. This means that we don't have control neither
+on when the data produced by them (e.g., when they do the capturing)
+nor what is the rate of the data received from them.
+
+<div class="p"><!----></div>
+For example, having an alarm system, we don't know when nor when we
+are going to receive a packet, neither how frequent the alarm system
+will send data packets to GSN. These kind of systems are typically
+implemented using a callback interface. In the callback interface,
+one needs to set a flag indicating the data reception state of the
+wrapper and control that flag in the <tt>run</tt> method to process
+the received data. 
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.1.6">
+5.1.6</a>&nbsp;&nbsp;sendToWrapper()</h3>
+
+<div class="p"><!----></div>
+Most devices, in addition to producing data, can also be controlled.
+You can override the method
+
+<div class="p"><!----></div>
+<tt>public boolean sendToWrapper(String action, String[] paramNames,
+Object[] paramValues) throws OperationNotSupportedException</tt> 
+
+<div class="p"><!----></div>
+if you want to offer this possibility to the users of your wrapper.
+
+<div class="p"><!----></div>
+You can consult the <tt>gsn.wrappers.general.SerialWrapper</tt> class
+for an example.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc5.2">
+5.2</a>&nbsp;&nbsp;A detailed description of the AbstractWrapper class</h2>
+
+<div class="p"><!----></div>
+In GSN, a wrapper is piece of Java code which acts as a bridge between
+the actual data producing/receiving device (e.g., sensor network,
+RFID reader, webcam...) and the GSN platform. A GSN wrapper should
+extend the <tt>gsn.wrapper.AbstractWrapper</tt>
+class. This class provides the following methods and data fields:
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+public&nbsp;static&nbsp;final&nbsp;String&nbsp;TIME_FIELD&nbsp;=&nbsp;"TIMED";
+
+<div class="p"><!----></div>
+public&nbsp;AddressBean&nbsp;getActiveAddressBean();
+
+<div class="p"><!----></div>
+public&nbsp;int&nbsp;getListenersSize();&nbsp;
+
+<div class="p"><!----></div>
+public&nbsp;ArrayList&lt;DataListener&#62;&nbsp;getListeners();&nbsp;
+
+<div class="p"><!----></div>
+public&nbsp;CharSequence&nbsp;addListener(DataListener&nbsp;dataListener);
+
+<div class="p"><!----></div>
+public&nbsp;void&nbsp;removeListener(DataListener&nbsp;dataListener);
+
+<div class="p"><!----></div>
+public&nbsp;int&nbsp;getDBAlias();
+
+<div class="p"><!----></div>
+public&nbsp;boolean&nbsp;sendToWrapper(String&nbsp;action,&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;String[]&nbsp;paramNames,&nbsp;Object[]&nbsp;paramValues)&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;throws&nbsp;OperationNotSupportedException;
+
+<div class="p"><!----></div>
+//&nbsp;Abstract&nbsp;methods
+
+<div class="p"><!----></div>
+public&nbsp;abstract&nbsp;boolean&nbsp;initialize();
+
+<div class="p"><!----></div>
+pulic&nbsp;abstract&nbsp;void&nbsp;finalize();
+
+<div class="p"><!----></div>
+public&nbsp;abstract&nbsp;String&nbsp;getWrapperName();
+
+<div class="p"><!----></div>
+public&nbsp;abstract&nbsp;DataField[]&nbsp;getOutputFormat();
+</dd>
+</dl>
+In GSN, the wrappers can not only receive data from a source, but
+also send data to it. Thus wrappers are actually two-way bridges between
+GSN and the data source. In the wrapper interface, the method sendToWrapper
+is called whenever there is a data item which should be send to the
+source. A data item could be as simple as a command for turning on
+a sensor inside the sensor network, or it could be as complex as a
+complete routing table which should be used for routing the packets
+in the sensor network. The full syntax of the sendToWrapper is depicted
+below.
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+public&nbsp;boolean&nbsp;sendToWrapper(String&nbsp;action,&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;String[]&nbsp;paramNames,&nbsp;Object[]&nbsp;paramValues)&nbsp;
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;&nbsp;&nbsp;throws&nbsp;OperationNotSupportedException;
+</dd>
+</dl>
+The default implementation of the afore-mentioned method throws <tt>OperationNotSupportedException</tt>
+exception because the wrapper doesn't support this operation. This
+design choice is justified by the observation that not all kind of
+devices (sensors) can accept data from a computer. For instance, a
+typical wireless camera doesn't accept commands from the wrapper.
+If the sensing device supports this operation, one needs to override
+this method so that instead of the default action (throwing exception),
+the wrapper sends the data to the sensor network.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc5.3">
+5.3</a>&nbsp;&nbsp;The life cycle of a wrapper<a name="sub:wrapper-life-cycle">
+</a></h2>
+
+<div class="p"><!----></div>
+
+<div class="p"><!----></div>
+<a name="tth_fIg5.1">
+</a> <center>Figure 5.1: The life cycle of a wrapper.<a name="fig:wrapper-lifecycle">
+</a></center>
+
+<div class="p"><!----></div>
+
+
+<div class="p"><!----></div>
+An instance of a wrapper is created whenever a <em>Wrapper Connection
+Request</em> (WCR) is received by the <em>Wrappers Repository</em> (WR).
+The WCRs are generated whenever GSN wants to activate a new virtual
+sensor. A WCR is generated for each stream source in the virtual sensor.
+
+<div class="p"><!----></div>
+A Wrapper Connection Request is an object which contains a wrapper
+name and its initialization parameters as defined in the Virtual Sensor
+Configuration file (VSC). Therefore, two WCRs are identicals if their
+wrapper name and initialization parameters are the same. The Wrappers
+Repository in a GSN instance is a repository of the active wrapper
+instances indexed by their WCRs. 
+
+<div class="p"><!----></div>
+Whenever a WCR is generated at the virtual sensor loader, it will
+be sent to the WR which does the following steps (as illustrated on
+Figure ): 
+
+<div class="p"><!----></div>
+
+<ol type="1">
+<li> Look for a wrapper instance in the repository which has the identical
+WCR. If found, WR registers the stream-source query with the wrapper
+and returns <tt>true</tt>.
+<div class="p"><!----></div>
+</li>
+
+<li> If there is no such WCR in the repository, the WR instantiates the
+appropriate wrapper object and calls its <tt>initialize</tt> method.
+If the <tt>initialize</tt> method returns <tt>true</tt>, WR will add
+the wrapper instance to the WR. Back to Step 1.
+<div class="p"><!----></div>
+</li>
+
+<li> If there is no WCR in the repository and the WR can not initialize
+the new wrapper using the specified initialization parameters and
+GSN context (e.g., the <tt>initialize</tt> method returns <tt>false</tt>),
+WR returns <tt>false</tt> to the virtual sensor loader. When the virtual
+sensor loader receives <tt>false</tt>, it tries the next wrapper (if
+there is any) . The virtual sensor loader fails to load a virtual
+sensor if at least one of the stream sources required by an input
+stream fails.
+<div class="p"><!----></div>
+</li>
+</ol>
+The two main reasons behind using the wrappers repository are: 
+
+<div class="p"><!----></div>
+
+<ul>
+<li> Sharing the processing power by performing query merging.
+<div class="p"><!----></div>
+</li>
+
+<li> Reducing the storage when several stream sources use the same wrappers.
+<div class="p"><!----></div>
+</li>
+</ul>
+The Wrapper Disconnect Request (WDR) is generated at the <tt>virtual-sensor-loader</tt>
+whenever GSN wants to release resources used by a virtual sensor.
+Typically, when the user removes a virtual sensor configuration while
+GSN is running, the virtual-sensor-loader generates a WDR for each
+stream source that was previously used by this virtual sensor. 
+
+<div class="p"><!----></div>
+When WR receives a WDR request, it de-registers the stream-source
+query from the wrapper. If after removing the stream source query
+from the wrapper, there are no queries registered with this wrapper
+(e.g., no other stream source is using the considered wrapper), WR
+calls the <tt>finalize</tt> method of the wrapper instance so that
+all its allocated resources will be released.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc5.4">
+5.4</a>&nbsp;&nbsp;Questions and Answers</h2>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.4.1">
+5.4.1</a>&nbsp;&nbsp;When is the sendToWrapper method called ? </h3>
+
+<div class="p"><!----></div>
+The sendToWrapper method can be only called from a virtual sensor
+which uses this wrapper. The code in the virtual sensor's class will
+be something like below:
+
+<div class="p"><!----></div>
+
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>
+virtualSensorConfiguration.getInputStream(INPUT_STREAM_NAME).
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;getSource(STREAM_SOURCE_ALIAS_NAME).
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;getActiveSourceProducer().
+
+<div class="p"><!----></div>
+&nbsp;&nbsp;sendToWrapper(mydata);
+</dd>
+</dl>
+So a virtual sensor can send data to the wrapper and the wrapper will
+forward it (if the <tt>sendToWrapper</tt> method is implemented) to
+the actual data source.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.4.2">
+5.4.2</a>&nbsp;&nbsp;How does a virtual sensor decide when to send data to the wrapper
+? </h3>
+
+<div class="p"><!----></div>
+A virtual sensor will typically decide using the following factors
+: 
+
+<div class="p"><!----></div>
+
+<ol type="1">
+<li> Based on its internal state, which depends on received data.
+<div class="p"><!----></div>
+</li>
+
+<li> After an interaction initiated by a user/agent/gsn-instance with the
+web interface; HTTP (e.g., implementing the <tt>dataFromWeb</tt> method
+in the virtual sensor, or when another virtual sensor sends data to
+this sensor server).
+<div class="p"><!----></div>
+</li>
+</ol>
+
+<div class="p"><!----></div>
+ <h1><a name="tth_chAp6">
+Chapter 6 </a><br />Writing a Protocol Description</h1>
+
+<div class="p"><!----></div>
+ <h1><a name="tth_chAp7">
+Chapter 7 </a><br />Your own web interface</h1>
+
+<div class="p"><!----></div>
+ <h1><a name="tth_chAp8">
+Chapter 8 </a><br />Inter-GSN communications</h1>
+
+<div class="p"><!----></div>
+ <h1><a name="tth_chAp9">
+Chapter 9 </a><br />GSN Class Reference</h1>
+
+<div class="p"><!----></div>
+AbstractWrapper, AbstractVirtualSensor, StreamElement
+
+<div class="p"><!----></div>
+<a name="tth_sEcindex"></a>
+
+<h2> Index (showing section)</h2>
+
+<table width="100%"><tr><td width="48%" valign="top"><hr />
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>AbstractVirtualSensor, <a href="#AbstractVirtualSensor41">4.1</a></dd>
+ <dt><b></b></dt>
+	<dd>Axis Wireless Camera, <a href="#Axis Wireless Camera32">3.2</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Bridge Virtual Sensor, <a href="#Bridge Virtual Sensor33">3.3</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Chart Virtual Sensor, <a href="#Chart Virtual Sensor33">3.3</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Developer, <a href="#Developer34">3.4</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Email notifications, <a href="#Email notifications34">3.4</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Global Sensor Networks, <a href="#Global Sensor Networks11">1.1</a></dd>
+ <dt><b></b></dt>
+	<dd>GoogleMaps, <a href="#GoogleMaps34">3.4</a></dd>
+ <dt><b></b></dt>
+	<dd>graphical user interface, 
+		<a href="#graphical user interface43">4.3</a></dd>
+ <dt><b></b></dt>
+	<dd>GSN Internals, <a href="#GSN Internals30">3.0</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Java Development Kit, <a href="#Java Development Kit12">1.2</a></dd>
+ <dt><b></b></dt>
+	<dd>JavaBeans Activation Framework, 
+		<a href="#JavaBeans Activation Framework34">3.4</a></dd>
+ <dt><b></b></dt>
+	<dd>JavaMail, <a href="#JavaMail34">3.4</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Memory Monitor, <a href="#Memory Monitor32">3.2</a></dd>
+</dl></td><td width="48%" valign="top"><hr />
+<dl compact="compact">
+ <dt><b></b></dt>
+	<dd>Remote Wrapper, <a href="#Remote Wrapper32">3.2</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Serial Wrapper, <a href="#Serial Wrapper32">3.2</a></dd>
+ <dt><b></b></dt>
+	<dd>SMS, <a href="#SMS34">3.4</a></dd>
+ <dt><b></b></dt>
+	<dd>SMS notifications, <a href="#SMS notifications34">3.4</a></dd>
+ <dt><b></b></dt>
+	<dd>Stream Exporter, <a href="#Stream Exporter33">3.3</a></dd>
+ <dt><b></b></dt>
+	<dd>StreamElement, <a href="#StreamElement42">4.2</a></dd>
+ <dt><b></b></dt>
+	<dd>System Time, <a href="#System Time32">3.2</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>TinyOS 1.x, <a href="#TinyOS 1.x32">3.2</a></dd>
+ <dt><b></b></dt>
+	<dd>TinyOS 2.x, <a href="#TinyOS 2.x32">3.2</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>UDP Wrapper, <a href="#UDP Wrapper32">3.2</a></dd>
+ <dt><b></b></dt>
+	<dd>USB Webcams, <a href="#USB Webcams32">3.2</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Virtual Sensors, <a href="#Virtual Sensors33">3.3</a><br /><br /></dd>
+ <dt><b></b></dt>
+	<dd>Web, <a href="#Web34">3.4</a></dd>
+ <dt><b></b></dt>
+	<dd>Wrappers, <a href="#Wrappers32">3.2</a></dd>
+</dl></td></tr></table>
+
+<hr /><h3>Footnotes:</h3>
+
+<div class="p"><!----></div>
+<a name="tthFtNtAAB"></a><a href="#tthFrefAAB"><sup>1</sup></a>Only the OV518 chipset is currently supported.
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 3.67.<br />On  3 Jan 2007, 16:22.</small>
+</html>
