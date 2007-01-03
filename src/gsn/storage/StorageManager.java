@@ -282,7 +282,7 @@ public class StorageManager {
     * 
     * @param tableName The database name which should be already created.
     * @param se The stream element to Insert in to the specified database.
-    * @param duplicateErrorSuspend, If set to true, the method ignores the
+    * @param duplicateErrorSuspend If set to true, the method ignores the
     * exception caused by the duplicated rows in the specified table.
     * @return True if the insert is done successfully. Any exceptions during the
     * insertion process causes this method to return false.
