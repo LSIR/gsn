@@ -2,14 +2,7 @@
     <processing-class>
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<init-params/>
-	</processing-class>
-        <description>A virtual sensor presenting the nodes inside the sensor scope</description>
-        <life-cycle pool-size="10" />
-        <addressing>
-	        	<predicate key="latitude">46.5211</predicate>
-	        	<predicate key="longitude">6.5676</predicate>
-    	  </addressing>
-        <output-structure>
+		   <output-structure>
             <field name="nodeId" type="int"/>
             <field name="sequenceNumber" type="int"/>
             <field name="temperature" type="double"/>
@@ -22,6 +15,14 @@
             <field name="windSpeed" type="double"/>
             <field name="windDirection" type="double"/>
         </output-structure>
+	</processing-class>
+        <description>A virtual sensor presenting the nodes inside the sensor scope</description>
+        <life-cycle pool-size="10" />
+        <addressing>
+	        	<predicate key="latitude">46.5211</predicate>
+	        	<predicate key="longitude">6.5676</predicate>
+    	  </addressing>
+     
         <storage history-size="1m" />
         <streams>
            <stream name="input1">
