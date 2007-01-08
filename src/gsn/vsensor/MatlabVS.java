@@ -1,4 +1,4 @@
-elpackage gsn.vsensor;
+package gsn.vsensor;
 
 import java.io.IOException;
 import java.io.Serializable;
