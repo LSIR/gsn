@@ -22,7 +22,7 @@ var GSN = {
 		GSN.context = params[0];
 		//highlight the right tab in the navigation bar
 		$("#navigation li").each(function(){
-			if($("a",$(this)).text()==GSN.context)
+			if($("a",this).text()==GSN.context)
 				$(this).addClass("selected");
 			else
 				$(this).removeClass("selected");
@@ -140,16 +140,15 @@ var GSN = {
 	,init : function(data) {
 		this.loaded=true;
 		$(".loading").remove();
-
+		
 		//show all the gsn container info
-		if ($(document).title()=="GSN") {
+		if ($(document).attr("title")=="GSN") {
 			var gsn = $("gsn",data);
-			$(document).title($(gsn).attr("name")+" :: GSN");
+			$(document).attr("title",$(gsn).attr("name")+" :: GSN");
 			$("#gsn-name").empty().append($(gsn).attr("name")+" :: GSN");
 			$("#gsn-desc").empty().append($(gsn).attr("description"));
 			$("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
 		}
-		
 		//build the leftside vs menu
 		$("#vsmenu").empty();
 		$("virtual-sensor",data).each(function(){
@@ -178,10 +177,8 @@ var GSN = {
   		
 		$.ajax({ type: "GET", url: "/gsn", success: function(data){
 			var start = new Date();
-						
 			//initalisation of gsn info, vsmenu
 			if (!GSN.loaded) GSN.init(data);
-			
 			
 			//create vsbox on the first load
 			if (firstload && GSN.context == "home") {
@@ -197,7 +194,7 @@ var GSN = {
 			
 			//update vsbox
 			$("virtual-sensor",data).each(function(){
-				GSN.vsbox.update($(this));
+				GSN.vsbox.update(this);
 			});
 			
 			//update map
@@ -220,7 +217,7 @@ var GSN = {
 		GSN.vsbox.bringToFront(vsName);
 		$.ajax({ type: "GET", url: "/gsn?name="+vsName, success: function(data){
 			$("virtual-sensor[@name="+vsName+"]",data).each(function(){
-					GSN.vsbox.update($(this));
+					GSN.vsbox.update(this);
 			});
 			
 			//update map
@@ -280,18 +277,19 @@ var GSN = {
 		* Update and show all the data of the vsbox
 		*/
 		,update: function (vs){
+
 			//when map is enable, update marker
 			if (GSN.map.loaded){
 				var lat = $("field[@name=latitude]",vs).text();
 				var lon = $("field[@name=longitude]",vs).text();
 				if (lat != "" && lon != ""){
-					GSN.map.updateMarker(vs.attr("name"),lat,lon);
+					GSN.map.updateMarker($(vs).attr("name"),lat,lon);
 				}
 			}
 			
 			//update the vsbox
-			var vsd = $(".vsbox-"+vs.attr("name"), $(this.container));
-			if (vsd.size()==0) return;
+			var vsd = $(".vsbox-"+$(vs).attr("name"), $(this.container))[0];
+			if (typeof vsd == "undefined") return;
 			//if (vsd.css("display")=="none") return;
 			
 			var vsdl = $("dl", vsd);
@@ -300,7 +298,7 @@ var GSN = {
 			var struct = vsdl.get(2);
 			var input = $("dl.input",vsdl.get(4));
 			dl = dynamic;
-	
+			
 			var name,cat,type,value;
 			var last_cmd,cmd;
 			var hiddenclass ="";
@@ -376,11 +374,11 @@ var GSN = {
 						value += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';	
 					
 				} 
-				$(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+cmd+hiddenclass+'">'+value+'</dd>');				
+				$(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');				
 			  });
 			  
-			  if (vs.attr("description")!="") {
-			 	$("dl.description", vsd).append($.DT({},""),$.DD({},vs.attr("description")));
+			  if ($(vs).attr("description")!="") {
+			 	$("dl.description", vsd).append($.DT({},""),$.DD({},$(vs).attr("description")));
 			 	$("a.tabdescription", vsd).show();
 			 	if (!gotStatic) {
 			  		$("a.tabdescription", vsd).addClass("active");
@@ -396,16 +394,16 @@ var GSN = {
 				var dd,field;
 				for (var i = 0; i<dds.size();i++){
 					dd = dds.get(i);
-					field = $("field[@name="+$(dd).attr("class")+"]",vs)
+					field = $("field[@name="+$(dd).attr("class")+"]",vs);
 					type = $(field).attr("type");
 					value = $(field).text();
 					if (value!="") {
 						if (type.indexOf("svg") != -1){
-							$("embed",$(dd)).attr("src",value);
+							$("embed",dd).attr("src",value);
 						} else if (type.indexOf("image") != -1){
-							$("img",$(dd)).attr("src",value);
+							$("img",dd).attr("src",value);
 						} else if (type.indexOf("binary") != -1){
-							$("a",$(dd)).attr("href",value);
+							$("a",dd).attr("href",value);
 						} else {
 							$(dd).empty().append(value);
 						}
@@ -687,7 +685,7 @@ var GSN = {
 					GSN.data.fields_type = new Array();
 					GSN.data.criterias = new Array();
 					GSN.data.nb_crit = 0;
-					$("field", $("virtual-sensor", msg)).each(function() {
+					$("virtual-sensor field", msg).each(function() {
 						if ($(this).attr("type").substr(0,3) != "bin") {
 							GSN.data.fields.push($(this).attr("name"));
 							GSN.data.fields_type.push($(this).attr("type"));
@@ -900,8 +898,8 @@ var GSN = {
 						target = w.document.body;
 					}
 
-					$("table#dataSet",$(target)).remove();
-					$(target).append($.TABLE({"size":"100%", "id":"dataSet"})); //"<table size=\"100%\" id=\"dataSet\">");
+					$("table#dataSet",target).remove();
+					$(target).append($.TABLE({"size":"100%", "id":"dataSet"}));
 					
 					
 					var line,tr,rows;
@@ -918,11 +916,11 @@ var GSN = {
 						for (var j = 0; j<rows.size();j++){
 							$(tr).append($.TD({},$(rows.get(j)).text()));
 						}
-						$("table#dataSet",$(target)).append(tr);
+						$("table#dataSet",target).append(tr);
 					}
 					
 					if (w != null){
-						$("table#dataSet .step", $(target)).background("#ffa84c")
+						$("table#dataSet .step", target).css("background","#ffa84c")
 					}
 				}
 			});

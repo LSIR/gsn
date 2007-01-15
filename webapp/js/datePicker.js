@@ -96,7 +96,7 @@ jQuery.datePicker = function()
 			// not in first display month so show a previous link
 			firstMonth = false;
 			var lastMonth = new Date(d.getFullYear(), d.getMonth()-1, 1);
-			var prevLink = jQuery("<a>").href('javascript:;').html(navLinks.p).click(function()
+			var prevLink = jQuery("<a>").attr('href','javascript:;').html(navLinks.p).click(function()
 			{
 				jQuery.datePicker.changeMonth(lastMonth, this);
 				return false;
@@ -111,7 +111,7 @@ jQuery.datePicker = function()
 			// in the last month - no next link
 			finalMonth = false;
 			var nextMonth = new Date(d.getFullYear(), d.getMonth()+1, 1);
-			var nextLink = jQuery("<a>").href('javascript:;').html(navLinks.n).click(function()
+			var nextLink = jQuery("<a>").attr("href",'javascript:;').html(navLinks.n).click(function()
 			{
 				jQuery.datePicker.changeMonth(nextMonth, this);
 				return false;
@@ -229,9 +229,9 @@ jQuery.datePicker = function()
 		jQuery('div.popup-calendar', _openCal).remove();
 		_openCal.append(c);
 		//fix hms, not proper
-		$("div.popup-calendar .hours",_openCal)[0].childNodes[_selectedHour].selected=true;
-		$("div.popup-calendar .minutes",_openCal)[0].childNodes[_selectedMinute].selected=true;
-		$("div.popup-calendar .seconds",_openCal)[0].childNodes[_selectedSecond].selected=true;
+		_openCal.find("div.popup-calendar .hours")[0].childNodes[_selectedHour].selected=true;
+		_openCal.find("div.popup-calendar .minutes")[0].childNodes[_selectedMinute].selected=true;
+		_openCal.find("div.popup-calendar .seconds")[0].childNodes[_selectedSecond].selected=true;
 	};
 	var _closeDatePicker = function()
 	{
@@ -279,7 +279,7 @@ jQuery.datePicker = function()
 				_closeDatePicker();
 			}
 			this.blur();
-			var input = jQuery('input', jQuery(this).findClosestParent('input'))[0];
+			var input = jQuery(this).findClosestParent('input').find("input")[0];
 			_firstDate = input._startDate;
 			_lastDate = input._endDate;
 			_firstDayOfWeek = input._firstDayOfWeek;
@@ -331,7 +331,7 @@ jQuery.datePicker = function()
 		updatetheInput: function(ele)
 		{
 			var hms = jQuery('div.popup-calendar .hours', _openCal).val() +":"+jQuery('div.popup-calendar .minutes', _openCal).val()+":"+jQuery('div.popup-calendar .seconds', _openCal).val();
-			var $theInput = jQuery('input', jQuery(ele).findClosestParent('input'));
+			var $theInput = jQuery(ele).findClosestParent('input').find('input');
 			$theInput.val(_selectedDate+" "+hms);
 			$theInput.trigger('change');
 		},
@@ -404,7 +404,7 @@ jQuery.fn.findClosestParent = function(s)
 {
 	var ele = this;
 	while (true) {
-		if (jQuery(s, ele).length > 0) {
+		if (ele.find(s).length > 0) {
 			return (ele);
 		}
 		ele = ele.parent();
