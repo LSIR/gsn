@@ -70,7 +70,7 @@ public class DirectoryRefresher {
                }
             } catch ( XmlRpcException e ) {
                logger.error( "Can't register the existing virtual sensors with the specified directory. (try " + ( ++DirectoryRefresher.this.errorCounter ) + ") err : "+e.getMessage( ) );
-               logger.error( e.getMessage( ) , e );            }
+               logger.debug( e.getMessage( ) , e );            }
          }
       } , INITIAL_DELAY , INTERVAL );
    } 

@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,17 +47,21 @@ public class ContainerImpl extends HttpServlet implements Container {
     * In the <code>registeredQueries</code> the key is the local virtual
     * sensor name.
     */
-   private static TreeMap < String , ArrayList < NotificationRequest >> notificationRequests               = new TreeMap < String , ArrayList < NotificationRequest >>( new CaseInsensitiveComparator( ) );
-   
+
+   private static ConcurrentHashMap<String , ArrayList < NotificationRequest >> notificationRequests               = new ConcurrentHashMap<String, ArrayList<NotificationRequest>>();
+
    private static final Class < ContainerImpl >                         notificationRequestsLock           = ContainerImpl.class;
    
    private static final HashMap < Integer , RemoteWrapper >             notificationCodeToRemoteDataSource = new HashMap < Integer , RemoteWrapper >( );
    
    private static final Object                                          psLock                             = new Object( );
    
+   public ContainerImpl ( ) {
+   }
+
    public void publishData ( AbstractVirtualSensor sensor ) {
       StreamElement data = sensor.getData( );
-      String name = sensor.getVirtualSensorConfiguration( ).getVirtualSensorName( );
+      String name = sensor.getVirtualSensorConfiguration( ).getVirtualSensorName( ).toLowerCase();
       StorageManager storageMan = StorageManager.getInstance( );
       synchronized ( psLock ) {
          storageMan.insertDataNoDupError( name , data );
@@ -173,7 +179,7 @@ public class ContainerImpl extends HttpServlet implements Container {
    }
    
    public synchronized void removeNotificationRequest ( String localVirtualSensorName , NotificationRequest notificationRequest ) {
-      localVirtualSensorName = localVirtualSensorName.toUpperCase( );
+      localVirtualSensorName = localVirtualSensorName.toLowerCase( );
       ArrayList < NotificationRequest > contents = notificationRequests.get( localVirtualSensorName );
       if ( contents == null ) {// when an invalid remove request recevied for
          // a
@@ -222,6 +228,7 @@ public class ContainerImpl extends HttpServlet implements Container {
    }
    
    public void removeAllResourcesAssociatedWithVSName ( String vsensorName ) {
+	  vsensorName = vsensorName.toLowerCase();
       ArrayList < NotificationRequest > effected = notificationRequests.remove( vsensorName );
       // FIXME : The used prepare statements should be released from the
       // stroagemanager using a timeout mechanism.

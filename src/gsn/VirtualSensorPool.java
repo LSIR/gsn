@@ -15,13 +15,7 @@ import org.apache.log4j.Logger;
  */
 public class VirtualSensorPool {
    
-   public static final String                    VSENSORCONFIG   = "VSENSORCONFIG";
-   
-   public static final String                    CONTAINER       = "CONTAINER";
-   
    private static final transient Logger         logger          = Logger.getLogger( VirtualSensorPool.class );
-   
-   private static final transient boolean        isDebugEnabled  = logger.isDebugEnabled( );
    
    private int                                   maxPoolSize;
    
@@ -71,7 +65,7 @@ public class VirtualSensorPool {
          } catch ( ClassNotFoundException e ) {
             logger.error( e.getMessage( ) , e );
          }
-      if ( isDebugEnabled )
+      if ( logger.isDebugEnabled() )
          logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " current busy instances : " ).append( currentPoolSize ).toString( ) );
       return newInstance;
    }
@@ -80,7 +74,7 @@ public class VirtualSensorPool {
       if ( o == null ) return;
       idleInstances.add( o );
       currentPoolSize--;
-      if ( isDebugEnabled )
+      if ( logger.isDebugEnabled() )
          logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " current busy instances : " ).append( currentPoolSize ).toString( ) );
    }
    
@@ -88,7 +82,7 @@ public class VirtualSensorPool {
       sizeEnforce.stopPlease( );
       for ( AbstractVirtualSensor o : allInstances )
          o.finalize( );
-      if ( isDebugEnabled ) logger.debug( new StringBuilder( ).append( "The VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " is now closed." ).toString( ) );
+      if ( logger.isDebugEnabled() ) logger.debug( new StringBuilder( ).append( "The VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " is now closed." ).toString( ) );
    }
    
    public void start ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
