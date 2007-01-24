@@ -13,14 +13,13 @@
                    </structure>
                 </collection>
               </structure>
-   		 <structure name="web-input"  usage="optional">  
+  		 <structure name="web-input"  usage="optional">  
 	          <value name="password"  field="webParameterPassword" style="attribute" usage="optional" />
    	       <collection field="webinput"  item-type="gsn.beans.WebInput" />
        </structure>
        <collection name="output-structure"   field="outputStructure"  item-type="gsn.beans.DataField" />
        </structure>
        <value name="description" field="description"  usage="optional"/>
-       <value name="webapp" field="webapp"  usage="optional"/>
        <structure name="life-cycle"  usage="optional">  
           <value name="pool-size"  field="lifeCyclePoolSize" style="attribute" />
        </structure>
@@ -46,7 +45,7 @@
 	   <collection field="sources" >
 	      <structure name="source" type="gsn.beans.StreamSource">
 	         <value  name="alias"  field="alias"  style="attribute"/>
-	         <value  name="storage-size" field="storageHistorySize" style="attribute" usage="optional" />
+	         <value  name="storage-size" field="rawHistorySize" style="attribute" usage="optional" />
 	         <value  name="disconnect-buffer-size" field="disconnectedBufferSize" style="attribute" usage="optional" />
 	         <value  name="sampling-rate" field="samplingRate" style="attribute" usage="optional" />
 	         <value  name="start-time"  field="startTime"  style="attribute" usage="optional"/>
