@@ -9,7 +9,6 @@
       <tstamp>
          <format property="TODAY" pattern="yyyy-MMMM-d-'at'-hh-mm-aa" locale="en"/>
       </tstamp>
-      
       <property environment="env"/>
       <property name="conf.dir" value="${basedir}/conf"/>
       <property name="build.dir" value="build"/>
@@ -133,7 +132,7 @@
    </target>
 
    <target name="securityTest" depends="build">
-      <java classpathref="classpath" classname="gsn.tests.SecurtiyTest" maxmemory="${maxMemoryUsage}" fork="true"
+      <java classpathref="classpath" classname="gsn.testss.SecurtiyTest" maxmemory="${maxMemoryUsage}" fork="true"
             dir="${build.dir}">
          
       </java>
@@ -184,21 +183,26 @@
       </junitreport>
    </target>
    
-   <target name="test" depends="build" description="Runs JUnit tests">
+   <target name="tests" depends="build" description="Runs JUnit tests">
       <junit printsummary="true" fork="false" haltonerror="false"
              errorproperty="errorOccuredInTests" haltonfailure="false"
-             failureproperty="tests.failed" showoutput="true">
+             failureproperty="testss.failed" showoutput="true">
          <classpath refid="classpath"/>
          
          <batchtest todir="${reports}/junit">
-            <fileset dir="${build.dir}" includes="**/*Test*.class"/>
-         </batchtest>
+     <!--       <fileset dir="${build.dir}" includes="**/*Test*.class" excludes="**/TestStreamExporterVirtualSensor*.class"/> -->
+         	 <fileset dir="${src.dir}">
+         	      <include name="**/*Test*.java"/>
+         	      <exclude name="**/TestStreamExporterVirtualSensor.java"/>
+         	      <exclude name="**/TestContainerImpl.java"/>
+         	 </fileset>
+<!--         	<fileset dir="${build.dir}" includes="**/TestStreamSource.*,**/TestAbstractWrapper.*,**/TestVSensorLoader.*" />-->
+        </batchtest>
       </junit>
-      
-      <fail if="tests.failed">
+      <fail if="testss.failed">
          
          ***********************************
-         One or more test failed !
+         One or more tests failed !
          ***********************************
          
       </fail>
@@ -247,7 +251,7 @@
    </target>
    
    <target name="pref" depends="build">
-      <java classpathref="classpath" classname="gsn.tests.CreationTest" maxmemory="64m" fork="true"
+      <java classpathref="classpath" classname="gsn.testss.CreationTest" maxmemory="64m" fork="true"
             dir="${build.dir}">
       </java>
    </target>
