@@ -1,9 +1,6 @@
 package gsn.beans;
 
-import gsn.utils.KeyValueImp;
-
 import java.util.ArrayList;
-
 import org.apache.commons.collections.KeyValue;
 
 /**
@@ -13,7 +10,9 @@ import org.apache.commons.collections.KeyValue;
  */
 public final class AddressBean {
    
-   private String                 wrapper;
+   private static final ArrayList<? extends KeyValue> EMPTY_PREDICATES = new  ArrayList<KeyValue>();
+
+private String                 wrapper;
    
    private ArrayList <? extends KeyValue > predicates;
    
@@ -21,6 +20,11 @@ public final class AddressBean {
       this.wrapper = wrapper;
       this.predicates = predicates;
    }
+   
+   public AddressBean ( final String wrapper  ) {
+	      this.wrapper = wrapper;
+	      this.predicates = EMPTY_PREDICATES ;
+	   }
    
    public String getWrapper ( ) {
       return this.wrapper;
@@ -43,25 +47,7 @@ public final class AddressBean {
       }
       return null;
    }
-   
-   /**
-    * Returns true timedever the set of predicates contain "port" and "host"
-    * keys.
-    * 
-    * @return
-    */
-   public boolean isAbsoluteAddressSpecified ( ) {
-      boolean containsAddress = false;
-      boolean containsPort = false;
-      for ( final KeyValue predicate : this.getPredicates( ) ) {
-         if ( "host".equalsIgnoreCase( ( String ) predicate.getKey( ) ) ) containsAddress = true;
-      }
-      for ( final KeyValue predicate : this.getPredicates( ) ) {
-         if ( "port".equalsIgnoreCase( ( String ) predicate.getKey( ) ) ) containsPort = true;
-      }
-      return containsAddress && containsPort;
-   }
-   
+
    public boolean equals ( final Object o ) {
       if ( this == o ) return true;
       if ( o == null || this.getClass( ) != o.getClass( ) ) return false;

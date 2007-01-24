@@ -29,6 +29,9 @@ public final class StreamElement implements Serializable {
    
    private long                                   internalPrimayKey = -1;
    
+   public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data  ) {
+	   this(outputStructure,data,System.currentTimeMillis());
+   }
    public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data , final long timeStamp ) {
       this.fieldNames = new String [ outputStructure.length ];
       this.fieldTypes = new Byte [ outputStructure.length ];

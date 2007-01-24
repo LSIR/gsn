@@ -1,5 +1,6 @@
 package gsn.beans;
 
+import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
 import java.beans.PropertyChangeListener;
 import java.io.FileInputStream;
@@ -40,9 +41,7 @@ public class ContainerConfig {
    
    public static final int               DEFAULT_GSN_PORT                 = 22001;
    
-   public static final int               DEFAULT_STORAGE_POOL_SIZE        = 100;
-   
-   protected String                      webName;
+  protected String                      webName;
    
    public static final String            FIELD_NAME_webName               = "webName";
    
@@ -86,7 +85,7 @@ public class ContainerConfig {
    
    public static final String            FIELD_NAME_jdbcURL               = "jdbcURL";
    
-   protected int                         storagePoolSize                  = DEFAULT_STORAGE_POOL_SIZE;
+   protected int                         storagePoolSize    =-1              ;
    
    private int sslPort ;
    
@@ -237,8 +236,7 @@ public class ContainerConfig {
     * @return Returns the storagePoolSize.
     */
    public int getStoragePoolSize ( ) {
-      if ( this.storagePoolSize <= 0 ) this.storagePoolSize = DEFAULT_STORAGE_POOL_SIZE;
-      return this.storagePoolSize;
+	   return this.storagePoolSize;
    }
    
    public String toString ( ) {

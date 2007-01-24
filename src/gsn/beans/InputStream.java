@@ -1,6 +1,5 @@
 package gsn.beans;
 
-import gsn.VSensorLoader;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.VirtualSensorPool;
 import gsn.storage.PoolIsFullException;
@@ -25,7 +24,7 @@ public class InputStream {
    
    private transient static final Logger               logger                = Logger.getLogger( InputStream.class );
    
-   private transient StorageManager                    storageMan;
+   private transient StorageManager                    storageMan = StorageManager.getInstance();
    
    private String                                      inputStreamName;
    
@@ -41,8 +40,6 @@ public class InputStream {
    
    private HashMap < CharSequence , StreamSource >           streamSourceAliasNameToStreamSourceName;
    
-   private transient long                              startTime;
-   
    private transient VirtualSensorPool                 pool;
    
    private final transient TreeMap< CharSequence , CharSequence > rewritingData         = new TreeMap < CharSequence , CharSequence >( new CaseInsensitiveComparator());
@@ -54,12 +51,6 @@ public class InputStream {
    /**
     * For making one initial delay.
     */
-   
-   public boolean initialize ( final HashMap context ) {
-      this.storageMan = ( StorageManager ) context.get( VSensorLoader.STORAGE_MANAGER );
-      if ( this.storageMan == null ) logger.error( "Initialization failed" );
-      return true;
-   }
    
    public String getQuery ( ) {
       return this.query;
@@ -104,30 +95,27 @@ public class InputStream {
     * 
     * @param alias The alias of the StreamSource which has new data.
     */
-   public void dataAvailable ( final CharSequence alias ) {
+   public boolean dataAvailable ( final CharSequence alias ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
       if ( this.pool == null ) {
          logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
-         return;
+         return false;
       }
       
       if ( this.currentCount > this.getCount( ) ) {
          if ( logger.isInfoEnabled( ) ) logger.info( "Maximum count reached, the value *discarded*" );
-         return;
+         return false;
       }
       
       final long currentTimeMillis = System.currentTimeMillis( );
       if ( this.rate > 0 && ( currentTimeMillis - this.lastVisited ) < this.rate ) {
          if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
-         // SimulationResult.addJustBeforeStartingToEvaluateQueries ( - 1
-         // );
-         // SimulationResult.addJustQueryEvaluationFinished ( - 1 );
-         return;
+         return false;
       }
       this.lastVisited = currentTimeMillis;
       
       if ( this.rewrittenSQL == null ) {
-         this.rewrittenSQL = new StringBuilder( SQLUtils.newRewrite( this.getQuery( ).trim( ).toLowerCase( ), this.rewritingData ).toString() .replace( "\"" , "" ) );
+         this.rewrittenSQL = new StringBuilder( SQLUtils.newRewrite( getQuery( ).trim( ).toLowerCase( ), this.rewritingData ).toString() .replace( "\"" , "" ) );
          if ( logger.isDebugEnabled( ) )
             logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
                   .toString( ) );
@@ -161,12 +149,12 @@ public class InputStream {
             this.pool.returnVS( sensor );
          }
       }
+      return true;
    }
    
    public void addToRenamingMapping ( final CharSequence aliasName , final CharSequence viewName ) {
       this.rewritingData.put( aliasName , viewName );
-      this.startTime = System.currentTimeMillis( );
-   }
+  }
    
    public void refreshAlias ( final String alias ) {
       if ( logger.isInfoEnabled( ) ) logger.info( "REFERES ALIAS CALEED" );
