@@ -14,7 +14,7 @@ import net.tinyos.packet.PhoenixSource;
  * @author alisalehi
  *
  */
-public class TestSensorScope {
+public class TinyOS2XTemplate {
    /**
     * A Test class to check if the wrapper works.
     * @param args

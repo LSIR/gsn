@@ -27,7 +27,7 @@ public class EPuckVS extends AbstractVirtualSensor {
    
    public boolean initialize ( ) {
       params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
-      wrapper = getVirtualSensorConfiguration( ).getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      wrapper = getVirtualSensorConfiguration( ).getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
       protocolManager = new ProtocolManager( new SerComProtocol( ) , wrapper );
       if ( logger.isDebugEnabled( ) ) logger.debug( "Created protocolManager" );
       try {
@@ -45,7 +45,7 @@ public class EPuckVS extends AbstractVirtualSensor {
    public void dataAvailable ( String inputStreamName , StreamElement data ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "I just received some data from the robot" );
       System.out.println( new String( ( byte [ ] ) data.getData( SerialWrapper.RAW_PACKET ) ) );
-      AbstractWrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      AbstractWrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
       if ( actionA == false ) {
          actionA = true;
          try {
@@ -59,7 +59,7 @@ public class EPuckVS extends AbstractVirtualSensor {
    
    public void finalize ( ) {
       try {
-         vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( ).sendToWrapper( "R\n",null,null );
+         vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper().sendToWrapper( "R\n",null,null );
       } catch ( OperationNotSupportedException e ) {
          logger.error( e.getMessage( ) , e );
       }

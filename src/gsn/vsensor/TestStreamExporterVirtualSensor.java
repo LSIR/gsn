@@ -4,27 +4,20 @@
  */
 package gsn.vsensor;
 
-import gsn.ContainerImpl;
-import gsn.VirtualSensorPool;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.KeyValueImp;
-
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Vector;
-
 import junit.framework.TestCase;
-
 import org.apache.commons.collections.KeyValue;
 
 /**
@@ -32,9 +25,7 @@ import org.apache.commons.collections.KeyValue;
  */
 public class TestStreamExporterVirtualSensor extends TestCase {
    
-   private final String  user = "gsntest" , passwd = "gsntest" , db = "gsntest" , url = "jdbc:mysql://localhost:3306/gsntest" , streamName = "aJUnitTestStream";
-   
-   private HashMap       hashMap;
+   private final String  user = "sa" , passwd = "" , db = "." , url = "jdbc:hsqldb:mem:." , streamName = "aJUnitTestStream";
    
    private VSensorConfig config;
    
@@ -49,19 +40,16 @@ public class TestStreamExporterVirtualSensor extends TestCase {
     * @see junit.framework.TestCase#setUp()
     */
    public void setUp ( ) {
-      hashMap = new HashMap( );
-      hashMap.put( VirtualSensorPool.CONTAINER , new ContainerImpl( ) );
       config = new VSensorConfig( );
       config.setVirtualSensorName( "JUnitTestStreamExporterVS" );
       config.setFileName( "PlaceholderfileNameForJUNitTesting" );
-      hashMap.put( VirtualSensorPool.VSENSORCONFIG , config );
+      
    }
    
    public void tearDown ( ) {
-      hashMap = null;
       config = null;
       try {
-         DriverManager.registerDriver( new com.mysql.jdbc.Driver( ) );
+         DriverManager.registerDriver( new org.hsqldb.jdbcDriver() );
          Connection connection = DriverManager.getConnection( url , user , passwd );
          connection.createStatement( ).execute( "DROP TABLE IF EXISTS " + streamName );
       } catch ( SQLException e ) {

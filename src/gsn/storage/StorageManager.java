@@ -7,12 +7,15 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
+
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -245,7 +248,7 @@ public class StorageManager {
       try {
          connection = connectionPool.borrowConnection( );
          StringBuilder viewStatement = new StringBuilder( "create view " ).append( viewName.toString( ) ).append( " AS ( " ).append( selectQuery.toString( ).toLowerCase( ) ).append(" ) ");
-         connection.createStatement( ).execute( viewStatement.toString() );
+          connection.createStatement( ).execute( viewStatement.toString() );
       } catch ( SQLException e ) {
          logger.error( e.getMessage( ) , e );
       } finally {
@@ -255,12 +258,12 @@ public class StorageManager {
       }
    }
    
-   private static final int MAX_DB_CONNECTIONS = Main.getContainerConfig( ).getStoragePoolSize( );
+   private static int MAX_DB_CONNECTIONS;
    
    /**
     * This method first transforms the query to lower case and then executes it.
     */
-   private PreparedStatement obtainPreparedStatementForQuery ( CharSequence sql ) throws SQLException {
+   public PreparedStatement obtainPreparedStatementForQuery ( CharSequence sql ) throws SQLException {
       Connection connection = connectionPool.borrowConnection( );
       PreparedStatement toReturn = null;
       try {
@@ -295,28 +298,55 @@ public class StorageManager {
          ps = obtainPreparedStatementForQuery( stringBuilder );
          int counter;
          for ( counter = 1 ; counter <= se.getFieldTypes( ).length ; counter++ ) {
-            switch ( se.getFieldTypes( )[ counter - 1 ] ) {
+        	 Serializable value = se.getData( )[ counter - 1 ];
+        	 switch ( se.getFieldTypes( )[ counter - 1 ] ) {
                case DataTypes.VARCHAR :
+            	   if (value==null)
+            		   ps.setNull(counter, Types.VARCHAR);
+            	   else
+            		   ps.setString(counter, value.toString());
+            	   break;
                case DataTypes.CHAR :
-                  ps.setString( counter , se.getData( )[ counter - 1 ].toString( ) );
-                  break;
+            	   if (value==null)
+            		   ps.setNull(counter, Types.CHAR);
+            	   else
+            		   ps.setString(counter, value.toString());
+            	   break;
                case DataTypes.INTEGER :
-                  ps.setInt( counter , ( Integer ) se.getData( )[ counter - 1 ] );
+            	   if (value==null)
+            		   ps.setNull(counter, Types.INTEGER);
+            	   else
+            		   ps.setInt( counter , ( Integer ) value );
                   break;
                case DataTypes.SMALLINT :
-                  ps.setShort( counter , ( Short ) se.getData( )[ counter - 1 ] );
+            	   if (value==null)
+            		   ps.setNull(counter, Types.SMALLINT);
+            	   else
+            		   ps.setShort( counter , ( Short ) value );
                   break;
                case DataTypes.TINYINT :
-                  ps.setByte( counter , ( Byte ) se.getData( )[ counter - 1 ] );
+            	   if (value==null)
+            		   ps.setNull(counter, Types.TINYINT);
+            	   else
+            		   ps.setByte( counter , ( Byte ) value );
                   break;
                case DataTypes.DOUBLE :
-                  ps.setDouble( counter , ( Double ) se.getData( )[ counter - 1 ] );
-                  break;
+            	   if (value==null)
+            		   ps.setNull(counter, Types.DOUBLE);
+            	   else 
+            		   ps.setDouble( counter , (Double)value );
+            	   break;
                case DataTypes.BIGINT :
-                  ps.setLong( counter , ( Long ) se.getData( )[ counter - 1 ] );
+            	   if (value==null)
+            		   ps.setNull(counter, Types.BIGINT);
+            	   else
+            		   ps.setLong( counter , ( Long )value );
                   break;
                case DataTypes.BINARY :
-                  ps.setBytes( counter , ( byte [ ] ) se.getData( )[ counter - 1 ] );
+            	   if (value==null)
+            		   ps.setNull(counter, Types.BINARY);
+            	   else
+            		   ps.setBytes( counter , ( byte [ ] ) value );
                   break;
                default :
                   logger.error( "The type conversion is not supported for : " + se.getFieldNames( )[ counter - 1 ] + "(" + se.getFieldTypes( )[ counter - 1 ] + ")" );
@@ -512,7 +542,7 @@ public class StorageManager {
    public void dropTable ( CharSequence tableName ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "Dropping table structure: " + tableName );
       String dropIndexStatement = null;
-      if ( StorageManager.getInstance( ).isHsql( ) ) dropIndexStatement = new StringBuilder( " DROP INDEX " ).append( tableName.toString( ).toLowerCase( ) ).append( "_INDEX IF EXISTS " ).toString( );
+      if ( isHsql( ) ) dropIndexStatement = new StringBuilder( "DROP INDEX " ).append( tableName.toString( ).toLowerCase( ) ).append( "_INDEX IF EXISTS " ).toString( );
       // if (StorageManager.getInstance ().isMysqlDB ())
       // dropIndexStatement = new StringBuilder ( " DROP INDEX " ).append (
       // tableName.toUpperCase () ).append ( "_INDEX ON " ).append (
@@ -596,7 +626,7 @@ public class StorageManager {
       return new DataEnumerator( ps , binaryFieldsLinked );
    }
    
-   public int executeUpdate ( StringBuilder updateStatement ) {
+   public int executeUpdate ( CharSequence updateStatement ) {
       PreparedStatement updatePreparedStatement = null;
       try {
          updatePreparedStatement = obtainPreparedStatementForQuery( updateStatement );
@@ -612,6 +642,8 @@ public class StorageManager {
       }
       return -1;
    }
+   public static final int               DEFAULT_STORAGE_POOL_SIZE        = 100;
+   
    
    public void initialize ( String databaseDriver , String databaseUserName , String databasePassword , String databaseURL ) {
       if ( databaseDriver.trim( ).equalsIgnoreCase( "org.hsqldb.jdbcDriver" ) )
@@ -623,6 +655,10 @@ public class StorageManager {
          logger.error( new StringBuilder( ).append( "Please check the storage element in the file : " ).append( getContainerConfig( ).getContainerFileName( ) ).toString( ) );
          System.exit( 1 );
       }
+      if (Main.getContainerConfig()==null || Main.getContainerConfig().getStoragePoolSize()<=0)
+    	  MAX_DB_CONNECTIONS=DEFAULT_STORAGE_POOL_SIZE;
+      else
+    	  MAX_DB_CONNECTIONS = Main.getContainerConfig( ).getStoragePoolSize( );
       connectionPool = new FastConnectionPool( databaseDriver , databaseUserName , databasePassword , databaseURL , MAX_DB_CONNECTIONS );
    }
 }

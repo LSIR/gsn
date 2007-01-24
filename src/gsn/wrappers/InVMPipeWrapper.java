@@ -3,6 +3,7 @@ package gsn.wrappers;
 import gsn.Mappings;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.DataField;
+import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.notifications.InGSNNotification;
 import gsn.notifications.NotificationRequest;
@@ -52,16 +53,15 @@ public class InVMPipeWrapper extends AbstractWrapper {
       return true;
    }
    
-   public CharSequence addListener ( DataListener dataListener ) {
+   public void addListener ( StreamSource ss ) {
       /**
        * First we create a view over the main source
        * (config.getVirtualSensorName). We encode all the conditions and
        * filtering in the view's definition. We perform select * from the view.
        */
-      CharSequence toReturn = super.addListener( dataListener );
+      super.addListener( ss );
       notificationRequest = new InGSNNotification( this , config.getVirtualSensorName( ) );
       Mappings.getContainer( ).addNotificationRequest( config.getVirtualSensorName( ) , notificationRequest );
-      return toReturn;
    }
    
    public boolean sendToWrapper ( String action,String[] paramNames, Serializable[] paramValues ) throws OperationNotSupportedException {
@@ -82,9 +82,9 @@ public class InVMPipeWrapper extends AbstractWrapper {
    
    public void remoteDataReceived ( ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "There are results, is there any listeners ?" );
-      for ( Iterator < DataListener > iterator = listeners.iterator( ) ; iterator.hasNext( ) ; ) {
-         DataListener dataListener = iterator.next( );
-         boolean results = getStorageManager( ).isThereAnyResult( dataListener.getViewQuery( ) );
+      for ( Iterator < StreamSource > iterator = listeners.iterator( ) ; iterator.hasNext( ) ; ) {
+         StreamSource dataListener = iterator.next( );
+         boolean results = getStorageManager( ).isThereAnyResult( new StringBuilder("select * from ").append(dataListener.getUIDStr()) );
          if ( results ) {
             if ( logger.isDebugEnabled( ) )
                logger.debug( new StringBuilder( ).append( "There are listeners, notify the " ).append( dataListener.getInputStream( ).getInputStreamName( ) ).append( " inputStream" ).toString( ) );

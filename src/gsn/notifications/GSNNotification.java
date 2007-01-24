@@ -15,9 +15,6 @@ import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Note that : 1. Set the REQUEST HEADER PARAMETER DESCRIBING THE BODY OF THE
- * REQUEST. 2. ONCE YOU SET THE BODY AS STREAM THE REQUEST PARAMETER DOESN'T
- * WORK HENCE USE THE REQUEST-HEADER-PARAMETER.
  */
 public class GSNNotification extends NotificationRequest {
    

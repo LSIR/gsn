@@ -35,7 +35,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
    private Timer                         timer;
    
    public boolean initialize (  ) {
-      setName( "DummyDataProducer-Thread" + ( ++threadCounter ) );
+      setName( "LocalTimeWrapper-Thread" + ( ++threadCounter ) );
       return true;
    }
    

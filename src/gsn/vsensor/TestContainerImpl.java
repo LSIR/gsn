@@ -27,21 +27,6 @@ public class TestContainerImpl {
 
    }
    
-   // @Test public void gettingGeneralWebAppInformations() throws Exception {
-   // WebConversation wc = new WebConversation();
-   // WebRequest request = new GetMethodWebRequest( "http://localhost:22001/gsn"
-   // );
-   // request.setHeaderField( "REQUEST" ,
-   // Container.REQUEST_WEB_APP_INFORMATION+"" );
-   // WebResponse response = wc.getResponse( request );
-   // assertEquals(response.getHeaderField(
-   // Container.RESPONSE_STATUS),Container.REQUEST_HANDLED_SUCCESSFULLY );
-   // assertNotNull( response.getHeaderField( Container.WEB_APP_AUTHOR ) );
-   // assertNotNull( response.getHeaderField( Container.WEB_APP_DESCRIPTION ) );
-   // assertNotNull( response.getHeaderField( Container.WEB_APP_EMAIL ) );
-   // assertNotNull( response.getHeaderField( Container.WEB_APP_NAME ) );
-   //      
-   // }
    @Test
    public void gettingListOfVirtualSensors ( ) throws Exception {
       WebConversation wc = new WebConversation( );

@@ -41,7 +41,7 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
    public boolean initialize ( ) {
       vsensor = getVirtualSensorConfiguration( );
       params = vsensor.getMainClassInitialParams( );
-      wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
       protocolManager = new ProtocolManager( new SerComProtocol( ) , wrapper );
       if ( logger.isDebugEnabled( ) ) logger.debug( "Created protocolManager" );
       try {
@@ -59,7 +59,7 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
       if ( logger.isDebugEnabled( ) ) logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getData(SerialWrapper.RAW_PACKET)));
       
       //needed? ######
-      AbstractWrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getActiveSourceProducer( );
+      AbstractWrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
       
       //raw data from serial
       String s = new String( ( byte [ ] ) data.getData( SerialWrapper.RAW_PACKET ) );
@@ -101,7 +101,6 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
    }
    
    public void finalize ( ) {
-    
    }
    
 }

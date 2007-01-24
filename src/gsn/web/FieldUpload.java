@@ -21,7 +21,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 
 /**
- * @author Clément Beffa (clement.beffa@epfl.ch)<br>
+ * @author Clement Beffa (clement.beffa@epfl.ch)<br>
  * @web.servlet name="FieldUpload" load-on-startup="true"
  * @web.servlet-mapping url-pattern="/upload"
  * 

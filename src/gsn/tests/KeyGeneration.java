@@ -11,7 +11,7 @@ import java.security.spec.X509EncodedKeySpec;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
-public class SecurtiyTest {
+public class KeyGeneration {
    
    public static void main ( String [ ] args ) throws Exception {
       
