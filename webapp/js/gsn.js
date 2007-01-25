@@ -704,12 +704,30 @@ var GSN = {
 						$("#aggregateFunction").append("<option value=\"AVG\">AVG</option>");
 						$("#aggregateFunction").append("<option value=\"AVG\">MAX</option>");
 						$("#aggregateFunction").append("<option value=\"AVG\">MIN</option>");
+						$("#fields").append("<br/>Group by : <select name=\"aggregateGB\" id=\"aggregateGB\" size=\"1\" onChange=\"javascript:GSN.data.groupBy(this.value)\"></select><br/>");
+						for (i = 0; i < GSN.data.fields.length; i++) {
+							$("#aggregateGB").append("<option value=\"" + GSN.data.fields[i] + "\">" + GSN.data.fields[i] + "</option>");
+						}
+						$("#aggregateGB").append("<option value=\"none\">None</option>");
 					} else {
 						$("#fields").append("<br/><input type=\"checkbox\" name=\"all\" onClick=\"javascript:GSN.data.checkAllFields(this.checked)\">Check all<br/>");
 					}
 					$("#fields").append("<br><a href=\"javascript:GSN.data.nbDatas()\" id=\"nextStep\">Next step</a>");
 				}
 			});
+		},
+		groupBy: function(option) {
+			if (option == "timed") {
+				$("#aggregateGB").after("<input type=\"text\" name=\"gbdelta\" id=\"gbdelta\" size=\"5\"><select name=\"gbdeltameasure\" id=\"gbdeltameasure\" size=\"1\"></select>");
+				$("#gbdeltameasure").append("<option value=\"ms\">Milisecond</option>");
+				$("#gbdeltameasure").append("<option value=\"s\">Second</option>");
+				$("#gbdeltameasure").append("<option value=\"m\">Minute</option>");
+				$("#gbdeltameasure").append("<option value=\"h\">Hour</option>");
+				$("#gbdeltameasure").append("<option value=\"d\">Day</option>");
+			} else {
+				$("#gbdelta").remove();
+				$("#gbdeltameasure").remove();
+			}
 		},
 		checkAllFields: function(check){
 			$("input").each(function () {
@@ -827,6 +845,22 @@ var GSN = {
 	   			} else {
 	   				request += "&commonReq=false";
 	   				request += "&aggregateFunction=" + $("#aggregateFunction").val();
+	   				if ($("#aggregateGB").attr("value") != "None") {
+	   					request += "&groupby=" + $("#aggregateGB").val();
+	   					if ($("#aggregateGB").attr("value") == "timed") {
+	   						temp = $("#gbdelta").val();
+	   						if ($("#gbdeltameasure").val() == "s") {
+	   							temp = temp * 1000;
+	   						} else if ($("#gbdeltameasure").val() == "m") {
+	   							temp = temp * 60000;
+	   						} else if ($("#gbdeltameasure").val() == "h") {
+	   							temp = temp * 3600000;
+	   						} else if ($("#gbdeltameasure").val() == "d") {
+	   							temp = temp * 86400000; // 3600000 * 24
+	   						}
+	   						request += "&groupbytimed=" + temp
+	   					}
+	   				}
 	   			}
 	   			$("input").each(function () {
 					if ($(this).attr("id") == "field" && $(this).attr("checked")) {
