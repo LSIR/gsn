@@ -63,6 +63,7 @@ public final class Main {
 	public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
 
 	public static void main ( String [ ] args ) throws IOException , RuntimeException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
+		System.out.println("GSN Starting ...");
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		PropertyConfigurator.configure ( DEFAULT_GSN_LOG4J_PROPERTIES );
@@ -162,7 +163,7 @@ public final class Main {
 		// Adding the wrappers to the GSN data structures.
 		if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
 		loadWrapperList(config);
-		initPKI (PUBLIC_KEY_FILE, PUBLIC_KEY_FILE);
+		//initPKI (PUBLIC_KEY_FILE, PUBLIC_KEY_FILE);
 	}
 
 	public static void loadWrapperList(Configuration config) throws ClassNotFoundException{

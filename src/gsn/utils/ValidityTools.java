@@ -72,9 +72,9 @@ public class ValidityTools {
       }
    }
    
-   public static void checkAccessibilityOfFiles ( String ... args ) {
-      for ( String name : args ) {
-         File f = new File( name );
+   public static void checkAccessibilityOfFiles ( String... args ) {
+	   for ( String name : args ) {
+		   File f = new File( name );
          if ( f.canRead( ) && f.canWrite( ) && f.isFile( ) ) continue;
          else {
             System.out.println( "The required file : " + f.getAbsolutePath( ) + " is not accessible." );

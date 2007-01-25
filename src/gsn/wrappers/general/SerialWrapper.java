@@ -392,11 +392,11 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
    private String           inputString;
    
    public void serialEvent ( SerialPortEvent e ) {
-      if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port event, reading..." );
-      if ( !isActive( ) || listeners.isEmpty( ) ) {
-         if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper dropped the input b/c there is no listener there or the wrapper is inactive." );
-         return;
-      }
+//      if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port event, reading..." );
+//      if ( !isActive( ) || listeners.isEmpty( ) ) {
+//         if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper dropped the input b/c there is no listener there or the wrapper is inactive." );
+//         return;
+//      }
       // Determine type of event.
       switch ( e.getEventType( ) ) {
          // Read data until -1 is returned.
@@ -421,7 +421,7 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
             // messageAreaIn.append("\n--- BREAK RECEIVED ---\n");
       }
       if ( logger.isDebugEnabled( ) ) {
-         logger.debug( new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : " ).append( inputBuffer ).toString( ) );
+         logger.debug( new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : " ).append( new String(inputBuffer) ).toString( ) );
       }
       
       if ( useInputSeparator ) {

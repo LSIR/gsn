@@ -55,7 +55,6 @@ public abstract class AbstractWrapper extends Thread {
 	 * Note that, GSN creates one view per listener.
 	 */
 	public void addListener ( StreamSource ss ) {
-		System.out.println(ss.toSql());
 		getStorageManager( ).createView( ss.getUIDStr() , ss.toSql() );
 		listeners.add(ss);
 	}
