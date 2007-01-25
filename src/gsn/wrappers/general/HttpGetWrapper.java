@@ -18,16 +18,6 @@ import org.apache.log4j.Logger;
  */
 public class HttpGetWrapper extends AbstractWrapper {
    
-   /**
-    * 
-    */
-   private static final Byte [ ] OUTPUT_FIELD_TYPES = new Byte [ ] { DataTypes.BINARY };
-   
-   /**
-    * 
-    */
-   private static final String [ ]  OUTPUT_FIELD_NAMES = new String [ ] { "PICTURE" };
-   
    private int                      DEFAULT_RATE       = 2000;
    
    private static int               threadCounter      = 0;
