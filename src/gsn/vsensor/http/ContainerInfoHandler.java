@@ -1,6 +1,5 @@
 package gsn.vsensor.http;
 
-import gsn.DirectoryRefresher;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
@@ -22,7 +21,7 @@ import org.apache.log4j.Logger;
  * @author alisalehi
  */
 public class ContainerInfoHandler implements RequestHandler {
-   private static transient Logger logger             = Logger.getLogger( DirectoryRefresher.class );
+   private static transient Logger logger             = Logger.getLogger( ContainerInfoHandler.class );
 	   
 	
    public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {

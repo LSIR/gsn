@@ -48,8 +48,7 @@ public class VSensorLoader extends Thread {
 
 	private static int                                             VSENSOR_LOADER_THREAD_COUNTER       = 0;
 
-	DirectoryRefresher directoryRefresher;
-
+	
 	public VSensorLoader() {
 
 	}
@@ -58,7 +57,6 @@ public class VSensorLoader extends Thread {
 		Thread thread = new Thread ( this );
 		thread.setName ( "VSensorLoader-Thread" + VSENSOR_LOADER_THREAD_COUNTER++ );
 		thread.start ( );
-		directoryRefresher= new DirectoryRefresher ( );
 	}
 
 	public void run ( ) {
@@ -320,7 +318,6 @@ public class VSensorLoader extends Thread {
 
 	public void stopLoading ( ) {
 		this.isActive = false;
-		directoryRefresher.timer.cancel ();
 		this.interrupt ( );
 		for ( String configFile : Mappings.getAllKnownFileName ( ) ) {
 			VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile );

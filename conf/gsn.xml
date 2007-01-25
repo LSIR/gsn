@@ -6,7 +6,8 @@
 <!--   <ssl-port>22002</ssl-port>
    <ssl-key-store-password>secure</ssl-key-store-password>
    <ssl-key-password>secure</ssl-key-password> -->
-   <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:MEM:." />
+<!--   <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:MEM:." /> -->
+   <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" />
    <directory-address>localhost:1882</directory-address> 
 </sensor-server>
 

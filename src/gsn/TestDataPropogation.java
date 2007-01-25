@@ -10,6 +10,7 @@ import gsn.beans.DataField;
 import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
+import gsn.beans.TestStreamSource;
 import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.MockWrapper;
@@ -111,6 +112,7 @@ public class TestDataPropogation {
 		assertTrue(streamSource.validate());
 		assertTrue(wrapper.updateWrapperTable(se));
 		assertEquals(sm.executeUpdate(new StringBuilder("delete from "+wrapper.getDBAliasInStr()+ " where TIMED="+se.getTimeStamp())),1);
+		
 		assertTrue(wrapper.publishStreamElement(se));
 		verify(streamSource);
 	}

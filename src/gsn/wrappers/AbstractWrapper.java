@@ -5,12 +5,14 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
+import gsn.beans.TestStreamSource;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -53,6 +55,7 @@ public abstract class AbstractWrapper extends Thread {
 	 * Note that, GSN creates one view per listener.
 	 */
 	public void addListener ( StreamSource ss ) {
+		System.out.println(ss.toSql());
 		getStorageManager( ).createView( ss.getUIDStr() , ss.toSql() );
 		listeners.add(ss);
 	}
@@ -216,14 +219,14 @@ public abstract class AbstractWrapper extends Thread {
 			if (StorageManager.isHsql())
 				sb.append("NOW_MILLIS() - ");
 			else if (StorageManager.isMysqlDB())
-				sb.append("UNIX_TIMESTAMP() - ");
+				sb.append("UNIX_TIMESTAMP()*1000 - ");
 			sb.append(maxTimeSizeInMSec).append(" )");
 		}
 		if (maxCountSize>0 && maxTimeSizeInMSec>0)
 			sb.append(" AND ");
 		if (maxCountSize>0 ) {
-			sb.append(" timed < (select timed from ").append(getDBAliasInStr());
-			sb.append(" order by timed desc limit 1 offset ").append(maxCountSize).append(" )");
+			sb.append(" timed < ( select * from (select timed from ").append(getDBAliasInStr());
+			sb.append(" order by timed desc limit 1 offset ").append(maxCountSize).append(" ) as X)");
 		}
 		return sb;
 	}

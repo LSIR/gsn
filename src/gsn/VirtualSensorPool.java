@@ -129,7 +129,7 @@ class TableSizeEnforceThread extends Thread {
    
    public void run ( ) {
       if ( this.virtualSensorConfiguration.getParsedStorageSize( ) == VSensorConfig.STORAGE_SIZE_NOT_SET ) return;
-      String virtualSensorName = this.virtualSensorConfiguration.getVirtualSensorName( );
+      String virtualSensorName = virtualSensorConfiguration.getVirtualSensorName( );
       StringBuilder query = null;
       if ( StorageManager.isHsql( ) ) {
          if ( this.virtualSensorConfiguration.isStorageCountBased( ) )
@@ -145,10 +145,9 @@ class TableSizeEnforceThread extends Thread {
                   .append( virtualSensorName ).append( " group by " ).append( virtualSensorName ).append( ".timed ORDER BY " ).append( virtualSensorName ).append( ".timed DESC LIMIT 1 offset " )
                   .append( this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( "  ) AS TMP_" ).append( ( int ) ( Math.random( ) * 100000000 ) ).append( " )" );
          else
-            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (UNIX_TIMESTAMP() -" ).append(
+            query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (UNIX_TIMESTAMP()*1000 -" ).append(
                this.virtualSensorConfiguration.getParsedStorageSize( ) ).append( ")" );
       }
-      if ( query == null ) return;
       try {
          /**
           * Initial delay. Very important, dont remove it. The VSensorLoader
@@ -165,8 +164,8 @@ class TableSizeEnforceThread extends Thread {
       
       if ( this.logger.isDebugEnabled( ) ) this.logger.debug( new StringBuilder( ).append( "Enforcing the limit size on the table by : " ).append( query ).toString( ) );
       while ( this.canRun ) {
-         int effected = StorageManager.getInstance( ).executeUpdate( query );
-         if ( this.logger.isDebugEnabled( ) )
+    	  int effected = StorageManager.getInstance( ).executeUpdate( query );
+    	  if ( this.logger.isDebugEnabled( ) )
             this.logger.debug( new StringBuilder( ).append( effected ).append( " old rows dropped from " ).append( this.virtualSensorConfiguration.getVirtualSensorName( ) ).toString( ) );
          try {
             Thread.sleep( this.RUNNING_INTERVALS );

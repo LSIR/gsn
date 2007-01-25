@@ -351,27 +351,34 @@ public  class StreamSource {
 			throw new GSNRuntimeException("Wrapper object is null, most probably a bug, please report it !");
 		if (validate()==false)
 			throw new GSNRuntimeException("Validation of this object the stream source failed, please check the logs.");
+		CharSequence wrapperAlias = getWrapper().getDBAliasInStr();
 		if (samplingRate==0 || (isStorageCountBased && getParsedStorageSize()==0))
-			return cachedSqlQuery = "select * from "+getWrapper().getDBAliasInStr()+ " where FALSE";
-		CharSequence projection = "*";//for optimization purposes, I should make this more constraint.
-		CharSequence innerQuery =null;
-		if (isStorageCountBased())
-			innerQuery = innerQueryForCountBased(projection,getParsedStorageSize(), getWrapper().getDBAliasInStr() );
-		else
-			innerQuery = innerQueryForWindowBased(projection,getParsedStorageSize(), getWrapper().getDBAliasInStr(), getStartDate().getTime(),getEndDate().getTime(), samplingRate);
+			return cachedSqlQuery = "select * from "+wrapperAlias+ " where FALSE";
 		TreeMap < CharSequence , CharSequence > rewritingMapping = new TreeMap < CharSequence , CharSequence >(new CaseInsensitiveComparator() );
-		String outterName= Main.randomTableNameGenerator(3);
-		rewritingMapping.put("wrapper",outterName );
-
-		StringBuilder toReturn = new StringBuilder( "select ").append(SQLUtils.newRewrite(SQLUtils.extractProjection(getSqlQuery()), rewritingMapping)).append(" from ( "+innerQuery+" ) as " ).append(outterName).append(" where " );
+		rewritingMapping.put("wrapper", wrapperAlias);
+		StringBuilder toReturn = new StringBuilder(getSqlQuery());
+		if (getSqlQuery().toLowerCase().indexOf(" where ")<0)
+			toReturn.append(" where " );
+		else
+			toReturn.append(" and " );
 //		Applying the ** START  AND END TIME ** for count based windows
-		if (isStorageCountBased) {
-			toReturn.append( " (").append(outterName).append(".TIMED >=" ).append( getStartDate( ).getTime( ) ).append( " AND ").append(outterName).append(".TIMED <=" ).append( getEndDate( ).getTime( ) ).append( ") AND " );
-			if ( samplingRate !=1  )
-				toReturn.append( " ( mod( ").append(outterName).append(".TIMED) *11 , 100)< " ).append( samplingRate*100 ).append( ") and " );
+		toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
+		
+		if (isStorageCountBased()) {
+			toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset " );
+			toReturn.append(getParsedStorageSize()-1).append( " )" );
+		}else {
+			toReturn.append("(wrapper.timed >");
+			if ( StorageManager.isHsql( ) ) 
+				toReturn.append( " (NOW_MILLIS()");
+			else if ( StorageManager.isMysqlDB( ) ) 
+				toReturn.append(" (UNIX_TIMESTAMP()*1000");
+			toReturn.append(" - ").append(getParsedStorageSize()).append(" ) ) ");
 		}
-		toReturn.append(SQLUtils.newRewrite( SQLUtils.extractWhereClause(getSqlQuery()) , rewritingMapping ));
-		toReturn.append(" order by timed desc");
+		if ( samplingRate !=1  )
+			toReturn.append( " and ( mod( timed , 100)< " ).append( samplingRate*100 ).append( ")" );
+		toReturn = new StringBuilder(SQLUtils.newRewrite(toReturn, rewritingMapping));
+		toReturn.append(" order by timed desc ");
 		if ( logger.isDebugEnabled( ) ) {
 			logger.debug( new StringBuilder( ).append( "The original Query : " ).append( getSqlQuery( ) ).toString( ) );
 			logger.debug( new StringBuilder( ).append( "The merged query : " ).append( toReturn.toString( ) ).append( " of the StreamSource " ).append( getAlias( ) ).append(
@@ -390,23 +397,8 @@ public  class StreamSource {
 			throw new GSNRuntimeException("You can't set the input stream on an invalid stream source. ");
 		return this;
 	}
-	public CharSequence innerQueryForCountBased(CharSequence projection, int size, CharSequence tableName) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("select  ").append(projection).append(" from ").append(tableName).append(" order by TIMED  desc  limit " ).append( size ).append( " offset 0" );
-		return sb;
-	}
-	public CharSequence innerQueryForWindowBased(CharSequence projection,int size, CharSequence tableName,long start,long end, float rate) {
-		if (start>=end)
-			throw new GSNRuntimeException("The start time can't be bigger or equal to the end time.");
-		StringBuilder sb = new StringBuilder();
-		sb.append("select ").append(projection).append(" from ").append(tableName).append(" where ").append(tableName).append(".timed >=").append(start).append(" and ").append(tableName).append(".timed <=").append(end);
-		if ( rate !=1 & rate!=0 )
-			sb.append( " and ( mod( " ).append(tableName).append(".TIMED) *11 , 100)< " ).append( rate*100 ).append( ")" );
-		if ( StorageManager.isHsql( ) ) 
-			sb.append( " and (NOW_MILLIS() - ").append(tableName).append(".TIMED ) <=" ).append( size );
-		else if ( StorageManager.isMysqlDB( ) ) 
-			sb.append( " and (UNIX_TIMESTAMP() - ").append(tableName).append(".TIMED ) <=" ).append( size);
-		sb.append(" order by TIMED  desc" );
-		return sb;
-	}
+	
+
+
+		
 }
