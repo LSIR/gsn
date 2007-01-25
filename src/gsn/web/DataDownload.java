@@ -61,6 +61,7 @@ public class DataDownload extends HttpServlet {
 	      String request = "";
 	      String expression = "";
 	      String line="";
+	      String groupby="";
 	      if (commonReq) {
 		      if (req.getParameter("fields") != null) {
 		    	  String[] fields = req.getParameterValues("fields");
@@ -88,6 +89,19 @@ public class DataDownload extends HttpServlet {
 		    	  }
 		      }
 		      request += "  " + aggregateFunction + "(" + field + ") ";
+	    	  if (req.getParameter("groupby") != null) {
+	    		  if (req.getParameter("groupby").equals("timed")) {
+	    			  int periodmeasure = 1;
+	    			  if (req.getParameter("groupbytimed")!=null) {
+	    				  periodmeasure = new Integer(req.getParameter("groupbytimed"));
+	    				  periodmeasure = java.lang.Math.max(periodmeasure, 1);
+	    			  }
+	    			  request += ", FLOOR(timed/" + periodmeasure + ") period "; 
+	    			  groupby = "GROUP BY period";
+	    		  } else {
+	    			  groupby = "GROUP BY " + req.getParameter("groupby");
+	    		  }
+	    	  }
 	      }
 	      
 	      String limit = "";
@@ -159,6 +173,7 @@ public class DataDownload extends HttpServlet {
 	    	  if (commonReq) {
 	    		  request += " order by timed DESC "+limit;
 	    	  }
+	    	  request += " " + groupby;
 	    	  request += ";";
 	    	  StringBuilder query = new StringBuilder(request);
 	    	  //out.println(query);
