@@ -96,7 +96,7 @@ public class DataDownload extends HttpServlet {
 	    				  periodmeasure = new Integer(req.getParameter("groupbytimed"));
 	    				  periodmeasure = java.lang.Math.max(periodmeasure, 1);
 	    			  }
-	    			  request += ", FLOOR(timed/" + periodmeasure + ") period "; 
+	    			  request += ", timed, FLOOR(timed/" + periodmeasure + ") period "; 
 	    			  groupby = "GROUP BY period";
 	    		  } else {
 	    			  groupby = "GROUP BY " + req.getParameter("groupby");
