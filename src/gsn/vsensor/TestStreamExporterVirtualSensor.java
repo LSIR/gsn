@@ -53,8 +53,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
          Connection connection = DriverManager.getConnection( url , user , passwd );
          connection.createStatement( ).execute( "DROP TABLE IF EXISTS " + streamName );
       } catch ( SQLException e ) {
-         // TODO Auto-generated catch block
-         e.printStackTrace( );
+          e.printStackTrace( );
       }
       
    }

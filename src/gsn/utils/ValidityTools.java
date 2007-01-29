@@ -1,5 +1,7 @@
 package gsn.utils;
 
+import gsn.storage.StorageManager;
+
 import java.io.File;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -168,4 +170,5 @@ public class ValidityTools {
 	         return false;
 	      }
 	   }
+
 }

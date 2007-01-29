@@ -90,34 +90,14 @@ public class VSensorLoader extends Thread {
 		}finally {
 			if ( this.isActive == false ) return;
 		}
-		configFilesLoop : for ( VSensorConfig configuration : addIt ) {
+		for ( VSensorConfig configuration : addIt ) {
 
-			for ( InputStream is : configuration.getInputStreams ( ) ) {
-				if ( !is.validate ( ) ) {
-					logger.error ( new StringBuilder ( ).append ( "Adding the virtual sensor specified in " ).append ( configuration.getFileName ( ) ).append ( " failed because of one or more problems in configuration file." )
-							.toString ( ) );
-					logger.error ( new StringBuilder ( ).append ( "Please check the file and try again" ).toString ( ) );
-					continue configFilesLoop;
-				}
-			}
-			String vsName = configuration.getVirtualSensorName ( );
-			if ( Mappings.getVSensorConfig ( vsName ) != null ) {
-				logger.error ( new StringBuilder ( ).append ( "Adding the virtual sensor specified in " ).append ( configuration.getFileName ( ) ).append ( " failed because the virtual sensor name used by " )
-						.append ( configuration.getFileName ( ) ).append ( " is already used by : " ).append ( Mappings.getVSensorConfig ( vsName ).getFileName ( ) ).toString ( ) );
-				logger.error ( "Note that the virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
-				continue;
-			}
-			if ( !StringUtils.isAlphanumericSpace ( vsName ) ) {
-				logger.error ( new StringBuilder ( ).append ( "Adding the virtual sensor specified in " ).append ( configuration.getFileName ( ) ).append (
-				" failed because the virtual sensor name is not following the requirements : " ).toString ( ) );
-				logger.error ( "The virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
-				logger.error ( "That the name of the virutal sensor should starting by alphabetical character and they can contain numerical characters afterwards." );
-				continue;
-			}
+			if (!isVirtualSensorValid(configuration))
+				continue ;
 			VirtualSensorPool pool = new VirtualSensorPool ( configuration );
 			try {
-				if ( this.createInputStreams ( configuration , pool ) == false ) {
-					logger.error ( "loading the >" + vsName + "< virtual sensor is stoped due to error(s) in preparing the input streams." );
+				if ( createInputStreams (  pool ) == false ) {
+					logger.error ( "loading the >" + configuration.getVirtualSensorName() + "< virtual sensor is stoped due to error(s) in preparing the input streams." );
 					continue;
 				}
 			} catch (InstantiationException e2) {
@@ -147,7 +127,7 @@ public class VSensorLoader extends Thread {
 				}
 				continue;
 			}
-			logger.warn ( new StringBuilder ( "adding : " ).append ( vsName ).append ( " virtual sensor[" ).append ( configuration.getFileName ( ) ).append ( "]" ).toString ( ) );
+			logger.warn ( new StringBuilder ( "adding : " ).append ( configuration.getVirtualSensorName() ).append ( " virtual sensor[" ).append ( configuration.getFileName ( ) ).append ( "]" ).toString ( ) );
 			Mappings.addVSensorInstance ( pool );
 			try {
 				pool.start ( );
@@ -163,21 +143,46 @@ public class VSensorLoader extends Thread {
 
 	private static int                                       TABLE_SIZE_ENFORCING_THREAD_COUNTER = 0;
 
-	private void removeAllResources ( VirtualSensorPool pool ) {
+	public boolean isVirtualSensorValid(VSensorConfig configuration) {
+		for ( InputStream is : configuration.getInputStreams ( ) ) {
+			if ( !is.validate ( ) ) {
+				logger.error ( new StringBuilder ( ).append ( "Adding the virtual sensor specified in " ).append ( configuration.getFileName ( ) ).append ( " failed because of one or more problems in configuration file." )
+						.toString ( ) );
+				logger.error ( new StringBuilder ( ).append ( "Please check the file and try again" ).toString ( ) );
+				return false;
+			}
+		}
+		String vsName = configuration.getVirtualSensorName ( );
+		if ( Mappings.getVSensorConfig ( vsName ) != null ) {
+			logger.error ( new StringBuilder ( ).append ( "Adding the virtual sensor specified in " ).append ( configuration.getFileName ( ) ).append ( " failed because the virtual sensor name used by " )
+					.append ( configuration.getFileName ( ) ).append ( " is already used by : " ).append ( Mappings.getVSensorConfig ( vsName ).getFileName ( ) ).toString ( ) );
+			logger.error ( "Note that the virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
+			return false;
+		}
+		if ( !StringUtils.isAlphanumericSpace ( vsName ) ) {
+			logger.error ( new StringBuilder ( ).append ( "Adding the virtual sensor specified in " ).append ( configuration.getFileName ( ) ).append (
+			" failed because the virtual sensor name is not following the requirements : " ).toString ( ) );
+			logger.error ( "The virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
+			logger.error ( "That the name of the virutal sensor should starting by alphabetical character and they can contain numerical characters afterwards." );
+			return false;
+		}
+		return true;
+	}
+	
+	public void removeAllResources ( VirtualSensorPool pool ) {
 		VSensorConfig config = pool.getConfig ( );
 		pool.closePool ( );
 		final String vsensorName = config.getVirtualSensorName ( );
 		if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Releasing previously used resources used by [" ).append ( vsensorName ).append ( "]." ).toString ( ) );
 		for ( InputStream inputStream : config.getInputStreams ( ) ) {
 			for ( StreamSource streamSource : inputStream.getSources ( ) ) {
-				final AbstractWrapper activeDataSource = streamSource.getWrapper ( );
+				final AbstractWrapper wrapper = streamSource.getWrapper ( );
 				// FIXME :  streamSource.getWrapper().removeListener(streamSource);
-				if ( activeDataSource.getListeners().size() == 0 ) {
-					final AddressBean activeDataSourceAddressBean = activeDataSource.getActiveAddressBean ( );
-					usedWrappers.remove ( activeDataSourceAddressBean );
-					Mappings.getContainer ( ).removeRemoteStreamSource ( activeDataSource.getDBAlias() );
-					activeDataSource.finalize (  );
-					activeDataSource.releaseResources ();
+				if ( wrapper.getListeners().size() == 1 ) {//This stream source is the only listener
+					usedWrappers.remove ( wrapper.getActiveAddressBean ( ) );
+					Mappings.getContainer ( ).removeRemoteStreamSource ( wrapper.getDBAlias() );
+					wrapper.finalize (  );
+					wrapper.releaseResources ();
 				}
 			}
 			inputStream.finalize ( );
@@ -242,17 +247,17 @@ public class VSensorLoader extends Thread {
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public boolean createInputStreams ( VSensorConfig vsensor , VirtualSensorPool pool ) throws InstantiationException, IllegalAccessException {
-		if ( logger.isDebugEnabled ( ) ) logger.debug ( new StringBuilder ( ).append ( "Preparing input streams for: " ).append ( vsensor.getVirtualSensorName ( ) ).toString ( ) );
-		if ( vsensor.getInputStreams ( ).size ( ) == 0 ) logger.warn ( new StringBuilder ( "There is no input streams defined for *" ).append ( vsensor.getVirtualSensorName ( ) ).append ( "*" ).toString ( ) );
-		for ( Iterator < InputStream > inputStreamIterator = vsensor.getInputStreams ( ).iterator ( ) ; inputStreamIterator.hasNext ( ) ; ) {
+	public boolean createInputStreams ( VirtualSensorPool pool ) throws InstantiationException, IllegalAccessException {
+		if ( logger.isDebugEnabled ( ) ) logger.debug ( new StringBuilder ( ).append ( "Preparing input streams for: " ).append ( pool.getConfig().getVirtualSensorName ( ) ).toString ( ) );
+		if ( pool.getConfig().getInputStreams ( ).size ( ) == 0 ) logger.warn ( new StringBuilder ( "There is no input streams defined for *" ).append ( pool.getConfig().getVirtualSensorName ( ) ).append ( "*" ).toString ( ) );
+		for ( Iterator < InputStream > inputStreamIterator = pool.getConfig().getInputStreams ( ).iterator ( ) ; inputStreamIterator.hasNext ( ) ; ) {
 			InputStream inputStream = inputStreamIterator.next ( );
 			for ( StreamSource  dataSouce : inputStream.getSources ( )) {
 				if ( prepareStreamSource ( inputStream , dataSouce ) == false ) return false;
 				// TODO if one stream source fails all the resources used by other successfuly initialized stream sources
 				// for this input stream should be released.
 			}
-			inputStream.setPool ( pool );
+			inputStream.setPool (pool );
 		}
 		return true;
 	}
@@ -302,6 +307,7 @@ public class VSensorLoader extends Thread {
 		if (!usedWrappers.containsKey(wrapper.getActiveAddressBean())) {
 			try {
 				storageManager.createTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
+				
 				Thread tableSizeEnforcingThread = new Thread ( wrapper.getTableSizeEnforce() );
 				tableSizeEnforcingThread.setName ( "TableSizeEnforceing-WRAPPER-Thread" + TABLE_SIZE_ENFORCING_THREAD_COUNTER++ );
 				tableSizeEnforcingThread.start ( );

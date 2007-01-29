@@ -232,6 +232,8 @@ public abstract class AbstractWrapper extends Thread {
 
 	public int removeUselessValues() {
 		CharSequence query = getUselessWindow();
+		if (query==null)
+			return 0;
 		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "RESULTING QUERY FOR Table Size Enforce " ).append( query ).toString( ) );
 		return StorageManager.getInstance().executeUpdate(query);
 	}

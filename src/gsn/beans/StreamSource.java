@@ -238,7 +238,9 @@ public  class StreamSource {
 	 * @return Returns the activeSourceProducer.
 	 */
 	public AbstractWrapper getWrapper ( ) {
-		return this.wrapper;
+		if (wrapper==null) 
+			throw new GSNRuntimeException("The wrapper for stream source is not set !.");
+		return wrapper;
 	}
 
 	private transient boolean isStorageCountBased  = false;
@@ -363,7 +365,7 @@ public  class StreamSource {
 			toReturn.append(" and " );
 //		Applying the ** START  AND END TIME ** for count based windows
 		toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
-		
+
 		if (isStorageCountBased()) {
 			toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset " );
 			toReturn.append(getParsedStorageSize()-1).append( " )" );
@@ -397,8 +399,8 @@ public  class StreamSource {
 			throw new GSNRuntimeException("You can't set the input stream on an invalid stream source. ");
 		return this;
 	}
-	
 
 
-		
+
+
 }

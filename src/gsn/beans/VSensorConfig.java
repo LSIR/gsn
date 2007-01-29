@@ -38,14 +38,13 @@ public class VSensorConfig implements Serializable {
 
 	private DataField []                outputStructure                        ;
 
-
 	private String                                 webParameterPassword                             = null;
 
 	private String                                 storageHistorySize;
 
 	private final HashMap < String , InputStream > inputStreamNameToInputStreamObjectMapping = new HashMap < String , InputStream >();
 
-	private final ArrayList < InputStream >        inputStreams                              = new ArrayList < InputStream >( );
+	private  InputStream        inputStreams  []                            ;
 
 	private ArrayList < KeyValue >                 mainClassInitialParams                    = new ArrayList < KeyValue >( );
 
@@ -412,5 +411,9 @@ public class VSensorConfig implements Serializable {
 	  public WebInput [ ] getWebinput ( ) {
 		  return webinput;
 	  }
+
+	public void setInputStreams(InputStream... inputStreams) {
+		this.inputStreams = inputStreams;
+	}
 
 }
