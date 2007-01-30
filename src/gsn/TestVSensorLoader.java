@@ -14,6 +14,7 @@ import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
+import gsn.utils.ValidityTools;
 import gsn.wrappers.MockWrapper;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -113,7 +114,7 @@ public class TestVSensorLoader {
 		assertTrue(loader.prepareStreamSource(is,ss2));
 //		assertTrue(StorageManager.getInstance().getTableSchema(ss1.getWrapper().getDBAliasInStr()));
 		ss1.getWrapper().releaseResources();
-		assertFalse(StorageManager.getInstance().getTableSchema(ss1.getWrapper().getDBAliasInStr()));
+		assertFalse(ValidityTools.tableExists(ss1.getWrapper().getDBAliasInStr()));
 		
 	}
 

@@ -662,16 +662,6 @@ public class StorageManager {
 			MAX_DB_CONNECTIONS = Main.getContainerConfig( ).getStoragePoolSize( );
 		connectionPool = new FastConnectionPool( databaseDriver , databaseUserName , databasePassword , databaseURL , MAX_DB_CONNECTIONS );
 	}
-	/**
-	 * Gets a table name and returns true if the table exists.
-	 * @param name
-	 * @return
-	 * @throws SQLException
-	 */
-	public  boolean getTableSchema(CharSequence name) throws SQLException {
-	
-		return false;
-	}
 }
 
 /**
