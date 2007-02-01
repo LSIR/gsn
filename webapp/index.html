@@ -19,6 +19,7 @@ $(document).ready(function() {
 	$("#refreshall_timeout").bind("change",GSN.updateallchange);
 	$("#refreshall").bind("click",GSN.updateall);
 	$("#closeall").bind("click",GSN.closeall);
+	$("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
 	
 	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 		
@@ -27,7 +28,7 @@ $(document).ready(function() {
 	
 	$("#refreshall_autozoomandcenter").bind("click",function() { 
 		if ($("#refreshall_autozoomandcenter").attr("checked")) {
-			location.hash="map"; 
+			GSN.map.userchange();
 			GSN.map.autozoomandcenter();
 		}
 	});
@@ -109,6 +110,7 @@ $(document).ready(function() {
         <ul id="vsmenu">
          <li><a href="#">not loaded</a></li>
         </ul>
+        <p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
 	</div>
 	<div id="footer">
 		<p>Powered by <a href="http://globalsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</p	>

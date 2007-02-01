@@ -40,6 +40,10 @@ var GSN = {
 		}		
 		
 		$("#main > div").hide();
+		if (GSN.context!="map") {
+			$("#toggleallmarkers").hide();
+			$("#vsmenu .toggle").hide();			
+		}
 		//for each page context
 		if (GSN.context=="home")	{
 			GSN.vsbox.container = "#vs";
@@ -69,6 +73,8 @@ var GSN = {
 			$("#main #control").show();
 			$("#control #closeall").hide();
 			$("#main #mapdiv").show();
+			$("#toggleallmarkers").show();
+			$("#vsmenu .toggle").show();
 			if(!GSN.map.loaded) {
 				$("#refreshall_autozoomandcenter").attr("checked",true);
 				GSN.map.init();
@@ -77,16 +83,19 @@ var GSN = {
 			
 			//take care of params
 			if (params.length>1) {
-				var lat=lng=zoom=0;
+				var lat=lng=zoom=null;
 				for (var i=1;i<params.length;i++){
 					val = params[i].split("=");
 					if (val[0]=="lt") lat = val[1];
 					if (val[0]=="lo") lng = val[1];
 					if (val[0]=="z") zoom = parseInt(val[1]);
 				}
-				map.setCenter(new GLatLng(lat,lng),zoom);
-				$("#refreshall_autozoomandcenter").attr("checked",false);
+				if (lat!=null) {
+					map.setCenter(new GLatLng(lat,lng),zoom);
+					$("#refreshall_autozoomandcenter").attr("checked",false);
+				}
 			}
+			GSN.map.autozoomandcenter();
 		} else if (GSN.context=="fullmap")	{
 			GSN.vsbox.container = "#vs";
 			GSN.map.followMarker(null);
@@ -532,15 +541,20 @@ var GSN = {
 				}); 
 				
 				map.setCenter(new GLatLng(0,0),1);
+				
    			}
 		}
 		/**
-		* Callback after any map change zoom and map move
+		* Callback after any map change zoom and map move and vs toggle
 		* Used for location #hash change
 		*/	
 		,userchange : function(){
-  			if (!$("#refreshall_autozoomandcenter").attr("checked"))
+  			var vs = (location.hash+",vs=[ALL],").split("vs=")[1].split(",")[0];			
+  			if (!$("#refreshall_autozoomandcenter").attr("checked")) 
 				location.hash = "map"+",lt="+map.getCenter().lat()+",lo="+map.getCenter().lng()+",z="+map.getZoom();
+			else
+				location.hash = "map"
+			if (vs!="[ALL]") location.hash += ",vs="+vs;
 		}
 		/**
 		* Callback after any zoom change
@@ -572,6 +586,19 @@ var GSN = {
 				else
 					GSN.map.showAllMarkers();
 			}
+			if (GSN.map.loaded) {
+				for (x in GSN.map.markers) {
+					var m = GSN.map.markers[x];
+					if (GSN.map.markerIsVisible(m.vsname)) {
+						$("#menu-"+m.vsname).next().html("X");
+						m.show();
+					}
+					else {
+						$("#menu-"+m.vsname).next().html("O");
+						m.hide();
+					}
+				}
+			}
 		}
 		/**
 		* Add marker
@@ -587,11 +614,73 @@ var GSN = {
   					
   			//add gpsenable classjaj
   			$("#menu-"+vsName).addClass("gpsenabled");
+  			$("#menu-"+vsName).parent().append($.A({"href":"javascript:GSN.map.toggleMarker('"+vsName+"');","class":"toggle"},"X"));
   			
   			if(GSN.context=="fullmap"){
 				var vs = $(".vsbox-"+vsName+" > h3 > span.vsname")
 				$(vs).wrap("<a href=\"javascript:GSN.menu('"+$(vs).text()+"');\"></a>");
 			}
+		}
+		/**
+		* Toggle marker
+		*/
+		,markerIsVisible: function(vsName){
+			var vs = (location.hash+",vs=[ALL],").split("vs=")[1].split(",")[0];
+			if ((":"+vs+":").indexOf(":"+vsName+":")!=-1 || vs == "[ALL]") 
+				return true;
+			else
+				return false;
+		}
+		/**
+		* Toggle marker
+		*/
+		,toggleAllMarkers: function(){
+			GSN.debug("in:toggleAllMarkers")
+			var params=location.hash.substr(1).split(",");
+			for (var i=1;i<params.length;i++){
+				val = params[i].split("=");
+				if (val[0]=="vs") {
+					params.splice(i,1);
+					$.historyLoad(params.join(","));
+					return;
+				}
+			}
+			params.push("vs=");
+			$.historyLoad(params.join(","));
+		}
+		/**
+		* Toggle marker
+		*/
+		,toggleMarker: function(vsName){
+			var params=location.hash.substr(1).split(",");
+			for (var i=1;i<params.length;i++){
+				val = params[i].split("=");
+				if (val[0]=="vs") {
+					var vs = val[1].split(":");
+					for (j in vs) {
+						if (vs[j]==vsName) {
+							vs.splice(j,1);
+							params[i]="vs="+vs.join(":");
+							$.historyLoad(params.join(","));
+							return;
+						}
+					}
+					if (vs[0]=="") vs = new Array();
+					vs.push(vsName);
+					if (vs.length<GSN.map.markers.length)
+						params[i]="vs="+vs.join(":");
+					else
+						params.splice(i,1);
+					$.historyLoad(params.join(","));
+					return;
+				}
+			}
+			var vs = new Array();
+			for (x in GSN.map.markers) {
+				if (GSN.map.markers[x].vsname!=vsName)
+					vs.push(GSN.map.markers[x].vsname);
+			}
+			$.historyLoad(location.hash.substr(1)+",vs="+vs.join(":"));
 		}
 		/**
 		* Update marker
@@ -640,7 +729,8 @@ var GSN = {
 		,showAllMarkers: function(){
 			var bounds = new GLatLngBounds();
 			for (x in GSN.map.markers) {
-				bounds.extend(GSN.map.markers[x].getPoint());
+				if (GSN.map.markerIsVisible(GSN.map.markers[x].vsname))
+					bounds.extend(GSN.map.markers[x].getPoint());
 			}
 			map.setZoom(map.getBoundsZoomLevel(bounds,map.getSize()));
 			map.setCenter(bounds.getCenter());
@@ -901,6 +991,7 @@ var GSN = {
 	   			$("form").attr("action", "/data");
 	   			$("#criterias").attr("target", "_self");
 	   			document.forms["formular"].submit();
+	   			$("#display .refreshing").remove();					
 	   		}
 	   	},
 	   	displayDatas: function(request) {

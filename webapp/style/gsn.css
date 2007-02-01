@@ -205,6 +205,7 @@ border: none;
 
 #vsmenu li
 {
+clear:both;
 border-bottom: 1px solid #ffffff;
 margin: 0;
 }
@@ -228,6 +229,15 @@ html>body #vsmenu li a { width: auto; }
 border-left: 10px solid #FFA84C;
 background-color: #FFB25F;
 color: #fff;
+}
+
+#vsmenu .toggle, #vsmenu .toggle:hover, #vsmenu .toggle:visited {
+background:none;
+float:right;
+margin:-22px 0 0 0;
+padding:0 5px;
+border:0;
+font-weight:bold;
 }
 
 .intro,.msg {
