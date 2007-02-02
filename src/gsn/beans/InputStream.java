@@ -121,7 +121,7 @@ public class InputStream {
 		 this.lastVisited = currentTimeMillis;
 
 		 if ( this.rewrittenSQL == null ) {
-			 this.rewrittenSQL = new StringBuilder( SQLUtils.newRewrite( getQuery( ).trim( ).toLowerCase( ), this.rewritingData ).toString() .replace( "\"" , "" ) );
+			 this.rewrittenSQL = new StringBuilder( SQLUtils.newRewrite( getQuery( ).trim( ).toLowerCase( ), this.rewritingData ));
 			 if ( logger.isDebugEnabled( ) )
 				 logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
 						 .toString( ) );
@@ -129,17 +129,14 @@ public class InputStream {
 		 if ( StorageManager.getInstance( ).isThereAnyResult( this.rewrittenSQL ) ) {
 			 this.currentCount++;
 			 AbstractVirtualSensor sensor = null;
+			 if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
+			 int elementCounterForDebugging = -1;
+			 final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL , false );
 			 try {
-				 sensor = this.pool.borrowVS( );
-				 if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
-				 final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL , false );
-				 int elementCounterForDebugging = -1;
+				 sensor = pool.borrowVS( );
 				 while ( resultOfTheQuery.hasMoreElements( ) ) {
 					 elementCounterForDebugging++;
 					 sensor.dataAvailable( this.getInputStreamName( ) , resultOfTheQuery.nextElement( ) );
-				 }
-				 if ( logger.isDebugEnabled( ) ) {
-					 logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );
 				 }
 			 } catch ( final PoolIsFullException e ) {
 				 logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
@@ -153,6 +150,9 @@ public class InputStream {
 				 logger.error(e.getMessage(),e);
 			 } finally {
 				 this.pool.returnVS( sensor );
+			 }
+			 if ( logger.isDebugEnabled( ) ) {
+				 logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );
 			 }
 		 }
 		 return true;

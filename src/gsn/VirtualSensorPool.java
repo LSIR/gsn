@@ -69,7 +69,10 @@ public class VirtualSensorPool {
          logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " current busy instances : " ).append( currentPoolSize ).toString( ) );
       return newInstance;
    }
-   
+   /**
+    * The method ignores the call if the input is null
+    * @param o
+    */
    public synchronized void returnVS ( AbstractVirtualSensor o ) {
       if ( o == null ) return;
       idleInstances.add( o );

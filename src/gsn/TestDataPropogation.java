@@ -79,6 +79,9 @@ public class TestDataPropogation {
 		assertNotNull(streamSource.toSql());
 		assertNotNull(streamSource.getUIDStr());
 		assertEquals(wrapper.getListeners().size(),1);
+		is.setQuery("select * from test");
+		is.setSources(streamSource);
+		assertTrue(is.validate());
 	}
 
 	/**
