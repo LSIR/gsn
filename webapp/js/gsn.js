@@ -16,6 +16,9 @@ var GSN = {
 	* Initialize a page load (begin, tab click & back button)
 	*/
 	,load: function(){
+		//by default, load home
+		if (location.hash == "") location.hash = "home";
+		
 		GSN.debug("init:"+location.hash);
 		var params=location.hash.substr(1).split(",");
 		
@@ -124,7 +127,6 @@ var GSN = {
 			var prev;
 			if ($("#vs4map div").size()!=0)
 				prev = $("#vs4map div").attr("class").split(" ")[0].split("-")[1];
-			console.debug(prev);
 			
 			if (prev != vsName) {
 				$("#vs4map").empty();
@@ -353,7 +355,10 @@ var GSN = {
 					}
 				} else {
 					//add to structure
-					$(struct).append($.DT({},name),$.DD({"class":name},type));
+					var s = type ;
+					if ($(this).attr("description")!=null)
+						s += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';	
+					$(struct).append('<dt>'+name+'</dt><dd class="'+name+'">'+s+'</dd>');
 					if (!gotDynamic) {
 			  			$("a.tabdynamic", vsd).show();
 						$("a.tabstructure", vsd).show();
@@ -386,7 +391,7 @@ var GSN = {
 					if (type.substr(0,1)=="*")
 						name = "*"+name;
 					
-					if ($(this).attr("description")!="")
+					if ($(this).attr("description")!=null)
 						value += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';	
 					
 				} 
@@ -451,10 +456,10 @@ var GSN = {
 			$("."+vsdiv+" a.tab"+dl, $(this.container)).addClass("active");
 		}
 		,toggleWebInput: function (event){
-			$("dt",$(event.target).parent()).hide();
-			$("dd",$(event.target).parent()).hide();
-			$("dt."+event.target.value,$(event.target).parent()).show();
-			$("dd."+event.target.value,$(event.target).parent()).show();
+			$(event.target).parent().find("dt").hide();
+			$(event.target).parent().find("dd").hide();
+			$(event.target).parent().find("dt."+event.target.value).show();
+			$(event.target).parent().find("dd."+event.target.value).show();
 		}
 	},
 	/**
@@ -557,7 +562,7 @@ var GSN = {
 		* Used for location #hash change
 		*/	
 		,userchange : function(){
-			if (location.hash.substr(0,3)!="map") return;
+			if (location.hash.substr(1,3)!="map") return;
   			var vs = (location.hash+",vs=[ALL],").split("vs=")[1].split(",")[0];			
   			if (!$("#refreshall_autozoomandcenter").attr("checked")) 
 				location.hash = "map"+",lt="+map.getCenter().lat()+",lo="+map.getCenter().lng()+",z="+map.getZoom();

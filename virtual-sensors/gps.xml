@@ -4,7 +4,7 @@
 		<init-params/>
  <web-input password="test">
          <command name="test">
-          <field name="reset1"    type="byte" >Non-zero value means reseting.</field>
+          <field name="reset1"    type="byte" />
           <field name="reset2"    type="*binary:2mb" >Files Size of 2MB max, The * means optional.</field>
         </command>
          <command name="test2">
@@ -14,7 +14,7 @@
         </command>
    </web-input>
   <output-structure>
-	  <field name="latiTude"    type="double" />
+	  <field name="latiTude"    type="double" >tested desc</field>
 	  <field name="longiTude"   type="double" />
 	  <field name="temperature" type="double" />
 	  <field name="light"       type="int" />

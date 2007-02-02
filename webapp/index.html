@@ -12,9 +12,6 @@
 <script type="text/javascript">
 <!--//<![CDATA[
 $(document).ready(function() {
-	//by default, load home
-	if (location.hash == "") location.hash = "home";
-
 	//bind every buttons to javascript functionality (only once)
 	$("#refreshall_timeout").bind("change",GSN.updateallchange);
 	$("#refreshall").bind("click",GSN.updateall);
