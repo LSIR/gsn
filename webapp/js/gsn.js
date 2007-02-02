@@ -117,14 +117,21 @@ var GSN = {
 	*/
 	,menu: function (vsName) {
 		$(".intro").remove();
-		
 		//define the click depending the context (home,data,map)
 		if (GSN.context=="home"){
 			GSN.addandupdate(vsName);
 		} else if (GSN.context=="map"){
-			$("#vs4map").empty();
-			GSN.map.followMarker(vsName);
-			GSN.addandupdate(vsName);
+			var prev;
+			if ($("#vs4map div").size()!=0)
+				prev = $("#vs4map div").attr("class").split(" ")[0].split("-")[1];
+			console.debug(prev);
+			
+			if (prev != vsName) {
+				$("#vs4map").empty();
+				GSN.map.followMarker(vsName);
+				GSN.addandupdate(vsName);
+			} else
+				GSN.vsbox.remove(vsName);
 		} else if (GSN.context=="data"){
 			GSN.data.init(vsName);
 		} else if (GSN.context=="fullmap"){
@@ -431,6 +438,7 @@ var GSN = {
 			var vsdiv = "vsbox-"+vsName;
 			$("."+vsdiv, $(this.container)).remove();
 			GSN.map.followMarker(null);
+			GSN.map.autozoomandcenter();
 		}
 		/**
 		* Vsbox tabs control
@@ -549,6 +557,7 @@ var GSN = {
 		* Used for location #hash change
 		*/	
 		,userchange : function(){
+			if (location.hash.substr(0,3)!="map") return;
   			var vs = (location.hash+",vs=[ALL],").split("vs=")[1].split(",")[0];			
   			if (!$("#refreshall_autozoomandcenter").attr("checked")) 
 				location.hash = "map"+",lt="+map.getCenter().lat()+",lo="+map.getCenter().lng()+",z="+map.getZoom();
@@ -733,7 +742,7 @@ var GSN = {
 					bounds.extend(GSN.map.markers[x].getPoint());
 			}
 			map.setZoom(map.getBoundsZoomLevel(bounds,map.getSize()));
-			map.setCenter(bounds.getCenter());
+			map.panTo(bounds.getCenter());
 		}
 	}
 	/**
