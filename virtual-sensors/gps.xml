@@ -8,8 +8,9 @@
           <field name="reset2"    type="*binary:2mb" >Files Size of 2MB max, The * means optional.</field>
         </command>
          <command name="test2">
-          <field name="reset1"    type="byte" >Non-zero value means reseting.</field>
-          <field name="reset2"    type="*binary:2mb" >Files Size of 2MB max, The * means optional.</field>
+          <field name="plop1"    type="byte" >one</field>
+          <field name="plop2"    type="string" >two</field>
+          <field name="plop3"    type="*binary:2mb" >three</field>          
         </command>
    </web-input>
   <output-structure>
