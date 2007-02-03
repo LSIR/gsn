@@ -268,7 +268,7 @@ public class StorageManager {
 		connection.setAutoCommit(true);
 		PreparedStatement toReturn = null;
 		try {
-			toReturn = connection.prepareStatement( sql.toString( ).toLowerCase( ) );
+			toReturn = connection.prepareStatement( sql.toString( ) );
 			if ( isDebugEnabled == true ) {
 				logger.debug( new StringBuilder( ).append( "insertion prepared statement created: " ).append( sql ).toString( ) );
 			}
@@ -354,7 +354,7 @@ public class StorageManager {
 				}
 			}
 			ps.setLong( counter , se.getTimeStamp( ) );
-			ps.executeUpdate( );
+			ps.execute();
 		} catch ( SQLException e ) {
 			if ( duplicateErrorSuspend && e.getMessage( ).contains( "Unique constraint violation" ) ) return true;
 			logger.warn( e.getMessage( ) , e );
@@ -638,13 +638,13 @@ public class StorageManager {
 			try {
 				if ( updatePreparedStatement != null ) updatePreparedStatement.getConnection( ).close( );
 			} catch ( SQLException e ) {
-				e.printStackTrace( );
+				logger.error( e.getMessage( ) , e );
 			}
 		}
 		return -1;
 	}
+	
 	public static final int               DEFAULT_STORAGE_POOL_SIZE        = 100;
-
 
 	public void initialize ( String databaseDriver , String databaseUserName , String databasePassword , String databaseURL ) {
 		if ( databaseDriver.trim( ).equalsIgnoreCase( "org.hsqldb.jdbcDriver" ) )
@@ -671,13 +671,11 @@ class FastConnectionPool {
 
 	transient Logger                                      logger     = Logger.getLogger( FastConnectionPool.class );
 
-	private transient static Class < FastConnectionPool > lock       = FastConnectionPool.class;
-
 	private String                                        dbURL;
 
 	private Properties                                    properties = new Properties( );
 
-	ComboPooledDataSource                                 cpds       = new ComboPooledDataSource( );
+	private ComboPooledDataSource                                 cpds       = new ComboPooledDataSource( );
 
 	public FastConnectionPool ( String driverClassName , String username , String password , String databaseURL , int maximumOpenConnectionsToDB ) {
 

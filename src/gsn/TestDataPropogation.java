@@ -113,7 +113,7 @@ public class TestDataPropogation {
 		expect(streamSource.dataAvailable()).andStubReturn(true);
 		replay(streamSource);
 		assertTrue(streamSource.validate());
-		assertTrue(wrapper.updateWrapperTable(se));
+		assertTrue(wrapper.insertIntoWrapperTable(se));
 		assertEquals(sm.executeUpdate(new StringBuilder("delete from "+wrapper.getDBAliasInStr()+ " where TIMED="+se.getTimeStamp())),1);
 		
 		assertTrue(wrapper.publishStreamElement(se));

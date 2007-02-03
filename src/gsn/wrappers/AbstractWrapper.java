@@ -142,7 +142,7 @@ public abstract class AbstractWrapper extends Thread {
 	protected Boolean postStreamElement ( StreamElement streamElement ) {
 		if (!isActive() || listeners.size()==0)
 			return false;
-		if (!updateWrapperTable(streamElement))
+		if (!insertIntoWrapperTable(streamElement))
 			return false;
 		synchronized ( listeners ) {
 			for (  StreamSource ss: listeners ) {
@@ -163,7 +163,7 @@ public abstract class AbstractWrapper extends Thread {
 	 * @param se Stream element to be inserted to the table if needed.
 	 * @return true if the stream element is successfully inserted into the table.
 	 */
-	public boolean updateWrapperTable(StreamElement se) {
+	public boolean insertIntoWrapperTable(StreamElement se) {
 		if (listeners.size()==0)
 			return false;
 		boolean result = getStorageManager( ).insertData( aliasCodeS , se );
