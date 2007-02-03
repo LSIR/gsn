@@ -110,11 +110,9 @@ public class TestAbstractWrapper {
 	public void testReleaseResources() {
 	}
 
-	/**
-	 * Test method for {@link gsn.wrappers.AbstractWrapper#initialize()}.
-	 */
 	@Test
-	public void testInitialize() {
+	public void testCleaning() {
+		
 	}
 
 }

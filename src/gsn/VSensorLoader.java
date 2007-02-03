@@ -8,7 +8,6 @@ import gsn.beans.VSensorConfig;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
-import gsn.wrappers.TableSizeEnforce;
 import java.io.File;
 import java.io.FileFilter;
 import java.sql.SQLException;
@@ -307,10 +306,6 @@ public class VSensorLoader extends Thread {
 		if (!usedWrappers.containsKey(wrapper.getActiveAddressBean())) {
 			try {
 				storageManager.createTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
-				
-				Thread tableSizeEnforcingThread = new Thread ( wrapper.getTableSizeEnforce() );
-				tableSizeEnforcingThread.setName ( "TableSizeEnforceing-WRAPPER-Thread" + TABLE_SIZE_ENFORCING_THREAD_COUNTER++ );
-				tableSizeEnforcingThread.start ( );
 			} catch ( SQLException e ) {
 				logger.error ( e.getMessage ( ) , e );
 				return false;
