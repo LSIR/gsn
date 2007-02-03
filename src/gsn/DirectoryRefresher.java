@@ -61,10 +61,10 @@ public class DirectoryRefresher {
                   if ( logger.isDebugEnabled( ) )
                      logger.debug( new StringBuilder( "Wants to connect to directory service at " ).append( Main.getContainerConfig( ).extractDirectoryServiceHost( ) ).append( ":" ).append(
                         Main.getContainerConfig( ).extractDirectoryServicePort( ) ) );
-                  Object [ ] params = new Object [ ] {Main.getContainerConfig( ).getContainerPort( ),configuration.getVirtualSensorName( ),configuration.getDescription( ),configuration.getRPCFriendlyAddressing( ),configuration.getUsedSources( )};
+                  Object [ ] params = new Object [ ] {Main.getContainerConfig( ).getContainerPort( ),configuration.getName( ),configuration.getDescription( ),configuration.getRPCFriendlyAddressing( ),configuration.getUsedSources( )};
                   Boolean result = ( Boolean ) client.execute( "registry.addVirtualSensor" , params );
                   if ( result == false ) {
-                     logger.debug( new StringBuilder( "Registering the " ).append( configuration.getVirtualSensorName( ) ).append( " failed !" ) );
+                     logger.debug( new StringBuilder( "Registering the " ).append( configuration.getName( ) ).append( " failed !" ) );
                   }
                   DirectoryRefresher.this.errorCounter = 0;
                }

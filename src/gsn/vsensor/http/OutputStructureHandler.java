@@ -28,7 +28,7 @@ public class OutputStructureHandler implements RequestHandler{
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( vsName ).append( "* received." ).toString( ) );
       StringBuilder sb = new StringBuilder("<virtual-sensor name=\"" ).append( vsName ).append( "\">\n" );
       for ( DataField df : sensorConfig.getOutputStructure( ) )
-         sb.append( "<field name=\"" ).append( df.getFieldName( ) ).append( "\" " ).append( "type=\"" ).append( df.getType( ) ).append( "\" " ).append( "description=\"" ).append(
+         sb.append( "<field name=\"" ).append( df.getName( ) ).append( "\" " ).append( "type=\"" ).append( df.getType( ) ).append( "\" " ).append( "description=\"" ).append(
             StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\" />\n" );
       sb.append( "<field name=\"timed\" type=\"long\" description=\"The timestamp associated with the stream element\" />\n" );
       sb.append( "</virtual-sensor>" );

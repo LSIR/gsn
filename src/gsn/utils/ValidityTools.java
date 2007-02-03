@@ -1,5 +1,7 @@
 package gsn.utils;
 
+import gsn.beans.DataField;
+import gsn.beans.DataTypes;
 import gsn.storage.StorageManager;
 
 import java.io.File;
@@ -31,7 +33,7 @@ import org.apache.log4j.Logger;
 public class ValidityTools {
 
 	public static final int              SMTP_PORT = 25;
-	
+
 	static Pattern hostAndPortPattern = Pattern.compile( "(.+):(\\d+)$" );
 
 	public static final transient Logger logger    = Logger.getLogger( ValidityTools.class );
@@ -192,26 +194,7 @@ public class ValidityTools {
 	 * @throws SQLException
 	 */
 	public static boolean tableExists(CharSequence tableName) throws SQLException{
-		if (!isValidJavaVariable(tableName))
-			throw new GSNRuntimeException("Table name is not valid");
-				
-		String  query ="select * from "+tableName.toString()+" where false";
-		ResultSet rs =null;
-		try{
-			rs= StorageManager.getInstance().executeQueryWithResultSet(query.toString());
-		}catch (SQLException e) {
-			if (e.getErrorCode()==Constants.HSQLDB_ERR_TABLE_DOESNT_EXIST)
-				return false;
-			throw e;
-		}finally{
-			if (rs!=null)
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-		}
-		return true;
+		return tableExists(tableName,new DataField[] {});
 	}
 
 	public static boolean isValidJavaVariable(CharSequence string) {
@@ -224,9 +207,52 @@ public class ValidityTools {
 			return false;
 		for (int i=1;i<sb.length();i++)
 			if (!Character.isJavaIdentifierPart(sb.charAt(i)))
-					return false;
+				return false;
 		return true;
 	}
-	
 
+	public static boolean tableExists(CharSequence tableName, DataField[] fields)throws SQLException {
+		if (!isValidJavaVariable(tableName))
+			throw new GSNRuntimeException("Table name is not valid");
+		String  query ="select * from "+tableName.toString()+" where false";
+		ResultSet rs =null;
+		ResultSetMetaData structure=null ;
+		try{
+			rs= StorageManager.getInstance().executeQueryWithResultSet(query.toString());
+			structure= rs.getMetaData();
+			if (fields!=null && fields.length>0) 
+				nextField : for (DataField field : fields) {
+					for (int i=1;i<=structure.getColumnCount();i++) {
+						String colName = structure.getColumnName(i);
+						int colType = structure.getColumnType(i);
+						if (field.getName().equalsIgnoreCase(colName))
+							if (field.getDataTypeID()==DataTypes.convertFromJDBCToGSNFormat(colType))
+								continue nextField;
+							else 
+								throw new GSNRuntimeException("The column : "+colName+" in the >"+tableName+"< is not compatible with type : "+field.getType()+". The actual type is : "+colType);
+					}
+					throw new GSNRuntimeException("The table "+tableName+" doesn't have the >"+field.getName()+"< column.");
+				}
+		}catch (SQLException e) {
+			/**
+			 * 1146 : for mysql
+			 * -26 : for hsqldb
+			 */
+			if(e.getErrorCode()==1146 || e.getErrorCode()==-22)
+				return false;
+			else {
+				logger.error(e.getErrorCode());
+				throw e;
+			}
+		}finally{
+			
+			if (rs!=null)
+				try {
+					rs.getStatement().getConnection().close();
+				} catch (SQLException e) {
+					logger.error(e.getMessage(),e);
+				}
+		}
+		return true;
+	}
 }

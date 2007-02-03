@@ -22,7 +22,7 @@ public class VSensorConfig implements Serializable {
 
 	public static final int                        NO_FIXED_RATE                             = 0;
 
-	private String                                 virtualSensorName;
+	private String                                 name;
 
 	private int                                    priority                                  = DEFAULT_PRIORITY;
 
@@ -79,7 +79,7 @@ public class VSensorConfig implements Serializable {
 	 public String[][] getRPCFriendlyOutputStructure() {
 		 String[][] toReturn = new String[this.outputStructure.length][2] ;
 		 for(int i=0;i<outputStructure.length;i++){
-			 toReturn[i][0] = ( String ) outputStructure[i].getFieldName();
+			 toReturn[i][0] = ( String ) outputStructure[i].getName();
 			 toReturn[i][1] = ( String ) outputStructure[i].getType();
 		 }
 		 return toReturn;
@@ -126,12 +126,12 @@ public class VSensorConfig implements Serializable {
 	   */
 	  private boolean nameInitialized = false;
 
-	  public String getVirtualSensorName ( ) {
+	  public String getName ( ) {
 		  if ( this.nameInitialized == false ) {
-			  this.virtualSensorName = this.virtualSensorName.replace( " " , "" ).trim( ).toLowerCase();
+			  this.name = this.name.replace( " " , "" ).trim( ).toLowerCase();
 			  this.nameInitialized = true;
 		  }
-		  return this.virtualSensorName;
+		  return this.name;
 	  }
 
 	  /**
@@ -195,10 +195,10 @@ public class VSensorConfig implements Serializable {
 	  }
 
 	  /**
-	   * @param virtualSensorName The virtualSensorName to set.
+	   * @param name The name to set.
 	   */
-	  public void setVirtualSensorName ( final String virtualSensorName ) {
-		  this.virtualSensorName = virtualSensorName;
+	  public void setName ( final String virtualSensorName ) {
+		  this.name = virtualSensorName;
 	  }
 
 	  /**
@@ -312,7 +312,7 @@ public class VSensorConfig implements Serializable {
 				  this.parsedStorageSize = Integer.parseInt( storageHistorySize );
 				  this.isStorageCountBased = true;
 			  } catch ( final NumberFormatException e ) {
-				  this.logger.error( new StringBuilder( ).append( "The storage size, " ).append( storageHistorySize ).append( ", specified for the virtual sensor : " ).append( this.virtualSensorName )
+				  this.logger.error( new StringBuilder( ).append( "The storage size, " ).append( storageHistorySize ).append( ", specified for the virtual sensor : " ).append( this.name )
 						  .append( " is not valid." ).toString( ) , e );
 				  return false;
 			  }
@@ -326,7 +326,7 @@ public class VSensorConfig implements Serializable {
 				  else if ( sIndex > 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
 				  this.isStorageCountBased = false;
 			  } catch ( final NumberFormatException e ) {
-				  this.logger.error( new StringBuilder( ).append( "The storage size, " ).append( storageHistorySize ).append( ", specified for the virtual sensor : " ).append( this.virtualSensorName )
+				  this.logger.error( new StringBuilder( ).append( "The storage size, " ).append( storageHistorySize ).append( ", specified for the virtual sensor : " ).append( this.name )
 						  .append( " is not valid." ).toString( ) , e );
 				  return false;
 			  }
@@ -389,7 +389,7 @@ public class VSensorConfig implements Serializable {
 			  builder.append( ")" );
 		  }
 		  builder.append( "]" );
-		  return "VSensorConfig{" + "virtualSensorName='" + this.virtualSensorName + '\'' + ", priority=" + this.priority + ", mainClass='" + this.mainClass + '\'' 
+		  return "VSensorConfig{" + "name='" + this.name + '\'' + ", priority=" + this.priority + ", mainClass='" + this.mainClass + '\'' 
 		  + ", description='" + this.description + '\'' + ", lifeCyclePoolSize=" + this.lifeCyclePoolSize + ", outputStreamRate=" + this.outputStreamRate
 		  + ", addressing=" + this.addressing + ", outputStructure=" + this.outputStructure + ", storageHistorySize='" + this.storageHistorySize + '\'' + builder.toString( )
 		  + ", mainClassInitialParams=" + this.mainClassInitialParams + ", lastModified=" + this.lastModified + ", fileName='" + this.fileName + '\'' + ", logger=" + this.logger + ", nameInitialized="

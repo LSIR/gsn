@@ -79,7 +79,7 @@ public class TestVSensorLoader {
 	@Test
 	public void testStopLoading() throws IOException {
 		VSensorConfig  sensorConfig = new VSensorConfig();
-		sensorConfig.setVirtualSensorName("test");
+		sensorConfig.setName("test");
 		File someFile = File.createTempFile("bla", ".xml");
 		sensorConfig.setMainClass("gsn.vsensor.BridgeVirtualSensor");
 		sensorConfig.setFileName(someFile.getAbsolutePath());
@@ -112,10 +112,8 @@ public class TestVSensorLoader {
 		ss2.setSamplingRate(1);
 		assertTrue(ss2.validate());
 		assertTrue(loader.prepareStreamSource(is,ss2));
-//		assertTrue(StorageManager.getInstance().getTableSchema(ss1.getWrapper().getDBAliasInStr()));
 		ss1.getWrapper().releaseResources();
 		assertFalse(ValidityTools.tableExists(ss1.getWrapper().getDBAliasInStr()));
-		
 	}
 
 }

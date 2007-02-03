@@ -36,7 +36,7 @@ public class VirtualSensorPool {
 	private int noOfCallsToReturnVS= 0;
 	public VirtualSensorPool ( VSensorConfig config ) {
 		if ( logger.isInfoEnabled( ) )
-			logger.info( ( new StringBuilder( "Preparing the pool for: " ) ).append( config.getVirtualSensorName( ) ).append( " with the max size of:" ).append( maxPoolSize ).toString( ) );
+			logger.info( ( new StringBuilder( "Preparing the pool for: " ) ).append( config.getName( ) ).append( " with the max size of:" ).append( maxPoolSize ).toString( ) );
 		this.config = config;
 		this.processingClassName = config.getProcessingClass( );
 		this.maxPoolSize = config.getLifeCyclePoolSize( );
@@ -44,7 +44,7 @@ public class VirtualSensorPool {
 	}
 
 	public synchronized AbstractVirtualSensor borrowVS ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
-		if ( currentPoolSize == maxPoolSize ) throw new PoolIsFullException( config.getVirtualSensorName( ) );
+		if ( currentPoolSize == maxPoolSize ) throw new PoolIsFullException( config.getName( ) );
 		currentPoolSize++;
 		AbstractVirtualSensor newInstance = null;
 		if ( idleInstances.size( ) > 0 )
@@ -66,7 +66,7 @@ public class VirtualSensorPool {
 				logger.error( e.getMessage( ) , e );
 			}
 			if ( logger.isDebugEnabled() )
-				logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " current busy instances : " ).append( currentPoolSize ).toString( ) );
+				logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getName( ) ).append( " current busy instances : " ).append( currentPoolSize ).toString( ) );
 			return newInstance;
 	}
 	/**
@@ -78,7 +78,7 @@ public class VirtualSensorPool {
 		idleInstances.add( o );
 		currentPoolSize--;
 		if ( logger.isDebugEnabled() )
-			logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " current busy instances : " ).append( currentPoolSize ).toString( ) );
+			logger.debug( new StringBuilder( ).append( "VSPool Of " ).append( config.getName( ) ).append( " current busy instances : " ).append( currentPoolSize ).toString( ) );
 		if (++noOfCallsToReturnVS%GARBAGE_COLLECTOR_INTERVAL==0)
 			DoUselessDataRemoval();
 			
@@ -87,7 +87,7 @@ public class VirtualSensorPool {
 	public synchronized void closePool ( ) {
 		for ( AbstractVirtualSensor o : allInstances )
 			o.finalize( );
-		if ( logger.isDebugEnabled() ) logger.debug( new StringBuilder( ).append( "The VSPool Of " ).append( config.getVirtualSensorName( ) ).append( " is now closed." ).toString( ) );
+		if ( logger.isDebugEnabled() ) logger.debug( new StringBuilder( ).append( "The VSPool Of " ).append( config.getName( ) ).append( " is now closed." ).toString( ) );
 	}
 
 	public void start ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
@@ -116,14 +116,14 @@ public class VirtualSensorPool {
 		StringBuilder query = uselessDataRemovalQuery();
 		int effected = StorageManager.getInstance( ).executeUpdate( query );
 		if (logger.isDebugEnabled( ) )
-			logger.debug( new StringBuilder( ).append( effected ).append( " old rows dropped from " ).append( config.getVirtualSensorName( ) ).toString( ) );
+			logger.debug( new StringBuilder( ).append( effected ).append( " old rows dropped from " ).append( config.getName( ) ).toString( ) );
 	}
 
 	/**
 	 * @return
 	 */
 	public StringBuilder uselessDataRemovalQuery() {
-		String virtualSensorName = config.getVirtualSensorName( );
+		String virtualSensorName = config.getName( );
 		StringBuilder query = null;
 		if ( StorageManager.isHsql( ) ) {
 			if ( config.isStorageCountBased( ) )

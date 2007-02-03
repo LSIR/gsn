@@ -5,6 +5,7 @@ import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
 
@@ -37,7 +38,8 @@ public class StorageManager {
 	public static enum DATABASE {
 
 		MYSQL ( "jdbc:mysql:" ) {
-
+			public static final int TABLE_DOESNT_EXIST = 1146;
+			
 			/*
 			 * Returns the MySQL data type that can store this gsn datafield.
 			 * @param field The datafield to be converted. @return convertedType
@@ -70,7 +72,8 @@ public class StorageManager {
 			}
 		} ,
 		HSQL ( "jdbc:hsql" ) {
-
+			public static final int TABLE_DOESNT_EXIST = -22;
+			
 			/*
 			 * Returns the HSQLDB data type that can store this gsn datafield.
 			 * @param field The datafield to be converted. @return convertedType
@@ -163,19 +166,10 @@ public class StorageManager {
 
 	public void createTable ( CharSequence tableName , DataField[] structure ) throws SQLException {
 		Connection connection = null;
-		dropTable( tableName );
-		String sqlCreateStatement = getCreateTableStatement( structure , tableName ).replace( "\"" , "" );
-		String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName.toString( ).toLowerCase( ) ).append( "_INDEX ON " ).append( tableName.toString( ).toLowerCase( ) ).append( " (timed DESC)" )
-		.toString( );
+		String sqlCreateStatement = getCreateTableStatement( structure , tableName );
+		String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName).append( "_INDEX ON " ).append( tableName).append( " (timed DESC)" ).toString( );
 		if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create table statement is : " ).append( sqlCreateStatement ).toString( ) );
 		if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create index statement is : " ).append( sqlCreateIndexStatement ).toString( ) );
-		TreeSet < CharSequence > fieldNames = new TreeSet < CharSequence >(new CaseInsensitiveComparator() );
-
-		for ( DataField fieldName : structure ) {
-			fieldNames.add( fieldName.getFieldName( ) );
-		}
-		existingTablesToColumnMapping.put( tableName , fieldNames );
-
 		try {
 			connection = connectionPool.borrowConnection( );
 			if ( isDebugEnabled == true ) logger.debug( sqlCreateStatement );
@@ -187,6 +181,18 @@ public class StorageManager {
 	}
 
 	/**
+	 * This method should be called after creating each table.
+	 * @param tableName
+	 * @param structure
+	 */
+	public void prepareStructures(CharSequence tableName, DataField[] structure) {;
+		TreeSet < CharSequence > fieldNames = new TreeSet < CharSequence >(new CaseInsensitiveComparator() );
+		for ( DataField fieldName : structure )
+			fieldNames.add( fieldName.getName( ) );
+		existingTablesToColumnMapping.put( tableName , fieldNames );
+	}
+
+	/**
 	 * The method is protected b/c of the StorageManagerTest so that it can be
 	 * testable from that class. The generated query is transformed to lower case
 	 * before being returned.
@@ -194,11 +200,11 @@ public class StorageManager {
 	protected String getCreateTableStatement (  DataField [] structure , CharSequence alias ) {
 		StringBuilder result = new StringBuilder( "CREATE " );
 		if ( isHsql( ) ) result.append( " CACHED " );
-		result.append( "TABLE " ).append( '\"' ).append( alias ).append( '\"' );
+		result.append( "TABLE " ).append( alias );
 		if ( isHsql( ) ) result.append( " (PK BIGINT NOT NULL IDENTITY, timed BIGINT NOT NULL, " );
 		if ( isMysqlDB( ) ) result.append( " (PK BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT, timed BIGINT NOT NULL, " );
 		for ( DataField field : structure ) {
-			result.append( '\"' ).append( field.getFieldName( ).toUpperCase( ) ).append( '\"' ).append( ' ' );
+			result.append( field.getName( ).toUpperCase( ) ).append( ' ' );
 			if ( StorageManager.isMysqlDB( ) ) {
 				switch ( field.getDataTypeID( ) ) {
 				case DataTypes.CHAR :
@@ -231,13 +237,6 @@ public class StorageManager {
 			result.append( " , " );
 		}
 		return result.deleteCharAt( result.lastIndexOf( "," ) ).append( ")" ).toString( ).toLowerCase( );
-	}
-
-	private String sqlType ( String type ) {
-		int index = type.trim( ).indexOf( ":" );
-		// if ( index >= 0 ) { return type.substring ( 0 , index ) ; }
-		if ( index >= 0 ) { return type.toUpperCase( ).substring( 0 , index ); }
-		return type.toUpperCase( );
 	}
 
 	/*

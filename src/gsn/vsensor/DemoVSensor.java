@@ -107,7 +107,7 @@ public class DemoVSensor extends AbstractVirtualSensor {
    
    public boolean initialize ( ) {
       for ( DataField field : getVirtualSensorConfiguration( ).getOutputStructure( ) )
-         fields.add( field.getFieldName( ) );
+         fields.add( field.getName( ) );
       return true;
    }
    

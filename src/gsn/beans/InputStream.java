@@ -145,7 +145,7 @@ public class InputStream {
 				 logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
 				 logger.warn( e.getMessage( ) , e );
 			 } catch ( final VirtualSensorInitializationFailedException e ) {
-				 logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getVirtualSensorName( )
+				 logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getName( )
 						 + " because initialization of that virtual sensor failed" );
 				 logger.error(e.getMessage(),e);
 			 } finally {

@@ -60,14 +60,14 @@ public class InVMPipeWrapper extends AbstractWrapper {
        * filtering in the view's definition. We perform select * from the view.
        */
       super.addListener( ss );
-      notificationRequest = new InGSNNotification( this , config.getVirtualSensorName( ) );
-      Mappings.getContainer( ).addNotificationRequest( config.getVirtualSensorName( ) , notificationRequest );
+      notificationRequest = new InGSNNotification( this , config.getName( ) );
+      Mappings.getContainer( ).addNotificationRequest( config.getName( ) , notificationRequest );
    }
    
    public boolean sendToWrapper ( String action,String[] paramNames, Serializable[] paramValues ) throws OperationNotSupportedException {
       AbstractVirtualSensor vs;
       try {
-         vs = Mappings.getVSensorInstanceByVSName( config.getVirtualSensorName( ) ).borrowVS( );
+         vs = Mappings.getVSensorInstanceByVSName( config.getName( ) ).borrowVS( );
       } catch ( PoolIsFullException e ) {
          logger.warn( "Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
          return false;
@@ -76,7 +76,7 @@ public class InVMPipeWrapper extends AbstractWrapper {
          return false;
       }
       boolean toReturn = vs.dataFromWeb( action , paramNames , paramValues );
-      Mappings.getVSensorInstanceByVSName( config.getVirtualSensorName( ) ).returnVS( vs );
+      Mappings.getVSensorInstanceByVSName( config.getName( ) ).returnVS( vs );
       return toReturn;
    }
    
@@ -97,7 +97,7 @@ public class InVMPipeWrapper extends AbstractWrapper {
    
    public String toString ( ) {
       StringBuilder sb = new StringBuilder( "InVMPipeWrapper, " );
-      sb.append( " RemoteVS : " ).append( config.getVirtualSensorName( ) );
+      sb.append( " RemoteVS : " ).append( config.getName( ) );
       return sb.toString( );
    }
    

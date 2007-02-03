@@ -61,7 +61,7 @@ public class ContainerImpl extends HttpServlet implements Container {
 
    public void publishData ( AbstractVirtualSensor sensor ) {
       StreamElement data = sensor.getData( );
-      String name = sensor.getVirtualSensorConfiguration( ).getVirtualSensorName( ).toLowerCase();
+      String name = sensor.getVirtualSensorConfiguration( ).getName( ).toLowerCase();
       StorageManager storageMan = StorageManager.getInstance( );
       synchronized ( psLock ) {
          storageMan.insertDataNoDupError( name , data );

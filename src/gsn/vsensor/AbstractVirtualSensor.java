@@ -31,13 +31,13 @@ public abstract class AbstractVirtualSensor {
    
    private void validateStreamElement ( StreamElement streamElement ) {
       if ( !compatibleStructure( streamElement.getFieldTypes( ) , getVirtualSensorConfiguration( ).getOutputStructure( ) ) ) {
-         StringBuilder exceptionMessage = new StringBuilder( ).append( "The streamElement produced by :" ).append( getVirtualSensorConfiguration( ).getVirtualSensorName( ) ).append(
+         StringBuilder exceptionMessage = new StringBuilder( ).append( "The streamElement produced by :" ).append( getVirtualSensorConfiguration( ).getName( ) ).append(
             " Virtual Sensor is not compatible with the defined streamElement.\n" );
          exceptionMessage.append( "The expected stream element structure (specified in " ).append( getVirtualSensorConfiguration( ).getFileName( ) ).append( " is [" );
          for ( DataField df : getVirtualSensorConfiguration( ).getOutputStructure( ) ) {
-            exceptionMessage.append( df.getFieldName( ) ).append( " (" ).append( DataTypes.TYPE_NAMES[ df.getDataTypeID( ) ] ).append( ") , " );
+            exceptionMessage.append( df.getName( ) ).append( " (" ).append( DataTypes.TYPE_NAMES[ df.getDataTypeID( ) ] ).append( ") , " );
          }
-         exceptionMessage.append( "] but the actual stream element received from the " + getVirtualSensorConfiguration( ).getVirtualSensorName( ) ).append( " has the [" );
+         exceptionMessage.append( "] but the actual stream element received from the " + getVirtualSensorConfiguration( ).getName( ) ).append( " has the [" );
          for ( int i = 0 ; i < streamElement.getFieldNames( ).length ; i++ )
             exceptionMessage.append( streamElement.getFieldNames( )[ i ] ).append( "(" ).append( DataTypes.TYPE_NAMES[ streamElement.getFieldTypes( )[ i ] ] ).append( ")," ).append(
                " ] thus the stream element dropped !!!" );
@@ -75,7 +75,7 @@ public abstract class AbstractVirtualSensor {
       }
       for ( int i = 0 ; i < outputStructure.length ; i++ ) {
          if ( fieldTypes[ i ] != outputStructure[ i ].getDataTypeID( ) ) {
-            logger.warn( "Validation problem for output field >" + outputStructure[ i ].getFieldName( ) + ", The field type declared as >" + DataTypes.TYPE_NAMES[ fieldTypes[ i ] ]
+            logger.warn( "Validation problem for output field >" + outputStructure[ i ].getName( ) + ", The field type declared as >" + DataTypes.TYPE_NAMES[ fieldTypes[ i ] ]
                + "< within the stream element but it is defined as in the VSD as : " + DataTypes.TYPE_NAMES[ outputStructure[ i ].getDataTypeID( ) ] );
             return false;
          }

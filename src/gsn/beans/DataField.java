@@ -17,7 +17,7 @@ public final class DataField implements Serializable {
    
    private String            description      = "Not Provided";
    
-   private String            fieldName;
+   private String            name;
    
    private byte               dataTypeID       = -1;
    
@@ -30,14 +30,14 @@ public final class DataField implements Serializable {
    }
    
    public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {
-      this.fieldName = fieldName;
+      this.name = fieldName;
       this.type = type;
       this.dataTypeID = DataTypes.convertTypeNameToTypeID( type );
       this.description = description;
    }
    
    public DataField ( final String name , final String type ) {
-      this.fieldName = name;
+      this.name = name;
       this.type = type;
       this.dataTypeID = DataTypes.convertTypeNameToTypeID( type );
    }
@@ -46,12 +46,12 @@ public final class DataField implements Serializable {
       return this.description;
    }
    transient boolean fieldNameConvertedToLowerCase = false;
-   public String getFieldName ( ) {
+   public String getName ( ) {
       if (fieldNameConvertedToLowerCase==false) {
          fieldNameConvertedToLowerCase=true;
-         this.fieldName=fieldName.toLowerCase( );
+         this.name=name.toLowerCase( );
       }
-      return this.fieldName;
+      return this.name;
    }
    
    public boolean equals ( final Object o ) {
@@ -59,7 +59,7 @@ public final class DataField implements Serializable {
       if ( !( o instanceof DataField ) ) return false;
       
       final DataField dataField = ( DataField ) o;
-      if ( this.fieldName != null ? !this.fieldName.equals( dataField.fieldName ) : dataField.fieldName != null ) return false;
+      if ( this.name != null ? !this.name.equals( dataField.name ) : dataField.name != null ) return false;
       return true;
    }
    
@@ -72,12 +72,12 @@ public final class DataField implements Serializable {
    }
    
    public int hashCode ( ) {
-      return ( this.fieldName != null ? this.fieldName.hashCode( ) : 0 );
+      return ( this.name != null ? this.name.hashCode( ) : 0 );
    }
    
    public String toString ( ) {
       final StringBuilder result = new StringBuilder( );
-      result.append( "[Field-Name:" ).append( this.fieldName ).append( ", Type:" ).append( DataTypes.TYPE_NAMES[ this.getDataTypeID( ) ] ).append( "[" + this.type + "]" ).append( ", Decription:" )
+      result.append( "[Field-Name:" ).append( this.name ).append( ", Type:" ).append( DataTypes.TYPE_NAMES[ this.getDataTypeID( ) ] ).append( "[" + this.type + "]" ).append( ", Decription:" )
             .append( this.description ).append( "]" );
       return result.toString( );
    }

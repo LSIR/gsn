@@ -38,7 +38,7 @@ public final class StreamElement implements Serializable {
       this.timeStamp = timeStamp;
       
       for ( byte i = 0 ; i < this.fieldNames.length ; i++ ) {
-         this.fieldNames[ i ] = outputStructure[ i ].getFieldName( ).toLowerCase( );
+         this.fieldNames[ i ] = outputStructure[ i ].getName( ).toLowerCase( );
          this.fieldTypes[ i ] = outputStructure[ i ].getDataTypeID( );
       }
       if ( this.fieldNames.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
@@ -250,7 +250,7 @@ public final class StreamElement implements Serializable {
     */
    private static byte findIndexInDataField(DataField[] outputFormat, String fieldName) {
       for (int i=0;i<outputFormat.length;i++) 
-         if (outputFormat[i].getFieldName( ).equalsIgnoreCase( fieldName ))
+         if (outputFormat[i].getName( ).equalsIgnoreCase( fieldName ))
             return outputFormat[i].getDataTypeID( );
       
       return -1;

@@ -38,31 +38,31 @@ public class ContainerInfoHandler implements RequestHandler {
          
          //return only the requested sensor if specified
          String reqName = request.getParameter("name");
-         if ( reqName != null && !sensorConfig.getVirtualSensorName().equals(reqName) ) continue;
+         if ( reqName != null && !sensorConfig.getName().equals(reqName) ) continue;
          
          sb.append("<virtual-sensor");
-         sb.append(" name=\"").append(sensorConfig.getVirtualSensorName()).append("\"" );
+         sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
          sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
          if (sensorConfig.getDescription() != null) {
             sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
          }
          sb.append( ">\n" );         
-         StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getVirtualSensorName( ) + " order by timed DESC limit 1 offset 0" );
+         StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getName( ) + " order by timed DESC limit 1 offset 0" );
          DataEnumerator result = StorageManager.getInstance( ).executeQuery( query , true );
          StreamElement se = null;
          if ( result.hasMoreElements( ) ) se = result.nextElement( );
          for ( DataField df : sensorConfig.getOutputStructure( ) ) {
             sb.append("\t<field");
-            sb.append(" name=\"").append(df.getFieldName().toLowerCase()).append("\"");
+            sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
             sb.append(" type=\"").append(df.getType()).append("\"");
             if (df.getDescription() != null && df.getDescription().trim().length() != 0)
                sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
             sb.append(">");
             if (se!= null ) 
             	if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
-            		sb.append( se.getData( df.getFieldName( ) ) );
+            		sb.append( se.getData( df.getName( ) ) );
             	else
-            		sb.append( se.getData( StringEscapeUtils.escapeXml( df.getFieldName( ) ) ) );
+            		sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
             sb.append("</field>\n");
          }
          result.close( );
@@ -80,7 +80,7 @@ public class ContainerInfoHandler implements RequestHandler {
         	        	
         			 sb.append( "\t<field");
         			 sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
-        			 sb.append(" name=\"" ).append( df.getFieldName( ).toLowerCase()).append( "\"" );
+        			 sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
         			 sb.append(" category=\"input\"");
         			 sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
         			 if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )

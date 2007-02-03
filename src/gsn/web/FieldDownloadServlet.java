@@ -61,7 +61,7 @@ public class FieldDownloadServlet extends HttpServlet {
       }
       boolean binary = false;
       for ( DataField df : sensorConfig.getOutputStructure( ) )
-         if ( df.getFieldName( ).toLowerCase( ).equals( colName.trim( ).toLowerCase( ) ) ) if ( df.getDataTypeID( ) == DataTypes.BINARY ) {
+         if ( df.getName( ).toLowerCase( ).equals( colName.trim( ).toLowerCase( ) ) ) if ( df.getDataTypeID( ) == DataTypes.BINARY ) {
             StringTokenizer st = new StringTokenizer( df.getType( ) , ":" );
             binary = true;
             if ( st.countTokens( ) != 2 ) break;

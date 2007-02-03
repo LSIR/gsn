@@ -96,4 +96,15 @@ public class TestValidityTools {
 	public void testTableExistsWithBadParameters() throws SQLException{
 		assertFalse(ValidityTools.tableExists("'f\\"));
 	}
+	@Test
+	public void testTablesWithSameStructure() throws SQLException{
+		StorageManager.getInstance().createTable("table1",new DataField[]{});
+		assertTrue(ValidityTools.tableExists("table1",new DataField[] {}));
+		StorageManager.getInstance().dropTable("table1");
+		StorageManager.getInstance().createTable("table1",new DataField[]{new DataField("sensor","double"),new DataField("sensor2","int")});
+		assertTrue(ValidityTools.tableExists("table1",new DataField[] {new DataField("sensor","double")}));
+		assertTrue(ValidityTools.tableExists("table1",new DataField[] {new DataField("sensor2","int")}));
+		assertTrue(ValidityTools.tableExists("table1",new DataField[] {new DataField("sensor2", "int"),new DataField("sensor","double")}));
+	}
+	
 }

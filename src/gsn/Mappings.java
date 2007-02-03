@@ -27,7 +27,7 @@ public final class Mappings {
    
    public static boolean addVSensorInstance ( VirtualSensorPool sensorPool ) {
       try {
-         if ( logger.isInfoEnabled( ) ) logger.info( ( new StringBuilder( "Testing the pool for :" ) ).append( sensorPool.getConfig( ).getVirtualSensorName( ) ).toString( ) );
+         if ( logger.isInfoEnabled( ) ) logger.info( ( new StringBuilder( "Testing the pool for :" ) ).append( sensorPool.getConfig( ).getName( ) ).toString( ) );
          sensorPool.returnVS( sensorPool.borrowVS( ) );
       } catch ( Exception e ) {
          logger.error( e.getMessage( ) , e );
@@ -37,11 +37,11 @@ public final class Mappings {
          return false;
       }
       TreeMap < String , Boolean > vsNameToOutputStructureFields = new TreeMap < String , Boolean >( );
-      vsNamesToOutputStructureFields.put( sensorPool.getConfig( ).getVirtualSensorName( ) , vsNameToOutputStructureFields );
+      vsNamesToOutputStructureFields.put( sensorPool.getConfig( ).getName( ) , vsNameToOutputStructureFields );
       for ( DataField fields : sensorPool.getConfig( ).getOutputStructure( ) )
-         vsNameToOutputStructureFields.put( fields.getFieldName( ) , Boolean.TRUE );
+         vsNameToOutputStructureFields.put( fields.getName( ) , Boolean.TRUE );
       vsNameToOutputStructureFields.put( "timed" , Boolean.TRUE );
-      vsNameTOVSConfig.put( sensorPool.getConfig( ).getVirtualSensorName( ) , sensorPool.getConfig( ) );
+      vsNameTOVSConfig.put( sensorPool.getConfig( ).getName( ) , sensorPool.getConfig( ) );
       fileNameToVSInstance.put( sensorPool.getConfig( ).getFileName( ) , sensorPool );
       return true;
    }
@@ -61,7 +61,7 @@ public final class Mappings {
    
    public static void removeFilename ( String fileName ) {
       VSensorConfig config = ( fileNameToVSInstance.get( fileName ) ).getConfig( );
-      vsNameTOVSConfig.remove( config.getVirtualSensorName( ) );
+      vsNameTOVSConfig.remove( config.getName( ) );
       fileNameToVSInstance.remove( fileName );
    }
    

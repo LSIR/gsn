@@ -7,6 +7,7 @@ import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
+import gsn.utils.ValidityTools;
 import gsn.wrappers.AbstractWrapper;
 import java.io.File;
 import java.io.FileFilter;
@@ -39,7 +40,7 @@ public class VSensorLoader extends Thread {
 	 */
 	private  final HashMap < AddressBean , AbstractWrapper > usedWrappers                   = new HashMap < AddressBean ,  AbstractWrapper >( );
 
-	private StorageManager                                         storageManager                      = StorageManager.getInstance ( );
+	private StorageManager                                         sm                      = StorageManager.getInstance ( );
 
 	private String                                                 pluginsDir;
 
@@ -59,7 +60,7 @@ public class VSensorLoader extends Thread {
 	}
 
 	public void run ( ) {
-		if ( storageManager == null ) {
+		if ( sm == null ) {
 			logger.fatal ( "The Storage Manager shouldn't be null, possible a BUG." );
 			return;
 		}
@@ -77,7 +78,7 @@ public class VSensorLoader extends Thread {
 		ArrayList < VSensorConfig > removeIt = modifications.getRemove ( );
 		ArrayList < VSensorConfig > addIt = modifications.getAdd ( );
 		for ( VSensorConfig configFile : removeIt ) {
-			logger.warn ( new StringBuilder ( ).append ( "removing : " ).append ( configFile.getVirtualSensorName ( ) ).toString ( ) );
+			logger.warn ( new StringBuilder ( ).append ( "removing : " ).append ( configFile.getName ( ) ).toString ( ) );
 			VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile.getFileName ( ) );
 			Mappings.removeFilename ( configFile.getFileName ( ) );
 			this.removeAllResources ( sensorInstance );
@@ -89,14 +90,14 @@ public class VSensorLoader extends Thread {
 		}finally {
 			if ( this.isActive == false ) return;
 		}
-		for ( VSensorConfig configuration : addIt ) {
+		for ( VSensorConfig vs : addIt ) {
 
-			if (!isVirtualSensorValid(configuration))
+			if (!isVirtualSensorValid(vs))
 				continue ;
-			VirtualSensorPool pool = new VirtualSensorPool ( configuration );
+			VirtualSensorPool pool = new VirtualSensorPool ( vs );
 			try {
 				if ( createInputStreams (  pool ) == false ) {
-					logger.error ( "loading the >" + configuration.getVirtualSensorName() + "< virtual sensor is stoped due to error(s) in preparing the input streams." );
+					logger.error ( "loading the >" + vs.getName() + "< virtual sensor is stoped due to error(s) in preparing the input streams." );
 					continue;
 				}
 			} catch (InstantiationException e2) {
@@ -105,36 +106,40 @@ public class VSensorLoader extends Thread {
 				logger.error(e2.getMessage(),e2);
 			}
 			try {
-				storageManager.createTable ( configuration.getVirtualSensorName ( ) , configuration.getOutputStructure ( ) );
+				if (!ValidityTools.tableExists( vs.getName ( ) , vs.getOutputStructure ( ) ))
+					sm.createTable ( vs.getName ( ) , vs.getOutputStructure ( ) );
+				else
+					logger.info("Reusing the existing "+vs.getName()+" table.");
 			} catch ( SQLException e ) {
 				if ( e.getMessage ( ).toLowerCase ( ).contains ( "table already exists" ) ) {
 					logger.error ( e.getMessage ( ) );
 					if ( logger.isInfoEnabled ( ) ) logger.info ( e.getMessage ( ) , e );
-					logger.error ( new StringBuilder ( ).append ( "Loading the virtual sensor specified in the file : " ).append ( configuration.getFileName ( ) ).append ( " failed" ).toString ( ) );
-					logger.error ( new StringBuilder ( ).append ( "The table : " ).append ( configuration.getVirtualSensorName ( ) ).append ( " is exists in the database specified in :" ).append (
+					logger.error ( new StringBuilder ( ).append ( "Loading the virtual sensor specified in the file : " ).append ( vs.getFileName ( ) ).append ( " failed" ).toString ( ) );
+					logger.error ( new StringBuilder ( ).append ( "The table : " ).append ( vs.getName ( ) ).append ( " is exists in the database specified in :" ).append (
 							Main.getContainerConfig ( ).getContainerFileName ( ) ).append ( "." ).toString ( ) );
 					logger.error ( "Solutions : " );
-					logger.error ( new StringBuilder ( ).append ( "1. Change the virtual sensor name, in the : " ).append ( configuration.getFileName ( ) ).toString ( ) );
+					logger.error ( new StringBuilder ( ).append ( "1. Change the virtual sensor name, in the : " ).append ( vs.getFileName ( ) ).toString ( ) );
 					logger.error ( new StringBuilder ( ).append ( "2. Change the URL of the database in " ).append ( Main.getContainerConfig ( ).getContainerFileName ( ) ).append (
 					" and choose another database." ).toString ( ) );
 					logger.error ( new StringBuilder ( ).append ( "3. Rename/Move the table with the name : " ).append ( Main.getContainerConfig ( ).getContainerFileName ( ) ).append ( " in the database." )
 							.toString ( ) );
 					logger.error ( new StringBuilder ( ).append ( "4. Change the overwrite-tables=\"true\" (be careful, this will overwrite all the data previously saved in " ).append (
-							configuration.getVirtualSensorName ( ) ).append ( " table )" ).toString ( ) );
+							vs.getName ( ) ).append ( " table )" ).toString ( ) );
 				} else {
 					logger.error ( e.getMessage ( ) , e );
 				}
 				continue;
 			}
-			logger.warn ( new StringBuilder ( "adding : " ).append ( configuration.getVirtualSensorName() ).append ( " virtual sensor[" ).append ( configuration.getFileName ( ) ).append ( "]" ).toString ( ) );
+			logger.warn ( new StringBuilder ( "adding : " ).append ( vs.getName() ).append ( " virtual sensor[" ).append ( vs.getFileName ( ) ).append ( "]" ).toString ( ) );
+			sm.prepareStructures(vs.getName(),vs.getOutputStructure());
 			Mappings.addVSensorInstance ( pool );
 			try {
 				pool.start ( );
 			} catch ( PoolIsFullException e1 ) {
-				logger.error ( "Creating the virtual sensor >" + configuration.getVirtualSensorName ( ) + "< failed." , e1 );
+				logger.error ( "Creating the virtual sensor >" + vs.getName ( ) + "< failed." , e1 );
 				continue;
 			} catch ( VirtualSensorInitializationFailedException e1 ) {
-				logger.error ( "Creating the virtual sensor >" + configuration.getVirtualSensorName ( ) + "< failed." , e1 );
+				logger.error ( "Creating the virtual sensor >" + vs.getName ( ) + "< failed." , e1 );
 				continue;
 			}
 		}
@@ -151,7 +156,7 @@ public class VSensorLoader extends Thread {
 				return false;
 			}
 		}
-		String vsName = configuration.getVirtualSensorName ( );
+		String vsName = configuration.getName ( );
 		if ( Mappings.getVSensorConfig ( vsName ) != null ) {
 			logger.error ( new StringBuilder ( ).append ( "Adding the virtual sensor specified in " ).append ( configuration.getFileName ( ) ).append ( " failed because the virtual sensor name used by " )
 					.append ( configuration.getFileName ( ) ).append ( " is already used by : " ).append ( Mappings.getVSensorConfig ( vsName ).getFileName ( ) ).toString ( ) );
@@ -171,7 +176,7 @@ public class VSensorLoader extends Thread {
 	public void removeAllResources ( VirtualSensorPool pool ) {
 		VSensorConfig config = pool.getConfig ( );
 		pool.closePool ( );
-		final String vsensorName = config.getVirtualSensorName ( );
+		final String vsensorName = config.getName ( );
 		if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Releasing previously used resources used by [" ).append ( vsensorName ).append ( "]." ).toString ( ) );
 		for ( InputStream inputStream : config.getInputStreams ( ) ) {
 			for ( StreamSource streamSource : inputStream.getSources ( ) ) {
@@ -186,9 +191,9 @@ public class VSensorLoader extends Thread {
 			}
 			inputStream.finalize ( );
 		}
-		// storageManager.renameTable(vsensorName,vsensorName+"Before"+System.currentTimeMillis());
+		// sm.renameTable(vsensorName,vsensorName+"Before"+System.currentTimeMillis());
 		Mappings.getContainer ( ).removeAllResourcesAssociatedWithVSName ( vsensorName );
-		this.storageManager.dropTable ( config.getVirtualSensorName ( ) );
+		this.sm.dropTable ( config.getName ( ) );
 	}
 
 	public static Modifications getUpdateStatus ( String virtualSensorsPath ) {
@@ -247,8 +252,8 @@ public class VSensorLoader extends Thread {
 	 * @throws InstantiationException 
 	 */
 	public boolean createInputStreams ( VirtualSensorPool pool ) throws InstantiationException, IllegalAccessException {
-		if ( logger.isDebugEnabled ( ) ) logger.debug ( new StringBuilder ( ).append ( "Preparing input streams for: " ).append ( pool.getConfig().getVirtualSensorName ( ) ).toString ( ) );
-		if ( pool.getConfig().getInputStreams ( ).size ( ) == 0 ) logger.warn ( new StringBuilder ( "There is no input streams defined for *" ).append ( pool.getConfig().getVirtualSensorName ( ) ).append ( "*" ).toString ( ) );
+		if ( logger.isDebugEnabled ( ) ) logger.debug ( new StringBuilder ( ).append ( "Preparing input streams for: " ).append ( pool.getConfig().getName ( ) ).toString ( ) );
+		if ( pool.getConfig().getInputStreams ( ).size ( ) == 0 ) logger.warn ( new StringBuilder ( "There is no input streams defined for *" ).append ( pool.getConfig().getName ( ) ).append ( "*" ).toString ( ) );
 		for ( Iterator < InputStream > inputStreamIterator = pool.getConfig().getInputStreams ( ).iterator ( ) ; inputStreamIterator.hasNext ( ) ; ) {
 			InputStream inputStream = inputStreamIterator.next ( );
 			for ( StreamSource  dataSouce : inputStream.getSources ( )) {
@@ -304,15 +309,19 @@ public class VSensorLoader extends Thread {
 			return false;
 		}
 		if (!usedWrappers.containsKey(wrapper.getActiveAddressBean())) {
-			try {
-				storageManager.createTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
-			} catch ( SQLException e ) {
-				logger.error ( e.getMessage ( ) , e );
-				return false;
-			}
+				try {
+					if (!ValidityTools.tableExists(wrapper.getDBAliasInStr(),wrapper.getOutputFormat()))
+						sm.createTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
+					sm.prepareStructures( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
+				} catch ( SQLException e ) {
+					logger.error ( e.getMessage ( ) , e );
+					return false;
+				}
 			streamSource.setWrapper ( wrapper );
 			wrapper.start ( );
 			usedWrappers.put ( wrapper.getActiveAddressBean() , wrapper );
+		}else {// There exists a stream source with very same addressing.
+			streamSource.setWrapper ( wrapper );
 		}
 		return true;
 	}
@@ -326,7 +335,7 @@ public class VSensorLoader extends Thread {
 			logger.warn ( "Removing the resources associated with : " + sensorInstance.getConfig ( ).getFileName ( ) + " [done]." );
 		}
 		try {
-			this.storageManager.shutdown ( );
+			this.sm.shutdown ( );
 		} catch ( SQLException e ) {
 			e.printStackTrace ( );
 		}
