@@ -69,25 +69,23 @@ public class BTWrapper extends AbstractWrapper {
    
    public void run ( ) {
 	   int nbBytes;
-      while ( isActive( ) ) {
-    	  try {
-    		  nbBytes = is.read(bytes);
-    		  if (nbBytes > 0) {
-    			  inputBuffer = new byte[nbBytes];
-    			  for(int i=0; i < nbBytes; i++) {
-    				  inputBuffer[i]= bytes[i];
-    			  }
-    			  StreamElement streamElement = new StreamElement( 
-    					  new String [ ] { RAW_PACKET } , 
-    					  new Byte [ ] { DataTypes.BINARY } , 
-    					  new Serializable [ ] { inputBuffer } , 
-    					  System.currentTimeMillis( ) );
-    			  postStreamElement( streamElement );
-    		  }
-    	  }catch(IOException e) {
-    		  logger.error(e);
-    	  }
-    	  
+	   while ( isActive( ) ) {
+		   try {
+			   nbBytes = is.read(bytes);
+			   if (nbBytes > 0) {
+				   inputBuffer = new byte[nbBytes];
+				   for(int i=0; i < nbBytes; i++) 
+					   inputBuffer[i]= bytes[i];
+				   StreamElement streamElement = new StreamElement( 
+						   new String [ ] { RAW_PACKET } , 
+						   new Byte [ ] { DataTypes.BINARY } , 
+						   new Serializable [ ] { inputBuffer } , 
+						   System.currentTimeMillis( ) );
+				   postStreamElement( streamElement );
+			   }
+		   }catch(IOException e) {
+			   logger.error(e);
+		   }
       }
    }
    

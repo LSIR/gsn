@@ -98,8 +98,6 @@ public class GPSGenerator extends AbstractWrapper {
          } catch ( InterruptedException e ) {
             logger.error( e.getMessage( ) , e );
          }
-         if ( listeners.isEmpty( ) ) continue;
-         
          StreamElement streamElement = new StreamElement( FIELD_NAMES , FIELD_TYPES , new Serializable [ ] { latitude , longitude , 25.5 , 650 , picture } );
          postStreamElement( streamElement );
       }

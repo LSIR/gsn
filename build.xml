@@ -203,7 +203,8 @@
          	 <fileset dir="${src.dir}">
          	      <include name="**/*Test*.java"/>
          	      <exclude name="**/TestStreamExporterVirtualSensor.java"/>
-         	      <exclude name="**/TestContainerImpl.java"/>
+	      	      <exclude name="**/TestContainerImpl.java"/>
+   	   	      <exclude name="**/RFIDTest.java"/>
          	 </fileset>
 <!--         	<fileset dir="${build.dir}" includes="**/TestStreamSource.*,**/TestAbstractWrapper.*,**/TestVSensorLoader.*" />-->
         </batchtest>

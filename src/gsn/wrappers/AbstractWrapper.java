@@ -140,6 +140,8 @@ public abstract class AbstractWrapper extends Thread {
 	 */
 	
 	protected Boolean postStreamElement ( StreamElement streamElement ) {
+		if (!isActive() || listeners.size()==0)
+			return false;
 		if (!updateWrapperTable(streamElement))
 			return false;
 		synchronized ( listeners ) {

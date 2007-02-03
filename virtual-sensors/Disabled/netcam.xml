@@ -17,7 +17,8 @@
       <stream name="input1">
           <source alias="source1" sampling-rate="1" storage-size="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://192.168.51.33/axis-cgi/jpg/image.cgi?resolution=320x240&amp;clock=0&amp;date=0</predicate>
+                    <!-- <predicate key="url">http://192.168.51.33/axis-cgi/jpg/image.cgi?resolution=320x240&amp;clock=0&amp;date=0</predicate>-->
+                    <predicate key="url">http://213.81.157.9:8044/axis-cgi/jpg/image.cgi?resolution=320x240</predicate>
                     <predicate key="rate">1000</predicate>
                 </address>
                 <query>select * from wrapper</query>

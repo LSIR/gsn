@@ -57,8 +57,6 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
          } catch ( InterruptedException e ) {
             logger.error( e.getMessage( ) , e );
          }
-         if ( listeners.isEmpty( ) ) continue;
-         
          long heapMemoryUsage = mbean.getHeapMemoryUsage( ).getUsed( );
          long nonHeapMemoryUsage = mbean.getNonHeapMemoryUsage( ).getUsed( );
          int pendingFinalizationCount = mbean.getObjectPendingFinalizationCount( );

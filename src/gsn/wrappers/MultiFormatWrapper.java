@@ -39,7 +39,7 @@ public class MultiFormatWrapper extends AbstractWrapper{
 	}
 
 	public void run() {
-		while (isAlive()) {
+		while (isActive()) {
 			try {
 				Thread.sleep(250);
 			} catch (InterruptedException e) {

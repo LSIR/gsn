@@ -27,7 +27,7 @@ public class EmptyWrapper extends AbstractWrapper {
    
    public void run ( ) {
       while ( isActive( ) ) {
-         if ( listeners.isEmpty( ) ) continue;
+    	  // do something
       }
    }
    

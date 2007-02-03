@@ -64,7 +64,6 @@ public class UDPWrapper extends AbstractWrapper {
             socket.receive( receivedPacket );
             String dataRead = new String( receivedPacket.getData( ) );
             if ( logger.isDebugEnabled( ) ) logger.debug( "UDPWrapper received a packet : " + dataRead );
-            
             StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { receivedPacket.getData( ) } , System
                   .currentTimeMillis( ) );
             postStreamElement( streamElement );

@@ -78,7 +78,7 @@ public class SensorScopeWrapper extends AbstractWrapper implements MessageListen
    
    public void messageReceived ( int toAddr , Message message ) {
       SensorScopeDataMsgWrapper parsed = new SensorScopeDataMsgWrapper( ( SensorScopeDataMsg ) message );
-      if ( isActive( ) ) if ( !listeners.isEmpty( ) ) postStreamElement( parsed.getStreamElement( ) );
+      postStreamElement( parsed.getStreamElement( ) );
    }
    
    public  DataField [] getOutputFormat ( ) {
