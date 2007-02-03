@@ -118,6 +118,7 @@ public class DataTypes {
          case Types.TIME :
             return TIME;
          case Types.DOUBLE :
+         case Types.DECIMAL:	// This is needed for doing aggregates in datadownload servlet.
             return DOUBLE;
          case Types.BINARY :
          case Types.BLOB :
