@@ -245,7 +245,6 @@ public class ValidityTools {
 				throw e;
 			}
 		}finally{
-			
 			if (rs!=null)
 				try {
 					rs.getStatement().getConnection().close();

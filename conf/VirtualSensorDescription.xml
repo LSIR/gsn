@@ -1,6 +1,6 @@
 <binding>
     <mapping name="virtual-sensor" class="gsn.beans.VSensorConfig">
-       <value name="name" field="virtualSensorName" style="attribute" />
+       <value name="name" field="name" style="attribute" />
        <value name="priority" field="priority" usage="optional" style="attribute" />  
        <value name="password" field="generalPassword" style="attribute" usage="optional" />
        <structure name="processing-class" usage="optional" >
@@ -68,7 +68,7 @@
    </mapping>
 
    <mapping name="field" class="gsn.beans.DataField">
-	<value name="name"  field="fieldName" style="attribute"/>
+	<value name="name"  field="name" style="attribute"/>
    	<value name="type" field="type" style="attribute"/>
    	<value field="description" style="text" usage="optional"/>
    </mapping>

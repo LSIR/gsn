@@ -84,13 +84,15 @@ public class DataEnumerator implements Enumeration {
 			if ( indexofPK == -1 && linkBinaryData ) throw new RuntimeException( "The specified query can't be used with binaryLinked paramter set to true." );
 		} catch ( Exception e ) {
 			logger.error( e.getMessage( ) , e );
-			try {
-				if (!preparedStatement.getConnection().isClosed())
-					preparedStatement.getConnection().close();
-			} catch (SQLException e2) {
-				logger.debug(e2.getMessage(),e2);
-			}
 			hasNext = false;
+		}finally {
+			if (hasNext==false)
+				try {
+					if (!preparedStatement.getConnection().isClosed())
+						preparedStatement.getConnection().close();
+				} catch (SQLException e) {
+					logger.warn(e.getMessage(),e);
+				}
 		}
 	}
 

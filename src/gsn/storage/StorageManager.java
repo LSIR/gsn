@@ -148,7 +148,7 @@ public class StorageManager {
 		return hsql;
 	}
 
-	private static StorageManager                  ourInstance                   = new StorageManager( );
+	private static StorageManager                  singleton                   = new StorageManager( );
 
 	private static FastConnectionPool              connectionPool;
 
@@ -159,7 +159,7 @@ public class StorageManager {
 	private TreeMap < CharSequence , TreeSet < CharSequence >> existingTablesToColumnMapping = new TreeMap < CharSequence , TreeSet < CharSequence >>( new CaseInsensitiveComparator( ) );
 
 	public static StorageManager getInstance ( ) {
-		return ourInstance;
+		return singleton;
 	}
 
 	private StorageManager ( ) {}
@@ -168,11 +168,10 @@ public class StorageManager {
 		Connection connection = null;
 		String sqlCreateStatement = getCreateTableStatement( structure , tableName );
 		String sqlCreateIndexStatement = new StringBuilder( "CREATE INDEX " ).append( tableName).append( "_INDEX ON " ).append( tableName).append( " (timed DESC)" ).toString( );
-		if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create table statement is : " ).append( sqlCreateStatement ).toString( ) );
-		if ( isDebugEnabled == true ) logger.debug( new StringBuilder( ).append( "The create index statement is : " ).append( sqlCreateIndexStatement ).toString( ) );
+		if ( logger.isDebugEnabled() ) logger.debug( new StringBuilder( ).append( "The create table statement is : " ).append( sqlCreateStatement ).toString( ) );
+		if ( logger.isDebugEnabled() ) logger.debug( new StringBuilder( ).append( "The create index statement is : " ).append( sqlCreateIndexStatement ).toString( ) );
 		try {
 			connection = connectionPool.borrowConnection( );
-			if ( isDebugEnabled == true ) logger.debug( sqlCreateStatement );
 			connection.createStatement( ).execute( sqlCreateStatement );
 			connection.createStatement( ).execute( sqlCreateIndexStatement );
 		} finally {
@@ -745,7 +744,9 @@ class FastConnectionPool {
 		} finally {
 			try {
 				if ( con != null && !con.isClosed( ) ) con.close( );
-			} catch ( SQLException e ) {}
+			} catch ( SQLException e ) {
+				logger.error(e.getMessage(),e);
+			}
 		}
 
 	}

@@ -81,16 +81,17 @@
       <copydir  dest="${build.dir}/org" src="${src.dir}/org"/>
     	<javac debug="true" srcdir="${src.dir}" optimize="off"
                destdir="${build.dir}" failonerror="true" source="1.5" classpathref="classpath"/>
-      <echo>Compiling JIBX Mappings...</echo>
-      <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
-            failonerror="true">
-         <classpath refid="classpath"/>
-         <arg value="conf/containerJIBX.xml"/>
-         <arg value="conf/VirtualSensorDescription.xml"/>            
-      </java>
    </target>
-   
-   <target name="dir" depends="build">
+   <target name="bind" depends="build">
+      <echo>Compiling JIBX Mappings...</echo>
+       <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
+   	            failonerror="true">
+   	         <classpath refid="classpath"/>
+   	         <arg value="conf/containerJIBX.xml"/>
+   	         <arg value="conf/VirtualSensorDescription.xml"/>            
+   	      </java>
+   </target>
+   <target name="dir" depends="bind">
       <!--  <webdoclet destdir="${dswebapp.dir}/WEB-INF/" description="This task for Directory Service">
             <fileset dir="${src.dir}">
                 <include name="**/registry/**"/>
@@ -111,7 +112,7 @@
    </target>
    
    
-   <target name="runcam" depends="build">
+   <target name="runcam" depends="bind">
       <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"
             dir="${build.dir}">
          <env key="LD_LIBRARY_PATH"
@@ -120,7 +121,7 @@
       </java>
    </target>
    
-   <target name="gsn" depends="build">
+   <target name="gsn" depends="bind">
       <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
          <classpath refid="classpath"/>
          <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
@@ -131,21 +132,21 @@
       </java>
    </target>
 
-   <target name="securityTest" depends="build">
+   <target name="securityTest" depends="bind">
       <java classpathref="classpath" classname="gsn.testss.SecurtiyTest" maxmemory="${maxMemoryUsage}" fork="true"
             dir="${build.dir}">
          
       </java>
    </target>  
    
-   <target name="rfidtest" depends="build">
+   <target name="rfidtest" depends="bind">
       <java classname="gsn.wrappers.RFIDTest" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
          <classpath refid="classpath"/>
       </java>
    </target>
 
 	   
-	   <target name="camtest" depends="build">
+	   <target name="camtest" depends="bind">
 	      <java classname="gsn.wrappers.cameras.usb.WebCamWrapper" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
 	         <classpath refid="classpath"/>
 	      	 <env key="LD_LIBRARY_PATH" value="${jmf.dir}/lib:${env.JAVA_HOME}/jre/lib/i386:${env.JAVA_HOME}/jre/lib/i386/client:${env.JAVA_HOME}/jre/lib/i386/xawt"/>
@@ -153,7 +154,7 @@
 	      </java>
 	   </target>
 	
-   <target name="runSim" depends="build">
+   <target name="runSim" depends="bind">
       <java classpathref="classpath" classname="gsn.simulation.Simulation" maxmemory="${maxMemoryUsage}" fork="true"
             dir="${build.dir}">
          <arg value="${config}"/>
@@ -163,7 +164,7 @@
       </java>
    </target>
    
-   <target name="jcoverage-build" depends="setup,build">
+   <target name="jcoverage-build" depends="setup,bind">
       <instrument todir="${build.dir}/jcoverage-classes">
          <fileset dir="${build.dir}">
             <include name="**/*.class"/>
@@ -192,7 +193,7 @@
       </junitreport>
    </target>
    
-   <target name="tests" depends="build" description="Runs JUnit tests">
+   <target name="tests" depends="bind" description="Runs JUnit tests">
       <junit printsummary="true" fork="false" haltonerror="false"
              errorproperty="errorOccuredInTests" haltonfailure="false"
              failureproperty="testss.failed" showoutput="true">
@@ -244,7 +245,7 @@
       </documentdoclet>
       
    </target>
-   <target name="jar" depends="clean,build">
+   <target name="jar" depends="clean,bind">
       <mkdir dir="${jars}"/>
       <jar destfile="${jars}/${jar.file}" basedir="${build.dir}" >
          <manifest>
@@ -253,20 +254,20 @@
          </manifest>
       </jar>
    </target>
-   <target name="installer" depends="clean,build,jar">
+   <target name="installer" depends="clean,bind,jar">
       <izpack input="${basedir}/installer/izpack-installer.xml"
               output="${basedir}/${jars}/gsn-installer.jar"
               basedir="${basedir}/installer"
               izPackdir="${basedir}/izpack"/>
    </target>
    
-   <target name="pref" depends="build">
+   <target name="pref" depends="bind">
       <java classpathref="classpath" classname="gsn.testss.CreationTest" maxmemory="64m" fork="true"
             dir="${build.dir}">
       </java>
    </target>
    
-   <target name="gui" depends="build">
+   <target name="gui" depends="bind">
       <java classname="gsn.gui.GSNConfiguratorFrame"  fork="true" dir="${basedir}">
          <classpath refid="classpath"/>
       </java>
