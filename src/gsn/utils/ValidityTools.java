@@ -238,6 +238,7 @@ public class ValidityTools {
 			 * 1146 : for mysql
 			 * -26 : for hsqldb
 			 */
+			
 			if(e.getErrorCode()==1146 || e.getErrorCode()==-22)
 				return false;
 			else {

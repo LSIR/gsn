@@ -5,37 +5,24 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
-import gsn.beans.TestStreamSource;
-import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
-import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
-
 import java.io.Serializable;
-import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.List;
 import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
-
-import com.mysql.jdbc.PreparedStatement;
-
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * Date: Aug 4, 2005 <br>
  */
 public abstract class AbstractWrapper extends Thread {
 
-
-	/**
-	 * Used by the data source when it wants to insert the data into it's main
-	 * database. The AbstractDataSource should keep track of this data source so
-	 * that it can release it when <code>finialize</code> called.
-	 */
 	private final static transient Logger      logger         = Logger.getLogger( AbstractWrapper.class );
 
-	protected final ArrayList < StreamSource > listeners      = new ArrayList < StreamSource >( );
+	protected final List < StreamSource > listeners      = Collections.synchronizedList(new ArrayList < StreamSource >( ));
 
 	private AddressBean                        activeAddressBean;
 
@@ -62,7 +49,7 @@ public abstract class AbstractWrapper extends Thread {
 	/**
 	 * @return the listeners
 	 */
-	public ArrayList < StreamSource > getListeners ( ) {
+	public List < StreamSource > getListeners ( ) {
 		return listeners;
 	}
 

@@ -231,21 +231,17 @@ public class StorageManager {
 					result.append( DataTypes.TYPE_NAMES[ field.getDataTypeID( ) ] );
 				break;
 				}
-
 			}
 			result.append( " , " );
 		}
 		return result.deleteCharAt( result.lastIndexOf( "," ) ).append( ")" ).toString( ).toLowerCase( );
 	}
 
-	/*
-	 * This method first transforms the query to lower case and then executes it.
-	 */
 	public void createView ( CharSequence viewName , CharSequence selectQuery ) {
 		Connection connection = null;
 		try {
 			connection = connectionPool.borrowConnection( );
-			StringBuilder viewStatement = new StringBuilder( "create view " ).append( viewName.toString( ) ).append( " AS ( " ).append( selectQuery.toString( ).toLowerCase( ) ).append(" ) ");
+			StringBuilder viewStatement = new StringBuilder( "create view " ).append( viewName ).append( " AS ( " ).append( selectQuery ).append(" ) ");
 			connection.createStatement( ).execute( viewStatement.toString() );
 		} catch ( SQLException e ) {
 			logger.error( e.getMessage( ) , e );
@@ -267,9 +263,8 @@ public class StorageManager {
 		PreparedStatement toReturn = null;
 		try {
 			toReturn = connection.prepareStatement( sql.toString( ) );
-			if ( isDebugEnabled == true ) {
+			if ( isDebugEnabled == true ) 
 				logger.debug( new StringBuilder( ).append( "insertion prepared statement created: " ).append( sql ).toString( ) );
-			}
 		} catch ( SQLException e ) {
 			logger.error( e.getMessage( ) , e );
 			try {
@@ -480,10 +475,13 @@ public class StorageManager {
 	 * @throws SQLException
 	 */
 	public ResultSet executeQueryWithResultSet ( String query ) throws SQLException {
-		Connection connection = null;
-		connection = connectionPool.borrowConnection( );
-		ResultSet toReturn = connection.createStatement( ).executeQuery( query );
-		return toReturn;
+		Connection connection = connectionPool.borrowConnection( );
+		try {
+			return connection.createStatement( ).executeQuery( query );
+		}catch (SQLException e) {
+			connection.close();
+			throw e;
+		}
 	}
 
 	/**
@@ -748,7 +746,6 @@ class FastConnectionPool {
 				logger.error(e.getMessage(),e);
 			}
 		}
-
 	}
 
 	public Connection borrowConnection ( ) throws SQLException {
