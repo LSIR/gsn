@@ -146,7 +146,7 @@ public abstract class AbstractWrapper extends Thread {
 			return false;
 		synchronized ( listeners ) {
 			for (  StreamSource ss: listeners ) {
-				if( getStorageManager( ).isThereAnyResult( new StringBuilder("select * from ").append(ss.getUIDStr()) )) {
+				if( getStorageManager( ).isThereAnyResult( new StringBuilder("select TIMED from ").append(ss.getUIDStr()) )) {
 					if ( logger.isDebugEnabled() == true ) logger.debug( "Output stream produced/received from a wrapper" );
 					return ss.dataAvailable( );
 				}

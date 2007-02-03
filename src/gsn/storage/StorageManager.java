@@ -753,6 +753,7 @@ class FastConnectionPool {
 
 	public Connection borrowConnection ( ) throws SQLException {
 		Connection conn = cpds.getConnection( );
+		if (logger.isDebugEnabled())logger.debug("Busy connections : "+cpds.getNumBusyConnections()+" MAX POOL SIZE : "+cpds.getMaxPoolSize());
 		conn.setAutoCommit( true );
 		return conn;
 	}
