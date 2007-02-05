@@ -78,17 +78,15 @@ public class DataDownload extends HttpServlet {
 	    		  out.println("Request ERROR");
 	    		  return;
 	    	  } else {
-	    		  field = req.getParameter("fields");
+	    		  //field = req.getParameter("fields");
+	    		  String[] fields = req.getParameterValues("fields");
+			      for (int i=0; i < fields.length; i++) {
+			    	  if (fields[i].equals("timed")) {
+			    		  wantTimeStamp = true;
+			    	  }
+			    	  request += ", " + fields[i];
+			      }    
 	    	  }
-		      String aggregateFunction = "AVG";
-		      if (req.getParameter("aggregateFunction")!= null) {
-		    	  if (req.getParameter("aggregateFunction").equals("MIN")) {
-		    		  aggregateFunction = "MIN";
-		    	  } else if (req.getParameter("aggregateFunction").equals("MAX")) {
-		    		  aggregateFunction = "MAX";
-		    	  }
-		      }
-		      request += "  " + aggregateFunction + "(" + field + ") ";
 	    	  if (req.getParameter("groupby") != null) {
 	    		  if (req.getParameter("groupby").equals("timed")) {
 	    			  int periodmeasure = 1;
@@ -96,7 +94,7 @@ public class DataDownload extends HttpServlet {
 	    				  periodmeasure = new Integer(req.getParameter("groupbytimed"));
 	    				  periodmeasure = java.lang.Math.max(periodmeasure, 1);
 	    			  }
-	    			  request += ", timed, FLOOR(timed/" + periodmeasure + ") period "; 
+	    			  request += ", Min(timed), FLOOR(timed/" + periodmeasure + ") period "; 
 	    			  groupby = "GROUP BY period";
 	    		  } else {
 	    			  groupby = "GROUP BY " + req.getParameter("groupby");

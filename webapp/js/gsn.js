@@ -795,7 +795,7 @@ var GSN = {
 							GSN.data.fields_type.push($(this).attr("type"));
 							if (radio) {
 								if (($(this).attr("type") == "int") || ($(this).attr("type") == "long") || ($(this).attr("type") == "double")) {
-									$("#fields").append("<input type=\"radio\" name=\"fields\" id=\"field\" value=\""+$(this).attr("name")+"\">"+$(this).attr("name")+"<br/>");
+									$("#fields").append("<div id='" + $(this).attr("name") + "'><input type=\"checkbox\" name=\"fields\" id=\"field\" value=\""+$(this).attr("name")+"\" onClick=\"javascript:GSN.data.aggregateSelect('"+$(this).attr("name")+"',this.checked)\">"+$(this).attr("name")+" </div>");
 								}
 							} else {
 								$("#fields").append("<input type=\"checkbox\" name=\"fields\" id=\"field\" value=\""+$(this).attr("name")+"\">"+$(this).attr("name")+"<br/>");
@@ -803,11 +803,6 @@ var GSN = {
 						}
 					});
 					if (radio) {
-						$("#field").attr("checked", true);
-						$("#fields").append("<br/><select name=\"aggregateFunction\" id=\"aggregateFunction\" size=\"1\"></select><br/>");
-						$("#aggregateFunction").append("<option value=\"AVG\">AVG</option>");
-						$("#aggregateFunction").append("<option value=\"AVG\">MAX</option>");
-						$("#aggregateFunction").append("<option value=\"AVG\">MIN</option>");
 						$("#fields").append("<br/>Group by : <select name=\"aggregateGB\" id=\"aggregateGB\" size=\"1\" onChange=\"javascript:GSN.data.groupBy(this.value)\"></select><br/>");
 						for (i = 0; i < GSN.data.fields.length; i++) {
 							$("#aggregateGB").append("<option value=\"" + GSN.data.fields[i] + "\">" + GSN.data.fields[i] + "</option>");
@@ -819,6 +814,17 @@ var GSN = {
 					$("#fields").append("<br><a href=\"javascript:GSN.data.nbDatas()\" id=\"nextStep\">Next step</a>");
 				}
 			});
+		},
+		aggregateSelect: function(that, checked){
+		  if (checked) {
+    		  $("#"+that).append(" <select name=\""+that+"AG\" id=\""+that+"AG\" size=\"1\"></select>");
+    		  $("#"+that+"AG").append("<option value=\"AVG\">AVG</option>");
+    		  $("#"+that+"AG").append("<option value=\"MAX\">MAX</option>");
+    		  $("#"+that+"AG").append("<option value=\"MIN\">MIN</option>");
+    	   } else {
+    	       $("#"+that+"AG").remove();
+    	   }
+						
 		},
 		groupBy: function(option) {
 			if (option == "timed") {
@@ -948,8 +954,7 @@ var GSN = {
 	   				request += "&commonReq=true";
 	   			} else {
 	   				request += "&commonReq=false";
-	   				request += "&aggregateFunction=" + $("#aggregateFunction").val();
-	   				if ($("#aggregateGB").attr("value") != "None") {
+	   				if ($("#aggregateGB").val() != "none") {
 	   					request += "&groupby=" + $("#aggregateGB").val();
 	   					if ($("#aggregateGB").attr("value") == "timed") {
 	   						temp = $("#gbdelta").val();
@@ -968,7 +973,11 @@ var GSN = {
 	   			}
 	   			$("input").each(function () {
 					if ($(this).attr("id") == "field" && $(this).attr("checked")) {
-						request += "&fields=" + $(this).attr("value");
+					   if ($("#commonReq").attr("checked")) {
+    						request += "&fields=" + $(this).attr("value");
+    					} else {
+    					   request += "&fields=" + $("#"+$(this).val()+"AG").val()+"("+$(this).attr("value")+")";
+    					}
 					}
 				});
 				if ($("#someDatas").attr("checked") && $("#nbOfDatas").attr("value") != "") {
