@@ -31,6 +31,7 @@ public class DataDownload extends HttpServlet {
 	      boolean responseCVS = false;
 	      boolean wantTimeStamp = false;
 	      boolean commonReq = true;
+	      boolean groupByTimed = false;
 		  PrintWriter out = res.getWriter();
 	      if (req.getParameter("vsName")==null || req.getParameter("vsName").equals("")) {
 	    	  res.sendError( Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
@@ -62,9 +63,9 @@ public class DataDownload extends HttpServlet {
 	      String expression = "";
 	      String line="";
 	      String groupby="";
+    	  String[] fields = req.getParameterValues("fields");
 	      if (commonReq) {
 		      if (req.getParameter("fields") != null) {
-		    	  String[] fields = req.getParameterValues("fields");
 			      for (int i=0; i < fields.length; i++) {
 			    	  if (fields[i].equals("timed")) {
 			    		  wantTimeStamp = true;
@@ -79,7 +80,7 @@ public class DataDownload extends HttpServlet {
 	    		  return;
 	    	  } else {
 	    		  //field = req.getParameter("fields");
-	    		  String[] fields = req.getParameterValues("fields");
+	    		  //String[] fields = req.getParameterValues("fields");
 			      for (int i=0; i < fields.length; i++) {
 			    	  if (fields[i].equals("timed")) {
 			    		  wantTimeStamp = true;
@@ -89,6 +90,7 @@ public class DataDownload extends HttpServlet {
 	    	  }
 	    	  if (req.getParameter("groupby") != null) {
 	    		  if (req.getParameter("groupby").equals("timed")) {
+    				  groupByTimed = true;
 	    			  int periodmeasure = 1;
 	    			  if (req.getParameter("groupbytimed")!=null) {
 	    				  periodmeasure = new Integer(req.getParameter("groupbytimed"));
@@ -189,14 +191,24 @@ public class DataDownload extends HttpServlet {
 	    		  return;
 	    	  }
 	    	  line = "";
+    		  int nbFields = 0;
 	    	  if (responseCVS) {
 	    		  boolean firstLine = true;
 	    		  out.println(query);
 		          while ( result.hasMoreElements( ) ) {
 		             StreamElement se = result.nextElement( );
 		             if (firstLine) {
-		            	 for (int i=0; i < se.getFieldNames().length; i++)
-		            		 line += delimiter + se.getFieldNames()[i].toString();
+		            	 nbFields = se.getFieldNames().length;
+		            	 if (groupByTimed) {
+		            		 nbFields--;
+		            	 }
+		            	 for (int i=0; i < nbFields; i++)
+		            		 //line += delimiter + se.getFieldNames()[i].toString();
+	    					 if ((!groupByTimed) || (i != fields.length)) {
+	    						 line += delimiter + fields[i];
+	    					 } else {
+	    						 line += delimiter + "timed";
+	    					 }
 		            	if (wantTimeStamp) {
 		            		line += delimiter + "timed";
 		            	}
@@ -204,8 +216,15 @@ public class DataDownload extends HttpServlet {
 		             }
 		             out.println(line.substring(delimiter.length()));
 		             line = "";
-		             for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ )
-		                   line += delimiter+se.getData( )[ i ].toString( );
+		             for ( int i = 0 ; i < nbFields ; i++ )
+		                   //line += delimiter+se.getData( )[ i ].toString( );
+
+		            	 if ( !commonReq && ((i >= fields.length) || (fields[i].contains("timed")))) {
+		            		SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
+		            		line += delimiter+sdf.format(se.getData( )[i]);
+		            	 } else {
+		            		 line += delimiter+se.getData( )[ i ].toString( );
+		          		 }
 		             if (wantTimeStamp) {
 		            	SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 					 	Date d = new Date (se.getTimeStamp());
@@ -220,12 +239,21 @@ public class DataDownload extends HttpServlet {
 		             StreamElement se = result.nextElement( );
 	    			  if (firstLine) {
 	    				 out.println("\t<line>");
-	    				 for (int i = 0; i < se.getFieldNames().length; i++)
-	    					 if (commonReq) {
-		    					 out.println("\t\t<field>" + se.getFieldNames()[i].toString()+"</field>");
+	    				 nbFields = se.getFieldNames().length;
+	    				 if (groupByTimed) {
+		            		 nbFields--;
+	    				 }
+	    				 for (int i = 0; i < nbFields; i++)
+	    					 //if (commonReq) {
+		    					 //out.println("\t\t<field>" + se.getFieldNames()[i].toString()+"</field>");
+	    					 if ((!groupByTimed) || (i != fields.length)) {
+	    						 out.println("\t\t<field>" + fields[i] + "</field>");
 	    					 } else {
-	    						 out.println("\t\t<field>"+expression+"</field>");
+	    						 out.println("\t\t<field>timed</field>");
 	    					 }
+	    					 //} else {
+	    					//	 out.println("\t\t<field>"+expression+"</field>");
+	    					 //}
 	    				 if (wantTimeStamp) {
 	    					 out.println("\t\t<field>timed</field>");
 	    				 }
@@ -234,9 +262,10 @@ public class DataDownload extends HttpServlet {
 	    			  }
 		             line = "";
 		             out.println("\t<line>");
-		             for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {
+		             for ( int i = 0 ; i < nbFields ; i++ ) {
 		            	 
-		            	 if ( !commonReq && expression.contains("(timed)")) {
+		            	 //if ( !commonReq && expression.contains("timed")) {
+		            	 if ( !commonReq && ((i >= fields.length) || (fields[i].contains("timed")))) {
 		            		SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 			            	out.println("\t\t<field>"+sdf.format(se.getData( )[i])+"</field>");
 		            	 } else
