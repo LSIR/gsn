@@ -417,7 +417,7 @@ var GSN = {
 			  });
 			  
 			  if ($(vs).attr("description")!="") {
-			 	$("dl.description", vsd).append($.DT({},""),$.DD({},$(vs).attr("description")));
+			 	$("dl.description", vsd).append($.DD({},$(vs).attr("description")));
 			 	$("a.tabdescription", vsd).show();
 			 	if (!gotStatic) {
 			  		$("a.tabdescription", vsd).addClass("active");
