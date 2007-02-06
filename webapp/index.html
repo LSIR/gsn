@@ -51,8 +51,8 @@ $(document).ready(function() {
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
 		
 		<div id="control">
-		  <div class="msg"></div>
-		  <div class="intro">Welcome to Global Sensor Networks. The first ten sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
+		  <iframe name="webupload" style="border:0;height:0;width:0;"></iframe>
+		  <div id="msg">Welcome to Global Sensor Networks. The first ten sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
 		  <p>Auto-refresh every : 
 			<select id="refreshall_timeout" >
 			<option value="3600000">1hour</option>

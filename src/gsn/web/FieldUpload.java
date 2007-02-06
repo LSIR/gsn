@@ -68,6 +68,7 @@ public class FieldUpload extends HttpServlet {
 		// Process the uploaded items
 		Iterator iter = items.iterator();
 		String cmd = "";
+		String vsname = "";
 		Base64 b64 = new Base64();
 		StringBuilder sb = new StringBuilder("<input>\n" );
 		while (iter.hasNext()) {
@@ -76,6 +77,7 @@ public class FieldUpload extends HttpServlet {
 		    if (item.getFieldName().equals("vsname")){
 		    	//define which cmd block is sent
 		    	sb.append("<vsname>"+item.getString()+"</vsname>\n");
+		    	vsname = item.getString();
 		    } else if (item.getFieldName().equals("cmd")){
 		    	//define which cmd block is sent
 		    	cmd = item.getString();
@@ -98,9 +100,11 @@ public class FieldUpload extends HttpServlet {
 		sb.append("</input>\n" );
 		
 		
+		//do something with xml aka sb.toString()
 		
-		//if no error, send a successful redirect
-	    //res.sendRedirect("/#home,msg=upsucc");
-		out.write(sb.toString());
+		String msg = "The upload to the virtual sensor went successfully! ("+vsname+")";
+		Integer code = 200;
+		out.write("<script>window.parent.GSN.msgcallback('"+msg+"',"+code+");</script>");
+		
 	}
 }

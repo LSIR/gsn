@@ -11,7 +11,6 @@ var GSN = {
 		}	
 	}
 	,context: null //home, data, map || fullmap
-	,msg: null  //if there is some msg to give back
 	/**
 	* Initialize a page load (begin, tab click & back button)
 	*/
@@ -30,18 +29,7 @@ var GSN = {
 			else
 				$(this).removeClass("selected");
 		});
-		
-		//take care of msg params
-		for (var i=1;i<params.length;i++){
-			val = params[i].split("=");
-			if (val[0]=="msg") {
-				GSN.msg = val[1]
-				params.splice(i,1);
-				$.historyLoad(params.join(","));
-				return;
-			}
-		}		
-		
+				
 		$("#main > div").hide();
 		if (GSN.context!="map") {
 			$("#toggleallmarkers").hide();
@@ -51,28 +39,18 @@ var GSN = {
 		if (GSN.context=="home")	{
 			GSN.vsbox.container = "#vs";
 			$("#main #control").show();
-			$(".msg").hide();
-			$(".intro").show();
 			$("#main #homediv").show();
 			$("#control #closeall").show();
 			//load and display all the visual sensors
 			if (!GSN.loaded) GSN.updateall();
 			
-			if (GSN.msg != null) {
-				$(".msg").show();
-				$(".intro").hide();
-				if (GSN.msg=="upsucc")
-					$("#control .msg").empty().append("The upload to the virtual sensor went successfully!");
-				GSN.msg = null;
-			}
 		} else if (GSN.context=="data")	{
-			$(".msg").remove();
+			$("#msg").hide();
 			$("#main #datachooser").show();
 			if (!GSN.loaded) GSN.updateall();
 		} else if (GSN.context=="map")	{
 			GSN.vsbox.container = "#vs4map";
-			$(".intro").hide();
-			$(".msg").remove();
+			$("#msg").hide();
 			$("#main #control").show();
 			$("#control #closeall").hide();
 			$("#main #mapdiv").show();
@@ -109,6 +87,19 @@ var GSN = {
 		}
 	}
 	/**
+	* iframe msg callback for webupload
+	*/
+	,msgcallback: function (msg,code) {
+		GSN.debug(code+": "+msg);
+		$("#msg").html(msg);		
+		$("#msg").removeClass();
+		if (code <= 200)
+			$("#msg").addClass("good");
+		else
+			$("#msg").addClass("bad");
+		$("#msg").show();
+	}
+	/**
 	* Click on the top navigation bar
 	*/
 	,nav: function (page) {
@@ -119,7 +110,7 @@ var GSN = {
 	* Click on the virtual sensor on the left bar
 	*/
 	,menu: function (vsName) {
-		$(".intro").remove();
+		$("#msg").hide();
 		//define the click depending the context (home,data,map)
 		if (GSN.context=="home"){
 			GSN.addandupdate(vsName);
@@ -147,7 +138,7 @@ var GSN = {
 	* Close all button
 	*/
 	,closeall: function (){
-		$(".intro").remove();
+		$("#msg").hide();
 		$("#vs").empty();
 		GSN.map.followMarker(null);
 	}
@@ -253,7 +244,7 @@ var GSN = {
 		*/
 		,add: function(vsName) {
 			var vsdiv = "vsbox-"+vsName;
-			if ($("."+vsdiv, $(this.container)).size()!=0) return; //already exists
+			if ($(this.container).find("."+vsdiv).size()!=0) return; //already exists
 			$(this.container).append($.DIV({"class":vsdiv+" vsbox"},
 									  $.H3({},$.SPAN({"class":"vsname"},vsName),
 									  	$.A({"href":"javascript:GSN.vsbox.remove('"+vsName+"');","class":"close"},"close"),
@@ -269,16 +260,18 @@ var GSN = {
 									  $.DL({"class":"static"}),
 									  $.DL({"class":"structure"}),
 									  $.DL({"class":"description"}),
-									  $.DL({"class":"upload"},
-									  	$.FORM({"action":"/upload","method":"post","enctype":"multipart/form-data"},
+									  $.DL({"class":"upload"}/*,
+									  	$.FORM({"action":"/upload","method":"post","enctype":"multipart/form-data","target":"webupload"},
 									  		$.INPUT({"type":"hidden","name":"vsname","value":vsName}),
 									  		$.SELECT({"class":"cmd","name":"cmd"}),
 									  		$.DL({"class":"input"}),
 									  		$.INPUT({"type":"submit","value":"upload"}),
 									  		$.P({},"* compulsary fields.")
-									  	)
+									  	)*/
 									  )
 			));
+			
+			$(this.container).find("."+vsdiv+" dl.upload").html('<form target="webupload" enctype="multipart/form-data" method="post" action="/upload"><input value="'+vsName+'" name="vsname" type="hidden"><select name="cmd" class="cmd"></select><dl class="input"></dl><input value="upload" type="submit"><p>* compulsary fields.</p></form>');
 			$(this.container).find("."+vsdiv+" select.cmd").bind("change", function(event) {GSN.vsbox.toggleWebInput(event)});
 		}
 		/**
@@ -332,14 +325,14 @@ var GSN = {
 				
 				if (name=="timed") {
 			  		if (value != "") value = GSN.util.printDate(value);
-					$("span.timed", vsd).empty().append(value);
+					$(vsd).find("span.timed").empty().append(value);
 			  		return;
 			  	}
 				
 				if (cat=="input") {
 					dl = input;
 					if (!gotInput) {	
-						$("a.tabupload", vsd).show();
+						$(vsd).find("a.tabupload").show();
 						gotInput = true;
 					}
 				} else if (cat=="predicate") {
@@ -347,9 +340,9 @@ var GSN = {
 					if (!gotStatic) {	
 						$("a.tabstatic", vsd).show();
 			  			if (!gotDynamic) {
-			  				$("a.tabstatic", vsd).addClass("active");
-			  				$("dl", vsd).hide();
-			  				$("dl.static", vsd).show();
+			  				$(vsd).find("a.tabstatic").addClass("active");
+			  				$(vsd).find("> dl").hide();
+			  				$(vsd).find("dl.static").show();
 			  			}
 						gotStatic = true;
 					}
@@ -406,7 +399,7 @@ var GSN = {
 							value += '<input type="'+type.split(":")[0]+'" name="'+cmd+";"+name+'" value="'+options[i]+'">'+options[i]+'</input>';
 						}
 					} else {
-						value = '<input type="file" name="'+cmd+";"+name+'"/>';
+						value = '<input type="text" name="'+cmd+";"+name+'"/>';
 					}
 					if ($(this).attr("description")!=null)
 						value += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';	
@@ -420,9 +413,9 @@ var GSN = {
 			 	$("dl.description", vsd).append($.DD({},$(vs).attr("description")));
 			 	$("a.tabdescription", vsd).show();
 			 	if (!gotStatic) {
-			  		$("a.tabdescription", vsd).addClass("active");
-			  		$("dl", vsd).hide();
-			  		$("dl.description", vsd).show();
+			  		$(vsd).find("a.tabdescription", vsd).addClass("active");
+			  		$(vsd).find("> dl").hide();
+			  		$(vsd).find("dl.description").show();
 			  	}
 				
 			  }
