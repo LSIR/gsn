@@ -835,6 +835,7 @@ var GSN = {
 			});
 		},
 		aggregateSelect: function(that, checked){
+		  // To can choose the aggregate type for the field
 		  if (checked) {
     		  $("#"+that).append(" <select name=\""+that+"AG\" id=\""+that+"AG\" size=\"1\"></select>");
     		  $("#"+that+"AG").append("<option value=\"AVG\">AVG</option>");
