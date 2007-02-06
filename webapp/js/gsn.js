@@ -272,14 +272,14 @@ var GSN = {
 									  $.DL({"class":"upload"},
 									  	$.FORM({"action":"/upload","method":"post","enctype":"multipart/form-data"},
 									  		$.INPUT({"type":"hidden","name":"vsname","value":vsName}),
-									  		$.SELECT({"class":"cmd","name":"cmd","onChange":"javascript:GSN.vsbox.toggleWebInput()"}),
+									  		$.SELECT({"class":"cmd","name":"cmd"}),
 									  		$.DL({"class":"input"}),
 									  		$.INPUT({"type":"submit","value":"upload"}),
 									  		$.P({},"* compulsary fields.")
 									  	)
 									  )
 			));
-			$("."+vsdiv+" select.cmd", $(this.container)).bind( "change", function(event) { GSN.vsbox.toggleWebInput(event); } );
+			$(this.container).find("."+vsdiv+" select.cmd").bind("change", function(event) {GSN.vsbox.toggleWebInput(event)});
 		}
 		/**
 		* Bring a vsbox at the beginning of the container
@@ -383,17 +383,35 @@ var GSN = {
 						$("select.cmd", vsd).append($.OPTION({},cmd));
 						last_cmd = cmd;
 					}
-					if (type.indexOf("binary") != -1){
-						value = '<input type="file" name="'+cmd+";"+name+'"/>';
-					} else {
-						value = '<input type="text" name="'+cmd+";"+name+'"/>';
+					var comp = '';
+					if (type.substr(0,1)=="*") {
+						comp = '*';
+						type=type.substr(1);
 					}
-					if (type.substr(0,1)=="*")
-						name = "*"+name;
-					
+
+					if (type.split(":")[0].indexOf("binary") != -1){
+						value = '<input type="file" name="'+cmd+";"+name+'"/>';
+					} else if (type.split(":")[0].indexOf("select") != -1){
+						var options = type.split(":")[1].split("|");
+						value = '<select name="'+cmd+";"+name+'">';
+						for (var i = 0; i < options.length;i++){
+							value += '<option>'+options[i]+'</option>';
+						}
+						value += '</select>';						
+					}  else if (type.split(":")[0].indexOf("radio") != -1 ||
+								type.split(":")[0].indexOf("checkbox") != -1){
+						var options = type.split(":")[1].split("|");
+						value = '';
+						for (var i = 0; i < options.length;i++){
+							value += '<input type="'+type.split(":")[0]+'" name="'+cmd+";"+name+'" value="'+options[i]+'">'+options[i]+'</input>';
+						}
+					} else {
+						value = '<input type="file" name="'+cmd+";"+name+'"/>';
+					}
 					if ($(this).attr("description")!=null)
 						value += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';	
 					
+					name = comp+name;
 				} 
 				$(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');				
 			  });
@@ -456,10 +474,11 @@ var GSN = {
 			$("."+vsdiv+" a.tab"+dl, $(this.container)).addClass("active");
 		}
 		,toggleWebInput: function (event){
+			var cmd = event.target.options[event.target.selectedIndex].text;
 			$(event.target).parent().find("dt").hide();
 			$(event.target).parent().find("dd").hide();
-			$(event.target).parent().find("dt."+event.target.value).show();
-			$(event.target).parent().find("dd."+event.target.value).show();
+			$(event.target).parent().find("dt."+cmd).show();
+			$(event.target).parent().find("dd."+cmd).show();
 		}
 	},
 	/**

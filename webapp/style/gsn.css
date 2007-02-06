@@ -313,7 +313,9 @@ font-weight:bold;
 .vsbox input[type=submit], .vsbox dl p {
 	margin-left:107px;
 }
-.vsbox select.cmd {margin-left:108px; width:146px;}
+.vsbox select.cmd{margin-left:108px; width:146px;}
+.vsbox .input select {width:146px;}
+.vsbox .input input {vertical-align:middle;}
 .vsbox dl p {	font-style: italic;}
 
 .vsbox a.tabdynamic, .vsbox a.tabstatic, .vsbox a.tabstructure,.vsbox a.tabdescription,.vsbox a.tabupload {
