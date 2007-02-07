@@ -193,7 +193,7 @@ public class VSensorLoader extends Thread {
 		}
 		// sm.renameTable(vsensorName,vsensorName+"Before"+System.currentTimeMillis());
 		Mappings.getContainer ( ).removeAllResourcesAssociatedWithVSName ( vsensorName );
-		this.sm.dropTable ( config.getName ( ) );
+//		this.sm.dropTable ( config.getName ( ) );
 	}
 
 	public static Modifications getUpdateStatus ( String virtualSensorsPath ) {
