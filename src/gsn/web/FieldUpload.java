@@ -37,74 +37,81 @@ public class FieldUpload extends HttpServlet {
 	}
 	
 	public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
+		String msg;
+		Integer code;
 		PrintWriter out = res.getWriter();
 		
 		//Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 		if (!isMultipart) {
 			out.write("not multipart!");
-			logger.error("not multipart");
-			return;
-		}
-		
-		//Create a factory for disk-based file items
-		FileItemFactory factory = new DiskFileItemFactory();
+			code = 666;
+			msg = "Error post data is not multipart!";
+			logger.error(msg);
+		} else {
+			// Create a factory for disk-based file items
+			FileItemFactory factory = new DiskFileItemFactory();
 
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
 
-		//Set overall request size constraint
-		//upload.setSizeMax(1000);
-		
-		// Parse the request
-		List /* FileItem */ items;
-		try {
-			items = upload.parseRequest(req);
-		} catch(Exception e){
-			logger.error("exception:",e);
-			return;
+			// Set overall request size constraint
+			upload.setSizeMax(5*1024*1024);
+			
+			
+			List items;
+			try {
+				// Parse the request
+				items = upload.parseRequest(req);
+			
+				//building xml data out of the input
+				String cmd = "";
+				String vsname = "";
+				Base64 b64 = new Base64();
+				StringBuilder sb = new StringBuilder("<input>\n" );
+				Iterator iter = items.iterator();
+				while (iter.hasNext()) {
+					FileItem item = (FileItem) iter.next();
+				    if (item.getFieldName().equals("vsname")){
+				    	//define which cmd block is sent
+				    	sb.append("<vsname>"+item.getString()+"</vsname>\n");
+				    	vsname = item.getString();
+				    } else if (item.getFieldName().equals("cmd")){
+				    	//define which cmd block is sent
+				    	cmd = item.getString();
+				    	sb.append("<command>"+item.getString()+"</command>\n");
+				    	sb.append("<fields>\n");
+				    } else if (item.getFieldName().split(";")[0].equals(cmd)) {
+				    	//only for the defined cmd    	
+				    	sb.append("<field>\n");
+			    	    sb.append("<name>"+item.getFieldName().split(";")[1]+"</name>\n");
+			    	    if (item.isFormField()) {
+					    	sb.append("<value>"+item.getString()+"</value>\n");
+			    	    } else {
+			    	    	sb.append("<value>"+new String(b64.encode(item.get()))+"</value>\n");
+			    	    }
+			    	    sb.append("</field>\n");
+				    }
+				}
+				sb.append("</fields>\n");
+				sb.append("</input>\n" );
+			
+				//do something with xml aka sb.toString()
+			
+				code = 200;
+				msg = "The upload to the virtual sensor went successfully! ("+vsname+")";
+			} catch (ServletFileUpload.SizeLimitExceededException e) {
+				code = 600;
+				msg = "Upload size exceeds maximum limit!";
+				logger.error(msg);
+	        } catch(Exception e){
+				code = 500;
+				msg = "Internal Error: "+e;
+				logger.error(msg);
+			}
+			
 		}
-		
-		// Process the uploaded items
-		Iterator iter = items.iterator();
-		String cmd = "";
-		String vsname = "";
-		Base64 b64 = new Base64();
-		StringBuilder sb = new StringBuilder("<input>\n" );
-		while (iter.hasNext()) {
-		    FileItem item = (FileItem) iter.next();
-		    
-		    if (item.getFieldName().equals("vsname")){
-		    	//define which cmd block is sent
-		    	sb.append("<vsname>"+item.getString()+"</vsname>\n");
-		    	vsname = item.getString();
-		    } else if (item.getFieldName().equals("cmd")){
-		    	//define which cmd block is sent
-		    	cmd = item.getString();
-		    	sb.append("<command>"+item.getString()+"</command>\n");
-		    	sb.append("<fields>\n");
-		    } else if (item.getFieldName().split(";")[0].equals(cmd)) {
-		    	//only for the defined cmd
-		    	
-		    	sb.append("<field>\n");
-	    	    sb.append("<name>"+item.getFieldName().split(";")[1]+"</name>\n");
-	    	    if (item.isFormField()) {
-			    	sb.append("<value>"+item.getString()+"</value>\n");
-	    	    } else {
-	    	    	sb.append("<value>"+new String(b64.encode(item.get()))+"</value>\n");
-	    	    }
-	    	    sb.append("</field>\n");
-		    }
-		}
-		sb.append("</fields>\n");
-		sb.append("</input>\n" );
-		
-		
-		//do something with xml aka sb.toString()
-		
-		String msg = "The upload to the virtual sensor went successfully! ("+vsname+")";
-		Integer code = 200;
+		//callback to the javascript
 		out.write("<script>window.parent.GSN.msgcallback('"+msg+"',"+code+");</script>");
-		
 	}
 }
