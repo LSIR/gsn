@@ -363,8 +363,8 @@ public  class StreamSource {
 			toReturn.append(" where " );
 		else
 			toReturn.append(" and " );
-//		Applying the ** START  AND END TIME ** for count based windows
-		toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
+//		Applying the ** START  AND END TIME ** for all types of windows based windows
+//		toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
 
 		if (isStorageCountBased()) {
 			toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset " );
