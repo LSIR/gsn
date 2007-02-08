@@ -28,7 +28,7 @@ public abstract class AbstractWrapper extends Thread {
 
 	private boolean                            isActive       = true;
 
-	private static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 100;
+	private static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 10;
 	/**
 	 * Returns the view name created for this listener.
 	 * Note that, GSN creates one view per listener.
@@ -117,7 +117,7 @@ public abstract class AbstractWrapper extends Thread {
 		StreamElement se = new StreamElement(getOutputFormat(),values,System.currentTimeMillis());
 		postStreamElement(se);
 	}
-	
+
 	/**
 	 * This method gets the generated stream element and notifies the input streams if needed.
 	 * The return value specifies if the newly provided stream element generated
@@ -125,23 +125,25 @@ public abstract class AbstractWrapper extends Thread {
 	 * @param streamElement
 	 * @return If the method returns false, it means the insertion doesn't effected any input stream.
 	 */
-	
+
 	protected Boolean postStreamElement ( StreamElement streamElement ) {
 		if (!isActive() || listeners.size()==0)
 			return false;
 		if (!insertIntoWrapperTable(streamElement))
 			return false;
+		boolean toReturn = false;
 		synchronized ( listeners ) {
 			for (  StreamSource ss: listeners ) {
 				if( getStorageManager( ).isThereAnyResult( new StringBuilder("select TIMED from ").append(ss.getUIDStr()) )) {
 					if ( logger.isDebugEnabled() == true ) logger.debug( "Output stream produced/received from a wrapper" );
-					return ss.dataAvailable( );
+					ss.dataAvailable( );
+					toReturn=true;
 				}
 			}
 		}
 		if (++noOfCallsToPostSE%GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS==0)
 			removeUselessValues();
-		return false;		
+		return toReturn;		
 	}
 	/**
 	 * Updates the table representing the data items produced by the stream element.
@@ -181,7 +183,7 @@ public abstract class AbstractWrapper extends Thread {
 			throw new GSNRuntimeException("Sending to an inactive/disabled wrapper is not allowed !");
 		throw new OperationNotSupportedException( "This wrapper doesn't support sending data back to the source." );
 	}
-   
+
 
 	/**
 	 * Removes all the listeners, drops the views representing them, drops the sensor table,
@@ -224,7 +226,7 @@ public abstract class AbstractWrapper extends Thread {
 			return 0;
 		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "RESULTING QUERY FOR Table Size Enforce " ).append( query ).toString( ) );
 		int deletedRows =StorageManager.getInstance().executeUpdate(query);
-	    if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( deletedRows ).append( " old rows dropped from " ).append( getDBAliasInStr() ).toString( ) );
+		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( deletedRows ).append( " old rows dropped from " ).append( getDBAliasInStr() ).toString( ) );
 		return deletedRows;
 	}
 	public void releaseResources ( ) {
