@@ -4,6 +4,7 @@ import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
+import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 
 import java.net.MalformedURLException;
@@ -17,6 +18,8 @@ import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
+ * TODO : Optimization for combining where clauses in the time based window and updating the
+ * registered query with the new where clause
  */
 public class RemoteWrapper extends AbstractWrapper {
 
@@ -123,21 +126,20 @@ public class RemoteWrapper extends AbstractWrapper {
 	 * Note that query translation is not needed, it is going to performed in the receiver's side.
 	 */
 	public void addListener ( StreamSource ss ) {
+		super.addListener(ss);
 		try {
 			registeredWhereClauses.add(ss.toSql());
 			refreshRemotelyRegisteredQuery();
-			super.addListener(ss);
 		}
 		catch (XmlRpcException ex) {
 			logger.warn("Adding the data listener failed. "+ex.getMessage(), ex);
 		};
-		
+
 	}
 
 	public void removeListener ( StreamSource ss ) {
-		registeredWhereClauses.remove ( ss );
-		// TEST REQUIRED, I'm not sure once the listener is removed, gsn answers with nak to the data packet.  if ( registeredWhereClauses.size ( ) > 0 ) refreshRemotelyRegisteredQuery ( );
 		super.removeListener ( ss );
+		registeredWhereClauses.remove ( ss );
 	}
 
 	/**
@@ -146,19 +148,8 @@ public class RemoteWrapper extends AbstractWrapper {
 	 * insert the data into the appropriate database and then calls the following
 	 * method).
 	 */
-	public void remoteDataReceived ( ) {
-		if ( logger.isDebugEnabled ( ) ) logger.debug ( "There are results, is there any listeners ?" );
-		for ( StreamSource ss :listeners ) {
-			boolean results = getStorageManager ( ).isThereAnyResult ( new StringBuilder("select * from ").append(ss.getUIDStr() ));
-			if ( results ) {
-				if ( logger.isDebugEnabled ( ) )
-					logger.debug ( new StringBuilder ( ).append ( "There are listeners, notify the " ).append ( ss.getInputStream ( ).getInputStreamName ( ) ).append ( " inputStream" ).toString ( ) );
-				// TODO :DECIDE WHETHER TO INFORM THE CLIENT OR NOT (TIME
-				// TRIGGERED. DATA TRIGGERED)
-				ss.dataAvailable ( );
-			}
-		}
-
+	public boolean remoteDataReceived (StreamElement se ) {
+		return postStreamElement(se);
 	}
 
 	public  DataField [] getOutputFormat ( ) {
@@ -176,13 +167,13 @@ public class RemoteWrapper extends AbstractWrapper {
 	public void finalize ( ) {
 		//TODO
 	}
-	public String getRemoteHost (){
+	public final String getRemoteHost (){
 		return host;
 	}
 	public int getRemotePort (){
 		return port;
 	}
-	public String getRemoveVSName (){
+	public final String getRemoveVSName (){
 		return remoteVSName;
 	}
 

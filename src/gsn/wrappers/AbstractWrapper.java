@@ -28,7 +28,7 @@ public abstract class AbstractWrapper extends Thread {
 
 	private boolean                            isActive       = true;
 
-	private static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 10;
+	private static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
 	/**
 	 * Returns the view name created for this listener.
 	 * Note that, GSN creates one view per listener.
