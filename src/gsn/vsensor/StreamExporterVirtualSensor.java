@@ -28,19 +28,21 @@ import java.sql.PreparedStatement;
  */
 public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 
-	public static final String            PARAM_USER    = "user" , PARAM_PASSWD = "password" , PARAM_URL = "url" , PARAM_TABLE_PREFIX = "table-prefix";
+	public static final String            PARAM_USER    = "user" , PARAM_PASSWD = "password" , PARAM_URL = "url" , PARAM_TABLE_PREFIX = "table";
 
 	private static final transient Logger logger        = Logger.getLogger( StreamExporterVirtualSensor.class );
 
 	StringBuilder                         sqlbuilder    = new StringBuilder( );
 
-	private String                        sqlstart , table_prefix = "GSN_EXPORT_";
+	private String                        sqlstart ;
 
 	private Connection                    connection;
 
 	private Statement                     statement;
 
 	private Vector < String >             createdTables = new Vector < String >( );
+
+	private String table_name;
 
 	public boolean initialize ( ) {
 		VSensorConfig vsensor = getVirtualSensorConfiguration( );
@@ -58,7 +60,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 				connection = DriverManager.getConnection( params.get( PARAM_URL ) , params.get( PARAM_USER ) , params.get( PARAM_PASSWD ) );
 				logger.debug( "jdbc connection established." );
 				if ( params.get( PARAM_TABLE_PREFIX ) != null ) 
-					table_prefix = params.get( PARAM_TABLE_PREFIX );
+					table_name = params.get( PARAM_TABLE_PREFIX );
 				statement = connection.createStatement( );
 
 			} catch ( SQLException e ) {
@@ -73,9 +75,8 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	public void dataAvailable ( String inputStreamName , StreamElement streamElement ) {
-		String tableName = table_prefix + inputStreamName;
-		ensureTableExistence( tableName , streamElement.getFieldNames( ) , streamElement.getFieldTypes( ) );
-		exportValues( tableName , streamElement );
+		ensureTableExistence( table_name , streamElement.getFieldNames( ) , streamElement.getFieldTypes( ) );
+		exportValues( table_name , streamElement );
 
 	}
 

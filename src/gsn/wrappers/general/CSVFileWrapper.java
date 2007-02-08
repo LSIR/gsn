@@ -131,7 +131,7 @@ public class CSVFileWrapper extends AbstractWrapper {
 				logger.debug("time: "+time);
 				logger.debug("system time: "+System.currentTimeMillis());
 				
-				StreamElement stream = new StreamElement(structure, serialized );
+				StreamElement stream = new StreamElement(structure, serialized, time );
 				this.postStreamElement(stream);
 			}// end of while loop
 
