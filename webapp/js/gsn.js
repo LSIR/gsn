@@ -98,6 +98,7 @@ var GSN = {
 		else
 			$("#msg").addClass("bad");
 		$("#msg").show();
+		document.getElementById("container").scrollIntoView(true);
 	}
 	/**
 	* Click on the top navigation bar
@@ -419,6 +420,7 @@ var GSN = {
 			  	}
 				
 			  }
+			  $(vsd).find("img").ToolTip();
 			  return true;
 			} else {
 				//update the vsbox when the value already exists

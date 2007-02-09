@@ -256,6 +256,13 @@ font-weight:bold;
 }
 
 /* specific style for vsbox and core bellow */
+.tooltip {
+	border: 1px solid #FFA84C;
+	padding: 2px;
+	background: #FFE0BF;
+	color: black;
+}
+
 #main > div { display:none; }
 
 .vsbox {
