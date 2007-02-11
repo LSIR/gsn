@@ -30,6 +30,7 @@ import javax.swing.text.StyledDocument;
 import org.apache.log4j.Logger;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class SwingLogView extends JPanel {
@@ -46,8 +47,6 @@ public class SwingLogView extends JPanel {
 	private Style style_bold, style_classic;
 
 	private StyledDocument doc;
-
-	private JPanel controlPane;
 
 	private JSpinner logSize;
 
@@ -108,42 +107,22 @@ public class SwingLogView extends JPanel {
 
 	public SwingLogView(String log_file) {
 		super();
-		// create text area to hold the log messages
-		add(BorderLayout.CENTER, getScrollPane());
-		
-		add(BorderLayout.PAGE_END, getControlBar());
 		this.log_file = log_file;
-	}
-
-	private JPanel getControlBar() {
-
-		controlPane = new JPanel(new GridBagLayout());
+		// create text area to hold the log messages
+		
 		logSize = new JSpinner(new SpinnerNumberModel(DEFAULT_LOG_SIZE,
 				MIN_LOG_SIZE, MAX_LOG_SIZE, SPINNER_STEP));
-		logSize
-		.setToolTipText("You can change here how much log history is displayed in this window.");
-
-		allowScroll = new JCheckBox(
-		"Scroll log window when new data is available.");
+		logSize.setToolTipText("You can change here how much log history is displayed in this window.");
+		allowScroll = new JCheckBox("Scroll log window when new data is available.");
 		allowScroll.setSelected(true);
-		allowScroll
-		.setToolTipText("Disable this to inspect old logs statements.");
-		/*
-		 * GridBagConstraints c = new GridBagConstraints(); c.gridx=0;
-		 * c.gridy=0; c.insets = new Insets(0,5,5,0);
-		 * c.anchor=GridBagConstraints.LINE_START; controlPanel.add(logSize, c);
-		 * c.gridx=1; controlPanel.add(new JLabel("History size."), c);
-		 * c.gridx=3; c.anchor=GridBagConstraints.LINE_END;
-		 * controlPanel.add(allowScroll, c);
-		 */
-		DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout(
-				"r:pref,4dlu,pref:g,8dlu,r:pref,4dlu,pref:g", ""));
+		allowScroll.setToolTipText("Disable this to inspect old logs statements.");
+		DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("pref:g,8dlu,r:pref,4dlu,pref:g", ""));
+		builder.append(getScrollPane(),5);
+		builder.nextLine();	
 		builder.append(logSize);
-		
 		builder.append(new JLabel("History size."));
 		builder.append(allowScroll);
-		controlPane = builder.getPanel();
-		return controlPane;
+		add(builder.getPanel());
 	}
 
 	public void doLog(Vector<String> logs) {
@@ -258,10 +237,8 @@ public class SwingLogView extends JPanel {
 		StyleConstants.setForeground(style_classic, Color.black);
 
 		scrollPane = new JScrollPane(logMessagesDisp);
-		scrollPane
-		.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane
-		.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		return scrollPane;
 	}

@@ -66,13 +66,7 @@ public class GSNConfiguratorPanel {
 
 	}
 
-	//private JButton directoryServiceStartStop = new JButton(startIcon);
-
 	private JButton gsnStart = new JButton(startIcon);
-
-	private JComboBox networkInterface;
-
-	private Timer timer;
 
 	private JFormattedTextField gsnPortNo;
 
@@ -198,10 +192,6 @@ public class GSNConfiguratorPanel {
 		gsnStart.addActionListener(new ActionListener() {
 
 			public boolean testBeforeRunningDirectory() {
-				// FIXME
-//				if (!confirmConstraint(!PIDUtils.isPIDExist(PIDUtils.GSN_PID),
-//				"Another GSN Server is running."))
-//				return false;
 
 				int gsnPort = bean.getContainerPort();
 				if (!confirmConstraint((gsnPort > 0 || gsnPort < 65000),
