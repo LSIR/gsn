@@ -7,10 +7,13 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
@@ -111,7 +114,10 @@ public class GSNConfiguratorPanel {
 	public void stopGsn() {
 		try {
 			Socket socket = new Socket(InetAddress.getLocalHost(), gsn.GSNController.GSN_CONTROL_PORT);
-			socket.getOutputStream();
+			PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
+			writer.println(gsn.GSNController.GSN_CONTROL_SHUTDOWN);
+			writer.flush();
+			notifyGsnHasStopped();
 		} catch(IOException e) {
 			// Could not connect to GSN. Assume it is not running.
 			JOptionPane.showMessageDialog(null, "Could not connect to GSN. It has probably already stopped (error message was: " + e.getMessage() +").");
@@ -192,7 +198,6 @@ public class GSNConfiguratorPanel {
 		gsnStart.addActionListener(new ActionListener() {
 
 			public boolean testBeforeRunningDirectory() {
-
 				int gsnPort = bean.getContainerPort();
 				if (!confirmConstraint((gsnPort > 0 || gsnPort < 65000),
 				"The specified port number for GSN is not valid."))
@@ -212,6 +217,7 @@ public class GSNConfiguratorPanel {
 							+ e2.getMessage() + ")");
 					return false;
 				}
+				
 				try {
 					ValidityTools.isDBAccessible(bean.getJdbcDriver(), bean
 							.getJdbcURL(), bean.getJdbcUsername(), bean
@@ -226,6 +232,7 @@ public class GSNConfiguratorPanel {
 			}
 
 			public void actionPerformed(ActionEvent e) {
+				
 				if (isGsnRunning() == false) {
 					if (testBeforeRunningDirectory() == false)
 						return;
