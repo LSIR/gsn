@@ -193,8 +193,9 @@ public class GSNConfiguratorFrame extends JFrame {
 	 * This is the central point of exit.
 	 */
 	private void closeGSNConfigurator() {
-		JOptionPane confirmExitPane = new JOptionPane(
-				"Are you sure you want to exit GSN Control Center ? GSN and GSN-DIR will be stopped.",
+		if(configuratorPanel.isGsnRunning()) {
+		JOptionPane confirmExitPane = new JOptionPane( 
+				"Are you sure you want to exit GSN Control Center ? GSN will be stopped.",
 				JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION,
 				GSN_ICON);
 		JDialog confirmExitDialog = confirmExitPane.createDialog(null,
@@ -203,6 +204,9 @@ public class GSNConfiguratorFrame extends JFrame {
 		Object selectedValue = confirmExitPane.getValue();
 		if (selectedValue != null
 				&& ((Integer) selectedValue).intValue() == JOptionPane.OK_OPTION) {
+			System.exit(0);
+		}
+		} else {
 			System.exit(0);
 		}
 	}
