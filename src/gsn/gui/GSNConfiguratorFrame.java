@@ -156,30 +156,7 @@ public class GSNConfiguratorFrame extends JFrame {
 		menuFile.add(new JMenuItem(new AboutAction(getBackground())));
 		menuFile.addSeparator();
 		menuFile.add(menuQuit);
-
-//		menuEdit = new JMenu(MENU_EDIT);
-//		menuEdit.setMnemonic(ACCEL_EDIT);
-//		menuUndo = new JMenuItem(MENU_UNDO);
-//		menuRedo = new JMenuItem(MENU_REDO);
-
-//		menuOptions = new JMenu(MENU_OPTIONS);
-
-//		menuHelp = new JMenu(MENU_HELP);
-//		menuHelp.setMnemonic(ACCEL_HELP);
-//		menuHelpContents = new JMenuItem(MENU_HELPCONTENTS);
-
-//		menuAbout = new JMenuItem(MENU_ABOUT);
-//		menuAbout.setAction(new AboutAction());
-
-//		menuBar.add(menuAbout);
-		//	menuHelp.add(menuHelpContents);
-//		menuHelp.addSeparator();
-//		menuHelp.add(menuAbout);
-
 		menuBar.add(menuFile);
-//		menuBar.add(menuEdit);
-//		menuBar.add(menuOptions);
-//		menuBar.add(menuHelp);
 		menuBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
 
 	}
@@ -190,7 +167,6 @@ public class GSNConfiguratorFrame extends JFrame {
 		"conf/log4j.directory.properties");
 		ValidityTools
 		.checkAccessibilityOfDirs(Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY);
-
 		PlasticLookAndFeel laf = new PlasticXPLookAndFeel();
 		PlasticLookAndFeel.setCurrentTheme(new DesertBluer());
 		try {
@@ -244,9 +220,7 @@ class UpdateAction extends AbstractAction{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
-
 }
 
 class AboutAction extends AbstractAction {
