@@ -50,6 +50,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
  */
 public final class Main {
 
+	private static GSNController controlSocket;
 	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 
 	public static transient Logger logger= Logger.getLogger ( Main.class );
@@ -83,7 +84,7 @@ public final class Main {
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
 			System.exit ( 1 );
 		} catch ( ClassNotFoundException e ) {
-			logger.error ( "The the wrapper.properties has classes which doesn't exist in the classpath");
+			logger.error ( "The file wrapper.properties refers to one or more classes which don't exist in the classpath");
 			logger.error ( e.getMessage ( ),e );
 			System.exit ( 1 );
 		}
@@ -129,6 +130,8 @@ public final class Main {
 			System.exit ( 1 );
 		}
 		final VSensorLoader vsloader = new VSensorLoader ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+		
+		controlSocket = new GSNController(vsloader);
 	}
 
 	/**
