@@ -14,8 +14,4 @@ public interface StartStopEventListener {
 
     public void notifyGSNStop();
 
-    public void notifyGSNDirStart();
-
-    public void notifyGSNDirStop();
-
 }

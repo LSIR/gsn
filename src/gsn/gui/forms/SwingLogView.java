@@ -109,9 +109,9 @@ public class SwingLogView extends JPanel {
 	public SwingLogView(String log_file) {
 		super();
 		// create text area to hold the log messages
-		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, getScrollPane());
-		add(BorderLayout.SOUTH, getControlBar());
+		
+		add(BorderLayout.PAGE_END, getControlBar());
 		this.log_file = log_file;
 	}
 
@@ -139,6 +139,7 @@ public class SwingLogView extends JPanel {
 		DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout(
 				"r:pref,4dlu,pref:g,8dlu,r:pref,4dlu,pref:g", ""));
 		builder.append(logSize);
+		
 		builder.append(new JLabel("History size."));
 		builder.append(allowScroll);
 		controlPane = builder.getPanel();
