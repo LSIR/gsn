@@ -183,7 +183,7 @@ public class GSNConfiguratorFrame extends JFrame {
 			System.out.println("Configuration file could not be found ! Stopping now (Error message: " + exception.getMessage());
 			exception.getStackTrace();
 		} catch(JiBXException exception) {
-			System.out.println("GSN Configurator encountered an error. Please report it to the gsn team at http://globalsn.sourceforge.net. Error message was: " + exception.getMessage());
+			System.out.println("GSN Configurator encountered an error. Please report it to the gsn team at http://gsn.sourceforge.net. Error message was: " + exception.getMessage());
 			exception.getStackTrace();
 			
 		}

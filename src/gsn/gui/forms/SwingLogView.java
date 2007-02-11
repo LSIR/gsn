@@ -7,6 +7,7 @@ import gsn.utils.ValidityTools;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -117,7 +118,7 @@ public class SwingLogView extends JPanel {
 		allowScroll.setSelected(true);
 		allowScroll.setToolTipText("Disable this to inspect old logs statements.");
 		DefaultFormBuilder builder = new DefaultFormBuilder(new FormLayout("pref:g,8dlu,r:pref,4dlu,pref:g", ""));
-		builder.append(getScrollPane(),5);
+		builder.append(getLoggerScrollPane(),5);
 		builder.nextLine();	
 		builder.append(logSize);
 		builder.append(new JLabel("History size."));
@@ -217,7 +218,7 @@ public class SwingLogView extends JPanel {
 	/**
 	 * Creates a scrollable text area
 	 */
-	private JScrollPane getScrollPane() {
+	private JScrollPane getLoggerScrollPane() {
 		logMessagesDisp = new JTextPane();
 		doc = logMessagesDisp.getStyledDocument();
 		// Define text styles
@@ -239,7 +240,6 @@ public class SwingLogView extends JPanel {
 		scrollPane = new JScrollPane(logMessagesDisp);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
 		return scrollPane;
 	}
 
