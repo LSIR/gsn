@@ -42,13 +42,15 @@ public class DirectoryRefresher {
    public DirectoryRefresher ( ) {
       XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl( );
       try {
-         config.setServerURL( new URL( "http://" + Main.getContainerConfig( ).getRegistryBootstrapAddr( ) + "/registry" ) );
+         config.setServerURL( new URL( "http://path-to-directory-server" ) );
          client.setConfig( config );
       } catch ( MalformedURLException e1 ) {
          logger.error( e1.getMessage( ) , e1 );
       }
       timer.scheduleAtFixedRate( new java.util.TimerTask( ) {
-         public void run ( ) {
+         private CharSequence directoryServer;
+
+		public void run ( ) {
             if ( DirectoryRefresher.this.errorCounter == 3 ) {
                logger.warn( "After 3 unsuccessful tries, GSN stopped contacting the directory." );
                this.cancel( );
@@ -59,8 +61,7 @@ public class DirectoryRefresher {
                while ( keys.hasNext( ) ) {
                  VSensorConfig configuration = keys.next( );
                   if ( logger.isDebugEnabled( ) )
-                     logger.debug( new StringBuilder( "Wants to connect to directory service at " ).append( Main.getContainerConfig( ).extractDirectoryServiceHost( ) ).append( ":" ).append(
-                        Main.getContainerConfig( ).extractDirectoryServicePort( ) ) );
+                     logger.debug( new StringBuilder( "Wants to connect to directory service at " ).append( directoryServer ));
                   Object [ ] params = new Object [ ] {Main.getContainerConfig( ).getContainerPort( ),configuration.getName( ),configuration.getDescription( ),configuration.getRPCFriendlyAddressing( ),configuration.getUsedSources( )};
                   Boolean result = ( Boolean ) client.execute( "registry.addVirtualSensor" , params );
                   if ( result == false ) {

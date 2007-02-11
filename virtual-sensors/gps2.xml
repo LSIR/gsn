@@ -11,8 +11,8 @@
 	        	<predicate key="LATITUDE">37.4</predicate>
 	        	<predicate key="LONGITUDE">-122.1</predicate>
     	  </addressing>
-        <storage  />
-        <streams>
+     <storage history-size="1m"/>
+       <streams>
            <stream name="input1">
             <source alias="source1" sampling-rate="1" storage-size="1">
                 <address wrapper="system-time">

@@ -17,7 +17,6 @@
 				style="attribute" />
 			<value name="url" field="jdbcURL" style="attribute" />
 		</structure>
-		<value name="directory-address" field="registryBootstrapAddr" />
 	</mapping>
 
 </binding>

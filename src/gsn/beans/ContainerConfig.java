@@ -65,10 +65,6 @@ public class ContainerConfig {
    
    protected int                         containerPort                    = DEFAULT_GSN_PORT;
    
-   protected String                      registryBootstrapAddr;
-   
-   public static final String            FIELD_NAME_registryBootstrapAddr = "registryBootstrapAddr";
-   
    protected String                      containerFileName;
    
    protected String                      jdbcDriver;
@@ -218,19 +214,7 @@ public class ContainerConfig {
     */
    private boolean isRegistryBootStrapAddrInitialized = false;
    
-   /**
-    * Returns null if the Registery bootstrap is not valid (e.g., null, empty,
-    * ...)
-    * 
-    * @return
-    */
-   public String getRegistryBootstrapAddr ( ) {
-      if ( !this.isRegistryBootStrapAddrInitialized ) {
-         if ( this.registryBootstrapAddr != null ) this.registryBootstrapAddr = this.registryBootstrapAddr.trim( );
-         this.isRegistryBootStrapAddrInitialized = true;
-      }
-      return this.registryBootstrapAddr;
-   }
+  
    
    /**
     * @return Returns the storagePoolSize.
@@ -244,13 +228,7 @@ public class ContainerConfig {
       builder.append( this.getClass( ).getName( ) ).append( " class [" ).append( "name=" ).append( this.webName ).append( "," );
       return builder.append( "]" ).toString( );
    }
-   
-   public void setRegistryBootstrapAddr ( String newValue ) {
-      String oldValue = this.registryBootstrapAddr;
-      this.registryBootstrapAddr = newValue;
-      changeSupport.firePropertyChange( FIELD_NAME_registryBootstrapAddr , oldValue , newValue );
-   }
-   
+
    /****************************************************************************
     * UTILITY METHODS, Used by the GUI mainly.
     ***************************************************************************/
@@ -283,13 +261,9 @@ public class ContainerConfig {
    
    public static final String     FIELD_NAME_gsnLogFileName          = "gsnLogFileName";
    
-   private String                 dirLog4jFile;
-   
    private String                 gsnLog4jFile;
    
    private String                 gsnConfigurationFileName;
-   
-   private Properties             dirLog4JProperties;
    
    private Properties             gsnLog4JProperties;
    
@@ -411,33 +385,27 @@ public class ContainerConfig {
       ContainerConfig toReturn = ( ContainerConfig ) uctx.unmarshalDocument( new FileInputStream( containerConfigurationFileName ) , null );
       
       Properties gsnLog4j = new Properties( );
-      Properties dirLog4j = new Properties( );
       try {
          gsnLog4j.load( new FileInputStream( gsnLog4jFile ) );
-         dirLog4j.load( new FileInputStream( dirLog4jFile ) );
       } catch ( IOException e ) {
          System.out.println( "Can't read the log4j files, please check the 2nd and 3rd parameters and try again." );
          e.printStackTrace( );
          System.exit( 1 );
       }
-      toReturn.initLog4JProperties( gsnLog4j , dirLog4j );
+      toReturn.initLog4JProperties( gsnLog4j  );
       toReturn.setSourceFiles( containerConfigurationFileName , gsnLog4jFile , dirLog4jFile );
       return toReturn;
    }
    
-   private void initLog4JProperties ( Properties gsnLog4j , Properties dirLog4j ) {
+   private void initLog4JProperties ( Properties gsnLog4j  ) {
       this.gsnLog4JProperties = gsnLog4j;
-      this.dirLog4JProperties = dirLog4j;
       setGsnLoggingLevel( extractLoggingLevel( gsnLog4j.getProperty( "log4j.rootLogger" ) , ContainerConfig.LOGGING_LEVELS , DEFAULT_LOGGING_LEVEL ) );
       setMaxGSNLogSizeInMB( OptionConverter.toFileSize( gsnLog4j.getProperty( "log4j.appender.file.MaxFileSize" ) , ContainerConfig.DEFAULT_GSN_LOG_SIZE ) / ( 1024 * 1024 ) );
-      this.setDirectoryLoggingLevel( extractLoggingLevel( dirLog4j.getProperty( "log4j.rootLogger" ) , ContainerConfig.LOGGING_LEVELS , DEFAULT_LOGGING_LEVEL ) );
-      this.setMaxDirectoryLogSizeInMB( OptionConverter.toFileSize( dirLog4j.getProperty( "log4j.appender.file.MaxFileSize" ) , ContainerConfig.DEFAULT_GSN_LOG_SIZE ) / ( 1024 * 1024 ) );
    }
    
    private void setSourceFiles ( String gsnConfigurationFileName , String gsnLog4jFile , String dirLog4jFile ) {
       this.gsnConfigurationFileName = gsnConfigurationFileName;
       this.gsnLog4jFile = gsnLog4jFile;
-      this.dirLog4jFile = dirLog4jFile;
    }
    
    public void setdatabaseSystem ( String newValue ) {
@@ -480,11 +448,7 @@ public class ContainerConfig {
    
    public void writeConfigurations ( ) throws FileNotFoundException , IOException {
       gsnLog4JProperties.put( "log4j.rootLogger" , getGsnLoggingLevel( ) + ",file" );
-      dirLog4JProperties.put( "log4j.rootLogger" , getDirectoryLoggingLevel( ) + ",file" );
-      
       gsnLog4JProperties.put( "log4j.appender.file.MaxFileSize" , getMaxGSNLogSizeInMB( ) + "MB" );
-      dirLog4JProperties.put( "log4j.appender.file.MaxFileSize" , getMaxDirectoryLogSizeInMB( ) + "MB" );
-      
       StringTemplateGroup templateGroup = new StringTemplateGroup( "gsn" );
       StringTemplate st = templateGroup.getInstanceOf( "com/xoben/gsn/gui/templates/templateConf" );
       st.setAttribute( "name" , getWebName( ) );
@@ -496,24 +460,12 @@ public class ContainerConfig {
       st.setAttribute( "db_driver" , getJdbcDriver( ) );
       st.setAttribute( "db_url" , getJdbcURL( ) );
       st.setAttribute( "gsn_port" , getContainerPort( ) );
-      st.setAttribute( "dir_socket" , getRegistryBootstrapAddr( ) );
       
       gsnLog4JProperties.store( new FileOutputStream( gsnLog4jFile ) , "" );
-      dirLog4JProperties.store( new FileOutputStream( dirLog4jFile ) , "" );
       FileWriter writer = new FileWriter( gsnConfigurationFileName );
       writer.write( st.toString( ) );
       writer.close( );
       
-   }
-   
-   public int extractDirectoryServicePort ( ) {
-      String rawValue = getRegistryBootstrapAddr( );
-      if ( rawValue == null || rawValue.trim( ).length( ) == 0 ) return -1;
-      return ValidityTools.getPortNumber( rawValue );
-   }
-   
-   public String extractDirectoryServiceHost ( ) {
-      return extractDirectoryServiceHost( getRegistryBootstrapAddr( ) );
    }
    
    public static String extractDirectoryServiceHost ( String rawValue ) {
@@ -523,7 +475,6 @@ public class ContainerConfig {
    public static ContainerConfig getDefaultConfiguration ( ) {
       ContainerConfig bean = new ContainerConfig( );
       bean.setContainerPort( ContainerConfig.DEFAULT_GSN_PORT );
-      bean.setRegistryBootstrapAddr( "localhost:1882" );
       bean.setJdbcDriver( ContainerConfig.JDBC_SYSTEMS[ 0 ] );
       bean.setJdbcPassword( "" );
       bean.setJdbcURL( "sa" );

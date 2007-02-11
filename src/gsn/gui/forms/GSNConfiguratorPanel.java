@@ -72,8 +72,6 @@ public class GSNConfiguratorPanel {
 
 	private JComboBox networkInterface;
 
-	private ValueModel directoryHostAddress;
-
 	private Timer timer;
 
 	private JFormattedTextField gsnPortNo;
@@ -83,8 +81,6 @@ public class GSNConfiguratorPanel {
 			throw new NullPointerException("The input bean shoudn't be null.");
 		this.bean = bean;
 		beanPresentationModel = new PresentationModel(bean);
-		directoryHostAddress = beanPresentationModel
-		.getModel(ContainerConfig.FIELD_NAME_registryBootstrapAddr);
 		initGUI();
 		initEvents();
 		instance = this;
@@ -227,18 +223,6 @@ public class GSNConfiguratorPanel {
 					return false;
 				}
 				try {
-					if (!confirmConstraint(ValidityTools.isAccessibleSocket(
-							bean.extractDirectoryServiceHost(), bean
-							.extractDirectoryServicePort()),
-					"The specified directory server is not accessible."))
-						return false;
-				} catch (Exception e2) {
-					confirmConstraint(false,
-							"The specified port number<br>for the GSN is busy.("
-							+ e2.getMessage() + ")");
-					return false;
-				}
-				try {
 					ValidityTools.isDBAccessible(bean.getJdbcDriver(), bean
 							.getJdbcURL(), bean.getJdbcUsername(), bean
 							.getJdbcPassword());
@@ -320,14 +304,7 @@ public class GSNConfiguratorPanel {
 		textfield.setToolTipText("The password of the database user to use.");
 		panelBuilder.append("Password", textfield);
 		panelBuilder.appendSeparator("Execution");
-		panelBuilder.append("Directory Server",
-				networkInterface = new JComboBox(
-						ContainerConfig.NETWORK_ADDRESSES));
-		networkInterface.setEditable(true);
-		networkInterface
-		.setToolTipText("Choose here on which IP address should the directory server be running if you intend to run one locally. You can also enter a remote gsn directory server address.");
-		networkInterface.setSelectedItem(directoryHostAddress.getValue());
-
+		
 		panelBuilder.append("GSN Server Port",
 				gsnPortNo = BasicComponentFactory
 				.createIntegerField(beanPresentationModel
@@ -403,9 +380,6 @@ public class GSNConfiguratorPanel {
 	}
 
 
-	public String getDirectoryHostAddress ( ) {
-		return ( String ) directoryHostAddress.getValue( );
-	}
 	public String getGsnPortNo ( ) {
 		return beanPresentationModel.getModel(ContainerConfig.FIELD_NAME_gsnPortNo).getValue( ).toString( );
 	}

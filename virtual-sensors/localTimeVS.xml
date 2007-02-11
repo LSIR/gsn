@@ -10,8 +10,8 @@
         <addressing>
 	        	<predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</predicate>
     	  </addressing>
-        <storage />
-        <streams>
+         <storage history-size="1m"/>
+   <streams>
            <stream name="input1">
             <source alias="source1" sampling-rate="1" storage-size="1">
                 <address wrapper="system-time">
