@@ -450,7 +450,7 @@ public class ContainerConfig {
       gsnLog4JProperties.put( "log4j.rootLogger" , getGsnLoggingLevel( ) + ",file" );
       gsnLog4JProperties.put( "log4j.appender.file.MaxFileSize" , getMaxGSNLogSizeInMB( ) + "MB" );
       StringTemplateGroup templateGroup = new StringTemplateGroup( "gsn" );
-      StringTemplate st = templateGroup.getInstanceOf( "com/xoben/gsn/gui/templates/templateConf" );
+      StringTemplate st = templateGroup.getInstanceOf( "gsn/gui/templates/templateConf" );
       st.setAttribute( "name" , getWebName( ) );
       st.setAttribute( "author" , getWebAuthor( ) );
       st.setAttribute( "description" , getWebDescription( ) );

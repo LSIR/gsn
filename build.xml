@@ -79,6 +79,8 @@
 
     <target name="build" depends="setup">
       <copydir  dest="${build.dir}/org" src="${src.dir}/org"/>
+      <copydir  dest="${build.dir}/gsn/gui/templates" src="${src.dir}/gsn/gui/templates"/>
+    	    		
     	<javac debug="true" srcdir="${src.dir}" optimize="off"
                destdir="${build.dir}" failonerror="true" source="1.5" classpathref="classpath"/>
    </target>

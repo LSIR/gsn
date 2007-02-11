@@ -5,4 +5,4 @@
    <description>Not Provided</description>
    <port>22001</port>
    <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:mem:." overwrite-tables="" permanent-storage=""/>
-</sensor-server>
+ </sensor-server>
