@@ -364,10 +364,6 @@ public class GSNConfiguratorPanel {
 		return panel;
 	}
 
-	public LogPanel getLogPanel() {
-		return logPanel;
-	}
-
 	public void registerInterestInStartStopState(StartStopEventListener listener) {
 		listeners.add(listener);
 	}
