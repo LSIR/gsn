@@ -89,7 +89,6 @@ public final class Main {
 		}
 		StorageManager.getInstance ( ).initialize ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) );
 		if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
-		Mappings.setContainer (new ContainerImpl ( ) );
 		final Server server = new Server ( );
 		//Connector connector = new SelectChannelConnector( ); //using basic connector for windows bug
 		Connector httpConnector = new SocketConnector ();

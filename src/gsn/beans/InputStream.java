@@ -13,6 +13,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import org.apache.commons.configuration.AbstractFileConfiguration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 
@@ -159,9 +160,12 @@ public class InputStream {
 	 }
 
 	 public void addToRenamingMapping ( final CharSequence aliasName , final CharSequence viewName ) {
-		 this.rewritingData.put( aliasName , viewName );
+		 rewritingData.put( aliasName , viewName );
 	 }
-
+	 public final TreeMap<CharSequence,CharSequence> getRenamingMapping() {
+			return rewritingData;
+		}
+	 
 	 public void refreshAlias ( final String alias ) {
 		 if ( logger.isInfoEnabled( ) ) logger.info( "REFERES ALIAS CALEED" );
 	 }
@@ -222,4 +226,5 @@ public class InputStream {
 	 public void setPool ( VirtualSensorPool pool ) {
 		 this.pool = pool;
 	 }
+
 }

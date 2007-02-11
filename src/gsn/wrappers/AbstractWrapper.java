@@ -44,6 +44,8 @@ public abstract class AbstractWrapper extends Thread {
 	public void removeListener ( StreamSource ss ) {
 		listeners.remove( ss );
 		getStorageManager( ).dropView( ss.getUIDStr() );
+		if (listeners.size()==0) 
+			releaseResources();
 	}
 
 	/**
@@ -86,13 +88,14 @@ public abstract class AbstractWrapper extends Thread {
 	}
 
 	/**
-	 * @param activeAddressBean the activeAddressBean to set
+	 * Only sets if there is no other activeAddressBean configured.
+	 * @param newVal the activeAddressBean to set
 	 */
-	public void setActiveAddressBean ( AddressBean activeAddressBean ) {
+	public void setActiveAddressBean ( AddressBean newVal ) {
 		if (this.activeAddressBean!=null) {
 			throw new RuntimeException("There is already an active address bean associated with the wrapper.");
 		}
-		this.activeAddressBean = activeAddressBean;
+		this.activeAddressBean = newVal;
 	}
 
 	private final transient int aliasCode = Main.tableNameGenerator( );
@@ -231,6 +234,7 @@ public abstract class AbstractWrapper extends Thread {
 	}
 	public void releaseResources ( ) {
 		isActive = false;
+		finalize();
 		if ( logger.isInfoEnabled() ) logger.info( "Finalized called" );
 		synchronized ( listeners ) {
 			Iterator<StreamSource> list =listeners.iterator();

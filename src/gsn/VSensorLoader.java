@@ -38,7 +38,7 @@ public class VSensorLoader extends Thread {
 	/**
 	 * Mapping between the AddressBean and DataSources
 	 */
-	private  final HashMap < AddressBean , AbstractWrapper > usedWrappers                   = new HashMap < AddressBean ,  AbstractWrapper >( );
+	private  final HashMap < AddressBean , AbstractWrapper > activeWrappers                   = new HashMap < AddressBean ,  AbstractWrapper >( );
 
 	private StorageManager                                         sm                      = StorageManager.getInstance ( );
 
@@ -48,12 +48,12 @@ public class VSensorLoader extends Thread {
 
 	private static int                                             VSENSOR_LOADER_THREAD_COUNTER       = 0;
 
-	
+
 	public VSensorLoader() {
 
 	}
-	public VSensorLoader ( String pluginsDir ) {
-		this.pluginsDir = pluginsDir;
+	public VSensorLoader ( String pluginsPath ) {
+		this.pluginsDir = pluginsPath;
 		Thread thread = new Thread ( this );
 		thread.setName ( "VSensorLoader-Thread" + VSENSOR_LOADER_THREAD_COUNTER++ );
 		thread.start ( );
@@ -81,7 +81,7 @@ public class VSensorLoader extends Thread {
 			logger.warn ( new StringBuilder ( ).append ( "removing : " ).append ( configFile.getName ( ) ).toString ( ) );
 			VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile.getFileName ( ) );
 			Mappings.removeFilename ( configFile.getFileName ( ) );
-			this.removeAllResources ( sensorInstance );
+			removeAllVSResources ( sensorInstance );
 		}
 		try {
 			Thread.sleep ( 3000 );
@@ -172,28 +172,30 @@ public class VSensorLoader extends Thread {
 		}
 		return true;
 	}
-	
-	public void removeAllResources ( VirtualSensorPool pool ) {
+
+	public void removeAllVSResources ( VirtualSensorPool pool ) {
 		VSensorConfig config = pool.getConfig ( );
 		pool.closePool ( );
 		final String vsensorName = config.getName ( );
 		if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Releasing previously used resources used by [" ).append ( vsensorName ).append ( "]." ).toString ( ) );
 		for ( InputStream inputStream : config.getInputStreams ( ) ) {
-			for ( StreamSource streamSource : inputStream.getSources ( ) ) {
-				final AbstractWrapper wrapper = streamSource.getWrapper ( );
-				// FIXME :  streamSource.getWrapper().removeListener(streamSource);
-				if ( wrapper.getListeners().size() == 1 ) {//This stream source is the only listener
-					usedWrappers.remove ( wrapper.getActiveAddressBean ( ) );
-					Mappings.getContainer ( ).removeRemoteStreamSource ( wrapper.getDBAlias() );
-					wrapper.finalize (  );
-					wrapper.releaseResources ();
-				}
-			}
+			for ( StreamSource streamSource : inputStream.getSources ( ) ) 
+				releaseStreamSource(streamSource);
 			inputStream.finalize ( );
 		}
 		// sm.renameTable(vsensorName,vsensorName+"Before"+System.currentTimeMillis());
 		Mappings.getContainer ( ).removeAllResourcesAssociatedWithVSName ( vsensorName );
 //		this.sm.dropTable ( config.getName ( ) );
+	}
+
+	public void releaseStreamSource(StreamSource streamSource) {
+		final AbstractWrapper wrapper = streamSource.getWrapper ( );
+		streamSource.getInputStream().getRenamingMapping().remove(streamSource.getAlias());
+		wrapper.removeListener(streamSource);
+		if ( !wrapper.isActive()) {//This stream source is the only listener
+			activeWrappers.remove ( wrapper.getActiveAddressBean ( ) );
+			Mappings.getContainer ( ).removeRemoteStreamSource ( wrapper.getDBAlias() );
+		}
 	}
 
 	public static Modifications getUpdateStatus ( String virtualSensorsPath ) {
@@ -273,7 +275,7 @@ public class VSensorLoader extends Thread {
 	 * @throws IllegalAccessException
 	 */
 	public AbstractWrapper findWrapper(AddressBean addressBean) throws InstantiationException, IllegalAccessException {
-		AbstractWrapper wrapper = usedWrappers.get ( addressBean );
+		AbstractWrapper wrapper = activeWrappers.get ( addressBean );
 		if ( wrapper == null ) {
 			if ( Main.getWrapperClass ( addressBean.getWrapper ( ) ) == null ) {
 				logger.error ( "The wrapper >" + addressBean.getWrapper ( ) + "< is not defined in the >" + Main.DEFAULT_WRAPPER_PROPERTIES_FILE + "< file." );
@@ -281,7 +283,6 @@ public class VSensorLoader extends Thread {
 			}
 			wrapper = ( AbstractWrapper ) Main.getWrapperClass ( addressBean.getWrapper ( ) ).newInstance ( );
 			wrapper.setActiveAddressBean ( addressBean );
-
 			boolean initializationResult = wrapper.initialize (  );
 			if ( initializationResult == false )
 				return null;
@@ -295,7 +296,6 @@ public class VSensorLoader extends Thread {
 			wrapper = findWrapper(addressBean);
 			if (wrapper!=null)
 				if (prepareStreamSource( streamSource,wrapper)) {
-					inputStream.addToRenamingMapping(streamSource.getAlias(), streamSource.getUIDStr());
 					break;
 				}
 			wrapper=null;
@@ -308,21 +308,22 @@ public class VSensorLoader extends Thread {
 			logger.error("Preparing the stream source failed because the wrapper : "+wrapper.getWrapperName()+" returns null for the >getOutputStructure< method!");
 			return false;
 		}
-		if (!usedWrappers.containsKey(wrapper.getActiveAddressBean())) {
-				try {
-					if (!ValidityTools.tableExists(wrapper.getDBAliasInStr(),wrapper.getOutputFormat()))
-						sm.createTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
-					sm.prepareStructures( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
-				} catch ( SQLException e ) {
-					logger.error ( e.getMessage ( ) , e );
-					return false;
-				}
+		if (!activeWrappers.containsKey(wrapper.getActiveAddressBean())) {
+			try {
+				if (!ValidityTools.tableExists(wrapper.getDBAliasInStr(),wrapper.getOutputFormat()))
+					sm.createTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
+				sm.prepareStructures( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
+			} catch ( SQLException e ) {
+				logger.error ( e.getMessage ( ) , e );
+				return false;
+			}
 			streamSource.setWrapper ( wrapper );
 			wrapper.start ( );
-			usedWrappers.put ( wrapper.getActiveAddressBean() , wrapper );
+			activeWrappers.put ( wrapper.getActiveAddressBean() , wrapper );
 		}else {// There exists a stream source with very same addressing.
 			streamSource.setWrapper ( wrapper );
 		}
+		streamSource.getInputStream().addToRenamingMapping(streamSource.getAlias(), streamSource.getUIDStr());
 		return true;
 	}
 
@@ -331,14 +332,13 @@ public class VSensorLoader extends Thread {
 		this.interrupt ( );
 		for ( String configFile : Mappings.getAllKnownFileName ( ) ) {
 			VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile );
-			removeAllResources ( sensorInstance );
+			removeAllVSResources ( sensorInstance );
 			logger.warn ( "Removing the resources associated with : " + sensorInstance.getConfig ( ).getFileName ( ) + " [done]." );
 		}
 		try {
-			this.sm.shutdown ( );
+			sm.shutdown ( );
 		} catch ( SQLException e ) {
 			e.printStackTrace ( );
 		}
 	}
-
 }

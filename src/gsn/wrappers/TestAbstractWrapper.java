@@ -103,13 +103,6 @@ public class TestAbstractWrapper {
 		systemTimeWrapper.sendToWrapper("bla");
 	}
 
-	/**
-	 * Test method for {@link gsn.wrappers.AbstractWrapper#releaseResources()}.
-	 */
-	@Test
-	public void testReleaseResources() {
-	}
-
 	@Test
 	public void testCleaning() {
 		
