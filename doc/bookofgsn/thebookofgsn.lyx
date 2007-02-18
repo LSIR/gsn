@@ -162,85 +162,15 @@ GSN comes preconfigured with many virtual sensors activated.
 \end_layout
 
 \begin_layout Standard
-GSN requires two processes to run: the directory service and gsn itself.
+It is possible to run GSN from a graphical user interface, or from the command
+ line interface.
+ The graphical interface is self explanatory ; you only need to run it and
+ to click on the Start button.
+ It also allows to easily analyze GSN log output.
 \end_layout
 
 \begin_layout Standard
-To start these processes from the command line, go to the directory where
- GSN is located and type:
-\end_layout
-
-\begin_layout LyX-Code
-ant dir
-\end_layout
-
-\begin_layout Standard
-This will start the directory service.
- If everything goes right, you should see something like this:
-\end_layout
-
-\begin_layout LyX-Code
-dir:
-\end_layout
-
-\begin_layout LyX-Code
-     [java] Loading logging details from : 
-\end_layout
-
-\begin_layout LyX-Code
-     conf/log4j.directory.properties
-\end_layout
-
-\begin_layout LyX-Code
-     [java] INFO  [2006-12-14 14:25:08,731] [main]
-\end_layout
-
-\begin_layout LyX-Code
-     (Registry.java:69)     - GSN-Registry-Server startup 
-\end_layout
-
-\begin_layout LyX-Code
-     [java] 2006-12-14 14:25:09.634::INFO:  Logging to STDERR
-\end_layout
-
-\begin_layout LyX-Code
-     via org.mortbay.log.StdErrLog
-\end_layout
-
-\begin_layout LyX-Code
-     [java] WARN  [2006-12-14 14:25:09,771] [main]
-\end_layout
-
-\begin_layout LyX-Code
-     (RegistryReferesh.java:44)     - Using RamDirectory which
-\end_layout
-
-\begin_layout LyX-Code
-     is not persistant.
-\end_layout
-
-\begin_layout LyX-Code
-     [java] 2006-12-14 14:25:09.796::INFO:  jetty-6.0.1
-\end_layout
-
-\begin_layout LyX-Code
-     [java] 2006-12-14 14:25:10.475::INFO:  Started 
-\end_layout
-
-\begin_layout LyX-Code
-     SelectChannelConnector @ 0.0.0.0:1882
-\end_layout
-
-\begin_layout LyX-Code
-     [java] INFO  [2006-12-14 14:25:10,476] [main]
-\end_layout
-
-\begin_layout LyX-Code
-     (Registry.java:101)     - [ok]
-\end_layout
-
-\begin_layout Standard
-You can now start gsn from another terminal:
+The command to start GSN from the command line interface is:
 \end_layout
 
 \begin_layout LyX-Code
@@ -261,16 +191,12 @@ conf/log4j.properties
  If you want to reduce the log verbosity, change all DEBUG and INFO values
  to WARN.
  If you want to debug your configuration, simply do the opposite.
+ This parameter can also be set from the graphical user interface.
 \end_layout
 
 \begin_layout Standard
-GSN does much more than generating log statements, however.
- You can access the web interface of the directory service on 
-\begin_inset LatexCommand \url{http://127.0.0.1:1882}
-
-\end_inset
-
- and the web interface of your gsn instance on 
+GSN does much more than generating log statements.
+ You can access the web interface of your gsn server on 
 \begin_inset LatexCommand \url{http://127.0.0.1:22001}
 
 \end_inset
@@ -2757,7 +2683,7 @@ GSN built-in virtual sensors
 \hfill
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="4">
+<lyxtabular version="3" rows="6" columns="4">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="8page%">
 <column alignment="center" valignment="top" leftline="true" width="8page%">
@@ -2978,7 +2904,7 @@ Sensor
 \end_inset
 </cell>
 </row>
-<row topline="true">
+<row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -3010,82 +2936,6 @@ GUIVS
 \begin_layout Standard
 A Graphical User Interface for sending commands to a hardware device.
  Two protocols are currently supported.
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
 \end_layout
 
 \end_inset
@@ -5661,20 +5511,54 @@ dataFromWeb
 Writing a Protocol Description
 \end_layout
 
-\begin_layout Chapter
-Your own web interface
+\begin_layout Standard
+In many cases, your data sources will emit structured data that respect
+ a predefined format.
+ Such a format is called a protocol.
+ It is of course possible to do the data extraction from the received data
+ packets with your own code.
+ However, when these protocols are complex, the task is not that easy and
+ it can consume a lot of time.
+\end_layout
+
+\begin_layout Standard
+This is why GSN ships with the jnetstream packet decoding library.
+ To use it with your protocol, you only need to describe your packets structure
+ in a C-like syntax.
+ You will be able to update the protocol definition without recompiling
+ the parser.
+ For more information, please consult 
+\begin_inset LatexCommand \htmlurl{http://jnetstream.sourceforge.net}
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+It is also possible to build such packets using jnetstream.
+ This feature is currently in development.
+ This allows to communicate with your data source.
 \end_layout
 
 \begin_layout Chapter
 Inter-GSN communications
 \end_layout
 
-\begin_layout Chapter
-GSN Class Reference
+\begin_layout Standard
+A virtual sensor can get data from another virtual sensor.
+ If this other virtual sensor is running on another GSN server, the communicatio
+n between these two servers is made with the XML-RPC protocol.
 \end_layout
 
 \begin_layout Standard
-AbstractWrapper, AbstractVirtualSensor, StreamElement
+This means that you can actually feed data to GSN from your own custom software
+ written in any language supporting XML-RPC.
+ 
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Standard
