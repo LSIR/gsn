@@ -4773,12 +4773,27 @@ Developer's Guide
 \end_layout
 
 \begin_layout Chapter
-Writing a Virtual Sensor
+Writing a Virtual Sensor Processing Class
 \begin_inset LatexCommand \label{cha:Writing-a-VS}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+In GSN, a virtual sensor processing class is a piece of Java code which
+ performs the final stage of the processing.
+ The inputs and the output structure of the virtual sensor is specified
+ in the virtual sensor description file (VSD).
+ Once a virtual sensor is loaded, GSN prepares an object pool for the virtual
+ sensor.
+ This pool used for both improving the performance and enforcing the maximum
+ resource consumption in the highly loaded environemnts.
+ You can specify the number of instances per virtual sensor using the <life-cycl
+e pool-size="X"/> element.
+ Every virtual sensor processing class (VSPC) extends the AbstractVirtualSensor
+ class.
 \end_layout
 
 \begin_layout Section
@@ -4791,9 +4806,9 @@ The AbstractVirtualSensor
 \end_layout
 
 \begin_layout Standard
-All virtual sensors subclass 
+All virtual sensors are subclass 
 \family typewriter
-AbstractVirtualSensor
+of the AbstractVirtualSensor
 \family default
  (package 
 \family typewriter
@@ -4868,6 +4883,7 @@ StreamElement
 dataProduced(StreamElement se)
 \family default
 .
+ 
 \end_layout
 
 \begin_layout Standard
@@ -4884,6 +4900,85 @@ Note that a Virtual Sensor should always use the same StreamElement structure
  If a virtual sensor really needs to produce several different stream elements,
  user must provide the set of all possibily fields in the stream elements
  and provide Null whenever the data item is not applicable.
+\end_layout
+
+\begin_layout Section
+Reading Initialization Parameters
+\end_layout
+
+\begin_layout Standard
+As you noticed in the Chart virtual sensor, a virtual sensor can receive
+ parameters from the virtual sensor description file and use them in the
+ initialization process.
+ An initialization parameter has a name and a value both are in the form
+ of String.
+ The parameter name is cases insensitive.
+\end_layout
+
+\begin_layout Standard
+For example, in order to read the value of the 
+\begin_inset Quotes eld
+\end_inset
+
+my-parameter
+\begin_inset Quotes erd
+\end_inset
+
+ parameter form the following code snippets
+\end_layout
+
+\begin_layout Standard
+...
+\end_layout
+
+\begin_layout Standard
+<processing-class> 
+\end_layout
+
+\begin_layout Standard
+<class-name>gsn.vsensor.ChartVirtualSensor</class-name>
+\end_layout
+
+\begin_layout Standard
+<init-params>
+\end_layout
+
+\begin_layout Standard
+<param name="my-parameter">123456</param>
+\end_layout
+
+\begin_layout Standard
+</init-params> 
+\end_layout
+
+\begin_layout Standard
+...
+\end_layout
+
+\begin_layout Standard
+You can use the following java code in the initialize method : 
+\end_layout
+
+\begin_layout Standard
+TreeMap < String , String > params = getVirtualSensorConfiguration( ).getMainClas
+sInitialParams( ); 
+\end_layout
+
+\begin_layout Standard
+String value = params.get("my-parameter");
+\end_layout
+
+\begin_layout Standard
+if (value ==null){ // parameter is missing.
+ 
+\end_layout
+
+\begin_layout Standard
+// use default value or return false with an error message.
+\end_layout
+
+\begin_layout Standard
+}
 \end_layout
 
 \begin_layout Section
@@ -4939,6 +5034,15 @@ dataAvailable()
  with the Swing event thread while your virtual sensor is run by a GSN thread.
 \end_layout
 
+\begin_layout Section
+Feedback channel to a Virtual Sensor
+\end_layout
+
+\begin_layout Standard
+public boolean dataFromWeb ( String action,String[] paramNames, Serializable[]
+ paramValues )
+\end_layout
+
 \begin_layout Chapter
 Writing a Wrapper
 \begin_inset LatexCommand \label{cha:Writing-a-Wrapper}
@@ -4986,19 +5090,16 @@ DataField[] getOutputFormat()
 \end_layout
 
 \begin_layout Standard
-In addition, you will always have to override the 
+Each wrapper is a thread in the GSN.
+ If you want to do some kind of processing in a fixed time interval, you
+ can override the 
 \family typewriter
 run() 
 \family default
-method, which does the 
-\begin_inset Quotes eld
-\end_inset
-
-real job
-\begin_inset Quotes erd
-\end_inset
-
-.
+method.
+ The run method is useful for time driven wrappers in which the production
+ of a sensor data is triggered by a timer.
+ 
 \end_layout
 
 \begin_layout Standard
