@@ -1,10 +1,5 @@
 <project name="gsn" default="build" basedir=".">
-   
-   <target name="all" depends="clean,setup,build">
-   </target>
-   
-   <target name="all.all" depends="test-report,docs"/>
-   
+     
    <target name="init" description="initializes properties and initialization tasks">
       <tstamp>
          <format property="TODAY" pattern="yyyy-MMMM-d-'at'-hh-mm-aa" locale="en"/>
@@ -41,12 +36,7 @@
       </path>
    	<available type="dir" file="${jmf.dir}" property="jmf.exists"/>
    	<fail unless="jmf.exists" message="The ${jmf.dir} directory is missing, please download  JMF from http://java.sun.com/products/java-media/jmf/2.1.1/download.html and place it in ${jmf.dir} directory." />
-		<!--  <taskdef resource="tasks.properties" classpath="${libdir}/jcoverage.jar"/>
-       <taskdef name="documentdoclet" classname="xdoclet.modules.doc.DocumentDocletTask" classpathref="classpath"/> 
-    	<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask" classpathref="classpath"/>
-        <taskdef name="ejbdoclet" classname="xdoclet.modules.ejb.EjbDocletTask" classpathref="classpath" />
-        <taskdef name="mockdoclet" classname="xdoclet.modules.mockobjects.MockObjectDocletTask" classpathref="classpath" /> -->
-   </target>
+ </target>
    
    <target name="clean" description="remove the previously compiled class files" depends="init">
       <delete includeEmptyDirs="yes" failonerror="no">
@@ -93,26 +83,16 @@
    	         <arg value="conf/VirtualSensorDescription.xml"/>            
    	      </java>
    </target>
-   <target name="dir" depends="bind">
-      <!--  <webdoclet destdir="${dswebapp.dir}/WEB-INF/" description="This task for Directory Service">
-            <fileset dir="${src.dir}">
-                <include name="**/registry/**"/>
-            </fileset>
-            <deploymentdescriptor mergeDir="${basedir}/merges">
-                <welcomefile file="/sensors.jsp"/>
-            </deploymentdescriptor>
-        </webdoclet> -->
+ <!-- 
+    <target name="dir" depends="bind">
       <java classname="gsn.registry.Registry" fork="true" dir="${basedir}">
          <classpath refid="classpath"/>
          <arg value="1882"/>
          <arg value="127.0.0.1"/>
-         <!--   <arg value="/tmp/bla" />-->
          <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
          <jvmarg value="-Dorg.mortbay.log.LogFactory.noDiscovery=false"/>
-         <!--<jvmarg value="-server"/>-->
       </java>
-   </target>
-   
+   </target>-->   
    
    <target name="runcam" depends="bind">
       <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"
@@ -155,28 +135,9 @@
 	      	 <env key="LD_PRELOAD" value="${env.JAVA_HOME}/jre/lib/i386/libjawt.so"/>
 	      </java>
 	   </target>
-	
-   <target name="runSim" depends="bind">
-      <java classpathref="classpath" classname="gsn.simulation.Simulation" maxmemory="${maxMemoryUsage}" fork="true"
-            dir="${build.dir}">
-         <arg value="${config}"/>
-         <arg value="${conf.dir}/log4j.properties"/>
-         <arg value="500"/>  <!-- Thread Counter -->           
-         <arg value="38000"/> <!-- The port for starting from -->
-      </java>
-   </target>
-   
-   <target name="jcoverage-build" depends="setup,bind">
-      <instrument todir="${build.dir}/jcoverage-classes">
-         <fileset dir="${build.dir}">
-            <include name="**/*.class"/>
-         </fileset>
-      </instrument>
-   </target>
-   
-   <target name="test-report" depends="jcoverage-build"
-           description="Runs JUnit tests, generates jcoverage,junit,todo reports">
-      
+
+
+   <target name="test-report" depends="tests" description="Runs JUnit tests, generates jcoverage,junit,todo reports">
       <junit printsummary="true" fork="false" haltonerror="false"
              errorproperty="errorOccuredInTests" haltonfailure="false">
          <formatter type="xml" usefile="true"/>
@@ -216,12 +177,9 @@
          
          ***********************************
          One or more tests failed !
-         ***********************************
-         
+         ***********************************  
       </fail>
    </target>
-   
-   
    <target name="docs" depends="setup">
       <javadoc classpathref="classpath"
                destdir="${reports}/javadoc"
@@ -261,12 +219,6 @@
               output="${basedir}/${jars}/gsn-installer.jar"
               basedir="${basedir}/installer"
               izPackdir="${basedir}/izpack"/>
-   </target>
-   
-   <target name="pref" depends="bind">
-      <java classpathref="classpath" classname="gsn.testss.CreationTest" maxmemory="64m" fork="true"
-            dir="${build.dir}">
-      </java>
    </target>
    
    <target name="gui" depends="bind">

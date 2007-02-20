@@ -1,5 +1,6 @@
 package gsn.wrappers;
 
+import static org.junit.Assert.*;
 import gsn.beans.AddressBean;
 import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
@@ -99,6 +100,9 @@ public class TestAbstractWrapper {
 	@Test (expected=GSNRuntimeException.class)
 	public void testSendToWrapper2() throws OperationNotSupportedException {
 		SystemTime systemTimeWrapper = new SystemTime();
+		assertTrue(systemTimeWrapper.initialize());
+		Thread thread = new Thread (systemTimeWrapper);
+		thread.start();
 		systemTimeWrapper.releaseResources();
 		systemTimeWrapper.sendToWrapper("bla");
 	}

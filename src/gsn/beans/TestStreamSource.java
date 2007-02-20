@@ -39,6 +39,7 @@ public class TestStreamSource {
 	@Before
 	public void setup() throws SQLException {
 		sm.createTable(wrapper.getDBAliasInStr(), new DataField[] {});
+		assertTrue(wrapper.initialize());
 	}
 	@After
 	public void teardown() {

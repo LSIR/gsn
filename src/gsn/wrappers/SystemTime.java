@@ -36,12 +36,12 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
    
    public boolean initialize (  ) {
       setName( "LocalTimeWrapper-Thread" + ( ++threadCounter ) );
+      timer = new Timer( CLOCK_PERIODS , this );
+      timer.setInitialDelay( INITIAL_DELAY );
       return true;
    }
    
    public void run ( ) {
-      timer = new Timer( CLOCK_PERIODS , this );
-      timer.setInitialDelay( INITIAL_DELAY );
       timer.start( );
    }
    
