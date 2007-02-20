@@ -17,7 +17,7 @@ public class VirtualSensorPool {
 
 	private static final transient Logger         logger          = Logger.getLogger( VirtualSensorPool.class );
 
-	private static final int GARBAGE_COLLECTOR_INTERVAL = 100;
+	private static final int GARBAGE_COLLECTOR_INTERVAL = 2;
 
 	private int                                   maxPoolSize;
 
