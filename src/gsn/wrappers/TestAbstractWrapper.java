@@ -2,10 +2,16 @@ package gsn.wrappers;
 
 import static org.junit.Assert.*;
 import gsn.beans.AddressBean;
+import gsn.beans.DataField;
+import gsn.beans.InputStream;
+import gsn.beans.StreamSource;
 import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
+import gsn.utils.KeyValueImp;
 
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.naming.OperationNotSupportedException;
@@ -28,7 +34,8 @@ public class TestAbstractWrapper {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.hsqldb.jdbcDriver( ) );
-		StorageManager.getInstance ( ).initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
+//		StorageManager.getInstance ( ).initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
+		StorageManager.getInstance ( ).initialize ( "com.mysql.jdbc.Driver","root","" , "jdbc:mysql://localhost/gsn");
 	}
 
 	/**
@@ -39,8 +46,7 @@ public class TestAbstractWrapper {
 	}
 
 	private StorageManager sm;
-	private ArrayList<AddressBean> addressing;
-
+	
 
 	/**
 	 * @throws java.lang.Exception
@@ -48,8 +54,7 @@ public class TestAbstractWrapper {
 	@Before
 	public void setUp() throws Exception {
 		sm = StorageManager.getInstance();
-		addressing = new ArrayList<AddressBean>();
-	}
+		}
 
 	/**
 	 * @throws java.lang.Exception
@@ -100,6 +105,7 @@ public class TestAbstractWrapper {
 	@Test (expected=GSNRuntimeException.class)
 	public void testSendToWrapper2() throws OperationNotSupportedException {
 		SystemTime systemTimeWrapper = new SystemTime();
+		systemTimeWrapper.setActiveAddressBean(new AddressBean("system-time",null));
 		assertTrue(systemTimeWrapper.initialize());
 		Thread thread = new Thread (systemTimeWrapper);
 		thread.start();
@@ -108,8 +114,25 @@ public class TestAbstractWrapper {
 	}
 
 	@Test
-	public void testCleaning() {
-		
+	public void testRemovingUselessData() throws SQLException, InterruptedException {
+    SystemTime wrapper = new SystemTime();
+    StorageManager.getInstance().createTable(wrapper.getDBAliasInStr(), new DataField[] {});
+    wrapper.setActiveAddressBean(new AddressBean("system-time",new KeyValueImp(SystemTime.CLOCK_PERIOD_KEY,"100")));
+    assertTrue(wrapper.initialize());
+    Thread thread = new Thread(wrapper);
+    InputStream is = new InputStream();
+     StreamSource  ss = new StreamSource().setAlias("my-stream").setAddressing(new AddressBean[] {new AddressBean("system-time")}).setSqlQuery("select * from wrapper where TIMED <0").setRawHistorySize("2").setInputStream(is);   
+    ss.setSamplingRate(1);
+    ss.setWrapper(wrapper );
+    assertTrue(ss.validate());
+    assertEquals(wrapper.getTimerClockPeriod(), 100);
+    thread.start();
+    Thread.sleep(1000);
+    ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet("select count(*) from "+wrapper.getDBAliasInStr());
+    assertTrue(rs.next());
+//    System.out.println(rs.getInt(1));
+    assertTrue(rs.getInt(1)<=(AbstractWrapper.GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS*2));
+    wrapper.releaseResources();
 	}
 
 }

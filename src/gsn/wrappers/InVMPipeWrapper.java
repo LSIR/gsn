@@ -3,6 +3,7 @@ package gsn.wrappers;
 import gsn.Mappings;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.DataField;
+import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.notifications.InGSNNotification;
@@ -21,84 +22,73 @@ import org.apache.log4j.Logger;
  * Creation time : Dec 18, 2006@4:03:24 PM<br> *
  */
 public class InVMPipeWrapper extends AbstractWrapper {
-   private static transient Logger                                      logger                             = Logger.getLogger( InVMPipeWrapper.class );
-
-   public void finalize ( ) {
-
-   }
-   
-   public DataField [ ] getOutputFormat ( ) {
-      return config.getOutputStructure( );
-   }
-   
-   public String getWrapperName ( ) {
-      return "In VM Pipe Wrapper";
-   }
-   
-   private VSensorConfig          config;
-   
-   private NotificationRequest    notificationRequest;
-   
-   public boolean initialize ( ) {
-      String remoteVSName = getActiveAddressBean( ).getPredicateValue( "name" );
-      if ( remoteVSName == null ) {
-         logger.warn( "The \"NAME\" paramter of the AddressBean which corresponds to the local Virtual Sensor is missing, Initialization failed." );
-         return false;
-      }
-      this.config = Mappings.getVSensorConfig( remoteVSName.toLowerCase( ).trim( ) );
-      if ( this.config == null ) {
-         logger.warn( "The Requested virtual sensor is not available (or not loaded yet), initialization failed !" );
-         return false;
-      }
-      return true;
-   }
-   
-   public void addListener ( StreamSource ss ) {
-      /**
-       * First we create a view over the main source
-       * (config.getVirtualSensorName). We encode all the conditions and
-       * filtering in the view's definition. We perform select * from the view.
-       */
-      super.addListener( ss );
-      notificationRequest = new InGSNNotification( this , config.getName( ) );
-      Mappings.getContainer( ).addNotificationRequest( config.getName( ) , notificationRequest );
-   }
-   
-   public boolean sendToWrapper ( String action,String[] paramNames, Serializable[] paramValues ) throws OperationNotSupportedException {
-      AbstractVirtualSensor vs;
-      try {
-         vs = Mappings.getVSensorInstanceByVSName( config.getName( ) ).borrowVS( );
-      } catch ( PoolIsFullException e ) {
-         logger.warn( "Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
-         return false;
-      } catch ( VirtualSensorInitializationFailedException e ) {
-         logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
-         return false;
-      }
-      boolean toReturn = vs.dataFromWeb( action , paramNames , paramValues );
-      Mappings.getVSensorInstanceByVSName( config.getName( ) ).returnVS( vs );
-      return toReturn;
-   }
-   
-   public void remoteDataReceived ( ) {
-      if ( logger.isDebugEnabled( ) ) logger.debug( "There are results, is there any listeners ?" );
-      for ( Iterator < StreamSource > iterator = listeners.iterator( ) ; iterator.hasNext( ) ; ) {
-         StreamSource dataListener = iterator.next( );
-         boolean results = getStorageManager( ).isThereAnyResult( new StringBuilder("select * from ").append(dataListener.getUIDStr()) );
-         if ( results ) {
-            if ( logger.isDebugEnabled( ) )
-               logger.debug( new StringBuilder( ).append( "There are listeners, notify the " ).append( dataListener.getInputStream( ).getInputStreamName( ) ).append( " inputStream" ).toString( ) );
-            // TODO :DECIDE WHETHER TO INFORM THE CLIENT OR NOT (TIME
-            // TRIGGERED. DATA TRIGGERED)
-            dataListener.dataAvailable( );
-         }
-      }
-   }
-   
-   public String toString ( ) {
-      StringBuilder sb = new StringBuilder( "InVMPipeWrapper, " );
-      sb.append( " RemoteVS : " ).append( config.getName( ) );
-      return sb.toString( );
-   }
-   
+  private static transient Logger                                      logger                             = Logger.getLogger( InVMPipeWrapper.class );
+  
+  public void finalize ( ) {
+    
+  }
+  
+  public DataField [ ] getOutputFormat ( ) {
+    return config.getOutputStructure( );
+  }
+  
+  public String getWrapperName ( ) {
+    return "In VM Pipe Wrapper";
+  }
+  
+  private VSensorConfig          config;
+  
+  private NotificationRequest    notificationRequest;
+  
+  public boolean initialize ( ) {
+    String remoteVSName = getActiveAddressBean( ).getPredicateValue( "name" );
+    if ( remoteVSName == null ) {
+      logger.warn( "The \"NAME\" paramter of the AddressBean which corresponds to the local Virtual Sensor is missing, Initialization failed." );
+      return false;
+    }
+    this.config = Mappings.getVSensorConfig( remoteVSName.toLowerCase( ).trim( ) );
+    if ( this.config == null ) {
+      logger.warn( "The Requested virtual sensor is not available (or not loaded yet), initialization failed !" );
+      return false;
+    }
+    return true;
+  }
+  
+  public void addListener ( StreamSource ss ) {
+    /**
+     * First we create a view over the main source
+     * (config.getVirtualSensorName). We encode all the conditions and
+     * filtering in the view's definition. We perform select * from the view.
+     */
+    super.addListener( ss );
+    notificationRequest = new InGSNNotification( this , config.getName( ) );
+    Mappings.getContainer( ).addNotificationRequest( config.getName( ) , notificationRequest );
+  }
+  
+  public boolean sendToWrapper ( String action,String[] paramNames, Serializable[] paramValues ) throws OperationNotSupportedException {
+    AbstractVirtualSensor vs;
+    try {
+      vs = Mappings.getVSensorInstanceByVSName( config.getName( ) ).borrowVS( );
+    } catch ( PoolIsFullException e ) {
+      logger.warn( "Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
+      return false;
+    } catch ( VirtualSensorInitializationFailedException e ) {
+      logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
+      return false;
+    }
+    boolean toReturn = vs.dataFromWeb( action , paramNames , paramValues );
+    Mappings.getVSensorInstanceByVSName( config.getName( ) ).returnVS( vs );
+    return toReturn;
+  }
+  
+  public boolean remoteDataReceived ( StreamElement se) {
+    return postStreamElement(se);
+  }
+  
+  public String toString ( ) {
+    StringBuilder sb = new StringBuilder( "InVMPipeWrapper, " );
+    sb.append( " RemoteVS : " ).append( config.getName( ) );
+    return sb.toString( );
+  }
+  
 }

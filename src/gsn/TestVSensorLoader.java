@@ -36,9 +36,8 @@ public class TestVSensorLoader {
 	public static void tearDownAfterClass() throws Exception {
 	}
 
-	ArrayList<AddressBean> addressing;
-	AddressBean addressBean;
-	
+  private AddressBean[] addressing= new AddressBean[] {new AddressBean("mock-test")};
+
 	@Before
 	public void setUp() throws Exception {
 		Main.resetWrapperList();
@@ -48,10 +47,6 @@ public class TestVSensorLoader {
 		propertiesConfiguration.addProperty("wrapper.name", "system-time");
 		propertiesConfiguration.addProperty("wrapper.class", "gsn.wrappers.SystemTime");
 		Main.loadWrapperList(propertiesConfiguration);
-		addressing = new ArrayList<AddressBean>();
-		addressBean= new AddressBean("mock-test");
-		addressing.add(addressBean);
-		
 	}
 
 	@After
@@ -67,7 +62,7 @@ public class TestVSensorLoader {
 	@Test
 	public void testPrepareWrapper() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		VSensorLoader loader = new VSensorLoader();
-		MockWrapper wrapper = (MockWrapper) loader.findWrapper(addressBean);
+		MockWrapper wrapper = (MockWrapper) loader.findWrapper(addressing[0]);
 		assertNotNull(wrapper);
 	}
 
@@ -87,9 +82,7 @@ public class TestVSensorLoader {
 		InputStream is = new InputStream();
 		is.setInputStreamName("t1");
 		is.setQuery("select * from my-stream1");
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("mock-test"));
-		StreamSource 	ss1 = new StreamSource().setAlias("my-stream1").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("2").setInputStream(is);		
+		StreamSource 	ss1 = new StreamSource().setAlias("my-stream1").setAddressing(new AddressBean[] {new AddressBean("mock-test")}).setSqlQuery("select * from wrapper").setRawHistorySize("2").setInputStream(is);		
 		ss1.setSamplingRate(1);
 		assertTrue(ss1.validate());
 		is.setSources(ss1);
@@ -102,13 +95,11 @@ public class TestVSensorLoader {
 	public void testOneInputStreamUsingTwoStreamSources() throws InstantiationException, IllegalAccessException, SQLException {
 		VSensorLoader loader = new VSensorLoader();
 		InputStream is = new InputStream();
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("mock-test"));
-		StreamSource 	ss1 = new StreamSource().setAlias("my-stream1").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("2").setInputStream(is);		
+		StreamSource 	ss1 = new StreamSource().setAlias("my-stream1").setAddressing(new AddressBean[] {new AddressBean("mock-test")}).setSqlQuery("select * from wrapper").setRawHistorySize("2").setInputStream(is);		
 		ss1.setSamplingRate(1);
 		assertTrue(ss1.validate());
 		assertTrue(loader.prepareStreamSource(is,ss1));
-		StreamSource 	ss2 = new StreamSource().setAlias("my-stream2").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("20").setInputStream(is);		
+		StreamSource 	ss2 = new StreamSource().setAlias("my-stream2").setAddressing(new AddressBean[] {new AddressBean("mock-test")}).setSqlQuery("select * from wrapper").setRawHistorySize("20").setInputStream(is);		
 		ss2.setSamplingRate(1);
 		assertTrue(ss2.validate());
 		assertTrue(loader.prepareStreamSource(is,ss2));

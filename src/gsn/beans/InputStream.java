@@ -83,8 +83,8 @@ public class InputStream {
 		 return this.rate;
 	 }
 
-	 public Collection < StreamSource > getSources ( ) {
-		 return this.streamSourceAliasNameToStreamSourceName.values( );
+	 public StreamSource[] getSources ( ) {
+		 return sources;
 	 }
 
 	 public StreamSource getSource ( final String streamSourceName ) {
@@ -193,7 +193,7 @@ public class InputStream {
 
 	 private transient boolean hasValidated             = false;
 
-	 boolean                   cachedValidationResult = false;
+	 private transient boolean                   cachedValidationResult = false;
 
 	 public boolean validate ( ) {
 		 if ( this.hasValidated ) return this.cachedValidationResult;
@@ -202,8 +202,8 @@ public class InputStream {
 			 logger.error("Input Stream "+getInputStreamName()+ " is not valid (No stream sources are specified), deployment failed !");
 			 return false;
 		 }
-		 for ( final StreamSource ss : this.sources ) {
-			 if ( !ss.validate( ) ) {
+		 for ( StreamSource ss : sources ) {
+      if ( !ss.validate( ) ) {
 				 logger.error( new StringBuilder( ).append( "The Stream Source : " ).append( ss.getAlias( ) ).append( " specified in the Input Stream : " ).append( this.getInputStreamName( ) ).append(
 				 " is not valid." ).toString( ) );
 				 return (cachedValidationResult=false);

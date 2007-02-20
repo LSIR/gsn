@@ -55,23 +55,20 @@ public class TestDataPropogation {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		ArrayList<AddressBean> addressing;
 		sm = StorageManager.getInstance();
-		addressing = new ArrayList<AddressBean>();
 		PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
 		propertiesConfiguration.addProperty("wrapper.name", "mock-test");
 		propertiesConfiguration.addProperty("wrapper.class", "gsn.wrappers.MockWrapper");
 		Main.loadWrapperList(propertiesConfiguration);
 		VSensorLoader loader = new VSensorLoader();
 		AddressBean addressBean= new AddressBean("mock-test");
-		addressing.add(addressBean);
 		wrapper = (MockWrapper) loader.findWrapper(addressBean);
 		wrapper.setOutputFormat(df);
 		InputStream is = new InputStream();
 		streamSource= createMock(StreamSource.class, new Method[] {StreamSource.class.getMethod("dataAvailable",new Class[] {})});
 		streamSource.setAlias("test");
 		streamSource.setRawHistorySize("1");
-		streamSource.setAddressing(addressing);
+		streamSource.setAddressing(new AddressBean[] {addressBean});
 		streamSource.setInputStream(is);
 		streamSource.setSamplingRate(1);
 		streamSource.setSqlQuery("select * from wrapper where data <> 1");

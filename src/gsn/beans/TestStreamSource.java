@@ -1,44 +1,44 @@
 package gsn.beans;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import gsn.storage.DataEnumerator;
+import gsn.storage.StorageManager;
+import gsn.utils.GSNRuntimeException;
+import gsn.wrappers.AbstractWrapper;
+import gsn.wrappers.SystemTime;
 import java.io.Serializable;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-
-import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
-import gsn.utils.GSNRuntimeException;
-import gsn.wrappers.AbstractWrapper;
-import gsn.wrappers.SystemTime;
-
-import org.apache.commons.httpclient.protocol.SSLProtocolSocketFactory;
+import org.apache.commons.collections.KeyValue;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.mysql.jdbc.SQLError;
 
 public class TestStreamSource {
 
 	private AbstractWrapper wrapper = new SystemTime();
 	private StorageManager sm =  StorageManager.getInstance();
-
-
+  private AddressBean[] addressing = new AddressBean[] {new AddressBean("system-time")};
+   
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.hsqldb.jdbcDriver( ) );
 		StorageManager.getInstance ( ).initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
+		
 	}
 
 	@Before
 	public void setup() throws SQLException {
 		sm.createTable(wrapper.getDBAliasInStr(), new DataField[] {});
+		wrapper.setActiveAddressBean(new AddressBean("system-time",null));
 		assertTrue(wrapper.initialize());
 	}
 	@After
@@ -56,8 +56,6 @@ public class TestStreamSource {
 	@Test
 	public void testCanStart() {
 		InputStream is = new InputStream();
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
 		StreamSource ss = new StreamSource().setAlias("my-stream").setRawHistorySize("10  s").setAddressing(addressing);
 		ss.setInputStream(is);
 		assertTrue(ss.canStart());
@@ -66,8 +64,6 @@ public class TestStreamSource {
 
 	@Test
 	public void testGetSQLQuery() {
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
 		InputStream is = new InputStream();
 		StreamSource ss = new StreamSource();
 		ss.setAddressing(addressing);
@@ -87,8 +83,6 @@ public class TestStreamSource {
 	@Test
 	public void testValidate() {
 		InputStream is = new InputStream();
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
 		StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10m");
 		assertTrue(ss.validate());
 		assertFalse(ss.isStorageCountBased());
@@ -111,23 +105,16 @@ public class TestStreamSource {
 	@Test (expected=GSNRuntimeException.class)
 	public void testBadStreamSources() throws GSNRuntimeException{
 		InputStream is = new InputStream();
-
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
-		StreamSource 	ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  min").setInputStream(is);
+	StreamSource 	ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  min").setInputStream(is);
 	}
 	@Test
 	public void testBadWindowSize() throws GSNRuntimeException{
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
 		StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  sec");
 		assertFalse(ss.validate());
 	}
 	@Test
 	public void testUID() {
 		InputStream is = new InputStream();
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
 		StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  s").setInputStream(is);
 		assertTrue(ss.validate());
 		assertNotNull(ss.getUIDStr());
@@ -138,8 +125,6 @@ public class TestStreamSource {
 	@Test
 	public void testRateZeroQueries() throws SQLException{
 		InputStream is = new InputStream();
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
 		StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  m").setInputStream(is);
 		ss.setSamplingRate(0);
 		ss.setWrapper(wrapper);
@@ -170,8 +155,6 @@ public class TestStreamSource {
 	@Test
 	public void testCountWindowSizeZero() {
 		InputStream is = new InputStream();
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
 		StreamSource 	ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("0 ").setInputStream(is);
 
 		ss.setWrapper(wrapper);
@@ -198,9 +181,7 @@ public class TestStreamSource {
 	@Test
 	public void testTimeBasedWindow() throws SQLException{
 		InputStream is = new InputStream();
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
-		StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("1  s").setInputStream(is);
+	  StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("1  s").setInputStream(is);
 		ss.setSamplingRate(1);
 		ss.setWrapper(wrapper );
 		assertTrue(ss.validate());
@@ -241,8 +222,6 @@ public class TestStreamSource {
 	@Test
 	public void testCountBasedWindowSize1() throws SQLException{
 		InputStream is = new InputStream();
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
 		StreamSource 	ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("1").setInputStream(is);
 		ss.setSamplingRate(1);
 		assertTrue(ss.validate());
@@ -269,8 +248,6 @@ public class TestStreamSource {
 	@Test
 	public void testCountBasedWindowSize2() throws SQLException{
 		InputStream is = new InputStream();
-		ArrayList<AddressBean> addressing = new ArrayList<AddressBean>();
-		addressing.add(new AddressBean("system-time"));
 		StreamSource 	ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("2").setInputStream(is);		
 		ss.setSamplingRate(1);
 		ss.setWrapper(wrapper );

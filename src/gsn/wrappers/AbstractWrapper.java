@@ -28,7 +28,7 @@ public abstract class AbstractWrapper extends Thread {
 
 	private boolean                            isActive       = true;
 
-	private static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
+	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
 	/**
 	 * Returns the view name created for this listener.
 	 * Note that, GSN creates one view per listener.
@@ -101,7 +101,7 @@ public abstract class AbstractWrapper extends Thread {
 	private final transient int aliasCode = Main.tableNameGenerator( );
 	private final CharSequence aliasCodeS = Main.tableNameGeneratorInString( aliasCode );
 
-	private long noOfCallsToPostSE;
+	private long noOfCallsToPostSE = 0;
 
 	public int getDBAlias ( ) {
 		return aliasCode;
@@ -144,8 +144,9 @@ public abstract class AbstractWrapper extends Thread {
 				}
 			}
 		}
-		if (++noOfCallsToPostSE%GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS==0)
-			removeUselessValues();
+		if (++noOfCallsToPostSE%GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS==0) {
+			 int removedRaws = removeUselessValues();
+    }
 		return toReturn;		
 	}
 	/**
@@ -217,21 +218,22 @@ public abstract class AbstractWrapper extends Thread {
 		if (maxCountSize>0 && maxTimeSizeInMSec>0)
 			sb.append(" AND ");
 		if (maxCountSize>0 ) {
-			sb.append(" timed < ( select * from (select timed from ").append(getDBAliasInStr());
-			sb.append(" order by timed desc limit 1 offset ").append(maxCountSize).append(" ) as X)");
+			sb.append(" timed < (select * from (select timed from ").append(getDBAliasInStr());
+			sb.append(" order by timed desc limit 1 offset ").append(maxCountSize).append(" ) as X )");
 		}
 		return sb;
 	}
 
 	public int removeUselessValues() {
 		CharSequence query = getUselessWindow();
-		if (query==null)
+    if (query==null)
 			return 0;
 		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "RESULTING QUERY FOR Table Size Enforce " ).append( query ).toString( ) );
 		int deletedRows =StorageManager.getInstance().executeUpdate(query);
 		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( deletedRows ).append( " old rows dropped from " ).append( getDBAliasInStr() ).toString( ) );
 		return deletedRows;
 	}
+  
 	public void releaseResources ( ) {
 		isActive = false;
 		finalize();

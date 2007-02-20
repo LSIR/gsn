@@ -1,23 +1,18 @@
 package gsn.wrappers.general;
 
-import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
-
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
-
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
-
 import au.com.bytecode.opencsv.CSVReader;
 
 
@@ -40,9 +35,6 @@ public class CSVFileWrapper extends AbstractWrapper {
 	private final transient Logger   logger             = Logger.getLogger( CSVFileWrapper.class );
 
 
-	private AddressBean              addressBean;
-
-
 	private static DataField [] structure;
 
 	private String filename;
@@ -59,13 +51,11 @@ public class CSVFileWrapper extends AbstractWrapper {
 	 */
 	public boolean initialize (  ) {
 		logger.warn("cvsfile wrapper initialize started...");
-		this.addressBean =getActiveAddressBean( );
-		ArrayList<? extends KeyValue> predicates = this.addressBean.getPredicates();
 		int column=0;
 		Vector v = new Vector();
-		for(int i=0;i<predicates.size();i++){
-			String key = (String) predicates.get(i).getKey();
-			String value = (String) predicates.get(i).getValue();
+		for(KeyValue predicate : getActiveAddressBean().getPredicates()){
+			String key = (String) predicate.getKey();
+			String value = (String) predicate.getValue();
 			logger.debug(v.size()+": type value: "+key);
 			if (key.equals(PARAM_FILE))
 				filename = value;
