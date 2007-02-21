@@ -38,7 +38,7 @@ import org.jfree.data.time.TimeSeriesCollection;
  */
 public class ChartVirtualSensor extends AbstractVirtualSensor {
    
-   private static final transient Logger               logger                             = Logger.getLogger( ChartVirtualSensor.class );
+   private  final transient Logger               logger                             = Logger.getLogger( this.getClass() );
    
    /**
     * The <code>GENERATE_COUNT</code> represents after how many inputs, the
@@ -51,7 +51,7 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
    
    private long                                        counter                            = 0;
    
-   private final static HashMap < String , ChartInfo > input_stream_name_to_ChartInfo_map = new HashMap < String , ChartInfo >( );
+   private final HashMap < String , ChartInfo > input_stream_name_to_ChartInfo_map = new HashMap < String , ChartInfo >( );
    
    private int                                         counter_pref                       = 0;
    
@@ -170,7 +170,7 @@ class ChartInfo {
    
    private static final String             SYNTAX          = "INPUT_STREAM_VAR_NAME:CHART_NAME:VERTICAL_AXIS_TITLE [TYPE@SIZE] {WIDTH;HEIGHT}";
    
-   private static final transient Logger   logger          = Logger.getLogger( ChartInfo.class );
+   private  final transient Logger   logger          = Logger.getLogger( this.getClass() );
    
    private String                          plotTitle;
    
