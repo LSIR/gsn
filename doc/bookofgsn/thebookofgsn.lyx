@@ -34,7 +34,7 @@ The Book of GSN
 \end_layout
 
 \begin_layout Author
-Jérôme Rousselot and Ali Salehi
+Global Sensor Networks Team
 \end_layout
 
 \begin_layout Standard
@@ -6014,8 +6014,98 @@ This means that you can actually feed data to GSN from your own custom software
  
 \end_layout
 
+\begin_layout Chapter*
+Appendix A,
+\end_layout
+
+\begin_layout Section*
+Using Eclipse for running and debugging;
+\end_layout
+
+\begin_layout Standard
+As GSN uses the Jibx framework for reading the xml documents, it is not
+ straightforward how to configure your eclipse environment to run/debug
+ your virtual sensors.
+\end_layout
+
+\begin_layout Standard
+Here is a step by step instruction :
+\end_layout
+
+\begin_layout Enumerate
+Setting the Ant Home : Go to Window Menu and select Preferences, on the
+ left side, click on the ANT and then select Runtime.
+ In the Classpath tab (opened on the center of the window) select Ant Home
+ Entries, click on the Ant Home button and browse toward the directory that
+ contains the files from the jakarta-ant archive.
+ Click on OK.
+\end_layout
+
+\begin_layout Enumerate
+Setting an Ant Build System for your GSN project : the Project menu and
+ click on properties tab.
+ Select Build on the left side and click on new and select Ant.
+ A new window pops up which has several tabs :
+\end_layout
+
+\begin_layout Itemize
+Main Tab : 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+For build file, click on Browse Workspace and select the build.xml file.
+\end_layout
+
+\begin_layout Itemize
+For base directory, click on the Browse Workspace and click on the project
+ name which contains the gsn source code.
+\end_layout
+
+\begin_layout Itemize
+Let the Set an Input Handler selected.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Targets Tab : 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+For After a Clean, click on Set Targets and select both Build and Bind.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Don't touch the Manual and Auto build options ! (leave it empty) 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Click on Ok.
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+You'll be returned back to the Builders page, make sure both Java Builder
+ AND New Builder (or what ever you named it in the previous window) are
+ selected.
+ Click on OK.
+\end_layout
+
+\begin_layout Standard
+Now you can debug your virtual sensors in eclipse, try it by setting a break
+ point on a line in the main file.
+\end_layout
+
 \begin_layout Standard
 
+\emph on
+IMPORTANT
+\emph default
+ : Sometimes you need to clean the project to run/debug GSN (Project menu,
+ Clean...).
 \end_layout
 
 \begin_layout Standard
