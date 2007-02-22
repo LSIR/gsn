@@ -89,7 +89,13 @@ public class GSNConfiguratorPanel implements ActionListener {
 			bean.writeConfigurations();
 			try {
 				AntRunner.nonBlockingAntTaskExecution(null, "gsn");
-				notifyGsnHasStarted();
+				logPanel.getGSNLogView().clear();
+				gsnIsRunning = true;
+				gsnStart.setIcon(stopIcon);
+				for (StartStopEventListener listener : listeners)
+					listener.notifyGSNStart();
+				updateTimer = new Timer(LogPanel.LOGVIEWER_REFRESH_INTERVAL, this);
+				updateTimer.start();
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -112,10 +118,23 @@ public class GSNConfiguratorPanel implements ActionListener {
 			PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 			writer.println(gsn.GSNController.GSN_CONTROL_SHUTDOWN);
 			writer.flush();
-			notifyGsnHasStopped();
+			gsnIsRunning = false;
+			gsnStart.setIcon(startIcon);
+			if (gsnReader != null) {
+				try {
+					gsnReader.close();
+				} catch (IOException ioe) {
+					System.out.println(ioe.getMessage());
+				}
+				gsnReader = null;
+			}
+			for (StartStopEventListener listener : listeners)
+				listener.notifyGSNStop();
+			stopWatchingLog();
+
 		} catch(IOException e) {
 			// Could not connect to GSN. Assume it is not running.
-			JOptionPane.showMessageDialog(null, "Could not connect to GSN. It has probably already stopped (error message was: " + e.getMessage() +").");
+			JOptionPane.showMessageDialog(null, "Could not connect to GSN. It either has already stopped or has not yet finished initialization (error message was: " + e.getMessage() +").");
 		}
 	}
 
@@ -170,32 +189,6 @@ public class GSNConfiguratorPanel implements ActionListener {
 
 	public boolean isGsnRunning() {
 		return gsnIsRunning;
-	}
-
-	public void notifyGsnHasStarted() {
-		logPanel.getGSNLogView().clear();
-		gsnIsRunning = true;
-		gsnStart.setIcon(stopIcon);
-		for (StartStopEventListener listener : listeners)
-			listener.notifyGSNStart();
-		updateTimer = new Timer(LogPanel.LOGVIEWER_REFRESH_INTERVAL, this);
-//		JOptionPane.showMessageDialog(null, "Congratulations! GSN has successfully started. You can use the web interface by visiting http://localhost:1882/index.jsp with your web browser.");
-	}
-
-	public void notifyGsnHasStopped() {
-		gsnIsRunning = false;
-		gsnStart.setIcon(startIcon);
-		if (gsnReader != null) {
-			try {
-				gsnReader.close();
-			} catch (IOException ioe) {
-				System.out.println(ioe.getMessage());
-			}
-			gsnReader = null;
-		}
-		for (StartStopEventListener listener : listeners)
-			listener.notifyGSNStop();
-		stopWatchingLog();
 	}
 
 	/**
