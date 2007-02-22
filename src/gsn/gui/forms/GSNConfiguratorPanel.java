@@ -39,26 +39,21 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.factories.ButtonBarFactory;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class GSNConfiguratorPanel {
+public class GSNConfiguratorPanel implements ActionListener {
 
 	private static final int LOCK_FILE_POLLING_INTERVAL = 500; // in
 	// milliseconds
 
 	private ContainerConfig bean;
-
 	private JPanel panel;
-
+	private Timer updateTimer;
 	private LogPanel logPanel;
-
 	private PresentationModel beanPresentationModel;
-
 	private static GSNConfiguratorPanel instance;
-
 	private Vector<StartStopEventListener> listeners = new Vector<StartStopEventListener>();
-
 	private static Icon startIcon;
-
 	private static Icon stopIcon;
+
 	static {
 		try {
 			startIcon = new ImageIcon(ImageIO.read(new File("icons/run.gif")));
@@ -125,10 +120,6 @@ public class GSNConfiguratorPanel {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		updateGsnLogView();
-	}
-
-	private void updateGsnLogView() {
 		if (gsnIsRunning) {
 			try {
 				if (gsnReader == null) {
@@ -156,6 +147,27 @@ public class GSNConfiguratorPanel {
 		}
 	}
 
+	public void stopWatchingLog() {
+		try {
+			// in case of immediate error, make sure we display the log
+			// output
+			Thread.sleep(Math.max(LogPanel.LOGVIEWER_INITIAL_DELAY,
+					LogPanel.LOGVIEWER_REFRESH_INTERVAL));
+
+			updateTimer.stop();
+			if (gsnReader != null) {
+				gsnReader.close();
+				gsnReader = null;
+			}
+		} catch (IOException ioe) {
+			System.out.println("Couldn't close log file " + LogPanel.GSN_LOG_FILE
+					+ " correctly: " + ioe);
+		} catch (InterruptedException e) {
+
+		}
+	}
+
+
 	public boolean isGsnRunning() {
 		return gsnIsRunning;
 	}
@@ -166,6 +178,7 @@ public class GSNConfiguratorPanel {
 		gsnStart.setIcon(stopIcon);
 		for (StartStopEventListener listener : listeners)
 			listener.notifyGSNStart();
+		updateTimer = new Timer(LogPanel.LOGVIEWER_REFRESH_INTERVAL, this);
 //		JOptionPane.showMessageDialog(null, "Congratulations! GSN has successfully started. You can use the web interface by visiting http://localhost:1882/index.jsp with your web browser.");
 	}
 
@@ -182,6 +195,7 @@ public class GSNConfiguratorPanel {
 		}
 		for (StartStopEventListener listener : listeners)
 			listener.notifyGSNStop();
+		stopWatchingLog();
 	}
 
 	/**

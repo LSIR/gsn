@@ -86,18 +86,12 @@ public class LogPanel extends JPanel {
 	private static final int DEFAULT_LOG_SIZE = 100000, MAX_LOG_SIZE = 1000000,
 	MIN_LOG_SIZE = 2000;
 
-	private Timer updateTimer;
 
-	private static final int LOGVIEWER_REFRESH_INTERVAL = 100; // refresh
+	public static final int LOGVIEWER_REFRESH_INTERVAL = 100; // refresh
 	// interval in
 	// ms
-
-	private static final int LOGVIEWER_INITIAL_DELAY = 10;
-
+	public static final int LOGVIEWER_INITIAL_DELAY = 10;
 	private static final int SPINNER_STEP = 1000;
-
-	private String log_file=GSN_LOG_FILE;
-
 	private BufferedReader reader;
 
 	public LogPanel() {
@@ -237,25 +231,6 @@ public class LogPanel extends JPanel {
 		return scrollPane;
 	}
 
-	public void stopWatchingLog() {
-		try {
-			// in case of immediate error, make sure we display the log
-			// output
-			Thread.sleep(Math.max(LOGVIEWER_INITIAL_DELAY,
-					LOGVIEWER_REFRESH_INTERVAL));
-
-			updateTimer.stop();
-			if (reader != null) {
-				reader.close();
-				reader = null;
-			}
-		} catch (IOException ioe) {
-			System.out.println("Couldn't close log file " + log_file
-					+ " correctly: " + ioe);
-		} catch (InterruptedException e) {
-
-		}
-	}
 
 	public void clear() {
 		try {
