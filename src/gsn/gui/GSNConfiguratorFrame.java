@@ -230,7 +230,7 @@ class UpdateAction extends AbstractAction{
 class AboutAction extends AbstractAction {
 	private static final String HTML_CODE_ABOUT_DIALOG = "<h1>GSN Control Center</h1><br>"
 		+ "<p>This software has been developed by "
-		+ "the GSN Development Team ( http://globalsn.sourceforge.net ).<br>";
+		+ "the GSN Development Team ( http://gsn.sourceforge.net ).<br>";
 	private Color bgColor;
 	public AboutAction(Color bgColor) {
 		super("About");
