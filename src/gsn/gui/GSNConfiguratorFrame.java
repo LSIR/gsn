@@ -175,9 +175,19 @@ public class GSNConfiguratorFrame extends JFrame {
 				public void mouseExited(MouseEvent arg0) {}
 				public void mousePressed(MouseEvent arg0) {	}
 				public void mouseReleased(MouseEvent arg0) { }
-	        	 
 	         });
 	         trayIcon.setToolTip("GSN Server");
+	         addWindowListener(new WindowAdapter() {
+	     		public void windowDeiconified(WindowEvent arg0) {
+	     			setVisible(true);
+	     			setExtendedState(Frame.NORMAL);
+	    		}
+
+	    		public void windowIconified(WindowEvent arg0) {
+	    			setVisible(false);
+	    			setExtendedState(Frame.ICONIFIED);
+	    		}	        	 
+	         })
 	         try {
 	             tray.add(trayIcon);
 	         } catch (AWTException e) {
@@ -187,32 +197,6 @@ public class GSNConfiguratorFrame extends JFrame {
 	}
 
 	
-    WindowListener wl = new WindowListener() {
-
-		public void windowActivated(WindowEvent arg0) {
-		}
-
-		public void windowClosed(WindowEvent arg0) {
-		}
-
-		public void windowClosing(WindowEvent arg0) {
-		}
-
-		public void windowDeactivated(WindowEvent arg0) {
-		}
-
-		public void windowDeiconified(WindowEvent arg0) {
-			setExtendedState(Frame.NORMAL);
-			setVisible(true);
-		}
-
-		public void windowIconified(WindowEvent arg0) {
-			setExtendedState(Frame.ICONIFIED);
-			setVisible(false);
-		}
-		public void windowOpened(WindowEvent arg0) {
-		}
-     };
 
 	
 	private void initEvents() {
