@@ -16,6 +16,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -96,6 +97,10 @@ public class GSNConfiguratorPanel implements ActionListener {
 					listener.notifyGSNStart();
 				updateTimer = new Timer(LogPanel.LOGVIEWER_REFRESH_INTERVAL, this);
 				updateTimer.start();
+				if (java.awt.Desktop.isDesktopSupported()) {
+					java.awt.Desktop.getDesktop().browse(
+							new URI("http://127.0.0.1:"+ Integer.toString(bean.getContainerPort())));
+				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
