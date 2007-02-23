@@ -187,7 +187,7 @@ public class GSNConfiguratorFrame extends JFrame {
 	    			setVisible(false);
 	    			setExtendedState(Frame.ICONIFIED);
 	    		}	        	 
-	         })
+	         });
 	         try {
 	             tray.add(trayIcon);
 	         } catch (AWTException e) {
