@@ -4,6 +4,8 @@ import gsn.beans.ContainerConfig;
 import gsn.gui.AntRunner;
 import gsn.utils.ValidityTools;
 import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.awt.SystemTray;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -54,7 +56,8 @@ public class GSNConfiguratorPanel implements ActionListener {
 	private Vector<StartStopEventListener> listeners = new Vector<StartStopEventListener>();
 	private static Icon startIcon;
 	private static Icon stopIcon;
-
+	
+	
 	static {
 		try {
 			startIcon = new ImageIcon(ImageIO.read(new File("icons/run.gif")));
@@ -69,6 +72,7 @@ public class GSNConfiguratorPanel implements ActionListener {
 
 	private JFormattedTextField gsnPortNo;
 
+	
 	public GSNConfiguratorPanel(ContainerConfig bean) {
 		if (bean == null)
 			throw new NullPointerException("The input bean shoudn't be null.");

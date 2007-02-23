@@ -5,16 +5,30 @@ import gsn.beans.ContainerConfig;
 import gsn.gui.forms.GSNConfiguratorPanel;
 import gsn.utils.ValidityTools;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Desktop;
+import java.awt.Frame;
+import java.awt.Image;
 import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -56,7 +70,7 @@ public class GSNConfiguratorFrame extends JFrame {
 	private JMenuItem menuUndo, menuRedo;
 
 	private JMenuItem menuHelpContents, menuAbout;
-
+	private PopupMenu popup;
 
 	// We load all icons here so that we can reuse them
 	public static final Icon GSN_ICON = new ImageIcon("icons/gsn.png");
@@ -90,21 +104,117 @@ public class GSNConfiguratorFrame extends JFrame {
 
 	private static final int ACCEL_HELP = KeyEvent.VK_H;
 
+	private  Desktop desktop;
+	private SystemTray tray;
+	private TrayIcon trayIcon = null;
+	private ContainerConfig bean;
 	/*
 	 * Initialize the frame window, close operations, menus, look&feel
 	 */
 	public GSNConfiguratorFrame(String containerConfigXML, String gsnLog4j,
 			String dirLog4j) throws FileNotFoundException, JiBXException {
 		super("GSN Middleware GUI");
-      ContainerConfig bean = ContainerConfig
-		.getConfigurationFromFile(containerConfigXML, gsnLog4j,
-				dirLog4j);
+		bean = ContainerConfig.getConfigurationFromFile(containerConfigXML, gsnLog4j,	dirLog4j);
 		configuratorPanel = new GSNConfiguratorPanel(bean);
 		initComponents();
 		initEvents();
+		initDesktop();
 		setVisible(true);
 	}
 
+	private void initDesktop() {
+		if(SystemTray.isSupported() && Desktop.isDesktopSupported()) {
+			tray = SystemTray.getSystemTray();
+			desktop = Desktop.getDesktop();
+			Image image = Toolkit.getDefaultToolkit().getImage("icons/gsn.png");
+			ActionListener trayListener = new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					try {
+						desktop.browse(new URI("http://127.0.0.1:"+Integer.toString(bean.getContainerPort())));
+					} catch(IOException ioe) {
+						System.out.println("GSN encountered an unexpected error: " + ioe.getMessage());
+						ioe.printStackTrace();
+					} catch (URISyntaxException e) {
+						e.printStackTrace();
+					}
+				}
+			};
+			
+	         // create a popup menu
+	         popup = new PopupMenu();
+	         
+	         // create menu item to access web interface
+	         MenuItem openWebItem = new MenuItem("GSN Web Interface");
+	         openWebItem.addActionListener(trayListener);
+	         popup.add(openWebItem);
+	         
+	         // menu item to exit gsn
+	         MenuItem quitItem = new MenuItem("Quit GSN");
+	         quitItem.addActionListener(quitListener);
+	         popup.addSeparator();
+	         popup.add(quitItem);
+	         
+	         // construct a TrayIcon
+	         trayIcon = new TrayIcon(image, "GSN", popup);
+	         trayIcon.setImageAutoSize(true);
+//	         trayIcon.addActionListener(new ActionListener() {
+//				public void actionPerformed(ActionEvent arg0) {
+//					System.out.println("trayIcon was clicked. visible= " + isVisible());
+//					setExtendedState(isVisible()?Frame.ICONIFIED:Frame.NORMAL);
+//					setVisible(isVisible()?false:true);
+//				}
+//	         });
+	         // In the interest of cross-platform compatibility
+	         trayIcon.addMouseListener(new MouseListener() {
+
+				public void mouseClicked(MouseEvent arg0) {
+					setVisible(isVisible()?false:true);
+					setExtendedState(isVisible()?Frame.NORMAL:Frame.ICONIFIED);
+				}
+				public void mouseEntered(MouseEvent arg0) {	}
+				public void mouseExited(MouseEvent arg0) {}
+				public void mousePressed(MouseEvent arg0) {	}
+				public void mouseReleased(MouseEvent arg0) { }
+	        	 
+	         });
+	         trayIcon.setToolTip("GSN Server");
+	         try {
+	             tray.add(trayIcon);
+	         } catch (AWTException e) {
+	             System.err.println(e);
+	         }
+		}
+	}
+
+	
+    WindowListener wl = new WindowListener() {
+
+		public void windowActivated(WindowEvent arg0) {
+		}
+
+		public void windowClosed(WindowEvent arg0) {
+		}
+
+		public void windowClosing(WindowEvent arg0) {
+		}
+
+		public void windowDeactivated(WindowEvent arg0) {
+		}
+
+		public void windowDeiconified(WindowEvent arg0) {
+			setExtendedState(Frame.NORMAL);
+			setVisible(true);
+		}
+
+		public void windowIconified(WindowEvent arg0) {
+			setExtendedState(Frame.ICONIFIED);
+			setVisible(false);
+		}
+		public void windowOpened(WindowEvent arg0) {
+		}
+     };
+
+	
 	private void initEvents() {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
@@ -134,6 +244,12 @@ public class GSNConfiguratorFrame extends JFrame {
 		configuratorPanel.registerInterestInStartStopState(statusBar);
 	}
 
+	private ActionListener quitListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			closeGSNConfigurator();
+		}
+	};
+	
 	private void initMenuBar() {
 		menuBar = new JMenuBar();
 
@@ -143,12 +259,7 @@ public class GSNConfiguratorFrame extends JFrame {
 		menuQuit = new JMenuItem(MENU_QUIT);
 		menuQuit.setAccelerator(ACCEL_QUIT);
 
-		menuQuit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				closeGSNConfigurator();
-			}
-
-		});
+		menuQuit.addActionListener(quitListener);
 
 		menuFile.setMnemonic(ACCEL_FILE);
 //		menuFile.add(menuNewConfig);
@@ -162,6 +273,7 @@ public class GSNConfiguratorFrame extends JFrame {
 	}
 
 	public static void main(String[] args)  {
+		
 		ValidityTools.checkAccessibilityOfFiles(Main.DEFAULT_GSN_CONF_FILE,
 				Main.DEFAULT_GSN_LOG4J_PROPERTIES,
 		"conf/log4j.directory.properties");
