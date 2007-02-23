@@ -1368,13 +1368,12 @@ TinyOS
 \end_layout
 
 \begin_layout Standard
-With default GSN installation we provide sample wrappers to interact with
- TinyOS based sensor networks (both version 1.x and 2.x).
- The TinyOS wrapper is actually a java program that interacts with the serial
- forwarder (provided by TinyOS distribution) which inturn presents a sensor
- network.
- In order to use the TinyOS wrapper with a sensor network you need to first
- generate the java representation of the message structures used in the
+GSN comes with sample wrappers for TinyOS based sensor networks (both version
+ 1.x and 2.x).
+ The TinyOS wrapper interacts with the serial forwarder (provided by TinyOS
+ distribution) which inturn presents a sensor network.
+ In order to use the TinyOS wrapper with a sensor network, you first need
+ to generate the Java representation of the message structures used in the
  network (in TinyOS they are defined in the .h files).
  NesC language provides a tool called 
 \begin_inset Quotes eld
@@ -1391,260 +1390,315 @@ mig
 \end_layout
 
 \begin_layout Standard
-Note for TinyOS 1.x users, due to strange java package management in TinyOS
- 2.x distribution, both TinyOS 1.x and 2.x are using very same package structures
- and class names which generates conflict when you have both TinyOS1.x and
- 2.x jar files in your classpath (which is the case for GSN).
+Due to strange java package management in TinyOS 2.x distribution, both TinyOS
+ 1.x and 2.x are using the same package structures and class names.
+ This is a source of conflicts if both TinyOS1.x and 2.x jar files are in
+ the classpath (which is the case for GSN).
  To resolve this, you need to edit the generated message file and modify
  it so that it only uses class files from the TinyOS 1.x (all classes must
  be imported from net.tinyos1x package).
 \end_layout
 
 \begin_layout Standard
-Once you generated the Java representation of the communication message
- structures, you need to write a wrapper class for your message.
+After generating the Java representation of the communication message structures
+, you need to write a wrapper class for your message.
  Assuming you have a message class called MyMessage which has three fields,
- node_id, temperature and light, here is a sample wrapper class to bind
- your network with GSN :
+ node_id, temperature and light, here is a sample wrapper class that binds
+ this example sensor network with GSN :
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
 //import net.tinyos1x.message.Message; // Only for TinyOS 1.x
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
 //import net.tinyos1x.message.MessageListener; // Only for TinyOS 1.x
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
 //import net.tinyos1x.message.MoteIF; // Only for TinyOS 1.x
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
 import net.tinyos.message.Message; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
 import net.tinyos.message.MessageListener; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
 import net.tinyos.message.MoteIF; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
 import net.tinyos.packet.BuildSource; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
 import net.tinyos.packet.PhoenixSource; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
 public class MyWrapper extends AbstractWrapper implements MessageListener
  { 
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
 private final DataField [] structure = new DataField[] {
 \end_layout
 
-\begin_layout Verse
-new DataField("node_id","int","The node id the mote."),
+\begin_layout LyX-Code
+  new DataField("node_id","int","The node id the mote."),
 \end_layout
 
-\begin_layout Verse
-new DataField("temperature","double","Presents the temperature sensor."),
+\begin_layout LyX-Code
+  new DataField("temperature","double","Presents the temperature sensor."),
 \end_layout
 
-\begin_layout Verse
-new DataField("light","double","Presents the light sensor.")
+\begin_layout LyX-Code
+  new DataField("light","double","Presents the light sensor.")
 \end_layout
 
-\begin_layout Verse
-}; 
+\begin_layout LyX-Code
+};
 \end_layout
 
-\begin_layout Verse
-public boolean initialize ( ) { 
+\begin_layout LyX-Code
+
 \end_layout
 
-\begin_layout Verse
-AddressBean addressBean = getActiveAddressBean( );
+\begin_layout LyX-Code
+public boolean initialize () { 
 \end_layout
 
-\begin_layout Verse
-String host = addressBean.getPredicateValue( "host" ); // The ip of the machine
- running serial forwarder.
+\begin_layout LyX-Code
+  AddressBean addressBean = getActiveAddressBean();
 \end_layout
 
-\begin_layout Verse
-if ( host == null || host.trim( ).length( ) == 0 ) {
+\begin_layout LyX-Code
+  // The ip of the machine running   serial forwarder.
 \end_layout
 
-\begin_layout Verse
-logger.warn( "The >host< parameter is missing from the RemoteWrapper wrapper."
- );
+\begin_layout LyX-Code
+  String host = addressBean.getPredicateValue( "host" ); 
 \end_layout
 
-\begin_layout Verse
-return false; //initialization failed, the host name is not provided in
- the parameters.
+\begin_layout LyX-Code
+  if (host == null || host.trim().length() == 0) {
 \end_layout
 
-\begin_layout Verse
-}
+\begin_layout LyX-Code
+    logger.warn("The >host< parameter is missing from the RemoteWrapper wrapper.")
+;
 \end_layout
 
-\begin_layout Verse
-int port; // The port of the machine running serial forwarder.
+\begin_layout LyX-Code
+    return false; 
 \end_layout
 
-\begin_layout Verse
-String portRaw = addressBean.getPredicateValue( "port" );
+\begin_layout LyX-Code
+    //initialization failed, the host name is not provided in the parameters.
 \end_layout
 
-\begin_layout Verse
-if ( portRaw == null || portRaw.trim( ).length( ) == 0 )
+\begin_layout LyX-Code
+  }
 \end_layout
 
-\begin_layout Verse
-{ logger.warn( "The >port< parameter is missing from the RemoteWrapper wrapper."
- );
+\begin_layout LyX-Code
+  int port; // The port of the machine running serial forwarder.
 \end_layout
 
-\begin_layout Verse
-return false;// initialization failed, the port no.
+\begin_layout LyX-Code
+  String portRaw = addressBean.getPredicateValue("port");
+\end_layout
+
+\begin_layout LyX-Code
+  if (portRaw == null || portRaw.trim( ).length( ) == 0) {
+\end_layout
+
+\begin_layout LyX-Code
+    logger.warn("The >port< parameter is missing from the RemoteWrapper wrapper.")
+;
+\end_layout
+
+\begin_layout LyX-Code
+    return false;
+\end_layout
+
+\begin_layout LyX-Code
+    // initialization failed, the port no.
  is not provided in the parameters.
 \end_layout
 
-\begin_layout Verse
-} try {
+\begin_layout LyX-Code
+  } 
 \end_layout
 
-\begin_layout Verse
-port = Integer.parseInt( portRaw ); 
+\begin_layout LyX-Code
+  try {
 \end_layout
 
-\begin_layout Verse
-if ( port > 65000 || port <= 0 ) throw new Exception( "Bad port No" + port
- );
+\begin_layout LyX-Code
+   port = Integer.parseInt(portRaw); 
 \end_layout
 
-\begin_layout Verse
-} catch ( Exception e ) { 
+\begin_layout LyX-Code
+   if (port > 65000 || port <= 0) throw new Exception("Bad port No" + port);
 \end_layout
 
-\begin_layout Verse
-logger.warn( "The >port< parameter is not a valid integer for the RemoteWrapper
- wrapper." ); 
+\begin_layout LyX-Code
+  } catch (Exception e) { 
 \end_layout
 
-\begin_layout Verse
-return false; // initialization failed, the port no.
+\begin_layout LyX-Code
+    logger.warn("The >port< parameter is not a valid integer"
+\end_layout
+
+\begin_layout LyX-Code
+     + "for the RemoteWrapper wrapper."); 
+\end_layout
+
+\begin_layout LyX-Code
+    return false; // initialization failed, the port no.
  is not valid.
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
+  }
+\end_layout
+
+\begin_layout LyX-Code
+  if(logger.isDebugEnabled())
+\end_layout
+
+\begin_layout LyX-Code
+    logger.debug("The SFWrapperDS connects to the Serial Forwarder interface
+ at *" 
+\end_layout
+
+\begin_layout LyX-Code
+       + host + ":" + port + "*"); 
+\end_layout
+
+\begin_layout LyX-Code
+  setName( "TinyOS-My-Wrapper") ;
+\end_layout
+
+\begin_layout LyX-Code
+  try {
+\end_layout
+
+\begin_layout LyX-Code
+    PhoenixSource reader=BuildSource.makePhoenix(BuildSource.makeSF(host,
+ port), null);
+\end_layout
+
+\begin_layout LyX-Code
+    // Only for TinyOS 2.x
+\end_layout
+
+\begin_layout LyX-Code
+    reader.start( ); // TinyOS 2.x
+\end_layout
+
+\begin_layout LyX-Code
+    moteif = new MoteIF( reader ); // Only for TinyOS 2.x
+\end_layout
+
+\begin_layout LyX-Code
+    // moteif = MoteIF (host,port); // Uncomment this, only for TinyOS 1.x
+\end_layout
+
+\begin_layout LyX-Code
+  } catch ( Exception e ) {
+\end_layout
+
+\begin_layout LyX-Code
+    logger.error( e.getMessage( ) , e );
+\end_layout
+
+\begin_layout LyX-Code
+    return false; 
+\end_layout
+
+\begin_layout LyX-Code
+    // Serial Forwarder client couldn't establish the connection.
+\end_layout
+
+\begin_layout LyX-Code
+  }
+\end_layout
+
+\begin_layout LyX-Code
+  moteif.registerListener(new MyMessage(), this);
+\end_layout
+
+\begin_layout LyX-Code
+  return true; //initialization is successful.
+\end_layout
+
+\begin_layout LyX-Code
 }
 \end_layout
 
-\begin_layout Verse
-if ( logger.isDebugEnabled( ) )
+\begin_layout LyX-Code
+
 \end_layout
 
-\begin_layout Verse
-logger.debug( "The SFWrapperDS connects to the Serial Forwarder interface
- at *" + host + ":" + port + "*" ); 
+\begin_layout LyX-Code
+public synchronized void finalize() {
 \end_layout
 
-\begin_layout Verse
-setName( "TinyOS-My-Wrapper") ;
+\begin_layout LyX-Code
+  moteif.deregisterListener(new SensorScopeDataMsg(), this);
 \end_layout
 
-\begin_layout Verse
-try {
-\end_layout
-
-\begin_layout Verse
-PhoenixSource reader=BuildSource.makePhoenix( BuildSource.makeSF( host , port
- ) , null );// Only for TinyOS 2.x
-\end_layout
-
-\begin_layout Verse
-reader.start( ); // TinyOS 2.x
-\end_layout
-
-\begin_layout Verse
-moteif = new MoteIF( reader ); // Only for TinyOS 2.x
-\end_layout
-
-\begin_layout Verse
-// moteif = MoteIF (host,port); // Uncomment this, only for TinyOS 1.x
-\end_layout
-
-\begin_layout Verse
-} catch ( Exception e ) {
-\end_layout
-
-\begin_layout Verse
-logger.error( e.getMessage( ) , e );
-\end_layout
-
-\begin_layout Verse
-return false; // Serial Forwarder client couldn't establish the connection.
-\end_layout
-
-\begin_layout Verse
+\begin_layout LyX-Code
 }
 \end_layout
 
-\begin_layout Verse
-moteif.registerListener( new MyMessage( ) , this );
+\begin_layout LyX-Code
+
 \end_layout
 
-\begin_layout Verse
-return true; //initialization is successful.
+\begin_layout LyX-Code
+public void messageReceived(int toAddr, Message message) {
 \end_layout
 
-\begin_layout Verse
+\begin_layout LyX-Code
+  MyMessage msg = (MyMessage) message;
+\end_layout
+
+\begin_layout LyX-Code
+  // (If needed) extract/parse/convert the sensor
+\end_layout
+
+\begin_layout LyX-Code
+  // measurements to some meaningful values
+\end_layout
+
+\begin_layout LyX-Code
+  postStreamElement( nodeid,sensor1,sensor2 );
+\end_layout
+
+\begin_layout LyX-Code
 }
 \end_layout
 
-\begin_layout Verse
-public synchronized void finalize ( ) {
+\begin_layout LyX-Code
+
 \end_layout
 
-\begin_layout Verse
-moteif.deregisterListener( new SensorScopeDataMsg( ) , this );
-\end_layout
-
-\begin_layout Verse
-}
-\end_layout
-
-\begin_layout Verse
-public void messageReceived ( int toAddr , Message message ) {
-\end_layout
-
-\begin_layout Verse
-MyMessage msg = (MyMessage) message;
-\end_layout
-
-\begin_layout Verse
-// (If needed) extract/parse/convert the sensor measurements to some meaningful
- values
-\end_layout
-
-\begin_layout Verse
-postStreamElement( nodeid,sensor1,sensor2 );
-\end_layout
-
-\begin_layout Verse
-}
-\end_layout
-
-\begin_layout Verse
+\begin_layout LyX-Code
 public DataField [] getOutputFormat ( ) { return structure; }
 \end_layout
 
@@ -2388,7 +2442,7 @@ Parameters for Http Get wrapper
 <column alignment="center" valignment="top" leftline="true" width="0">
 <column alignment="center" valignment="top" leftline="true" width="15line%">
 <column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="30line%">
+<column alignment="center" valignment="top" leftline="true" width="30line%">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -5995,7 +6049,7 @@ This is why GSN ships with the jnetstream packet decoding library.
 \begin_layout Standard
 It is also possible to build such packets using jnetstream.
  This feature is currently in development.
- This allows to communicate with your data source.
+ This allows to communicate easily with the data source.
 \end_layout
 
 \begin_layout Chapter
@@ -6009,94 +6063,221 @@ n between these two servers is made with the XML-RPC protocol.
 \end_layout
 
 \begin_layout Standard
-This means that you can actually feed data to GSN from your own custom software
+This means that it is possible to feed data to GSN from a custom software
  written in any language supporting XML-RPC.
  
 \end_layout
 
 \begin_layout Chapter*
-Appendix A,
+Appendix A
 \end_layout
 
 \begin_layout Section*
-Using Eclipse for running and debugging;
+Using Eclipse for developing with GSN
 \end_layout
 
 \begin_layout Standard
-As GSN uses the Jibx framework for reading the xml documents, it is not
- straightforward how to configure your eclipse environment to run/debug
- your virtual sensors.
+Required software: Java Development Kit version 6, Eclipse 3.2 and Ant 1.6.5.
 \end_layout
 
 \begin_layout Standard
-Here is a step by step instruction :
+After installing Eclipse, open the
+\family typewriter
+ Help
+\family default
+ menu and select 
+\family typewriter
+Software Updates
+\family default
+, then 
+\family typewriter
+Find and Install...
+ 
+\family default
+Choose 
+\family typewriter
+New Features to install
+\family default
+, and click on 
+\family typewriter
+Next.
+
+\family default
+ select 
+\family typewriter
+New Remote Site...
+\family default
+, insert 
+\begin_inset Quotes eld
+\end_inset
+
+Subclipse
+\begin_inset Quotes erd
+\end_inset
+
+ in the Name field and http://subclipse.tigris.org/update_1.2.x in the URL field.
+ Clicking on 
+\family typewriter
+Finish
+\family default
+ and choose subversion as the feature to install.
+ Do not select Mylar.
+ After installing, restart Eclipse.
 \end_layout
 
-\begin_layout Enumerate
-Setting the Ant Home : Go to Window Menu and select Preferences, on the
- left side, click on the ANT and then select Runtime.
- In the Classpath tab (opened on the center of the window) select Ant Home
- Entries, click on the Ant Home button and browse toward the directory that
- contains the files from the jakarta-ant archive.
+\begin_layout Standard
+Open the 
+\family typewriter
+SVN Repository Exploring 
+\family default
+and add a new repository location pointing to 
+\family typewriter
+https://svn.sourceforge.net/svnroot/gsn
+\family default
+.
+ Explore the repository and select the 
+\family typewriter
+trunk
+\family default
+ folder.
+ Right-click and choose 
+\family typewriter
+checkout...
+ 
+\family default
+Be sure to check it out as a project configured with the New Project Wizard.
+ It is necessary to configure the 
+\family typewriter
+Build Path.
+ 
+\family default
+Add all the jar files located in the lib directory.
+ GSN also requires the JMF library to compile correctly.
+ Due to licensing restriction, JMF must be downloaded separately from 
+\family typewriter
+http://java.sun.com/products/java-media/jmf/2.1.1/download.html 
+\family default
+sand installed into gsn/JMF-2.1.1e.
+ Finally, add to the Build Path the file 
+\family typewriter
+gsn/JMF-2.1.12/lib/jmf.jar
+\family default
+.
+ GSN should now compile successfully.
+\end_layout
+
+\begin_layout Standard
+As GSN uses the JIBX framework for reading the xml documents, it is not
+ straightforward how to configure the Eclipse environment to run/debug code.
+\end_layout
+
+\begin_layout Standard
+Choose 
+\family typewriter
+Properties
+\family default
+ in the 
+\family typewriter
+Project
+\family default
+ menu.
+ Select 
+\family typewriter
+Build
+\family default
+ on the left side and click on new and select 
+\family typewriter
+Ant
+\family default
+.
+ A new window pops up which has several tabs.
+\end_layout
+
+\begin_layout Itemize
+In the 
+\family typewriter
+Main
+\family default
+ tab, use 
+\family typewriter
+Browse Workspace
+\family default
+ to select the gsn 
+\family typewriter
+build.xml
+\family default
+ file as the build file.
+ Choose the project folder in which you checked out gsn as the 
+\family typewriter
+Base Directory
+\family default
+ parameter.
+ Keep checked the parameter 
+\family typewriter
+Set an Input Handler
+\family default
+.
+ In the 
+\family typewriter
+Targets
+\family default
+ tab, 
+\end_layout
+
+\begin_layout Itemize
+In 
+\family typewriter
+After a 
+\begin_inset Quotes erd
+\end_inset
+
+Clean
+\begin_inset Quotes erd
+\end_inset
+
+
+\family default
+, click on 
+\family typewriter
+Set Targets
+\family default
+ and select both 
+\family typewriter
+Build
+\family default
+ and 
+\family typewriter
+Bind
+\family default
+.
+ Don't modify the Manual and Auto build options (leave these empty).
+ 
+\end_layout
+
+\begin_layout Standard
+After going back to the 
+\family typewriter
+Builders
+\family default
+ page, make sure that both 
+\family typewriter
+Java Builder
+\family default
+ and 
+\family typewriter
+New Builder
+\family default
+ (we suggest to name it 
+\family typewriter
+Ant Builder
+\family default
+) are selected.
  Click on OK.
 \end_layout
 
-\begin_layout Enumerate
-Setting an Ant Build System for your GSN project : the Project menu and
- click on properties tab.
- Select Build on the left side and click on new and select Ant.
- A new window pops up which has several tabs :
-\end_layout
-
-\begin_layout Itemize
-Main Tab : 
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-For build file, click on Browse Workspace and select the build.xml file.
-\end_layout
-
-\begin_layout Itemize
-For base directory, click on the Browse Workspace and click on the project
- name which contains the gsn source code.
-\end_layout
-
-\begin_layout Itemize
-Let the Set an Input Handler selected.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Targets Tab : 
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-For After a Clean, click on Set Targets and select both Build and Bind.
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Don't touch the Manual and Auto build options ! (leave it empty) 
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Click on Ok.
-\end_layout
-
-\end_deeper
 \begin_layout Standard
-You'll be returned back to the Builders page, make sure both Java Builder
- AND New Builder (or what ever you named it in the previous window) are
- selected.
- Click on OK.
-\end_layout
-
-\begin_layout Standard
-Now you can debug your virtual sensors in eclipse, try it by setting a break
- point on a line in the main file.
+Now you can debug gsn code in eclipse, try it by setting a break point on
+ a line in the main file.
 \end_layout
 
 \begin_layout Standard
@@ -6104,8 +6285,8 @@ Now you can debug your virtual sensors in eclipse, try it by setting a break
 \emph on
 IMPORTANT
 \emph default
- : Sometimes you need to clean the project to run/debug GSN (Project menu,
- Clean...).
+ : Sometimes, it is necessary to clean the project to run/debug GSN (Project
+ menu, Clean...).
 \end_layout
 
 \begin_layout Standard
