@@ -48,8 +48,12 @@ public class GSNController extends Thread {
 			if(message.equalsIgnoreCase(GSN_CONTROL_SHUTDOWN)) { // We stop GSN here
 				logger.info("Shutting down GSN...");
 				running = false;
-				vsLoader.stopLoading();
-				logger.info("All virtual sensors have been stopped, shutting down virtual machine.");
+				if(vsLoader != null) {
+					vsLoader.stopLoading();
+					logger.info("All virtual sensors have been stopped, shutting down virtual machine.");
+				} else {
+					logger.warn("Could not shut down virtual sensors properly. We are probably exiting GSN before it has been completely initialized.");
+				}
 				System.exit(0);
 			}
 			} catch(SocketTimeoutException e) {
@@ -59,6 +63,15 @@ public class GSNController extends Thread {
 				logger.warn("Error while accepting control connection: " + e.getMessage());
 			}
 		}
+	}
+	
+	/*
+	 * This method must be called after virtual sensors initialization.
+	 * It allows GSNController to shut down properly all the virtual sensors in use.
+	 */
+	public void setLoader(VSensorLoader vsLoader) {
+		if(this.vsLoader == null) // override protection
+			this.vsLoader = vsLoader;
 	}
 	
 }
