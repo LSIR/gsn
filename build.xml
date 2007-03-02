@@ -138,16 +138,15 @@
 
 
    <target name="test-report" depends="tests" description="Runs JUnit tests, generates jcoverage,junit,todo reports">
-      <junit printsummary="true" fork="false" haltonerror="false"
-             errorproperty="errorOccuredInTests" haltonfailure="false">
+      <junit printsummary="true" fork="false" haltonerror="true"
+             errorproperty="errorOccuredInTests" haltonfailure="true">
          <formatter type="xml" usefile="true"/>
          <classpath refid="classpath"/>
          <batchtest todir="${reports}/junit">
-            <fileset dir="${build.dir}/jcoverage-classes/" includes="**/*Test.class"/>
+            <fileset dir="${build.dir}/classes/" includes="**/*Test.class"/>
          </batchtest>
       </junit>
-      
-      <report srcdir="${src.dir}" destdir="${reports}/jcoverage"/>
+    
       <junitreport todir="${reports}/junit">
          <fileset dir="${reports}/junit">
             <include name="TEST-*.xml"/>
@@ -157,8 +156,8 @@
    </target>
    
    <target name="tests" depends="bind" description="Runs JUnit tests">
-      <junit printsummary="true" fork="false" haltonerror="false"
-             errorproperty="errorOccuredInTests" haltonfailure="false"
+      <junit printsummary="true" fork="false" haltonerror="true"
+             errorproperty="errorOccuredInTests" haltonfailure="true"
              failureproperty="testss.failed" showoutput="true">
          <classpath refid="classpath"/>
          
@@ -173,13 +172,8 @@
 <!--         	<fileset dir="${build.dir}" includes="**/TestStreamSource.*,**/TestAbstractWrapper.*,**/TestVSensorLoader.*" />-->
         </batchtest>
       </junit>
-      <fail if="testss.failed">
-         
-         ***********************************
-         One or more tests failed !
-         ***********************************  
-      </fail>
-   </target>
+    <fail if="testss.failed">At least one test Failed !</fail>
+     </target>
    <target name="docs" depends="setup">
       <javadoc classpathref="classpath"
                destdir="${reports}/javadoc"
