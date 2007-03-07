@@ -52,29 +52,29 @@
       <mkdir dir="${reports}/todos"/>
       <mkdir dir="${reports}/javadoc"/>
       <mkdir dir="${reports}/junit"/>
+      <condition property="java6">
+        <equals arg1="${ant.java.version}" arg2="1.6"/> 
+      </condition>
+        <copydir  dest="${build.dir}/org" src="${src.dir}/org"/>
+        <copydir  dest="${build.dir}/gsn/gui/templates" src="${src.dir}/gsn/gui/templates"/>
    </target>
-   <!--
-    <target name="xdoclet" depends="setup">
-        <echo>XDoclet on GSN Web Interface</echo>
-        <webdoclet destdir="${webapp.dir}/WEB-INF/">
-            <fileset dir="${src.dir}">
-                <include name="**/gsn/web/*.java"/>
-            </fileset>
-            <deploymentdescriptor mergeDir="${basedir}/merges">
-                <welcomefile file="introduction.do"/>
-            </deploymentdescriptor>
-        </webdoclet>
-    </target>
--->
-
-    <target name="build" depends="setup">
-      <copydir  dest="${build.dir}/org" src="${src.dir}/org"/>
-      <copydir  dest="${build.dir}/gsn/gui/templates" src="${src.dir}/gsn/gui/templates"/>
-    	    		
-    	<javac debug="true" srcdir="${src.dir}" optimize="off"
+ 
+  <target name="build-no-gui" unless="java6">
+    <echo>As your JDK is not version 6, the compile process excludes the source code for the GUI.</echo>
+    <javac debug="true" srcdir="${src.dir}" optimize="off"
+                 destdir="${build.dir}" failonerror="true" source="1.5" classpathref="classpath" excludes="**/gui/**">
+    </javac> 
+  </target> 
+      
+  <target name="build-gui" if="java6">
+    <javac debug="true" srcdir="${src.dir}" optimize="off"
                destdir="${build.dir}" failonerror="true" source="1.5" classpathref="classpath"/>
-   </target>
-   <target name="bind" depends="build">
+  
+  </target> 
+      
+    <target name="build" depends="setup,build-gui,build-no-gui"/>
+
+      <target name="bind" depends="build">
       <echo>Compiling JIBX Mappings...</echo>
        <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
    	            failonerror="true">
@@ -216,7 +216,7 @@
    </target>
    
    <target name="gui" depends="bind">
-      <java classname="gsn.gui.GSNConfiguratorFrame"  fork="true" dir="${basedir}">
+    <java classname="gsn.gui.GSNConfiguratorFrame"  fork="true" dir="${basedir}">
          <classpath refid="classpath"/>
       	 <jvmarg value="-splash:icons/GSNLogo.png" />
       </java>
