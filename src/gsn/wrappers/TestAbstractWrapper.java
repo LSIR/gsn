@@ -105,7 +105,7 @@ public class TestAbstractWrapper {
 	@Test (expected=GSNRuntimeException.class)
 	public void testSendToWrapper2() throws OperationNotSupportedException {
 		SystemTime systemTimeWrapper = new SystemTime();
-		systemTimeWrapper.setActiveAddressBean(new AddressBean("system-time",null));
+		systemTimeWrapper.setActiveAddressBean(new AddressBean("system-time"));
 		assertTrue(systemTimeWrapper.initialize());
 		Thread thread = new Thread (systemTimeWrapper);
 		thread.start();

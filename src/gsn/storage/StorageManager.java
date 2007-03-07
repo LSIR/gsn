@@ -242,6 +242,8 @@ public class StorageManager {
 		try {
 			connection = connectionPool.borrowConnection( );
 			StringBuilder viewStatement = new StringBuilder( "create view " ).append( viewName ).append( " AS ( " ).append( selectQuery ).append(" ) ");
+			if (logger.isDebugEnabled())
+				logger.debug("View creation statement: "+viewStatement);
 			connection.createStatement( ).execute( viewStatement.toString() );
 		} catch ( SQLException e ) {
 			logger.error( e.getMessage( ) , e );

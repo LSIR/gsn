@@ -134,7 +134,6 @@ public class RemoteWrapper extends AbstractWrapper {
 		catch (XmlRpcException ex) {
 			logger.warn("Adding the data listener failed. "+ex.getMessage(), ex);
 		};
-
 	}
 
 	public void removeListener ( StreamSource ss ) {

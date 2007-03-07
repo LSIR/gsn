@@ -1,6 +1,5 @@
 package gsn.beans;
 
-import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
 import java.beans.PropertyChangeListener;
 import java.io.FileInputStream;

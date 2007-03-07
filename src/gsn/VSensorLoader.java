@@ -306,10 +306,10 @@ public class VSensorLoader extends Thread {
     AbstractWrapper wrapper = null;
     for ( AddressBean addressBean : streamSource.getAddressing ( ) ) {
       wrapper = findWrapper(addressBean);
-      if (wrapper!=null)
-        if (prepareStreamSource( streamSource,wrapper)) 
+      if (wrapper!=null && prepareStreamSource( streamSource,wrapper)) 
           break;
-      wrapper=null;
+      else
+    	  wrapper=null;
     }
     return (wrapper!=null);
   }

@@ -38,7 +38,7 @@ public class TestStreamSource {
 	@Before
 	public void setup() throws SQLException {
 		sm.createTable(wrapper.getDBAliasInStr(), new DataField[] {});
-		wrapper.setActiveAddressBean(new AddressBean("system-time",null));
+		wrapper.setActiveAddressBean(new AddressBean("system-time"));
 		assertTrue(wrapper.initialize());
 	}
 	@After

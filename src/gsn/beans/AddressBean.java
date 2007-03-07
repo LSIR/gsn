@@ -25,6 +25,7 @@ public final class AddressBean {
   
   public AddressBean ( final String wrapper  ) {
     this.wrapper = wrapper;
+    this.predicates=EMPTY_PREDICATES;
   }
   
   public String getWrapper ( ) {

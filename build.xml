@@ -62,7 +62,7 @@
   <target name="build-no-gui" unless="java6">
     <echo>As your JDK is not version 6, the compile process excludes the source code for the GUI.</echo>
     <javac debug="true" srcdir="${src.dir}" optimize="off"
-                 destdir="${build.dir}" failonerror="true" source="1.5" classpathref="classpath" excludes="**/gui/**">
+                 destdir="${build.dir}" failonerror="true" source="1.5" classpathref="classpath" excludes="**/gui/**,**/DiskSpaceWrapper.java">
     </javac> 
   </target> 
       

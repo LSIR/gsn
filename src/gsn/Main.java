@@ -63,7 +63,7 @@ public final class Main {
 
 	public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
 
-	public static void main ( String [ ] args ) throws IOException , RuntimeException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
+	public static void main ( String [ ]  args) throws IOException , RuntimeException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
 		System.out.println("GSN Starting ...");
 		controlSocket = new GSNController(null);
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
@@ -73,13 +73,13 @@ public final class Main {
 			initialize ( "conf/gsn.xml" );
 		} catch ( JiBXException e ) {
 			logger.error ( e.getMessage ( ) );
-			logger.error ( new StringBuilder ( ).append ( "Can't parse the GSN configuration file : " ).append ( args[ 0 ] ).toString ( ) );
+			logger.error ( new StringBuilder ( ).append ( "Can't parse the GSN configuration file : conf/gsn.xml" ).toString ( ) );
 			logger.error ( "Please check the syntax of the file to be sure it is compatible with the requirements." );
 			logger.error ( "You can find a sample configuration file from the GSN release." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
 			System.exit ( 1 );
 		} catch ( FileNotFoundException e ) {
-			logger.error ( new StringBuilder ( ).append ( "The the configuration file : " ).append ( args[ 0 ] ).append ( " doesn't exist." ).toString ( ) );
+			logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
 			logger.error ( e.getMessage ( ) );
 			logger.error ( "Check the path of the configuration file and try again." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
