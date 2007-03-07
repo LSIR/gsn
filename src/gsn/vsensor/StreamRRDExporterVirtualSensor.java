@@ -50,8 +50,7 @@ public class StreamRRDExporterVirtualSensor extends AbstractVirtualSensor {
 		}
 		logger.debug( "rrdfile=" + this.rrdfile);
 		if (ensureFileExistence(rrdfile)) return true;
-//		else return createRRDFile();
-		return true;
+		else return createRRDFile();
 	}
 
 	private boolean createRRDFile() {

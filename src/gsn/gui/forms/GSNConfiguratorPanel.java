@@ -1,5 +1,7 @@
 package gsn.gui.forms;
 
+import gsn.GSNStop;
+import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.gui.AntRunner;
 import gsn.utils.ValidityTools;
@@ -19,6 +21,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -123,10 +126,7 @@ public class GSNConfiguratorPanel implements ActionListener {
 
 	public void stopGsn() {
 		try {
-			Socket socket = new Socket(InetAddress.getLocalHost(), gsn.GSNController.GSN_CONTROL_PORT);
-			PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
-			writer.println(gsn.GSNController.GSN_CONTROL_SHUTDOWN);
-			writer.flush();
+			GSNStop.stopGSN();
 			gsnIsRunning = false;
 			gsnStart.setIcon(startIcon);
 			if (gsnReader != null) {

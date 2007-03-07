@@ -113,6 +113,13 @@
          <!-- For JDK5 profiling <jvmarg value="-Xrunhprof:heap=sites,depth=15,force=n"/> -->
       </java>
    </target>
+ 
+   <!-- ================================= 
+          target: stop              
+         ================================= -->
+    <target name="stop" depends="build" description="Stop's the running GSN server (if any)">
+       <java classname="gsn.GSNStop" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}" classpathref="classpath"/>
+    </target>
 
    <target name="securityTest" depends="bind">
       <java classpathref="classpath" classname="gsn.testss.SecurtiyTest" maxmemory="${maxMemoryUsage}" fork="true"
