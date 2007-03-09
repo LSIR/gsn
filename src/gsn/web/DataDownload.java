@@ -1,17 +1,21 @@
 package gsn.web;
 
 import gsn.Container;
+import gsn.VSensorLoader;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author Pierre-Alain Robert (PARO, pierre-alain.robert-at-epfl.ch)<br>
@@ -23,6 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class DataDownload extends HttpServlet {
 	
+	private static transient Logger                                logger                              = Logger.getLogger ( DataDownload.class );
+	  
 	public void  doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 		doPost(req, res);
 	}
@@ -184,8 +190,16 @@ public class DataDownload extends HttpServlet {
 	    		  return;
 	    	  }
 	    	  
-	    	  DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , false );
-	    	  if (result.IsNull()) {
+	    	  DataEnumerator result;
+			try {
+				result = StorageManager.getInstance( ).executeQuery( query , false );
+			} catch (SQLException e) {
+				logger.error("ERROR IN EXECUTING, query: "+query);
+				logger.error(e.getMessage(),e);
+				logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
+				return;
+			}
+	    	  if (!result.hasMoreElements()) {
 	    		  res.setContentType("text/html");
 	    		  out.println("No data corresponds to your request");
 	    		  return;

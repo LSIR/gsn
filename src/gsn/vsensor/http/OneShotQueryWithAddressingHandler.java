@@ -10,6 +10,7 @@ import gsn.storage.StorageManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,8 +44,16 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
       String windowSize = request.getParameter( "window" );
       if ( windowSize == null || windowSize.trim( ).length( ) == 0 ) windowSize = "1";
       StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0" );
-      DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , true );
-      StringBuilder sb = new StringBuilder("<result>\n");
+      DataEnumerator result;
+	try {
+		result = StorageManager.getInstance( ).executeQuery( query , true );
+	} catch (SQLException e) {
+		logger.error("ERROR IN EXECUTING, query: "+query);
+		logger.error(e.getMessage(),e);
+		logger.error("Query is from "+request.getRemoteAddr()+"- "+request.getRemoteHost());
+		return;
+		}
+	StringBuilder sb = new StringBuilder("<result>\n");
       while ( result.hasMoreElements( ) ) {
          StreamElement se = result.nextElement( );
          sb.append( "<stream-element>\n" );
@@ -56,7 +65,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
          sb.append( "<field name=\"timed\" >" ).append( se.getTimeStamp( ) ).append( "</field>\n" );
          VSensorConfig sensorConfig = Mappings.getVSensorConfig( vsName );
          if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( vsName ).append( "* received." ).toString( ) );
-         //StringBuilder sb = new StringBuilder( "<virtual-sensor name=\"" ).append( vsName ).append( "\" last-modified=\"" ).append( new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\">\n" );
+         //StringBuilder statement = new StringBuilder( "<virtual-sensor name=\"" ).append( vsName ).append( "\" last-modified=\"" ).append( new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\">\n" );
          for ( KeyValue df : sensorConfig.getAddressing( ) )
             sb.append( "<field name=\"" ).append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ) ) ).append( "\">" ).append( StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) )
                   .append( "</field>\n" );

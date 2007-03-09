@@ -6,6 +6,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
@@ -65,7 +66,11 @@ public abstract class AbstractVirtualSensor {
       synchronized ( producedData ) {
          producedData.add( streamElement );
       }
-      Mappings.getContainer( ).publishData( this );
+      try {
+		Mappings.getContainer( ).publishData( this );
+	} catch (SQLException e) {
+		logger.error(e.getMessage(),e);
+	}
    }
    
    private static boolean compatibleStructure ( Byte [ ] fieldTypes ,  DataField [] outputStructure ) {

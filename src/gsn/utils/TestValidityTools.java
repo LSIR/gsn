@@ -15,10 +15,11 @@ import org.junit.Test;
 
 public class TestValidityTools {
 
+	static StorageManager sm = StorageManager.getInstance();
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.hsqldb.jdbcDriver( ) );
-		StorageManager.getInstance ( ).initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
+		sm.initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
 	}
 
 	@AfterClass
@@ -70,7 +71,7 @@ public class TestValidityTools {
 
 	@Test
 	public void testIsLocalhost() {
-	
+
 	}
 
 	@Test
@@ -80,31 +81,31 @@ public class TestValidityTools {
 
 	@Test (expected=GSNRuntimeException.class)
 	public void testTableExists() throws SQLException{
-		assertFalse(ValidityTools.tableExists("myTable"));
-		StorageManager.getInstance().createTable("table1",new DataField[]{});
-		assertTrue(ValidityTools.tableExists("table1"));
-		StorageManager.getInstance().dropTable("table1");
-		assertFalse(ValidityTools.tableExists("table1"));
-		assertFalse(ValidityTools.tableExists(""));
-		assertFalse(ValidityTools.tableExists(null));
+		assertFalse(sm.tableExists("myTable"));
+		sm.executeCreateTable("table1",new DataField[]{});
+		assertTrue(sm.tableExists("table1"));
+		sm.executeDropTable("table1");
+		assertFalse(sm.tableExists("table1"));
+		assertFalse(sm.tableExists(""));
+		assertFalse(sm.tableExists(null));
 	}
 	@Test (expected=GSNRuntimeException.class)
 	public void testTableExistsWithEmptyTableName() throws SQLException{
-		assertFalse(ValidityTools.tableExists(""));
+		assertFalse(sm.tableExists(""));
 	}
 	@Test (expected=GSNRuntimeException.class)
 	public void testTableExistsWithBadParameters() throws SQLException{
-		assertFalse(ValidityTools.tableExists("'f\\"));
+		assertFalse(sm.tableExists("'f\\"));
 	}
 	@Test
 	public void testTablesWithSameStructure() throws SQLException{
-		StorageManager.getInstance().createTable("table1",new DataField[]{});
-		assertTrue(ValidityTools.tableExists("table1",new DataField[] {}));
-		StorageManager.getInstance().dropTable("table1");
-		StorageManager.getInstance().createTable("table1",new DataField[]{new DataField("sensor","double"),new DataField("sensor2","int")});
-		assertTrue(ValidityTools.tableExists("table1",new DataField[] {new DataField("sensor","double")}));
-		assertTrue(ValidityTools.tableExists("table1",new DataField[] {new DataField("sensor2","int")}));
-		assertTrue(ValidityTools.tableExists("table1",new DataField[] {new DataField("sensor2", "int"),new DataField("sensor","double")}));
+		sm.executeCreateTable("table1",new DataField[]{});
+		assertTrue(sm.tableExists("table1",new DataField[] {}));
+		sm.executeDropTable("table1");
+		sm.executeCreateTable("table1",new DataField[]{new DataField("sensor","double"),new DataField("sensor2","int")});
+		assertTrue(sm.tableExists("table1",new DataField[] {new DataField("sensor","double")}));
+		assertTrue(sm.tableExists("table1",new DataField[] {new DataField("sensor2","int")}));
+		assertTrue(sm.tableExists("table1",new DataField[] {new DataField("sensor2", "int"),new DataField("sensor","double")}));
 	}
-	
+
 }

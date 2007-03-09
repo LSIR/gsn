@@ -6,9 +6,7 @@ package gsn.notifications;
 
 import org.apache.log4j.Logger;
 import gsn.Main;
-import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 import gsn.wrappers.InVMPipeWrapper;
 /**
  * 
@@ -21,11 +19,11 @@ public class InGSNNotification extends NotificationRequest {
   
   private final transient Logger logger = Logger.getLogger( InGSNNotification.class );
   
-  private String                 query;
+  private StringBuilder                 query;
   
   public InGSNNotification ( InVMPipeWrapper listener , String removeVSName ) {
     this.inVMPipeWrapper = listener;
-    this.query = new StringBuilder( "select * from " ).append(  removeVSName ).toString( );
+    this.query = new StringBuilder( "select * from " ).append(  removeVSName );
   }
   
   private int notificationCode = Main.tableNameGenerator( );
@@ -38,12 +36,12 @@ public class InGSNNotification extends NotificationRequest {
    * Returning null means select * This is used for optimization, see
    * ContainerImpl for more information.
    */
-  public CharSequence getQuery ( ) {
+  public StringBuilder getQuery ( ) {
     return query;
   }
   
   public boolean send ( DataEnumerator data ) {
-    try {
+   try {
       if ( !inVMPipeWrapper.isActive( ) ) return false;
       while ( data.hasMoreElements( ) ) 
         inVMPipeWrapper.remoteDataReceived(data.nextElement());

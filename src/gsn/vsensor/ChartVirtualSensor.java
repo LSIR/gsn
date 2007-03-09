@@ -261,7 +261,7 @@ class ChartInfo {
             dataCollectionForTheChart.addSeries( timeSeries );
          }
          try {
-            timeSeries.add( new FixedMillisecond( new Date( streamElement.getTimeStamp( ) ) ) , Integer.parseInt( streamElement.getData( )[ i ].toString( ) ) );
+            timeSeries.addOrUpdate( new FixedMillisecond( new Date( streamElement.getTimeStamp( ) ) ) , Integer.parseInt( streamElement.getData( )[ i ].toString( ) ) );
          } catch ( SeriesException e ) {
             logger.warn( e.getMessage( ) , e );
          }

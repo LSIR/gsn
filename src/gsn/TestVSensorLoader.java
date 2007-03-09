@@ -104,7 +104,7 @@ public class TestVSensorLoader {
 		assertTrue(ss2.validate());
 		assertTrue(loader.prepareStreamSource(is,ss2));
 		ss1.getWrapper().releaseResources();
-		assertFalse(ValidityTools.tableExists(ss1.getWrapper().getDBAliasInStr()));
+		assertFalse(StorageManager.getInstance().tableExists(ss1.getWrapper().getDBAliasInStr()));
 	}
 	
 	@Test
@@ -115,14 +115,14 @@ public class TestVSensorLoader {
 		ss.setSamplingRate(1);
 		assertTrue(ss.validate());
 		assertTrue(loader.prepareStreamSource(is,ss));
-		assertTrue(ValidityTools.tableExists(ss.getWrapper().getDBAliasInStr()));
-		assertTrue(ValidityTools.tableExists(ss.getUIDStr()));
+		assertTrue(StorageManager.getInstance().tableExists(ss.getWrapper().getDBAliasInStr()));
+		assertTrue(StorageManager.getInstance().tableExists(ss.getUIDStr()));
 		assertFalse(is.getRenamingMapping().isEmpty());
 		loader.releaseStreamSource(ss);
 		assertTrue(is.getRenamingMapping().isEmpty());
-		assertFalse(ValidityTools.tableExists(ss.getUIDStr()));
+		assertFalse(StorageManager.getInstance().tableExists(ss.getUIDStr()));
 		assertFalse(ss.getWrapper().isActive());
-		assertFalse(ValidityTools.tableExists(ss.getWrapper().getDBAliasInStr()));
+		assertFalse(StorageManager.getInstance().tableExists(ss.getWrapper().getDBAliasInStr()));
 		assertTrue(is.getRenamingMapping().isEmpty());
 		ss = new StreamSource().setAlias("my-stream1").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("2").setInputStream(is);		
 		ss.setSamplingRate(1);

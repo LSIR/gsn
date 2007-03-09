@@ -87,12 +87,7 @@ public class DataEnumerator implements Enumeration {
 			hasNext = false;
 		}finally {
 			if (hasNext==false)
-				try {
-					if (!preparedStatement.getConnection().isClosed())
-						preparedStatement.getConnection().close();
-				} catch (SQLException e) {
-					logger.warn(e.getMessage(),e);
-				}
+				close();
 		}
 	}
 
@@ -166,7 +161,7 @@ public class DataEnumerator implements Enumeration {
 	public void close ( ) {
 		this.hasNext = false;
 		try {
-			resultSet.getStatement( ).getConnection( ).close( );
+			resultSet.getStatement( ).close( );
 		} catch ( SQLException e ) {
 
 		}

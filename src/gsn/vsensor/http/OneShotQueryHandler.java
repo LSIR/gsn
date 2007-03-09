@@ -8,6 +8,8 @@ import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -37,8 +39,16 @@ public class OneShotQueryHandler implements RequestHandler{
       String windowSize = request.getParameter( "window" );
       if ( windowSize == null || windowSize.trim( ).length( ) == 0 ) windowSize = "1";
       StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0" );
-      DataEnumerator  result = StorageManager.getInstance( ).executeQuery( query , true );
-      StringBuilder sb = new StringBuilder("<result>\n");
+      DataEnumerator result;
+	try {
+		result = StorageManager.getInstance( ).executeQuery( query , true );
+	} catch (SQLException e) {
+		logger.error("ERROR IN EXECUTING, query: "+query);
+		logger.error(e.getMessage(),e);
+		logger.error("Query is from "+request.getRemoteAddr()+"- "+request.getRemoteHost());
+		return;
+		}
+	StringBuilder sb = new StringBuilder("<result>\n");
       while ( result.hasMoreElements( ) ) {
          StreamElement se = result.nextElement( );
          sb.append( "<stream-element>\n" );

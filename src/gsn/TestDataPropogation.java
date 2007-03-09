@@ -18,6 +18,7 @@ import gsn.wrappers.MockWrapper;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -103,9 +104,10 @@ public class TestDataPropogation {
 	 * @throws InstantiationException 
 	 * @throws NoSuchMethodException 
 	 * @throws SecurityException 
+	 * @throws SQLException 
 	 */
 	@Test
-	public void testPostOneStreamElement() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException {
+	public void testPostOneStreamElement() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException, SQLException {
 		StreamElement se = new StreamElement(df,new Serializable[] {10},System.currentTimeMillis());
 		expect(streamSource.dataAvailable()).andStubReturn(true);
 		replay(streamSource);
@@ -127,9 +129,10 @@ public class TestDataPropogation {
 	 * @throws InstantiationException 
 	 * @throws NoSuchMethodException 
 	 * @throws SecurityException 
+	 * @throws SQLException 
 	 */
 	@Test
-	public void testPostTwoStreamElements() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException {
+	public void testPostTwoStreamElements() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException, SQLException {
 		StreamElement se1 = new StreamElement(df,new Serializable[] {9},System.currentTimeMillis());
 		StreamElement se2 = new StreamElement(df,new Serializable[] {10},System.currentTimeMillis()+10);
 		expect(streamSource.dataAvailable()).andReturn(true).times(2);
@@ -150,9 +153,10 @@ public class TestDataPropogation {
 	 * @throws InstantiationException 
 	 * @throws NoSuchMethodException 
 	 * @throws SecurityException 
+	 * @throws SQLException 
 	 */
 	@Test
-	public void testPostTwoStreamElementsDropOne() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException {
+	public void testPostTwoStreamElementsDropOne() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException, SQLException {
 		StreamElement se1 = new StreamElement(df,new Serializable[] {9},System.currentTimeMillis());
 		StreamElement se2 = new StreamElement(df,new Serializable[] {10},System.currentTimeMillis()+10);
 		StreamElement se3 = new StreamElement(df,new Serializable[] {1},System.currentTimeMillis()+11);

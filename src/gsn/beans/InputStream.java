@@ -7,6 +7,8 @@ import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -48,7 +50,7 @@ public class InputStream {
 
 	private transient long                              lastVisited           = 0;
 
-	private CharSequence                               rewrittenSQL;
+	private StringBuilder                               rewrittenSQL;
 
 	/**
 	 * For making one initial delay.
@@ -101,8 +103,9 @@ public class InputStream {
 	  * results.
 	  * 
 	  * @param alias The alias of the StreamSource which has new data.
+	 * @throws SQLException 
 	  */
-	 public boolean dataAvailable ( final CharSequence alias ) {
+	 public boolean dataAvailable ( final CharSequence alias ) throws SQLException {
 		 if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
 		 if ( this.pool == null ) {
 			 logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );

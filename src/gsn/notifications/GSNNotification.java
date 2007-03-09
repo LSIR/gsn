@@ -29,7 +29,7 @@ public class GSNNotification extends NotificationRequest {
     * <code>queryWithoutDoubleQuots</code><br>
     * except without using any double quotation.
     */
-   private CharSequence                      query;
+   private StringBuilder                      query;
    
    private String                      prespectiveVirtualSensor;
    
@@ -63,7 +63,7 @@ public class GSNNotification extends NotificationRequest {
     * @return Returns the query.
     */
    
-   public CharSequence getQuery ( ) {
+   public StringBuilder getQuery ( ) {
       return query;
    }
  
@@ -169,10 +169,14 @@ public class GSNNotification extends NotificationRequest {
       while ( data.hasMoreElements( ) ) {
          se = data.nextElement( );
          boolean result = notifyPeerAboutData( se );
+     	if (logger.isDebugEnabled())
+    		logger.debug("GSN Notification wants to send data to the network.");
+
          if ( result == false ) {
             logger.warn( new StringBuilder( ).append( "The result of delivering data was false, the remote client is not interested anymore, query dropped." ).toString( ) );
             return false;
          }
+         
       }
       return true;
    }

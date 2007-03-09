@@ -8,6 +8,7 @@ import gsn.beans.StreamSource;
 import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -32,18 +33,20 @@ public abstract class AbstractWrapper extends Thread {
 	/**
 	 * Returns the view name created for this listener.
 	 * Note that, GSN creates one view per listener.
+	 * @throws SQLException 
 	 */
-	public void addListener ( StreamSource ss ) {
-		getStorageManager( ).createView( ss.getUIDStr() , ss.toSql() );
+	public void addListener ( StreamSource ss ) throws SQLException {
+		getStorageManager( ).executeCreateView( ss.getUIDStr() , ss.toSql() );
 		listeners.add(ss);
 	}
 
 	/**
 	 * Removes the listener with it's associated view.
+	 * @throws SQLException 
 	 */
-	public void removeListener ( StreamSource ss ) {
+	public void removeListener ( StreamSource ss ) throws SQLException {
 		listeners.remove( ss );
-		getStorageManager( ).dropView( ss.getUIDStr() );
+		getStorageManager( ).executeDropView( ss.getUIDStr() );
 		if (listeners.size()==0) 
 			releaseResources();
 	}
@@ -130,24 +133,35 @@ public abstract class AbstractWrapper extends Thread {
 	 */
 
 	protected Boolean postStreamElement ( StreamElement streamElement ) {
-		if (!isActive() || listeners.size()==0)
-			return false;
-		if (!insertIntoWrapperTable(streamElement))
-			return false;
-		boolean toReturn = false;
-		synchronized ( listeners ) {
-			for (  StreamSource ss: listeners ) {
-				if( getStorageManager( ).isThereAnyResult( new StringBuilder("select * from ").append(ss.getUIDStr()) )) {
-					if ( logger.isDebugEnabled() == true ) logger.debug( "Output stream produced/received from a wrapper" );
-					ss.dataAvailable( );
-					toReturn=true;
+		try {
+			if (!isActive() || listeners.size()==0)
+				return false;
+			if (!insertIntoWrapperTable(streamElement))
+				return false;
+			boolean toReturn = false;
+			synchronized ( listeners ) {
+				for (  StreamSource ss: listeners ) {
+					if( getStorageManager( ).isThereAnyResult( new StringBuilder("select * from ").append(ss.getUIDStr()) )) {
+						if ( logger.isDebugEnabled() == true ) logger.debug( "Output stream produced/received from a wrapper" );
+						try {
+							ss.dataAvailable( );
+						} catch (SQLException e) {
+							logger.error(e.getMessage(),e);
+							return false;
+						}
+						toReturn=true;
+					}
 				}
 			}
+			if (++noOfCallsToPostSE%GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS==0) {
+				int removedRaws = removeUselessValues();
+			}
+			return toReturn;		
+		}catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			logger.error("Produced data item from the wrapper couldn't be propagated inside the system.");
+			return false;
 		}
-		if (++noOfCallsToPostSE%GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS==0) {
-			 int removedRaws = removeUselessValues();
-    }
-		return toReturn;		
 	}
 	/**
 	 * Updates the table representing the data items produced by the stream element.
@@ -155,15 +169,12 @@ public abstract class AbstractWrapper extends Thread {
 	 * 
 	 * @param se Stream element to be inserted to the table if needed.
 	 * @return true if the stream element is successfully inserted into the table.
+	 * @throws SQLException 
 	 */
-	public boolean insertIntoWrapperTable(StreamElement se) {
+	public boolean insertIntoWrapperTable(StreamElement se) throws SQLException {
 		if (listeners.size()==0)
 			return false;
-		boolean result = getStorageManager( ).insertData( aliasCodeS , se );
-		if ( result == false ) {
-			logger.warn( "Inserting the following data item failed : " + se );
-			return false;
-		}
+		getStorageManager( ).executeInsert( aliasCodeS , getOutputFormat(),se );
 		return true;
 	}
 	/**
@@ -194,7 +205,7 @@ public abstract class AbstractWrapper extends Thread {
 	 * stops the TableSizeEnforce thread.
 	 *
 	 */
-	public CharSequence getUselessWindow() {
+	public StringBuilder getUselessWindow() {
 		int maxCountSize = -1;
 		int maxTimeSizeInMSec = -1;
 		synchronized (listeners) {
@@ -224,17 +235,17 @@ public abstract class AbstractWrapper extends Thread {
 		return sb;
 	}
 
-	public int removeUselessValues() {
-		CharSequence query = getUselessWindow();
-    if (query==null)
+	public int removeUselessValues() throws SQLException {
+		StringBuilder query = getUselessWindow();
+		if (query==null)
 			return 0;
 		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "RESULTING QUERY FOR Table Size Enforce " ).append( query ).toString( ) );
 		int deletedRows =StorageManager.getInstance().executeUpdate(query);
 		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( deletedRows ).append( " old rows dropped from " ).append( getDBAliasInStr() ).toString( ) );
 		return deletedRows;
 	}
-  
-	public void releaseResources ( ) {
+
+	public void releaseResources ( ) throws SQLException {
 		isActive = false;
 		finalize();
 		if ( logger.isInfoEnabled() ) logger.info( "Finalized called" );
@@ -242,11 +253,11 @@ public abstract class AbstractWrapper extends Thread {
 			Iterator<StreamSource> list =listeners.iterator();
 			while (list.hasNext()) {
 				StreamSource ss = list.next();
-				getStorageManager( ).dropView( ss.getUIDStr() );
+				getStorageManager( ).executeDropView( ss.getUIDStr() );
 				list.remove();
 			}
 		}
-		getStorageManager( ).dropTable( aliasCodeS );
+		getStorageManager( ).executeDropTable( aliasCodeS );
 	}
 
 	public static final String TIME_FIELD = "timed";

@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class NotificationRequest {
    
-   public abstract CharSequence getQuery ( );
+   public abstract StringBuilder getQuery ( );
    
    private transient ArrayList < CharSequence > cachedPrespectiveVirtualSensors = null;
    

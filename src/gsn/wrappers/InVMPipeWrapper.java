@@ -13,6 +13,7 @@ import gsn.vsensor.AbstractVirtualSensor;
 import gsn.vsensor.http.OneShotQueryHandler;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.Iterator;
 import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
@@ -54,7 +55,7 @@ public class InVMPipeWrapper extends AbstractWrapper {
     return true;
   }
   
-  public void addListener ( StreamSource ss ) {
+  public void addListener ( StreamSource ss ) throws SQLException {
     /**
      * First we create a view over the main source
      * (config.getVirtualSensorName). We encode all the conditions and
@@ -64,6 +65,7 @@ public class InVMPipeWrapper extends AbstractWrapper {
     notificationRequest = new InGSNNotification( this , config.getName( ) );
     Mappings.getContainer( ).addNotificationRequest( config.getName( ) , notificationRequest );
   }
+  //TODO : Remove Listener is missing !
   
   public boolean sendToWrapper ( String action,String[] paramNames, Serializable[] paramValues ) throws OperationNotSupportedException {
     AbstractVirtualSensor vs;
@@ -82,6 +84,8 @@ public class InVMPipeWrapper extends AbstractWrapper {
   }
   
   public boolean remoteDataReceived ( StreamElement se) {
+	  if (logger.isDebugEnabled())
+		logger.debug("InVMPipe received stream element.");
     return postStreamElement(se);
   }
   

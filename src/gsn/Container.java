@@ -1,5 +1,7 @@
 package gsn;
 
+import java.sql.SQLException;
+
 import gsn.notifications.NotificationRequest;
 import gsn.vsensor.AbstractVirtualSensor;
 import gsn.wrappers.RemoteWrapper;
@@ -77,7 +79,7 @@ public interface Container {
    /**
     * METHODS TO BE DEFINED IN ANY CONTAINER IMPLEMENTATION.
     */
-   public void publishData ( AbstractVirtualSensor sensor );
+   public void publishData ( AbstractVirtualSensor sensor ) throws SQLException ;
    
    public void addRemoteStreamSource ( int alias , RemoteWrapper remoteWrapper );
    

@@ -5,7 +5,6 @@ import gsn.notifications.InGSNNotification;
 import gsn.notifications.NotificationRequest;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
 import gsn.vsensor.http.AddressingReqHandler;
 import gsn.vsensor.http.ContainerInfoHandler;
@@ -13,16 +12,14 @@ import gsn.vsensor.http.OneShotQueryHandler;
 import gsn.vsensor.http.OneShotQueryWithAddressingHandler;
 import gsn.vsensor.http.OutputStructureHandler;
 import gsn.vsensor.http.RequestHandler;
-import gsn.wrappers.InVMPipeWrapper;
 import gsn.wrappers.RemoteWrapper;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -59,12 +56,12 @@ public class ContainerImpl extends HttpServlet implements Container {
    public ContainerImpl ( ) {
    }
 
-   public void publishData ( AbstractVirtualSensor sensor ) {
+   public void publishData ( AbstractVirtualSensor sensor ) throws SQLException {
       StreamElement data = sensor.getData( );
       String name = sensor.getVirtualSensorConfiguration( ).getName( ).toLowerCase();
       StorageManager storageMan = StorageManager.getInstance( );
       synchronized ( psLock ) {
-         storageMan.insertDataNoDupError( name , data );
+       	storageMan.executeInsert( name ,sensor.getVirtualSensorConfiguration().getOutputStructure(), data );
       }
       // SimulationResult.addJustBeforeStartingToEvaluateQueries ();
       ArrayList < NotificationRequest > registered;
@@ -91,12 +88,13 @@ public class ContainerImpl extends HttpServlet implements Container {
             if ( de.hasMoreElements( ) ) {
                notificationCandidates.add( interestedClient );
                notificationData.add( de );
-            }
+            }else
+            	de.close();
          }
       }
       // IMPROVE : The Asynchronous notification System.
       for ( int i = 0 ; i < notificationCandidates.size( ) ; i++ ) {
-         boolean notificationResult = notificationCandidates.get( i ).send( notificationData.get( i ) );
+    	 boolean notificationResult = notificationCandidates.get( i ).send( notificationData.get( i ) );
          if ( notificationResult == false ) {
             logger.info( "Query notification fail, query removed " + notificationCandidates.get( i ).toString( ) );
             removeNotificationRequest( notificationCandidates.get( i ) );

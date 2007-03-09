@@ -96,7 +96,7 @@ public class FieldUpload extends HttpServlet {
 				sb.append("</fields>\n");
 				sb.append("</input>\n" );
 			
-				//do something with xml aka sb.toString()
+				//do something with xml aka statement.toString()
 			
 				code = 200;
 				msg = "The upload to the virtual sensor went successfully! ("+vsname+")";

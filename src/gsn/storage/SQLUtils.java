@@ -36,7 +36,7 @@ public class SQLUtils {
 	 * @param renameMapping
 	 * @return
 	 */
-	public static CharSequence newRewrite ( CharSequence query , TreeMap < CharSequence , CharSequence > renameMapping ) {
+	public static StringBuilder newRewrite ( CharSequence query , TreeMap < CharSequence , CharSequence > renameMapping ) {
 		// Selecting strings between pair of "" : (\"[^\"]*\")
 		// Selecting tableID.tableName or tableID.* : (\\w+(\\.(\w+)|\\*))
 		// The combined pattern is : (\"[^\"]*\")|(\\w+\\.((\\w+)|\\*))
@@ -68,7 +68,7 @@ public class SQLUtils {
 		}
 		String cleanFromClause = fromClauseMather.appendTail( result ).toString( );
 		String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
-		return finalResult;
+		return new StringBuilder(finalResult);
 	}
 
 	public static String extractProjection(String pQuery) {

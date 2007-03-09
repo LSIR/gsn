@@ -6,6 +6,7 @@ import gsn.storage.StorageManager;
 import gsn.vsensor.AbstractVirtualSensor;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -114,7 +115,13 @@ public class VirtualSensorPool {
 	public void DoUselessDataRemoval ( ) {
 		if ( config.getParsedStorageSize( ) == VSensorConfig.STORAGE_SIZE_NOT_SET ) return;
 		StringBuilder query = uselessDataRemovalQuery();
-		int effected = StorageManager.getInstance( ).executeUpdate( query );
+		int effected = 0;
+		try {
+			effected = StorageManager.getInstance( ).executeUpdate( query );
+		} catch (SQLException e) {
+			logger.error("Error in executing: "+query);
+			logger.error(e.getMessage(),e);
+		}
 		if (logger.isDebugEnabled( ) )
 			logger.debug( new StringBuilder( ).append( effected ).append( " old rows dropped from " ).append( config.getName( ) ).toString( ) );
 	}
@@ -137,7 +144,7 @@ public class VirtualSensorPool {
 			if ( config.isStorageCountBased( ) )
 				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed <= ( SELECT * FROM ( SELECT timed FROM " )
 				.append( virtualSensorName ).append( " group by " ).append( virtualSensorName ).append( ".timed ORDER BY " ).append( virtualSensorName ).append( ".timed DESC LIMIT 1 offset " )
-				.append( config.getParsedStorageSize( ) ).append( "  ) AS TMP_" ).append( ( int ) ( Math.random( ) * 100000000 ) ).append( " )" );
+				.append( config.getParsedStorageSize( ) ).append( "  ) AS TMP)" );
 			else
 				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (UNIX_TIMESTAMP()*1000 -" ).append(
 						config.getParsedStorageSize( ) ).append( ")" );

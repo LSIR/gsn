@@ -10,6 +10,7 @@ import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,7 +49,15 @@ public class ContainerInfoHandler implements RequestHandler {
          }
          sb.append( ">\n" );         
          StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getName( ) + " order by timed DESC limit 1 offset 0" );
-         DataEnumerator result = StorageManager.getInstance( ).executeQuery( query , true );
+         DataEnumerator result;
+		try {
+			result = StorageManager.getInstance( ).executeQuery( query , true );
+		} catch (SQLException e) {
+			logger.error("ERROR IN EXECUTING, query: "+query);
+			logger.error(e.getMessage(),e);
+			logger.error("Query is from "+request.getRemoteAddr()+"- "+request.getRemoteHost());
+			return;
+			}
          StreamElement se = null;
          if ( result.hasMoreElements( ) ) se = result.nextElement( );
          for ( DataField df : sensorConfig.getOutputStructure( ) ) {

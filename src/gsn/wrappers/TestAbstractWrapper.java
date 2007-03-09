@@ -101,9 +101,10 @@ public class TestAbstractWrapper {
 	 * Test method for {@link gsn.wrappers.AbstractWrapper#sendToWrapper(java.lang.Object)}.
 	 * Test to see what is the behavior if the wrapper is disabled.
 	 * @throws OperationNotSupportedException 
+	 * @throws SQLException 
 	 */
 	@Test (expected=GSNRuntimeException.class)
-	public void testSendToWrapper2() throws OperationNotSupportedException {
+	public void testSendToWrapper2() throws OperationNotSupportedException, SQLException {
 		SystemTime systemTimeWrapper = new SystemTime();
 		systemTimeWrapper.setActiveAddressBean(new AddressBean("system-time"));
 		assertTrue(systemTimeWrapper.initialize());
@@ -116,7 +117,7 @@ public class TestAbstractWrapper {
 	@Test
 	public void testRemovingUselessData() throws SQLException, InterruptedException {
     SystemTime wrapper = new SystemTime();
-    StorageManager.getInstance().createTable(wrapper.getDBAliasInStr(), new DataField[] {});
+    StorageManager.getInstance().executeCreateTable(wrapper.getDBAliasInStr(), new DataField[] {});
     wrapper.setActiveAddressBean(new AddressBean("system-time",new KeyValueImp(SystemTime.CLOCK_PERIOD_KEY,"100")));
     assertTrue(wrapper.initialize());
     Thread thread = new Thread(wrapper);
@@ -128,7 +129,7 @@ public class TestAbstractWrapper {
     assertEquals(wrapper.getTimerClockPeriod(), 100);
     thread.start();
     Thread.sleep(1000);
-    ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet("select count(*) from "+wrapper.getDBAliasInStr());
+    ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet(new StringBuilder("select count(*) from ").append(wrapper.getDBAliasInStr()));
     assertTrue(rs.next());
 //    System.out.println(rs.getInt(1));
     assertTrue(rs.getInt(1)<=(AbstractWrapper.GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS*2));

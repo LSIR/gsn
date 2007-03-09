@@ -37,13 +37,13 @@ public class TestStreamSource {
 
 	@Before
 	public void setup() throws SQLException {
-		sm.createTable(wrapper.getDBAliasInStr(), new DataField[] {});
+		sm.executeCreateTable(wrapper.getDBAliasInStr(), new DataField[] {});
 		wrapper.setActiveAddressBean(new AddressBean("system-time"));
 		assertTrue(wrapper.initialize());
 	}
 	@After
-	public void teardown() {
-		sm.dropTable(wrapper.getDBAliasInStr());
+	public void teardown() throws SQLException {
+		sm.executeDropTable(wrapper.getDBAliasInStr());
 	}
 
 	@Test
@@ -129,13 +129,13 @@ public class TestStreamSource {
 		ss.setSamplingRate(0);
 		ss.setWrapper(wrapper);
 		assertTrue(ss.validate());
-		String query = ss.toSql().toString();
-		assertTrue(query.toLowerCase().indexOf("mod")<0);
-		assertTrue(query.toLowerCase().indexOf("false")>0);
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()/2) );
+		StringBuilder query = ss.toSql();
+		assertTrue(query.toString().toLowerCase().indexOf("mod")<0);
+		assertTrue(query.toString().toLowerCase().indexOf("false")>0);
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(), ss.getWrapper().getOutputFormat(),new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()/2) );
 		DataEnumerator dm = sm.executeQuery(query, true);
 		assertFalse(dm.hasMoreElements());
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(), ss.getWrapper().getOutputFormat(),new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
 		dm = sm.executeQuery(query, true);
 		assertFalse(dm.hasMoreElements());
 		wrapper.removeListener(ss);
@@ -147,13 +147,13 @@ public class TestStreamSource {
 		ss.setSamplingRate(-0.1f);
 	}
 	@Test(expected=GSNRuntimeException.class)
-	public void badSamplingRateBadOrder() {
+	public void badSamplingRateBadOrder() throws SQLException {
 		StreamSource ss = new StreamSource().setAlias("my-stream").setSqlQuery("select * from wrapper").setRawHistorySize("10  s");
 		ss.setWrapper(wrapper);
 		ss.setSamplingRate(0.2f);
 	}
 	@Test
-	public void testCountWindowSizeZero() {
+	public void testCountWindowSizeZero() throws SQLException {
 		InputStream is = new InputStream();
 		StreamSource 	ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("0 ").setInputStream(is);
 
@@ -170,7 +170,7 @@ public class TestStreamSource {
 	}
 
 	@Test(expected=GSNRuntimeException.class)
-	public void testInvalidStreamSource() {
+	public void testInvalidStreamSource() throws SQLException {
 		InputStream is = new InputStream();
 		StreamSource ss = new StreamSource().setAlias("my-stream").setSqlQuery("select * from wrapper").setRawHistorySize("10  s").setInputStream(is);
 		ss.setWrapper(wrapper);
@@ -185,12 +185,12 @@ public class TestStreamSource {
 		ss.setSamplingRate(1);
 		ss.setWrapper(wrapper );
 		assertTrue(ss.validate());
-		String query = ss.toSql().toString();
-		assertTrue(query.toLowerCase().indexOf("mod")<0);
-		assertTrue(sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()/2) ));
+		StringBuilder query = ss.toSql();
+		assertTrue(query.toString().toLowerCase().indexOf("mod")<0);
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(),ss.getWrapper().getOutputFormat(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()/2) );
 		DataEnumerator dm = sm.executeQuery(query, true);
 		assertFalse(dm.hasMoreElements());
-		assertTrue(sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis())) );
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(), ss.getWrapper().getOutputFormat(),new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis())) ;
 		ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet(query);
 		assertTrue(rs.next());
 		assertFalse(rs.next());
@@ -198,7 +198,7 @@ public class TestStreamSource {
 		assertTrue(dm.hasMoreElements());
 		dm.nextElement();
 		assertFalse(dm.hasMoreElements());
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(),ss.getWrapper().getOutputFormat(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
 		dm = sm.executeQuery(query, true);
 		assertTrue(dm.hasMoreElements());
 		dm.nextElement();
@@ -212,7 +212,7 @@ public class TestStreamSource {
 		}
 		dm = sm.executeQuery(query, true);
 		assertFalse(dm.hasMoreElements());
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(),ss.getWrapper().getOutputFormat(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
 		dm = sm.executeQuery(query, true);
 		assertTrue(dm.hasMoreElements());
 		dm.nextElement();
@@ -226,18 +226,18 @@ public class TestStreamSource {
 		ss.setSamplingRate(1);
 		assertTrue(ss.validate());
 		ss.setWrapper(wrapper );
-		String query = ss.toSql().toString();
-		assertTrue(query.toLowerCase().indexOf("mod")<0);
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
+		StringBuilder query = ss.toSql();
+		assertTrue(query.toString().toLowerCase().indexOf("mod")<0);
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(),ss.getWrapper().getOutputFormat(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
 		DataEnumerator dm = sm.executeQuery(query, true);
 		assertTrue(dm.hasMoreElements());
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(),ss.getWrapper().getOutputFormat(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
 		dm = sm.executeQuery(query, true);
 		assertTrue(dm.hasMoreElements());
 		dm.nextElement();
 		assertFalse(dm.hasMoreElements());
 		long timed = System.currentTimeMillis()+100;
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},timed) );
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(),ss.getWrapper().getOutputFormat(), new StreamElement(new DataField[] {},new Serializable[] {},timed) );
 		dm = sm.executeQuery(query, true);
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), timed);
@@ -252,13 +252,13 @@ public class TestStreamSource {
 		ss.setSamplingRate(1);
 		ss.setWrapper(wrapper );
 		assertTrue(ss.validate());
-		String query = ss.toSql().toString();
-		assertTrue(query.toLowerCase().indexOf("mod")<0);
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
+		StringBuilder query = ss.toSql();
+		assertTrue(query.toString().toLowerCase().indexOf("mod")<0);
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(), ss.getWrapper().getOutputFormat(), new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis()) );
 		long time1 = System.currentTimeMillis()+10;
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},time1) );
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(), ss.getWrapper().getOutputFormat(),new StreamElement(new DataField[] {},new Serializable[] {},time1) );
 		long time2 = System.currentTimeMillis()+100;
-		sm.insertData(ss.getWrapper().getDBAliasInStr(), new StreamElement(new DataField[] {},new Serializable[] {},time2) );
+		sm.executeInsert(ss.getWrapper().getDBAliasInStr(), ss.getWrapper().getOutputFormat(),new StreamElement(new DataField[] {},new Serializable[] {},time2) );
 		DataEnumerator dm = sm.executeQuery(query, true);
 		ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet(query);
 		assertTrue(rs.next());
@@ -275,8 +275,9 @@ public class TestStreamSource {
 	/**
 	 * This method is only used for testing purposes.
 	 * @param query
+	 * @throws SQLException 
 	 */
-	public static void printTable(String query) {
+	public static void printTable(StringBuilder query) throws SQLException {
 		System.out.println("Printing for Query : "+query);
 		DataEnumerator dm = StorageManager.getInstance().executeQuery(query, true); 
 		while (dm.hasMoreElements()) {

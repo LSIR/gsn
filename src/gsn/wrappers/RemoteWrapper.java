@@ -9,6 +9,7 @@ import gsn.beans.StreamSource;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
@@ -124,8 +125,9 @@ public class RemoteWrapper extends AbstractWrapper {
 	}
 	/**
 	 * Note that query translation is not needed, it is going to performed in the receiver's side.
+	 * @throws SQLException 
 	 */
-	public void addListener ( StreamSource ss ) {
+	public void addListener ( StreamSource ss ) throws SQLException {
 		super.addListener(ss);
 		try {
 			registeredWhereClauses.add(ss.toSql());
@@ -136,7 +138,7 @@ public class RemoteWrapper extends AbstractWrapper {
 		};
 	}
 
-	public void removeListener ( StreamSource ss ) {
+	public void removeListener ( StreamSource ss ) throws SQLException {
 		super.removeListener ( ss );
 		registeredWhereClauses.remove ( ss );
 	}

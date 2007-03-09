@@ -6,6 +6,8 @@ import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;
+
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,7 +43,7 @@ public  class StreamSource {
   
   protected  int         uid        ;
   
-  protected  CharSequence         uidS    ;
+  protected  StringBuilder         uidS    ;
   /**
    * Checks the timing to see whether the time is ok for starting.
    */
@@ -228,7 +230,7 @@ public  class StreamSource {
     return sqlQuery;
   }
   
-  public void setWrapper ( AbstractWrapper wrapper  ) {
+  public void setWrapper ( AbstractWrapper wrapper  ) throws SQLException {
     if (validate()==false)
       throw new GSNRuntimeException("Can't set the wrapper when the stream source is invalid.");
     this.wrapper = wrapper;
@@ -316,7 +318,7 @@ public  class StreamSource {
   
   
   
-  public CharSequence getUIDStr() {
+  public StringBuilder getUIDStr() {
     if (validate()==false)
       return null;
     if (uidS==null) {
@@ -331,12 +333,12 @@ public  class StreamSource {
     return getUIDStr().hashCode();
   }
   
-  public Boolean dataAvailable ( ) {
+  public Boolean dataAvailable ( ) throws SQLException {
     if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data avialble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
     return inputStream.dataAvailable( getUIDStr() );
   }
   
-  CharSequence cachedSqlQuery = null;
+  private StringBuilder cachedSqlQuery = null;
   
   /**
    * This method gets a stream source specification and generates the appropriate where clauses representing the stream source.
@@ -347,7 +349,7 @@ public  class StreamSource {
    *
    * @return
    */
-  public CharSequence toSql() {
+  public StringBuilder toSql() {
     if (cachedSqlQuery!=null)
       return cachedSqlQuery;
     if (getWrapper()==null)
@@ -356,7 +358,7 @@ public  class StreamSource {
       throw new GSNRuntimeException("Validation of this object the stream source failed, please check the logs.");
     CharSequence wrapperAlias = getWrapper().getDBAliasInStr();
     if (samplingRate==0 || (isStorageCountBased && getParsedStorageSize()==0))
-      return cachedSqlQuery = "select * from "+wrapperAlias+ " where FALSE";
+      return cachedSqlQuery = new StringBuilder("select * from ").append(wrapperAlias).append(" where FALSE");
     TreeMap < CharSequence , CharSequence > rewritingMapping = new TreeMap < CharSequence , CharSequence >(new CaseInsensitiveComparator() );
     rewritingMapping.put("wrapper", wrapperAlias);
     StringBuilder toReturn = new StringBuilder(getSqlQuery());

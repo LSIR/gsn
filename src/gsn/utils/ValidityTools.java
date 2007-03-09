@@ -186,16 +186,7 @@ public class ValidityTools {
 			return false;
 		}
 	}
-	/**
-	 * Returns false if the table doesnt exist.
-	 * 
-	 * @param tableName
-	 * @return
-	 * @throws SQLException
-	 */
-	public static boolean tableExists(CharSequence tableName) throws SQLException{
-		return tableExists(tableName,new DataField[] {});
-	}
+
 
 	public static boolean isValidJavaVariable(CharSequence string) {
 		if (string ==null)
@@ -210,49 +201,5 @@ public class ValidityTools {
 				return false;
 		return true;
 	}
-
-	public static boolean tableExists(CharSequence tableName, DataField[] fields)throws SQLException {
-		if (!isValidJavaVariable(tableName))
-			throw new GSNRuntimeException("Table name is not valid");
-		String  query ="select * from "+tableName.toString()+" where false";
-		ResultSet rs =null;
-		ResultSetMetaData structure=null ;
-		try{
-			rs= StorageManager.getInstance().executeQueryWithResultSet(query.toString());
-			structure= rs.getMetaData();
-			if (fields!=null && fields.length>0) 
-				nextField : for (DataField field : fields) {
-					for (int i=1;i<=structure.getColumnCount();i++) {
-						String colName = structure.getColumnName(i);
-						int colType = structure.getColumnType(i);
-						if (field.getName().equalsIgnoreCase(colName))
-							if (field.getDataTypeID()==DataTypes.convertFromJDBCToGSNFormat(colType))
-								continue nextField;
-							else 
-								throw new GSNRuntimeException("The column : "+colName+" in the >"+tableName+"< is not compatible with type : "+field.getType()+". The actual type is : "+colType);
-					}
-					throw new GSNRuntimeException("The table "+tableName+" doesn't have the >"+field.getName()+"< column.");
-				}
-		}catch (SQLException e) {
-			/**
-			 * 1146 : for mysql
-			 * -26 : for hsqldb
-			 */
-			
-			if(e.getErrorCode()==1146 || e.getErrorCode()==-22)
-				return false;
-			else {
-				logger.error(e.getErrorCode());
-				throw e;
-			}
-		}finally{
-			if (rs!=null)
-				try {
-					rs.getStatement().getConnection().close();
-				} catch (SQLException e) {
-					logger.error(e.getMessage(),e);
-				}
-		}
-		return true;
-	}
+	
 }

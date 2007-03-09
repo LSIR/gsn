@@ -288,7 +288,7 @@ public final class Main {
 		return randomTableNameGenerator ( 15 ).hashCode ( );
 	}
 
-	public static CharSequence tableNameGeneratorInString (int code) {
+	public static StringBuilder tableNameGeneratorInString (int code) {
 		StringBuilder sb = new StringBuilder ("_");
 		if (code<0)
 			sb.append ( "_" );
