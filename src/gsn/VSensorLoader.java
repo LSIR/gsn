@@ -8,6 +8,7 @@ import gsn.beans.VSensorConfig;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
+import gsn.utils.graph.Graph;
 import gsn.wrappers.AbstractWrapper;
 import java.io.File;
 import java.io.FileFilter;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -76,7 +78,7 @@ public class VSensorLoader extends Thread {
 	public void loadPlugin ( ) throws SQLException , JiBXException {
 		Modifications modifications = getUpdateStatus ( pluginsDir );
 		ArrayList < VSensorConfig > removeIt = modifications.getRemove ( );
-		ArrayList < VSensorConfig > addIt = modifications.getAdd ( );
+		ArrayList<VSensorConfig> vsConfigsToAdd = modifications.getAdd();
 		for ( VSensorConfig configFile : removeIt ) {
 			logger.warn ( new StringBuilder ( ).append ( "removing : " ).append ( configFile.getName ( ) ).toString ( ) );
 			VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile.getFileName ( ) );
@@ -90,6 +92,16 @@ public class VSensorLoader extends Thread {
 		}finally {
 			if ( this.isActive == false ) return;
 		}
+		
+		Graph<VSensorConfig> graph = modifications.getGraph();
+		List<VSensorConfig> nodesByDFSSearch = graph.getNodesByDFSSearch();
+		ArrayList<VSensorConfig> addIt = new ArrayList<VSensorConfig>(vsConfigsToAdd.size());
+		for (VSensorConfig config : nodesByDFSSearch) {
+			if(vsConfigsToAdd.contains(config)){
+				addIt.add(config);
+			}
+		}
+		
 		for ( VSensorConfig vs : addIt ) {
 			if (!isVirtualSensorValid(vs))
 				continue ;
