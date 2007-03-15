@@ -1,13 +1,14 @@
 package gsn.beans;
 
-import gsn.registry.Registry;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.wrappers.RemoteWrapper;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
+
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 
@@ -298,7 +299,7 @@ public class VSensorConfig implements Serializable {
 		  storageHistorySize = storageHistorySize.replace( " " , "" ).trim( ).toLowerCase( );
 		  for ( final InputStream inputStream : this.inputStreams )
 			  this.inputStreamNameToInputStreamObjectMapping.put( inputStream.getInputStreamName( ) , inputStream );
-
+		 
 		  if ( storageHistorySize.equalsIgnoreCase( "0" ) ) return true;
 		  final int second = 1000;
 		  final int minute = second * 60;
@@ -394,6 +395,14 @@ public class VSensorConfig implements Serializable {
 		  + ", addressing=" + this.addressing + ", outputStructure=" + this.outputStructure + ", storageHistorySize='" + this.storageHistorySize + '\'' + builder.toString( )
 		  + ", mainClassInitialParams=" + this.mainClassInitialParams + ", lastModified=" + this.lastModified + ", fileName='" + this.fileName + '\'' + ", logger=" + this.logger + ", nameInitialized="
 		  + this.nameInitialized + ", isStorageCountBased=" + this.isStorageCountBased + ", parsedStorageSize=" + this.parsedStorageSize + '}';
+	  }
+	  
+	  public boolean equals(Object obj){
+		  if (obj instanceof VSensorConfig) {
+			  VSensorConfig vSensorConfig = (VSensorConfig) obj;
+			  return name.equals(vSensorConfig.getName()); 			
+		  }
+		  return false;
 	  }
 
 	  public String getGeneralPassword(){
