@@ -78,7 +78,7 @@ public class VSensorLoader extends Thread {
 	public void loadPlugin ( ) throws SQLException , JiBXException {
 		Modifications modifications = getUpdateStatus ( pluginsDir );
 		ArrayList < VSensorConfig > removeIt = modifications.getRemove ( );
-		ArrayList<VSensorConfig> vsConfigsToAdd = modifications.getAdd();
+		ArrayList<VSensorConfig> addIt = modifications.getAdd();
 		for ( VSensorConfig configFile : removeIt ) {
 			logger.warn ( new StringBuilder ( ).append ( "removing : " ).append ( configFile.getName ( ) ).toString ( ) );
 			VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile.getFileName ( ) );
@@ -91,15 +91,6 @@ public class VSensorLoader extends Thread {
 			logger.error ( e.getMessage ( ) , e );
 		}finally {
 			if ( this.isActive == false ) return;
-		}
-		
-		Graph<VSensorConfig> graph = modifications.getGraph();
-		List<VSensorConfig> nodesByDFSSearch = graph.getNodesByDFSSearch();
-		ArrayList<VSensorConfig> addIt = new ArrayList<VSensorConfig>(vsConfigsToAdd.size());
-		for (VSensorConfig config : nodesByDFSSearch) {
-			if(vsConfigsToAdd.contains(config)){
-				addIt.add(config);
-			}
 		}
 		
 		for ( VSensorConfig vs : addIt ) {

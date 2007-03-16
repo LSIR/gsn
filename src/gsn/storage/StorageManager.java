@@ -418,7 +418,7 @@ public class StorageManager {
 		 return  new StringBuilder( "alter table " ).append( oldName ).append( " rename to " ).append( newName ).toString();
 	 }
 	 public static StringBuilder getStatementDropTable(CharSequence tableName) {
-		 return new StringBuilder( " " ).append( tableName );
+		 return new StringBuilder( "drop table if exists " ).append( tableName );
 	 }
 	 /**
 	  * First detects the appropriate DB Engine to use. Get's the drop index statement syntax (which is DB dependent)

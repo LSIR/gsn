@@ -2,6 +2,7 @@ package gsn.beans;
 
 import gsn.Mappings;
 import gsn.utils.graph.Graph;
+import gsn.utils.graph.Node;
 import gsn.utils.graph.NodeNotExistsExeption;
 
 import java.io.FileInputStream;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
@@ -35,12 +37,12 @@ public final class Modifications {
    private static transient Logger     logger                  = Logger.getLogger( Modifications.class );
    
    /**
-    * The list of the file names to be added to the GSN.
+    * The list of the virtual sensors, sorted by dependency relations between them,
+    * to be added to the GSN.
     * 
     * @return Returns the add.
     */
    public ArrayList < VSensorConfig > getAdd ( ) {
-	   fillGraph(addVirtualSensorConf.iterator());
       return addVirtualSensorConf;
    }
    
@@ -49,7 +51,17 @@ public final class Modifications {
     */
    public void setAdd ( final Collection < String > add ) {
       addVirtualSensorConf.clear( );
-      loadVirtualSensors( add , addVirtualSensorConf );
+      ArrayList<VSensorConfig> toAdd = new ArrayList<VSensorConfig>();
+      loadVirtualSensors( add , toAdd );
+      fillGraph(toAdd.iterator());
+
+      List<VSensorConfig> nodesByDFSSearch = graph.getNodesByDFSSearch();
+      for (VSensorConfig config : nodesByDFSSearch) {
+    	  int indexOf = toAdd.indexOf(config);
+    	  if(indexOf != -1){
+    		  addVirtualSensorConf.add(toAdd.get(indexOf));
+    	  }
+      }
    }
    
    /**
@@ -107,16 +119,28 @@ public final class Modifications {
     */
    public void setRemove ( final Collection < String > listOfTheRemovedVirtualSensorsFileName ) {
       removeVirtualSensorConf.clear( );
+      //file has been removed, the virtual sensor and dependent virtual sensors should be deleted
       for (String fileName : listOfTheRemovedVirtualSensorsFileName) {
-    	  VSensorConfig config = Mappings.getConfigurationObject(fileName);
-    	  try {
-			graph.removeNode(config);
-		} catch (NodeNotExistsExeption e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	  VSensorConfig vSensorConfig = Mappings.getConfigurationObject(fileName);
+    	  if(vSensorConfig != null){
+    		  Node<VSensorConfig> node = graph.findNode(vSensorConfig);
+    		  if (node != null && removeVirtualSensorConf.contains(vSensorConfig) == false) {
+				  //adding to removed list the removed vs and all virtual sensors that depend on it   
+				  List<Node<VSensorConfig>> nodesAffectedByRemoval = graph.nodesAffectedByRemoval(node);
+				  for (Node<VSensorConfig> toRemoveNode : nodesAffectedByRemoval) {
+					  VSensorConfig config = toRemoveNode.getObject();
+					  if(removeVirtualSensorConf.contains(config) == false)
+						  removeVirtualSensorConf.add(config);
+				  }
+			  }
+    		  try {
+				graph.removeNode(vSensorConfig);
+			} catch (NodeNotExistsExeption e) {
+				// This shouldn't happen 
+				logger.error(e.getMessage(), e);
+			}
+    	  }
 	}
-      loadVirtualSensors( listOfTheRemovedVirtualSensorsFileName , removeVirtualSensorConf );
    }
    
    /**
@@ -126,9 +150,10 @@ public final class Modifications {
     * @param remove : The list of the virtual sensor descriptor files removed.
     */
    public Modifications ( final Collection < String > add , final Collection < String > remove ) {
-	  buildDependencyGraph(); 
-      setAdd( add );
-      setRemove( remove );
+	   buildDependencyGraph(); 
+	   //the order of the following two methods is important
+	   setRemove( remove );
+	   setAdd( add );
    }
    
    
@@ -149,23 +174,17 @@ private Collection < VSensorConfig > getModifications ( ) {
 	   graph = new Graph<VSensorConfig>();
 	   Iterator<VSensorConfig> allVSensorConfigs = Mappings.getAllVSensorConfigs();
 	   fillGraph(allVSensorConfigs);
-
-
-	   if(logger.isDebugEnabled())
-		   logger.debug(graph.toString());
-
-
    }
 
    private void fillGraph(Iterator<VSensorConfig> allVSensorConfigs) {
 	   HashMap<String, VSensorConfig> vsNameTOVSConfig = new HashMap<String, VSensorConfig>();
 	   while(allVSensorConfigs.hasNext()){
 		   VSensorConfig config = allVSensorConfigs.next();
-		   vsNameTOVSConfig.put(config.getName().toLowerCase(), config);
+		   vsNameTOVSConfig.put(config.getName().toLowerCase().trim(), config);
 		   graph.addNode(config);
 	   }
 
-	   for(VSensorConfig config : vsNameTOVSConfig.values()){ 		
+outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){ 		
 		   Collection<InputStream> inputStreams = config.getInputStreams();
 		   for (InputStream stream : inputStreams) {
 			   StreamSource[] sources = stream.getSources();
@@ -174,11 +193,35 @@ private Collection < VSensorConfig > getModifications ( ) {
 				   for (int j = 0; j < addressing.length; j++) {
 					   String vsensorName = addressing[i].getPredicateValue("NAME");
 					   if (vsensorName != null) {
-						   VSensorConfig sensorConfig = vsNameTOVSConfig.get(vsensorName.toLowerCase());
+						   String vsName = vsensorName.toLowerCase().trim();
+						VSensorConfig sensorConfig = vsNameTOVSConfig.get(vsName);
+						   if(sensorConfig == null)
+							   sensorConfig = Mappings.getVSensorConfig(vsName);
+						   if(sensorConfig == null){
+							   if(logger.isInfoEnabled())
+								   logger.info("There is no virtaul sensor with name >" +  vsName + "<");
+							   try {
+								   graph.removeNode(config);
+								   continue outFor;
+							   } catch (NodeNotExistsExeption e) {
+								   logger.error(e.getMessage(), e);
+								   //This shouldn't happen, as we first add all virtual sensors to the graph
+							   }
+							   continue;
+						   }
 						   try {
-							   graph.addEdge(config, sensorConfig);
+							   if(graph.findNode(sensorConfig) != null)
+								   graph.addEdge(config, sensorConfig);
+							   else
+								   try {
+									   graph.removeNode(config);
+								   } catch (NodeNotExistsExeption e) {
+									   logger.error(e.getMessage(), e);
+									   //This shouldn't happen, as we first add all virtual sensors to the graph
+								   }
 						   } catch (NodeNotExistsExeption e) {
-							   e.printStackTrace();
+							   logger.error(e.getMessage(), e);
+							   //This shouldn't happen, as we first add all virtual sensors to the graph
 						   }
 					   }
 				   }

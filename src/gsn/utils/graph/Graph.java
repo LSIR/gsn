@@ -52,6 +52,11 @@ public class Graph<T> {
 
 	}
 
+	/**
+	 * Returns list of nodes that are ascendings of the <code>node</code> including the <code>node</code> itself
+	 * @param node
+	 * @return
+	 */
 	public List<Node<T>> nodesAffectedByRemoval(Node<T> node) {
 		return getAscendingNodes(node);
 	}
@@ -91,10 +96,10 @@ public class Graph<T> {
 			throws NodeNotExistsExeption {
 		Node<T> startNode = findNode(startObject);
 		if (startNode == null)
-			throw new NodeNotExistsExeption(startNode.toString());
+			throw new NodeNotExistsExeption(startObject == null ? "null" : startObject.toString());
 		Node<T> endNode = findNode(endObject);
 		if (endNode == null)
-			throw new NodeNotExistsExeption(endNode.toString());
+			throw new NodeNotExistsExeption(endObject == null ? "null" : endObject.toString());
 		try {
 			startNode.addEdge(endNode);
 			rootNodes.remove(endNode);
@@ -114,7 +119,7 @@ public class Graph<T> {
 	public boolean removeNode(T object) throws NodeNotExistsExeption {
 		Node<T> node = findNode(object);
 		if (node == null)
-			throw new NodeNotExistsExeption(object.toString());
+			throw new NodeNotExistsExeption(object == null ? "null" : object.toString());
 
 		List<Node<T>> ascendingNodes = getAscendingNodes(node);
 		for (Node<T> ascendingNode : ascendingNodes) {
