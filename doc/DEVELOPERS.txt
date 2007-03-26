@@ -8,7 +8,8 @@ GSN is licensed under the GNU GPL license, version 2. A complete copy
 of the text can be found in the file GPL-2.txt.
 Basically, it grants you the rights to use, redistribute and modify
 GSN. However, if you want to redistribute a modified version of GSN,
-you must provide the complete source code of your modifications.
+you must provide the complete source code of your modifications. 
+In case of doubt, please refer to the file GPL-2.txt.
 
 Checking out the code 
 =====================
@@ -21,7 +22,7 @@ project by using the subclipse plugin (http://subclipse.tigris.org).
 
 Or with the following command-line:
 
-svn co https://svn.sourceforge.net/svnroot/globalsn globalsn
+svn co https://svn.sourceforge.net/svnroot/gsn gsn
  
 
 Installing dependencies
