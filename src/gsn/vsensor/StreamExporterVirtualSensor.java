@@ -46,6 +46,8 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 	private String password;
 
 	private String user;
+	
+	private String url;
 
 	public boolean initialize ( ) {
 		VSensorConfig vsensor = getVirtualSensorConfiguration( );
@@ -59,7 +61,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 		table_name = params.get( TABLE_NAME );
 		user = params.get(PARAM_USER);
 		password = params.get(PARAM_PASSWD);
-
+		url = params.get(PARAM_URL);
 		try {
 			Class.forName(params.get(PARAM_DRIVER));
 			connection = getConnection();
@@ -99,7 +101,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 
 	public Connection getConnection() throws SQLException {
 		if (this.connection==null || this.connection.isClosed())
-			this.connection=DriverManager.getConnection(user,password,PARAM_URL);
+			this.connection=DriverManager.getConnection(url,user,password);
 		return connection;
 	}
 
