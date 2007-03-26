@@ -33,10 +33,6 @@
 The Book of GSN
 \end_layout
 
-\begin_layout Author
-Global Sensor Networks Team
-\end_layout
-
 \begin_layout Standard
 \begin_inset LatexCommand \tableofcontents{}
 
@@ -1368,12 +1364,13 @@ TinyOS
 \end_layout
 
 \begin_layout Standard
-GSN comes with sample wrappers for TinyOS based sensor networks (both version
- 1.x and 2.x).
- The TinyOS wrapper interacts with the serial forwarder (provided by TinyOS
- distribution) which inturn presents a sensor network.
- In order to use the TinyOS wrapper with a sensor network, you first need
- to generate the Java representation of the message structures used in the
+With default GSN installation we provide sample wrappers to interact with
+ TinyOS based sensor networks (both version 1.x and 2.x).
+ The TinyOS wrapper is actually a java program that interacts with the serial
+ forwarder (provided by TinyOS distribution) which inturn presents a sensor
+ network.
+ In order to use the TinyOS wrapper with a sensor network you need to first
+ generate the java representation of the message structures used in the
  network (in TinyOS they are defined in the .h files).
  NesC language provides a tool called 
 \begin_inset Quotes eld
@@ -1390,315 +1387,260 @@ mig
 \end_layout
 
 \begin_layout Standard
-Due to strange java package management in TinyOS 2.x distribution, both TinyOS
- 1.x and 2.x are using the same package structures and class names.
- This is a source of conflicts if both TinyOS1.x and 2.x jar files are in
- the classpath (which is the case for GSN).
+Note for TinyOS 1.x users, due to strange java package management in TinyOS
+ 2.x distribution, both TinyOS 1.x and 2.x are using very same package structures
+ and class names which generates conflict when you have both TinyOS1.x and
+ 2.x jar files in your classpath (which is the case for GSN).
  To resolve this, you need to edit the generated message file and modify
  it so that it only uses class files from the TinyOS 1.x (all classes must
  be imported from net.tinyos1x package).
 \end_layout
 
 \begin_layout Standard
-After generating the Java representation of the communication message structures
-, you need to write a wrapper class for your message.
+Once you generated the Java representation of the communication message
+ structures, you need to write a wrapper class for your message.
  Assuming you have a message class called MyMessage which has three fields,
- node_id, temperature and light, here is a sample wrapper class that binds
- this example sensor network with GSN :
+ node_id, temperature and light, here is a sample wrapper class to bind
+ your network with GSN :
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
 //import net.tinyos1x.message.Message; // Only for TinyOS 1.x
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
 //import net.tinyos1x.message.MessageListener; // Only for TinyOS 1.x
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
 //import net.tinyos1x.message.MoteIF; // Only for TinyOS 1.x
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
 import net.tinyos.message.Message; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
 import net.tinyos.message.MessageListener; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
 import net.tinyos.message.MoteIF; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
 import net.tinyos.packet.BuildSource; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
 import net.tinyos.packet.PhoenixSource; // Only for TinyOS 2.x
 \end_layout
 
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout LyX-Code
+\begin_layout Verse
 public class MyWrapper extends AbstractWrapper implements MessageListener
  { 
 \end_layout
 
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout LyX-Code
+\begin_layout Verse
 private final DataField [] structure = new DataField[] {
 \end_layout
 
-\begin_layout LyX-Code
-  new DataField("node_id","int","The node id the mote."),
+\begin_layout Verse
+new DataField("node_id","int","The node id the mote."),
 \end_layout
 
-\begin_layout LyX-Code
-  new DataField("temperature","double","Presents the temperature sensor."),
+\begin_layout Verse
+new DataField("temperature","double","Presents the temperature sensor."),
 \end_layout
 
-\begin_layout LyX-Code
-  new DataField("light","double","Presents the light sensor.")
+\begin_layout Verse
+new DataField("light","double","Presents the light sensor.")
 \end_layout
 
-\begin_layout LyX-Code
-};
+\begin_layout Verse
+}; 
 \end_layout
 
-\begin_layout LyX-Code
-
+\begin_layout Verse
+public boolean initialize ( ) { 
 \end_layout
 
-\begin_layout LyX-Code
-public boolean initialize () { 
+\begin_layout Verse
+AddressBean addressBean = getActiveAddressBean( );
 \end_layout
 
-\begin_layout LyX-Code
-  AddressBean addressBean = getActiveAddressBean();
+\begin_layout Verse
+String host = addressBean.getPredicateValue( "host" ); // The ip of the machine
+ running serial forwarder.
 \end_layout
 
-\begin_layout LyX-Code
-  // The ip of the machine running   serial forwarder.
+\begin_layout Verse
+if ( host == null || host.trim( ).length( ) == 0 ) {
 \end_layout
 
-\begin_layout LyX-Code
-  String host = addressBean.getPredicateValue( "host" ); 
+\begin_layout Verse
+logger.warn( "The >host< parameter is missing from the RemoteWrapper wrapper."
+ );
 \end_layout
 
-\begin_layout LyX-Code
-  if (host == null || host.trim().length() == 0) {
+\begin_layout Verse
+return false; //initialization failed, the host name is not provided in
+ the parameters.
 \end_layout
 
-\begin_layout LyX-Code
-    logger.warn("The >host< parameter is missing from the RemoteWrapper wrapper.")
-;
+\begin_layout Verse
+}
 \end_layout
 
-\begin_layout LyX-Code
-    return false; 
+\begin_layout Verse
+int port; // The port of the machine running serial forwarder.
 \end_layout
 
-\begin_layout LyX-Code
-    //initialization failed, the host name is not provided in the parameters.
+\begin_layout Verse
+String portRaw = addressBean.getPredicateValue( "port" );
 \end_layout
 
-\begin_layout LyX-Code
-  }
+\begin_layout Verse
+if ( portRaw == null || portRaw.trim( ).length( ) == 0 )
 \end_layout
 
-\begin_layout LyX-Code
-  int port; // The port of the machine running serial forwarder.
+\begin_layout Verse
+{ logger.warn( "The >port< parameter is missing from the RemoteWrapper wrapper."
+ );
 \end_layout
 
-\begin_layout LyX-Code
-  String portRaw = addressBean.getPredicateValue("port");
-\end_layout
-
-\begin_layout LyX-Code
-  if (portRaw == null || portRaw.trim( ).length( ) == 0) {
-\end_layout
-
-\begin_layout LyX-Code
-    logger.warn("The >port< parameter is missing from the RemoteWrapper wrapper.")
-;
-\end_layout
-
-\begin_layout LyX-Code
-    return false;
-\end_layout
-
-\begin_layout LyX-Code
-    // initialization failed, the port no.
+\begin_layout Verse
+return false;// initialization failed, the port no.
  is not provided in the parameters.
 \end_layout
 
-\begin_layout LyX-Code
-  } 
+\begin_layout Verse
+} try {
 \end_layout
 
-\begin_layout LyX-Code
-  try {
+\begin_layout Verse
+port = Integer.parseInt( portRaw ); 
 \end_layout
 
-\begin_layout LyX-Code
-   port = Integer.parseInt(portRaw); 
+\begin_layout Verse
+if ( port > 65000 || port <= 0 ) throw new Exception( "Bad port No" + port
+ );
 \end_layout
 
-\begin_layout LyX-Code
-   if (port > 65000 || port <= 0) throw new Exception("Bad port No" + port);
+\begin_layout Verse
+} catch ( Exception e ) { 
 \end_layout
 
-\begin_layout LyX-Code
-  } catch (Exception e) { 
+\begin_layout Verse
+logger.warn( "The >port< parameter is not a valid integer for the RemoteWrapper
+ wrapper." ); 
 \end_layout
 
-\begin_layout LyX-Code
-    logger.warn("The >port< parameter is not a valid integer"
-\end_layout
-
-\begin_layout LyX-Code
-     + "for the RemoteWrapper wrapper."); 
-\end_layout
-
-\begin_layout LyX-Code
-    return false; // initialization failed, the port no.
+\begin_layout Verse
+return false; // initialization failed, the port no.
  is not valid.
 \end_layout
 
-\begin_layout LyX-Code
-  }
-\end_layout
-
-\begin_layout LyX-Code
-  if(logger.isDebugEnabled())
-\end_layout
-
-\begin_layout LyX-Code
-    logger.debug("The SFWrapperDS connects to the Serial Forwarder interface
- at *" 
-\end_layout
-
-\begin_layout LyX-Code
-       + host + ":" + port + "*"); 
-\end_layout
-
-\begin_layout LyX-Code
-  setName( "TinyOS-My-Wrapper") ;
-\end_layout
-
-\begin_layout LyX-Code
-  try {
-\end_layout
-
-\begin_layout LyX-Code
-    PhoenixSource reader=BuildSource.makePhoenix(BuildSource.makeSF(host,
- port), null);
-\end_layout
-
-\begin_layout LyX-Code
-    // Only for TinyOS 2.x
-\end_layout
-
-\begin_layout LyX-Code
-    reader.start( ); // TinyOS 2.x
-\end_layout
-
-\begin_layout LyX-Code
-    moteif = new MoteIF( reader ); // Only for TinyOS 2.x
-\end_layout
-
-\begin_layout LyX-Code
-    // moteif = MoteIF (host,port); // Uncomment this, only for TinyOS 1.x
-\end_layout
-
-\begin_layout LyX-Code
-  } catch ( Exception e ) {
-\end_layout
-
-\begin_layout LyX-Code
-    logger.error( e.getMessage( ) , e );
-\end_layout
-
-\begin_layout LyX-Code
-    return false; 
-\end_layout
-
-\begin_layout LyX-Code
-    // Serial Forwarder client couldn't establish the connection.
-\end_layout
-
-\begin_layout LyX-Code
-  }
-\end_layout
-
-\begin_layout LyX-Code
-  moteif.registerListener(new MyMessage(), this);
-\end_layout
-
-\begin_layout LyX-Code
-  return true; //initialization is successful.
-\end_layout
-
-\begin_layout LyX-Code
+\begin_layout Verse
 }
 \end_layout
 
-\begin_layout LyX-Code
-
+\begin_layout Verse
+if ( logger.isDebugEnabled( ) )
 \end_layout
 
-\begin_layout LyX-Code
-public synchronized void finalize() {
+\begin_layout Verse
+logger.debug( "The SFWrapperDS connects to the Serial Forwarder interface
+ at *" + host + ":" + port + "*" ); 
 \end_layout
 
-\begin_layout LyX-Code
-  moteif.deregisterListener(new SensorScopeDataMsg(), this);
+\begin_layout Verse
+setName( "TinyOS-My-Wrapper") ;
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
+try {
+\end_layout
+
+\begin_layout Verse
+PhoenixSource reader=BuildSource.makePhoenix( BuildSource.makeSF( host , port
+ ) , null );// Only for TinyOS 2.x
+\end_layout
+
+\begin_layout Verse
+reader.start( ); // TinyOS 2.x
+\end_layout
+
+\begin_layout Verse
+moteif = new MoteIF( reader ); // Only for TinyOS 2.x
+\end_layout
+
+\begin_layout Verse
+// moteif = MoteIF (host,port); // Uncomment this, only for TinyOS 1.x
+\end_layout
+
+\begin_layout Verse
+} catch ( Exception e ) {
+\end_layout
+
+\begin_layout Verse
+logger.error( e.getMessage( ) , e );
+\end_layout
+
+\begin_layout Verse
+return false; // Serial Forwarder client couldn't establish the connection.
+\end_layout
+
+\begin_layout Verse
 }
 \end_layout
 
-\begin_layout LyX-Code
-
+\begin_layout Verse
+moteif.registerListener( new MyMessage( ) , this );
 \end_layout
 
-\begin_layout LyX-Code
-public void messageReceived(int toAddr, Message message) {
+\begin_layout Verse
+return true; //initialization is successful.
 \end_layout
 
-\begin_layout LyX-Code
-  MyMessage msg = (MyMessage) message;
-\end_layout
-
-\begin_layout LyX-Code
-  // (If needed) extract/parse/convert the sensor
-\end_layout
-
-\begin_layout LyX-Code
-  // measurements to some meaningful values
-\end_layout
-
-\begin_layout LyX-Code
-  postStreamElement( nodeid,sensor1,sensor2 );
-\end_layout
-
-\begin_layout LyX-Code
+\begin_layout Verse
 }
 \end_layout
 
-\begin_layout LyX-Code
-
+\begin_layout Verse
+public synchronized void finalize ( ) {
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Verse
+moteif.deregisterListener( new SensorScopeDataMsg( ) , this );
+\end_layout
+
+\begin_layout Verse
+}
+\end_layout
+
+\begin_layout Verse
+public void messageReceived ( int toAddr , Message message ) {
+\end_layout
+
+\begin_layout Verse
+MyMessage msg = (MyMessage) message;
+\end_layout
+
+\begin_layout Verse
+// (If needed) extract/parse/convert the sensor measurements to some meaningful
+ values
+\end_layout
+
+\begin_layout Verse
+postStreamElement( nodeid,sensor1,sensor2 );
+\end_layout
+
+\begin_layout Verse
+}
+\end_layout
+
+\begin_layout Verse
 public DataField [] getOutputFormat ( ) { return structure; }
 \end_layout
 
@@ -2442,7 +2384,7 @@ Parameters for Http Get wrapper
 <column alignment="center" valignment="top" leftline="true" width="0">
 <column alignment="center" valignment="top" leftline="true" width="15line%">
 <column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="30line%">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="30line%">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -6019,6 +5961,1500 @@ dataFromWeb
 \end_layout
 
 \begin_layout Chapter
+The Web Interface
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This is a presentation of the web interface bundled with GSN.
+ It can be used as a starting point for creating another one.
+\end_layout
+
+\begin_layout Section
+Overview
+\end_layout
+
+\begin_layout Standard
+The project aimed at improving the first web interface on many aspects such
+ as design (one of the main factor which drives user choice), responsiveness
+ (using asynchronous techniques) and functionality (map integration for
+ GPS enabled sensors).
+\end_layout
+
+\begin_layout Section
+Design and architecture
+\end_layout
+
+\begin_layout Subsection
+Client side
+\end_layout
+
+\begin_layout Standard
+One of the core problems faced when using AJAX
+\begin_inset LatexCommand \cite{ajax}
+
+\end_inset
+
+ technology is the poor browser support and incompatibilities between different
+ vendors.
+ Even by focusing only on the biggest ones (IE, Firefox & Opera) which aggregate
+ 99% of the user base, there are still many compatibility issues.
+ In order to avoid dealing will these issues and be forced to develop tweaks
+ for every browser, a good solution is to use a Javascript library which
+ will be used as a middleware between our code and the browser.
+ Such a Javascript library will allow us to easily access the DOM, to make
+ AJAX requests or even have some fancy visual effects (fade out,...).
+ However, this induces a new problem: Which Javascript library to choose?
+ There are plenty of Javascript libraries on the Internet.
+ Almost all of them are open source, so licensing is not an issue.
+ This is a brief overview of the most famous ones:
+\end_layout
+
+\begin_layout Itemize
+JQuery
+\begin_inset LatexCommand \cite{jquery}
+
+\end_inset
+
+: A small library with powerful functionalities.
+ Very active development and gaining popularity.
+ 
+\end_layout
+
+\begin_layout Itemize
+Prototype
+\begin_inset LatexCommand \cite{prototype}
+
+\end_inset
+
+: Probably the most famous one due to RubyOnRails fame.
+ Support everything we can expect but is a bit bloated.
+ 
+\end_layout
+
+\begin_layout Itemize
+mootools
+\begin_inset LatexCommand \cite{mootools}
+
+\end_inset
+
+: An ultra compact Javascript framework.
+ Not so much user base.
+ 
+\end_layout
+
+\begin_layout Itemize
+Yahoo! User Interface (YUI)
+\begin_inset LatexCommand \cite{yui}
+
+\end_inset
+
+: A proven library not so much used outside of Yahoo.
+ 
+\end_layout
+
+\begin_layout Standard
+Considering those different libraries, JQuery was chosen as it has enough
+ functionality for this project but remains quite small (15kb).
+ Moreover, JQuery has a nice and powerful syntax which makes code easy both
+ to write and to read afterwards.
+\end_layout
+
+\begin_layout Subsection
+Server side
+\end_layout
+
+\begin_layout Standard
+AJAX techniques require data exchange between the client and the server.
+ Although the X in AJAX means XML, there are other ways to exchange data.
+ One of the most popular is JSON (JavaScript Object Notation), which sends
+ directly Javascript objects.
+ Although this is more efficient for the Javascript code on the client side,
+ XML was preferred as it is more modular and allow to do at the same time
+ a webAPI to access GSN sensors.
+ It was designed to be close to the REST api entirely in XML to make it
+ simpler to use.
+\end_layout
+
+\begin_layout Standard
+As early as the first week, the basic XML api was built in jsp in order
+ to start the javascript interaction.
+ It was used for a while then replaced by a servlet at location 
+\emph on
+/gsn
+\emph default
+ to avoid using any jsp at all.
+\end_layout
+
+\begin_layout Section
+Implementation
+\end_layout
+
+\begin_layout Subsection
+Javascript files
+\end_layout
+
+\begin_layout Standard
+For rapid development, the GSN web interface uses many pieces of existing
+ javascript code which are in the js folder.
+\end_layout
+
+\begin_layout Standard
+The following files are part of the webapp:
+\end_layout
+
+\begin_layout Itemize
+jquery-latest.pack.js: The main jQuery library.
+ The version in use comes from the svn as some needed fixes were not available
+ in the latest version.
+ 
+\end_layout
+
+\begin_layout Itemize
+jquery-dom.js: An extension to jQuery which allows easy DOM creation written
+ like $.DIV(
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+"class":"test"
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+,"content"); 
+\end_layout
+
+\begin_layout Itemize
+jquery.history.js: An extension to jQuery to manage the hash part of the location
+ url (index.html#hash).
+ It is used to allow the page to be fully static html while at the same
+ time still support the browser back button and bookmarking of a specific
+ part of the page.
+ 
+\end_layout
+
+\begin_layout Itemize
+dimensions.js: An extension to jQuery to know the page's width and height.
+ Used only in fullmap.html in order to have the container with vsboxes of
+ the right size.
+ 
+\end_layout
+
+\begin_layout Itemize
+datepicker.js: Customized extension of jquery used for the datetime helper.
+\end_layout
+
+\begin_layout Itemize
+jquery-tooltip.js: A plugin to have better tooltips than the browser default
+ behaviour which is used for descriptions.
+ 
+\end_layout
+
+\begin_layout Itemize
+gsn.js: Our core javascript code.
+ Explanations in the next subsection.
+ 
+\end_layout
+
+\begin_layout Subsection
+gsn.js core function
+\end_layout
+
+\begin_layout Standard
+Almost all of gsn JavaScript code is regrouped inside gsn.js.
+ It is written using a JavaScript Object Notation and use a GSN object to
+ reduce the risk of conflicts with any future addition of JavaScript code.
+ 
+\emph on
+vsName
+\emph default
+, the name of the virtual sensor (text) is considered as unique, which explains
+ why it is so much used as a parameter.
+ Most of the ajax calls go to the 
+\emph on
+/gsn
+\emph default
+ servlet.
+ The data part uses the 
+\emph on
+/data
+\emph default
+ servlet for retrieving data.
+ Binary and image are accessed through the 
+\emph on
+/field
+\emph default
+ servlet and webinput upload goes to the 
+\emph on
+/upload
+\emph default
+ servlet.
+\end_layout
+
+\begin_layout Standard
+Here is a brief explanation of the core variables and functions:
+\end_layout
+
+\begin_layout Itemize
+GSN.context: defines which page of gsn is being displayed (home, data, map
+ or fullmap).
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.load(): initializes a page load (begin, tab click & back button).
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.msgcallback(): callback method when the webupload iframe finishes.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.nav(page): click on the top navigation bar.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.menu(vsName): click on the virtual sensor on the left bar.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.loaded: is true after the first load of XML info which calls GSN.init().
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.init(): initializes the gsn title and the left side menu.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.updatenb: a counter to prevent multiple instances of GSN.updateall().
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.updateall(): Ajax call to update all the sensor displays on the page
+ and the map.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.addandupdate(vsName): adds a vsbox if it doesn't exist, bring it to front
+ and update it.
+ 
+\end_layout
+
+\begin_layout Standard
+The virtual sensor information (dynamic, static and structure) are regrouped
+ in a div box called the vsbox.
+ This div has the class .vsbox and .vsbox-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+the virtual sensor name
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+.
+ They will be put in the container specified by GSN.vsbox.container.
+ Here are the function of the GSN.vsbox.* part:
+\end_layout
+
+\begin_layout Itemize
+GSN.vsbox.container: the container to put the vsbox (default "#vs").
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.vsbox.add(vsName): creates an empty vsbox.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.vsbox.bringToFront(vsName): brings a vsbox at the beginning of the container.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.vsbox.update(vs): updates and shows all the data of the vsbox.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.vsbox.remove(vsName): removes the vsbox from the container.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.vsbox.toggle(...): to manage the click on tab.
+ 
+\end_layout
+
+\begin_layout Standard
+All the functionality used to display the virtual sensor on the google map
+ is regrouped in the GSN.map.* part.
+ Here is the core functionality:
+\end_layout
+
+\begin_layout Itemize
+GSN.map.loaded: ss true after the initialisation of the google map.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.markers : array containing the displayed markers.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.highlighted : the index of the focused marker or null.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.highlightedmarker : the green marker.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.init(): initializes the google map.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.userchange(): callback after any map change (zoom and map move) and
+ vs toggle to update #hash of URL.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.zoomend(..): callback after any zoom change, used for the tricked followed
+ marker.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.trickhighlighted(): followed marker and top of the others.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.autozoomandcenter(): auto-zoom and center on the visible sensors.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.addMarker(vsName,lat,lon): adds a vs marker on the map.
+\end_layout
+
+\begin_layout Itemize
+GSN.map.markerIsVisible(vsName): returns if a marker is visible.
+\end_layout
+
+\begin_layout Itemize
+GSN.map.toggleAllMarkers(): toggles all markers (visible or not).
+\end_layout
+
+\begin_layout Itemize
+GSN.map.toggleMarker(vsName): toggles marker (visible or not).
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.updateMarker(vsName,lat,lon): updates a vs marker position on the
+ map.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.followMarker(vsName): highlights a marker, stops it if called with
+ null name.
+ 
+\end_layout
+
+\begin_layout Itemize
+GSN.map.showAllMarkers(): zoom out to see all markers.
+ 
+\end_layout
+
+\begin_layout Standard
+The functionality in the data webpage is regrouped in the GSN.data.* part
+ and was only bugfixed and slightly improved.
+ The remaining GSN.util.* functions are basic formatting piece of code that
+ don't need any explanations at all.
+\end_layout
+
+\begin_layout Subsection
+Problems faced
+\end_layout
+
+\begin_layout Subsubsection
+Dropping tables
+\end_layout
+
+\begin_layout Standard
+The first version of the gsn webapp "template" was using tables for layout
+ which is considered as bad by most web designers.
+ Therefore, it was transformed to a layout using only divs elements and
+ css attributes for styling.
+ The advantages are: cleaner html code, easier to understand, more flexible
+ (as changing only the css could change the whole look & feel) and faster
+ as the size is smaller and the css file can be cached by the client browser.
+ It was quickly rewritten from scratch to match the current gsn website
+ style.
+\end_layout
+
+\begin_layout Subsubsection
+IE showstopper
+\end_layout
+
+\begin_layout Standard
+A big problem was identified after the first week of implementation.
+ Some of the functionality used in jQuery library was not compatible with
+ IE.
+ Some rare XML parsing modes totally broke.
+ Hopefully, with the help of the jQuery team, it was resolved.
+ Therefore, a switch was made from jQuery 1.0 to the jQuery from the svn
+ as it was the only fixed version.
+\end_layout
+
+\begin_layout Standard
+Another IE only bug caused problems, because Ajax request in IE are locally
+ cached like any normal http request.
+ Therefore, the webapp wasn't refreshing even if the Javascript was working
+ fine and making ajax calls.
+ It was easily resolved by adding to the XML API servlet various http headers
+ (Expires, Cache-Control,..) to avoid any caching at all.
+\end_layout
+
+\begin_layout Subsubsection
+Retrieving dynamic data with ajax
+\end_layout
+
+\begin_layout Standard
+As the webapp is composed only of static html files, the dynamic data has
+ to be pulled from the servlet through JavaScript.
+ It is done easily using the 
+\emph on
+.ajax
+\emph default
+ function of jQuery.
+ In the main 
+\emph on
+GSN.updateall
+\emph default
+ function which updates all virtual sensors data at every refresh, the webapp
+ calls the servlet at 
+\begin_inset LatexCommand \url{http://localhost:22001/gsn}
+
+\end_inset
+
+ using the following code:
+\end_layout
+
+\begin_layout LyX-Code
+$.ajax({ type: "GET", url: "/gsn", success: function(data) {
+\end_layout
+
+\begin_layout LyX-Code
+        // use the data variable which contain virtual sensors data 
+\end_layout
+
+\begin_layout LyX-Code
+}
+\end_layout
+
+\begin_layout Standard
+As shown above, using ajax in jQuery is very straightforward.
+ The retrieved data is in xml and formatted as below:
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+<gsn name="gsn" author="cb" email="cb@epfl.ch" description="none">
+\end_layout
+
+\begin_layout LyX-Code
+  <virtual-sensor name="vs" last-modified="1171105166765">
+\end_layout
+
+\begin_layout LyX-Code
+    <field name="temp" type="long" description="none">-5</field>
+\end_layout
+
+\begin_layout LyX-Code
+  </virtual-sensor>
+\end_layout
+
+\begin_layout LyX-Code
+</gsn>
+\end_layout
+
+\begin_layout Standard
+After retrieving the xml data, it is parsed with the 
+\emph on
+$()
+\emph default
+ function of jQuery which supports xml data similarly to inline html.
+ The syntax looks as below with the data variable being the ajax reply from
+ the servlet:
+\end_layout
+
+\begin_layout LyX-Code
+$("virtual-sensor",data).each(function(){
+\end_layout
+
+\begin_layout LyX-Code
+  var vsname = $(this).attr("name");
+\end_layout
+
+\begin_layout LyX-Code
+});
+\end_layout
+
+\begin_layout Standard
+When the 
+\emph on
+GSN.updateall
+\emph default
+ function finishes to parse xml and updates the inline html with the new
+ virtual sensors data, the standard Javascript function 
+\emph on
+setTimeout()
+\emph default
+ is used in order to call the 
+\emph on
+GSN.updateall
+\emph default
+ function again for the next refresh.
+\end_layout
+
+\begin_layout Standard
+In addition, when clicking on the right side menu on a virtual sensor, an
+ ajax call is made as well.
+ The data of the clicked virtual sensor is retrieved using 
+\begin_inset LatexCommand \url{http://localhost:22001/gsn?name=vsname}
+
+\end_inset
+
+.
+ The logic is the same than during a 
+\emph on
+GSN.updateall
+\emph default
+ but only the specified virtual sensor is in the xml data.
+ Using the same JavaScript code, it will update only the specified virtual
+ sensor box.
+\end_layout
+
+\begin_layout Standard
+Not much can go wrong with these ajax calls.
+ As specified in its format, the reply will always be fully understood by
+ the JavaScript parsing.
+ The worst that can happen is that the servlet stops responding.
+ In this case, the ajax query will timeouts and never succeeds which will
+ stop any further update.
+ The ajax indicator (animated gif) will turn forever, showing that something
+ went wrong during xml data fetching.
+ The client browser should never freeze nor crash.
+ The user will actually still be able to use the gsn webapp, but will not
+ receive any new updates to the data.
+\end_layout
+
+\begin_layout Subsubsection
+XML formatting of virtual sensor
+\end_layout
+
+\begin_layout Standard
+As explained in the design section, the gsn webapp use an xml api to give
+ data.
+ All the information concerning a virtual sensor is regrouped into a single
+ 
+\emph on
+virtual-sensor
+\emph default
+ block.
+ All the different types of data (dynamic, structure, predicate,..) are merged
+ into a single entity as it is much more efficient than having to query
+ multiple times the servlet.
+ The overall size of a single block, as it is only text, costs far less
+ than the latency of multiple queries.
+ Moreover, the main gsn webapp page requires all types of data at the initializa
+tion, thus merging them makes sense.
+\end_layout
+
+\begin_layout Standard
+Every type of data is mapped into the 
+\emph on
+field
+\emph default
+ block following the rules below.
+ Field names are converted into lowercase and fields are sorted by type
+ in the same order than below.
+\end_layout
+
+\begin_layout Standard
+To begin with, the 
+\emph on
+virtual-sensor
+\emph default
+ block is opened with the following included attributes: 
+\end_layout
+
+\begin_layout Itemize
+name: virtual sensor name (unique) ;
+\end_layout
+
+\begin_layout Itemize
+last-modified: last-modified datetime in unix format ;
+\end_layout
+
+\begin_layout Itemize
+description: virtual sensor description.
+\end_layout
+
+\begin_layout Standard
+Here is a sample of the xml output from the servlet:
+\end_layout
+
+\begin_layout LyX-Code
+<gsn name="gsn" author="cb" email="cb@epfl.ch" description="none">
+\end_layout
+
+\begin_layout LyX-Code
+  <virtual-sensor name="vs" last-modified="1171105166765">
+\end_layout
+
+\begin_layout LyX-Code
+    <field name="temp" type="long" description="none">-5</field>
+\end_layout
+
+\begin_layout LyX-Code
+  </virtual-sensor>
+\end_layout
+
+\begin_layout LyX-Code
+</gsn>
+\end_layout
+
+\begin_layout Standard
+Then, the dynamic fields with their data are mapped from the output-structure
+ block of the xml config of the virtual sensor into a unique field block.
+ Below is a xml config sample:
+\end_layout
+
+\begin_layout LyX-Code
+<gsn name="gsn" author="cb" email="cb@epfl.ch" description="none">
+\end_layout
+
+\begin_layout LyX-Code
+  <virtual-sensor name="vs" last-modified="1171105166765">
+\end_layout
+
+\begin_layout LyX-Code
+    <field name="temp" type="long" description="none">-5</field>
+\end_layout
+
+\begin_layout LyX-Code
+  </virtual-sensor>
+\end_layout
+
+\begin_layout LyX-Code
+</gsn>
+\end_layout
+
+\begin_layout Standard
+It would be mapped into the following line in the xml output from the servlet:
+\end_layout
+
+\begin_layout LyX-Code
+<gsn name="gsn" author="cb" email="cb@epfl.ch" description="none">
+\end_layout
+
+\begin_layout LyX-Code
+  <virtual-sensor name="vs" last-modified="1171105166765">
+\end_layout
+
+\begin_layout LyX-Code
+    <field name="temp" type="long" description="none">-5</field>
+\end_layout
+
+\begin_layout LyX-Code
+  </virtual-sensor>
+\end_layout
+
+\begin_layout LyX-Code
+</gsn>
+\end_layout
+
+\begin_layout Standard
+An additional dynamic field is added with the timestamp in unix format as
+ in the following xml sample:
+\end_layout
+
+\begin_layout LyX-Code
+<gsn name="gsn" author="cb" email="cb@epfl.ch" description="none">
+\end_layout
+
+\begin_layout LyX-Code
+  <virtual-sensor name="vs" last-modified="1171105166765">
+\end_layout
+
+\begin_layout LyX-Code
+    <field name="temp" type="long" description="none">-5</field>
+\end_layout
+
+\begin_layout LyX-Code
+  </virtual-sensor>
+\end_layout
+
+\begin_layout LyX-Code
+</gsn>
+\end_layout
+
+\begin_layout Standard
+Afterwards, the static predicate fields are mapped from the adressing block
+ of the xml config of the virtual sensor into a unique field block as well
+ if they exist.
+ Below is a predicate xml config sample:
+\end_layout
+
+\begin_layout LyX-Code
+<gsn name="gsn" author="cb" email="cb@epfl.ch" description="none">
+\end_layout
+
+\begin_layout LyX-Code
+  <virtual-sensor name="vs" last-modified="1171105166765">
+\end_layout
+
+\begin_layout LyX-Code
+    <field name="temp" type="long" description="none">-5</field>
+\end_layout
+
+\begin_layout LyX-Code
+  </virtual-sensor>
+\end_layout
+
+\begin_layout LyX-Code
+</gsn>
+\end_layout
+
+\begin_layout Standard
+It would be mapped into the following line in the xml output from the servlet:
+\end_layout
+
+\begin_layout LyX-Code
+<field name="latitude" category="predicate">37.4</field>
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+Additionally, the webinputs block from the xml config of the virtual sensor
+ are mapped into a unique field block if they exist.
+ They are not kept hierarchically by command anymore.
+ Below is a xml config sample:
+\end_layout
+
+\begin_layout LyX-Code
+<web-input password="test">
+\end_layout
+
+\begin_layout LyX-Code
+  <command name="cmd1">
+\end_layout
+
+\begin_layout LyX-Code
+    <field name="control" type="*binary:2mb">Binary upload</field>
+\end_layout
+
+\begin_layout LyX-Code
+  </command>
+\end_layout
+
+\begin_layout LyX-Code
+</web-input>
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+It would be mapped into the following line in the xml output from the servlet:
+\end_layout
+
+\begin_layout LyX-Code
+<field command="cmd1" name="control" category="input" 
+\end_layout
+
+\begin_layout LyX-Code
+type="*binary:2mb" description="Binary upload"/>
+\end_layout
+
+\begin_layout Standard
+Finally, the 
+\emph on
+virtual-sensor
+\emph default
+ block is closed.
+\end_layout
+
+\begin_layout LyX-Code
+</virtual-sensor>
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+Mapping all these different types into the same field block syntax is easier
+ to parse by jQuery and allow reuse of code for similar functionality, like
+ between dynamic and static fields.
+\end_layout
+
+\begin_layout Subsubsection
+Highlighted marker on Google map
+\end_layout
+
+\begin_layout Standard
+The code around GSN.map.trickhighlighted() can look quite suspicious.
+ Why so much code and diverse variables just to highlight a marker on Google
+ map? Changing from one type of marker to another does not require all this.
+ It could have been made easier, but then when you zoom out you might not
+ see the highlighted marker if it is surrounded by many other markers.
+ It is due because Google map does not allow to specify the z-index of a
+ marker and automatically order them by their latitude.
+ Thus the marker with the lowest latitude will be shown on top of the others
+ one.
+\end_layout
+
+\begin_layout Standard
+This behaviour can be changed by using a trick which is to use a marker
+ with an offsetted latitude and an offsetted marker image which will always
+ be at a lower latitude than the other markers.
+ Thus always be on top of them.
+ It is offsetted depending of the zoom level and the normal marker height.
+ With this trick, the highlighted marker is popping out of crowd as shown
+ on the left side image.
+ 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename figures/chapterWebInterface/gsn2_hightrick1.png
+
+\end_inset
+
+ 
+\begin_inset Graphics
+	filename ../BEFFA-2007/gsn2_hightrick2.png
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+The only drawback of this technique is that it might look weird sometime
+ because of the shape of the marker.
+ As the right side image shows, the spike of the highlighted market is on
+ top of the one bellow.
+ Anyway it isn't that frequent and the benefits when zoomed out in a dense
+ area of marker are worth it.
+\end_layout
+
+\begin_layout Subsubsection
+Bookmarking and back button support for Ajax website
+\end_layout
+
+\begin_layout Standard
+When a web application uses ajax techniques, one of the key features of
+ the browsing experience is broken: the URL.
+ With ajax calls made without a page load, the state of the current web
+ page is not related to the URL anymore.
+ It breaks the back button feature of any browser, and even worse, the current
+ web page cannot be bookmarked properly.
+ As those feature are essential to a website, it is necessary to find a
+ way to mimic them.
+ The solution is to use the hash part of the URL : 
+\begin_inset LatexCommand \url{http://server.com/index.html#hash}
+
+\end_inset
+
+.
+ The hash part is easily modified through javascript without a page load
+ and is considered as a page change by every browser which means that the
+ back button feature works.
+ In addition, an URL with a hash part can be bookmarked and, with some javascrip
+t initialization, can restore the webpage in the same state than when it
+ was bookmarked.
+ This was implemented using a jQuery extension as some tricky javascript
+ code is required to make this functionality compatible with Internet Explorer.
+\end_layout
+
+\begin_layout Standard
+For example, a URL in the gsn webapp when browsing the map part might look
+ like the following:
+\newline
+ 
+\begin_inset LatexCommand \url{http://localhost:22001/#map,lt=38.17343267903539,lo=-121.9537353515625,z=8,vs=gpsvs:gps2:memorymonitorvs}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Such a URL is fully bookmarkable and will initialize the webapp at the same
+ state which allows people to share URL in order to show specific sensors.
+ It is decomposed into several parameters which represent: 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset LatexCommand \url{map}
+
+\end_inset
+
+: which context/part of the webapp (could be home, data or map) 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset LatexCommand \url{lt=38.17343267903539}
+
+\end_inset
+
+: latitude of the map when not in automatic mode 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset LatexCommand \url{lo=-121.9537353515625}
+
+\end_inset
+
+: longitude of the map when not in automatic mode 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset LatexCommand \url{z=8}
+
+\end_inset
+
+: zoom level of the map when not in automatic mode 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset LatexCommand \url{vs=gpsvs:gps2:memorymonitorvs}
+
+\end_inset
+
+: shown virtual sensors when some are hidden 
+\end_layout
+
+\begin_layout Standard
+Nevertheless, the URL can become quite long with all these parameters inside
+ it.
+ However, it is not a problem as Internet Explorer supports URL lengths
+ up to 2048 characters.
+ The alternative web browsers (FireFox, Opera & Safari) are even better
+ and support up to 100000 characters.
+\end_layout
+
+\begin_layout Subsubsection
+Improved UI
+\end_layout
+
+\begin_layout Standard
+A lot of work went into the design of the general user interface.
+ The UI of the data part was highly customized.
+ To simplify and to be more error prone, the datetime field was given a
+ special helper shown bellow.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename figures/chapterWebInterface/gsn2_datetime.png
+	width 60text%
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+It allows the user to specify a date and time only with mouse click.
+ It was proven to be much more quicker that way.
+\end_layout
+
+\begin_layout Standard
+A waiting indicator was added during ajax calls when gsn refreshes sensors
+ fields or when data is retrieved in the data part.
+ Such indicators are necessary in ajax applications, otherwise the user
+ believes that nothing is happening, gets frustrated and might click multiple
+ times, which won't improve respond time.
+\end_layout
+
+\begin_layout Subsubsection
+Webinput upload to virtual sensor
+\end_layout
+
+\begin_layout Standard
+The ability to upload input to a virtual sensor, as shown below, was one
+ of the last additions to the gsn webapp.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename figures/chapterWebInterface/gsn2_upload.png
+	width 60text%
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+For simplicity and modularity, the upload inputs are regrouped into subgroups
+ which can be selected with the upper select box.
+ Upload inputs are optional and specified in the sensor xml configuration,
+ thus the tab only appears when it is specified.
+ The different types are specified but are not enforced on the client side
+ as this could be easily bypassed.
+ The validation is done on the server side as client input should never
+ be trusted.
+ The following types have special input fields :
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+binary
+\emph default
+: file upload ;
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+radio
+\emph default
+: radio button with limited choice ;
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+checkbox
+\emph default
+: checkbox with limited choice ;
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+select
+\emph default
+: drop down box with limited choice ;
+\end_layout
+
+\begin_layout Standard
+The radio, checkbox and select types use the syntax like "radio:ele1|ele2"
+ to specify the multiple choice.
+ The binary field is limited by a maximum size specified in the type part
+ with a syntax like "binary:Xmb".
+ When the type begins with a star, it is compulsary.
+ Here is a sample xml config which shows all the capabilities:
+\end_layout
+
+\begin_layout LyX-Code
+<gsn name="gsn" author="cb" email="cb@epfl.ch" description="none">
+\end_layout
+
+\begin_layout LyX-Code
+  <virtual-sensor name="vs" last-modified="1171105166765">
+\end_layout
+
+\begin_layout LyX-Code
+    <field name="temp" type="long" description="none">-5</field>
+\end_layout
+
+\begin_layout LyX-Code
+  </virtual-sensor>
+\end_layout
+
+\begin_layout LyX-Code
+</gsn>
+\end_layout
+
+\begin_layout Standard
+An ajax like behaviour was required to give feedback to the user after the
+ webinput upload.
+ However, the XMLHTTPrequest object used to send ajax calls doesn't support
+ file upload for security reasons.
+ To bypass this limitation, a normal FORM element is used but uses a hidden
+ inline frame as a target.
+ When the user clicks the submit button, the upload starts in the hidden
+ IFrame to the destination 
+\emph on
+/upload
+\emph default
+.
+ When the upload ends or breaks, the servlet replies back with html code
+ like the following code line.
+ This javascript code calls back the parent window GSN core object which
+ allows the webapp to give feedback to the user.
+\end_layout
+
+\begin_layout LyX-Code
+<script>window.parent.GSN.msgcallback('msg',code);</script>
+\end_layout
+
+\begin_layout Standard
+On the servlet side, the jakarta fileupload library was used to speed up
+ development.
+ A servlet translates the POST upload into XML-RPC format before sending
+ it to the gsn system.
+ The xml produced is similar to the following block lines.
+ Normal fields are given in text format and binary fields are encoded in
+ Base 64.
+\end_layout
+
+\begin_layout LyX-Code
+<input>
+\end_layout
+
+\begin_layout LyX-Code
+  <vsname>gpsvs</vsname>
+\end_layout
+
+\begin_layout LyX-Code
+  <command>test</command>
+\end_layout
+
+\begin_layout LyX-Code
+  <fields>
+\end_layout
+
+\begin_layout LyX-Code
+    <field>
+\end_layout
+
+\begin_layout LyX-Code
+      <name>reset1</name>
+\end_layout
+
+\begin_layout LyX-Code
+      <value>test comment</value>
+\end_layout
+
+\begin_layout LyX-Code
+    </field>
+\end_layout
+
+\begin_layout LyX-Code
+    <field>
+\end_layout
+
+\begin_layout LyX-Code
+      <name>reset2</name>
+\end_layout
+
+\begin_layout LyX-Code
+      <value>ABQOBJREFUevQ18FNW9/3+C/q7tza+tXB ...
+ AARK5CYII=</value>
+\end_layout
+
+\begin_layout LyX-Code
+    </field>
+\end_layout
+
+\begin_layout LyX-Code
+    <field>
+\end_layout
+
+\begin_layout LyX-Code
+      <name>test1</name>
+\end_layout
+
+\begin_layout LyX-Code
+      <value>banana</value>
+\end_layout
+
+\begin_layout LyX-Code
+    </field>
+\end_layout
+
+\begin_layout LyX-Code
+    <field>
+\end_layout
+
+\begin_layout LyX-Code
+      <name>test2</name>
+\end_layout
+
+\begin_layout LyX-Code
+      <value>orange</value>
+\end_layout
+
+\begin_layout LyX-Code
+    </field>
+\end_layout
+
+\begin_layout LyX-Code
+    <field>
+\end_layout
+
+\begin_layout LyX-Code
+      <name>test2</name>
+\end_layout
+
+\begin_layout LyX-Code
+      <value>apple</value>
+\end_layout
+
+\begin_layout LyX-Code
+    </field>
+\end_layout
+
+\begin_layout LyX-Code
+    <field>
+\end_layout
+
+\begin_layout LyX-Code
+      <name>test3</name>
+\end_layout
+
+\begin_layout LyX-Code
+      <value>orange</value>
+\end_layout
+
+\begin_layout LyX-Code
+    </field>
+\end_layout
+
+\begin_layout LyX-Code
+  </fields>
+\end_layout
+
+\begin_layout LyX-Code
+</input>
+\end_layout
+
+\begin_layout Standard
+The servlet takes care of keeping only the input fields of the command activated
+ by the drop down menu.
+ The xml ouput can be read in the 
+\emph on
+sb.toString()
+\emph default
+ variable and has to be validated by the gsn system.
+ The feedback is sent to the user as explained before and corresponds, in
+ the servlet, to the 
+\emph on
+msg
+\emph default
+ and 
+\emph on
+code
+\emph default
+ variables.
+ The 
+\emph on
+msg
+\emph default
+ could be any text string but should escape single quote and will be displayed
+ at the top of the webinterface.
+ A 
+\emph on
+code
+\emph default
+ higher than 200 is considered as an error and is shown in red to the user,
+ otherwise it is in black.
+ Nevertheless the code is not shown to the user in the current interface.
+\end_layout
+
+\begin_layout Subsubsection
+Porting from jQuery 1.0 to 1.1
+\end_layout
+
+\begin_layout Standard
+Porting the JavaScript from 1.0 to 1.1 wasn't straight forward.
+ Some API functions from jQuery were removed to decrease complexity like
+ 
+\emph on
+$().title
+\emph default
+ replaced by the generic 
+\emph on
+$().attr("title")
+\emph default
+.
+ The 
+\emph on
+ $(element,context) 
+\emph default
+ was not working properly anymore.
+ The problem was solved using a different function: 
+\emph on
+$(context).find(element)
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+Using the latest version of jQuery is important for speed improvements and
+ simplify further updates: upcoming versions should not have more API changes.
+\end_layout
+
+\begin_layout Subsection
+Testing & Debugging
+\end_layout
+
+\begin_layout Standard
+GSN webapp was fully tested using the main browsers on the web: Internet
+ Explorer, Firefox & Opera.
+ There was not any formal testing routine or unit testing.
+ However, the core functionality were tested in the three browsers to ensure
+ that they were working similarly.
+\end_layout
+
+\begin_layout Standard
+After a month of implementation, the interface was quite advanced but never
+ tested with many sensors.
+ When we added more than 40 sensors, it became ridiculously slow.
+ It took more than 15 seconds to show them.
+ JavaScript is slow and using some nice syntax features of jQuery can be
+ very expensive, especially the $("") function ! By refactoring the code,
+ avoiding to use the most expensive functions and extensive testing, the
+ execution time was reduced to less than two seconds, thus an improvement
+ of a factor ten.
+ However, as the number of virtual sensors could be even much bigger, it
+ was decided to show only the first ten sensors on the front page to bound
+ the loading time.
+ Later, the speed was again improved by updating jQuery to the new 1.1 version.
+\end_layout
+
+\begin_layout Subsubsection
+Javascript debugging
+\end_layout
+
+\begin_layout Standard
+With ajax webapp, the amount of complex javascript code is significant,
+ thus it needs to be debugged and analyzed.
+ Hopefully, a relatively new extension for FireFox called FireBug
+\begin_inset LatexCommand \cite{firebug}
+
+\end_inset
+
+ helps a lot.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename ../BEFFA-2007/firebug.png
+	width 100text%
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+As shown above, it allows to easily output debugging messages with the 
+\emph on
+console.debug(...)
+\emph default
+ object.
+ Objects can be fully analysed and changed.
+ The html and css code could be modified on the fly.
+ This is very powerful and helps a lot.
+\end_layout
+
+\begin_layout Standard
+Nevertheless, when testing gsn compatibility with IE, this is a pain to
+ not have FireBug.
+ Moreover that IE usually have some weird and hard to catch JavaScript bug.
+\end_layout
+
+\begin_layout Subsection
+GPSVS sensor
+\end_layout
+
+\begin_layout Standard
+A GPS bluetooth sensor was received during the project development.
+ A small virtual sensor was created to test it.
+ Using the serial port wrapper, it was very fast and easy to do.
+ This experience also brought some relevant feedback to the team.
+ The sensor code was quickly put together using a serial port wrapper, as
+ bluetooth supports serial port emulation (BlueTooth Serial Port Profile).
+ GPS sensors actually have some specification for their output called NMEA
+\begin_inset LatexCommand \cite{nmea}
+
+\end_inset
+
+.
+ Only a subset of it was implemented, the GPRMC part to be precise.
+ This is some formatted text only output looking for example like 
+\emph on
+"$GPRMC,081836,A,3751.65,S,14507.36,E,000.0,360.0,130998,011.3,E*62"
+\emph default
+ which has to be converted to Google maps coordinates.
+\end_layout
+
+\begin_layout Standard
+The GPS sensor was developed using a GPSlim device but should be successfully
+ used by any device following the NMEA specification.
+ It was actually tested with a Nokia GPS device without any modification.
+ The only small problem was the linkage of the Nokia GPS device which requires
+ a passcode.
+ It can be found deep down in the documentation and is 0000 by default.
+\end_layout
+
+\begin_layout Chapter
 Writing a Protocol Description
 \end_layout
 
@@ -6049,7 +7485,7 @@ This is why GSN ships with the jnetstream packet decoding library.
 \begin_layout Standard
 It is also possible to build such packets using jnetstream.
  This feature is currently in development.
- This allows to communicate easily with the data source.
+ This allows to communicate with your data source.
 \end_layout
 
 \begin_layout Chapter
@@ -6063,230 +7499,13 @@ n between these two servers is made with the XML-RPC protocol.
 \end_layout
 
 \begin_layout Standard
-This means that it is possible to feed data to GSN from a custom software
+This means that you can actually feed data to GSN from your own custom software
  written in any language supporting XML-RPC.
  
 \end_layout
 
-\begin_layout Chapter*
-Appendix A
-\end_layout
-
-\begin_layout Section*
-Using Eclipse for developing with GSN
-\end_layout
-
-\begin_layout Standard
-Required software: Java Development Kit version 6, Eclipse 3.2 and Ant 1.6.5.
-\end_layout
-
-\begin_layout Standard
-After installing Eclipse, open the
-\family typewriter
- Help
-\family default
- menu and select 
-\family typewriter
-Software Updates
-\family default
-, then 
-\family typewriter
-Find and Install...
- 
-\family default
-Choose 
-\family typewriter
-New Features to install
-\family default
-, and click on 
-\family typewriter
-Next.
-
-\family default
- select 
-\family typewriter
-New Remote Site...
-\family default
-, insert 
-\begin_inset Quotes eld
-\end_inset
-
-Subclipse
-\begin_inset Quotes erd
-\end_inset
-
- in the Name field and http://subclipse.tigris.org/update_1.2.x in the URL field.
- Clicking on 
-\family typewriter
-Finish
-\family default
- and choose subversion as the feature to install.
- Do not select Mylar.
- After installing, restart Eclipse.
-\end_layout
-
-\begin_layout Standard
-Open the 
-\family typewriter
-SVN Repository Exploring 
-\family default
-and add a new repository location pointing to 
-\family typewriter
-https://svn.sourceforge.net/svnroot/gsn
-\family default
-.
- Explore the repository and select the 
-\family typewriter
-trunk
-\family default
- folder.
- Right-click and choose 
-\family typewriter
-checkout...
- 
-\family default
-Be sure to check it out as a project configured with the New Project Wizard.
- It is necessary to configure the 
-\family typewriter
-Build Path.
- 
-\family default
-Add all the jar files located in the lib directory.
- GSN also requires the JMF library to compile correctly.
- Due to licensing restriction, JMF must be downloaded separately from 
-\family typewriter
-http://java.sun.com/products/java-media/jmf/2.1.1/download.html 
-\family default
-sand installed into gsn/JMF-2.1.1e.
- Finally, add to the Build Path the file 
-\family typewriter
-gsn/JMF-2.1.12/lib/jmf.jar
-\family default
-.
- GSN should now compile successfully.
-\end_layout
-
-\begin_layout Standard
-As GSN uses the JIBX framework for reading the xml documents, it is not
- straightforward how to configure the Eclipse environment to run/debug code.
-\end_layout
-
-\begin_layout Standard
-Choose 
-\family typewriter
-Properties
-\family default
- in the 
-\family typewriter
-Project
-\family default
- menu.
- Select 
-\family typewriter
-Build
-\family default
- on the left side and click on new and select 
-\family typewriter
-Ant
-\family default
-.
- A new window pops up which has several tabs.
-\end_layout
-
-\begin_layout Itemize
-In the 
-\family typewriter
-Main
-\family default
- tab, use 
-\family typewriter
-Browse Workspace
-\family default
- to select the gsn 
-\family typewriter
-build.xml
-\family default
- file as the build file.
- Choose the project folder in which you checked out gsn as the 
-\family typewriter
-Base Directory
-\family default
- parameter.
- Keep checked the parameter 
-\family typewriter
-Set an Input Handler
-\family default
-.
- In the 
-\family typewriter
-Targets
-\family default
- tab, 
-\end_layout
-
-\begin_layout Itemize
-In 
-\family typewriter
-After a 
-\begin_inset Quotes erd
-\end_inset
-
-Clean
-\begin_inset Quotes erd
-\end_inset
-
-
-\family default
-, click on 
-\family typewriter
-Set Targets
-\family default
- and select both 
-\family typewriter
-Build
-\family default
- and 
-\family typewriter
-Bind
-\family default
-.
- Don't modify the Manual and Auto build options (leave these empty).
- 
-\end_layout
-
-\begin_layout Standard
-After going back to the 
-\family typewriter
-Builders
-\family default
- page, make sure that both 
-\family typewriter
-Java Builder
-\family default
- and 
-\family typewriter
-New Builder
-\family default
- (we suggest to name it 
-\family typewriter
-Ant Builder
-\family default
-) are selected.
- Click on OK.
-\end_layout
-
-\begin_layout Standard
-Now you can debug gsn code in eclipse, try it by setting a break point on
- a line in the main file.
-\end_layout
-
 \begin_layout Standard
 
-\emph on
-IMPORTANT
-\emph default
- : Sometimes, it is necessary to clean the project to run/debug GSN (Project
- menu, Clean...).
 \end_layout
 
 \begin_layout Standard
