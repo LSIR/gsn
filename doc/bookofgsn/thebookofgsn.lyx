@@ -1041,12 +1041,23 @@ Remote Wrapper
 \end_layout
 
 \begin_layout Standard
-This is a special wrapper that allows GSN to treat a remote virtual sensor
- (located on anthor machine in the network) as a data source for another
- virtual sensor.
+A virtual sensor can get data from another virtual sensor (Inter-GSN communicati
+on).
+ If this other virtual sensor is running on another GSN server, the communicatio
+n between these two servers is made with the XML-RPC protocol.
+ This means that you can actually feed data to GSN from your own custom
+ software written in any language supporting XML-RPC.
+ 
+\end_layout
+
+\begin_layout Standard
+The Remote Wrapper is a special wrapper that allows GSN to treat a remote
+ virtual sensor (located on anthor machine in the network) as a data source
+ for another virtual sensor.
  This data source can be configured on the same GSN server (in this case,
  we say that they are defined in the same container), or it can be run on
- another computer (hence the ip/port of this wrapper).
+ another computer (hence the ip and port parameters of this wrapper).
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1084,6 +1095,8 @@ is the port number on which this GSN instance is listening (the standard
 name
 \family default
  is the name of the virtual sensor to which we want to connect.
+ Note that this wrapper uses the very same XML-RPC style communication used
+ by GSN.
 \end_layout
 
 \begin_layout Standard
@@ -5964,133 +5977,370 @@ dataFromWeb
 The Web Interface
 \end_layout
 
-\begin_layout Section
-Introduction
-\end_layout
-
 \begin_layout Standard
 This is a presentation of the web interface bundled with GSN.
  It can be used as a starting point for creating another one.
 \end_layout
 
+\begin_layout Standard
+In GSN we separated the look and feel of the web interface from the underlying
+ processing components.
+ This design enables other users to provide their own web interface over
+ the GSN.
+ In this section we describe both the current server side protocol and the
+ currently available web interface which visualizes the data from the server.
+ While the server side component is fixed with GSN, the client side web
+ interface can be changed based on the users and applications.
+\end_layout
+
 \begin_layout Section
-Overview
+ServerSide protocol
 \end_layout
 
 \begin_layout Standard
-The project aimed at improving the first web interface on many aspects such
- as design (one of the main factor which drives user choice), responsiveness
- (using asynchronous techniques) and functionality (map integration for
- GPS enabled sensors).
+In GSN, all the request are first received by the the /gsn (gsn.web.ControllerServ
+let).
+ In GSN we provide several request handlers each of them implements the
+ gsn.web.RequestHandler interface.
+ Each request from the clients has a REQUEST parameter to specify the request
+ type, 
+\family typewriter
+http://server/gsn?REQUEST=
+\family default
+\shape italic
+type
+\shape default
+, where 
+\shape italic
+type
+\shape default
+ is an integer.
+ If there is no 
+\shape italic
+type
+\shape default
+ specified, ControllerServlet assumes type 0.
+ Here are the list of the parameters and the Contant representing them.
 \end_layout
 
-\begin_layout Section
-Design and architecture
+\begin_layout Itemize
+0, or not present: REQUEST_LIST_VIRTUAL_SENSORS.
+ 
+\end_layout
+
+\begin_layout Itemize
+113, REQUEST_OUTPUT_FORMAT.
+\end_layout
+
+\begin_layout Itemize
+114, REQUEST_ONE_SHOT_QUERY.
+\end_layout
+
+\begin_layout Itemize
+115, REQUEST_ADDRESSING.
+\end_layout
+
+\begin_layout Itemize
+116, REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING.
+\end_layout
+
+\begin_layout Standard
+The RequestHandler interface two methods:
+\end_layout
+
+\begin_layout Itemize
+isValid (HttpServletRequest, HttpServletResponse) verifying the validity
+ of the request (presence and validity of the parameters) or responding
+ by and error message if not.
+ 
+\end_layout
+
+\begin_layout Itemize
+handle (HttpServletRequest, HttpServletResponse) which treat the request
+ and send the response in XML format 
 \end_layout
 
 \begin_layout Subsection
-Client side
+REQUEST_LIST_VIRTUAL_SENSORS (Default, Zero)
 \end_layout
 
 \begin_layout Standard
-One of the core problems faced when using AJAX
-\begin_inset LatexCommand \cite{ajax}
-
-\end_inset
-
- technology is the poor browser support and incompatibilities between different
- vendors.
- Even by focusing only on the biggest ones (IE, Firefox & Opera) which aggregate
- 99% of the user base, there are still many compatibility issues.
- In order to avoid dealing will these issues and be forced to develop tweaks
- for every browser, a good solution is to use a Javascript library which
- will be used as a middleware between our code and the browser.
- Such a Javascript library will allow us to easily access the DOM, to make
- AJAX requests or even have some fancy visual effects (fade out,...).
- However, this induces a new problem: Which Javascript library to choose?
- There are plenty of Javascript libraries on the Internet.
- Almost all of them are open source, so licensing is not an issue.
- This is a brief overview of the most famous ones:
+Has the following informations: 
 \end_layout
 
 \begin_layout Itemize
-JQuery
-\begin_inset LatexCommand \cite{jquery}
+GSN information from the 
+\family typewriter
+gsn.xml 
+\family default
+file (name, author, email, description) .
+\end_layout
 
-\end_inset
+\begin_layout Itemize
+For each valid virtual sensor
+\end_layout
 
-: A small library with powerful functionalities.
- Very active development and gaining popularity.
+\begin_deeper
+\begin_layout Itemize
+Virtual Sensor name, description and the timestamp of the most recently
+ produced stream element.
  
 \end_layout
 
 \begin_layout Itemize
-Prototype
-\begin_inset LatexCommand \cite{prototype}
-
+The list of the addressing predicates (category=
+\begin_inset Quotes erd
 \end_inset
 
-: Probably the most famous one due to RubyOnRails fame.
- Support everything we can expect but is a bit bloated.
- 
+predicate
+\begin_inset Quotes erd
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-mootools
-\begin_inset LatexCommand \cite{mootools}
-
-\end_inset
-
-: An ultra compact Javascript framework.
- Not so much user base.
- 
+The list of the output fields,their types and their most recent value.
+ The value of the field is only included in the output if it can be easily
+ converted to String format.
+ If the type of a field is binary (e.g., a JPEG image), as the value, the
+ controller returns a URL pointing to the /field(gsn.web.FieldDownloadServlet)
+ to retrive the actual binary data.
 \end_layout
 
-\begin_layout Itemize
-Yahoo! User Interface (YUI)
-\begin_inset LatexCommand \cite{yui}
+\end_deeper
+\begin_layout Standard
 
-\end_inset
-
-: A proven library not so much used outside of Yahoo.
- 
 \end_layout
 
 \begin_layout Standard
-Considering those different libraries, JQuery was chosen as it has enough
- functionality for this project but remains quite small (15kb).
- Moreover, JQuery has a nice and powerful syntax which makes code easy both
- to write and to read afterwards.
+Example: 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<gsn name="Container" author="EPFL" email="ali.salehi@epfl.ch" description="Not
+ Provided">
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<virtual-sensor name="invmaccess" last-modified="1173280806000" description="MyV
+S">
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<field name="image" type="binary:image/jpeg">/field?vs=invmaccess&field=DATA&pk=
+2868</field>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<field name="timed" type="long" description="The timestamp associated with
+ the stream element">1174999988339</field>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<field name="geographical" category="predicate">BC 143, EPFL, Lausanne </field>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+</virtual-sensor>
+\end_layout
+
+\begin_layout Standard
+</gsn>
 \end_layout
 
 \begin_layout Subsection
-Server side
+REQUEST_OUTPUT_FORMAT (113)
 \end_layout
 
 \begin_layout Standard
-AJAX techniques require data exchange between the client and the server.
- Although the X in AJAX means XML, there are other ways to exchange data.
- One of the most popular is JSON (JavaScript Object Notation), which sends
- directly Javascript objects.
- Although this is more efficient for the Javascript code on the client side,
- XML was preferred as it is more modular and allow to do at the same time
- a webAPI to access GSN sensors.
- It was designed to be close to the REST api entirely in XML to make it
- simpler to use.
+Provides the output structure of a given virtual sensors.
+ The only parameter needed is name of the virtual sensor the user want the
+ description of (e.g., 
+\family typewriter
+http://server/get?REQUEST=113
+\backslash
+&name=
+\family default
+\shape italic
+VirtualSensorName
+\end_layout
+
+\begin_layout Subsection
+REQUEST_ONE_SHOT_QUERY (114)
 \end_layout
 
 \begin_layout Standard
-As early as the first week, the basic XML api was built in jsp in order
- to start the javascript interaction.
- It was used for a while then replaced by a servlet at location 
-\emph on
-/gsn
-\emph default
- to avoid using any jsp at all.
+This request is handled by the class gsn.vsensor.http.OneShotQueryHandler.
+ This servlet executes a one shot query over the GSN's internal table and
+ presents the results in the form of the stream elements.
+ This request needs the following parameters:
+\end_layout
+
+\begin_layout Itemize
+name, the name of the virtual sensor [mandatory]
+\end_layout
+
+\begin_layout Itemize
+condition: the WHERE part of the request (ex: LATITUDE > 100 AND light <
+ 10) [optional]
+\end_layout
+
+\begin_layout Itemize
+fields: an array of the requested fields in the stream elements.
+ If not present, * is used [optional]
+\end_layout
+
+\begin_layout Itemize
+window: the number last elements wanted (1 if not present) [optional] 
+\end_layout
+
+\begin_layout Standard
+Example, accessing the 
+\family typewriter
+http://localhost:22001/gsn?REQUEST=114&name=invmaccess
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<result> 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<stream-element> 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<field name="DATA">/field?vs=invmaccess&field=DATA&pk=5130</field>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<field name="timed">1175001199874</field> </stream-element> 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+</result>
+\end_layout
+
+\begin_layout Subsection
+REQUEST_ADDRESSING (115)
+\end_layout
+
+\begin_layout Standard
+Given the name of the virtual sensor, it provides the addressing predicates
+ associated with the virtual sensor.
+ It is very similar to 
+\family typewriter
+REQUEST_OUTPUT_FORMAT.
+\end_layout
+
+\begin_layout Standard
+Example, accessing the 
+\family typewriter
+http://localhost:22001/gsn?REQUEST=115&name=invmaccess
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<virtual-sensor name="invmaccess" last-modified="1173280806000">
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<predicate key="geographical">BC 143, EPFL, Lausanne</predicate> </virtual-senso
+r>
+\end_layout
+
+\begin_layout Subsection
+REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING (116)
+\end_layout
+
+\begin_layout Standard
+This request is actually the combination of the REQUEST_ONE_SHOT_QUERY and
+ REQUEST_ADDRESSING in one request.
+ The parameters
+\end_layout
+
+\begin_layout Standard
+are the union of the specified types.
+ Example: 
+\family typewriter
+http://localhost:22001/gsn?REQUEST=116&name=invmaccess
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<result>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<stream-element>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<field name="DATA">/field?vs=invmaccess&field=DATA&pk=15102</field>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<field name="timed">1175006917711</field>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+<field name="geographical">BC 143, EPFL, Lausanne</field>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+</stream-element>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+</result>
+\end_layout
+
+\begin_layout Standard
+You might ask why we need this request if we can get the same result by
+ combining the 115 and 114 ? The answer is the performance, establishing
+ the TCP connections are expensive.
 \end_layout
 
 \begin_layout Section
-Implementation
+Client Side JavaScript
 \end_layout
 
 \begin_layout Subsection
@@ -7316,39 +7566,6 @@ code
  Nevertheless the code is not shown to the user in the current interface.
 \end_layout
 
-\begin_layout Subsubsection
-Porting from jQuery 1.0 to 1.1
-\end_layout
-
-\begin_layout Standard
-Porting the JavaScript from 1.0 to 1.1 wasn't straight forward.
- Some API functions from jQuery were removed to decrease complexity like
- 
-\emph on
-$().title
-\emph default
- replaced by the generic 
-\emph on
-$().attr("title")
-\emph default
-.
- The 
-\emph on
- $(element,context) 
-\emph default
- was not working properly anymore.
- The problem was solved using a different function: 
-\emph on
-$(context).find(element)
-\emph default
-.
-\end_layout
-
-\begin_layout Standard
-Using the latest version of jQuery is important for speed improvements and
- simplify further updates: upcoming versions should not have more API changes.
-\end_layout
-
 \begin_layout Subsection
 Testing & Debugging
 \end_layout
@@ -7486,22 +7703,6 @@ This is why GSN ships with the jnetstream packet decoding library.
 It is also possible to build such packets using jnetstream.
  This feature is currently in development.
  This allows to communicate with your data source.
-\end_layout
-
-\begin_layout Chapter
-Inter-GSN communications
-\end_layout
-
-\begin_layout Standard
-A virtual sensor can get data from another virtual sensor.
- If this other virtual sensor is running on another GSN server, the communicatio
-n between these two servers is made with the XML-RPC protocol.
-\end_layout
-
-\begin_layout Standard
-This means that you can actually feed data to GSN from your own custom software
- written in any language supporting XML-RPC.
- 
 \end_layout
 
 \begin_layout Standard
