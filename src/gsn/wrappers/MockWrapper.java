@@ -1,12 +1,13 @@
 package gsn.wrappers;
 
 import gsn.beans.DataField;
+import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
 public class MockWrapper extends AbstractWrapper {
 	int threadCounter;
 	
-	private DataField[] outputFormat =new DataField[] {};
+	private DataField[] outputFormat =new DataField[] {new DataField("data","int")};
 
 	public boolean initialize() {
 		setName("TestWrapperMockObject-Thread" + (++threadCounter));
@@ -33,8 +34,6 @@ public class MockWrapper extends AbstractWrapper {
 		return "TestWrapperMock";
 	}
 
-	public void setOutputFormat(DataField[] outputFormat) {
-		this.outputFormat = outputFormat;
-	}
+
 	
 }

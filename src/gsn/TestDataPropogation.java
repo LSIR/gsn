@@ -29,7 +29,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestDataPropogation {
-	private final DataField[] df = new DataField[] {new DataField("data","int","some sample data.")};
 	
 	/**
 	 * @throws java.lang.Exception
@@ -64,7 +63,6 @@ public class TestDataPropogation {
 		VSensorLoader loader = new VSensorLoader();
 		AddressBean addressBean= new AddressBean("mock-test");
 		wrapper = (MockWrapper) loader.findWrapper(addressBean);
-		wrapper.setOutputFormat(df);
 		InputStream is = new InputStream();
 		streamSource= createMock(StreamSource.class, new Method[] {StreamSource.class.getMethod("dataAvailable",new Class[] {})});
 		streamSource.setAlias("test");
@@ -108,7 +106,7 @@ public class TestDataPropogation {
 	 */
 	@Test
 	public void testPostOneStreamElement() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException, SQLException {
-		StreamElement se = new StreamElement(df,new Serializable[] {10},System.currentTimeMillis());
+		StreamElement se = new StreamElement(streamSource.getWrapper().getOutputFormat(),new Serializable[] {10},System.currentTimeMillis());
 		expect(streamSource.dataAvailable()).andStubReturn(true);
 		replay(streamSource);
 		assertTrue(streamSource.validate());
@@ -133,8 +131,8 @@ public class TestDataPropogation {
 	 */
 	@Test
 	public void testPostTwoStreamElements() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException, SQLException {
-		StreamElement se1 = new StreamElement(df,new Serializable[] {9},System.currentTimeMillis());
-		StreamElement se2 = new StreamElement(df,new Serializable[] {10},System.currentTimeMillis()+10);
+		StreamElement se1 = new StreamElement(streamSource.getWrapper().getOutputFormat(),new Serializable[] {9},System.currentTimeMillis());
+		StreamElement se2 = new StreamElement(streamSource.getWrapper().getOutputFormat(),new Serializable[] {10},System.currentTimeMillis()+10);
 		expect(streamSource.dataAvailable()).andReturn(true).times(2);
 		replay(streamSource);
 		assertTrue(streamSource.validate());
@@ -157,6 +155,7 @@ public class TestDataPropogation {
 	 */
 	@Test
 	public void testPostTwoStreamElementsDropOne() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException, SQLException {
+		DataField[] df= streamSource.getWrapper().getOutputFormat();
 		StreamElement se1 = new StreamElement(df,new Serializable[] {9},System.currentTimeMillis());
 		StreamElement se2 = new StreamElement(df,new Serializable[] {10},System.currentTimeMillis()+10);
 		StreamElement se3 = new StreamElement(df,new Serializable[] {1},System.currentTimeMillis()+11);
