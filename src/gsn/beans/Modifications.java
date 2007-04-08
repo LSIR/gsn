@@ -53,7 +53,7 @@ public final class Modifications {
       addVirtualSensorConf.clear( );
       ArrayList<VSensorConfig> toAdd = new ArrayList<VSensorConfig>();
       loadVirtualSensors( add , toAdd );
-      fillGraph(toAdd.iterator());
+      fillGraph(graph, toAdd.iterator());
 
       List<VSensorConfig> nodesByDFSSearch = graph.getNodesByDFSSearch();
       for (VSensorConfig config : nodesByDFSSearch) {
@@ -173,10 +173,10 @@ private Collection < VSensorConfig > getModifications ( ) {
    private void buildDependencyGraph ( ) {
 	   graph = new Graph<VSensorConfig>();
 	   Iterator<VSensorConfig> allVSensorConfigs = Mappings.getAllVSensorConfigs();
-	   fillGraph(allVSensorConfigs);
+	   fillGraph(graph, allVSensorConfigs);
    }
 
-   private void fillGraph(Iterator<VSensorConfig> allVSensorConfigs) {
+   private static void fillGraph(Graph<VSensorConfig> graph, Iterator<VSensorConfig> allVSensorConfigs) {
 	   HashMap<String, VSensorConfig> vsNameTOVSConfig = new HashMap<String, VSensorConfig>();
 	   while(allVSensorConfigs.hasNext()){
 		   VSensorConfig config = allVSensorConfigs.next();
@@ -228,6 +228,12 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 			   }
 		   }
 	   }
+   }
+   
+   public static Graph<VSensorConfig> buildDependencyGraphFromIterator(Iterator<VSensorConfig> vsensorIterator){
+	   Graph<VSensorConfig> graph = new Graph<VSensorConfig>();
+	   fillGraph(graph, vsensorIterator);
+	   return graph;
    }
    
 }

@@ -1,6 +1,8 @@
 package gsn.utils.graph;
 
-public class Edge<T> {
+import java.io.Serializable;
+
+public class Edge<T> implements Serializable{
 	private Node<T> startNode;
 
 	private Node<T> endNode;

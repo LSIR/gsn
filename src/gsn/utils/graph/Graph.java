@@ -1,9 +1,10 @@
 package gsn.utils.graph;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Graph<T> {
+public class Graph<T> implements Serializable{
 	private ArrayList<Node<T>> nodes;
 
 	private ArrayList<Node<T>> rootNodes;

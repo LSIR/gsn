@@ -1,5 +1,7 @@
 package gsn.beans;
 
+import java.io.Serializable;
+
 import org.apache.commons.collections.KeyValue;
 
 /**
@@ -7,7 +9,7 @@ import org.apache.commons.collections.KeyValue;
  * Date: Aug 4, 2005 <br>
  * Time: 10:46:16 PM <br>
  */
-public final class AddressBean {
+public final class AddressBean implements Serializable{
   
   private static final   KeyValue[] EMPTY_PREDICATES = new  KeyValue[0];
   

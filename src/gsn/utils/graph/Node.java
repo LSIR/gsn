@@ -1,8 +1,9 @@
 package gsn.utils.graph;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Node<T> {
+public class Node<T> implements Serializable{
 	private ArrayList<Edge<T>> inputEdges;
 
 	private ArrayList<Edge<T>> outputEdges;

@@ -1,5 +1,6 @@
 package gsn.utils;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Comparator;
  * and value pairs hence you don't need to call trim when putting or getting a
  * value to/from the hashmap.
  */
-public class CaseInsensitiveComparator implements Comparator {
+public class CaseInsensitiveComparator implements Comparator,Serializable {
    
    public int compare ( Object o1 , Object o2 ) {
       if ( o1 == null && o2 == null ) return 0;

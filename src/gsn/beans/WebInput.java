@@ -4,8 +4,10 @@
  */
 package gsn.beans;
 
+import java.io.Serializable;
 
-public class WebInput {
+
+public class WebInput implements Serializable{
    private String name;
    private DataField[] parameters;
    
