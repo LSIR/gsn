@@ -52,18 +52,18 @@ public class GSNController extends Thread {
 				if (logger.isDebugEnabled())
 					logger.debug("Opened connection on control socket.");
 				socket.setSoTimeout(GSN_CONTROL_READ_TIMEOUT);
-				
-				//Only connections from localhost are allowed
-				if(socket.getInetAddress().isLoopbackAddress() == false){
-					try{
-						logger.warn("Connection request from IP address >" + socket.getInetAddress().getHostAddress() +"< was denied.");
+
+				// Only connections from localhost are allowed
+				if (socket.getInetAddress().isLoopbackAddress() == false) {
+					try {
+						logger.warn("Connection request from IP address >" + socket.getInetAddress().getHostAddress() + "< was denied.");
 						socket.close();
-					}catch(IOException ioe){
-						//do nothing
+					} catch (IOException ioe) {
+						// do nothing
 					}
 					continue;
 				}
-					
+
 				new ConnectionManager(socket).start();
 			} catch (SocketTimeoutException e) {
 				if (logger.isDebugEnabled())
@@ -118,8 +118,7 @@ public class GSNController extends Thread {
 					} else if (GSN_CONTROL_LIST_LOADED_VSENSORS.equalsIgnoreCase(message)) {
 						Graph<VSensorConfig> dependencyGraph = Modifications.buildDependencyGraphFromIterator(Mappings
 								.getAllVSensorConfigs());
-						if(objos == null)
-							objos = new ObjectOutputStream(incoming.getOutputStream());
+						objos = new ObjectOutputStream(incoming.getOutputStream());
 						objos.writeObject(dependencyGraph);
 						objos.flush();
 					}
