@@ -359,7 +359,7 @@ public  class StreamSource implements Serializable{
       throw new GSNRuntimeException("Validation of this object the stream source failed, please check the logs.");
     CharSequence wrapperAlias = getWrapper().getDBAliasInStr();
     if (samplingRate==0 || (isStorageCountBased && getParsedStorageSize()==0))
-      return cachedSqlQuery = new StringBuilder("select * from ").append(wrapperAlias).append(" where FALSE");
+      return cachedSqlQuery = new StringBuilder("select * from ").append(wrapperAlias).append(" where 1=0");
     TreeMap < CharSequence , CharSequence > rewritingMapping = new TreeMap < CharSequence , CharSequence >(new CaseInsensitiveComparator() );
     rewritingMapping.put("wrapper", wrapperAlias);
     StringBuilder toReturn = new StringBuilder(getSqlQuery());
@@ -368,23 +368,30 @@ public  class StreamSource implements Serializable{
     else
       toReturn.append(" and " );
 //  Applying the ** START  AND END TIME ** for all types of windows based windows
-//  toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
+ toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
     
     if (isStorageCountBased()) {
-      toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset " );
-      toReturn.append(getParsedStorageSize()-1).append( " )" );
-    }else {
+  		if (StorageManager.isHsql()||StorageManager.isMysqlDB())
+  			toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset " ).append(getParsedStorageSize()-1).append( " )" );
+  		else if (StorageManager.isSqlServer())
+  			toReturn.append("timed >= (select min(timed) from (select TOP ").append(getParsedStorageSize()).append(" timed from (select distinct(timed) from ").append(wrapperAlias).append(") as x  order by timed desc ) as y )" );
+    }else { //time based
       toReturn.append("(wrapper.timed >");
       if ( StorageManager.isHsql( ) ) 
         toReturn.append( " (NOW_MILLIS()");
       else if ( StorageManager.isMysqlDB( ) ) 
         toReturn.append(" (UNIX_TIMESTAMP()*1000");
+      else if (StorageManager.isSqlServer()) {
+    	  // NOTE1 : The value retuend is in seconds (hence 1000)
+    	  // NOTE2 : There is no time in the date for the epoch, maybe doesn't match with the current system time, needs checking.
+    	  toReturn.append(" (convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 )");
+      }
       toReturn.append(" - ").append(getParsedStorageSize()).append(" ) ) ");
     }
     if ( samplingRate !=1  )
       toReturn.append( " and ( mod( timed , 100)< " ).append( samplingRate*100 ).append( ")" );
     toReturn = new StringBuilder(SQLUtils.newRewrite(toReturn, rewritingMapping));
-    toReturn.append(" order by timed desc ");
+   // toReturn.append(" order by timed desc ");
     if ( logger.isDebugEnabled( ) ) {
       logger.debug( new StringBuilder( ).append( "The original Query : " ).append( getSqlQuery( ) ).toString( ) );
       logger.debug( new StringBuilder( ).append( "The merged query : " ).append( toReturn.toString( ) ).append( " of the StreamSource " ).append( getAlias( ) ).append(

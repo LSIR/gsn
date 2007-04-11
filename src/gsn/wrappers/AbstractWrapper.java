@@ -224,13 +224,19 @@ public abstract class AbstractWrapper extends Thread {
 				sb.append("NOW_MILLIS() - ");
 			else if (StorageManager.isMysqlDB())
 				sb.append("UNIX_TIMESTAMP()*1000 - ");
+			else if (StorageManager.isSqlServer())
+				sb.append("(convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 ) - ");
 			sb.append(maxTimeSizeInMSec).append(" )");
 		}
 		if (maxCountSize>0 && maxTimeSizeInMSec>0)
 			sb.append(" AND ");
 		if (maxCountSize>0 ) {
-			sb.append(" timed < (select * from (select timed from ").append(getDBAliasInStr());
+			if (StorageManager.isHsql()|| StorageManager.isMysqlDB()) {
+			sb.append(" timed < (select min(timed) from (select timed from ").append(getDBAliasInStr());
 			sb.append(" order by timed desc limit 1 offset ").append(maxCountSize).append(" ) as X )");
+			}else if (StorageManager.isSqlServer()) {
+				sb.append(" timed < (select min(timed) from (select top " ).append(maxCountSize).append(" * ").append(" from ").append(getDBAliasInStr()).append(")as x ) ");
+			}
 		}
 		return sb;
 	}

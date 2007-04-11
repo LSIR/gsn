@@ -100,7 +100,7 @@ public class DataTypes {
          if ( DataTypes.ALL_PATTERNS[ i ].matcher( type ).matches( ) ) return i;
       throw new GSNRuntimeException( new StringBuilder( "The type *" ).append( type ).append( "* is not recognized." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
    }
-   
+   // TODO: THIS METHOD NEEDS REWRITE FOR SQL SERVER
    public static Byte convertFromJDBCToGSNFormat ( final int colTypeInJDBCFormat ) {
       switch ( colTypeInJDBCFormat ) {
          case Types.BIGINT :

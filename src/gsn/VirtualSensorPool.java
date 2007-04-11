@@ -148,6 +148,12 @@ public class VirtualSensorPool {
 			else
 				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (UNIX_TIMESTAMP()*1000 -" ).append(
 						config.getParsedStorageSize( ) ).append( ")" );
+		}else if (StorageManager.isSqlServer()) {
+			if ( config.isStorageCountBased( ) )
+				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (select min(timed) from (select top " ).append(config.getParsedStorageSize()).append(" * ").append(" from ").append(virtualSensorName).append(")as x ) ");
+			else
+				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed <  (convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 -" ).append(
+						config.getParsedStorageSize( ) ).append( ")" );
 		}
 		if ( logger.isDebugEnabled( ) ) this.logger.debug( new StringBuilder( ).append( "Enforcing the limit size on the VS table by : " ).append( query ).toString( ) );
 		return query;

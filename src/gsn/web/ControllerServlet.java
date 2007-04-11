@@ -17,13 +17,10 @@ import org.apache.log4j.Logger;
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * Creation time : Dec 5, 2006@5:46:41 PM<br>
- * @web.servlet name="gsn" load-on-startup="1"
- * @web.servlet-mapping url-pattern="/gsn"
  */
 public class ControllerServlet extends HttpServlet {
    
    private static transient Logger                                      logger                             = Logger.getLogger ( ControllerServlet.class );
-   
    
    /**
     * HTTP RETURN CODES :
@@ -79,16 +76,16 @@ public class ControllerServlet extends HttpServlet {
       if ( logger.isDebugEnabled ( ) ) logger.debug ( "Received a request with code : " + requestType );
       
       switch ( requestType ) {
-         case REQUEST_ONE_SHOT_QUERY :
+      case 0 :
+          handler = new ContainerInfoHandler ( );
+          if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
+          break;   
+      case REQUEST_ONE_SHOT_QUERY :
             handler = new OneShotQueryHandler ( );
             if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
             break;
          case REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING :
             handler = new OneShotQueryWithAddressingHandler ( );
-            if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
-            break;
-         case 0 :
-            handler = new ContainerInfoHandler ( );
             if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
             break;
          case REQUEST_OUTPUT_FORMAT :

@@ -113,7 +113,7 @@ public class RemoteWrapper extends AbstractWrapper {
 		int notificationCode = getDBAlias ( );
 //		String query = new StringBuffer ( "SELECT * FROM " ).append ( remoteVSName ).append ( " WHERE " ).append ( getWhereClausesAllTogher ( ) ).append ( " ORDER BY " ).append ( remoteVSName ).append (
 //		".TIMED DESC LIMIT 1 OFFSET 0" ).toString ( );
-		String query = new StringBuilder("select * from ").append(remoteVSName).append(" order by timed desc limit 1 offset 0").toString();
+		String query = new StringBuilder("select * from ").append(remoteVSName).toString();
 		Object [ ] params = new Object [ ] {Main.getContainerConfig ().getContainerPort (),remoteVSName,query.toString( ), notificationCode};
 		if ( logger.isDebugEnabled ( ) )
 			logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( host ).append (port).append ("/").append (remoteVSName).append ( " with the query ->" ).append ( query ).append ( "<-" ).toString ( ) );

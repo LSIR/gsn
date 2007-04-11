@@ -6,24 +6,13 @@ import gsn.notifications.NotificationRequest;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import gsn.vsensor.AbstractVirtualSensor;
-import gsn.vsensor.http.AddressingReqHandler;
-import gsn.vsensor.http.ContainerInfoHandler;
-import gsn.vsensor.http.OneShotQueryHandler;
-import gsn.vsensor.http.OneShotQueryWithAddressingHandler;
-import gsn.vsensor.http.OutputStructureHandler;
-import gsn.vsensor.http.RequestHandler;
 import gsn.wrappers.RemoteWrapper;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 /**
@@ -31,7 +20,7 @@ import org.apache.log4j.Logger;
  * @web.servlet name="gsn" load-on-startup="1"
  * @web.servlet-mapping url-pattern="/gsn"
  */
-public class ContainerImpl extends HttpServlet implements Container {
+public class ContainerImpl implements Container {
    
    private static transient Logger                                      logger                             = Logger.getLogger( ContainerImpl.class );
    
@@ -101,57 +90,6 @@ public class ContainerImpl extends HttpServlet implements Container {
          }
       }
       
-   }
-   
-   public void doGet ( HttpServletRequest request , HttpServletResponse response ) throws ServletException , IOException {
-      response.setContentType( "text/xml" );
-      // to be sure it isn't cached
-      response.setHeader( "Expires" , "Sat, 6 May 1995 12:00:00 GMT" );
-      response.setHeader( "Cache-Control" , "no-store, no-cache, must-revalidate" );
-      response.addHeader( "Cache-Control" , "post-check=0, pre-check=0" );
-      response.setHeader( "Pragma" , "no-cache" );
-      
-      String rawRequest = request.getParameter( Container.REQUEST );
-      int requestType = -1;
-      if ( rawRequest == null || rawRequest.trim( ).length( ) == 0 ) {
-         requestType = Container.REQUEST_LIST_VIRTUAL_SENSORS;
-      } else
-         try {
-            requestType = Integer.parseInt( ( String ) rawRequest );
-         } catch ( Exception e ) {
-            logger.debug( e.getMessage( ) , e );
-            requestType = -1;
-         }
-      StringBuilder sb = new StringBuilder( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" );
-      response.getWriter( ).write( sb.toString( ) );
-      RequestHandler handler;
-      if ( logger.isDebugEnabled( ) ) logger.debug( "Received a request with code : " + requestType );
-      
-      switch ( requestType ) {
-         case Container.REQUEST_ONE_SHOT_QUERY :
-            handler = new OneShotQueryHandler( );
-            if ( handler.isValid( request , response ) ) handler.handle( request , response );
-            break;
-         case Container.REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING :
-            handler = new OneShotQueryWithAddressingHandler( );
-            if ( handler.isValid( request , response ) ) handler.handle( request , response );
-            break;
-         case Container.REQUEST_LIST_VIRTUAL_SENSORS :
-            handler = new ContainerInfoHandler( );
-            if ( handler.isValid( request , response ) ) handler.handle( request , response );
-            break;
-         case Container.REQUEST_OUTPUT_FORMAT :
-            handler = new OutputStructureHandler( );
-            if ( handler.isValid( request , response ) ) handler.handle( request , response );
-            break;
-         case Container.REQUEST_ADDRESSING :
-            handler = new AddressingReqHandler( );
-            if ( handler.isValid( request , response ) ) handler.handle( request , response );
-            break;
-         default :
-            response.sendError( Container.UNSUPPORTED_REQUEST_ERROR , "The requested operation is not supported." );
-            break;
-      }
    }
    
    public synchronized void addNotificationRequest ( String localVirtualSensorName , NotificationRequest notificationRequest ) {

@@ -47,8 +47,13 @@ public class ContainerInfoHandler implements RequestHandler {
          if (sensorConfig.getDescription() != null) {
             sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
          }
-         sb.append( ">\n" );         
-         StringBuilder query = new StringBuilder( "select * from " + sensorConfig.getName( ) + " order by timed DESC limit 1 offset 0" );
+         sb.append( ">\n" );
+         StringBuilder query=null;
+         if (StorageManager.isHsql()||StorageManager.isMysqlDB())
+          query= new StringBuilder( "select * from " + sensorConfig.getName( ) + " order by timed DESC limit 1 offset 0" );
+         else if (StorageManager.isSqlServer())
+             query= new StringBuilder( "select top 1 * from " + sensorConfig.getName( ) + " order by timed DESC" );
+         
          DataEnumerator result;
 		try {
 			result = StorageManager.getInstance( ).executeQuery( query , true );
