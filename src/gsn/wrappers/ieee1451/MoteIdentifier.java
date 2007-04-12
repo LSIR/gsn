@@ -1,6 +1,5 @@
 package gsn.wrappers.ieee1451;
 
-import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
@@ -14,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import net.tinyos1x.message.Message;
 import net.tinyos1x.message.MessageListener;
 import net.tinyos1x.message.MoteIF;
@@ -32,12 +30,12 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
    private LazyTimedHashMap         lazyActiveMicas;
    
    /**
-    * The RATE in Milliseconds.
+    * The pooling interval in Milliseconds. How often pool for the TEDS. Used by motes and cameras.
     */
-   private int                      RATE                = 7 * 1000;
+   private int                      pooling_interval                ;
    
    /**
-    * The TimeOut in milliseconds.
+    * The TimeOut in milliseconds. When to remove the TEDS. Used by motes and cameras.
     */
    private int                      TIMEOUT             = 30 * 1000;
    
@@ -82,18 +80,22 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       micaTEDS.add( 0 , "MicaONE.xml" );
       micaTEDS.add( 1 , "MicaTWO.xml" );
       micaTEDS.add( 2 , "MicaTHREE.xml" );
-      micaTEDS.add( 3 , "MicaFOUR.xml" );
       
       AddressBean addressBean = getActiveAddressBean( );
       if ( addressBean.getPredicateValue( "TIMEOUT" ) != null ) {
          TIMEOUT = Integer.parseInt( ( String ) addressBean.getPredicateValue( "TIMEOUT" ) );
       }
-      if ( addressBean.getPredicateValue( "RATE" ) != null ) {
-         RATE = Integer.parseInt( ( String ) addressBean.getPredicateValue( "RATE" ) );
-      }
-      if ( addressBean.getPredicateValue( "templates-directory" ) == null )
-         logger.warn( "The MoteIdentifier couldn't initialize. The >templates-directory< parameter is missing from the set of the wrapper configuration parameters." );
+      /*
+       * pooling interval is five times less than the timeout value. 
+       */
+      pooling_interval = TIMEOUT/5;
+      host =addressBean.getPredicateValue( "host" ); 
+      if (host  == null ){
+         logger.warn( "The MoteIdentifier couldn't initialize. The >host< parameter is missing from the set of the wrapper configuration parameters." );
+         return false;
+      }  
       
+      port = addressBean.getPredicateValueAsInt("port", 9001);
       // ------INITIALIZING THE TEMPLATE DIRECTORY ---------
       String templateDirPath = addressBean.getPredicateValue( "templates-directory" );
       if ( templateDirPath == null ) {
@@ -125,7 +127,7 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       // Serial Forwarder Related
       if ( logger.isDebugEnabled( ) ) logger.debug( "The MoteIdentifier connects to the Serial Forwarder interface at *" + host + ":" + port + "*" );
       setName( "MoteIdentifier-Thread" + ( ++threadCounter ) );
-      
+      logger.info("Initializing the serial forwarder connection to:  "+host+":"+port);
       mote = new MoteIF( host , port );
       mote.registerListener( new TedsMessage( ) , this );
       outputStructure = new DataField [ ] { new DataField( ID_OUTPUT_FIELD , "varchar(20)" , "Id of the detected transducer" ) , new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) ,
@@ -211,7 +213,7 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       mote.start( );
       while ( isActive( ) ) {
          try {
-            Thread.sleep( RATE );
+            Thread.sleep( pooling_interval );
          } catch ( InterruptedException e ) {
             logger.error( e.getMessage( ) , e );
          }

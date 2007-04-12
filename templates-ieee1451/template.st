@@ -1,34 +1,31 @@
 <virtual-sensor name="$CH0:{c|$c.name$}$" priority="11">
    <processing-class>
       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+      <output-structure>
+      $FIELD:{f| <field name="$f.name$"     type="$f.type$"/>}; separator="\n"$
+   </output-structure>
    </processing-class>
-   <author>Ali Salehi</author>
-   <email>ali.salehi-at-epfl.ch</email>
    <description>$CH0:{c|$c.description$}$</description>
    <life-cycle pool-size="10"/>
    <addressing>
       <predicate key="geographical">$CH0:{c|$c.location$}$</predicate>
    </addressing>
-   <output-structure>
-
-      $FIELD:{f| <field name="$f.name$"     type="$f.type$"/>}; separator="\n"$
-
-   </output-structure>
+   
    <storage permanent-storage="true" history-size="15m" />
-   <input-streams>
-      <input-stream name="data" rate="100">
-         <stream-source alias="wsn" sampling-rate="1" storage-size="1"
+   <streams>
+      <stream name="data" rate="100">
+         <source alias="wsn" sampling-rate="1" storage-size="1"
                         disconnect-buffer-size="10">
             <address wrapper="tinynode">
-               <predicate key="HOST">192.168.51.12</predicate>
+               <predicate key="HOST">localhost</predicate>
                <predicate key="PORT">9001</predicate>
 
 	       $FIELD:{f| <predicate key="field.$f.key$">$f.name$ | $f.type$ | $f.description$ | get_gsnHeader_$f.name$</predicate>}; separator="\n"$
 
             </address>
-            <query>select * from "WRAPPER"</query>
-         </stream-source>
-         <query>select * from "wsn"</query>
-      </input-stream>
-   </input-streams>
+            <query>select * from WRAPPER</query>
+         </source>
+         <query>select * from wsn</query>
+      </stream>
+   </streams>
 </virtual-sensor>

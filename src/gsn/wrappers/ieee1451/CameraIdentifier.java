@@ -1,6 +1,5 @@
 package gsn.wrappers.ieee1451;
 
-import gsn.Container;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
@@ -12,9 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 /**
@@ -76,10 +72,10 @@ public class CameraIdentifier extends AbstractWrapper {
       String pingCommandParams = null;
       if ( System.getProperty( "os.name" ).equals( "Mac OS X" ) )
          pingCommandParams = " -c1 -t1 ";
-      else if ( System.getProperty( "os.name" ).toLowerCase( ).indexOf( "linux" ) > 0 )
+      else if ( System.getProperty( "os.name" ).toLowerCase( ).indexOf( "linux" ) >= 0 )
          pingCommandParams = " -c1 -w1 ";
       else
-         logger.error( "Not defined for your OS" );
+         logger.error( "Not defined for your OS : "+System.getProperty("os.name") );
       camIPs.add( 0 , pingCommand + pingCommandParams + "192.168.51.30" );
       camIPs.add( 1 , pingCommand + pingCommandParams + "192.168.51.31" );
       camIPs.add( 2 , pingCommand + pingCommandParams + "192.168.51.32" );
