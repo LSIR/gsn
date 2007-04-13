@@ -62,7 +62,7 @@ public class CameraIdentifier extends AbstractWrapper {
    private static final Byte [ ]                        OUTPUT_FIELD_TYPES    = new Byte [ ] { DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR , DataTypes.VARCHAR };
    
    private static final transient  DataField [] cachedOutputStructure = new DataField[] {new DataField( ID_OUTPUT_FIELD , "VARCHAR(20)" , "Id of the detected transducer" ) 
-   , new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) 
+   , new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(8000)" , "TEDS-data" ) 
    , new DataField( STATUS_OUTPUT_FIELD , "VARCHAR(20)" , "status:added or removed" ) 
    , new DataField( VSFILE_OUTPUT_FIELD , "VARCHAR(40)" , "Virtual Sensor Filename" ) };
    

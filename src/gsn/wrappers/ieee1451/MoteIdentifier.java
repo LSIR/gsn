@@ -130,7 +130,7 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       logger.info("Initializing the serial forwarder connection to:  "+host+":"+port);
       mote = new MoteIF( host , port );
       mote.registerListener( new TedsMessage( ) , this );
-      outputStructure = new DataField [ ] { new DataField( ID_OUTPUT_FIELD , "varchar(20)" , "Id of the detected transducer" ) , new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(10000)" , "TEDS-data" ) ,
+      outputStructure = new DataField [ ] { new DataField( ID_OUTPUT_FIELD , "varchar(20)" , "Id of the detected transducer" ) , new DataField( TEDS_OUTPUT_FIELD , "VARCHAR(8000)" , "TEDS-data" ) ,
             new DataField( STATUS_OUTPUT_FIELD , "VARCHAR(20)" , "status:added or removed" ) , new DataField( VSFILE_OUTPUT_FIELD , "VARCHAR(40)" , "Virtual Sensor Filename" ) };
       
       return true;
