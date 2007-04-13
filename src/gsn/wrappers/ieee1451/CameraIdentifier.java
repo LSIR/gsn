@@ -74,6 +74,8 @@ public class CameraIdentifier extends AbstractWrapper {
          pingCommandParams = " -c1 -t1 ";
       else if ( System.getProperty( "os.name" ).toLowerCase( ).indexOf( "linux" ) >= 0 )
          pingCommandParams = " -c1 -w1 ";
+      else if (System.getProperty("os.name").toLowerCase().indexOf("windows")>=0)
+    	  pingCommandParams="-n 1 -w 1000 ";
       else
          logger.error( "Not defined for your OS : "+System.getProperty("os.name") );
       camIPs.add( 0 , pingCommand + pingCommandParams + "192.168.51.30" );

@@ -253,18 +253,23 @@ public class StorageManager {
 		executeDropTable(tableName, getConnection());
 	}
 
-	public void executeDropTable(CharSequence tableName, Connection connection)
-			throws SQLException {
+	public void executeDropTable(CharSequence tableName, Connection connection) {
 		if (logger.isDebugEnabled())
 			logger.debug("Dropping table structure: " + tableName);
-		PreparedStatement prepareStatement = connection
-				.prepareStatement(getStatementDropTable(tableName).toString());
-		prepareStatement.execute();
-		close(prepareStatement);
-		prepareStatement = connection.prepareStatement(getStatementDropIndex(
-				tableName + "_INDEX", connection).toString());
-		prepareStatement.execute();
-		close(prepareStatement);
+		PreparedStatement prepareStatement = null;
+		try{
+			prepareStatement= connection.prepareStatement(getStatementDropTable(tableName).toString());
+			prepareStatement.execute();
+			close(prepareStatement);
+			prepareStatement = connection.prepareStatement(getStatementDropIndex(
+				tableName + "_INDEX", tableName,connection).toString());
+			prepareStatement.execute();
+		}catch (SQLException e) {
+			logger.info(e.getMessage(),e);
+		}finally{
+			close(prepareStatement);
+		}
+		
 	}
 
 	public void executeDropView(StringBuilder tableName) throws SQLException {
@@ -522,7 +527,13 @@ public class StorageManager {
 	}
 
 	public static StringBuilder getStatementDropTable(CharSequence tableName) {
-		return new StringBuilder("drop table if exists ").append(tableName);
+		StringBuilder sb = new StringBuilder("Drop table ");
+		if (StorageManager.isSqlServer() || StorageManager.isHsql())
+			sb.append(tableName);
+		else if (StorageManager.isMysqlDB()){
+			sb.append(tableName).append(" if exists " );
+		}
+		return sb;
 	}
 
 	/**
@@ -534,11 +545,11 @@ public class StorageManager {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static StringBuilder getStatementDropIndex(CharSequence indexName,
+	public static StringBuilder getStatementDropIndex(CharSequence indexName, CharSequence tableName,
 			Connection connection) throws SQLException {
 		DATABASE db = getDatabaseForConnection(connection);
 		return new StringBuilder(db.getStatementDropIndex().replace("#NAME",
-				indexName));
+				indexName).replace("#TABLE",tableName ));
 	}
 
 	public static StringBuilder getStatementDropView(CharSequence viewName,
@@ -672,11 +683,17 @@ public class StorageManager {
 			}
 
 			public String getStatementDropIndex() {
-				return "DROP TABLE IF EXISTS #NAME";
+				if (isSqlServer())
+					return "DROP TABLE #NAME";
+				else
+					return "DROP TABLE IF EXISTS #NAME";
 			}
 
 			public String getStatementDropView() {
-				return "DROP VIEW IF EXISTS #NAME";
+				if (isSqlServer())
+					return "DROP VIEW #NAME";
+				else
+					return "DROP VIEW IF EXISTS #NAME";
 			}
 		},
 		HSQL("jdbc:hsql:", "org.hsqldb.jdbcDriver") {
@@ -707,7 +724,11 @@ public class StorageManager {
 			}
 
 			public String getStatementDropIndex() {
-				return "DROP INDEX #NAME IF EXISTS";
+				if (StorageManager.isHsql()||StorageManager.isSqlServer())
+					return "DROP INDEX #NAME";
+				if (StorageManager.isMysqlDB())
+					return "DROP INDEX #NAME IF EXISTS";
+				return null;
 			}
 
 			public String getStatementDropView() {
@@ -742,11 +763,11 @@ public class StorageManager {
 			}
 
 			public String getStatementDropIndex() {
-				return "DROP INDEX #NAME IF EXISTS";
+				return "DROP INDEX #NAME ON #TABLE";
 			}
 
 			public String getStatementDropView() {
-				return "DROP VIEW #NAME IF EXISTS";
+				return "DROP VIEW #NAME";
 			}
 		};
 
