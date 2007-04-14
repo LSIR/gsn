@@ -10,7 +10,7 @@ package gsn.wrappers.cameras.usb;
 
 // For more resources see :
 // http://www.geocities.com/marcoschmidt.geo/java-image-coding.html
-import gsn.Container;
+
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
@@ -22,10 +22,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.Enumeration;
+import java.util.Vector;
+
 import javax.media.Buffer;
 import javax.media.CaptureDeviceInfo;
 import javax.media.CaptureDeviceManager;
@@ -108,10 +107,12 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
    
    private transient final static  DataField [] dataField = new DataField[] {new DataField( PICTURE_KEY , "binary:jpeg" , "The pictures observerd from the webcam." )};
    // -----------------------------------START----------------------------------------
+   // DEVICE NAME FOR LINUX CAM: "v4l:OV518 USB Camera:0"
    public boolean initialize ( ) {
       setName( "WebCamWrapper-Thread:" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
       String liveView = addressBean.getPredicateValue( "live-view" );
+      String deviceName=addressBean.getPredicateValue("device");
       boolean isLiveViewEnabled = false;
       if ( liveView == null ) {
          logger.warn( "The >liveView< parameter is missing for the WebCamWrappe,  initialization failed." );
@@ -124,11 +125,15 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
             return false;
          }
       }
-      return webcamInitialization( isLiveViewEnabled );
+      return webcamInitialization( isLiveViewEnabled ,deviceName);
    }
    
-   private boolean webcamInitialization ( boolean liveView ) {
-      CaptureDeviceInfo device = CaptureDeviceManager.getDevice( "v4l:OV518 USB Camera:0" );
+   private boolean webcamInitialization ( boolean liveView,String deviceName ) {
+	  CaptureDeviceInfo device = CaptureDeviceManager.getDevice( deviceName );
+      if (device==null) {
+    	  logger.error("Device doesn't exist: "+deviceName);
+    	  return false;
+      }
       MediaLocator loc = device.getLocator( );
       try {
          ds = Manager.createDataSource( loc );
@@ -209,7 +214,7 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
                logger.error( "Device failed to get to realized state" );
                return false;
             }
-         }
+         } 		
       }
       
       deviceProc.start( );
@@ -324,12 +329,34 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
 }
    
    public static void main ( String [ ] args ) {
-      PropertyConfigurator.configure( DEFAULT_GSN_LOG4J_PROPERTIES );
-      WebCamWrapper test = new WebCamWrapper( );
-      boolean initialization = test.webcamInitialization( true );
-      if ( initialization ) test.start( );
-      else
-         System.out.println( "Start Failed." );
+	   PropertyConfigurator.configure( DEFAULT_GSN_LOG4J_PROPERTIES );
+	   if (args.length==0)
+		   printDeviceList();
+	   else if (args.length==1) {
+		   System.out.println("Trying to connect to capturing device: "+args[0]);
+		   WebCamWrapper test = new WebCamWrapper( );
+		   boolean initialization = test.webcamInitialization( true ,args[0]); 
+		   if ( initialization ) test.start( );
+		   else
+			   System.out.println( "Start Failed." );
+	   }else {
+		   System.err.println("You can call this method either without any argument to get the list of the devices and with the arguments to capture.");
+	   }
    }
-   
+   public static void printDeviceList() {
+	   System.out.println("List of capturing devices: ");
+	   Vector devices = CaptureDeviceManager.getDeviceList(null);
+	   Enumeration list = devices.elements();
+	   while (list.hasMoreElements()) {
+		   CaptureDeviceInfo deviceInfo =(CaptureDeviceInfo) list.nextElement();
+		   String name = deviceInfo.getName();
+		   
+		   Format[] fmts = deviceInfo.getFormats();
+		   System.out.println("NAME: " +name);
+		   for (int i = 0; i < fmts.length; i++) {
+			   System.out.println("\t"+fmts[i]);
+		   }
+	   }
+   }
+
 }
