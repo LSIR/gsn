@@ -52,6 +52,9 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
+import sun.rmi.transport.LiveRef;
+
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
@@ -61,12 +64,6 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
 public class WebCamWrapper extends AbstractWrapper implements ControllerListener {
    
    public static final String            PICTURE_KEY                  = "PICTURE";
-   
-   /**
-    * Shows the required interval between two consequitive snapshots. The below
-    * time is in MSec.
-    */
-   private final int                     INTERVAL                     = 30;
    
    private final ByteArrayOutputStream   baos                         = new ByteArrayOutputStream( 16 * 1024 );
    
@@ -105,15 +102,16 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
    
    public static final String            DEFAULT_GSN_LOG4J_PROPERTIES = "conf/log4j.properties";
    
-   private transient final static  DataField [] dataField = new DataField[] {new DataField( PICTURE_KEY , "binary:jpeg" , "The pictures observerd from the webcam." )};
+   private transient final static  DataField [] dataField = new DataField[] {new DataField( PICTURE_KEY , "binary:image/jpeg" , "The pictures observerd from the webcam." )};
    // -----------------------------------START----------------------------------------
    // DEVICE NAME FOR LINUX CAM: "v4l:OV518 USB Camera:0"
+   private boolean isLiveViewEnabled = false;
+   
    public boolean initialize ( ) {
       setName( "WebCamWrapper-Thread:" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
       String liveView = addressBean.getPredicateValue( "live-view" );
       String deviceName=addressBean.getPredicateValue("device");
-      boolean isLiveViewEnabled = false;
       if ( liveView == null ) {
          logger.warn( "The >liveView< parameter is missing for the WebCamWrappe,  initialization failed." );
          return false;
@@ -237,8 +235,8 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
             converter = new BufferToImage( rgbf );
          } else if ( streams[ i ].getFormat( ) instanceof YUVFormat ) {
             camStream = streams[ i ];
-            YUVFormat rgbf = ( YUVFormat ) streams[ i ].getFormat( );
-            converter = new BufferToImage( rgbf );
+            YUVFormat yuvf = ( YUVFormat ) streams[ i ].getFormat( );
+            converter = new BufferToImage( yuvf );
          }
       if ( liveView ) {
          mainFrame = new JFrame( "Webcam's current observations [GSN Project]." );
@@ -279,19 +277,16 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
       return converter.createImage( buff );
    }
    
-   
-   
    public  DataField[] getOutputFormat ( ) {
       return dataField;
    }
    
-   private StreamElement getData ( ) {
+   private StreamElement getStreamElement ( ) {
       StreamElement streamElement = null;
       try {
          baos.reset( );
          if ( reading != null ) {
             codec.encode( reading.getBufferedImage( ) );
-            
             streamElement = new StreamElement( new String [ ] { PICTURE_KEY } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { baos.toByteArray( ) } , System.currentTimeMillis( ) );
          }
       } catch ( Exception e ) {
@@ -301,17 +296,18 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
    }
    
    public void run ( ) {
-      Graphics2D graphics2D = ( Graphics2D ) lable.getGraphics( );
-      reading = new ImageWrapper( getImage( ) );
-      BufferedImage bi;
-      long lastPicture = 0;
+	  reading = new ImageWrapper( getImage( ) );
+	  int i=0;
       while ( isActive( ) ) {
-         reading.setImage( getImage( ) );
-         graphics2D.drawImage( reading.getImage( ) , 0 , 0 , null );
+         if (isLiveViewEnabled) {
+        	  Graphics2D graphics2D = ( Graphics2D ) lable.getGraphics( );
+        	  graphics2D.drawImage( reading.getImage( ) , 0 , 0 , null );
+         }
          if ( listeners.isEmpty( ) ) continue;
-         if ( lastPicture++ % INTERVAL != 0 ) continue;
-         StreamElement streamElement = getData( );
-         postStreamElement( streamElement );
+         //if ( lastPicture++ % INTERVAL != 0 ) continue;
+        // System.out.println("CALLED"+i++);
+         reading.setImage( getImage( ) );
+         postStreamElement( getStreamElement( ) );
       }
    }
    
