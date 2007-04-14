@@ -191,7 +191,7 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 			   for (int i = 0; i < sources.length; i++) {
 				   AddressBean[] addressing = sources[i].getAddressing();
 				   for (int j = 0; j < addressing.length; j++) {
-					   String vsensorName = addressing[i].getPredicateValue("NAME");
+					   String vsensorName = addressing[j].getPredicateValue("NAME");
 					   if (vsensorName != null) {
 						   String vsName = vsensorName.toLowerCase().trim();
 						VSensorConfig sensorConfig = vsNameTOVSConfig.get(vsName);
