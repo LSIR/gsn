@@ -141,7 +141,8 @@ public class InputStream implements Serializable{
 				 sensor = pool.borrowVS( );
 				 while ( resultOfTheQuery.hasMoreElements( ) ) {
 					 elementCounterForDebugging++;
-					 sensor.dataAvailable( this.getInputStreamName( ) , resultOfTheQuery.nextElement( ) );
+					 StreamElement element= resultOfTheQuery.nextElement( );
+				 	 sensor.dataAvailable( this.getInputStreamName( ) , element );
 				 }
 			 } catch ( final PoolIsFullException e ) {
 				 logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );

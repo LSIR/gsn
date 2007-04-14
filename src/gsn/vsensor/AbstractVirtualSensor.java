@@ -31,24 +31,23 @@ public abstract class AbstractVirtualSensor {
    public abstract boolean initialize ( );
    
    private void validateStreamElement ( StreamElement streamElement ) {
-      if ( !compatibleStructure( streamElement.getFieldTypes( ) , getVirtualSensorConfiguration( ).getOutputStructure( ) ) ) {
-         StringBuilder exceptionMessage = new StringBuilder( ).append( "The streamElement produced by :" ).append( getVirtualSensorConfiguration( ).getName( ) ).append(
-            " Virtual Sensor is not compatible with the defined streamElement.\n" );
-         exceptionMessage.append( "The expected stream element structure (specified in " ).append( getVirtualSensorConfiguration( ).getFileName( ) ).append( " is [" );
-         for ( DataField df : getVirtualSensorConfiguration( ).getOutputStructure( ) ) {
-            exceptionMessage.append( df.getName( ) ).append( " (" ).append( DataTypes.TYPE_NAMES[ df.getDataTypeID( ) ] ).append( ") , " );
-         }
-         exceptionMessage.append( "] but the actual stream element received from the " + getVirtualSensorConfiguration( ).getName( ) ).append( " has the [" );
-         for ( int i = 0 ; i < streamElement.getFieldNames( ).length ; i++ )
-            exceptionMessage.append( streamElement.getFieldNames( )[ i ] ).append( "(" ).append( DataTypes.TYPE_NAMES[ streamElement.getFieldTypes( )[ i ] ] ).append( ")," ).append(
-               " ] thus the stream element dropped !!!" );
-         throw new RuntimeException( exceptionMessage.toString( ) );
+	   if ( !compatibleStructure( streamElement, getVirtualSensorConfiguration( ).getOutputStructure( ) ) ) {
+		   StringBuilder exceptionMessage = new StringBuilder( ).append( "The streamElement produced by :" ).append( getVirtualSensorConfiguration( ).getName( ) ).append(
+		   " Virtual Sensor is not compatible with the defined streamElement.\n" );
+		   exceptionMessage.append( "The expected stream element structure (specified in " ).append( getVirtualSensorConfiguration( ).getFileName( ) ).append( " is [" );
+		   for ( DataField df : getVirtualSensorConfiguration( ).getOutputStructure( ) ) 
+			   exceptionMessage.append( df.getName( ) ).append( " (" ).append( DataTypes.TYPE_NAMES[ df.getDataTypeID( ) ] ).append( ") , " );
+		   exceptionMessage.append( "] but the actual stream element received from the " + getVirtualSensorConfiguration( ).getName( ) ).append( " has the [" );
+		   for ( int i = 0 ; i < streamElement.getFieldNames( ).length ; i++ )
+			   exceptionMessage.append( streamElement.getFieldNames( )[ i ] ).append( "(" ).append( DataTypes.TYPE_NAMES[ streamElement.getFieldTypes( )[ i ] ] ).append( ")," );
+		   exceptionMessage.append(" ] thus the stream element dropped !!!" );
+		   throw new RuntimeException( exceptionMessage.toString( ) );
       }
    }
    
    protected synchronized void dataProduced ( StreamElement streamElement ) {
       try {
-         validateStreamElement( streamElement );
+    	  validateStreamElement( streamElement );
       } catch ( Exception e ) {
          logger.error( e.getMessage( ) , e );
          return;
@@ -73,19 +72,19 @@ public abstract class AbstractVirtualSensor {
 	}
    }
    
-   private static boolean compatibleStructure ( Byte [ ] fieldTypes ,  DataField [] outputStructure ) {
-      if ( outputStructure.length != fieldTypes.length ) {
-         logger.warn( "Validation problem, the number of field doesn't match the number of output data strcture of the virtual sensor" );
-         return false;
-      }
-      for ( int i = 0 ; i < outputStructure.length ; i++ ) {
-         if ( fieldTypes[ i ] != outputStructure[ i ].getDataTypeID( ) ) {
-            logger.warn( "Validation problem for output field >" + outputStructure[ i ].getName( ) + ", The field type declared as >" + DataTypes.TYPE_NAMES[ fieldTypes[ i ] ]
-               + "< within the stream element but it is defined as in the VSD as : " + DataTypes.TYPE_NAMES[ outputStructure[ i ].getDataTypeID( ) ] );
-            return false;
-         }
-      }
-      return true;
+   private static boolean compatibleStructure ( StreamElement se ,  DataField [] outputStructure ) {
+	   if ( outputStructure.length != se.getFieldNames().length ) {
+		   logger.warn( "Validation problem, the number of field doesn't match the number of output data strcture of the virtual sensor" );
+		   return false;
+	   }
+	   for ( int i = 0 ; i < outputStructure.length ; i++ ) 
+		   for (int j=0;j<se.getFieldNames().length;j++)
+			   if ( outputStructure[i].getName().equalsIgnoreCase(se.getFieldNames()[j]))
+				   if (se.getFieldTypes()[ i ] != outputStructure[ j ].getDataTypeID( ) ) {
+					   logger.warn( "Validation problem for output field >" + outputStructure[ i ].getName( ) + ", The field type declared as >" + DataTypes.TYPE_NAMES[ se.getFieldTypes()[ i ] ]);
+					   return false;
+				   }
+	   return true;
    }
    
    public synchronized StreamElement getData ( ) {
