@@ -119,7 +119,7 @@ public final class Main {
 		webAppContext.setContextPath ( "/" );
 		webAppContext.setResourceBase ( DEFAULT_WEB_APP_PATH );
 		ServletHandler servletHandler = new ServletHandler ( );
-		 servletHandler.addServletWithMapping ( "gsn.registry.MyXmlRPCServlet" , "/gsn-handler" );
+		  servletHandler.addServletWithMapping ( "gsn.GSNRPC" , "/gsn-handler" );
 	      servletHandler.addServletWithMapping ( "gsn.web.ControllerServlet" , "/gsn" );
 	      servletHandler.addServletWithMapping ( "gsn.web.DataDownload" , "/data" );
 	      servletHandler.addServletWithMapping ( "gsn.web.FieldDownloadServlet" , "/field" );

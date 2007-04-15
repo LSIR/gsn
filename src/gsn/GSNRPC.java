@@ -2,10 +2,12 @@
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * Creation time : Dec 7, 2006@8:08:29 PM<br> *
  */
-package gsn.registry;
+package gsn;
 
 import gsn.GSNRequestHandler;
 import gsn.Main;
+import gsn.registry.MyConfig;
+import gsn.registry.RequestInitializableRequestProcessor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,9 +27,9 @@ import org.apache.xmlrpc.webserver.XmlRpcServletServer;
  * @author alisalehi
  *
  */
-public class MyXmlRPCServlet extends XmlRpcServlet{
+public class GSNRPC extends XmlRpcServlet{
    
-   private final transient Logger   logger                = Logger.getLogger ( MyXmlRPCServlet.class );
+   private final transient Logger   logger                = Logger.getLogger ( GSNRPC.class );
    
    protected XmlRpcServletServer  newXmlRpcServer(ServletConfig pConfig ) throws XmlRpcException {
      return new XmlRpcServletServer ( ) {
@@ -43,9 +45,9 @@ public class MyXmlRPCServlet extends XmlRpcServlet{
        * Stupid bug ?!!!, always setRequestProcessorFactoryFactory before starting to manupluate the mapping
        */
       mapping.setRequestProcessorFactoryFactory (factory);
-      if (Main.getContainerConfig ()==null)
-         mapping.addHandler ("registry",RegistryRequestHandler.class);
-      else
+//      if (Main.getContainerConfig ()==null)
+//         mapping.addHandler ("registry",RegistryRequestHandler.class);
+//      else
          mapping.addHandler ("gsn", GSNRequestHandler.class);
       return mapping;
    }
