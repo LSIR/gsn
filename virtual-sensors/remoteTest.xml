@@ -2,7 +2,7 @@
    <processing-class>
       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
    <output-structure>
-      <field name="DATA" type="binary:jpg"/>
+      <field name="DATA" type="binary:image/jpeg"/>
    </output-structure>
   
    </processing-class>

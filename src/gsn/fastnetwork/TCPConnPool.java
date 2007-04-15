@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Lover of Ghazal
+ * This file is excluded from the build process.
  */
 public class TCPConnPool {
    
