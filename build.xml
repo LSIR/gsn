@@ -7,9 +7,6 @@
       <property environment="env"/>
       <property name="conf.dir" value="${basedir}/conf"/>
       <property name="build.dir" value="build"/>
-      <property name="webapp.dir" value="webapp"/>
-      <property name="dswebapp.dir" value="dswebapp"/>
-      <property name="merge.dir" value="metadata"/>
       <property name="src.dir" value="src"/>
       <property name="jars" value="jars"/>
       <property name="libdir" value="lib"/>
@@ -73,16 +70,6 @@
    	         <arg value="conf/VirtualSensorDescription.xml"/>            
    	      </java>
    </target>
- <!-- 
-    <target name="dir" depends="bind">
-      <java classname="gsn.registry.Registry" fork="true" dir="${basedir}">
-         <classpath refid="classpath"/>
-         <arg value="1882"/>
-         <arg value="127.0.0.1"/>
-         <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
-         <jvmarg value="-Dorg.mortbay.log.LogFactory.noDiscovery=false"/>
-      </java>
-   </target>-->   
    
    <target name="runcam" depends="bind">
       <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"

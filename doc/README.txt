@@ -30,49 +30,31 @@ Data can be sent to various output devices. This is called
 the notification subsystem. For example, a virtual sensor
 can send data to an sms gateway.
 
+For any question regarding the project please refer to the mailing
+lists (see http://sourceforge.net/mail/?group_id=158046).
+We strongly suggest users to register to the mailing lists as it is
+the main source for development and feature news. It also serves as
+the primary medium for discussions on development, deployment issues, etc.
+
 
 How to use GSN
 ==============
-
-GSN ships with a graphical configuration tool. You can start
+GSN ships with a commandline tools. You can start
 it with the following command:
 
-Windows				gsn-gui.bat
-Mac OS X, Linux		gsn-gui.sh
+Windows				gsn-no-gui.bat
+Mac OS X, Linux		gsn-no-gui.sh
 
-For more advanced configurations, like servers without graphical
-display, you can use the "nogui" script files to start gsn in
-text mode.
-
-
-GSN uses two processes: the directory service, and gsn itself.
-GSN needs a directory service to run. The default settings from
-the graphical interface should be fine. Simply click on the green
-button to start the service. After some initialization time, the
-button should show a red square icon to allow you to stop the
-service. If it does not, please check the log output display
-from the graphical interface (Click on Directory Server log).
-You can test the service by visiting
-
-http://localhost:1882
-
-with your web browser.
-
-Once the directory server is running, you can start GSN. Click on
-the start button to run it. Again, after some time the button
-should display a red square box.
-The log output (in "GSN Log") should start displaying lots of
-texts. To reduce the amount of text, change the log level from
-INFO to WARN. To stop the log window scrolling, uncheck the box
-"Scroll log window when new data is available". You may find
-this feature useful to inspect warnings or eventual errors.
-
-If GSN seems to be running successfully, please visit
+After some initialization time, you'll see several
+log messages, now you can test the service by visiting
 
 http://localhost:22001
 
-There you can see the output of various virtual sensors that
-are enabled by default with GSN.
+with your web browser.
+
+Note that, the log output (in "GSN Log") normally displays lots of
+texts, which is normal. To reduce the amount of text, change the log level from
+INFO to WARN (in the conf/log4j.properties (See the book of GSN file in doc folder).
 
 
 How to use GoogleMaps with GSN
@@ -91,7 +73,6 @@ with the key value you have received.
 
 
 For more information, don't hesitate to contact us !
-
 
 
 The GSN Development Team.

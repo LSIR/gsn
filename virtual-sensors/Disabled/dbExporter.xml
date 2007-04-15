@@ -5,6 +5,8 @@
          <param name="url">jdbc:mysql://localhost:3306/gsntest</param>
          <param name="user">gsntest</param>
          <param name="password">gsntest</param>
+				 <param name="driver">com.mysql.jdbc.Driver</param>
+				 <param name="table">mytable</param>
       </init-params>
    </processing-class>
    <description>

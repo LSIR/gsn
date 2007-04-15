@@ -54,7 +54,7 @@ message.
 
 To test the build, run
 
-ant gui
+ant gsn
 
 That's all !
 
@@ -72,6 +72,8 @@ a virtual sensor, you need to Generate  Keys and Certificates :
     a keystore (note that the keystore file name MUST be stored in conf/gsn.jks)
    cd conf
    keytool -keystore gsn.jks -alias gsn -genkey -keyalg RS
+
+
 
 Running the webapp in apache
 ========================
