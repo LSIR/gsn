@@ -17,7 +17,7 @@
       <!--  Enable the following line when you want to use Java Media Framework.
  You should unarchive the complete archive provide by sun and fix the
  following line to point to you path. -->
-      <property name="jmf.dir"     value="JMF-2.1.1e" /> 
+<!--       <property name="jmf.dir"     value="JMF-2.1.1e" /> -->
       <path id="classpath">
          <pathelement location="${build.dir}/jcoverage-classes/"/>
          <pathelement location="${build.dir}/"/>
@@ -27,12 +27,12 @@
          </fileset>
          <!--  Enable the following line if you want to use Java Media Frame Work.
   Note that you should first set the jmf.dir path above -->
-         <fileset dir="${jmf.dir}">
+<!--         <fileset dir="${jmf.dir}">
             <include name="**/*.jar" />
-         </fileset> 
+         </fileset>  -->
       </path>
    	<available type="dir" file="${jmf.dir}" property="jmf.exists"/>
-   	<fail unless="jmf.exists" message="The ${jmf.dir} directory is missing, please download  JMF from http://java.sun.com/products/java-media/jmf/2.1.1/download.html and place it in ${jmf.dir} directory." />
+<!--   	<fail unless="jmf.exists" message="The ${jmf.dir} directory is missing, please download  JMF from http://java.sun.com/products/java-media/jmf/2.1.1/download.html and place it in ${jmf.dir} directory." /> -->
  </target>
    
    <target name="clean" description="remove the previously compiled class files" depends="init">
