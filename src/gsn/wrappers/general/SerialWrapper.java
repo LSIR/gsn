@@ -25,6 +25,7 @@ import java.util.TooManyListenersException;
 import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.hsqldb.lib.InOutUtil;
 
 /**
  * Modified to used RXTX (http://users.frii.com/jarvi/rxtx/) which a LGPL
@@ -108,11 +109,10 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
       }
       
       inputSeparator = addressBean.getPredicateValue( "inputseparator" );
-      if ( inputSeparator == null ) {
+      if ( inputSeparator == null ) 
          useInputSeparator = false;
-      } else {
+       else 
          useInputSeparator = true;
-      }
       
       String newBaudRate = addressBean.getPredicateValue( "baudrate" );
       if ( newBaudRate != null && newBaudRate.trim( ).length( ) > 0 ) {
@@ -389,8 +389,6 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
    
    private byte [ ]         inputBuffer;
    
-   private String           inputString;
-   
    public void serialEvent ( SerialPortEvent e ) {
 //      if ( logger.isDebugEnabled( ) ) logger.debug( "Serial wrapper received a serial port event, reading..." );
 //      if ( !isActive( ) || listeners.isEmpty( ) ) {
@@ -420,26 +418,15 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
          case SerialPortEvent.BI :
             // messageAreaIn.append("\n--- BREAK RECEIVED ---\n");
       }
-      if ( logger.isDebugEnabled( ) ) {
-         logger.debug( new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : " ).append( new String(inputBuffer) ).toString( ) );
-      }
       
+      if ( logger.isDebugEnabled( ) ) 
+          logger.debug( new StringBuilder( "Serial port wrapper processed a serial port event, stringbuffer is now : " ).append( new String(inputBuffer) ).toString( ) );
       if ( useInputSeparator ) {
-         inputString = inputString + new String( inputBuffer );
-         
-         String [ ] dataChunks = inputString.split( inputSeparator );
-         
-         for ( int i = 0 ; i < dataChunks.length - 1 ; i++ ) {
-            if ( dataChunks[ i ].length( ) == 0 ) continue;
-            
-            StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { dataChunks[ i ].getBytes( ) } , System
-                  .currentTimeMillis( ) );
-            postStreamElement( streamElement );
-         }
-         inputString = dataChunks[ dataChunks.length - 1 ];
-      } else {
-         StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { inputBuffer } , System.currentTimeMillis( ) );
-         postStreamElement( streamElement );
+         for ( String chunk : new String(inputBuffer).split( inputSeparator ) ) 
+             if ( chunk.length( ) > 0 ) 
+            	 postStreamElement( chunk.getBytes( ) );
+      } else { //without separator character.
+    	  postStreamElement( inputBuffer );
       }
    }
    

@@ -1,4 +1,4 @@
-#LyX 1.4.4 created this file. For more info see http://www.lyx.org/
+#LyX 1.4.3 created this file. For more info see http://www.lyx.org/
 \lyxformat 245
 \begin_document
 \begin_header
@@ -33,12 +33,16 @@
 The Book of GSN
 \end_layout
 
-\begin_layout Author
-Global Sensor Networks (GSN) Team
+\begin_layout Standard
+\begin_inset LatexCommand \tableofcontents{}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-\begin_inset LatexCommand \tableofcontents{}
+\begin_inset FloatList table
 
 \end_inset
 
@@ -97,6 +101,7 @@ GSN offers advanced data filtering functionnalities through an enhanced
  SQL syntax.
  It is assumed that the reader has some knowledge of the Standard Query
  Language (SQL).
+ If not, we encourage you to read some documentation like ??? and ???.
  Using it for basic operations is fairly intuitive and you should be able
  to start using it from the examples provided in this document.
 \end_layout
@@ -128,13 +133,12 @@ t Kit
 
 \end_inset
 
- (we strongly recommend you to use version JDK 6).
+.
  Some optional GSN components, such as the USB webcam wrapper, need third-party
  libraries that we are not allowed to redistribute under GPL license.
  If you want to use these features, you will have to download and install
  these by yourself.
  We apologize for the inconvenience.
- 
 \end_layout
 
 \begin_layout Standard
@@ -194,11 +198,8 @@ console
 
  which presents the standard output and the other one called file which
  points to logs/gsn.log file.
- The 
-\family typewriter
-log4j.rootLogger=WARN,console,file
-\family default
- sets the logging level of both detinations to WARN level.
+ The log4j.rootLogger=WARN,console,file sets the logging level of both detination
+s to WARN level.
  
 \end_layout
 
@@ -261,176 +262,6 @@ GSN Web Interface
 \end_inset
 
 
-\end_layout
-
-\begin_layout Section
-GSN and Databases
-\end_layout
-
-\begin_layout Standard
-One of the components in GSN's architecture is stream processor which is
- built on top of the relational databases therefore GSN always needs a relationa
-l database to do its low level processing.
- For performing stream processing GSN needs to use database dependent no-sql
- syntaxes which implies coupling GSN code (the part related to stream processing
-) with database vendors extentions to the standard sql api.
- For list of the database servers which can be used with GSN's stream processing
- engine see table 
-\begin_inset LatexCommand \pageref{tab:Supported-databases}
-
-\end_inset
-
- .
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float table
-wide false
-sideways false
-status open
-
-\begin_layout Caption
-\begin_inset LatexCommand \label{tab:Supported-databases}
-
-\end_inset
-
-Supported databases in GSN.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="2">
-<features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-Database name
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-Tested version
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-HSQLDB Memory
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-1.8.0.7
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-MySQL5
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-5.0.30
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-HSQLDB File
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-1.8.0.7
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-Microsoft SQL Server
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-2005 (Express)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-By default, GSN comes with the appropriate jdbc drivers for the mentioned
- database servers.
- The default option is HSQLDB in Memory database as it doesn't need any
- configurations and it is very light weight.
- For more enterprise systems users can use either Microsoft SQL Server 2005
- or MySQL version 5.
- For chaning the default database server please see the 
-\family typewriter
-gsn.xml
-\family default
- file in the 
-\family typewriter
-conf
-\family default
- directory of your installation.
 \end_layout
 
 \begin_layout Section
@@ -1582,442 +1413,248 @@ Note for TinyOS 1.x users, due to strange java package management in TinyOS
 Once you generated the Java representation of the communication message
  structures, you need to write a wrapper class for your message.
  Assuming you have a message class called MyMessage which has three fields,
- node_id, temperature and light, here (see figure 
-\begin_inset LatexCommand \pageref{writing-a-tinyos-wrapper}
-
-\end_inset
-
- )is a sample wrapper class to bind your network with GSN.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Verse
-\begin_inset LatexCommand \label{writing-a-tinyos-wrapper}
-
-\end_inset
-
-
+ node_id, temperature and light, here is a sample wrapper class to bind
+ your network with GSN :
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 //import net.tinyos1x.message.Message; // Only for TinyOS 1.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 //import net.tinyos1x.message.MessageListener; // Only for TinyOS 1.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 //import net.tinyos1x.message.MoteIF; // Only for TinyOS 1.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 import net.tinyos.message.Message; // Only for TinyOS 2.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 import net.tinyos.message.MessageListener; // Only for TinyOS 2.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 import net.tinyos.message.MoteIF; // Only for TinyOS 2.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 import net.tinyos.packet.BuildSource; // Only for TinyOS 2.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 import net.tinyos.packet.PhoenixSource; // Only for TinyOS 2.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 public class MyWrapper extends AbstractWrapper implements MessageListener
  { 
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 private final DataField [] structure = new DataField[] {
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 new DataField("node_id","int","The node id the mote."),
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 new DataField("temperature","double","Presents the temperature sensor."),
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 new DataField("light","double","Presents the light sensor.")
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 }; 
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 public boolean initialize ( ) { 
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 AddressBean addressBean = getActiveAddressBean( );
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 String host = addressBean.getPredicateValue( "host" ); // The ip of the machine
  running serial forwarder.
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 if ( host == null || host.trim( ).length( ) == 0 ) {
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 logger.warn( "The >host< parameter is missing from the RemoteWrapper wrapper."
  );
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 return false; //initialization failed, the host name is not provided in
  the parameters.
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 }
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 int port; // The port of the machine running serial forwarder.
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 String portRaw = addressBean.getPredicateValue( "port" );
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 if ( portRaw == null || portRaw.trim( ).length( ) == 0 )
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 { logger.warn( "The >port< parameter is missing from the RemoteWrapper wrapper."
  );
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 return false;// initialization failed, the port no.
  is not provided in the parameters.
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 } try {
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 port = Integer.parseInt( portRaw ); 
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 if ( port > 65000 || port <= 0 ) throw new Exception( "Bad port No" + port
  );
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 } catch ( Exception e ) { 
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 logger.warn( "The >port< parameter is not a valid integer for the RemoteWrapper
  wrapper." ); 
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 return false; // initialization failed, the port no.
  is not valid.
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 }
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 if ( logger.isDebugEnabled( ) )
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 logger.debug( "The SFWrapperDS connects to the Serial Forwarder interface
  at *" + host + ":" + port + "*" ); 
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 setName( "TinyOS-My-Wrapper") ;
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 try {
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 PhoenixSource reader=BuildSource.makePhoenix( BuildSource.makeSF( host , port
  ) , null );// Only for TinyOS 2.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 reader.start( ); // TinyOS 2.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 moteif = new MoteIF( reader ); // Only for TinyOS 2.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 // moteif = MoteIF (host,port); // Uncomment this, only for TinyOS 1.x
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 } catch ( Exception e ) {
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 logger.error( e.getMessage( ) , e );
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 return false; // Serial Forwarder client couldn't establish the connection.
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 }
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 moteif.registerListener( new MyMessage( ) , this );
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 return true; //initialization is successful.
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 }
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 public synchronized void finalize ( ) {
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 moteif.deregisterListener( new SensorScopeDataMsg( ) , this );
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 }
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 public void messageReceived ( int toAddr , Message message ) {
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 MyMessage msg = (MyMessage) message;
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 // (If needed) extract/parse/convert the sensor measurements to some meaningful
  values
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 postStreamElement( nodeid,sensor1,sensor2 );
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 }
 \end_layout
 
 \begin_layout Verse
-
-\family typewriter
-\size small
 public DataField [] getOutputFormat ( ) { return structure; }
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -2090,7 +1727,7 @@ COM2
 In its default mode of operation, each time it receives a byte sequence,
  it will be published in a StreamElement under the name 
 \family typewriter
-RAW_PACKET
+RAW_PACKET(varchar)
 \family default
  and the type 
 \family typewriter
@@ -2934,240 +2571,51 @@ USB Webcams
 \end_layout
 
 \begin_layout Standard
-As you noticed, for using GSN you need to have Java Media Framework (or
- simply JMF) installed in the JMF-2.1.1e folder in the GSN's root installation
- directory (E.g., c:
-\backslash
-gsn).
- Note that JMF is not distributed with GSN due to the licence incompatibility.
- In order to use your usb cam with GSN you need to make sure the device
- is installed correctly under your operating system.
- For instance, you should be able to use the camera in your favorite capturing
- tool.
- For windows, you should check the CD accompanied with your usb camera to
- get the appropriate software while in Linux first look for the appropriate
- driver (e.g., see 
-\begin_inset LatexCommand \url[OVCam.org]{http://ovcam.org/ov511/}
-
-\end_inset
-
- for ovcam511/518 cameras
-\begin_inset Foot
-status open
-
-\begin_layout Standard
-In case your linux distribution doesn't recognize the usb camera, try to
- get the latest driver from the aforementioned website and compile it.
- You need tothen insert the module to the kernel by executing the following
- commands: 
-\family typewriter
-sudo rmmod ov511; sudo modprobe ovcamchip;sudo modprobe ov511
-\end_layout
-
-\end_inset
-
-) and then try capturing using one of the existing capturing programs in
- linux such as xawtv.
- 
+Because of a license incompatibility, the wrapper for OV511/518 wired usb
+ cameras is not distributed with the standard installation of GSN.
 \end_layout
 
 \begin_layout Standard
-Once you could use the usb camera for capturing, you need to get the binary
- version of JMF and install it in the JMF-2.1.1e directory inside the gsn
- installation (let's call this path 
-\family typewriter
-jmf.dir
-\family default
-).
+You can find the wrapper (the java files) from the svn repository of GSN
+ at 
+\begin_inset LatexCommand \htmlurl{http://www.sourceforge.net/projects/gsn}
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+To use the ovcam511/518 wrapper with linux: 
+\end_layout
+
+\begin_layout Standard
+1.
+ Get the driver from 
+\begin_inset LatexCommand \htmlurl{http://ovcam.org/ov511/}
+
+\end_inset
+
+, compile it and install it.
+\end_layout
+
+\begin_layout Standard
+2.
+ Download the Java Media Framework for your platform and install it.
  At this stage, the JMF should detect your webcam.
  If it does not, most probably the ov511 driver was not correctly installed.
  Please refer to the documentation of your distribution.
- You can confirm this by running JMStudio and clicking on File menu > Capture.
 \end_layout
 
 \begin_layout Standard
-The next step is adding the usb camera as a capturing device to JMF's Registery.
- For this, you need to simply run the JMF Registery program which resides
- in the jmf's installation directory.
- Once you ran this program, go to the capture devices and click on 
-\begin_inset Quotes eld
-\end_inset
-
-Detect Capture Devices
-\begin_inset Quotes erd
-\end_inset
-
-, after a few second, you'll see a list on the left side.
- You can get the details for each each capturing device in the right window
- by clicking on the device name.
- The details part has several important information for each source such
- as:
-\end_layout
-
-\begin_layout Itemize
-Locator, a URI pointing to the device.
- We need this for the wrapper.
-\end_layout
-
-\begin_layout Itemize
-Format of the output, which is typically written as RGB or YUV.
- For each format you can have different supported sizes.
- 
+3.
+ Once the webcam is detected by the JMF, On linux : sudo rmmod ov511; sudo
+ modprobe ovcamchip;sudo modprobe ov511
 \end_layout
 
 \begin_layout Standard
-Because of a license incompatibility, the wrapper for usb cameras is not
- distributed with the GSN easy installer (Ghazal), in case you are using
- Ghazal, you need to get the wrapper from the svn repository.
- In case you are using the latest code from the svn repository, you can
- skip this step.
-\begin_inset Foot
-status open
-
-\begin_layout Standard
-
-\family typewriter
-http://gsn.svn.sourceforge.net/viewvc/gsn/trunk/src/gsn/wrappers/cameras/usb/
-\end_layout
-
-\end_inset
-
-.
- 
-\end_layout
-
-\begin_layout Standard
-Now you can directly jump to the next section which is about using the web
- cam with GSN.
- But I strongly recommend you no to do so as in this part we'll try to make
- sure that GSN wrapper can see the camera.
- For doing this step, simply open a terminal and go to the GSN's installation
- directory.
- There, you need to execute:
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-ant camtest
-\end_layout
-
-\begin_layout Standard
-The output should be similar to figure 
-\begin_inset LatexCommand \pageref{fig:ant-camtest-output}
-
-\end_inset
-
-
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Caption
-
-\family typewriter
-\begin_inset LatexCommand \label{fig:ant-camtest-output}
-
-\end_inset
-
-ant camtest
-\family default
- output in windows.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename figures/webcam-list-output-windows.png
-	lyxscale 50
-	scale 50
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-.
- The above command give you the name of the capturing device (which can
- capture sound or video) and its capturing details such as resolution and
- formatting.
- In the figure I marked my capturing device's name.
- Once you know the name, run the following command:
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-ant camtest -Ddev=
-\shape italic
-device_name
-\end_layout
-
-\begin_layout Standard
-For instance I wrote the following for my usb camera:
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-ant camtest -Ddev=
-\family default
-
-\begin_inset Quotes erd
-\end_inset
-
-
-\family typewriter
-vfw:Microsoft WDM Image Capture (Win32):0
-\family default
-
-\begin_inset Quotes erd
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-After executing this command you should see a window popping up and showing
- the output of your video capturing device (See figure 
-\begin_inset LatexCommand \pageref{fig:camtest-output}
-
-\end_inset
-
-
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Caption
-\begin_inset LatexCommand \label{fig:camtest-output}
-
-\end_inset
-
-Output of the capturing test program.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename figures/webcam-capturing-window.png
-	lyxscale 50
-	scale 50
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
- for a typical output).
-\end_layout
-
-\begin_layout Standard
-The system environment or the java execution environment (in Eclipse) must
+4.
+ The system environment or the java execution environment (in Eclipse) must
  be configured:
 \end_layout
 
@@ -3220,7 +2668,7 @@ Parameters for OV511 USB webcams
 \hfill
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="5">
+<lyxtabular version="3" rows="2" columns="5">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0">
 <column alignment="center" valignment="top" leftline="true" width="15line%">
@@ -3322,53 +2770,6 @@ Sets the web cam in live mode.
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-None.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-device
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-String
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-Yes
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-Name of the capturing device.
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Standard
@@ -3545,41 +2946,6 @@ Defines the rate at which data is produced.
 
 \end_layout
 
-\begin_layout Subsection
-\begin_inset LatexCommand \index{GPS}
-
-\end_inset
-
-GPS devices
-\begin_inset LatexCommand \label{sub:GPS-devices}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-In GSN we added support for handling the GPS packets received from the GPS
- devices.
- For our experiments we used GPSlim 236 and Nokia LD-3W.
- Both of the aforementioned devices are without any display and they work
- under bluetooth.
- In most operating systems, bluetooth devices are actually mapped to a serial
- port which means we could use the serial wrapper for connecting and communicati
-ng with bluetooth devices (BlueTooth Serial Port Profile).
- The GPS sensors actually have some specification for their output called
- NMEA.
- Only a subset of it was implemented in the GPS virtual sensor, the GPRMC
- part to be precise.
- This is some formatted text only output looking for example like 
-\emph on
-"$GPRMC,081836,A,3751.65,S,14507.36,E,000.0,360.0,130998,011.3,E*62"
-\emph default
- which has to be converted to Google maps coordinates [in order to be shown
- in the web interface].
- 
-\end_layout
-
 \begin_layout Section
 Data filtering and processing
 \end_layout
@@ -3669,13 +3035,6 @@ Virtual sensors are configured in the virtual-sensors directory.
  running, because GSN periodically scans this directory for updates.
  This can be very useful when you are learning how to use GSN: you can immediate
 ly see the effect of modifying a query.
- The list of some of the most used virtual sensors is provided in table
- 
-\begin_inset LatexCommand \pageref{tab:List-of-VS}
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
@@ -4032,15 +3391,8 @@ section.
 
 \begin_layout Standard
 We will work with an example to better understand these concepts.
- We present here a configuration for a virtual sensor called 
-\family typewriter
-MemoryPlotVS
-\family default
- which uses the 
-\family typewriter
-ChartVirtualSensor
-\family default
- processing class and gets data from another virtual sensor, named 
+ We present here a configuration for the ChartVirtualSensor that gets data
+ from another virtual sensor, named 
 \family typewriter
 MemoryMonitorVS
 \family default
@@ -4055,16 +3407,6 @@ and
 memoryPlotVS.xml
 \emph default
 .
- Figure 
-\begin_inset LatexCommand \pageref{memory-plot-vs-xml}
-
-\end_inset
-
- shows the virtual sensor descriptor (VSD) file for the 
-\family typewriter
-MemoryPlotVS
-\family default
-.
 \end_layout
 
 \begin_layout LyX-Code
@@ -4072,383 +3414,264 @@ MemoryPlotVS
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout LyX-Code
-
-\size footnotesize
-\begin_inset LatexCommand \label{memory-plot-vs-xml}
-
-\end_inset
-
 <virtual-sensor name="MemoryPlotVS" >
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
   <processing-class>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
      <class-name>gsn.vsensor.ChartVirtualSensor</class-name>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
         <init-params>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             <param name="input-Stream">DATA</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             <param name="title">GSN Memory Usage</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             <param name="type">ANY</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             <param name="height">200</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             <param name="width">300</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             <param name="vertical-axis">Sensor Readings</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             <param name="history-size">100</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
       </init-params>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
    <output-structure>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
      <field name="DATA" type="binary:image/jpeg"/> 
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
    </output-structure>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
  </processing-class>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
  <description>My chart virtual sensor<description>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
  <life-cycle pool-size="10"/>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
  <addressing>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
    <predicate key="geographical">BC building EPFL</predicat>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
  </addressing>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
  <storage history-size="1" />
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
  <streams>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
     <stream name="DATA" rate="100">
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
       <source alias="source1" storage-size="1 sampling-rate="1">
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             <address wrapper="remote">
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
-               <predicate key="HOST">localhost</predicate>
+               <predicate key="HOST">
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
-               <predicate key="PORT">22001</predicate>
+                  localhost
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
-               <predicate key="NAME">MemoryMonitorVS</predicate>
+               </predicate>
 \end_layout
 
 \begin_layout LyX-Code
+               <predicate key="PORT">
+\end_layout
 
-\size footnotesize
+\begin_layout LyX-Code
+                  22001
+\end_layout
+
+\begin_layout LyX-Code
+               </predicate>
+\end_layout
+
+\begin_layout LyX-Code
+               <predicate key="NAME">
+\end_layout
+
+\begin_layout LyX-Code
+                  MemoryMonitorVS
+\end_layout
+
+\begin_layout LyX-Code
+               </predicate>
+\end_layout
+
+\begin_layout LyX-Code
             </address>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             <query>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
-              select HEAP,NON_HEAP,PENDING_FINALIZATION_COUNT,TIMED
+              select HEAP,NON_HEAP,
 \end_layout
 
 \begin_layout LyX-Code
+              PENDING_FINALIZATION_COUNT,TIMED
+\end_layout
 
-\size footnotesize
+\begin_layout LyX-Code
               from wrapper
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
             </query>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
          </source>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
          <query>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
           select * from source1
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
          </query>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
        </stream>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
    </streams>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size footnotesize
 </virtual-sensor>
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
 Let us analyze this long file piece by piece.
- The first part (figure 
-\begin_inset LatexCommand \pageref{processing-class-xml}
-
-\end_inset
-
- )defines which class to use and configures it:
+ The first part defines which class to use and configures it:
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout LyX-Code
-
-\size small
-\begin_inset LatexCommand \label{processing-class-xml}
-
-\end_inset
-
 <processing-class>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
     <class-name>gsn.vsensor.ChartVirtualSensor</class-name>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
     <init-params>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
          <param name="input-Stream">DATA</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
          <param name="title">GSN Memory Usage</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
          <param name="type">ANY</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
          <param name="height">200</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
          <param name="width">300</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
          <param name="vertical-axis">Sensor Readings</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
          <param name="history-size">100</param>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
       </init-params>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
     <output-structure>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
       <field name="DATA" type="binary:image/jpeg"/> 
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
     </output-structure>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
  </processing-class>
 \end_layout
 
-\end_inset
-
-
-\end_layout
-
 \begin_layout Standard
-This virtual sensor processing class generates graphs from the data it receives.
+This virtual sensor generates graphs from the data it receives.
  We see here that the graph has a name, 
 \begin_inset Quotes eld
 \end_inset
@@ -4473,60 +3696,47 @@ DATA
 \begin_inset Quotes erd
 \end_inset
 
- which is a jpeg image hence 
-\family typewriter
-type="binary:image/jpeg"
-\family default
-.
+ which is a jpeg image hence type="binary:image/jpeg".
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout LyX-Code
-
-\size small
 <description>My chart virtual sensor</description>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <life-cycle pool-size="2"/>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <addressing>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
    <predicate key="geographical">...</predicate>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 </addressing>
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
 The description field is shown to the user through the web interface, and
- you can also use it to describe the functionalities of this virtual sensor
- in a plain text format.
- Both the description and the addressing information is for a virtual sensor
- is shown by the default web interface.
+ you can also use it to help you remember what this specific configuration
+ does.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+life-cycle pool-size
+\family default
+ option is a performance parameter.
+ It is usually safe to keep the default value.
+ It defines the maximum number of instances of this virtual sensor (with
+ this configuration).
+ This can happen when the processing method of the virtual sensor takes
+ a long time to complete, and / or when data arrives at high speed.
+ If all instances are busy, then the data will be dropped.
 \end_layout
 
 \begin_layout Standard
@@ -4536,12 +3746,7 @@ addressing
 \family default
  section is used to describe the location of the sensor (physical and logical
  address).
- Formally speaking, the addressing is a set of predicates in the form of
- 
-\begin_inset Formula $<key,value>$
-\end_inset
-
- pairs which can be used to anotate virtual sensors.
+ This can be used to annotate a virtual sensor.
  In GSN we have two special addressing keys, latitude and longitude, which
  are used by GSN's web interface to visualize the phyiscal location of the
  virtual sensor on the google map interface.
@@ -4549,82 +3754,35 @@ addressing
 \end_layout
 
 \begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Standard
-
-\family typewriter
-\size small
 <addressing>
 \end_layout
 
 \begin_layout Standard
-
-\family typewriter
-\size small
 <predicate key="type">mica sensor temperature light</predicate>
 \end_layout
 
 \begin_layout Standard
-
-\family typewriter
-\size small
 <predicate key="LATITUDE">37.4</predicate>
 \end_layout
 
 \begin_layout Standard
-
-\family typewriter
-\size small
 <predicate key="LONGITUDE">-122.1</predicate>
 \end_layout
 
 \begin_layout Standard
-
-\family typewriter
-\size small
-</addressing>
+</addressing> 
 \end_layout
 
 \begin_layout Standard
-
-\family typewriter
-\size small
-<storage history-size=
-\family default
-"
-\family typewriter
-1
-\family default
-"
-\family typewriter
- />
+Note that the addressing part is optional and can be omitted.
 \end_layout
 
-\end_inset
-
-
+\begin_layout LyX-Code
+<storage history-size="1" />
 \end_layout
 
-\begin_layout Standard
-The 
-\family typewriter
-life-cycle
-\family default
- 
-\family typewriter
-pool-size
-\family default
- option is a performance parameter.
- It is usually safe to keep the default value.
- It defines the maximum number of instances of this virtual sensor (with
- this configuration).
- This can happen when the processing method of the virtual sensor takes
- a long time to complete, and / or when data arrives at high speed.
- If all instances are busy, then the data will be dropped.
+\begin_layout LyX-Code
+
 \end_layout
 
 \begin_layout Standard
@@ -4650,129 +3808,75 @@ defines the number of streamElements produced by this virtual sensor that
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout LyX-Code
-
-\size small
-\begin_inset LatexCommand \label{virtual-sensor-stream-section-xml-example}
-
-\end_inset
-
 <streams>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <stream name="DATA" rate="100">
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <source alias="source1" storage-size="1" sampling-rate="1">
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <address wrapper="local">
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <predicate key="HOST">localhost</predicate>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <predicate key="PORT">22001</predicate>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <predicate key="NAME">MemoryMonitorVS</predicate>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 </address>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <query>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
   select HEAP,NON_HEAP,
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
     PENDING_FINALIZATION_COUNT,TIMED
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
   from wrapper
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 </query>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 </source>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 <query>select * from source1</query>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 </stream>
 \end_layout
 
 \begin_layout LyX-Code
-
-\size small
 </streams>
 \end_layout
 
-\end_inset
-
-
-\end_layout
-
 \begin_layout Standard
-The streams section (figure 
-\begin_inset LatexCommand \pageref{virtual-sensor-stream-section-xml-example}
-
-\end_inset
-
- ) is very important.
+The streams section is very important.
  It tells GSN what data it should send to the virtual sensor you are using
  (how to feed the virtual sensor).
  A virtual sensor can receive data from one or more streams.
@@ -4892,8 +3996,9 @@ This virtual sensor generates graphs from the data it receives.
 
 \begin_layout Standard
 \begin_inset Float table
+placement h
 wide false
-sideways false
+sideways true
 status open
 
 \begin_layout Caption
@@ -5257,8 +4362,9 @@ It requires a JDBC URL and a user name and password so that it knows where
 
 \begin_layout Standard
 \begin_inset Float table
+placement h
 wide false
-sideways false
+sideways true
 status open
 
 \begin_layout Caption
@@ -5535,8 +4641,7 @@ None
 \end_layout
 
 \begin_layout Section
-Data publishing (This part is currently under development and will be merged
- with feedback channel of GSN).
+Data publishing
 \end_layout
 
 \begin_layout Subsection
@@ -5665,7 +4770,7 @@ lib
 
 \end_inset
 
-SMS notifications: TBD
+SMS notifications
 \end_layout
 
 \begin_layout Part
@@ -7015,7 +6120,6 @@ Example:
 \begin_layout Standard
 
 \family typewriter
-\size small
 <gsn name="Container" author="EPFL" email="ali.salehi@epfl.ch" description="Not
  Provided">
 \end_layout
@@ -7023,7 +6127,6 @@ Example:
 \begin_layout Standard
 
 \family typewriter
-\size small
 <virtual-sensor name="invmaccess" last-modified="1173280806000" description="MyV
 S">
 \end_layout
@@ -7031,7 +6134,6 @@ S">
 \begin_layout Standard
 
 \family typewriter
-\size small
 <field name="image" type="binary:image/jpeg">/field?vs=invmaccess&field=DATA&pk=
 2868</field>
 \end_layout
@@ -7039,7 +6141,6 @@ S">
 \begin_layout Standard
 
 \family typewriter
-\size small
 <field name="timed" type="long" description="The timestamp associated with
  the stream element">1174999988339</field>
 \end_layout
@@ -7047,21 +6148,16 @@ S">
 \begin_layout Standard
 
 \family typewriter
-\size small
 <field name="geographical" category="predicate">BC 143, EPFL, Lausanne </field>
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 </virtual-sensor>
 \end_layout
 
 \begin_layout Standard
-
-\family typewriter
-\size small
 </gsn>
 \end_layout
 
@@ -7120,35 +6216,30 @@ http://localhost:22001/gsn?REQUEST=114&name=invmaccess
 \begin_layout Standard
 
 \family typewriter
-\size small
 <result> 
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 <stream-element> 
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 <field name="DATA">/field?vs=invmaccess&field=DATA&pk=5130</field>
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 <field name="timed">1175001199874</field> </stream-element> 
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 </result>
 \end_layout
 
@@ -7173,22 +6264,14 @@ http://localhost:22001/gsn?REQUEST=115&name=invmaccess
 \begin_layout Standard
 
 \family typewriter
-\size small
 <virtual-sensor name="invmaccess" last-modified="1173280806000">
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
-<predicate key="geographical">BC 143, EPFL, Lausanne</predicate>
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size small
-</virtual-sensor>
+<predicate key="geographical">BC 143, EPFL, Lausanne</predicate> </virtual-senso
+r>
 \end_layout
 
 \begin_layout Subsection
@@ -7211,49 +6294,42 @@ http://localhost:22001/gsn?REQUEST=116&name=invmaccess
 \begin_layout Standard
 
 \family typewriter
-\size small
 <result>
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 <stream-element>
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 <field name="DATA">/field?vs=invmaccess&field=DATA&pk=15102</field>
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 <field name="timed">1175006917711</field>
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 <field name="geographical">BC 143, EPFL, Lausanne</field>
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 </stream-element>
 \end_layout
 
 \begin_layout Standard
 
 \family typewriter
-\size small
 </result>
 \end_layout
 
@@ -7289,9 +6365,7 @@ jquery-latest.pack.js: The main jQuery library.
 
 \begin_layout Itemize
 jquery-dom.js: An extension to jQuery which allows easy DOM creation written
- like 
-\family typewriter
-$.DIV(
+ like $.DIV(
 \begin_inset ERT
 status collapsed
 
@@ -7313,9 +6387,7 @@ status collapsed
 
 \end_inset
 
-,"content")
-\family default
-; 
+,"content"); 
 \end_layout
 
 \begin_layout Itemize
@@ -7351,13 +6423,7 @@ gsn.js: Our core javascript code.
 \end_layout
 
 \begin_layout Subsection
-
-\family typewriter
-\size normal
-gsn.js
-\family default
-\size default
- core function
+gsn.js core function
 \end_layout
 
 \begin_layout Standard
@@ -8510,6 +7576,11 @@ GSN webapp was fully tested using the main browsers on the web: Internet
  There was not any formal testing routine or unit testing.
  However, the core functionality were tested in the three browsers to ensure
  that they were working similarly.
+\end_layout
+
+\begin_layout Standard
+After a month of implementation, the interface was quite advanced but never
+ tested with many sensors.
  When we added more than 40 sensors, it became ridiculously slow.
  It took more than 15 seconds to show them.
  JavaScript is slow and using some nice syntax features of jQuery can be
@@ -8523,11 +7594,84 @@ GSN webapp was fully tested using the main browsers on the web: Internet
  Later, the speed was again improved by updating jQuery to the new 1.1 version.
 \end_layout
 
-\begin_layout Standard
-\begin_inset Note Note
-status open
+\begin_layout Subsubsection
+Javascript debugging
+\end_layout
 
 \begin_layout Standard
+With ajax webapp, the amount of complex javascript code is significant,
+ thus it needs to be debugged and analyzed.
+ Hopefully, a relatively new extension for FireFox called FireBug
+\begin_inset LatexCommand \cite{firebug}
+
+\end_inset
+
+ helps a lot.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename ../BEFFA-2007/firebug.png
+	width 100text%
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+As shown above, it allows to easily output debugging messages with the 
+\emph on
+console.debug(...)
+\emph default
+ object.
+ Objects can be fully analysed and changed.
+ The html and css code could be modified on the fly.
+ This is very powerful and helps a lot.
+\end_layout
+
+\begin_layout Standard
+Nevertheless, when testing gsn compatibility with IE, this is a pain to
+ not have FireBug.
+ Moreover that IE usually have some weird and hard to catch JavaScript bug.
+\end_layout
+
+\begin_layout Subsection
+GPSVS sensor
+\end_layout
+
+\begin_layout Standard
+A GPS bluetooth sensor was received during the project development.
+ A small virtual sensor was created to test it.
+ Using the serial port wrapper, it was very fast and easy to do.
+ This experience also brought some relevant feedback to the team.
+ The sensor code was quickly put together using a serial port wrapper, as
+ bluetooth supports serial port emulation (BlueTooth Serial Port Profile).
+ GPS sensors actually have some specification for their output called NMEA
+\begin_inset LatexCommand \cite{nmea}
+
+\end_inset
+
+.
+ Only a subset of it was implemented, the GPRMC part to be precise.
+ This is some formatted text only output looking for example like 
+\emph on
+"$GPRMC,081836,A,3751.65,S,14507.36,E,000.0,360.0,130998,011.3,E*62"
+\emph default
+ which has to be converted to Google maps coordinates.
+\end_layout
+
+\begin_layout Standard
+The GPS sensor was developed using a GPSlim device but should be successfully
+ used by any device following the NMEA specification.
+ It was actually tested with a Nokia GPS device without any modification.
+ The only small problem was the linkage of the Nokia GPS device which requires
+ a passcode.
+ It can be found deep down in the documentation and is 0000 by default.
+\end_layout
+
+\begin_layout Chapter
 Writing a Protocol Description
 \end_layout
 
@@ -8561,120 +7705,8 @@ It is also possible to build such packets using jnetstream.
  This allows to communicate with your data source.
 \end_layout
 
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section*
-
-\newpage
-Appendix
-\end_layout
-
-\begin_layout Subsection*
-Using Eclipse for development and debugging virtual sensors in GSN
-\end_layout
-
 \begin_layout Standard
-Here I would like to give the instructions for whom interested in using
- eclipse's debugging capabilities with GSN.
- As GSN uses the Jibx framework for reading the xml documents, it is not
- straightforward how to configure your eclipse environment to run/debug
- your virtual sensors.
- Here is the instruction that worked for me:
-\end_layout
 
-\begin_layout Itemize
-Setting the Ant Home: 
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Go to Window Menu and select Preferences, on the left side, click on the
- Ant and then select Runtime.
-\end_layout
-
-\begin_layout Itemize
-In the Classpath tab (opened on thecenterof the window) select Ant Home
- Entries, click on the Ant Home button and browse toward the directory that
- contains the files from the apache-ant archive.
-\end_layout
-
-\begin_layout Itemize
-Click on OK.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Setting an Ant Build System for your GSN project:
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-On the Project menu and click on properties tab.
-\end_layout
-
-\begin_layout Itemize
-Select Build on the left side and click on new and select Ant.
-\end_layout
-
-\begin_layout Itemize
-A new window pops up which has several tabs :
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Main Tab :
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-For build file, click on Browse Workspace and select the build.xml file
-\end_layout
-
-\begin_layout Itemize
-For base directory, click on the Browse Workspace and click on theproject
- name which contains the gsn source code.
-\end_layout
-
-\begin_layout Itemize
-Let the Set an Input Handler selected.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Targets Tab :
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-For After a Clean, click on Set Targets and select both Build and Bind.
-\end_layout
-
-\begin_layout Itemize
-Don't touch the Manual and Auto build option ! (leave it empty)
-\end_layout
-
-\begin_layout Itemize
-Click on Ok.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-You'll be returned back to the Builders page, make sure both Java Builder
- AND New Builder (or what ever you named it in the previouswindow) are selected.
- Click on OK.
-\end_layout
-
-\begin_layout Itemize
-Now you can debug your virtual sensors in eclipse, try it by setting a breakpoin
-t on a line in the main file.
-\end_layout
-
-\begin_layout Itemize
-IMPORTANT : Sometimes you need to clean the project to run/debug GSN (Project
- menu, Clean...).
 \end_layout
 
 \begin_layout Standard
