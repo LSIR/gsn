@@ -404,6 +404,15 @@ public class VSensorConfig implements Serializable {
 		  }
 		  return false;
 	  }
+	  
+	  public int hashCode(){
+		  if(name != null){
+			  return name.hashCode();
+		  }
+		  else{
+			  return super.hashCode();
+		  }
+	  }
 
 	  public String getGeneralPassword(){
 		  return generalPassword;

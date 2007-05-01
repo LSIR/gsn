@@ -180,8 +180,10 @@ private Collection < VSensorConfig > getModifications ( ) {
 	   HashMap<String, VSensorConfig> vsNameTOVSConfig = new HashMap<String, VSensorConfig>();
 	   while(allVSensorConfigs.hasNext()){
 		   VSensorConfig config = allVSensorConfigs.next();
-		   vsNameTOVSConfig.put(config.getName().toLowerCase().trim(), config);
-		   graph.addNode(config);
+		if(config != null && config.getName() != null){
+			   vsNameTOVSConfig.put(config.getName().toLowerCase().trim(), config);
+			   graph.addNode(config);
+		   }
 	   }
 
 outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){ 		
