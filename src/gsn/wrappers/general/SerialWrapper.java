@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.hsqldb.lib.InOutUtil;
 
+import com.sun.org.apache.regexp.internal.REProgram;
+
 /**
  * Modified to used RXTX (http://users.frii.com/jarvi/rxtx/) which a LGPL
  * replacement for javacomm. The Easiest way to install RXTX is from the binary
@@ -82,6 +84,8 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
    private int                     parity        = SerialPort.PARITY_NONE;
    
    private  DataField [] dataField     ;
+
+   private int output_format;
    
    /*
     * Needs the following information from XML file : serialport : the name of
@@ -113,6 +117,18 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
          useInputSeparator = false;
        else 
          useInputSeparator = true;
+      
+      
+      String representation = addressBean.getPredicateValue( "representation" );
+      
+      if ( representation == null ) 
+         output_format=0;
+       else if (representation.equalsIgnoreCase("string"))
+         output_format=1;
+       else {
+       logger.error("The provided representation >"+representation+"< is not valid, possible values are binary , string");
+       return false;
+       }
       
       String newBaudRate = addressBean.getPredicateValue( "baudrate" );
       if ( newBaudRate != null && newBaudRate.trim( ).length( ) > 0 ) {
@@ -424,12 +440,33 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
       if ( useInputSeparator ) {
          for ( String chunk : new String(inputBuffer).split( inputSeparator ) ) 
              if ( chunk.length( ) > 0 ) 
-            	 postStreamElement( chunk.getBytes( ) );
+            	 post_item(chunk);
       } else { //without separator character.
-    	  postStreamElement( inputBuffer );
+    	  post_item(inputBuffer );
       }
    }
    
+   private void post_item (byte[] val){
+	   switch (output_format){
+  	 case 0:
+      	 postStreamElement(  val );
+      	 break;
+  	 case 1:
+  		 postStreamElement( new String( val ));
+  		 break;
+  	 }
+   }
+   
+   private void post_item (String val){
+	   switch (output_format){
+  	 case 0:
+      	 postStreamElement(  val.getBytes() );
+      	 break;
+  	 case 1:
+  		 postStreamElement(  val );
+  		 break;
+  	 }
+   }
    public static void main ( String [ ] args ) {
       Properties properties = new Properties( );
       properties.put( "log4j.rootLogger" , "DEBUG,console" );
