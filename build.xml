@@ -52,7 +52,9 @@
       <condition property="java6">
         <equals arg1="${ant.java.version}" arg2="1.6"/> 
       </condition>
-        <copydir  dest="${build.dir}/org" src="${src.dir}/org"/>
+      <copydir  dest="${build.dir}/org" src="${src.dir}/org"/>
+	  <copydir  dest="${build.dir}/gsn/gui/templates" src="${src.dir}/gsn/gui/templates"/>
+   	  <copydir  dest="${build.dir}/gsn/gui/resources" src="${src.dir}/gsn/gui/resources"/>
    </target>
  
      
@@ -94,6 +96,13 @@
          <!-- For JDK5 profiling <jvmarg value="-Xrunhprof:heap=sites,depth=15,force=n"/> -->
       </java>
    </target>
+	
+	<target name="gui" depends="bind">
+	    <java classname="gsn.gui.GSNConfiguratorFrame"  fork="true" dir="${basedir}">
+	         <classpath refid="classpath"/>
+	      	 <jvmarg value="-splash:icons/GSNLogo.png" />
+	      </java>
+	</target>	
  
    <!-- ================================= 
           target: stop              
