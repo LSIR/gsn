@@ -21,6 +21,8 @@ public class VSensorConfigModel extends Model {
 
 	public static final String PROPERTY_PRIORITY = "priority";
 
+	public static final String PROPERTY_GENERAL_PASSWORD = "generalPassword";
+
 	public static final String PROPERTY_MAIN_CLASS = "mainClass";
 
 	public static final String PROPERTY_DESCRIPTION = "description";
@@ -33,9 +35,13 @@ public class VSensorConfigModel extends Model {
 
 	public static final String PROPERTY_STORAGE_HISTORY_SIZE = "storageHistorySize";
 
+	public static final String PROPERTY_RATE_UNLIMITED = "rateUnlimited";
+
 	private String name;
 
 	private int priority;
+
+	private String generalPassword;
 
 	private String mainClass;
 
@@ -58,20 +64,23 @@ public class VSensorConfigModel extends Model {
 	private ArrayListModel mainClassInitialParams;
 
 	private ArrayListModel webinput;
+	
+	private boolean rateUnlimited;
 
 	public VSensorConfigModel() {
 		priority = VSensorConfig.DEFAULT_PRIORITY;
-		lifeCyclePoolSize = 10;
+		lifeCyclePoolSize = VSensorConfig.DEFAULT_POOL_SIZE;
 		addressing = new ArrayListModel();
 		outputStructure = new ArrayListModel();
 		inputStreams = new ArrayListModel();
 		mainClassInitialParams = new ArrayListModel();
 		webinput = new ArrayListModel();
 	}
-	
-	public VSensorConfigModel(VSensorConfig vSensorConfig){
+
+	public VSensorConfigModel(VSensorConfig vSensorConfig) {
 		name = vSensorConfig.getName();
 		priority = vSensorConfig.getPriority();
+		generalPassword = vSensorConfig.getGeneralPassword();
 		mainClass = vSensorConfig.getProcessingClass();
 		description = vSensorConfig.getDescription();
 		lifeCyclePoolSize = vSensorConfig.getLifeCyclePoolSize();
@@ -90,9 +99,12 @@ public class VSensorConfigModel extends Model {
 		addWebInputList(vSensorConfig.getWebinput());
 	}
 
+
 	private void addWebInputList(WebInput[] webInputs) {
-		for (int i = 0; i < webInputs.length; i++) {
-			addWebInputModel(new WebInputModel(webInputs[i]));
+		if (webInputs != null) {
+			for (int i = 0; i < webInputs.length; i++) {
+				addWebInputModel(new WebInputModel(webInputs[i]));
+			}
 		}
 	}
 
@@ -101,8 +113,10 @@ public class VSensorConfigModel extends Model {
 	}
 
 	private void addMainClassInitialParamsList(TreeMap<String, String> initialParams) {
-		for (Map.Entry<String, String> entry : initialParams.entrySet()) {
-			addMainClassInitialParam(new KeyValueImp(entry.getKey(), entry.getValue()));
+		if (initialParams != null) {
+			for (Map.Entry<String, String> entry : initialParams.entrySet()) {
+				addMainClassInitialParam(new KeyValueImp(entry.getKey(), entry.getValue()));
+			}
 		}
 	}
 
@@ -111,8 +125,10 @@ public class VSensorConfigModel extends Model {
 	}
 
 	private void addInputStreamList(Collection<InputStream> inputStreams) {
-		for (InputStream stream : inputStreams) {
-			addInputStreamModel(new InputStreamModel(stream));
+		if (inputStreams != null) {
+			for (InputStream stream : inputStreams) {
+				addInputStreamModel(new InputStreamModel(stream));
+			}
 		}
 	}
 
@@ -121,8 +137,10 @@ public class VSensorConfigModel extends Model {
 	}
 
 	private void addOutputStructureList(DataField[] dataFields) {
-		for (int i = 0; i < dataFields.length; i++) {
-			addOutputStructure(new DataFieldModel(dataFields[i]));
+		if (dataFields != null) {
+			for (int i = 0; i < dataFields.length; i++) {
+				addOutputStructure(new DataFieldModel(dataFields[i]));
+			}
 		}
 	}
 
@@ -131,8 +149,10 @@ public class VSensorConfigModel extends Model {
 	}
 
 	private void addAddressingList(KeyValue[] keyValues) {
-		for (int i = 0; i < keyValues.length; i++) {
-			addAddressing(keyValues[i]);
+		if (keyValues != null) {
+			for (int i = 0; i < keyValues.length; i++) {
+				addAddressing(keyValues[i]);
+			}
 		}
 	}
 
@@ -145,7 +165,9 @@ public class VSensorConfigModel extends Model {
 	}
 
 	public void setDescription(String description) {
+		String oldDescription = getDescription();
 		this.description = description;
+		firePropertyChange(PROPERTY_DESCRIPTION, oldDescription, description);
 	}
 
 	public int getLifeCyclePoolSize() {
@@ -153,7 +175,9 @@ public class VSensorConfigModel extends Model {
 	}
 
 	public void setLifeCyclePoolSize(int lifeCyclePoolSize) {
+		int oldLifecyclePoolSize = getLifeCyclePoolSize();
 		this.lifeCyclePoolSize = lifeCyclePoolSize;
+		firePropertyChange(PROPERTY_LIFECYCLE_POOL_SIZE, oldLifecyclePoolSize, lifeCyclePoolSize);
 	}
 
 	public String getMainClass() {
@@ -161,7 +185,9 @@ public class VSensorConfigModel extends Model {
 	}
 
 	public void setMainClass(String mainClass) {
+		String oldMainClass = getMainClass();
 		this.mainClass = mainClass;
+		firePropertyChange(PROPERTY_MAIN_CLASS, oldMainClass, mainClass);
 	}
 
 	public String getName() {
@@ -169,7 +195,9 @@ public class VSensorConfigModel extends Model {
 	}
 
 	public void setName(String name) {
+		String oldName = getName();
 		this.name = name;
+		firePropertyChange(PROPERTY_NAME, oldName, name);
 	}
 
 	public int getOutputStreamRate() {
@@ -177,7 +205,9 @@ public class VSensorConfigModel extends Model {
 	}
 
 	public void setOutputStreamRate(int outputStreamRate) {
+		int oldOutputStreamRate = getOutputStreamRate();
 		this.outputStreamRate = outputStreamRate;
+		firePropertyChange(PROPERTY_OUTPUT_STREAM_RATE, oldOutputStreamRate, outputStreamRate);
 	}
 
 	public int getPriority() {
@@ -185,7 +215,9 @@ public class VSensorConfigModel extends Model {
 	}
 
 	public void setPriority(int priority) {
+		int oldPriority = getPriority();
 		this.priority = priority;
+		firePropertyChange(PROPERTY_PRIORITY, oldPriority, priority);
 	}
 
 	public String getStorageHistorySize() {
@@ -193,7 +225,9 @@ public class VSensorConfigModel extends Model {
 	}
 
 	public void setStorageHistorySize(String storageHistorySize) {
+		String oldStorageHistorySize = getStorageHistorySize();
 		this.storageHistorySize = storageHistorySize;
+		firePropertyChange(PROPERTY_STORAGE_HISTORY_SIZE, oldStorageHistorySize, storageHistorySize);
 	}
 
 	public String getWebParameterPassword() {
@@ -201,7 +235,29 @@ public class VSensorConfigModel extends Model {
 	}
 
 	public void setWebParameterPassword(String webParameterPassword) {
+		String oldWebParameterPassword = getWebParameterPassword();
 		this.webParameterPassword = webParameterPassword;
+		firePropertyChange(PROPERTY_WEB_PARAMETER_PASSWORD, oldWebParameterPassword, webParameterPassword);
+	}
+
+	public String getGeneralPassword() {
+		return generalPassword;
+	}
+
+	public void setGeneralPassword(String generalPassword) {
+		String oldGeneralPassword = getGeneralPassword();
+		this.generalPassword = generalPassword;
+		firePropertyChange(PROPERTY_GENERAL_PASSWORD, oldGeneralPassword, generalPassword);
+	}
+
+	public boolean isRateUnlimited() {
+		return rateUnlimited;
+	}
+
+	public void setRateUnlimited(boolean rateUnlimited) {
+		boolean oldRateUnlimited = isRateUnlimited();
+		this.rateUnlimited = rateUnlimited;
+		firePropertyChange(PROPERTY_RATE_UNLIMITED, oldRateUnlimited, rateUnlimited);
 	}
 
 	public ArrayListModel getAddressing() {

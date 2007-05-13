@@ -4,6 +4,7 @@ import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.gui.forms.GSNConfiguratorPanel;
 import gsn.gui.forms.VSensorVisualizerPanel;
+import gsn.gui.util.GUIUtil;
 import gsn.utils.ValidityTools;
 
 import java.awt.AWTException;
@@ -122,82 +123,84 @@ public class GSNConfiguratorFrame extends JFrame {
 		initComponents();
 		initEvents();
 //		initDesktop();
+		GUIUtil.locateOnOpticalScreenCenter(this);
 		setVisible(true);
 	}
 
-	private void initDesktop() {
-		if(SystemTray.isSupported() && Desktop.isDesktopSupported()) {
-			tray = SystemTray.getSystemTray();
-			desktop = Desktop.getDesktop();
-			Image image = Toolkit.getDefaultToolkit().getImage("icons/gsn.png");
-			ActionListener trayListener = new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					try {
-						desktop.browse(new URI("http://127.0.0.1:"+Integer.toString(bean.getContainerPort())));
-					} catch(IOException ioe) {
-						System.out.println("GSN encountered an unexpected error: " + ioe.getMessage());
-						ioe.printStackTrace();
-					} catch (URISyntaxException e) {
-						e.printStackTrace();
-					}
-				}
-			};
-			
-	         // create a popup menu
-	         popup = new PopupMenu();
-	         
-	         // create menu item to access web interface
-	         MenuItem openWebItem = new MenuItem("GSN Web Interface");
-	         openWebItem.addActionListener(trayListener);
-	         popup.add(openWebItem);
-	         
-	         // menu item to exit gsn
-	         MenuItem quitItem = new MenuItem("Quit GSN");
-	         quitItem.addActionListener(quitListener);
-	         popup.addSeparator();
-	         popup.add(quitItem);
-	         
-	         // construct a TrayIcon
-	         trayIcon = new TrayIcon(image, "GSN", popup);
-	         trayIcon.setImageAutoSize(true);
-//	         trayIcon.addActionListener(new ActionListener() {
+	//TODO:requires JDk 6	
+//	private void initDesktop() {
+//		if(SystemTray.isSupported() && Desktop.isDesktopSupported()) {
+//			tray = SystemTray.getSystemTray();
+//			desktop = Desktop.getDesktop();
+//			Image image = Toolkit.getDefaultToolkit().getImage("icons/gsn.png");
+//			ActionListener trayListener = new ActionListener() {
 //				public void actionPerformed(ActionEvent arg0) {
-//					System.out.println("trayIcon was clicked. visible= " + isVisible());
-//					setExtendedState(isVisible()?Frame.ICONIFIED:Frame.NORMAL);
-//					setVisible(isVisible()?false:true);
+//					try {
+//						desktop.browse(new URI("http://127.0.0.1:"+Integer.toString(bean.getContainerPort())));
+//					} catch(IOException ioe) {
+//						System.out.println("GSN encountered an unexpected error: " + ioe.getMessage());
+//						ioe.printStackTrace();
+//					} catch (URISyntaxException e) {
+//						e.printStackTrace();
+//					}
 //				}
+//			};
+//			
+//	         // create a popup menu
+//	         popup = new PopupMenu();
+//	         
+//	         // create menu item to access web interface
+//	         MenuItem openWebItem = new MenuItem("GSN Web Interface");
+//	         openWebItem.addActionListener(trayListener);
+//	         popup.add(openWebItem);
+//	         
+//	         // menu item to exit gsn
+//	         MenuItem quitItem = new MenuItem("Quit GSN");
+//	         quitItem.addActionListener(quitListener);
+//	         popup.addSeparator();
+//	         popup.add(quitItem);
+//	         
+//	         // construct a TrayIcon
+//	         trayIcon = new TrayIcon(image, "GSN", popup);
+//	         trayIcon.setImageAutoSize(true);
+////	         trayIcon.addActionListener(new ActionListener() {
+////				public void actionPerformed(ActionEvent arg0) {
+////					System.out.println("trayIcon was clicked. visible= " + isVisible());
+////					setExtendedState(isVisible()?Frame.ICONIFIED:Frame.NORMAL);
+////					setVisible(isVisible()?false:true);
+////				}
+////	         });
+//	         // In the interest of cross-platform compatibility
+//	         trayIcon.addMouseListener(new MouseListener() {
+//
+//				public void mouseClicked(MouseEvent arg0) {
+//					setVisible(isVisible()?false:true);
+//					setExtendedState(isVisible()?Frame.NORMAL:Frame.ICONIFIED);
+//				}
+//				public void mouseEntered(MouseEvent arg0) {	}
+//				public void mouseExited(MouseEvent arg0) {}
+//				public void mousePressed(MouseEvent arg0) {	}
+//				public void mouseReleased(MouseEvent arg0) { }
 //	         });
-	         // In the interest of cross-platform compatibility
-	         trayIcon.addMouseListener(new MouseListener() {
-
-				public void mouseClicked(MouseEvent arg0) {
-					setVisible(isVisible()?false:true);
-					setExtendedState(isVisible()?Frame.NORMAL:Frame.ICONIFIED);
-				}
-				public void mouseEntered(MouseEvent arg0) {	}
-				public void mouseExited(MouseEvent arg0) {}
-				public void mousePressed(MouseEvent arg0) {	}
-				public void mouseReleased(MouseEvent arg0) { }
-	         });
-	         trayIcon.setToolTip("GSN Server");
-	         addWindowListener(new WindowAdapter() {
-	     		public void windowDeiconified(WindowEvent arg0) {
-	     			setVisible(true);
-	     			setExtendedState(Frame.NORMAL);
-	    		}
-
-	    		public void windowIconified(WindowEvent arg0) {
-	    			setVisible(false);
-	    			setExtendedState(Frame.ICONIFIED);
-	    		}	        	 
-	         });
-	         try {
-	             tray.add(trayIcon);
-	         } catch (AWTException e) {
-	             System.err.println(e);
-	         }
-		}
-	}
+//	         trayIcon.setToolTip("GSN Server");
+//	         addWindowListener(new WindowAdapter() {
+//	     		public void windowDeiconified(WindowEvent arg0) {
+//	     			setVisible(true);
+//	     			setExtendedState(Frame.NORMAL);
+//	    		}
+//
+//	    		public void windowIconified(WindowEvent arg0) {
+//	    			setVisible(false);
+//	    			setExtendedState(Frame.ICONIFIED);
+//	    		}	        	 
+//	         });
+//	         try {
+//	             tray.add(trayIcon);
+//	         } catch (AWTException e) {
+//	             System.err.println(e);
+//	         }
+//		}
+//	}
 
 	
 

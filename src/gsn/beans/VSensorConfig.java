@@ -23,6 +23,8 @@ public class VSensorConfig implements Serializable {
 
 	public static final int                        NO_FIXED_RATE                             = 0;
 
+	public static final int                        DEFAULT_POOL_SIZE                         = 10;
+
 	private String                                 name;
 
 	private int                                    priority                                  = DEFAULT_PRIORITY;
@@ -31,7 +33,7 @@ public class VSensorConfig implements Serializable {
 
 	private String                                 description;
 
-	private int                                    lifeCyclePoolSize                         = 10;
+	private int                                    lifeCyclePoolSize                         = DEFAULT_POOL_SIZE;
 
 	private int                                    outputStreamRate;
 
