@@ -1,6 +1,7 @@
 package gsn.gui.forms;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -13,9 +14,11 @@ import gsn.gui.util.GUIUtil;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -72,7 +75,7 @@ public class VSensorWebInpuPanel {
 	public JComponent createPanel() {
 		initComponents();
 		
-		FormLayout layout = new FormLayout("right:pref, 4dlu, max(pref;150dlu), pref:g", "pref, 8dlu, pref, 5dlu, pref, 5dlu, pref");
+		FormLayout layout = new FormLayout("right:max(pref;60), 4dlu, max(pref;150dlu), pref:g", "pref, 8dlu, pref, 5dlu, pref, 5dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
@@ -85,12 +88,15 @@ public class VSensorWebInpuPanel {
 	}
 
 	private JComponent createListPanel() {
-		FormLayout layout = new FormLayout("pref, pref", "pref");
+		FormLayout layout = new FormLayout("right:max(pref;60), 4dlu, pref:g, 7dlu, pref", "pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
-		builder.add(new JScrollPane(commandList), cc.xy(1, 1));
-		builder.add(createButtomBar(), cc.xy(2, 1));
+		builder.addLabel("Names", cc.xy(1, 1, "right, top"));
+		JScrollPane scrollPane = new JScrollPane(commandList);
+		scrollPane.setPreferredSize(new Dimension(200, 200));
+		builder.add(scrollPane, cc.xy(3, 1));
+		builder.add(createButtomBar(), cc.xy(5, 1));
 		return builder.getPanel();
 	}
 
@@ -107,7 +113,7 @@ public class VSensorWebInpuPanel {
 	private void initComponents() {
 		passwordTextField = BasicComponentFactory.createTextField(presentationModel
 				.getModel(VSensorConfigModel.PROPERTY_WEB_PARAMETER_PASSWORD));
-		commandList = BasicComponentFactory.createList(selectionInList);
+		commandList = BasicComponentFactory.createList(selectionInList, new WebInputListCellRenderer());
 		dataFieldEditorPanel = new DataFieldEditorPanel(null);
 		addAction = new AddAction();
 		removeAction = new RemoveAction();
@@ -115,6 +121,8 @@ public class VSensorWebInpuPanel {
 		addButton = new JButton(getAddAction());
 		removeButton = new JButton(getRemoveAction());
 		editButton = new JButton(getEditAction());
+		
+		updateActionEnablement();
 	}
 
 	private Action getEditAction() {
@@ -133,6 +141,19 @@ public class VSensorWebInpuPanel {
 		boolean hasSelection = selectionInList.hasSelection();
 		getEditAction().setEnabled(hasSelection);
 		getRemoveAction().setEnabled(hasSelection);
+	}
+	
+	public class WebInputListCellRenderer extends DefaultListCellRenderer {
+		
+		@Override
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			if(value instanceof WebInputModel){
+				label.setText(((WebInputModel)value).getName());
+			}
+			return this;
+		}
+		
 	}
 
 	private class SelectionEmptyHandler implements PropertyChangeListener {
@@ -261,6 +282,7 @@ public class VSensorWebInpuPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				canceled = false;
+				presentationModel.setBean(null);
 				close();
 			}
 		}

@@ -3,6 +3,7 @@ package gsn.gui.forms;
 import gsn.gui.beans.DataFieldModel;
 import gsn.gui.util.GUIUtil;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -62,17 +63,21 @@ public class DataFieldEditorPanel {
 	public void setListModel(ArrayListModel dataFieldListModel){
 		this.dataFieldListModel = dataFieldListModel;
 		selectionInList.setList(dataFieldListModel);
+		updateActionEnablement();
 	}
 	
 	public JComponent createPanel() {
 		initConponents();
 
-		FormLayout layout = new FormLayout("pref:g, 7dlu, pref", "pref");
+		FormLayout layout = new FormLayout("right:max(pref;60), 4dlu, pref:g, 7dlu, pref", "pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
-		builder.add(new JScrollPane(table), cc.xy(1, 1));
-		builder.add(createButtomBar(), cc.xy(3, 1));
+		builder.addLabel("Fields", cc.xy(1, 1, "right, top"));
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setPreferredSize(new Dimension(200, 200));
+		builder.add(scrollPane, cc.xy(3, 1));
+		builder.add(createButtomBar(), cc.xy(5, 1));
 		return builder.getPanel();
 	}
 
@@ -116,6 +121,7 @@ public class DataFieldEditorPanel {
 		boolean hasSelection = selectionInList.hasSelection();
 		getEditAction().setEnabled(hasSelection);
 		getRemoveAction().setEnabled(hasSelection);
+		getAddAction().setEnabled(dataFieldListModel != null);
 	}
 
 	public static class DataFieldTableModel extends AbstractTableAdapter implements TableModel {

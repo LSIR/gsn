@@ -3,6 +3,7 @@ package gsn.gui.forms;
 import gsn.gui.util.GUIUtil;
 import gsn.utils.KeyValueImp;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -59,6 +60,12 @@ public class KeyValueEditorPanel {
 		selectionInList = new SelectionInList((ListModel) this.keyValueList);
 		selectionInList.addPropertyChangeListener(SelectionInList.PROPERTYNAME_SELECTION_EMPTY, new SelectionEmptyHandler());
 	}
+	
+	public void setListModel(ArrayListModel keyValueList){
+		this.keyValueList = keyValueList;
+		selectionInList.setList(keyValueList);
+		updateActionEnablement();
+	}
 
 	public JComponent createPanel() {
 		initConponents();
@@ -67,7 +74,9 @@ public class KeyValueEditorPanel {
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
-		builder.add(new JScrollPane(table), cc.xy(1, 1));
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setPreferredSize(new Dimension(200, 200));
+		builder.add(scrollPane, cc.xy(1, 1));
 		builder.add(createButtomBar(), cc.xy(3, 1));
 		return builder.getPanel();
 	}
@@ -112,6 +121,7 @@ public class KeyValueEditorPanel {
 		boolean hasSelection = selectionInList.hasSelection();
 		getEditAction().setEnabled(hasSelection);
 		getRemoveAction().setEnabled(hasSelection);
+		getAddAction().setEnabled(keyValueList != null);
 	}
 
 	public static class KeyValueTableModel extends AbstractTableAdapter implements TableModel {
