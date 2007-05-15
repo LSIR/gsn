@@ -262,7 +262,7 @@ public class StorageManager {
 			prepareStatement = connection.prepareStatement(stmt);
 			prepareStatement.execute();
 			close(prepareStatement);
-			stmt = getStatementDropTable(tableName).toString();
+			stmt = getStatementDropTable(tableName,connection).toString();
 			if (logger.isDebugEnabled())
 				logger.debug("Dropping table structure: " + tableName+ " With query: "+stmt);
 			prepareStatement= connection.prepareStatement(stmt);
@@ -312,6 +312,7 @@ public class StorageManager {
 		PreparedStatement prepareStatement = connection.prepareStatement(sql
 				.toString());
 		prepareStatement.execute();
+		System.out.println(sql.toString());
 		prepareStatement.close();
 
 		sql = getStatementCreateIndexOnTimed(tableName);
@@ -528,13 +529,12 @@ public class StorageManager {
 				" rename to ").append(newName).toString();
 	}
 
-	public static StringBuilder getStatementDropTable(CharSequence tableName) {
+	public static StringBuilder getStatementDropTable(CharSequence tableName,Connection conn) throws SQLException {
 		StringBuilder sb = new StringBuilder("Drop table ");
-		if (isMysqlDB())
-			sb.append(" if exists " );
+		DATABASE db = getDatabaseForConnection(conn);
+		if (db.getDBType()==MYSQL_DB) sb.append(" if exists " );
 		sb.append(tableName);
-		if ( StorageManager.isHsql())
-			sb.append(" if exists " );
+		if (db.getDBType()==HSQL_DB) sb.append(" if exists " );
 		return sb;
 	}
 
@@ -570,19 +570,18 @@ public class StorageManager {
 	public static StringBuilder getStatementCreateTable(CharSequence tableName,
 			DataField[] structure, Connection connection) throws SQLException {
 		StringBuilder result = new StringBuilder("CREATE ");
-		if (isHsql())
+		DATABASE db = getDatabaseForConnection(connection);
+		if (db.getDBType()==HSQL_DB)
 			result.append(" CACHED ");
 		result.append("TABLE ").append(tableName);
-		if (isHsql() || isSqlServer())
-			result
-					.append(" (PK BIGINT NOT NULL IDENTITY, timed BIGINT NOT NULL, ");
-		else if (isMysqlDB())
-			result
-					.append(" (PK BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT, timed BIGINT NOT NULL, ");
+		if (db.getDBType()== SQLSERVER_DB || db.getDBType()==HSQL_DB)
+			result.append(" (PK BIGINT NOT NULL IDENTITY, timed BIGINT NOT NULL, ");
+		else if (db.getDBType()==MYSQL_DB)
+			result.append(" (PK BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT, timed BIGINT NOT NULL, ");
 
 		for (DataField field : structure) {
 			result.append(field.getName().toUpperCase()).append(' ');
-			if (isMysqlDB()) {
+			if (db.getDBType()==MYSQL_DB) {
 				switch (field.getDataTypeID()) {
 				case DataTypes.CHAR:
 				case DataTypes.VARCHAR:
@@ -597,7 +596,7 @@ public class StorageManager {
 					result.append(DataTypes.TYPE_NAMES[field.getDataTypeID()]);
 					break;
 				}
-			} else if (isHsql()) {
+			} else if (db.getDBType()==HSQL_DB) {
 				switch (field.getDataTypeID()) {
 				case DataTypes.CHAR:
 				case DataTypes.VARCHAR:
@@ -609,7 +608,7 @@ public class StorageManager {
 					result.append(DataTypes.TYPE_NAMES[field.getDataTypeID()]);
 					break;
 				}
-			} else if (isSqlServer()) {
+			} else if (db.getDBType()==SQLSERVER_DB) {
 				switch (field.getDataTypeID()) {
 				case DataTypes.CHAR:
 				case DataTypes.VARCHAR:
@@ -651,6 +650,11 @@ public class StorageManager {
 	private static boolean mysql = false;
 
 	private static boolean hsql = false;
+	
+	public static final int MYSQL_DB=1;
+	public static final int SQLSERVER_DB=2;
+	public static final int HSQL_DB=3;
+	
 
 	public static enum DATABASE {
 
@@ -697,6 +701,7 @@ public class StorageManager {
 				else
 					return "DROP VIEW IF EXISTS #NAME";
 			}
+			public  int getDBType() {return MYSQL_DB;}
 		},
 		HSQL("jdbc:hsql:", "org.hsqldb.jdbcDriver") {
 
@@ -736,6 +741,7 @@ public class StorageManager {
 			public String getStatementDropView() {
 				return "DROP VIEW #NAME IF EXISTS";
 			}
+			public  int getDBType() {return HSQL_DB;}
 		},
 		SQLSERVER("jdbc:jtds:sqlserver:", "net.sourceforge.jtds.jdbc.Driver") {
 
@@ -771,6 +777,8 @@ public class StorageManager {
 			public String getStatementDropView() {
 				return "DROP VIEW #NAME";
 			}
+			public  int getDBType() {return SQLSERVER_DB;}
+			
 		};
 
 		private final String jdbcPrefix;
@@ -787,6 +795,7 @@ public class StorageManager {
 				logger.error(e.getMessage(), e);
 			}
 		}
+
 
 		/**
 		 * The prefix is in lower case
@@ -814,6 +823,9 @@ public class StorageManager {
 		public abstract String getStatementDropView();
 
 		public abstract int getTableNotExistsErrNo();
+		
+		public abstract int getDBType();
+		
 	};
 
 	/**

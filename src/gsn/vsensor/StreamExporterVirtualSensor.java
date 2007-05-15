@@ -1,47 +1,31 @@
-/**
- * 
- * @author Jerome Rousselot
- */
 package gsn.vsensor;
 
-import gsn.beans.DataTypes;
+import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
-import gsn.storage.StorageManager.DATABASE;
 import gsn.utils.GSNRuntimeException;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 import java.util.TreeMap;
-import java.util.Vector;
 import org.apache.log4j.Logger;
 import java.sql.PreparedStatement;
+
 /**
  * This virtual sensor saves its input stream to any JDBC accessible source.
- * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * @author Jerome Rousselot ( jeromerousselot@gmail.com )
  */
 public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 
 	public static final String            PARAM_USER    = "user" , PARAM_PASSWD = "password" , PARAM_URL = "url" , TABLE_NAME = "table",PARAM_DRIVER="driver";
 
-	public static final String[] OBLIGATORY_PARAMS = new String[] {PARAM_USER,PARAM_PASSWD,PARAM_URL,PARAM_DRIVER};
+	public static final String[] OBLIGATORY_PARAMS = new String[] {PARAM_USER,PARAM_URL,PARAM_DRIVER};
 
 	private static final transient Logger logger        = Logger.getLogger( StreamExporterVirtualSensor.class );
 
 	private Connection                    connection;
 
-	private String table_name;
+	private CharSequence table_name;
 
 	private String password;
 
@@ -81,21 +65,21 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 			logger.error("Initialization failed. There is a table called " + TABLE_NAME+ " Inside the database but the structure is not compatible with what GSN expects.");
 			return false;
 		}
-
 		return true;
 	}
 
 	public void dataAvailable ( String inputStreamName , StreamElement streamElement ) {
 		StringBuilder query = StorageManager.getStatementInsert(table_name, getVirtualSensorConfiguration().getOutputStructure(), streamElement);
-		PreparedStatement ps = null;
+		
 		try {
-			ps = connection.prepareStatement(query.toString());
+			StorageManager.executeInsert(table_name ,getVirtualSensorConfiguration().getOutputStructure(),streamElement,getConnection() );
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 			logger.error("Insertion failed! ("+ query+")");
 		}finally {
-			StorageManager.close(ps);
+			dataProduced( streamElement );
 		}
+		
 	}
 
 

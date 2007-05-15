@@ -2,17 +2,11 @@ package gsn;
 
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
-import gsn.utils.CaseInsensitiveComparator;
-
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public final class Mappings {
    
    private static final ConcurrentHashMap<String,VSensorConfig>              vsNameTOVSConfig               = new ConcurrentHashMap<String,VSensorConfig>( );
