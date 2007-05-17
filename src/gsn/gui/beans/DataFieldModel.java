@@ -2,9 +2,13 @@ package gsn.gui.beans;
 
 import gsn.beans.DataField;
 
+import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.beans.Model;
+import com.jgoodies.validation.ValidationResult;
+import com.jgoodies.validation.util.PropertyValidationSupport;
+import com.jgoodies.validation.util.ValidationUtils;
 
-public class DataFieldModel extends Model {
+public class DataFieldModel extends Model{
 	public static final String PROPERTY_DESCRIPTION = "description";
 
 	public static final String PROPERTY_NAME = "name";
@@ -56,6 +60,10 @@ public class DataFieldModel extends Model {
 		this.type = type;
 		firePropertyChange(PROPERTY_TYPE, oldType, type);
 	}
-	
+
+	public DataField getDataField() {
+		return (new DataField(getName(), getType(), getDescription()));
+	}
+
 	
 }

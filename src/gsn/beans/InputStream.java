@@ -21,10 +21,10 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 
 /**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
+ * 
  */
 public class InputStream implements Serializable{
-
+	
 	public static final int                             INITIAL_DELAY_5000MSC = 5000;
 
 	private transient static final Logger               logger                = Logger.getLogger( InputStream.class );
@@ -84,6 +84,10 @@ public class InputStream implements Serializable{
 
 	 public int getRate ( ) {
 		 return this.rate;
+	 }
+	 
+	 public void setRate(int rate){
+		 this.rate = rate;
 	 }
 
 	 public StreamSource[] getSources ( ) {

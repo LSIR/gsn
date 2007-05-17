@@ -3,10 +3,12 @@ package gsn.gui.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
@@ -68,5 +70,24 @@ public class VSensorConfigUtil {
 			// " failed because the configuratio of I/O problems.").toString());
 		}
 		return null;
+	}
+	
+	public static void saveVSensorConfig(VSensorConfig vSensorConfig, File file) throws FileNotFoundException, JiBXException{
+		if(vSensorConfig == null)
+			throw new RuntimeException("Null pointer Exception: VSensor config should not be null");
+		IBindingFactory bfact;
+		IMarshallingContext mctx;
+		try {
+			bfact = BindingDirectory.getFactory(VSensorConfig.class);
+			mctx = bfact.createMarshallingContext();
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+			mctx.setIndent(4);
+			mctx.marshalDocument(vSensorConfig, "UTF-8", null, fileOutputStream);
+		} catch (JiBXException e) {
+			throw e;
+		} catch (FileNotFoundException e) {
+			throw e;
+		}
+		
 	}
 }

@@ -1,5 +1,7 @@
 package gsn.gui.beans;
 
+import java.util.Iterator;
+
 import gsn.beans.AddressBean;
 import gsn.beans.StreamSource;
 
@@ -144,6 +146,32 @@ public class StreamSourceModel extends Model {
 		String oldStartTime = getStartTime();
 		this.startTime = startTime;
 		firePropertyChange(PROPERTY_START_TIME, oldStartTime, startTime);
+	}
+
+	public StreamSource getStreamSource() {
+		StreamSource streamSource = new StreamSource();
+		streamSource.setAlias(getAlias());
+		streamSource.setRawHistorySize(getRawHistorySize());
+		streamSource.setSamplingRate(getSamplingRate());
+		streamSource.setSqlQuery(getSqlQuery());
+		streamSource.setEndTime(getEndTime());
+		streamSource.setStartTime(getStartTime());
+		streamSource.setDisconnectedBufferSize(getDisconnectedBufferSize());
+		AddressBean[] addressBeans = new AddressBean[addressing.size()];
+		for (int i = 0; i < addressing.size(); i++) {
+			addressBeans[i] = ((AddressBeanModel)addressing.get(i)).getAddressBean();
+		}
+		streamSource.setAddressing(addressBeans);
+		return streamSource;
+	}
+
+	public ArrayListModel cloneAddressing() {
+		ArrayListModel copyOfAddressing = new ArrayListModel();
+		for (Iterator iter = addressing.iterator(); iter.hasNext();) {
+			AddressBeanModel addressBeanModel = (AddressBeanModel) iter.next();
+			copyOfAddressing.add(addressBeanModel.clone());
+		}
+		return copyOfAddressing;
 	}
 	
 	

@@ -1,21 +1,27 @@
 package gsn.gui.forms;
 
 import gsn.gui.beans.VSensorConfigModel;
+import gsn.gui.beans.VSensorConfigPresentationModel;
 
 import java.awt.Component;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JTextField;
 
-import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.validation.ValidationResult;
+import com.jgoodies.validation.ValidationResultModel;
+import com.jgoodies.validation.view.ValidationComponentUtils;
 
 public class VSensorGeneralPanel {
 
-	private PresentationModel vSensorConfigPresentationModel;
+	private VSensorConfigPresentationModel presentationModel;
 	private JTextField nameTextField;
 	private JTextField priorityTextField;
 	private JTextField generalPasswordTextField;
@@ -24,27 +30,34 @@ public class VSensorGeneralPanel {
 	private JTextField storageSizeTextField;
 	private JTextField maximumAllowedRateTextField;
 	private JCheckBox marUnlimitedCheckBox;
+	private JComponent editorPanel;
 
-	public VSensorGeneralPanel(PresentationModel presentationModel) {
-		vSensorConfigPresentationModel = presentationModel;
+	public VSensorGeneralPanel(VSensorConfigPresentationModel presentationModel) {
+		this.presentationModel = presentationModel;
 	}
 
 	public Component createPanel() {
 		initComponents();
-		KeyValueEditorPanel keyValueEditorPanel = new KeyValueEditorPanel(((VSensorConfigModel)vSensorConfigPresentationModel.getBean()).getAddressing());
+		initComponentAnnotations();
+		initEventHandling();
+		
+		KeyValueEditorPanel keyValueEditorPanel = new KeyValueEditorPanel(((VSensorConfigModel)presentationModel.getBean()).getAddressing());
 		
 		FormLayout layout = new FormLayout("pref:g", "pref, pref:g, pref, pref:g");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
 		builder.addSeparator("General properties", cc.xy(1, 1));
-		builder.add(buildGeneralFieldsPanel(), cc.xy(1, 2));
+		editorPanel = buildGeneralFieldsPanel();
+		builder.add(editorPanel, cc.xy(1, 2));
 		builder.addSeparator("Addressing", cc.xy(1, 3));
 		builder.add(keyValueEditorPanel.createPanel(), cc.xy(1, 4));
+		
+		updateComponentTreeMandatoryAndSeverity(presentationModel.getValidationResultModel().getResult());
 		return builder.getPanel();
 	}
 	
-	private Component buildGeneralFieldsPanel() {
+	private JComponent buildGeneralFieldsPanel() {
 		FormLayout layout = new FormLayout(
 				"right:pref, 3dlu, pref:g, 7dlu, right:pref, 3dlu, pref:g, 3dlu, pref, 3dlu",
 				"pref, 3dlu, pref, 3dlu, pref, 3dlu, pref");
@@ -71,14 +84,36 @@ public class VSensorGeneralPanel {
 	}
 
 	private void initComponents() {
-		nameTextField = BasicComponentFactory.createTextField(vSensorConfigPresentationModel.getModel(VSensorConfigModel.PROPERTY_NAME));
-		priorityTextField = BasicComponentFactory.createIntegerField(vSensorConfigPresentationModel.getModel(VSensorConfigModel.PROPERTY_PRIORITY));
-		generalPasswordTextField = BasicComponentFactory.createTextField(vSensorConfigPresentationModel.getModel(VSensorConfigModel.PROPERTY_GENERAL_PASSWORD));
-		descriptionTextField = BasicComponentFactory.createTextField(vSensorConfigPresentationModel.getModel(VSensorConfigModel.PROPERTY_DESCRIPTION));
-		poolSizeTextField = BasicComponentFactory.createIntegerField(vSensorConfigPresentationModel.getModel(VSensorConfigModel.PROPERTY_LIFECYCLE_POOL_SIZE));
-		storageSizeTextField = BasicComponentFactory.createTextField(vSensorConfigPresentationModel.getModel(VSensorConfigModel.PROPERTY_STORAGE_HISTORY_SIZE));
-		maximumAllowedRateTextField = BasicComponentFactory.createIntegerField(vSensorConfigPresentationModel.getComponentModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE));
-		marUnlimitedCheckBox = BasicComponentFactory.createCheckBox(vSensorConfigPresentationModel.getModel(VSensorConfigModel.PROPERTY_RATE_UNLIMITED), "Unlimited");
+		nameTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(VSensorConfigModel.PROPERTY_NAME));
+		priorityTextField = BasicComponentFactory.createIntegerField(presentationModel.getModel(VSensorConfigModel.PROPERTY_PRIORITY));
+		generalPasswordTextField = BasicComponentFactory.createTextField(presentationModel.getModel(VSensorConfigModel.PROPERTY_GENERAL_PASSWORD));
+		descriptionTextField = BasicComponentFactory.createTextField(presentationModel.getModel(VSensorConfigModel.PROPERTY_DESCRIPTION));
+		poolSizeTextField = BasicComponentFactory.createIntegerField(presentationModel.getModel(VSensorConfigModel.PROPERTY_LIFECYCLE_POOL_SIZE));
+		storageSizeTextField = BasicComponentFactory.createTextField(presentationModel.getModel(VSensorConfigModel.PROPERTY_STORAGE_HISTORY_SIZE));
+		maximumAllowedRateTextField = BasicComponentFactory.createIntegerField(presentationModel.getComponentModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE));
+		marUnlimitedCheckBox = BasicComponentFactory.createCheckBox(presentationModel.getModel(VSensorConfigModel.PROPERTY_RATE_UNLIMITED), "Unlimited");
+	}
+	
+	private void initComponentAnnotations() {
+		ValidationComponentUtils.setMandatory(nameTextField, true);
+		ValidationComponentUtils.setMessageKey(nameTextField, "VSensorConfig.Name");
+	}
+	
+	private void initEventHandling() {
+		presentationModel.getValidationResultModel().addPropertyChangeListener(ValidationResultModel.PROPERTYNAME_RESULT,
+				new ValidationChangeHandler());
+	}
+	
+	private void updateComponentTreeMandatoryAndSeverity(ValidationResult result) {
+		ValidationComponentUtils.updateComponentTreeSeverity(editorPanel, result);
+		ValidationComponentUtils.updateComponentTreeMandatoryAndBlankBackground(editorPanel);
+	}
+	
+	private final class ValidationChangeHandler implements PropertyChangeListener {
+
+		public void propertyChange(PropertyChangeEvent evt) {
+			updateComponentTreeMandatoryAndSeverity((ValidationResult) evt.getNewValue());
+		}
 	}
 
 }

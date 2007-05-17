@@ -1,6 +1,6 @@
 package gsn.gui.forms;
 
-import gsn.gui.util.GUIUtil;
+import gsn.gui.util.GUIUtils;
 import gsn.utils.KeyValueImp;
 
 import java.awt.Dimension;
@@ -19,6 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableModel;
 
@@ -34,6 +35,10 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.ButtonBarFactory;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.validation.ValidationResult;
+import com.jgoodies.validation.Validator;
+import com.jgoodies.validation.util.ValidationUtils;
+import com.jgoodies.validation.view.ValidationComponentUtils;
 
 public class KeyValueEditorPanel {
 
@@ -60,15 +65,15 @@ public class KeyValueEditorPanel {
 		selectionInList = new SelectionInList((ListModel) this.keyValueList);
 		selectionInList.addPropertyChangeListener(SelectionInList.PROPERTYNAME_SELECTION_EMPTY, new SelectionEmptyHandler());
 	}
-	
-	public void setListModel(ArrayListModel keyValueList){
+
+	public void setListModel(ArrayListModel keyValueList) {
 		this.keyValueList = keyValueList;
 		selectionInList.setList(keyValueList);
 		updateActionEnablement();
 	}
 
 	public JComponent createPanel() {
-		initConponents();
+		initComponents();
 
 		FormLayout layout = new FormLayout("pref:g, 7dlu, pref", "pref");
 		PanelBuilder builder = new PanelBuilder(layout);
@@ -91,7 +96,7 @@ public class KeyValueEditorPanel {
 		return builder.getPanel();
 	}
 
-	private void initConponents() {
+	private void initComponents() {
 		table = new JTable();
 		table.setModel(new KeyValueTableModel(selectionInList));
 		table.setSelectionModel(new SingleListSelectionAdapter(selectionInList.getSelectionIndexHolder()));
@@ -171,7 +176,7 @@ public class KeyValueEditorPanel {
 		public EditAction() {
 			super("Edit\u2026");
 		}
-		
+
 		public void actionPerformed(ActionEvent e) {
 			KeyValueImp keyValueImp = (KeyValueImp) selectionInList.getSelection();
 			KeyValueEditorDialog dialog = new KeyValueEditorDialog(null, keyValueImp);
@@ -187,6 +192,7 @@ public class KeyValueEditorPanel {
 		public RemoveAction() {
 			super("Remove");
 		}
+
 		public void actionPerformed(ActionEvent e) {
 			keyValueList.remove(selectionInList.getSelection());
 		}
@@ -203,6 +209,7 @@ public class KeyValueEditorPanel {
 
 		public KeyValueEditorDialog(Frame parent, KeyValue keyValue) {
 			super(parent, "Key-Value Editor", true);
+			setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			this.keyValue = keyValue;
 			canceled = false;
 		}
@@ -223,9 +230,10 @@ public class KeyValueEditorPanel {
 
 		private void build() {
 			setContentPane(buildContentPane());
+			initComponentAnnotations();
 			pack();
 			setResizable(false);
-			GUIUtil.locateOnOpticalScreenCenter(this);
+			GUIUtils.locateOnOpticalScreenCenter(this);
 		}
 
 		private JComponent buildContentPane() {
@@ -251,6 +259,13 @@ public class KeyValueEditorPanel {
 			return builder.getPanel();
 		}
 
+		private void initComponentAnnotations() {
+			ValidationComponentUtils.setMandatory(keyTextField, true);
+			ValidationComponentUtils.setMessageKey(keyTextField, "KeyValue.key");
+			ValidationComponentUtils.setMandatory(valueTextField, true);
+			ValidationComponentUtils.setMessageKey(valueTextField, "KeyValue.value");
+		}
+
 		private JComponent buildButtonBar() {
 			JPanel bar = ButtonBarFactory.buildOKCancelBar(new JButton(new OKAction()), new JButton(new CancelAction()));
 			bar.setBorder(Borders.BUTTON_BAR_GAP_BORDER);
@@ -265,9 +280,15 @@ public class KeyValueEditorPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				canceled = false;
-				((KeyValueImp) keyValue).setKey(keyTextField.getText());
-				((KeyValueImp) keyValue).setValue(valueTextField.getText());
-				close();
+				Validator validator = new KeyValueValidator();
+				ValidationResult validationResult = validator.validate();
+				if (validationResult.hasErrors()) {
+					GUIUtils.showValidationMessage(e, "Please fix the following errors:", validationResult);
+				} else {
+					((KeyValueImp) keyValue).setKey(keyTextField.getText());
+					((KeyValueImp) keyValue).setValue(valueTextField.getText());
+					close();
+				}
 			}
 		}
 
@@ -281,6 +302,19 @@ public class KeyValueEditorPanel {
 				canceled = true;
 				close();
 			}
+		}
+		
+		private final class KeyValueValidator implements Validator{
+			public ValidationResult validate() {
+				ValidationResult result = new ValidationResult();
+				if(ValidationUtils.isBlank(keyTextField.getText()))
+					result.addError("Key is empty");
+				if(ValidationUtils.isBlank(valueTextField.getText())){
+					result.addError("Value is empty");
+				}
+				return result;
+			}
+			
 		}
 	}
 

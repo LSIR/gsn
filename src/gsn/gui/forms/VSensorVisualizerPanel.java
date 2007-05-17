@@ -5,6 +5,7 @@ import gsn.Main;
 import gsn.beans.Modifications;
 import gsn.beans.VSensorConfig;
 import gsn.gui.util.GSNDropDownButton;
+import gsn.gui.util.GUIUtils;
 import gsn.gui.util.SimpleInternalFrame;
 import gsn.gui.util.VSensorConfigUtil;
 import gsn.gui.util.VSensorIOUtil;
@@ -118,6 +119,8 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 	private static ImageIcon refreshDiskIcon = new ImageIcon(Utilities.loadImage("gsn/gui/resources/refresh-disk.png"));
 
+	private static ImageIcon newVSensorIcon = new ImageIcon(Utilities.loadImage("gsn/gui/resources/vs-add.png"));
+
 	private static final String USER_REFRESHING_THREAD = "USER_REFRESHING_THREAD";
 
 	private static final String VISUALIZER_PANEL = "visualizer panel";
@@ -157,6 +160,8 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 	private VSVPopupMenuProvider popupMenuProvider;
 
 	private JButton refreshGraphButton;
+
+	private JButton newVSensorButton;
 
 	private JSpinner refreshIntervalSpinner;
 
@@ -210,10 +215,19 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			if (onDemandConnector.isConnected())
 				onDemandConnector.getVSensorsFromGSN();
 			else
-				showErrorMessage("Error connectiong to GSN");
+				GUIUtils.showErrorMessage("Error connectiong to GSN");
 			onDemandConnector.disconnect();
 		} else if (source == refreshDiskGraphButton) {
 			loadVSensorConfigs();
+		} else if(source == newVSensorButton){
+			VSensorConfig vSensorConfig = new VSensorConfig();
+			vSensorConfig.setName("please change me_" + Main.randomTableNameGenerator(7));
+			VSensorEditor vSensorEditor = new VSensorEditor(vSensorConfig);
+			vSensorEditor.open();
+			if(!vSensorEditor.hasBeanCanceled()){
+				VSensorConfig sensorConfig = vSensorEditor.getVSensorConfig();
+				System.out.println(sensorConfig);
+			}
 		}
 	}
 
@@ -411,18 +425,24 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		refreshDiskGraphButton.setToolTipText("Click to reload virtual sensors from disk");
 		refreshDiskGraphButton.addActionListener(this);
 		refreshDiskGraphButton.setEnabled(true);
+		
+		newVSensorButton = new JButton(newVSensorIcon);
+		newVSensorButton.setToolTipText("New Virtual Sensor");
+		newVSensorButton.addActionListener(this);
+		newVSensorButton.setEnabled(true);
 
 		JComponent layoutDropDwonButton = createLayoutDropDwonButton();
 		layoutDropDwonButton.setToolTipText("Layout graph");
 
-		FormLayout layout = new FormLayout("2dlu,pref,2dlu,pref,2dlu,pref,8dlu,pref,4dlu,pref,2dlu", "2dlu,p,2dlu");
+		FormLayout layout = new FormLayout("2dlu, pref, 2dlu,pref,2dlu,pref,2dlu,pref,8dlu,pref,4dlu,pref,2dlu", "2dlu,p,2dlu");
 		CellConstraints cc = new CellConstraints();
 		toolBarPanel.setLayout(layout);
-		toolBarPanel.add(layoutDropDwonButton, cc.xy(2, 2));
-		toolBarPanel.add(refreshDiskGraphButton, cc.xy(4, 2));
-		toolBarPanel.add(refreshGraphButton, cc.xy(6, 2));
-		toolBarPanel.add(refreshIntervalSpinner, cc.xy(8, 2));
-		toolBarPanel.add(autoRefreshCheckBox, cc.xy(10, 2));
+		toolBarPanel.add(newVSensorButton, cc.xy(2, 2));
+		toolBarPanel.add(layoutDropDwonButton, cc.xy(4, 2));
+		toolBarPanel.add(refreshDiskGraphButton, cc.xy(6, 2));
+		toolBarPanel.add(refreshGraphButton, cc.xy(8, 2));
+		toolBarPanel.add(refreshIntervalSpinner, cc.xy(10, 2));
+		toolBarPanel.add(autoRefreshCheckBox, cc.xy(12, 2));
 		visualizerPanel.add(toolBarPanel, BorderLayout.NORTH);
 
 		CardLayout cardLayout = new CardLayout();
@@ -494,10 +514,10 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 				}
 				stringBuilder.append("</OL>");
 				stringBuilder.append("</HTML>");
-				showMessage(stringBuilder.toString());
+				GUIUtils.showMessage(stringBuilder.toString(), "Virtual Sensor Definition Error");
 			}
 		} catch (IOException e) {
-			showErrorMessage(e.getMessage());
+			GUIUtils.showErrorMessage(e.getMessage());
 		}
 	}
 
@@ -516,14 +536,6 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		}
 	}
 
-	private void showErrorMessage(String message) {
-		JOptionPane.showMessageDialog(null, "<html><center>" + message, "Error", JOptionPane.ERROR_MESSAGE);
-	}
-	
-	private void showMessage(String message) {
-		JOptionPane.showMessageDialog(null, message, "Virtual Sensor Definition Error", JOptionPane.WARNING_MESSAGE);
-	}
-
 	private void enableDisableVSensor(VSensorConfig vSensorConfig) {
 		// TODO Auto-generated method stub
 		if (getConfigStatus(vSensorConfig) == CONFIG_STATUS_DISABLED) {
@@ -531,14 +543,14 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 				vSensorIOUtil.enableVirtualSensor(new File(vSensorConfig.getFileName()));
 				loadVSensorConfigs();
 			} catch (IOException e) {
-				showErrorMessage(e.getMessage());
+				GUIUtils.showErrorMessage(e.getMessage());
 			}
 		} else {
 			try {
 				vSensorIOUtil.disableVirtualSensor(new File(vSensorConfig.getFileName()));
 				loadVSensorConfigs();
 			} catch (IOException e) {
-				showErrorMessage(e.getMessage());
+				GUIUtils.showErrorMessage(e.getMessage());
 			}
 		}
 	}

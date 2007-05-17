@@ -80,7 +80,7 @@ public class VSensorIOUtil {
 	}
 
 	public void saveInDesabledVirtualSensors(File vsFile) {
-
+		
 	}
 
 	/**

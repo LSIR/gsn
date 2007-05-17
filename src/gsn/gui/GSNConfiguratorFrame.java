@@ -4,7 +4,7 @@ import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.gui.forms.GSNConfiguratorPanel;
 import gsn.gui.forms.VSensorVisualizerPanel;
-import gsn.gui.util.GUIUtil;
+import gsn.gui.util.GUIUtils;
 import gsn.utils.ValidityTools;
 
 import java.awt.AWTException;
@@ -123,7 +123,7 @@ public class GSNConfiguratorFrame extends JFrame {
 		initComponents();
 		initEvents();
 //		initDesktop();
-		GUIUtil.locateOnOpticalScreenCenter(this);
+		GUIUtils.locateOnOpticalScreenCenter(this);
 		setVisible(true);
 	}
 

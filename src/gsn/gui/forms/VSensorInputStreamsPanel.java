@@ -1,8 +1,9 @@
 package gsn.gui.forms;
 
 import gsn.gui.beans.InputStreamModel;
+import gsn.gui.beans.InputStreamPresentationModel;
 import gsn.gui.beans.VSensorConfigModel;
-import gsn.gui.util.GUIUtil;
+import gsn.gui.util.GUIUtils;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -21,6 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableModel;
 
@@ -36,14 +38,21 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.ButtonBarFactory;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.validation.ValidationResult;
+import com.jgoodies.validation.ValidationResultModel;
+import com.jgoodies.validation.view.ValidationComponentUtils;
 
 public class VSensorInputStreamsPanel {
 	private PresentationModel presentationModel;
+
 	private SelectionInList selectionInList;
+
 	private VSensorConfigModel vSensorConfigModel;
-	
+
 	private JTable table;
+
 	private JTextField queryTextField;
+
 	private JButton addButton;
 
 	private Action addAction;
@@ -55,7 +64,7 @@ public class VSensorInputStreamsPanel {
 	private JButton removeButton;
 
 	private JButton editButton;
-	
+
 	private StreamSourceEditorPanel streamSourceEditorPanel;
 
 	public VSensorInputStreamsPanel(PresentationModel presentationModel) {
@@ -68,7 +77,7 @@ public class VSensorInputStreamsPanel {
 
 	public Component createPanel() {
 		initComponents();
-		
+
 		FormLayout layout = new FormLayout("right:max(pref;60), 4dlu, max(pref;150dlu):g", "pref, 8dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
@@ -77,7 +86,7 @@ public class VSensorInputStreamsPanel {
 		builder.add(streamSourceEditorPanel.createPanel(), cc.xyw(1, 3, 3));
 		return builder.getPanel();
 	}
-	
+
 	private JComponent createTablePanel() {
 		FormLayout layout = new FormLayout("right:max(pref;60), 4dlu, pref:g, 7dlu, pref", "pref, 4dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
@@ -92,7 +101,7 @@ public class VSensorInputStreamsPanel {
 		builder.add(createButtomBar(), cc.xy(5, 1));
 		return builder.getPanel();
 	}
-	
+
 	private JComponent createButtomBar() {
 		ButtonStackBuilder builder = new ButtonStackBuilder();
 		builder.addGridded(addButton);
@@ -102,27 +111,28 @@ public class VSensorInputStreamsPanel {
 		builder.addGridded(removeButton);
 		return builder.getPanel();
 	}
-	
+
 	private void initComponents() {
 		table = new JTable();
 		table.setModel(new InputStreamTableModel(selectionInList));
 		table.setSelectionModel(new SingleListSelectionAdapter(selectionInList.getSelectionIndexHolder()));
-		
+
 		addAction = new AddAction();
 		removeAction = new RemoveAction();
 		editAction = new EditAction();
 		addButton = new JButton(getAddAction());
 		removeButton = new JButton(getRemoveAction());
 		editButton = new JButton(getEditAction());
-		
-		queryTextField = BasicComponentFactory.createTextField(new BeanAdapter(selectionInList, true).getValueModel(InputStreamModel.PROPERTY_QUERY));
+
+		queryTextField = BasicComponentFactory.createTextField(new BeanAdapter(selectionInList, true)
+				.getValueModel(InputStreamModel.PROPERTY_QUERY));
 		queryTextField.setEditable(false);
-		
+
 		streamSourceEditorPanel = new StreamSourceEditorPanel(null);
-		
+
 		updateActionEnablement();
 	}
-	
+
 	private Action getEditAction() {
 		return editAction;
 	}
@@ -140,7 +150,7 @@ public class VSensorInputStreamsPanel {
 		getEditAction().setEnabled(hasSelection);
 		getRemoveAction().setEnabled(hasSelection);
 	}
-	
+
 	public static class InputStreamTableModel extends AbstractTableAdapter implements TableModel {
 
 		private static final String[] COLUMNS = { "Name", "Count", "Rate" };
@@ -169,11 +179,11 @@ public class VSensorInputStreamsPanel {
 			updateActionEnablement();
 		}
 	}
-	
+
 	private class SelectionHandler implements PropertyChangeListener {
 		public void propertyChange(PropertyChangeEvent evt) {
-			if(selectionInList.hasSelection())
-				streamSourceEditorPanel.setListModel(((InputStreamModel)selectionInList.getSelection()).getSources());
+			if (selectionInList.hasSelection())
+				streamSourceEditorPanel.setListModel(((InputStreamModel) selectionInList.getSelection()).getSources());
 			else
 				streamSourceEditorPanel.setListModel(null);
 		}
@@ -220,22 +230,29 @@ public class VSensorInputStreamsPanel {
 			vSensorConfigModel.getInputStreams().remove(selectionInList.getSelection());
 		}
 	}
-	
+
 	private class InputStreamEditorDialog extends JDialog {
 		private boolean canceled;
 
 		private InputStreamModel inputStreamModel;
-		private PresentationModel presentationModel;
+
+		private InputStreamPresentationModel presentationModel;
 
 		private JTextField nameTextField;
+
 		private JTextField countTextField;
+
 		private JTextField rateTextField;
+
 		private JTextField queryTextField;
 
-		public InputStreamEditorDialog(Frame parent, InputStreamModel dataFieldModel) {
+		private JComponent editorPanel;
+
+		public InputStreamEditorDialog(Frame parent, InputStreamModel inputStreamModel) {
 			super(parent, "Input Stream Editor", true);
-			this.inputStreamModel = dataFieldModel;
-			presentationModel = new PresentationModel(dataFieldModel);
+			setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+			this.inputStreamModel = inputStreamModel;
+			presentationModel = new InputStreamPresentationModel(inputStreamModel);
 			canceled = false;
 		}
 
@@ -255,18 +272,38 @@ public class VSensorInputStreamsPanel {
 
 		private void build() {
 			initComponents();
+			initComponentAnnotations();
+			initEventHandling();
 			setContentPane(buildContentPane());
 			pack();
-//			setResizable(false);
-			GUIUtil.locateOnOpticalScreenCenter(this);
+			// setResizable(false);
+			GUIUtils.locateOnOpticalScreenCenter(this);
 		}
-		
-		private void initComponents(){
-			nameTextField = BasicComponentFactory.createTextField(presentationModel.getModel(InputStreamModel.PROPERTY_INPUT_STREAM_NAME));
-			countTextField = BasicComponentFactory.createLongField(presentationModel.getModel(InputStreamModel.PROPERTY_COUNT));
-			rateTextField = BasicComponentFactory.createIntegerField(presentationModel.getModel(InputStreamModel.PROPERTY_RATE));
-			queryTextField = BasicComponentFactory.createTextField(presentationModel.getModel(InputStreamModel.PROPERTY_QUERY));
-			
+
+		private void initComponents() {
+			nameTextField = BasicComponentFactory.createTextField(presentationModel
+					.getBufferedModel(InputStreamModel.PROPERTY_INPUT_STREAM_NAME));
+			countTextField = BasicComponentFactory.createLongField(presentationModel.getBufferedModel(InputStreamModel.PROPERTY_COUNT));
+			rateTextField = BasicComponentFactory.createIntegerField(presentationModel.getBufferedModel(InputStreamModel.PROPERTY_RATE));
+			queryTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(InputStreamModel.PROPERTY_QUERY));
+
+		}
+
+		private void initComponentAnnotations() {
+			ValidationComponentUtils.setMandatory(nameTextField, true);
+			ValidationComponentUtils.setMessageKey(nameTextField, "InputStream.Name");
+			ValidationComponentUtils.setMandatory(queryTextField, true);
+			ValidationComponentUtils.setMessageKey(queryTextField, "InputStream.Query");
+		}
+
+		private void initEventHandling() {
+			presentationModel.getValidationResultModel().addPropertyChangeListener(ValidationResultModel.PROPERTYNAME_RESULT,
+					new ValidationChangeHandler());
+		}
+
+		private void updateComponentTreeMandatoryAndSeverity(ValidationResult result) {
+			ValidationComponentUtils.updateComponentTreeSeverity(editorPanel, result);
+			ValidationComponentUtils.updateComponentTreeMandatoryAndBlankBackground(editorPanel);
 		}
 
 		private JComponent buildContentPane() {
@@ -274,8 +311,11 @@ public class VSensorInputStreamsPanel {
 			PanelBuilder builder = new PanelBuilder(layout);
 			builder.getPanel().setBorder(new EmptyBorder(18, 12, 12, 12));
 			CellConstraints cc = new CellConstraints();
-			builder.add(buildEditorPanel(), cc.xy(1, 1));
+			editorPanel = buildEditorPanel();
+			builder.add(editorPanel, cc.xy(1, 1));
 			builder.add(buildButtonBar(), cc.xy(1, 3));
+			
+			updateComponentTreeMandatoryAndSeverity(presentationModel.getValidationResultModel().getResult());
 			return builder.getPanel();
 		}
 
@@ -307,9 +347,11 @@ public class VSensorInputStreamsPanel {
 			}
 
 			public void actionPerformed(ActionEvent e) {
-				canceled = false;
-				presentationModel.setBean(null);
-				close();
+				if (!presentationModel.getValidationResultModel().hasErrors()) {
+					canceled = false;
+					presentationModel.triggerCommit();
+					close();
+				}
 			}
 		}
 
@@ -321,10 +363,17 @@ public class VSensorInputStreamsPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				canceled = true;
+				presentationModel.triggerFlush();
 				close();
 			}
 		}
+		
+		private final class ValidationChangeHandler implements PropertyChangeListener {
+
+			public void propertyChange(PropertyChangeEvent evt) {
+				updateComponentTreeMandatoryAndSeverity((ValidationResult) evt.getNewValue());
+			}
+		}
 	}
-	
 
 }

@@ -1,8 +1,12 @@
 package gsn.gui.beans;
 
-import org.apache.commons.collections.KeyValue;
+import java.util.Collections;
 
 import gsn.beans.AddressBean;
+import gsn.beans.DataField;
+import gsn.utils.KeyValueImp;
+
+import org.apache.commons.collections.KeyValue;
 
 import com.jgoodies.binding.beans.Model;
 import com.jgoodies.binding.list.ArrayListModel;
@@ -54,4 +58,21 @@ public class AddressBeanModel extends Model {
 		this.wrapper = wrapper;
 	}
 
+	public AddressBean getAddressBean() {
+		AddressBean addressBean = new AddressBean(getWrapper(), (KeyValue[]) predicates.toArray(new KeyValue[0]));
+		return addressBean;
+	}
+
+	public AddressBeanModel clone(){
+		AddressBeanModel copy = new AddressBeanModel();
+		copy.setWrapper(getWrapper());
+		ArrayListModel predicatesCopy = new ArrayListModel();
+		for (int i = 0; i < predicates.size(); i++) {
+			KeyValue oldKeyValue = (KeyValue) predicates.get(i);
+			KeyValue keyValue = new KeyValueImp(String.valueOf(oldKeyValue.getKey()), String.valueOf(oldKeyValue.getValue()));
+			predicatesCopy.add(keyValue); 
+		}
+		copy.setPredicates(predicatesCopy);
+		return copy;
+	}
 }

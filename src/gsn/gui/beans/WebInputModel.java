@@ -49,6 +49,17 @@ public class WebInputModel extends Model {
 	public void setParameters(ArrayListModel parameters) {
 		this.parameters = parameters;
 	}
+
+	public WebInput getWebInput() {
+		WebInput webInput = new WebInput();
+		webInput.setName(getName());
+		DataField[] dataFields = new DataField[getParameters().size()];
+		for (int i = 0; i < getParameters().size(); i++) {
+			dataFields[i] = ((DataFieldModel)getParameters().get(i)).getDataField();
+		}
+		webInput.setParameters(dataFields);
+		return webInput;
+	}
 	
 	
 }

@@ -9,7 +9,7 @@ import gsn.beans.StreamSource;
 import com.jgoodies.binding.beans.Model;
 import com.jgoodies.binding.list.ArrayListModel;
 
-public class InputStreamModel extends Model{
+public class InputStreamModel extends Model {
 	public static final String PROPERTY_INPUT_STREAM_NAME = "inputStreamName";
 
 	public static final String PROPERTY_COUNT = "count";
@@ -27,13 +27,13 @@ public class InputStreamModel extends Model{
 	private String query;
 
 	private ArrayListModel sources;
-	
-	public InputStreamModel(){
+
+	public InputStreamModel() {
 		sources = new ArrayListModel();
 		count = Long.MAX_VALUE;
 	}
-	
-	public InputStreamModel(InputStream inputStream){
+
+	public InputStreamModel(InputStream inputStream) {
 		inputStreamName = inputStream.getInputStreamName();
 		count = inputStream.getCount();
 		rate = inputStream.getRate();
@@ -95,13 +95,29 @@ public class InputStreamModel extends Model{
 	public void setSources(ArrayListModel sources) {
 		this.sources = sources;
 	}
-	
-	public void addSource(StreamSourceModel streamSourceModel){
+
+	public void addSource(StreamSourceModel streamSourceModel) {
 		sources.add(streamSourceModel);
 	}
-	
-	public void removeSource(StreamSourceModel streamSourceModel){
+
+	public void removeSource(StreamSourceModel streamSourceModel) {
 		sources.remove(streamSourceModel);
 	}
-	
+
+	public InputStream getInputStream() {
+		InputStream inputStream = new InputStream();
+		inputStream.setInputStreamName(getInputStreamName());
+		inputStream.setCount(getCount());
+		inputStream.setRate(getRate());
+		inputStream.setQuery(getQuery());
+
+		StreamSource[] streamSources = new StreamSource[sources.size()];
+		for (int i = 0; i < sources.size(); i++) {
+			streamSources[i] = ((StreamSourceModel)sources.get(i)).getStreamSource();
+			streamSources[i].setInputStream(inputStream);
+		}
+		inputStream.setSources(streamSources);
+		return inputStream;
+	}
+
 }

@@ -1,8 +1,10 @@
 package gsn.gui.forms;
 
 import gsn.gui.beans.AddressBeanModel;
+import gsn.gui.beans.AddressBeanPresentationModel;
 import gsn.gui.beans.StreamSourceModel;
-import gsn.gui.util.GUIUtil;
+import gsn.gui.beans.StreamSourcePresentationModel;
+import gsn.gui.util.GUIUtils;
 
 import java.awt.Component;
 import java.awt.Dialog;
@@ -25,10 +27,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.BasicComponentFactory;
+import com.jgoodies.binding.list.ArrayListModel;
 import com.jgoodies.binding.list.SelectionInList;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
@@ -36,13 +39,16 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.ButtonBarFactory;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.validation.ValidationResult;
+import com.jgoodies.validation.ValidationResultModel;
+import com.jgoodies.validation.view.ValidationComponentUtils;
 
 public class StreamSourceEditorDialog extends JDialog {
 	private boolean canceled;
 
 	private StreamSourceModel streamSourceModel;
 
-	private PresentationModel presentationModel;
+	private StreamSourcePresentationModel presentationModel;
 
 	private SelectionInList selectionInList;
 
@@ -76,10 +82,16 @@ public class StreamSourceEditorDialog extends JDialog {
 
 	private JButton editButton;
 
+	private JComponent editorPanel;
+	
+	private ArrayListModel oldAddressing;
+
 	public StreamSourceEditorDialog(Frame parent, StreamSourceModel streamSourceModel) {
 		super(parent, "Stream Source Editor", true);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.streamSourceModel = streamSourceModel;
-		presentationModel = new PresentationModel(streamSourceModel);
+		presentationModel = new StreamSourcePresentationModel(streamSourceModel);
+		oldAddressing = streamSourceModel.cloneAddressing();
 		selectionInList = new SelectionInList((ListModel) streamSourceModel.getAddressing());
 		selectionInList.addPropertyChangeListener(SelectionInList.PROPERTYNAME_SELECTION_EMPTY, new SelectionEmptyHandler());
 		selectionInList.addPropertyChangeListener(SelectionInList.PROPERTYNAME_SELECTION, new SelectionHandler());
@@ -102,23 +114,27 @@ public class StreamSourceEditorDialog extends JDialog {
 
 	private void build() {
 		initComponents();
+		initComponentAnnotations();
+		initEventHandling();
 		setContentPane(buildContentPane());
+		updateComponentTreeMandatoryAndSeverity(presentationModel.getValidationResultModel().getResult());
 		pack();
 		// setResizable(false);
-		GUIUtil.locateOnOpticalScreenCenter(this);
+		GUIUtils.locateOnOpticalScreenCenter(this);
 	}
 
 	private void initComponents() {
-		aliasTextField = BasicComponentFactory.createTextField(presentationModel.getModel(StreamSourceModel.PROPERTY_ALIAS));
-		startTimeTextField = BasicComponentFactory.createTextField(presentationModel.getModel(StreamSourceModel.PROPERTY_START_TIME));
-		endTimeTextField = BasicComponentFactory.createTextField(presentationModel.getModel(StreamSourceModel.PROPERTY_END_TIME));
+		aliasTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_ALIAS));
+		startTimeTextField = BasicComponentFactory.createTextField(presentationModel
+				.getBufferedModel(StreamSourceModel.PROPERTY_START_TIME));
+		endTimeTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_END_TIME));
 		dbsTextField = BasicComponentFactory.createIntegerField(presentationModel
-				.getModel(StreamSourceModel.PROPERTY_DISCONNECTED_BUFFER_SIZE));
+				.getBufferedModel(StreamSourceModel.PROPERTY_DISCONNECTED_BUFFER_SIZE));
 		samplingRateTextField = BasicComponentFactory.createFormattedTextField(presentationModel
-				.getModel(StreamSourceModel.PROPERTY_SAMPLING_RATE), NumberFormat.getNumberInstance());
+				.getBufferedModel(StreamSourceModel.PROPERTY_SAMPLING_RATE), NumberFormat.getNumberInstance());
 		historySizeTextField = BasicComponentFactory.createTextField(presentationModel
-				.getModel(StreamSourceModel.PROPERTY_RAW_HISTORY_SIZE));
-		queryTextField = BasicComponentFactory.createTextField(presentationModel.getModel(StreamSourceModel.PROPERTY_SQL_QUERY));
+				.getBufferedModel(StreamSourceModel.PROPERTY_RAW_HISTORY_SIZE));
+		queryTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_SQL_QUERY));
 
 		addressingList = BasicComponentFactory.createList(selectionInList, new AddressBeanListCellRenderer());
 		addressBeanEditorPanel = new AddressBeanEditorPanel(null);
@@ -131,6 +147,23 @@ public class StreamSourceEditorDialog extends JDialog {
 
 		updateActionEnablement();
 
+	}
+
+	private void initComponentAnnotations() {
+		ValidationComponentUtils.setMandatory(aliasTextField, true);
+		ValidationComponentUtils.setMessageKey(aliasTextField, "StreamSource.Alias");
+		ValidationComponentUtils.setMandatory(queryTextField, true);
+		ValidationComponentUtils.setMessageKey(queryTextField, "StreamSource.SqlQuery");
+	}
+
+	private void initEventHandling() {
+		presentationModel.getValidationResultModel().addPropertyChangeListener(ValidationResultModel.PROPERTYNAME_RESULT,
+				new ValidationChangeHandler());
+	}
+
+	private void updateComponentTreeMandatoryAndSeverity(ValidationResult result) {
+		ValidationComponentUtils.updateComponentTreeSeverity(editorPanel, result);
+		ValidationComponentUtils.updateComponentTreeMandatoryAndBlankBackground(editorPanel);
 	}
 
 	private Action getEditAction() {
@@ -221,12 +254,20 @@ public class StreamSourceEditorDialog extends JDialog {
 		}
 	}
 
+	private final class ValidationChangeHandler implements PropertyChangeListener {
+
+		public void propertyChange(PropertyChangeEvent evt) {
+			updateComponentTreeMandatoryAndSeverity((ValidationResult) evt.getNewValue());
+		}
+	}
+
 	private JComponent buildContentPane() {
 		FormLayout layout = new FormLayout("pref:g", "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.getPanel().setBorder(new EmptyBorder(18, 12, 12, 12));
 		CellConstraints cc = new CellConstraints();
-		builder.add(buildEditorPanel(), cc.xy(1, 1));
+		editorPanel = buildEditorPanel();
+		builder.add(editorPanel, cc.xy(1, 1));
 		builder.add(buildAddressingBeanPanel(), cc.xy(1, 3));
 		builder.add(buildDialogButtonBar(), cc.xy(1, 7));
 		builder.add(addressBeanEditorPanel.createPanel(), cc.xy(1, 5));
@@ -292,9 +333,11 @@ public class StreamSourceEditorDialog extends JDialog {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			canceled = false;
-			presentationModel.setBean(null);
-			close();
+			if (!presentationModel.getValidationResultModel().hasErrors()) {
+				canceled = false;
+				presentationModel.triggerCommit();
+				close();
+			}
 		}
 	}
 
@@ -306,6 +349,8 @@ public class StreamSourceEditorDialog extends JDialog {
 
 		public void actionPerformed(ActionEvent e) {
 			canceled = true;
+			((StreamSourceModel)presentationModel.getBean()).setAddressing(oldAddressing);
+			presentationModel.triggerFlush();
 			close();
 		}
 	}
@@ -315,11 +360,14 @@ public class StreamSourceEditorDialog extends JDialog {
 
 		private JTextField wrapperNameTextField;
 
-		private PresentationModel presentationModel;
+		private AddressBeanPresentationModel presentationModel;
+
+		private JComponent editorPanel;
 
 		public AddressBeanEditorDialog(Dialog parent, AddressBeanModel addressBeanModel) {
 			super(parent, "Addressing Editor", true);
-			presentationModel = new PresentationModel(addressBeanModel);
+			setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+			presentationModel = new AddressBeanPresentationModel(addressBeanModel);
 			canceled = false;
 		}
 
@@ -338,10 +386,19 @@ public class StreamSourceEditorDialog extends JDialog {
 		}
 
 		private void build() {
+			initComponents();
+			initComponentAnnotations();
+			initEventHandling();
 			setContentPane(buildContentPane());
+			updateComponentTreeMandatoryAndSeverity(presentationModel.getValidationResultModel().getResult());
 			pack();
 			setResizable(false);
-			GUIUtil.locateOnOpticalScreenCenter(this);
+			GUIUtils.locateOnOpticalScreenCenter(this);
+		}
+
+		private void initComponents() {
+			wrapperNameTextField = BasicComponentFactory.createTextField(presentationModel
+					.getBufferedModel(AddressBeanModel.PROPERTY_WRAPPER));
 		}
 
 		private JComponent buildContentPane() {
@@ -349,13 +406,13 @@ public class StreamSourceEditorDialog extends JDialog {
 			PanelBuilder builder = new PanelBuilder(layout);
 			builder.getPanel().setBorder(new EmptyBorder(18, 12, 12, 12));
 			CellConstraints cc = new CellConstraints();
-			builder.add(buildEditorPanel(), cc.xy(1, 1));
+			editorPanel = buildEditorPanel();
+			builder.add(editorPanel, cc.xy(1, 1));
 			builder.add(buildButtonBar(), cc.xy(1, 3));
 			return builder.getPanel();
 		}
 
 		private JComponent buildEditorPanel() {
-			wrapperNameTextField = BasicComponentFactory.createTextField(presentationModel.getModel(AddressBeanModel.PROPERTY_WRAPPER));
 			FormLayout layout = new FormLayout("right:pref, 4dlu, pref:g", "pref");
 			PanelBuilder builder = new PanelBuilder(layout);
 			CellConstraints cc = new CellConstraints();
@@ -364,10 +421,32 @@ public class StreamSourceEditorDialog extends JDialog {
 			return builder.getPanel();
 		}
 
+		private void initComponentAnnotations() {
+			ValidationComponentUtils.setMandatory(wrapperNameTextField, true);
+			ValidationComponentUtils.setMessageKey(wrapperNameTextField, "AddressBean.Wrapper");
+		}
+
+		private void initEventHandling() {
+			presentationModel.getValidationResultModel().addPropertyChangeListener(ValidationResultModel.PROPERTYNAME_RESULT,
+					new ValidationChangeHandler());
+		}
+
+		private void updateComponentTreeMandatoryAndSeverity(ValidationResult result) {
+			ValidationComponentUtils.updateComponentTreeSeverity(editorPanel, result);
+			ValidationComponentUtils.updateComponentTreeMandatoryAndBlankBackground(editorPanel);
+		}
+
 		private JComponent buildButtonBar() {
 			JPanel bar = ButtonBarFactory.buildOKCancelBar(new JButton(new OKAction()), new JButton(new CancelAction()));
 			bar.setBorder(Borders.BUTTON_BAR_GAP_BORDER);
 			return bar;
+		}
+
+		private final class ValidationChangeHandler implements PropertyChangeListener {
+
+			public void propertyChange(PropertyChangeEvent evt) {
+				updateComponentTreeMandatoryAndSeverity((ValidationResult) evt.getNewValue());
+			}
 		}
 
 		private final class OKAction extends AbstractAction {
@@ -377,9 +456,11 @@ public class StreamSourceEditorDialog extends JDialog {
 			}
 
 			public void actionPerformed(ActionEvent e) {
-				canceled = false;
-				presentationModel.setBean(null);
-				close();
+				if (!presentationModel.getValidationResultModel().hasErrors()) {
+					canceled = false;
+					presentationModel.triggerCommit();
+					close();
+				}
 			}
 		}
 
@@ -391,6 +472,7 @@ public class StreamSourceEditorDialog extends JDialog {
 
 			public void actionPerformed(ActionEvent e) {
 				canceled = true;
+				presentationModel.triggerFlush();
 				close();
 			}
 		}

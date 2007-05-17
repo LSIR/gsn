@@ -299,4 +299,40 @@ public class VSensorConfigModel extends Model {
 	public void setWebinput(ArrayListModel webinput) {
 		this.webinput = webinput;
 	}
+
+	public VSensorConfig getVSensorConfig() {
+		VSensorConfig vSensorConfig = new VSensorConfig();
+		vSensorConfig.setName(getName());
+		vSensorConfig.setDescription(getDescription());
+		vSensorConfig.setGeneralPassword(getGeneralPassword());
+		vSensorConfig.setLifeCyclePoolSize(getLifeCyclePoolSize());
+		vSensorConfig.setMainClass(getMainClass());
+		vSensorConfig.setOutputStreamRate(getOutputStreamRate());
+		vSensorConfig.setPriority(getPriority());
+		vSensorConfig.setAddressing((KeyValue[]) getAddressing().toArray(new KeyValue[0]));
+		
+		System.out.println("input stream size : " + getInputStreams().getSize());
+		InputStream[] inputStreams = new InputStream[getInputStreams().size()];
+		for (int i = 0; i < getInputStreams().size(); i++) {
+			inputStreams[i] = ((InputStreamModel)getInputStreams().get(i)).getInputStream();
+		}
+		vSensorConfig.setInputStreams(inputStreams);
+		
+		vSensorConfig.setMainClassInitialParams(getMainClassInitialParams());
+		
+		DataField[] outputStructure = new DataField[getOutputStructure().size()];
+		for (int i = 0; i < getOutputStructure().size(); i++) {
+			outputStructure[i] = ((DataFieldModel)getOutputStructure().get(i)).getDataField();
+		}
+		vSensorConfig.setOutputStructure(outputStructure);
+		
+		WebInput[] webInputs = new WebInput[getWebinput().size()];
+		for (int i = 0; i < getWebinput().size(); i++) {
+			webInputs[i] = ((WebInputModel)getWebinput().get(i)).getWebInput();
+		}
+		vSensorConfig.setWebInput(webInputs);
+		if(vSensorConfig.validate() == false)
+			System.out.println("VSensor validation failed");
+		return vSensorConfig;
+	}
 }

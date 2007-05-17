@@ -1,16 +1,16 @@
 package gsn.gui.forms;
 
+import gsn.gui.beans.VSensorConfigModel;
+import gsn.gui.beans.WebInputModel;
+import gsn.gui.beans.WebInputPresentationModel;
+import gsn.gui.util.GUIUtils;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import gsn.gui.beans.VSensorConfigModel;
-import gsn.gui.beans.WebInputModel;
-
-import gsn.gui.util.GUIUtil;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -24,9 +24,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-
-import org.apache.commons.collections.KeyValue;
 
 import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.BasicComponentFactory;
@@ -37,6 +36,9 @@ import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.ButtonBarFactory;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.validation.ValidationResult;
+import com.jgoodies.validation.ValidationResultModel;
+import com.jgoodies.validation.view.ValidationComponentUtils;
 
 public class VSensorWebInpuPanel {
 
@@ -61,7 +63,7 @@ public class VSensorWebInpuPanel {
 	private JButton editButton;
 
 	private VSensorConfigModel vSensorConfigModel;
-	
+
 	private DataFieldEditorPanel dataFieldEditorPanel;
 
 	public VSensorWebInpuPanel(PresentationModel presentationModel) {
@@ -74,7 +76,7 @@ public class VSensorWebInpuPanel {
 
 	public JComponent createPanel() {
 		initComponents();
-		
+
 		FormLayout layout = new FormLayout("right:max(pref;60), 4dlu, max(pref;150dlu), pref:g", "pref, 8dlu, pref, 5dlu, pref, 5dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
@@ -121,7 +123,7 @@ public class VSensorWebInpuPanel {
 		addButton = new JButton(getAddAction());
 		removeButton = new JButton(getRemoveAction());
 		editButton = new JButton(getEditAction());
-		
+
 		updateActionEnablement();
 	}
 
@@ -142,18 +144,18 @@ public class VSensorWebInpuPanel {
 		getEditAction().setEnabled(hasSelection);
 		getRemoveAction().setEnabled(hasSelection);
 	}
-	
+
 	public class WebInputListCellRenderer extends DefaultListCellRenderer {
-		
+
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-			if(value instanceof WebInputModel){
-				label.setText(((WebInputModel)value).getName());
+			if (value instanceof WebInputModel) {
+				label.setText(((WebInputModel) value).getName());
 			}
 			return this;
 		}
-		
+
 	}
 
 	private class SelectionEmptyHandler implements PropertyChangeListener {
@@ -161,11 +163,11 @@ public class VSensorWebInpuPanel {
 			updateActionEnablement();
 		}
 	}
-	
+
 	private class SelectionHandler implements PropertyChangeListener {
 		public void propertyChange(PropertyChangeEvent evt) {
-			if(selectionInList.hasSelection())
-				dataFieldEditorPanel.setListModel(((WebInputModel)selectionInList.getSelection()).getParameters());
+			if (selectionInList.hasSelection())
+				dataFieldEditorPanel.setListModel(((WebInputModel) selectionInList.getSelection()).getParameters());
 			else
 				dataFieldEditorPanel.setListModel(null);
 		}
@@ -217,13 +219,15 @@ public class VSensorWebInpuPanel {
 		private boolean canceled;
 
 		private JTextField commandNameTextField;
-		
-		private PresentationModel presentationModel;
 
+		private WebInputPresentationModel presentationModel;
+
+		private JComponent editorPanel;
 
 		public WebINputEditorDialog(Frame parent, WebInputModel webInputModel) {
 			super(parent, "Web Input Editor", true);
-			presentationModel = new PresentationModel(webInputModel);
+			setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+			presentationModel = new WebInputPresentationModel(webInputModel);
 			canceled = false;
 		}
 
@@ -242,10 +246,32 @@ public class VSensorWebInpuPanel {
 		}
 
 		private void build() {
+			initComponents();
+			initComponentAnnotations();
+			initEventHandling();
 			setContentPane(buildContentPane());
 			pack();
 			setResizable(false);
-			GUIUtil.locateOnOpticalScreenCenter(this);
+			GUIUtils.locateOnOpticalScreenCenter(this);
+		}
+
+		private void initComponents() {
+			commandNameTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(WebInputModel.PROPERTY_NAME));
+		}
+
+		private void initComponentAnnotations() {
+			ValidationComponentUtils.setMandatory(commandNameTextField, true);
+			ValidationComponentUtils.setMessageKey(commandNameTextField, "WebInput.Name");
+		}
+
+		private void initEventHandling() {
+			presentationModel.getValidationResultModel().addPropertyChangeListener(ValidationResultModel.PROPERTYNAME_RESULT,
+					new ValidationChangeHandler());
+		}
+
+		private void updateComponentTreeMandatoryAndSeverity(ValidationResult result) {
+			ValidationComponentUtils.updateComponentTreeSeverity(editorPanel, result);
+			ValidationComponentUtils.updateComponentTreeMandatoryAndBlankBackground(editorPanel);
 		}
 
 		private JComponent buildContentPane() {
@@ -253,13 +279,15 @@ public class VSensorWebInpuPanel {
 			PanelBuilder builder = new PanelBuilder(layout);
 			builder.getPanel().setBorder(new EmptyBorder(18, 12, 12, 12));
 			CellConstraints cc = new CellConstraints();
-			builder.add(buildEditorPanel(), cc.xy(1, 1));
+			editorPanel = buildEditorPanel();
+			builder.add(editorPanel, cc.xy(1, 1));
 			builder.add(buildButtonBar(), cc.xy(1, 3));
+
+			updateComponentTreeMandatoryAndSeverity(presentationModel.getValidationResultModel().getResult());
 			return builder.getPanel();
 		}
 
 		private JComponent buildEditorPanel() {
-			commandNameTextField = BasicComponentFactory.createTextField(presentationModel.getModel(WebInputModel.PROPERTY_NAME));
 			FormLayout layout = new FormLayout("right:pref, 4dlu, pref:g", "pref");
 			PanelBuilder builder = new PanelBuilder(layout);
 			CellConstraints cc = new CellConstraints();
@@ -281,9 +309,11 @@ public class VSensorWebInpuPanel {
 			}
 
 			public void actionPerformed(ActionEvent e) {
-				canceled = false;
-				presentationModel.setBean(null);
-				close();
+				if (!presentationModel.getValidationResultModel().hasErrors()) {
+					canceled = false;
+					presentationModel.triggerCommit();
+					close();
+				}
 			}
 		}
 
@@ -295,7 +325,15 @@ public class VSensorWebInpuPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				canceled = true;
+				presentationModel.triggerFlush();
 				close();
+			}
+		}
+
+		private final class ValidationChangeHandler implements PropertyChangeListener {
+
+			public void propertyChange(PropertyChangeEvent evt) {
+				updateComponentTreeMandatoryAndSeverity((ValidationResult) evt.getNewValue());
 			}
 		}
 	}

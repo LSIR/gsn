@@ -18,7 +18,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
 /**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * Date: Aug 4, 2005 <br>
  * Time: 10:15:42 PM <br>
  */
@@ -115,6 +114,10 @@ public  class StreamSource implements Serializable{
     return disconnectedBufferSize;
   }
   
+  public void setDisconnectedBufferSize(int disconnectedBufferSize){
+	  this.disconnectedBufferSize = disconnectedBufferSize;
+  }
+  
   public float getSamplingRate ( ) {
     return samplingRate;
   }
@@ -155,6 +158,10 @@ public  class StreamSource implements Serializable{
     return this.startTime;
   }
   
+  
+  public void setStartTime(String startTime){
+	  this.startTime = startTime;
+  }
   /**
    * Converts the result of the <code>getEndTime()</code> to a Date object
    * and caches the object through execution.

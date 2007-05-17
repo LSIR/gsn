@@ -13,7 +13,7 @@ import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 
 /**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
+ * 
  */
 public class VSensorConfig implements Serializable {
 
@@ -432,6 +432,9 @@ public class VSensorConfig implements Serializable {
 		  return webinput;
 	  }
 
+	  public void setWebInput(WebInput[] webInput){
+		  this.webinput = webInput;
+	  }
 	public void setInputStreams(InputStream... inputStreams) {
 		this.inputStreams = inputStreams;
 	}
