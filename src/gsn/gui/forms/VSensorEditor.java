@@ -119,13 +119,14 @@ public class VSensorEditor {
 						int index = fileName.lastIndexOf(".xml");
 						if (index == -1)
 							fileName = fileName + ".xml";
-						saveVSensorConfig(fileName);
+						saveVSensorConfig(fileName, true);
 					}else{
 						GUIUtils.showErrorMessage("Invalid file name");
 					}
 					System.out.println("File Name : " + fileName);
 				}else{
-					saveVSensorConfig(oldVSensorConfig.getFileName());
+					saveVSensorConfig(oldVSensorConfig.getFileName(), false);
+					//TODO : show proper message
 				}
 			} else {
 				GUIUtils.showValidationMessage(e, "Some errors exist, please correct them:", presentationModel.getValidationResultModel()
@@ -133,10 +134,14 @@ public class VSensorEditor {
 			}
 		}
 
-		private void saveVSensorConfig(String fileName) {
-			File file = new File(GUIConfig.VSENSOR_DISABLED_DIR_PATH, fileName);
-			if (!file.exists() || JOptionPane.showConfirmDialog(dialog, "<html>The file <" + file.getAbsolutePath()
-							+ "> already exists.<br>Do you want to overwrite it?</html>", "Confirmation",
+		private void saveVSensorConfig(String fileName, boolean newFile) {
+			File file;
+			if(newFile)
+				file = new File(GUIConfig.VSENSOR_DISABLED_DIR_PATH, fileName);
+			else
+				file = new File(fileName);
+			if (!file.exists() || JOptionPane.showConfirmDialog(dialog, "<html>The file &lt;" + file.getAbsolutePath()
+							+ "&gt; already exists.<br>Do you want to overwrite it?</html>", "Confirmation",
 							JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 				try {
 					presentationModel.triggerCommit();
@@ -144,7 +149,7 @@ public class VSensorEditor {
 					canceled = false;
 					close();
 				} catch (FileNotFoundException e1) {
-					GUIUtils.showErrorMessage("Could not write file");
+					GUIUtils.showErrorMessage("Can not write file");
 					e1.printStackTrace();
 				} catch (JiBXException e1) {
 					GUIUtils.showErrorMessage("Error in virtual sensor definition, saving the virtual sensor was aborted");

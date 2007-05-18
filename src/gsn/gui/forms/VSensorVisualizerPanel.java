@@ -225,8 +225,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			VSensorEditor vSensorEditor = new VSensorEditor(vSensorConfig);
 			vSensorEditor.open();
 			if(!vSensorEditor.hasBeanCanceled()){
-				VSensorConfig sensorConfig = vSensorEditor.getVSensorConfig();
-				System.out.println(sensorConfig);
+				loadVSensorConfigs();
 			}
 		}
 	}
@@ -259,6 +258,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 	public void startWatchingGSN() {
 		// TODO complete this code
 		// ((CardLayout) panel.getLayout()).show(panel, VISUALIZER_PANEL);
+		autoRefreshCheckBox.setEnabled(true);
 		if (autoRefreshCheckBox.isSelected()) {
 			connector = new GSNConnector(AUTO_REFRESHING_THREAD);
 			connector.start();
@@ -268,6 +268,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 	public void stopWatchingGSN() {
 		// TODO complete this code
+		autoRefreshCheckBox.setEnabled(false);
 		if (connector != null) {
 			connector.interrupt();
 			connector = null;
@@ -415,6 +416,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		autoRefreshCheckBox = new JCheckBox("Refresh in selected Interval");
 		autoRefreshCheckBox.setSelected(false);
 		autoRefreshCheckBox.addActionListener(this);
+		autoRefreshCheckBox.setEnabled(false);
 
 		refreshGraphButton = new JButton(refreshIcon);
 		refreshGraphButton.setToolTipText("Click to refresh virtual sensors");
@@ -554,6 +556,14 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			}
 		}
 	}
+	
+	private void editVSensorConfig(VSensorConfig vSensorConfig){
+		VSensorEditor editor = new VSensorEditor(vSensorConfig);
+		editor.open();
+		if(!editor.hasBeanCanceled()){
+			loadVSensorConfigs();
+		}
+	}
 
 	private boolean validateVSensorConfig(VSensorConfig config) {
 		for (gsn.beans.InputStream inputStream : config.getInputStreams()) {
@@ -572,6 +582,8 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		private ShowHideAction showHideAction;
 
 		private EnableDisableAction enableDisableAction;
+		
+		private ModifyVSensorAction modifyVSensorAction;
 
 		public VSVPopupMenuProvider(VSVGraphScene scene) {
 			this.scene = scene;
@@ -586,12 +598,18 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			enableDisableAction = new EnableDisableAction();
 			enableDisableMenuItem.setAction(enableDisableAction);
 			popupMenu.add(enableDisableMenuItem);
+			
+			JMenuItem editMenuItem = new JMenuItem();
+			modifyVSensorAction = new ModifyVSensorAction();
+			editMenuItem.setAction(modifyVSensorAction);
+			popupMenu.add(editMenuItem);
 
 		}
 
 		public JPopupMenu getPopupMenu(final Widget widget, Point localLocation) {
 			showHideAction.setWidget(widget);
 			enableDisableAction.setWidget(widget);
+			modifyVSensorAction.setWidget(widget);
 			return popupMenu;
 		}
 
@@ -761,7 +779,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 		public void setWidget(Widget widget) {
 			this.widget = widget;
-			putValue(NAME, (widget.isVisible() ? "hide " : "show ") + ((VSVNodeWidget) widget).getNodeName());
+			putValue(NAME, (widget.isVisible() ? "Hide " : "Show ") + ((VSVNodeWidget) widget).getNodeName());
 		}
 	}
 
@@ -784,9 +802,26 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			this.widget = widget;
 			VSensorConfig config = (VSensorConfig) scene.findObject(widget);
 			if (getConfigStatus(config) == CONFIG_STATUS_DISABLED)
-				putValue(NAME, "enable " + ((VSVNodeWidget) widget).getNodeName());
+				putValue(NAME, "Enable " + ((VSVNodeWidget) widget).getNodeName());
 			else
-				putValue(NAME, "disable " + ((VSVNodeWidget) widget).getNodeName());
+				putValue(NAME, "Disable " + ((VSVNodeWidget) widget).getNodeName());
+		}
+	}
+	
+	private class ModifyVSensorAction extends AbstractAction{
+		private Widget widget;
+		
+		public void actionPerformed(ActionEvent e){
+			if(widget != null){
+				VSensorConfig config = (VSensorConfig) scene.findObject(widget);
+				editVSensorConfig(config);
+			}
+		}
+		
+		public void setWidget(Widget widget){
+			this.widget = widget;
+			VSensorConfig config = (VSensorConfig) scene.findObject(widget);
+			putValue(NAME, "Edit " + ((VSVNodeWidget) widget).getNodeName());
 		}
 	}
 
