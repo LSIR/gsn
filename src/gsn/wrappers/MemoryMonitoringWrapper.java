@@ -41,7 +41,7 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
       setName( "MemoryMonitoringWrapper-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
       if ( addressBean.getPredicateValue( "sampling-rate" ) != null ) {
-         samplingRate = ParamParser.getInteger( addressBean.getPredicateValue( "rate" ) , DEFAULT_SAMPLING_RATE );
+         samplingRate = ParamParser.getInteger( addressBean.getPredicateValue( "sampling-rate" ) , DEFAULT_SAMPLING_RATE );
          if ( samplingRate <= 0 ) {
             logger.warn( "The specified >sampling-rate< parameter for the >MemoryMonitoringWrapper< should be a positive number.\nGSN uses the default rate (" + DEFAULT_SAMPLING_RATE + "ms )." );
             samplingRate = DEFAULT_SAMPLING_RATE;
@@ -54,6 +54,7 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
       while ( isActive( ) ) {
          try {
             Thread.sleep( samplingRate );
+		    System.out.println(samplingRate);
          } catch ( InterruptedException e ) {
             logger.error( e.getMessage( ) , e );
          }
