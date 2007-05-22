@@ -28,12 +28,15 @@ public class CSVFileWrapper extends AbstractWrapper {
 
 	private static final String PARAM_SEPERATOR = "seperator";
 
+	private static final String PARAM_DATE_FORMAT = "dateFormat";
+
 	private static final String PARAM_QUOTE = "quote";
 
 	private static int               threadCounter      = 0;
 
 	private final transient Logger   logger             = Logger.getLogger( CSVFileWrapper.class );
 
+	private String dateFormat = "HH:mm:ss-dd.MM.yyyy";
 
 	private static DataField [] structure;
 
@@ -42,10 +45,12 @@ public class CSVFileWrapper extends AbstractWrapper {
 	private int columns;
 
 	private int skip_lines = 0;
-	
+
 	private char seperator = '\t';
 
 	private char quote= '#';
+
+	private long lastTime = 0L;
 
 	/**
 	 */
@@ -65,6 +70,8 @@ public class CSVFileWrapper extends AbstractWrapper {
 				seperator = value.charAt(0);
 			else if (key.equals(PARAM_FILE))
 				quote = value.charAt(0);
+			else if (key.equals(PARAM_DATE_FORMAT))
+				dateFormat = value;
 			else if (key.equals("time"))
 				v.add(new DataField(value, "bigint"));
 			else v.add(new DataField(value, key));	 
@@ -79,15 +86,22 @@ public class CSVFileWrapper extends AbstractWrapper {
 	}
 
 	public void run ( ) {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		logger.warn("cvsfile wrapper run started...");
 		// Parse the data
 		try {//i/o may go wrong
 			CSVReader reader = new CSVReader(new FileReader(filename),seperator, quote ,skip_lines);
 			String [] nextLine;
-			SimpleDateFormat dateTimeForm = new SimpleDateFormat( "HH:mm:ss-dd.MM.yyyy" );
+			SimpleDateFormat dateTimeForm = new SimpleDateFormat( dateFormat );
 			Date date = null;
 			long time;
 			Serializable[] serialized = new Serializable[columns];
+
 			while ((nextLine = reader.readNext()) != null) {
 				int k=0;
 				time = 0;
@@ -105,12 +119,19 @@ public class CSVFileWrapper extends AbstractWrapper {
 						}
 					}
 					if(structure[j].getDataTypeID() == DataTypes.DOUBLE){
-						Double d = Double.valueOf(nextLine[j]);
-						if (d==null) { 
-							logger.error("invalide double format! "+nextLine[j]);
+						try{
+							Double d = Double.valueOf(nextLine[j]);
+							if (d==null) { 
+								logger.error("invalide double format for "+nextLine[j]+" at timestamp "+time);
+								serialized[k++] = null;
+							} else serialized[k++] = d.doubleValue();
+						}catch(NumberFormatException e){
+							logger.error("wrong double format for :"+nextLine[j]+" at timestamp "+time);
+							logger.error(e);
 							serialized[k++] = null;
-						} else serialized[k++] = d.doubleValue();
-						logger.debug("double: "+nextLine[j]+" - "+Double.valueOf(nextLine[j])+" - "+serialized[k-1]);
+						}
+
+						logger.debug("double: "+nextLine[j]);
 					}
 				}// end of j loop
 //				logger.debug("-----");
@@ -120,9 +141,13 @@ public class CSVFileWrapper extends AbstractWrapper {
 				logger.debug("serialized: "+str);
 				logger.debug("time: "+time);
 				logger.debug("system time: "+System.currentTimeMillis());
-				
-				StreamElement stream = new StreamElement(structure, serialized, time );
-				this.postStreamElement(stream);
+				lastTime=time;
+				try{
+					StreamElement stream = new StreamElement(structure, serialized);
+					postStreamElement(stream);
+				} catch(ArrayIndexOutOfBoundsException e){
+					logger.error("the number of columns for the row with timestamp "+time+" is not sufficient");
+				}
 			}// end of while loop
 
 		}catch(IOException e){
