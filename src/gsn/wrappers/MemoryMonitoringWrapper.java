@@ -54,7 +54,6 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
       while ( isActive( ) ) {
          try {
             Thread.sleep( samplingRate );
-		    System.out.println(samplingRate);
          } catch ( InterruptedException e ) {
             logger.error( e.getMessage( ) , e );
          }
