@@ -34,7 +34,10 @@ public class GSNRPC extends XmlRpcServlet{
    protected XmlRpcServletServer  newXmlRpcServer(ServletConfig pConfig ) throws XmlRpcException {
      return new XmlRpcServletServer ( ) {
          protected XmlRpcHttpRequestConfigImpl newConfig ( HttpServletRequest pRequest ) {
-            return new MyConfig ( pRequest.getRemoteAddr ( ) );
+        	 String addr= pRequest.getHeader("X-Forwarded-Server");
+        	 if (addr==null)
+        		 addr=pRequest.getRemoteAddr();
+            return new MyConfig ( addr);
          }
       };
    }
