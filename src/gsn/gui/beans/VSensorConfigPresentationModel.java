@@ -4,6 +4,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 
+import org.apache.commons.validator.GenericValidator;
+
 import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.beans.PropertyConnector;
 import com.jgoodies.binding.list.ArrayListModel;
@@ -36,6 +38,7 @@ public class VSensorConfigPresentationModel extends PresentationModel {
 	private void initEventHandling() {
 		PropertyChangeListener handler = new ValidationUpdateHandler();
 		getBufferedModel(VSensorConfigModel.PROPERTY_NAME).addValueChangeListener(handler);
+		getBufferedModel(VSensorConfigModel.PROPERTY_STORAGE_HISTORY_SIZE).addValueChangeListener(handler);
 
 		getModel(VSensorConfigModel.PROPERTY_RATE_UNLIMITED).addValueChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -58,6 +61,29 @@ public class VSensorConfigPresentationModel extends PresentationModel {
 		if (null == getBufferedValue(VSensorConfigModel.PROPERTY_NAME)
 				|| ValidationUtils.isBlank(getBufferedValue(VSensorConfigModel.PROPERTY_NAME).toString()))
 			support.addError("Name", "should not be empty");
+		
+		String historySize = (String) getBufferedValue(VSensorConfigModel.PROPERTY_STORAGE_HISTORY_SIZE);
+		if (!GenericValidator.isBlankOrNull(historySize)) {
+			historySize = historySize.replace( " " , "" ).trim( ).toLowerCase( );
+			final int mIndex = historySize.indexOf("m");
+			final int hIndex = historySize.indexOf("h");
+			final int sIndex = historySize.indexOf("s");
+			if (mIndex < 0 && hIndex < 0 && sIndex < 0) {
+				if (!GenericValidator.isInt(historySize))
+					support.addError("History Size", "invalid history size");
+			} else {
+				final StringBuilder shs = new StringBuilder(historySize);
+				int index = sIndex;
+				if (hIndex >= 0)
+					index = hIndex;
+				else if (mIndex >= 0)
+					index = mIndex;
+				if (index != shs.length() - 1 || !GenericValidator.isInt(shs.deleteCharAt(index).toString()))
+					support.addError("History Size", "invalid history size");
+			}
+		}else{
+			setBufferedValue(VSensorConfigModel.PROPERTY_STORAGE_HISTORY_SIZE, null);
+		}
 
 		VSensorConfigModel vSensorConfigModel = (VSensorConfigModel) getBean();
 		ArrayListModel inputStreams = vSensorConfigModel.getInputStreams();
@@ -71,6 +97,7 @@ public class VSensorConfigPresentationModel extends PresentationModel {
 							+ inputStreamModel.getInputStreamName());
 			}
 		}
+		
 		return support.getResult();
 	}
 

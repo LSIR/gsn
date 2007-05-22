@@ -121,9 +121,9 @@ public class VSensorEditor {
 							fileName = fileName + ".xml";
 						saveVSensorConfig(fileName, true);
 					}else{
+						//TODO: this message should not be displayed when dialog is canceled
 						GUIUtils.showErrorMessage("Invalid file name");
 					}
-					System.out.println("File Name : " + fileName);
 				}else{
 					saveVSensorConfig(oldVSensorConfig.getFileName(), false);
 					//TODO : show proper message

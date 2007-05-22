@@ -97,6 +97,7 @@ public class VSensorGeneralPanel {
 	private void initComponentAnnotations() {
 		ValidationComponentUtils.setMandatory(nameTextField, true);
 		ValidationComponentUtils.setMessageKey(nameTextField, "VSensorConfig.Name");
+		ValidationComponentUtils.setMessageKey(storageSizeTextField, "VSensorConfig.History Size");
 	}
 	
 	private void initEventHandling() {

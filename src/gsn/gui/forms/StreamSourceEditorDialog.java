@@ -13,7 +13,12 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.NumberFormat;
+import java.text.FieldPosition;
+import java.text.Format;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -29,6 +34,10 @@ import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.NumberFormatter;
+
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.validator.GenericValidator;
 
 import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.binding.list.ArrayListModel;
@@ -83,7 +92,7 @@ public class StreamSourceEditorDialog extends JDialog {
 	private JButton editButton;
 
 	private JComponent editorPanel;
-	
+
 	private ArrayListModel oldAddressing;
 
 	public StreamSourceEditorDialog(Frame parent, StreamSourceModel streamSourceModel) {
@@ -123,15 +132,72 @@ public class StreamSourceEditorDialog extends JDialog {
 		GUIUtils.locateOnOpticalScreenCenter(this);
 	}
 
+	private class MyDateFormat extends Format {
+		private SimpleDateFormat simpleDateFormat;
+
+		private String format;
+
+		public MyDateFormat(String format) {
+			simpleDateFormat = new SimpleDateFormat(format);
+			this.format = format;
+		}
+
+		@Override
+		public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+			try {
+				Date parseDate = DateUtils.parseDate(obj.toString(), new String[] { format });
+				return new StringBuffer(simpleDateFormat.format(parseDate));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			return simpleDateFormat.format(obj, toAppendTo, pos);
+		}
+
+		@Override
+		public Object parseObject(String source, ParsePosition pos) {
+			Date date = (Date) simpleDateFormat.parseObject(source, pos);
+			if (date == null)
+				return null;
+			return simpleDateFormat.format(date);
+		}
+
+	}
+
 	private void initComponents() {
+		MyDateFormat dateFormat = new MyDateFormat("yyyy/MM/dd 'at' HH:mm:ss z");
 		aliasTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_ALIAS));
-		startTimeTextField = BasicComponentFactory.createTextField(presentationModel
-				.getBufferedModel(StreamSourceModel.PROPERTY_START_TIME));
-		endTimeTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_END_TIME));
+		startTimeTextField = BasicComponentFactory.createFormattedTextField(presentationModel
+				.getBufferedModel(StreamSourceModel.PROPERTY_START_TIME), dateFormat);
+		endTimeTextField = BasicComponentFactory.createFormattedTextField(presentationModel
+				.getBufferedModel(StreamSourceModel.PROPERTY_END_TIME), dateFormat);
 		dbsTextField = BasicComponentFactory.createIntegerField(presentationModel
 				.getBufferedModel(StreamSourceModel.PROPERTY_DISCONNECTED_BUFFER_SIZE));
+		NumberFormatter formatter = new NumberFormatter() {
+
+			@Override
+			public Object stringToValue(String text) throws ParseException {
+				try {
+					float value = Float.parseFloat(text);
+					if (getMinimum().compareTo(value) <= 0 && getMaximum().compareTo(value) >= 0)
+						return value;
+				} catch (NumberFormatException e) {
+
+				}
+
+				return super.stringToValue(text);
+			}
+
+			@Override
+			public String valueToString(Object value) throws ParseException {
+				return super.valueToString(value);
+			}
+
+		};
+		formatter.setValueClass(Float.class);
+		formatter.setMinimum(0f);
+		formatter.setMaximum(1f);
 		samplingRateTextField = BasicComponentFactory.createFormattedTextField(presentationModel
-				.getBufferedModel(StreamSourceModel.PROPERTY_SAMPLING_RATE), NumberFormat.getNumberInstance());
+				.getBufferedModel(StreamSourceModel.PROPERTY_SAMPLING_RATE), formatter);
 		historySizeTextField = BasicComponentFactory.createTextField(presentationModel
 				.getBufferedModel(StreamSourceModel.PROPERTY_RAW_HISTORY_SIZE));
 		queryTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_SQL_QUERY));
@@ -154,6 +220,7 @@ public class StreamSourceEditorDialog extends JDialog {
 		ValidationComponentUtils.setMessageKey(aliasTextField, "StreamSource.Alias");
 		ValidationComponentUtils.setMandatory(queryTextField, true);
 		ValidationComponentUtils.setMessageKey(queryTextField, "StreamSource.SqlQuery");
+		ValidationComponentUtils.setMessageKey(historySizeTextField, "StreamSource.History Size");
 	}
 
 	private void initEventHandling() {
@@ -349,7 +416,7 @@ public class StreamSourceEditorDialog extends JDialog {
 
 		public void actionPerformed(ActionEvent e) {
 			canceled = true;
-			((StreamSourceModel)presentationModel.getBean()).setAddressing(oldAddressing);
+			((StreamSourceModel) presentationModel.getBean()).setAddressing(oldAddressing);
 			presentationModel.triggerFlush();
 			close();
 		}
