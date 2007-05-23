@@ -3,6 +3,7 @@ package gsn.wrappers;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.AddressBean;
+import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
@@ -18,7 +19,6 @@ import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 /**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * TODO : Optimization for combining where clauses in the time based window and updating the
  * registered query with the new where clause
  */
@@ -40,33 +40,37 @@ public class RemoteWrapper extends AbstractWrapper {
 
 	private  XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
 
+	private String url;
+
 	public boolean initialize (  ) {
+		
 		AddressBean addressBean =getActiveAddressBean ( );
 		host = addressBean.getPredicateValue ( "host" );
 		if ( host == null || host.trim ( ).length ( ) == 0 ) {
 			logger.warn ( "The >host< parameter is missing from the RemoteWrapper wrapper." );
 			return false;
 		}
-		String portRaw = addressBean.getPredicateValue ( "port" );
-		if ( portRaw == null || portRaw.trim ( ).length ( ) == 0 ) {
-			logger.warn ( "The >port< parameter is missing from the RemoteWrapper wrapper." );
-			return false;
-		}
-		try {
-			port = Integer.parseInt ( portRaw );
-			if ( port > 65000 || port <= 0 ) throw new Exception ( "Bad port No" + port );
-		} catch ( Exception e ) {
-			logger.warn ( "The >port< parameter is not a valid integer for the RemoteWrapper wrapper." );
-			return false;
-		}
-		this.remoteVSName = addressBean.getPredicateValue ( "name" );
+		int port = addressBean.getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
+	    if ( port > 65000 || port <= 0 ) {
+	    	logger.error("Remote wrapper initialization failed, bad port number:"+port);
+	    	return false;
+	    }
+	    
+	     if ( (url =addressBean.getPredicateValue ( "url" ))==null) {
+	    	 url ="http://" + host +":"+port+ "/gsn-handler";
+	    	 //logger.warn ( "The \"URL\" paramter of the AddressBean which corresponds to the remote machine's url, e.g., http://some-host:port/path/to/gsn/" );
+	    	 //return false;
+	     }
+	    	 
+	    this.remoteVSName = addressBean.getPredicateValue ( "name" );
 		if ( this.remoteVSName == null ) {
 			logger.warn ( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
 			return false;
 		}
-		this.remoteVSName = this.remoteVSName.trim ().toLowerCase ();
+		
+		this.remoteVSName = remoteVSName.trim ().toLowerCase ();
 		try {
-			config.setServerURL ( new URL ( "http://" + host +":"+port+ "/gsn-handler" ) );
+			config.setServerURL ( new URL ( url ) );
 			client.setConfig ( config );
 		} catch ( MalformedURLException e1 ) {
 			logger.warn ( "Remote Wrapper initialization failed : "+e1.getMessage ( ) , e1 );
