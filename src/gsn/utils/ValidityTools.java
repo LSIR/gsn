@@ -139,7 +139,7 @@ public class ValidityTools {
 				return false;
 			for ( InetAddress address : NETWORK_LOCAL_INETADDRESSES )
 				if ( address.equals( hostAddress ) ) return true;
-			return false;
+			return hostAddress.isLoopbackAddress();
 		} catch ( UnknownHostException e ) {
 			logger.debug( e );
 			return false;

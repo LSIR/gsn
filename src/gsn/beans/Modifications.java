@@ -31,8 +31,6 @@ import org.jibx.runtime.JiBXException;
  * This class holds the files changed in the virtual-sensor directory and
  * adds/removes the virtual sensors based on the changes.
  * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * TODO : Handling the modifications.
  */
 public final class Modifications {
    
@@ -214,7 +212,8 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 					   Class<?> wrapperClass = Main.getWrapperClass(wrapper);
 					   if (wrapperClass == null) {
 						   //If this addressing element is the last one, remove VS from the graph
-						   logger.warn ( "The specified wrapper >"+addressing[addressingIndex].getWrapper()+"< does not exist");
+						   if(logger.isDebugEnabled())
+							   logger.debug ( "The specified wrapper >"+addressing[addressingIndex].getWrapper()+"< does not exist");
 						   if(addressingIndex == addressing.length && !hasValidAddressing){
 							   try {
 								   graph.removeNode(config);
@@ -261,8 +260,8 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 							   if(sensorConfig == null)
 								   sensorConfig = Mappings.getVSensorConfig(vsName);
 							   if(sensorConfig == null){
-								   if(logger.isInfoEnabled())
-									   logger.info("There is no virtaul sensor with name >" +  vsName + "< in the >" + config.getName() + "< virtual sensor");
+								   if(logger.isDebugEnabled())
+									   logger.debug("There is no virtaul sensor with name >" +  vsName + "< in the >" + config.getName() + "< virtual sensor");
 
 								   //If this addressing element is the last one, remove VS from the graph
 								   if(addressingIndex == addressing.length - 1 && !hasValidAddressing){

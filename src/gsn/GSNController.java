@@ -2,6 +2,7 @@ package gsn;
 
 import gsn.beans.Modifications;
 import gsn.beans.VSensorConfig;
+import gsn.utils.ValidityTools;
 import gsn.utils.graph.Graph;
 
 import java.io.BufferedReader;
@@ -54,7 +55,7 @@ public class GSNController extends Thread {
 				socket.setSoTimeout(GSN_CONTROL_READ_TIMEOUT);
 
 				// Only connections from localhost are allowed
-				if (socket.getInetAddress().isLoopbackAddress() == false) {
+				if (ValidityTools.isLocalhost(socket.getInetAddress().getHostAddress()) == false) {
 					try {
 						logger.warn("Connection request from IP address >" + socket.getInetAddress().getHostAddress() + "< was denied.");
 						socket.close();
