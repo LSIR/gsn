@@ -71,7 +71,10 @@ public class TestValidityTools {
 
 	@Test
 	public void testIsLocalhost() {
-
+		assertTrue(ValidityTools.isLocalhost("127.0.0.1"));
+		assertFalse(ValidityTools.isLocalhost("127.0.1.1"));
+		assertTrue(ValidityTools.isLocalhost("localhost"));
+		assertFalse(ValidityTools.isLocalhost("129.0.0.1"));
 	}
 
 	@Test

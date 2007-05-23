@@ -133,9 +133,10 @@ public class ValidityTools {
 
 	public static boolean isLocalhost ( String host ) {
 		// this allows us to be ipv6 compatible (we simply remove the port)
-		host = getHostName( host );
 		try {
 			InetAddress hostAddress = InetAddress.getByName( host );
+			if (hostAddress==null)
+				return false;
 			for ( InetAddress address : NETWORK_LOCAL_INETADDRESSES )
 				if ( address.equals( hostAddress ) ) return true;
 			return false;
@@ -143,10 +144,6 @@ public class ValidityTools {
 			logger.debug( e );
 			return false;
 		}
-		/*
-		 * for (String addr : NETWORK_LOCAL_ADDRESS) if
-		 * (host.equals(addr.toLowerCase().trim())) return true;
-		 */
 	}
 
 	public static final ArrayList < String >      NETWORK_LOCAL_ADDRESS       = new ArrayList < String >( );
