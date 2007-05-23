@@ -1,12 +1,16 @@
 package gsn.beans;
 
+import gsn.Main;
 import gsn.Mappings;
 import gsn.utils.graph.Graph;
 import gsn.utils.graph.Node;
 import gsn.utils.graph.NodeNotExistsExeption;
+import gsn.wrappers.RemoteWrapper;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -176,6 +182,12 @@ private Collection < VSensorConfig > getModifications ( ) {
 	   fillGraph(graph, allVSensorConfigs);
    }
 
+   /**
+    * Note: There my be multiple valid addressing element for each stream source and for each unique addressing,
+    * an edge is added to the graph 
+    * @param graph
+    * @param allVSensorConfigs
+    */ 
    private static void fillGraph(Graph<VSensorConfig> graph, Iterator<VSensorConfig> allVSensorConfigs) {
 	   HashMap<String, VSensorConfig> vsNameTOVSConfig = new HashMap<String, VSensorConfig>();
 	   while(allVSensorConfigs.hasNext()){
@@ -190,36 +202,79 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 		   Collection<InputStream> inputStreams = config.getInputStreams();
 		   for (InputStream stream : inputStreams) {
 			   StreamSource[] sources = stream.getSources();
-			   for (int i = 0; i < sources.length; i++) {
-				   AddressBean[] addressing = sources[i].getAddressing();
-				   for (int j = 0; j < addressing.length; j++) {
-					   String vsensorName = addressing[j].getPredicateValue("NAME");
-					   if (vsensorName != null) {
+			   for (int sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
+				   AddressBean[] addressing = sources[sourceIndex].getAddressing();
+				   boolean hasValidAddressing = false;
+				   for (int addressingIndex = 0; addressingIndex < addressing.length; addressingIndex++) {
+					   String vsensorName = addressing[addressingIndex].getPredicateValue("NAME");
+					   String wrapper = addressing[addressingIndex].getWrapper();
+
+					   Class<?> wrapperClass = Main.getWrapperClass(wrapper);
+					   if (wrapperClass == null) {
+						   //If this addressing element is the last one, remove VS from the graph
+						   logger.warn ( "The specified wrapper >"+addressing[addressingIndex].getWrapper()+"< does not exist");
+						   if(addressingIndex == addressing.length && !hasValidAddressing){
+							   try {
+								   graph.removeNode(config);
+							   } catch (NodeNotExistsExeption e) {
+								   logger.error(e.getMessage(), e);
+								   //This shouldn't happen, as we first add all virtual sensors to the graph
+							   }
+							   continue outFor;
+						   }
+						   continue;
+					   }
+
+					if(wrapperClass.isAssignableFrom(RemoteWrapper.class)){
+						   if(validateRemoteWrapper(addressing[addressingIndex]))
+							   hasValidAddressing = true;
+						   //If this addressing element is the last one, remove VS from the graph
+						   else if(addressingIndex == addressing.length - 1 && !hasValidAddressing){
+							   try {
+								   graph.removeNode(config);
+							   } catch (NodeNotExistsExeption e) {
+								   logger.error(e.getMessage(), e);
+								   //This shouldn't happen, as we first add all virtual sensors to the graph
+							   }
+							   continue outFor;
+						   }
+
+					   }else if(vsensorName != null){
 						   String vsName = vsensorName.toLowerCase().trim();
-						VSensorConfig sensorConfig = vsNameTOVSConfig.get(vsName);
+						   VSensorConfig sensorConfig = vsNameTOVSConfig.get(vsName);
 						   if(sensorConfig == null)
 							   sensorConfig = Mappings.getVSensorConfig(vsName);
 						   if(sensorConfig == null){
 							   if(logger.isInfoEnabled())
 								   logger.info("There is no virtaul sensor with name >" +  vsName + "<");
-							   try {
-								   graph.removeNode(config);
-								   continue outFor;
-							   } catch (NodeNotExistsExeption e) {
-								   logger.error(e.getMessage(), e);
-								   //This shouldn't happen, as we first add all virtual sensors to the graph
-							   }
-							   continue;
-						   }
-						   try {
-							   if(graph.findNode(sensorConfig) != null)
-								   graph.addEdge(config, sensorConfig);
-							   else
+
+							   //If this addressing element is the last one, remove VS from the graph
+							   if(addressingIndex == addressing.length - 1 && !hasValidAddressing){
 								   try {
 									   graph.removeNode(config);
 								   } catch (NodeNotExistsExeption e) {
 									   logger.error(e.getMessage(), e);
 									   //This shouldn't happen, as we first add all virtual sensors to the graph
+								   }
+								   continue outFor;
+							   }
+							   continue;
+						   }
+						   try {
+							   if(graph.findNode(sensorConfig) != null){
+								   graph.addEdge(config, sensorConfig);
+								   hasValidAddressing = true;
+							   }
+							   else
+								   //If this addressing element is the last one, remove VS from the graph
+								   if(addressingIndex == addressing.length - 1 && !hasValidAddressing){
+									   try {
+										   graph.removeNode(config);
+									   } catch (NodeNotExistsExeption e) {
+										   logger.error(e.getMessage(), e);
+										   //This shouldn't happen, as we first add all virtual sensors to the graph
+									   }
+									   continue outFor;
 								   }
 						   } catch (NodeNotExistsExeption e) {
 							   logger.error(e.getMessage(), e);
@@ -231,6 +286,68 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 		   }
 	   }
    }
+   
+   public static boolean validateRemoteWrapper ( AddressBean addressBean ) {
+	   XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
+	   XmlRpcClient client = new XmlRpcClient ( );
+
+	   String host = addressBean.getPredicateValue ( "host" );
+	   if ( host == null || host.trim ( ).length ( ) == 0 ) {
+		   if(logger.isDebugEnabled())
+			   logger.debug( "The >host< parameter is missing from the RemoteWrapper wrapper." );
+		   return false;
+	   }
+	   String portRaw = addressBean.getPredicateValue ( "port" );
+	   if ( portRaw == null || portRaw.trim ( ).length ( ) == 0 ) {
+		   if(logger.isDebugEnabled())
+			   logger.debug ( "The >port< parameter is missing from the RemoteWrapper wrapper." );
+		   return false;
+	   }
+	   int port;
+	   try {
+		   port = Integer.parseInt ( portRaw );
+		   if ( port > 65000 || port <= 0 ) throw new Exception ( "Bad port No" + port );
+	   } catch ( Exception e ) {
+		   if(logger.isDebugEnabled())
+			   logger.debug ( "The >port< parameter is not a valid integer for the RemoteWrapper wrapper." );
+		   return false;
+	   }
+	   String remoteVSName = addressBean.getPredicateValue ( "name" );
+	   if ( remoteVSName == null ) {
+		   if(logger.isDebugEnabled())
+			   logger.debug ( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
+		   return false;
+	   }
+	   remoteVSName = remoteVSName.trim ().toLowerCase ();
+	   try {
+		   config.setServerURL ( new URL ( "http://" + host +":"+port+ "/gsn-handler" ) );
+		   client.setConfig ( config );
+	   } catch ( MalformedURLException e1 ) {
+		   if(logger.isDebugEnabled())
+			   logger.debug ( "Remote Wrapper initialization failed : "+e1.getMessage ( ) , e1 );
+	   }
+
+	   String destination = new StringBuilder ( ).append ( host ).append ( ":" ).append ( port ).toString ( );
+	   if ( logger.isDebugEnabled() ) logger.debug ( new StringBuilder ( ).append ( "Wants to ask for structure from : " ).append ( destination ).toString ( ) );
+	   Object [ ] params = new Object [ ] {remoteVSName};
+	   Object[] result =null;
+	   try{
+		   result =  (Object[]) client.execute ("gsn.getOutputStructure", params);
+	   }catch(Exception e){
+		   if(logger.isDebugEnabled())
+			   logger.debug ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (destination).append (", ERROR : ").append (e.getMessage ()).toString ( ) );
+		   logger.debug (e.getMessage (),e);
+		   return false;
+	   }
+	   if ( result.length==0) {
+		   if(logger.isDebugEnabled())
+			   logger.debug ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (destination).toString ( ) );
+		   return false;
+	   }
+
+	   return true;
+	}
+ 
    
    public static Graph<VSensorConfig> buildDependencyGraphFromIterator(Iterator<VSensorConfig> vsensorIterator){
 	   Graph<VSensorConfig> graph = new Graph<VSensorConfig>();
