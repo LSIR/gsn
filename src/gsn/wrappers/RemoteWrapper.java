@@ -7,12 +7,10 @@ import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -43,26 +41,28 @@ public class RemoteWrapper extends AbstractWrapper {
 	private String url;
 
 	public boolean initialize (  ) {
-		
+		/**
+		 * First looks for URL parameter, if it is there it will be used otherwise
+		 * looks for host and port parameters.
+		 */
 		AddressBean addressBean =getActiveAddressBean ( );
-		host = addressBean.getPredicateValue ( "host" );
-		if ( host == null || host.trim ( ).length ( ) == 0 ) {
-			logger.warn ( "The >host< parameter is missing from the RemoteWrapper wrapper." );
-			return false;
+		if ( (url =addressBean.getPredicateValue ( "url" ))==null) {
+			host = addressBean.getPredicateValue ( "host" );
+			if ( host == null || host.trim ( ).length ( ) == 0 ) {
+				logger.warn ( "The >host< parameter is missing from the RemoteWrapper wrapper." );
+				return false;
+			}
+			int port = addressBean.getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
+		    if ( port > 65000 || port <= 0 ) {
+		    	logger.error("Remote wrapper initialization failed, bad port number:"+port);
+		    	return false;
+		    }
+		    
+		     	 url ="http://" + host +":"+port;
 		}
-		int port = addressBean.getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
-	    if ( port > 65000 || port <= 0 ) {
-	    	logger.error("Remote wrapper initialization failed, bad port number:"+port);
-	    	return false;
-	    }
-	    
-	     if ( (url =addressBean.getPredicateValue ( "url" ))==null) {
-	    	 url ="http://" + host +":"+port+ "/gsn-handler";
-	    	 //logger.warn ( "The \"URL\" paramter of the AddressBean which corresponds to the remote machine's url, e.g., http://some-host:port/path/to/gsn/" );
-	    	 //return false;
-	     }
-	    	 
-	    this.remoteVSName = addressBean.getPredicateValue ( "name" );
+		url+="/gsn-handler";   
+	     
+	   this.remoteVSName = addressBean.getPredicateValue ( "name" );
 		if ( this.remoteVSName == null ) {
 			logger.warn ( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
 			return false;

@@ -15,11 +15,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * @web.servlet name="gsn" load-on-startup="1"
- * @web.servlet-mapping url-pattern="/gsn"
- */
+
 public class ContainerImpl implements Container {
    
    private static transient Logger                                      logger                             = Logger.getLogger( ContainerImpl.class );
