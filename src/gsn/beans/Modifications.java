@@ -2,9 +2,11 @@ package gsn.beans;
 
 import gsn.Main;
 import gsn.Mappings;
+import gsn.utils.ValidityTools;
 import gsn.utils.graph.Graph;
 import gsn.utils.graph.Node;
 import gsn.utils.graph.NodeNotExistsExeption;
+import gsn.wrappers.InVMPipeWrapper;
 import gsn.wrappers.RemoteWrapper;
 
 import java.io.FileInputStream;
@@ -225,7 +227,9 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 						   continue;
 					   }
 
-					if(wrapperClass.isAssignableFrom(RemoteWrapper.class)){
+					   boolean isLocalRemote = wrapperClass.isAssignableFrom(RemoteWrapper.class) && isInTheSameGSNInstance(addressing[addressingIndex]);
+					   
+					   if(wrapperClass.isAssignableFrom(RemoteWrapper.class) && !isLocalRemote){
 						   if(validateRemoteWrapper(addressing[addressingIndex]))
 							   hasValidAddressing = true;
 						   //If this addressing element is the last one, remove VS from the graph
@@ -238,17 +242,10 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 							   }
 							   continue outFor;
 						   }
-
-					   }else if(vsensorName != null){
-						   String vsName = vsensorName.toLowerCase().trim();
-						   VSensorConfig sensorConfig = vsNameTOVSConfig.get(vsName);
-						   if(sensorConfig == null)
-							   sensorConfig = Mappings.getVSensorConfig(vsName);
-						   if(sensorConfig == null){
-							   if(logger.isInfoEnabled())
-								   logger.info("There is no virtaul sensor with name >" +  vsName + "<");
-
-							   //If this addressing element is the last one, remove VS from the graph
+					   }else if(wrapperClass.isAssignableFrom(InVMPipeWrapper.class) || isLocalRemote){
+						   if(vsensorName == null){
+							   if(logger.isDebugEnabled())
+								   logger.debug ( "The \"NAME\" paramter of the AddressBean which corresponds to the remote/local Virtual Sensor is missing" );
 							   if(addressingIndex == addressing.length - 1 && !hasValidAddressing){
 								   try {
 									   graph.removeNode(config);
@@ -258,14 +255,15 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 								   }
 								   continue outFor;
 							   }
-							   continue;
-						   }
-						   try {
-							   if(graph.findNode(sensorConfig) != null){
-								   graph.addEdge(config, sensorConfig);
-								   hasValidAddressing = true;
-							   }
-							   else
+						   } else{
+							   String vsName = vsensorName.toLowerCase().trim();
+							   VSensorConfig sensorConfig = vsNameTOVSConfig.get(vsName);
+							   if(sensorConfig == null)
+								   sensorConfig = Mappings.getVSensorConfig(vsName);
+							   if(sensorConfig == null){
+								   if(logger.isInfoEnabled())
+									   logger.info("There is no virtaul sensor with name >" +  vsName + "< in the >" + config.getName() + "< virtual sensor");
+
 								   //If this addressing element is the last one, remove VS from the graph
 								   if(addressingIndex == addressing.length - 1 && !hasValidAddressing){
 									   try {
@@ -276,9 +274,28 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 									   }
 									   continue outFor;
 								   }
-						   } catch (NodeNotExistsExeption e) {
-							   logger.error(e.getMessage(), e);
-							   //This shouldn't happen, as we first add all virtual sensors to the graph
+								   continue;
+							   }
+							   try {
+								   if(graph.findNode(sensorConfig) != null){
+									   graph.addEdge(config, sensorConfig);
+									   hasValidAddressing = true;
+								   }
+								   else
+									   //If this addressing element is the last one, remove VS from the graph
+									   if(addressingIndex == addressing.length - 1 && !hasValidAddressing){
+										   try {
+											   graph.removeNode(config);
+										   } catch (NodeNotExistsExeption e) {
+											   logger.error(e.getMessage(), e);
+											   //This shouldn't happen, as we first add all virtual sensors to the graph
+										   }
+										   continue outFor;
+									   }
+							   } catch (NodeNotExistsExeption e) {
+								   logger.error(e.getMessage(), e);
+								   //This shouldn't happen, as we first add all virtual sensors to the graph
+							   }
 						   }
 					   }
 				   }
@@ -287,7 +304,34 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 	   }
    }
    
-   public static boolean validateRemoteWrapper ( AddressBean addressBean ) {
+   private static boolean isInTheSameGSNInstance(AddressBean addressBean) {
+	   String host = addressBean.getPredicateValue ( "host" );
+	   if ( host == null || host.trim ( ).length ( ) == 0 ) {
+		   if(logger.isDebugEnabled())
+			   logger.debug( "The >host< parameter is missing from the RemoteWrapper wrapper." );
+		   return false;
+	   }
+	   String portRaw = addressBean.getPredicateValue ( "port" );
+	   if ( portRaw == null || portRaw.trim ( ).length ( ) == 0 ) {
+		   if(logger.isDebugEnabled())
+			   logger.debug ( "The >port< parameter is missing from the RemoteWrapper wrapper." );
+		   return false;
+	   }
+	   int port;
+	   try {
+		   port = Integer.parseInt ( portRaw );
+		   if ( port > 65000 || port <= 0 ) throw new Exception ( "Bad port No" + port );
+	   } catch ( Exception e ) {
+		   if(logger.isDebugEnabled())
+			   logger.debug ( "The >port< parameter is not a valid integer for the RemoteWrapper wrapper." );
+		   return false;
+	   }
+
+	   boolean toReturn = (ValidityTools.isLocalhost(host) && Main.getContainerConfig().getContainerPort() == port);
+	   return toReturn;
+   }
+
+public static boolean validateRemoteWrapper ( AddressBean addressBean ) {
 	   XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
 	   XmlRpcClient client = new XmlRpcClient ( );
 
