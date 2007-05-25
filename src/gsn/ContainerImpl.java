@@ -79,7 +79,7 @@ public class ContainerImpl implements Container {
       }
       // IMPROVE : The Asynchronous notification System.
       for ( int i = 0 ; i < notificationCandidates.size( ) ; i++ ) {
-    	 boolean notificationResult = notificationCandidates.get( i ).send( notificationData.get( i ) );
+    		  boolean notificationResult = notificationCandidates.get( i ).send( notificationData.get( i ) );
          if ( notificationResult == false ) {
             logger.info( "Query notification fail, query removed " + notificationCandidates.get( i ).toString( ) );
             removeNotificationRequest( notificationCandidates.get( i ) );

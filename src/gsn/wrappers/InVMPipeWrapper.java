@@ -18,10 +18,6 @@ import java.util.Iterator;
 import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Creation time : Dec 18, 2006@4:03:24 PM<br> *
- */
 public class InVMPipeWrapper extends AbstractWrapper {
   private static transient Logger                                      logger                             = Logger.getLogger( InVMPipeWrapper.class );
   
@@ -86,7 +82,7 @@ public class InVMPipeWrapper extends AbstractWrapper {
   public boolean remoteDataReceived ( StreamElement se) {
 	  if (logger.isDebugEnabled())
 		logger.debug("InVMPipe received stream element.");
-    return postStreamElement(se);
+	return postStreamElement(se);
   }
   
   public String toString ( ) {

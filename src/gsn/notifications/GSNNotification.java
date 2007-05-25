@@ -50,7 +50,7 @@ public class GSNNotification extends NotificationRequest {
 		this.remotePort = port;
 		this.remoteAddress = remoteHost;
 		this.prespectiveVirtualSensor = virtualSensorName;
-		TreeMap rewritingInfo = new TreeMap(new CaseInsensitiveComparator());
+		TreeMap<CharSequence,CharSequence> rewritingInfo = new TreeMap<CharSequence,CharSequence>(new CaseInsensitiveComparator());
 		rewritingInfo.put("wrapper", virtualSensorName);
 		if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
 			query += " order by timed desc limit 1 offset 0";

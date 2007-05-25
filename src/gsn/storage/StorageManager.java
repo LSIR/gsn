@@ -109,12 +109,12 @@ public class StorageManager {
 							else
 								throw new GSNRuntimeException("The column : "
 										+ colName + " in the >" + tableName
-										+ "< is not compatible with type : "
+										+ "< table is not compatible with type : "
 										+ field.getType()
-										+ ". The actual type is : " + colType);
+										+ ". The actual type for this table (currently in the database): " + colType);
 					}
 					throw new GSNRuntimeException("The table " + tableName
-							+ " doesn't have the >" + field.getName()
+							+ " in the database, doesn't have the >" + field.getName()
 							+ "< column.");
 				}
 		} catch (SQLException e) {
@@ -312,7 +312,6 @@ public class StorageManager {
 		PreparedStatement prepareStatement = connection.prepareStatement(sql
 				.toString());
 		prepareStatement.execute();
-		System.out.println(sql.toString());
 		prepareStatement.close();
 
 		sql = getStatementCreateIndexOnTimed(tableName);
