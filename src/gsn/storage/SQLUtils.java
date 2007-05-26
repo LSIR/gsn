@@ -64,7 +64,7 @@ public class SQLUtils {
 			String tableName = fromClauseMather.group( 1 );
 			CharSequence replacement = renameMapping.get( tableName );
 			if ( replacement != null ) 
-				fromClauseMather.appendReplacement( result , replacement.toString( ) );         
+				fromClauseMather.appendReplacement( result , replacement.toString( ) + " ");         
 		}
 		String cleanFromClause = fromClauseMather.appendTail( result ).toString( );
 		String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
