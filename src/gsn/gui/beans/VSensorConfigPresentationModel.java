@@ -19,6 +19,8 @@ import com.jgoodies.validation.util.ValidationUtils;
 
 public class VSensorConfigPresentationModel extends PresentationModel {
 
+	private static final int UNLIMITED_OUTPUT_RATE = 0;
+
 	private final ValidationResultModel validationResultModel;
 
 	private PropertyValidationSupport support;
@@ -110,10 +112,10 @@ public class VSensorConfigPresentationModel extends PresentationModel {
 	}
 
 	protected void updateMaximumRate() {
-		// boolean enabled =
-		// getModel(VSensorConfigModel.PROPERTY_RATE_UNLIMITED).booleanValue();
-		// System.out.println(getComponentModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE));
-		// getComponentModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE).setEnabled(enabled);
+		 boolean selected = getModel(VSensorConfigModel.PROPERTY_RATE_UNLIMITED).booleanValue();
+		 if(selected)
+			 getModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE).setValue(UNLIMITED_OUTPUT_RATE);
+		 System.out.println("selected : (" + selected + ") ,value = " + getModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE).getValue());
 	}
 
 }

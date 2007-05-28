@@ -25,6 +25,8 @@ import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.beans.WebInput;
 import gsn.gui.forms.VSensorGraphScene;
+import gsn.utils.GSNRuntimeException;
+import gsn.wrappers.AbstractWrapper;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -59,7 +61,6 @@ import org.netbeans.api.visual.widget.SeparatorWidget;
 import org.netbeans.api.visual.widget.Widget;
 import org.openide.util.Utilities;
 
-
 /**
  * This class represents a node widget in the VMD visualization style. It
  * implements the minimize ability. It allows to add pin widgets into the widget
@@ -78,6 +79,8 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 	static final Image IMAGE_EXPAND = Utilities.loadImage("gsn/gui/resources/vsv-expand.png"); // NOI18N
 
 	static final Image IMAGE_COLLAPSE = Utilities.loadImage("gsn/gui/resources/vsv-collapse.png"); // NOI18N
+
+	static final Image IMAGE_ACTIVE_ADDRESS_BEAN = Utilities.loadImage("gsn/gui/resources/accept.png"); // NOI18N
 
 	static final Color BORDER_CATEGORY_BACKGROUND = new Color(0Xfdc66f);
 
@@ -379,73 +382,6 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 	 * 
 	 * @return the list of pin widgets
 	 */
-	private List<Widget> getPinWidgets() {
-		ArrayList<Widget> pins = new ArrayList<Widget>(getChildren());
-		pins.remove(header);
-		pins.remove(pinsSeparator);
-		return pins;
-	}
-
-	/**
-	 * Sorts and assigns pins into categories.
-	 * 
-	 * @param pinsCategories
-	 *            the map of category name as key and a list of pin widgets as
-	 *            value
-	 */
-	public void sortPins(HashMap<String, List<Widget>> pinsCategories) {
-		List<Widget> previousPins = getPinWidgets();
-		ArrayList<Widget> unresolvedPins = new ArrayList<Widget>(previousPins);
-
-		for (Iterator<Widget> iterator = unresolvedPins.iterator(); iterator.hasNext();) {
-			Widget widget = iterator.next();
-			if (pinCategoryWidgets.containsValue(widget))
-				iterator.remove();
-		}
-
-		ArrayList<String> unusedCategories = new ArrayList<String>(pinCategoryWidgets.keySet());
-
-		ArrayList<String> categoryNames = new ArrayList<String>(pinsCategories.keySet());
-		Collections.sort(categoryNames);
-
-		ArrayList<Widget> newWidgets = new ArrayList<Widget>();
-		for (String categoryName : categoryNames) {
-			if (categoryName == null)
-				continue;
-			unusedCategories.remove(categoryName);
-			newWidgets.add(createPinCategoryWidget(categoryName));
-			List<Widget> widgets = pinsCategories.get(categoryName);
-			for (Widget widget : widgets)
-				if (unresolvedPins.remove(widget))
-					newWidgets.add(widget);
-		}
-
-		if (!unresolvedPins.isEmpty())
-			newWidgets.addAll(0, unresolvedPins);
-
-		for (String category : unusedCategories)
-			pinCategoryWidgets.remove(category);
-
-		removeChildren(previousPins);
-		addChildren(newWidgets);
-	}
-
-	private Widget createPinCategoryWidget(String categoryDisplayName) {
-		Widget w = pinCategoryWidgets.get(categoryDisplayName);
-		if (w != null)
-			return w;
-		LabelWidget label = new LabelWidget(getScene(), categoryDisplayName);
-		label.setOpaque(true);
-		label.setBackground(BORDER_CATEGORY_BACKGROUND);
-		label.setForeground(Color.GRAY);
-		label.setFont(fontPinCategory);
-		label.setAlignment(LabelWidget.Alignment.CENTER);
-		label.setCheckClipping(true);
-		if (stateModel.getBooleanState())
-			label.setPreferredBounds(new Rectangle());
-		pinCategoryWidgets.put(categoryDisplayName, label);
-		return label;
-	}
 
 	/**
 	 * Collapses the widget.
@@ -565,7 +501,7 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 			}
 			topWidget.addChild(addressingWidget);
 		}
-		
+
 		topWidget.addChild(createTitleValueWidget(scene, "Priority : ", String.valueOf(vSensorConfig.getPriority())));
 		if (vSensorConfig.getGeneralPassword() != null)
 			topWidget.addChild(createTitleValueWidget(scene, "Password : ", vSensorConfig.getGeneralPassword()));
@@ -636,6 +572,10 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 		return new VSVMinimizableLabelWidget(this, title);
 	}
 
+	private Widget createImagedTitledDetailWidget(VSensorGraphScene scene, String title, Image image) {
+		return new VSVMinimizableLabelWidget(this, title, image);
+	}
+
 	private Border createDetailsBorder() {
 		return BorderFactory.createCompositeBorder(BorderFactory.createEmptyBorder(1), BorderFactory.createLineBorder(1,
 				VSVNodeBorder.COLOR_BORDER));
@@ -677,16 +617,26 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 				pinWidget.addChild(createTitleValueWidget(scene, "Query : ", "'" + streamSource.getSqlQuery() + "'"));
 				AddressBean[] addressing = streamSource.getAddressing();
 				if (addressing.length > 0) {
-					Widget addressingWidget = createTitledDetailWidget(scene, "Address");
 					for (int i = 0; i < addressing.length; i++) {
+						AbstractWrapper wrapper = null;
+						Widget addressingWidget;
+						try {
+							wrapper = streamSource.getWrapper();
+						} catch (GSNRuntimeException e) {
+						}
+						
+						if (wrapper != null && addressing[i].equals(wrapper.getActiveAddressBean()))
+							addressingWidget = createImagedTitledDetailWidget(scene, "Address", IMAGE_ACTIVE_ADDRESS_BEAN);
+						else
+							addressingWidget = createTitledDetailWidget(scene, "Address");
 						addressingWidget.addChild(createTitleValueWidget(scene, "Wrapper", addressing[i].getWrapper()));
 						KeyValue[] predicates = addressing[i].getPredicates();
 						for (int j = 0; j < predicates.length; j++) {
 							addressingWidget.addChild(createTitleValueWidget(scene, predicates[j].getKey().toString(), predicates[j]
 									.getValue().toString()));
 						}
+						pinWidget.addChild(addressingWidget);
 					}
-					pinWidget.addChild(addressingWidget);
 				}
 				inputStreamWidget.addChild(pinWidget);
 			}
@@ -727,5 +677,6 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 	public void setWidgetIcon(Image statusImage) {
 		setNodeImage(statusImage);
 	}
+
 
 }

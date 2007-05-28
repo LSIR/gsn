@@ -196,12 +196,12 @@ public class VSensorGraphScene extends VSVGraphScene {
 		Collection<InputStream> inputStreams = config.getInputStreams();
 		for (InputStream stream : inputStreams) {
 			StreamSource[] sources = stream.getSources();
-			for (int i = 0; i < sources.length; i++) {
-				AddressBean[] addressing = sources[i].getAddressing();
-				for (int j = 0; j < addressing.length; j++) {
-					String vsensorName = addressing[i].getPredicateValue("NAME");
+			for (int sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
+				AddressBean[] addressing = sources[sourceIndex].getAddressing();
+				for (int addressingIndex = 0; addressingIndex < addressing.length; addressingIndex++) {
+					String vsensorName = addressing[addressingIndex].getPredicateValue("NAME");
 					if (vsensorName != null && vsensorName.equalsIgnoreCase(endNode.getObject().getName().trim())) {
-						pinIDs.add(sources[i].getUIDStr().toString());
+						pinIDs.add(sources[sourceIndex].getUIDStr().toString());
 					}
 				}
 			}
@@ -210,7 +210,7 @@ public class VSensorGraphScene extends VSVGraphScene {
 	}
 
 	void setVSDependencyGraph(Graph<VSensorConfig> graph, boolean checkForModification) {
-		if (checkForModification == false || runningGraphhModified(graph)) {
+		if (checkForModification == false || runningGraphModified(graph)) {
 			createSceneFromVSDependencyGraph(graph);
 		}
 		oldRunningGraph = graph;
@@ -245,7 +245,7 @@ public class VSensorGraphScene extends VSVGraphScene {
 		return false;
 	}
 	
-	public boolean runningGraphhModified(Graph<VSensorConfig> graph) {
+	public boolean runningGraphModified(Graph<VSensorConfig> graph) {
 //		 TODO : complete this method
 		if (oldRunningGraph == null)
 			return true;

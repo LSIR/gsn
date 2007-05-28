@@ -206,22 +206,9 @@ public class VSensorLoader extends Thread {
 	}
 
 	public static Modifications getUpdateStatus ( String virtualSensorsPath ) {
-		TreeSet < String > remove = new TreeSet < String >( new Comparator ( ) {
-
-			public int compare ( Object o1 , Object o2 ) {
-				String input1 = o1.toString ( ).trim ( );
-				String input2 = o2.toString ( ).trim ( );
-				return input1.compareTo ( input2 );
-			}
-		} );
-		TreeSet < String > add = new TreeSet < String >( new Comparator ( ) {
-
-			public int compare ( Object o1 , Object o2 ) {
-				String input1 = o1.toString ( ).trim ( );
-				String input2 = o2.toString ( ).trim ( );
-				return input1.compareTo ( input2 );
-			}
-		} );
+		ArrayList< String > remove = new ArrayList<String> ();
+		ArrayList< String > add = new ArrayList<String> ();
+		
 		String [ ] previous = Mappings.getAllKnownFileName ( );
 		FileFilter filter = new FileFilter ( ) {
 
@@ -316,6 +303,7 @@ public class VSensorLoader extends Thread {
 				if (wrapper!=null && prepareStreamSource( streamSource,wrapper)) 
 					break;
 				else
+					//TODO: remove wrapper from activeWrappers and release its resources
 					wrapper=null;
 			} catch (SQLException e) {
 				logger.error(e.getMessage(),e);

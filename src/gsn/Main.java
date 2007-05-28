@@ -151,6 +151,32 @@ public final class Main {
 	private static ContainerConfig                       containerConfig;
 
 	private static HashMap < String , VSensorConfig >    virtualSensors;
+	
+	public static void initializeWrappers() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
+		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
+		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+		PropertyConfigurator.configure ( DEFAULT_GSN_LOG4J_PROPERTIES );
+		try {
+			initialize ( "conf/gsn.xml" );
+		} catch ( JiBXException e ) {
+			logger.error ( e.getMessage ( ) );
+			logger.error ( new StringBuilder ( ).append ( "Can't parse the GSN configuration file : conf/gsn.xml" ).toString ( ) );
+			logger.error ( "Please check the syntax of the file to be sure it is compatible with the requirements." );
+			logger.error ( "You can find a sample configuration file from the GSN release." );
+			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
+			System.exit ( 1 );
+		} catch ( FileNotFoundException e ) {
+			logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
+			logger.error ( e.getMessage ( ) );
+			logger.error ( "Check the path of the configuration file and try again." );
+			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
+			System.exit ( 1 );
+		} catch ( ClassNotFoundException e ) {
+			logger.error ( "The file wrapper.properties refers to one or more classes which don't exist in the classpath");
+			logger.error ( e.getMessage ( ),e );
+			System.exit ( 1 );
+		}
+	}
 
 	private static void initialize ( String containerConfigurationFileName ) throws JiBXException , FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
 		containerConfig = loadConfiguration ( containerConfigurationFileName );

@@ -350,7 +350,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 	private void initGui() {
 		listModel = new DefaultListModel();
-		vsensorJList = new JList(listModel);
+		vsensorJList = new JList(new SortedListModel(listModel));
 		vsensorJList.setCellRenderer(new VSensorListCellRenderer());
 		vsensorJList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -505,7 +505,10 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			listModel.removeAllElements();
 			scene.setVSDependencyGraph(allVSensorsDepGraph, false);
 			for (VSensorConfig config : vSensorConfigList) {
-				((VSVNodeWidget) scene.findWidget(config)).setWidgetIcon(getStatusIcon(config).getImage());
+				VSVNodeWidget widget = (VSVNodeWidget) scene.findWidget(config);
+				//In the case of remote sources that are not valid, the VS is not added to the graph
+				if(widget != null)
+					widget.setWidgetIcon(getStatusIcon(config).getImage());
 			}
 			scene.doLayout();
 			if(!badConfigFiles.isEmpty()){
@@ -715,7 +718,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 				Object obj = objInputStream.readObject();
 				if (obj instanceof Graph) {
 					final Graph<VSensorConfig> graph = (Graph<VSensorConfig>) obj;
-					if (scene.runningGraphhModified(graph)) {
+					if (scene.runningGraphModified(graph)) {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
 								// scene.setVSDependencyGraph(graph, false);

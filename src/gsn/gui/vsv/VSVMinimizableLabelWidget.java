@@ -32,7 +32,7 @@ public class VSVMinimizableLabelWidget extends Widget implements VSVMinimizeAbil
 
 	private VSVNodeWidget vsvNodeWidget;
 	
-	public VSVMinimizableLabelWidget(VSVNodeWidget vsvNodeWidget, String title) {
+	public VSVMinimizableLabelWidget(VSVNodeWidget vsvNodeWidget, String title, Image image){
 		super(vsvNodeWidget.getScene());
 		this.vsvNodeWidget = vsvNodeWidget;
 		Scene scene = vsvNodeWidget.getScene();
@@ -52,6 +52,10 @@ public class VSVMinimizableLabelWidget extends Widget implements VSVMinimizeAbil
 		minimizeWidget.getActions().addAction(new ToggleMinimizedAction());
 		header.addChild(minimizeWidget);
 		
+		if(image != null){
+			header.addChild(new ImageWidget(scene, image));
+		}
+		
 		LabelWidget titleWidget = new LabelWidget(scene, title);
 		titleWidget.setBackground(VSVNodeWidget.BORDER_CATEGORY_BACKGROUND);
 		titleWidget.setForeground(Color.GRAY);
@@ -63,6 +67,10 @@ public class VSVMinimizableLabelWidget extends Widget implements VSVMinimizeAbil
 		stateModel = new StateModel();
 		stateModel.addListener(this);
 		notifyStateChanged(ObjectState.createNormal(), ObjectState.createNormal());
+	}
+	
+	public VSVMinimizableLabelWidget(VSVNodeWidget vsvNodeWidget, String title) {
+		this(vsvNodeWidget, title, null);
 	}
 	
 	private final class ToggleMinimizedAction extends WidgetAction.Adapter {

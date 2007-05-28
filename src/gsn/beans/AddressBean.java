@@ -5,7 +5,6 @@ import java.io.Serializable;
 import org.apache.commons.collections.KeyValue;
 
 /**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * Date: Aug 4, 2005 <br>
  * Time: 10:46:16 PM <br>
  */

@@ -30,6 +30,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -270,12 +276,8 @@ public class GSNConfiguratorFrame extends JFrame {
 
 	}
 
-	public static void main(String[] args)  {
+	public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException  {
 		
-		ValidityTools.checkAccessibilityOfFiles(Main.DEFAULT_GSN_CONF_FILE,
-				Main.DEFAULT_GSN_LOG4J_PROPERTIES);
-		ValidityTools
-		.checkAccessibilityOfDirs(Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY);
 		PlasticLookAndFeel laf = new PlasticXPLookAndFeel();
 		PlasticLookAndFeel.setCurrentTheme(new DesertBluer());
 		try {
@@ -285,6 +287,8 @@ public class GSNConfiguratorFrame extends JFrame {
 		}
 		
 		try {
+			Main.initializeWrappers();
+			
 		new GSNConfiguratorFrame(Main.DEFAULT_GSN_CONF_FILE,
 				Main.DEFAULT_GSN_LOG4J_PROPERTIES,
 		"conf/log4j.directory.properties");
