@@ -30,10 +30,7 @@ public class RemoteWrapper extends AbstractWrapper {
 
 	private ArrayList < CharSequence > registeredWhereClauses = new ArrayList < CharSequence >( );
 
-	private String                     host;
-
-	private int                        port;
-
+	
 	private XmlRpcClient                    client             = new XmlRpcClient ( );
 
 	private  XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
@@ -47,7 +44,7 @@ public class RemoteWrapper extends AbstractWrapper {
 		 */
 		AddressBean addressBean =getActiveAddressBean ( );
 		if ( (url =addressBean.getPredicateValue ( "url" ))==null) {
-			host = addressBean.getPredicateValue ( "host" );
+			String host = addressBean.getPredicateValue ( "host" );
 			if ( host == null || host.trim ( ).length ( ) == 0 ) {
 				logger.warn ( "The >host< parameter is missing from the RemoteWrapper wrapper." );
 				return false;
@@ -88,19 +85,18 @@ public class RemoteWrapper extends AbstractWrapper {
 	 * @return Null if the RemoteWrapper can't obtain the data strcture from the
 	 */
 	private  DataField [] askForStrcture ( ) {
-		String destination = new StringBuilder ( ).append ( host ).append ( ":" ).append ( port ).toString ( );
-		if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Wants to ask for structure from : " ).append ( destination ).toString ( ) );
+		if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Wants to ask for structure from : " ).append ( url ).toString ( ) );
 		Object [ ] params = new Object [ ] {remoteVSName};
 		Object[] result =null;
 		try{
 			result =  (Object[]) client.execute ("gsn.getOutputStructure", params);
 		}catch(Exception e){
-			logger.warn ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (destination).append (", ERROR : ").append (e.getMessage ()).toString ( ) );
+			logger.warn ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (url).append (", ERROR : ").append (e.getMessage ()).toString ( ) );
 			logger.debug (e.getMessage (),e);
 			return null;
 		}
 		if ( result.length==0) {
-			logger.warn ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (destination).toString ( ) );
+			logger.warn ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (url).toString ( ) );
 			return null;
 		}
 		DataField[] toReturn = new DataField [result.length];
@@ -120,7 +116,7 @@ public class RemoteWrapper extends AbstractWrapper {
 		String query = new StringBuilder("select * from ").append(remoteVSName).toString();
 		Object [ ] params = new Object [ ] {Main.getContainerConfig ().getContainerPort (),remoteVSName,query.toString( ), notificationCode};
 		if ( logger.isDebugEnabled ( ) )
-			logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( host ).append (port).append ("/").append (remoteVSName).append ( " with the query ->" ).append ( query ).append ( "<-" ).toString ( ) );
+			logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( url).append("--").append (remoteVSName).append ( " with the query ->" ).append ( query ).append ( "<-" ).toString ( ) );
 		Boolean bool = (Boolean) client.execute ("gsn.registerQuery", params);
 		if (bool==false) {
 			logger.warn ( new StringBuilder ( ).append ( "Query Registeration for the remote virtual sensor : ").append (remoteVSName).append (" failed.").toString ( ) );
@@ -172,11 +168,8 @@ public class RemoteWrapper extends AbstractWrapper {
 	public void finalize ( ) {
 		//TODO
 	}
-	public final String getRemoteHost (){
-		return host;
-	}
-	public int getRemotePort (){
-		return port;
+	public String getRemoteURL (){
+		return url;
 	}
 	public final String getRemoveVSName (){
 		return remoteVSName;

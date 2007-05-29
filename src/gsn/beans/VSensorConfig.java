@@ -353,10 +353,9 @@ public class VSensorConfig implements Serializable {
 		  StringBuilder usedSources = new StringBuilder( );
 		  for ( InputStream is : inputStreams )
 			  for ( StreamSource ss : is.getSources( ) )
-
 				  if ( ss.getWrapper( ) instanceof RemoteWrapper ) {
 					  RemoteWrapper remote = ( RemoteWrapper ) ss.getWrapper( );
-					  usedSources.append( remote.getRemoteHost( ) ).append( ":" ).append( remote.getRemotePort( ) ).append( "/" ).append( remote.getRemoveVSName( ) ).append( " " );
+					  usedSources.append( remote.getRemoteURL() ).append( "/" ).append( remote.getRemoveVSName( ) ).append( " " );
 				  } else {
 //					  usedSources.append( ss.getWrapper( ).getWrapperName( ) ).append( Registry.SPACE_CHARACTER );
 				  }
