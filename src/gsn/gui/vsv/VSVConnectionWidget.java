@@ -67,6 +67,7 @@ public class VSVConnectionWidget extends ConnectionWidget implements LayoutRelat
 		super(scene);
 		this.edgeID = edgeID;
 		setRouter(router);
+		setStroke(new BasicStroke(1.5f));
 		setSourceAnchorShape(AnchorShape.NONE);
 		setTargetAnchorShape(AnchorShape.TRIANGLE_FILLED);
 		setPaintControlPoints(true);

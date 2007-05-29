@@ -74,8 +74,21 @@ public final class AddressBean implements Serializable{
     if ( o == null || this.getClass( ) != o.getClass( ) ) return false;
     
     final AddressBean addressBean = ( AddressBean ) o;
-    if ( !this.predicates.equals( addressBean.predicates ) ) return false;
     if ( !this.wrapper.equals( addressBean.wrapper ) ) return false;
+    
+    if(predicates.length != addressBean.predicates.length)
+    	return false;
+    for ( final KeyValue predicate : this.predicates ) {
+    	boolean isEqual = false;
+    	for ( final KeyValue predicate2 : addressBean.predicates ){
+        	if(predicate.equals(predicate2)){
+        		isEqual = true;
+        		break;
+        	}
+        }
+    	if(!isEqual)
+    		return false;
+    }
     
     return true;
   }
@@ -83,7 +96,9 @@ public final class AddressBean implements Serializable{
   public int hashCode ( ) {
     int result;
     result = this.wrapper.hashCode( );
-    result = 29 * result + this.predicates.hashCode( );
+    for ( final KeyValue predicate : this.predicates ) {
+    	result = 29 * result + predicate.hashCode();
+    }
     return result;
   }
   
