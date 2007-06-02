@@ -46,6 +46,7 @@ public class VSensorEditor {
 		oldVSensorConfig = vSensorConfig;
 		canceled = false;
 		dialog = new JDialog((Frame) null, true);
+		dialog.setIconImage(VSensorVisualizerPanel.VS_EDIT_ICON.getImage());
 		dialog.setTitle("Virtual Sensor Editor");
 		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	}

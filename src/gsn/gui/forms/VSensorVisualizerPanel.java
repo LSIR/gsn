@@ -38,6 +38,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -103,6 +104,12 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 	public static final ImageIcon VS_NOT_LOADED_ICON = new ImageIcon(Utilities.loadImage("gsn/gui/resources/vs-green-error.png"));
 
+	public static final ImageIcon LIGHT_BUBBLE_ICON = new ImageIcon(Utilities.loadImage("gsn/gui/resources/show.png"));
+
+	public static final ImageIcon GRAY_BUBBLE_ICON = new ImageIcon(Utilities.loadImage("gsn/gui/resources/hide.png"));
+
+	public static ImageIcon VS_EDIT_ICON = new ImageIcon(Utilities.loadImage("gsn/gui/resources/vs-edit.png"));
+
 	private static final String AUTO_REFRESHING_THREAD = "AUTO_REFRESHING_THREAD";
 
 	private static final String DEFAULT_PANEL = "default panel";
@@ -121,6 +128,14 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 	private static ImageIcon newVSensorIcon = new ImageIcon(Utilities.loadImage("gsn/gui/resources/vs-add.png"));
 
+	private static ImageIcon showAllIcon = new ImageIcon(Utilities.loadImage("gsn/gui/resources/show-all-vs.png"));
+
+	private static ImageIcon hideAllIcon = new ImageIcon(Utilities.loadImage("gsn/gui/resources/hide-all-vs.png"));
+
+	private static ImageIcon showDisabledIcon = new ImageIcon(Utilities.loadImage("gsn/gui/resources/show-all-disabled-vs.png"));
+
+	private static ImageIcon hideDisabledIcon = new ImageIcon(Utilities.loadImage("gsn/gui/resources/hide-all-disabled-vs.png"));
+
 	private static final String USER_REFRESHING_THREAD = "USER_REFRESHING_THREAD";
 
 	private static final String VISUALIZER_PANEL = "visualizer panel";
@@ -137,9 +152,11 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 	private JCheckBox autoRefreshCheckBox;
 
-	private ArrayList<VSensorConfig> vSensorConfigList;
+	private ArrayList<String> vSensorConfigList;
 
 	private ArrayList<Integer> vSensorConfigStatusList;
+
+	private HashMap<String, VSensorConfig> vSensorConfigNameToConfigMap;
 
 	private GSNConnector connector;
 
@@ -163,6 +180,12 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 	private JButton newVSensorButton;
 
+	private JButton refreshDiskGraphButton;
+
+	private JButton showHideAllButton;
+
+	private JButton showHideDisabledButton;
+
 	private JSpinner refreshIntervalSpinner;
 
 	private SimpleInternalFrame satteliteViewInternalFrame;
@@ -180,8 +203,6 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 	private JList vsensorJList;
 
 	protected int refreshInterval;
-
-	private JButton refreshDiskGraphButton;
 
 	public VSensorVisualizerPanel() {
 		initGui();
@@ -219,15 +240,56 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			onDemandConnector.disconnect();
 		} else if (source == refreshDiskGraphButton) {
 			loadVSensorConfigs();
-		} else if(source == newVSensorButton){
+			showHideAllButton.setIcon(hideAllIcon);
+			showHideDisabledButton.setIcon(hideDisabledIcon);
+		} else if (source == newVSensorButton) {
 			VSensorConfig vSensorConfig = new VSensorConfig();
 			vSensorConfig.setName("please change me_" + Main.randomTableNameGenerator(7));
 			VSensorEditor vSensorEditor = new VSensorEditor(vSensorConfig);
 			vSensorEditor.open();
-			if(!vSensorEditor.hasBeanCanceled()){
+			if (!vSensorEditor.hasBeanCanceled()) {
 				loadVSensorConfigs();
 			}
+		} else if (source == showHideAllButton) {
+			if (scene != null) {
+				boolean condition = showHideAllButton.getIcon() == showAllIcon;
+				if (condition) {
+					scene.showAll();
+					showHideAllButton.setIcon(hideAllIcon);
+					showHideDisabledButton.setIcon(hideDisabledIcon);
+				} else {
+					scene.hideAll();
+					showHideAllButton.setIcon(showAllIcon);
+				}
+				showHideDisabledButton.setEnabled(condition);
+				vsensorJList.repaint();
+			}
+		} else if (source == showHideDisabledButton) {
+			if (scene != null) {
+				List<Widget> disabledWidgets = getDisabledVSensors();
+				if (showHideDisabledButton.getIcon() == showDisabledIcon) {
+					scene.showWidgets(disabledWidgets);
+					showHideDisabledButton.setIcon(hideDisabledIcon);
+				} else {
+					scene.hideWidgets(disabledWidgets);
+					showHideDisabledButton.setIcon(showDisabledIcon);
+				}
+				vsensorJList.repaint();
+			}
 		}
+	}
+
+	private List<Widget> getDisabledVSensors() {
+		ArrayList<Widget> resultList = new ArrayList<Widget>();
+		for (int i = 0; i < vSensorConfigStatusList.size(); i++) {
+			if (vSensorConfigStatusList.get(i).intValue() == CONFIG_STATUS_DISABLED) {
+				String widgetName = vSensorConfigList.get(i).trim().toLowerCase();
+				Widget foundWidget = scene.findWidget(widgetName);
+				if (foundWidget != null)
+					resultList.add(foundWidget);
+			}
+		}
+		return resultList;
 	}
 
 	public JPanel getPanel() {
@@ -342,7 +404,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 	}
 
 	private Integer getConfigStatus(VSensorConfig sensorConfig) {
-		int index = vSensorConfigList.indexOf(sensorConfig);
+		int index = vSensorConfigList.indexOf(sensorConfig.getName());
 		if (index != -1)
 			return vSensorConfigStatusList.get(index);
 		return null;
@@ -357,8 +419,8 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 				if (SwingUtilities.isRightMouseButton(e)) {
 					int index = vsensorJList.locationToIndex(e.getPoint());
 					if (scene != null && index > -1) {
-						popupMenuProvider.getPopupMenu(scene.findWidget(listModel.elementAt(index)), null).show(vsensorJList, e.getX(),
-								e.getY());
+						popupMenuProvider.getPopupMenu(scene.findWidget(vsensorJList.getModel().getElementAt(index)), null).show(
+								vsensorJList, e.getX(), e.getY());
 					}
 				}
 			}
@@ -427,16 +489,25 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		refreshDiskGraphButton.setToolTipText("Click to reload virtual sensors from disk");
 		refreshDiskGraphButton.addActionListener(this);
 		refreshDiskGraphButton.setEnabled(true);
-		
+
 		newVSensorButton = new JButton(newVSensorIcon);
 		newVSensorButton.setToolTipText("New Virtual Sensor");
 		newVSensorButton.addActionListener(this);
 		newVSensorButton.setEnabled(true);
 
+		showHideAllButton = new JButton(hideAllIcon);
+		showHideAllButton.setToolTipText("Click to show/hide all virtual sensors");
+		showHideAllButton.addActionListener(this);
+
+		showHideDisabledButton = new JButton(hideDisabledIcon);
+		showHideDisabledButton.setToolTipText("Click to show/hide disabled virtual sensors");
+		showHideDisabledButton.addActionListener(this);
+
 		JComponent layoutDropDwonButton = createLayoutDropDwonButton();
 		layoutDropDwonButton.setToolTipText("Layout graph");
 
-		FormLayout layout = new FormLayout("2dlu, pref, 2dlu,pref,2dlu,pref,2dlu,pref,8dlu,pref,4dlu,pref,2dlu", "2dlu,p,2dlu");
+		FormLayout layout = new FormLayout("2dlu, pref, 2dlu,pref,2dlu,pref,2dlu,pref,8dlu,pref,4dlu,pref,8dlu,pref,2dlu,pref,2dlu",
+				"2dlu,p,2dlu");
 		CellConstraints cc = new CellConstraints();
 		toolBarPanel.setLayout(layout);
 		toolBarPanel.add(newVSensorButton, cc.xy(2, 2));
@@ -445,6 +516,8 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		toolBarPanel.add(refreshGraphButton, cc.xy(8, 2));
 		toolBarPanel.add(refreshIntervalSpinner, cc.xy(10, 2));
 		toolBarPanel.add(autoRefreshCheckBox, cc.xy(12, 2));
+		toolBarPanel.add(showHideAllButton, cc.xy(14, 2));
+		toolBarPanel.add(showHideDisabledButton, cc.xy(16, 2));
 		visualizerPanel.add(toolBarPanel, BorderLayout.NORTH);
 
 		CardLayout cardLayout = new CardLayout();
@@ -467,10 +540,9 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 	}
 
 	private void loadVSensorConfigs() {
-		vSensorConfigList = new ArrayList<VSensorConfig>();
+		vSensorConfigList = new ArrayList<String>();
 		vSensorConfigStatusList = new ArrayList<Integer>();
-		vSensorConfigList = new ArrayList<VSensorConfig>();
-		vSensorConfigStatusList = new ArrayList<Integer>();
+		vSensorConfigNameToConfigMap = new HashMap<String, VSensorConfig>();
 
 		try {
 			File[] enabledVSensorFiles = vSensorIOUtil.readVirtualSensors();
@@ -504,14 +576,16 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			scene.removeAllNodes();
 			listModel.removeAllElements();
 			scene.setVSDependencyGraph(allVSensorsDepGraph, false);
-			for (VSensorConfig config : vSensorConfigList) {
+			for (String vsName : vSensorConfigList) {
+				VSensorConfig config = vSensorConfigNameToConfigMap.get(vsName);
 				VSVNodeWidget widget = (VSVNodeWidget) scene.findWidget(config);
-				//In the case of remote sources that are not valid, the VS is not added to the graph
-				if(widget != null)
+				// In the case of remote sources that are not valid, the VS is
+				// not added to the graph
+				if (widget != null)
 					widget.setWidgetIcon(getStatusIcon(config).getImage());
 			}
 			scene.doLayout();
-			if(!badConfigFiles.isEmpty()){
+			if (!badConfigFiles.isEmpty()) {
 				StringBuilder stringBuilder = new StringBuilder("<HTML>The following virtsul sensor definition files have error ");
 				stringBuilder.append("<OL>");
 				for (File file : badConfigFiles) {
@@ -526,23 +600,42 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		}
 	}
 
-	private void putInVSensorConfigList(VSensorConfig config, int status) {
-		int index = vSensorConfigList.indexOf(config);
+	private void putInVSensorConfigList(final VSensorConfig config, int status) {
+		VSensorConfig oldConfig = null;
+		String vsName = config.getName();
+		int index = vSensorConfigList.indexOf(vsName);
 		if (index != -1) {
 			vSensorConfigStatusList.set(index, status);
+			oldConfig = vSensorConfigNameToConfigMap.get(vsName);
 		} else {
-			vSensorConfigList.add(config);
+			vSensorConfigList.add(vsName);
 			vSensorConfigStatusList.add(status);
 		}
+		vSensorConfigNameToConfigMap.put(vsName, config);
+
+		// TODO: handle concurrency
 		if (scene != null) {
-			VSVNodeWidget widget = (VSVNodeWidget) scene.findWidget(config);
-			if (widget != null)
+			VSVNodeWidget widget;
+			if (oldConfig == null)
+				widget = (VSVNodeWidget) scene.findWidget(config);
+			else
+				widget = (VSVNodeWidget) scene.findWidget(oldConfig);
+			if (widget != null) {
 				widget.setWidgetIcon(getStatusIcon(config).getImage());
+				if (oldConfig != null) {
+					scene.removeObject(oldConfig);
+					scene.addObject(config, widget);
+					int indexInListModel = listModel.indexOf(oldConfig);
+					listModel.set(indexInListModel, config);
+					widget.objectUpdated();
+				}
+			}
+			//If we don't do this, we might face some NPEs
+			scene.validate();
 		}
 	}
 
 	private void enableDisableVSensor(VSensorConfig vSensorConfig) {
-		// TODO Auto-generated method stub
 		if (getConfigStatus(vSensorConfig) == CONFIG_STATUS_DISABLED) {
 			try {
 				vSensorIOUtil.enableVirtualSensor(new File(vSensorConfig.getFileName()));
@@ -559,11 +652,11 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			}
 		}
 	}
-	
-	private void editVSensorConfig(VSensorConfig vSensorConfig){
+
+	private void editVSensorConfig(VSensorConfig vSensorConfig) {
 		VSensorEditor editor = new VSensorEditor(vSensorConfig);
 		editor.open();
-		if(!editor.hasBeanCanceled()){
+		if (!editor.hasBeanCanceled()) {
 			loadVSensorConfigs();
 		}
 	}
@@ -585,7 +678,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		private ShowHideAction showHideAction;
 
 		private EnableDisableAction enableDisableAction;
-		
+
 		private ModifyVSensorAction modifyVSensorAction;
 
 		public VSVPopupMenuProvider(VSVGraphScene scene) {
@@ -601,7 +694,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			enableDisableAction = new EnableDisableAction();
 			enableDisableMenuItem.setAction(enableDisableAction);
 			popupMenu.add(enableDisableMenuItem);
-			
+
 			JMenuItem editMenuItem = new JMenuItem();
 			modifyVSensorAction = new ModifyVSensorAction();
 			editMenuItem.setAction(modifyVSensorAction);
@@ -783,6 +876,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		public void setWidget(Widget widget) {
 			this.widget = widget;
 			putValue(NAME, (widget.isVisible() ? "Hide " : "Show ") + ((VSVNodeWidget) widget).getNodeName());
+			putValue(SMALL_ICON, (widget.isVisible() ? GRAY_BUBBLE_ICON : LIGHT_BUBBLE_ICON));
 		}
 	}
 
@@ -804,26 +898,33 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 		public void setWidget(Widget widget) {
 			this.widget = widget;
 			VSensorConfig config = (VSensorConfig) scene.findObject(widget);
-			if (getConfigStatus(config) == CONFIG_STATUS_DISABLED)
+			if (getConfigStatus(config) == CONFIG_STATUS_DISABLED) {
 				putValue(NAME, "Enable " + ((VSVNodeWidget) widget).getNodeName());
-			else
+				putValue(SMALL_ICON, VS_LOADED_ICON);
+			} else {
 				putValue(NAME, "Disable " + ((VSVNodeWidget) widget).getNodeName());
+				putValue(SMALL_ICON, VS_DISABLED_ICON);
+			}
 		}
 	}
-	
-	private class ModifyVSensorAction extends AbstractAction{
+
+	private class ModifyVSensorAction extends AbstractAction {
 		private Widget widget;
-		
-		public void actionPerformed(ActionEvent e){
-			if(widget != null){
+
+		public ModifyVSensorAction() {
+			putValue(SMALL_ICON, VS_EDIT_ICON);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			if (widget != null) {
 				VSensorConfig config = (VSensorConfig) scene.findObject(widget);
 				editVSensorConfig(config);
 			}
 		}
-		
-		public void setWidget(Widget widget){
+
+		public void setWidget(Widget widget) {
 			this.widget = widget;
-			VSensorConfig config = (VSensorConfig) scene.findObject(widget);
+			// VSensorConfig config = (VSensorConfig) scene.findObject(widget);
 			putValue(NAME, "Edit " + ((VSVNodeWidget) widget).getNodeName());
 		}
 	}

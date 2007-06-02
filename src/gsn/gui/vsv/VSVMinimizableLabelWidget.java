@@ -32,6 +32,8 @@ public class VSVMinimizableLabelWidget extends Widget implements VSVMinimizeAbil
 
 	private VSVNodeWidget vsvNodeWidget;
 	
+	private String title;
+	
 	public VSVMinimizableLabelWidget(VSVNodeWidget vsvNodeWidget, String title, Image image){
 		super(vsvNodeWidget.getScene());
 		this.vsvNodeWidget = vsvNodeWidget;
@@ -56,6 +58,7 @@ public class VSVMinimizableLabelWidget extends Widget implements VSVMinimizeAbil
 			header.addChild(new ImageWidget(scene, image));
 		}
 		
+		this.title = title;
 		LabelWidget titleWidget = new LabelWidget(scene, title);
 		titleWidget.setBackground(VSVNodeWidget.BORDER_CATEGORY_BACKGROUND);
 		titleWidget.setForeground(Color.GRAY);
@@ -112,6 +115,10 @@ public class VSVMinimizableLabelWidget extends Widget implements VSVMinimizeAbil
 
 	private boolean isMinimizableWidget(Widget widget) {
 		return true;
+	}
+
+	public String getTitle() {
+		return title;
 	}
 
 }

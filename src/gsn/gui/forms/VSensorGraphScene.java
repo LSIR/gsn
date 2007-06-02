@@ -21,6 +21,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.eclipse.mylar.zest.layout.LayoutAlgorithm;
 import org.eclipse.mylar.zest.layout.LayoutEntity;
@@ -29,7 +33,6 @@ import org.eclipse.mylar.zest.layout.LayoutStyles;
 import org.eclipse.mylar.zest.layout.SpringLayoutAlgorithm;
 import org.netbeans.api.visual.action.WidgetAction;
 import org.netbeans.api.visual.widget.Widget;
-
 
 /**
  * @author Mehdi Riahi
@@ -43,8 +46,12 @@ public class VSensorGraphScene extends VSVGraphScene {
 
 	public static final String TYPE_VIRTUAL_SENSOR = "vsensor";
 
+	private static final int MINIMUM_WIDTH = 400;
+
+	private static final int MINIMUM_HEIGHT = 300;
+
 	private Graph<VSensorConfig> oldRunningGraph;
-	
+
 	private Graph<VSensorConfig> oldOnDiskGraph;
 
 	private ArrayList<VSensorGraphListener> listeners;
@@ -58,7 +65,7 @@ public class VSensorGraphScene extends VSVGraphScene {
 	public VSensorGraphScene(Graph<VSensorConfig> vsDependencyGraph) {
 		listeners = new ArrayList<VSensorGraphListener>();
 		nodeIDToNodeWidgetMap = new HashMap<String, VSVNodeWidget>();
-//		oldRunningGraph = vsDependencyGraph;
+		// oldRunningGraph = vsDependencyGraph;
 		oldOnDiskGraph = vsDependencyGraph;
 
 		SpringLayoutAlgorithm springLayoutAlgorithm = new SpringLayoutAlgorithm(LayoutStyles.NONE);
@@ -119,12 +126,28 @@ public class VSensorGraphScene extends VSVGraphScene {
 	public void doLayout() {
 		setVisible(true);
 
+		int width = (int) getBounds().getWidth();
+		int height = (int) getBounds().getHeight();
+		
+		//If we don't do this, the width will grow on each layou
+		JComponent view = getView();
+		if(view != null){
+			if(view.getParent() instanceof JViewport){
+				JScrollPane scrollPane = (JScrollPane) view.getParent().getParent();
+				width = scrollPane.getWidth();
+				height = scrollPane.getHeight();
+			}
+		}
+		
+		//sets the minimum width and height
+		width = Math.max(MINIMUM_WIDTH, width);
+		height = Math.max(MINIMUM_HEIGHT, height);
 		// computes placement of nodes in the scene
-		SVGUtils.performLayout(entities, relationShips, layoutAlgorithm, (int) getBounds().getWidth(), (int) getBounds().getHeight());
+		SVGUtils.performLayout(entities, relationShips, layoutAlgorithm, width, height);
 
 		// moves nodes to the locations computed by previous layout algorithm
 		layoutScene();
-//		getSceneAnimator().animateZoomFactor(1); // to show the scene immediately
+	    //to show the scene immediately
 		validate();
 	}
 
@@ -244,9 +267,9 @@ public class VSensorGraphScene extends VSVGraphScene {
 		}
 		return false;
 	}
-	
+
 	public boolean runningGraphModified(Graph<VSensorConfig> graph) {
-//		 TODO : complete this method
+		// TODO : complete this method
 		if (oldRunningGraph == null)
 			return true;
 		ArrayList<Node<VSensorConfig>> newNodes = graph.getNodes();
@@ -267,8 +290,8 @@ public class VSensorGraphScene extends VSVGraphScene {
 		}
 		return false;
 	}
-	
-	public void setOldRunningGraph(Graph<VSensorConfig> graph){
+
+	public void setOldRunningGraph(Graph<VSensorConfig> graph) {
 		oldRunningGraph = graph;
 	}
 
@@ -351,9 +374,54 @@ public class VSensorGraphScene extends VSVGraphScene {
 			removeNodeWithEdges(nodeIDs[i]);
 			// notifying all listeners
 			for (VSensorGraphListener listener : listeners) {
-				listener.nodeRemoving((VSensorConfig) findObject(nodeIDToNodeWidgetMap.get(nodeIDs[i])), nodeIDToNodeWidgetMap.get(nodeIDs[i]));
+				listener.nodeRemoving((VSensorConfig) findObject(nodeIDToNodeWidgetMap.get(nodeIDs[i])), nodeIDToNodeWidgetMap
+						.get(nodeIDs[i]));
 			}
 			nodeIDToNodeWidgetMap.remove(nodeIDs[i]);
+		}
+	}
+
+	public void showAll() {
+		if (isVisible()) {
+			synchronized (this) {
+				for (Widget widget : nodeIDToNodeWidgetMap.values())
+					widget.setVisible(true);
+				for (LayoutRelationship layoutRelationship : relationShips) {
+					((VSVConnectionWidget) layoutRelationship).setVisible(true);
+				}
+			}
+			validate();
+		}
+	}
+
+	public void hideAll() {
+		if (isVisible()) {
+			synchronized (this) {
+				for (Widget widget : nodeIDToNodeWidgetMap.values())
+					widget.setVisible(false);
+				for (LayoutRelationship layoutRelationship : relationShips) {
+					((VSVConnectionWidget) layoutRelationship).setVisible(false);
+				}
+			}
+			validate();
+		}
+	}
+
+	public void showWidgets(List<Widget> disabledWidgets) {
+		synchronized (this) {
+			for (Widget widget : disabledWidgets) {
+				widget.setVisible(false);
+				changeVisibility((VSVNodeWidget) widget);
+			}
+		}
+	}
+	
+	public void hideWidgets(List<Widget> disabledWidgets) {
+		synchronized (this) {
+			for (Widget widget : disabledWidgets) {
+				widget.setVisible(true);
+				changeVisibility((VSVNodeWidget) widget);
+			}
 		}
 	}
 }

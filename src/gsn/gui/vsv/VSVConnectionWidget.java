@@ -106,7 +106,7 @@ public class VSVConnectionWidget extends ConnectionWidget implements LayoutRelat
 
 	public LayoutEntity getDestinationInLayout() {
 		return (LayoutEntity) ((VSVPinWidget) graphPinScene.findWidget(graphPinScene.getEdgeTarget(edgeID))).getParentWidget()
-				.getParentWidget();
+				.getParentWidget().getParentWidget();
 	}
 
 	public Object getLayoutInformation() {

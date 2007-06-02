@@ -61,6 +61,8 @@ public  class StreamSource implements Serializable{
   
   private InputStream inputStream ;
   
+  private AddressBean activeAddressBean; // To be used by the gui
+  
   public StreamSource() {
   }
   
@@ -242,6 +244,7 @@ public  class StreamSource implements Serializable{
     if (validate()==false)
       throw new GSNRuntimeException("Can't set the wrapper when the stream source is invalid.");
     this.wrapper = wrapper;
+    this.activeAddressBean = wrapper.getActiveAddressBean();
     wrapper.addListener(this);
   }
   
@@ -300,9 +303,9 @@ public  class StreamSource implements Serializable{
       } else
         try {
           final StringBuilder shs = new StringBuilder( this.rawHistorySize );
-          if ( mIndex > 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
-          else if ( hIndex > 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
-          else if ( sIndex > 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
+          if ( mIndex >= 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
+          else if ( hIndex >= 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
+          else if ( sIndex >= 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
           this.isStorageCountBased = false;
         } catch ( NumberFormatException e ) {
           logger.debug( e.getMessage( ) , e );
@@ -417,8 +420,16 @@ public  class StreamSource implements Serializable{
       throw new GSNRuntimeException("You can't set the input stream on an invalid stream source. ");
     return this;
   }
-  
-  
-  
-  
+
+
+  /**
+   * The wrapper in <code>StreamSource</code> is transient and is not serialized, so
+   * we use this method to specify the active address bean which is not accessible via 
+   * the wrapper instance.
+   * @return the active address bean
+   */
+  public AddressBean getActiveAddressBean() {
+	  return activeAddressBean;
+  }
+
 }

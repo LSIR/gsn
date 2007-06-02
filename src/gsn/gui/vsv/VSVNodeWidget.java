@@ -18,6 +18,8 @@
  */
 package gsn.gui.vsv;
 
+import gsn.Main;
+import gsn.VSensorLoader;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.InputStream;
@@ -125,6 +127,8 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 	private double layoutHeight;
 
 	private boolean animateMinimizing = false;
+
+	private Widget widgetForInputStreams;
 
 	/**
 	 * Creates a node widget.
@@ -588,10 +592,11 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 		nameWidget.setOpaque(false);
 		nameWidget.setLayout(LayoutFactory.createHorizontalFlowLayout(LayoutFactory.SerialAlignment.CENTER, 8));
 		LabelWidget titleWidget = new LabelWidget(scene, title);
-		titleWidget.setFont(scene.getFont().deriveFont(10.0f));
+		Font derivedFont = scene.getFont().deriveFont(10.0f);
+		titleWidget.setFont(derivedFont);
 
-		LabelWidget valueWidget = new LabelWidget(scene, value + " ");
-		valueWidget.setFont(scene.getFont().deriveFont(10.0f));
+		VSVLabelWidget valueWidget = new VSVLabelWidget(scene, value + " ", true);
+		valueWidget.setFont(derivedFont);
 
 		nameWidget.addChild(titleWidget);
 		nameWidget.addChild(valueWidget);
@@ -599,9 +604,12 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 	}
 
 	public void addPins(VSensorGraphScene scene, HashMap<InputStream, List<Widget>> inputStreamPins) {
+		widgetForInputStreams = null;
 		for (Map.Entry<InputStream, List<Widget>> entry : inputStreamPins.entrySet()) {
 			InputStream inputStream = entry.getKey();
 			List<Widget> widgets = entry.getValue();
+			if (widgetForInputStreams == null)
+				widgetForInputStreams = new VSVMinimizableLabelWidget(this, "Input \nStreams");
 			VSVMinimizableLabelWidget inputStreamWidget = new VSVMinimizableLabelWidget(this, inputStream.getInputStreamName());
 			for (Widget widget : widgets) {
 				VSVPinWidget pinWidget = (VSVPinWidget) widget;
@@ -618,14 +626,10 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 				AddressBean[] addressing = streamSource.getAddressing();
 				if (addressing.length > 0) {
 					for (int i = 0; i < addressing.length; i++) {
-						AbstractWrapper wrapper = null;
 						Widget addressingWidget;
-						try {
-							wrapper = streamSource.getWrapper();
-						} catch (GSNRuntimeException e) {
-						}
 						
-						if (wrapper != null && addressing[i].equals(wrapper.getActiveAddressBean()))
+						AddressBean activeAddressBean = streamSource.getActiveAddressBean();
+						if (activeAddressBean != null && activeAddressBean.equals(addressing[i]))
 							addressingWidget = createImagedTitledDetailWidget(scene, "Address", IMAGE_ACTIVE_ADDRESS_BEAN);
 						else
 							addressingWidget = createTitledDetailWidget(scene, "Address");
@@ -648,12 +652,15 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 			inputStreamWidget.addChild(createTitleValueWidget(scene, "Count : ", count == Long.MAX_VALUE ? "Max Value" : String
 					.valueOf(count)));
 			inputStreamWidget.addChild(createTitleValueWidget(scene, "Query : ", "'" + inputStream.getQuery() + "'"));
-			addChild(inputStreamWidget);
+			widgetForInputStreams.addChild(inputStreamWidget);
+			// addChild(inputStreamWidget);
 			// if(isMinimized())
 			// inputStreamWidget.collapseWidget();
 			// else
 			// inputStreamWidget.expandWidget();
 		}
+		if (widgetForInputStreams != null)
+			addChild(widgetForInputStreams);
 	}
 
 	/**
@@ -678,5 +685,55 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 		setNodeImage(statusImage);
 	}
 
+	public void objectUpdated() {
+		if (widgetForInputStreams == null)
+			return;
+		List<Widget> inputStreamWidgetList = widgetForInputStreams.getChildren();
+		for (Widget inputStreamWidget : inputStreamWidgetList) {
+//			 We must exclude label and minimize/maximize image widgets
+			if (inputStreamWidget instanceof VSVMinimizableLabelWidget) {
+				List<Widget> streamSourceWidgetList = inputStreamWidget.getChildren();
+				for (Widget streamSourceWidget : streamSourceWidgetList) {
+					// We must exclude label and minimize/maximize image widgets
+					if (streamSourceWidget instanceof VSVPinWidget) {
+						VSVPinWidget pinWidget = (VSVPinWidget) streamSourceWidget;
+						List<Widget> streamSourceDetailWidgetList = pinWidget.getChildren();
+						VSensorGraphScene graphScene = (VSensorGraphScene) getScene();
+						VSensorConfig config = (VSensorConfig) graphScene.findObject(this);
+
+						List<Widget> childrenToRemove = new ArrayList<Widget>();
+						for (int i = 6; i < streamSourceDetailWidgetList.size(); i++) {
+							childrenToRemove.add(streamSourceDetailWidgetList.get(i));
+						}
+						// Removes addressing widgets
+						pinWidget.removeChildren(childrenToRemove);
+						
+						InputStream inputStream = config.getInputStream(((VSVMinimizableLabelWidget)inputStreamWidget).getTitle());
+						StreamSource streamSource = inputStream.getSource(pinWidget.getPinName());
+						AddressBean[] addressing = streamSource.getAddressing();
+						if (addressing.length > 0) {
+							for (int i = 0; i < addressing.length; i++) {
+								Widget addressingWidget;
+								
+								AddressBean activeAddressBean = streamSource.getActiveAddressBean();
+								if (activeAddressBean != null && activeAddressBean.equals(addressing[i]))
+									addressingWidget = createImagedTitledDetailWidget(graphScene, "Address", IMAGE_ACTIVE_ADDRESS_BEAN);
+								else
+									addressingWidget = createTitledDetailWidget(graphScene, "Address");
+								addressingWidget.addChild(createTitleValueWidget(graphScene, "Wrapper", addressing[i].getWrapper()));
+								KeyValue[] predicates = addressing[i].getPredicates();
+								for (int j = 0; j < predicates.length; j++) {
+									addressingWidget.addChild(createTitleValueWidget(graphScene, predicates[j].getKey().toString(), predicates[j]
+											.getValue().toString()));
+								}
+								pinWidget.addChild(addressingWidget);
+							}
+						}
+					}
+				}
+			}
+		}
+
+	}
 
 }

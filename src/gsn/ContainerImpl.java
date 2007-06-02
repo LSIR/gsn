@@ -101,7 +101,7 @@ public class ContainerImpl implements Container {
       }
       synchronized ( contents ) {
          /**
-          * We want to hande InGSNNotification's faster.
+          * We want to handle InGSNNotification's faster.
           */
          if ( notificationRequest instanceof InGSNNotification )
             contents.add( 0 , notificationRequest );

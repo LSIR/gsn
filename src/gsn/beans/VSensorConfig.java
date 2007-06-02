@@ -53,7 +53,7 @@ public class VSensorConfig implements Serializable {
 
 	private transient Long                         lastModified;
 
-	private transient String                       fileName;
+	private String                       fileName;
 
 	private transient final Logger                 logger                                    = Logger.getLogger( VSensorConfig.class );
 

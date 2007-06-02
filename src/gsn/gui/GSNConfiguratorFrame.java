@@ -53,6 +53,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.jibx.runtime.JiBXException;
+import org.openide.util.Utilities;
 
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
@@ -222,6 +223,7 @@ public class GSNConfiguratorFrame extends JFrame {
 
 	private void initComponents() {
 		setSize(800, 600);
+		setIconImage(Utilities.loadImage("gsn/gui/resources/gsn.png"));
 		contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		
