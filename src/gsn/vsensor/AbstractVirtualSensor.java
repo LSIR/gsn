@@ -10,9 +10,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public abstract class AbstractVirtualSensor {
    
    private static final transient Logger logger           = Logger.getLogger( AbstractVirtualSensor.class );

@@ -29,6 +29,16 @@ public final class StreamElement implements Serializable {
    
    private long                                   internalPrimayKey = -1;
    
+   public StreamElement (StreamElement other) {
+	   this.fieldNames=new String[other.fieldNames.length];
+	   for (int i=0;i<other.fieldNames.length;i++) {
+		   fieldNames[i]=other.fieldNames[i];
+		   fieldValues[i]=other.fieldValues[i];
+		   fieldTypes[i]=other.fieldTypes[i];
+	   }
+	   this.timeStamp=other.timeStamp;
+	   this.internalPrimayKey = other.internalPrimayKey;
+   }
    public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data  ) {
 	   this(outputStructure,data,System.currentTimeMillis());
    }
@@ -119,7 +129,11 @@ public final class StreamElement implements Serializable {
    public final Serializable [ ] getData ( ) {
       return this.fieldValues;
    }
-   
+
+   public void setData (int index,Serializable data ) {
+	     this.fieldValues[index]=data;
+   }
+	
    public long getTimeStamp ( ) {
       return this.timeStamp;
    }

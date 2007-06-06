@@ -29,13 +29,14 @@ public class RemoteWrapper extends AbstractWrapper {
 	private String                     remoteVSName;
 
 	private ArrayList < CharSequence > registeredWhereClauses = new ArrayList < CharSequence >( );
-
 	
 	private XmlRpcClient                    client             = new XmlRpcClient ( );
 
 	private  XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
 
 	private String url;
+	
+	private String local_URL;
 
 	public boolean initialize (  ) {
 		/**
@@ -57,7 +58,11 @@ public class RemoteWrapper extends AbstractWrapper {
 		    
 		     	 url ="http://" + host +":"+port;
 		}
-		url+="/gsn-handler";   
+		local_URL = addressBean.getPredicateValueWithDefault("local-url","http://localhost:"+Main.getContainerConfig().getContainerPort());
+		if (!url.endsWith("/"))
+			url+="/";
+		if (!local_URL.endsWith("/"))
+			local_URL+="/";
 	     
 	   this.remoteVSName = addressBean.getPredicateValue ( "name" );
 		if ( this.remoteVSName == null ) {
@@ -67,7 +72,7 @@ public class RemoteWrapper extends AbstractWrapper {
 		
 		this.remoteVSName = remoteVSName.trim ().toLowerCase ();
 		try {
-			config.setServerURL ( new URL ( url ) );
+			config.setServerURL ( new URL ( url +"gsn-handler") );
 			client.setConfig ( config );
 		} catch ( MalformedURLException e1 ) {
 			logger.warn ( "Remote Wrapper initialization failed : "+e1.getMessage ( ) , e1 );
@@ -168,9 +173,7 @@ public class RemoteWrapper extends AbstractWrapper {
 	public void finalize ( ) {
 		//TODO
 	}
-	public String getRemoteURL (){
-		return url;
-	}
+	
 	public final String getRemoveVSName (){
 		return remoteVSName;
 	}

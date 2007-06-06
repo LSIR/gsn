@@ -50,6 +50,22 @@ public final class AddressBean implements Serializable{
     }
     return null;
   }
+  
+  /**
+   * Gets a parameter name. If the parameter value exists and is not an empty string, returns the value otherwise returns the
+   * default value
+   * @param key The key to look for in the map.
+   * @param defaultValue Will be return if the key is not present or its an empty string.
+   * @return
+   */
+  public String getPredicateValueWithDefault(String key, String defaultValue) {
+	  String value = getPredicateValue(key);
+	  if (value==null|| value.trim().length()==0)
+		  return defaultValue;
+	  else
+		  return value;
+  }
+  
   /**
    * Gets a parameter name. If the parameter value exists and is a valid integer, returns the value otherwise returns the
    * default value
@@ -58,16 +74,16 @@ public final class AddressBean implements Serializable{
    * @return
    */
   public int getPredicateValueAsInt(String key, int defaultValue) {
-    String value = getPredicateValue(key);
-    if (value==null|| value.trim().length()==0)
-      return defaultValue;
-    try { 
-      return Integer.parseInt(value);
-    }catch (Exception e) {
-      return defaultValue;
-    }
+	  String value = getPredicateValue(key);
+	  if (value==null|| value.trim().length()==0)
+		  return defaultValue;
+	  try { 
+		  return Integer.parseInt(value);
+	  }catch (Exception e) {
+		  return defaultValue;
+	  }
   }
-  
+
   
   public boolean equals ( final Object o ) {
     if ( this == o ) return true;

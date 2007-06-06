@@ -33,8 +33,6 @@ import org.jfree.data.time.TimeSeriesCollection;
  * USED FOR DRAWING, THE BIGGER THE OUTPUT PLOT SIZE (IN KILOBYTES) AND THE
  * HIGHER PROCESSING TIME.
  * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * @author Jerome Rousselot (jeromerousselot@gmail.com)<br>
  */
 public class ChartVirtualSensor extends AbstractVirtualSensor {
    
