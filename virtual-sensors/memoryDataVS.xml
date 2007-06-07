@@ -23,6 +23,7 @@
                 <address wrapper="memory-usage">
                     <predicate key="HOST">localhost</predicate>
                     <predicate key="PORT">22001</predicate>
+                    <predicate key="local-port">22001</predicate> <!-- This can be omited if you don't want to proxy the access to the GSN through Apache Httpd -->
                     <predicate key="sampling-rate">1000</predicate>
                 </address>
                 <query>select HEAP,NON_HEAP,PENDING_FINALIZATION_COUNT,TIMED from wrapper</query>

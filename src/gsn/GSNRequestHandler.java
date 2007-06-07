@@ -56,6 +56,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
 			logger.info( "Request received for unknown v-sensor : " + virtualSensorName );
 			return false;
 		}
+    
 		GSNNotification interest = new GSNNotification( port , remoteAddress , virtualSensorName , query , notificationCode );
 		if ( logger.isInfoEnabled( ) )
 			logger.info( new StringBuilder( ).append( "REGISTER REQUEST FOR " ).append( virtualSensorName ).append( " received from :" ).append( interest.getRemoteAddress( ) ).append( ":" ).append(

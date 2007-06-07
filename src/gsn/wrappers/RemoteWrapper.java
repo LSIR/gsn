@@ -35,9 +35,9 @@ public class RemoteWrapper extends AbstractWrapper {
 	private  XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
 
 	private String url;
+  
+  private int local_gsn_port; // might be different than actual port when gsn is proxied through apache.
 	
-	private String local_URL;
-
 	public boolean initialize (  ) {
 		/**
 		 * First looks for URL parameter, if it is there it will be used otherwise
@@ -58,18 +58,15 @@ public class RemoteWrapper extends AbstractWrapper {
 		    
 		     	 url ="http://" + host +":"+port;
 		}
-		local_URL = addressBean.getPredicateValueWithDefault("local-url","http://localhost:"+Main.getContainerConfig().getContainerPort());
 		if (!url.endsWith("/"))
 			url+="/";
-		if (!local_URL.endsWith("/"))
-			local_URL+="/";
-	     
+		   
 	   this.remoteVSName = addressBean.getPredicateValue ( "name" );
 		if ( this.remoteVSName == null ) {
 			logger.warn ( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
 			return false;
 		}
-		
+		this.local_gsn_port = addressBean.getPredicateValueAsInt("local-port", Main.getContainerConfig().getContainerPort());
 		this.remoteVSName = remoteVSName.trim ().toLowerCase ();
 		try {
 			config.setServerURL ( new URL ( url +"gsn-handler") );
@@ -119,7 +116,7 @@ public class RemoteWrapper extends AbstractWrapper {
 //		String query = new StringBuffer ( "SELECT * FROM " ).append ( remoteVSName ).append ( " WHERE " ).append ( getWhereClausesAllTogher ( ) ).append ( " ORDER BY " ).append ( remoteVSName ).append (
 //		".TIMED DESC LIMIT 1 OFFSET 0" ).toString ( );
 		String query = new StringBuilder("select * from ").append(remoteVSName).toString();
-		Object [ ] params = new Object [ ] {Main.getContainerConfig ().getContainerPort (),remoteVSName,query.toString( ), notificationCode};
+		Object [ ] params = new Object [ ] {local_gsn_port,remoteVSName,query.toString( ), notificationCode};
 		if ( logger.isDebugEnabled ( ) )
 			logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( url).append("--").append (remoteVSName).append ( " with the query ->" ).append ( query ).append ( "<-" ).toString ( ) );
 		Boolean bool = (Boolean) client.execute ("gsn.registerQuery", params);
@@ -181,4 +178,13 @@ public class RemoteWrapper extends AbstractWrapper {
 	public String getWrapperName () {
 		return "Remote source GSN network";
 	}
+/**
+ * Useful in cases where access to the GSN is proxied through apache
+ * @return
+ */
+  public int getLocalGSNPort() {
+    return local_gsn_port;
+  }
+  
+  
 }
