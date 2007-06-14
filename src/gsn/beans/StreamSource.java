@@ -431,5 +431,14 @@ public  class StreamSource implements Serializable{
   public AddressBean getActiveAddressBean() {
 	  return activeAddressBean;
   }
+  public String toString() {
+	  StringBuilder toReturn = new StringBuilder();
+	  toReturn.append(" Stream Source object: ");
+	  toReturn.append(" Alias: ").append(alias);
+	  toReturn.append(" uidS: ").append(uidS);
+	  toReturn.append(" Active source: ").append(activeAddressBean);
+	  
+	  return toReturn.toString();
+  }
 
 }
