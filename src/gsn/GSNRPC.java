@@ -1,16 +1,8 @@
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Creation time : Dec 7, 2006@8:08:29 PM<br> *
- */
 package gsn;
 
 import gsn.GSNRequestHandler;
-import gsn.Main;
 import gsn.registry.MyConfig;
 import gsn.registry.RequestInitializableRequestProcessor;
-
-import java.io.IOException;
-import java.net.URL;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
@@ -22,11 +14,6 @@ import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 import org.apache.xmlrpc.webserver.XmlRpcServletServer;
 
-
-/**
- * @author alisalehi
- *
- */
 public class GSNRPC extends XmlRpcServlet{
    
    private final transient Logger   logger                = Logger.getLogger ( GSNRPC.class );
@@ -62,5 +49,5 @@ public class GSNRPC extends XmlRpcServlet{
          return output;
       }
    };
-   
+
 }

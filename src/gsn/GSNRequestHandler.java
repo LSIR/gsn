@@ -1,20 +1,13 @@
 package gsn;
 
-import java.util.Date;
-import java.util.Vector;
 import org.apache.log4j.Logger;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.notifications.GSNNotification;
 import gsn.registry.MyConfig;
 import gsn.registry.RequestInitializableRequestProcessor;
-import gsn.storage.StorageManager;
 import gsn.wrappers.RemoteWrapper;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Creation time : Dec 8, 2006@11:15:01 AM<br> *
- */
 public class GSNRequestHandler implements RequestInitializableRequestProcessor {
 
 	private static transient Logger logger = Logger.getLogger( GSNRequestHandler.class );
@@ -45,7 +38,14 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
 			return remoteWrapper.remoteDataReceived(se );
 		}
 	}
-
+	/**
+	 * If GSN wants to register a request to a virtual sensor on this machine.
+	 * @param port
+	 * @param virtualSensorName, the name of the virtual sensor for which this gsn received a query.
+	 * @param query, the query from the remote machine.
+	 * @param notificationCode.
+	 * @return
+	 */
 	public boolean registerQuery ( int port , String virtualSensorName , String query , int notificationCode ) {
 		if ( virtualSensorName == null || ( virtualSensorName = virtualSensorName.trim( ).toLowerCase( ) ).length( ) == 0 ) {
 			logger.warn( "Bad request received for Data_strctutes" );

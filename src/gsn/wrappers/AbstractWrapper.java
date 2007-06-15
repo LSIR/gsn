@@ -38,6 +38,7 @@ public abstract class AbstractWrapper extends Thread {
 	public void addListener ( StreamSource ss ) throws SQLException {
 		getStorageManager( ).executeCreateView( ss.getUIDStr() , ss.toSql() );
 		listeners.add(ss);
+		logger.fatal("Adding listeners: "+ss.toString());
 	}
 
 	/**
@@ -140,9 +141,10 @@ public abstract class AbstractWrapper extends Thread {
 				return false;
 			boolean toReturn = false;
 			synchronized ( listeners ) {
+				if (logger.isDebugEnabled()) logger.debug("Size of the listeners to be evaluated - "+listeners.size() );
 				for (  StreamSource ss: listeners ) {
 					if( getStorageManager( ).isThereAnyResult( new StringBuilder("select * from ").append(ss.getUIDStr()) )) {
-						if ( logger.isDebugEnabled() == true ) logger.debug( "Output stream produced/received from a wrapper" );
+						if ( logger.isDebugEnabled() ) logger.debug( getWrapperName()+ " - Output stream produced/received from a wrapper "+ss.toString() );
 						try {
 							ss.dataAvailable( );
 						} catch (SQLException e) {

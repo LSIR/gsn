@@ -136,15 +136,24 @@ public class GSNNotification extends NotificationRequest {
 		this.latestVisitTime = lastRespondTime;
 	}
 
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof GSNNotification))
-			return false;
-		GSNNotification input = (GSNNotification) obj;
-		return input.notificationCode == notificationCode;
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = super.hashCode();
+		result = PRIME * result + notificationCode;
+		return result;
 	}
 
-	public int hashCode() {
-		return toString().hashCode();
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final GSNNotification other = (GSNNotification) obj;
+		if (notificationCode != other.notificationCode)
+			return false;
+		return true;
 	}
 
 	public String toString() {

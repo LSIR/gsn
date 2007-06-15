@@ -2,21 +2,15 @@ package gsn;
 
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
+import gsn.http.FieldDownloadServlet;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
-
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -52,12 +46,10 @@ import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public final class Main {
 
 	private static GSNController controlSocket;
+
 	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 
 	public static transient Logger logger= Logger.getLogger ( Main.class );
@@ -120,10 +112,10 @@ public final class Main {
 		webAppContext.setResourceBase ( DEFAULT_WEB_APP_PATH );
 		ServletHandler servletHandler = new ServletHandler ( );
 		  servletHandler.addServletWithMapping ( "gsn.GSNRPC" , "/gsn-handler" );
-	      servletHandler.addServletWithMapping ( "gsn.web.ControllerServlet" , "/gsn" );
-	      servletHandler.addServletWithMapping ( "gsn.web.DataDownload" , "/data" );
-	      servletHandler.addServletWithMapping ( "gsn.web.FieldDownloadServlet" , "/field" );
-	      servletHandler.addServletWithMapping ( "gsn.web.FieldUpload" , "/upload" );
+	      servletHandler.addServletWithMapping ( "gsn.http.ControllerServlet" , "/gsn" );
+	      servletHandler.addServletWithMapping ( "gsn.http.DataDownload" , "/data" );
+	      servletHandler.addServletWithMapping ( "gsn.http.FieldDownloadServlet" , "/field" );
+	      servletHandler.addServletWithMapping ( "gsn.http.FieldUpload" , "/upload" );
 	    webAppContext.setServletHandler ( servletHandler );
 		/// webAppContext.setConnectorNames(new String[]{httpConnector.getName()});
 

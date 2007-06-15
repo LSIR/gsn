@@ -46,11 +46,15 @@ public class InGSNNotification extends NotificationRequest {
 	}
 
 	public boolean send(DataEnumerator data) {
+		  if (logger.isDebugEnabled())
+				logger.debug("InVMPipe received the stream elements.");
 		try {
 			if (!inVMPipeWrapper.isActive())
 				return false;
 			while (data.hasMoreElements()) {
 				StreamElement nextElement = data.nextElement();
+				  if (logger.isDebugEnabled())
+						logger.debug("InVMPipe submit a stream element.");
 				inVMPipeWrapper.remoteDataReceived(nextElement);
 			}
 			return true;
@@ -60,15 +64,24 @@ public class InGSNNotification extends NotificationRequest {
 		}
 	}
 
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof InGSNNotification))
-			return false;
-		InGSNNotification input = (InGSNNotification) obj;
-		return input.notificationCode == notificationCode;
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = super.hashCode();
+		result = PRIME * result + notificationCode;
+		return result;
 	}
 
-	public int hashCode() {
-		return toString().hashCode();
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final InGSNNotification other = (InGSNNotification) obj;
+		if (notificationCode != other.notificationCode)
+			return false;
+		return true;
 	}
 
 	public String toString() {

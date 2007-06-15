@@ -10,15 +10,13 @@ import gsn.notifications.InGSNNotification;
 import gsn.notifications.NotificationRequest;
 import gsn.storage.PoolIsFullException;
 import gsn.vsensor.AbstractVirtualSensor;
-import gsn.vsensor.http.OneShotQueryHandler;
-
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Iterator;
 import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
 
 public class InVMPipeWrapper extends AbstractWrapper {
+	
   private static transient Logger                                      logger                             = Logger.getLogger( InVMPipeWrapper.class );
   
   public void finalize ( ) {
@@ -80,8 +78,6 @@ public class InVMPipeWrapper extends AbstractWrapper {
   }
   
   public boolean remoteDataReceived ( StreamElement se) {
-	  if (logger.isDebugEnabled())
-		logger.debug("InVMPipe received stream element.");
 	return postStreamElement(se);
   }
   

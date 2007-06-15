@@ -281,6 +281,7 @@ public class VSensorLoader extends Thread {
 			if ( initializationResult == false )
 				return null;
 			try {
+				logger.debug("Wrapper name: "+wrapper.getWrapperName()+ " -- view name "+ wrapper.getDBAliasInStr());
 				if (!sm.tableExists(wrapper.getDBAliasInStr(),wrapper.getOutputFormat()))
 					sm.executeCreateTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
 			} catch ( SQLException e ) {
