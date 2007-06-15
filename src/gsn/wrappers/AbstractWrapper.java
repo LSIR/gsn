@@ -38,7 +38,8 @@ public abstract class AbstractWrapper extends Thread {
 	public void addListener ( StreamSource ss ) throws SQLException {
 		getStorageManager( ).executeCreateView( ss.getUIDStr() , ss.toSql() );
 		listeners.add(ss);
-		logger.fatal("Adding listeners: "+ss.toString());
+		if (logger.isDebugEnabled())
+			logger.debug("Adding listeners: "+ss.toString());
 	}
 
 	/**
