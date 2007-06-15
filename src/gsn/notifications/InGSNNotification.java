@@ -15,14 +15,16 @@ import gsn.wrappers.InVMPipeWrapper;
 public class InGSNNotification extends NotificationRequest {
 
 	private InVMPipeWrapper inVMPipeWrapper;
-
-	private final transient Logger logger = Logger
-			.getLogger(InGSNNotification.class);
+	
+	private String remoteVSName ;
+	
+	private final transient Logger logger = Logger.getLogger(InGSNNotification.class);
 
 	private StringBuilder query;
 
 	public InGSNNotification(InVMPipeWrapper listener, String remoteVSName) {
 		this.inVMPipeWrapper = listener;
+		this.remoteVSName=remoteVSName;
 		if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
 			query = new StringBuilder("select * from ").append(remoteVSName).append(" order by timed desc limit 1 offset 0");
 		}
@@ -64,22 +66,27 @@ public class InGSNNotification extends NotificationRequest {
 		}
 	}
 
+		@Override
 	public int hashCode() {
 		final int PRIME = 31;
-		int result = super.hashCode();
-		result = PRIME * result + notificationCode;
+		int result = 1;
+		result = PRIME * result + ((remoteVSName == null) ? 0 : remoteVSName.hashCode());
 		return result;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		final InGSNNotification other = (InGSNNotification) obj;
-		if (notificationCode != other.notificationCode)
+		if (remoteVSName == null) {
+			if (other.remoteVSName != null)
+				return false;
+		} else if (!remoteVSName.equals(other.remoteVSName))
 			return false;
 		return true;
 	}

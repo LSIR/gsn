@@ -25,18 +25,4 @@ public abstract class NotificationRequest {
    
    public abstract int getNotificationCode ( );
    
-   public boolean equals ( Object obj ) {
-      if ( obj == null || !( obj instanceof NotificationRequest ) ) return false;
-      NotificationRequest input = ( NotificationRequest ) obj;
-      return getNotificationCode( )== input.getNotificationCode( );
-   }
-   
-   public int hashCode ( ) {
-      return getNotificationCode( );
-   }
-   
-   public String toString ( ) {
-      return "The notification request with the code of *" + getNotificationCode( ) + "*";
-   }
-   
 }

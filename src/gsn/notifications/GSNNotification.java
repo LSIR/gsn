@@ -14,13 +14,9 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class GSNNotification extends NotificationRequest {
 
-	private final transient Logger logger = Logger
-			.getLogger(GSNNotification.class);
+	private final transient Logger logger = Logger.getLogger(GSNNotification.class);
 
 	private int remotePort;
 
@@ -139,7 +135,9 @@ public class GSNNotification extends NotificationRequest {
 	public int hashCode() {
 		final int PRIME = 31;
 		int result = super.hashCode();
-		result = PRIME * result + notificationCode;
+		result = PRIME * result + ((prespectiveVirtualSensor == null) ? 0 : prespectiveVirtualSensor.hashCode());
+		result = PRIME * result + ((remoteAddress == null) ? 0 : remoteAddress.hashCode());
+		result = PRIME * result + remotePort;
 		return result;
 	}
 
@@ -151,7 +149,17 @@ public class GSNNotification extends NotificationRequest {
 		if (getClass() != obj.getClass())
 			return false;
 		final GSNNotification other = (GSNNotification) obj;
-		if (notificationCode != other.notificationCode)
+		if (prespectiveVirtualSensor == null) {
+			if (other.prespectiveVirtualSensor != null)
+				return false;
+		} else if (!prespectiveVirtualSensor.equals(other.prespectiveVirtualSensor))
+			return false;
+		if (remoteAddress == null) {
+			if (other.remoteAddress != null)
+				return false;
+		} else if (!remoteAddress.equals(other.remoteAddress))
+			return false;
+		if (remotePort != other.remotePort)
 			return false;
 		return true;
 	}

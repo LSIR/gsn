@@ -28,7 +28,7 @@ public class InVMPipeWrapper extends AbstractWrapper {
   }
   
   public String getWrapperName ( ) {
-    return "In VM Pipe Wrapper";
+    return "InVM Pipe Wrapper";
   }
   
   private VSensorConfig          config;
