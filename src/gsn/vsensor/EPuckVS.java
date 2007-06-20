@@ -6,11 +6,8 @@ import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.general.SerialWrapper;
-
 import java.util.TreeMap;
-
 import javax.naming.OperationNotSupportedException;
-
 import org.apache.log4j.Logger;
 
 public class EPuckVS extends AbstractVirtualSensor {

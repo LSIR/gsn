@@ -15,9 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class SimHttpListener extends HttpServlet {
    
    private static final int START_PORT_INDEX = 29000;

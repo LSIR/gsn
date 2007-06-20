@@ -1,13 +1,8 @@
-/**
- * 
- * @author Jerome Rousselot
- */
 package gsn.gui.forms;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.Vector;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -17,20 +12,14 @@ import javax.swing.JSpinner;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import org.apache.log4j.Logger;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
-/**
- * @author jerome
- * 
- */
 public class LogPanel extends JPanel {
 
 	public static final String GSN_LOG_FILE = "logs/gsn.log";
@@ -199,7 +188,7 @@ public class LogPanel extends JPanel {
 			logger.warn(e.getMessage(),e);
 			System.err.println ("---------------------------------------------");
 			System.err.println("GSN-Installer encountered an error. Please help us make this software better !");
-			System.err.println("Simply send the files in the logs directory to jerome.rousselot@gmail.com.");
+			System.err.println("Simply send the files in the logs directory to the GSN mailing list.");
 			System.err.println("The GSN Development Team thanks you for your help !");
 			System.err.println ("---------------------------------------------");
 		}

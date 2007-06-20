@@ -1,20 +1,8 @@
-/**
- * 
- */
 package gsn.utils.protocols.EPuck;
 
-import java.util.HashMap;
-import java.util.Vector;
-
 import gsn.utils.protocols.AbstractHCIProtocol;
-import gsn.utils.protocols.AbstractHCIQuery;
 import gsn.utils.protocols.BasicHCIQuery;
 
-
-/**
- * @author alisalehi
- *
- */
 public class SerComProtocol extends AbstractHCIProtocol {
    
    public static final String EPUCK_PROTOCOL="EPUCK_PROTOCOL";

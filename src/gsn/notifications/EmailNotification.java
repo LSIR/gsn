@@ -14,10 +14,7 @@ import org.apache.log4j.Logger;
  * >activation.jar< file in the lib. 2. JavaMail API :
  * (http://java.sun.com/products/javamail/downloads/index.html) and put the all
  * the jar files of JavaMail in the lib directory.
- * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Create : May 26, 2005 <br>
- * Created for : GSN project. <br>
+
  */
 public class EmailNotification extends NotificationRequest {
    

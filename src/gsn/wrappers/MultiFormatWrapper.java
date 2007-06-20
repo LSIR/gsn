@@ -1,7 +1,6 @@
 package gsn.wrappers;
 
 import org.apache.log4j.Logger;
-
 import gsn.beans.DataField;
 
 /**
@@ -13,8 +12,6 @@ import gsn.beans.DataField;
  * The first packet is for sensors which can only measure temperature while the latter is for the
  * sensors equipped with both temperature and light sensors. 
  * 
- * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 public class MultiFormatWrapper extends AbstractWrapper{
 	private  DataField   []    collection        = new DataField[] {new DataField("packet_type","int","packet type"),new DataField("temperature","double","Presents the temperature sensor."),new DataField("light","double","Presents the light sensor.")};

@@ -2,7 +2,6 @@ package gsn.gui.beans;
 
 import gsn.beans.DataField;
 import gsn.beans.WebInput;
-
 import com.jgoodies.binding.beans.Model;
 import com.jgoodies.binding.list.ArrayListModel;
 

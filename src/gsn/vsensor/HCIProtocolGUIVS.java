@@ -9,9 +9,6 @@ import gsn.wrappers.AbstractWrapper;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
-/**
- * @author Jerome Rousselot <jerome.rousselot@csem.ch>
- */
 public class HCIProtocolGUIVS extends AbstractVirtualSensor {
 
 	private static final transient Logger logger        = Logger.getLogger( HCIProtocolGUIVS.class );

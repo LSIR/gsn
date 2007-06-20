@@ -1,13 +1,9 @@
 package gsn.beans;
 
 import java.io.Serializable;
-
 import org.apache.commons.collections.KeyValue;
+import org.apache.log4j.Logger;
 
-/**
- * Date: Aug 4, 2005 <br>
- * Time: 10:46:16 PM <br>
- */
 public final class AddressBean implements Serializable{
   
   private static final   KeyValue[] EMPTY_PREDICATES = new  KeyValue[0];
@@ -15,6 +11,8 @@ public final class AddressBean implements Serializable{
   private String                 wrapper;
   
   private  KeyValue[] predicates  = EMPTY_PREDICATES;
+  
+  private final static transient Logger    logger   = Logger.getLogger( AddressBean.class );
   
   public AddressBean ( final String wrapper , KeyValue... newPredicates ) {
     this.wrapper = wrapper;
@@ -46,7 +44,8 @@ public final class AddressBean implements Serializable{
   public String getPredicateValue ( String key ) {
     key = key.trim( );
     for (  KeyValue predicate : this.predicates ) {
-      if ( predicate.getKey( ).toString( ).trim( ).equalsIgnoreCase( key ) ) return ( ( String ) predicate.getValue( ) ).trim( );
+      logger.fatal(predicate.getKey()+" --- " +predicate.getValue());
+      if ( predicate.getKey( ).toString( ).trim( ).equalsIgnoreCase( key ) ) return ( ( String ) predicate.getValue( ));
     }
     return null;
   }

@@ -8,10 +8,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
-
 public class GSNStop {
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		stopGSN();

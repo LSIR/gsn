@@ -2,19 +2,14 @@ package gsn.beans;
 
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.wrappers.RemoteWrapper;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
-
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 
-/**
- * 
- */
 public class VSensorConfig implements Serializable {
 
 	private static final long                      serialVersionUID                          = 1625382440863797197L;

@@ -1,8 +1,5 @@
 package gsn.http;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class ParameterMissingException extends Exception {
    
    public ParameterMissingException ( ) {

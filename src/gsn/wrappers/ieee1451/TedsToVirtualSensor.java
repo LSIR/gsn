@@ -1,21 +1,13 @@
 package gsn.wrappers.ieee1451;
 
-//import net.java.jddac.common.type.TypeAttr;
-
 import gsn.Main;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.apache.log4j.Logger;
-
-/**
- * @author Surender Reddy Yerva(yerva, surenderreddy.yerva-at-epfl.ch)<br>
- */
 
 public class TedsToVirtualSensor {
    private final Logger             logger              = Logger.getLogger( TedsToVirtualSensor.class );

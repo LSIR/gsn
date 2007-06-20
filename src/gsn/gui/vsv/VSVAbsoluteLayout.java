@@ -3,12 +3,8 @@ package gsn.gui.vsv;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Collection;
-import java.util.List;
-
-import org.eclipse.mylar.zest.layout.LayoutEntity;
 import org.netbeans.api.visual.layout.Layout;
 import org.netbeans.api.visual.widget.Widget;
-
 
 public class VSVAbsoluteLayout implements Layout {
 

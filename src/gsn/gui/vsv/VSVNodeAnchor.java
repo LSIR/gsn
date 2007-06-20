@@ -32,7 +32,7 @@ import java.util.Set;
  * For each usage the anchor resolves a different position.
  * The positions are resolved at the top and the bottom of the widget where the anchor is attached to.
  *
- * @author David Kaspar
+ * Original author: David Kaspar
  */
 public class VSVNodeAnchor extends Anchor {
 

@@ -1,22 +1,16 @@
 package gsn;
 
 import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import gsn.beans.AddressBean;
-import gsn.beans.DataField;
 import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
-import gsn.utils.ValidityTools;
 import gsn.wrappers.MockWrapper;
-
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.After;
 import org.junit.AfterClass;

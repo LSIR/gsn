@@ -3,11 +3,9 @@ package gsn.tests;
 import static org.junit.Assert.*;
 import gsn.beans.AddressBean;
 import gsn.utils.KeyValueImp;
-
 import org.apache.commons.collections.KeyValue;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 
 public class AdressBeanTest {
 	private AddressBean addressBean1;

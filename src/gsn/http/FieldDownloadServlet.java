@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 
 //path="/WEB-INF/file_not_found.jpg"
 
-
 public class FieldDownloadServlet extends HttpServlet {
 
 	private static transient Logger                                      logger                             = Logger.getLogger( FieldDownloadServlet.class );

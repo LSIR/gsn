@@ -1,7 +1,6 @@
 package gsn.gui.forms;
 
 import gsn.beans.VSensorConfig;
-
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 

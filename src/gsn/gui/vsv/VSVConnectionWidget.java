@@ -36,7 +36,7 @@ import java.awt.*;
  * This class represents a connection widget in the VMD visualization style. Can
  * be combined with any other widget.
  * 
- * @author David Kaspar
+ * Original author: David Kaspar
  */
 public class VSVConnectionWidget extends ConnectionWidget implements LayoutRelationship {
 

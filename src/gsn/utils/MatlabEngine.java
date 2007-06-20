@@ -34,9 +34,8 @@ import java.io.*;
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  *
- * @author W. Andreas Klimke, University of Stuttgart 
+ * Original author: W. Andreas Klimke, University of Stuttgart 
  *         (klimke@ians.uni-stuttgart.de)
- * @version 0.1
  *
  */
 public class MatlabEngine {

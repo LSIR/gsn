@@ -4,14 +4,12 @@ import gsn.gui.beans.VSensorConfigModel;
 import gsn.gui.beans.WebInputModel;
 import gsn.gui.beans.WebInputPresentationModel;
 import gsn.gui.util.GUIUtils;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
@@ -26,7 +24,6 @@ import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-
 import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.binding.list.SelectionInList;

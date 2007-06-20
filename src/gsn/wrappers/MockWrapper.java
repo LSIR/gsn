@@ -1,7 +1,6 @@
 package gsn.wrappers;
 
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
 public class MockWrapper extends AbstractWrapper {

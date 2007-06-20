@@ -5,13 +5,10 @@ import gsn.gui.beans.VSensorConfigModel;
 import gsn.gui.beans.VSensorConfigPresentationModel;
 import gsn.gui.util.GUIUtils;
 import gsn.gui.util.VSensorConfigUtil;
-import gsn.gui.util.VSensorIOUtil;
-
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -21,9 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-
 import org.jibx.runtime.JiBXException;
-
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.ButtonBarFactory;

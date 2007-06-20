@@ -1,25 +1,13 @@
-/**
- * 
- * @author Jerome Rousselot
- */
 package gsn.gui;
-
 
 import gsn.gui.forms.GSNConfiguratorPanel;
 import gsn.gui.forms.StartStopEventListener;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-
-
-/**
- * @author jerome
- * 
- */
 public class GSNStatusBar extends JPanel implements StartStopEventListener {
 
     JLabel gsnstatus, dirstatus;

@@ -2,16 +2,11 @@ package gsn.gui.vsv;
 
 import java.awt.Color;
 import java.awt.Paint;
-
 import org.netbeans.api.visual.border.Border;
 import org.netbeans.api.visual.border.BorderFactory;
 import org.netbeans.api.visual.laf.LookFeel;
 import org.netbeans.api.visual.model.ObjectState;
 
-/**
- * @author Mehdi Riahi
- * 
- */
 public class VSVLookFeal extends LookFeel {
 	private static final Color COLOR_SELECTED = new Color(0xeaa524);
 

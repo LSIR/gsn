@@ -7,22 +7,13 @@ import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
-
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.TreeMap;
-
-import org.apache.commons.configuration.AbstractFileConfiguration;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 
-/**
- * 
- */
 public class InputStream implements Serializable{
 	
 	public static final int                             INITIAL_DELAY_5000MSC = 5000;

@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * Note that this class will trim all the space characters surrounding the key
  * and value pairs hence you don't need to call trim when putting or getting a
  * value to/from the hashmap.

@@ -1,11 +1,6 @@
-/**
- * 
- * @author Jerome Rousselot
- */
 package gsn.utils.protocols;
 
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 /**
  *  This class represents a query of a host controller interface protocol.
@@ -15,8 +10,6 @@ import java.util.regex.Pattern;
  *  This means that instead of writing the appropriate bytes to a port to
  *  get a node ID, you can send the AbstractHCIQuery "getID".
  *  This makes the code easier to read and to maintain.
- *  @author Jérôme Rousselot <jerome.rousselot@csem.ch>
- *
  */
 public abstract class AbstractHCIQuery {
 	

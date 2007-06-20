@@ -7,24 +7,14 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Enumeration;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
-
-/**
- * @author alisalehi
- *
- */
 public class OneShotQueryWithAddressingHandler implements RequestHandler{
 
    private static transient Logger                                      logger                             = Logger.getLogger( OneShotQueryHandler.class );

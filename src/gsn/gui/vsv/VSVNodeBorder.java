@@ -19,7 +19,6 @@
 package gsn.gui.vsv;
 
 import org.netbeans.api.visual.border.Border;
-
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 

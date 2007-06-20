@@ -1,15 +1,7 @@
-/**
- * 
- * @author Jerome Rousselot
- */
 package gsn.utils.protocols;
 
 import java.util.Vector;
 
-/**
- * @author jerome
- *
- */
 public class BasicHCIQuery extends AbstractHCIQueryWithoutAnswer {
 
 	public static final String DEFAULT_NAME="CUSTOM_QUERY";

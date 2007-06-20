@@ -5,9 +5,6 @@ import gsn.storage.SQLUtils;
 import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public abstract class NotificationRequest {
    
    public abstract StringBuilder getQuery ( );

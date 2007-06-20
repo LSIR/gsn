@@ -1,7 +1,6 @@
 package gsn.storage;
 
 /**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * This exception can occur in two places : 1. When the upper limit of the pool
  * size for DataBase reached (which is specified in the container's
  * configuraion) 2. When the upper limit of the pool size for a virtual sensor

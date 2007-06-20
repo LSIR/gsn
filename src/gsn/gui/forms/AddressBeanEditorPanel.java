@@ -1,14 +1,10 @@
 package gsn.gui.forms;
 
 import javax.swing.JComponent;
-import javax.swing.JTextField;
-
 import com.jgoodies.binding.PresentationModel;
-import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
 import gsn.gui.beans.AddressBeanModel;
 
 public class AddressBeanEditorPanel {

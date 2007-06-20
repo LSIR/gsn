@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
@@ -159,9 +158,6 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
  * This class represents a chart. The class is initialized using a String with a
  * predefined syntax. The class acts as a proxy between the Virtual Sensor and
  * the JFreeChart library which is used for plotting diagrams.
- * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * @author Jerome Rousselot (jerome.rousselot@csem.ch)<br>
  */
 
 class ChartInfo {

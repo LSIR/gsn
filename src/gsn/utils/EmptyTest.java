@@ -1,6 +1,3 @@
-/**
- * 
- */
 package gsn.utils;
 
 
@@ -12,10 +9,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import junit.framework.JUnit4TestAdapter;
 
-/**
- * @author alisalehi
- *
- */
 public class EmptyTest {
    @After public void clean()  throws Exception{
       

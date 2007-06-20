@@ -6,9 +6,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Properties;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class QueryGenerator {
    
    public static StringBuffer generateQuery ( String selectingFields , ArrayList < String > tables , int maxNumberOfPredicates , int maxNumOfInvolvedTables , int max_number_in_produced_data ) {

@@ -1,16 +1,10 @@
 package gsn.beans;
 
 import gsn.utils.CaseInsensitiveComparator;
-
 import java.io.Serializable;
 import java.util.TreeMap;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public final class StreamElement implements Serializable {
    
    private static final long                      serialVersionUID  = 2000261462783698617L;

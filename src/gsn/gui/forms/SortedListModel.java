@@ -26,8 +26,7 @@ import javax.swing.event.ListDataListener;
  * a sorted model. You can create a SortedListModel from models you
  * already have. Place the SortedListModel into a JList, for example, to provide
  * a sorted view of your underlying model.
- *
- * @author John O'Conner
+ * Original author: John O'Conner
  */
 public class SortedListModel extends AbstractListModel {
     

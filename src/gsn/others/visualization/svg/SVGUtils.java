@@ -5,7 +5,6 @@ import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.StringTokenizer;
-
 import org.eclipse.mylar.zest.layout.HorizontalTreeLayoutAlgorithm;
 import org.eclipse.mylar.zest.layout.InvalidLayoutConfiguration;
 import org.eclipse.mylar.zest.layout.LayoutAlgorithm;
@@ -15,9 +14,6 @@ import org.eclipse.mylar.zest.layout.LayoutStyles;
 import org.eclipse.mylar.zest.layout.RadialLayoutAlgorithm;
 import org.eclipse.mylar.zest.layout.TreeLayoutAlgorithm;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class SVGUtils {
    
    public static final TreeLayoutAlgorithm           TREE_VERT  = new TreeLayoutAlgorithm( LayoutStyles.NONE );

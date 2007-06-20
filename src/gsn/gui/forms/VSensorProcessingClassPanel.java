@@ -1,11 +1,7 @@
 package gsn.gui.forms;
 
-import gsn.gui.beans.VSensorConfigPresentationModel;
-
 import java.awt.Component;
-
 import javax.swing.JTabbedPane;
-
 import com.jgoodies.binding.PresentationModel;
 
 public class VSensorProcessingClassPanel {

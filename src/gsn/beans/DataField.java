@@ -4,15 +4,8 @@ import gsn.utils.GSNRuntimeException;
 
 import java.io.Serializable;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch) <br>
- * Create : Apr 26, 2005 <br>
- */
 public final class DataField implements Serializable {
-   
-   /**
-    * 
-    */
+  
    private static final long serialVersionUID = -8841539191525018987L;
    
    private String            description      = "Not Provided";
@@ -24,9 +17,6 @@ public final class DataField implements Serializable {
    private String            type;
    
    private DataField ( ) {
-   /**
-    * This constructor is needed by JIBX XML Parser.
-    */
    }
    
    public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {

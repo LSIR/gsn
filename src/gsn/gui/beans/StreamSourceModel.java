@@ -1,10 +1,8 @@
 package gsn.gui.beans;
 
 import java.util.Iterator;
-
 import gsn.beans.AddressBean;
 import gsn.beans.StreamSource;
-
 import com.jgoodies.binding.beans.Model;
 import com.jgoodies.binding.list.ArrayListModel;
 

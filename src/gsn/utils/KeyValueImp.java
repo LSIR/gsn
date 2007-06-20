@@ -1,7 +1,6 @@
 package gsn.utils;
 
 import java.io.Serializable;
-
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 
@@ -9,10 +8,6 @@ import org.apache.log4j.Logger;
  * The <I> Predicate </I> class represents mapping between a key and a value.
  * Two predicates are the same if they have the same name and value. This class
  * is used for Abstract Addressing and Options.
- * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Create : Apr 26, 2005 <br>
- * Created for : GSN project.
  */
 public class KeyValueImp implements KeyValue , Serializable {
    

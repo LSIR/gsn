@@ -15,10 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Date: Aug 4, 2005 <br>
- */
+
 public abstract class AbstractWrapper extends Thread {
 
 	private final static transient Logger      logger         = Logger.getLogger( AbstractWrapper.class );

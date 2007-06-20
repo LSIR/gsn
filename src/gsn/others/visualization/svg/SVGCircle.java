@@ -5,9 +5,6 @@ import java.awt.Color;
 import org.antlr.stringtemplate.StringTemplate;
 import org.eclipse.mylar.zest.layout.LayoutEntity;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class SVGCircle extends AbstractSVGElement implements LayoutEntity {
    
    private final String         TEMPLATE    = "<circle cx=\"$X$\" cy=\"$Y$\" r=\"$R$\" fill=\"#$FILL_COLOR$\" stroke=\"#$STROKE_COLOR$\" stroke-width=\"$STROKE_WIDTH$\" stroke-opacity=\"$STROKE_OPACITY$\" /> \n";

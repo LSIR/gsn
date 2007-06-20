@@ -11,7 +11,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 
 /**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  * FIXME : 1. Because a prepared statements relies on the connection being
  * there. If a connection times out the pool will restore it and then the
  * prepared statement is then stale. The only way you can tell this it to use

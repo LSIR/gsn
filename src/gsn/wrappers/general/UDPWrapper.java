@@ -10,17 +10,12 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.ArrayList;
-import java.util.Collection;
 import org.apache.log4j.Logger;
 
 /**
  * Links GSN to a Wisenet sensors network. The computer running this wrapper
  * should be connected to an IP network. One of the WSN nodes should forward
  * received packets through UDP to the host running this wrapper.
- * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * @author Jerome Rousselot (jerome.rousselot@csem.ch), CSEM<br>
  */
 public class UDPWrapper extends AbstractWrapper {
    

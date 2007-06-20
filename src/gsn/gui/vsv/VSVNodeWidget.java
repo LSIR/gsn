@@ -18,8 +18,6 @@
  */
 package gsn.gui.vsv;
 
-import gsn.Main;
-import gsn.VSensorLoader;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.InputStream;
@@ -27,9 +25,6 @@ import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.beans.WebInput;
 import gsn.gui.forms.VSensorGraphScene;
-import gsn.utils.GSNRuntimeException;
-import gsn.wrappers.AbstractWrapper;
-
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -39,13 +34,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.apache.commons.collections.KeyValue;
 import org.eclipse.mylar.zest.layout.LayoutEntity;
 import org.netbeans.api.visual.action.WidgetAction;
@@ -74,7 +66,7 @@ import org.openide.util.Utilities;
  * <code>sortPins</code> method. The <code>sortPins</code> method has to be
  * called refresh the order after adding a pin widget.
  * 
- * @author David Kaspar
+ * Original author: David Kaspar
  */
 public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMinimizeAbility, LayoutEntity {
 

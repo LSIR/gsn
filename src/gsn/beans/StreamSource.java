@@ -6,21 +6,15 @@ import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;
-
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.TreeMap;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
-/**
- * Date: Aug 4, 2005 <br>
- * Time: 10:15:42 PM <br>
- */
 public  class StreamSource implements Serializable{
   
   public static final String DEFAULT_QUERY = "select * from wrapper";

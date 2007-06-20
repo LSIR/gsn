@@ -18,10 +18,6 @@ import net.tinyos1x.message.MessageListener;
 import net.tinyos1x.message.MoteIF;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * @author Surender Reddy (yerva, surenderreddy.yerva-at-epfl.ch)<br>
- */
 
 public class MoteIdentifier extends AbstractWrapper implements MessageListener , ChangeListener {
    

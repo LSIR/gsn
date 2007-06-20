@@ -19,11 +19,6 @@ import java.sql.Types;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- *         Date: Aug 5, 2005 <br>
- *         Time: 9:29:47 AM <br>
- */
 public class StorageManager {
 
 	/***************************************************************************

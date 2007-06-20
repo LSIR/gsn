@@ -16,10 +16,6 @@ import java.net.*;
 
 import org.apache.log4j.Logger;
 
-/**
- * @author Jérôme Rousselot (jerome@jaimepaslaneige.com)
- * 
- */
 public class GSNController extends Thread {
 
 	private ServerSocket mySocket;

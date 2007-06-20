@@ -10,17 +10,12 @@ import gsn.beans.DataField;
 import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
-import gsn.beans.TestStreamSource;
 import gsn.storage.StorageManager;
-import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.MockWrapper;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -30,18 +25,12 @@ import org.junit.Test;
 
 public class TestDataPropogation {
 	
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.hsqldb.jdbcDriver( ) );
 		StorageManager.getInstance ( ).initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
 	}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 	}
@@ -50,9 +39,6 @@ public class TestDataPropogation {
 	private MockWrapper wrapper;
 	private StreamSource streamSource;
 	
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@Before
 	public void setUp() throws Exception {
 		sm = StorageManager.getInstance();
@@ -80,9 +66,6 @@ public class TestDataPropogation {
 		assertTrue(is.validate());
 	}
 
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@After
 	public void tearDown() throws Exception {
 	 wrapper.removeListener(streamSource);
@@ -168,6 +151,4 @@ public class TestDataPropogation {
 		assertTrue(streamSource.toSql().toString().toLowerCase().indexOf("mod")<0);
 		verify(streamSource);
 	}
-	
-	
 }

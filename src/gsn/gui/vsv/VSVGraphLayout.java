@@ -3,14 +3,9 @@ package gsn.gui.vsv;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Collection;
-
 import org.netbeans.api.visual.graph.layout.GraphLayout;
 import org.netbeans.api.visual.graph.layout.UniversalGraph;
 
-/**
- * @author Mehdi Riahi
- *
- */
 public class VSVGraphLayout extends GraphLayout<String, String> {
 
 	public VSVGraphLayout(boolean animated) {

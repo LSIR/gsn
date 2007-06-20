@@ -15,10 +15,6 @@ import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 import au.com.bytecode.opencsv.CSVReader;
 
-
-/**
- * @author Andreas Wombacher
- */
 public class CSVFileWrapper extends AbstractWrapper {
 
 

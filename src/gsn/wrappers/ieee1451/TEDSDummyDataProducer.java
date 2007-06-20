@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
  * This is a dummy data generator which is highly configurable through the
  * wrappers configuration in the virtual sensor's configuration file.
  * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 
 public class TEDSDummyDataProducer extends AbstractWrapper {

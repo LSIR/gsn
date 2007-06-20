@@ -1,8 +1,5 @@
 package gsn.utils;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class GSNRuntimeException extends RuntimeException {
    
    private int             type                              = 0;

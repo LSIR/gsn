@@ -1,23 +1,15 @@
-
 package gsn.http;
 
 import gsn.Container;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
-
 import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
-
-/**
- * @author alisalehi
- */
 public class OutputStructureHandler implements RequestHandler{
    private static transient Logger                                      logger                             = Logger.getLogger( OutputStructureHandler.class );
    

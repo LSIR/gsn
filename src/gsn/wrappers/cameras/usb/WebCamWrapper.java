@@ -52,15 +52,9 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-import sun.rmi.transport.LiveRef;
-
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
-/**
- * @author Ali Salehi (AliS)<br>
- */
 public class WebCamWrapper extends AbstractWrapper implements ControllerListener {
    
    public static final String            PICTURE_KEY                  = "PICTURE";

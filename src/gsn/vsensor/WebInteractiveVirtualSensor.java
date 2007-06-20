@@ -10,19 +10,13 @@ import gsn.others.visualization.svg.SVGPage;
 import gsn.others.visualization.svg.SVGUtils;
 import gsn.utils.LazyTimedHashMap;
 import gsn.utils.ParamParser;
-
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.TreeMap;
-
 import javax.naming.OperationNotSupportedException;
-
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
    
    private static final transient Logger logger            = Logger.getLogger( WebInteractiveVirtualSensor.class );

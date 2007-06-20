@@ -8,9 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class SQLUtils {
 
 	public static ArrayList < CharSequence > extractTableNamesUsedInQuery ( CharSequence query ) {

@@ -17,8 +17,6 @@ import org.apache.log4j.Logger;
  * Virtual sensor to support GPS coord given by NMEA specification over serial
  * Only the $GPRMC values are required.
  * (works as well on bluetooth GPS mapped to serial)
- * 
- * @author Clement Beffa ( clement.beffa@epfl.ch )
  */
 public class GPSNMEAVS extends AbstractVirtualSensor {
    

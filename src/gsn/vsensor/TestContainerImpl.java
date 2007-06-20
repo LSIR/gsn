@@ -5,21 +5,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import gsn.Container;
 import junit.framework.JUnit4TestAdapter;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 
-/**
- * @author alisalehi This class assumes GSN is running on the localhost:22001.
- */
 public class TestContainerImpl {
    
    @After

@@ -1,4 +1,3 @@
-
 package gsn.utils.protocols;
 
 
@@ -27,7 +26,6 @@ import org.apache.log4j.Logger;
  * a query the protocol might require you not to send any
  * query before the end of a timer or the reception of an
  * answer from the mote, whichever comes first. 
- * @author Jérôme Rousselot <jerome.rousselot@csem.ch>
  * @see ProtocolManager
  * @see AbstractHCIQuery
  */

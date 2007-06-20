@@ -1,9 +1,5 @@
 package gsn.wrappers.tinyos1x;
 
-/**
- * @author ari.saadi
- * @author Ali Salehi (AliS)
- */
 public class Convert {
    
    // Here are the constant used, maybe you will want to put theme elsewere

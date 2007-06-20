@@ -21,7 +21,7 @@ package gsn.gui.vsv;
 /**
  * This interface represents an ability to collapse and expand a widget. It is implemented by a VMDNodeWidget.
  *
- * @author David Kaspar
+ * Original author: David Kaspar
  */
 public interface VSVMinimizeAbility {
 

@@ -1,20 +1,9 @@
-/**
- * 
- */
 package gsn.utils.protocols.EPuck;
 
-import gsn.gui.JHCIProtocolControl;
 import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
-
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
 
-
-/**
- * @author alisalehi
- *
- */
 public class SetSpeed extends AbstractHCIQueryWithoutAnswer {
 	
 	private static final transient Logger logger = Logger.getLogger( SetSpeed.class );

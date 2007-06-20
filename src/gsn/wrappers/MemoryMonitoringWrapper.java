@@ -10,10 +10,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import org.apache.log4j.Logger;
 
-/**
- * Date: Sep 4, 2006 Time: 4:07:58 PM
- * @author Ali Salehi
- */
 public class MemoryMonitoringWrapper extends AbstractWrapper {
    
    private static final int          DEFAULT_SAMPLING_RATE                 = 1000;

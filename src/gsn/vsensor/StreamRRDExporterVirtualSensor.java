@@ -8,17 +8,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
-
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 
-/**
- * This virtual sensor saves its input stream to any JDBC accessible source.
- * 
- * @author Andreas Wombacher
- */
 public class StreamRRDExporterVirtualSensor extends AbstractVirtualSensor {
 	public static final String            PARAM_RRDFILE    = "rrdfile" ;
 

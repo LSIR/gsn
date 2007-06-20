@@ -3,9 +3,7 @@ package gsn.gui.beans;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
-
 import org.apache.commons.validator.GenericValidator;
-
 import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.beans.PropertyConnector;
 import com.jgoodies.binding.list.ArrayListModel;

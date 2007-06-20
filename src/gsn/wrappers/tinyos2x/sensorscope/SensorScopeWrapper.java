@@ -7,8 +7,6 @@ import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
 import java.io.Serializable;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import net.tinyos.message.Message;
 import net.tinyos.message.MessageListener;
 import net.tinyos.message.MoteIF;
@@ -16,9 +14,6 @@ import net.tinyos.packet.BuildSource;
 import net.tinyos.packet.PhoenixSource;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS)<br>
- */
 public class SensorScopeWrapper extends AbstractWrapper implements MessageListener {
    
    private final transient Logger logger        = Logger.getLogger( SensorScopeWrapper.class );

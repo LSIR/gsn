@@ -19,8 +19,6 @@ import de.avetana.bluetooth.rfcomm.RFCommConnectionImpl;
  * connection on top of it. The url is given in the configuration file with
  * the "url" property.
  * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * @author Jerome Rousselot CSEM<br>
  */
 public class BTWrapper extends AbstractWrapper {
    

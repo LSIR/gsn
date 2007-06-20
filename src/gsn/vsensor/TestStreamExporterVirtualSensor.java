@@ -1,7 +1,3 @@
-/**
- * 
- * @author Jerome Rousselot
- */
 package gsn.vsensor;
 
 import gsn.beans.DataField;
@@ -20,9 +16,6 @@ import java.util.Vector;
 import junit.framework.TestCase;
 import org.apache.commons.collections.KeyValue;
 
-/**
- * @author jerome
- */
 public class TestStreamExporterVirtualSensor extends TestCase {
    
    private final String  user = "sa" , passwd = "" , db = "." , url = "jdbc:hsqldb:mem:." , streamName = "aJUnitTestStream";

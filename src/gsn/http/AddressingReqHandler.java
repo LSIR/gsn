@@ -11,10 +11,6 @@ import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
-
-/**
- * @author alisalehi
- */
 public class AddressingReqHandler implements RequestHandler {
    
    private static transient Logger                                      logger                             = Logger.getLogger( AddressingReqHandler.class );

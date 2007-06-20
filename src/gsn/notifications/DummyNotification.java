@@ -3,9 +3,6 @@ package gsn.notifications;
 import gsn.Main;
 import gsn.storage.DataEnumerator;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class DummyNotification extends NotificationRequest {
    
    

@@ -1,11 +1,7 @@
 package gsn.gui.beans;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
-
 import com.jgoodies.binding.beans.Model;
 import com.jgoodies.binding.list.ArrayListModel;
 

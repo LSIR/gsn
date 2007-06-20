@@ -2,14 +2,9 @@ package gsn.vsensor;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-
 import java.io.Serializable;
-
 import org.apache.log4j.Logger;
 
-/**
- * @author Jerome Rousselot (jerome.rousselot -at- csem.ch)<br>
- */
 public class WiseNodeVirtualSensor extends AbstractVirtualSensor {
    
    private static final transient Logger logger = Logger.getLogger( WiseNodeVirtualSensor.class );

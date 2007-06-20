@@ -19,9 +19,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 public class ContainerInfoHandler implements RequestHandler {
-   private static transient Logger logger             = Logger.getLogger( ContainerInfoHandler.class );
+  
+  private static transient Logger logger             = Logger.getLogger( ContainerInfoHandler.class );
 	   
-	
    public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
       response.setStatus( HttpServletResponse.SC_OK );
       StringBuilder sb = new StringBuilder( "<gsn " );

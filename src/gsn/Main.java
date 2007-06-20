@@ -2,7 +2,6 @@ package gsn;
 
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
-import gsn.http.FieldDownloadServlet;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
 import java.io.File;

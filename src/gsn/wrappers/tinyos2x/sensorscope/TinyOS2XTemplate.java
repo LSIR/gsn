@@ -1,6 +1,3 @@
-/**
- * 
- */
 package gsn.wrappers.tinyos2x.sensorscope;
 
 import net.tinyos.message.Message;
@@ -9,11 +6,6 @@ import net.tinyos.message.MoteIF;
 import net.tinyos.packet.BuildSource;
 import net.tinyos.packet.PhoenixSource;
 
-
-/**
- * @author alisalehi
- *
- */
 public class TinyOS2XTemplate {
    /**
     * A Test class to check if the wrapper works.

@@ -3,21 +3,12 @@ package gsn.vsensor;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-
-import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.MatlabEngine;
 
-
-/**
- * 
- * @author Jérôme Rousselot (jeromerousselot@gmail.com)
- *
- */
 public class MatlabVS extends AbstractVirtualSensor {
 
 	private final static transient Logger      logger         = Logger.getLogger( AbstractVirtualSensor.class );

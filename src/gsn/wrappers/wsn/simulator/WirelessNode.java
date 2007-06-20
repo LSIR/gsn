@@ -1,10 +1,5 @@
 package gsn.wrappers.wsn.simulator;
 
-
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
-
 public class WirelessNode extends Thread implements WirelessNodeInterface {
    
    int                  sleepingTime = 5000;

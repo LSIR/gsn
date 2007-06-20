@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
  *  Warning: other methods of this class may be refactored soon,
  *  and more states could be added.
  *  
- *  @author Jérôme Rousselot <jerome.rousselot@csem.ch>
  *  @see AbstractHCIProtocol
  */
 public class ProtocolManager {

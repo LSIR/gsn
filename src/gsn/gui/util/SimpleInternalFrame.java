@@ -55,7 +55,7 @@ import javax.swing.border.AbstractBorder;
  * If you don't do anything, multiple simple internal frames will
  * be displayed as selected.
  * 
- * @author Karsten Lentzsch
+ * Original author: hor Karsten Lentzsch
  * @version $Revision: 1.3 $
  * 
  * @see    javax.swing.JInternalFrame

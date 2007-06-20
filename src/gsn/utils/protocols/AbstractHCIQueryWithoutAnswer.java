@@ -1,18 +1,11 @@
-/**
- * 
- */
 package gsn.utils.protocols;
 
 import java.util.Vector;
-
-
 
 /**
  * This class provides an empty implementation of the methods
  * getWaitTime, needsAnswer and getAnswers to make it
  * easier to implement queries that don't require an answer.
- *  @author Jérôme Rousselot <jerome.rousselot@csem.ch>
- *
  */
 public abstract class AbstractHCIQueryWithoutAnswer extends AbstractHCIQuery {
 

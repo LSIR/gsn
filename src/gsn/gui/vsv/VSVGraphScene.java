@@ -17,11 +17,8 @@
  * Microsystems, Inc. All Rights Reserved.
  */
 package gsn.gui.vsv;
-
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -35,9 +32,6 @@ import org.netbeans.api.visual.action.WidgetAction;
 import org.netbeans.api.visual.anchor.Anchor;
 import org.netbeans.api.visual.anchor.AnchorFactory;
 import org.netbeans.api.visual.graph.GraphPinScene;
-import org.netbeans.api.visual.graph.layout.GraphLayout;
-import org.netbeans.api.visual.graph.layout.GridGraphLayout;
-import org.netbeans.api.visual.graph.layout.UniversalGraph;
 import org.netbeans.api.visual.layout.LayoutFactory;
 import org.netbeans.api.visual.layout.SceneLayout;
 import org.netbeans.api.visual.router.Router;
@@ -55,7 +49,7 @@ import org.netbeans.api.visual.widget.Widget;
  * <p>
  * The scene has following actions: zoom, panning, rectangular selection.
  *
- * @author David Kaspar
+ * Original author: David Kaspar
  */
 // TODO - remove popup menu action
 public class VSVGraphScene extends GraphPinScene<String, String, String> {

@@ -1,15 +1,9 @@
 package gsn.notifications;
 
 import gsn.beans.StreamElement;
-
 import org.antlr.stringtemplate.StringTemplate;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Create : May 26, 2005 <br>
- * Created for : GSN-PD project. <br>
- */
 public class NotificationUtils {
    
    private static transient Logger logger         = Logger.getLogger( NotificationUtils.class );

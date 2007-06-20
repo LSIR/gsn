@@ -1,10 +1,8 @@
 package gsn.gui.forms;
 
 import gsn.gui.beans.VSensorConfigModel;
-
 import javax.swing.JComponent;
 import javax.swing.JTextField;
-
 import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.forms.builder.PanelBuilder;

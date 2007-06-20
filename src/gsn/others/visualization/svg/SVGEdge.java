@@ -8,9 +8,6 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.eclipse.mylar.zest.layout.LayoutEntity;
 import org.eclipse.mylar.zest.layout.LayoutRelationship;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class SVGEdge extends AbstractSVGElement implements LayoutRelationship {
    
    private boolean              directed       = false;

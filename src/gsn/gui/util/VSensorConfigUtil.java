@@ -5,19 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.HashMap;
-
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-
 import gsn.beans.VSensorConfig;
 
-/**
- * @author Mehdi Riahi
- * 
- */
 public class VSensorConfigUtil {
 
 	public static HashMap<File, VSensorConfig> getVSensorConfigs(File[] files) {

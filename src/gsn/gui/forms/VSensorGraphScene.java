@@ -12,7 +12,6 @@ import gsn.others.visualization.svg.SVGUtils;
 import gsn.utils.graph.Edge;
 import gsn.utils.graph.Graph;
 import gsn.utils.graph.Node;
-
 import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -20,11 +19,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.eclipse.mylar.zest.layout.LayoutAlgorithm;
 import org.eclipse.mylar.zest.layout.LayoutEntity;
@@ -34,10 +31,6 @@ import org.eclipse.mylar.zest.layout.SpringLayoutAlgorithm;
 import org.netbeans.api.visual.action.WidgetAction;
 import org.netbeans.api.visual.widget.Widget;
 
-/**
- * @author Mehdi Riahi
- * 
- */
 public class VSensorGraphScene extends VSVGraphScene {
 
 	public static final String TYPE_STREAM_SOURCE = "source";

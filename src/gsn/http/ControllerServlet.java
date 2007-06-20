@@ -8,10 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Creation time : Dec 5, 2006@5:46:41 PM<br>
- */
 public class ControllerServlet extends HttpServlet {
    
    private static transient Logger                                      logger                             = Logger.getLogger ( ControllerServlet.class );

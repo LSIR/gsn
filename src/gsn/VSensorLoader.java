@@ -7,25 +7,17 @@ import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
-import gsn.utils.ValidityTools;
-import gsn.utils.graph.Graph;
 import gsn.wrappers.AbstractWrapper;
 import java.io.File;
 import java.io.FileFilter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jibx.runtime.JiBXException;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class VSensorLoader extends Thread {
 
 

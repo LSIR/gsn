@@ -2,20 +2,15 @@ package gsn.wrappers.general;
 
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.wrappers.AbstractWrapper;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS)<br>
- */
 public class HttpGetWrapper extends AbstractWrapper {
    
    private int                      DEFAULT_RATE       = 2000;

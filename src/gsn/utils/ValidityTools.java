@@ -1,9 +1,5 @@
 package gsn.utils;
 
-import gsn.beans.DataField;
-import gsn.beans.DataTypes;
-import gsn.storage.StorageManager;
-
 import java.io.File;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -13,23 +9,14 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class ValidityTools {
 
 	public static final int              SMTP_PORT = 25;

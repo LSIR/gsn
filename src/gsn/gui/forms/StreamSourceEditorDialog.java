@@ -5,7 +5,6 @@ import gsn.gui.beans.AddressBeanPresentationModel;
 import gsn.gui.beans.StreamSourceModel;
 import gsn.gui.beans.StreamSourcePresentationModel;
 import gsn.gui.util.GUIUtils;
-
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -19,7 +18,6 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
@@ -35,10 +33,7 @@ import javax.swing.ListModel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
-
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.commons.validator.GenericValidator;
-
 import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.binding.list.ArrayListModel;
 import com.jgoodies.binding.list.SelectionInList;

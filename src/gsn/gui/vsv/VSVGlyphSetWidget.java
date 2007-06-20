@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * This widget represents a list of glyphs rendered horizontally one after another. A glyph is a small image - usually 16x16px.
  *
- * @author David Kaspar
+ * Original author David Kaspar
  */
 public class VSVGlyphSetWidget extends Widget {
 

@@ -1,6 +1,5 @@
 package gsn.vsensor;
 
-import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
@@ -10,7 +9,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
-import java.sql.PreparedStatement;
 
 /**
  * This virtual sensor saves its input stream to any JDBC accessible source.

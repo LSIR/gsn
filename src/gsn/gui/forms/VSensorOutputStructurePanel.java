@@ -1,9 +1,7 @@
 package gsn.gui.forms;
 
 import gsn.gui.beans.VSensorConfigModel;
-
 import java.awt.Component;
-
 import com.jgoodies.binding.PresentationModel;
 
 public class VSensorOutputStructurePanel {

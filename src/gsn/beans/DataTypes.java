@@ -1,11 +1,9 @@
 package gsn.beans;
 
 import gsn.utils.GSNRuntimeException;
-
 import java.sql.Types;
 import java.util.Date;
 import java.util.regex.Pattern;
-
 import org.apache.log4j.Logger;
 
 public class DataTypes {

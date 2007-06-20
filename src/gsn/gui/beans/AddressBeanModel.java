@@ -1,13 +1,8 @@
 package gsn.gui.beans;
 
-import java.util.Collections;
-
 import gsn.beans.AddressBean;
-import gsn.beans.DataField;
 import gsn.utils.KeyValueImp;
-
 import org.apache.commons.collections.KeyValue;
-
 import com.jgoodies.binding.beans.Model;
 import com.jgoodies.binding.list.ArrayListModel;
 

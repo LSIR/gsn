@@ -5,9 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class SimulationResult {
    
    private static boolean simulate = false;

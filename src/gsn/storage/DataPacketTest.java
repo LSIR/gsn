@@ -5,12 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
-
 import junit.framework.TestCase;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class DataPacketTest extends TestCase {
    
    String     dbURL = "jdbc:hsqldb:mem:.";

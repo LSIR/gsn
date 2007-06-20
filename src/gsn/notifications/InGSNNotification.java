@@ -1,7 +1,3 @@
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Creation time : Dec 18, 2006@4:18:05 PM<br> *  
- */
 package gsn.notifications;
 
 import org.apache.log4j.Logger;
@@ -10,7 +6,6 @@ import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import gsn.wrappers.InVMPipeWrapper;
-
 
 public class InGSNNotification extends NotificationRequest {
 

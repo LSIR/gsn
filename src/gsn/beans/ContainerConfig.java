@@ -19,9 +19,6 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import com.jgoodies.binding.beans.ExtendedPropertyChangeSupport;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public class ContainerConfig {
    
    private ExtendedPropertyChangeSupport changeSupport = new ExtendedPropertyChangeSupport( this );

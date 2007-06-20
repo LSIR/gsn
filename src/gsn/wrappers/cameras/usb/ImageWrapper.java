@@ -10,9 +10,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-/**
- * @author Ali Salehi (AliS)<br>
- */
 public class ImageWrapper implements Serializable {
    
    private transient BufferedImage bimg;

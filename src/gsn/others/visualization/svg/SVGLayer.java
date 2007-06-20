@@ -2,7 +2,6 @@ package gsn.others.visualization.svg;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.antlr.stringtemplate.StringTemplate;
 
 public class SVGLayer extends AbstractSVGElement {

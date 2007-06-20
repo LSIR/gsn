@@ -6,8 +6,6 @@ import java.io.IOException;
 
 /**
  * A utility class for working with virtual sensor files
- * 
- * @author Mehdi Riahi
  */
 public class VSensorIOUtil {
 	private String virtualSensorDir;

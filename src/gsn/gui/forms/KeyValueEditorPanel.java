@@ -2,13 +2,11 @@ package gsn.gui.forms;
 
 import gsn.gui.util.GUIUtils;
 import gsn.utils.KeyValueImp;
-
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -22,9 +20,7 @@ import javax.swing.ListModel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableModel;
-
 import org.apache.commons.collections.KeyValue;
-
 import com.jgoodies.binding.adapter.AbstractTableAdapter;
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter;
 import com.jgoodies.binding.list.ArrayListModel;

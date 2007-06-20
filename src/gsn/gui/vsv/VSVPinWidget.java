@@ -32,7 +32,7 @@ import java.util.List;
  * This class represents a pin widget in the VMD visualization style.
  * The pin widget consists of a name and a glyph set.
  *
- * @author David Kaspar
+ * Original author: David Kaspar
  */
 public class VSVPinWidget extends Widget {
 

@@ -1,22 +1,13 @@
 package gsn.wrappers;
 
-import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import java.io.File;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.management.ThreadMXBean;
-import java.util.ArrayList;
-import java.util.Collection;
 import org.apache.log4j.Logger;
 
-/**
- *
- * @author mehdi
- */
 public class DiskSpaceWrapper extends AbstractWrapper{
     
     private static final int            DEFAULT_SAMPLING_RATE       = 1000;

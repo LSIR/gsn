@@ -3,8 +3,6 @@
  * all derivative works MUST be freely available and open sourced under GPL licence. <br>
  * If you are wishing to combine/use the GSN with proprietary code and distribute your code under non-open source<br>
  * licence please contact the authors to get specialized license.<br>
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- * Creation time : Dec 7, 2006@9:53:35 PM<br> *  
  */
 package gsn;
 
@@ -18,9 +16,6 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
-/**
- * @author alisalehi
- */
 public class DirectoryRefresher {
    
    private static transient Logger logger             = Logger.getLogger( DirectoryRefresher.class );

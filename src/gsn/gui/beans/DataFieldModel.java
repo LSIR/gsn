@@ -1,12 +1,7 @@
 package gsn.gui.beans;
 
 import gsn.beans.DataField;
-
-import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.beans.Model;
-import com.jgoodies.validation.ValidationResult;
-import com.jgoodies.validation.util.PropertyValidationSupport;
-import com.jgoodies.validation.util.ValidationUtils;
 
 public class DataFieldModel extends Model{
 	public static final String PROPERTY_DESCRIPTION = "description";

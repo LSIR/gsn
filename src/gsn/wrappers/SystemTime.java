@@ -11,8 +11,6 @@ import org.apache.log4j.Logger;
 
 /**
  * This wrapper presents the system current clock.
- * 
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
  */
 
 public class SystemTime extends AbstractWrapper implements ActionListener {

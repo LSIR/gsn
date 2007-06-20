@@ -1,17 +1,8 @@
-/**
- * 
- */
 package gsn.utils.protocols.EPuck;
 
 import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
-
 import java.util.Vector;
 
-
-/**
- * @author alisalehi
- *
- */
 public class Reset extends AbstractHCIQueryWithoutAnswer {
 
 	public static final String queryDescription = "Resets the state of the EPuck robot.";

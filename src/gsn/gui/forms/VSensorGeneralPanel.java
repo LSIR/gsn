@@ -2,15 +2,12 @@ package gsn.gui.forms;
 
 import gsn.gui.beans.VSensorConfigModel;
 import gsn.gui.beans.VSensorConfigPresentationModel;
-
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
-
 import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;

@@ -3,8 +3,6 @@ package gsn.gui;
 import gsn.beans.StreamElement;
 import gsn.utils.protocols.AbstractHCIQuery;
 import gsn.utils.protocols.ProtocolManager;
-import gsn.vsensor.HCIProtocolGUIVS;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,7 +10,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
-
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -30,17 +27,10 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-
 import org.apache.log4j.Logger;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
-/**
- * @author Jérôme Rousselot <jerome.rousselot@csem.ch>
- *
- */
 
 public class JHCIProtocolControl extends JFrame {
 

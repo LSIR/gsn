@@ -1,18 +1,9 @@
-/**
- * 
- * @author Jerome Rousselot
- */
 package gsn.utils.protocols.EPuck;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Vector;
-
 import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
 
-/**
- * @author jerome
- *
- */
 public class BodyLED extends AbstractHCIQueryWithoutAnswer {
 
 	public static final String queryDescription = "Switches the body LED on and off.";

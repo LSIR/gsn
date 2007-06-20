@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public abstract class AbstractSVGElement implements SVGElement {
    
    private String  link;

@@ -5,13 +5,10 @@ import gsn.beans.InputStream;
 import gsn.beans.VSensorConfig;
 import gsn.beans.WebInput;
 import gsn.utils.KeyValueImp;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.apache.commons.collections.KeyValue;
-
 import com.jgoodies.binding.beans.Model;
 import com.jgoodies.binding.list.ArrayListModel;
 

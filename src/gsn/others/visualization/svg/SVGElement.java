@@ -1,8 +1,5 @@
 package gsn.others.visualization.svg;
 
-/**
- * @author Ali Salehi (AliS, ali.salehi-at-epfl.ch)<br>
- */
 public interface SVGElement {
    
    /**
