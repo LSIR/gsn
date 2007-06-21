@@ -46,10 +46,7 @@ public class ContainerInfoHandler implements RequestHandler {
          }
          sb.append( ">\n" );
          StringBuilder query=null;
-         if (StorageManager.isHsql()||StorageManager.isMysqlDB())
-          query= new StringBuilder( "select * from " + sensorConfig.getName( ) + " order by timed DESC limit 1 offset 0" );
-         else if (StorageManager.isSqlServer())
-             query= new StringBuilder( "select top 1 * from " + sensorConfig.getName( ) + " order by timed DESC" );
+         query= new StringBuilder( "select * from " + sensorConfig.getName( ) + " where timed = (select max(timed) from " + sensorConfig.getName() + ")");
          
          DataEnumerator result;
 		try {
@@ -61,20 +58,24 @@ public class ContainerInfoHandler implements RequestHandler {
 			return;
 			}
          StreamElement se = null;
-         if ( result.hasMoreElements( ) ) se = result.nextElement( );
-         for ( DataField df : sensorConfig.getOutputStructure( ) ) {
-            sb.append("\t<field");
-            sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
-            sb.append(" type=\"").append(df.getType()).append("\"");
-            if (df.getDescription() != null && df.getDescription().trim().length() != 0)
-               sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
-            sb.append(">");
-            if (se!= null ) 
-            	if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
-            		sb.append( se.getData( df.getName( ) ) );
-            	else
-            		sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
-            sb.append("</field>\n");
+         int counter = 1;
+         while ( result.hasMoreElements( ) ) {
+        	 se = result.nextElement( );
+        	 for ( DataField df : sensorConfig.getOutputStructure( ) ) {
+        		 sb.append("\t<field");
+        		 sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
+        		 sb.append(" type=\"").append(df.getType()).append("\"");
+        		 if (df.getDescription() != null && df.getDescription().trim().length() != 0)
+        			 sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
+        		 sb.append(">");
+        		 if (se!= null ) 
+        			 if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
+        				 sb.append( se.getData( df.getName( ) ) );
+        			 else
+        				 sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
+        		 sb.append("</field>\n");
+        	 }
+        	 counter++;
          }
          result.close( );
          sb.append("\t<field name=\"timed\" type=\"long\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : se.getTimeStamp( ) ).append( "</field>\n" );

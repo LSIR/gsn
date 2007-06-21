@@ -1,8 +1,15 @@
 package gsn.http;
 
+import gsn.Mappings;
+import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.StreamElement;
+import gsn.storage.PoolIsFullException;
+import gsn.vsensor.AbstractVirtualSensor;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -32,6 +39,8 @@ public class FieldUpload extends HttpServlet {
 		String msg;
 		Integer code;
 		PrintWriter out = res.getWriter();
+		ArrayList<String> paramNames = new ArrayList<String>();
+		ArrayList<String> paramValues = new ArrayList<String>();
 		
 		//Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
@@ -77,10 +86,13 @@ public class FieldUpload extends HttpServlet {
 				    	//only for the defined cmd    	
 				    	sb.append("<field>\n");
 			    	    sb.append("<name>"+item.getFieldName().split(";")[1]+"</name>\n");
+			    	    paramNames.add(item.getFieldName().split(";")[1]);
 			    	    if (item.isFormField()) {
 					    	sb.append("<value>"+item.getString()+"</value>\n");
+					    	paramValues.add(item.getString());
 			    	    } else {
 			    	    	sb.append("<value>"+new String(b64.encode(item.get()))+"</value>\n");
+					    	paramValues.add(new String(b64.encode(item.get())));
 			    	    }
 			    	    sb.append("</field>\n");
 				    }
@@ -90,16 +102,28 @@ public class FieldUpload extends HttpServlet {
 			
 				//do something with xml aka statement.toString()
 			
+			    AbstractVirtualSensor vs = null;
+			    try {
+			    	vs = Mappings.getVSensorInstanceByVSName( vsname ).borrowVS( );
+			    	vs.dataFromWeb( cmd , paramNames.toArray(new String[]{}) , paramValues.toArray(new Serializable[]{}) );
+			    } catch ( PoolIsFullException e ) {
+			      logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
+			    } catch ( VirtualSensorInitializationFailedException e ) {
+			      logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
+			    } finally {
+			    	Mappings.getVSensorInstanceByVSName(vsname).returnVS(vs);
+			    }
+				
 				code = 200;
 				msg = "The upload to the virtual sensor went successfully! ("+vsname+")";
 			} catch (ServletFileUpload.SizeLimitExceededException e) {
 				code = 600;
 				msg = "Upload size exceeds maximum limit!";
-				logger.error(msg);
+				logger.error(msg, e);
 	        } catch(Exception e){
 				code = 500;
 				msg = "Internal Error: "+e;
-				logger.error(msg);
+				logger.error(msg, e);
 			}
 			
 		}
