@@ -278,6 +278,11 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 							   try {
 								   if(graph.findNode(sensorConfig) != null){
 									   graph.addEdge(config, sensorConfig);
+									   if(graph.hasCycle()){
+										   logger.warn("A dependency cycle was found when adding >" + config.getName() + "< virtual sensor. The cycle will be removed");
+										   graph.removeNode(sensorConfig);
+										   continue outFor;
+									   }
 									   hasValidAddressing = true;
 								   }
 								   else
@@ -304,98 +309,98 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
    }
    
    private static boolean isInTheSameGSNInstance(AddressBean addressBean) {
-	   String host = addressBean.getPredicateValue ( "host" );
-	   if ( host == null || host.trim ( ).length ( ) == 0 ) {
-		   if(logger.isDebugEnabled())
-			   logger.debug( "The >host< parameter is missing from the RemoteWrapper wrapper." );
-		   return false;
-	   }
-	   String portRaw = addressBean.getPredicateValue ( "port" );
-	   if ( portRaw == null || portRaw.trim ( ).length ( ) == 0 ) {
-		   if(logger.isDebugEnabled())
-			   logger.debug ( "The >port< parameter is missing from the RemoteWrapper wrapper." );
-		   return false;
-	   }
+	   String urlStr = addressBean.getPredicateValue ( "url" );
+	   String host;
 	   int port;
-	   try {
-		   port = Integer.parseInt ( portRaw );
-		   if ( port > 65000 || port <= 0 ) throw new Exception ( "Bad port No" + port );
-	   } catch ( Exception e ) {
-		   if(logger.isDebugEnabled())
-			   logger.debug ( "The >port< parameter is not a valid integer for the RemoteWrapper wrapper." );
-		   return false;
-	   }
 
+	   if(urlStr != null){
+		   try {
+			   URL url = new URL(urlStr);
+			   host = url.getHost();
+			   port = url.getPort() != -1 ? url.getPort() : ContainerConfig.DEFAULT_GSN_PORT;
+		   } catch (MalformedURLException e) {
+			   logger.warn("Malformed URL : " + e.getMessage(), e);
+			   return false;
+		   }
+	   }else{
+
+		   host = addressBean.getPredicateValue ( "host" );
+		   if ( host == null || host.trim ( ).length ( ) == 0 ) {
+			   logger.warn ( "The >host< parameter is missing from the RemoteWrapper wrapper." );
+			   return false;
+		   }
+		   port = addressBean.getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
+		   if ( port > 65000 || port <= 0 ) {
+			   logger.error("Remote wrapper initialization failed, bad port number:"+port);
+			   return false;
+		   }
+	   }
 	   boolean toReturn = (ValidityTools.isLocalhost(host) && Main.getContainerConfig().getContainerPort() == port);
 	   return toReturn;
    }
 
-public static boolean validateRemoteWrapper ( AddressBean addressBean ) {
+   public static boolean validateRemoteWrapper ( AddressBean addressBean ) {
 	   XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
 	   XmlRpcClient client = new XmlRpcClient ( );
+	   String url;
 
-	   String host = addressBean.getPredicateValue ( "host" );
-	   if ( host == null || host.trim ( ).length ( ) == 0 ) {
-		   if(logger.isDebugEnabled())
-			   logger.debug( "The >host< parameter is missing from the RemoteWrapper wrapper." );
-		   return false;
+	   if ( (url = addressBean.getPredicateValue ( "url" )) == null) {
+		   String host = addressBean.getPredicateValue ( "host" );
+		   if ( host == null || host.trim ( ).length ( ) == 0 ) {
+			   logger.warn ( "The >host< parameter is missing from the RemoteWrapper wrapper." );
+			   return false;
+		   }
+		   int port = addressBean.getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
+		   if ( port > 65000 || port <= 0 ) {
+			   logger.error("Remote wrapper initialization failed, bad port number:"+port);
+			   return false;
+		   }
+
+		   url ="http://" + host +":"+port;
 	   }
-	   String portRaw = addressBean.getPredicateValue ( "port" );
-	   if ( portRaw == null || portRaw.trim ( ).length ( ) == 0 ) {
-		   if(logger.isDebugEnabled())
-			   logger.debug ( "The >port< parameter is missing from the RemoteWrapper wrapper." );
-		   return false;
-	   }
-	   int port;
-	   try {
-		   port = Integer.parseInt ( portRaw );
-		   if ( port > 65000 || port <= 0 ) throw new Exception ( "Bad port No" + port );
-	   } catch ( Exception e ) {
-		   if(logger.isDebugEnabled())
-			   logger.debug ( "The >port< parameter is not a valid integer for the RemoteWrapper wrapper." );
-		   return false;
-	   }
-	   String remoteVSName = addressBean.getPredicateValue ( "name" );
+	   if (!url.endsWith("/"))
+		   url+="/";
+
+	   String remoteVSName;
+	   remoteVSName = addressBean.getPredicateValue ( "name" );
 	   if ( remoteVSName == null ) {
-		   if(logger.isDebugEnabled())
-			   logger.debug ( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
+		   logger.warn ( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
 		   return false;
 	   }
 	   remoteVSName = remoteVSName.trim ().toLowerCase ();
+
 	   try {
-		   config.setServerURL ( new URL ( "http://" + host +":"+port+ "/gsn-handler" ) );
+		   config.setServerURL ( new URL ( url + "gsn-handler") );
 		   client.setConfig ( config );
 	   } catch ( MalformedURLException e1 ) {
-		   if(logger.isDebugEnabled())
-			   logger.debug ( "Remote Wrapper initialization failed : "+e1.getMessage ( ) , e1 );
+		   logger.warn ( "Remote Wrapper initialization failed : "+e1.getMessage ( ) , e1 );
 	   }
 
-	   String destination = new StringBuilder ( ).append ( host ).append ( ":" ).append ( port ).toString ( );
-	   if ( logger.isDebugEnabled() ) logger.debug ( new StringBuilder ( ).append ( "Wants to ask for structure from : " ).append ( destination ).toString ( ) );
+	   if ( logger.isDebugEnabled() ) logger.debug ( new StringBuilder ( ).append ( "Wants to ask for structure from : " ).append ( url ).toString ( ) );
 	   Object [ ] params = new Object [ ] {remoteVSName};
 	   Object[] result =null;
 	   try{
 		   result =  (Object[]) client.execute ("gsn.getOutputStructure", params);
 	   }catch(Exception e){
 		   if(logger.isDebugEnabled())
-			   logger.debug ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (destination).append (", ERROR : ").append (e.getMessage ()).toString ( ) );
+			   logger.debug ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (url).toString ( ) );
 		   logger.debug (e.getMessage (),e);
 		   return false;
 	   }
 	   if ( result.length==0) {
 		   if(logger.isDebugEnabled())
-			   logger.debug ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (destination).toString ( ) );
+			   logger.debug ( new StringBuilder ( ).append ( "Message couldn't be sent to :" ).append (url).toString ( ) );
 		   return false;
 	   }
 
 	   return true;
-	}
- 
-   
+   }
+
+
    public static Graph<VSensorConfig> buildDependencyGraphFromIterator(Iterator<VSensorConfig> vsensorIterator){
 	   Graph<VSensorConfig> graph = new Graph<VSensorConfig>();
 	   fillGraph(graph, vsensorIterator);
 	   return graph;
    }
-   
+
 }

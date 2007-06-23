@@ -43,13 +43,13 @@ public class Graph<T> implements Serializable{
 	private void rdfs(Node<T> node, ArrayList<Node<T>> list) {
 		if (node == null)
 			return;
+		node.setVisited(true);
 		for (Edge<T> edge : node.getInputEdges()) {
 			if (edge.getStartNode().isVisited() == false) {
 				rdfs(edge.getStartNode(), list);
 			}
 		}
 		list.add(node);
-		node.setVisited(true);
 
 	}
 
@@ -103,10 +103,20 @@ public class Graph<T> implements Serializable{
 			throw new NodeNotExistsExeption(endObject == null ? "null" : endObject.toString());
 		try {
 			startNode.addEdge(endNode);
-			rootNodes.remove(endNode);
+			if(!endNode.equals(findRootNode(startNode)))
+				rootNodes.remove(endNode);
 		} catch (EdgeExistsException e) {
 			// TODO Auto-generated catch block
 		}
+	}
+
+	public Node<T> findRootNode(Node<T> startNode) {
+		List<Node<T>> ascendingNodes = getAscendingNodes(startNode);
+		for (Node<T> node : ascendingNodes) {
+			if(rootNodes.contains(node))
+				return node;
+		}
+		return null;
 	}
 
 	/**
@@ -114,7 +124,7 @@ public class Graph<T> implements Serializable{
 	 * removes all ascending nodes of it, except root node.
 	 * 
 	 * @param Object
-	 * @return a boolean indicating wether the node is removed
+	 * @return a boolean indicating whether the node is removed
 	 * @throws NodeNotExistsExeption
 	 */
 	public boolean removeNode(T object) throws NodeNotExistsExeption {
