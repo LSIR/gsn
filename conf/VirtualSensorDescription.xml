@@ -46,6 +46,7 @@
 	      <structure name="source" type="gsn.beans.StreamSource">
 	         <value  name="alias"  field="alias"  style="attribute"/>
 	         <value  name="storage-size" field="rawHistorySize" style="attribute" usage="optional" />
+	         <value  name="slide" field="rawSlideValue" style="attribute" usage="optional" />
 	         <value  name="disconnect-buffer-size" field="disconnectedBufferSize" style="attribute" usage="optional" />
 	         <value  name="sampling-rate" field="samplingRate" style="attribute" usage="optional" />
 	         <value  name="start-time"  field="startTime"  style="attribute" usage="optional"/>

@@ -269,13 +269,13 @@ public class ContainerConfig {
    
    public static String [ ]       NETWORK_ADDRESSES;
    
-   public static final String [ ] JDBC_SYSTEMS                       = { "HSqlDB in Memory" , "HSqlDB in File" , "MySql" };
+   public static final String [ ] JDBC_SYSTEMS                       = { "HSqlDB in Memory" , "HSqlDB in File" , "MySql", "SQL Server" };
    
-   public static final String [ ] JDBC_URLS                          = new String [ ] { "jdbc:hsqldb:mem:." , "jdbc:hsqldb:file:/path/to/file" , "jdbc:mysql://host:3306/dbName" };
+   public static final String [ ] JDBC_URLS                          = new String [ ] { "jdbc:hsqldb:mem:." , "jdbc:hsqldb:file:/path/to/file" , "jdbc:mysql://localhost:3306/gsn", "jdbc:jtds:sqlserver://localhost/gsn" };
    
-   public static final String [ ] JDBC_DRIVERS                       = new String [ ] { "org.hsqldb.jdbcDriver" , "org.hsqldb.jdbcDriver" , "com.mysql.jdbc.Driver" };
+   public static final String [ ] JDBC_DRIVERS                       = new String [ ] { "org.hsqldb.jdbcDriver" , "org.hsqldb.jdbcDriver" , "com.mysql.jdbc.Driver", "net.sourceforge.jtds.jdbc.Driver" };
    
-   public static final String [ ] JDBC_URLS_PREFIX                   = new String [ ] { "jdbc:hsqldb:mem:" , "jdbc:hsqldb:file:" , "jdbc:mysql:" };
+   public static final String [ ] JDBC_URLS_PREFIX                   = new String [ ] { "jdbc:hsqldb:mem:" , "jdbc:hsqldb:file:" , "jdbc:mysql:", "jdbc:jtds:sqlserver:" };
    
    public static final String     DEFAULT_LOGGING_LEVEL              = ContainerConfig.LOGGING_LEVELS[ 3 ];
    
@@ -419,6 +419,8 @@ public class ContainerConfig {
          setJdbcURL( JDBC_URLS[ 1 ] );
       } else if ( newValue == JDBC_SYSTEMS[ 2 ] ) {
          setJdbcURL( JDBC_URLS[ 2 ] );
+      } else if ( newValue == JDBC_SYSTEMS[ 3 ] ) {
+         setJdbcURL( JDBC_URLS[ 3 ] );
       }
       changeSupport.firePropertyChange( FIELD_NAME_databaseSystem , oldValue , newValue );
    }

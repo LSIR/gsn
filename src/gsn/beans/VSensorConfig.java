@@ -2,11 +2,13 @@ package gsn.beans;
 
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.wrappers.RemoteWrapper;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeMap;
+
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 
@@ -317,11 +319,10 @@ public class VSensorConfig implements Serializable {
 		  } else {
 			  try {
 				  final StringBuilder shs = new StringBuilder( storageHistorySize );
-				  if ( mIndex > 0 )
-					  this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
-				  else if ( hIndex > 0 )
-					  this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
-				  else if ( sIndex > 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
+				  if ( mIndex >= 0 && mIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
+		          else if ( hIndex >= 0 && hIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
+		          else if ( sIndex >= 0 && sIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
+		          else Integer.parseInt("");
 				  this.isStorageCountBased = false;
 			  } catch ( final NumberFormatException e ) {
 				  this.logger.error( new StringBuilder( ).append( "The storage size, " ).append( storageHistorySize ).append( ", specified for the virtual sensor : " ).append( this.name )
@@ -429,8 +430,13 @@ public class VSensorConfig implements Serializable {
 	  public void setWebInput(WebInput[] webInput){
 		  this.webinput = webInput;
 	  }
+	  
 	public void setInputStreams(InputStream... inputStreams) {
 		this.inputStreams = inputStreams;
+	}
+	
+	public void setStorageHistorySize(String storageHistorySize){
+		this.storageHistorySize = storageHistorySize;
 	}
 
 }

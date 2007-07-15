@@ -43,6 +43,8 @@ public class InputStream implements Serializable{
 	private transient long                              lastVisited           = 0;
 
 	private StringBuilder                               rewrittenSQL;
+	
+	private boolean queryCached;
 
 	/**
 	 * For making one initial delay.
@@ -101,63 +103,63 @@ public class InputStream implements Serializable{
 	  * @param alias The alias of the StreamSource which has new data.
 	 * @throws SQLException 
 	  */
-	 public boolean dataAvailable ( final CharSequence alias ) throws SQLException {
-		 if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
-		 if ( this.pool == null ) {
-			 logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
-			 return false;
-		 }
-
-		 if ( this.currentCount > this.getCount( ) ) {
-			 if ( logger.isInfoEnabled( ) ) logger.info( "Maximum count reached, the value *discarded*" );
-			 return false;
-		 }
-
-		 final long currentTimeMillis = System.currentTimeMillis( );
-		 if ( this.rate > 0 && ( currentTimeMillis - this.lastVisited ) < this.rate ) {
-			 if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
-			 return false;
-		 }
-		 this.lastVisited = currentTimeMillis;
-
-		 if ( this.rewrittenSQL == null ) {
-			 this.rewrittenSQL = new StringBuilder( SQLUtils.newRewrite( getQuery( ).trim( ).toLowerCase( ), this.rewritingData ));
-			 if ( logger.isDebugEnabled( ) )
-				 logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
-						 .toString( ) );
-		 }
-		 if ( StorageManager.getInstance( ).isThereAnyResult( this.rewrittenSQL ) ) {
-			 this.currentCount++;
-			 AbstractVirtualSensor sensor = null;
-			 if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
-			 int elementCounterForDebugging = -1;
-			 final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL , false );
-			 try {
-				 sensor = pool.borrowVS( );
-				 while ( resultOfTheQuery.hasMoreElements( ) ) {
-					 elementCounterForDebugging++;
-					 StreamElement element= resultOfTheQuery.nextElement( );
-				 	 sensor.dataAvailable( this.getInputStreamName( ) , element );
-				 }
-			 } catch ( final PoolIsFullException e ) {
-				 logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
-				 logger.warn( e.getMessage( ) , e );
-			 } catch ( final UnsupportedOperationException e ) {
-				 logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
-				 logger.warn( e.getMessage( ) , e );
-			 } catch ( final VirtualSensorInitializationFailedException e ) {
-				 logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getName( )
-						 + " because initialization of that virtual sensor failed" );
-				 logger.error(e.getMessage(),e);
-			 } finally {
-				 this.pool.returnVS( sensor );
-			 }
-			 if ( logger.isDebugEnabled( ) ) {
-				 logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );
-			 }
-		 }
-		 return true;
-	 }
+//	 public boolean dataAvailable ( final CharSequence alias ) throws SQLException {
+//		 if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
+//		 if ( this.pool == null ) {
+//			 logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
+//			 return false;
+//		 }
+//
+//		 if ( this.currentCount > this.getCount( ) ) {
+//			 if ( logger.isInfoEnabled( ) ) logger.info( "Maximum count reached, the value *discarded*" );
+//			 return false;
+//		 }
+//
+//		 final long currentTimeMillis = System.currentTimeMillis( );
+//		 if ( this.rate > 0 && ( currentTimeMillis - this.lastVisited ) < this.rate ) {
+//			 if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
+//			 return false;
+//		 }
+//		 this.lastVisited = currentTimeMillis;
+//
+//		 if ( this.rewrittenSQL == null ) {
+//			 this.rewrittenSQL = new StringBuilder( SQLUtils.newRewrite( getQuery( ).trim( ).toLowerCase( ), this.rewritingData ));
+//			 if ( logger.isDebugEnabled( ) )
+//				 logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
+//						 .toString( ) );
+//		 }
+//		 if ( StorageManager.getInstance( ).isThereAnyResult( this.rewrittenSQL ) ) {
+//			 this.currentCount++;
+//			 AbstractVirtualSensor sensor = null;
+//			 if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
+//			 int elementCounterForDebugging = -1;
+//			 final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL , false );
+//			 try {
+//				 sensor = pool.borrowVS( );
+//				 while ( resultOfTheQuery.hasMoreElements( ) ) {
+//					 elementCounterForDebugging++;
+//					 StreamElement element= resultOfTheQuery.nextElement( );
+//				 	 sensor.dataAvailable( this.getInputStreamName( ) , element );
+//				 }
+//			 } catch ( final PoolIsFullException e ) {
+//				 logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
+//				 logger.warn( e.getMessage( ) , e );
+//			 } catch ( final UnsupportedOperationException e ) {
+//				 logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
+//				 logger.warn( e.getMessage( ) , e );
+//			 } catch ( final VirtualSensorInitializationFailedException e ) {
+//				 logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getName( )
+//						 + " because initialization of that virtual sensor failed" );
+//				 logger.error(e.getMessage(),e);
+//			 } finally {
+//				 this.pool.returnVS( sensor );
+//			 }
+//			 if ( logger.isDebugEnabled( ) ) {
+//				 logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );
+//			 }
+//		 }
+//		 return true;
+//	 }
 
 	 public void addToRenamingMapping ( final CharSequence aliasName , final CharSequence viewName ) {
 		 rewritingData.put( aliasName , viewName );
@@ -227,4 +229,83 @@ public class InputStream implements Serializable{
 		 this.pool = pool;
 	 }
 
+	 public void invalidateCachedQuery(StreamSource streamSource){
+		 queryCached = false;
+		 rewrittenSQL = null;
+	 }
+	 
+	 public boolean executeQuery( final CharSequence alias ) throws SQLException{
+		 if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
+		 if ( this.pool == null ) {
+			 logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
+			 return false;
+		 }
+
+		 if ( this.currentCount > this.getCount( ) ) {
+			 if ( logger.isInfoEnabled( ) ) logger.info( "Maximum count reached, the value *discarded*" );
+			 return false;
+		 }
+
+		 final long currentTimeMillis = System.currentTimeMillis( );
+		 if ( this.rate > 0 && ( currentTimeMillis - this.lastVisited ) < this.rate ) {
+			 if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
+			 return false;
+		 }
+		 this.lastVisited = currentTimeMillis;
+
+		 if ( !queryCached ) {
+			 rewriteQuery();
+			 if ( logger.isDebugEnabled( ) && queryCached)
+				 logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
+						 .toString( ) );
+		 }
+		 if ( queryCached && StorageManager.getInstance( ).isThereAnyResult( this.rewrittenSQL ) ) {
+			 this.currentCount++;
+			 AbstractVirtualSensor sensor = null;
+			 if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
+			 int elementCounterForDebugging = -1;
+			 final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL , false );
+			 try {
+				 sensor = pool.borrowVS( );
+				 while ( resultOfTheQuery.hasMoreElements( ) ) {
+					 elementCounterForDebugging++;
+					 StreamElement element= resultOfTheQuery.nextElement( );
+				 	 sensor.dataAvailable( this.getInputStreamName( ) , element );
+				 }
+			 } catch ( final PoolIsFullException e ) {
+				 logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
+				 logger.warn( e.getMessage( ) , e );
+			 } catch ( final UnsupportedOperationException e ) {
+				 logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
+				 logger.warn( e.getMessage( ) , e );
+			 } catch ( final VirtualSensorInitializationFailedException e ) {
+				 logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getName( )
+						 + " because initialization of that virtual sensor failed" );
+				 logger.error(e.getMessage(),e);
+			 } finally {
+				 this.pool.returnVS( sensor );
+			 }
+			 if ( logger.isDebugEnabled( ) ) {
+				 logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );
+			 }
+		 }
+		 return true;
+	 }
+
+	private void rewriteQuery() {
+		String query = getQuery().trim().toLowerCase();
+		for (int i = 0; i < sources.length; i++) {
+			StringBuilder sb = sources[i].rewrite(query);
+			if(sb == null){
+				logger.error("Rewriting query failed. The rewrite() method of the stream source <" + sources[i].getAlias() + "> returned null.");
+				rewrittenSQL = null;
+				queryCached = false;
+				return;
+			}else{
+				query = sb.toString();
+			}
+		}
+		rewrittenSQL = new StringBuilder(query);
+		queryCached = true;
+	}
 }

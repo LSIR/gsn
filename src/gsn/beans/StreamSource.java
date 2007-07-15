@@ -1,6 +1,8 @@
 package gsn.beans;
 
 import gsn.Main;
+import gsn.beans.windowing.QueryRewriter;
+import gsn.beans.windowing.WindowType;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
@@ -31,6 +33,8 @@ public  class StreamSource implements Serializable{
   
   private String                        rawHistorySize = null;
   
+  private String                        rawSlideValue = null;
+  
   private int                           disconnectedBufferSize;
   
   private String                        sqlQuery;
@@ -57,6 +61,8 @@ public  class StreamSource implements Serializable{
   
   private AddressBean activeAddressBean; // To be used by the gui
   
+  private transient QueryRewriter queryRewriter;
+  
   public StreamSource() {
   }
   
@@ -67,7 +73,14 @@ public  class StreamSource implements Serializable{
   
   public StreamSource setRawHistorySize(String rawHistorySize) {
     this.rawHistorySize = rawHistorySize;
+    isValidated = false;
     return this;
+  }
+  
+  public StreamSource setRawSlideValue(String rawSlideValue){
+	  this.rawSlideValue = rawSlideValue;
+	  isValidated = false;
+	  return this;
   }
   
   public StreamSource setAddressing(AddressBean[] addressing) {
@@ -253,9 +266,15 @@ public  class StreamSource implements Serializable{
   
   private transient boolean isStorageCountBased  = false;
   
+  private WindowType windowingType = DEFAULT_WINDOW_TYPE;
+  
   public static final int   STORAGE_SIZE_NOT_SET = -1;
+  public static final int   DEFAULT_SLIDE_VALUE = 1;
+  public static final WindowType   DEFAULT_WINDOW_TYPE = WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE;
   
   private transient int     parsedStorageSize    = STORAGE_SIZE_NOT_SET;
+  
+  private transient int     parsedSlideValue    = DEFAULT_SLIDE_VALUE;
   
   private transient boolean isValidated = false;
   private transient boolean validationResult = false;
@@ -267,6 +286,7 @@ public  class StreamSource implements Serializable{
   public boolean validate ( ) {
     if (isValidated==true)
       return validationResult;
+    windowingType = DEFAULT_WINDOW_TYPE;
     isValidated=true;
     if (getSamplingRate()<=0) 
       logger.warn( new StringBuilder( ).append( "The sampling rate is set to zero (or negative) which means no results. StreamSource = " )
@@ -277,7 +297,7 @@ public  class StreamSource implements Serializable{
     }
     if ( this.rawHistorySize != null ) {
       this.rawHistorySize = this.rawHistorySize.replace( " " , "" ).trim( ).toLowerCase( );
-      if ( this.rawHistorySize.equalsIgnoreCase( "" ) ) return true;
+      if ( this.rawHistorySize.equalsIgnoreCase( "" ) ) return validationResult = true;
       final int second = 1000;
       final int minute = second * 60;
       final int hour = minute * 60;
@@ -288,25 +308,75 @@ public  class StreamSource implements Serializable{
         try {
           this.parsedStorageSize = Integer.parseInt( this.rawHistorySize );
           this.isStorageCountBased = true;
+          windowingType = WindowType.TUPLE_BASED;
         } catch ( final NumberFormatException e ) {
           logger.error( new StringBuilder( ).append( "The storage size, " ).append( this.rawHistorySize ).append( ", specified for the Stream Source : " ).append( this.getAlias( ) ).append(
           " is not valid." ).toString( ) , e );
           return (validationResult= false);
         }
-        return (validationResult=true);
       } else
         try {
           final StringBuilder shs = new StringBuilder( this.rawHistorySize );
-          if ( mIndex >= 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
-          else if ( hIndex >= 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
-          else if ( sIndex >= 0 ) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
+          if ( mIndex >= 0 && mIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
+          else if ( hIndex >= 0 && hIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
+          else if ( sIndex >= 0 && sIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
+          else Integer.parseInt("");
           this.isStorageCountBased = false;
+          windowingType = WindowType.TIME_BASED;
         } catch ( NumberFormatException e ) {
           logger.debug( e.getMessage( ) , e );
           logger.error( new StringBuilder( ).append( "The storage size, " ).append( this.rawHistorySize ).append( ", specified for the Stream Source : " ).append( this.getAlias( ) ).append(
           " is not valid." ).toString( ) );
           return (validationResult=false);
         }
+    }
+    logger.debug("validate() called");   
+    //Parsing slide value
+    if(this.rawSlideValue == null){
+    	//If slide value was not specified by the user, consider it as 1 tuple
+    	windowingType = (windowingType == WindowType.TUPLE_BASED) ? WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE : WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE;
+    	return validationResult = true;
+    } else {
+    	this.rawSlideValue = this.rawSlideValue.replace( " " , "" ).trim( ).toLowerCase( );
+    	//If slide value was not specified by the user, consider it as 1 tuple    	
+        if ( this.rawSlideValue.equalsIgnoreCase( "" ) ){
+        	windowingType = (windowingType == WindowType.TUPLE_BASED) ? WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE : WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE;
+        	return validationResult = true;
+        }
+        final int second = 1000;
+        final int minute = second * 60;
+        final int hour = minute * 60;
+        final int mIndex = this.rawSlideValue.indexOf( "m" );
+        final int hIndex = this.rawSlideValue.indexOf( "h" );
+        final int sIndex = this.rawSlideValue.indexOf( "s" );
+        if ( mIndex < 0 && hIndex < 0 && sIndex < 0 ) {
+          try {
+            this.parsedSlideValue = Integer.parseInt( this.rawSlideValue );
+            if(parsedSlideValue == 1){//We consider this as a special case
+            	windowingType = (windowingType == WindowType.TIME_BASED) ? WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE : WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE;
+            }
+            else if(windowingType == WindowType.TIME_BASED)
+            	windowingType = WindowType.TIME_BASED_WIN_TUPLE_BASED_SLIDE;
+          } catch ( final NumberFormatException e ) {
+            logger.error( new StringBuilder( ).append( "The slide value, " ).append( this.rawSlideValue ).append( ", specified for the Stream Source : " ).append( this.getAlias( ) ).append(
+            " is not valid." ).toString( ) , e );
+            return (validationResult= false);
+          }
+        } else
+          try {
+            final StringBuilder shs = new StringBuilder( this.rawSlideValue );
+            if ( mIndex >= 0 && mIndex == shs.length() - 1) this.parsedSlideValue = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
+            else if ( hIndex >= 0 && hIndex == shs.length() - 1) this.parsedSlideValue = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
+            else if ( sIndex >= 0 && sIndex == shs.length() - 1) this.parsedSlideValue = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
+            else Integer.parseInt("");
+            if(windowingType == WindowType.TUPLE_BASED)
+            	windowingType = WindowType.TUPLE_BASED_WIN_TIME_BASED_SLIDE;
+          } catch ( NumberFormatException e ) {
+            logger.debug( e.getMessage( ) , e );
+            logger.error( new StringBuilder( ).append( "The slide value, " ).append( this.rawSlideValue ).append( ", specified for the Stream Source : " ).append( this.getAlias( ) ).append(
+            " is not valid." ).toString( ) );
+            return (validationResult=false);
+          }
     }
     return validationResult=true;
   }
@@ -321,7 +391,38 @@ public  class StreamSource implements Serializable{
     return this.parsedStorageSize;
   }
   
+  public WindowType getWindowingType(){
+	  validate();
+	  return windowingType;
+  }
   
+  public int getParsedSlideValue(){
+	  validate();
+	  return parsedSlideValue;
+  }
+  
+  public boolean windowSlided() throws SQLException{
+	  if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data avialble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
+	  return inputStream.executeQuery( getUIDStr() );
+	  
+  }
+  
+  public void setQueryRewriter(QueryRewriter rewriter){
+	  this.queryRewriter = rewriter;
+  }
+  
+  public QueryRewriter getQueryRewriter(){
+	  return queryRewriter;
+  }
+  
+  public StringBuilder rewrite(String query){
+	  if(queryRewriter != null){
+		  return queryRewriter.rewrite(query);
+	  }else{
+		  //TODO ??
+		  return null;
+	  }
+  }
   
   public StringBuilder getUIDStr() {
     if (validate()==false)
@@ -338,10 +439,10 @@ public  class StreamSource implements Serializable{
     return getUIDStr().hashCode();
   }
   
-  public Boolean dataAvailable ( ) throws SQLException {
-    if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data avialble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
-    return inputStream.dataAvailable( getUIDStr() );
-  }
+//  public Boolean dataAvailable ( ) throws SQLException {
+//    if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data avialble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
+//    return inputStream.dataAvailable( getUIDStr() );
+//  }
   
   private StringBuilder cachedSqlQuery = null;
   

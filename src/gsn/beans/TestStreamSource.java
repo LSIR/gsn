@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import gsn.beans.windowing.WindowType;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
@@ -105,11 +106,60 @@ public class TestStreamSource {
 		InputStream is = new InputStream();
 	StreamSource 	ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  min").setInputStream(is);
 	}
+	
+	@Test (expected=GSNRuntimeException.class)
+	public void testBadStreamSources2() throws GSNRuntimeException{
+		InputStream is = new InputStream();
+	StreamSource 	ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  m20").setInputStream(is);
+	}
+	
+	@Test (expected=GSNRuntimeException.class)
+	public void testBadStreamSources3() throws GSNRuntimeException{
+		InputStream is = new InputStream();
+	StreamSource 	ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("m").setInputStream(is);
+	}
+	
 	@Test
 	public void testBadWindowSize() throws GSNRuntimeException{
 		StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  sec");
 		assertFalse(ss.validate());
 	}
+	
+	@Test
+	public void testBadSlideValue() throws GSNRuntimeException{
+		StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  s").setRawSlideValue("5 sec");
+		assertFalse(ss.validate());
+	}
+	
+	@Test
+	public void testWindowType1(){
+		StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10 s");
+		assertEquals(ss.getWindowingType(), WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE);
+		ss.setRawSlideValue("5 s");
+		assertEquals(ss.getWindowingType(), WindowType.TIME_BASED);
+		ss.setRawSlideValue("2");
+		assertEquals(ss.getWindowingType(), WindowType.TIME_BASED_WIN_TUPLE_BASED_SLIDE);
+		ss.setRawSlideValue("");
+		assertEquals(ss.getWindowingType(), WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE);
+	}
+	
+	@Test
+	public void testWindowType2(){
+		StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10 ");
+		assertTrue(ss.validate());
+		assertTrue(ss.validate());
+		assertEquals(ss.getWindowingType(), WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE);
+		ss.setRawSlideValue("5 s");
+		assertEquals(ss.getWindowingType(), WindowType.TUPLE_BASED_WIN_TIME_BASED_SLIDE);
+		ss.setRawSlideValue("2");
+		assertEquals(ss.getWindowingType(), WindowType.TUPLE_BASED);
+		ss.setRawSlideValue("");
+		assertEquals(ss.getWindowingType(), WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE);
+		ss.setRawHistorySize("");
+		ss.setRawSlideValue("");
+		assertEquals(ss.getWindowingType(), WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE);
+	}
+	
 	@Test
 	public void testUID() {
 		InputStream is = new InputStream();

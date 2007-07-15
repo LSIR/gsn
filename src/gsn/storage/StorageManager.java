@@ -974,4 +974,34 @@ public class StorageManager {
 					dbConnectionProperties);
 		return connection;
 	}
+	
+	
+	/**
+	 * Retruns an approximation of the difference between the current time of the DB and that of the local system
+	 * @return
+	 */
+	public long getTimeDifferenceInMillis(){
+		StringBuilder query = new StringBuilder("select ");
+		if (StorageManager.isHsql())
+			query.append(" NOW_MILLIS()");
+		else if (StorageManager.isMysqlDB())
+			query.append(" UNIX_TIMESTAMP()*1000");
+		else if (StorageManager.isSqlServer()) {
+			query.append(" convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 ");
+		}
+		PreparedStatement prepareStatement = null;
+		try {
+			prepareStatement = getConnection().prepareStatement(query.toString());
+			long time1 = System.currentTimeMillis();
+			ResultSet resultSet = prepareStatement.executeQuery();
+			resultSet.next();
+			long time2 = System.currentTimeMillis();
+			return resultSet.getLong(1) -  time2 + (time2 - time1) / 2;
+		} catch (SQLException error) {
+			logger.error(error.getMessage(), error);
+		} finally {
+			close(prepareStatement);
+		}
+		return 0;
+	}
 }

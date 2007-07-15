@@ -50,7 +50,7 @@ public class TestDataPropogation {
 		AddressBean addressBean= new AddressBean("mock-test");
 		wrapper = (MockWrapper) loader.findWrapper(addressBean);
 		InputStream is = new InputStream();
-		streamSource= createMock(StreamSource.class, new Method[] {StreamSource.class.getMethod("dataAvailable",new Class[] {})});
+		streamSource= createMock(StreamSource.class, new Method[] {StreamSource.class.getMethod("windowSlided",new Class[] {})});
 		streamSource.setAlias("test");
 		streamSource.setRawHistorySize("1");
 		streamSource.setAddressing(new AddressBean[] {addressBean});
@@ -90,7 +90,7 @@ public class TestDataPropogation {
 	@Test
 	public void testPostOneStreamElement() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException, SQLException {
 		StreamElement se = new StreamElement(streamSource.getWrapper().getOutputFormat(),new Serializable[] {10},System.currentTimeMillis());
-		expect(streamSource.dataAvailable()).andStubReturn(true);
+		expect(streamSource.windowSlided()).andStubReturn(true);
 		replay(streamSource);
 		assertTrue(streamSource.validate());
 		assertTrue(wrapper.insertIntoWrapperTable(se));
@@ -116,7 +116,7 @@ public class TestDataPropogation {
 	public void testPostTwoStreamElements() throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchMethodException, SQLException {
 		StreamElement se1 = new StreamElement(streamSource.getWrapper().getOutputFormat(),new Serializable[] {9},System.currentTimeMillis());
 		StreamElement se2 = new StreamElement(streamSource.getWrapper().getOutputFormat(),new Serializable[] {10},System.currentTimeMillis()+10);
-		expect(streamSource.dataAvailable()).andReturn(true).times(2);
+		expect(streamSource.windowSlided()).andReturn(true).times(2);
 		replay(streamSource);
 		assertTrue(streamSource.validate());
 		assertTrue(wrapper.publishStreamElement(se1));
@@ -142,7 +142,7 @@ public class TestDataPropogation {
 		StreamElement se1 = new StreamElement(df,new Serializable[] {9},System.currentTimeMillis());
 		StreamElement se2 = new StreamElement(df,new Serializable[] {10},System.currentTimeMillis()+10);
 		StreamElement se3 = new StreamElement(df,new Serializable[] {1},System.currentTimeMillis()+11);
-		expect(streamSource.dataAvailable()).andReturn(true).times(2);
+		expect(streamSource.windowSlided()).andReturn(true).times(2);
 		replay(streamSource);
 		assertTrue(streamSource.validate());
 		assertTrue(wrapper.publishStreamElement(se1));

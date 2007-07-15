@@ -307,6 +307,7 @@ public class VSensorConfigModel extends Model {
 		vSensorConfig.setOutputStreamRate(getOutputStreamRate());
 		vSensorConfig.setPriority(getPriority());
 		vSensorConfig.setAddressing((KeyValue[]) getAddressing().toArray(new KeyValue[0]));
+		vSensorConfig.setStorageHistorySize(getStorageHistorySize());
 		
 		System.out.println("input stream size : " + getInputStreams().getSize());
 		InputStream[] inputStreams = new InputStream[getInputStreams().size()];

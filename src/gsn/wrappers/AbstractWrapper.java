@@ -5,15 +5,23 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
+import gsn.beans.windowing.LocalTimeBasedSlidingHandler;
+import gsn.beans.windowing.RemoteTimeBasedSlidingHandler;
+import gsn.beans.windowing.SlidingHandler;
+import gsn.beans.windowing.TupleBasedSlidingHandler;
+import gsn.beans.windowing.WindowType;
 import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
+
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+
 import javax.naming.OperationNotSupportedException;
+
 import org.apache.log4j.Logger;
 
 public abstract class AbstractWrapper extends Thread {
@@ -25,6 +33,12 @@ public abstract class AbstractWrapper extends Thread {
 	private AddressBean                        activeAddressBean;
 
 	private boolean                            isActive       = true;
+	
+	private SlidingHandler tupleBasedSlidingHandler ;
+	
+	private SlidingHandler timeBasedSlidingHandler ;
+	
+	private HashMap<Class, SlidingHandler> slidingHandlers = new HashMap<Class, SlidingHandler>();
 
 	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
 	/**
@@ -33,10 +47,30 @@ public abstract class AbstractWrapper extends Thread {
 	 * @throws SQLException 
 	 */
 	public void addListener ( StreamSource ss ) throws SQLException {
-		getStorageManager( ).executeCreateView( ss.getUIDStr() , ss.toSql() );
+		if(WindowType.isTimeBased(ss.getWindowingType())){
+			if(timeBasedSlidingHandler == null){
+				timeBasedSlidingHandler = isUsingSystemTimestamp() ? new LocalTimeBasedSlidingHandler(this) : new RemoteTimeBasedSlidingHandler(this);
+				addSlidingHandler(timeBasedSlidingHandler);
+			}
+		}
+		else{
+			if(tupleBasedSlidingHandler == null)
+				tupleBasedSlidingHandler = new TupleBasedSlidingHandler(this);
+			addSlidingHandler(tupleBasedSlidingHandler);
+		}
+		
+		for (SlidingHandler slidingHandler : slidingHandlers.values()) {
+			if(slidingHandler.isInterestingIn(ss))
+				slidingHandler.addStreamSource(ss);
+		}
+		
 		listeners.add(ss);
 		if (logger.isDebugEnabled())
 			logger.debug("Adding listeners: "+ss.toString());
+	}
+	
+	public void addSlidingHandler(SlidingHandler slidingHandler){
+		slidingHandlers.put(slidingHandler.getClass(), slidingHandler);
 	}
 
 	/**
@@ -45,7 +79,11 @@ public abstract class AbstractWrapper extends Thread {
 	 */
 	public void removeListener ( StreamSource ss ) throws SQLException {
 		listeners.remove( ss );
-		getStorageManager( ).executeDropView( ss.getUIDStr() );
+//		getStorageManager( ).executeDropView( ss.getUIDStr() );
+		for (SlidingHandler slidingHandler : slidingHandlers.values()) {
+			if(slidingHandler.isInterestingIn(ss))
+				slidingHandler.removeStreamSource(ss);
+		}
 		if (listeners.size()==0) 
 			releaseResources();
 	}
@@ -138,21 +176,15 @@ public abstract class AbstractWrapper extends Thread {
 			if (!insertIntoWrapperTable(streamElement))
 				return false;
 			boolean toReturn = false;
-			synchronized ( listeners ) {
-				if (logger.isDebugEnabled()) logger.debug("Size of the listeners to be evaluated - "+listeners.size() );
-				for (  StreamSource ss: listeners ) {
-					if( getStorageManager( ).isThereAnyResult( new StringBuilder("select * from ").append(ss.getUIDStr()) )) {
-						if ( logger.isDebugEnabled() ) logger.debug( getWrapperName()+ " - Output stream produced/received from a wrapper "+ss.toString() );
-						try {
-							ss.dataAvailable( );
-						} catch (SQLException e) {
-							logger.error(e.getMessage(),e);
-							return false;
-						}
-						toReturn=true;
-					}
-				}
+			
+			if (logger.isDebugEnabled()) logger.debug("Size of the listeners to be evaluated - "+listeners.size() );
+			
+			for (SlidingHandler slidingHandler : slidingHandlers.values()) {
+				toReturn = slidingHandler.dataAvailable(streamElement);
+				if(toReturn == false)
+					return false;
 			}
+
 			if (++noOfCallsToPostSE%GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS==0) {
 				int removedRaws = removeUselessValues();
 			}
@@ -206,38 +238,22 @@ public abstract class AbstractWrapper extends Thread {
 	 *
 	 */
 	public StringBuilder getUselessWindow() {
-		int maxCountSize = -1;
-		int maxTimeSizeInMSec = -1;
-		synchronized (listeners) {
-			for (StreamSource ss:listeners)
-				if (ss.isStorageCountBased())
-					maxCountSize=Math.max(maxCountSize, ss.getParsedStorageSize());
-				else
-					maxTimeSizeInMSec=Math.max(maxTimeSizeInMSec,ss.getParsedStorageSize());
-		}
-		if (maxCountSize<=0 && maxTimeSizeInMSec<=0)
-			return null;
-		StringBuilder sb = new StringBuilder("delete from ").append(getDBAliasInStr()).append(" where " );
-		if (maxTimeSizeInMSec>0) {
-			sb.append(" timed < (");
-			if (StorageManager.isHsql())
-				sb.append("NOW_MILLIS() - ");
-			else if (StorageManager.isMysqlDB())
-				sb.append("UNIX_TIMESTAMP()*1000 - ");
-			else if (StorageManager.isSqlServer())
-				sb.append("(convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 ) - ");
-			sb.append(maxTimeSizeInMSec).append(" )");
-		}
-		if (maxCountSize>0 && maxTimeSizeInMSec>0)
-			sb.append(" AND ");
-		if (maxCountSize>0 ) {
-			if (StorageManager.isHsql()|| StorageManager.isMysqlDB()) {
-			sb.append(" timed < (select min(timed) from (select timed from ").append(getDBAliasInStr());
-			sb.append(" order by timed desc limit 1 offset ").append(maxCountSize).append(" ) as X )");
-			}else if (StorageManager.isSqlServer()) {
-				sb.append(" timed < (select min(timed) from (select top " ).append(maxCountSize).append(" * ").append(" from ").append(getDBAliasInStr()).append(")as x ) ");
+		long minTimed = -1;
+		synchronized (slidingHandlers) {
+			for (SlidingHandler slidingHandler : slidingHandlers.values()) {
+				long  timed = slidingHandler.getOldestTimestamp();
+				logger.debug("***** Oldest timestamp : " + timed);
+				if( timed != -1 )
+					minTimed = (minTimed != -1) ? Math.min(minTimed, timed) : timed; 
 			}
 		}
+
+		logger.debug("Oldest timestamp : " + minTimed);
+		
+		if (minTimed == -1)
+			return null;
+		StringBuilder sb = new StringBuilder("delete from ").append(getDBAliasInStr()).append(" where " );
+		sb.append(" timed < ").append(minTimed);
 		return sb;
 	}
 
@@ -255,13 +271,9 @@ public abstract class AbstractWrapper extends Thread {
 		isActive = false;
 		finalize();
 		if ( logger.isInfoEnabled() ) logger.info( "Finalized called" );
-		synchronized ( listeners ) {
-			Iterator<StreamSource> list =listeners.iterator();
-			while (list.hasNext()) {
-				StreamSource ss = list.next();
-				getStorageManager( ).executeDropView( ss.getUIDStr() );
-				list.remove();
-			}
+		listeners.clear();
+		for(SlidingHandler slidingHandler : slidingHandlers.values()){
+			slidingHandler.finilize();
 		}
 		getStorageManager( ).executeDropTable( aliasCodeS );
 	}
@@ -285,6 +297,15 @@ public abstract class AbstractWrapper extends Thread {
 
 	public abstract String getWrapperName ( );
 
-
+	/**
+	 * Indicates whether we use GSN's time (local time) or the time already exists in
+	 * the data (remote time) for the timestamp of generated stream elements. By default it returns true, please override 
+	 * it to return false if your wrapper uses remote time. 
+	 * @return <code>true</code> if we use local time <br>
+	 *          <code>false</code> if we use remote time
+	 */
+	public boolean isUsingSystemTimestamp(){
+		return true;
+	}
 
 }

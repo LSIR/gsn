@@ -44,7 +44,7 @@ public final class AddressBean implements Serializable{
   public String getPredicateValue ( String key ) {
     key = key.trim( );
     for (  KeyValue predicate : this.predicates ) {
-      logger.fatal(predicate.getKey()+" --- " +predicate.getValue());
+//      logger.fatal(predicate.getKey()+" --- " +predicate.getValue());
       if ( predicate.getKey( ).toString( ).trim( ).equalsIgnoreCase( key ) ) return ( ( String ) predicate.getValue( ));
     }
     return null;
