@@ -39,6 +39,8 @@ public abstract class AbstractWrapper extends Thread {
 	private SlidingHandler timeBasedSlidingHandler ;
 	
 	private HashMap<Class, SlidingHandler> slidingHandlers = new HashMap<Class, SlidingHandler>();
+	
+	private boolean usingRemoteTimestamp = false;
 
 	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
 	/**
@@ -49,7 +51,7 @@ public abstract class AbstractWrapper extends Thread {
 	public void addListener ( StreamSource ss ) throws SQLException {
 		if(WindowType.isTimeBased(ss.getWindowingType())){
 			if(timeBasedSlidingHandler == null){
-				timeBasedSlidingHandler = isUsingSystemTimestamp() ? new LocalTimeBasedSlidingHandler(this) : new RemoteTimeBasedSlidingHandler(this);
+				timeBasedSlidingHandler = isUsingRemoteTimestamp() == false ? new LocalTimeBasedSlidingHandler(this) : new RemoteTimeBasedSlidingHandler(this);
 				addSlidingHandler(timeBasedSlidingHandler);
 			}
 		}
@@ -180,9 +182,7 @@ public abstract class AbstractWrapper extends Thread {
 			if (logger.isDebugEnabled()) logger.debug("Size of the listeners to be evaluated - "+listeners.size() );
 			
 			for (SlidingHandler slidingHandler : slidingHandlers.values()) {
-				toReturn = slidingHandler.dataAvailable(streamElement);
-				if(toReturn == false)
-					return false;
+				toReturn = toReturn || slidingHandler.dataAvailable(streamElement);
 			}
 
 			if (++noOfCallsToPostSE%GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS==0) {
@@ -299,13 +299,19 @@ public abstract class AbstractWrapper extends Thread {
 
 	/**
 	 * Indicates whether we use GSN's time (local time) or the time already exists in
-	 * the data (remote time) for the timestamp of generated stream elements. By default it returns true, please override 
-	 * it to return false if your wrapper uses remote time. 
-	 * @return <code>true</code> if we use local time <br>
-	 *          <code>false</code> if we use remote time
+	 * the data (remote time) for the timestamp of generated stream elements.
+	 * @return <code>false</code> if we use local time <br>
+	 *          <code>true</code> if we use remote time
 	 */
-	public boolean isUsingSystemTimestamp(){
-		return true;
+	protected boolean isUsingRemoteTimestamp(){
+		return usingRemoteTimestamp;
 	}
 
+	/**
+	 * 
+	 * @param usingRemoteTimestamp
+	 */
+	protected void setUsingRemoteTimestamp(boolean usingRemoteTimestamp){
+		this.usingRemoteTimestamp = usingRemoteTimestamp;
+	}
 }

@@ -8,6 +8,7 @@ import gsn.beans.StreamElement;
 import gsn.utils.GSNRuntimeException;
 import gsn.utils.ValidityTools;
 import java.io.Serializable;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -981,22 +982,23 @@ public class StorageManager {
 	 * @return
 	 */
 	public long getTimeDifferenceInMillis(){
-		StringBuilder query = new StringBuilder("select ");
+		StringBuilder query = new StringBuilder();
 		if (StorageManager.isHsql())
-			query.append(" NOW_MILLIS()");
+			query.append("call NOW_MILLIS()");
 		else if (StorageManager.isMysqlDB())
-			query.append(" UNIX_TIMESTAMP()*1000");
+			query.append("select  UNIX_TIMESTAMP()*1000");
 		else if (StorageManager.isSqlServer()) {
-			query.append(" convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 ");
+			query.append("select convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 ");
 		}
 		PreparedStatement prepareStatement = null;
 		try {
 			prepareStatement = getConnection().prepareStatement(query.toString());
 			long time1 = System.currentTimeMillis();
-			ResultSet resultSet = prepareStatement.executeQuery();
+			ResultSet resultSet;
+			resultSet = prepareStatement.executeQuery();
 			resultSet.next();
 			long time2 = System.currentTimeMillis();
-			return resultSet.getLong(1) -  time2 + (time2 - time1) / 2;
+			return resultSet.getLong(1) - time2 + (time2 - time1) / 2;
 		} catch (SQLException error) {
 			logger.error(error.getMessage(), error);
 		} finally {

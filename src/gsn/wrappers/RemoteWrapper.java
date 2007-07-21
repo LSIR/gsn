@@ -7,10 +7,12 @@ import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -80,6 +82,7 @@ public class RemoteWrapper extends AbstractWrapper {
 			return false;
 		}
 		Mappings.getContainer ( ).addRemoteStreamSource ( getDBAlias ( ) , this );
+		setUsingRemoteTimestamp(true);
 		return true;
 	}
 

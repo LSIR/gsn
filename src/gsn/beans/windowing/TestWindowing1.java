@@ -204,10 +204,11 @@ public class TestWindowing1 {
 		assertTrue(((SQLViewQueryRewriter) ss.getQueryRewriter()).createViewSQL().toString().toLowerCase().indexOf("mod") < 0);
 		StringBuilder query = new StringBuilder(((SQLViewQueryRewriter) ss.getQueryRewriter()).createViewSQL());
 
+		print(query.toString());
+		
 		long time = System.currentTimeMillis();
 		wrapper.postStreamElement(createStreamElement(time));
 		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query);
-		assertTrue(rs.next());
 		assertFalse(rs.next());
 
 		StringBuilder vsQuery = new StringBuilder("select * from ").append(config.getName());
@@ -221,13 +222,14 @@ public class TestWindowing1 {
 		wrapper.postStreamElement(createStreamElement(time1));
 		long time2 = time + 100;
 		wrapper.postStreamElement(createStreamElement(time2));
-		print(query.toString());
+		
 		DataEnumerator dm = sm.executeQuery(query, true);
 		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
 		assertNotNull(rs);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
+		
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), time2);
 		assertTrue(dm.hasMoreElements());

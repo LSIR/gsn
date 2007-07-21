@@ -59,6 +59,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
     if(maximumDelay > 0){
     	streamElementBuffer = SynchronizedBuffer.decorate(new UnboundedFifoBuffer());
     	delayPostingElements = true;
+    	setUsingRemoteTimestamp(true);
     }
     return true;
   }
@@ -120,10 +121,5 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
     return timer.getDelay();
   }
 
-  @Override
-  public boolean isUsingSystemTimestamp() {
-	  return false;
-  }
-  
   
 }

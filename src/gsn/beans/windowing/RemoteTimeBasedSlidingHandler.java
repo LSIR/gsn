@@ -45,10 +45,11 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 	}
 
 	public boolean dataAvailable(StreamElement streamElement) {
+		boolean toReturn = false;
 		synchronized (streamSources) {
 			for (StreamSource streamSource : streamSources) {
 				if (streamSource.getWindowingType() == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE)
-					streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
+					toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
 				else {
 					long nextSlide = slidingHashMap.get(streamSource);
 					// this is the first stream element
@@ -60,18 +61,20 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 					} else {
 						long timeStamp = streamElement.getTimeStamp();
 						if (nextSlide <= timeStamp) {
-//							long timestampDiff = timeStamp - nextSlide;
-//							int slideValue = streamSource.getParsedSlideValue();
-//							nextSlide = nextSlide + (timestampDiff / slideValue + 1) * slideValue;
+							// long timestampDiff = timeStamp - nextSlide;
+							// int slideValue =
+							// streamSource.getParsedSlideValue();
+							// nextSlide = nextSlide + (timestampDiff /
+							// slideValue + 1) * slideValue;
 							nextSlide = timeStamp + streamSource.getParsedSlideValue();
-							streamSource.getQueryRewriter().dataAvailable(timeStamp);
+							toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(timeStamp);
 							slidingHashMap.put(streamSource, nextSlide);
 						}
 					}
 				}
 			}
 		}
-		return true;
+		return toReturn;
 	}
 
 	public void removeStreamSource(StreamSource streamSource) {
@@ -129,9 +132,9 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 		if (maxTupleCount > 0) {
 			StringBuilder query = new StringBuilder();
 			if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
-				query.append(" select min(timed) from (select timed from ").append(wrapper.getDBAliasInStr()).append(" where timed <= ");
+				query.append(" select timed from ").append(wrapper.getDBAliasInStr()).append(" where timed <= ");
 				query.append(System.currentTimeMillis() - maxSlideForTupleBased).append(" order by timed desc limit 1 offset ").append(
-						maxTupleCount).append(") as X ");
+						maxTupleCount - 1);
 			} else if (StorageManager.isSqlServer()) {
 				query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
 						wrapper.getDBAliasInStr()).append(" where timed <= ").append(System.currentTimeMillis() - maxSlideForTupleBased)
@@ -207,13 +210,18 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 					if (StorageManager.isHsql() || StorageManager.isMysqlDB())
 						toReturn.append(" order by timed desc ");
 				} else {// WindowType.TUPLE_BASED_WIN_TIME_BASED_SLIDE
-					if (StorageManager.isHsql() || StorageManager.isMysqlDB())
+					if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
 						toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
-								" where UID='").append(streamSource.getUIDStr()).append("') order by timed desc limit ").append(windowSize);
-					else if (StorageManager.isSqlServer())
+								" where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
+						toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");
+						toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr());
+						toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" )");
+						toReturn.append(" order by timed desc ");
+					} else if (StorageManager.isSqlServer()) {
 						toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(
 								" where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE)
 								.append(" where UID='").append(streamSource.getUIDStr()).append("') order by timed desc ) ");
+					}
 				}
 			}
 

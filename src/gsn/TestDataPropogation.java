@@ -4,7 +4,10 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.verify;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.InputStream;
@@ -12,10 +15,12 @@ import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.storage.StorageManager;
 import gsn.wrappers.MockWrapper;
+
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.After;
 import org.junit.AfterClass;

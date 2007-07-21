@@ -1,6 +1,5 @@
 package gsn.beans.windowing;
 
-import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.storage.SQLUtils;

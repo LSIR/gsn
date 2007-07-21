@@ -105,11 +105,11 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 	}
 
 	public boolean dataAvailable(StreamElement streamElement) {
-		boolean toReturn = true;
+		boolean toReturn = false;
 		synchronized (streamSources) {
 			for (StreamSource streamSource : streamSources) {
 				if (streamSource.getWindowingType() == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE)
-					streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
+					toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
 			}
 		}
 		return toReturn;
@@ -140,9 +140,9 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 		if (maxTupleCount > 0) {
 			StringBuilder query = new StringBuilder();
 			if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
-				query.append(" select min(timed) from (select timed from ").append(wrapper.getDBAliasInStr()).append(" where timed <= ");
+				query.append(" select timed from ").append(wrapper.getDBAliasInStr()).append(" where timed <= ");
 				query.append(System.currentTimeMillis() - maxSlideForTupleBased).append(" order by timed desc limit 1 offset ").append(
-						maxTupleCount).append(") as X ");
+						maxTupleCount - 1);
 			} else if (StorageManager.isSqlServer()) {
 				query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
 						wrapper.getDBAliasInStr()).append(" where timed <= ").append(System.currentTimeMillis() - maxSlideForTupleBased)
@@ -254,7 +254,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 
 			WindowType windowingType = streamSource.getWindowingType();
 			if (windowingType == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE) {
-				
+
 				toReturn.append("(wrapper.timed >");
 				if (StorageManager.isHsql())
 					toReturn.append(" (NOW_MILLIS()");
@@ -267,32 +267,37 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 					// checking.
 					toReturn.append(" (convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 )");
 				}
-				
+
 				long timeDifferenceInMillis = storageManager.getTimeDifferenceInMillis();
 				// System.out.println(timeDifferenceInMillis);
 				toReturn.append(" - ").append(windowSize).append(" - ").append(timeDifferenceInMillis).append(" )");
 				if (StorageManager.isHsql() || StorageManager.isMysqlDB())
 					toReturn.append(") order by timed desc ");
-				
+
 			} else {
 				if (windowingType == WindowType.TIME_BASED) {
-					
+
 					toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ")
 							.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr()).append(
 									"') and timed >= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
 									" where UID='").append(streamSource.getUIDStr()).append("') - ").append(windowSize).append(" ) ");
 					if (StorageManager.isHsql() || StorageManager.isMysqlDB())
 						toReturn.append(" order by timed desc ");
-					
+
 				} else {// WindowType.TUPLE_BASED_WIN_TIME_BASED_SLIDE
-					
-					if (StorageManager.isHsql() || StorageManager.isMysqlDB())
+
+					if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
 						toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
-								" where UID='").append(streamSource.getUIDStr()).append("') order by timed desc limit ").append(windowSize);
-					else if (StorageManager.isSqlServer())
+								" where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
+						toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");
+						toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr());
+						toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" )");
+						toReturn.append(" order by timed desc ");
+					} else if (StorageManager.isSqlServer()) {
 						toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(
 								" where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE)
 								.append(" where UID='").append(streamSource.getUIDStr()).append("') order by timed desc ) ");
+					}
 				}
 			}
 

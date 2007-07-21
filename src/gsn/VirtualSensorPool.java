@@ -6,6 +6,7 @@ import gsn.storage.StorageManager;
 import gsn.vsensor.AbstractVirtualSensor;
 
 import java.io.File;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -129,28 +130,33 @@ public class VirtualSensorPool {
 	public StringBuilder uselessDataRemovalQuery() {
 		String virtualSensorName = config.getName( );
 		StringBuilder query = null;
-		if ( StorageManager.isHsql( ) ) {
-			if ( config.isStorageCountBased( ) )
+		if ( config.isStorageCountBased( ) ){
+			if ( StorageManager.isHsql( ) ) {
 				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed not in ( select " ).append(
 						virtualSensorName ).append( ".timed from " ).append( virtualSensorName ).append( " order by " ).append( virtualSensorName ).append( ".timed DESC  LIMIT  " ).append(
 								config.getParsedStorageSize( ) ).append( " offset 0 )" );
-			else
-				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (NOW_MILLIS() -" ).append(
-						config.getParsedStorageSize( ) ).append( ")" );
-		} else if ( StorageManager.isMysqlDB( ) ) {
-			if ( config.isStorageCountBased( ) )
-				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed <= ( SELECT * FROM ( SELECT timed FROM " )
-				.append( virtualSensorName ).append( " group by " ).append( virtualSensorName ).append( ".timed ORDER BY " ).append( virtualSensorName ).append( ".timed DESC LIMIT 1 offset " )
-				.append( config.getParsedStorageSize( ) ).append( "  ) AS TMP)" );
-			else
-				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (UNIX_TIMESTAMP()*1000 -" ).append(
-						config.getParsedStorageSize( ) ).append( ")" );
-		}else if (StorageManager.isSqlServer()) {
-			if ( config.isStorageCountBased( ) )
-				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (select min(timed) from (select top " ).append(config.getParsedStorageSize()).append(" * ").append(" from ").append(virtualSensorName).append(")as x ) ");
-			else
-				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed <  (convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 -" ).append(
-						config.getParsedStorageSize( ) ).append( ")" );
+
+			} else if ( StorageManager.isMysqlDB( ) ) {
+				if ( config.isStorageCountBased( ) )
+					query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed <= ( SELECT * FROM ( SELECT timed FROM " )
+					.append( virtualSensorName ).append( " group by " ).append( virtualSensorName ).append( ".timed ORDER BY " ).append( virtualSensorName ).append( ".timed DESC LIMIT 1 offset " )
+					.append( config.getParsedStorageSize( ) ).append( "  ) AS TMP)" );
+			}else if (StorageManager.isSqlServer()) {
+				if ( config.isStorageCountBased( ) )
+					query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < (select min(timed) from (select top " ).append(config.getParsedStorageSize()).append(
+					" * ").append(" from ").append(virtualSensorName).append(" order by ").append(virtualSensorName).append(".timed DESC ) as x ) ");
+			}
+		}else{
+			long timedToRemove = -1;
+			try {
+				ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName));
+				if(rs.next())
+					timedToRemove = rs.getLong(1);
+			} catch (SQLException e) {
+				logger.error(e.getMessage(), e);
+			}
+			query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < " ).append(timedToRemove);
+			query.append(" - ").append(config.getParsedStorageSize( ) );
 		}
 		if ( logger.isDebugEnabled( ) ) this.logger.debug( new StringBuilder( ).append( "Enforcing the limit size on the VS table by : " ).append( query ).toString( ) );
 		return query;

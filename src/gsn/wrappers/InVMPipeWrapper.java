@@ -46,6 +46,7 @@ public class InVMPipeWrapper extends AbstractWrapper {
       logger.warn( "The Requested virtual sensor is not available (or not loaded yet), initialization failed !" );
       return false;
     }
+    setUsingRemoteTimestamp(true);
     return true;
   }
   

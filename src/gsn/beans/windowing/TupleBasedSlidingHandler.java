@@ -46,15 +46,15 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 	}
 
 	public boolean dataAvailable(StreamElement streamElement) {
-		boolean toReturn = true;
+		boolean toReturn = false;
 		synchronized (streamSources) {
 			for (StreamSource streamSource : streamSources) {
 				if (streamSource.getWindowingType() == WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE)
-					streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
+					toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
 				else {
 					int slideVar = slidingHashMap.get(streamSource) + 1;
 					if (slideVar == streamSource.getParsedSlideValue()) {
-						streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
+						toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
 						slideVar = 0;
 					}
 					slidingHashMap.put(streamSource, slideVar);
@@ -86,8 +86,8 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 		if (maxTupleCount > 0) {
 			StringBuilder query = new StringBuilder();
 			if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
-				query.append(" select min(timed) from (select timed from ").append(wrapper.getDBAliasInStr());
-				query.append(" order by timed desc limit 1 offset ").append(maxTupleCount).append(") as X");
+				query.append(" select timed from ").append(wrapper.getDBAliasInStr());
+				query.append(" order by timed desc limit 1 offset ").append(maxTupleCount - 1);
 			} else if (StorageManager.isSqlServer()) {
 				query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
 						wrapper.getDBAliasInStr()).append(" order by timed desc )as X  ");
@@ -107,9 +107,9 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 		if (maxWindowSize > 0) {
 			StringBuilder query = new StringBuilder();
 			if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
-				query.append(" select min(timed) - ").append(maxWindowSize).append(" from (select timed from ").append(
+				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from ").append(
 						wrapper.getDBAliasInStr());
-				query.append(" order by timed desc limit 1 offset ").append(maxTupleForTimeBased).append(" ) as X ");
+				query.append(" order by timed desc limit 1 offset ").append(maxTupleForTimeBased - 1).append(" ) as X ");
 			} else if (StorageManager.isSqlServer()) {
 				query.append(" select min(timed) - ").append(maxWindowSize).append(" from (select top ").append(maxTupleForTimeBased)
 						.append(" * ").append(" from ").append(wrapper.getDBAliasInStr()).append(" order by timed desc ) as X  ");
@@ -187,29 +187,33 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			WindowType windowingType = streamSource.getWindowingType();
 			if (windowingType == WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE) {
 				if (StorageManager.isHsql() || StorageManager.isMysqlDB())
-					toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='")
-							.append(streamSource.getUIDStr()).append("') order by timed desc limit ").append(windowSize);
+					toReturn.append("timed >= (select timed from ").append(wrapperAlias).append(
+							" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ) order by timed desc ");
 				else if (StorageManager.isSqlServer())
-					toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(
-							" where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='")
-							.append(streamSource.getUIDStr()).append("') order by timed desc )  ");
+					toReturn.append("timed >= (select min(timed) from (select TOP ").append(windowSize).append(
+							" timed from ").append(wrapperAlias)
+							.append(" order by timed desc ) as y )");
 			} else {
 				if (windowingType == WindowType.TUPLE_BASED) {
-					if (StorageManager.isHsql() || StorageManager.isMysqlDB())
+					if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
 						toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
-								" where UID='").append(streamSource.getUIDStr()).append("') order by timed desc limit ").append(windowSize);
-					else if (StorageManager.isSqlServer())
+								" where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
+						toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");
+						toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr());
+						toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" )");
+						toReturn.append(" order by timed desc ");
+					} else if (StorageManager.isSqlServer()) {
 						toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(
 								" where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE)
 								.append(" where UID='").append(streamSource.getUIDStr()).append("') order by timed desc) ");
+					}
 				} else { // WindowType.TIME_BASED_WIN_TUPLE_BASED_SLIDE
 					toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ")
 							.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr()).append(
 									"') and timed >= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
-									" where UID='").append(streamSource.getUIDStr()).append("') - ").append(windowSize).append(
-									" ) ");
-					if(StorageManager.isHsql() || StorageManager.isMysqlDB())
-						 toReturn.append(" order by timed desc ");
+									" where UID='").append(streamSource.getUIDStr()).append("') - ").append(windowSize).append(" ) ");
+					if (StorageManager.isHsql() || StorageManager.isMysqlDB())
+						toReturn.append(" order by timed desc ");
 				}
 			}
 
