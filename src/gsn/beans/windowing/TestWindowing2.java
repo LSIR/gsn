@@ -47,6 +47,7 @@ public class TestWindowing2 {
 
 		@Override
 		public boolean initialize() {
+			setUsingRemoteTimestamp(true);
 			return true;
 		}
 
@@ -54,12 +55,7 @@ public class TestWindowing2 {
 		public Boolean postStreamElement(StreamElement streamElement) {
 			return super.postStreamElement(streamElement);
 		}
-
-		@Override
-		public boolean isUsingSystemTimestamp() {
-			return false;
-		}
-		
+	
 	}
 
 	private WrapperForTest2 wrapper = new WrapperForTest2();
