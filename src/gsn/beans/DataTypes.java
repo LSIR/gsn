@@ -57,11 +57,11 @@ public class DataTypes {
    public final static String            DOUBLE_NAME               = "Double";
    
    // NEXT FIELD
-   public final static String            TIME_PATTERN_STRING       = "\\s*TIME\\s*";
-   
-   public final static byte               TIME                      = 6;
-   
-   public final static String            TIME_NAME                 = "Time";
+//   public final static String            TIME_PATTERN_STRING       = "\\s*TIME\\s*";
+//   
+//   public final static byte               TIME                      = 6;
+//   
+//   public final static String            TIME_NAME                 = "Time";
    
    // NEXT FIELD
    public final static String            TINYINT_PATTERN_STRING    = "\\s*TINYINT\\s*";
@@ -81,12 +81,15 @@ public class DataTypes {
    public final static Pattern [ ]       ALL_PATTERNS              = new Pattern [ ] { Pattern.compile( VAR_CHAR_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( CHAR_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( INTEGER_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( BIGINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( BINARY_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
-         Pattern.compile( DOUBLE_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( TIME_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
+         Pattern.compile( DOUBLE_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
+//         Pattern.compile( TIME_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( TINYINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( SMALLINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) };
    
    public final static StringBuilder     ERROR_MESSAGE             = new StringBuilder( "Acceptable types are (TINYINT, SMALLINT, INTEGER,BIGINT,CHAR(#),BINARY[(#)],VARCHAR(#),DOUBLE,TIME)." );
    
-   public final static String [ ]        TYPE_NAMES                = new String [ ] { VARCHAR_NAME , CHAR_NAME , INTEGER_NAME , BIGINT_NAME , BINARY_NAME , DOUBLE_NAME , TIME_NAME , TINYINT_NAME ,
+   public final static String [ ]        TYPE_NAMES                = new String [ ] { VARCHAR_NAME , CHAR_NAME , INTEGER_NAME , BIGINT_NAME , BINARY_NAME , DOUBLE_NAME , 
+//     TIME_NAME ,
+     TINYINT_NAME ,
          SMALLINT_NAME                                            };
    
    public final static Object [ ]        TYPE_SAMPLE_VALUES        = { "A chain of chars" , 'c' , new Integer( 32 ) , new Integer( 66000 ) , new Byte( ( byte ) 12 ) , new Double( 3.141592 ) ,
@@ -113,8 +116,8 @@ public class DataTypes {
             return VARCHAR;
          case Types.CHAR :
             return CHAR;
-         case Types.TIME :
-            return TIME;
+//         case Types.TIME :
+//            return TIME;
          case Types.DOUBLE :
          case Types.DECIMAL:	// This is needed for doing aggregates in datadownload servlet.
             return DOUBLE;

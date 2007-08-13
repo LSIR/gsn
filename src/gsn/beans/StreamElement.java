@@ -41,14 +41,13 @@ public final class StreamElement implements Serializable {
       this.fieldTypes = new Byte [ outputStructure.length ];
       this.timeStamp = timeStamp;
       
-      for ( byte i = 0 ; i < this.fieldNames.length ; i++ ) {
+      for ( int i = 0 ; i < this.fieldNames.length ; i++ ) {
          this.fieldNames[ i ] = outputStructure[ i ].getName( ).toLowerCase( );
          this.fieldTypes[ i ] = outputStructure[ i ].getDataTypeID( );
       }
       if ( this.fieldNames.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
       this.verifyTypesCompatibility( this.fieldTypes , data );
       this.fieldValues = data;
-      
    }
    
    public StreamElement ( final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data ) {
@@ -197,9 +196,9 @@ public final class StreamElement implements Serializable {
                toReturn[ i ] = fieldValues[ i ];
                break;
             case DataTypes.BIGINT :
-            case DataTypes.TIME :
-               toReturn[ i ] = Long.toString( ( Long ) fieldValues[ i ] );
-               break;
+//            case DataTypes.TIME :
+//               toReturn[ i ] = Long.toString( ( Long ) fieldValues[ i ] );
+//               break;
             case DataTypes.TINYINT :
             case DataTypes.SMALLINT :
             case DataTypes.INTEGER :
@@ -226,9 +225,9 @@ public final class StreamElement implements Serializable {
                values[ i ] = ( Double ) fieldValues[ i ];
                break;
             case DataTypes.BIGINT :
-            case DataTypes.TIME :
-               values[ i ] = Long.parseLong( ( String ) fieldValues[ i ] );
-               break;
+//            case DataTypes.TIME :
+//               values[ i ] = Long.parseLong( ( String ) fieldValues[ i ] );
+//               break;
             case DataTypes.TINYINT :
                values[ i ] = Byte.parseByte( ( String ) fieldValues[ i ] );
                break;
