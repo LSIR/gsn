@@ -305,7 +305,7 @@ font-weight:bold;
 	padding:0;
 	margin:0;
 	padding-right:5px;
-	width:100px;
+	min-width:100px;
 	height:1.3em;
 	text-align:right;
 }
