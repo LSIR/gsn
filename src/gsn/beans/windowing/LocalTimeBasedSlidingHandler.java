@@ -109,7 +109,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 		synchronized (streamSources) {
 			for (StreamSource streamSource : streamSources) {
 				if (streamSource.getWindowingType() == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE)
-					toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
+					toReturn = streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp()) || toReturn;
 			}
 		}
 		return toReturn;

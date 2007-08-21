@@ -50,11 +50,11 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 		synchronized (streamSources) {
 			for (StreamSource streamSource : streamSources) {
 				if (streamSource.getWindowingType() == WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE)
-					toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
+					toReturn = streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp()) || toReturn;
 				else {
 					int slideVar = slidingHashMap.get(streamSource) + 1;
 					if (slideVar == streamSource.getParsedSlideValue()) {
-						toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
+						toReturn = streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp()) || toReturn;
 						slideVar = 0;
 					}
 					slidingHashMap.put(streamSource, slideVar);

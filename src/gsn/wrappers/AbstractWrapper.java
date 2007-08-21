@@ -182,7 +182,7 @@ public abstract class AbstractWrapper extends Thread {
 			if (logger.isDebugEnabled()) logger.debug("Size of the listeners to be evaluated - "+listeners.size() );
 			
 			for (SlidingHandler slidingHandler : slidingHandlers.values()) {
-				toReturn = toReturn || slidingHandler.dataAvailable(streamElement);
+				toReturn = slidingHandler.dataAvailable(streamElement) || toReturn;
 			}
 
 			if (++noOfCallsToPostSE%GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS==0) {

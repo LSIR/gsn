@@ -49,7 +49,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 		synchronized (streamSources) {
 			for (StreamSource streamSource : streamSources) {
 				if (streamSource.getWindowingType() == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE)
-					toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp());
+					toReturn = streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp()) || toReturn;
 				else {
 					long nextSlide = slidingHashMap.get(streamSource);
 					// this is the first stream element
@@ -67,7 +67,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 							// nextSlide = nextSlide + (timestampDiff /
 							// slideValue + 1) * slideValue;
 							nextSlide = timeStamp + streamSource.getParsedSlideValue();
-							toReturn = toReturn || streamSource.getQueryRewriter().dataAvailable(timeStamp);
+							toReturn = streamSource.getQueryRewriter().dataAvailable(timeStamp) || toReturn;
 							slidingHashMap.put(streamSource, nextSlide);
 						}
 					}

@@ -71,7 +71,7 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
 	@Override
 	public boolean dataAvailable(long timestamp) {
 		try {
-			//TODO : use preparedStatement instead of creating a new query each time
+			//TODO : use prepareStatement instead of creating a new query each time
 			StringBuilder query = new StringBuilder("update ").append(VIEW_HELPER_TABLE);
 			query.append(" set timed=").append(timestamp).append(" where UID='").append(streamSource.getUIDStr());
 			query.append("' ");
