@@ -46,9 +46,7 @@ public class SensorScopeWrapper extends AbstractWrapper implements MessageListen
          logger.warn( "The >port< parameter is not a valid integer for the RemoteWrapper wrapper." );
          return false;
       }
-      if ( logger.isDebugEnabled( ) ) {
-         logger.debug( "The SFWrapperDS connects to the Serial Forwarder interface at *" + host + ":" + port + "*" );
-      }
+      logger.debug( "The SFWrapperDS trying to connect to the Serial Forwarder interface at *" + host + ":" + port + "*" );
       setName( "TinyOS2-SensorScope-Thread:" + ( ++threadCounter ) );
       try {
          PhoenixSource reader = BuildSource.makePhoenix( BuildSource.makeSF( host , port ) , null );
@@ -58,6 +56,7 @@ public class SensorScopeWrapper extends AbstractWrapper implements MessageListen
          logger.error( e.getMessage( ) , e );
          return false;
       }
+      logger.debug("SensorScopeWrapper initialization done successfully.");
       moteif.registerListener( new SensorScopeDataMsg( ) , this );
       return true;
    }
