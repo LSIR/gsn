@@ -95,12 +95,15 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query1 for getting oldest timestamp : " + query);
 			}
+			ResultSet resultSet = null;
 			try {
-				ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
+				 resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
 				if (resultSet.next())
 					timed1 = resultSet.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
+			}finally {
+			  StorageManager.close(resultSet);
 			}
 		}
 
@@ -117,13 +120,16 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query2 for getting oldest timestamp : " + query);
 			}
+			ResultSet resultSet = null ;
 			try {
-				ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
+				resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
 				if (resultSet.next())
 					timed2 = resultSet.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
-			}
+			}finally {
+        StorageManager.close(resultSet);
+      }
 		}
 
 		if (timed1 >= 0 && timed2 >= 0)

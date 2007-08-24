@@ -60,7 +60,7 @@
      
     <target name="build" depends="setup">
     	<javac debug="true" srcdir="${src.dir}" optimize="off"
-    			destdir="${build.dir}" failonerror="true" source="1.5" classpathref="classpath">
+    			destdir="${build.dir}" failonerror="true"  classpathref="classpath">
 					 <exclude name="**/TCPConnPool.java"/>
 					 <exclude name="**/NetworkUtility.java"/>
  

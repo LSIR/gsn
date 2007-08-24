@@ -125,12 +125,7 @@ public class StorageManager {
 				throw e;
 			}
 		} finally {
-			if (rs != null)
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					logger.error(e.getMessage(), e);
-				}
+			close(rs);
 		}
 		return true;
 	}
@@ -200,7 +195,7 @@ public class StorageManager {
 	public static void close(ResultSet resultSet) {
 		try {
 			if (resultSet != null)
-				resultSet.close();
+				resultSet.getStatement().close();
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -783,12 +778,12 @@ public class StorageManager {
 		DATABASE(String jdbcPrefix, String driver) {
 			this.jdbcPrefix = jdbcPrefix;
 			this.driver = driver;
-			try {
-				Class.forName(driver);
-			} catch (ClassNotFoundException e) {
-				logger.error("Error in loading the database driver. !");
-				logger.error(e.getMessage(), e);
-			}
+//			try {
+//				Class.forName(driver);
+//			} catch (ClassNotFoundException e) {
+//				logger.error("Error in loading the database driver. !");
+//				logger.error(e.getMessage(), e);
+//			}
 		}
 
 

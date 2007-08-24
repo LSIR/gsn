@@ -148,12 +148,15 @@ public class VirtualSensorPool {
 			}
 		}else{
 			long timedToRemove = -1;
+			ResultSet rs = null;
 			try {
-				ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName));
+				 rs = StorageManager.getInstance().executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName));
 				if(rs.next())
 					timedToRemove = rs.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
+			}finally {
+			  StorageManager.close(rs);
 			}
 			query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < " ).append(timedToRemove);
 			query.append(" - ").append(config.getParsedStorageSize( ) );

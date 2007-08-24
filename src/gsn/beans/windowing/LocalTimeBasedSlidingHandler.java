@@ -152,13 +152,15 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query for getting oldest timestamp : " + query);
 			}
-
+			ResultSet resultSet = null;
 			try {
-				ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
+			  resultSet= StorageManager.getInstance().executeQueryWithResultSet(query);
 				if (resultSet.next())
 					timed2 = resultSet.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
+			}finally {
+			  StorageManager.close(resultSet);
 			}
 		}
 

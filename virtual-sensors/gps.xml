@@ -3,11 +3,11 @@
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<init-params/>
  <web-input password="test">
-         <command name="ploppy">
-          <field name="plop1"    type="radio:apple|orange|banana" >one</field>
-          <field name="plop2"    type="*checkbox:apple|orange|banana" >two</field>
-          <field name="plop3"    type="select:apple|orange|banana" >three</field>          
-        </command>
+         <command name="ploppy">
+          <field name="plop1"    type="radio:apple|orange|banana" >one</field>
+          <field name="plop2"    type="*checkbox:apple|orange|banana" >two</field>
+          <field name="plop3"    type="select:apple|orange|banana" >three</field>          
+        </command>
          <command name="test">
           <field name="reset1"    type="byte" />
           <field name="reset2"    type="*binary:2mb" >Files Size of 2MB max, The * means optional.</field>

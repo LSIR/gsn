@@ -171,6 +171,7 @@ public final class Main {
 
 	private static void initialize ( String containerConfigurationFileName ) throws JiBXException , FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
 		containerConfig = loadConfiguration ( containerConfigurationFileName );
+		Class.forName(containerConfig.getJdbcDriver());
 		containerConfig.setContainerConfigurationFileName ( containerConfigurationFileName );
 		if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Loading wrappers.properties at : " ).append ( DEFAULT_WRAPPER_PROPERTIES_FILE ).toString ( ) );
 		Configuration config = null;
