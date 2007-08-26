@@ -11,8 +11,11 @@ import gsn.wrappers.AbstractWrapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -21,15 +24,15 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 
 	private static final transient Logger logger = Logger.getLogger(RemoteTimeBasedSlidingHandler.class);
 
-	private ArrayList<StreamSource> streamSources;
+	private List<StreamSource> streamSources;
 
-	private HashMap<StreamSource, Long> slidingHashMap;
+	private Map<StreamSource, Long> slidingHashMap;
 
 	private AbstractWrapper wrapper;
 
 	public RemoteTimeBasedSlidingHandler(AbstractWrapper wrapper) {
-		streamSources = new ArrayList<StreamSource>();
-		slidingHashMap = new HashMap<StreamSource, Long>();
+		streamSources = Collections.synchronizedList(new ArrayList<StreamSource>());
+		slidingHashMap = Collections.synchronizedMap(new HashMap<StreamSource, Long>());
 		this.wrapper = wrapper;
 	}
 
@@ -44,7 +47,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 		streamSources.add(streamSource);
 	}
 
-	public boolean dataAvailable(StreamElement streamElement) {
+	public synchronized boolean dataAvailable(StreamElement streamElement) {
 		boolean toReturn = false;
 		synchronized (streamSources) {
 			for (StreamSource streamSource : streamSources) {
@@ -122,13 +125,13 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 			}
 			ResultSet resultSet = null;
 			try {
-			  resultSet= StorageManager.getInstance().executeQueryWithResultSet(query);
+				resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
 				if (resultSet.next())
 					timed1 = resultSet.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
-			}finally {
-			  StorageManager.close(resultSet);
+			} finally {
+				StorageManager.close(resultSet);
 			}
 		}
 		if (maxTupleCount > 0) {
@@ -148,13 +151,13 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 			}
 			ResultSet resultSet = null;
 			try {
-				 resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
+				resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
 				if (resultSet.next())
 					timed2 = resultSet.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
-			}finally {
-			  StorageManager.close(resultSet);
+			} finally {
+				StorageManager.close(resultSet);
 			}
 		}
 

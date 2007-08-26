@@ -30,7 +30,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
   
   private static final int              DEFAULT_CLOCK_PERIODS     = 1 * 1000;
   
-  private static final int DEFAULT_MAX_DELAY = 10 * 1000;
+  private static final int DEFAULT_MAX_DELAY = -1;
   
   private String [ ]                    EMPTY_FIELD_LIST  = new String [ ] {};
   
@@ -60,6 +60,8 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
     	streamElementBuffer = SynchronizedBuffer.decorate(new UnboundedFifoBuffer());
     	delayPostingElements = true;
     	setUsingRemoteTimestamp(true);
+    	if(timer.getDelay() < maximumDelay)
+    		logger.warn("Maximum delay is greater than element production interval. Running for a long time may lead to an OutOfMemoryException" );
     }
     return true;
   }
@@ -67,6 +69,8 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
   public void run ( ) {
     timer.start( );
     if(delayPostingElements){
+    	if(logger.isDebugEnabled())
+    		logger.warn("Starting <" + getWrapperName() + "> with delayed elements.");
     	while(isActive()){
     		synchronized(objectLock){
     			while(streamElementBuffer.isEmpty()){

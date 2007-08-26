@@ -1,6 +1,5 @@
 package gsn.beans.windowing;
 
-import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 
 public abstract class QueryRewriter {

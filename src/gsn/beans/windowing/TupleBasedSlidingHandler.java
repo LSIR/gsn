@@ -11,8 +11,11 @@ import gsn.wrappers.AbstractWrapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -20,15 +23,15 @@ import org.apache.log4j.Logger;
 public class TupleBasedSlidingHandler implements SlidingHandler {
 	private static final transient Logger logger = Logger.getLogger(TupleBasedSlidingHandler.class);
 
-	private ArrayList<StreamSource> streamSources;
+	private List<StreamSource> streamSources;
 
-	private HashMap<StreamSource, Integer> slidingHashMap;
+	private Map<StreamSource, Integer> slidingHashMap;
 
 	private AbstractWrapper wrapper;
 
 	public TupleBasedSlidingHandler(AbstractWrapper wrapper) {
-		streamSources = new ArrayList<StreamSource>();
-		slidingHashMap = new HashMap<StreamSource, Integer>();
+		streamSources = Collections.synchronizedList(new ArrayList<StreamSource>());
+		slidingHashMap = Collections.synchronizedMap(new HashMap<StreamSource, Integer>());
 		this.wrapper = wrapper;
 	}
 

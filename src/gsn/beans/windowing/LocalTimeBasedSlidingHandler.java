@@ -11,8 +11,11 @@ import gsn.wrappers.AbstractWrapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -25,7 +28,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 
 	private static int timerCount = 0;
 
-	private ArrayList<StreamSource> streamSources;
+	private List<StreamSource> streamSources;
 
 	private AbstractWrapper wrapper;
 
@@ -33,11 +36,11 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 
 	private int timerTick = -1;
 
-	private HashMap<StreamSource, Integer> slidingHashMap;
+	private Map<StreamSource, Integer> slidingHashMap;
 
 	public LocalTimeBasedSlidingHandler(AbstractWrapper wrapper) {
-		streamSources = new ArrayList<StreamSource>();
-		slidingHashMap = new HashMap<StreamSource, Integer>();
+		streamSources = Collections.synchronizedList(new ArrayList<StreamSource>());
+		slidingHashMap = Collections.synchronizedMap(new HashMap<StreamSource, Integer>());
 		timer = new Timer("LocalTimeBasedSlidingHandlerTimer" + (++timerCount));
 		this.wrapper = wrapper;
 	}
@@ -154,13 +157,13 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 			}
 			ResultSet resultSet = null;
 			try {
-			  resultSet= StorageManager.getInstance().executeQueryWithResultSet(query);
+				resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
 				if (resultSet.next())
 					timed2 = resultSet.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
-			}finally {
-			  StorageManager.close(resultSet);
+			} finally {
+				StorageManager.close(resultSet);
 			}
 		}
 
@@ -182,19 +185,21 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 		int oldTimerTick = timerTick;
 		// recalculating timer tick
 		timerTick = -1;
-		for (StreamSource streamSource : slidingHashMap.keySet()) {
-			if (streamSource.getWindowingType() == WindowType.TIME_BASED) {
-				slidingHashMap.put(streamSource, streamSource.getParsedSlideValue() - streamSource.getParsedStorageSize());
-				if (timerTick == -1)
-					timerTick = GCD(streamSource.getParsedStorageSize(), streamSource.getParsedSlideValue());
-				else
-					timerTick = GCD(timerTick, GCD(streamSource.getParsedStorageSize(), streamSource.getParsedSlideValue()));
-			} else {
-				slidingHashMap.put(streamSource, 0);
-				if (timerTick == -1)
-					timerTick = streamSource.getParsedSlideValue();
-				else
-					timerTick = GCD(timerTick, streamSource.getParsedSlideValue());
+		synchronized (slidingHashMap) {
+			for (StreamSource streamSource : slidingHashMap.keySet()) {
+				if (streamSource.getWindowingType() == WindowType.TIME_BASED) {
+					slidingHashMap.put(streamSource, streamSource.getParsedSlideValue() - streamSource.getParsedStorageSize());
+					if (timerTick == -1)
+						timerTick = GCD(streamSource.getParsedStorageSize(), streamSource.getParsedSlideValue());
+					else
+						timerTick = GCD(timerTick, GCD(streamSource.getParsedStorageSize(), streamSource.getParsedSlideValue()));
+				} else {
+					slidingHashMap.put(streamSource, 0);
+					if (timerTick == -1)
+						timerTick = streamSource.getParsedSlideValue();
+					else
+						timerTick = GCD(timerTick, streamSource.getParsedSlideValue());
+				}
 			}
 		}
 		if (oldTimerTick != timerTick && timerTick > 0) {
