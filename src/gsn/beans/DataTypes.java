@@ -57,11 +57,15 @@ public class DataTypes {
    public final static String            DOUBLE_NAME               = "Double";
    
    // NEXT FIELD
-//   public final static String            TIME_PATTERN_STRING       = "\\s*TIME\\s*";
-//   
-//   public final static byte               TIME                      = 6;
-//   
-//   public final static String            TIME_NAME                 = "Time";
+   /**
+    * Type Time is not supported at the moment. If you want to present time, please use
+    * longint. For more information consult the GSN mailing list on the same subject. 
+    */
+   public final static String            TIME_PATTERN_STRING       = "\\s*TIME\\s*";
+   
+   public final static byte               TIME                      = 6;
+  
+   public final static String            TIME_NAME                 = "Time";
    
    // NEXT FIELD
    public final static String            TINYINT_PATTERN_STRING    = "\\s*TINYINT\\s*";
@@ -82,13 +86,13 @@ public class DataTypes {
          Pattern.compile( CHAR_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( INTEGER_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( BIGINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( BINARY_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( DOUBLE_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
-//         Pattern.compile( TIME_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
+         Pattern.compile( TIME_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( TINYINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( SMALLINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) };
    
    public final static StringBuilder     ERROR_MESSAGE             = new StringBuilder( "Acceptable types are (TINYINT, SMALLINT, INTEGER,BIGINT,CHAR(#),BINARY[(#)],VARCHAR(#),DOUBLE,TIME)." );
    
    public final static String [ ]        TYPE_NAMES                = new String [ ] { VARCHAR_NAME , CHAR_NAME , INTEGER_NAME , BIGINT_NAME , BINARY_NAME , DOUBLE_NAME , 
-//     TIME_NAME ,
+     TIME_NAME ,
      TINYINT_NAME ,
          SMALLINT_NAME                                            };
    
@@ -96,9 +100,13 @@ public class DataTypes {
          new Date( ).getTime( ) , new Integer( 1 ) , new Integer( 9 ) };
    
    public static byte convertTypeNameToTypeID ( final String type ) {
+      logger.fatal("input : "+type);
       if ( type == null ) throw new GSNRuntimeException( new StringBuilder( "The type *null* is not recoginzed by GSN." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
       for ( byte i = 0 ; i < DataTypes.ALL_PATTERNS.length ; i++ )
-         if ( DataTypes.ALL_PATTERNS[ i ].matcher( type ).matches( ) ) return i;
+         if ( DataTypes.ALL_PATTERNS[ i ].matcher( type ).matches( ) ){
+             logger.fatal("Output: "+i);
+             return i;
+         }
       throw new GSNRuntimeException( new StringBuilder( "The type *" ).append( type ).append( "* is not recognized." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
    }
    // TODO: THIS METHOD NEEDS REWRITE FOR SQL SERVER

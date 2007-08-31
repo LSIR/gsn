@@ -402,7 +402,7 @@ public class StorageManager {
 			int counter;
 			for (counter = 1; counter <= streamElement.getFieldTypes().length; counter++) {
 				Serializable value = streamElement.getData()[counter - 1];
-				switch (streamElement.getFieldTypes()[counter - 1]) {
+                                switch (streamElement.getFieldTypes()[counter - 1]) {
 				case DataTypes.VARCHAR:
 					if (value == null)
 						ps.setNull(counter, Types.VARCHAR);
