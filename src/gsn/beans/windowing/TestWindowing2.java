@@ -55,7 +55,7 @@ public class TestWindowing2 {
 		public Boolean postStreamElement(StreamElement streamElement) {
 			return super.postStreamElement(streamElement);
 		}
-	
+
 	}
 
 	private WrapperForTest2 wrapper = new WrapperForTest2();
@@ -66,12 +66,21 @@ public class TestWindowing2 {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		DriverManager.registerDriver(new org.hsqldb.jdbcDriver());
-		StorageManager.getInstance().initialize("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.");
-//		 StorageManager.getInstance().initialize("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest");
-//		 StorageManager.getInstance().initialize("net.sourceforge.jtds.jdbc.Driver",
-		// "mehdi", "mehdi",
-		// "jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3");
+		initDB(StorageManager.HSQL_DB);
+	}
+
+	private static void initDB(int dbType) throws SQLException {
+		if (StorageManager.MYSQL_DB == dbType) {
+			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+			StorageManager.getInstance().initialize("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest");
+		} else if (StorageManager.HSQL_DB == dbType) {
+			DriverManager.registerDriver(new org.hsqldb.jdbcDriver());
+			StorageManager.getInstance().initialize("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.");
+		} else {
+			DriverManager.registerDriver(new net.sourceforge.jtds.jdbc.Driver());
+			StorageManager.getInstance().initialize("net.sourceforge.jtds.jdbc.Driver", "mehdi", "mehdi",
+					"jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3");
+		}
 	}
 
 	@Before
@@ -85,7 +94,7 @@ public class TestWindowing2 {
 	public void teardown() throws SQLException {
 		sm.executeDropTable(wrapper.getDBAliasInStr());
 	}
-	
+
 	/**
 	 * Testing time-based slide on each tuple (remote time-based)
 	 */
@@ -125,7 +134,7 @@ public class TestWindowing2 {
 		assertTrue(((SQLViewQueryRewriter) ss.getQueryRewriter()).createViewSQL().toString().toLowerCase().indexOf("mod") < 0);
 		StringBuilder query = new StringBuilder(((SQLViewQueryRewriter) ss.getQueryRewriter()).createViewSQL());
 		print(query.toString());
-		
+
 		long time = System.currentTimeMillis();
 		wrapper.postStreamElement(createStreamElement(time));
 		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query);
@@ -138,18 +147,18 @@ public class TestWindowing2 {
 		rs = sm.executeQueryWithResultSet(sb);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time);
-		
+
 		long time1 = time + 1000;
 		wrapper.postStreamElement(createStreamElement(time1));
 		long time2 = time + 2500;
 		wrapper.postStreamElement(createStreamElement(time2));
-		
+
 		DataEnumerator dm = sm.executeQuery(query, true);
 		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
-		
+
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), time2);
 		assertTrue(dm.hasMoreElements());
@@ -158,7 +167,7 @@ public class TestWindowing2 {
 
 		wrapper.removeListener(ss);
 	}
-	
+
 	/**
 	 * Testing time-based window-slide (remote time-based)
 	 */
@@ -198,7 +207,7 @@ public class TestWindowing2 {
 		assertTrue(((SQLViewQueryRewriter) ss.getQueryRewriter()).createViewSQL().toString().toLowerCase().indexOf("mod") < 0);
 		StringBuilder query = new StringBuilder(((SQLViewQueryRewriter) ss.getQueryRewriter()).createViewSQL());
 		print(query.toString());
-		
+
 		long time = System.currentTimeMillis() + 2000;
 		wrapper.postStreamElement(createStreamElement(time));
 		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query);
@@ -210,16 +219,16 @@ public class TestWindowing2 {
 		rs = sm.executeQueryWithResultSet(sb);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), -1L);
-		
+
 		long time1 = time + 1500;
 		wrapper.postStreamElement(createStreamElement(time1));
 		long time2 = time + 3800;
 		wrapper.postStreamElement(createStreamElement(time2));
-		
+
 		rs = sm.executeQueryWithResultSet(sb);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time2);
-		
+
 		long time3 = time + 4200;
 		wrapper.postStreamElement(createStreamElement(time3));
 		DataEnumerator dm = sm.executeQuery(query, true);
@@ -227,7 +236,7 @@ public class TestWindowing2 {
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
-		
+
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), time2);
 		assertTrue(dm.hasMoreElements());
@@ -239,14 +248,14 @@ public class TestWindowing2 {
 		rs = sm.executeQueryWithResultSet(sb);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time4);
-		
+
 		dm = sm.executeQuery(query, true);
 		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
-		
+
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), time4);
 		assertTrue(dm.hasMoreElements());
@@ -254,10 +263,10 @@ public class TestWindowing2 {
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), time2);
 		assertFalse(dm.hasMoreElements());
-		
+
 		wrapper.removeListener(ss);
 	}
-	
+
 	/**
 	 * Testing tuple-based-win-time-based-slide
 	 */
@@ -297,7 +306,7 @@ public class TestWindowing2 {
 		assertTrue(((SQLViewQueryRewriter) ss.getQueryRewriter()).createViewSQL().toString().toLowerCase().indexOf("mod") < 0);
 		StringBuilder query = new StringBuilder(((SQLViewQueryRewriter) ss.getQueryRewriter()).createViewSQL());
 		print(query.toString());
-		
+
 		long time = System.currentTimeMillis() + 2000;
 		wrapper.postStreamElement(createStreamElement(time));
 		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query);
@@ -309,25 +318,25 @@ public class TestWindowing2 {
 		rs = sm.executeQueryWithResultSet(sb);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), -1L);
-		
+
 		long time1 = time + 1500;
 		wrapper.postStreamElement(createStreamElement(time1));
 		long time2 = time + 2500;
 		wrapper.postStreamElement(createStreamElement(time2));
-		
+
 		rs = sm.executeQueryWithResultSet(sb);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time2);
-		
+
 		long time3 = time + 3500;
 		wrapper.postStreamElement(createStreamElement(time3));
-		
+
 		DataEnumerator dm = sm.executeQuery(query, true);
 		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
-		
+
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), time2);
 		assertTrue(dm.hasMoreElements());
@@ -339,22 +348,22 @@ public class TestWindowing2 {
 		rs = sm.executeQueryWithResultSet(sb);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time4);
-		
+
 		dm = sm.executeQuery(query, true);
 		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
-		
+
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), time4);
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), time3);
 		assertFalse(dm.hasMoreElements());
-		
+
 		wrapper.removeListener(ss);
 	}
-	
+
 	private StreamElement createStreamElement(long timed) {
 		return new StreamElement(new DataField[] {}, new Serializable[] {}, timed);
 	}

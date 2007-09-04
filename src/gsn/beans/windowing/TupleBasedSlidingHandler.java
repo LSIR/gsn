@@ -100,22 +100,26 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			}
 			ResultSet resultSet = null;
 			try {
-				 resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
+				resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
 				if (resultSet.next())
 					timed1 = resultSet.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
-			}finally {
-			  StorageManager.close(resultSet);
+			} finally {
+				StorageManager.close(resultSet);
 			}
 		}
 
 		if (maxWindowSize > 0) {
 			StringBuilder query = new StringBuilder();
-			if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
-				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from ").append(
-						wrapper.getDBAliasInStr());
+			if (StorageManager.isMysqlDB()) {
+				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from ")
+						.append(wrapper.getDBAliasInStr());
 				query.append(" order by timed desc limit 1 offset ").append(maxTupleForTimeBased - 1).append(" ) as X ");
+			} else if (StorageManager.isHsql()) {
+				query.append(" select timed - ").append(maxWindowSize).append(" from ").append(wrapper.getDBAliasInStr()).append(
+						" where timed in (select timed from ").append(wrapper.getDBAliasInStr());
+				query.append(" order by timed desc limit 1 offset ").append(maxTupleForTimeBased - 1).append(" ) ");
 			} else if (StorageManager.isSqlServer()) {
 				query.append(" select min(timed) - ").append(maxWindowSize).append(" from (select top ").append(maxTupleForTimeBased)
 						.append(" * ").append(" from ").append(wrapper.getDBAliasInStr()).append(" order by timed desc ) as X  ");
@@ -123,16 +127,16 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query2 for getting oldest timestamp : " + query);
 			}
-			ResultSet resultSet = null ;
+			ResultSet resultSet = null;
 			try {
 				resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
 				if (resultSet.next())
 					timed2 = resultSet.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
-			}finally {
-        StorageManager.close(resultSet);
-      }
+			} finally {
+				StorageManager.close(resultSet);
+			}
 		}
 
 		if (timed1 >= 0 && timed2 >= 0)
@@ -188,28 +192,44 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			toReturn.append(" wrapper.timed >=").append(streamSource.getStartDate().getTime()).append(" and timed <=").append(
 					streamSource.getEndDate().getTime());
 
-			if (streamSource.getSamplingRate() != 1)
-				toReturn.append(" and ( mod( timed , 100)< ").append(streamSource.getSamplingRate() * 100).append(")");
+			if (streamSource.getSamplingRate() != 1) {
+				if (StorageManager.isHsql())
+					toReturn.append(" and ( timed - (timed / 100) * 100 < ").append(streamSource.getSamplingRate() * 100).append(")");
+				else
+					toReturn.append(" and ( mod( timed , 100)< ").append(streamSource.getSamplingRate() * 100).append(")");
+			}
 
 			toReturn.append(" and ");
 
 			WindowType windowingType = streamSource.getWindowingType();
 			if (windowingType == WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE) {
-				if (StorageManager.isHsql() || StorageManager.isMysqlDB())
-					toReturn.append("timed >= (select timed from ").append(wrapperAlias).append(
-							" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ) order by timed desc ");
-				else if (StorageManager.isSqlServer())
-					toReturn.append("timed >= (select min(timed) from (select TOP ").append(windowSize).append(
-							" timed from ").append(wrapperAlias)
-							.append(" order by timed desc ) as y )");
+				if (StorageManager.isMysqlDB()) {
+					toReturn.append("timed >= (select timed from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ")
+							.append(windowSize - 1).append(" ) order by timed desc ");
+				} else if (StorageManager.isHsql()) {
+					toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" where timed in (select timed from ")
+							.append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(
+									" )) order by timed desc ");
+				} else if (StorageManager.isSqlServer()) {
+					toReturn.append("timed >= (select min(timed) from (select TOP ").append(windowSize).append(" timed from ").append(
+							wrapperAlias).append(" order by timed desc ) as y )");
+				}
 			} else {
 				if (windowingType == WindowType.TUPLE_BASED) {
-					if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
+					if (StorageManager.isMysqlDB()) {
 						toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
 								" where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
 						toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");
 						toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr());
 						toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" )");
+						toReturn.append(" order by timed desc ");
+					} else if (StorageManager.isHsql()) {
+						toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
+								" where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select distinct(timed) from ");
+						toReturn.append(wrapperAlias).append(" where timed in (select timed from ").append(wrapperAlias).append(
+								" where timed <= (select timed from ");
+						toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr());
+						toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ))");
 						toReturn.append(" order by timed desc ");
 					} else if (StorageManager.isSqlServer()) {
 						toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(

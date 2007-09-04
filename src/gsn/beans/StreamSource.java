@@ -288,9 +288,14 @@ public  class StreamSource implements Serializable{
       return validationResult;
     windowingType = DEFAULT_WINDOW_TYPE;
     isValidated=true;
-    if (getSamplingRate()<=0) 
+    if (samplingRate <=0 ) 
       logger.warn( new StringBuilder( ).append( "The sampling rate is set to zero (or negative) which means no results. StreamSource = " )
           .append( getAlias( ) ).toString( ) );
+    else if(samplingRate > 1){
+    	samplingRate = 1;
+    	logger.warn( new StringBuilder( ).append( "The provided sampling rate is greater than 1, resetting it to 1. StreamSource = " )
+    	          .append( getAlias( ) ).toString( ) );
+    }
     if (getAddressing().length==0) {
       logger.warn(new StringBuilder("Validation failed because there is no addressing predicates provided for the stream source (the addressing part of the stream source is empty)").append("stream source alias = ").append(getAlias()));
       return validationResult=false;

@@ -34,8 +34,9 @@ import org.junit.Test;
  * Notes:
  * <ol>
  * <li>The tests for time-based windows may not pass because of the
- * 	complication of testing time and the dependence on runtime.</li>
- * <li>As SQL Server does not support order by clause in view queries, some of the tests won't be passed for SQL Server</li>
+ * complication of testing time and the dependence on runtime.</li>
+ * <li>As SQL Server does not support order by clause in view queries, some of
+ * the tests won't be passed for SQL Server</li>
  * </ol>
  */
 public class TestWindowing1 {
@@ -76,14 +77,21 @@ public class TestWindowing1 {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		DriverManager.registerDriver(new org.hsqldb.jdbcDriver());
-		 StorageManager.getInstance().initialize("org.hsqldb.jdbcDriver",
-		 "sa", "", "jdbc:hsqldb:mem:.");
-//		StorageManager.getInstance().initialize("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://172.16.4.121/gsntest");
-		// StorageManager.getInstance().initialize("net.sourceforge.jtds.jdbc.Driver",
-		// "mehdi", "mehdi",
-		// "jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3");
+		initDB(StorageManager.HSQL_DB);
+	}
 
+	private static void initDB(int dbType) throws SQLException {
+		if (StorageManager.MYSQL_DB == dbType) {
+			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+			StorageManager.getInstance().initialize("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest");
+		} else if (StorageManager.HSQL_DB == dbType) {
+			DriverManager.registerDriver(new org.hsqldb.jdbcDriver());
+			StorageManager.getInstance().initialize("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.");
+		} else {
+			DriverManager.registerDriver(new net.sourceforge.jtds.jdbc.Driver());
+			StorageManager.getInstance().initialize("net.sourceforge.jtds.jdbc.Driver", "mehdi", "mehdi",
+					"jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3");
+		}
 	}
 
 	@Before
@@ -205,7 +213,7 @@ public class TestWindowing1 {
 		StringBuilder query = new StringBuilder(((SQLViewQueryRewriter) ss.getQueryRewriter()).createViewSQL());
 
 		print(query.toString());
-		
+
 		long time = System.currentTimeMillis();
 		wrapper.postStreamElement(createStreamElement(time));
 		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query);
@@ -222,14 +230,14 @@ public class TestWindowing1 {
 		wrapper.postStreamElement(createStreamElement(time1));
 		long time2 = time + 100;
 		wrapper.postStreamElement(createStreamElement(time2));
-		
+
 		DataEnumerator dm = sm.executeQuery(query, true);
 		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
 		assertNotNull(rs);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
-		
+
 		assertTrue(dm.hasMoreElements());
 		assertEquals(dm.nextElement().getTimeStamp(), time2);
 		assertTrue(dm.hasMoreElements());
@@ -680,7 +688,7 @@ public class TestWindowing1 {
 		wrapper.postStreamElement(createStreamElement(time2));
 
 		try {
-			Thread.sleep(2800);
+			Thread.sleep(2500);
 		} catch (InterruptedException e) {
 		}
 
