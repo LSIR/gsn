@@ -30,7 +30,7 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
 
     // regular expression clauses for finding the field names and their types from packet definition
     private static final String NAME_PATTERN = "// Accessor methods for field: (\\w+)";
-    private static final String TYPE_PATTERN = "//\\s+Field type: (\\w+)";
+    private static final String TYPE_PATTERN = "//\\s+Field type: (\\w+),";
     
     private static final String INITPARAM_SOURCE = "source";
     private static final String INITPARAM_PACKETNAME = "packet-name";
@@ -47,41 +47,48 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
     
     // the interface to communicate with mote
     private MoteIF moteIF;
-    // they have to be buffered because they arrive independently of GSN
     private static HashMap<String, String> types;
+    // hashmap for storing the field name and its type
     private HashMap<String, String> fields;
+    // arraylist for storing the field names in the correct order
+    private ArrayList<String> fieldsOrdered;
     
     // class and object variables used to extract data from packets using reflection
     private Class packetClass;
     private Object packetObject;
     
     public boolean initialize ( ) {
-        setName( "CodeGenWrapper-Thread" + ( ++threadCounter ) );
+        setName( "MigMessageWrapper-Thread" + ( ++threadCounter ) );
         AddressBean addressBean = getActiveAddressBean( );
         if ( addressBean.getPredicateValue(INITPARAM_SOURCE) != null ) {
             source = addressBean.getPredicateValue(INITPARAM_SOURCE);
         } else {
-            logger.warn("The specified parameter >" + INITPARAM_SOURCE + "< for >CodeGenWrapper< is missing.");
+            logger.warn("The specified parameter >" + INITPARAM_SOURCE + "< for >MigMessageWrapper< is missing.");
             logger.warn("Initialization failed.");
             return false;
         }
         if ( addressBean.getPredicateValue(INITPARAM_PACKETNAME) != null ) {
             packetName = addressBean.getPredicateValue(INITPARAM_PACKETNAME);
         } else {
-            logger.warn("The specified parameter >" + INITPARAM_PACKETNAME + "< for >CodeGenWrapper< is missing.");
+            logger.warn("The specified parameter >" + INITPARAM_PACKETNAME + "< for >MigMessageWrapper< is missing.");
             logger.warn("Initialization failed.");
             return false;
         }
         if ( addressBean.getPredicateValue(INITPARAM_PATH) != null ) {
             path = addressBean.getPredicateValue(INITPARAM_PATH);
         } else {
-            logger.warn("The specified parameter >" + INITPARAM_PATH + "< for >CodeGenWrapper< is missing.");
+            logger.warn("The specified parameter >" + INITPARAM_PATH + "< for >MigMessageWrapper< is missing.");
             logger.warn("Initialization failed.");
             return false;
         }
 
-        logger.debug("Connecting to " + source);
-        moteIF = new MoteIF(BuildSource.makePhoenix(source, PrintStreamMessenger.err));
+        try {
+            logger.debug("Connecting to " + source);
+            moteIF = new MoteIF(BuildSource.makePhoenix(source, PrintStreamMessenger.err));
+        } catch(Exception e) {
+            logger.warn("Cannot open connection to: " + source, e);
+            return false;
+        } 
         types = makeTypeMap();
         logger.debug("Reading packet definition from " + path + packetName + ".java");
         outputStructureCache = createOutputStructure(path + packetName + ".java");
@@ -117,7 +124,7 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
      */
     private DataField[] createOutputStructure(String filename) {
         fields = new HashMap<String, String>();
-        ArrayList<String> fieldnames = new ArrayList<String>();
+        fieldsOrdered = new ArrayList<String>();
         try
         {
             BufferedReader input = new BufferedReader(new FileReader(filename));
@@ -150,8 +157,9 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
                     type = typeMatcher.group(1);
                 }
                 if(name != null && type != null) {
-                    fieldnames.add(name);
+                    fieldsOrdered.add(name);
                     fields.put(name, type);
+                    logger.debug("Adding " + name + " with type " + type);
                     name = null;
                     type = null;
                 }
@@ -166,7 +174,7 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
 
         // create an array of DataTypes for returning
         ArrayList<DataField> fieldsAL = new ArrayList<DataField>();
-        Iterator<String> it = fieldnames.iterator();
+        Iterator<String> it = fieldsOrdered.iterator();
         while(it.hasNext()) {
             String curName = it.next();
             String curType = fields.get(curName);
@@ -208,19 +216,20 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
         ArrayList<Serializable> retvals = new ArrayList<Serializable>();            
         Method[] allMethods = packetClass.getDeclaredMethods();
 
-        for (Method method : allMethods) {
-            String methodName = method.getName();
-            try {
-                for(String fieldName : fields.keySet()) {
+        for(String fieldName : fieldsOrdered) {
+            for (Method method : allMethods) {
+                String methodName = method.getName();
+                try {
                     if(methodName.equals("get_" + fieldName)) {
                         method.setAccessible(true);
+                        Serializable value = (Serializable) method.invoke(packetObject);
                         retvals.add((Serializable) method.invoke(packetObject));
                     }
+                } catch (InvocationTargetException e) {
+                    logger.error("Invocation of " + methodName + " failed: %s%n", e);
+                } catch (IllegalAccessException e) {
+                    logger.error("Cannot access " + methodName, e);
                 }
-            } catch (InvocationTargetException e) {
-                logger.error("Invocation of " + methodName + " failed: %s%n", e);
-            } catch (IllegalAccessException e) {
-                logger.error("Cannot access " + methodName, e);
             }
         }
         postStreamElement( retvals.toArray(new Serializable[] {}) );
