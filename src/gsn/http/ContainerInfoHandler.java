@@ -11,6 +11,7 @@ import gsn.storage.StorageManager;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,95 +22,99 @@ import org.apache.log4j.Logger;
 public class ContainerInfoHandler implements RequestHandler {
   
   private static transient Logger logger             = Logger.getLogger( ContainerInfoHandler.class );
-	   
-   public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
-      response.setStatus( HttpServletResponse.SC_OK );
-      StringBuilder sb = new StringBuilder( "<gsn " );
-      sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
-      sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
-      sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
-      sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
+  
+  public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
+    response.setStatus( HttpServletResponse.SC_OK );
+    StringBuilder sb = new StringBuilder( "<gsn " );
+    sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
+    sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
+    sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
+    sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
+    
+    Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
+    //return only the requested sensor if specified
+    String reqName = request.getParameter("name");
+    while ( vsIterator.hasNext( ) ) {
+      VSensorConfig sensorConfig = vsIterator.next( );
+      if ( reqName != null && !sensorConfig.getName().equals(reqName) ) continue;
+      sb.append("<virtual-sensor");
+      sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
+      sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
+      if (sensorConfig.getDescription() != null) {
+        sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
+      }
+      sb.append( ">\n" );
       
-      Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
-      while ( vsIterator.hasNext( ) ) {
-         VSensorConfig sensorConfig = vsIterator.next( );
-         
-         //return only the requested sensor if specified
-         String reqName = request.getParameter("name");
-         if ( reqName != null && !sensorConfig.getName().equals(reqName) ) continue;
-         
-         sb.append("<virtual-sensor");
-         sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
-         sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
-         if (sensorConfig.getDescription() != null) {
-            sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
-         }
-         sb.append( ">\n" );
-         StringBuilder query=null;
-         query= new StringBuilder( "select * from " + sensorConfig.getName( ) + " where timed = (select max(timed) from " + sensorConfig.getName() + ")");
-         
-         DataEnumerator result;
-		try {
-			result = StorageManager.getInstance( ).executeQuery( query , true );
-		} catch (SQLException e) {
-			logger.error("ERROR IN EXECUTING, query: "+query);
-			logger.error(e.getMessage(),e);
-			logger.error("Query is from "+request.getRemoteAddr()+"- "+request.getRemoteHost());
-			return;
-			}
-         StreamElement se = null;
-         int counter = 1;
-         while ( result.hasMoreElements( ) ) {
-        	 se = result.nextElement( );
-        	 for ( DataField df : sensorConfig.getOutputStructure( ) ) {
-        		 sb.append("\t<field");
-        		 sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
-        		 sb.append(" type=\"").append(df.getType()).append("\"");
-        		 if (df.getDescription() != null && df.getDescription().trim().length() != 0)
-        			 sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
-        		 sb.append(">");
-        		 if (se!= null ) 
-        			 if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
-        				 sb.append( se.getData( df.getName( ) ) );
-        			 else
-        				 sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
-        		 sb.append("</field>\n");
-        	 }
-        	 counter++;
-         }
-         result.close( );
-         sb.append("\t<field name=\"timed\" type=\"long\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : se.getTimeStamp( ) ).append( "</field>\n" );
-         for ( KeyValue df : sensorConfig.getAddressing( )){
+      ArrayList<StreamElement> ses = getMostRecentValueFor(sensorConfig.getName());
+      int counter = 1;
+      if (ses!=null ) {
+        for (StreamElement se:ses){
+          for ( DataField df : sensorConfig.getOutputStructure( ) ) {
+            sb.append("\t<field");
+            sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
+            sb.append(" type=\"").append(df.getType()).append("\"");
+            if (df.getDescription() != null && df.getDescription().trim().length() != 0)
+              sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
+            sb.append(">");
+            if (se!= null ) 
+              if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
+                sb.append( se.getData( df.getName( ) ) );
+              else
+                sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
+            sb.append("</field>\n");
+          }
+          sb.append("\t<field name=\"timed\" type=\"long\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : se.getTimeStamp( ) ).append( "</field>\n" );
+          for ( KeyValue df : sensorConfig.getAddressing( )){
             sb.append("\t<field");
             sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
             sb.append(" category=\"predicate\">");
             sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
             sb.append("</field>\n" );
-         }
-         if (sensorConfig.getWebinput( )!=null){
-        	 for ( WebInput wi : sensorConfig.getWebinput( ) ) {
-        		 for ( DataField df : wi.getParameters ( ) ) {
-        	        	
-        			 sb.append( "\t<field");
-        			 sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
-        			 sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
-        			 sb.append(" category=\"input\"");
-        			 sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
-        			 if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
-        				 sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
-        			 sb.append( "></field>\n" );
-        		 }
-        	 }
-         }
-         sb.append( "</virtual-sensor>\n" );
+          }
+          if (sensorConfig.getWebinput( )!=null){
+            for ( WebInput wi : sensorConfig.getWebinput( ) ) {
+              for ( DataField df : wi.getParameters ( ) ) {
+                sb.append( "\t<field");
+                sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
+                sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
+                sb.append(" category=\"input\"");
+                sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
+                if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
+                  sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
+                sb.append( "></field>\n" );
+              }
+            }
+          }
+          counter++;
+        }
       }
-     
-      sb.append( "</gsn>\n" );
-      
-      response.getWriter( ).write( sb.toString( ) );
-   }
-   
-   public boolean isValid ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
-      return true;
-   }
+      sb.append( "</virtual-sensor>\n" );
+    }
+    sb.append( "</gsn>\n" );
+    response.getWriter( ).write( sb.toString( ) );
+  }
+  
+  public boolean isValid ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
+    return true;
+  }
+  /**
+   * returns null if there is an error.
+   * 
+   * @param virtual_sensor_name
+   * @return
+   */
+  public static ArrayList<StreamElement> getMostRecentValueFor(String virtual_sensor_name) {
+    StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(")");
+    ArrayList<StreamElement> toReturn=new ArrayList<StreamElement>() ;
+    try {
+      DataEnumerator result = StorageManager.getInstance( ).executeQuery( query , true );
+      while ( result.hasMoreElements( ) ) 
+        toReturn.add(result.nextElement());
+    } catch (SQLException e) {
+      logger.error("ERROR IN EXECUTING, query: "+query);
+      logger.error(e.getMessage(),e);
+      return null;
+    }
+    return toReturn;
+  }
 }

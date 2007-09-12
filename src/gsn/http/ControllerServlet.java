@@ -66,7 +66,7 @@ public class ControllerServlet extends HttpServlet {
       if ( logger.isDebugEnabled ( ) ) logger.debug ( "Received a request with code : " + requestType );
       
       switch ( requestType ) {
-      case 0 :
+      case 0 : //default case pointing to the /gsn
           handler = new ContainerInfoHandler ( );
           if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
           break;   

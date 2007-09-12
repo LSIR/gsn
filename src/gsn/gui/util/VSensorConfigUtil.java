@@ -23,7 +23,6 @@ public class VSensorConfigUtil {
 			bfact = BindingDirectory.getFactory(VSensorConfig.class);
 			uctx = bfact.createUnmarshallingContext();
 		} catch (JiBXException e1) {
-			// logger.fatal(e1.getMessage(), e1);
 			return null;
 		}
 		HashMap<File, VSensorConfig> fileToVSensorConfigMap = new HashMap<File, VSensorConfig>(files.length);

@@ -100,11 +100,9 @@ public class DataTypes {
          new Date( ).getTime( ) , new Integer( 1 ) , new Integer( 9 ) };
    
    public static byte convertTypeNameToTypeID ( final String type ) {
-      logger.fatal("input : "+type);
-      if ( type == null ) throw new GSNRuntimeException( new StringBuilder( "The type *null* is not recoginzed by GSN." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
+       if ( type == null ) throw new GSNRuntimeException( new StringBuilder( "The type *null* is not recoginzed by GSN." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
       for ( byte i = 0 ; i < DataTypes.ALL_PATTERNS.length ; i++ )
          if ( DataTypes.ALL_PATTERNS[ i ].matcher( type ).matches( ) ){
-             logger.fatal("Output: "+i);
              return i;
          }
       throw new GSNRuntimeException( new StringBuilder( "The type *" ).append( type ).append( "* is not recognized." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );

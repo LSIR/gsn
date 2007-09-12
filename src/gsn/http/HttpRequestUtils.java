@@ -1,6 +1,5 @@
 package gsn.http;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 
@@ -10,13 +9,6 @@ import javax.servlet.http.HttpServletRequest;
  * specified default value.
  */
 public class HttpRequestUtils {
-   
-   public static void setCharacterEncoding ( String encoding , HttpServletRequest req ) throws UnsupportedEncodingException {
-      new String( "".getBytes( "8859_1" ) , encoding ); // Check if the
-      // encoding name is
-      // valid.
-      req.setCharacterEncoding( encoding );
-   }
    
    /**
     * Extracts the string parameter from the request

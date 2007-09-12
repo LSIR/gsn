@@ -200,7 +200,7 @@ public class GSNNotification extends NotificationRequest {
 		}		
 		if (result == false) {
 			if (++query_removal_counter>query_removal_threshold) {
-				logger.fatal("The remote is not interested anymore, the notification should be removed (try: "+query_removal_counter+" out of "+query_removal_threshold+")");
+				logger.warn("The remote is not interested anymore, the notification should be removed (try: "+query_removal_counter+" out of "+query_removal_threshold+")");
 				result= false;
 			}else {
 				/**

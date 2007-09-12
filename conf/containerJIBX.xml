@@ -1,11 +1,9 @@
 <binding>
-	<mapping name="sensor-server"
-		class="gsn.beans.ContainerConfig">
+	<mapping name="sensor-server" class="gsn.beans.ContainerConfig">
 		<value name="name" field="webName" usage="optional" />
 		<value name="author" field="webAuthor" usage="optional" />
 		<value name="email" field="webEmail" usage="optional" />
-		<value name="description" field="webDescription"
-			usage="optional" />
+		<value name="description" field="webDescription" usage="optional" />
 		<value name="port" field="containerPort" />
 		<value name="ssl-port" field="sslPort" usage="optional"/>
                 <value name="ssl-key-store-password" field="sslKeyStorePassword" usage="optional"/>
@@ -13,10 +11,13 @@
                <structure name="storage">
 			<value name="driver" field="jdbcDriver" style="attribute" />
 			<value name="user" field="jdbcUsername" style="attribute" />
-			<value name="password" field="jdbcPassword"
-				style="attribute" />
+			<value name="password" field="jdbcPassword" style="attribute" />
 			<value name="url" field="jdbcURL" style="attribute" />
 		</structure>
+		<collection name="microsoft-research-sensormap"    field="msrMap"  item-type="gsn.utils.KeyValueImp" usage="optional" />  
 	</mapping>
-
+  <mapping name="parameter" class="gsn.utils.KeyValueImp" >
+  	   <value name="key"   field="key"   style="attribute" />
+   	   <value field="value" style="text"/>
+   </mapping>
 </binding>

@@ -1,7 +1,9 @@
 <binding>
     <mapping name="virtual-sensor" class="gsn.beans.VSensorConfig">
        <value name="name" field="name" style="attribute" />
-       <value name="priority" field="priority" usage="optional" style="attribute" />  
+       <value name="priority" field="priority" usage="optional" style="attribute" />
+       <value name="publish-to-microsoft-research-sensor-map" field="sensorMap" usage="optional" style="attribute" />  
+       
        <value name="password" field="generalPassword" style="attribute" usage="optional" />
        <structure name="processing-class" usage="optional" >
               <value name="class-name" field="mainClass"  />  
