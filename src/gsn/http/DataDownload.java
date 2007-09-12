@@ -22,7 +22,19 @@ public class DataDownload extends HttpServlet {
 	public void  doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 		doPost(req, res);
 	}
-	
+	/**
+	 * List of the parameters for the requests:
+	 * url : /data
+	 * param-name: vsName
+	 * param-name: fields [there can be multiple parameters with this name pointing to different fields in the stream element].
+	 * param-name: commonReq (always true !)
+	 * param-name: display , if there is a value it should be CSV.
+	 * param-name: delimiter, useful for CSV output (can be "tab","space","other")
+	 * param-name: otherdelimiter useful in the case of having delimiter=other
+	 * param-name: groupby can point to one of the fields in the stream element. In case groupby=timed then the parameter groupbytimed points to the period for which data should be aggregated [in milliseconds]. 
+	 * param-name: nb give the maximum number of elements to be outputed (most recent values first).
+	 * param-name: 
+	 */
 	public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 	      boolean responseCVS = false;
 	      boolean wantTimeStamp = false;

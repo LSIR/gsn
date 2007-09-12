@@ -504,11 +504,13 @@ public class ContainerConfig {
   /**
    * MSR MAP PART.
    */
-  private ArrayList<KeyValueImp> msrMap = new ArrayList<KeyValueImp>();
+  private ArrayList<KeyValueImp> msrMap ;
   private HashMap<String, String> msrMapCached ;
   public HashMap<String, String> getMsrMap() {
     if (msrMapCached==null) {
       msrMapCached = new HashMap<String, String>();
+      if (msrMap==null)
+        return msrMapCached;
       for (KeyValueImp kv : msrMap)
         msrMapCached.put(kv.getKey().toLowerCase().trim(), kv.getValue());
     }

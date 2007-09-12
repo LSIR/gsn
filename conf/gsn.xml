@@ -3,7 +3,7 @@
    <author>My name</author>
    <email>my email address</email>
    <description>Not Provided</description>
-   <port>22009</port>
+   <port>22001</port>
 <!-- OTHER DATABASE OPTIONS -->
 <!-- <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:MEM:." />  -->
 <!-- <storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:MyFile" /> -->
