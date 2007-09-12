@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Array;
 
 /** MigMessageWrapper is used for reading TinyOS 2.x generated datapackets.
  * The wrapper reads packet definition from a MIG-generated .java-file and
@@ -30,15 +31,17 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
 
     // regular expression clauses for finding the field names and their types from packet definition
     private static final String NAME_PATTERN = "// Accessor methods for field: (\\w+)";
-    private static final String TYPE_PATTERN = "//\\s+Field type: (\\w+),";
+    private static final String TYPE_PATTERN = "//\\s+Field type: (\\w+(\\[\\])?),";
     
     private static final String INITPARAM_SOURCE = "source";
     private static final String INITPARAM_PACKETNAME = "packet-name";
     private static final String INITPARAM_PATH = "path";
+    private static final String INITPARAM_CLASS_PACKAGE = "class-package";
     
     private String source;
     private String packetName;
     private String path;
+    private String classPackage;
     
     private int threadCounter = 0;
     private final transient Logger logger = Logger.getLogger( MigMessageWrapper.class );
@@ -50,8 +53,10 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
     private static HashMap<String, String> types;
     // hashmap for storing the field name and its type
     private HashMap<String, String> fields;
+    private HashMap<String, String> outputFields;
     // arraylist for storing the field names in the correct order
     private ArrayList<String> fieldsOrdered;
+    private ArrayList<String> outputFieldsOrdered;
     
     // class and object variables used to extract data from packets using reflection
     private Class packetClass;
@@ -81,7 +86,12 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
             logger.warn("Initialization failed.");
             return false;
         }
-
+        if ( addressBean.getPredicateValue(INITPARAM_CLASS_PACKAGE) != null ) {
+            classPackage = addressBean.getPredicateValue(INITPARAM_CLASS_PACKAGE);
+        } else {
+            classPackage = "gsn";
+        }
+        
         try {
             logger.debug("Connecting to " + source);
             moteIF = new MoteIF(BuildSource.makePhoenix(source, PrintStreamMessenger.err));
@@ -91,11 +101,9 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
         } 
         types = makeTypeMap();
         logger.debug("Reading packet definition from " + path + packetName + ".java");
-        outputStructureCache = createOutputStructure(path + packetName + ".java");
-        if(outputStructureCache == null) return false;
         
         try {
-            packetClass = Class.forName(packetName);
+            packetClass = Class.forName(classPackage + "." + packetName);
             packetObject = packetClass.newInstance();
             Message msg = (Message)packetObject;
             moteIF.registerListener(msg, this);
@@ -104,6 +112,8 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
             logger.warn("Reading packet structure of " + packetName + " failed:", e);
             return false;
         } 
+        outputStructureCache = createOutputStructure(path + packetName + ".java");
+        if(outputStructureCache == null) return false;
         return true;
     }
     
@@ -115,6 +125,10 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
         types.put("short", "smallint");
         types.put("int", "integer");
         types.put("long", "bigint");
+        types.put("byte[]", "tinyint");
+        types.put("short[]", "smallint");
+        types.put("int[]", "integer");
+        types.put("long[]", "bigint");
         return types;
     }
     
@@ -125,6 +139,8 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
     private DataField[] createOutputStructure(String filename) {
         fields = new HashMap<String, String>();
         fieldsOrdered = new ArrayList<String>();
+        outputFields = new HashMap<String, String>();
+        outputFieldsOrdered = new ArrayList<String>();
         try
         {
             BufferedReader input = new BufferedReader(new FileReader(filename));
@@ -157,11 +173,33 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
                     type = typeMatcher.group(1);
                 }
                 if(name != null && type != null) {
-                    fieldsOrdered.add(name);
-                    fields.put(name, type);
-                    logger.debug("Adding " + name + " with type " + type);
-                    name = null;
-                    type = null;
+                    if(type.contains("[]")) {
+                        int i=0;
+                        int size=0;
+                        Method getArraySize = packetClass.getDeclaredMethod("numElements_" + name);
+                        try {
+                            size = (Integer) getArraySize.invoke(packetObject);
+                        } catch (InvocationTargetException e) {
+                            logger.error("Invocation of numElements_" + name + " failed: %s%n", e);
+                        }
+                        for(i=0; i < size; i++) {
+                            outputFieldsOrdered.add(name + i);
+                            outputFields.put(name + i, type);
+                            logger.debug("Adding " + name + i + " with type " + type);                            
+                        }
+                        fieldsOrdered.add(name);
+                        fields.put(name, type);
+                        name = null;
+                        type = null;                        
+                    } else {
+                        fieldsOrdered.add(name);
+                        fields.put(name, type);
+                        outputFieldsOrdered.add(name);
+                        outputFields.put(name, type);
+                        logger.debug("Adding " + name + " with type " + type);
+                        name = null;
+                        type = null;
+                    }
                 }
             }
             input.close();
@@ -174,10 +212,10 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
 
         // create an array of DataTypes for returning
         ArrayList<DataField> fieldsAL = new ArrayList<DataField>();
-        Iterator<String> it = fieldsOrdered.iterator();
+        Iterator<String> it = outputFieldsOrdered.iterator();
         while(it.hasNext()) {
             String curName = it.next();
-            String curType = fields.get(curName);
+            String curType = outputFields.get(curName);
             fieldsAL.add(new DataField(curName.toUpperCase(), types.get(curType), curName));
         }
         return fieldsAL.toArray(new DataField[] {} );
@@ -217,13 +255,22 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
         Method[] allMethods = packetClass.getDeclaredMethods();
 
         for(String fieldName : fieldsOrdered) {
+            boolean isArray = checkArray(fieldName);
             for (Method method : allMethods) {
                 String methodName = method.getName();
                 try {
                     if(methodName.equals("get_" + fieldName)) {
+                        logger.debug("Using " + methodName);
                         method.setAccessible(true);
                         Serializable value = (Serializable) method.invoke(packetObject);
-                        retvals.add((Serializable) method.invoke(packetObject));
+                        logger.debug("Got: " + value.getClass().getCanonicalName());
+                        if(isArray) {
+                            for(int i=0; i < Array.getLength(value); i++) {
+                                retvals.add((Serializable) Array.get(value, i));
+                            }
+                        } else {
+                            retvals.add((Serializable) method.invoke(packetObject));
+                        }
                     }
                 } catch (InvocationTargetException e) {
                     logger.error("Invocation of " + methodName + " failed: %s%n", e);
@@ -233,6 +280,12 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
             }
         }
         postStreamElement( retvals.toArray(new Serializable[] {}) );
+    }
+    
+    private boolean checkArray(String fieldName) {
+        String type = fields.get(fieldName);
+        if(type.contains("[]")) return true;
+        else return false;
     }
     
     /** Overrides gsn.wrappers.AbstractWrapper.run
