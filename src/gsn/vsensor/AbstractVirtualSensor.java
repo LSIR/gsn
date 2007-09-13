@@ -16,7 +16,7 @@ public abstract class AbstractVirtualSensor {
    
    private VSensorConfig                 virtualSensorConfiguration;
    
-   private ArrayList < StreamElement >   producedData     = new ArrayList < StreamElement >( );
+   private ArrayList < StreamElement >   producedDataBuffer     = new ArrayList < StreamElement >( );
    
    private long                          lastVisitiedTime = 0;
    
@@ -27,8 +27,8 @@ public abstract class AbstractVirtualSensor {
     */
    public abstract boolean initialize ( );
    
-   private void validateStreamElement ( StreamElement streamElement ) {
-	   if ( !compatibleStructure( streamElement, getVirtualSensorConfiguration( ).getOutputStructure( ) ) ) {
+   private void validateStreamElement ( StreamElement streamElement ,boolean adjust) {
+	   if ( !compatibleStructure( streamElement, getVirtualSensorConfiguration( ).getOutputStructure( ),adjust ) ) {
 		   StringBuilder exceptionMessage = new StringBuilder( ).append( "The streamElement produced by :" ).append( getVirtualSensorConfiguration( ).getName( ) ).append(
 		   " Virtual Sensor is not compatible with the defined streamElement.\n" );
 		   exceptionMessage.append( "The expected stream element structure (specified in " ).append( getVirtualSensorConfiguration( ).getFileName( ) ).append( " is [" );
@@ -41,44 +41,71 @@ public abstract class AbstractVirtualSensor {
 		   throw new RuntimeException( exceptionMessage.toString( ) );
       }
    }
-   
-   protected synchronized void dataProduced ( StreamElement streamElement ) {
-      try {
-    	  validateStreamElement( streamElement );
-      } catch ( Exception e ) {
-         logger.error( e.getMessage( ) , e );
-         return;
-      }
-      
-      if ( !streamElement.isTimestampSet( ) ) streamElement.setTimeStamp( System.currentTimeMillis( ) );
-      
-      final int outputStreamRate = getVirtualSensorConfiguration( ).getOutputStreamRate( );
-      final long currentTime = System.currentTimeMillis( );
-      if ( ( currentTime - lastVisitiedTime ) < outputStreamRate ) {
-         if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
-         return;
-      }
-      lastVisitiedTime = currentTime;
-      synchronized ( producedData ) {
-         producedData.add( streamElement );
-      }
-      try {
-		Mappings.getContainer( ).publishData( this );
-	} catch (SQLException e) {
-		logger.error(e.getMessage(),e);
-	}
+   /**
+    * if Adjust is true then system checks the output structure of the virtual sensor and
+    * only publishes the fields defined in the output structure of the virtual sensor and 
+    * ignores the rest. IF the adjust is set to false, the system will enforce strict
+    * compatibility of the output and the produced value.
+    * 
+    * @param streamElement
+    * @param adjust Default is false.
+    */
+   protected synchronized void dataProduced ( StreamElement streamElement,boolean adjust ) {
+     try {
+       validateStreamElement( streamElement,adjust );
+     } catch ( Exception e ) {
+        logger.error( e.getMessage( ) , e );
+        return;
+     }
+     if ( !streamElement.isTimestampSet( ) ) streamElement.setTimeStamp( System.currentTimeMillis( ) );
+     
+     final int outputStreamRate = getVirtualSensorConfiguration( ).getOutputStreamRate( );
+     final long currentTime = System.currentTimeMillis( );
+     if ( ( currentTime - lastVisitiedTime ) < outputStreamRate ) {
+        if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
+        return;
+     }
+     lastVisitiedTime = currentTime;
+     synchronized ( producedDataBuffer ) {
+        producedDataBuffer.add( streamElement );
+     }
+     try {
+       Mappings.getContainer( ).publishData( this );
+     } catch (SQLException e) {
+       logger.error(e.getMessage(),e);
+     }
    }
-   
-   private static boolean compatibleStructure ( StreamElement se ,  DataField [] outputStructure ) {
-	   if ( outputStructure.length != se.getFieldNames().length ) {
+   /**
+    * Calls the dataProduced with adjust = false.
+    * @param streamElement
+    */
+   protected synchronized void dataProduced ( StreamElement streamElement ) {
+     dataProduced(streamElement,false);
+   }
+   /**
+    * First checks compatibility of the data type of each output data item in the stream element with the
+    * defined output in the VSD file. (this check is done regardless of the value for adjust flag).
+    * <p>
+    * If the adjust flag is set to true, the method checks the newly generated stream element
+    * and returns true if and only if the number of data items is equal to the number of output
+    * data structure defined for this virtual sensor.
+    * If the adjust=true, then this test is not performed.
+    * 
+    * @param se
+    * @param outputStructure
+    * @param adjust default is false.
+    * @return
+    */
+   private static boolean compatibleStructure ( StreamElement se ,  DataField [] outputStructure ,boolean adjust ) {
+     if (!adjust && outputStructure.length != se.getFieldNames().length ) {
 		   logger.warn( "Validation problem, the number of field doesn't match the number of output data strcture of the virtual sensor" );
 		   return false;
 	   }
 	   for ( int i = 0 ; i < outputStructure.length ; i++ ) 
 		   for (int j=0;j<se.getFieldNames().length;j++)
 			   if ( outputStructure[i].getName().equalsIgnoreCase(se.getFieldNames()[j]))
-				   if (se.getFieldTypes()[ i ] != outputStructure[ j ].getDataTypeID( ) ) {
-					   logger.warn( "Validation problem for output field >" + outputStructure[ i ].getName( ) + ", The field type declared as >" + DataTypes.TYPE_NAMES[ se.getFieldTypes()[ i ] ]);
+				   if (outputStructure[ i ].getDataTypeID( ) != se.getFieldTypes()[ j ] ) {
+					   logger.warn( "Validation problem for output field >" + outputStructure[ i ].getName( ) + ", The field type declared as >" + DataTypes.TYPE_NAMES[ se.getFieldTypes()[ j ] ]+"< while in VSD it is defined as >"+DataTypes.TYPE_NAMES[outputStructure[ i ].getDataTypeID( )]);
 					   return false;
 				   }
 	   return true;
@@ -86,8 +113,8 @@ public abstract class AbstractVirtualSensor {
    
    public synchronized StreamElement getData ( ) {
       StreamElement toReturn;
-      synchronized ( producedData ) {
-         toReturn = producedData.remove( 0 );
+      synchronized ( producedDataBuffer ) {
+         toReturn = producedDataBuffer.remove( 0 );
       }
       return toReturn;
    }

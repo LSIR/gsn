@@ -48,7 +48,7 @@ public class PublicToMSRTest {
     sensorDescriptor.setLatitude(conf.getLatitude());
     sensorDescriptor.setLongitude(conf.getLongitude());
     sensorDescriptor.setAltitude(conf.getAltitude());
-    sensorDescriptor.setSensorType(MSRSensorDescriptor.SENSOR_TYPE_GENERIC);
+    sensorDescriptor.setSensorType(MSRSensorDescriptor.SENSOR_TYPE_GEORSS);
     sensorDescriptor.setDataType(MSRSensorDescriptor.DATA_TYPE_HTML);
     sensorDescriptor.setUnit("Custom");
     sensorDescriptor.setSamplingPeriod(1);

@@ -2,15 +2,8 @@ package gsn.vsensor;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-
 import org.apache.log4j.Logger;
-
 import java.io.Serializable;
-
-import net.tinyos.packet.*;
-import net.tinyos.util.*;
-import net.tinyos.message.*;
-import net.tinyos.tools.*;
 
 /** 
  * This virtual sensor is used for accessing Sensorscope data with
@@ -141,9 +134,8 @@ public class SensorscopeVS extends AbstractVirtualSensor {
                 solarRadiation, airTemperature, airHumidity, skinTemperature, 
                 soilMoisture, windDirection } , 
             System.currentTimeMillis() );
-        dataProduced( out );
-
-    }
+        dataProduced( out,true );//flexibile output.
+ }
     
    public double getRainMeter ( short rawValue ) {
       return rawValue * 0.254;
