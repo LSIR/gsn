@@ -808,9 +808,9 @@ var GSN = {
 							GSN.data.fields.push($(this).attr("name"));
 							GSN.data.fields_type.push($(this).attr("type"));
 							if (radio) {
-								if (($(this).attr("type") == "int") || ($(this).attr("type") == "long") || ($(this).attr("type") == "double")) {
+								//if (($(this).attr("type") == "int") || ($(this).attr("type") == "long") || ($(this).attr("type") == "double")) {
 									$("#fields").append("<div id='" + $(this).attr("name") + "'><input type=\"checkbox\" name=\"fields\" id=\"field\" value=\""+$(this).attr("name")+"\" onClick=\"javascript:GSN.data.aggregateSelect('"+$(this).attr("name")+"',this.checked)\">"+$(this).attr("name")+" </div>");
-								}
+								//}
 							} else {
 								$("#fields").append("<input type=\"checkbox\" name=\"fields\" id=\"field\" value=\""+$(this).attr("name")+"\">"+$(this).attr("name")+"<br/>");
 							}
@@ -819,7 +819,7 @@ var GSN = {
 					if (radio) {
 						$("#fields").append("<br/>Group by : <select name=\"aggregateGB\" id=\"aggregateGB\" size=\"1\" onChange=\"javascript:GSN.data.groupBy(this.value)\"></select><br/>");
 						for (i = 0; i < GSN.data.fields.length; i++) {
-							$("#aggregateGB").append("<option value=\"" + GSN.data.fields[i] + "\">" + GSN.data.fields[i] + "</option>");
+						  $("#aggregateGB").append("<option value=\"" + GSN.data.fields[i] + "\">" + GSN.data.fields[i] + "</option>");
 						}
 						$("#aggregateGB").append("<option value=\"none\">None</option>");
 					} else {
