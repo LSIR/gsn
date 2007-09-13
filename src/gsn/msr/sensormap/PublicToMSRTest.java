@@ -2,9 +2,7 @@ package gsn.msr.sensormap;
 
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
-
 import java.io.ByteArrayOutputStream;
-import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.net.URL;
 import javax.xml.namespace.QName;
@@ -19,7 +17,6 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
-
 import org.apache.log4j.Logger;
 
 public class PublicToMSRTest {

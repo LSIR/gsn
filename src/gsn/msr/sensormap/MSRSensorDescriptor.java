@@ -27,6 +27,7 @@ public class MSRSensorDescriptor {
   public static String SENSOR_TYPE_TRAFFIC = "http://research.microsoft.com/nec/sensor/type/SensorType.owl#Traffic";
   public static String SENSOR_TYPE_PARKING ="http://research.microsoft.com/nec/sensor/type/SensorType.owl#Parking";
   public static String SENSOR_TYPE_GENERIC =  "http://research.microsoft.com/nec/sensor/type/SensorType.owl#Generic";
+  public static String SENSOR_TYPE_GEORSS =  "http://research.microsoft.com/nec/sensor/type/SensorType.owl#GeoRSS";
   
   private String sensorType;
  
