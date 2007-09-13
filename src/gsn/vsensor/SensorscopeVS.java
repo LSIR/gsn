@@ -116,7 +116,7 @@ public class SensorscopeVS extends AbstractVirtualSensor {
             } else if(fieldName.equals(AIR_HUMIDITY)) {
                 airHumidity = getHumidity((Integer) dataFields[i], airTemperature);
             } else if(fieldName.equals(SKIN_TEMPERATURE)) {
-                skinTemperature = getTemperature((Integer) dataFields[i]);
+                skinTemperature = getSkinTemperature((Integer) dataFields[i]);
             } else if(fieldName.equals(SOIL_MOISTURE)) {
                 soilMoisture = getSoilMoisture((Integer) dataFields[i]);
             } else if(fieldName.equals(WIND_DIRECTION)) {
@@ -209,6 +209,14 @@ public class SensorscopeVS extends AbstractVirtualSensor {
       } else {
          return NO_VALUE;
       }
+    }
+    
+    public double getSkinTemperature (int rawValue) {
+        if ( rawValue != 0 ) {
+            return ( rawValue / 16.0 ) - 273.15;
+        } else {
+            return NO_VALUE;
+        }
     }
 
     public double getHumidity (int rawValue, double temperature) {
