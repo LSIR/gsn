@@ -27,7 +27,11 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedOutput;
-
+/**
+ * rss?vsname=nameOFVS&locatable=true
+ * @author salehi
+ *
+ */
 public class MSRSenseRSSHandler extends HttpServlet{
   
   private static transient Logger logger             = Logger.getLogger( MSRSenseRSSHandler.class );

@@ -457,11 +457,11 @@ public class VSensorConfig implements Serializable {
   public void preprocess_addressing() {
     if (!addressing_processed) {
       for (KeyValue kv:getAddressing())
-        if (kv.getKey().equals("altitude"))
+        if (kv.getKey().toString().equalsIgnoreCase("altitude"))
           cached_altitude=Double.parseDouble(kv.getValue().toString());
-        else if (kv.getKey().equals("longitude"))
+        else if (kv.getKey().toString().equalsIgnoreCase("longitude"))
           cached_longitude=Double.parseDouble(kv.getValue().toString());
-        else if (kv.getKey().equals("latitude"))
+        else if (kv.getKey().toString().equalsIgnoreCase("latitude"))
           cached_latitude=Double.parseDouble(kv.getValue().toString());
       addressing_processed=true;
     }
