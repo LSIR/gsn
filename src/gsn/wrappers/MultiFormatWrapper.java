@@ -1,5 +1,9 @@
 package gsn.wrappers;
 
+import java.io.Serializable;
+
+import net.tinyos.packet.Serial;
+
 import org.apache.log4j.Logger;
 import gsn.beans.DataField;
 
@@ -56,10 +60,9 @@ public class MultiFormatWrapper extends AbstractWrapper{
 				temperature = ((int)(Math.random()*1000))/10.0;
 				packetType=2;
 			}
-			if (packetType>0) {
-				postStreamElement(packetType,temperature,light);
-			}
-
+			if (packetType>0) 
+				postStreamElement(new Serializable[] {packetType,temperature,light});
+	
 		}
 	}   
 }

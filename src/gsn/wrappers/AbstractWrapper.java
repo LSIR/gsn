@@ -162,6 +162,10 @@ public abstract class AbstractWrapper extends Thread {
 		StreamElement se = new StreamElement(getOutputFormat(),values,System.currentTimeMillis());
 		postStreamElement(se);
 	}
+	protected void postStreamElement ( long timestamp, Serializable... values  ) {
+	  StreamElement se = new StreamElement(getOutputFormat(),values,timestamp);
+	  postStreamElement(se);
+	}
 
 	/**
 	 * This method gets the generated stream element and notifies the input streams if needed.
