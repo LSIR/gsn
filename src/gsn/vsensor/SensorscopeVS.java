@@ -82,8 +82,9 @@ public class SensorscopeVS extends AbstractVirtualSensor {
         
         // Air temperature is needed afterwards by watermark and humidity,
         // so it has to be calculated first
-        int i=0;
+        int i = 0;
         for(String fieldName : data.getFieldNames()) {
+            fieldName = fieldName.toUpperCase();
             if(fieldName.equals(AIR_TEMPERATURE)) {
                 airTemperature = getTemperature((Integer) dataFields[i]);
             }
