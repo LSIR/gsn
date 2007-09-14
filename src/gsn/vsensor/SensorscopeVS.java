@@ -4,6 +4,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import org.apache.log4j.Logger;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /** 
  * This virtual sensor is used for accessing Sensorscope data with
@@ -35,12 +36,6 @@ public class SensorscopeVS extends AbstractVirtualSensor {
     private static final String WIND_DIRECTION = "WINDDIRECTION";
     private static final String FOO = "FOO";
     
-    private static final String [ ] FIELD_NAMES = new String [ ] { 
-            NTW_SENDER_ID, NTW_DISTANCE_TO_BTS, TSP_HOP_COUNT, TSP_PACKET_SN,
-            REPORTER_ID, TIMESTAMP, RAIN_METER, WIND_SPEED, WATERMARK,
-            SOLAR_RADIATION, AIR_TEMPERATURE, AIR_HUMIDITY, SKIN_TEMPERATURE,
-            SOIL_MOISTURE, WIND_DIRECTION };
-
     public boolean initialize ( ) {
         return true;
     }
@@ -83,58 +78,110 @@ public class SensorscopeVS extends AbstractVirtualSensor {
             }
             i++;
         }
+        
+        // Output structure is adjusted dynamically depending on what input fields
+        // are got.
+        // fieldNames is for the field names of input stream element, they
+        //    will be the same for output as well
+        // dataTypes is for datatypes of the output values. These are set
+        //    statically, because the input values are all int or short and
+        //    outputs are short or double
+        // datas has the actual data, which is calculated here
+        ArrayList<String> fieldNames = new ArrayList<String>();
+        ArrayList<Byte> dataTypes = new ArrayList<Byte>();
+        ArrayList<Serializable> datas = new ArrayList<Serializable>();
         i=0;
         for(String fieldName : data.getFieldNames()) {
             fieldName = fieldName.toUpperCase();
             if(fieldName.equals(NTW_SENDER_ID)) {
                 ntwSenderId = (Short) dataFields[i];
+                fieldNames.add(NTW_SENDER_ID);
+                dataTypes.add(DataTypes.SMALLINT);
+                datas.add(ntwSenderId);
             } else if(fieldName.equals(NTW_DISTANCE_TO_BTS)) {
                 ntwDistToBts = (Short) dataFields[i];
+                fieldNames.add(NTW_DISTANCE_TO_BTS);
+                dataTypes.add(DataTypes.SMALLINT);
+                datas.add(ntwDistToBts);
             } else if(fieldName.equals(TSP_HOP_COUNT)) {
                 tspHopCount = (Short) dataFields[i];
+                fieldNames.add(TSP_HOP_COUNT);
+                dataTypes.add(DataTypes.SMALLINT);
+                datas.add(tspHopCount);
             } else if(fieldName.equals(TSP_PACKET_SN)) {
                 tspPacketSn = (Short) dataFields[i];
+                fieldNames.add(TSP_PACKET_SN);
+                dataTypes.add(DataTypes.SMALLINT);
+                datas.add(tspPacketSn);
             } else if(fieldName.equals(REPORTER_ID)) {
                 reporterId = (Short) dataFields[i];
+                fieldNames.add(REPORTER_ID);
+                dataTypes.add(DataTypes.SMALLINT);
+                datas.add(reporterId);
             } else if(fieldName.equals(TIMESTAMP)) {
                 timestamp = (Long) dataFields[i];
+                fieldNames.add(TIMESTAMP);
+                dataTypes.add(DataTypes.BIGINT);
+                datas.add(timestamp);
             } else if(fieldName.equals(RAIN_METER)) {
                 rainMeter = getRainMeter((Short) dataFields[i]);
+                fieldNames.add(RAIN_METER);
+                dataTypes.add(DataTypes.DOUBLE);
+                datas.add(rainMeter);
             } else if(fieldName.equals(WIND_SPEED)) {
                 windSpeed = getWindSpeed((Short) dataFields[i]);
+                fieldNames.add(WIND_SPEED);
+                dataTypes.add(DataTypes.DOUBLE);
+                datas.add(windSpeed);
             } else if(fieldName.equals(WATERMARK)) {
                 watermark = getWatermark((Integer) dataFields[i], airTemperature);
+                fieldNames.add(WATERMARK);
+                dataTypes.add(DataTypes.DOUBLE);
+                datas.add(watermark);
             } else if(fieldName.equals(SOLAR_RADIATION)) {
                 solarRadiation = getSolarRadiation((Integer) dataFields[i]);
+                fieldNames.add(SOLAR_RADIATION);
+                dataTypes.add(DataTypes.DOUBLE);
+                datas.add(solarRadiation);
+            } else if(fieldName.equals(AIR_TEMPERATURE)) {
+                fieldNames.add(AIR_TEMPERATURE);
+                dataTypes.add(DataTypes.DOUBLE);
+                datas.add(airTemperature);
             } else if(fieldName.equals(AIR_HUMIDITY)) {
                 airHumidity = getHumidity((Integer) dataFields[i], airTemperature);
+                fieldNames.add(AIR_HUMIDITY);
+                dataTypes.add(DataTypes.DOUBLE);
+                datas.add(airHumidity);
             } else if(fieldName.equals(SKIN_TEMPERATURE)) {
                 skinTemperature = getSkinTemperature((Integer) dataFields[i]);
+                fieldNames.add(SKIN_TEMPERATURE);
+                dataTypes.add(DataTypes.DOUBLE);
+                datas.add(skinTemperature);
             } else if(fieldName.equals(SOIL_MOISTURE)) {
                 soilMoisture = getSoilMoisture((Integer) dataFields[i]);
+                fieldNames.add(SOIL_MOISTURE);
+                dataTypes.add(DataTypes.DOUBLE);
+                datas.add(soilMoisture);
             } else if(fieldName.equals(WIND_DIRECTION)) {
                 windDirection = getWindDirection((Integer) dataFields[i]);
+                fieldNames.add(WIND_DIRECTION);
+                dataTypes.add(DataTypes.DOUBLE);
+                datas.add(windDirection);
             } else if(fieldName.equals(FOO)) {
                 foo = (Short) dataFields[i];
+                fieldNames.add(FOO);
+                dataTypes.add(DataTypes.SMALLINT);
+                datas.add(foo);
             }
             i++;
         }
         
-        
-        // foo is left out from the output
-        StreamElement out = new StreamElement( FIELD_NAMES , 
-            new Byte[ ] { 
-                DataTypes.SMALLINT, DataTypes.SMALLINT, DataTypes.SMALLINT, DataTypes.SMALLINT,
-                DataTypes.SMALLINT, DataTypes.BIGINT, DataTypes.DOUBLE, DataTypes.DOUBLE,
-                DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE,
-                DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE } , 
-            new Serializable [ ] { 
-                ntwSenderId, ntwDistToBts, tspHopCount, tspPacketSn,
-                reporterId, timestamp, rainMeter, windSpeed, watermark,
-                solarRadiation, airTemperature, airHumidity, skinTemperature, 
-                soilMoisture, windDirection } , 
-            System.currentTimeMillis() );
-        dataProduced( out,true );//flexibile output.
+        StreamElement out = new StreamElement( 
+                fieldNames.toArray(new String[] {}) , 
+                dataTypes.toArray(new Byte[] {}),
+                datas.toArray(new Serializable[] {}),
+                System.currentTimeMillis() );
+        dataProduced( out, true );//flexibile output.
  }
     
    public double getRainMeter ( short rawValue ) {
