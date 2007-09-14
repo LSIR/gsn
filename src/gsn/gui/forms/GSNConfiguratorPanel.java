@@ -111,7 +111,7 @@ public class GSNConfiguratorPanel implements ActionListener {
 	}
 
 	public void stopGsn() {
-		try {
+//		try {
 			GSNStop.stopGSN();
 			gsnIsRunning = false;
 			gsnStart.setIcon(startIcon);
@@ -127,10 +127,10 @@ public class GSNConfiguratorPanel implements ActionListener {
 				listener.notifyGSNStop();
 			stopWatchingLog();
 
-		} catch(IOException e) {
-			// Could not connect to GSN. Assume it is not running.
-			JOptionPane.showMessageDialog(null, "Could not connect to GSN. It either has already stopped or has not yet finished initialization (error message was: " + e.getMessage() +").");
-		}
+//		} catch(IOException e) {
+//			// Could not connect to GSN. Assume it is not running.
+//			JOptionPane.showMessageDialog(null, "Could not connect to GSN. It either has already stopped or has not yet finished initialization (error message was: " + e.getMessage() +").");
+//		}
 	}
 
 	public void actionPerformed(ActionEvent e) {
