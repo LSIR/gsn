@@ -67,7 +67,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	public void dataAvailable ( String inputStreamName , StreamElement streamElement ) {
-		StringBuilder query = StorageManager.getStatementInsert(table_name, getVirtualSensorConfiguration().getOutputStructure(), streamElement);
+		StringBuilder query = StorageManager.getStatementInsert(table_name, getVirtualSensorConfiguration().getOutputStructure());
 		
 		try {
 			StorageManager.executeInsert(table_name ,getVirtualSensorConfiguration().getOutputStructure(),streamElement,getConnection() );
