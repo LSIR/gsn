@@ -110,7 +110,7 @@
           target: stop              
          ================================= -->
     <target name="stop" depends="build" description="Stop's the running GSN server (if any)">
-       <java classname="gsn.GSNStop" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}" classpathref="classpath"/>
+       <java classname="gsn.GSNStop" maxmemory="${maxMemoryUsage}"  fork="false" dir="${basedir}" classpathref="classpath"/>
     </target>
 
    <target name="securityTest" depends="bind">

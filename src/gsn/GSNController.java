@@ -111,7 +111,6 @@ public class GSNController extends Thread {
 							logger
 									.warn("Could not shut down virtual sensors properly. We are probably exiting GSN before it has been completely initialized.");
 						}
-						System.exit(0);
 					} else if (GSN_CONTROL_LIST_LOADED_VSENSORS.equalsIgnoreCase(message)) {
 						Graph<VSensorConfig> dependencyGraph = Modifications.buildDependencyGraphFromIterator(Mappings
 								.getAllVSensorConfigs());

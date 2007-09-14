@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -61,13 +62,13 @@ public final class Main {
   
   public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
   
-  public static void main ( String [ ]  args) throws IOException , RuntimeException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
+  public static void main ( String [ ]  args)  {
     System.out.println("GSN Starting ...");
-    controlSocket = new GSNController(null);
     ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
     ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
     PropertyConfigurator.configure ( DEFAULT_GSN_LOG4J_PROPERTIES );
     try {
+      controlSocket = new GSNController(null);
       initialize ( "conf/gsn.xml" );
     } catch ( JiBXException e ) {
       logger.error ( e.getMessage ( ) );
@@ -75,17 +76,26 @@ public final class Main {
       logger.error ( "Please check the syntax of the file to be sure it is compatible with the requirements." );
       logger.error ( "You can find a sample configuration file from the GSN release." );
       if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
-      System.exit ( 1 );
+      return;
     } catch ( FileNotFoundException e ) {
       logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
       logger.error ( e.getMessage ( ) );
       logger.error ( "Check the path of the configuration file and try again." );
       if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
-      System.exit ( 1 );
+      return;
     } catch ( ClassNotFoundException e ) {
       logger.error ( "The file wrapper.properties refers to one or more classes which don't exist in the classpath");
       logger.error ( e.getMessage ( ),e );
-      System.exit ( 1 );
+      return;
+    } catch (UnknownHostException e) {
+      logger.error ( e.getMessage ( ),e );
+      return;
+    } catch (IOException e) {
+      logger.error ( e.getMessage ( ),e );
+      return;
+    } catch (Exception e) {
+      logger.error ( e.getMessage ( ),e );
+      return;    
     }
     StorageManager.getInstance ( ).initialize ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) );
     if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
@@ -127,7 +137,7 @@ public final class Main {
     } catch ( Exception e ) {
       logger.error ( "Start of the HTTP server failed. The HTTP protocol is used in most of the communications." );
       logger.error ( e.getMessage ( ) , e );
-      System.exit ( 1 );
+      return;
     }
     final VSensorLoader vsloader = new VSensorLoader ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
     controlSocket.setLoader(vsloader);

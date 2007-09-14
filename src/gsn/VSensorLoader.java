@@ -363,6 +363,8 @@ public class VSensorLoader extends Thread {
       sm.shutdown ( );
     } catch ( SQLException e ) {
       e.printStackTrace ( );
+    }finally {
+      System.exit(0);
     }
   }
 }
