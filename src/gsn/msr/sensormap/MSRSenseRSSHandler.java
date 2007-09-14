@@ -55,10 +55,8 @@ public class MSRSenseRSSHandler extends HttpServlet{
     feed.setTitle(Main.getContainerConfig().getWebName());
     feed.setDescription(Main.getContainerConfig().getWebDescription());
     feed.setAuthor(Main.getContainerConfig().getWebAuthor());
-    feed.setLink("http://"+Main.getContainerConfig().getContainerPort()+"/rss");
-    feed.setDescription("description of this GSN node");
+    feed.setLink("http://"+Main.getContainerConfig().getMsrMap().get("host")+":"+Main.getContainerConfig().getContainerPort());
     ArrayList<SyndEntry> entries = new ArrayList<SyndEntry>();
-    // http://localhost:22001/rss?vsname=invmaccess
     Boolean location_required = HttpRequestUtils.getBooleanParameter("locatable", false, req);
     VSensorConfig config = Mappings.getVSensorConfig(req.getParameter("vsname"));//if missing, means that all virtual sensors.
     if (config==null) {
@@ -80,17 +78,12 @@ public class MSRSenseRSSHandler extends HttpServlet{
   private SyndEntry generateFeed(VSensorConfig conf,boolean locatable) {
     SyndEntry entry = new SyndEntryImpl();
     entry.setTitle(conf.getName());
-    
-    
-//  entry.setLink("http://localhost:22001/");
     SyndContent  description = new SyndContentImpl();
     description.setType("text/html");
     entry.setDescription(description);
-    
-//  description.setValue("<![CDATA["+"TEST"+"]]>");
     ArrayList<StreamElement> values = ContainerInfoHandler.getMostRecentValueFor(conf.getName());
     StringBuilder formattedOutput = new StringBuilder();
-    formattedOutput.append("<table class=\"gsn\"><thead><tr><td>Sensor Name</td><td>Value</td></tr></thead><tbody>");
+    formattedOutput.append("<table class=\"gsn\"><thead><tr><td>Sensor Name</td><td>Value</td><td></td></tr></thead><tbody>");
     boolean hasValue =(values!=null&&!values.isEmpty()); 
     for (StreamElement se:values) {
       for ( DataField df : conf.getOutputStructure( ) ) { 
@@ -99,13 +92,14 @@ public class MSRSenseRSSHandler extends HttpServlet{
           formattedOutput.append("No data available.</td></tr>");
           continue;
         }
+        String url = "http://"+Main.getContainerConfig().getMsrMap().get("host")+":"+Main.getContainerConfig().getContainerPort()+"/data?vsname="+conf.getName()+"&nb=100&display=CSV&commonReq=true&fields="+df.getName()+"&fields=timed";
         if (df.getDataTypeID()==DataTypes.BINARY && df.getType().toLowerCase().indexOf("image")>=0)
           formattedOutput.append("<img src=\"").append(se.getData(df.getName())).append("\" />");
         else if (df.getDataTypeID()==DataTypes.BINARY)
           formattedOutput.append("<a href=\"").append(se.getData(df.getName())).append("\" >Download</a>");
         else   
           formattedOutput.append(se.getData(df.getName()));
-        formattedOutput.append("</td></tr>");
+        formattedOutput.append("</td><td><a class=\"data_links\" href=\""+url+"\" >Get data</a></td></tr>");
       }
       entry.setPublishedDate(new Date(values.get(0).getTimeStamp()));
     }
