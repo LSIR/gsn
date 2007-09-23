@@ -33,6 +33,7 @@ public class StreamSourcePresentationModel extends PresentationModel {
 		getBufferedModel(StreamSourceModel.PROPERTY_ALIAS).addValueChangeListener(handler);
 		getBufferedModel(StreamSourceModel.PROPERTY_SQL_QUERY).addValueChangeListener(handler);
 		getBufferedModel(StreamSourceModel.PROPERTY_RAW_HISTORY_SIZE).addValueChangeListener(handler);
+		getBufferedModel(StreamSourceModel.PROPERTY_RAW_SLIDE_VALUE).addValueChangeListener(handler);
 	}
 
 	private void updateValidationResult() {
@@ -48,29 +49,37 @@ public class StreamSourcePresentationModel extends PresentationModel {
 		if (null == getBufferedValue(StreamSourceModel.PROPERTY_SQL_QUERY)
 				|| ValidationUtils.isBlank(String.valueOf(getBufferedValue(StreamSourceModel.PROPERTY_SQL_QUERY))))
 			support.addError("SqlQuery", "should not be empty");
+		
 		String rawHistorySize = (String) getBufferedValue(StreamSourceModel.PROPERTY_RAW_HISTORY_SIZE);
-		if (!GenericValidator.isBlankOrNull(rawHistorySize)) {
-			rawHistorySize = rawHistorySize.replace( " " , "" ).trim( ).toLowerCase( );
-			final int mIndex = rawHistorySize.indexOf("m");
-			final int hIndex = rawHistorySize.indexOf("h");
-			final int sIndex = rawHistorySize.indexOf("s");
+		validateRawSize(rawHistorySize, StreamSourceModel.PROPERTY_RAW_HISTORY_SIZE, "History Size", "invalid history size");
+		
+		String rawSlideValue = (String) getBufferedValue(StreamSourceModel.PROPERTY_RAW_SLIDE_VALUE);
+		validateRawSize(rawSlideValue, StreamSourceModel.PROPERTY_RAW_SLIDE_VALUE, "Slide Value", "invalid slide value");
+		return support.getResult();
+	}
+
+	private void validateRawSize(String rawSize, String beanProperty, String errorProperty, String errotMessage) {
+		if (!GenericValidator.isBlankOrNull(rawSize)) {
+			rawSize = rawSize.replace(" ", "").trim().toLowerCase();
+			final int mIndex = rawSize.indexOf("m");
+			final int hIndex = rawSize.indexOf("h");
+			final int sIndex = rawSize.indexOf("s");
 			if (mIndex < 0 && hIndex < 0 && sIndex < 0) {
-				if (!GenericValidator.isInt(rawHistorySize))
-					support.addError("History Size", "invalid history size");
+				if (!GenericValidator.isInt(rawSize))
+					support.addError(errorProperty, errotMessage);
 			} else {
-				final StringBuilder shs = new StringBuilder(rawHistorySize);
+				final StringBuilder shs = new StringBuilder(rawSize);
 				int index = sIndex;
 				if (hIndex >= 0)
 					index = hIndex;
 				else if (mIndex >= 0)
 					index = mIndex;
 				if (index != shs.length() - 1 || !GenericValidator.isInt(shs.deleteCharAt(index).toString()))
-					support.addError("History Size", "invalid history size");
+					support.addError(errorProperty, errotMessage);
 			}
-		}else{
-			setBufferedValue(StreamSourceModel.PROPERTY_RAW_HISTORY_SIZE, null);
+		} else {
+			setBufferedValue(beanProperty, null);
 		}
-		return support.getResult();
 	}
 
 	private final class ValidationUpdateHandler implements PropertyChangeListener {

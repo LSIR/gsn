@@ -21,6 +21,8 @@ public class StreamSourceModel extends Model {
 
 	public static final String PROPERTY_SQL_QUERY = "sqlQuery";
 
+	public static final String PROPERTY_RAW_SLIDE_VALUE = "rawSlideValue";
+
 	private String alias;
 
 	private float samplingRate;
@@ -30,6 +32,8 @@ public class StreamSourceModel extends Model {
 	private String endTime;
 
 	private String rawHistorySize;
+	
+	private String rawSlideValue;
 
 	private int disconnectedBufferSize;
 
@@ -47,6 +51,7 @@ public class StreamSourceModel extends Model {
 		startTime = streamSource.getStartTime();
 		endTime = streamSource.getEndTime();
 		rawHistorySize = streamSource.getRawHistorySize();
+		rawSlideValue = streamSource.getSlideValue();
 		disconnectedBufferSize = streamSource.getDisconnectedBufferSize();
 		sqlQuery = streamSource.getSqlQuery();
 		addressing = new ArrayListModel();
@@ -115,7 +120,17 @@ public class StreamSourceModel extends Model {
 		this.rawHistorySize = rawHistorySize;
 		firePropertyChange(PROPERTY_RAW_HISTORY_SIZE, oldRawHistorySize, rawHistorySize);
 	}
+	
+	public String getRawSlideValue() {
+		return rawSlideValue;
+	}
 
+	public void setRawSlideValue(String rawSlideValue) {
+		String oldRawSlideValue = getRawSlideValue();
+		this.rawSlideValue = rawSlideValue;
+		firePropertyChange(PROPERTY_RAW_SLIDE_VALUE, oldRawSlideValue, rawSlideValue);
+	}
+	
 	public float getSamplingRate() {
 		return samplingRate;
 	}
@@ -150,6 +165,7 @@ public class StreamSourceModel extends Model {
 		StreamSource streamSource = new StreamSource();
 		streamSource.setAlias(getAlias());
 		streamSource.setRawHistorySize(getRawHistorySize());
+		streamSource.setRawSlideValue(getRawSlideValue());
 		streamSource.setSamplingRate(getSamplingRate());
 		streamSource.setSqlQuery(getSqlQuery());
 		streamSource.setEndTime(getEndTime());

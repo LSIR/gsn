@@ -68,6 +68,8 @@ public class StreamSourceEditorDialog extends JDialog {
 
 	private JTextField historySizeTextField;
 
+	private JTextField slideValueTextField;
+
 	private JTextField queryTextField;
 
 	private AddressBeanEditorPanel addressBeanEditorPanel;
@@ -195,6 +197,8 @@ public class StreamSourceEditorDialog extends JDialog {
 				.getBufferedModel(StreamSourceModel.PROPERTY_SAMPLING_RATE), formatter);
 		historySizeTextField = BasicComponentFactory.createTextField(presentationModel
 				.getBufferedModel(StreamSourceModel.PROPERTY_RAW_HISTORY_SIZE));
+		slideValueTextField = BasicComponentFactory.createTextField(presentationModel
+				.getBufferedModel(StreamSourceModel.PROPERTY_RAW_SLIDE_VALUE));
 		queryTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_SQL_QUERY));
 
 		addressingList = BasicComponentFactory.createList(selectionInList, new AddressBeanListCellRenderer());
@@ -216,6 +220,7 @@ public class StreamSourceEditorDialog extends JDialog {
 		ValidationComponentUtils.setMandatory(queryTextField, true);
 		ValidationComponentUtils.setMessageKey(queryTextField, "StreamSource.SqlQuery");
 		ValidationComponentUtils.setMessageKey(historySizeTextField, "StreamSource.History Size");
+		ValidationComponentUtils.setMessageKey(slideValueTextField, "StreamSource.Slide Value");
 	}
 
 	private void initEventHandling() {
@@ -337,7 +342,7 @@ public class StreamSourceEditorDialog extends JDialog {
 	}
 
 	private JComponent buildAddressingBeanPanel() {
-		FormLayout layout = new FormLayout("right:max(pref;40), 4dlu, pref:g, 7dlu, pref", "pref, 3dlu, pref");
+		FormLayout layout = new FormLayout("right:max(pref;40), 4dlu, pref:g, 7dlu, pref", "pref, 3dlu, min(pref;100)");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
@@ -362,7 +367,7 @@ public class StreamSourceEditorDialog extends JDialog {
 
 	private JComponent buildEditorPanel() {
 		FormLayout layout = new FormLayout("right:pref, 4dlu, pref:g",
-				"pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, , 3dlu, pref");
+				"pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		CellConstraints cc = new CellConstraints();
 		builder.addLabel("Alias", cc.xy(1, 1));
@@ -373,12 +378,14 @@ public class StreamSourceEditorDialog extends JDialog {
 		builder.add(startTimeTextField, cc.xy(3, 5));
 		builder.addLabel("End Time", cc.xy(1, 7));
 		builder.add(endTimeTextField, cc.xy(3, 7));
-		builder.addLabel("History Size", cc.xy(1, 9));
+		builder.addLabel("Window Size", cc.xy(1, 9));
 		builder.add(historySizeTextField, cc.xy(3, 9));
-		builder.addLabel("Disconnected Buffer Size", cc.xy(1, 11));
-		builder.add(dbsTextField, cc.xy(3, 11));
-		builder.addLabel("Query", cc.xy(1, 13));
-		builder.add(queryTextField, cc.xy(3, 13));
+		builder.addLabel("Slide", cc.xy(1, 11));
+		builder.add(slideValueTextField, cc.xy(3, 11));
+		builder.addLabel("Disconnected Buffer Size", cc.xy(1, 13));
+		builder.add(dbsTextField, cc.xy(3, 13));
+		builder.addLabel("Query", cc.xy(1, 15));
+		builder.add(queryTextField, cc.xy(3, 15));
 		return builder.getPanel();
 	}
 

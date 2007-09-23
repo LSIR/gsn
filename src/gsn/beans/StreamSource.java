@@ -240,6 +240,13 @@ public  class StreamSource implements Serializable{
   }
   
   /**
+   * @return the slide value
+   */
+  public String getSlideValue () {
+	  return rawSlideValue != null ? rawSlideValue : String.valueOf(DEFAULT_SLIDE_VALUE);
+  }
+  
+  /**
    * @return Returns the sqlQuery.
    */
   public String getSqlQuery ( ) {

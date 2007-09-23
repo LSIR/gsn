@@ -609,6 +609,7 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 
 				StreamSource streamSource = inputStream.getSource(pinWidget.getPinName());
 				pinWidget.addChild(createTitleValueWidget(scene, "Window size : ", streamSource.getStorageSize()));
+				pinWidget.addChild(createTitleValueWidget(scene, "Slide size : ", streamSource.getSlideValue()));
 				pinWidget.addChild(createTitleValueWidget(scene, "Sampling rate : ", String.valueOf(streamSource.getSamplingRate())));
 				pinWidget.addChild(createTitleValueWidget(scene, "Disconnect buffer size : ", String.valueOf(streamSource
 						.getDisconnectedBufferSize())));
