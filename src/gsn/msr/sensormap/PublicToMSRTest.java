@@ -55,7 +55,7 @@ public class PublicToMSRTest {
     sensorDescriptor.setReportPeriod(1);
     sensorDescriptor.setDescription(container_conf.getWebDescription());
     sensorDescriptor.setKeywords("");
-    sensorDescriptor.setUrl("http://"+host+":"+container_conf.getContainerPort()+"/rss?locatable=true&vsname="+conf.getName());// GeoRSS feed.
+    sensorDescriptor.setUrl("http://"+host+"/rss%3flocatable=true%26vsname="+conf.getName());// GeoRSS feed.
     
     // user info part.
     SOAPElement soapElement = soapBodyElement.addChildElement(soapEnvelope.createName("publisherName"));
@@ -88,10 +88,13 @@ public class PublicToMSRTest {
     req_log_out.write('\n');
     response.writeTo(req_log_out);
     String req_log_str = req_log_out.toString();
-    if (req_log_str.indexOf("OK")>0 || (req_log_str.indexOf("ERROR")>0 && req_log_str.indexOf("same name and publisher exists")>0 )) {
-     logger.warn("Registeration of virtual sensor: "+conf.getName()+" to the microsoft sensor map done successfully.");
-      logger.debug(req_log_str);
-    }    else {//there is an error
+    if (req_log_str.indexOf("OK")>0 ) {
+     logger.warn("Registeration of virtual sensor: "+conf.getName()+" to the microsoft sensor map done successfully."+req_log_str);
+     logger.debug(req_log_str);
+    }else if ( req_log_str.indexOf("ERROR")>0 && req_log_str.indexOf("same name and publisher exists")>0 ) {
+      logger.warn("(re)Registeration of virtual sensor: "+conf.getName()+"."+req_log_str);
+     // logger.debug(req_log_str);
+    }else {//there is an error
     logger.warn("Registeration to the sensor map failed, here are the request and respond");
     logger.warn(req_log_str);
     }

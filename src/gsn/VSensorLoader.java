@@ -163,6 +163,7 @@ public class VSensorLoader extends Thread {
     if (userName==null||password==null||host==null) {
       logger.warn("user and/or password and/or host parameters are missing from the gsn.xml file from the microsoft-research-sensormap path.");
       logger.warn("registeration to microsoft research sensormap failed.");
+      logger.warn("Not that the host has the format of machineName:PortNumber , missing PortNumber implies port 80.");
       return;
     }
     try {
