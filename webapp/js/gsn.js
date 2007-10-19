@@ -16,10 +16,26 @@ var GSN = {
 	*/
 	,load: function(){
 		//by default, load home
-		if (location.hash == "") location.hash = "home";
+		
+		
+		var splittedURL = window.location.href.split('/');
+		var pageName = splittedURL[splittedURL.length-1].split('.');
+		
+		
+		
+		if (pageName[0]=="data") location.hash = "data";
+		if (pageName[0]=="map") location.hash = "map";
+		if (location.hash == "" || pageName[0] == "index"){
+					location.hash = "home";
+					pageName[0] = "home";
+				}
+		
 		
 		GSN.debug("init:"+location.hash);
 		var params=location.hash.substr(1).split(",");
+		
+		//params[0] = pageName[0];
+		
 		
 		GSN.context = params[0];
 		//highlight the right tab in the navigation bar
