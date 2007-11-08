@@ -137,13 +137,13 @@ public class StreamSourceEditorPanel {
 				return streamSourceModel.getAlias();
 			case 1:
 				return streamSourceModel.getSamplingRate();
+//			case 2:
+//				return streamSourceModel.getStartTime();
+//			case 3:
+//				return streamSourceModel.getEndTime();
 			case 2:
-				return streamSourceModel.getStartTime();
-			case 3:
-				return streamSourceModel.getEndTime();
-			case 4:
 				return streamSourceModel.getRawHistorySize();
-			case 5:
+			case 3:
 				return streamSourceModel.getDisconnectedBufferSize();
 			default:
 				throw new IllegalStateException("Unknown column");

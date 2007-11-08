@@ -27,10 +27,6 @@ public  class StreamSource implements Serializable{
   
   private float                        samplingRate       ;
   
-  private String                        startTime;
-  
-  private String                        endTime;
-  
   private String                        rawHistorySize = null;
   
   private String                        rawSlideValue = null;
@@ -140,96 +136,6 @@ public  class StreamSource implements Serializable{
       this.samplingRate=newRate;
     else
       throw new GSNRuntimeException("Invalid sampling rate is provided. Sampling rate is between 0 and 1.");
-  }
-  
-  /**
-   * @return Returns the endTime.
-   */
-  public String getEndTime ( ) {
-    if ( this.endTime == null ) this.endTime = new SimpleDateFormat( dateFormats[ 0 ] ).format( new Date( System.currentTimeMillis( ) * 2 ) );
-    return endTime;
-  }
-  
-  /**
-   * @param endTime The endTime to set.
-   */
-  public StreamSource setEndTime ( final String endTime ) {
-    this.endTime = endTime;
-    this.endDate = null;
-    return this;
-  }
-  
-  /**
-   * @return Returns the startTime.
-   */
-  public String getStartTime ( ) {
-    if ( this.startTime == null ) this.startTime = new SimpleDateFormat( dateFormats[ 0 ] ).format( new Date( System.currentTimeMillis( ) ) );
-    return this.startTime;
-  }
-  
-  
-  public void setStartTime(String startTime){
-	  this.startTime = startTime;
-  }
-  /**
-   * Converts the result of the <code>getEndTime()</code> to a Date object
-   * and caches the object through execution.
-   * 
-   * @return Returns the endDate. <p/> Note that, if there is any error in
-   * conversion, the return value will be a Date object representing Long.Min
-   */
-  public Date getEndDate ( ) {
-    if ( this.endDate == null ) {
-      try {
-        this.endDate = DateUtils.parseDate( this.getEndTime( ) , dateFormats );
-      } catch ( final ParseException e ) {
-        logger.warn( e.getMessage( ) , e );
-        this.endDate = new Date( 0 );
-      }
-    }
-    return this.endDate;
-  }
-  
-  /**
-   * @return Returns the startDate.
-   */
-  public Date getStartDate ( ) {
-    if ( this.startDate == null ) {
-      try {
-        this.startDate = DateUtils.parseDate( this.getStartTime( ) , dateFormats );
-      } catch ( final ParseException e ) {
-        logger.warn("Stream Source disabled, invalid start time !\n "+ e.getMessage( ) , e );
-        this.startDate = new Date( Long.MAX_VALUE );
-      }
-    }
-    return this.startDate;
-  }
-  
-  
-  public boolean canStart () {
-    if (!validate())
-      return false;
-    Date startDate = getStartDate () ;
-    Date endDate = getEndDate () ;
-    Date now = new Date ( System.currentTimeMillis () ) ;
-    boolean result = false;
-    result = startDate.before ( now ) ;
-    result &= endDate.after ( now ) ;
-    return result ;
-  }
-  
-  /**
-   * Tries to find the first index of time the source is going to be accessed.
-   * If it can't parse the start time, it'll return Long.MAX_VALUE
-   * 
-   * @return Returns the current system time in the long form.
-   */
-  public long startTimeInLong ( ) {
-    long result = Long.MAX_VALUE;
-    final Date startDate = this.getStartDate( );
-    result = startDate.getTime( );
-    return result;
-    
   }
   
   /**
@@ -485,7 +391,7 @@ public  class StreamSource implements Serializable{
     else
       toReturn.append(" and " );
 //  Applying the ** START  AND END TIME ** for all types of windows based windows
- toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
+// toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
     
     if (isStorageCountBased()) {
   		if (StorageManager.isHsql()||StorageManager.isMysqlDB())

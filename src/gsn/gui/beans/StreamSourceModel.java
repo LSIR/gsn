@@ -27,10 +27,6 @@ public class StreamSourceModel extends Model {
 
 	private float samplingRate;
 
-	private String startTime;
-
-	private String endTime;
-
 	private String rawHistorySize;
 	
 	private String rawSlideValue;
@@ -48,8 +44,6 @@ public class StreamSourceModel extends Model {
 	public StreamSourceModel(StreamSource streamSource){
 		alias = (String) streamSource.getAlias();
 		samplingRate = streamSource.getSamplingRate();
-		startTime = streamSource.getStartTime();
-		endTime = streamSource.getEndTime();
 		rawHistorySize = streamSource.getRawHistorySize();
 		rawSlideValue = streamSource.getSlideValue();
 		disconnectedBufferSize = streamSource.getDisconnectedBufferSize();
@@ -100,17 +94,6 @@ public class StreamSourceModel extends Model {
 		firePropertyChange(PROPERTY_DISCONNECTED_BUFFER_SIZE, oldDisconnectedBufferSize, disconnectedBufferSize);
 	}
 
-	public String getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(String endTime) {
-		//TODO:use DateFormat
-		String oldEndTime = getEndTime();
-		this.endTime = endTime;
-		firePropertyChange(PROPERTY_END_TIME, oldEndTime, endTime);
-	}
-
 	public String getRawHistorySize() {
 		return rawHistorySize;
 	}
@@ -151,16 +134,6 @@ public class StreamSourceModel extends Model {
 		firePropertyChange(PROPERTY_SQL_QUERY, oldSqlQuery, sqlQuery);
 	}
 
-	public String getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(String startTime) {
-		String oldStartTime = getStartTime();
-		this.startTime = startTime;
-		firePropertyChange(PROPERTY_START_TIME, oldStartTime, startTime);
-	}
-
 	public StreamSource getStreamSource() {
 		StreamSource streamSource = new StreamSource();
 		streamSource.setAlias(getAlias());
@@ -168,8 +141,6 @@ public class StreamSourceModel extends Model {
 		streamSource.setRawSlideValue(getRawSlideValue());
 		streamSource.setSamplingRate(getSamplingRate());
 		streamSource.setSqlQuery(getSqlQuery());
-		streamSource.setEndTime(getEndTime());
-		streamSource.setStartTime(getStartTime());
 		streamSource.setDisconnectedBufferSize(getDisconnectedBufferSize());
 		AddressBean[] addressBeans = new AddressBean[addressing.size()];
 		for (int i = 0; i < addressing.size(); i++) {

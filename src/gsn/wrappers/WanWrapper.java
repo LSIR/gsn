@@ -1,0 +1,180 @@
+package gsn.wrappers;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import gsn.beans.DataField;
+import gsn.beans.StreamElement;
+import org.apache.log4j.Logger;
+import au.com.bytecode.opencsv.CSVReader;
+
+public class WanWrapper extends AbstractWrapper {
+  // The first line describes the data logger, had to check for each file it reads.
+  // The 2nd, 3rd and 4th lines are going to have data structure information for rest of the output
+  // Time stamp is always the first column in the output.
+  private static final String DateFormat = "yyyy-MM-dd HH:mm:ss";
+  
+  private static final String QUOTE = "\"";
+  private static final String SAMPLING = "sampling";
+  private int sampling = -1; //in milliseconds.
+  private int SAMPLING_DEFAULT = 10*60*1000; // 10 mins
+  
+  private static final String FILE = "file";
+  private String filename  =null; //in milliseconds.
+  
+  private long last_modified = -1;
+  
+  private final transient Logger   logger             = Logger.getLogger( WanWrapper.class );
+  private DataField[] structure;
+  private int threadCounter=0;
+  private SimpleDateFormat dateTimeFormat ;
+  public boolean initialize() {
+    setName( "WanWrapper-Thread:" + ( ++threadCounter ) );
+    dateTimeFormat = new SimpleDateFormat( DateFormat );
+    sampling = getActiveAddressBean( ).getPredicateValueAsInt(SAMPLING, SAMPLING_DEFAULT);
+    filename = getActiveAddressBean().getPredicateValue(FILE);
+    if (filename ==null||filename.length()==0 ) {
+      logger.error("The wrapper failed, the "+FILE+" parameter is missing.");
+      return false;
+    }
+    try {
+      structure = headerToStructure(getHeader(filename));
+    } catch (IOException e) {
+      logger.error("The system expects a valid content [at least headers] inside "+filename);
+      logger.error(e.getMessage(),e);
+      return false;
+    }
+    return true;
+  }
+  
+  public static String[][] getHeader(String filename) throws IOException {
+    CSVReader reader = new CSVReader(new FileReader(filename));
+    String[] data =  reader.readNext();
+    if (data == null)
+      return null;
+    String[][] headers = new String[4][data.length];
+    headers[0]=data;
+    headers[1]= reader.readNext();
+    headers[2]= reader.readNext();
+    headers[3]= reader.readNext();
+    reader.close();
+    return headers;
+  }
+  
+  public static DataField[]  headerToStructure(String[][] header) {
+    DataField[] output = new DataField[header[1].length-1];
+    for (int i=1;i<header[1].length;i++) {
+      StringBuilder description = new StringBuilder(header[2][i]);
+      if (header[3][i].length()>2)
+        description.append(" - ").append(header[3][i]);
+      output[i-1]= new DataField(convertHeaderName(header[1][i]),"double", description.toString());
+    }
+    return output;
+  }
+  
+  public static String convertHeaderName(String name) {
+    return name.replace("(", "").replace(")", "");
+  }
+  public  StreamElement rowToSE(DataField[] structure, String[] data) {
+    Date date;
+    StreamElement se = null;
+    try {
+      date = dateTimeFormat.parse(data[0]);
+      se = new StreamElement(structure,removeTimestampFromRow(data),date.getTime());
+    } catch (ParseException e) {
+      logger.error("invalide date format! "+data[0]);
+      logger.error(e.getMessage(),e);
+    }finally {
+      return se;
+    }
+  }
+  
+  public Double[] removeTimestampFromRow(String [] data) {
+    Double[] toReturn = new Double[data.length-1];
+    for (int i=1;i<data.length;i++) {
+      if (data[i].equalsIgnoreCase("NaN")) {
+        toReturn[i-1] = null;
+      }else 
+        toReturn[i-1] = Double.parseDouble(data[i]);
+    }
+    return toReturn;
+  }
+  public void run() {
+    File input =null;
+    CSVReader reader = null;
+    while (true) {
+      try {
+        Thread.sleep(sampling);
+        input = new File (filename);
+        if (!input.exists()|| !input.isFile()) {
+          logger.debug("The specified file: "+filename+" doesn't exist, going to sleep.");
+          continue;
+        }
+        if (!isNewDataAvailable())
+          continue;
+        DataField[] current_structure = headerToStructure(getHeader(filename));
+        String[] data = null;
+        reader = new CSVReader(new FileReader(filename),',','\"',4);
+        while ((data =reader.readNext()) !=null) {
+          if (data.length!=(current_structure.length+1)) {
+            logger.debug("Possible empty line ignored.");
+            continue;
+          }
+          StreamElement streamElement = rowToSE(current_structure, data);
+          postStreamElement(streamElement);
+        }
+      } catch (InterruptedException e) {
+        logger.error(e.getMessage(),e);
+      } catch (FileNotFoundException e) {
+        logger.error("Error in reading "+filename+" doesn't exist, going to sleep.");
+        logger.error(e.getMessage(),e);
+      } catch (IOException e) {
+        logger.error("Error in reading "+filename+" doesn't exist, going to sleep.");
+        logger.error(e.getMessage(),e);
+      } catch (Exception e) {
+        logger.error("Error in reading/processing "+filename);
+        logger.error(e.getMessage(),e);
+      } finally {
+        if (reader!=null)
+          try {
+            reader.close();
+          } catch (IOException e) {
+          }
+      }
+    }
+  }
+  
+  public DataField[] getOutputFormat() {
+    return structure;
+  }
+  
+  public String getWrapperName() {
+    return "WanWrapper";
+  }
+  
+  public void finalize() {
+    threadCounter--;  
+  }
+  
+  /**
+   * Returns true if the size of the file is bigger than 10 bytes and the last modified time of the file
+   * is after the last_modified time we recorded from the previous call of this method. This method sets
+   * the value of last_modified variable hence calling this method twice results false in the second call.
+   * @return boolean
+   */
+  public boolean isNewDataAvailable() {
+    File file2 = new File(filename);
+    if (file2.getTotalSpace()<10)
+      return false;
+    long new_val=file2.lastModified();
+    if (new_val>last_modified) {
+      last_modified=new_val;
+      return true;
+    }
+    return false;
+  }
+}

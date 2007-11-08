@@ -190,21 +190,13 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 				toReturn.append(" where ");
 			else
 				toReturn.append(" and ");
-			// Applying the ** START AND END TIME ** for all types of windows
-			// based
-			// windows
-			toReturn.append(" wrapper.timed >=").append(streamSource.getStartDate().getTime()).append(" and timed <=").append(
-					streamSource.getEndDate().getTime());
-
+		
 			if (streamSource.getSamplingRate() != 1) {
 				if (StorageManager.isHsql())
-					toReturn.append(" and ( timed - (timed / 100) * 100 < ").append(streamSource.getSamplingRate() * 100).append(")");
+					toReturn.append(" ( timed - (timed / 100) * 100 < ").append(streamSource.getSamplingRate() * 100).append(") and ");
 				else
-					toReturn.append(" and ( mod( timed , 100)< ").append(streamSource.getSamplingRate() * 100).append(")");
+					toReturn.append(" ( mod( timed , 100)< ").append(streamSource.getSamplingRate() * 100).append(") and ");
 			}
-
-			toReturn.append(" and ");
-
 			WindowType windowingType = streamSource.getWindowingType();
 			if (windowingType == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE) {
 				toReturn.append("(wrapper.timed >= (select timed from ").append(VIEW_HELPER_TABLE).append(" where UID='").append(

@@ -91,7 +91,7 @@ public class TestAbstractWrapper {
 	@Test
 	public void testRemovingUselessData() throws SQLException, InterruptedException {
     SystemTime wrapper = new SystemTime();
-    StorageManager.getInstance().executeCreateTable(wrapper.getDBAliasInStr(), new DataField[] {});
+    StorageManager.getInstance().executeCreateTable(wrapper.getDBAliasInStr(), new DataField[] {},true);
     wrapper.setActiveAddressBean(new AddressBean("system-time",new KeyValueImp(SystemTime.CLOCK_PERIOD_KEY,"100")));
     assertTrue(wrapper.initialize());
     Thread thread = new Thread(wrapper);

@@ -85,7 +85,7 @@ public class TestWindowing2 {
 
 	@Before
 	public void setup() throws SQLException {
-		sm.executeCreateTable(wrapper.getDBAliasInStr(), new DataField[] {});
+		sm.executeCreateTable(wrapper.getDBAliasInStr(), new DataField[] {},true);
 		wrapper.setActiveAddressBean(new AddressBean("system-time"));
 		assertTrue(wrapper.initialize());
 	}
@@ -122,7 +122,7 @@ public class TestWindowing2 {
 		is.setPool(pool);
 		if (sm.tableExists(config.getName()))
 			sm.executeDropTable(config.getName());
-		sm.executeCreateTable(config.getName(), config.getOutputStructure());
+		sm.executeCreateTable(config.getName(), config.getOutputStructure(),true);
 		// Mappings.addVSensorInstance ( pool );
 		pool.start();
 
@@ -195,7 +195,7 @@ public class TestWindowing2 {
 		is.setPool(pool);
 		if (sm.tableExists(config.getName()))
 			sm.executeDropTable(config.getName());
-		sm.executeCreateTable(config.getName(), config.getOutputStructure());
+		sm.executeCreateTable(config.getName(), config.getOutputStructure(),true);
 		// Mappings.addVSensorInstance ( pool );
 		pool.start();
 
@@ -294,7 +294,7 @@ public class TestWindowing2 {
 		is.setPool(pool);
 		if (sm.tableExists(config.getName()))
 			sm.executeDropTable(config.getName());
-		sm.executeCreateTable(config.getName(), config.getOutputStructure());
+		sm.executeCreateTable(config.getName(), config.getOutputStructure(),true);
 		// Mappings.addVSensorInstance ( pool );
 		pool.start();
 

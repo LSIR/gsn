@@ -49,7 +49,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 			connection = getConnection();
 			logger.debug( "jdbc connection established." );
 			if (!StorageManager.tableExists(table_name,getVirtualSensorConfiguration().getOutputStructure() , connection))
-				StorageManager.executeCreateTable(table_name, getVirtualSensorConfiguration().getOutputStructure(), connection);
+				StorageManager.executeCreateTable(table_name, getVirtualSensorConfiguration().getOutputStructure(), false,connection);
 		} catch (ClassNotFoundException e) {
 			logger.error(e.getMessage(),e);
 			logger.error("Initialization of the Stream Exporter VS failed !");

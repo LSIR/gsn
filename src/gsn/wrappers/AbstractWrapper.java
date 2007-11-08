@@ -176,7 +176,11 @@ public abstract class AbstractWrapper extends Thread {
 	 */
 
 	protected Boolean postStreamElement ( StreamElement streamElement ) {
-		try {
+		if (streamElement==null) {
+		  logger.info("postStreamElement is called with null ! Wrapper "+ getWrapperName()+" might has a problem !");
+		  return false;
+		}
+	  try {
 			if (!isActive() || listeners.size()==0)
 				return false;
 			if (!insertIntoWrapperTable(streamElement))
@@ -317,5 +321,14 @@ public abstract class AbstractWrapper extends Thread {
 	 */
 	protected void setUsingRemoteTimestamp(boolean usingRemoteTimestamp){
 		this.usingRemoteTimestamp = usingRemoteTimestamp;
+	}
+	/**
+	 * Returns true if the wrapper can produce multiple different data items [stream elements] with the same timestamp.
+	 * If this is true, then all the stream elements with the same timestamp will be accepted.
+	 * If this method returns false (default value), duplicates override each other and the latest received duplicate
+	 * is the one which is going to be persisted.
+	 */
+	public boolean isTimeStampUnique() {
+	  return true;
 	}
 }

@@ -454,6 +454,9 @@ public class VSensorConfig implements Serializable {
   private transient Double cached_longitude = null;
   private transient Double cached_latitude =  null;
   private boolean addressing_processed = false;
+
+  private boolean isTimestampUnique = true;
+  
   public void preprocess_addressing() {
     if (!addressing_processed) {
       for (KeyValue kv:getAddressing())
@@ -477,6 +480,10 @@ public class VSensorConfig implements Serializable {
   public Double getLongitude() {
     preprocess_addressing();
     return cached_longitude;
+  }
+
+  public boolean getIsTimeStampUnique() {
+    return isTimestampUnique ;
   }
   
 }

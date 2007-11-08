@@ -36,7 +36,7 @@ public class TestStreamSource {
 
 	@Before
 	public void setup() throws SQLException {
-		sm.executeCreateTable(wrapper.getDBAliasInStr(), new DataField[] {});
+		sm.executeCreateTable(wrapper.getDBAliasInStr(), new DataField[] {},true);
 		wrapper.setActiveAddressBean(new AddressBean("system-time"));
 		assertTrue(wrapper.initialize());
 	}
@@ -44,22 +44,6 @@ public class TestStreamSource {
 	public void teardown() throws SQLException {
 		sm.executeDropTable(wrapper.getDBAliasInStr());
 	}
-
-	@Test
-	public void testGetStartAndEndTime() {
-		StreamSource ss = new StreamSource().setAlias("my-stream").setRawHistorySize("10  s");
-		assertFalse(new Date(System.currentTimeMillis()).before(ss.getStartDate()));
-		assertTrue(new Date(System.currentTimeMillis()).before(ss.getEndDate()));
-	}
-
-	@Test
-	public void testCanStart() {
-		InputStream is = new InputStream();
-		StreamSource ss = new StreamSource().setAlias("my-stream").setRawHistorySize("10  s").setAddressing(addressing);
-		ss.setInputStream(is);
-		assertTrue(ss.canStart());
-	}
-
 
 	@Test
 	public void testGetSQLQuery() {

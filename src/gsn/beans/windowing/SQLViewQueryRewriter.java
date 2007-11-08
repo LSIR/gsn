@@ -23,7 +23,7 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
 		try {
 			if (storageManager.tableExists(VIEW_HELPER_TABLE))
 				storageManager.executeDropTable(VIEW_HELPER_TABLE);
-			storageManager.executeCreateTable(VIEW_HELPER_TABLE, viewHelperFields);
+			storageManager.executeCreateTable(VIEW_HELPER_TABLE, viewHelperFields,false);
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		}

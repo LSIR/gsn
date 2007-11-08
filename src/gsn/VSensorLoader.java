@@ -109,7 +109,7 @@ public class VSensorLoader extends Thread {
       }
       try {
         if (!sm.tableExists( vs.getName ( ) , vs.getOutputStructure ( ) ))
-          sm.executeCreateTable ( vs.getName ( ) , vs.getOutputStructure ( ) );
+          sm.executeCreateTable ( vs.getName ( ) , vs.getOutputStructure ( ),pool.getConfig().getIsTimeStampUnique() );
         else
           logger.info("Reusing the existing "+vs.getName()+" table.");
       } catch ( SQLException e ) {
@@ -311,7 +311,7 @@ public class VSensorLoader extends Thread {
       try {
         logger.debug("Wrapper name: "+wrapper.getWrapperName()+ " -- view name "+ wrapper.getDBAliasInStr());
         if (!sm.tableExists(wrapper.getDBAliasInStr(),wrapper.getOutputFormat()))
-          sm.executeCreateTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ) );
+          sm.executeCreateTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ),wrapper.isTimeStampUnique() );
       } catch ( SQLException e ) {
         logger.error ( e.getMessage ( ) , e );
         return null;

@@ -83,7 +83,7 @@ public class TestValidityTools {
 	@Test (expected=GSNRuntimeException.class)
 	public void testTableExists() throws SQLException{
 		assertFalse(sm.tableExists("myTable"));
-		sm.executeCreateTable("table1",new DataField[]{});
+		sm.executeCreateTable("table1",new DataField[]{},true);
 		assertTrue(sm.tableExists("table1"));
 		sm.executeDropTable("table1");
 		assertFalse(sm.tableExists("table1"));
@@ -100,10 +100,10 @@ public class TestValidityTools {
 	}
 	@Test
 	public void testTablesWithSameStructure() throws SQLException{
-		sm.executeCreateTable("table1",new DataField[]{});
+		sm.executeCreateTable("table1",new DataField[]{},true);
 		assertTrue(sm.tableExists("table1",new DataField[] {}));
 		sm.executeDropTable("table1");
-		sm.executeCreateTable("table1",new DataField[]{new DataField("sensor","double"),new DataField("sensor2","int")});
+		sm.executeCreateTable("table1",new DataField[]{new DataField("sensor","double"),new DataField("sensor2","int")},true);
 		assertTrue(sm.tableExists("table1",new DataField[] {new DataField("sensor","double")}));
 		assertTrue(sm.tableExists("table1",new DataField[] {new DataField("sensor2","int")}));
 		assertTrue(sm.tableExists("table1",new DataField[] {new DataField("sensor2", "int"),new DataField("sensor","double")}));

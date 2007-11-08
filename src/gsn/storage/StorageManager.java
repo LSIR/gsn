@@ -279,9 +279,9 @@ public class StorageManager {
     close(prepareStatement);
   }
   
-  public void executeCreateTable(CharSequence tableName, DataField[] structure)
+  public void executeCreateTable(CharSequence tableName, DataField[] structure,boolean unique)
   throws SQLException {
-    executeCreateTable(tableName, structure, getConnection());
+    executeCreateTable(tableName, structure,unique, getConnection());
   }
   
   /**
@@ -289,11 +289,12 @@ public class StorageManager {
    * 
    * @param tableName
    * @param structure
+   * @param unique , setting this true cause the system to create a unique index on time.
    * @param connection
    * @throws SQLException
    */
   public static void executeCreateTable(CharSequence tableName,
-      DataField[] structure, Connection connection) throws SQLException {
+      DataField[] structure,boolean unique, Connection connection) throws SQLException {
     StringBuilder sql = getStatementCreateTable(tableName, structure,
         connection);
     if (logger.isDebugEnabled())
@@ -304,7 +305,7 @@ public class StorageManager {
     prepareStatement.execute();
     prepareStatement.close();
     
-    sql = getStatementCreateIndexOnTimed(tableName);
+    sql = getStatementCreateIndexOnTimed(tableName,unique);
     if (logger.isDebugEnabled())
       logger.debug(new StringBuilder().append(
       "The create index statement is : ").append(sql).toString());
@@ -535,9 +536,13 @@ public class StorageManager {
   }
   
   public static StringBuilder getStatementCreateIndexOnTimed(
-      CharSequence tableName) throws SQLException {
-    return new StringBuilder("CREATE INDEX ").append(tableName).append(
-    "_INDEX ON ").append(tableName).append(" (timed DESC)");
+      CharSequence tableName,boolean unique) throws SQLException {
+    StringBuilder toReturn = new StringBuilder("CREATE ");
+    if (unique)
+      toReturn.append(" unique ");
+    toReturn.append(" INDEX ").append(tableName).append(
+        "_INDEX ON ").append(tableName).append(" (timed DESC)");
+    return toReturn;
   }
   
   public static StringBuilder getStatementCreateTable(CharSequence tableName,

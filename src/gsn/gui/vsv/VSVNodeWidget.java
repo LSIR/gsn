@@ -613,8 +613,8 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 				pinWidget.addChild(createTitleValueWidget(scene, "Sampling rate : ", String.valueOf(streamSource.getSamplingRate())));
 				pinWidget.addChild(createTitleValueWidget(scene, "Disconnect buffer size : ", String.valueOf(streamSource
 						.getDisconnectedBufferSize())));
-				pinWidget.addChild(createTitleValueWidget(scene, "Start time : ", String.valueOf(streamSource.getStartTime())));
-				pinWidget.addChild(createTitleValueWidget(scene, "End time : ", String.valueOf(streamSource.getEndTime())));
+//				pinWidget.addChild(createTitleValueWidget(scene, "Start time : ", String.valueOf(streamSource.getStartTime())));
+//				pinWidget.addChild(createTitleValueWidget(scene, "End time : ", String.valueOf(streamSource.getEndTime())));
 				pinWidget.addChild(createTitleValueWidget(scene, "Query : ", "'" + streamSource.getSqlQuery() + "'"));
 				AddressBean[] addressing = streamSource.getAddressing();
 				if (addressing.length > 0) {
