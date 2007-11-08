@@ -10,11 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-
-import org.apache.commons.collections.EnumerationUtils;
 import org.apache.log4j.Logger;
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -112,16 +109,16 @@ public class WanWrapper extends AbstractWrapper {
   }
   
   public Double[] removeTimestampFromRow(DataField[] structure, String [] data) {
-    Double[] toReturn = new Double[structure.length];
-    next_val:for (int i=1;i<structure.length;i++) {
-      data[i]=data[i].trim();
+   Double[] toReturn = new Double[structure.length];
+    next_val:for (int i=0;i<structure.length;i++) {
+      String val = data[i+1].trim();
       for (String nan : not_a_number_constants) {
-        if (data[i].equals(nan)) {
-          toReturn[i-1] = null;
+        if (val.equals(nan)) {
+          toReturn[i] = null;
           continue next_val;
         }
       }
-      toReturn[i-1] = Double.parseDouble(data[i]);
+      toReturn[i] = Double.parseDouble(val);
     }
     return toReturn;
   }
@@ -139,10 +136,11 @@ public class WanWrapper extends AbstractWrapper {
         }
         if (!isNewDataAvailable())
           continue;
-        DataField[] current_structure = headerToStructure(getHeader(filename));
+       DataField[] current_structure = headerToStructure(getHeader(filename));
         String[] data = null;
         reader = new CSVReader(new FileReader(filename),',','\"',4);
-        while ((data =reader.readNext()) !=null) {
+       while ((data =reader.readNext()) !=null) {
+          
           if (data.length<(current_structure.length+1)) {
             logger.info("Possible empty line ignored.");
             continue;
@@ -194,7 +192,8 @@ public class WanWrapper extends AbstractWrapper {
     if (file2.getTotalSpace()<10)
       return false;
     long new_val=file2.lastModified();
-    if (new_val>last_modified) {
+//    if (new_val>(last_modified+2*60*1000)) {
+      if (new_val>(last_modified)) {
       last_modified=new_val;
       return true;
     }

@@ -172,7 +172,11 @@ public final class StreamElement implements Serializable {
       this.indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
       for ( int i = 0 ; i < this.fieldNames.length ; i++ )
         this.indexedFieldNames.put( this.fieldNames[ i ] , i );
+//      for (String k : this.indexedFieldNames.keySet())
+//        System.out.println("Key : "+k + " VALUE = "+this.indexedFieldNames.get(k));
     }
+//    System.out.print(fieldName+" AT INDEX : "+ this.indexedFieldNames.get( fieldName ) );
+//    System.out.println(" HAS VALUE : "+this.fieldValues[ this.indexedFieldNames.get( fieldName ) ]);
     return this.fieldValues[ this.indexedFieldNames.get( fieldName ) ];
   }
   

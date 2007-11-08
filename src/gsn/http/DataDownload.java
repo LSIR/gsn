@@ -185,7 +185,7 @@ public class DataDownload extends HttpServlet {
       }
       generated_request_query += " " + groupby;
       generated_request_query += ";";
-    
+      
       if (req.getParameter("sql") != null) {
         res.setContentType("text/html");
         respond.println("#"+generated_request_query);
@@ -284,8 +284,12 @@ public class DataDownload extends HttpServlet {
             if ( !commonReq && ((i >= fields.length) || (fields[i].contains("timed")))) {
               SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
               respond.println("\t\t<field>"+sdf.format(se.getData( )[i])+"</field>");
-            } else
-              respond.println("\t\t<field>"+se.getData( )[ i ].toString( )+"</field>"); 
+            } else {
+              if (se.getData()[i]==null)
+                respond.println("\t\t<field>Null</field>");
+              else
+                respond.println("\t\t<field>"+se.getData( )[ i ].toString( )+"</field>");
+            }
           }
           if (wantTimeStamp) {
             SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
