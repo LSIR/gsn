@@ -6,9 +6,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+
+import org.apache.commons.collections.EnumerationUtils;
 import org.apache.log4j.Logger;
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -32,11 +38,23 @@ public class WanWrapper extends AbstractWrapper {
   private DataField[] structure;
   private int threadCounter=0;
   private SimpleDateFormat dateTimeFormat ;
+  
+  public static final String NOT_A_NUMBER = "not_a_number";
+  private List<String> not_a_number_constants = new ArrayList<String>() ;
+  
   public boolean initialize() {
     setName( "WanWrapper-Thread:" + ( ++threadCounter ) );
     dateTimeFormat = new SimpleDateFormat( DateFormat );
     sampling = getActiveAddressBean( ).getPredicateValueAsInt(SAMPLING, SAMPLING_DEFAULT);
     filename = getActiveAddressBean().getPredicateValue(FILE);
+    String not_a_number_constant_val = getActiveAddressBean().getPredicateValue(NOT_A_NUMBER);
+    
+    if (not_a_number_constant_val != null && not_a_number_constant_val.trim().length()>0) {
+      StringTokenizer st = new StringTokenizer(not_a_number_constant_val,",");
+      while (st.hasMoreTokens()) 
+        not_a_number_constants.add(st.nextToken().trim());
+    }
+    
     if (filename ==null||filename.length()==0 ) {
       logger.error("The wrapper failed, the "+FILE+" parameter is missing.");
       return false;
@@ -84,7 +102,7 @@ public class WanWrapper extends AbstractWrapper {
     StreamElement se = null;
     try {
       date = dateTimeFormat.parse(data[0]);
-      se = new StreamElement(structure,removeTimestampFromRow(data),date.getTime());
+      se = new StreamElement(structure,removeTimestampFromRow(structure,data),date.getTime());
     } catch (ParseException e) {
       logger.error("invalide date format! "+data[0]);
       logger.error(e.getMessage(),e);
@@ -93,16 +111,21 @@ public class WanWrapper extends AbstractWrapper {
     }
   }
   
-  public Double[] removeTimestampFromRow(String [] data) {
-    Double[] toReturn = new Double[data.length-1];
-    for (int i=1;i<data.length;i++) {
-      if (data[i].equalsIgnoreCase("NaN")) {
-        toReturn[i-1] = null;
-      }else 
-        toReturn[i-1] = Double.parseDouble(data[i]);
+  public Double[] removeTimestampFromRow(DataField[] structure, String [] data) {
+    Double[] toReturn = new Double[structure.length];
+    next_val:for (int i=1;i<structure.length;i++) {
+      data[i]=data[i].trim();
+      for (String nan : not_a_number_constants) {
+        if (data[i].equals(nan)) {
+          toReturn[i-1] = null;
+          continue next_val;
+        }
+      }
+      toReturn[i-1] = Double.parseDouble(data[i]);
     }
     return toReturn;
   }
+  
   public void run() {
     File input =null;
     CSVReader reader = null;
@@ -120,8 +143,8 @@ public class WanWrapper extends AbstractWrapper {
         String[] data = null;
         reader = new CSVReader(new FileReader(filename),',','\"',4);
         while ((data =reader.readNext()) !=null) {
-          if (data.length!=(current_structure.length+1)) {
-            logger.debug("Possible empty line ignored.");
+          if (data.length<(current_structure.length+1)) {
+            logger.info("Possible empty line ignored.");
             continue;
           }
           StreamElement streamElement = rowToSE(current_structure, data);
