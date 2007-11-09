@@ -191,8 +191,8 @@ public class WanWrapper extends AbstractWrapper {
     if (file2.getTotalSpace()<10)
       return false;
     long new_val=file2.lastModified();
-//  if (new_val>(last_modified+2*60*1000)) {
-    if (new_val>(last_modified)) {
+  if (new_val>(last_modified+2*60*1000)) {
+//    if (new_val>(last_modified)) {
       last_modified=new_val;
       return true;
     }
