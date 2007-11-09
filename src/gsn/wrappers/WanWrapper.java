@@ -66,7 +66,7 @@ public class WanWrapper extends AbstractWrapper {
     return true;
   }
   
-  public static String[][] getHeader(String filename) throws IOException {
+  public  String[][] getHeader(String filename) throws IOException {
     CSVReader reader = new CSVReader(new FileReader(filename));
     String[] data =  reader.readNext();
     if (data == null)
@@ -76,11 +76,17 @@ public class WanWrapper extends AbstractWrapper {
     headers[1]= reader.readNext();
     headers[2]= reader.readNext();
     headers[3]= reader.readNext();
+    if (headers[0]==null||headers[1]==null ||headers[2]==null||headers[3]==null) {
+      logger.debug("Header read incompletely.");
+      return null;
+    }
     reader.close();
     return headers;
   }
   
   public static DataField[]  headerToStructure(String[][] header) {
+    if (header == null)
+      return null;
     DataField[] output = new DataField[header[1].length-1];
     for (int i=1;i<header[1].length;i++) {
       StringBuilder description = new StringBuilder(header[2][i]);
@@ -109,7 +115,7 @@ public class WanWrapper extends AbstractWrapper {
   }
   
   public Double[] removeTimestampFromRow(DataField[] structure, String [] data) {
-   Double[] toReturn = new Double[structure.length];
+    Double[] toReturn = new Double[structure.length];
     next_val:for (int i=0;i<structure.length;i++) {
       String val = data[i+1].trim();
       for (String nan : not_a_number_constants) {
@@ -136,11 +142,12 @@ public class WanWrapper extends AbstractWrapper {
         }
         if (!isNewDataAvailable())
           continue;
-       DataField[] current_structure = headerToStructure(getHeader(filename));
+        DataField[] current_structure = headerToStructure(getHeader(filename));
+        if (current_structure==null)
+          continue;
         String[] data = null;
         reader = new CSVReader(new FileReader(filename),',','\"',4);
-       while ((data =reader.readNext()) !=null) {
-          
+        while ((data =reader.readNext()) !=null) {
           if (data.length<(current_structure.length+1)) {
             logger.info("Possible empty line ignored.");
             continue;
@@ -148,14 +155,6 @@ public class WanWrapper extends AbstractWrapper {
           StreamElement streamElement = rowToSE(current_structure, data);
           postStreamElement(streamElement);
         }
-      } catch (InterruptedException e) {
-        logger.error(e.getMessage(),e);
-      } catch (FileNotFoundException e) {
-        logger.error("Error in reading "+filename+" doesn't exist, going to sleep.");
-        logger.error(e.getMessage(),e);
-      } catch (IOException e) {
-        logger.error("Error in reading "+filename+" doesn't exist, going to sleep.");
-        logger.error(e.getMessage(),e);
       } catch (Exception e) {
         logger.error("Error in reading/processing "+filename);
         logger.error(e.getMessage(),e);
@@ -192,8 +191,8 @@ public class WanWrapper extends AbstractWrapper {
     if (file2.getTotalSpace()<10)
       return false;
     long new_val=file2.lastModified();
-//    if (new_val>(last_modified+2*60*1000)) {
-      if (new_val>(last_modified)) {
+//  if (new_val>(last_modified+2*60*1000)) {
+    if (new_val>(last_modified)) {
       last_modified=new_val;
       return true;
     }

@@ -86,7 +86,7 @@
       </java>
    </target>
    
-   <target name="gsn" depends="bind">
+   <target name="gsn" depends="bind,cleandb">
       <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
          <classpath refid="classpath"/>
          <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
@@ -111,6 +111,7 @@
          ================================= -->
     <target name="stop" depends="build" description="Stop's the running GSN server (if any)">
        <java classname="gsn.GSNStop" maxmemory="${maxMemoryUsage}"  fork="false" dir="${basedir}" classpathref="classpath"/>
+   	   <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" classpathref="classpath"/>
     </target>
 
    <target name="securityTest" depends="bind">
@@ -215,6 +216,9 @@
               basedir="${basedir}/installer"
               izPackdir="${basedir}/izpack"/>
    </target>
+	<target name="cleandb" depends="bind">
+		 <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" classpathref="classpath"/>
+	</target>
    
 </project>
 

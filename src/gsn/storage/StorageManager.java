@@ -16,6 +16,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 
@@ -541,7 +542,7 @@ public class StorageManager {
     if (unique)
       toReturn.append(" unique ");
     toReturn.append(" INDEX ").append(tableName).append(
-        "_INDEX ON ").append(tableName).append(" (timed DESC)");
+    "_INDEX ON ").append(tableName).append(" (timed DESC)");
     return toReturn;
   }
   
@@ -938,8 +939,8 @@ public class StorageManager {
       .error(new StringBuilder()
       .append(e.getMessage())
       .append(
-          ", Please refer to the logs for more detailed information.")
-          .toString());
+      ", Please refer to the logs for more detailed information.")
+      .toString());
       logger.error("Make sure in the : "
           + getContainerConfig().getContainerFileName()
           + " file, the <storage ...> element is correct.");
@@ -988,5 +989,19 @@ public class StorageManager {
       close(prepareStatement);
     }
     return 0;
+  }
+  
+  public ArrayList<String> getInternalTables() throws SQLException {
+    ArrayList<String> toReturn = new ArrayList<String>();
+    Connection c = getConnection();
+    ResultSet rs = null;
+    if (isMysqlDB()) {
+      rs = executeQueryWithResultSet(new StringBuilder("show tables"),c );
+    }
+    if (rs!=null) 
+      while (rs.next())
+        if (rs.getString(1).startsWith("_"))
+          toReturn.add(rs.getString(1));
+    return toReturn;
   }
 }

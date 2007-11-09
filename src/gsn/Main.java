@@ -69,7 +69,7 @@ public final class Main {
     PropertyConfigurator.configure ( DEFAULT_GSN_LOG4J_PROPERTIES );
     try {
       controlSocket = new GSNController(null);
-      initialize ( "conf/gsn.xml" );
+      initialize ( DEFAULT_GSN_CONF_FILE );
     } catch ( JiBXException e ) {
       logger.error ( e.getMessage ( ) );
       logger.error ( new StringBuilder ( ).append ( "Can't parse the GSN configuration file : conf/gsn.xml" ).toString ( ) );
