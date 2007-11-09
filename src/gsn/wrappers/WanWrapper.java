@@ -1,7 +1,6 @@
 package gsn.wrappers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
@@ -28,8 +27,6 @@ public class WanWrapper extends AbstractWrapper {
   
   private static final String FILE = "file";
   private String filename  =null; //in milliseconds.
-  
-  private long last_modified = -1;
   
   private final transient Logger   logger             = Logger.getLogger( WanWrapper.class );
   private DataField[] structure;
@@ -78,6 +75,10 @@ public class WanWrapper extends AbstractWrapper {
     headers[3]= reader.readNext();
     if (headers[0]==null||headers[1]==null ||headers[2]==null||headers[3]==null) {
       logger.debug("Header read incompletely.");
+      System.out.println(headers[0]==null);
+      System.out.println(headers[1]==null);
+      System.out.println(headers[2]==null);
+      System.out.println(headers[3]==null);
       return null;
     }
     reader.close();
@@ -187,15 +188,11 @@ public class WanWrapper extends AbstractWrapper {
    * @return boolean
    */
   public boolean isNewDataAvailable() {
-    File file2 = new File(filename);
-    if (file2.getTotalSpace()<10)
+    File f = new File(filename);
+    if (f.getTotalSpace()<10)
       return false;
-    long new_val=file2.lastModified();
-  if (new_val>(last_modified+2*60*1000)) {
-//    if (new_val>(last_modified)) {
-      last_modified=new_val;
+    if (f.lastModified()<(System.currentTimeMillis()+2*60*1000)) 
       return true;
-    }
     return false;
   }
 }
