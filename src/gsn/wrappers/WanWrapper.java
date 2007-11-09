@@ -181,6 +181,7 @@ public class WanWrapper extends AbstractWrapper {
     threadCounter--;  
   }
   
+  private long lastModified= -1;
   /**
    * Returns true if the size of the file is bigger than 10 bytes and the last modified time of the file
    * is after the last_modified time we recorded from the previous call of this method. This method sets
@@ -191,8 +192,11 @@ public class WanWrapper extends AbstractWrapper {
     File f = new File(filename);
     if (f.getTotalSpace()<10)
       return false;
-    if (f.lastModified()<(System.currentTimeMillis()+2*60*1000)) 
+     long current_lastModified = f.lastModified();
+    if ( lastModified<current_lastModified && current_lastModified<(System.currentTimeMillis()+2*60*1000)) {
+      lastModified=current_lastModified;
       return true;
+    }
     return false;
   }
 }
