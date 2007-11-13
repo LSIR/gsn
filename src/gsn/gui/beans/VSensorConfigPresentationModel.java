@@ -15,6 +15,7 @@ import com.jgoodies.validation.util.DefaultValidationResultModel;
 import com.jgoodies.validation.util.PropertyValidationSupport;
 import com.jgoodies.validation.util.ValidationUtils;
 
+@SuppressWarnings("serial")
 public class VSensorConfigPresentationModel extends PresentationModel {
 
 	private static final int UNLIMITED_OUTPUT_RATE = 0;
@@ -46,8 +47,7 @@ public class VSensorConfigPresentationModel extends PresentationModel {
 			}
 		});
 
-		PropertyConnector connector = new PropertyConnector(ConverterFactory
-				.createBooleanNegator(getModel(VSensorConfigModel.PROPERTY_RATE_UNLIMITED)), "value",
+		PropertyConnector.connect(ConverterFactory.createBooleanNegator(getModel(VSensorConfigModel.PROPERTY_RATE_UNLIMITED)), "value",
 				getComponentModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE), ComponentValueModel.PROPERTYNAME_ENABLED);
 	}
 
@@ -61,10 +61,10 @@ public class VSensorConfigPresentationModel extends PresentationModel {
 		if (null == getBufferedValue(VSensorConfigModel.PROPERTY_NAME)
 				|| ValidationUtils.isBlank(getBufferedValue(VSensorConfigModel.PROPERTY_NAME).toString()))
 			support.addError("Name", "should not be empty");
-		
+
 		String historySize = (String) getBufferedValue(VSensorConfigModel.PROPERTY_STORAGE_HISTORY_SIZE);
 		if (!GenericValidator.isBlankOrNull(historySize)) {
-			historySize = historySize.replace( " " , "" ).trim( ).toLowerCase( );
+			historySize = historySize.replace(" ", "").trim().toLowerCase();
 			final int mIndex = historySize.indexOf("m");
 			final int hIndex = historySize.indexOf("h");
 			final int sIndex = historySize.indexOf("s");
@@ -81,7 +81,7 @@ public class VSensorConfigPresentationModel extends PresentationModel {
 				if (index != shs.length() - 1 || !GenericValidator.isInt(shs.deleteCharAt(index).toString()))
 					support.addError("History Size", "invalid history size");
 			}
-		}else{
+		} else {
 			setBufferedValue(VSensorConfigModel.PROPERTY_STORAGE_HISTORY_SIZE, null);
 		}
 
@@ -93,11 +93,11 @@ public class VSensorConfigPresentationModel extends PresentationModel {
 			for (Iterator iter = inputStreams.iterator(); iter.hasNext();) {
 				InputStreamModel inputStreamModel = (InputStreamModel) iter.next();
 				if (inputStreamModel.getSources().getSize() == 0)
-					support.addError("StreamSources", "at least one stream source is needed for input stream : "
+					support.addError("StreamSources", "at least one stream source is needed for the input stream : "
 							+ inputStreamModel.getInputStreamName());
 			}
 		}
-		
+
 		return support.getResult();
 	}
 
@@ -110,10 +110,10 @@ public class VSensorConfigPresentationModel extends PresentationModel {
 	}
 
 	protected void updateMaximumRate() {
-		 boolean selected = getModel(VSensorConfigModel.PROPERTY_RATE_UNLIMITED).booleanValue();
-		 if(selected)
-			 getModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE).setValue(UNLIMITED_OUTPUT_RATE);
-		 System.out.println("selected : (" + selected + ") ,value = " + getModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE).getValue());
+		boolean selected = getModel(VSensorConfigModel.PROPERTY_RATE_UNLIMITED).booleanValue();
+		if (selected)
+			getModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE).setValue(UNLIMITED_OUTPUT_RATE);
+		System.out.println("selected : (" + selected + ") ,value = " + getModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE).getValue());
 	}
 
 }

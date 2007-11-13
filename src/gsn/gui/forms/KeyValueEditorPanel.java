@@ -276,7 +276,7 @@ public class KeyValueEditorPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				canceled = false;
-				Validator validator = new KeyValueValidator();
+				KeyValueValidator validator = new KeyValueValidator();
 				ValidationResult validationResult = validator.validate();
 				if (validationResult.hasErrors()) {
 					GUIUtils.showValidationMessage(e, "Please fix the following errors:", validationResult);
@@ -300,7 +300,7 @@ public class KeyValueEditorPanel {
 			}
 		}
 		
-		private final class KeyValueValidator implements Validator{
+		private final class KeyValueValidator{
 			public ValidationResult validate() {
 				ValidationResult result = new ValidationResult();
 				if(ValidationUtils.isBlank(keyTextField.getText()))

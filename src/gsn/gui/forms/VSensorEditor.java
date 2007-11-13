@@ -5,10 +5,13 @@ import gsn.gui.beans.VSensorConfigModel;
 import gsn.gui.beans.VSensorConfigPresentationModel;
 import gsn.gui.util.GUIUtils;
 import gsn.gui.util.VSensorConfigUtil;
+
+import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -18,12 +21,11 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+
 import org.jibx.runtime.JiBXException;
-import com.jgoodies.forms.builder.PanelBuilder;
+
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.ButtonBarFactory;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.validation.util.ValidationUtils;
 
 public class VSensorEditor {
@@ -60,7 +62,7 @@ public class VSensorEditor {
 		dialog.dispose();
 	}
 
-	public boolean hasBeanCanceled() {
+	public boolean hasBeenCanceled() {
 		return canceled;
 	}
 
@@ -75,12 +77,10 @@ public class VSensorEditor {
 	}
 
 	private JComponent buildContentPane() {
-		FormLayout layout = new FormLayout("pref:g", "pref:g, 6dlu, pref");
-		PanelBuilder builder = new PanelBuilder(layout);
-		CellConstraints cc = new CellConstraints();
-		builder.add(createTabbedPane(), cc.xy(1, 1));
-		builder.add(buildButtonBar(), cc.xy(1, 3));
-		return builder.getPanel();
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(createTabbedPane(), BorderLayout.CENTER);
+		panel.add(buildButtonBar(), BorderLayout.SOUTH);
+		return panel;
 	}
 
 	private JComponent createTabbedPane() {
@@ -116,13 +116,14 @@ public class VSensorEditor {
 						if (index == -1)
 							fileName = fileName + ".xml";
 						saveVSensorConfig(fileName, true);
-					}else{
-						//TODO: this message should not be displayed when dialog is canceled
+					} else {
+						// TODO: this message should not be displayed when
+						// dialog is canceled
 						GUIUtils.showErrorMessage("Invalid file name");
 					}
-				}else{
+				} else {
 					saveVSensorConfig(oldVSensorConfig.getFileName(), false);
-					//TODO : show proper message
+					// TODO : show proper message
 				}
 			} else {
 				GUIUtils.showValidationMessage(e, "Some errors exist, please correct them:", presentationModel.getValidationResultModel()
@@ -132,13 +133,13 @@ public class VSensorEditor {
 
 		private void saveVSensorConfig(String fileName, boolean newFile) {
 			File file;
-			if(newFile)
+			if (newFile)
 				file = new File(GUIConfig.VSENSOR_DISABLED_DIR_PATH, fileName);
 			else
 				file = new File(fileName);
-			if (!file.exists() || JOptionPane.showConfirmDialog(dialog, "<html>The file &lt;" + file.getAbsolutePath()
-							+ "&gt; already exists.<br>Do you want to overwrite it?</html>", "Confirmation",
-							JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			if (!file.exists()
+					|| JOptionPane.showConfirmDialog(dialog, "<html>The file &lt;" + file.getAbsolutePath()
+							+ "&gt; already exists.<br>Do you want to overwrite it?</html>", "Confirmation", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 				try {
 					presentationModel.triggerCommit();
 					VSensorConfigUtil.saveVSensorConfig(getVSensorConfig(), file);

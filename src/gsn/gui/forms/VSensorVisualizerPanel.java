@@ -7,12 +7,14 @@ import gsn.beans.VSensorConfig;
 import gsn.gui.util.GSNDropDownButton;
 import gsn.gui.util.GUIUtils;
 import gsn.gui.util.SimpleInternalFrame;
+import gsn.gui.util.SortedListModel;
 import gsn.gui.util.VSensorConfigUtil;
 import gsn.gui.util.VSensorIOUtil;
 import gsn.gui.vsv.VSVGraphScene;
 import gsn.gui.vsv.VSVNodeWidget;
 import gsn.utils.graph.Graph;
 import gsn.utils.graph.Node;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -20,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Window;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -39,6 +42,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -61,6 +65,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import org.eclipse.mylar.zest.layout.GridLayoutAlgorithm;
 import org.eclipse.mylar.zest.layout.HorizontalTreeLayoutAlgorithm;
 import org.eclipse.mylar.zest.layout.LayoutAlgorithm;
@@ -72,6 +77,7 @@ import org.netbeans.api.visual.action.ActionFactory;
 import org.netbeans.api.visual.action.PopupMenuProvider;
 import org.netbeans.api.visual.widget.Widget;
 import org.openide.util.Utilities;
+
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -133,16 +139,6 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 	private static final String USER_REFRESHING_THREAD = "USER_REFRESHING_THREAD";
 
 	private static final String VISUALIZER_PANEL = "visualizer panel";
-
-	public static void main(String[] args) {
-		VSensorConfig c1 = new VSensorConfig();
-		c1.setName("name");
-		VSensorConfig c2 = new VSensorConfig();
-		c2.setName("name");
-		HashMap<VSensorConfig, Integer> map = new HashMap<VSensorConfig, Integer>();
-		map.put(c1, 1);
-		System.out.println(map.containsKey(c2));
-	}
 
 	private JCheckBox autoRefreshCheckBox;
 
@@ -226,12 +222,15 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 				onDemandConnector = new GSNConnector(USER_REFRESHING_THREAD);
 				onDemandConnector.setActive(false);
 			}
-			onDemandConnector.connect();
-			if (onDemandConnector.isConnected())
-				onDemandConnector.getVSensorsFromGSN();
-			else
-				GUIUtils.showErrorMessage("Error connectiong to GSN");
-			onDemandConnector.disconnect();
+			// onDemandConnector.connect();
+			// if (onDemandConnector.isConnected())
+			// onDemandConnector.getVSensorsFromGSN();
+			// else
+			// GUIUtils.showErrorMessage("Error connectiong to GSN");
+			// onDemandConnector.disconnect();
+			RefreshGraphDialog dialog = new RefreshGraphDialog(SwingUtilities.windowForComponent(defaultPanel),
+					ModalityType.APPLICATION_MODAL, onDemandConnector);
+
 		} else if (source == refreshDiskGraphButton) {
 			loadVSensorConfigs();
 			showHideAllButton.setIcon(hideAllIcon);
@@ -241,7 +240,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			vSensorConfig.setName("please change me_" + Main.randomTableNameGenerator(7));
 			VSensorEditor vSensorEditor = new VSensorEditor(vSensorConfig);
 			vSensorEditor.open();
-			if (!vSensorEditor.hasBeanCanceled()) {
+			if (!vSensorEditor.hasBeenCanceled()) {
 				loadVSensorConfigs();
 			}
 		} else if (source == showHideAllButton) {
@@ -312,8 +311,6 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 	}
 
 	public void startWatchingGSN() {
-		// TODO complete this code
-		// ((CardLayout) panel.getLayout()).show(panel, VISUALIZER_PANEL);
 		autoRefreshCheckBox.setEnabled(true);
 		if (autoRefreshCheckBox.isSelected()) {
 			connector = new GSNConnector(AUTO_REFRESHING_THREAD);
@@ -323,15 +320,12 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 	}
 
 	public void stopWatchingGSN() {
-		// TODO complete this code
 		autoRefreshCheckBox.setEnabled(false);
 		if (connector != null) {
 			connector.interrupt();
 			connector = null;
 		}
 		refreshGraphButton.setEnabled(false);
-		// ((CardLayout) panel.getLayout()).show(panel, DEFAULT_PANEL);
-		// listModel.clear();
 	}
 
 	private void changeSceneLayoutAlgorithm(final LayoutAlgorithm layoutAlgorithm) {
@@ -624,7 +618,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 					widget.objectUpdated();
 				}
 			}
-			//If we don't do this, we might face some NPEs
+			// If we don't do this, we might face some NPEs
 			scene.validate();
 		}
 	}
@@ -650,7 +644,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 	private void editVSensorConfig(VSensorConfig vSensorConfig) {
 		VSensorEditor editor = new VSensorEditor(vSensorConfig);
 		editor.open();
-		if (!editor.hasBeanCanceled()) {
+		if (!editor.hasBeenCanceled()) {
 			loadVSensorConfigs();
 		}
 	}
@@ -710,6 +704,8 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 		boolean active;
 
+		boolean disconnected;
+
 		boolean connected;
 
 		InputStream inputStream;
@@ -724,6 +720,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 			setName(name);
 			active = true;
 			connected = false;
+			disconnected = true;
 		}
 
 		public void connect() {
@@ -763,6 +760,7 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 					exx.printStackTrace();
 				}
 				connected = false;
+				disconnected = true;
 			}
 		}
 
@@ -835,21 +833,47 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 
 	}
 
-	private class RefreshGraphDialog extends JDialog {
+	private static class RefreshGraphDialog extends JDialog implements Runnable {
 		JLabel label;
 
-		public RefreshGraphDialog(Window owner, ModalityType modalityType) {
+		private GSNConnector connector;
+		
+		private static final ImageIcon LOADING_ICON = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("gsn/gui/resources/rotation.gif"));
+
+		public RefreshGraphDialog(Window owner, ModalityType modalityType, GSNConnector connector) {
 			super(owner, modalityType);
 			setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-			label = new JLabel("Virtual sensor modification was detected. Refreshing Visualizer...");
+			this.connector = connector;
+			JPanel panel = new JPanel(new BorderLayout(5, 5));
+			label = new JLabel("Refreshing virtual sensors...");
 			label.setFont(label.getFont().deriveFont(20f));
-			add(label);
+			panel.add(label, BorderLayout.CENTER);
+			panel.add(new JLabel(LOADING_ICON), BorderLayout.WEST);
+			add(panel);
+			initConnection();
 		}
 
-		public void showDialog(Graph<VSensorConfig> graph) {
-			pack();
-			setLocationByPlatform(true);
+		@Override
+		public void run() {
+			connector.connect();
+			if (connector.isConnected())
+				connector.getVSensorsFromGSN();
+			else
+				GUIUtils.showErrorMessage("Error connectiong to GSN");
+			connector.disconnect();
+			setVisible(false);
+			dispose();
+		}
 
+		private void initConnection() {
+			new Thread(this).start();
+			showDialog();
+		}
+
+		public void showDialog() {
+			pack();
+			GUIUtils.locateOnOpticalScreenCenter(this);
+			super.setVisible(true);
 		}
 	}
 

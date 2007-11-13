@@ -11,10 +11,6 @@ public class StreamSourceModel extends Model {
 
 	public static final String PROPERTY_SAMPLING_RATE = "samplingRate";
 
-	public static final String PROPERTY_START_TIME = "startTime";
-
-	public static final String PROPERTY_END_TIME = "endTime";
-
 	public static final String PROPERTY_RAW_HISTORY_SIZE = "rawHistorySize";
 
 	public static final String PROPERTY_DISCONNECTED_BUFFER_SIZE = "disconnectedBufferSize";

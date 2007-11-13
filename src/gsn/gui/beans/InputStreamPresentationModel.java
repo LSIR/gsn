@@ -9,6 +9,7 @@ import com.jgoodies.validation.util.DefaultValidationResultModel;
 import com.jgoodies.validation.util.PropertyValidationSupport;
 import com.jgoodies.validation.util.ValidationUtils;
 
+@SuppressWarnings("serial")
 public class InputStreamPresentationModel extends PresentationModel {
 	
 	private final ValidationResultModel validationResultModel;

@@ -5,6 +5,8 @@ import gsn.gui.beans.AddressBeanPresentationModel;
 import gsn.gui.beans.StreamSourceModel;
 import gsn.gui.beans.StreamSourcePresentationModel;
 import gsn.gui.util.GUIUtils;
+
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -28,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.WindowConstants;
@@ -58,10 +61,6 @@ public class StreamSourceEditorDialog extends JDialog {
 
 	private JTextField aliasTextField;
 
-	private JTextField startTimeTextField;
-
-	private JTextField endTimeTextField;
-
 	private JTextField dbsTextField;
 
 	private JTextField samplingRateTextField;
@@ -70,7 +69,7 @@ public class StreamSourceEditorDialog extends JDialog {
 
 	private JTextField slideValueTextField;
 
-	private JTextField queryTextField;
+	private JTextArea queryTextArea;
 
 	private AddressBeanEditorPanel addressBeanEditorPanel;
 
@@ -161,12 +160,7 @@ public class StreamSourceEditorDialog extends JDialog {
 	}
 
 	private void initComponents() {
-		MyDateFormat dateFormat = new MyDateFormat("yyyy/MM/dd 'at' HH:mm:ss z");
 		aliasTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_ALIAS));
-		startTimeTextField = BasicComponentFactory.createFormattedTextField(presentationModel
-				.getBufferedModel(StreamSourceModel.PROPERTY_START_TIME), dateFormat);
-		endTimeTextField = BasicComponentFactory.createFormattedTextField(presentationModel
-				.getBufferedModel(StreamSourceModel.PROPERTY_END_TIME), dateFormat);
 		dbsTextField = BasicComponentFactory.createIntegerField(presentationModel
 				.getBufferedModel(StreamSourceModel.PROPERTY_DISCONNECTED_BUFFER_SIZE));
 		NumberFormatter formatter = new NumberFormatter() {
@@ -199,8 +193,10 @@ public class StreamSourceEditorDialog extends JDialog {
 				.getBufferedModel(StreamSourceModel.PROPERTY_RAW_HISTORY_SIZE));
 		slideValueTextField = BasicComponentFactory.createTextField(presentationModel
 				.getBufferedModel(StreamSourceModel.PROPERTY_RAW_SLIDE_VALUE));
-		queryTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_SQL_QUERY));
-
+		queryTextArea = BasicComponentFactory.createTextArea(presentationModel.getBufferedModel(StreamSourceModel.PROPERTY_SQL_QUERY));
+		queryTextArea.setLineWrap(true);
+		queryTextArea.setWrapStyleWord(true);
+		
 		addressingList = BasicComponentFactory.createList(selectionInList, new AddressBeanListCellRenderer());
 		addressBeanEditorPanel = new AddressBeanEditorPanel(null);
 		addAction = new AddAction();
@@ -217,8 +213,8 @@ public class StreamSourceEditorDialog extends JDialog {
 	private void initComponentAnnotations() {
 		ValidationComponentUtils.setMandatory(aliasTextField, true);
 		ValidationComponentUtils.setMessageKey(aliasTextField, "StreamSource.Alias");
-		ValidationComponentUtils.setMandatory(queryTextField, true);
-		ValidationComponentUtils.setMessageKey(queryTextField, "StreamSource.SqlQuery");
+		ValidationComponentUtils.setMandatory(queryTextArea, true);
+		ValidationComponentUtils.setMessageKey(queryTextArea, "StreamSource.SqlQuery");
 		ValidationComponentUtils.setMessageKey(historySizeTextField, "StreamSource.History Size");
 		ValidationComponentUtils.setMessageKey(slideValueTextField, "StreamSource.Slide Value");
 	}
@@ -329,20 +325,25 @@ public class StreamSourceEditorDialog extends JDialog {
 	}
 
 	private JComponent buildContentPane() {
-		FormLayout layout = new FormLayout("pref:g", "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref");
+		FormLayout layout = new FormLayout("pref:g", "pref:g, 6dlu, pref, 6dlu, pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.getPanel().setBorder(new EmptyBorder(18, 12, 12, 12));
 		CellConstraints cc = new CellConstraints();
 		editorPanel = buildEditorPanel();
 		builder.add(editorPanel, cc.xy(1, 1));
 		builder.add(buildAddressingBeanPanel(), cc.xy(1, 3));
-		builder.add(buildDialogButtonBar(), cc.xy(1, 7));
 		builder.add(addressBeanEditorPanel.createPanel(), cc.xy(1, 5));
-		return builder.getPanel();
+		
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.setAutoscrolls(true);
+		panel.add(new JScrollPane(builder.getPanel()), BorderLayout.CENTER);
+		panel.add(buildDialogButtonBar(), BorderLayout.SOUTH);
+		
+		return panel;
 	}
 
 	private JComponent buildAddressingBeanPanel() {
-		FormLayout layout = new FormLayout("right:max(pref;40), 4dlu, pref:g, 7dlu, pref", "pref, 3dlu, min(pref;100)");
+		FormLayout layout = new FormLayout("right:max(pref;40), 4dlu, max(pref;150dlu):g, 7dlu, pref", "pref, 3dlu, min(pref;100)");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
@@ -366,32 +367,28 @@ public class StreamSourceEditorDialog extends JDialog {
 	}
 
 	private JComponent buildEditorPanel() {
-		FormLayout layout = new FormLayout("right:pref, 4dlu, pref:g",
-				"pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref");
+		FormLayout layout = new FormLayout("right:pref, 4dlu, min(pref;150dlu):g",
+				"pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, min(pref;70dlu):g");
 		PanelBuilder builder = new PanelBuilder(layout);
 		CellConstraints cc = new CellConstraints();
 		builder.addLabel("Alias", cc.xy(1, 1));
 		builder.add(aliasTextField, cc.xy(3, 1));
 		builder.addLabel("Sampling Rate", cc.xy(1, 3));
 		builder.add(samplingRateTextField, cc.xy(3, 3));
-		builder.addLabel("Start Time", cc.xy(1, 5));
-		builder.add(startTimeTextField, cc.xy(3, 5));
-		builder.addLabel("End Time", cc.xy(1, 7));
-		builder.add(endTimeTextField, cc.xy(3, 7));
-		builder.addLabel("Window Size", cc.xy(1, 9));
-		builder.add(historySizeTextField, cc.xy(3, 9));
-		builder.addLabel("Slide", cc.xy(1, 11));
-		builder.add(slideValueTextField, cc.xy(3, 11));
-		builder.addLabel("Disconnected Buffer Size", cc.xy(1, 13));
-		builder.add(dbsTextField, cc.xy(3, 13));
-		builder.addLabel("Query", cc.xy(1, 15));
-		builder.add(queryTextField, cc.xy(3, 15));
+		builder.addLabel("Window Size", cc.xy(1, 5));
+		builder.add(historySizeTextField, cc.xy(3, 5));
+		builder.addLabel("Slide", cc.xy(1, 7));
+		builder.add(slideValueTextField, cc.xy(3, 7));
+		builder.addLabel("Disconnected Buffer Size", cc.xy(1, 9));
+		builder.add(dbsTextField, cc.xy(3, 9));
+		builder.addLabel("Query", cc.xy(1, 11));
+		builder.add(new JScrollPane(queryTextArea), cc.xy(3, 11));
 		return builder.getPanel();
 	}
 
 	private JComponent buildDialogButtonBar() {
 		JPanel bar = ButtonBarFactory.buildOKCancelBar(new JButton(new OKAction()), new JButton(new CancelAction()));
-		bar.setBorder(Borders.BUTTON_BAR_GAP_BORDER);
+		bar.setBorder(Borders.DLU7_BORDER);
 		return bar;
 	}
 

@@ -2,12 +2,17 @@ package gsn.gui.forms;
 
 import gsn.gui.beans.VSensorConfigModel;
 import gsn.gui.beans.VSensorConfigPresentationModel;
+
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
 import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -22,7 +27,7 @@ public class VSensorGeneralPanel {
 	private JTextField nameTextField;
 	private JTextField priorityTextField;
 	private JTextField generalPasswordTextField;
-	private JTextField descriptionTextField;
+	private JTextArea descriptionTextArea;
 	private JTextField poolSizeTextField;
 	private JTextField storageSizeTextField;
 	private JTextField maximumAllowedRateTextField;
@@ -56,8 +61,8 @@ public class VSensorGeneralPanel {
 	
 	private JComponent buildGeneralFieldsPanel() {
 		FormLayout layout = new FormLayout(
-				"right:pref, 3dlu, pref:g, 7dlu, right:pref, 3dlu, pref:g, 3dlu, pref, 3dlu",
-				"pref, 3dlu, pref, 3dlu, pref, 3dlu, pref");
+				"right:pref, 3dlu, min(pref;75dlu), 7dlu, right:pref, 3dlu, min(pref;50dlu), 3dlu, pref, 3dlu",
+				"pref, 3dlu, pref, 3dlu, pref, 3dlu, min(pref;100dlu):g");
 		layout.setColumnGroups(new int[][]{{1, 5}, {3, 7}});
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
@@ -76,7 +81,7 @@ public class VSensorGeneralPanel {
 		builder.add(maximumAllowedRateTextField, cc.xy(7, 5));
 		builder.add(marUnlimitedCheckBox, cc.xy(9, 5));
 		builder.addLabel("Description", cc.xy(1, 7));
-		builder.add(descriptionTextField, cc.xyw(3, 7, 7));
+		builder.add(new JScrollPane(descriptionTextArea), cc.xyw(3, 7, 7));
 		return builder.getPanel();
 	}
 
@@ -84,7 +89,10 @@ public class VSensorGeneralPanel {
 		nameTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(VSensorConfigModel.PROPERTY_NAME));
 		priorityTextField = BasicComponentFactory.createIntegerField(presentationModel.getModel(VSensorConfigModel.PROPERTY_PRIORITY));
 		generalPasswordTextField = BasicComponentFactory.createTextField(presentationModel.getModel(VSensorConfigModel.PROPERTY_GENERAL_PASSWORD));
-		descriptionTextField = BasicComponentFactory.createTextField(presentationModel.getModel(VSensorConfigModel.PROPERTY_DESCRIPTION));
+		descriptionTextArea = BasicComponentFactory.createTextArea(presentationModel.getModel(VSensorConfigModel.PROPERTY_DESCRIPTION));
+		descriptionTextArea.setLineWrap(true);
+		descriptionTextArea.setWrapStyleWord(true);
+		
 		poolSizeTextField = BasicComponentFactory.createIntegerField(presentationModel.getModel(VSensorConfigModel.PROPERTY_LIFECYCLE_POOL_SIZE));
 		storageSizeTextField = BasicComponentFactory.createTextField(presentationModel.getModel(VSensorConfigModel.PROPERTY_STORAGE_HISTORY_SIZE));
 		maximumAllowedRateTextField = BasicComponentFactory.createIntegerField(presentationModel.getComponentModel(VSensorConfigModel.PROPERTY_OUTPUT_STREAM_RATE));

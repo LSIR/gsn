@@ -1,4 +1,4 @@
-package gsn.gui.forms;
+package gsn.gui.util;
 
 /*
  * SortedListModel.java

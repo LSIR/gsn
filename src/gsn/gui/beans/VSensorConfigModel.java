@@ -12,6 +12,7 @@ import org.apache.commons.collections.KeyValue;
 import com.jgoodies.binding.beans.Model;
 import com.jgoodies.binding.list.ArrayListModel;
 
+@SuppressWarnings("serial")
 public class VSensorConfigModel extends Model {
 
 	public static final String PROPERTY_NAME = "name";

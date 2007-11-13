@@ -30,7 +30,7 @@ public class AddressBeanEditorPanel {
 	public JComponent createPanel(){
 		initComponents();
 		
-		FormLayout layout = new FormLayout("right:max(pref;40), 4dlu, max(pref;150dlu):g", "pref:g");
+		FormLayout layout = new FormLayout("right:max(pref;40), 4dlu, max(pref;150dlu):g", "max(pref;150dlu):g");
 		PanelBuilder builder = new PanelBuilder(layout);
 //		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();

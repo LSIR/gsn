@@ -1,19 +1,22 @@
 package gsn.gui.forms;
 
 import gsn.gui.beans.StreamSourceModel;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
+
 import com.jgoodies.binding.adapter.AbstractTableAdapter;
 import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.binding.adapter.SingleListSelectionAdapter;
@@ -31,8 +34,8 @@ public class StreamSourceEditorPanel {
 	private ArrayListModel streamSourceListModel;
 
 	private JTable table;
-	
-	private JTextField queryTextField;
+
+	private JTextArea queryTextArea;
 
 	private JButton addButton;
 
@@ -60,18 +63,18 @@ public class StreamSourceEditorPanel {
 
 	public JComponent createPanel() {
 		initConponents();
-		
-		FormLayout layout = new FormLayout("right:max(pref;60), 4dlu, pref:g, 7dlu, pref", "pref, 4dlu, pref");
+
+		FormLayout layout = new FormLayout("right:max(pref;50), 4dlu, min(pref;150dlu):g, 7dlu, pref", "pref, 4dlu, min(pref;70dlu):g");
 		PanelBuilder builder = new PanelBuilder(layout);
 		builder.setDefaultDialogBorder();
 		CellConstraints cc = new CellConstraints();
 		builder.addLabel("Stream sources", cc.xy(1, 1, "right, top"));
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setPreferredSize(new Dimension(350, 200));
+		scrollPane.setPreferredSize(new Dimension(350, 150));
 		builder.add(scrollPane, cc.xy(3, 1));
 		builder.add(createButtomBar(), cc.xy(5, 1));
 		builder.addLabel("Query", cc.xy(1, 3));
-		builder.add(queryTextField, cc.xy(3, 3));
+		builder.add(new JScrollPane(queryTextArea), cc.xy(3, 3));
 		return builder.getPanel();
 	}
 
@@ -89,16 +92,20 @@ public class StreamSourceEditorPanel {
 		table = new JTable();
 		table.setModel(new StreamSourceTableModel(selectionInList));
 		table.setSelectionModel(new SingleListSelectionAdapter(selectionInList.getSelectionIndexHolder()));
-		
+
 		addAction = new AddAction();
 		removeAction = new RemoveAction();
 		editAction = new EditAction();
 		addButton = new JButton(getAddAction());
 		removeButton = new JButton(getRemoveAction());
 		editButton = new JButton(getEditAction());
-		
-		queryTextField = BasicComponentFactory.createTextField(new BeanAdapter(selectionInList, true).getValueModel(StreamSourceModel.PROPERTY_SQL_QUERY));
-		queryTextField.setEditable(false);
+
+		queryTextArea = BasicComponentFactory.createTextArea(new BeanAdapter(selectionInList, true)
+				.getValueModel(StreamSourceModel.PROPERTY_SQL_QUERY));
+		queryTextArea.setLineWrap(true);
+		queryTextArea.setWrapStyleWord(true);
+
+		queryTextArea.setEditable(false);
 		updateActionEnablement();
 	}
 
@@ -123,8 +130,7 @@ public class StreamSourceEditorPanel {
 
 	public static class StreamSourceTableModel extends AbstractTableAdapter implements TableModel {
 
-		private static final String[] COLUMNS = { "Alias", "Sampling Rate", "Start Time", "End Time", "History Size",
-				"Disconnected Buffer Size" };
+		private static final String[] COLUMNS = { "Alias", "Sampling Rate", "History Size", "Disconnected Buffer Size" };
 
 		public StreamSourceTableModel(SelectionInList selectionInList) {
 			super(selectionInList, COLUMNS);
@@ -137,10 +143,10 @@ public class StreamSourceEditorPanel {
 				return streamSourceModel.getAlias();
 			case 1:
 				return streamSourceModel.getSamplingRate();
-//			case 2:
-//				return streamSourceModel.getStartTime();
-//			case 3:
-//				return streamSourceModel.getEndTime();
+				// case 2:
+				// return streamSourceModel.getStartTime();
+				// case 3:
+				// return streamSourceModel.getEndTime();
 			case 2:
 				return streamSourceModel.getRawHistorySize();
 			case 3:
@@ -198,6 +204,5 @@ public class StreamSourceEditorPanel {
 			streamSourceListModel.remove(selectionInList.getSelection());
 		}
 	}
-	
-	
+
 }
