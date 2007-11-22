@@ -37,7 +37,7 @@ public class GSNController extends Thread {
 	public GSNController(VSensorLoader vsLoader) throws UnknownHostException, IOException {
 		super();
 		this.vsLoader = vsLoader;
-		mySocket = new ServerSocket(GSN_CONTROL_PORT, 0, InetAddress.getLocalHost());
+		mySocket = new ServerSocket(GSN_CONTROL_PORT, 0, InetAddress.getByName("localhost"));
 		this.start();
 	}
 
