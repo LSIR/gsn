@@ -35,6 +35,27 @@ p
 	margin: 0.5em 0;
 }
 
+input[type=button],input[type=submit]
+{
+	color: black;
+	text-align: center;
+	border: 0px;
+	cursor: pointer;
+	
+	border: 1px solid #FFA84C;
+	border-left: 10px solid #FFA84C;
+	background-color: #FCFDDC;
+}
+
+
+
+
+input[type=button]:active,input[type=button]:hover,input[type=submit]:active,input[type=submit]:hover
+{
+	color: #FFA84C;
+	background-color: white;
+}
+
 /* container layout */
 body, html 
 {
@@ -104,13 +125,22 @@ body
 	padding:0;
 }
 
-#navigation li
+#navigation #menu li
 {
 	float:left;
 	list-style-type:none;
 	border-right:1px solid #ffffff;
 	white-space:nowrap;
 }
+
+#navigation #linkWebsite li
+{
+	float:right;
+	list-style-type:none;
+	border-left:1px solid #ffffff;
+	white-space:nowrap;
+}
+
 
 #navigation li a
 {
@@ -158,18 +188,18 @@ body
 	width:100%;
 }
 
-#datachooser .step
+.step
 {
 	background-color:#ffa84c;
 	color:#000000;
 }
 
-#datachooser .data
+.data
 {
 	background-color:#ffffff;
 }
 
-#datachooser .query
+.query
 {
 	font-style:italic;
 }
@@ -235,30 +265,75 @@ body
 	border: none;
 }
 
-#vsmenu li
-{
-	clear:both;
-	border-bottom: 1px solid #ffffff;
-	margin: 0;
-}
-
-#vsmenu li a
+.rubric
 {
 	display: block;
+	margin: 1px;
 	padding: 5px 5px 5px 0.5em;
-	border-left: 10px solid #FFE2BF;
-	background-color: #FFF0DF;
+	border-left: 10px solid #FFC29F;
+	background-color: #FCFDDC;
 	color: #FFA84C;
 	text-decoration: none;
-	width: 100%;
 }
 
-html>body #vsmenu li a 
+.rubric:hover
+{
+	display: block;
+	border-left-color: #FFC29F;
+	background-color: #FCFDDC;
+	color: black;
+}
+
+.sensorName
+{
+	display: block;
+	margin: 1px;
+	padding: 5px 5px 5px 0.5em;
+	border-left: 10px solid #FFE2BF;
+	background-color: #FCFDDC;
+	color: #FFA84C;
+	text-decoration: none;
+}
+
+
+#dropArea .sensorName:hover
+{
+	background-color: white;/*#F0F000;*/
+	border-left-color: #FFE2BF;
+}
+
+#dropArea
+{
+	border: thin double #FFA84C;
+	background-color: #FFE0BF;
+	height: 100px;
+	text-align:left;
+}
+
+#dropAreaMask
+{
+	background-color: none;
+	height: 180px;
+	width:80%;
+	margin-left: 10%;
+	text-align:left;
+}
+
+#titleDropArea
+{
+	background-color: #FFA84C;
+	border: thin double #FFA84C;
+	text-align:center;
+}
+
+
+
+html>body #vsmenu div a 
 {
 	width: auto;
 }
 
-#vsmenu li a:hover
+#vsmenu a:hover, #vsmenu div span:hover
 {
 	border-left: 10px solid #FFA84C;
 	background-color: #FFB25F;
@@ -484,6 +559,9 @@ html>body #vsmenu li a
 	font-weight: bold;
 }
 
+
+
+
 /* Date picker specific styles follow */
 
 a.date-picker 
@@ -629,4 +707,36 @@ input.date-picker
 {
 	width: 90px;
 	margin: 1px 5px 5px 0;
+}
+
+#chartContainer
+{
+	text-align:center;
+}
+.chart
+{
+	text-align:center;
+	border: 2px solid #404040;//#FFC29F;
+	background-color: #303030;
+	padding: 10px;
+}
+
+#dataSet
+{
+	border: thin double #FFA84C;
+	background-color: #FFE0BF;
+}
+
+.stepContainer .step
+{
+	border: thin double #FFA84C;
+	background-color: #FFE0BF;
+	margin-bottom: 1px;
+	padding: 1px;
+	cursor:pointer;
+}
+
+.stepContainer .step:hover
+{
+	background-color: #FFF0CF;
 }

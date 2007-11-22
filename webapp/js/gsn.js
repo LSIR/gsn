@@ -1,35 +1,38 @@
 /**
  * gsn javascript
  */
+
+//Note: Balise creation: $.BaliseName({"attribute1":"value1",...},textInsideTag)
+
 var map;
  
 var GSN = { 
+	
 	debugmode: false
 	,debug: function (txt) {
 		if(typeof console != "undefined" && this.debugmode) {
 			console.debug(txt);
 		}	
 	}
+	
+	
 	,context: null //home, data, map || fullmap
 	/**
 	* Initialize a page load (begin, tab click & back button)
 	*/
 	,load: function(){
-		//by default, load home
-		
-		
 		var splittedURL = window.location.href.split('/');
 		var pageName = splittedURL[splittedURL.length-1].split('.');
 		
 		
 		
-		if (pageName[0]=="data") location.hash = "data";
-		if (pageName[0]=="map") location.hash = "map";
+		if (pageName[0]=="data" && location.hash == "") location.hash = "data";
+		if (pageName[0]=="map" && location.hash == "") location.hash = "map";
+		if (pageName[0]=="fullmap" && location.hash == "") location.hash = "fullmap";
 		if (location.hash == "" || pageName[0] == "index"){
 					location.hash = "home";
 					pageName[0] = "home";
-				}
-		
+		}
 		
 		GSN.debug("init:"+location.hash);
 		var params=location.hash.substr(1).split(",");
@@ -39,7 +42,7 @@ var GSN = {
 		
 		GSN.context = params[0];
 		//highlight the right tab in the navigation bar
-		$("#navigation li").each(function(){
+		$("#navigation div").each(function(){
 			if($("a",this).text()==GSN.context)
 				$(this).addClass("selected");
 			else
@@ -73,9 +76,9 @@ var GSN = {
 			$("#toggleallmarkers").show();
 			$("#vsmenu .toggle").show();
 			if(!GSN.map.loaded) {
-				$("#refreshall_autozoomandcenter").attr("checked",true);
-				GSN.map.init();
 				GSN.updateall();
+				GSN.map.init();
+				$("#refreshall_autozoomandcenter").attr("checked",true);
 			}
 			
 			//take care of params
@@ -102,6 +105,8 @@ var GSN = {
 			}
 		}
 	}
+	
+	
 	/**
 	* iframe msg callback for webupload
 	*/
@@ -116,6 +121,8 @@ var GSN = {
 		$("#msg").show();
 		document.getElementById("container").scrollIntoView(true);
 	}
+	
+	
 	/**
 	* Click on the top navigation bar
 	*/
@@ -123,6 +130,8 @@ var GSN = {
 		$.historyLoad(page);
 		return false;
 	}
+	
+	
 	/**
 	* Click on the virtual sensor on the left bar
 	*/
@@ -135,7 +144,6 @@ var GSN = {
 			var prev;
 			if ($("#vs4map div").size()!=0)
 				prev = $("#vs4map div").attr("class").split(" ")[0].split("-")[1];
-			
 			if (prev != vsName) {
 				$("#vs4map").empty();
 				GSN.map.followMarker(vsName);
@@ -154,15 +162,24 @@ var GSN = {
 	/**
 	* Close all button
 	*/
+	
 	,closeall: function (){
 		$("#msg").hide();
 		$("#vs").empty();
 		GSN.map.followMarker(null);
 	}
+	
+	
 	,loaded : false
+	
+	
 	/**
 	* Initialize the gsn title and leftside menu
 	*/
+	,vsName : new Array()
+	,selectedSensors : new Array()
+	,numSensorAssociatedWithCategory : new Hash()
+	
 	,init : function(data) {
 		this.loaded=true;
 		$(".loading").remove();
@@ -175,20 +192,239 @@ var GSN = {
 			$("#gsn-desc").empty().append($(gsn).attr("description"));
 			$("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
 		}
-		//build the leftside vs menu
+		//build the rightside vs menu
 		$("#vsmenu").empty();
+		
+		
+		
+		var arraySize = 0;
 		$("virtual-sensor",data).each(function(){
-			var vsname = $(this).attr("name");
-			$("#vsmenu").append($.LI({},$.A({"href":"javascript:GSN.menu('"+vsname+"');","id":"menu-"+vsname+""},vsname)));
+			name = $(this).attr("name");
+			GSN.vsName[arraySize] = name;
+			arraySize++;
+			
 			//if ($("field[@name=latitude]",$(this)).text()!="") 
 			//	$("#menu-"+vsname).addClass("gpsenabled");
 		});
+		
+		// Make a matrix of the array of the sensor with the group name in the second column
+		GSN.vsName = GSN.util.regroupByRubricSensorName(GSN.vsName);
+		
+		
+		// Creation of the sidebar menu with categories
+		var vsName = GSN.vsName;
+		var previousCategoryName;
+		for(var i=0;i<vsName.length;++i){
+			if(vsName[i][1] != previousCategoryName && vsName[i][1] != "others"){
+				// Append Group to menu if different from category others
+				if(GSN.context == "data"){
+					$("#vsmenu").append($.A({"class":"rubric","href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+" span\"));","id":"menu-rubric-"+vsName[i][1]+""},"  Group: "+vsName[i][1]));
+					$("#menu-rubric-"+vsName[i][1]).prepend($.IMG({'src':'../img/group.png'}));
+				}
+				else{
+					$("#vsmenu").append($.DIV({},$.A({"class":"rubric","href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+" a\"));","id":"menu-rubric-"+vsName[i][1]+""},"  Group: "+vsName[i][1])));
+					$("#menu-rubric-"+vsName[i][1]).prepend($.IMG({'src':'../img/group.png'}));
+				}
+				previousCategoryName = vsName[i][1];
+				// New category start with 0 sensors associated
+				GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],0);
+			}
+			if(vsName[i][1] != "others"){
+				// Append Sensor Name to menu if different from category others
+				if(GSN.context == "data"){
+					$("#vsmenu").append($.DIV({"class":vsName[i][1]},$.SPAN({"class":"sensorName","id":"menu-"+vsName[i][0]+""},vsName[i][0])));
+				}
+				else{
+					$("#vsmenu").append($.DIV({"class":vsName[i][1]},$.A({"class":"sensorName","href":"javascript:GSN.menu('"+vsName[i][0]+"');","id":"menu-"+vsName[i][0]+""},vsName[i][0])));
+				}
+				// increment the number of sensors associated to the rubric
+				GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);
+			}
+		}// End for
+		
+		
+		// Append Group Others to menu
+		if(GSN.context == "data"){
+			$("#vsmenu").append($.A({"class":"rubric","href":"javascript:GSN.util.toggle($(\".others span\"));","id":"menu-rubric-others"},"  Others"));
+			$("#menu-rubric-others").prepend($.IMG({'src':'../img/group.png'}));
+		}
+		else{
+			$("#vsmenu").append($.DIV({},$.A({"class":"rubric","href":"javascript:GSN.util.toggle($(\".others a\"));","id":"menu-rubric-others"},"  Others")));
+			$("#menu-rubric-others").prepend($.IMG({'src':'../img/group.png'}));
+		}
+		GSN.numSensorAssociatedWithCategory.setItem("others",0);
+		
+		// Append Sensor Name to menu if it corresponds to category others
+		for(var i=0;i<vsName.length;++i){
+			if(vsName[i][1] == "others"){
+				if(GSN.context == "data")$("#vsmenu").append($.DIV({"class":vsName[i][1]},$.SPAN({"class":"sensorName","id":"menu-"+vsName[i][0]},vsName[i][0])));
+				else $("#vsmenu").append($.DIV({"class":vsName[i][1]},$.A({"class":"sensorName","href":"javascript:GSN.menu('"+vsName[i][0]+"');","id":"menu-"+vsName[i][0]+""},vsName[i][0])));
+				GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);
+			}
+		}
+		
+		
+		
+		// Hide all the sensors in the side bar
+		$(".sensorName").hide();
+		
+		// Drag and Drop Functionnality
+		if(GSN.context == "data"){
+			// Sensors configuration
+			$("#vsmenu .sensorName").draggable({
+				cursor: 'move',
+				helper: 'clone',
+				start: function(){}
+			});
+			
+			// Sensor Group configuration
+			$("#vsmenu .rubric").draggable({
+				cursor: 'move',
+				helper: 'clone',
+				revert: true,
+				start: function(){}
+			});
+			
+			// Drop area configuration
+			$("#dropAreaMask").droppable({
+				accept: ".ui-draggable",
+				drop: function(ev, ui) {
+					var sensorDroppedName = $(ui.draggable.element).text();
+
+					if(!GSN.isAlreadyInSelectedSensorArray(sensorDroppedName)){
+						if(sensorDroppedName.substr(0,9) == "  Group: "){
+							//If a group has been dropped
+							GSN.AddSensorGroupToTheDraggableArea($(ui.draggable.element).text().substr(9));
+						}	else if (sensorDroppedName == "  Others") {
+							//If the group 'others' has been dropped
+							GSN.AddSensorGroupToTheDraggableArea("others");
+						}	else {
+							//If a sensor has been dropped
+							GSN.AddSensorToTheDraggableArea(sensorDroppedName);
+						}
+					}
+					
+				}
+			});
+
+		}
+			
 	}
+	
+	
+	,isAlreadyInSelectedSensorArray: function(sensorName){
+		// Look in the selected sensor array to see if the selected sensor don't already belongs to this former
+		var alreadyBelongSelectedSensor = false;
+		for(var i=0; i<GSN.selectedSensors.length; ++i){
+			if(sensorName == GSN.selectedSensors[i]){
+				alreadyBelongSelectedSensor = true;
+				break;
+			}
+		}
+		return alreadyBelongSelectedSensor;
+	}
+	
+	/**
+	* Add a sensor to the drop Area add the sensor to the selected sensor array
+	*/
+	,AddSensorToTheDraggableArea: function(sensorDroppedName){
+		sensorDroppedName = jQuery.trim(sensorDroppedName);
+		
+		// Add the dropped sensor to the drop area and set border
+		$("#dropArea").prepend($.SPAN({'class':'sensorName','id':'inDraggableArea-'+sensorDroppedName}));
+		$("#inDraggableArea-"+sensorDroppedName).css("border-left", "10px solid #FFA84C");
+		
+		// Add a link do delete the sensor from the draggable area
+		$("#inDraggableArea-"+sensorDroppedName).append("<a href=\"javascript:GSN.removeFromDraggableArea('"+sensorDroppedName+"')\"><img src=\"../img/button_cancel.png\"/></a>&nbsp;&nbsp;"+sensorDroppedName+"");
+		
+		// Remove the selected sensor from the sidebar
+		$("#menu-"+sensorDroppedName).remove();
+		
+		// Resize the drop area 
+		stringLength = $("#dropArea").css('height').length
+		newSize = parseInt($("#dropArea").css('height').substr(0,stringLength-2))+24+'px';
+		$("#dropArea").css('height',newSize);
+		
+		// Resize the drop area mask
+		stringLength = $("#dropAreaMask").css('height').length
+		newSize = parseInt($("#dropAreaMask").css('height').substr(0,stringLength-2))+24+'px';
+		$("#dropAreaMask").css('height',newSize);		
+		
+		// Add the dropped sensor to the selected sensor array
+		GSN.selectedSensors.push(sensorDroppedName);
+	}
+	
+	/**
+	* Add a sensor group to the drop Area add the sensors to the selected sensor array
+	*/
+	,AddSensorGroupToTheDraggableArea: function(groupName){
+		if(confirm("Are you sure that you want to add the "+GSN.numSensorAssociatedWithCategory.getItem(groupName)+" sensors of the '"+groupName+"' group?")){
+			for(var i=0; i < GSN.vsName.length; ++i){
+				if(GSN.vsName[i][1] == groupName){	
+					// If this sensor is already in the selected sensor array we remove it to have after a nive grouping inside the drop area
+					if(GSN.isAlreadyInSelectedSensorArray(GSN.vsName[i][0])) 
+						GSN.removeFromDraggableArea(GSN.vsName[i][0]);		
+					
+					// Add the sensor to the draggable area
+					GSN.AddSensorToTheDraggableArea(GSN.vsName[i][0]);
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	* Remove From drop Area the sensor and remove the sensor from the selected sensor array
+	*/
+	,removeFromDraggableArea: function(sensorName) {
+		// Remove the selected sensor from the drop area
+		$("#inDraggableArea-"+sensorName).remove();
+		var nameCategory;
+		
+		// Remove the sensor from the selected sensor array
+		for(var i=0; i<GSN.selectedSensors.length;++i){
+			if(jQuery.trim(GSN.selectedSensors[i]) == jQuery.trim(sensorName)){
+				GSN.selectedSensors.splice(i,1);
+			}
+		}
+		
+		
+		// Find the category name associated with the sensor name
+		for(var i=0;i<GSN.vsName.length;++i){
+			if(GSN.vsName[i][0] == sensorName) nameCategory = GSN.vsName[i][1];
+		}
+		
+		//alert(GSN.selectedSensors+"        "+nameCategory+"          "+$("#vsmenu #menu-rubric-"+nameCategory).length);
+		
+		// Append the sensor in the sidebar in the correct category
+		$("#vsmenu #menu-rubric-"+nameCategory).after($.DIV({"class":nameCategory},$.SPAN({"class":"sensorName","id":"menu-"+sensorName},sensorName)));
+		
+		// Make the appended sensor in the side bar draggable
+		$("."+nameCategory+" #menu-"+sensorName).draggable({
+				cursor: 'move',
+				helper: 'clone',
+				start: function(){}
+				});
+		
+		// Resize the drop area 
+		stringLength = $("#dropArea").css('height').length
+		newSize = parseInt($("#dropArea").css('height').substr(0,stringLength-2))-24+'px';
+		$("#dropArea").css('height',newSize);
+		
+		// Resize the drop area mask
+		stringLength = $("#dropAreaMask").css('height').length
+		newSize = parseInt($("#dropAreaMask").css('height').substr(0,stringLength-2))-24+'px';
+		$("#dropAreaMask").css('height',newSize);
+	}
+	
+	
 	,updatenb: 0
 	,updateallchange: function(){
 		if($("#refreshall_timeout").attr("value") != 0)
 			GSN.updateall();
 	}
+	
+	
 	/**
 	* Ajax call to update all the sensor display on the page and the map
 	*/
@@ -236,6 +472,8 @@ var GSN = {
 			GSN.debug("updateall time:"+diff/1000); 
 		}});
 	}
+	
+	
 	/**
 	* Add a vsbox if it doesn't exist, bring it to front and update it
 	*/
@@ -250,12 +488,16 @@ var GSN = {
 			GSN.map.autozoomandcenter();
 		}});
 	}
+	
+	
 	/**
 	* vsbox, display the vs info
 	*/
 	,vsbox: {
 		//box showing all vs info
 		container: "#vs"
+		
+		
 		/**
 		* Create an empty vsbox
 		*/
@@ -264,20 +506,22 @@ var GSN = {
 			if ($(this.container).find("."+vsdiv).size()!=0) return; //already exists
 			$(this.container).append($.DIV({"class":vsdiv+" vsbox"},
 									  $.H3({},$.SPAN({"class":"vsname"},vsName),
-									  	$.A({"href":"javascript:GSN.vsbox.remove('"+vsName+"');","class":"close"},"close"),
+									  	$.A({"href":"javascript:GSN.vsbox.remove('"+vsName+"');","class":"close"},$.IMG({'src':'./img/button_cancel.png'})),
 								      	$.SPAN({"class":"timed"},"loading...")
 									    ),$.UL({"class":"tabnav"},
-									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','dynamic');","class":"tabdynamic active"},"dynamic")),
-									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','static');","class":"tabstatic"},"addressing")),
-									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','structure');","class":"tabstructure"},"structure")),
-									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','description');","class":"tabdescription"},"description")),
-									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','upload');","class":"tabupload"},"upload"))									    	
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','dynamic');","class":"tabdynamic active"},"Real-Time")),
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','static');","class":"tabstatic"},"Addressing")),
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','structure');","class":"tabstructure"},"Structure")),
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','description');","class":"tabdescription"},"Description")),
+									    	$.LI({},$.A({"href":"javascript:GSN.vsbox.toggle('"+vsName+"','upload');","class":"tabupload"},"Upload")),									
+									    	$.LI({},$.A({"href":"./data.html","class":"tabdata"},"Download"))			    	
 									      ),
 									  $.DL({"class":"dynamic"}),
 									  $.DL({"class":"static"}),
 									  $.DL({"class":"structure"}),
 									  $.DL({"class":"description"}),
 									  $.DL({"class":"upload"}/*,
+									  
 									  	$.FORM({"action":"/upload","method":"post","enctype":"multipart/form-data","target":"webupload"},
 									  		$.INPUT({"type":"hidden","name":"vsname","value":vsName}),
 									  		$.SELECT({"class":"cmd","name":"cmd"}),
@@ -286,11 +530,14 @@ var GSN = {
 									  		$.P({},"* compulsary fields.")
 									  	)*/
 									  )
+									 ,$.DL({"class":"data"})
 			));
 			
 			$(this.container).find("."+vsdiv+" dl.upload").html('<form target="webupload" enctype="multipart/form-data" method="post" action="/upload"><input value="'+vsName+'" name="vsname" type="hidden"><select name="cmd" class="cmd"></select><dl class="input"></dl><input value="upload" type="submit"><p>* compulsary fields.</p></form>');
 			$(this.container).find("."+vsdiv+" select.cmd").bind("change", function(event) {GSN.vsbox.toggleWebInput(event)});
 		}
+		
+		
 		/**
 		* Bring a vsbox at the beginning of the container
 		*/
@@ -301,6 +548,8 @@ var GSN = {
 			$(this.container).prepend($("."+vsdiv, $(this.container)));
 			$("."+vsdiv, $(this.container)).fadeIn("slow");
 		}
+		
+		
 		/**
 		* Update and show all the data of the vsbox
 		*/
@@ -375,6 +624,8 @@ var GSN = {
 						gotDynamic = true;
 					}
 				}
+				
+				$(vsd).find("dl.data").show();
 							
 				//set the value
 				if (cat == null) {
@@ -383,7 +634,7 @@ var GSN = {
 					} else if (type.indexOf("svg") != -1){
 						value = '<embed type="image/svg+xml" width="400" height="400" src="'+value+'" PLUGINSPAGE="http://www.adobe.com/svg/viewer/install/" />';
 					} else if (type.indexOf("image") != -1){
-						value = '<img src="'+value+'" alt="error" />';
+						value = '<img src="'+value+'"/>';
 					} else if (type.indexOf("binary") != -1){
 						value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
 					}
@@ -427,7 +678,7 @@ var GSN = {
 			  });
 			  
 			  if ($(vs).attr("description")!="") {
-			 	$("dl.description", vsd).append($.DD({},$(vs).attr("description")));
+			 	$("dl.description", vsd).empty().append($.DD({},$(vs).attr("description")));
 			 	$("a.tabdescription", vsd).show();
 			 	if (!gotStatic) {
 			  		$(vsd).find("a.tabdescription", vsd).addClass("active");
@@ -465,6 +716,8 @@ var GSN = {
 				return false;
 			}
 		}
+		
+		
 		/**
 		* Remove the vsbox from the container
 		*/
@@ -474,6 +727,8 @@ var GSN = {
 			GSN.map.followMarker(null);
 			GSN.map.autozoomandcenter();
 		}
+		
+		
 		/**
 		* Vsbox tabs control
 		*/
@@ -492,6 +747,8 @@ var GSN = {
 			$(event.target).parent().find("dd."+cmd).show();
 		}
 	},
+	
+	
 	/**
 	* All the map thing
 	*/
@@ -502,6 +759,8 @@ var GSN = {
 		,markers : new Array()
 		,highlighted : null
 		,highlightedmarker : null
+		
+		
 		/**
 		* Initialize the google map
 		*/
@@ -516,11 +775,11 @@ var GSN = {
 				//load and initialize google map
 				GSN.debug("init gmap");
        
-       			this.loaded=true;
+       	this.loaded=true;
 				
-        		map = new GMap2(document.getElementById("vsmap"));
-        		//set the different control on the map
-        		map.addControl(new GLargeMapControl());
+        map = new GMap2(document.getElementById("vsmap"));
+        //set the different control on the map
+        map.addControl(new GLargeMapControl());
 				map.addControl(new GMapTypeControl());
 				map.addControl(new GScaleControl());
 				map.addControl(new GOverviewMapControl());
@@ -551,6 +810,7 @@ var GSN = {
 				tinyred.iconAnchor = new GPoint(6, 20);
 				tinyred.infoWindowAnchor = new GPoint(5, 1);
 				GSN.map.tinyred = tinyred;
+				
 				var tinygreen = new GIcon();
 				tinygreen.image = "http://labs.google.com/ridefinder/images/mm_20_green.png";
 				tinygreen.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
@@ -564,8 +824,9 @@ var GSN = {
   				GEvent.addListener(map, "click", function(overlay, point) {
 					if(overlay)	{
 						//when a marker is clicked
-						if(typeof overlay.vsname != "undefined") 
+						if(typeof overlay.vsname != "undefined"){
 							GSN.menu(overlay.vsname);
+						}
 					}
 					else
 						$("#refreshall_autozoomandcenter").attr("checked",false);
@@ -587,6 +848,8 @@ var GSN = {
 				
    			}
 		}
+		
+		
 		/**
 		* Callback after any map change zoom and map move and vs toggle
 		* Used for location #hash change
@@ -600,6 +863,8 @@ var GSN = {
 				location.hash = "map"
 			if (vs!="[ALL]") location.hash += ",vs="+vs;
 		}
+		
+		
 		/**
 		* Callback after any zoom change
 		* Used for the tricked followed marker
@@ -607,18 +872,22 @@ var GSN = {
 		,zoomend : function(oldzoomlevel,newzoomlevel){
 			GSN.map.trickhighlighted();
 		}
+		
+		
 		/**
 		* Followed marker and top of the others
 		*/
 		,trickhighlighted : function(){
 			if (GSN.map.highlighted != null) {
 				var hPoint = map.getCurrentMapType().getProjection().fromLatLngToPixel(GSN.map.markers[GSN.map.highlighted].getPoint(),map.getZoom());
-    			var marker = new GMarker(map.getCurrentMapType().getProjection().fromPixelToLatLng(new GPoint(hPoint.x , hPoint.y + 20 ) , map.getZoom()),GSN.map.tinygreen);
-    			map.removeOverlay(GSN.map.highlightedmarker);
-    			GSN.map.highlightedmarker = marker;
-  				map.addOverlay(marker);
-      		}
+  			var marker = new GMarker(map.getCurrentMapType().getProjection().fromPixelToLatLng(new GPoint(hPoint.x , hPoint.y + 20 ) , map.getZoom()),GSN.map.tinygreen);
+  			if(GSN.map.highlightedmarker != null) map.removeOverlay(GSN.map.highlightedmarker);
+  			GSN.map.highlightedmarker = marker;
+				map.addOverlay(marker);
+    	}
 		}
+		
+		
 		/**
 		* Auto-zoom and center on the visible sensors
 		*/
@@ -644,6 +913,8 @@ var GSN = {
 				}
 			}
 		}
+		
+		
 		/**
 		* Add marker
 		*/
@@ -658,13 +929,16 @@ var GSN = {
   					
   			//add gpsenable classjaj
   			$("#menu-"+vsName).addClass("gpsenabled");
-  			$("#menu-"+vsName).parent().append($.A({"href":"javascript:GSN.map.toggleMarker('"+vsName+"');","class":"toggle"},"X"));
+  			$("#menu-"+vsName).append("<br/>");
+  			$("#menu-"+vsName).append($.A({"href":"javascript:GSN.map.toggleMarker('"+vsName+"');","class":"toggle"},"X"));
   			
   			if(GSN.context=="fullmap"){
 				var vs = $(".vsbox-"+vsName+" > h3 > span.vsname")
 				$(vs).wrap("<a href=\"javascript:GSN.menu('"+$(vs).text()+"');\"></a>");
 			}
 		}
+		
+		
 		/**
 		* Toggle marker
 		*/
@@ -675,6 +949,8 @@ var GSN = {
 			else
 				return false;
 		}
+		
+		
 		/**
 		* Toggle marker
 		*/
@@ -692,6 +968,8 @@ var GSN = {
 			params.push("vs=");
 			$.historyLoad(params.join(","));
 		}
+		
+		
 		/**
 		* Toggle marker
 		*/
@@ -726,6 +1004,8 @@ var GSN = {
 			}
 			$.historyLoad(location.hash.substr(1)+",vs="+vs.join(":"));
 		}
+		
+		
 		/**
 		* Update marker
 		*/
@@ -743,13 +1023,14 @@ var GSN = {
 			if (!updated)
 				GSN.map.addMarker(vsName,lat,lon);
 		}
+		
+		
 		/**
 		* Highlight a marker
 		* Stop it if called with null name
 		*/
 		,followMarker: function(vsName){
 			if (!GSN.map.loaded) return;
-			
 			if (vsName!=null) {
 				for (x in GSN.map.markers) {
 					var m = GSN.map.markers[x];
@@ -767,6 +1048,8 @@ var GSN = {
 				map.removeOverlay(GSN.map.highlightedmarker);
 			}
 		}
+		
+		
 		/**
 		* Zoom out to see all marker
 		*/
@@ -780,6 +1063,8 @@ var GSN = {
 			map.panTo(bounds.getCenter());
 		}
 	}
+	
+	
 	/**
 	* Data part
 	*/	
@@ -789,66 +1074,164 @@ var GSN = {
 		fields_type : new Array(),
 		criterias : new Array(),
 		nb_crit : 0,
+		radio:false,
 		
-		init: function(vsName, radio){
-			if (radio == null) {
-				radio = false;
-			}
-   			$("form").attr("action", "");
+		/**
+		* Initialisation of the Data part (called as soon as a user selected sensors and click on the button)
+		*/	
+		init: function(){
+			GSN.data.fields.splice(0);
+			GSN.data.fields_type.splice(0);
+			
+			$("#step1Container .data").hide("slow").prev().click(function(){$(this).next().toggle("slow");$(this).next().next().toggle("slow");});
+			
+			//remove the deselection function and drag and drop
+			$("#dropArea img").remove();
+			$(".sensorName").draggableDisable();
+			$(".rubric").draggableDisable();
+			$('.nextStepButton').remove();
+			
+			
+			// Remove eventual duplicate in the selected sensors array
+			for(var i=1; i<GSN.selectedSensors.length; ++i)
+				if(GSN.selectedSensors[i-1] == GSN.selectedSensors[i]) GSN.selectedSensors.splice(i,1);
+			
+			
+   		$("form").attr("action","");
 			$("#dataSet").remove();
-			$("#criterias").empty();
-			$("#criterias").append("<tr><td class=\"step\">Step 1/5 : Selection of the Virtual Sensor</td></tr>");
-			$("#criterias").append("<tr><td class=\"data\" id=\"vsensor\">Selected virtual sensor : " + vsName + "</td></tr>");
-			$("#vsensor").append("<input type=\"hidden\" name=\"vsName\" id=\"vsName\" value=\""+vsName+"\">");
-			$("#criterias").append("<tr><td class=\"step\">Step 2/5 : Selection of the fields</td></tr>");
-			$("#criterias").append("<tr><td class=\"data\" id=\"fields\"></td></tr>");
-			$("#fields").append("<input type=\"radio\" id=\"commonReq\" name=\"commonReq\" value=\"true\" onClick=\"javascript:GSN.data.init('" + vsName + "', false)\">Common request ");
-			$("#fields").append("<input type=\"radio\" id=\"aggregReq\" name=\"commonReq\" value=\"false\" onClick=\"javascript:GSN.data.init('" + vsName + "', true)\">Aggregate functions<br><br>");
-			if (radio) {
+			$("#step2Container").empty();
+			$("#resetButton").show();
+			
+			$("#formular").append("<input type=\"hidden\" name=\"numberSelectedSensor\" id=\"numberSelectedSensor\" value=\""+GSN.selectedSensors.length+"\">");
+			for(var i=0; i<GSN.selectedSensors.length; ++i)
+				$("#formular").append("<input type=\"hidden\" name=\"vsName"+i+"\" id=\"vsName"+i+"\" value=\""+GSN.selectedSensors[i]+"\">");
+
+			$("#step2Container").append("<div class=\"step\">Step 2/5 : Selection of the Fields</div>");
+			$("#step2Container").append("<div class=\"data\" id=\"fields\"></div>");
+			$("#fields").append("<input type=\"radio\" id=\"commonReq\" name=\"commonReq\" onClick=\"javascript:GSN.data.radio=false;GSN.data.init();\" />Common request ");
+			$("#fields").append("<input type=\"radio\" id=\"aggregReq\" name=\"aggregReq\" onClick=\"javascript:GSN.data.radio=true;GSN.data.init();\" />Aggregate functions<br/><br/>");
+			$("#fields").append($.DIV({'id':'separation'},""));
+			if (GSN.data.radio) {
 				$("#aggregReq").attr("checked", true);
 			} else {
 				$("#commonReq").attr("checked", true);
 			}
-				
-			$("#fields").append("Select field(s)<br/>");
-			$.ajax({
-				type: "GET",
-				url: "/gsn?REQUEST=113&name="+vsName,
-				success: function(msg) {
-					GSN.data.fields = new Array();
-					GSN.data.fields_type = new Array();
-					GSN.data.criterias = new Array();
-					GSN.data.nb_crit = 0;
-					$("virtual-sensor field", msg).each(function() {
-						if ($(this).attr("type").substr(0,3) != "bin") {
-							GSN.data.fields.push($(this).attr("name"));
-							GSN.data.fields_type.push($(this).attr("type"));
-							if (radio) {
-								//if (($(this).attr("type") == "int") || ($(this).attr("type") == "long") || ($(this).attr("type") == "double")) {
-									$("#fields").append("<div id='" + $(this).attr("name") + "'><input type=\"checkbox\" name=\"fields\" id=\"field\" value=\""+$(this).attr("name")+"\" onClick=\"javascript:GSN.data.aggregateSelect('"+$(this).attr("name")+"',this.checked)\">"+$(this).attr("name")+" </div>");
-								//}
-							} else {
-								$("#fields").append("<input type=\"checkbox\" name=\"fields\" id=\"field\" value=\""+$(this).attr("name")+"\">"+$(this).attr("name")+"<br/>");
+			
+			
+			for(var i=0; i<GSN.selectedSensors.length; ++i){
+				$.ajax({
+					async: false,
+					type: "GET",
+					url: "/gsn?REQUEST=113&name="+GSN.selectedSensors[i],
+					success: function(msg) {
+						$("virtual-sensor field", msg).each(function() {
+							if ($(this).attr("type").substr(0,3) != "bin") {
+								GSN.data.fields.push($(this).attr("name"));
+								GSN.data.fields_type.push($(this).attr("type"));
+							}
+						});
+						GSN.data.fields.push("end");
+						GSN.data.fields_type.push("end");
+					}
+				});
+			}
+			GSN.data.selectCommonFieldAndDisplay();
+		},
+		
+		/**
+		* Field part: select the common field from the selected sensors
+		*/	
+		selectCommonFieldAndDisplay: function(){
+			//Find Common Fields
+			var tempCommonFields = new Array();
+			var secondEndSeen;
+			var firstEndSeen = -1;
+			
+			//look for the first end position in the GSN.data.fields array
+			for(var k=0; k<GSN.data.fields.length; ++k){
+				if(GSN.data.fields[k] == "end"){
+					secondEndSeen = k;
+					break;
+				}
+			}
+			
+			//if more than one sensor selected
+			if(GSN.selectedSensors.length > 1){
+				for(var k=secondEndSeen+1; k<GSN.data.fields.length; ++k){
+					
+					if(GSN.data.fields[k] != "end"){
+						for(var m=firstEndSeen+1; m<secondEndSeen; ++m){
+							if(GSN.data.fields[k] == GSN.data.fields[m]){
+								tempCommonFields.push(GSN.data.fields[k]);
 							}
 						}
-					});
-					if (radio) {
-						$("#fields").append("<br/>Group by : <select name=\"aggregateGB\" id=\"aggregateGB\" size=\"1\" onChange=\"javascript:GSN.data.groupBy(this.value)\"></select><br/>");
-						for (i = 0; i < GSN.data.fields.length; i++) {
-						  $("#aggregateGB").append("<option value=\"" + GSN.data.fields[i] + "\">" + GSN.data.fields[i] + "</option>");
-						}
-						$("#aggregateGB").append("<option value=\"none\">None</option>");
-					} else {
-						$("#fields").append("<br/><input type=\"checkbox\" name=\"all\" onClick=\"javascript:GSN.data.checkAllFields(this.checked)\">Check all<br/>");
 					}
-					$("#fields").append("<br><a href=\"javascript:GSN.data.nbDatas()\" id=\"nextStep\">Next step</a>");
+					else{
+						//if => GSN.data.fields[k] == "end"
+						firstEndSeen = secondEndSeen;
+						secondEndSeen = GSN.data.fields[k];
+					}								
 				}
-			});
+				GSN.data.fields = tempCommonFields;
+			} else {
+				GSN.data.fields.pop();
+			}
+			
+			if(GSN.selectedSensors.length > 1){
+				$("#separation").append("Common Found Fields:<br/>");
+			} else {
+				$("#separation").append("Select field(s):<br/>");
+			}
+			
+			//Display Common Fields
+			for(var i=0; i<GSN.data.fields.length; i++){
+				if (GSN.data.radio) {
+					//if (($(this).attr("type") == "int") || ($(this).attr("type") == "long") || ($(this).attr("type") == "double")) {
+						$("#separation").append("<div id='" + GSN.data.fields[i] + "'><input type=\"checkbox\" name=\"fields\" class=\"field\" value=\""+GSN.data.fields[i]+"\" onClick=\"javascript:GSN.data.aggregateSelect('"+GSN.data.fields[i]+"',this.checked)\">"+GSN.data.fields[i].prettyString()+" </div>");
+					//}
+				} else {
+					$("#separation").append("<input type=\"checkbox\" name=\"fields\" class=\"field\" value=\""+GSN.data.fields[i]+"\">"+GSN.data.fields[i].prettyString()+"<br/>");
+				}
+				
+				if (GSN.data.radio) {
+					$("#groupByContainer").empty();
+					$("#separation").append("<span id=\"groupByContainer\">");
+					$("#groupByContainer").append("<br/>Group by : <select name=\"aggregateGB\" id=\"aggregateGB\" size=\"1\" onChange=\"javascript:GSN.data.groupBy(this.value)\"></select><br/>");
+					for (var j=0; j < GSN.data.fields.length; j++) {
+					  $("#aggregateGB").append("<option value=\"" + GSN.data.fields[j] + "\">" + GSN.data.fields[j].prettyString() + "</option>");
+					}
+					$("#aggregateGB").append("<option value=\"none\">None</option>");
+					$("#aggregateGB").append("</select>");
+					$("#separation").append("</span>");
+				} else {
+					$("#checkAllContainer").remove();
+					$("#separation").append("<span id=\"checkAllContainer\"><br/><input type=\"checkbox\" id=\"all\" name=\"all\" onClick=\"javascript:GSN.data.checkAllFields(this.checked)\">Check all<br/></span>");
+				}
+			}
+			
+			GSN.data.appendNextStepButton("fields","if(GSN.data.atLeastOneFieldSelected())GSN.data.nbDatas()");
 		},
+		
+		atLeastOneFieldSelected: function(){
+      var n = $(".field:checked").length;
+			if(n > 0) return true
+			else alert("You have to select at least one field.");
+		},
+		
+		/**
+		* Append a button in "idInWichAppend" with an action: "onclick" an "idButton" and a "value" (configurable)
+		*/	
+		appendNextStepButton: function(idInWichAppend,onclick,idButton,value){
+			if(idButton==null) idButton="";
+			if(value==null) value="Next Step";
+			$("#"+idInWichAppend+"").append('<br/><div class="nextStepButton"><input type="button" id="'+idButton+'" value="'+value+'" onClick="'+onclick+';"/>'+"&nbsp&nbsp&nbsp<input type=\"button\" id=\"resetButton\" value=\"Reset\" onClick=\"window.location='./data.html';\"/></div>");
+		},
+		
+		
 		aggregateSelect: function(that, checked){
 		  // To can choose the aggregate type for the field
 		  if (checked) {
-    		  $("#"+that).append(" <select name=\""+that+"AG\" id=\""+that+"AG\" size=\"1\"></select>");
+    		  $("#"+that).append("<select name=\""+that+"AG\" id=\""+that+"AG\" size=\"1\"></select>");
     		  $("#"+that+"AG").append("<option value=\"AVG\">AVG</option>");
     		  $("#"+that+"AG").append("<option value=\"MAX\">MAX</option>");
     		  $("#"+that+"AG").append("<option value=\"MIN\">MIN</option>");
@@ -857,6 +1240,8 @@ var GSN = {
     	   }
 						
 		},
+		
+		
 		groupBy: function(option) {
 			if (option == "timed") {
 				$("#aggregateGB").after("<input type=\"text\" name=\"gbdelta\" id=\"gbdelta\" size=\"5\"><select name=\"gbdeltameasure\" id=\"gbdeltameasure\" size=\"1\"></select>");
@@ -870,28 +1255,41 @@ var GSN = {
 				$("#gbdeltameasure").remove();
 			}
 		},
+		
+		
 		checkAllFields: function(check){
 			$("input").each(function () {
-				if ($(this).attr("id") == "field") {
+				if ($(this).attr("class") == "field") {
 					$(this).attr("checked", check);
 				}
 			});
 		},
+		
+		
 		nbDatas: function() {
-			$("#nextStep").remove();
-			$("#criterias").append("<tr><td class=\"step\">Step 3/5 : Selection of the Virtual Sensor</td></tr>");
-			$("#criterias").append("<tr><td class=\"data\" id=\"nbDatas\"></td></tr>");
+			$(".nextStepButton").remove();
+			$("#step2Container .data").hide("slow").prev().click(function(){$(this).next().toggle("slow");});
+			$("#step2Container .data :enabled").attr("disabled", "disabled");
+			
+			$("#step3Container").append("<div class=\"step\">Step 3/5 : Selection of the Data Range</div>");
+			$("#step3Container").append("<div class=\"data\" id=\"nbDatas\"></div>");
 			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"allDatas\" value=\"\" checked> All data<br/>");
 			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"someDatas\" value=\"\"> Last <input type=\"text\" name=\"nb\" value=\"\" id=\"nbOfDatas\" size=\"4\"/> values<br/>");
-			$("#nbDatas").append("<br><a href=\"javascript:GSN.data.addCriteria(true)\" id=\"nextStep\">Next step</a>");
+			GSN.data.appendNextStepButton("nbDatas","GSN.data.addCriteria(true)");
 		},	
+		
+		
 		addCriteria: function(newStep) {
 			if (newStep) {
-				$("#nextStep").remove();
-				$("#criterias").append("<tr><td class=\"step\">Step 4/5 : Selection of the criterias</td></tr>");
-				$("#criterias").append("<tr><td class=\"data\" id=\"where\">");
+				$(".nextStepButton").remove();
+				$("#step3Container .data").hide("slow").prev().click(function(){$(this).next().toggle("slow");});
+				$("#step3Container .data :enabled").attr("disabled", "disabled");
+				
+				$("#step4Container").append("<div class=\"step\">Step 4/5 : Selection of the Criterias</div>");
+				$("#step4Container").append("<div class=\"data\" id=\"where\"></div>");
 				$("#where").append("<a id=\"addCrit\" href=\"javascript:GSN.data.addCriteria(false)\">Add criteria</a>");
-				$("#where").append("<br/><br/><a id=\"nextStep\" href=\"javascript:GSN.data.selectDataDisplay()\">Next step</a></td></tr>");
+				$("#where").append('<br/><br/>');	
+				GSN.data.appendNextStepButton("where","GSN.data.selectDataDisplay()");
 			} else {
 				GSN.data.nb_crit++;
 				newcrit = "<div id=\"where" + GSN.data.nb_crit + "\"></div>";
@@ -900,6 +1298,8 @@ var GSN = {
 	    		GSN.data.criterias.push(GSN.data.nb_crit);
 			}
 		},
+		
+		
 		addCriteriaLine: function(nb_crit, field) {
 				newcrit = "";
 				if (GSN.data.criterias.length > 0) {
@@ -933,6 +1333,8 @@ var GSN = {
 	    		$("#critfield"+nb_crit).attr("value", field);
 	    		GSN.data.criteriaForType(GSN.data.fields[0],nb_crit);
 		},
+		
+		
 		criteriaForType: function(field, nb_crit) {
 			if (field == "timed") {
 				$("#critval"+nb_crit).val(GSN.util.printDate((new Date()).getTime()));
@@ -941,74 +1343,97 @@ var GSN = {
 				$("#critval"+nb_crit).val("");
 			}
 		},
+		
+		
 		removeCrit: function(critnb) {
-	   		$("#where"+critnb).remove();
-	   		var critTMP = new Array();
-	   		for (var i=0; i<GSN.data.criterias.length; i++) {
-	   			if (GSN.data.criterias[i] == critnb) {
-	   				if (i == 0 && GSN.data.criterias.length > 0) {
-	   					$("#critJoin"+GSN.data.criterias[i+1]).remove();
-	   				}
-	   			} else {
-	   				critTMP.push(GSN.data.criterias[i]);
-	   			}
-	   		}
-	   		GSN.data.criterias = critTMP;
-	   	},
-	   	selectDataDisplay: function() {
-	   		$("#nextStep").remove();
-	   		$("#criterias").append("<tr><td class=\"step\">Step 5/5 : Selection of the format</td></tr>");
-			$("#criterias").append("<tr><td class=\"data\" id=\"display\">");
+   		$("#where"+critnb).remove();
+   		var critTMP = new Array();
+   		for (var i=0; i<GSN.data.criterias.length; i++) {
+   			if (GSN.data.criterias[i] == critnb) {
+   				if (i == 0 && GSN.data.criterias.length > 0) {
+   					$("#critJoin"+GSN.data.criterias[i+1]).remove();
+   				}
+   			} else {
+   				critTMP.push(GSN.data.criterias[i]);
+   			}
+   		}
+   		GSN.data.criterias = critTMP;
+   	},
+   	
+   	
+   	selectDataDisplay: function() {
+	   	$(".nextStepButton").remove();
+	   	$("#step4Container .data").hide("slow").prev().click(function(){$(this).next().toggle("slow");});
+	   	$("#step4Container .data :enabled").attr("disabled", "disabled");
+	   	
+	   	$("#step5Container").append("<div class=\"step\">Step 5/5 : Selection of the Format</div>");
+			$("#step5Container").append("<div class=\"data\" id=\"display\"></div>");
 			$("#display").append($.DIV({"id":"showSQL"},$.A({"href":"javascript:GSN.data.getDatas(true);"},"Show SQL query")));
 			$("#display").append("<input type=\"radio\" id=\"samePage\" value=\"samepage\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\" checked>In this page<br/>");
 			$("#display").append("<input type=\"radio\" id=\"popup\" value=\"popup\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\">In a new window<br/>");
 			$("#display").append("<input type=\"radio\" id=\"CSV\" value=\"CSV\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\">Download data<br/>");
-			$("#display").append("<br/><a id=\"getDatas\" href=\"javascript:GSN.data.getDatas()\">Get data</a><br/><br/>");
-	   	},
-	   	showFormatCSV: function() {
-	   		if ($("#CSV").attr("checked")) {
-	   			$("#getDatas").before($.DIV({"id":"cvsFormat"}));
-	   			$("#cvsFormat").append($.INPUT({"type":"radio", "name":"delimiter", "value":"tab"})).append("tab");
-	   			$("#cvsFormat").append($.BR()).append($.INPUT({"type":"radio", "name":"delimiter", "value":"space"})).append("space");
-	   			$("#cvsFormat").append($.BR()).append($.INPUT({"type":"radio", "name":"delimiter", "value":"other"})).append("other : ");
-	   			$("#cvsFormat").append($.INPUT({"type":"text", "name":"otherdelimiter", "size":"2"})).append($.BR()).append($.BR());
-	   		} else {
-	   			$("#cvsFormat").remove();
-	   		}
-	   	},
-	   	getDatas: function(sql) {
-	  		$("table#dataSet","#datachooser").remove();
-	   		$("#display").append($.SPAN({"class":"refreshing"},$.IMG({"src":"style/ajax-loader.gif","alt":"loading","title":""})));
-	   		if ($("#samePage").attr("checked") || $("#popup").attr("checked") || sql) {
-	   			request = "vsName="+$("#vsName").attr("value");
-	   			if ($("#commonReq").attr("checked")) {
-	   				request += "&commonReq=true";
-	   			} else {
-	   				request += "&commonReq=false";
-	   				if ($("#aggregateGB").val() != "none") {
-	   					request += "&groupby=" + $("#aggregateGB").val();
-	   					if ($("#aggregateGB").attr("value") == "timed") {
-	   						temp = $("#gbdelta").val();
-	   						if ($("#gbdeltameasure").val() == "s") {
-	   							temp = temp * 1000;
-	   						} else if ($("#gbdeltameasure").val() == "m") {
-	   							temp = temp * 60000;
-	   						} else if ($("#gbdeltameasure").val() == "h") {
-	   							temp = temp * 3600000;
-	   						} else if ($("#gbdeltameasure").val() == "d") {
-	   							temp = temp * 86400000; // 3600000 * 24
-	   						}
-	   						request += "&groupbytimed=" + temp
-	   					}
-	   				}
-	   			}
-	   			$("input").each(function () {
-					if ($(this).attr("id") == "field" && $(this).attr("checked")) {
-					   if ($("#commonReq").attr("checked")) {
-    						request += "&fields=" + $(this).attr("value");
-    					} else {
-    					   request += "&fields=" + $("#"+$(this).val()+"AG").val()+"("+$(this).attr("value")+")";
-    					}
+			$("#display").append('<br/>');
+			$("#display").append("<input type=\"radio\" id=\"barChart\" name=\"chartType\" onClick=\"\" checked/>Bar Chart<br/>");
+			$("#display").append("<input type=\"radio\" id=\"lineChart\" name=\"chartType\" onClick=\"\"/>Line Chart<br/>");
+			GSN.data.appendNextStepButton("display","GSN.data.getDatas()","getDatas","Get Data");
+			$("#display").append('<br/><br/>');
+			
+			$("#step5Container .data").prev().click(function(){$(this).next().toggle("slow");});
+	  },
+   	
+   	
+   	showFormatCSV: function() {
+   		if ($("#CSV").attr("checked")) {
+   			$("#cvsFormat").empty();
+   			$("#getDatas").before($.DIV({"id":"cvsFormat"}));
+   			$("#cvsFormat").append($.INPUT({"type":"radio", "name":"delimiter", "id":"tab", "value":"tab"})).append("tab");
+   			$("#cvsFormat").append($.BR()).append($.INPUT({"type":"radio", "name":"delimiter", "id":"space", "value":"space"})).append("space");
+   			$("#cvsFormat").append($.BR()).append($.INPUT({"type":"radio", "name":"delimiter", "id":"other", "value":"other"})).append("other : ");
+   			$("#cvsFormat").append($.INPUT({"type":"text", "name":"otherdelimiter", "size":"2"})).append($.BR()).append($.BR());
+   			$("#tab").attr("checked",true);
+   		} else {
+   			$("#cvsFormat").remove();
+   		}
+   	},
+   	
+   	
+   	getDatas: function(sql) {
+   		$("#chartContainer").empty();  
+   		$("#dataSet").remove(); 	
+  		$("table #dataSet","#datachooser").remove();
+  		
+   		$("#display").append($.SPAN({"class":"refreshing"},$.IMG({"src":"style/ajax-loader.gif","alt":"loading","title":""})));
+   		if ($("#samePage").attr("checked") || $("#popup").attr("checked") || sql) {
+   			if(GSN.selectedSensors.length > 1) request="multirequest=true";
+   			else request="multirequest=false";
+   			if ($("#commonReq").attr("checked")) {
+   				request += "&commonReq=true";
+   			} else {
+   				request += "&commonReq=false";
+   				if ($("#aggregateGB").val() != "none") {
+   					request += "&groupby=" + $("#aggregateGB").val();
+   					if ($("#aggregateGB").attr("value") == "timed") {
+   						temp = $("#gbdelta").val();
+   						if ($("#gbdeltameasure").val() == "s") {
+   							temp = temp * 1000;
+   						} else if ($("#gbdeltameasure").val() == "m") {
+   							temp = temp * 60000;
+   						} else if ($("#gbdeltameasure").val() == "h") {
+   							temp = temp * 3600000;
+   						} else if ($("#gbdeltameasure").val() == "d") {
+   							temp = temp * 86400000; // 3600000 * 24
+   						}
+   						request += "&groupbytimed=" + temp
+   					}
+   				}
+   			}
+   			$("input").each(function () {
+				if ($(this).attr("class") == "field" && $(this).attr("checked")) {
+				   if ($("#commonReq").attr("checked")) {
+  						request += "&fields=" + $(this).attr("value");
+  					} else {
+  					   request += "&fields=" + $("#"+$(this).val()+"AG").val()+"("+$(this).attr("value")+")";
+  					}
 					}
 				});
 				if ($("#someDatas").attr("checked") && $("#nbOfDatas").attr("value") != "") {
@@ -1023,88 +1448,321 @@ var GSN = {
 					request += "&critop="+$("#critop"+GSN.data.criterias[i]).val();
 					request += "&critval="+$("#critval"+GSN.data.criterias[i]).val();
 				}
-				if (sql) {
-					request += "&sql=true";
-					$.ajax({
-						type: "GET",
-						url: "/data?"+request,
-						success: function(msg) {
-							$("#display .refreshing").remove();					
-							$("#showSQL .query").remove();
-							$("#showSQL").append($.P({"class":"query"},unescape(msg)));
-						}
-					});
-					
-				}else
-					GSN.data.displayDatas(request);
-	   		} /*else if ($("#popup").attr("checked")) {
-	   			$("form").attr("target", "_blank");
-	   			$("form").attr("action", "/showData.jsp");
-	   			document.forms["formular"].submit();
-	   		} */ else if ($("#CSV").attr("checked")) {
-	   			$("form").attr("action", "/data");
-	   			$("#criterias").attr("target", "_self");
-	   			document.forms["formular"].submit();
-	   			$("#display .refreshing").remove();					
-	   		}
-	   	},
-	   	displayDatas: function(request) {
-	   			$.ajax({
-				type: "GET",
-				url: "/data?"+request,
-				success: function(msg) {
-					//remove indicator	
-					$("#display .refreshing").remove();					
 				
-	
-					//should check no field selected...
-					if ($("data", msg).size() == 0) {
-						alert(msg);
-						return;
-					}
-					else if ($("line", msg).size() == 0) {
-						alert('No data corresponds to your request');
-						return;
-					}
-
-					var target = "#datachooser";
-					if ($("#popup").attr("checked")){
-						var w = window.open("", "Data", "width=700,height=700,scrollbars=yes");
-						if (w == null) {
-							alert('Your browser security setting blocks popup. Please turn it off for this website.');
-							return;
-						}
-						target = w.document.body;
-					}
-
-					$("table#dataSet",target).remove();
-					$(target).append($.TABLE({"size":"100%", "id":"dataSet"}));
-					
-					
-					var line,tr,rows;
-					var lines = $("line", msg);
-					for (var i = 0; i<lines.size();i++){
-						line = lines.get(i);
-						
-						if (i==0)
-							tr = $.TR({"id":"line"+i, "class":"step"});
-						else
-							tr = $.TR({"id":"line"+i, "class":"data"});
-						
-						rows = $("field", line);
-						for (var j = 0; j<rows.size();j++){
-							$(tr).append($.TD({},$(rows.get(j)).text()));
-						}
-						$("table#dataSet",target).append(tr);
-					}
-					
-					if (w != null){
-						$("table#dataSet .step", target).css("background","#ffa84c")
+				if (sql) {
+					$("#showSQL p").empty();
+					for(var i=0; i<GSN.selectedSensors.length; ++i){
+						request += "&sql=true";
+						$.ajax({
+							type: "GET",
+							url: "/data?"+request+"&vsName="+GSN.selectedSensors[i],
+							success: function(msg) {
+								$("#display .refreshing").remove();
+								$("#showSQL").append($.P({"class":"query"},unescape(msg)));
+							}
+						});
 					}
 				}
-			});
-	   	}
-	}
+				
+				if(!sql) GSN.data.displayDatas(request);
+   		} /*else if ($("#popup").attr("checked")) {
+   			$("form").attr("target", "_blank");
+   			$("form").attr("action", "/showData.jsp");
+   			document.forms["formular"].submit();
+   		} */ 
+   		else if ($("#CSV").attr("checked")) {
+   			$("form").attr("action", "/multidata");
+   			$("form").attr("target", "_blank");
+   			
+   			$("#step2Container .data :disabled").removeAttr("disabled");
+   			$("#step3Container .data :disabled").removeAttr("disabled");
+   			$("#step4Container .data :disabled").removeAttr("disabled");
+   			
+   			
+   			document.forms["formular"].submit();
+   			$("#display .refreshing").remove();
+   			
+   			$("#step2Container .data :enabled").attr("disabled", "disabled");
+   			$("#step3Container .data :enabled").attr("disabled", "disabled");
+   			$("#step4Container .data :enabled").attr("disabled", "disabled");
+   			
+   		}
+   	},
+   	
+   	
+   	displayDatas: function(request) {
+			$('#getDatas').attr("value","Update");
+			
+			//should check no field selected...
+			if ($(".field[checked]").length == 0) {
+				$("#display .refreshing").remove();
+				alert("You have to select at least one field.");
+				return;
+			}
+   		
+   		// Define the target
+			var target = "#datachooser";
+			if ($("#popup").attr("checked")){
+				var w = window.open("", "Data", "width=700,height=700,scrollbars=yes");
+				if (w == null) {
+					alert('Your browser security setting blocks popup. Please turn it off for this website.');
+					return;
+				}
+				target = w.document.body;
+			}
+				
+			$("#datachooser table",target).remove();
+			$("#datachooser").append('<span id="chartContainer"></span>'); 
+   		
+   		var answerLinesFromXMLSensorNum = new Array();
+   		var minValue = new Array();
+   		var maxValue = new Array();
+   		for(var i=0; i<GSN.selectedSensors.length; ++i){
+   			var vsName = GSN.selectedSensors[i];
+   			var nbFields = $(".field[checked]").length;
+   			var sensorNumber = i;
+   			$.ajax({
+   				async: false,
+					type: "GET",
+					url: "/data?"+request+"&vsName="+vsName,
+					success: function(answer) {
+						// Remove indicator	
+						$("#display .refreshing").remove();
+						
+						// Store the answer
+						answerLinesFromXMLSensorNum[sensorNumber] = $("line", answer);
+						
+						// If no answer return
+						if ($("line",answer).size() == 0) {
+							alert('No data corresponds to your request for the sensor: '+vsName);
+							return;
+						}
+						
+
+
+						$(target).append($.TABLE({"size":"100%", "id":"dataSet"}));
+						$("table#dataSet",target).append("<tr><td class='step' align='center' colspan='"+nbFields+"'>"+vsName.prettyString()+"</td></tr>");
+						
+						var line,tr,rows;
+						var lines = $("line", answer);
+						for (var i = 0; i<lines.size();i++){
+							line = lines.get(i);
+							
+							if (i==0)
+								tr = $.TR({"id":"line"+i, "class":"step"});
+							else
+								tr = $.TR({"id":"line"+i, "class":"data"});
+							
+							rows = $("field", line);
+							
+							for (var j = 0; j<rows.size();j++){
+								if(j <= nbFields && i == 0) $(tr).append($.TD({},$(rows.get(j)).text().prettyString()));
+								else $(tr).append($.TD({},$(rows.get(j)).text()));
+							}
+							$("table#dataSet",target).append(tr);
+						}
+						
+						//table coloration
+						if (w != null){
+							$("table#dataSet .step", target).css("background","#ffa84c");
+						}
+						
+						
+
+					}
+				});
+   		}
+   		
+   		
+   		
+   		// Compute the min/max for each field for each sensor
+			var nbSelectedFields = $("field",answerLinesFromXMLSensorNum[0].get(0)).length;
+			var nbSelectedSensors = GSN.selectedSensors.length;
+			var incModulo = 0;
+			var modulo = 5;
+			
+			// creation of a Matrix dimension: nbSelectedSensors * nbSelectedFields
+			var values = new Array(nbSelectedSensors);
+			for(var i=0; i<nbSelectedSensors; ++i)
+							values[i] = new Array(nbSelectedFields);
+			
+			for(var i=0; i < nbSelectedSensors; i++){
+				//Initialisation of the Matrix
+				for(var m=0; m < nbSelectedFields; m++) values[i][m] = 0;
+				
+				for(var m=0; m < nbSelectedFields; m++){
+					// Initialisation of min/max values
+					if(i == 0) minValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
+					if(i == 0) maxValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
+					
+					incModulo = 0;
+					for(var k=0; k< (answerLinesFromXMLSensorNum[i].length-1); k++){
+																																	// 1 because first line only vsName
+						var field = $("field",answerLinesFromXMLSensorNum[i].get(1+k));
+						
+						actualValue = field.eq(m).text();
+						//alert(actualValue);break;
+	
+						if(minValue[m] >  actualValue) minValue[m] = actualValue;
+						if(maxValue[m] <  actualValue) maxValue[m] = actualValue;
+						
+						// Construct values Array which contains of the values for the current selected sensor and for the current field
+						if((answerLinesFromXMLSensorNum[i].length-1) > 10){
+							// If too many data reduce (take data every modulo)
+							if(values[i][m] == "" && incModulo == 0){
+								values[i][m] = actualValue;
+							}else if(incModulo == modulo){
+								values[i][m] = actualValue+","+values[i][m];;
+							}
+							
+							if(incModulo == modulo) incModulo=0;
+							else incModulo++;
+						}
+						else{
+							if(values[i][m] == ""){
+								values[i][m] = actualValue;
+							}else{
+								values[i][m] = actualValue+","+values[i][m];
+							}
+						}
+						
+					}
+					//alert(minValue[m]);
+					//alert(maxValue[m]);
+				}
+			}
+			//alert(minValue);
+   		//alert(maxValue);
+			
+			
+			// Find the index of Timed
+			regularExpression = new RegExp("timed","i");
+			var timedIndexInNbSelectedFieldsArray=-1;
+			for(var m=0; m < nbSelectedFields; m++){
+				if(regularExpression.test($("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text())){
+					timedIndexInNbSelectedFieldsArray = m;
+				}
+			}
+			
+			
+			GSN.data.makeChart(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,"barChart");
+			GSN.data.makeChart(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,"lineChart");
+			
+			if($('#barChart').attr("checked")) $('.lineChart').hide();
+			if($('#lineChart').attr("checked")) $('.barChart').hide();
+				
+			$('#barChart').attr("onclick","$('.lineChart').hide();$('.barChart').show();");
+			$('#lineChart').attr("onclick","$('.lineChart').show();$('.barChart').hide();");
+			
+   	}// End displayDatas
+   	
+   	,makeChart: function(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,typeChart){
+			// Chart Part
+			for(var m=0; m < nbSelectedFields; m++){
+				regularExpression = new RegExp("timed","i");
+				if(timedIndexInNbSelectedFieldsArray != m){
+					$("#chartContainer").append('<div class="'+typeChart+'" id="'+typeChart+m+'"></div><br/>'); 
+					
+		 			var so = new SWFObject("./open-flash-chart/open-flash-chart.swf", typeChart+m, "450", "200", "9", "#FFFFFF");
+		 			
+		 			so.addVariable("variables","true");
+					so.addVariable("title","Data viewer: "+$("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text().prettyString()+",{font-size:20px; color: #000000; margin: 5px; padding:5px; padding-left: 20px; padding-right: 20px;}");
+					
+					
+					// If too much data remove some to construct the chart
+	   			var nbValues = values.toString().split(',').length/nbSelectedFields;
+	   			if(nbValues > 3){
+	   				reduceNumberOfData = true;
+	   				x_step = 4;
+	   			}
+	   			else{
+	   				x_step = 1;
+	   			}
+					so.addVariable("x_axis_steps",x_step);
+					so.addVariable("x_label_style","10,#000000,0,"+x_step+",#eeeeee");
+					so.addVariable("y_label_style","10,#000000");
+					
+					// Timed on x axis
+					var x_label;
+					if(timedIndexInNbSelectedFieldsArray != -1) x_label = values[0][timedIndexInNbSelectedFieldsArray];
+					else{
+						x_label = 1;
+						var nbLineInAnswerMax = 0;
+						for(var i=0; i <  GSN.selectedSensors.length; i++) if(nbLineInAnswerMax < answerLinesFromXMLSensorNum[i].length) nbLineInAnswerMax=answerLinesFromXMLSensorNum[i].length;
+						for(var p=1; p < nbLineInAnswerMax; p++) x_label += ","+(p+1);
+					}
+					so.addVariable("x_labels",x_label);
+					so.addVariable("y_legend",""+$("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text().prettyString()+",12,#000000");
+					so.addVariable("y_ticks","5,10,5");
+					
+
+					
+					so.addVariable("x_axis_colour","#000000");
+					so.addVariable("x_grid_colour","#eeeeee");
+					so.addVariable("y_axis_colour","#000000");
+					so.addVariable("y_grid_colour","#eeeeee");
+					so.addVariable("tool_tip","#key#\n#x_label#\n#val#");
+					
+					//so.addVariable("inner_background","#FCFDDC,#FF6600,90");
+		 			so.addVariable("bg_colour","#ffffff");
+
+					
+					//alert(minValue[m]+"   "+maxValue[m]);
+					//deltaDiv2 = Math.abs(Math.floor((parseInt(maxValue[m]) - parseInt(minValue[m])/2)));
+					minVal = Math.floor(parseInt(minValue[m])-2);
+					if(parseInt(maxValue[m]) < 0) maxVal = 0;
+					else maxVal = Math.floor(parseInt(maxValue[m])+2);
+					
+					
+					so.addVariable("y_min",minVal);
+					so.addVariable("y_max",maxVal);
+		
+					
+					if(typeChart == "barChart"){
+						GSN.data.makeBarChart(so,values,m);
+					}
+					else if(typeChart == "lineChart"){
+						GSN.data.makeLineChart(so,values,m);
+					}
+					so.write(typeChart+m,"");
+				}
+			}
+   		// End Chart Part
+   	}
+	
+	
+		,makeLineChart: function(so,values,field){
+			for(i=0; i<GSN.selectedSensors.length;++i){
+				if(i == 0){
+					so.addVariable("line_dot","2,#01B0F0,"+GSN.selectedSensors[0]+",10,4");
+					so.addVariable("values",values[i][field]);
+				}
+				else{
+					so.addVariable("line_dot_"+(i+1),"2,#F0E14C,"+GSN.selectedSensors[i]+",10,4");
+					so.addVariable("values_"+(i+1),values[i][field]);
+				}
+			}
+		}
+		
+		
+		,makeBarChart: function(so,values,field){
+			so.addVariable("x_axis_3d","3");
+			for(i=0; i<GSN.selectedSensors.length;++i){
+				if(i == 0){
+					so.addVariable("bar_3d","75,#FF6600,"+GSN.selectedSensors[0]+",10");
+					so.addVariable("values",values[i][field]);
+				}
+				else{
+					so.addVariable("bar_3d_"+(i+1),"75,#F0E14C,"+GSN.selectedSensors[i]+",10");
+					so.addVariable("values_"+(i+1),values[i][field]);
+				}
+			}
+		}
+   	
+	}//End GSN.data
+	
+
+	
 	,util: {
 		/**
 		* Pretty print of timestamp date
@@ -1115,12 +1773,81 @@ var GSN = {
 	        value += " "+GSN.util.addleadingzero(date.getHours())+":"+GSN.util.addleadingzero(date.getMinutes())+":"+GSN.util.addleadingzero(date.getSeconds());	       
 	        return value;
 	    }
-	    /**
+	    
+	    
+	  /**
 		* Add a zero if less then 10
 		*/
 		,addleadingzero : function (num){
 			var n = String(num);
 			return (n.length == 1 ? "0"+n : n);
 		}
+		
+		
+		/**
+		* toggle the display of sensors in the sidebar
+		*/
+		,toggle: function(obj){
+			$("a",obj).show();
+			obj.toggle();
+		}
+		
+	  /**
+		* Take an array return a sorted matrix with sensor name in first col and rubric name in the second col
+		*/
+		,regroupByRubricSensorName: function(vsName){
+			vsName.sort();
+			
+			//Creation of a Matrix n*2
+			vsNameRubric = new Array(vsName.length);
+			for(var i=0; i<vsName.length; ++i)
+							vsNameRubric[i] = new Array(2);
+			
+			//Initialisation of the matrix
+			vsNameRubric[0][0] = vsName[0];
+			vsNameRubric[0][1] = "others";
+			
+			//fill the matrix
+			var createRubric = false;
+			var firstTimeTry = true;
+			var rubricName;
+			for(var i=1; i<vsName.length; ++i){
+				//to create a rubric we want at least a degree of similarity of 3 char
+				for(var similarDegree=3; similarDegree<vsName[i].length; ++similarDegree){
+					
+					// create a regular expression with will check if the current row has a degree of similarity with the previous one (note that the test is made in the next two if)
+					regularExpression = new RegExp("^"+vsName[i-1].substr(0,similarDegree),"i");
+					
+					// if the two rows don't match and it is NOT the first time we compare them
+					if(!regularExpression.test(vsName[i]) && !firstTimeTry){
+						createRubric = true;
+						rubricName = vsName[i-1].substr(0,similarDegree-1);
+						break;
+					}
+					// if the two rows don't match and it is the first time we compare them
+					else if(!regularExpression.test(vsName[i]) && firstTimeTry){
+						break;
+					}
+					// if we reach this point the two rows match for this similarDegree => there is a degree of similitud > 3 we will create a rubric
+					firstTimeTry = false
+				}
+				//first collum the sensor name
+				vsNameRubric[i][0] = vsName[i];
+				//second collum the rubric name
+				vsNameRubric[i][1] = rubricName;
+				
+				//if we discover a rubric => previous element fit in this rubric
+				if(createRubric) vsNameRubric[i-1][1] = rubricName;
+				
+				// reinitialisation of the variables
+				createRubric = false;
+				rubricName = "others";
+				firstTimeTry = true;
+				
+			}
+			return vsNameRubric;
+		}
+		
+		
 	}	
 };

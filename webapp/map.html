@@ -9,8 +9,9 @@
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
-	<script type="text/javascript" src="js/gsn.js"></script>
 	<script type="text/javascript" src="js/datePicker.js"></script>
+	<script type="text/javascript" src="js/functions.js"></script>
+	<script type="text/javascript" src="js/gsn.js"></script>
 	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
 <script type="text/javascript">
 <!--//<![CDATA[
@@ -36,19 +37,20 @@ $(document).ready(function() {
 //]]>-->
 </script>
 </head>
-<body>
+<body onunload="GUnload()">
 
 <div id="container">
 	<div id="header">
 		<h1><a href="." id="gsn-name">GSN</a></h1>
 	</div>
 	<div id="navigation">
-		<ul>
+		<ul id="menu">
 			<li><a href="index.html">home</a></li>
 			<li><a href="data.html">data</a></li>
 			<li class="selected"><a href="map.html">map</a></li>
 			<li><a href="fullmap.html">fullmap</a></li>
 		</ul>
+		<ul id="linkWebsite"><li><a href="http://gsn.sourceforge.net/">GSN Home</a></li></ul>
 	</div>
 	<div id="main">
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>

@@ -126,6 +126,8 @@ public final class Main {
     servletHandler.addServletWithMapping ( "gsn.http.FieldDownloadServlet" , "/field" );
     servletHandler.addServletWithMapping ( "gsn.http.FieldUpload" , "/upload" );
     servletHandler.addServletWithMapping ( "gsn.msr.sensormap.MSRSenseRSSHandler" , "/rss" );
+    servletHandler.addServletWithMapping ( "gsn.http.MultiDataDownload" , "/multidata" );
+
     webAppContext.setServletHandler ( servletHandler );
     /// webAppContext.setConnectorNames(new String[]{httpConnector.getName()});
     
