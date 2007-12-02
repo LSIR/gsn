@@ -21,6 +21,7 @@ var GSN = {
 	* Initialize a page load (begin, tab click & back button)
 	*/
 	,load: function(){
+		
 		var splittedURL = window.location.href.split('/');
 		var pageName = splittedURL[splittedURL.length-1].split('.');
 		
@@ -778,11 +779,13 @@ var GSN = {
        	this.loaded=true;
 				
         map = new GMap2(document.getElementById("vsmap"));
+        
         //set the different control on the map
         map.addControl(new GLargeMapControl());
 				map.addControl(new GMapTypeControl());
 				map.addControl(new GScaleControl());
 				map.addControl(new GOverviewMapControl());
+				
 
 				/*
 				// custom epfl map
@@ -845,7 +848,7 @@ var GSN = {
 				}); 
 				
 				map.setCenter(new GLatLng(0,0),1);
-				
+				map.setMapType(G_HYBRID_MAP);
    			}
 		}
 		
@@ -1274,7 +1277,7 @@ var GSN = {
 			$("#step3Container").append("<div class=\"step\">Step 3/5 : Selection of the Data Range</div>");
 			$("#step3Container").append("<div class=\"data\" id=\"nbDatas\"></div>");
 			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"allDatas\" value=\"\" checked> All data<br/>");
-			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"someDatas\" value=\"\"> Last <input type=\"text\" name=\"nb\" value=\"\" id=\"nbOfDatas\" size=\"4\"/> values<br/>");
+			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"someDatas\" value=\"\" onclick=\"$('#nbOfDatas').focus()\"> Last <input onclick=\"$('#someDatas').attr('checked', 'checked');\" type=\"text\" name=\"nb\" value=\"\" id=\"nbOfDatas\" size=\"4\"/> values<br/>");
 			GSN.data.appendNextStepButton("nbDatas","GSN.data.addCriteria(true)");
 		},	
 		
@@ -1369,32 +1372,32 @@ var GSN = {
 	   	$("#step5Container").append("<div class=\"step\">Step 5/5 : Selection of the Format</div>");
 			$("#step5Container").append("<div class=\"data\" id=\"display\"></div>");
 			$("#display").append($.DIV({"id":"showSQL"},$.A({"href":"javascript:GSN.data.getDatas(true);"},"Show SQL query")));
-			$("#display").append("<input type=\"radio\" id=\"samePage\" value=\"samepage\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\" checked>In this page<br/>");
-			$("#display").append("<input type=\"radio\" id=\"popup\" value=\"popup\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\">In a new window<br/>");
-			$("#display").append("<input type=\"radio\" id=\"CSV\" value=\"CSV\" name=\"display\" onClick=\"javascript:GSN.data.showFormatCSV()\">Download data<br/>");
+			$("#display").append("<input type=\"radio\" id=\"dispChartAndData\" value=\"DispChartAndValue\" name=\"display\" onClick=\"javascript:$('.chartOption').show('slow');$('.cvsFormat').hide('slow');\" checked>Plot and View Data<br/>");
+			$("#display").append("<input type=\"radio\" id=\"dispChart\" value=\"DispChart\" name=\"display\" onClick=\"javascript:$('.chartOption').show('slow');$('.cvsFormat').hide('slow');\">Plot Data Only<br/>");
+			$("#display").append("<input type=\"radio\" id=\"dispData\" value=\"DispData\" name=\"display\" onClick=\"javascript:$('.chartOption').hide('slow');$('.cvsFormat').hide('slow');\">View Data Only<br/>");
+				
+			$("#display").append("<input type=\"radio\" id=\"popup\" value=\"popup\" name=\"display\" onClick=\"javascript:$('.chartOption').show('slow');$('.cvsFormat').hide('slow');\">In a new window<br/>");
+			$("#display").append("<input type=\"radio\" id=\"CSV\" value=\"CSV\" name=\"display\" onClick=\"javascript:$('.chartOption').hide('slow');$('.cvsFormat').show('slow');\">Download data<br/>");
 			$("#display").append('<br/>');
-			$("#display").append("<input type=\"radio\" id=\"barChart\" name=\"chartType\" onClick=\"\" checked/>Bar Chart<br/>");
-			$("#display").append("<input type=\"radio\" id=\"lineChart\" name=\"chartType\" onClick=\"\"/>Line Chart<br/>");
+
+			
+			$("#display").append("<div class=\"chartOption\">Chart Selection:</div>");
+			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"barChart\" class=\"chartType\" name=\"chartType\" onClick=\"\" checked/>Bar Chart<br/></div>");
+			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"lineChart\" class=\"chartType\" name=\"chartType\" onClick=\"\"/>Line Chart<br/></div>");
+			
+			$("#display").append("<div class=\"cvsFormat\">Delimiters:</div>");
+			$("#display").append("<div class=\"cvsFormat\"><input type=\"radio\" id=\"tab\" class=\"chartType\" name=\"delimiter\" value=\"tab\" checked/>Tab<br/></div>");
+			$("#display").append("<div class=\"cvsFormat\"><input type=\"radio\" id=\"space\" class=\"chartType\" name=\"delimiter\" value=\"space\"/>Space<br/></div>");
+			$("#display").append("<div class=\"cvsFormat\"><input type=\"radio\" id=\"other\" class=\"chartType\" name=\"delimiter\" value=\"other\"/>Other : <input type=\"text\" name=\"otherdelimiter\" size=\"2\"/><br/></div>");
+			
+			
 			GSN.data.appendNextStepButton("display","GSN.data.getDatas()","getDatas","Get Data");
 			$("#display").append('<br/><br/>');
 			
+			$(".cvsFormat").hide();
+			
 			$("#step5Container .data").prev().click(function(){$(this).next().toggle("slow");});
 	  },
-   	
-   	
-   	showFormatCSV: function() {
-   		if ($("#CSV").attr("checked")) {
-   			$("#cvsFormat").empty();
-   			$("#getDatas").before($.DIV({"id":"cvsFormat"}));
-   			$("#cvsFormat").append($.INPUT({"type":"radio", "name":"delimiter", "id":"tab", "value":"tab"})).append("tab");
-   			$("#cvsFormat").append($.BR()).append($.INPUT({"type":"radio", "name":"delimiter", "id":"space", "value":"space"})).append("space");
-   			$("#cvsFormat").append($.BR()).append($.INPUT({"type":"radio", "name":"delimiter", "id":"other", "value":"other"})).append("other : ");
-   			$("#cvsFormat").append($.INPUT({"type":"text", "name":"otherdelimiter", "size":"2"})).append($.BR()).append($.BR());
-   			$("#tab").attr("checked",true);
-   		} else {
-   			$("#cvsFormat").remove();
-   		}
-   	},
    	
    	
    	getDatas: function(sql) {
@@ -1402,8 +1405,9 @@ var GSN = {
    		$("#dataSet").remove(); 	
   		$("table #dataSet","#datachooser").remove();
   		
+  		
    		$("#display").append($.SPAN({"class":"refreshing"},$.IMG({"src":"style/ajax-loader.gif","alt":"loading","title":""})));
-   		if ($("#samePage").attr("checked") || $("#popup").attr("checked") || sql) {
+   		if (!$("#CSV").attr("checked") || sql) {
    			if(GSN.selectedSensors.length > 1) request="multirequest=true";
    			else request="multirequest=false";
    			if ($("#commonReq").attr("checked")) {
@@ -1575,11 +1579,27 @@ var GSN = {
    		
    		
    		
-   		// Compute the min/max for each field for each sensor
+   		
 			var nbSelectedFields = $("field",answerLinesFromXMLSensorNum[0].get(0)).length;
 			var nbSelectedSensors = GSN.selectedSensors.length;
+			
+			
+			
+			// Find the index of Timed
+			regularExpression = new RegExp("timed","i");
+			var timedIndexInNbSelectedFieldsArray=-1;
+			for(var m=0; m < nbSelectedFields; m++){
+				if(regularExpression.test($("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text())){
+					timedIndexInNbSelectedFieldsArray = m;
+				}
+			}
+			// Will be useful to detect if parseFloat needed or not for comparison
+			
+			
+			// Compute the min/max for each field for each sensor
 			var incModulo = 0;
-			var modulo = 5;
+			GSN.data.modulo = Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/GSN.data.nbDispVal/nbSelectedFields);
+			var modulo = GSN.data.modulo;
 			
 			// creation of a Matrix dimension: nbSelectedSensors * nbSelectedFields
 			var values = new Array(nbSelectedSensors);
@@ -1592,17 +1612,18 @@ var GSN = {
 				
 				for(var m=0; m < nbSelectedFields; m++){
 					// Initialisation of min/max values
-					if(i == 0) minValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
-					if(i == 0) maxValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
-					
+					if(i == 0 && timedIndexInNbSelectedFieldsArray != m) minValue[m] = parseFloat($("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text());
+					else minValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
+					if(i == 0 && timedIndexInNbSelectedFieldsArray != m) maxValue[m] = parseFloat($("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text());
+					else maxValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
 					incModulo = 0;
 					for(var k=0; k< (answerLinesFromXMLSensorNum[i].length-1); k++){
 																																	// 1 because first line only vsName
 						var field = $("field",answerLinesFromXMLSensorNum[i].get(1+k));
 						
-						actualValue = field.eq(m).text();
-						//alert(actualValue);break;
-	
+						if(timedIndexInNbSelectedFieldsArray != m) actualValue = parseFloat(field.eq(m).text());
+						else actualValue = field.eq(m).text();
+							
 						if(minValue[m] >  actualValue) minValue[m] = actualValue;
 						if(maxValue[m] <  actualValue) maxValue[m] = actualValue;
 						
@@ -1635,29 +1656,33 @@ var GSN = {
    		//alert(maxValue);
 			
 			
-			// Find the index of Timed
-			regularExpression = new RegExp("timed","i");
-			var timedIndexInNbSelectedFieldsArray=-1;
-			for(var m=0; m < nbSelectedFields; m++){
-				if(regularExpression.test($("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text())){
-					timedIndexInNbSelectedFieldsArray = m;
-				}
-			}
+
 			
 			
 			GSN.data.makeChart(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,"barChart");
 			GSN.data.makeChart(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,"lineChart");
 			
-			if($('#barChart').attr("checked")) $('.lineChart').hide();
-			if($('#lineChart').attr("checked")) $('.barChart').hide();
+			
+			if($('#barChart').attr("checked") && ($('#dispChartAndData').attr("checked") || $('#popup').attr("checked") || $('#dispChart').attr("checked"))) $('.lineChart').hide();
+			if($('#lineChart').attr("checked") && ($('#dispChartAndData').attr("checked") || $('#popup').attr("checked") || $('#dispChart').attr("checked"))) $('.barChart').hide();
+			if($('#dispData').attr("checked")){
+				$('.lineChart').hide();
+				$('.barChart').hide();
+			}
+			if($('#dispChart').attr("checked")) $('#dataSet').hide();
 				
 			$('#barChart').attr("onclick","$('.lineChart').hide();$('.barChart').show();");
 			$('#lineChart').attr("onclick","$('.lineChart').show();$('.barChart').hide();");
 			
    	}// End displayDatas
    	
+   	,modulo:0
+   	,nbDispVal:6
    	,makeChart: function(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,typeChart){
 			// Chart Part
+			var nbValue = Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/nbSelectedFields);
+			
+			
 			for(var m=0; m < nbSelectedFields; m++){
 				regularExpression = new RegExp("timed","i");
 				if(timedIndexInNbSelectedFieldsArray != m){
@@ -1671,26 +1696,29 @@ var GSN = {
 					
 					// If too much data remove some to construct the chart
 	   			var nbValues = values.toString().split(',').length/nbSelectedFields;
-	   			if(nbValues > 3){
-	   				reduceNumberOfData = true;
-	   				x_step = 4;
-	   			}
-	   			else{
-	   				x_step = 1;
-	   			}
+	   			x_step = 2;
 					so.addVariable("x_axis_steps",x_step);
 					so.addVariable("x_label_style","10,#000000,0,"+x_step+",#eeeeee");
 					so.addVariable("y_label_style","10,#000000");
 					
 					// Timed on x axis
 					var x_label;
-					if(timedIndexInNbSelectedFieldsArray != -1) x_label = values[0][timedIndexInNbSelectedFieldsArray];
-					else{
-						x_label = 1;
-						var nbLineInAnswerMax = 0;
-						for(var i=0; i <  GSN.selectedSensors.length; i++) if(nbLineInAnswerMax < answerLinesFromXMLSensorNum[i].length) nbLineInAnswerMax=answerLinesFromXMLSensorNum[i].length;
-						for(var p=1; p < nbLineInAnswerMax; p++) x_label += ","+(p+1);
+					var incModulo = 0;
+					if(timedIndexInNbSelectedFieldsArray != -1){
+						x_label = values[0][timedIndexInNbSelectedFieldsArray];
 					}
+					else{
+						x_label = 1;	
+						for(var p=1; p < nbValue; p++){
+							if(incModulo == GSN.data.modulo){
+								x_label += ","+(p+1);
+								incModulo = 0;
+							}
+							incModulo++;
+						}
+					}
+					
+					
 					so.addVariable("x_labels",x_label);
 					so.addVariable("y_legend",""+$("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text().prettyString()+",12,#000000");
 					so.addVariable("y_ticks","5,10,5");
@@ -1708,10 +1736,12 @@ var GSN = {
 
 					
 					//alert(minValue[m]+"   "+maxValue[m]);
-					//deltaDiv2 = Math.abs(Math.floor((parseInt(maxValue[m]) - parseInt(minValue[m])/2)));
-					minVal = Math.floor(parseInt(minValue[m])-2);
+					//deltaDiv = Math.abs(Math.floor((parseFloat(maxValue[m]) - parseFloat(minValue[m]))));
+					if(minValue[m] < 0) minVal = Math.floor(1.05*parseFloat(minValue[m]));
+					else minVal = Math.floor(0.95*parseFloat(minValue[m]));
+					
 					if(parseInt(maxValue[m]) < 0) maxVal = 0;
-					else maxVal = Math.floor(parseInt(maxValue[m])+2);
+					else maxVal = Math.floor(1.05*parseFloat(maxValue[m]));
 					
 					
 					so.addVariable("y_min",minVal);
@@ -1797,7 +1827,6 @@ var GSN = {
 		*/
 		,regroupByRubricSensorName: function(vsName){
 			vsName.sort();
-			
 			//Creation of a Matrix n*2
 			vsNameRubric = new Array(vsName.length);
 			for(var i=0; i<vsName.length; ++i)
@@ -1811,12 +1840,21 @@ var GSN = {
 			var createRubric = false;
 			var firstTimeTry = true;
 			var rubricName;
+			
+			
+			
 			for(var i=1; i<vsName.length; ++i){
 				//to create a rubric we want at least a degree of similarity of 3 char
 				for(var similarDegree=3; similarDegree<vsName[i].length; ++similarDegree){
 					
 					// create a regular expression with will check if the current row has a degree of similarity with the previous one (note that the test is made in the next two if)
 					regularExpression = new RegExp("^"+vsName[i-1].substr(0,similarDegree),"i");
+					
+					//particular case
+					if(regularExpression.test(vsName[i]) && firstTimeTry){
+						createRubric = true;
+						rubricName = vsName[i-1].substr(0,similarDegree);
+					}
 					
 					// if the two rows don't match and it is NOT the first time we compare them
 					if(!regularExpression.test(vsName[i]) && !firstTimeTry){
