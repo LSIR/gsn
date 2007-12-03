@@ -19,7 +19,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
@@ -30,6 +29,9 @@ import com.jgoodies.binding.list.SelectionInList;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.factories.ButtonBarFactory;
 import com.jgoodies.forms.layout.FormLayout;
+import java.util.logging.Level;
+import org.jdesktop.swingx.JXErrorPane;
+import org.jdesktop.swingx.error.ErrorInfo;
 
 public class GSNConfiguratorPanel implements ActionListener {
 
@@ -99,13 +101,13 @@ public class GSNConfiguratorPanel implements ActionListener {
 			}
 		} catch (FileNotFoundException e1) {
 			confirmConstraint(false,
-					"Can't write the configuration to the file ("
-					+ e1.getMessage() + ")");
+					"Can't write the configuration to the file"
+					, e1.getMessage());
 			return;
 		} catch (IOException e1) {
 			confirmConstraint(false,
-					"Can't write the configuration to the file ("
-					+ e1.getMessage() + ")");
+					"Can't write the configuration to the file"
+					, e1.getMessage());
 			return;
 		}
 	}
@@ -202,21 +204,21 @@ public class GSNConfiguratorPanel implements ActionListener {
 			public boolean testBeforeRunningDirectory() {
 				int gsnPort = bean.getContainerPort();
 				if (!confirmConstraint((gsnPort > 0 || gsnPort < 65000),
-				"The specified port number for GSN is not valid."))
+				"The specified port number for GSN is not valid.", null))
 					return false;
 				if (!confirmConstraint((bean.getMaxGSNLogSizeInMB() > 0 && bean
 						.getMaxGSNLogSizeInMB() <= 100),
-				"The size of the log file is limited to 100 MB. (Min is 1MB)"))
+				"The size of the log file is limited to 100 MB. (Min is 1MB)", null))
 					return false;
 				try {
 					if (!confirmConstraint(!ValidityTools.isAccessibleSocket(
 							"localhost", gsnPort),
-					"The specified port number<br>for the GSN is busy."))
+					"The specified port number<br>for the GSN is busy.", null))
 						return false;
 				} catch (Exception e2) {
 					confirmConstraint(false,
-							"The specified port number<br>for the GSN is busy.("
-							+ e2.getMessage() + ")");
+							"The specified port number<br>for the GSN is busy."
+							, e2.getMessage());
 					return false;
 				}
 				
@@ -226,8 +228,8 @@ public class GSNConfiguratorPanel implements ActionListener {
 							.getJdbcPassword());
 				} catch (Exception e1) {
 					confirmConstraint(false,
-							"Can't connect to the specified database server ("
-							+ e1.getMessage() + ")");
+							"Can't connect to the specified database server "
+							, e1.getMessage());
 					return false;
 				}
 				return true;
@@ -246,10 +248,12 @@ public class GSNConfiguratorPanel implements ActionListener {
 		});
 	}
 
-	private boolean confirmConstraint(boolean validitiyCondition, String message) {
+	private boolean confirmConstraint(boolean validitiyCondition, String basicErrorMessage, String detailedErrorMessage) {
 		if (!validitiyCondition) {
-			JOptionPane.showMessageDialog(null, "<html><center>" + message,
-					"Error", JOptionPane.ERROR_MESSAGE);
+                    JXErrorPane.showDialog(null, new ErrorInfo("Error", basicErrorMessage, detailedErrorMessage, null, null, Level.SEVERE, null));
+                        
+//			JOptionPane.showMessageDialog(null, "<html><center>" + message,
+//					"Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		return true;

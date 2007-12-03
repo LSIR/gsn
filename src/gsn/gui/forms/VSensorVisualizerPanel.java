@@ -732,11 +732,11 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 					e1.printStackTrace();
 				}
 				try {
-					System.out.println(getName() + ": " + (i + 1) + ". Trying to connect to GSN at " + InetAddress.getLocalHost() + ":"
+					System.out.println(getName() + ": " + (i + 1) + ". Trying to connect to GSN at " + InetAddress.getByName("localhost") + ":"
 							+ GSNController.GSN_CONTROL_PORT);
 					if (socket.isClosed())
 						socket = new Socket();
-					socket.connect(new InetSocketAddress(InetAddress.getLocalHost(), GSNController.GSN_CONTROL_PORT));
+					socket.connect(new InetSocketAddress(InetAddress.getByName("localhost"), GSNController.GSN_CONTROL_PORT));
 					writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 					inputStream = socket.getInputStream();
 					connected = true;
