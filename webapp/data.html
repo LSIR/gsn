@@ -31,23 +31,11 @@
 	<script type="text/javascript">
 <!--//<![CDATA[
 $(document).ready(function() {
-	//bind every buttons to javascript functionality (only once)
-	$("#refreshall_timeout").bind("change",GSN.updateallchange);
-	$("#refreshall").bind("click",GSN.updateall);
-	$("#closeall").bind("click",GSN.closeall);
-	$("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
-	
 	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 		
 	//load the requested page
 	$.historyInit(GSN.load);
 	
-	$("#refreshall_autozoomandcenter").bind("click",function() { 
-		if ($("#refreshall_autozoomandcenter").attr("checked")) {
-			GSN.map.userchange();
-			GSN.map.autozoomandcenter();
-		}
-	});
 });	
 //]]>-->
 </script>
@@ -60,10 +48,10 @@ $(document).ready(function() {
 	</div>
 	<div id="navigation" style="text-align:right;">
 		<ul id="menu">
-			<li><a href="index.html">home</a></li>
-			<li class="selected"><a href="data.html">data</a></li>
-			<li><a href="map.html">map</a></li>
-			<li><a href="fullmap.html">fullmap</a></li>
+			<li><a href="index.html#home">home</a></li>
+			<li class="selected"><a href="data.html#data">data</a></li>
+			<li><a href="map.html#map">map</a></li>
+			<li><a href="fullmap.html#fullmap">fullmap</a></li>
 		</ul>
 		<ul id="linkWebsite"><li><a href="http://gsn.sourceforge.net/">GSN Home</a></li></ul>
 	</div>

@@ -3,28 +3,27 @@
  */
 
 //Note: Balise creation: $.BaliseName({"attribute1":"value1",...},textInsideTag)
-
 var map;
- 
 var GSN = { 
 	
 	debugmode: false
 	,debug: function (txt) {
-		if(typeof console != "undefined" && this.debugmode) {
+		if(typeof console != "undefined" && GSN.debugmode) {
 			console.debug(txt);
 		}	
 	}
 	
 	
 	,context: null //home, data, map || fullmap
+	,loaded: false
 	/**
 	* Initialize a page load (begin, tab click & back button)
 	*/
 	,load: function(){
+		if(GSN.loaded) return;
 		
 		var splittedURL = window.location.href.split('/');
 		var pageName = splittedURL[splittedURL.length-1].split('.');
-		
 		
 		
 		if (pageName[0]=="data" && location.hash == "") location.hash = "data";
@@ -36,9 +35,10 @@ var GSN = {
 		}
 		
 		GSN.debug("init:"+location.hash);
+		
 		var params=location.hash.substr(1).split(",");
 		
-		//params[0] = pageName[0];
+		params[0] = pageName[0];
 		
 		
 		GSN.context = params[0];
@@ -79,7 +79,6 @@ var GSN = {
 			if(!GSN.map.loaded) {
 				GSN.updateall();
 				GSN.map.init();
-				$("#refreshall_autozoomandcenter").attr("checked",true);
 			}
 			
 			//take care of params
@@ -92,14 +91,12 @@ var GSN = {
 					if (val[0]=="z") zoom = parseInt(val[1]);
 				}
 				if (lat!=null) {
-					map.setCenter(new GLatLng(lat,lng),zoom);
-					$("#refreshall_autozoomandcenter").attr("checked",false);
+					map.setCenterAndZoom(new LatLonPoint(lat,lng),zoom);
 				}
 			}
-			GSN.map.autozoomandcenter();
+			GSN.map.showAllMarkers();
 		} else if (GSN.context=="fullmap")	{
 			GSN.vsbox.container = "#vs";
-			GSN.map.followMarker(null);
 			if(!GSN.map.loaded) {
 				GSN.map.init();
 				GSN.updateall();
@@ -125,15 +122,6 @@ var GSN = {
 	
 	
 	/**
-	* Click on the top navigation bar
-	*/
-	,nav: function (page) {
-		$.historyLoad(page);
-		return false;
-	}
-	
-	
-	/**
 	* Click on the virtual sensor on the left bar
 	*/
 	,menu: function (vsName) {
@@ -147,8 +135,9 @@ var GSN = {
 				prev = $("#vs4map div").attr("class").split(" ")[0].split("-")[1];
 			if (prev != vsName) {
 				$("#vs4map").empty();
-				GSN.map.followMarker(vsName);
 				GSN.addandupdate(vsName);
+				GSN.map.zoomOnMarker(vsName);
+				
 			} else
 				GSN.vsbox.remove(vsName);
 		} else if (GSN.context=="data"){
@@ -156,8 +145,7 @@ var GSN = {
 		} else if (GSN.context=="fullmap"){
 			$(".vsbox").removeClass("followed");
 			$(".vsbox-"+vsName).addClass("followed");
-			GSN.map.followMarker(vsName);
-			GSN.map.autozoomandcenter();
+			GSN.map.zoomOnMarker(vsName);
 		}
 	}
 	/**
@@ -172,8 +160,6 @@ var GSN = {
 	
 	
 	,loaded : false
-	
-	
 	/**
 	* Initialize the gsn title and leftside menu
 	*/
@@ -430,13 +416,15 @@ var GSN = {
 	* Ajax call to update all the sensor display on the page and the map
 	*/
 	,updateall: function(num,showall){
+		var firstload = !GSN.loaded;
+		
 		//to prevent multiple update instance
 		if (typeof num == "number" && num != GSN.updatenb) return;
 		GSN.updatenb++;
 		
 		$(".refreshing").show();
 		
-		var firstload = !GSN.loaded;
+		
   		
 		$.ajax({ type: "GET", url: "/gsn", success: function(data){
 			var start = new Date();
@@ -460,8 +448,6 @@ var GSN = {
 				GSN.vsbox.update(this);
 			});
 			
-			//update map
-			GSN.map.autozoomandcenter();
 			
 			//next refresh
 			if($("#refreshall_timeout").attr("value") > 0)
@@ -471,7 +457,17 @@ var GSN = {
 			
 			var diff = new Date() - start;
 			GSN.debug("updateall time:"+diff/1000); 
+			
+			if(firstload){
+			//update map 
+			if (GSN.context=="map" || GSN.context=="fullmap"){
+				GSN.map.showAllMarkers();
+			}
+		}
+			
 		}});
+		
+		
 	}
 	
 	
@@ -484,9 +480,6 @@ var GSN = {
 			$("virtual-sensor[@name="+vsName+"]",data).each(function(){
 					GSN.vsbox.update(this);
 			});
-			
-			//update map
-			GSN.map.autozoomandcenter();
 		}});
 	}
 	
@@ -725,8 +718,6 @@ var GSN = {
 		,remove: function (vsName) {
 			var vsdiv = "vsbox-"+vsName;
 			$("."+vsdiv, $(this.container)).remove();
-			GSN.map.followMarker(null);
-			GSN.map.autozoomandcenter();
 		}
 		
 		
@@ -755,8 +746,6 @@ var GSN = {
 	*/
 	map: {
 		loaded: false //the #vsmap div is initialized
-		,tinyred: null
-		,tinygreen: null
 		,markers : new Array()
 		,highlighted : null
 		,highlightedmarker : null
@@ -765,177 +754,52 @@ var GSN = {
 		/**
 		* Initialize the google map
 		*/
-		,init : function(){
-			if(typeof GBrowserIsCompatible == "undefined") {
-				//no internet
-				$("#vsmap").empty().append($.P({"class":"error"},"Google maps isn't loaded! Maybe your internet connection is not working."));
-			} else if(!GBrowserIsCompatible()) {
-				//bad api key
-				$("#vsmap").empty().append($.P({"class":"error"},"Your browser isn't compatible to Google maps or the Google maps API key is wrong. By default, Google maps only works if your using the host : http://localhost:22001/ . If you need a different host, edit index.html and change the google maps API key."));
-			} else if (GBrowserIsCompatible()) {
-				//load and initialize google map
-				GSN.debug("init gmap");
-       
+		,init : function(){       
        	this.loaded=true;
+				map.setCenterAndZoom(new LatLonPoint(0,0),1);
+		    map.setMapType(Mapstraction.HYBRID);
+		    
+		    //set the different control on the map
+		    map.addMapTypeControls();
+		    map.addLargeControls();		
 				
-        map = new GMap2(document.getElementById("vsmap"));
-        
-        //set the different control on the map
-        map.addControl(new GLargeMapControl());
-				map.addControl(new GMapTypeControl());
-				map.addControl(new GScaleControl());
-				map.addControl(new GOverviewMapControl());
-				
+		}
+		
+		
 
-				/*
-				// custom epfl map
-				var copyright = new GCopyright(1, new GLatLngBounds(new GLatLng(-90, -180), new GLatLng(90, 180)), 16, "©2006 EPFL");
-				var copyrightCollection = new GCopyrightCollection('Imagery');
-				copyrightCollection.addCopyright(copyright);
-				var tileLayers = [new GTileLayer(copyrightCollection, 16, 17)];
-				// retrieve the tiles location
-				customGetTileUrl = function(a, b) {
-					return "http://sensorscope.epfl.ch/map/image/" + a.x + "_" + a.y + "_" + (17 - b) + ".jpg"
-				}
-				tileLayers[0].getTileUrl = customGetTileUrl;
-				// display the custom map
-				var customMap = new GMapType(tileLayers, new GMercatorProjection(18), "Aerial", {errorMessage:"Aerial imagery unavailable."});
-				map.addMapType(customMap);
-				*/			
-
-
-				// Create our "tiny" markers icon
-				var tinyred = new GIcon();
-				tinyred.image = "http://labs.google.com/ridefinder/images/mm_20_red.png";
-				tinyred.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
-				tinyred.iconSize = new GSize(12, 20);
-				tinyred.shadowSize = new GSize(22, 20);
-				tinyred.iconAnchor = new GPoint(6, 20);
-				tinyred.infoWindowAnchor = new GPoint(5, 1);
-				GSN.map.tinyred = tinyred;
-				
-				var tinygreen = new GIcon();
-				tinygreen.image = "http://labs.google.com/ridefinder/images/mm_20_green.png";
-				tinygreen.shadow = "http://labs.google.com/ridefinder/images/mm_20_shadow.png";
-				tinygreen.iconSize = new GSize(12, 20);
-				tinygreen.shadowSize = new GSize(22, 20);
-				tinygreen.iconAnchor = new GPoint(6, 40);
-				tinygreen.infoWindowAnchor = new GPoint(5, 1);
-				GSN.map.tinygreen = tinygreen;
-		
-  				//attach event
-  				GEvent.addListener(map, "click", function(overlay, point) {
-					if(overlay)	{
-						//when a marker is clicked
-						if(typeof overlay.vsname != "undefined"){
-							GSN.menu(overlay.vsname);
-						}
-					}
-					else
-						$("#refreshall_autozoomandcenter").attr("checked",false);
-				});		
-				GEvent.addListener(map, 'zoomend', function (oldzoomlevel,newzoomlevel) {
-  					GSN.map.zoomend(oldzoomlevel,newzoomlevel);
-  					GSN.map.userchange();
-				});
-				
-				GEvent.addListener(map, 'dragstart', function () {
-  					$("#refreshall_autozoomandcenter").attr("checked",false);
-				}); 
-				
-				GEvent.addListener(map, 'moveend', function () {
-  					GSN.map.userchange();
-				}); 
-				
-				map.setCenter(new GLatLng(0,0),1);
-				map.setMapType(G_HYBRID_MAP);
-   			}
-		}
-		
-		
-		/**
-		* Callback after any map change zoom and map move and vs toggle
-		* Used for location #hash change
-		*/	
-		,userchange : function(){
-			if (location.hash.substr(1,3)!="map") return;
-  			var vs = (location.hash+",vs=[ALL],").split("vs=")[1].split(",")[0];			
-  			if (!$("#refreshall_autozoomandcenter").attr("checked")) 
-				location.hash = "map"+",lt="+map.getCenter().lat()+",lo="+map.getCenter().lng()+",z="+map.getZoom();
-			else
-				location.hash = "map"
-			if (vs!="[ALL]") location.hash += ",vs="+vs;
-		}
-		
-		
-		/**
-		* Callback after any zoom change
-		* Used for the tricked followed marker
-		*/	
-		,zoomend : function(oldzoomlevel,newzoomlevel){
-			GSN.map.trickhighlighted();
-		}
-		
-		
-		/**
-		* Followed marker and top of the others
-		*/
-		,trickhighlighted : function(){
-			if (GSN.map.highlighted != null) {
-				var hPoint = map.getCurrentMapType().getProjection().fromLatLngToPixel(GSN.map.markers[GSN.map.highlighted].getPoint(),map.getZoom());
-  			var marker = new GMarker(map.getCurrentMapType().getProjection().fromPixelToLatLng(new GPoint(hPoint.x , hPoint.y + 20 ) , map.getZoom()),GSN.map.tinygreen);
-  			if(GSN.map.highlightedmarker != null) map.removeOverlay(GSN.map.highlightedmarker);
-  			GSN.map.highlightedmarker = marker;
-				map.addOverlay(marker);
-    	}
-		}
-		
-		
-		/**
-		* Auto-zoom and center on the visible sensors
-		*/
-		,autozoomandcenter:function (){
-			if (GSN.map.loaded && $("#refreshall_autozoomandcenter").attr("checked")){
-				//not following any sensor
-				if (GSN.map.highlighted!=null)
-					map.panTo(GSN.map.markers[GSN.map.highlighted].getPoint());	
-				else
-					GSN.map.showAllMarkers();
-			}
-			if (GSN.map.loaded) {
-				for (x in GSN.map.markers) {
-					var m = GSN.map.markers[x];
-					if (GSN.map.markerIsVisible(m.vsname)) {
-						$("#menu-"+m.vsname).next().html("X");
-						m.show();
-					}
-					else {
-						$("#menu-"+m.vsname).next().html("O");
-						m.hide();
-					}
-				}
-			}
-		}
 		
 		
 		/**
 		* Add marker
 		*/
 		,addMarker: function(vsName,lat,lon){
-			if (!map.isLoaded())
-				map.setCenter(new GLatLng(lat,lon), 13);
-		
-			var marker = new GMarker(new GLatLng(lat,lon),GSN.map.tinyred);
-  			marker.vsname = vsName;
+			var marker = new Marker(new LatLonPoint(lat,lon));
+  		marker.setAttribute("vsname",vsName);
+  		
+  		
+  		if(mapProvider=="microsoft"){
+  			marker.setIcon("./img/green_marker.png");
+  			marker.setInfoBubble("Show Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+vsName+"\");'>"+vsName+"</a>");
   			GSN.map.markers.push(marker);
-  			map.addOverlay(marker);
-  					
-  			//add gpsenable classjaj
-  			$("#menu-"+vsName).addClass("gpsenabled");
-  			$("#menu-"+vsName).append("<br/>");
-  			$("#menu-"+vsName).append($.A({"href":"javascript:GSN.map.toggleMarker('"+vsName+"');","class":"toggle"},"X"));
-  			
-  			if(GSN.context=="fullmap"){
+  			//marker.toMicrosoft();
+  		}
+			if(mapProvider=="google"){
+				marker.setIcon("./img/green_marker.png");
+				marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
+				GSN.map.markers.push(marker);
+				//marker.toGoogle();
+			}
+			if(mapProvider=="yahoo"){
+				marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
+				GSN.map.markers.push(marker);
+				//marker.toYahoo();
+			}
+			
+			map.addMarker(marker);
+			//add gpsenable class
+			$("#menu-"+vsName).addClass("gpsenabled");
+			
+			if(GSN.context=="fullmap"){
 				var vs = $(".vsbox-"+vsName+" > h3 > span.vsname")
 				$(vs).wrap("<a href=\"javascript:GSN.menu('"+$(vs).text()+"');\"></a>");
 			}
@@ -943,88 +807,18 @@ var GSN = {
 		
 		
 		/**
-		* Toggle marker
-		*/
-		,markerIsVisible: function(vsName){
-			var vs = (location.hash+",vs=[ALL],").split("vs=")[1].split(",")[0];
-			if ((":"+vs+":").indexOf(":"+vsName+":")!=-1 || vs == "[ALL]") 
-				return true;
-			else
-				return false;
-		}
-		
-		
-		/**
-		* Toggle marker
-		*/
-		,toggleAllMarkers: function(){
-			GSN.debug("in:toggleAllMarkers")
-			var params=location.hash.substr(1).split(",");
-			for (var i=1;i<params.length;i++){
-				val = params[i].split("=");
-				if (val[0]=="vs") {
-					params.splice(i,1);
-					$.historyLoad(params.join(","));
-					return;
-				}
-			}
-			params.push("vs=");
-			$.historyLoad(params.join(","));
-		}
-		
-		
-		/**
-		* Toggle marker
-		*/
-		,toggleMarker: function(vsName){
-			var params=location.hash.substr(1).split(",");
-			for (var i=1;i<params.length;i++){
-				val = params[i].split("=");
-				if (val[0]=="vs") {
-					var vs = val[1].split(":");
-					for (j in vs) {
-						if (vs[j]==vsName) {
-							vs.splice(j,1);
-							params[i]="vs="+vs.join(":");
-							$.historyLoad(params.join(","));
-							return;
-						}
-					}
-					if (vs[0]=="") vs = new Array();
-					vs.push(vsName);
-					if (vs.length<GSN.map.markers.length)
-						params[i]="vs="+vs.join(":");
-					else
-						params.splice(i,1);
-					$.historyLoad(params.join(","));
-					return;
-				}
-			}
-			var vs = new Array();
-			for (x in GSN.map.markers) {
-				if (GSN.map.markers[x].vsname!=vsName)
-					vs.push(GSN.map.markers[x].vsname);
-			}
-			$.historyLoad(location.hash.substr(1)+",vs="+vs.join(":"));
-		}
-		
-		
-		/**
 		* Update marker
 		*/
 		,updateMarker: function(vsName,lat,lon){
-			var updated = false;
-			for (x in GSN.map.markers) {
+			for (x=0; x<GSN.map.markers.length; x++) {
 				var m = GSN.map.markers[x];
-				if (m.vsname == vsName) {
-					GSN.map.markers[x].setPoint(new GLatLng(lat,lon));	
-					updated = true;
-					if (GSN.map.highlighted == x)
-						GSN.map.trickhighlighted();
+				if (m.getAttribute("vsname") == vsName) {
+					m.hide();
+					map.removeMarker(m);
+					GSN.map.markers.splice(x,1);
 				}
 			}
-			if (!updated)
-				GSN.map.addMarker(vsName,lat,lon);
+			GSN.map.addMarker(vsName,lat,lon);
 		}
 		
 		
@@ -1032,24 +826,29 @@ var GSN = {
 		* Highlight a marker
 		* Stop it if called with null name
 		*/
-		,followMarker: function(vsName){
+		,zoomOnMarker: function(vsName){
 			if (!GSN.map.loaded) return;
+			
 			if (vsName!=null) {
 				for (x in GSN.map.markers) {
 					var m = GSN.map.markers[x];
-					if (m.vsname == vsName) {	
+					if (m.getAttribute("vsname") == vsName) {	
 						GSN.map.highlighted = x;
-						GSN.map.trickhighlighted();
-						GSN.map.autozoomandcenter();
+						map.setCenter(new LatLonPoint(m.location.lat,m.location.lon)) 
 						return;
 					}
 				}
 			}
-			
-			if (GSN.map.highlighted != null) {
-				GSN.map.highlighted = null;	
-				map.removeOverlay(GSN.map.highlightedmarker);
+		}
+		
+		,areVisible: true
+		,toggleAllMarkers: function(){
+			for (x=0; x<GSN.map.markers.length; x++) {
+				var m = GSN.map.markers[x];
+				if(GSN.areVisible) m.hide();
+				else m.show();
 			}
+			GSN.areVisible = !GSN.areVisible;
 		}
 		
 		
@@ -1057,13 +856,7 @@ var GSN = {
 		* Zoom out to see all marker
 		*/
 		,showAllMarkers: function(){
-			var bounds = new GLatLngBounds();
-			for (x in GSN.map.markers) {
-				if (GSN.map.markerIsVisible(GSN.map.markers[x].vsname))
-					bounds.extend(GSN.map.markers[x].getPoint());
-			}
-			map.setZoom(map.getBoundsZoomLevel(bounds,map.getSize()));
-			map.panTo(bounds.getCenter());
+			map.autoCenterAndZoom();
 		}
 	}
 	
@@ -1086,7 +879,7 @@ var GSN = {
 			GSN.data.fields.splice(0);
 			GSN.data.fields_type.splice(0);
 			
-			$("#step1Container .data").hide("slow").prev().click(function(){$(this).next().toggle("slow");$(this).next().next().toggle("slow");});
+			$("#step1Container .data").hide("slow").prev().unbind('click').click(function(){$(this).next().toggle("slow");$(this).next().next().toggle("slow");});
 			
 			//remove the deselection function and drag and drop
 			$("#dropArea img").remove();
@@ -1271,7 +1064,7 @@ var GSN = {
 		
 		nbDatas: function() {
 			$(".nextStepButton").remove();
-			$("#step2Container .data").hide("slow").prev().click(function(){$(this).next().toggle("slow");});
+			$("#step2Container .data").hide("slow").prev().unbind('click').click(function(){$(this).next().toggle("slow");});
 			$("#step2Container .data :enabled").attr("disabled", "disabled");
 			
 			$("#step3Container").append("<div class=\"step\">Step 3/5 : Selection of the Data Range</div>");
@@ -1285,7 +1078,7 @@ var GSN = {
 		addCriteria: function(newStep) {
 			if (newStep) {
 				$(".nextStepButton").remove();
-				$("#step3Container .data").hide("slow").prev().click(function(){$(this).next().toggle("slow");});
+				$("#step3Container .data").hide("slow").prev().unbind('click').click(function(){$(this).next().toggle("slow");});
 				$("#step3Container .data :enabled").attr("disabled", "disabled");
 				
 				$("#step4Container").append("<div class=\"step\">Step 4/5 : Selection of the Criterias</div>");
@@ -1366,7 +1159,7 @@ var GSN = {
    	
    	selectDataDisplay: function() {
 	   	$(".nextStepButton").remove();
-	   	$("#step4Container .data").hide("slow").prev().click(function(){$(this).next().toggle("slow");});
+	   	$("#step4Container .data").hide("slow").prev().unbind('click').click(function(){$(this).next().toggle("slow");});
 	   	$("#step4Container .data :enabled").attr("disabled", "disabled");
 	   	
 	   	$("#step5Container").append("<div class=\"step\">Step 5/5 : Selection of the Format</div>");
@@ -1441,7 +1234,12 @@ var GSN = {
 					}
 				});
 				if ($("#someDatas").attr("checked") && $("#nbOfDatas").attr("value") != "") {
-					request += "&nb=" + $("#nbOfDatas").attr("value");
+					var nbValueToExtract = parseInt($("#nbOfDatas").attr("value"));
+					if(nbValueToExtract%6 != 0){
+						nbValueToExtract= nbValueToExtract+ 6 - nbValueToExtract%6;
+					}
+					request += "&nb=" + nbValueToExtract;
+					alert("nbValueToExtract "+nbValueToExtract);
 				}
 				for (var i=0; i < GSN.data.criterias.length; i++) {
 					if (i > 0) {
@@ -1549,7 +1347,7 @@ var GSN = {
 						
 						var line,tr,rows;
 						var lines = $("line", answer);
-						for (var i = 0; i<lines.size();i++){
+						for (var i = 0; i< parseInt($("#nbOfDatas").attr("value"))+1; i++){
 							line = lines.get(i);
 							
 							if (i==0)
@@ -1570,9 +1368,6 @@ var GSN = {
 						if (w != null){
 							$("table#dataSet .step", target).css("background","#ffa84c");
 						}
-						
-						
-
 					}
 				});
    		}
@@ -1590,10 +1385,9 @@ var GSN = {
 			var timedIndexInNbSelectedFieldsArray=-1;
 			for(var m=0; m < nbSelectedFields; m++){
 				if(regularExpression.test($("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text())){
-					timedIndexInNbSelectedFieldsArray = m;
+					timedIndexInNbSelectedFieldsArray = m; // Will be useful to detect if parseFloat needed or not for comparison
 				}
 			}
-			// Will be useful to detect if parseFloat needed or not for comparison
 			
 			
 			// Compute the min/max for each field for each sensor
@@ -1612,11 +1406,18 @@ var GSN = {
 				
 				for(var m=0; m < nbSelectedFields; m++){
 					// Initialisation of min/max values
-					if(i == 0 && timedIndexInNbSelectedFieldsArray != m) minValue[m] = parseFloat($("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text());
-					else minValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
-					if(i == 0 && timedIndexInNbSelectedFieldsArray != m) maxValue[m] = parseFloat($("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text());
-					else maxValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
+					if(i==0 && timedIndexInNbSelectedFieldsArray != m){
+						minValue[m] = parseFloat($("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text());
+						maxValue[m] = parseFloat($("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text());
+					}
+					else if(i==0 && timedIndexInNbSelectedFieldsArray == m){
+						minValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
+						maxValue[m] = $("field",answerLinesFromXMLSensorNum[i].get(1)).eq(m).text();
+					}
+					
 					incModulo = 0;
+					
+					
 					for(var k=0; k< (answerLinesFromXMLSensorNum[i].length-1); k++){
 																																	// 1 because first line only vsName
 						var field = $("field",answerLinesFromXMLSensorNum[i].get(1+k));
@@ -1627,13 +1428,19 @@ var GSN = {
 						if(minValue[m] >  actualValue) minValue[m] = actualValue;
 						if(maxValue[m] <  actualValue) maxValue[m] = actualValue;
 						
-						// Construct values Array which contains of the values for the current selected sensor and for the current field
-						if((answerLinesFromXMLSensorNum[i].length-1) > 10){
+						// Computation of the average
+						if(k == 0 && timedIndexInNbSelectedFieldsArray != m) average = actualValue;
+						else if(timedIndexInNbSelectedFieldsArray != m) average = (average + actualValue)/2;
+						else average = actualValue; // case it is the time
+						
+						// Construct values Array which contains the values for the current selected sensor and for the current field
+						if((answerLinesFromXMLSensorNum[i].length-1) > 6){
 							// If too many data reduce (take data every modulo)
 							if(values[i][m] == "" && incModulo == 0){
-								values[i][m] = actualValue;
+								values[i][m] = average;
+								incModulo--; // because the first data don't count
 							}else if(incModulo == modulo){
-								values[i][m] = actualValue+","+values[i][m];;
+								values[i][m] = average+","+values[i][m];
 							}
 							
 							if(incModulo == modulo) incModulo=0;
@@ -1654,7 +1461,9 @@ var GSN = {
 			}
 			//alert(minValue);
    		//alert(maxValue);
-			
+   		alert(modulo*6);
+   		alert(modulo);
+			alert(values[0][timedIndexInNbSelectedFieldsArray]);
 			
 
 			
@@ -1680,8 +1489,7 @@ var GSN = {
    	,nbDispVal:6
    	,makeChart: function(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,typeChart){
 			// Chart Part
-			var nbValue = Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/nbSelectedFields);
-			
+			var nbValue = Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/nbSelectedFields)-1;
 			
 			for(var m=0; m < nbSelectedFields; m++){
 				regularExpression = new RegExp("timed","i");
@@ -1885,6 +1693,24 @@ var GSN = {
 			}
 			return vsNameRubric;
 		}
+		
+		,getURLParam: function(strParamName){
+		  var strReturn = "";
+		  var strHref = window.location.href;
+		  if ( strHref.indexOf("?") > -1 ){
+		    var strQueryString = strHref.substr(strHref.indexOf("?")).toLowerCase();
+		    var aQueryString = strQueryString.split("&");
+		    for ( var iParam = 0; iParam < aQueryString.length; iParam++ ){
+		      if ( 
+						aQueryString[iParam].indexOf(strParamName.toLowerCase() + "=") > -1 ){
+		        var aParam = aQueryString[iParam].split("=");
+		        strReturn = aParam[1];
+		        break;
+		      }
+		    }
+		  }
+		  return unescape(strReturn);
+		} 
 		
 		
 	}	

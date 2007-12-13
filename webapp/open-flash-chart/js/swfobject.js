@@ -101,8 +101,7 @@ deconcept.SWFObject.prototype = {
 		}
 		return swfNode;
 	},
-	write: function(elementId,source){
-		if(source=="") source = document;
+	write: function(elementId){
 		if(this.getAttribute('useExpressInstall')) {
 			// check to see if we need to do an express install
 			var expressInstallReqVer = new deconcept.PlayerVersion([6,0,65]);
@@ -114,12 +113,12 @@ deconcept.SWFObject.prototype = {
 			}
 		}
 		if(this.skipDetect || this.getAttribute('doExpressInstall') || this.installedVer.versionIsValid(this.getAttribute('version'))){
-			var n = (typeof elementId == 'string') ? source.getElementById(elementId) : elementId;
+			var n = (typeof elementId == 'string') ? document.getElementById(elementId) : elementId;
 			n.innerHTML = this.getSWFHTML();
 			return true;
 		}else{
 			if(this.getAttribute('redirectUrl') != "") {
-				source.location.replace(this.getAttribute('redirectUrl'));
+				document.location.replace(this.getAttribute('redirectUrl'));
 			}
 		}
 		return false;
