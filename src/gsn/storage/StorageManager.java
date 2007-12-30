@@ -69,6 +69,29 @@ public class StorageManager {
     return tableExists(tableName, new DataField[] {}, connection);
   }
   
+  
+  public static DataField[] tableToStructure(CharSequence tableName,Connection connection) throws SQLException {
+    StringBuilder sb = new StringBuilder("select * from ").append(tableName).append(" where 1=0 ");
+    ResultSet rs = null;
+    DataField[] toReturn = null;
+    try {
+      rs = executeQueryWithResultSet(sb, connection);
+      ResultSetMetaData structure = rs.getMetaData();
+      ArrayList<DataField> toReturnArr = new ArrayList<DataField>();
+      for (int i=1;i<=structure.getColumnCount();i++) {
+        String colName = structure.getColumnName(i);
+        if (colName.equalsIgnoreCase("pk")) continue;
+        String colType = structure.getColumnTypeName(i);
+        toReturnArr.add(new DataField(colName,colType));           
+      }
+      toReturn = toReturnArr.toArray(new DataField[] {});
+    }finally {
+      if (rs!=null)
+        close(rs);
+    }
+    return toReturn;
+  }
+  
   /**
    * Returns false if the table doesnt exist. If the table exists but the
    * structure is not compatible with the specified fields the method throws
@@ -399,6 +422,8 @@ public class StorageManager {
       ps = connection.prepareStatement(query);
       int counter=1;
       for (DataField dataField : fields) {
+        if (dataField.getName().equalsIgnoreCase("timed"))
+          continue;
         Serializable value = streamElement.getData(dataField.getName());
         switch (dataField.getDataTypeID()) {
           case DataTypes.VARCHAR:
@@ -490,12 +515,19 @@ public class StorageManager {
    */
   public static StringBuilder getStatementInsert(CharSequence tableName, DataField fields[]) {
     StringBuilder toReturn = new StringBuilder("insert into ").append( tableName).append(" ( ");
-    for (DataField dataField : fields)
+    int numberOfQuestionMarks = 1; //Timed is always there.
+    for (DataField dataField : fields) {
+      if (dataField.getName().equalsIgnoreCase("timed"))
+        continue;
+      numberOfQuestionMarks++;
       toReturn.append(dataField.getName()).append(" ,");
+    }
     toReturn.append(" timed ").append(" ) values (");
-    for (int i = 0; i < fields.length; i++)
+    for (int i = 1; i <= numberOfQuestionMarks; i++)
       toReturn.append("?,");
-    toReturn.append(" ? )");//for timed
+    toReturn.deleteCharAt(toReturn.length()-1);
+    toReturn.append(")");
+    System.out.println(toReturn.toString());
     return toReturn;
   }
   
@@ -559,6 +591,7 @@ public class StorageManager {
       result.append(" (PK BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT, timed BIGINT NOT NULL, ");
     
     for (DataField field : structure) {
+      if (field.getName().equalsIgnoreCase("pk")||field.getName().equalsIgnoreCase("timed")) continue;
       result.append(field.getName().toUpperCase()).append(' ');
       if (db.getDBType()==MYSQL_DB) {
         switch (field.getDataTypeID()) {

@@ -31,7 +31,7 @@ public final class DataField implements Serializable {
       this.type = type;
       this.dataTypeID = DataTypes.convertTypeNameToTypeID( type );
    }
-   
+ 
    public String getDescription ( ) {
       return this.description;
    }
