@@ -25,21 +25,13 @@ var GSN = {
 		var splittedURL = window.location.href.split('/');
 		var pageName = splittedURL[splittedURL.length-1].split('.');
 		
-		
-		if (pageName[0]=="data" && location.hash == "") location.hash = "data";
-		if (pageName[0]=="map" && location.hash == "") location.hash = "map";
-		if (pageName[0]=="fullmap" && location.hash == "") location.hash = "fullmap";
-		if (location.hash == "" || pageName[0] == "index"){
-					location.hash = "home";
+		if (pageName[0] == "index" || pageName[0] == ""){
 					pageName[0] = "home";
 		}
-		
-		GSN.debug("init:"+location.hash);
 		
 		var params=location.hash.substr(1).split(",");
 		
 		params[0] = pageName[0];
-		
 		
 		GSN.context = params[0];
 		//highlight the right tab in the navigation bar
@@ -497,7 +489,10 @@ var GSN = {
 		*/
 		,add: function(vsName) {
 			var vsdiv = "vsbox-"+vsName;
-			if ($(this.container).find("."+vsdiv).size()!=0) return; //already exists
+			
+			if($(this.container).find("."+vsdiv).size()!=0) return; //already exists
+			
+			
 			$(this.container).append($.DIV({"class":vsdiv+" vsbox"},
 									  $.H3({},$.SPAN({"class":"vsname"},vsName),
 									  	$.A({"href":"javascript:GSN.vsbox.remove('"+vsName+"');","class":"close"},$.IMG({'src':'./img/button_cancel.png'})),
@@ -781,18 +776,15 @@ var GSN = {
   			marker.setIcon("./img/green_marker.png");
   			marker.setInfoBubble("Show Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+vsName+"\");'>"+vsName+"</a>");
   			GSN.map.markers.push(marker);
-  			//marker.toMicrosoft();
   		}
 			if(mapProvider=="google"){
 				marker.setIcon("./img/green_marker.png");
 				marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
 				GSN.map.markers.push(marker);
-				//marker.toGoogle();
 			}
 			if(mapProvider=="yahoo"){
 				marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
 				GSN.map.markers.push(marker);
-				//marker.toYahoo();
 			}
 			
 			map.addMarker(marker);
@@ -1239,7 +1231,6 @@ var GSN = {
 						nbValueToExtract= nbValueToExtract+ 6 - nbValueToExtract%6;
 					}
 					request += "&nb=" + nbValueToExtract;
-					alert("nbValueToExtract "+nbValueToExtract);
 				}
 				for (var i=0; i < GSN.data.criterias.length; i++) {
 					if (i > 0) {
@@ -1347,7 +1338,11 @@ var GSN = {
 						
 						var line,tr,rows;
 						var lines = $("line", answer);
-						for (var i = 0; i< parseInt($("#nbOfDatas").attr("value"))+1; i++){
+						
+						if($("#nbOfDatas").attr("value")) nbOfData = parseInt($("#nbOfDatas").attr("value"))+1;
+						else nbOfData = lines.size();
+							
+						for (var i = 0; i<nbOfData ; i++){
 							line = lines.get(i);
 							
 							if (i==0)
@@ -1461,10 +1456,6 @@ var GSN = {
 			}
 			//alert(minValue);
    		//alert(maxValue);
-   		alert(modulo*6);
-   		alert(modulo);
-			alert(values[0][timedIndexInNbSelectedFieldsArray]);
-			
 
 			
 			

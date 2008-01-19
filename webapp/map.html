@@ -29,7 +29,7 @@
 		
 		
 		mapProvider = GSN.util.getURLParam("mapProvider");
-		if(mapProvider.indexOf("#")!=-1){ //remove hash
+		if(mapProvider.indexOf("#")!=-1){ //remove hash if any
 			mapProvider = mapProvider.substring(0,mapProvider.indexOf("#"));
 		}
 		if(mapProvider=="google"){
