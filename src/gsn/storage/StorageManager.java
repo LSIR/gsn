@@ -491,8 +491,8 @@ public class StorageManager {
         logger.warn("Inserting a stream element failed : "
             + streamElement.toString(), e);
     }catch (Exception e) {
-      logger.warn("Error occurred on inserting data to the database.",e);
-      logger.warn("An stream element dropped due to unexpected error. (Stream element: "+streamElement.toString()+")+ Query: "+query, e);
+      logger.warn("Error occurred on inserting data to the database, an stream element dropped due to: "+e.getMessage()+". (Stream element: "+streamElement.toString()+")+ Query: "+query);
+      logger.info(e.getMessage(),e);
     }
     finally {
       close(ps);
@@ -527,7 +527,6 @@ public class StorageManager {
       toReturn.append("?,");
     toReturn.deleteCharAt(toReturn.length()-1);
     toReturn.append(")");
-    System.out.println(toReturn.toString());
     return toReturn;
   }
   
