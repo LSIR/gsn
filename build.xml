@@ -52,9 +52,10 @@
       <condition property="java6">
         <equals arg1="${ant.java.version}" arg2="1.6"/> 
       </condition>
-      <copydir  dest="${build.dir}/org" src="${src.dir}/org"/>
+      <copydir  dest="${build.dir}/org/apache" src="${src.dir}/org/apache"/>
+      <copydir  dest="${build.dir}/org/apache" src="${src.dir}/org/apache"/>
 	  <copydir  dest="${build.dir}/gsn/gui/templates" src="${src.dir}/gsn/gui/templates"/>
-   	  <copydir  dest="${build.dir}/gsn/gui/resources" src="${src.dir}/gsn/gui/resources"/>
+   	<copydir  dest="${build.dir}/META-INF" src="${src.dir}/META-INF"/>
    </target>
  
      

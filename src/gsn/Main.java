@@ -43,9 +43,12 @@ import org.mortbay.jetty.Server;
 //import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.security.SslSocketConnector;
-import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
 
+/**
+ * Web Service URL : http://localhost:22001/services/Service?wsdl
+ *
+ */
 public final class Main {
   
   private static GSNController controlSocket;
@@ -119,19 +122,7 @@ public final class Main {
     WebAppContext webAppContext = new WebAppContext ( );
     webAppContext.setContextPath ( "/" );
     webAppContext.setResourceBase ( DEFAULT_WEB_APP_PATH );
-    ServletHandler servletHandler = new ServletHandler ( );
-    servletHandler.addServletWithMapping ( "gsn.GSNRPC" , "/gsn-handler" );
-    servletHandler.addServletWithMapping ( "gsn.http.ControllerServlet" , "/gsn" );
-    servletHandler.addServletWithMapping ( "gsn.http.DataDownload" , "/data" );
-    servletHandler.addServletWithMapping ( "gsn.http.FieldDownloadServlet" , "/field" );
-    servletHandler.addServletWithMapping ( "gsn.http.FieldUpload" , "/upload" );
-    servletHandler.addServletWithMapping ( "gsn.msr.sensormap.MSRSenseRSSHandler" , "/rss" );
-    servletHandler.addServletWithMapping ( "gsn.http.MultiDataDownload" , "/multidata" );
-
-    webAppContext.setServletHandler ( servletHandler );
-    /// webAppContext.setConnectorNames(new String[]{httpConnector.getName()});
-    
-    server.setHandler ( webAppContext );
+    server.addHandler( webAppContext );
     server.setStopAtShutdown ( true );
     server.setSendServerVersion ( false );
     try {
