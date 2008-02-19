@@ -40,7 +40,12 @@ public class MSRSenseRSSHandler extends HttpServlet{
   
   public void doGet ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
     response.setContentType(MIME_TYPE);
-    SyndFeed feed = getFeed(request);
+    SyndFeed feed;
+    try {
+      feed = getFeed(request);
+    } catch (Exception e1) {
+      throw new IOException(e1);
+    }
     SyndFeedOutput output = new SyndFeedOutput();
     try {
       output.output(feed,response.getWriter());
@@ -49,7 +54,7 @@ public class MSRSenseRSSHandler extends HttpServlet{
     }
   }
   //http://localhost:22001/rss?vsname=memoryusage5&locatable=true
-  protected SyndFeed getFeed(HttpServletRequest req) {
+  protected SyndFeed getFeed(HttpServletRequest req) throws Exception {
     SyndFeed feed = new SyndFeedImpl();
     feed.setFeedType("rss_2.0");
     feed.setTitle(Main.getContainerConfig().getWebName());
@@ -75,7 +80,7 @@ public class MSRSenseRSSHandler extends HttpServlet{
     return feed;
   }
   
-  private SyndEntry generateFeed(VSensorConfig conf,boolean locatable) {
+  private SyndEntry generateFeed(VSensorConfig conf,boolean locatable) throws Exception {
     SyndEntry entry = new SyndEntryImpl();
     entry.setTitle(conf.getName());
     SyndContent  description = new SyndContentImpl();
