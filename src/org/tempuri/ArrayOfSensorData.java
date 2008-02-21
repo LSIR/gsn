@@ -26,11 +26,11 @@ public class ArrayOfSensorData implements org.apache.axis2.databinding.ADBBean {
     /* This type was generated from the piece of schema that had
        name = ArrayOfSensorData
        Namespace URI = http://tempuri.org/
-       Namespace Prefix = ns2
+       Namespace Prefix = ns1
      */
     private static java.lang.String generatePrefix(java.lang.String namespace) {
         if (namespace.equals("http://tempuri.org/")) {
-            return "ns2";
+            return "ns1";
         }
 
         return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();

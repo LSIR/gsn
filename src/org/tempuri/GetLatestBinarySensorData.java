@@ -12,7 +12,7 @@ package org.tempuri;
  */
 public class GetLatestBinarySensorData implements org.apache.axis2.databinding.ADBBean {
     public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName("http://tempuri.org/",
-            "GetLatestBinarySensorData", "ns2");
+            "GetLatestBinarySensorData", "ns1");
 
     /**
      * field for PublisherName
@@ -43,7 +43,7 @@ public class GetLatestBinarySensorData implements org.apache.axis2.databinding.A
 
     private static java.lang.String generatePrefix(java.lang.String namespace) {
         if (namespace.equals("http://tempuri.org/")) {
-            return "ns2";
+            return "ns1";
         }
 
         return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();

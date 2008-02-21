@@ -10,7 +10,7 @@
       <property name="src.dir" value="src"/>
       <property name="jars" value="jars"/>
       <property name="libdir" value="lib"/>
-      <property name="reports" value="reports"/>
+   	  <property name="reports" value="reports"/>
       <property name="temp" value="temp"/>
       <property name="maxMemoryUsage" value="128m"/>
       <property name="jar.file" value="gsn-core.jar"/>

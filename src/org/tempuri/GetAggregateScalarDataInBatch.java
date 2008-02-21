@@ -12,7 +12,7 @@ package org.tempuri;
  */
 public class GetAggregateScalarDataInBatch implements org.apache.axis2.databinding.ADBBean {
     public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName("http://tempuri.org/",
-            "GetAggregateScalarDataInBatch", "ns2");
+            "GetAggregateScalarDataInBatch", "ns1");
 
     /**
      * field for PublisherNames
@@ -48,7 +48,7 @@ public class GetAggregateScalarDataInBatch implements org.apache.axis2.databindi
 
     private static java.lang.String generatePrefix(java.lang.String namespace) {
         if (namespace.equals("http://tempuri.org/")) {
-            return "ns2";
+            return "ns1";
         }
 
         return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
