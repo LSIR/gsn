@@ -1,6 +1,7 @@
 package gsn;
 
 import gsn.beans.AddressBean;
+import gsn.beans.DataField;
 import gsn.beans.InputStream;
 import gsn.beans.Modifications;
 import gsn.beans.StreamSource;
@@ -8,7 +9,6 @@ import gsn.beans.VSensorConfig;
 import gsn.msr.sensormap.PublicToMSRTest;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
-import gsn.utils.KeyValueImp;
 import gsn.wrappers.AbstractWrapper;
 import java.io.File;
 import java.io.FileFilter;
@@ -17,11 +17,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import javax.xml.soap.SOAPException;
-
-import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+import org.apache.commons.validator.Validator;
+import org.apache.commons.validator.util.ValidatorUtils;
 import org.apache.log4j.Logger;
 import org.jibx.runtime.JiBXException;
 
@@ -193,7 +193,10 @@ public class VSensorLoader extends Thread {
       logger.error ( "Note that the virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
       return false;
     }
-    if ( !StringUtils.isAlphanumericSpace ( vsName ) ) {
+    
+    
+    
+    if ( !isValidJavaIdentifier( vsName ) ) {
       logger.error ( new StringBuilder ( ).append ( "Adding the virtual sensor specified in " ).append ( configuration.getFileName ( ) ).append (
       " failed because the virtual sensor name is not following the requirements : " ).toString ( ) );
       logger.error ( "The virtual sensor name is case insensitive and all the spaces in it's name will be removed automatically." );
@@ -203,6 +206,24 @@ public class VSensorLoader extends Thread {
     return true;
   }
   
+  static protected boolean isValidJavaIdentifier(final String name) {
+    boolean valid = false;
+    while (true) {
+      if (false == Character.isJavaIdentifierStart(name.charAt(0))) 
+        break;
+      valid = true;
+      final int count = name.length();
+      for (int i = 1; i < count; i++) {
+        if (false == Character.isJavaIdentifierPart(name.charAt(i))) {
+          valid = false;
+          break;
+        }
+      }
+      break;
+    }
+    return valid;
+  }
+
   public void removeAllVSResources ( VirtualSensorPool pool ) {
     VSensorConfig config = pool.getConfig ( );
     pool.closePool ( );
@@ -299,11 +320,11 @@ public class VSensorLoader extends Thread {
   public AbstractWrapper findWrapper(AddressBean addressBean) throws InstantiationException, IllegalAccessException {
     AbstractWrapper wrapper = activeWrappers.get ( addressBean );
     if ( wrapper == null ) {
-      if ( Main.getWrapperClass ( addressBean.getWrapper ( ) ) == null ) {
+      if ( Main.getInstance().getWrapperClass ( addressBean.getWrapper ( ) ) == null ) {
         logger.error ( "The wrapper >" + addressBean.getWrapper ( ) + "< is not defined in the >" + Main.DEFAULT_WRAPPER_PROPERTIES_FILE + "< file." );
         return null;
       }
-      wrapper = ( AbstractWrapper ) Main.getWrapperClass ( addressBean.getWrapper ( ) ).newInstance ( );
+      wrapper = ( AbstractWrapper ) Main.getInstance().getWrapperClass ( addressBean.getWrapper ( ) ).newInstance ( );
       wrapper.setActiveAddressBean ( addressBean );
       boolean initializationResult = wrapper.initialize (  );
       if ( initializationResult == false )
@@ -329,7 +350,7 @@ public class VSensorLoader extends Thread {
     for ( AddressBean addressBean : streamSource.getAddressing ( ) ) {
       wrapper = findWrapper(addressBean);
       try {
-        if (wrapper!=null && prepareStreamSource( streamSource,wrapper)) 
+        if (wrapper!=null && prepareStreamSource( streamSource,wrapper.getOutputFormat(),wrapper)) 
           break;
         else
           //TODO: remove wrapper from activeWrappers and release its resources
@@ -342,8 +363,8 @@ public class VSensorLoader extends Thread {
     return (wrapper!=null);
   }
   
-  public boolean prepareStreamSource ( StreamSource streamSource ,AbstractWrapper wrapper ) throws InstantiationException, IllegalAccessException, SQLException {
-    if (wrapper.getOutputFormat()==null) {
+  public boolean prepareStreamSource ( StreamSource streamSource ,DataField[] outputformat, AbstractWrapper wrapper ) throws InstantiationException, IllegalAccessException, SQLException {
+    if (outputformat==null) {
       logger.error("Preparing the stream source failed because the wrapper : "+wrapper.getWrapperName()+" returns null for the >getOutputStructure< method!");
       return false;
     }
