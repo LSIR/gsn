@@ -275,7 +275,7 @@ public class GSNConfiguratorFrame extends JFrame {
 		}
 		
 		try {
-			Main.initializeWrappers();
+			Main.getInstance().initializeConfiguration();
 			
 		new GSNConfiguratorFrame(Main.DEFAULT_GSN_CONF_FILE,
 				Main.DEFAULT_GSN_LOG4J_PROPERTIES,

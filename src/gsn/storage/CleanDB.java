@@ -13,7 +13,7 @@ public class CleanDB {
   
   public static void main(String[] args) throws Exception {
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
-    ContainerConfig cc =Main.loadConfiguration(Main.DEFAULT_GSN_CONF_FILE);
+    ContainerConfig cc =Main.getContainerConfig();
     Class.forName(cc.getJdbcDriver());
     StorageManager.getInstance ( ).initialize ( cc.getJdbcDriver ( ) , cc.getJdbcUsername ( ) , cc.getJdbcPassword ( ) , cc.getJdbcURL ( ) );
     ArrayList<String> tables = StorageManager.getInstance().getInternalTables();

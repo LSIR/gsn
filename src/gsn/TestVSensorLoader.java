@@ -11,6 +11,8 @@ import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
 import gsn.wrappers.MockWrapper;
+import gsn.wrappers.WrappersUtil;
+
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -34,13 +36,12 @@ public class TestVSensorLoader {
 
 	@Before
 	public void setUp() throws Exception {
-		Main.resetWrapperList();
-		PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
+	  PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
 		propertiesConfiguration.addProperty("wrapper.name", "mock-test");
 		propertiesConfiguration.addProperty("wrapper.class", "gsn.wrappers.MockWrapper");
 		propertiesConfiguration.addProperty("wrapper.name", "system-time");
 		propertiesConfiguration.addProperty("wrapper.class", "gsn.wrappers.SystemTime");
-		Main.loadWrapperList(propertiesConfiguration);
+		Main.getInstance();
 	}
 
 	@After

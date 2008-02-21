@@ -50,7 +50,7 @@ public class TestDataPropogation {
 		PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
 		propertiesConfiguration.addProperty("wrapper.name", "mock-test");
 		propertiesConfiguration.addProperty("wrapper.class", "gsn.wrappers.MockWrapper");
-		Main.loadWrapperList(propertiesConfiguration);
+//		Main.loadWrapperList(propertiesConfiguration);
 		VSensorLoader loader = new VSensorLoader();
 		AddressBean addressBean= new AddressBean("mock-test");
 		wrapper = (MockWrapper) loader.findWrapper(addressBean);
@@ -62,7 +62,7 @@ public class TestDataPropogation {
 		streamSource.setInputStream(is);
 		streamSource.setSamplingRate(1);
 		streamSource.setSqlQuery("select * from wrapper where data <> 1");
-		assertTrue(loader.prepareStreamSource(streamSource,wrapper));
+		assertTrue(loader.prepareStreamSource(streamSource,wrapper.getOutputFormat(),wrapper));
 		assertNotNull(streamSource.toSql());
 		assertNotNull(streamSource.getUIDStr());
 		assertEquals(wrapper.getListeners().size(),1);
@@ -75,8 +75,6 @@ public class TestDataPropogation {
 	public void tearDown() throws Exception {
 	 wrapper.removeListener(streamSource);
 	 wrapper.releaseResources();
-	 Main.resetWrapperList();
-	
 	}
 
 	/**

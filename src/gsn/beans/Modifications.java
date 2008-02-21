@@ -209,7 +209,7 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 					   String vsensorName = addressing[addressingIndex].getPredicateValue("NAME");
 					   String wrapper = addressing[addressingIndex].getWrapper();
 
-					   Class<?> wrapperClass = Main.getWrapperClass(wrapper);
+					   Class<?> wrapperClass = Main.getInstance().getWrapperClass(wrapper);
 					   if (wrapperClass == null) {
 						   //If this addressing element is the last one, remove VS from the graph
 						   if(logger.isDebugEnabled())
