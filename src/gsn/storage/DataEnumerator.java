@@ -51,6 +51,12 @@ public class DataEnumerator implements Enumeration<StreamElement> {
   
   
   public DataEnumerator ( PreparedStatement preparedStatement , boolean binaryLinked ) {
+    try {
+      preparedStatement.setFetchSize(50);
+    } catch (SQLException e1) {
+      logger.warn(e1.getMessage(),e1);
+    }
+    
     if ( preparedStatement == null ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
       hasNext = false;

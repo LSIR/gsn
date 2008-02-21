@@ -96,6 +96,7 @@ class DelayedDataEnumerator implements Enumeration<ScheduledStreamElement>{
     StringBuilder query = new StringBuilder("select * from ").append(dbName).append(" order by TIMED asc");
     try {
       data = StorageManager.getInstance().executeQuery(query,false);
+      
     }catch (SQLException e) {
       logger.error(e.getMessage(),e);
     }
