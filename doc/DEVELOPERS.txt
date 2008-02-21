@@ -99,18 +99,41 @@ RewriteEngine on
 RewriteRule ^(gsn-handler|gsn|rss|field|data|upload|multidata)(|\?(.*))$ http://localhost:22001/$0 [P]
 
 Example (linux):
- Alias /gsn/ "/home/ali/gsn/trunk/webapp/"
-   <Directory "/home/ali/gsn/trunk/webapp">
-      Options Indexes MultiViews FollowSymLinks
-      AllowOverride None
-      Order deny,allow
-      Deny from all
-   </Directory>
-   <Directory "/gsn/">
-     RewriteEngine on
-     RewriteRule ^(gsn-handler|gsn|rss|field|data|upload|multidata)(|\?(.*))$ http://localhost:22001/$0 [P]
-   </Directory>
 
+NameVirtualHost *
+<VirtualHost *>
+        DocumentRoot /var/www/
+        <Directory />
+                Options FollowSymLinks
+                AllowOverride None
+        </Directory>
+        <Directory /var/www/>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride None
+                Order allow,deny
+                allow from all
+                RewriteEngine on
+                RewriteRule ^(gsn-handler|gsn|rss|field|data|upload|multidata)(|\?(.*))$ http://localhost:22001/$0 [P]
+        </Directory>
+
+        ErrorLog /var/log/apache2/error.log
+        LogLevel warn
+
+        CustomLog /var/log/apache2/access.log combined
+        ServerSignature On
+
+        Alias /gsn/ "/home/ali/gsn/trunk/webapp/"
+        <Directory "/home/ali/gsn/trunk/webapp">
+         Options Indexes MultiViews FollowSymLinks
+         AllowOverride None
+         Allow from all
+        </Directory>
+        <Directory "/home/ali/gsn/trunk/webapp/WEB-INF">
+         AllowOverride None
+         Deny from all
+        </Directory>
+
+</VirtualHost>
 
 Bugs
 ====
