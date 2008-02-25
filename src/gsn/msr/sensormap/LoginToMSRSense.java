@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import org.apache.commons.collections.KeyValue;
 
-// http://atom.research.microsoft.com/SenseWebV3/sensormanager/service.asmx?WSDL
-
 public class LoginToMSRSense {
   
   public static void main(String[] args) throws RemoteException {

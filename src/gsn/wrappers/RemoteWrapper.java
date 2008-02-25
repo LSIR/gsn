@@ -21,6 +21,7 @@ import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 /**
  * TODO : Optimization for combining where clauses in the time based window and updating the
  * registered query with the new where clause
+ * URL => http://micssrv12.epfl.ch/
  */
 public class RemoteWrapper extends AbstractWrapper {
 

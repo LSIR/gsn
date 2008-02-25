@@ -195,7 +195,8 @@ public class MultiDataDownload extends HttpServlet {
         finalGeneratedQuest[i] += " " + groupby;
         finalGeneratedQuest[i] += ";";
       }
-      
+      for (String sql:finalGeneratedQuest)
+        System.out.println(">>>"+sql);
       DataEnumerator result[] = new DataEnumerator[numberSelectedSensor];
       
       for(int i=0;i<numberSelectedSensor;i++){

@@ -11,4 +11,7 @@ http://atom.research.microsoft.com/SenseWebV3/sensormanager/service.asmx?WSDL //
 Generating code for the data hub package.
 http://atom.research.microsoft.com/SenseWebV3/DataHub/Service.asmx?WSDL
 
-wsdl2java -o generated -p gsn.msr.sensormap.datahub -s -ss -sd -uri service.asmx.xml 
+wsdl2java -o generated -p gsn.msr.sensormap.datahub -s -ss -sd -uri service.asmx.xml
+
+Accessing to the datahub on the localhost:
+http://localhost:22001/services/Service?wsdl

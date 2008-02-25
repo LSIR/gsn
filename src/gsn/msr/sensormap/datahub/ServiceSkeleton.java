@@ -11,12 +11,10 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.StringTokenizer;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.tempuri.ArrayOfArrayOfSensorData;
@@ -72,28 +70,30 @@ public class ServiceSkeleton {
       VSensorConfig conf =Mappings.getVSensorConfig(vsName);
       if (vsFieldIndex>=conf.getOutputStructure().length)
         continue;//reject.
-      StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,PK, AVG(").append(conf.getOutputStructure()[vsFieldIndex].getName()).append(") as data from ").append(vsName).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by TIMED/").append(aggInMSec).append(" order by TIMED");
+      StringBuilder query = new StringBuilder("select MAX(TIMED) as TIMED,PK, AVG(").append(conf.getOutputStructure()[vsFieldIndex].getName()).append(") as data from ").append(vsName).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by TIMED/").append(aggInMSec).append(" order by TIMED");
       System.out.println("QUERY : "+query);
       DataEnumerator output = null;
       try {
         output = StorageManager.getInstance().executeQuery(query, true);
-        SensorData data = new SensorData(); 
-        ArrayOfDateTime arrayOfDateTime = new ArrayOfDateTime();
-        ArrayList<Double> sensor_readings = new ArrayList();
         while(output.hasMoreElements()) {
+          System.out.println("ADDING");
           StreamElement se = output.nextElement();
+          SensorData data = new SensorData();
+          ArrayOfDateTime arrayOfDateTime = new ArrayOfDateTime();
+          ArrayList<Double> sensor_readings = new ArrayList();
           Calendar timestamp = Calendar.getInstance();
           timestamp.setTimeInMillis(se.getTimeStamp());
           arrayOfDateTime.addDateTime(timestamp);
           sensor_readings.add(Double.parseDouble(se.getData()[0].toString()));
+          data.setSensorType(5);//Vector
+          data.setDataType(1);// Generic
+          data.setTimestamps(arrayOfDateTime);
+          ArrayOfDouble arrayOfDouble = new ArrayOfDouble();
+          arrayOfDouble.set_double(ArrayUtils.toPrimitive(sensor_readings.toArray(new Double[] {})));
+          data.setData(arrayOfDouble);
+          sensorData.addSensorData(data);    
         }
-        data.setSensorType(5);//Vector
-        data.setDataType(1);// Generic
-        data.setTimestamps(arrayOfDateTime);
-        ArrayOfDouble arrayOfDouble = new ArrayOfDouble();
-        arrayOfDouble.set_double(ArrayUtils.toPrimitive(sensor_readings.toArray(new Double[] {})));
-        data.setData(arrayOfDouble);
-        sensorData.addSensorData(data);
+        
       }catch (SQLException e) {
         logger.error(e.getMessage(),e);
       }
