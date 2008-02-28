@@ -75,7 +75,8 @@ public class ServiceSkeleton {
     ArrayOfSensorData items = new ArrayOfSensorData();
     for (String signalInfo: input.getSensorNames().getString()) {
       SignalRequest req = new SignalRequest(signalInfo);
-      StringBuilder query = new StringBuilder("select TIMED as TIMED, ").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" order by timed desc limit 0,1");
+      StringBuilder query = new StringBuilder("select pk,TIMED, ").append(req.getFieldName()).append(" as data from ").append(req.getVsName()).append(" order by timed desc limit 0,1");
+//      logger.fatal(query);
       items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
     }
     toReturn.setGetLatestScalarDataInBatchResult(items);
@@ -87,7 +88,7 @@ public class ServiceSkeleton {
     ArrayOfSensorData items = new ArrayOfSensorData();
     for (String signalInfo: input.getSensorNames().getString()) {
       SignalRequest req = new SignalRequest(signalInfo);
-      StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,PK, AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime()).append(" order by TIMED");
+      StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED, AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis());
       items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
     }
     toReturn.setGetAggregateScalarDataInBatchResult(items);
@@ -121,7 +122,10 @@ public class ServiceSkeleton {
     ArrayOfSensorData toReturn = new ArrayOfSensorData();
     try {
       DataEnumerator output = null;
-      output = StorageManager.getInstance().executeQuery(query, true);
+      boolean is_binary_linked= true;
+      if (query.toString().replaceAll(" ","").toLowerCase().indexOf("avg(")>0)
+        is_binary_linked = false;
+      output = StorageManager.getInstance().executeQuery(query, is_binary_linked);
       SensorData data = new SensorData(); 
       ArrayOfDateTime arrayOfDateTime = new ArrayOfDateTime();
       ArrayList<Double> sensor_readings = new ArrayList();
