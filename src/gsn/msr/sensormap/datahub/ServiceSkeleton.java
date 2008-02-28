@@ -76,7 +76,7 @@ public class ServiceSkeleton {
     for (String signalInfo: input.getSensorNames().getString()) {
       SignalRequest req = new SignalRequest(signalInfo);
       StringBuilder query = new StringBuilder("select pk,TIMED, ").append(req.getFieldName()).append(" as data from ").append(req.getVsName()).append(" order by timed desc limit 0,1");
-//      logger.fatal(query);
+//    logger.fatal(query);
       items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
     }
     toReturn.setGetLatestScalarDataInBatchResult(items);
@@ -95,16 +95,16 @@ public class ServiceSkeleton {
     return toReturn;
   }
   
-  
   class SignalRequest {
     private int signal_index = -1;
     private VSensorConfig conf;
     public SignalRequest(String req) {
       StringTokenizer st= new StringTokenizer(req,"@");
+      if (st.countTokens()!=2)
+        throw new RuntimeException("Bad request: correct format is sensorName@FieldID , Your (invalid) request is:"+req);
       String vsName = st.nextToken();
-      logger.fatal("VSNAME : "+vsName);
       this.signal_index= Integer.parseInt(st.nextToken());
-      logger.fatal("VSFIELD INDEX : "+signal_index);
+      logger.debug("WS-REQUEST: VSNAME : "+vsName+",VSFIELD INDEX : "+signal_index);
       this.conf =Mappings.getVSensorConfig(vsName);
       if (signal_index>=conf.getOutputStructure().length)
         throw new RuntimeException("Bad request: vs-name="+vsName+", "+signal_index+">"+conf.getOutputStructure().length);

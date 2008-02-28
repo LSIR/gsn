@@ -172,11 +172,11 @@ public final class StreamElement implements Serializable {
       this.indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
       for ( int i = 0 ; i < this.fieldNames.length ; i++ )
         this.indexedFieldNames.put( this.fieldNames[ i ] , i );
-//      for (String k : this.indexedFieldNames.keySet())
-//        System.out.println("Key : "+k + " VALUE = "+this.indexedFieldNames.get(k));
+//    for (String k : this.indexedFieldNames.keySet())
+//    System.out.println("Key : "+k + " VALUE = "+this.indexedFieldNames.get(k));
     }
-//    System.out.print(fieldName+" AT INDEX : "+ this.indexedFieldNames.get( fieldName ) );
-//    System.out.println(" HAS VALUE : "+this.fieldValues[ this.indexedFieldNames.get( fieldName ) ]);
+//  System.out.print(fieldName+" AT INDEX : "+ this.indexedFieldNames.get( fieldName ) );
+//  System.out.println(" HAS VALUE : "+this.fieldValues[ this.indexedFieldNames.get( fieldName ) ]);
     Integer index = this.indexedFieldNames.get( fieldName );
     if (index == null) {
       logger.info("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
@@ -204,6 +204,8 @@ public final class StreamElement implements Serializable {
           toReturn[ i ] = fieldValues[ i ];
           break;
         case DataTypes.BIGINT :
+          toReturn[ i ] = Long.toString( ( Long ) fieldValues[ i ] );
+          break;
 //        case DataTypes.TIME :
 //        toReturn[ i ] = Long.toString( ( Long ) fieldValues[ i ] );
 //        break;
@@ -234,8 +236,8 @@ public final class StreamElement implements Serializable {
           break;
         case DataTypes.BIGINT :
 //        case DataTypes.TIME :
-//        values[ i ] = Long.parseLong( ( String ) fieldValues[ i ] );
-//        break;
+        values[ i ] = Long.parseLong( ( String ) fieldValues[ i ] );
+        break;
         case DataTypes.TINYINT :
           values[ i ] = Byte.parseByte( ( String ) fieldValues[ i ] );
           break;
