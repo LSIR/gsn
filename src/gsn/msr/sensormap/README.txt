@@ -15,3 +15,10 @@ wsdl2java -o generated -p gsn.msr.sensormap.datahub -s -ss -sd -uri service.asmx
 
 Accessing to the datahub on the localhost:
 http://localhost:22001/services/Service?wsdl
+
+Using the appropriate host/port for your web services:
+> If you want to have your web service accessible through port 22001 (or any other port your gsn instance is running on) then you just
+copy the "Service.auto.aar", rename it to "Service.aar" and put in the webapp/WEB-INF/services directory.
+> If you have your gsn server proxied by some other program, then you need to give the host/port address of that program. For instance
+if you are using gsn behind an apache server which runs on a separate port and ip, simply edit "META-INF\Service.wsdl" inside the 
+"Service.manual.aar" file, and modify the " <wsdl:service name="Service"> " part of the file (should be close to the end of the file).
