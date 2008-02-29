@@ -63,7 +63,7 @@ public class ServiceSkeleton {
     ArrayOfArrayOfSensorData items = new ArrayOfArrayOfSensorData();
     for (String signalInfo: input.getSensorNames().getString()) {
       SignalRequest req = new SignalRequest(signalInfo);
-      StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,PK, AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by TIMED/").append(aggInMSec).append(" order by TIMED");
+      StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by FLOOR(TIMED/").append(aggInMSec).append(") order by TIMED");
       items.addArrayOfSensorData(transformToSensorDataArray(query));
     }
     toReturn.setGetAggregateScalarDataSeriesInBatchResult(items);

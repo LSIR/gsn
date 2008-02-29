@@ -187,6 +187,9 @@ var GSN = {
 		});
 		
 		// Make a matrix of the array of the sensor with the group name in the second column
+		
+		//Test example
+		//GSN.vsName.push("genepi_meteo_10_replay", "genepi_meteo_11_replay","genepi_meteo_12_replay","genepi_meteo_13_replay","genepi_meteo_15_replay","genepi_meteo_16_replay","genepi_meteo_18_replay","genepi_meteo_2_replay","genepi_meteo_3_replay","genepi_meteo_4_replay","genepi_meteo_6_replay","genepi_meteo_7_replay");	
 		GSN.vsName = GSN.util.regroupByRubricSensorName(GSN.vsName);
 		
 		
@@ -223,22 +226,29 @@ var GSN = {
 		
 		
 		// Append Group Others to menu
-		if(GSN.context == "data"){
-			$("#vsmenu").append($.A({"class":"rubric","href":"javascript:GSN.util.toggle($(\".others span\"));","id":"menu-rubric-others"},"  Others"));
-			$("#menu-rubric-others").prepend($.IMG({'src':'../img/group.png'}));
-		}
-		else{
-			$("#vsmenu").append($.DIV({},$.A({"class":"rubric","href":"javascript:GSN.util.toggle($(\".others a\"));","id":"menu-rubric-others"},"  Others")));
-			$("#menu-rubric-others").prepend($.IMG({'src':'../img/group.png'}));
-		}
-		GSN.numSensorAssociatedWithCategory.setItem("others",0);
-		
-		// Append Sensor Name to menu if it corresponds to category others
+		var othersRubricSensorPresent=false;
 		for(var i=0;i<vsName.length;++i){
-			if(vsName[i][1] == "others"){
-				if(GSN.context == "data")$("#vsmenu").append($.DIV({"class":vsName[i][1]},$.SPAN({"class":"sensorName","id":"menu-"+vsName[i][0]},vsName[i][0])));
-				else $("#vsmenu").append($.DIV({"class":vsName[i][1]},$.A({"class":"sensorName","href":"javascript:GSN.menu('"+vsName[i][0]+"');","id":"menu-"+vsName[i][0]+""},vsName[i][0])));
-				GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);
+			if(vsName[i][1] == "others") othersRubricSensorPresent = true;
+		}
+		
+		if(othersRubricSensorPresent){
+			if(GSN.context == "data"){
+				$("#vsmenu").append($.A({"class":"rubric","href":"javascript:GSN.util.toggle($(\".others span\"));","id":"menu-rubric-others"},"  Others"));
+				$("#menu-rubric-others").prepend($.IMG({'src':'../img/group.png'}));
+			}
+			else{
+				$("#vsmenu").append($.DIV({},$.A({"class":"rubric","href":"javascript:GSN.util.toggle($(\".others a\"));","id":"menu-rubric-others"},"  Others")));
+				$("#menu-rubric-others").prepend($.IMG({'src':'../img/group.png'}));
+			}
+			GSN.numSensorAssociatedWithCategory.setItem("others",0);
+			
+			// Append Sensor Name to menu if it corresponds to category others
+			for(var i=0;i<vsName.length;++i){
+				if(vsName[i][1] == "others"){
+					if(GSN.context == "data")$("#vsmenu").append($.DIV({"class":vsName[i][1]},$.SPAN({"class":"sensorName","id":"menu-"+vsName[i][0]},vsName[i][0])));
+					else $("#vsmenu").append($.DIV({"class":vsName[i][1]},$.A({"class":"sensorName","href":"javascript:GSN.menu('"+vsName[i][0]+"');","id":"menu-"+vsName[i][0]+""},vsName[i][0])));
+					GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);
+				}
 			}
 		}
 		
@@ -1624,64 +1634,54 @@ var GSN = {
 	  /**
 		* Take an array return a sorted matrix with sensor name in first col and rubric name in the second col
 		*/
+		
+
 		,regroupByRubricSensorName: function(vsName){
 			vsName.sort();
-			//Creation of a Matrix n*2
-			vsNameRubric = new Array(vsName.length);
-			for(var i=0; i<vsName.length; ++i)
-							vsNameRubric[i] = new Array(2);
 			
-			//Initialisation of the matrix
-			vsNameRubric[0][0] = vsName[0];
-			vsNameRubric[0][1] = "others";
+			//Creation of a Matrix n*2 and initialization
+			vsNameRubric = new Array(vsName.length);
+			for(var i=0; i<vsName.length; ++i){
+				vsNameRubric[i] = new Array(2);
+				vsNameRubric[i][0] = vsName[i];
+				vsNameRubric[i][1] = "others";
+			}
 			
 			//fill the matrix
+			var numberAtTheEnd = new RegExp("[0-9]$");
 			var createRubric = false;
 			var firstTimeTry = true;
 			var rubricName;
-			
-			
-			
 			for(var i=1; i<vsName.length; ++i){
-				//to create a rubric we want at least a degree of similarity of 3 char
 				for(var similarDegree=3; similarDegree<vsName[i].length; ++similarDegree){
-					
-					// create a regular expression with will check if the current row has a degree of similarity with the previous one (note that the test is made in the next two if)
 					regularExpression = new RegExp("^"+vsName[i-1].substr(0,similarDegree),"i");
 					
-					//particular case
-					if(regularExpression.test(vsName[i]) && firstTimeTry){
-						createRubric = true;
-						rubricName = vsName[i-1].substr(0,similarDegree);
-					}
+						if(!regularExpression.test(vsName[i]) && firstTimeTry){
+							
+							break;
+						}
+						if(regularExpression.test(vsName[i]) && firstTimeTry){
+							firstTimeTry=false;
+						}
+						
+						if(numberAtTheEnd.test(vsName[i].substr(0,similarDegree))){
+							break;
+						}
+						
+						if(regularExpression.test(vsName[i]) && !firstTimeTry){
+							vsNameRubric[i][1] = vsName[i-1].substr(0,similarDegree);
+							vsNameRubric[i-1][1] = vsName[i-1].substr(0,similarDegree);
+						}
+						
+						
+						if(!regularExpression.test(vsName[i]) && !firstTimeTry){
+							break;
+						}
 					
-					// if the two rows don't match and it is NOT the first time we compare them
-					if(!regularExpression.test(vsName[i]) && !firstTimeTry){
-						createRubric = true;
-						rubricName = vsName[i-1].substr(0,similarDegree-1);
-						break;
-					}
-					// if the two rows don't match and it is the first time we compare them
-					else if(!regularExpression.test(vsName[i]) && firstTimeTry){
-						break;
-					}
-					// if we reach this point the two rows match for this similarDegree => there is a degree of similitud > 3 we will create a rubric
-					firstTimeTry = false
+					
 				}
-				//first collum the sensor name
-				vsNameRubric[i][0] = vsName[i];
-				//second collum the rubric name
-				vsNameRubric[i][1] = rubricName;
-				
-				//if we discover a rubric => previous element fit in this rubric
-				if(createRubric) vsNameRubric[i-1][1] = rubricName;
-				
-				// reinitialisation of the variables
-				createRubric = false;
-				rubricName = "others";
-				firstTimeTry = true;
-				
 			}
+			
 			return vsNameRubric;
 		}
 		
@@ -1706,3 +1706,4 @@ var GSN = {
 		
 	}	
 };
+

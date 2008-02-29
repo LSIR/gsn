@@ -114,6 +114,7 @@ NameVirtualHost *
                 allow from all
                 RewriteEngine on
                 RewriteRule ^(gsn-handler|gsn|rss|field|data|upload|multidata)(|\?(.*))$ http://localhost:22001/$0 [P]
+                RewriteRule ^services/Service(|\?(.*))$ http://localhost:22001/$0 [P] #REQUIRED ONLY IF YOU WANT TO USE GSN'S WEB SERVICES.
         </Directory>
 
         ErrorLog /var/log/apache2/error.log
