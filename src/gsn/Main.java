@@ -49,9 +49,9 @@ import org.mortbay.jetty.webapp.WebAppContext;
  *
  */
 public final class Main {
-  
+
   private static Main singleton ;
-  
+
   private Main() throws Exception{
     System.out.println("GSN Starting ...");
     ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
@@ -60,7 +60,7 @@ public final class Main {
 //    initializeConfiguration();
     try {
       controlSocket = new GSNController(null);
-      initializeConfiguration();
+      containerConfig = loadContainerConfiguration();
     } catch ( FileNotFoundException e ) {
       logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
       logger.error ( e.getMessage ( ) );
@@ -75,7 +75,7 @@ public final class Main {
       return;
     } catch (Exception e) {
       logger.error ( e.getMessage ( ),e );
-      return;    
+      return;
     }
     StorageManager.getInstance ( ).initialize ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) );
     if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
@@ -91,7 +91,7 @@ public final class Main {
       sslSocketConnector.setPassword(getContainerConfig().getSSLKeyStorePassword());
       sslSocketConnector.setPort(getContainerConfig().getSSLPort());
     }
-    
+
     if (sslSocketConnector==null)
       server.setConnectors ( new Connector [ ] { httpConnector } );
     else
@@ -112,7 +112,7 @@ public final class Main {
     final VSensorLoader vsloader = new VSensorLoader ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
     controlSocket.setLoader(vsloader);
   }
-  
+
   public synchronized static Main getInstance() {
     if (singleton==null)
       try {
@@ -123,46 +123,47 @@ public final class Main {
       }
     return singleton;
   }
-  
+
   private GSNController controlSocket;
-  
+
   public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
-  
+
   public static transient Logger logger= Logger.getLogger ( Main.class );
-  
+
   public static final String     DEFAULT_WRAPPER_PROPERTIES_FILE  = "conf/wrappers.properties";
-  
+
   public static final String     DEFAULT_GSN_CONF_FILE            = "conf/gsn.xml";
-  
+
   public static final String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
-  
+
   public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
-  
+
   public static void main ( String [ ]  args)  {
     Main.getInstance();
   }
-  
-  
-  
+
+
+
   /**
    * Mapping between the wrapper name (used in addressing of stream source)
    * into the class implementing DataSource.
    */
-  private  HashMap < String , Class < ? >> wrappers = new HashMap < String , Class < ? >>( );
-  
+  private static  HashMap < String , Class < ? >> wrappers ;
+
   private  ContainerConfig                       containerConfig;
-  
+
   private  HashMap < String , VSensorConfig >    virtualSensors;
-  
-  public void initializeConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
+
+  public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
     ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES , Main.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
     ValidityTools.checkAccessibilityOfDirs ( Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
+    ContainerConfig toReturn = null;
     try {
-      containerConfig = initialize ( );
+      toReturn = loadContainerConfig ( );
+      wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
       if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Loading wrappers.properties at : " ).append ( DEFAULT_WRAPPER_PROPERTIES_FILE ).toString ( ) );
       if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
-      setWrappers(WrappersUtil.loadWrappers(new HashMap<String, Class<?>>()));
     } catch ( JiBXException e ) {
       logger.error ( e.getMessage ( ) );
       logger.error ( new StringBuilder ( ).append ( "Can't parse the GSN configuration file : conf/gsn.xml" ).toString ( ) );
@@ -180,10 +181,12 @@ public final class Main {
       logger.error ( "The file wrapper.properties refers to one or more classes which don't exist in the classpath");
       logger.error ( e.getMessage ( ),e );
       System.exit ( 1 );
+    }finally {
+      return toReturn;
     }
   }
-  
-  private static ContainerConfig initialize () throws JiBXException, FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
+
+  private static ContainerConfig loadContainerConfig () throws JiBXException, FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
     IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
     IUnmarshallingContext uctx = bfact.createUnmarshallingContext ( );
     ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( DEFAULT_GSN_CONF_FILE ) ) , null );
@@ -191,19 +194,17 @@ public final class Main {
     conf.setContainerConfigurationFileName (  DEFAULT_GSN_CONF_FILE );
     return conf;
   }
-  
-  public HashMap<String, Class<?>> getWrappers() {
-    return wrappers;
-  }
 
-  public void setWrappers(HashMap<String, Class<?>> wrappers) {
-    this.wrappers = wrappers;
+  public static HashMap<String, Class<?>> getWrappers() throws ClassNotFoundException {
+    if (singleton==null )
+      return WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
+    return singleton.wrappers;
   }
 
   private static final String PUBLIC_KEY_FILE=".public_key";
-  
+
   private static final String PRIVATE_KEY_FILE=".private_key";
-  
+
   public static void initPKI ( String publicKeyFile,String privateKeyFile ) throws NoSuchAlgorithmException , NoSuchProviderException , FileNotFoundException , IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
     // TODO  : Use the pri/pub keys if they exist. (needs verification first).
     KeyPairGenerator keyGen = KeyPairGenerator.getInstance ( "DSA" , "SUN" );
@@ -227,7 +228,7 @@ public final class Main {
     ksca.load (null);
     logger.warn ("Public and Private keys are generated successfully.");
   }
-  
+
   private static PrivateKey readPrivateKey () throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException{
     FileInputStream keyfis = new FileInputStream (PRIVATE_KEY_FILE);
     byte[] encKey = new byte[keyfis.available ()];
@@ -237,7 +238,7 @@ public final class Main {
     KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
     return keyFactory.generatePrivate (privKeySpec);
   }
-  
+
   private static PublicKey readPublicKey () throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
     FileInputStream keyfis = new FileInputStream (PUBLIC_KEY_FILE);
     byte[] encKey = new byte[keyfis.available ()];
@@ -247,38 +248,46 @@ public final class Main {
     KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
     return keyFactory.generatePublic (pubKeySpec);
   }
-  
-  public  Class < ? > getWrapperClass ( String id ) {
-    return wrappers.get ( id );
+
+  public  static Class < ? > getWrapperClass ( String id )  {
+    Class toReturn = null;
+    try {
+      toReturn =  getWrappers().get ( id );
+    } catch (ClassNotFoundException e) {
+      logger.error(e.getMessage(),e);
+    }
+    finally {
+      return toReturn;
+    }
   }
-  
+
   public final HashMap < String , VSensorConfig > getVirtualSensors ( ) {
     return virtualSensors;
   }
-  
+
   public  boolean justConsumes ( ) {
     Iterator < VSensorConfig > vsconfigs = virtualSensors.values ( ).iterator ( );
     while ( vsconfigs.hasNext ( ) )
       if ( !vsconfigs.next ( ).needsStorage ( ) ) return false;
     return true;
   }
-  
+
   /**
    * Get's the GSN configuration without starting GSN.
    * @return
    * @throws Exception
    */
   public static ContainerConfig getContainerConfig ( ) {
-    if (singleton==null) {
+    if (singleton==null)
       try {
-        return initialize();
+        return loadContainerConfig();
       } catch (Exception e) {
         return null;
       }
-    }
-    return Main.getInstance().containerConfig;
+      else
+        return singleton.containerConfig;
   }
-  
+
   public static String randomTableNameGenerator ( int length ) {
     byte oneCharacter;
     StringBuffer result = new StringBuffer ( length );
@@ -288,11 +297,11 @@ public final class Main {
     }
     return result.toString ( );
   }
-  
+
   public static int tableNameGenerator ( ) {
     return randomTableNameGenerator ( 15 ).hashCode ( );
   }
-  
+
   public static StringBuilder tableNameGeneratorInString (int code) {
     StringBuilder sb = new StringBuilder ("_");
     if (code<0)

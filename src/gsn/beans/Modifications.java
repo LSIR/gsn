@@ -30,28 +30,28 @@ import org.jibx.runtime.JiBXException;
 /**
  * This class holds the files changed in the virtual-sensor directory and
  * adds/removes the virtual sensors based on the changes.
- * 
+ *
  */
 public final class Modifications {
-   
-   private ArrayList < VSensorConfig > addVirtualSensorConf    = new ArrayList < VSensorConfig >( );
-   
-   private ArrayList < VSensorConfig > removeVirtualSensorConf = new ArrayList < VSensorConfig >( );
+
+   private final ArrayList < VSensorConfig > addVirtualSensorConf    = new ArrayList < VSensorConfig >( );
+
+   private final ArrayList < VSensorConfig > removeVirtualSensorConf = new ArrayList < VSensorConfig >( );
 
    private Graph<VSensorConfig> graph;
-   
+
    private static transient Logger     logger                  = Logger.getLogger( Modifications.class );
-   
+
    /**
     * The list of the virtual sensors, sorted by dependency relations between them,
     * to be added to the GSN.
-    * 
+    *
     * @return Returns the add.
     */
    public ArrayList < VSensorConfig > getAdd ( ) {
       return addVirtualSensorConf;
    }
-   
+
    /**
     * @param add The add to set.
     */
@@ -69,10 +69,10 @@ public final class Modifications {
     	  }
       }
    }
-   
+
    /**
     * Note that the list parameter should be an empty arrayList;
-    * 
+    *
     * @param fileNames
     * @param list
     */
@@ -98,7 +98,7 @@ public final class Modifications {
                logger.error( new StringBuilder( ).append( "Please check the file and try again" ).toString( ) );
                continue ;
             }
-            
+
             list.add( configuration );
          } catch ( JiBXException e ) {
             logger.error( e.getMessage( ) , e );
@@ -110,16 +110,16 @@ public final class Modifications {
          }
       }
    }
-   
+
    /**
     * The list of the virtual sensors which should be removed.
-    * 
+    *
     * @return Returns the remove.
     */
    public ArrayList < VSensorConfig > getRemove ( ) {
       return removeVirtualSensorConf;
    }
-   
+
    /**
     * @param listOfTheRemovedVirtualSensorsFileName The remove to set.
     */
@@ -131,7 +131,7 @@ public final class Modifications {
     	  if(vSensorConfig != null){
     		  Node<VSensorConfig> node = graph.findNode(vSensorConfig);
     		  if (node != null && removeVirtualSensorConf.contains(vSensorConfig) == false) {
-				  //adding to removed list the removed vs and all virtual sensors that depend on it   
+				  //adding to removed list the removed vs and all virtual sensors that depend on it
 				  List<Node<VSensorConfig>> nodesAffectedByRemoval = graph.nodesAffectedByRemoval(node);
 				  for (Node<VSensorConfig> toRemoveNode : nodesAffectedByRemoval) {
 					  VSensorConfig config = toRemoveNode.getObject();
@@ -142,28 +142,28 @@ public final class Modifications {
     		  try {
 				graph.removeNode(vSensorConfig);
 			} catch (NodeNotExistsExeption e) {
-				// This shouldn't happen 
+				// This shouldn't happen
 				logger.error(e.getMessage(), e);
 			}
     	  }
 	}
    }
-   
+
    /**
     * Construct a new Modifcations object.
-    * 
+    *
     * @param add : The list of the virtual sensor descriptor files added.
     * @param remove : The list of the virtual sensor descriptor files removed.
     */
    public Modifications ( final Collection < String > add , final Collection < String > remove ) {
-	   buildDependencyGraph(); 
+	   buildDependencyGraph();
 	   //the order of the following two methods is important
 	   setRemove( remove );
 	   setAdd( add );
    }
-   
-   
-   
+
+
+
    public Graph<VSensorConfig> getGraph() {
 	  return graph;
    }
@@ -172,10 +172,10 @@ private Collection < VSensorConfig > getModifications ( ) {
       // Finding the virtual sensors by nme
       // adapting the output structure.
       // making sure that the registered client's will not leave.
-      
+
       return null;
    }
-   
+
    private void buildDependencyGraph ( ) {
 	   graph = new Graph<VSensorConfig>();
 	   Iterator<VSensorConfig> allVSensorConfigs = Mappings.getAllVSensorConfigs();
@@ -184,10 +184,10 @@ private Collection < VSensorConfig > getModifications ( ) {
 
    /**
     * Note: There my be multiple valid addressing element for each stream source and for each unique addressing,
-    * an edge is added to the graph 
+    * an edge is added to the graph
     * @param graph
     * @param allVSensorConfigs
-    */ 
+    */
    private static void fillGraph(Graph<VSensorConfig> graph, Iterator<VSensorConfig> allVSensorConfigs) {
 	   HashMap<String, VSensorConfig> vsNameTOVSConfig = new HashMap<String, VSensorConfig>();
 	   while(allVSensorConfigs.hasNext()){
@@ -198,7 +198,7 @@ private Collection < VSensorConfig > getModifications ( ) {
 		   }
 	   }
 
-outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){ 		
+outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 		   Collection<InputStream> inputStreams = config.getInputStreams();
 		   for (InputStream stream : inputStreams) {
 			   StreamSource[] sources = stream.getSources();
@@ -209,7 +209,7 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 					   String vsensorName = addressing[addressingIndex].getPredicateValue("NAME");
 					   String wrapper = addressing[addressingIndex].getWrapper();
 
-					   Class<?> wrapperClass = Main.getInstance().getWrapperClass(wrapper);
+					   Class<?> wrapperClass = Main.getWrapperClass(wrapper);
 					   if (wrapperClass == null) {
 						   //If this addressing element is the last one, remove VS from the graph
 						   if(logger.isDebugEnabled())
@@ -227,7 +227,7 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 					   }
 
 					   boolean isLocalRemote = wrapperClass.isAssignableFrom(RemoteWrapper.class) && isInTheSameGSNInstance(addressing[addressingIndex]);
-					   
+
 					   if(wrapperClass.isAssignableFrom(RemoteWrapper.class) && !isLocalRemote){
 						   if(validateRemoteWrapper(addressing[addressingIndex]))
 							   hasValidAddressing = true;
@@ -307,7 +307,7 @@ outFor:for(VSensorConfig config : vsNameTOVSConfig.values()){
 		   }
 	   }
    }
-   
+
    private static boolean isInTheSameGSNInstance(AddressBean addressBean) {
 	   String urlStr = addressBean.getPredicateValue ( "url" );
 	   String host;

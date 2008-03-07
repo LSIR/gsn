@@ -52,8 +52,8 @@ public class GSNConfiguratorFrame extends JFrame {
 	// The swing components for this Frame
 	private Container contentPane;
 
-	private GSNConfiguratorPanel configuratorPanel;
-	
+	private final GSNConfiguratorPanel configuratorPanel;
+
 	private VSensorVisualizerPanel vSensorVisualizerPanel;
 
 	private GSNStatusBar statusBar;
@@ -103,8 +103,8 @@ public class GSNConfiguratorFrame extends JFrame {
 
 	private  Desktop desktop;
 	private SystemTray tray;
-	private TrayIcon trayIcon = null;
-	private ContainerConfig bean;
+	private final TrayIcon trayIcon = null;
+	private final ContainerConfig bean;
 	/*
 	 * Initialize the frame window, close operations, menus, look&feel
 	 */
@@ -120,7 +120,7 @@ public class GSNConfiguratorFrame extends JFrame {
 		setVisible(true);
 	}
 
-	//TODO:requires JDk 6	
+	//TODO:requires JDk 6
 //	private void initDesktop() {
 //		if(SystemTray.isSupported() && Desktop.isDesktopSupported()) {
 //			tray = SystemTray.getSystemTray();
@@ -138,21 +138,21 @@ public class GSNConfiguratorFrame extends JFrame {
 //					}
 //				}
 //			};
-//			
+//
 //	         // create a popup menu
 //	         popup = new PopupMenu();
-//	         
+//
 //	         // create menu item to access web interface
 //	         MenuItem openWebItem = new MenuItem("GSN Web Interface");
 //	         openWebItem.addActionListener(trayListener);
 //	         popup.add(openWebItem);
-//	         
+//
 //	         // menu item to exit gsn
 //	         MenuItem quitItem = new MenuItem("Quit GSN");
 //	         quitItem.addActionListener(quitListener);
 //	         popup.addSeparator();
 //	         popup.add(quitItem);
-//	         
+//
 //	         // construct a TrayIcon
 //	         trayIcon = new TrayIcon(image, "GSN", popup);
 //	         trayIcon.setImageAutoSize(true);
@@ -185,7 +185,7 @@ public class GSNConfiguratorFrame extends JFrame {
 //	    		public void windowIconified(WindowEvent arg0) {
 //	    			setVisible(false);
 //	    			setExtendedState(Frame.ICONIFIED);
-//	    		}	        	 
+//	    		}
 //	         });
 //	         try {
 //	             tray.add(trayIcon);
@@ -195,9 +195,9 @@ public class GSNConfiguratorFrame extends JFrame {
 //		}
 //	}
 
-	
 
-	
+
+
 	private void initEvents() {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
@@ -212,10 +212,10 @@ public class GSNConfiguratorFrame extends JFrame {
 		setIconImage(Utilities.loadImage("gsn/gui/resources/gsn.png"));
 		contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
-		
+
 		vSensorVisualizerPanel = new VSensorVisualizerPanel();
 		configuratorPanel.registerInterestInStartStopState(vSensorVisualizerPanel);
-		
+
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.add(configuratorPanel.getPanel(), "GSN Configurator");
 		tabbedPane.add(vSensorVisualizerPanel.getPanel(), "VSensor Visualizer");
@@ -229,19 +229,19 @@ public class GSNConfiguratorFrame extends JFrame {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void initStatusBar() {
 		statusBar = new GSNStatusBar();
 		configuratorPanel.registerInterestInStartStopState(statusBar);
 	}
 
-	private ActionListener quitListener = new ActionListener() {
+	private final ActionListener quitListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			closeGSNConfigurator();
 		}
 	};
-	
+
 	private void initMenuBar() {
 		menuBar = new JMenuBar();
 
@@ -265,7 +265,7 @@ public class GSNConfiguratorFrame extends JFrame {
 	}
 
 	public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException  {
-		
+
 		PlasticLookAndFeel laf = new PlasticXPLookAndFeel();
 		PlasticLookAndFeel.setCurrentTheme(new DesertBluer());
 		try {
@@ -273,10 +273,10 @@ public class GSNConfiguratorFrame extends JFrame {
 		} catch (UnsupportedLookAndFeelException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		try {
-			Main.getInstance().initializeConfiguration();
-			
+			Main.loadContainerConfiguration();
+
 		new GSNConfiguratorFrame(Main.DEFAULT_GSN_CONF_FILE,
 				Main.DEFAULT_GSN_LOG4J_PROPERTIES,
 		"conf/log4j.directory.properties");
@@ -286,7 +286,7 @@ public class GSNConfiguratorFrame extends JFrame {
 		} catch(JiBXException exception) {
 			System.out.println("GSN Configurator encountered an error. Please report it to the gsn team at http://gsn.sourceforge.net. Error message was: " + exception.getMessage());
 			exception.getStackTrace();
-			
+
 		}
 	}
 
@@ -295,7 +295,7 @@ public class GSNConfiguratorFrame extends JFrame {
 	 */
 	private void closeGSNConfigurator() {
 		if(configuratorPanel.isGsnRunning()) {
-		JOptionPane confirmExitPane = new JOptionPane( 
+		JOptionPane confirmExitPane = new JOptionPane(
 				"Are you sure you want to exit GSN Control Center ? GSN will be stopped.",
 				JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION,
 				GSN_ICON);
@@ -332,7 +332,7 @@ class AboutAction extends AbstractAction {
 	private static final String HTML_CODE_ABOUT_DIALOG = "<h1>GSN Control Center</h1><br>"
 		+ "<p>This software has been developed by "
 		+ "the GSN Development Team ( http://gsn.sourceforge.net ).<br>";
-	private Color bgColor;
+	private final Color bgColor;
 	public AboutAction(Color bgColor) {
 		super("About");
 		this.bgColor = bgColor;
@@ -348,5 +348,5 @@ class AboutAction extends AbstractAction {
 		JDialog aboutDialog = aboutPane.createDialog(null,
 		"About GSN Configurator");
 		aboutDialog.setVisible(true);
-	}	
+	}
 }
