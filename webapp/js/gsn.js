@@ -1071,8 +1071,8 @@ var GSN = {
 			
 			$("#step3Container").append("<div class=\"step\">Step 3/5 : Selection of the Data Range</div>");
 			$("#step3Container").append("<div class=\"data\" id=\"nbDatas\"></div>");
-			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"allDatas\" value=\"\" checked> All data<br/>");
-			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"someDatas\" value=\"\" onclick=\"$('#nbOfDatas').focus()\"> Last <input onclick=\"$('#someDatas').attr('checked', 'checked');\" type=\"text\" name=\"nb\" value=\"\" id=\"nbOfDatas\" size=\"4\"/> values<br/>");
+			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"allDatas\" value=\"\"> All data<br/>");
+			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"someDatas\" value=\"\" checked onclick=\"$('#nbOfDatas').focus()\"> Last <input onclick=\"$('#someDatas').attr('checked', 'checked');\" type=\"text\" name=\"nb\" value=\"20\" id=\"nbOfDatas\" size=\"4\"/> values<br/>");
 			GSN.data.appendNextStepButton("nbDatas","GSN.data.addCriteria(true)");
 		},	
 		
@@ -1179,14 +1179,21 @@ var GSN = {
 			$("#display").append("<div class=\"chartOption\">Chart Selection:</div>");
 			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"barChart\" class=\"chartType\" name=\"chartType\" onClick=\"\" checked/>Bar Chart<br/></div>");
 			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"lineChart\" class=\"chartType\" name=\"chartType\" onClick=\"\"/>Line Chart<br/></div>");
+			$("#display").append("<div class=\"chartOption\">Display:</div>");
+			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"allData\" class=\"dataDisplay\" name=\"dataDisplay\" onClick=\"\" checked/>All Values<br/></div>");
+			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"modData\" class=\"dataDisplay\" name=\"dataDisplay\" onClick=\"\"/>Modulus Mode<br/></div>");
 			
+						
 			$("#display").append("<div class=\"cvsFormat\">Delimiters:</div>");
-			$("#display").append("<div class=\"cvsFormat\"><input type=\"radio\" id=\"tab\" class=\"chartType\" name=\"delimiter\" value=\"tab\" checked/>Tab<br/></div>");
+			
+			$("#display").append("<div class=\"cvsFormat\"><input type=\"radio\" id=\"semicolon\" class=\"chartType\" name=\"delimiter\" value=\"semicolon\" checked/>Semicolon<br/></div>");
+			$("#display").append("<div class=\"cvsFormat\"><input type=\"radio\" id=\"tab\" class=\"chartType\" name=\"delimiter\" value=\"tab\"/>Tab<br/></div>");
 			$("#display").append("<div class=\"cvsFormat\"><input type=\"radio\" id=\"space\" class=\"chartType\" name=\"delimiter\" value=\"space\"/>Space<br/></div>");
 			$("#display").append("<div class=\"cvsFormat\"><input type=\"radio\" id=\"other\" class=\"chartType\" name=\"delimiter\" value=\"other\"/>Other : <input type=\"text\" name=\"otherdelimiter\" size=\"2\"/><br/></div>");
 			
-			
+			$("#display").append("<div class=\"chartOption\"><input type=\"checkbox\" name=\"fullscreenView\" value=\"fullscreenView\" id=\"fullscreenView\"/>Go Fullscreen</div>");
 			GSN.data.appendNextStepButton("display","GSN.data.getDatas()","getDatas","Get Data");
+			
 			$("#display").append('<br/><br/>');
 			
 			$(".cvsFormat").hide();
@@ -1294,6 +1301,9 @@ var GSN = {
    	
    	
    	displayDatas: function(request) {
+   		
+   		
+   		
 			$('#getDatas').attr("value","Update");
 			
 			//should check no field selected...
@@ -1313,9 +1323,22 @@ var GSN = {
 				}
 				target = w.document.body;
 			}
+			if($('#fullscreenView').attr("checked"))
+			{
+				$('#container > div').hide('slow');
 				
-			$("#datachooser table",target).remove();
-			$("#datachooser").append('<span id="chartContainer"></span>'); 
+				$('body').prepend('<div id="fullscreenContent" style="width:'+(screen.width)+';"></div>');
+				$('#fullscreenContent').append('<br/><input type="button" value="Back to Data Part" onclick="$(\'#container > div\').show(\'slow\'); $(\'#fullscreenContent\').remove();"/>')
+				$("#fullscreenContent").append('&nbsp;&nbsp;&nbsp;<input type="button" value="Go to Table Values" onclick="document.location.href=\'#dataSet\'"/>');
+				$('#fullscreenContent').append('<br/><br/><div id="seeLink">See chart:<br/><ul></ul></div>');
+				$('#fullscreenContent').append('<span id="chartContainer"></span><br/><br/><br/><br/><br/><br/><br/><br/>');
+				target=$('#fullscreenContent');
+			}
+			else{
+				$("#datachooser table",target).remove();
+				$("#datachooser").append('<span id="chartContainer"></span>'); 
+			}
+   		$("#chartContainer").hide();
    		
    		var answerLinesFromXMLSensorNum = new Array();
    		var minValue = new Array();
@@ -1342,8 +1365,7 @@ var GSN = {
 						}
 						
 
-
-						$(target).append($.TABLE({"size":"100%", "id":"dataSet"}));
+						$(target).append($.TABLE({"size":"100%","align":"center", "id":"dataSet"}));
 						$("table#dataSet",target).append("<tr><td class='step' align='center' colspan='"+nbFields+"'>"+vsName.prettyString()+"</td></tr>");
 						
 						var line,tr,rows;
@@ -1373,6 +1395,8 @@ var GSN = {
 						if (w != null){
 							$("table#dataSet .step", target).css("background","#ffa84c");
 						}
+						
+						$(target).append('<br/><br/>');
 					}
 				});
    		}
@@ -1399,6 +1423,7 @@ var GSN = {
 			var incModulo = 0;
 			GSN.data.modulo = Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/GSN.data.nbDispVal/nbSelectedFields);
 			var modulo = GSN.data.modulo;
+			if($("#allData").attr("checked")) modulo = 1;
 			
 			// creation of a Matrix dimension: nbSelectedSensors * nbSelectedFields
 			var values = new Array(nbSelectedSensors);
@@ -1466,7 +1491,6 @@ var GSN = {
 			}
 			//alert(minValue);
    		//alert(maxValue);
-
 			
 			
 			GSN.data.makeChart(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,"barChart");
@@ -1492,16 +1516,30 @@ var GSN = {
 			// Chart Part
 			var nbValue = Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/nbSelectedFields)-1;
 			
+					
+					
 			for(var m=0; m < nbSelectedFields; m++){
 				regularExpression = new RegExp("timed","i");
 				if(timedIndexInNbSelectedFieldsArray != m){
-					$("#chartContainer").append('<div class="'+typeChart+'" id="'+typeChart+m+'"></div><br/>'); 
 					
-		 			var so = new SWFObject("./open-flash-chart/open-flash-chart.swf", typeChart+m, "450", "200", "9", "#FFFFFF");
-		 			
+					
+					if($('#fullscreenView').attr("checked")){
+						$("#chartContainer").append('<div class="'+typeChart+'" id="'+typeChart+m+'"></div>');
+						var so = new SWFObject("./open-flash-chart/open-flash-chart.swf", typeChart+m, screen.width-100, screen.height-250, "9", "#FFFFFF");
+						if($("#"+typeChart).attr("checked")){
+							$("#chartContainer").append('&nbsp;&nbsp;&nbsp;<input type="button" value="Back to Data Part" onclick="$(\'#container > div\').show(\'slow\'); $(\'#fullscreenContent\').remove();"/>');
+							$("#chartContainer").append('&nbsp;&nbsp;&nbsp;<input type="button" value="Go to Top" onclick="document.location.href=\'#fullscreenContent\'"/>');
+							$("#chartContainer").append('&nbsp;&nbsp;&nbsp;<input type="button" value="Go to Table Values" onclick="document.location.href=\'#dataSet\'"/>');
+							$("#chartContainer").append('<br/><br/>'); 
+							$("#seeLink ul").append("<li><a href='#"+typeChart+m+"'>"+$("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text().prettyString()+"</a></li>");
+						}
+					}
+					else{
+						$("#chartContainer").append('<div class="'+typeChart+'" id="'+typeChart+m+'"></div><br/>'); 
+		 				var so = new SWFObject("./open-flash-chart/open-flash-chart.swf", typeChart+m, "450", "200", "9", "#FFFFFF");
+		 			}
 		 			so.addVariable("variables","true");
 					so.addVariable("title","Data viewer: "+$("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text().prettyString()+",{font-size:20px; color: #000000; margin: 5px; padding:5px; padding-left: 20px; padding-right: 20px;}");
-					
 					
 					// If too much data remove some to construct the chart
 	   			var nbValues = values.toString().split(',').length/nbSelectedFields;
@@ -1533,7 +1571,9 @@ var GSN = {
 					so.addVariable("y_ticks","5,10,5");
 					
 
-					
+					if($("#allData").attr("checked")){
+						so.addVariable("x_label_style","0,#FFFFFF,0");
+					}
 					so.addVariable("x_axis_colour","#000000");
 					so.addVariable("x_grid_colour","#eeeeee");
 					so.addVariable("y_axis_colour","#000000");
@@ -1567,6 +1607,9 @@ var GSN = {
 				}
 			}
    		// End Chart Part
+   		
+   		$('#chartContainer').show();
+   		
    	}
 	
 	

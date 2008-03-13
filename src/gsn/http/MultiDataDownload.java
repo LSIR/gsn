@@ -72,6 +72,8 @@ public class MultiDataDownload extends HttpServlet {
         delimiter = "\t";
       } else if (reqdelimiter.equals("space")){
         delimiter = " ";
+      } else if (reqdelimiter.equals("semicolon")){
+        delimiter = ";";
       } else if (reqdelimiter.equals("other") && req.getParameter("otherdelimiter") != null && !req.getParameter("otherdelimiter").equals("")) {
         delimiter = req.getParameter("otherdelimiter");
       }
@@ -220,19 +222,20 @@ public class MultiDataDownload extends HttpServlet {
             if (groupByTimed) {
               nbFields--;
             }
-            for (int j=0; j < nbFields; j++)
+            for (int j=0; j < nbFields; j++){
               // line += delimiter + se.getFieldNames()[i].toString();
               if ((!groupByTimed) || (j != fields.length)) {
                 line += delimiter + fields[j];
               } else {
                 line += delimiter + "timed";
               }
+            }
             if (wantTimeStamp) {
               line += delimiter + "timed";
             }
             firstLine = false;
           }
-          respond.println(line.substring(delimiter.length()));
+          //respond.println(line.substring(delimiter.length()));
           line = "";
           for ( int j = 0 ; j < nbFields ; j++ )
             
