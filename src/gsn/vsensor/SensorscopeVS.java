@@ -129,7 +129,7 @@ public class SensorscopeVS extends AbstractVirtualSensor {
                 dataTypes.add(DataTypes.DOUBLE);
                 datas.add(rainMeter);
             } else if(fieldName.equals(WIND_SPEED)) {
-                windSpeed = getWindSpeed((Short) dataFields[i]);
+                windSpeed = getWindSpeed((Integer) dataFields[i]);
                 fieldNames.add(WIND_SPEED);
                 dataTypes.add(DataTypes.DOUBLE);
                 datas.add(windSpeed);
@@ -238,7 +238,7 @@ public class SensorscopeVS extends AbstractVirtualSensor {
       return ( ( rawValue * 2.5 * 1.4545 ) / 4095.0 ) * 360.0 / 3.3;
     }
 
-    public double getWindSpeed (short rawValue) {
+    public double getWindSpeed (int rawValue) {
       return ( rawValue * 2250.0 / SAMPLING_TIME ) * 1.609 * 1000.0 / 3600.0;
     }
 
