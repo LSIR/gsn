@@ -757,17 +757,17 @@ var GSN = {
 		
 		
 		/**
-		* Initialize the google map
+		* Initialize the map
 		*/
 		,init : function(){       
        	this.loaded=true;
-				map.setCenterAndZoom(new LatLonPoint(0,0),1);
+			map.setCenterAndZoom(new LatLonPoint(0,0),1);
 		    map.setMapType(Mapstraction.HYBRID);
 		    
 		    //set the different control on the map
 		    map.addMapTypeControls();
 		    map.addLargeControls();		
-				
+			
 		}
 		
 		
@@ -779,14 +779,14 @@ var GSN = {
 		*/
 		,addMarker: function(vsName,lat,lon){
 			var marker = new Marker(new LatLonPoint(lat,lon));
-  		marker.setAttribute("vsname",vsName);
+  			marker.setAttribute("vsname",vsName);
   		
   		
-  		if(mapProvider=="microsoft"){
-  			marker.setIcon("./img/green_marker.png");
-  			marker.setInfoBubble("Show Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+vsName+"\");'>"+vsName+"</a>");
-  			GSN.map.markers.push(marker);
-  		}
+	  		if(mapProvider=="microsoft"){
+	  			marker.setIcon("./img/green_marker.png");
+	  			marker.setInfoBubble("Show/Hide Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+vsName+"\");'>"+vsName+"</a>");
+	  			GSN.map.markers.push(marker);
+	  		}
 			if(mapProvider=="google"){
 				marker.setIcon("./img/green_marker.png");
 				marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
@@ -1326,7 +1326,8 @@ var GSN = {
 			if($('#fullscreenView').attr("checked"))
 			{
 				$('#container > div').hide('slow');
-				
+				window.resizeTo(screen.width,screen.height);
+				window.moveTo(0,0);
 				$('body').prepend('<div id="fullscreenContent" style="width:'+(screen.width)+';"></div>');
 				$('#fullscreenContent').append('<br/><input type="button" value="Back to Data Part" onclick="$(\'#container > div\').show(\'slow\'); $(\'#fullscreenContent\').remove();"/>')
 				$("#fullscreenContent").append('&nbsp;&nbsp;&nbsp;<input type="button" value="Go to Table Values" onclick="document.location.href=\'#dataSet\'"/>');
