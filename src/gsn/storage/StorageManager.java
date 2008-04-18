@@ -34,10 +34,11 @@ public class StorageManager {
     String name = connection.getMetaData().getDatabaseProductName();
     if (name.toLowerCase().indexOf("hsql") >= 0)
       return DATABASE.HSQL;
+    else if (name.toLowerCase().indexOf("h2") >= 0)
+      return DATABASE.H2;
     else if (name.toLowerCase().indexOf("mysql") >= 0)
       return DATABASE.MYSQL;
-    else if (name.toLowerCase().indexOf("sql server") >= 0
-        || name.toLowerCase().indexOf("sqlserver") > 0)
+    else if (name.toLowerCase().indexOf("sql server") >= 0 || name.toLowerCase().indexOf("sqlserver") > 0)
       return DATABASE.SQLSERVER;
     else {
       return null;
@@ -106,8 +107,7 @@ public class StorageManager {
    * @Throws GSNRuntimeException
    */
   
-  public static boolean tableExists(CharSequence tableName,
-      DataField[] fields, Connection connection) throws SQLException,
+  public static boolean tableExists(CharSequence tableName, DataField[] fields, Connection connection) throws SQLException,
       GSNRuntimeException {
     if (!ValidityTools.isValidJavaVariable(tableName))
       throw new GSNRuntimeException("Table name is not valid");
@@ -122,8 +122,7 @@ public class StorageManager {
             String colName = structure.getColumnName(i);
             int colType = structure.getColumnType(i);
             if (field.getName().equalsIgnoreCase(colName))
-              if (field.getDataTypeID() == DataTypes
-                  .convertFromJDBCToGSNFormat(colType))
+              if (field.getDataTypeID() == DataTypes.convertFromJDBCToGSNFormat(colType))
                 continue nextField;
               else
                 throw new GSNRuntimeException("The column : "
@@ -665,6 +664,7 @@ public class StorageManager {
   public static final int MYSQL_DB=1;
   public static final int SQLSERVER_DB=2;
   public static final int HSQL_DB=3;
+  public static final int H2_DB=4;
   
   
   public static enum DATABASE {
@@ -753,6 +753,45 @@ public class StorageManager {
         return "DROP VIEW #NAME IF EXISTS";
       }
       public  int getDBType() {return HSQL_DB;}
+    },
+    H2("jdbc:h2:", "org.h2.Driver") {
+      public int getTableNotExistsErrNo() {
+        return 42102;
+      }
+      
+      /*
+       * Returns the HSQLDB data type that can store this gsn datafield.
+       * @param field The datafield to be converted. @return convertedType
+       * the data type used by hsql.
+       */
+      public String convertGSNTypeToLocalType(DataField field) {
+        String convertedType = null;
+        switch (field.getDataTypeID()) {
+          case DataTypes.CHAR:
+          case DataTypes.VARCHAR:
+            // Because the parameter for the varchar is not
+            // optional.
+            convertedType = field.getType();
+            break;
+          default:
+            convertedType = DataTypes.TYPE_NAMES[field.getDataTypeID()];
+          break;
+        }
+        return convertedType;
+      }
+      
+      public String getStatementDropIndex() {
+        if (StorageManager.isHsql()||StorageManager.isSqlServer())
+          return "DROP INDEX #NAME";
+        if (StorageManager.isMysqlDB())
+          return "DROP INDEX #NAME IF EXISTS";
+        return null;
+      }
+      
+      public String getStatementDropView() {
+        return "DROP VIEW #NAME IF EXISTS";
+      }
+      public  int getDBType() {return H2_DB;}
     },
     SQLSERVER("jdbc:jtds:sqlserver:", "net.sourceforge.jtds.jdbc.Driver") {
       
@@ -859,8 +898,7 @@ public class StorageManager {
   
   private static StorageManager singleton = new StorageManager();
   
-  private static final transient Logger logger = Logger
-  .getLogger(StorageManager.class);
+  private static final transient Logger logger = Logger.getLogger(StorageManager.class);
   
   public static final int DEFAULT_STORAGE_POOL_SIZE = 100;
   

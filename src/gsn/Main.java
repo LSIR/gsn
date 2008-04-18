@@ -54,9 +54,9 @@ public final class Main {
 
   private Main() throws Exception{
     System.out.println("GSN Starting ...");
-    ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
+    ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
     ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
-    PropertyConfigurator.configure ( DEFAULT_GSN_LOG4J_PROPERTIES );
+    PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 //    initializeConfiguration();
     try {
       controlSocket = new GSNController(null);
@@ -130,8 +130,6 @@ public final class Main {
 
   public static transient Logger logger= Logger.getLogger ( Main.class );
 
-  public static final String     DEFAULT_WRAPPER_PROPERTIES_FILE  = "conf/wrappers.properties";
-
   public static final String     DEFAULT_GSN_CONF_FILE            = "conf/gsn.xml";
 
   public static final String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
@@ -155,14 +153,14 @@ public final class Main {
   private  HashMap < String , VSensorConfig >    virtualSensors;
 
   public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
-    ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES , Main.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
+    ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
     ValidityTools.checkAccessibilityOfDirs ( Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
     ContainerConfig toReturn = null;
     try {
       toReturn = loadContainerConfig ( );
       wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
-      if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Loading wrappers.properties at : " ).append ( DEFAULT_WRAPPER_PROPERTIES_FILE ).toString ( ) );
+      if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Loading wrappers.properties at : " ).append ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE ).toString ( ) );
       if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
     } catch ( JiBXException e ) {
       logger.error ( e.getMessage ( ) );
@@ -195,6 +193,7 @@ public final class Main {
     return conf;
   }
 
+//FIXME: COPIED_FOR_SAFE_STOAGE
   public static HashMap<String, Class<?>> getWrappers() throws ClassNotFoundException {
     if (singleton==null )
       return WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
@@ -248,7 +247,7 @@ public final class Main {
     KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
     return keyFactory.generatePublic (pubKeySpec);
   }
-
+// FIXME: COPIED_FOR_SAFE_STOAGE
   public  static Class < ? > getWrapperClass ( String id )  {
     Class toReturn = null;
     try {

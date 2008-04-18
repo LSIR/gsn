@@ -10,6 +10,8 @@ import gsn.msr.sensormap.PublicToMSRTest;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
+import gsn.wrappers.WrappersUtil;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -311,17 +313,18 @@ public class VSensorLoader extends Thread {
     return true;
   }
   /**
-   * Trys to find a wrapper first from the active wrappers or instantiates a new one and puts it in the cache.
+   * Tries to find a wrapper first from the active wrappers or instantiates a new one and puts it in the cache.
    * @param addressBean
    * @return
    * @throws InstantiationException
    * @throws IllegalAccessException
+   * FIXME: COPIED_FOR_SAFE_STOAGE
    */
   public AbstractWrapper findWrapper(AddressBean addressBean) throws InstantiationException, IllegalAccessException {
     AbstractWrapper wrapper = activeWrappers.get ( addressBean );
     if ( wrapper == null ) {
       if ( Main.getInstance().getWrapperClass ( addressBean.getWrapper ( ) ) == null ) {
-        logger.error ( "The wrapper >" + addressBean.getWrapper ( ) + "< is not defined in the >" + Main.DEFAULT_WRAPPER_PROPERTIES_FILE + "< file." );
+        logger.error ( "The wrapper >" + addressBean.getWrapper ( ) + "< is not defined in the >" + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE + "< file." );
         return null;
       }
       wrapper = ( AbstractWrapper ) Main.getInstance().getWrapperClass ( addressBean.getWrapper ( ) ).newInstance ( );

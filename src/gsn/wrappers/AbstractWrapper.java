@@ -139,11 +139,11 @@ public abstract class AbstractWrapper extends Thread {
 		}
 		this.activeAddressBean = newVal;
 	}
+  private long noOfCallsToPostSE = 0;
 
 	private final transient int aliasCode = Main.tableNameGenerator( );
 	private final CharSequence aliasCodeS = Main.tableNameGeneratorInString( aliasCode );
 
-	private long noOfCallsToPostSE = 0;
 
 	public int getDBAlias ( ) {
 		return aliasCode;
