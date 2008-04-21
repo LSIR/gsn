@@ -220,6 +220,12 @@
 	<target name="cleandb" depends="bind">
 		 <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" classpathref="classpath"/>
 	</target>
+	
+	<target name="start-acquisition" depends="bind">
+		<java classname="gsn.acquisition2.server.SafeStorageServer"  fork="true" dir="${basedir}" classpathref="classpath">
+			<arg id="ss-port" value="25000"/>
+		</java>
+	</target>
    
 </project>
 
