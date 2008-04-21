@@ -1,6 +1,7 @@
 package gsn.acquisition2.client;
 
 import gsn.*;
+import gsn.acquisition2.messages.DataMsg;
 import gsn.beans.*;
 import gsn.utils.*;
 import java.net.*;
@@ -28,7 +29,12 @@ public class SafeStorageClient {
     cfg.getFilterChain().addLast("codec",   new ProtocolCodecFilter( new ObjectSerializationCodecFactory()));
     IoSession session = null;
     try {
-      ConnectFuture future = connector.connect(new InetSocketAddress(host, port), new SafeStorageClientSessionHandler(wrapperDetails ), cfg);
+      ConnectFuture future = connector.connect(new InetSocketAddress(host, port), new SafeStorageClientSessionHandler(wrapperDetails ,new MessageHandler() {
+
+        public boolean messageToBeProcessed(DataMsg dataMessage) {
+          System.out.println(dataMessage);
+          return true;
+        }},"requester-1"), cfg);
       future.join();
       session = future.getSession();
     } catch (RuntimeIOException e) {
