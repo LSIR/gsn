@@ -30,6 +30,6 @@ public class SafeStorageServer {
   }
   public static void main(String[] args) throws Exception {
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
-    new SafeStorageServer(12345);
+    new SafeStorageServer(25000);
   }
 }

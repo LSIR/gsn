@@ -20,6 +20,10 @@ public abstract class AbstractWrapper2  extends Thread{
   
   private String tableName;
   
+  private IoSession network;
+ 
+  private PreparedStatement insertPS;
+ 
   public String getTableName() {
     return tableName;
   }
@@ -46,25 +50,6 @@ public abstract class AbstractWrapper2  extends Thread{
     this.activeAddressBean = newVal;
   }
   
-  /**
-   * The addressing is provided in the ("ADDRESS",Collection<KeyValue>). If
-   * the DataSource can't initialize itself because of either internal error or
-   * inaccessibility of the host specified in the address the method returns
-   * false. The dbAliasName of the DataSource is also specified with the
-   * "DBALIAS" in the context. The "STORAGEMAN" points to the StorageManager
-   * which should be used for querying.
-   * 
-   * @return True if the initialization do successfully otherwise false;
-   */
-  
-  public abstract boolean initialize ( );
-  
-  public abstract void finalize ( );
-  
-  public abstract String getWrapperName ( );
-  
-  IoSession network;
-  private PreparedStatement insertPS;
   public IoSession getNetwork() {
     return network;
   }
@@ -72,9 +57,11 @@ public abstract class AbstractWrapper2  extends Thread{
   public void setNetwork(IoSession network) {
     this.network = network;
   }
-  
- 
-  
+  /**
+   * Data stored as an array into the storage.
+   * The meaning of each item should be specified through the documentation in the header.
+   * @param values
+   */
   protected void postStreamElement(Serializable... values)  {
     try {
       insertPS.clearParameters();
@@ -104,6 +91,22 @@ public abstract class AbstractWrapper2  extends Thread{
   public void canReaderDB() throws InterruptedException {
     queue.take();
   }
+  /**
+   * The addressing is provided in the ("ADDRESS",Collection<KeyValue>). If
+   * the DataSource can't initialize itself because of either internal error or
+   * inaccessibility of the host specified in the address the method returns
+   * false. The dbAliasName of the DataSource is also specified with the
+   * "DBALIAS" in the context. The "STORAGEMAN" points to the StorageManager
+   * which should be used for querying.
+   * 
+   * @return True if the initialization do successfully otherwise false;
+   */
   
+  public abstract boolean initialize ( );
   
+  public abstract void finalize ( ); // TODO, the safe storage should stop the acquisition part.
+  
+  public abstract String getWrapperName ( ); 
+  
+  public abstract void run();
 }

@@ -1,20 +1,16 @@
 package gsn.acquisition2.wrappers;
 
-import gsn.acquisition2.SafeStorageDB;
 import gsn.beans.AddressBean;
-import gsn.beans.DataField;
-import gsn.beans.DataTypes;
-import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
-import gsn.wrappers.MemoryMonitoringWrapper;
-
-import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
-import java.sql.PreparedStatement;
-
 import org.apache.log4j.Logger;
-
+/**
+ * The output format is:
+ * 
+ * heapMemoryUsage (long) ,  nonHeapMemoryUsage(long) , pendingFinalizationCount(int), timed(long)
+ *
+ */
 public class MemoryMontoringWrapper2 extends AbstractWrapper2{
   
   private static final int          DEFAULT_SAMPLING_RATE                 = 1000;
@@ -55,10 +51,6 @@ public class MemoryMontoringWrapper2 extends AbstractWrapper2{
      }
   }
   
-  private SafeStorageDB getStorage() {
-    return null;
-  }
-
   public void finalize ( ) {
      threadCounter--;
   }

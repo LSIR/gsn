@@ -1,6 +1,5 @@
 package gsn.acquisition2.server;
 
-
 import gsn.acquisition2.SafeStorage;
 import gsn.acquisition2.messages.AcknowledgmentMsg;
 import gsn.acquisition2.messages.DataMsg;
@@ -24,7 +23,6 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
   
   public SafeStorageServerSessionHandler(SafeStorage ss) throws ClassNotFoundException, SQLException {
     this.ss = ss;
-    
   }
   
   private static transient Logger                                logger                              = Logger.getLogger ( SafeStorageServerSessionHandler.class );
@@ -40,6 +38,11 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
       HelloMsg hello = (HelloMsg) message;
       logger.debug("Hello received : "+hello.getWrapperDetails().toString());
       wrapper = ss.prepareWrapper(hello, session);
+      if (wrapper == null) {
+        session.close();
+        return;
+      }
+        
       readerPS = ss.getStorage().createPreparedStatement("select pk,stream_element,created_at from "+wrapper.getTableName()+" where processed = false order by created_at asc limit 1");
       successAckUpdatePS = ss.getStorage().createPreparedStatement("update "+wrapper.getTableName()+" set PROCESSED  = true where pk = ? ");
     }

@@ -6,7 +6,7 @@ public class DataMsg extends AbstractMessage {
 
   private static final long serialVersionUID = 6707634030386675571L;
 
-  private Serializable data;
+  private Object[] data;
 
   private long sequenceNumber = -1;
   
@@ -16,7 +16,7 @@ private long created_at = -1;
     return sequenceNumber;
   }
 
-  public Serializable getData() {
+  public Object[] getData() {
     return data;
   }
 
@@ -24,7 +24,7 @@ private long created_at = -1;
     return created_at;
   }
 
-  public DataMsg(Serializable data,long seqNo,long created_at) {
+  public DataMsg(Object[] data,long seqNo,long created_at) {
     this.data = data;
     this.sequenceNumber=seqNo;
     this.created_at = created_at;

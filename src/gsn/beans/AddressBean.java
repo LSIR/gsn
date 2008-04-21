@@ -125,6 +125,25 @@ public final class AddressBean implements Serializable{
     result.append( "]" );
     return result.toString( );
   }
+
+  private String inputStreamName;
+  private String virtualSensorName;
+
+  public String getInputStreamName() {
+    return inputStreamName;
+  }
+
+  public void setInputStreamName(String inputStreamName) {
+    this.inputStreamName = inputStreamName;
+  }
+
+  public String getVirtualSensorName() {
+    return virtualSensorName;
+  }
+
+  public void setVirtualSensorName(String virtualSensorName) {
+    this.virtualSensorName = virtualSensorName;
+  }
   
   
 }

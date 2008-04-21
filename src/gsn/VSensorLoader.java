@@ -19,11 +19,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import javax.xml.soap.SOAPException;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.validator.Validator;
-import org.apache.commons.validator.util.ValidatorUtils;
+
 import org.apache.log4j.Logger;
 import org.jibx.runtime.JiBXException;
 
@@ -304,7 +302,7 @@ public class VSensorLoader extends Thread {
     for ( Iterator < InputStream > inputStreamIterator = pool.getConfig().getInputStreams ( ).iterator ( ) ; inputStreamIterator.hasNext ( ) ; ) {
       InputStream inputStream = inputStreamIterator.next ( );
       for ( StreamSource  dataSouce : inputStream.getSources ( )) {
-        if ( prepareStreamSource ( inputStream , dataSouce ) == false ) return false;
+        if ( prepareStreamSource ( pool.getConfig(),inputStream , dataSouce ) == false ) return false;
         // TODO if one stream source fails all the resources used by other successfuly initialized stream sources
         // for this input stream should be released.
       }
@@ -347,10 +345,12 @@ public class VSensorLoader extends Thread {
         logger.debug("Existing wrapper found and reused. [name :"+addressBean.getWrapper() );
     return wrapper;
   }
-  public boolean prepareStreamSource ( InputStream inputStream , StreamSource streamSource  ) throws InstantiationException, IllegalAccessException {
+  public boolean prepareStreamSource ( VSensorConfig vsensorConfig,InputStream inputStream , StreamSource streamSource  ) throws InstantiationException, IllegalAccessException {
     streamSource.setInputStream(inputStream);
     AbstractWrapper wrapper = null;
     for ( AddressBean addressBean : streamSource.getAddressing ( ) ) {
+      addressBean.setInputStreamName(inputStream.getInputStreamName());
+      addressBean.setVirtualSensorName(vsensorConfig.getName());
       wrapper = findWrapper(addressBean);
       try {
         if (wrapper!=null && prepareStreamSource( streamSource,wrapper.getOutputFormat(),wrapper)) 

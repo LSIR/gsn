@@ -15,23 +15,27 @@ public class SafeStorageClientSessionHandler extends IoHandlerAdapter {
   
   AbstractMessage helloMsg = null;
   
-  public SafeStorageClientSessionHandler(AddressBean wrapprDetails) {
-    helloMsg = new HelloMsg(wrapprDetails,"requestee-1");
-    
+  private MessageHandler handler;
+  
+  public SafeStorageClientSessionHandler(AddressBean wrapprDetails,MessageHandler handler,String requester) {
+    this.handler=handler;
+    helloMsg = new HelloMsg(wrapprDetails,requester);
   }
-  public SafeStorageClientSessionHandler(AddressBean wrapprDetails,boolean continueOnErr) {
-    helloMsg = new HelloMsg(wrapprDetails,"requestee-1",continueOnErr);
-  }
+  
   public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
 
   }
   public void messageReceived(IoSession session, Object message) throws Exception {
     logger.debug("Received data from the server");
     DataMsg dataMsg = (DataMsg) message;
+    if (handler.messageToBeProcessed(dataMsg)) {
+      session.write(new AcknowledgmentMsg(AcknowledgmentMsg.SUCCESS,dataMsg.getSequenceNumber()));
+      logger.debug("Sending Success Ack");
+    }else {
+      session.write(new AcknowledgmentMsg(AcknowledgmentMsg.FAILURE,dataMsg.getSequenceNumber()));
+      logger.debug("Sending Success Nack");
+    }
     
-    // todo : PROCESS IT.
-    session.write(new AcknowledgmentMsg(AcknowledgmentMsg.SUCCESS,dataMsg.getSequenceNumber()));
-    logger.debug("Sending Success ACK");
   }
   public void messageSent(IoSession session, Object message) throws Exception {
 
