@@ -99,7 +99,7 @@ public class GSNController extends Thread {
 		}
 		
 		public void sendStopMessage () {
-			writer.println(GSNController.GSN_CONTROL_REGISTER_SHUTDOWN);
+			writer.println(GSNController.GSN_CONTROL_SHUTDOWN);
 		    writer.flush();
 		}
 
