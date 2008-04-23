@@ -35,16 +35,30 @@ public final class AddressBean implements Serializable{
     return this.predicates;
   }
   
+  public String getPredicateValueWithException ( String key ) {
+    key = key.trim( );
+    for (  KeyValue predicate : this.predicates ) {
+      if ( predicate.getKey( ).toString( ).trim( ).equalsIgnoreCase( key ) ) {
+        final String value = ( String ) predicate.getValue( );
+        if (value.trim().length()>0)
+          return ( value);
+      }
+    }
+    throw new RuntimeException("The required parameter: >"+key+"<+ is missing.from the virtual sensor configuration file.");
+  }
+  
+  
   /**
    * Note that the key for the value is case insensitive.
    * 
    * @param key
    * @return
    */
+  
   public String getPredicateValue ( String key ) {
     key = key.trim( );
     for (  KeyValue predicate : this.predicates ) {
-//      logger.fatal(predicate.getKey()+" --- " +predicate.getValue());
+//    logger.fatal(predicate.getKey()+" --- " +predicate.getValue());
       if ( predicate.getKey( ).toString( ).trim( ).equalsIgnoreCase( key ) ) return ( ( String ) predicate.getValue( ));
     }
     return null;
@@ -58,11 +72,11 @@ public final class AddressBean implements Serializable{
    * @return
    */
   public String getPredicateValueWithDefault(String key, String defaultValue) {
-	  String value = getPredicateValue(key);
-	  if (value==null|| value.trim().length()==0)
-		  return defaultValue;
-	  else
-		  return value;
+    String value = getPredicateValue(key);
+    if (value==null|| value.trim().length()==0)
+      return defaultValue;
+    else
+      return value;
   }
   
   /**
@@ -73,16 +87,27 @@ public final class AddressBean implements Serializable{
    * @return
    */
   public int getPredicateValueAsInt(String key, int defaultValue) {
-	  String value = getPredicateValue(key);
-	  if (value==null|| value.trim().length()==0)
-		  return defaultValue;
-	  try { 
-		  return Integer.parseInt(value);
-	  }catch (Exception e) {
-		  return defaultValue;
-	  }
+    String value = getPredicateValue(key);
+    if (value==null|| value.trim().length()==0)
+      return defaultValue;
+    try { 
+      return Integer.parseInt(value);
+    }catch (Exception e) {
+      return defaultValue;
+    }
   }
-
+  
+  public int getPredicateValueAsIntWithException ( String key ) {
+    String value = getPredicateValue(key);
+    if (value==null|| value.trim().length()==0)
+      throw new RuntimeException("The required parameter: >"+key+"<+ is missing.from the virtual sensor configuration file.");
+    try { 
+      return Integer.parseInt(value);
+    }catch (Exception e) {
+      throw new RuntimeException("The required parameter: >"+key+"<+ is bad formatted.from the virtual sensor configuration file.",e);
+    }
+  }
+  
   
   public boolean equals ( final Object o ) {
     if ( this == o ) return true;
@@ -92,17 +117,17 @@ public final class AddressBean implements Serializable{
     if ( !this.wrapper.equals( addressBean.wrapper ) ) return false;
     
     if(predicates.length != addressBean.predicates.length)
-    	return false;
+      return false;
     for ( final KeyValue predicate : this.predicates ) {
-    	boolean isEqual = false;
-    	for ( final KeyValue predicate2 : addressBean.predicates ){
-        	if(predicate.equals(predicate2)){
-        		isEqual = true;
-        		break;
-        	}
+      boolean isEqual = false;
+      for ( final KeyValue predicate2 : addressBean.predicates ){
+        if(predicate.equals(predicate2)){
+          isEqual = true;
+          break;
         }
-    	if(!isEqual)
-    		return false;
+      }
+      if(!isEqual)
+        return false;
     }
     
     return true;
@@ -112,7 +137,7 @@ public final class AddressBean implements Serializable{
     int result;
     result = this.wrapper.hashCode( );
     for ( final KeyValue predicate : this.predicates ) {
-    	result = 29 * result + predicate.hashCode();
+      result = 29 * result + predicate.hashCode();
     }
     return result;
   }
@@ -125,22 +150,22 @@ public final class AddressBean implements Serializable{
     result.append( "]" );
     return result.toString( );
   }
-
+  
   private String inputStreamName;
   private String virtualSensorName;
-
+  
   public String getInputStreamName() {
     return inputStreamName;
   }
-
+  
   public void setInputStreamName(String inputStreamName) {
     this.inputStreamName = inputStreamName;
   }
-
+  
   public String getVirtualSensorName() {
     return virtualSensorName;
   }
-
+  
   public void setVirtualSensorName(String virtualSensorName) {
     this.virtualSensorName = virtualSensorName;
   }
