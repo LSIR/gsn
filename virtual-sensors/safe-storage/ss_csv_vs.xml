@@ -1,0 +1,36 @@
+<virtual-sensor name="ss_csv_vs" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+        <output-structure>
+          <field name="TIMESTAMP" type="BIGINT" />
+          <field name="RECORD" type="INTEGER" />
+          <field name="BATT_VOLT_AVG" type="DOUBLE" />
+          <field name="PRESSURE_AVG1" type="DOUBLE" />
+       </output-structure>
+    </processing-class>
+    <description> CSV VS for Safe Storage Test </description>
+    <life-cycle pool-size="10" />
+    <addressing/>
+    <storage history-size="10"/>
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="ss_csv">
+          <predicate key="ss-host">localhost</predicate>
+          <predicate key="ss-port">25000</predicate>
+          <predicate key="continue-on-error">true</predicate>
+          <predicate key="wrapper-name">csv2</predicate>
+          <predicate key="csv-format-file-path">virtual-sensors/safe-storage/csv_format.txt</predicate>
+          <predicate key="csv-skip-lines">1</predicate>
+          <predicate key="csv-separator">,</predicate>
+          <predicate key="csv-source-file-path">virtual-sensors/safe-storage/csv_source.csv</predicate>
+          <predicate key="csv-format-line-names">2</predicate>
+          <predicate key="csv-format-line-descriptions">3,4</predicate>
+          <predicate key="csv-format-line-format">5</predicate>
+        </address>
+        <query> select * from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor> 

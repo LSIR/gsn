@@ -226,6 +226,10 @@
 			<arg id="ss-port" value="25000"/>
 		</java>
 	</target>
+	
+	<target name="stop-acquisition" depends="bind">
+		<java classname="gsn.SafeStorageStop"  fork="true" dir="${basedir}" classpathref="classpath" />
+	</target>
    
 </project>
 

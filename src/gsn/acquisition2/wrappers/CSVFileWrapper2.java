@@ -1,79 +1,35 @@
 package gsn.acquisition2.wrappers;
 
-import gsn.acquisition2.SafeStorageDB;
-import gsn.beans.DataField;
-import gsn.beans.DataTypes;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Vector;
-import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
-import au.com.bytecode.opencsv.CSVReader;
 
 public class CSVFileWrapper2 extends AbstractWrapper2 {
 
-	private static final String PARAM_FILE = "file";
+	private static final String CSV_SKIP_LINES = "csv-skip-lines";
+	private static final String CSV_SKIP_LINES_DEFAULT = "0";
+	private int csvSkipLines;
+	
+	private BufferedReader fileReader = null;
+	
+	private static int threadCounter = 0;
 
-	private static final String PARAM_SKIP_LINES = "skip_lines";
+	private final transient Logger logger = Logger.getLogger( CSVFileWrapper2.class );
 
-	private static final String PARAM_SEPERATOR = "seperator";
-
-	private static final String PARAM_DATE_FORMAT = "dateFormat";
-
-	private static final String PARAM_QUOTE = "quote";
-
-	private static int               threadCounter      = 0;
-
-	private final transient Logger   logger             = Logger.getLogger( CSVFileWrapper2.class );
-
-	private String dateFormat = "HH:mm:ss-dd.MM.yyyy";
-
-	private static DataField [] structure;
-
-	private String filename;
-
-	private int columns;
-
-	private int skip_lines = 0;
-
-	private char seperator = '\t';
-
-	private char quote= '"';
-
-	private long lastTime = 0L;
-
-	/**
-	 */
 	public boolean initialize (  ) {
 		logger.warn("cvsfile wrapper initialize started...");
-		int column=0;
-		Vector v = new Vector();
-		for(KeyValue predicate : getActiveAddressBean().getPredicates()){
-			String key = (String) predicate.getKey();
-			String value = (String) predicate.getValue();
-			logger.debug(v.size()+": type value: "+key);
-			if (key.equals(PARAM_FILE))
-				filename = value;
-			else if (key.equals(PARAM_SKIP_LINES))
-				skip_lines  = Integer.valueOf(value).intValue();
-			else if (key.equals(PARAM_SEPERATOR))
-				seperator = value.charAt(0);
-			else if (key.equals(PARAM_QUOTE))
-				quote = value.charAt(0);
-			else if (key.equals(PARAM_DATE_FORMAT))
-				dateFormat = value;
-			else if (key.equals("time"))
-				v.add(new DataField(value, "bigint"));
-			else v.add(new DataField(value, key));	 
+		String path = null;
+		try {
+			path = getActiveAddressBean().getPredicateValue(CSVFileWrapperFormat.CSV_SOURCE_FILE_PATH);
+			fileReader = new BufferedReader(new FileReader(path));
+		} catch (FileNotFoundException e) {
+			logger.error("The file "+path+" is not accessible!", e);
+			return false;
 		}
-		this.columns= v.size();
-		this.structure = new DataField[columns];
-		for(int i=0;i<columns;i++)
-			structure[i]=(DataField)v.get(i);
+		csvSkipLines = Integer.parseInt(getActiveAddressBean().getPredicateValueWithDefault(CSV_SKIP_LINES, CSV_SKIP_LINES_DEFAULT));
+		//
 		setName( "CVSFileWrapper-Thread:" + ( ++threadCounter ) );
 		logger.warn("cvsfile wrapper initialize completed ...");
 		return true;
@@ -86,76 +42,21 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 			e1.printStackTrace();
 		}
 		logger.warn("cvsfile wrapper run started...");
-		// Parse the data
-		try {//i/o may go wrong
-			CSVReader reader = new CSVReader(new FileReader(filename),seperator, quote ,skip_lines);
-			String [] nextLine;
-			SimpleDateFormat dateTimeForm = new SimpleDateFormat( dateFormat );
-			Date date = null;
-			long time;
-			Serializable[] serialized = new Serializable[columns];
-
-			while ((nextLine = reader.readNext()) != null) {
-				int k=0;
-				time = 0;
-				logger.debug("length: "+nextLine.length );
-				for (int j=0; j<Math.min(columns,nextLine.length); j++){
-					logger.debug("Type ID of "+nextLine[j]+"  : "+structure[j].getDataTypeID());
-					if(structure[j].getDataTypeID() == DataTypes.BIGINT){
-						date = dateTimeForm.parse(nextLine[j]);
-						if (date==null){
-							logger.error("invalide date format! "+nextLine[j]);
-							serialized[k++] = null;
-						} else {
-							time = date.getTime();
-							serialized[k++] = time;
-						}
-					}
-					if(structure[j].getDataTypeID() == DataTypes.DOUBLE){
-						try{
-							Double d = Double.valueOf(nextLine[j]);
-							if (d==null) { 
-								logger.error("invalide double format for "+nextLine[j]+" at timestamp "+time);
-								serialized[k++] = null;
-							} else serialized[k++] = d.doubleValue();
-						}catch(NumberFormatException e){
-							logger.error("wrong double format for :"+nextLine[j]+" at timestamp "+time);
-							logger.error(e);
-							serialized[k++] = null;
-						}
-
-						logger.debug("double: "+nextLine[j]);
-					}
-				}// end of j loop
-//				logger.debug("-----");
-				String str ="";
-				for (int j=0;j<serialized.length;j++)
-					str = str+","+serialized[j];
-				logger.debug("serialized: "+str);
-				logger.debug("time: "+time);
-				logger.debug("system time: "+System.currentTimeMillis());
-				lastTime=time;
-				try{
-					postStreamElement(str, System.currentTimeMillis( ));
-				} catch(ArrayIndexOutOfBoundsException e){
-					logger.error("the number of columns for the row with timestamp "+time+" is not sufficient");
+		// Produce the data by reading the file
+		String nextLine = null;
+		try {
+			int skip_lines = csvSkipLines;
+			while ((nextLine = fileReader.readLine()) != null) {
+				if (skip_lines-- <= 0) {
+					postStreamElement(nextLine, System.currentTimeMillis( ));
 				}
-			}// end of while loop
-
-		}catch(IOException e){
-			logger.error("the file "+filename+" is not accessible!", e);
-		} catch(ParseException e){
-			logger.error("there has been a parse excpetion! ", e);
+			}
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 		}
-		logger.warn("processing of file "+filename+" completed.....");
-	}
-
-	private SafeStorageDB getStorage() {
-		return null;
 	}
 
 	public void finalize (  ) {
-		logger.warn("cvsfile wrapper initialize completed ...");
 		threadCounter--;  
 	}
 

@@ -4,7 +4,6 @@ import gsn.beans.Modifications;
 import gsn.beans.VSensorConfig;
 import gsn.utils.ValidityTools;
 import gsn.utils.graph.Graph;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -13,10 +12,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.*;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
-import org.hsqldb.lib.Iterator;
 
 public class GSNController extends Thread {
 
@@ -27,8 +23,6 @@ public class GSNController extends Thread {
 	private static final int GSN_CONTROL_READ_TIMEOUT = 20000;
 
 	public static final String GSN_CONTROL_SHUTDOWN = "GSN STOP";
-	
-	public static final String GSN_CONTROL_REGISTER_SHUTDOWN = "GSN REGISTER";
 
 	public static final String GSN_CONTROL_LIST_LOADED_VSENSORS = "LIST LOADED VSENSORS";
 
@@ -37,11 +31,8 @@ public class GSNController extends Thread {
 	public static transient Logger logger = Logger.getLogger(GSNController.class);
 
 	private VSensorLoader vsLoader;
-	
-	protected static ArrayList<ConnectionManager> safeStoragesControllers;
 
 	public GSNController(VSensorLoader vsLoader) throws UnknownHostException, IOException {
-		safeStoragesControllers = new ArrayList<ConnectionManager>();
 		this.vsLoader = vsLoader;
 		mySocket = new ServerSocket(GSN_CONTROL_PORT, 0, InetAddress.getByName("localhost"));
 		this.start();
@@ -97,11 +88,6 @@ public class GSNController extends Thread {
 		public ConnectionManager(Socket incoming) {
 			this.incoming = incoming;
 		}
-		
-		public void sendStopMessage () {
-			writer.println(GSNController.GSN_CONTROL_SHUTDOWN);
-		    writer.flush();
-		}
 
 		public void run() {
 			try {
@@ -119,10 +105,6 @@ public class GSNController extends Thread {
 						// here
 						logger.info("Shutting down GSN...");
 						running = false;
-						for (int i =0 ; i < GSNController.safeStoragesControllers.size() ; i++){
-							GSNController.safeStoragesControllers.get(i).sendStopMessage();
-						}
-						
 						if (vsLoader != null) {
 							vsLoader.stopLoading();
 							logger.info("All virtual sensors have been stopped, shutting down virtual machine.");
@@ -137,13 +119,10 @@ public class GSNController extends Thread {
 						objos.writeObject(dependencyGraph);
 						objos.flush();
 					}
-					else if (GSN_CONTROL_REGISTER_SHUTDOWN.equalsIgnoreCase(message)) {
-						safeStoragesControllers.add(this);
-					}
 					message = reader.readLine();
 				}
 			} catch (IOException e) {
-				logger.warn("Error while reading from or writing to control connection: " + e.getMessage());
+				logger.warn("Error while reading from or writing to control connection: " + e.getMessage(), e);
 			}
 		}
 	}
