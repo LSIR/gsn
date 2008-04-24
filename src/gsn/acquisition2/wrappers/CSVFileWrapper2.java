@@ -51,9 +51,11 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 					postStreamElement(nextLine, System.currentTimeMillis( ));
 				}
 			}
+			fileReader.close();
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
+		logger.warn("cvsfile wrapper run finished...");
 	}
 
 	public void finalize (  ) {

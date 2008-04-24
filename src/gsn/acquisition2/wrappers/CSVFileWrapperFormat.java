@@ -90,10 +90,9 @@ public class CSVFileWrapperFormat {
 						field_formats.add(tmp);
 					}
 				}
-				else {
-					logger.debug("Format file line " + i + " not processed");
-				}
 			}
+			
+			reader.close();
 
 			int nb_fields = Math.min(field_names.size(), field_description.size());
 			nb_fields = Math.min(nb_fields, field_formats.size());

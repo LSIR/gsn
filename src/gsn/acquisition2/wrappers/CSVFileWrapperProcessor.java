@@ -43,7 +43,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 			long time = 0;
 			for (int j = 0 ; j < nextLine.length ; j++) {
 
-				logger.debug("Next line to parse: " + nextLine[j]);
+				logger.debug("Next line to parse: " + nextLine[j] + " dataType: " + structure[j].getDataTypeID());
 
 				String tmp = null;
 				if(structure[j].getDataTypeID() == DataTypes.BIGINT){
@@ -60,6 +60,9 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 				}
 				if(structure[j].getDataTypeID() == DataTypes.DOUBLE){
 					try{
+						
+						nextLine[j] = filterNAN(nextLine[j]);
+						
 						Double d = Double.valueOf(nextLine[j]);
 						if (d==null) { 
 							logger.error("invalide double format for "+nextLine[j]+" at timestamp "+time);
@@ -74,6 +77,9 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 				}
 				if(structure[j].getDataTypeID() == DataTypes.INTEGER){
 					try{
+						
+						nextLine[j] = filterNAN(nextLine[j]);
+						
 						Integer d = Integer.valueOf(nextLine[j]);
 						if (d==null) { 
 							logger.error("invalide integer format for "+nextLine[j]+" at timestamp "+time);
@@ -85,6 +91,10 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 						serialized[j] = null;
 					}
 					logger.debug("integer: "+nextLine[j]);
+				}
+				if (structure[j].getDataTypeID() == DataTypes.VARCHAR) {
+					serialized[j] = nextLine[j].substring(1, nextLine[j].length() - 1);
+					logger.debug("string: "+nextLine[j]);
 				}
 			}
 
@@ -100,10 +110,14 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 		}
 		return true;
 	}
+	
+	private String filterNAN (String value) {
+		if (value.compareToIgnoreCase("NaN") == 0)  value = "NaN";
+		return value;
+	}
 
 	@Override
 	public boolean isTimeStampUnique() {
 		return false;
 	}
-
 }
