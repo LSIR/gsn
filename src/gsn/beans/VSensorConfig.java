@@ -455,7 +455,7 @@ public class VSensorConfig implements Serializable {
   private transient Double cached_latitude =  null;
   private boolean addressing_processed = false;
 
-  private boolean isTimestampUnique = true;
+  private boolean isTimestampUnique = false;
   
   public void preprocess_addressing() {
     if (!addressing_processed) {
