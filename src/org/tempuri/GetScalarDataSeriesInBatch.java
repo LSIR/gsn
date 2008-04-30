@@ -1,5 +1,5 @@
 /**
- * GetAggregateScalarDataSeriesInBatchResponse.java
+ * GetScalarDataSeriesInBatch.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.3  Built on : Aug 10, 2007 (04:45:58 LKT)
@@ -8,22 +8,43 @@ package org.tempuri;
 
 
 /**
- *  GetAggregateScalarDataSeriesInBatchResponse bean class
+ *  GetScalarDataSeriesInBatch bean class
  */
-public class GetAggregateScalarDataSeriesInBatchResponse implements org.apache.axis2.databinding.ADBBean {
+public class GetScalarDataSeriesInBatch implements org.apache.axis2.databinding.ADBBean {
     public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName("http://tempuri.org/",
-            "GetAggregateScalarDataSeriesInBatchResponse", "ns1");
+            "GetScalarDataSeriesInBatch", "ns1");
 
     /**
-     * field for GetAggregateScalarDataSeriesInBatchResult
+     * field for PublisherNames
      */
-    protected org.tempuri.ArrayOfSensorData localGetAggregateScalarDataSeriesInBatchResult;
+    protected org.tempuri.ArrayOfString localPublisherNames;
 
     /*  This tracker boolean wil be used to detect whether the user called the set method
      *   for this attribute. It will be used to determine whether to include this field
      *   in the serialized XML
      */
-    protected boolean localGetAggregateScalarDataSeriesInBatchResultTracker = false;
+    protected boolean localPublisherNamesTracker = false;
+
+    /**
+     * field for SensorNames
+     */
+    protected org.tempuri.ArrayOfString localSensorNames;
+
+    /*  This tracker boolean wil be used to detect whether the user called the set method
+     *   for this attribute. It will be used to determine whether to include this field
+     *   in the serialized XML
+     */
+    protected boolean localSensorNamesTracker = false;
+
+    /**
+     * field for StartTime
+     */
+    protected java.util.Calendar localStartTime;
+
+    /**
+     * field for EndTime
+     */
+    protected java.util.Calendar localEndTime;
 
     private static java.lang.String generatePrefix(java.lang.String namespace) {
         if (namespace.equals("http://tempuri.org/")) {
@@ -35,26 +56,80 @@ public class GetAggregateScalarDataSeriesInBatchResponse implements org.apache.a
 
     /**
      * Auto generated getter method
-     * @return org.tempuri.ArrayOfSensorData
+     * @return org.tempuri.ArrayOfString
      */
-    public org.tempuri.ArrayOfSensorData getGetAggregateScalarDataSeriesInBatchResult() {
-        return localGetAggregateScalarDataSeriesInBatchResult;
+    public org.tempuri.ArrayOfString getPublisherNames() {
+        return localPublisherNames;
     }
 
     /**
      * Auto generated setter method
-     * @param param GetAggregateScalarDataSeriesInBatchResult
+     * @param param PublisherNames
      */
-    public void setGetAggregateScalarDataSeriesInBatchResult(
-        org.tempuri.ArrayOfSensorData param) {
+    public void setPublisherNames(org.tempuri.ArrayOfString param) {
         if (param != null) {
             //update the setting tracker
-            localGetAggregateScalarDataSeriesInBatchResultTracker = true;
+            localPublisherNamesTracker = true;
         } else {
-            localGetAggregateScalarDataSeriesInBatchResultTracker = false;
+            localPublisherNamesTracker = false;
         }
 
-        this.localGetAggregateScalarDataSeriesInBatchResult = param;
+        this.localPublisherNames = param;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return org.tempuri.ArrayOfString
+     */
+    public org.tempuri.ArrayOfString getSensorNames() {
+        return localSensorNames;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param SensorNames
+     */
+    public void setSensorNames(org.tempuri.ArrayOfString param) {
+        if (param != null) {
+            //update the setting tracker
+            localSensorNamesTracker = true;
+        } else {
+            localSensorNamesTracker = false;
+        }
+
+        this.localSensorNames = param;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.util.Calendar
+     */
+    public java.util.Calendar getStartTime() {
+        return localStartTime;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param StartTime
+     */
+    public void setStartTime(java.util.Calendar param) {
+        this.localStartTime = param;
+    }
+
+    /**
+     * Auto generated getter method
+     * @return java.util.Calendar
+     */
+    public java.util.Calendar getEndTime() {
+        return localEndTime;
+    }
+
+    /**
+     * Auto generated setter method
+     * @param param EndTime
+     */
+    public void setEndTime(java.util.Calendar param) {
+        this.localEndTime = param;
     }
 
     /**
@@ -90,7 +165,7 @@ public class GetAggregateScalarDataSeriesInBatchResponse implements org.apache.a
                 public void serialize(
                     org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter)
                     throws javax.xml.stream.XMLStreamException {
-                    GetAggregateScalarDataSeriesInBatchResponse.this.serialize(MY_QNAME,
+                    GetScalarDataSeriesInBatch.this.serialize(MY_QNAME,
                         factory, xmlWriter);
                 }
             };
@@ -130,17 +205,83 @@ public class GetAggregateScalarDataSeriesInBatchResponse implements org.apache.a
             xmlWriter.writeStartElement(parentQName.getLocalPart());
         }
 
-        if (localGetAggregateScalarDataSeriesInBatchResultTracker) {
-            if (localGetAggregateScalarDataSeriesInBatchResult == null) {
+        if (localPublisherNamesTracker) {
+            if (localPublisherNames == null) {
                 throw new org.apache.axis2.databinding.ADBException(
-                    "GetAggregateScalarDataSeriesInBatchResult cannot be null!!");
+                    "publisherNames cannot be null!!");
             }
 
-            localGetAggregateScalarDataSeriesInBatchResult.serialize(new javax.xml.namespace.QName(
-                    "http://tempuri.org/",
-                    "GetAggregateScalarDataSeriesInBatchResult"), factory,
-                xmlWriter);
+            localPublisherNames.serialize(new javax.xml.namespace.QName(
+                    "http://tempuri.org/", "publisherNames"), factory, xmlWriter);
         }
+
+        if (localSensorNamesTracker) {
+            if (localSensorNames == null) {
+                throw new org.apache.axis2.databinding.ADBException(
+                    "sensorNames cannot be null!!");
+            }
+
+            localSensorNames.serialize(new javax.xml.namespace.QName(
+                    "http://tempuri.org/", "sensorNames"), factory, xmlWriter);
+        }
+
+        namespace = "http://tempuri.org/";
+
+        if (!namespace.equals("")) {
+            prefix = xmlWriter.getPrefix(namespace);
+
+            if (prefix == null) {
+                prefix = generatePrefix(namespace);
+
+                xmlWriter.writeStartElement(prefix, "startTime", namespace);
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            } else {
+                xmlWriter.writeStartElement(namespace, "startTime");
+            }
+        } else {
+            xmlWriter.writeStartElement("startTime");
+        }
+
+        if (localStartTime == null) {
+            // write the nil attribute
+            throw new org.apache.axis2.databinding.ADBException(
+                "startTime cannot be null!!");
+        } else {
+            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                    localStartTime));
+        }
+
+        xmlWriter.writeEndElement();
+
+        namespace = "http://tempuri.org/";
+
+        if (!namespace.equals("")) {
+            prefix = xmlWriter.getPrefix(namespace);
+
+            if (prefix == null) {
+                prefix = generatePrefix(namespace);
+
+                xmlWriter.writeStartElement(prefix, "endTime", namespace);
+                xmlWriter.writeNamespace(prefix, namespace);
+                xmlWriter.setPrefix(prefix, namespace);
+            } else {
+                xmlWriter.writeStartElement(namespace, "endTime");
+            }
+        } else {
+            xmlWriter.writeStartElement("endTime");
+        }
+
+        if (localEndTime == null) {
+            // write the nil attribute
+            throw new org.apache.axis2.databinding.ADBException(
+                "endTime cannot be null!!");
+        } else {
+            xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                    localEndTime));
+        }
+
+        xmlWriter.writeEndElement();
 
         xmlWriter.writeEndElement();
     }
@@ -313,17 +454,50 @@ public class GetAggregateScalarDataSeriesInBatchResponse implements org.apache.a
         java.util.ArrayList elementList = new java.util.ArrayList();
         java.util.ArrayList attribList = new java.util.ArrayList();
 
-        if (localGetAggregateScalarDataSeriesInBatchResultTracker) {
+        if (localPublisherNamesTracker) {
             elementList.add(new javax.xml.namespace.QName(
-                    "http://tempuri.org/",
-                    "GetAggregateScalarDataSeriesInBatchResult"));
+                    "http://tempuri.org/", "publisherNames"));
 
-            if (localGetAggregateScalarDataSeriesInBatchResult == null) {
+            if (localPublisherNames == null) {
                 throw new org.apache.axis2.databinding.ADBException(
-                    "GetAggregateScalarDataSeriesInBatchResult cannot be null!!");
+                    "publisherNames cannot be null!!");
             }
 
-            elementList.add(localGetAggregateScalarDataSeriesInBatchResult);
+            elementList.add(localPublisherNames);
+        }
+
+        if (localSensorNamesTracker) {
+            elementList.add(new javax.xml.namespace.QName(
+                    "http://tempuri.org/", "sensorNames"));
+
+            if (localSensorNames == null) {
+                throw new org.apache.axis2.databinding.ADBException(
+                    "sensorNames cannot be null!!");
+            }
+
+            elementList.add(localSensorNames);
+        }
+
+        elementList.add(new javax.xml.namespace.QName("http://tempuri.org/",
+                "startTime"));
+
+        if (localStartTime != null) {
+            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                    localStartTime));
+        } else {
+            throw new org.apache.axis2.databinding.ADBException(
+                "startTime cannot be null!!");
+        }
+
+        elementList.add(new javax.xml.namespace.QName("http://tempuri.org/",
+                "endTime"));
+
+        if (localEndTime != null) {
+            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(
+                    localEndTime));
+        } else {
+            throw new org.apache.axis2.databinding.ADBException(
+                "endTime cannot be null!!");
         }
 
         return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName,
@@ -341,9 +515,9 @@ public class GetAggregateScalarDataSeriesInBatchResponse implements org.apache.a
          * Postcondition: If this object is an element, the reader is positioned at its end element
          *                If this object is a complex type, the reader is positioned at the end element of its outer element
          */
-        public static GetAggregateScalarDataSeriesInBatchResponse parse(
+        public static GetScalarDataSeriesInBatch parse(
             javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception {
-            GetAggregateScalarDataSeriesInBatchResponse object = new GetAggregateScalarDataSeriesInBatchResponse();
+            GetScalarDataSeriesInBatch object = new GetScalarDataSeriesInBatch();
 
             int event;
             java.lang.String nillableValue = null;
@@ -372,13 +546,12 @@ public class GetAggregateScalarDataSeriesInBatchResponse implements org.apache.a
                         java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(
                                     ":") + 1);
 
-                        if (!"GetAggregateScalarDataSeriesInBatchResponse".equals(
-                                    type)) {
+                        if (!"GetScalarDataSeriesInBatch".equals(type)) {
                             //find namespace for the prefix
                             java.lang.String nsUri = reader.getNamespaceContext()
                                                            .getNamespaceURI(nsPrefix);
 
-                            return (GetAggregateScalarDataSeriesInBatchResponse) org.tempuri.ExtensionMapper.getTypeObject(nsUri,
+                            return (GetScalarDataSeriesInBatch) org.tempuri.ExtensionMapper.getTypeObject(nsUri,
                                 type, reader);
                         }
                     }
@@ -395,15 +568,69 @@ public class GetAggregateScalarDataSeriesInBatchResponse implements org.apache.a
 
                 if (reader.isStartElement() &&
                         new javax.xml.namespace.QName("http://tempuri.org/",
-                            "GetAggregateScalarDataSeriesInBatchResult").equals(
-                            reader.getName())) {
-                    object.setGetAggregateScalarDataSeriesInBatchResult(org.tempuri.ArrayOfSensorData.Factory.parse(
+                            "publisherNames").equals(reader.getName())) {
+                    object.setPublisherNames(org.tempuri.ArrayOfString.Factory.parse(
                             reader));
 
                     reader.next();
                 } // End of if for expected property start element
 
                 else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "sensorNames").equals(reader.getName())) {
+                    object.setSensorNames(org.tempuri.ArrayOfString.Factory.parse(
+                            reader));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "startTime").equals(reader.getName())) {
+                    java.lang.String content = reader.getElementText();
+
+                    object.setStartTime(org.apache.axis2.databinding.utils.ConverterUtil.convertToDateTime(
+                            content));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                    // A start element we are not expecting indicates an invalid parameter was passed
+                    throw new org.apache.axis2.databinding.ADBException(
+                        "Unexpected subelement " + reader.getLocalName());
+                }
+
+                while (!reader.isStartElement() && !reader.isEndElement())
+                    reader.next();
+
+                if (reader.isStartElement() &&
+                        new javax.xml.namespace.QName("http://tempuri.org/",
+                            "endTime").equals(reader.getName())) {
+                    java.lang.String content = reader.getElementText();
+
+                    object.setEndTime(org.apache.axis2.databinding.utils.ConverterUtil.convertToDateTime(
+                            content));
+
+                    reader.next();
+                } // End of if for expected property start element
+
+                else {
+                    // A start element we are not expecting indicates an invalid parameter was passed
+                    throw new org.apache.axis2.databinding.ADBException(
+                        "Unexpected subelement " + reader.getLocalName());
                 }
 
                 while (!reader.isStartElement() && !reader.isEndElement())

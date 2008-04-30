@@ -20,6 +20,11 @@ public class ExtensionMapper {
         }
 
         if ("http://tempuri.org/".equals(namespaceURI) &&
+                "BasicSensorData".equals(typeName)) {
+            return org.tempuri.BasicSensorData.Factory.parse(reader);
+        }
+
+        if ("http://tempuri.org/".equals(namespaceURI) &&
                 "ArrayOfSensorData".equals(typeName)) {
             return org.tempuri.ArrayOfSensorData.Factory.parse(reader);
         }
@@ -45,28 +50,18 @@ public class ExtensionMapper {
         }
 
         if ("http://tempuri.org/".equals(namespaceURI) &&
+                "SensorInfo".equals(typeName)) {
+            return org.tempuri.SensorInfo.Factory.parse(reader);
+        }
+
+        if ("http://tempuri.org/".equals(namespaceURI) &&
                 "ArrayOfSensorInfo".equals(typeName)) {
             return org.tempuri.ArrayOfSensorInfo.Factory.parse(reader);
         }
 
         if ("http://tempuri.org/".equals(namespaceURI) &&
-                "ArrayOfArrayOfSensorData".equals(typeName)) {
-            return org.tempuri.ArrayOfArrayOfSensorData.Factory.parse(reader);
-        }
-
-        if ("http://tempuri.org/".equals(namespaceURI) &&
-                "ArrayOfGuid".equals(typeName)) {
-            return org.tempuri.ArrayOfGuid.Factory.parse(reader);
-        }
-
-        if ("http://tempuri.org/".equals(namespaceURI) &&
-                "BasicSensorData".equals(typeName)) {
-            return org.tempuri.BasicSensorData.Factory.parse(reader);
-        }
-
-        if ("http://tempuri.org/".equals(namespaceURI) &&
-                "SensorInfo".equals(typeName)) {
-            return org.tempuri.SensorInfo.Factory.parse(reader);
+                "ArrayOfString".equals(typeName)) {
+            return org.tempuri.ArrayOfString.Factory.parse(reader);
         }
 
         if ("http://tempuri.org/".equals(namespaceURI) &&
@@ -75,8 +70,8 @@ public class ExtensionMapper {
         }
 
         if ("http://tempuri.org/".equals(namespaceURI) &&
-                "ArrayOfString".equals(typeName)) {
-            return org.tempuri.ArrayOfString.Factory.parse(reader);
+                "ArrayOfGuid".equals(typeName)) {
+            return org.tempuri.ArrayOfGuid.Factory.parse(reader);
         }
 
         throw new org.apache.axis2.databinding.ADBException("Unsupported type " +

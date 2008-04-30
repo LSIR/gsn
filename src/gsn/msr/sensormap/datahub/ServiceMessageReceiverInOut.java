@@ -275,6 +275,7 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             getAggregateScalarDataSeriesResponse33, false);
                 } else
                  if ("GetAggregateScalarDataSeriesInBatch".equals(methodName)) {
+                	  
                     org.tempuri.GetAggregateScalarDataSeriesInBatchResponse getAggregateScalarDataSeriesInBatchResponse35 =
                         null;
                     org.tempuri.GetAggregateScalarDataSeriesInBatch wrappedParam =
