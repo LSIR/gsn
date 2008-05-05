@@ -21,8 +21,11 @@ public class CSVFileWrapperFormat {
 
 	private static DataField[] fields = null;
 
-	private static final Pattern removeParenthesisPattern = Pattern.compile("[()]") ;
-
+	private static final Pattern closeParenthesisPattern = Pattern.compile("[)]") ;
+	
+	private static final Pattern openParenthesisPattern = Pattern.compile("[(]") ;
+	
+	
 	private static final Pattern toTimePattern = Pattern.compile("^(TS:)[\\p{Print}]*") ;
 
 	private static final Pattern floatToDoublePattern = Pattern.compile("(float)") ;
@@ -69,7 +72,7 @@ public class CSVFileWrapperFormat {
 				i++;
 				if (i == csvFormatLineNames){
 					for (int j = 0 ; j < nextLine.length ; j++) {
-						field_names.add(nextLine[j].replaceAll(removeParenthesisPattern.pattern(), ""));
+						field_names.add(nextLine[j].replaceAll(closeParenthesisPattern.pattern(), "").replaceAll(openParenthesisPattern.pattern(), "_"));
 					}
 				}
 				else if (contains(csvFormatLineDescriptions, i)){
