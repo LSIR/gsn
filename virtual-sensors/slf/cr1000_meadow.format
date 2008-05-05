@@ -1,0 +1,5 @@
+"TOA5","CR1000_MEADOW","CR1000","9206","CR1000.Std.13","CPU:Wiler_PaoloC_25_01_2008_MEADOW_str.CR1","30282","Data_TDR"
+"TIMESTAMP","RECORD","Batt_Volt_Avg","Panel_temp_Avg","ToppVWC(1)","ToppVWC(2)","ToppVWC(3)","ToppVWC(4)","ToppVWC(5)","ToppVWC(6)"
+"TS","RN","Volts","","","","","","",""
+"","","Avg","Avg","Smp","Smp","Smp","Smp","Smp","Smp"
+"TS:y-M-d k:m:s","integer","double","double","double","double","double","double","double","double"
