@@ -21,6 +21,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 	public boolean initialize() {
 		super.initialize();
 		structure = CSVFileWrapperFormat.parseFormatFile(getActiveAddressBean());
+		if (structure == null) return false; 
 		csvSeparator = getActiveAddressBean().getPredicateValueWithDefault(CSV_SEPARATOR, CSV_SEPARATOR_DEFAULT).charAt(0);
 		return true;
 	}

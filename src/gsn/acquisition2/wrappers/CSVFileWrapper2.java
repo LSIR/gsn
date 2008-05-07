@@ -13,7 +13,7 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 	private int csvSkipLines;
 
 	private static final String CSV_UPDATE_DELAY = "csv-update-delay";
-	private static final String CSV_UPDATE_DELAY_DEFAULT = "5000";
+	private static final String CSV_UPDATE_DELAY_DEFAULT = "20000";
 	private static long updateDelay;
 
 	private File dataFile = null;

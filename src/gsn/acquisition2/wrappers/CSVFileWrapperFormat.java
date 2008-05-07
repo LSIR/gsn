@@ -109,7 +109,7 @@ public class CSVFileWrapperFormat {
 						(field_description.get(j)));
 			}
 		} catch (FileNotFoundException e) {
-			logger.warn(e.getMessage(), e);
+			logger.warn("The file >" + filepath + "< does not exists.");
 			return null;
 		} catch (IOException e) {
 			logger.warn(e.getMessage(), e);
