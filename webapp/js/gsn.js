@@ -289,7 +289,7 @@ var GSN = {
 							GSN.AddSensorGroupToTheDraggableArea("others");
 						}	else {
 							//If a sensor has been dropped
-							GSN.AddSensorToTheDraggableArea(sensorDroppedName);
+							GSN.AddSensorToTheDraggableArea(sensorDroppedName,GSN.selectedSensors.length);
 						}
 					}
 					
@@ -316,27 +316,38 @@ var GSN = {
 	/**
 	* Add a sensor to the drop Area add the sensor to the selected sensor array
 	*/
-	,AddSensorToTheDraggableArea: function(sensorDroppedName){
+	,AddSensorToTheDraggableArea: function(sensorDroppedName,colorID){
 		sensorDroppedName = jQuery.trim(sensorDroppedName);
 		
 		// Add the dropped sensor to the drop area and set border
 		$("#dropArea").prepend($.SPAN({'class':'sensorName','id':'inDraggableArea-'+sensorDroppedName}));
 		$("#inDraggableArea-"+sensorDroppedName).css("border-left", "10px solid #FFA84C");
 		
+		
 		// Add a link do delete the sensor from the draggable area
-		$("#inDraggableArea-"+sensorDroppedName).append("<a href=\"javascript:GSN.removeFromDraggableArea('"+sensorDroppedName+"')\"><img src=\"../img/button_cancel.png\"/></a>&nbsp;&nbsp;"+sensorDroppedName+"");
+		$("#inDraggableArea-"+sensorDroppedName).append("<a href=\"javascript:GSN.removeFromDraggableArea('"+sensorDroppedName+"')\"><img src=\"../img/button_cancel.png\"/></a>");
+		$("#inDraggableArea-"+sensorDroppedName).append("&nbsp;&nbsp;"+sensorDroppedName+"");
+		
+		
+		$("#inDraggableArea-"+sensorDroppedName).append('<div class="colorpicker" id="colorpicker-'+sensorDroppedName+'" style="display:none;position:relative;left:80px;"></div>');
+		$("#inDraggableArea-"+sensorDroppedName).append('<input type="text" size="7" onclick="if($(\'#colorpicker-'+sensorDroppedName+'\').css(\'display\') == \'none\'){$(\'.colorpicker\').hide(\'slow\');$(\'#colorpicker-'+sensorDroppedName+'\').show(\'slow\');$(\'#colorpickerButton-'+sensorDroppedName+'\').show();}" id="hexcode-'+sensorDroppedName+'" name="hexcode-'+sensorDroppedName+'" value="#'+DEFAULT_COLOR_CODE[colorID%DEFAULT_COLOR_CODE.length]+'" style="float:right;position:relative;top:-20px;width:55px;border-width:1px;"/>');
+		$("#inDraggableArea-"+sensorDroppedName).append('<input type="button" class="colorpicker" id="colorpickerButton-'+sensorDroppedName+'" onclick="$(\'.colorpicker\').hide(\'slow\');" value="Ok" style="display:none;float:right;position:relative;top:-22px;left:-5px;"/>');
+		
+		$('#colorpicker-'+sensorDroppedName+'').farbtastic('#hexcode-'+sensorDroppedName+'');
+		//console.log(sensorDroppedName+'   #'+DEFAULT_COLOR_CODE[colorID%DEFAULT_COLOR_CODE.length]);
+		
 		
 		// Remove the selected sensor from the sidebar
 		$("#menu-"+sensorDroppedName).remove();
 		
 		// Resize the drop area 
 		stringLength = $("#dropArea").css('height').length
-		newSize = parseInt($("#dropArea").css('height').substr(0,stringLength-2))+24+'px';
+		newSize = parseInt($("#dropArea").css('height').substr(0,stringLength-2))+30+'px';
 		$("#dropArea").css('height',newSize);
 		
 		// Resize the drop area mask
 		stringLength = $("#dropAreaMask").css('height').length
-		newSize = parseInt($("#dropAreaMask").css('height').substr(0,stringLength-2))+24+'px';
+		newSize = parseInt($("#dropAreaMask").css('height').substr(0,stringLength-2))+30+'px';
 		$("#dropAreaMask").css('height',newSize);		
 		
 		// Add the dropped sensor to the selected sensor array
@@ -348,14 +359,18 @@ var GSN = {
 	*/
 	,AddSensorGroupToTheDraggableArea: function(groupName){
 		if(confirm("Are you sure that you want to add the "+GSN.numSensorAssociatedWithCategory.getItem(groupName)+" sensors of the '"+groupName+"' group?")){
-			for(var i=0; i < GSN.vsName.length; ++i){
-				if(GSN.vsName[i][1] == groupName){	
+			var nbSelectedSensor = GSN.selectedSensors.length;
+			var nbSensorToAdd = GSN.numSensorAssociatedWithCategory.getItem(groupName);
+			var nbSensor = GSN.vsName.length;
+
+			for(var i=0; i < nbSensor; ++i){
+				if(GSN.vsName[i][1] == groupName){
 					// If this sensor is already in the selected sensor array we remove it to have after a nive grouping inside the drop area
 					if(GSN.isAlreadyInSelectedSensorArray(GSN.vsName[i][0])) 
 						GSN.removeFromDraggableArea(GSN.vsName[i][0]);		
 					
 					// Add the sensor to the draggable area
-					GSN.AddSensorToTheDraggableArea(GSN.vsName[i][0]);
+					GSN.AddSensorToTheDraggableArea(GSN.vsName[i][0],(nbSelectedSensor+i));
 				}
 			}
 		}
@@ -760,13 +775,27 @@ var GSN = {
 		* Initialize the map
 		*/
 		,init : function(){       
-       	this.loaded=true;
+      this.loaded=true;
 			map.setCenterAndZoom(new LatLonPoint(0,0),1);
-		    map.setMapType(Mapstraction.HYBRID);
+			
+			// Setting the map type
+			var map_type;
+			if(DEFAULT_MAP_TYPE=="road"){
+				map_type = Mapstraction.ROAD;
+			} else if(DEFAULT_MAP_TYPE=="satellite") {
+				map_type = Mapstraction.SATELLITE;
+			} else if(DEFAULT_MAP_TYPE=="hybrid") {
+				map_type = Mapstraction.HYBRID;
+			} else {
+				alert("Error: "+DEFAULT_MAP_TYPE+" is an unknown map type");
+				return;
+			}
+			  
+		  map.setMapType(map_type);
 		    
-		    //set the different control on the map
-		    map.addMapTypeControls();
-		    map.addLargeControls();		
+		  //set the different control on the map
+		  map.addMapTypeControls();
+		  map.addLargeControls();		
 			
 		}
 		
@@ -988,7 +1017,13 @@ var GSN = {
 						$("#separation").append("<div id='" + GSN.data.fields[i] + "'><input type=\"checkbox\" name=\"fields\" class=\"field\" value=\""+GSN.data.fields[i]+"\" onClick=\"javascript:GSN.data.aggregateSelect('"+GSN.data.fields[i]+"',this.checked)\">"+GSN.data.fields[i].prettyString()+" </div>");
 					//}
 				} else {
-					$("#separation").append("<input type=\"checkbox\" name=\"fields\" class=\"field\" value=\""+GSN.data.fields[i]+"\">"+GSN.data.fields[i].prettyString()+"<br/>");
+					$("#separation").append("<input type=\"checkbox\" name=\"fields\" class=\"field\" value=\""+GSN.data.fields[i]+"\">"+GSN.data.fields[i].prettyString());
+					$("#separation").append("<br\>");
+					
+
+					
+					
+					
 				}
 				
 				if (GSN.data.radio) {
@@ -1007,7 +1042,9 @@ var GSN = {
 				}
 			}
 			
-			GSN.data.appendNextStepButton("fields","if(GSN.data.atLeastOneFieldSelected())GSN.data.nbDatas()");
+			
+			
+			GSN.data.appendNextStepButton("separation","if(GSN.data.atLeastOneFieldSelected())GSN.data.nbDatas()");
 		},
 		
 		atLeastOneFieldSelected: function(){
@@ -1072,7 +1109,7 @@ var GSN = {
 			$("#step3Container").append("<div class=\"step\">Step 3/5 : Selection of the Data Range</div>");
 			$("#step3Container").append("<div class=\"data\" id=\"nbDatas\"></div>");
 			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"allDatas\" value=\"\"> All data<br/>");
-			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"someDatas\" value=\"\" checked onclick=\"$('#nbOfDatas').focus()\"> Last <input onclick=\"$('#someDatas').attr('checked', 'checked');\" type=\"text\" name=\"nb\" value=\"20\" id=\"nbOfDatas\" size=\"4\"/> values<br/>");
+			$("#nbDatas").append("<input type=\"radio\" name=\"nbdatas\" id=\"someDatas\" value=\"\" checked onclick=\"$('#nbOfDatas').focus()\"> Last <input onclick=\"$('#someDatas').attr('checked', 'checked');\" type=\"text\" name=\"nb\" value=\"10\" id=\"nbOfDatas\" size=\"4\"/> values<br/>");
 			GSN.data.appendNextStepButton("nbDatas","GSN.data.addCriteria(true)");
 		},	
 		
@@ -1181,7 +1218,7 @@ var GSN = {
 			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"lineChart\" class=\"chartType\" name=\"chartType\" onClick=\"\"/>Line Chart<br/></div>");
 			$("#display").append("<div class=\"chartOption\">Display:</div>");
 			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"allData\" class=\"dataDisplay\" name=\"dataDisplay\" onClick=\"\" checked/>All Values<br/></div>");
-			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"modData\" class=\"dataDisplay\" name=\"dataDisplay\" onClick=\"\"/>Modulus Mode<br/></div>");
+			$("#display").append("<div class=\"chartOption\"><input type=\"radio\" id=\"modData\" class=\"dataDisplay\" name=\"dataDisplay\" onClick=\"\"/>Snapshot Mode<br/></div>");
 			
 						
 			$("#display").append("<div class=\"cvsFormat\">Delimiters:</div>");
@@ -1245,7 +1282,7 @@ var GSN = {
 				if ($("#someDatas").attr("checked") && $("#nbOfDatas").attr("value") != "") {
 					var nbValueToExtract = parseInt($("#nbOfDatas").attr("value"));
 					if(nbValueToExtract%6 != 0){
-						nbValueToExtract= nbValueToExtract+ 6 - nbValueToExtract%6;
+						nbValueToExtract= nbValueToExtract + 6 - nbValueToExtract%6;
 					}
 					request += "&nb=" + nbValueToExtract;
 				}
@@ -1422,8 +1459,10 @@ var GSN = {
 			
 			// Compute the min/max for each field for each sensor
 			var incModulo = 0;
-			GSN.data.modulo = Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/GSN.data.nbDispVal/nbSelectedFields);
+			GSN.data.modulo = Math.floor(($("field",answerLinesFromXMLSensorNum[0]).length-1)/GSN.data.nbDispVal/nbSelectedFields);//Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/GSN.data.nbDispVal/nbSelectedFields);
 			var modulo = GSN.data.modulo;
+			console.log("Modulo="+modulo);
+			
 			if($("#allData").attr("checked")) modulo = 1;
 			
 			// creation of a Matrix dimension: nbSelectedSensors * nbSelectedFields
@@ -1465,33 +1504,35 @@ var GSN = {
 						else average = actualValue; // case it is the time
 						
 						// Construct values Array which contains the values for the current selected sensor and for the current field
-						if((answerLinesFromXMLSensorNum[i].length-1) > 6){
+						nbValueToShow = parseInt($("#nbOfDatas").attr("value"));
+						offset= 6 - nbValueToShow%6;
+						
+						if((answerLinesFromXMLSensorNum[i].length-1) > 6 && $("#modData").attr("checked")){
 							// If too many data reduce (take data every modulo)
 							if(values[i][m] == "" && incModulo == 0){
-								values[i][m] = average;
-								incModulo--; // because the first data don't count
-							}else if(incModulo == modulo){
-								values[i][m] = average+","+values[i][m];
-							}
-							
-							if(incModulo == modulo) incModulo=0;
-							else incModulo++;
+									values[i][m] = average;
+								}else if(incModulo == 0){
+									values[i][m] = average+","+values[i][m];
+								}
+								incModulo++;
+								incModulo %= modulo;
 						}
 						else{
-							if(values[i][m] == ""){
-								values[i][m] = actualValue;
-							}else{
-								values[i][m] = actualValue+","+values[i][m];
+							if(k < nbValueToShow){
+								if(values[i][m] == ""){
+									values[i][m] = actualValue;
+								}else{
+									values[i][m] = actualValue+","+values[i][m];
+								}
 							}
 						}
-						
 					}
 					//alert(minValue[m]);
 					//alert(maxValue[m]);
 				}
 			}
 			//alert(minValue);
-   		//alert(maxValue);
+   			//alert(maxValue);
 			
 			
 			GSN.data.makeChart(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,"barChart");
@@ -1508,16 +1549,17 @@ var GSN = {
 				
 			$('#barChart').attr("onclick","$('.lineChart').hide();$('.barChart').show();");
 			$('#lineChart').attr("onclick","$('.lineChart').show();$('.barChart').hide();");
-			
    	}// End displayDatas
    	
    	,modulo:0
-   	,nbDispVal:6
+   	,nbDispVal:NUMBER_OF_VALUE_TO_DISPLAY_IN_CHARTS_IN_MODULUS_MODE // Number of value to display in modulo mode
    	,makeChart: function(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,typeChart){
 			// Chart Part
 			var nbValue = Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/nbSelectedFields)-1;
+			console.log("Nb Values extracted="+nbValue);
+			console.log("Nb Values requested="+$("#nbOfDatas").val());
+			console.log("Offset Values="+(nbValue-$("#nbOfDatas").val()));
 			
-					
 					
 			for(var m=0; m < nbSelectedFields; m++){
 				regularExpression = new RegExp("timed","i");
@@ -1536,18 +1578,26 @@ var GSN = {
 						}
 					}
 					else{
-						$("#chartContainer").append('<div class="'+typeChart+'" id="'+typeChart+m+'"></div><br/>'); 
-		 				var so = new SWFObject("./open-flash-chart/open-flash-chart.swf", typeChart+m, "450", "200", "9", "#FFFFFF");
+						$("#chartContainer").append('<div style="border-width:10px;" class="'+typeChart+'" id="'+typeChart+m+'"></div><br/>'); 
+		 				var so = new SWFObject("./open-flash-chart/open-flash-chart.swf", typeChart+m, "450", "400", "9", "#FFFFFF");
 		 			}
 		 			so.addVariable("variables","true");
 					so.addVariable("title","Data viewer: "+$("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text().prettyString()+",{font-size:20px; color: #000000; margin: 5px; padding:5px; padding-left: 20px; padding-right: 20px;}");
 					
-					// If too much data remove some to construct the chart
-	   			var nbValues = values.toString().split(',').length/nbSelectedFields;
-	   			x_step = 2;
+		   		
+		   		if(!$("#modData").attr("checked")){
+		   			x_step = GSN.data.modulo;
+		   		}	else { 
+		   			x_step = 2;
+		   		}
+		   		//console.log("x_step="+x_step);
+		   		
+		   		
 					so.addVariable("x_axis_steps",x_step);
-					so.addVariable("x_label_style","10,#000000,0,"+x_step+",#eeeeee");
 					so.addVariable("y_label_style","10,#000000");
+					
+					so.addVariable("x_label_style","10,#000000,2,"+x_step+",#eeeeee");
+					
 					
 					// Timed on x axis
 					var x_label;
@@ -1572,9 +1622,7 @@ var GSN = {
 					so.addVariable("y_ticks","5,10,5");
 					
 
-					if($("#allData").attr("checked")){
-						so.addVariable("x_label_style","0,#FFFFFF,0");
-					}
+
 					so.addVariable("x_axis_colour","#000000");
 					so.addVariable("x_grid_colour","#eeeeee");
 					so.addVariable("y_axis_colour","#000000");
@@ -1596,7 +1644,7 @@ var GSN = {
 					
 					so.addVariable("y_min",minVal);
 					so.addVariable("y_max",maxVal);
-		
+					
 					
 					if(typeChart == "barChart"){
 						GSN.data.makeBarChart(so,values,m);
@@ -1605,7 +1653,11 @@ var GSN = {
 						GSN.data.makeLineChart(so,values,m);
 					}
 					so.write(typeChart+m,"");
+					
 				}
+				
+				
+				//console.log("X Label: "+x_label);
 			}
    		// End Chart Part
    		
@@ -1616,12 +1668,12 @@ var GSN = {
 	
 		,makeLineChart: function(so,values,field){
 			for(i=0; i<GSN.selectedSensors.length;++i){
-				if(i == 0){
-					so.addVariable("line_dot","2,#01B0F0,"+GSN.selectedSensors[0]+",10,4");
+				if(i==0){
+					so.addVariable("line_dot","2,"+$('#hexcode-'+GSN.selectedSensors[i]).val()+","+GSN.selectedSensors[i]+",10,4");
 					so.addVariable("values",values[i][field]);
 				}
 				else{
-					so.addVariable("line_dot_"+(i+1),"2,#F0E14C,"+GSN.selectedSensors[i]+",10,4");
+					so.addVariable("line_dot_"+(i+1),"2,"+$('#hexcode-'+GSN.selectedSensors[i]).val()+","+GSN.selectedSensors[i]+",10,4");
 					so.addVariable("values_"+(i+1),values[i][field]);
 				}
 			}
@@ -1632,11 +1684,11 @@ var GSN = {
 			so.addVariable("x_axis_3d","3");
 			for(i=0; i<GSN.selectedSensors.length;++i){
 				if(i == 0){
-					so.addVariable("bar_3d","75,#FF6600,"+GSN.selectedSensors[0]+",10");
+					so.addVariable("bar_3d","75,"+$('#hexcode-'+GSN.selectedSensors[i]).val()+","+GSN.selectedSensors[0]+",10");
 					so.addVariable("values",values[i][field]);
 				}
 				else{
-					so.addVariable("bar_3d_"+(i+1),"75,#F0E14C,"+GSN.selectedSensors[i]+",10");
+					so.addVariable("bar_3d_"+(i+1),"75,"+$('#hexcode-'+GSN.selectedSensors[i]).val()+","+GSN.selectedSensors[i]+",10");
 					so.addVariable("values_"+(i+1),values[i][field]);
 				}
 			}

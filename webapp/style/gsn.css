@@ -42,6 +42,8 @@ input[type=button],input[type=submit]
 	border: 0px;
 	cursor: pointer;
 	
+	margin:1px;
+	
 	border: 1px solid #FFA84C;
 	border-left: 10px solid #FFA84C;
 	background-color: #FCFDDC;
@@ -301,7 +303,7 @@ body
 
 .sensorName
 {
-	display: block;
+	display: block;	
 	margin: 1px;
 	padding: 5px 5px 5px 0.5em;
 	border-left: 10px solid #FFE2BF;
@@ -321,14 +323,14 @@ body
 {
 	border: thin double #FFA84C;
 	background-color: #FFE0BF;
-	height: 100px;
+	height: 220px;
 	text-align:left;
 }
 
 #dropAreaMask
 {
 	background-color: none;
-	height: 180px;
+	height: 300px;
 	width:80%;
 	margin-left: 10%;
 	text-align:left;
@@ -755,3 +757,16 @@ input.date-picker
 {
 	background-color: #FFF0CF;
 }
+
+#colorDiv
+{
+	float: left;
+	width: 300px;
+	border: thin double #FFA84C;
+}
+
+#fieldsDiv
+{
+	float: left;
+}	
+

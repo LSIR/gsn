@@ -10,20 +10,23 @@
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
 	<script type="text/javascript" src="js/datePicker.js"></script>
-	<script type="text/javascript" src="js/functions.js"></script>
-	<script type="text/javascript" src="js/gsn.js"></script>
 	
 	<!-- Include Map engine-->
 	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
 	<!--<script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=YahooDemo" type="text/javascript"></script>-->
 	<script src="http://dev.virtualearth.net/mapcontrol/v3/mapcontrol.js" type="text/javascript"></script>
 	<script type="text/javascript" src="js/mapstraction.js"></script>
-	
+		
 	<script type="text/javascript" src="js/constants.js"></script>
+	<script type="text/javascript" src="js/functions.js"></script>
+	<script type="text/javascript" src="js/gsn.js"></script>
+	
+
+	
 	<script type="text/javascript">
 	<!--//<![CDATA[
 	var mapProvider = null;
-	
+
 	$(document).ready(function() {
 		
 		
@@ -46,6 +49,7 @@
 			$("#VE").attr("checked","checked");
 			$("#toggleallmarkers").remove(); // because marker.hide() not possible with VE
 		}
+		
 		
 		map = new Mapstraction('vsmap',mapProvider);
 			
