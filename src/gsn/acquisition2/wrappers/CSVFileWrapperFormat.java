@@ -22,10 +22,10 @@ public class CSVFileWrapperFormat {
 	private static DataField[] fields = null;
 
 	private static final Pattern closeParenthesisPattern = Pattern.compile("[)]") ;
-	
+
 	private static final Pattern openParenthesisPattern = Pattern.compile("[(]") ;
-	
-	
+
+
 	private static final Pattern toTimePattern = Pattern.compile("^(TS:)[\\p{Print}]*") ;
 
 	private static final Pattern floatToDoublePattern = Pattern.compile("(float)") ;
@@ -41,8 +41,8 @@ public class CSVFileWrapperFormat {
 	private static final String CSV_FORMAT_LINE_FORMAT = "csv-format-line-format";
 	private static final String CSV_FORMAT_LINE_FORMAT_DEFAULT = "5";
 	private static int csvFormatLineFormat;
-	
-	private static SimpleDateFormat dateFormat = null;
+
+	private static SimpleDateFormat dateFormat[] = null;
 
 	public static DataField[] parseFormatFile (AddressBean infos){
 
@@ -85,23 +85,24 @@ public class CSVFileWrapperFormat {
 				}
 				else if (i == csvFormatLineFormat){
 					String tmp;
+					dateFormat = new SimpleDateFormat[nextLine.length] ;
 					for (int j = 0 ; j < nextLine.length ; j++) {
 						tmp = new String () ;
-						if (nextLine[j].startsWith("TS:")) dateFormat = new SimpleDateFormat (nextLine[j].substring(3)) ;
+						if (nextLine[j].startsWith("TS:")) dateFormat[j] = new SimpleDateFormat (nextLine[j].substring(3)) ;
 						tmp = nextLine[j].replaceAll(toTimePattern.pattern(), "BIGINT");
 						tmp = tmp.replaceAll(floatToDoublePattern.pattern(), "DOUBLE");
 						field_formats.add(tmp);
 					}
 				}
 			}
-			
+
 			reader.close();
 
 			int nb_fields = Math.min(field_names.size(), field_description.size());
 			nb_fields = Math.min(nb_fields, field_formats.size());
-			
+
 			fields = new DataField[nb_fields];
-			
+
 			for (int j = 0 ; j < nb_fields ; j++) {
 				fields[j] = new DataField(
 						field_names.get(j), 
@@ -117,14 +118,14 @@ public class CSVFileWrapperFormat {
 		} 
 		if (logger.isDebugEnabled()){
 			for (int i = 0 ; i < fields.length ; i++) {
-				logger.debug(fields[i]);
+				logger.debug("Field " + i + " " + fields[i]);
 			}
 		}
 		return fields;
 	}
-	
-	public static SimpleDateFormat getDateFormat () {
-		return dateFormat;
+
+	public static SimpleDateFormat getDateFormat (int column) {
+		return dateFormat[column];
 	}
 
 	private static boolean contains (int[] ar, int value) {

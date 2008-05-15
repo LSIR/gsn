@@ -43,7 +43,7 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
         return;
       }
         
-      readerPS = ss.getStorage().createPreparedStatement("select pk,stream_element,created_at from "+wrapper.getTableName()+" where processed = false order by created_at asc limit 1");
+      readerPS = ss.getStorage().createPreparedStatement("select pk,stream_element,created_at from "+wrapper.getTableName()+" where processed = false order by pk asc limit 1");
       successAckUpdatePS = ss.getStorage().createPreparedStatement("update "+wrapper.getTableName()+" set PROCESSED  = true where pk = ? ");
     }
     if (message instanceof AcknowledgmentMsg) {

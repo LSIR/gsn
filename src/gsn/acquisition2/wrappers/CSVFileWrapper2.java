@@ -13,7 +13,7 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 	private int csvSkipLines;
 
 	private static final String CSV_UPDATE_DELAY = "csv-update-delay";
-	private static final String CSV_UPDATE_DELAY_DEFAULT = "20000";
+	private static final String CSV_UPDATE_DELAY_DEFAULT = "6000";
 	private static long updateDelay;
 
 	private File dataFile = null;
@@ -57,17 +57,23 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 				try {
 					fileReader = new BufferedReader(new FileReader(path));
 					// Produce the data by reading the file
-					int skip_lines = csvSkipLines;
-					int processed_lines = 0;
+					int read_lines = 0;
 					while ((nextLine = fileReader.readLine()) != null) {
-						if (skip_lines-- <= 0) {
-							if (processed_lines > nbOfProcessedLines) {
-								postStreamElement(nextLine, System.currentTimeMillis( ));
-								nbOfProcessedLines = processed_lines;
+						read_lines++;
+						if (! nextLine.matches("\\s*$")) {
+							if (read_lines > csvSkipLines) {
+								if (read_lines > nbOfProcessedLines) {
+									logger.debug("Next line: " + nextLine);
+									postStreamElement(nextLine, System.currentTimeMillis( ));
+									nbOfProcessedLines = read_lines;
+								}
+								else logger.debug("Line already processed");
 							}
+							else logger.debug("Line skipped");
 						}
-						processed_lines++;
+						else logger.debug("Empty line skipped");
 					}
+					logger.debug("EOF reached");
 					fileReader.close();
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
