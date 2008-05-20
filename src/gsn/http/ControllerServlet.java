@@ -38,6 +38,10 @@ public class ControllerServlet extends HttpServlet {
    
    public static final int    REQUEST_ADDRESSING                     = 115;
    
+   public static final int    REQUEST_LOGIN			     = 200;
+   
+   public static final int    REQUEST_LOGOUT			     = 201;
+   
    /**
     * getting the request from the web and handling it.
     */
@@ -86,6 +90,14 @@ public class ControllerServlet extends HttpServlet {
             handler = new AddressingReqHandler ( );
             if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
             break;
+         case REQUEST_LOGIN :
+        	 handler = new LoginReqHandler ( );
+        	 if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
+        	 break;
+         case REQUEST_LOGOUT :
+        	 handler = new LogoutReqHandler ( );
+        	 if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
+        	 break;
          default :
             response.sendError ( UNSUPPORTED_REQUEST_ERROR , "The requested operation is not supported." );
             break;

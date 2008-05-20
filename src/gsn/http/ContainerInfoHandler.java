@@ -27,6 +27,7 @@ public class ContainerInfoHandler implements RequestHandler {
     response.setStatus( HttpServletResponse.SC_OK );
     StringBuilder sb = new StringBuilder( "<gsn " );
     sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
+    sb.append( "protected=\"" ).append( StringEscapeUtils.escapeXml( Boolean.toString(Main.getContainerConfig( ).isPrivacyEnabled())) ).append( "\" " );
     sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
     sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
     sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
