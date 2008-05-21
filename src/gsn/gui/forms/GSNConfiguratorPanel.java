@@ -3,6 +3,7 @@ package gsn.gui.forms;
 import gsn.GSNStop;
 import gsn.beans.ContainerConfig;
 import gsn.gui.AntRunner;
+import gsn.gui.GSNConfiguratorFrame;
 import gsn.utils.ValidityTools;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -114,7 +115,7 @@ public class GSNConfiguratorPanel implements ActionListener {
 
 	public void stopGsn() {
 //		try {
-			GSNStop.stopGSN();
+			GSNStop.stopGSN(GSNConfiguratorFrame.gsnControllerPort);
 			gsnIsRunning = false;
 			gsnStart.setIcon(startIcon);
 			if (gsnReader != null) {

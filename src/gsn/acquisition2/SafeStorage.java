@@ -22,9 +22,9 @@ public class SafeStorage {
   
   private SafeStorageDB storage ;
   
-  public SafeStorage() throws ClassNotFoundException, SQLException {
+  public SafeStorage(int safeStoragePort) throws ClassNotFoundException, SQLException {
     wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>(),SAFE_STORAGE_WRAPPERS_PROPERTIES);
-    storage = new SafeStorageDB();
+    storage = new SafeStorageDB(safeStoragePort);
     storage.executeSQL("create table if not exists SETUP (pk INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, table_name varchar not null unique, requester varchar not null unique,created_at TIMESTAMP default CURRENT_TIMESTAMP() not null )");
   }
   

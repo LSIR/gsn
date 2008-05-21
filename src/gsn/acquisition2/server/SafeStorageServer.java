@@ -15,10 +15,12 @@ import org.apache.mina.transport.socket.nio.*;
 
 public class SafeStorageServer {
   
+	public static transient Logger logger = Logger.getLogger(SafeStorageServer.class);
+	
 	private IoAcceptor acceptor;
 	
   public SafeStorageServer(int portNo) throws IOException, ClassNotFoundException, SQLException {
-    SafeStorage ss  = new SafeStorage();
+    SafeStorage ss  = new SafeStorage(portNo);
     acceptor = new SocketAcceptor();
     acceptor.getDefaultConfig().setThreadModel(ThreadModel.MANUAL);
     // Prepare the service configuration.
@@ -26,7 +28,7 @@ public class SafeStorageServer {
     cfg.setReuseAddress(true);
     cfg.getFilterChain().addLast("codec",   new ProtocolCodecFilter( new ObjectSerializationCodecFactory()));
     acceptor.bind(new InetSocketAddress(portNo),   new SafeStorageServerSessionHandler(ss), cfg);
-    System.out.println("Listening on port " + portNo);
+    logger.info("Safe Storage Server is listening on port: " + portNo);
   }
   
   public void shutdown () {
@@ -34,8 +36,10 @@ public class SafeStorageServer {
   }
   
   public static void main(String[] args) throws Exception {
+	  int safeStorageServerPort = Integer.parseInt(args[0]);
+	int safeStorageControllerPort = Integer.parseInt(args[1]);
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
-    SafeStorageServer sss = new SafeStorageServer(Integer.parseInt(args[0]));
-    new SafeStorageController(sss);
+    SafeStorageServer sss = new SafeStorageServer(safeStorageServerPort);
+    new SafeStorageController(sss, safeStorageControllerPort);
   }
 }

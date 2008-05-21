@@ -52,6 +52,8 @@ import org.mortbay.jetty.webapp.WebAppContext;
 public final class Main {
 
   private static Main singleton ;
+  
+  private static int gsnControllerPort;
 
   private Main() throws Exception{
     System.out.println("GSN Starting ...");
@@ -60,7 +62,7 @@ public final class Main {
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 //    initializeConfiguration();
     try {
-      controlSocket = new GSNController(null);
+      controlSocket = new GSNController(null, gsnControllerPort);
       containerConfig = loadContainerConfiguration();
     } catch ( FileNotFoundException e ) {
       logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
@@ -140,8 +142,11 @@ public final class Main {
 
   public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
 
+  
+  
   public static void main ( String [ ]  args)  {
-    Main.getInstance();
+	  Main.gsnControllerPort = Integer.parseInt(args[0]) ;
+	Main.getInstance();
   }
 
 

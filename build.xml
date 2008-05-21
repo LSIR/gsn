@@ -1,5 +1,7 @@
 <project name="gsn" default="build" basedir=".">
-     
+   <property name="safe-storage-port" value="25000"/>
+   <property name="safe-storage-controller-port" value="25002"/>
+	<property name="gsn-controller-port" value="22222"/>
    <target name="init" description="initializes properties and initialization tasks">
       <tstamp>
          <format property="TODAY" pattern="yyyy-MMMM-d-'at'-hh-mm-aa" locale="en"/>
@@ -93,6 +95,7 @@
          <classpath refid="classpath"/>
          <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
          <jvmarg value="-Dorg.mortbay.log.LogFactory.noDiscovery=false"/>
+      	 <arg id="gsnc-port" value="${gsn-controller-port}" />
          <!-- <jvmarg value="-server"/> Sometimes on windows compaines about a missing dll.-->
          <!-- For profiling using JConsole <jvmarg value="-Dcom.sun.management.jmxremote"/> -->
          <!-- For JDK5 profiling <jvmarg value="-Xrunhprof:heap=sites,depth=15,force=n"/> -->
@@ -112,7 +115,9 @@
           target: stop              
          ================================= -->
     <target name="stop" depends="build" description="Stop's the running GSN server (if any)">
-       <java classname="gsn.GSNStop" maxmemory="${maxMemoryUsage}"  fork="false" dir="${basedir}" classpathref="classpath"/>
+       <java classname="gsn.GSNStop" maxmemory="${maxMemoryUsage}"  fork="false" dir="${basedir}" classpathref="classpath">
+       		<arg id="gsnc-port" value="${gsn-controller-port}" />	
+       </java>
     </target>
 
    <target name="securityTest" depends="bind">
@@ -223,12 +228,15 @@
 	
 	<target name="start-acquisition" depends="bind">
 		<java classname="gsn.acquisition2.server.SafeStorageServer"  fork="true" dir="${basedir}" classpathref="classpath">
-			<arg id="ss-port" value="25000"/>
+			<arg id="ss-port" value="${safe-storage-port}"/>
+			<arg id="ssc-port" value="${safe-storage-controller-port}" />
 		</java>
 	</target>
 	
 	<target name="stop-acquisition" depends="bind">
-		<java classname="gsn.SafeStorageStop"  fork="true" dir="${basedir}" classpathref="classpath" />
+		<java classname="gsn.SafeStorageStop"  fork="true" dir="${basedir}" classpathref="classpath">
+			<arg id="ssc-port" value="${safe-storage-controller-port}" />
+		</java>
 	</target>
    
 </project>

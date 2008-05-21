@@ -10,18 +10,17 @@ import org.apache.log4j.Logger;
 
 public class SafeStorageController {
 
-	public static final int SAFE_STORAGE_CONTROL_PORT = 25001;
-
 	public static final String SAFE_STORAGE_SHUTDOWN = "SS SHUTDOWN";
 
 	private SafeStorageServer safeStorageServer;
 
 	public static transient Logger logger = Logger.getLogger(SafeStorageController.class);
 
-	public SafeStorageController(final SafeStorageServer safeStorageServer) {
+	public SafeStorageController(final SafeStorageServer safeStorageServer, int safeStorageControllerPort) {
 		super();
 		this.safeStorageServer = safeStorageServer;
-		ActionPort.listen(SAFE_STORAGE_CONTROL_PORT, new NetworkAction(){
+		logger.info("Started Safe Storage Controller on port " + safeStorageControllerPort);
+		ActionPort.listen(safeStorageControllerPort, new NetworkAction(){
 			@Override
 			public boolean actionPerformed(Socket socket) {
 				try {

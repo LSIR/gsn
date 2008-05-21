@@ -8,14 +8,14 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class SafeStorageStop {
-
+	
 	public static void main (String[] args) {
-		stopSafeStorageServers();
+		stopSafeStorageServers(Integer.parseInt(args[0]));
 	}
 	
-	public static void stopSafeStorageServers () {
+	public static void stopSafeStorageServers (int safeStorageControllerPort) {
 	    try {
-	      Socket socket = new Socket(InetAddress.getByName("localhost"), SafeStorageController.SAFE_STORAGE_CONTROL_PORT);
+	      Socket socket = new Socket(InetAddress.getByName("localhost"), safeStorageControllerPort);
 	      PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 	      writer.println(SafeStorageController.SAFE_STORAGE_SHUTDOWN);
 	      writer.flush();

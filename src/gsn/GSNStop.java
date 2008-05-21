@@ -9,12 +9,12 @@ import java.net.Socket;
 public class GSNStop {
   
   public static void main(String[] args) {
-    stopGSN();
+    stopGSN(Integer.parseInt(args[0]));
   }
-  public static void stopGSN(){
+  public static void stopGSN(int gsnControllerPort){
     try {
 //      Socket socket = new Socket(InetAddress.getLocalHost().getLocalHost(), gsn.GSNController.GSN_CONTROL_PORT);
-      Socket socket = new Socket(InetAddress.getByName("localhost"), gsn.GSNController.GSN_CONTROL_PORT);
+      Socket socket = new Socket(InetAddress.getByName("localhost"), gsnControllerPort);
       PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
       writer.println(gsn.GSNController.GSN_CONTROL_SHUTDOWN);
       writer.flush();

@@ -68,6 +68,8 @@ public class GSNConfiguratorFrame extends JFrame {
 
 	private JMenuItem menuHelpContents, menuAbout;
 	private PopupMenu popup;
+	
+	public static int gsnControllerPort;
 
 	// We load all icons here so that we can reuse them
 	public static final Icon GSN_ICON = new ImageIcon("icons/gsn.png");
@@ -266,6 +268,8 @@ public class GSNConfiguratorFrame extends JFrame {
 
 	public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException  {
 
+		gsnControllerPort = Integer.parseInt(args[0]);
+		
 		PlasticLookAndFeel laf = new PlasticXPLookAndFeel();
 		PlasticLookAndFeel.setCurrentTheme(new DesertBluer());
 		try {

@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
 
@@ -16,8 +15,11 @@ public class SafeStorageDB {
   
   private Connection connection;
   
-  public SafeStorageDB() throws ClassNotFoundException, SQLException {
+  private String dbUrl = null;
+  
+  public SafeStorageDB(int safeStoragePort) throws ClassNotFoundException, SQLException {
     Class.forName("org.h2.Driver");
+    dbUrl = "jdbc:h2:storage" + safeStoragePort + ".h2";
     connection = getConnection();
   }
   
@@ -31,7 +33,7 @@ public class SafeStorageDB {
   
   public Connection getConnection() throws SQLException {
     if (connection ==null || connection.isClosed())
-     connection = DriverManager.getConnection("jdbc:h2:storage.h2", "sa", "");
+     connection = DriverManager.getConnection(dbUrl, "sa", "");
     return connection;
   }
   

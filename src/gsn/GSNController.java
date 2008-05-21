@@ -18,7 +18,7 @@ public class GSNController extends Thread {
 
 	private ServerSocket mySocket;
 
-	public static final int GSN_CONTROL_PORT = 22222;
+	private static int gsnControllerPort;
 
 	private static final int GSN_CONTROL_READ_TIMEOUT = 20000;
 
@@ -32,14 +32,15 @@ public class GSNController extends Thread {
 
 	private VSensorLoader vsLoader;
 
-	public GSNController(VSensorLoader vsLoader) throws UnknownHostException, IOException {
+	public GSNController(VSensorLoader vsLoader, int gsnControllerPort) throws UnknownHostException, IOException {
 		this.vsLoader = vsLoader;
-		mySocket = new ServerSocket(GSN_CONTROL_PORT, 0, InetAddress.getByName("localhost"));
+		this.gsnControllerPort = gsnControllerPort ;
+		mySocket = new ServerSocket(gsnControllerPort, 0, InetAddress.getByName("localhost"));
 		this.start();
 	}
 
 	public void run() {
-		logger.info("Started GSN Controller on port " + GSN_CONTROL_PORT);
+		logger.info("Started GSN Controller on port " + gsnControllerPort);
 		while (running) {
 			try {
 				Socket socket = mySocket.accept();

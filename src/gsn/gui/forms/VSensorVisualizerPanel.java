@@ -4,6 +4,7 @@ import gsn.GSNController;
 import gsn.Main;
 import gsn.beans.Modifications;
 import gsn.beans.VSensorConfig;
+import gsn.gui.GSNConfiguratorFrame;
 import gsn.gui.util.GSNDropDownButton;
 import gsn.gui.util.GUIUtils;
 import gsn.gui.util.SimpleInternalFrame;
@@ -733,10 +734,10 @@ public class VSensorVisualizerPanel implements StartStopEventListener, VSensorGr
 				}
 				try {
 					System.out.println(getName() + ": " + (i + 1) + ". Trying to connect to GSN at " + InetAddress.getByName("localhost") + ":"
-							+ GSNController.GSN_CONTROL_PORT);
+							+ GSNConfiguratorFrame.gsnControllerPort);
 					if (socket.isClosed())
 						socket = new Socket();
-					socket.connect(new InetSocketAddress(InetAddress.getByName("localhost"), GSNController.GSN_CONTROL_PORT));
+					socket.connect(new InetSocketAddress(InetAddress.getByName("localhost"), GSNConfiguratorFrame.gsnControllerPort));
 					writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 					inputStream = socket.getInputStream();
 					connected = true;
