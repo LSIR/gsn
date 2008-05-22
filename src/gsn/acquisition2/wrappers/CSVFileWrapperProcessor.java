@@ -14,26 +14,28 @@ import gsn.beans.DataTypes;
 
 public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
-	//private static final Pattern toTimePattern = Pattern.compile("^(TS:)[\\p{Print}]*") ;
-
+	CSVFileWrapperParameters parameters = null;
+	
 	private DataField[] structure;
 
 	private final transient Logger logger = Logger.getLogger( CSVFileWrapperProcessor.class );
 
-	private static final String CSV_SEPARATOR = "csv-separator";
-	private static final String CSV_SEPARATOR_DEFAULT = ",";
-	private Character csvSeparator;
-
-	private static final String CSV_QUOTE_CHAR = "csv-quote";
-	private static final String CSV_QUOTE_CHAR_DEFAULT = "\"";
-	private Character csvQuoteChar;
-
 	public boolean initialize() {
+		
 		super.initialize();
-		structure = CSVFileWrapperFormat.parseFormatFile(getActiveAddressBean());
-		if (structure == null) return false; 
-		csvSeparator = getActiveAddressBean().getPredicateValueWithDefault(CSV_SEPARATOR, CSV_SEPARATOR_DEFAULT).charAt(0);
-		csvQuoteChar = getActiveAddressBean().getPredicateValueWithDefault(CSV_QUOTE_CHAR, CSV_QUOTE_CHAR_DEFAULT).charAt(0);
+		
+		try {
+			parameters = new CSVFileWrapperParameters () ;
+			parameters.initParameters(getActiveAddressBean());
+			structure = CSVFileWrapperFormat.parseFormatFile(parameters);
+		}
+		catch (RuntimeException e) {
+			logger.error(e.getMessage());
+			return false;
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			return false;
+		}
 		return true;
 	}
 
@@ -46,9 +48,9 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 	public boolean messageToBeProcessed(DataMsg dataMessage) {
 
 		Serializable[] serialized = new Serializable[structure.length];
-
+		
 		String msg = (String) dataMessage.getData()[0];
-		CSVReader csvReader = new CSVReader (new StringReader(msg), csvSeparator, csvQuoteChar) ;
+		CSVReader csvReader = new CSVReader (new StringReader(msg), parameters.getCsvSeparator(), parameters.getCsvQuoteChar()) ;
 
 		logger.debug("Next Line to parse: " + msg);
 

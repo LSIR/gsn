@@ -91,8 +91,8 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
   }
 
 public void sessionClosed(IoSession session) throws Exception {
-  readerPS.close();
-  successAckUpdatePS.close();
+  if (readerPS != null) readerPS.close();
+  if (successAckUpdatePS != null) successAckUpdatePS.close();
   // Update the number of clients using this wrapper.
 }
 
