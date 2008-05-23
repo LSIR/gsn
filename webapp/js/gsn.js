@@ -7,10 +7,17 @@ var map;
 var GSN = { 
 	
 	debugmode: false
-	,debug: function (txt) {
-		if(typeof console != "undefined" && GSN.debugmode) {
-			console.debug(txt);
-		}	
+	,log: function (txt) {
+		if(typeof console != "undefined")
+			if(GSN.util.getURLParam("debug")==1 || GSN.debugmode) {
+				console.log(txt);
+			}	
+	}
+	,info: function (txt) {
+		if(typeof console != "undefined")
+			if(GSN.util.getURLParam("debug")==1 || GSN.debugmode) {
+				console.info(txt);
+			}	
 	}
 	
 	
@@ -101,7 +108,7 @@ var GSN = {
 	* iframe msg callback for webupload
 	*/
 	,msgcallback: function (msg,code) {
-		GSN.debug(code+": "+msg);
+		GSN.log(code+": "+msg);
 		$("#msg").html(msg);		
 		$("#msg").removeClass();
 		if (code <= 200)
@@ -293,13 +300,13 @@ var GSN = {
 						}
 					}
 					
+					
 				}
 			});
 
 		}
 			
 	}
-	
 	
 	,isAlreadyInSelectedSensorArray: function(sensorName){
 		// Look in the selected sensor array to see if the selected sensor don't already belongs to this former
@@ -329,12 +336,22 @@ var GSN = {
 		$("#inDraggableArea-"+sensorDroppedName).append("&nbsp;&nbsp;"+sensorDroppedName+"");
 		
 		
-		$("#inDraggableArea-"+sensorDroppedName).append('<div class="colorpicker" id="colorpicker-'+sensorDroppedName+'" style="display:none;position:relative;left:80px;"></div>');
-		$("#inDraggableArea-"+sensorDroppedName).append('<input type="text" size="7" onclick="if($(\'#colorpicker-'+sensorDroppedName+'\').css(\'display\') == \'none\'){$(\'.colorpicker\').hide(\'slow\');$(\'#colorpicker-'+sensorDroppedName+'\').show(\'slow\');$(\'#colorpickerButton-'+sensorDroppedName+'\').show();}" id="hexcode-'+sensorDroppedName+'" name="hexcode-'+sensorDroppedName+'" value="#'+DEFAULT_COLOR_CODE[colorID%DEFAULT_COLOR_CODE.length]+'" style="float:right;position:relative;top:-20px;width:55px;border-width:1px;"/>');
-		$("#inDraggableArea-"+sensorDroppedName).append('<input type="button" class="colorpicker" id="colorpickerButton-'+sensorDroppedName+'" onclick="$(\'.colorpicker\').hide(\'slow\');" value="Ok" style="display:none;float:right;position:relative;top:-22px;left:-5px;"/>');
 		
-		$('#colorpicker-'+sensorDroppedName+'').farbtastic('#hexcode-'+sensorDroppedName+'');
-		//console.log(sensorDroppedName+'   #'+DEFAULT_COLOR_CODE[colorID%DEFAULT_COLOR_CODE.length]);
+		try{
+			$("#inDraggableArea-"+sensorDroppedName).append('<div class="colorpicker" id="colorpicker-'+sensorDroppedName+'" style="display:none;position:relative;left:80px;"></div>');
+			$("#inDraggableArea-"+sensorDroppedName).append('<input type="text" maxlength="7" size="7" onclick="if($(\'#colorpicker-'+sensorDroppedName+'\').css(\'display\') == \'none\'){$(\'.colorpicker\').hide(\'slow\');$(\'#colorpicker-'+sensorDroppedName+'\').show(\'slow\');$(\'#colorpickerButton-'+sensorDroppedName+'\').show();}" id="hexcode-'+sensorDroppedName+'" name="hexcode-'+sensorDroppedName+'" value="#'+DEFAULT_COLOR_CODE[colorID%DEFAULT_COLOR_CODE.length]+'" style="float:right;position:relative;top:-20px;width:55px;border-width:1px;"/>');
+			$("#inDraggableArea-"+sensorDroppedName).append('<input type="button" class="colorpicker" id="colorpickerButton-'+sensorDroppedName+'" onclick="$(\'.colorpicker\').hide(\'slow\');" value="Ok" style="display:none;float:right;position:relative;top:-22px;left:-5px;"/>');
+
+			$('#colorpicker-'+sensorDroppedName).farbtastic('#hexcode-'+sensorDroppedName);
+		} catch(err) {
+			$("#colorpicker-"+sensorDroppedName).remove();
+			$("#hexcode-"+sensorDroppedName).remove();
+			$("#inDraggableArea-"+sensorDroppedName).append('<input type="text" maxlength="7" size="7" id="hexcode-'+sensorDroppedName+'" name="hexcode-'+sensorDroppedName+'" onchange="$(this).css(\'background-color\',$(this).val())" value="#'+DEFAULT_COLOR_CODE[colorID%DEFAULT_COLOR_CODE.length]+'" style="float:right;position:relative;top:-20px;width:55px;border-width:1px;background-color:#'+DEFAULT_COLOR_CODE[colorID%DEFAULT_COLOR_CODE.length]+';"/>');
+		
+			txt="There was an error with farbtastic.\n\n";
+		  txt+="Error description: " + err.description + "\n\n";
+		  GSN.log(txt);
+		}
 		
 		
 		// Remove the selected sensor from the sidebar
@@ -352,6 +369,8 @@ var GSN = {
 		
 		// Add the dropped sensor to the selected sensor array
 		GSN.selectedSensors.push(sensorDroppedName);
+		
+		
 	}
 	
 	/**
@@ -473,7 +492,7 @@ var GSN = {
 			$(".refreshing").hide();	
 			
 			var diff = new Date() - start;
-			GSN.debug("updateall time:"+diff/1000); 
+			GSN.log("updateall time:"+diff/1000); 
 			
 			if(firstload){
 			//update map 
@@ -1019,11 +1038,6 @@ var GSN = {
 				} else {
 					$("#separation").append("<input type=\"checkbox\" name=\"fields\" class=\"field\" value=\""+GSN.data.fields[i]+"\">"+GSN.data.fields[i].prettyString());
 					$("#separation").append("<br\>");
-					
-
-					
-					
-					
 				}
 				
 				if (GSN.data.radio) {
@@ -1388,7 +1402,7 @@ var GSN = {
    			$.ajax({
    				async: false,
 					type: "GET",
-					url: "/data?"+request+"&vsName="+vsName,
+					url: "/data?"+request+"&vsName="+vsName+"&rand="+Math.random(),
 					success: function(answer) {
 						// Remove indicator	
 						$("#display .refreshing").remove();
@@ -1444,7 +1458,8 @@ var GSN = {
    		
 			var nbSelectedFields = $("field",answerLinesFromXMLSensorNum[0].get(0)).length;
 			var nbSelectedSensors = GSN.selectedSensors.length;
-			
+			GSN.info("nbSelectedFields="+nbSelectedFields);
+			GSN.info("nbSelectedSensors="+nbSelectedSensors);
 			
 			
 			// Find the index of Timed
@@ -1461,7 +1476,7 @@ var GSN = {
 			var incModulo = 0;
 			GSN.data.modulo = Math.floor(($("field",answerLinesFromXMLSensorNum[0]).length-1)/GSN.data.nbDispVal/nbSelectedFields);//Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/GSN.data.nbDispVal/nbSelectedFields);
 			var modulo = GSN.data.modulo;
-			console.log("Modulo="+modulo);
+			GSN.info("Modulo="+modulo);
 			
 			if($("#allData").attr("checked")) modulo = 1;
 			
@@ -1495,6 +1510,8 @@ var GSN = {
 						if(timedIndexInNbSelectedFieldsArray != m) actualValue = parseFloat(field.eq(m).text());
 						else actualValue = field.eq(m).text();
 							
+						GSN.log("Actual Value:"+actualValue);
+						
 						if(minValue[m] >  actualValue) minValue[m] = actualValue;
 						if(maxValue[m] <  actualValue) maxValue[m] = actualValue;
 						
@@ -1527,15 +1544,18 @@ var GSN = {
 							}
 						}
 					}
-					//alert(minValue[m]);
-					//alert(maxValue[m]);
+					//GSN.log(minValue[m]);
+					//GSN.log(maxValue[m]);
 				}
 			}
-			//alert(minValue);
-   			//alert(maxValue);
+			GSN.info("Final minValue:");
+			GSN.log(minValue);
+   		GSN.info("Final maxValue:");
+   		GSN.log(maxValue);
 			
-			
+			GSN.info("Generation Bar Chart:");
 			GSN.data.makeChart(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,"barChart");
+			GSN.info("Generation Line Chart:");
 			GSN.data.makeChart(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,"lineChart");
 			
 			
@@ -1556,9 +1576,9 @@ var GSN = {
    	,makeChart: function(nbSelectedFields,timedIndexInNbSelectedFieldsArray,answerLinesFromXMLSensorNum,values,minValue,maxValue,typeChart){
 			// Chart Part
 			var nbValue = Math.floor($("field",answerLinesFromXMLSensorNum[0]).length/nbSelectedFields)-1;
-			console.log("Nb Values extracted="+nbValue);
-			console.log("Nb Values requested="+$("#nbOfDatas").val());
-			console.log("Offset Values="+(nbValue-$("#nbOfDatas").val()));
+			GSN.log("Nb Values extracted="+nbValue);
+			GSN.log("Nb Values requested="+$("#nbOfDatas").val());
+			GSN.log("Offset Values="+(nbValue-$("#nbOfDatas").val()));
 			
 					
 			for(var m=0; m < nbSelectedFields; m++){
@@ -1590,7 +1610,7 @@ var GSN = {
 		   		}	else { 
 		   			x_step = 2;
 		   		}
-		   		//console.log("x_step="+x_step);
+		   		//GSN.log("x_step="+x_step);
 		   		
 		   		
 					so.addVariable("x_axis_steps",x_step);
@@ -1633,17 +1653,17 @@ var GSN = {
 		 			so.addVariable("bg_colour","#ffffff");
 
 					
-					//alert(minValue[m]+"   "+maxValue[m]);
+					GSN.log($("field",answerLinesFromXMLSensorNum[0].get(0)).eq(m).text().prettyString()+":  min: "+minValue[m]+"   MAX: "+maxValue[m]);
 					//deltaDiv = Math.abs(Math.floor((parseFloat(maxValue[m]) - parseFloat(minValue[m]))));
-					if(minValue[m] < 0) minVal = Math.floor(1.05*parseFloat(minValue[m]));
-					else minVal = Math.floor(0.95*parseFloat(minValue[m]));
+//					if(minValue[m] < 0) minVal = Math.floor(1.05*parseFloat(minValue[m]));
+//					else minVal = Math.floor(0.95*parseFloat(minValue[m]));
+//					
+//					if(parseInt(maxValue[m]) < 0) maxVal = 0;
+//					else maxVal = Math.floor(1.05*parseFloat(maxValue[m]));
 					
-					if(parseInt(maxValue[m]) < 0) maxVal = 0;
-					else maxVal = Math.floor(1.05*parseFloat(maxValue[m]));
 					
-					
-					so.addVariable("y_min",minVal);
-					so.addVariable("y_max",maxVal);
+					so.addVariable("y_min",minValue[m]);
+					so.addVariable("y_max",maxValue[m]);
 					
 					
 					if(typeChart == "barChart"){
@@ -1657,7 +1677,7 @@ var GSN = {
 				}
 				
 				
-				//console.log("X Label: "+x_label);
+				//GSN.log("X Label: "+x_label);
 			}
    		// End Chart Part
    		
