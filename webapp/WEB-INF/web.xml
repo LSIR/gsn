@@ -3,6 +3,7 @@
 
 <web-app>
     <display-name>GSN</display-name>
+<!--
 	<login-config>
     	<auth-method>BASIC</auth-method>
     	<realm-name>GSNRealm</realm-name>
@@ -41,6 +42,7 @@
 			<role-name>gsnuser</role-name>
 		</auth-constraint>
 	</security-constraint>
+-->
     <servlet>
         <servlet-name>AxisServlet</servlet-name>
         <display-name>Apache-Axis Servlet</display-name>

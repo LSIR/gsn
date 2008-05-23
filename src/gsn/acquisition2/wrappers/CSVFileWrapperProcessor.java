@@ -15,19 +15,26 @@ import gsn.beans.DataTypes;
 public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 	CSVFileWrapperParameters parameters = null;
-	
-	private DataField[] structure;
 
 	private final transient Logger logger = Logger.getLogger( CSVFileWrapperProcessor.class );
 
+	private CSVFileWrapperFormat csvFormat = null;
+
 	public boolean initialize() {
-		
-		super.initialize();
-		
+
+		logger.warn("cvsfile processor wrapper initialize started...");
+
+		if (! super.initialize()) return false; 
+
 		try {
 			parameters = new CSVFileWrapperParameters () ;
+			logger.debug("Getting parameters from config file.");
 			parameters.initParameters(getActiveAddressBean());
-			structure = CSVFileWrapperFormat.parseFormatFile(parameters);
+			logger.debug("done");
+			csvFormat = new CSVFileWrapperFormat () ;
+			logger.debug("Parsing Format file.");
+			csvFormat.parseFormatFile(parameters);
+			logger.debug("done");
 		}
 		catch (RuntimeException e) {
 			logger.error(e.getMessage());
@@ -36,47 +43,50 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 			logger.error(e.getMessage());
 			return false;
 		}
+
+		logger.warn("cvsfile processor wrapper initialize completed...");
+
 		return true;
 	}
 
 	@Override
 	public DataField[] getOutputFormat() {
-		return structure;
+		return csvFormat.getFields();
 	}
 
 	@Override
 	public boolean messageToBeProcessed(DataMsg dataMessage) {
 
-		Serializable[] serialized = new Serializable[structure.length];
-		
+		Serializable[] serialized = new Serializable[csvFormat.getFields().length];
+
 		String msg = (String) dataMessage.getData()[0];
 		CSVReader csvReader = new CSVReader (new StringReader(msg), parameters.getCsvSeparator(), parameters.getCsvQuoteChar()) ;
 
-		logger.debug("Next Line to parse: " + msg);
+		logger.debug("message to be processed: " + msg + " with vsf format: " + csvFormat + " and csv reader: " + csvReader);
 
 		String[] nextLine = null;
 		try {
 			nextLine = csvReader.readNext();
 
-			if (nextLine.length == structure.length) {
+			if (nextLine.length == csvFormat.getFields().length) {
 
 				Date date = null;
 				long time = 0;
 				boolean timefound = false;
 				for (int j = 0 ; j < nextLine.length ; j++) {
 
-					logger.debug("Next line to parse: " + nextLine[j] + " dataType: " + structure[j].getDataTypeID());
+					logger.debug("Next line to parse: " + nextLine[j] + " dataType: " + csvFormat.getFields()[j].getDataTypeID());
 
 					String tmp = null;
-					if(structure[j].getDataTypeID() == DataTypes.BIGINT){
+					if(csvFormat.getFields()[j].getDataTypeID() == DataTypes.BIGINT){
 						try {
 
-							logger.debug("Timestamp field found. Associated Date Format is >" + CSVFileWrapperFormat.getDateFormat(j).toPattern() + "<");
+							logger.debug("Timestamp field found. Associated Date Format is >" + csvFormat.getDateFormat(j).toPattern() + "<");
 
 							timefound = true;
 							tmp = nextLine[j].replaceAll("^\"|\"$", ""); // Remove the " chars
 
-							int patternLength = CSVFileWrapperFormat.getDateFormat(j).toPattern().length();
+							int patternLength = csvFormat.getDateFormat(j).toPattern().length();
 							if (tmp.length() < patternLength) {
 								// Padd the field with 0's
 								StringBuilder sb = new StringBuilder (tmp) ;
@@ -85,16 +95,16 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 								tmp = sb.toString();
 								logger.debug("Next line padded with 0's: ->" + tmp);
 							}
-							date = CSVFileWrapperFormat.getDateFormat(j).parse(tmp);
+							date = csvFormat.getDateFormat(j).parse(tmp);
 							time += date.getTime();
 							serialized[j] = date.getTime();
 						} catch (ParseException e) {
-							logger.error("invalide date format! (Pattern: " + CSVFileWrapperFormat.getDateFormat(j).toLocalizedPattern() + ") "+nextLine[j]);
+							logger.error("invalide date format! (Pattern: " + csvFormat.getDateFormat(j).toLocalizedPattern() + ") "+nextLine[j]);
 							serialized[j] = new Date (0).getTime();
 						}
 						logger.debug("time: "+tmp);
 					}
-					if(structure[j].getDataTypeID() == DataTypes.DOUBLE){
+					if(csvFormat.getFields()[j].getDataTypeID() == DataTypes.DOUBLE){
 						try{
 
 							nextLine[j] = filterNAN(nextLine[j]);
@@ -111,7 +121,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 						}
 						logger.debug("double: "+nextLine[j]);
 					}
-					if(structure[j].getDataTypeID() == DataTypes.INTEGER){
+					if(csvFormat.getFields()[j].getDataTypeID() == DataTypes.INTEGER){
 						try{
 
 							nextLine[j] = filterNAN(nextLine[j]);
@@ -128,11 +138,11 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 						}
 						logger.debug("integer: "+nextLine[j]);
 					}
-					if (structure[j].getDataTypeID() == DataTypes.VARCHAR) {
+					if (csvFormat.getFields()[j].getDataTypeID() == DataTypes.VARCHAR) {
 						serialized[j] = nextLine[j].replaceAll("^\"|\"$", "");
 						logger.debug("string: "+nextLine[j]);
 					}
-					if (structure[j].getDataTypeID() == DataTypes.BINARY) {
+					if (csvFormat.getFields()[j].getDataTypeID() == DataTypes.BINARY) {
 						serialized[j] = nextLine[j].replaceAll("^\"|\"$", "").getBytes();
 						logger.debug("blob:" + nextLine[j]);
 					}
@@ -153,7 +163,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 				logger.debug("Data Message Posted with Timed: " + time);
 			}
 			else {
-				logger.warn("The length of the line (" + nextLine.length + ") doesn't match the structure length (" + structure.length + ")");
+				logger.error("The length of the line (" + nextLine.length + ") doesn't match the structure length (" + csvFormat.getFields().length + ")");
 			}
 			csvReader.close();
 		} catch (IOException e) {
@@ -165,10 +175,5 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 	private String filterNAN (String value) {
 		if (value.compareToIgnoreCase("NaN") == 0)  value = "NaN";
 		return value;
-	}
-
-	@Override
-	public boolean isTimeStampUnique() {
-		return false;
 	}
 }

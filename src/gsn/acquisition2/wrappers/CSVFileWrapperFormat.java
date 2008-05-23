@@ -13,7 +13,7 @@ public class CSVFileWrapperFormat {
 
 	private static final transient Logger logger = Logger.getLogger ( CSVFileWrapperFormat.class );
 
-	private static DataField[] fields = null;
+	private DataField[] fields = null;
 
 	private static final Pattern closeParenthesisPattern = Pattern.compile("[)]") ;
 
@@ -23,10 +23,12 @@ public class CSVFileWrapperFormat {
 
 	private static final Pattern floatToDoublePattern = Pattern.compile("(float)") ;
 
-	private static SimpleDateFormat dateFormat[] = null;
+	private SimpleDateFormat dateFormat[] = null;
 
-	public static DataField[] parseFormatFile (CSVFileWrapperParameters parameters) throws IOException {
+	public DataField[] parseFormatFile (CSVFileWrapperParameters parameters) throws IOException {
 
+		logger.debug("Parsing format file >" + parameters.getCsvFormatFilePath() + "<");
+		
 		ArrayList<String> field_names = new ArrayList<String> () ;
 		ArrayList<String> field_description = new ArrayList<String> () ;
 		ArrayList<String> field_formats = new ArrayList<String> () ;
@@ -75,8 +77,8 @@ public class CSVFileWrapperFormat {
 					field_formats.get(j),
 					(field_description.get(j)));
 		}
-
 		if (logger.isDebugEnabled()){
+			logger.debug("Format: ");
 			for (int k = 0 ; k < fields.length ; k++) {
 				logger.debug("Field " + k + " " + fields[k]);
 			}
@@ -84,8 +86,12 @@ public class CSVFileWrapperFormat {
 		return fields;
 	}
 
-	public static SimpleDateFormat getDateFormat (int column) {
+	public SimpleDateFormat getDateFormat (int column) {
 		return dateFormat[column];
+	}
+	
+	public DataField[] getFields () {
+		return fields;
 	}
 
 	private static boolean contains (int[] ar, int value) {
