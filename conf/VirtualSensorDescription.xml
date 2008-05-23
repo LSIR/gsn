@@ -8,7 +8,7 @@
        <value name="password" field="generalPassword" style="attribute" usage="optional" />
        <structure name="processing-class" usage="optional" >
               <value name="class-name" field="mainClass"  />
-              <value name="unique-timestamps" field="isTimestampUnique"  usage="optional" />  
+              <value name="unique-timestamps" field="isTimestampUnique" usage="optional" default="true" />  
               <structure name="init-params" usage="optional" >
                 <collection field="mainClassInitialParams"  >
                    <structure  name="param" type="gsn.utils.KeyValueImp">
