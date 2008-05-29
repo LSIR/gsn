@@ -23,6 +23,8 @@ public abstract class AbstractWrapper2  extends Thread{
   private IoSession network;
  
   private PreparedStatement insertPS;
+  
+  private boolean keepProcessedSafeStorageEntries = true;
  
   public String getTableName() {
     return tableName;
@@ -109,4 +111,12 @@ public abstract class AbstractWrapper2  extends Thread{
   public abstract String getWrapperName ( ); 
   
   public abstract void run();
+
+public boolean isKeepProcessedSafeStorageEntries() {
+	return keepProcessedSafeStorageEntries;
+}
+
+public void setKeepProcessedSafeStorageEntries(boolean keepProcessedInSafeStorage) {
+	this.keepProcessedSafeStorageEntries = keepProcessedInSafeStorage;
+}
 }

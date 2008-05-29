@@ -36,6 +36,13 @@ public class SafeStorage {
       logger.error ( "The wrapper >" + wrapper_name + "< is not defined in the >" + SAFE_STORAGE_WRAPPERS_PROPERTIES + "< file." );
       return null;
     }
+    
+    String wrapper_keep_processed_ss_entries = addressBean.getPredicateValue("wrapper-keep-processed-ss-entries");
+    boolean keepProcessed = true;
+    if (wrapper_keep_processed_ss_entries != null) {
+    	keepProcessed = Boolean.parseBoolean(wrapper_keep_processed_ss_entries);
+    }
+    
     AbstractWrapper2 wrapper = ( AbstractWrapper2 ) wrappers.get ( wrapper_name ).newInstance ( );
     wrapper.setActiveAddressBean ( addressBean );
     boolean initializationResult = wrapper.initialize (  );
@@ -49,6 +56,7 @@ public class SafeStorage {
       wrapper.setTableName(table_name);
       wrapper.setNetwork(network);
       wrapper.setPreparedStatement(ps);
+      wrapper.setKeepProcessedSafeStorageEntries(keepProcessed) ;
     } catch ( SQLException e ) {
       logger.error ( e.getMessage ( ) , e );
       return null;

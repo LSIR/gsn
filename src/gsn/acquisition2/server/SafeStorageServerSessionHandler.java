@@ -44,12 +44,16 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 				session.close();
 				return;
 			}
-			
 			SessionState sstate = new SessionState () ;
 			sstate.setWrapper(wrapper);
 			sstate.setReaderPS(ss.getStorage().createPreparedStatement("select pk,stream_element,created_at from "+wrapper.getTableName()+" where processed = false order by pk asc limit 1"));	
-			sstate.setSuccessAckUpdatePS(ss.getStorage().createPreparedStatement("update "+wrapper.getTableName()+" set PROCESSED  = true where pk = ? "));
-			
+			logger.debug("isKeepProcessedSafeStorageEntries: " + wrapper.isKeepProcessedSafeStorageEntries());
+			if (wrapper.isKeepProcessedSafeStorageEntries()) {
+				sstate.setSuccessAckUpdatePS(ss.getStorage().createPreparedStatement("update "+wrapper.getTableName()+" set PROCESSED  = true where pk = ? "));
+			}
+			else {
+				sstate.setSuccessAckUpdatePS(ss.getStorage().createPreparedStatement("delete from " + wrapper.getTableName() + " where pk = ? "));
+			}
 			sessionStates.put(session, sstate) ;
 		}
 		if (message instanceof AcknowledgmentMsg) {
