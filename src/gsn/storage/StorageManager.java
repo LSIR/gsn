@@ -489,9 +489,9 @@ public class StorageManager {
       } else
         logger.warn("Inserting a stream element failed : "
             + streamElement.toString(), e);
-    }catch (Exception e) {
+    }catch (SQLException e) {
       logger.warn("Error occurred on inserting data to the database, an stream element dropped due to: "+e.getMessage()+". (Stream element: "+streamElement.toString()+")+ Query: "+query);
-      logger.info(e.getMessage(),e);
+      throw e; 
     }
     finally {
       close(ps);

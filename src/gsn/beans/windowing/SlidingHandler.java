@@ -11,7 +11,7 @@ public interface SlidingHandler {
 
 	public boolean dataAvailable(StreamElement streamElement);
 
-	public boolean isInterestingIn(StreamSource streamSource);
+	public boolean isInterestedIn(StreamSource streamSource);
 
 	public long getOldestTimestamp();
 	

@@ -62,7 +62,7 @@ public abstract class AbstractWrapper extends Thread {
 		}
 		
 		for (SlidingHandler slidingHandler : slidingHandlers.values()) {
-			if(slidingHandler.isInterestingIn(ss))
+			if(slidingHandler.isInterestedIn(ss))
 				slidingHandler.addStreamSource(ss);
 		}
 		
@@ -83,7 +83,7 @@ public abstract class AbstractWrapper extends Thread {
 		listeners.remove( ss );
 //		getStorageManager( ).executeDropView( ss.getUIDStr() );
 		for (SlidingHandler slidingHandler : slidingHandlers.values()) {
-			if(slidingHandler.isInterestingIn(ss))
+			if(slidingHandler.isInterestedIn(ss))
 				slidingHandler.removeStreamSource(ss);
 		}
 		if (listeners.size()==0) 
@@ -251,8 +251,12 @@ public abstract class AbstractWrapper extends Thread {
 			for (SlidingHandler slidingHandler : slidingHandlers.values()) {
 				long  timed = slidingHandler.getOldestTimestamp();
 				logger.debug("***** Oldest timestamp : " + timed);
-				if( timed != -1 )
-					minTimed = (minTimed != -1) ? Math.min(minTimed, timed) : timed; 
+				if( timed == -1 ){
+                                    minTimed = -1;
+                                    break;
+                                }else{
+				    minTimed = (minTimed != -1) ? Math.min(minTimed, timed) : timed; 
+                                }
 			}
 		}
 

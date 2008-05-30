@@ -148,7 +148,7 @@ public abstract class AbstractVirtualSensor {
       this.virtualSensorConfiguration = virtualSensorConfiguration;
    }
    
-   /*
+   /**
     * This method is going to be called by the container when one of the input
     * streams has a data to be delivered to this virtual sensor. After receiving
     * the data, the virutal sensor can do the processing on it and this
