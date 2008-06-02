@@ -5,8 +5,9 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import org.apache.log4j.Logger;
-
 import au.com.bytecode.opencsv.CSVReader;
 import gsn.acquisition2.messages.DataMsg;
 import gsn.beans.DataField;
@@ -19,6 +20,8 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 	private final transient Logger logger = Logger.getLogger( CSVFileWrapperProcessor.class );
 
 	private CSVFileWrapperFormat csvFormat = null;
+	
+	private static final TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
 
 	public boolean initialize() {
 
@@ -72,7 +75,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 				Date date = null;
 				long time = 0;
-				boolean timefound = false;
+				byte timefound = 0;
 				for (int j = 0 ; j < nextLine.length ; j++) {
 
 					logger.debug("Next line to parse: " + nextLine[j] + " dataType: " + csvFormat.getFields()[j].getDataTypeID());
@@ -83,7 +86,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 							logger.debug("Timestamp field found. Associated Date Format is >" + csvFormat.getDateFormat(j).toPattern() + "<");
 
-							timefound = true;
+							timefound++;
 							tmp = nextLine[j].replaceAll("^\"|\"$", ""); // Remove the " chars
 
 							int patternLength = csvFormat.getDateFormat(j).toPattern().length();
@@ -154,9 +157,15 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 					}
 				}
 
-				if (! timefound) {
+				// Adjust time
+				if (timefound == 0) {
 					time = System.currentTimeMillis(); 
 				}
+				else if (timefound > 1) {
+					// it is a timestamp composed with many columns
+					time += timeZone.getRawOffset();
+				}
+				
 
 				postStreamElement(time, serialized);
 
