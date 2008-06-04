@@ -45,6 +45,7 @@ public class MultiDataDownload extends HttpServlet {
 	 */
 	public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 
+		SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss z");
 		boolean responseCVS = false;
 		boolean wantTimeStamp = false;
 		boolean commonReq = true;
@@ -150,7 +151,6 @@ public class MultiDataDownload extends HttpServlet {
 						}
 						if (critfields[i].equals("timed")) {
 							try {
-								SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 								Date d = sdf.parse(critval[i]);
 								where += d.getTime();
 							} catch (Exception e) {
@@ -168,7 +168,6 @@ public class MultiDataDownload extends HttpServlet {
 						}
 						if (critfields[i].equals("timed")) {
 							try {
-								SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 								Date d = sdf.parse(critval[i]);
 								where += d.getTime();
 							} catch (Exception e) {
@@ -241,13 +240,11 @@ public class MultiDataDownload extends HttpServlet {
 					for ( int j = 0 ; j < nbFields ; j++ )
 
 						if ( !commonReq && ((j >= fields.length) || (fields[j].contains("timed")))) {
-							SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 							line += delimiter+sdf.format(se.getData( )[j]);
 						} else {
 							line += delimiter+se.getData( )[ j ].toString( );
 						}
 					if (wantTimeStamp) {
-						SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 						Date d = new Date (se.getTimeStamp());
 						line += delimiter + sdf.format(d);
 					}

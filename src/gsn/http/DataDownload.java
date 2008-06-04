@@ -9,6 +9,9 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +42,8 @@ public class DataDownload extends HttpServlet {
    * param-name: 
    */
   public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
+	  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss z");
+	  TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
     boolean responseCVS = false;
     boolean wantTimeStamp = false;
     boolean commonReq = true;
@@ -138,7 +143,6 @@ public class DataDownload extends HttpServlet {
             }
             if (critfields[i].equals("timed")) {
               try {
-                SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
                 Date d = sdf.parse(critval[i]);
                 where += d.getTime();
               } catch (Exception e) {
@@ -156,7 +160,6 @@ public class DataDownload extends HttpServlet {
             }
             if (critfields[i].equals("timed")) {
               try {
-                SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
                 Date d = sdf.parse(critval[i]);
                 where += d.getTime();
               } catch (Exception e) {
@@ -236,13 +239,11 @@ public class DataDownload extends HttpServlet {
             //line += delimiter+se.getData( )[ i ].toString( );
             
             if ( !commonReq && ((i >= fields.length) || (fields[i].contains("timed")))) {
-              SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
               line += delimiter+sdf.format(se.getData( )[i]);
             } else {
               line += delimiter+se.getData( )[ i ].toString( );
             }
           if (wantTimeStamp) {
-            SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
             Date d = new Date (se.getTimeStamp());
             line += delimiter + sdf.format(d);
           }
@@ -282,7 +283,6 @@ public class DataDownload extends HttpServlet {
             
             //if ( !commonReq && expression.contains("timed")) {
             if ( !commonReq && ((i >= fields.length) || (fields[i].contains("timed")))) {
-              SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
               respond.println("\t\t<field>"+sdf.format(se.getData( )[i])+"</field>");
             } else {
               if (se.getData()[i]==null)
@@ -292,7 +292,6 @@ public class DataDownload extends HttpServlet {
             }
           }
           if (wantTimeStamp) {
-            SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
             Date d = new Date (se.getTimeStamp());
             respond.println("\t\t<field>"+sdf.format(d)+"</field>");
           }
