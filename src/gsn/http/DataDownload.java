@@ -42,7 +42,7 @@ public class DataDownload extends HttpServlet {
    * param-name: 
    */
   public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
-	  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss z");
+	  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
 	  TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
     boolean responseCVS = false;
     boolean wantTimeStamp = false;

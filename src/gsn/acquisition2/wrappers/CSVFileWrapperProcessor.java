@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -75,7 +76,11 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 				Date date = null;
 				long time = 0;
-				byte timefound = 0;
+				boolean timefound = false;
+				
+				StringBuilder timeVal = new StringBuilder();
+				StringBuilder timeFor = new StringBuilder();
+				
 				for (int j = 0 ; j < nextLine.length ; j++) {
 
 					logger.debug("Next line to parse: " + nextLine[j] + " dataType: " + csvFormat.getFields()[j].getDataTypeID());
@@ -86,7 +91,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 							logger.debug("Timestamp field found. Associated Date Format is >" + csvFormat.getDateFormat(j).toPattern() + "<");
 
-							timefound++;
+							timefound = true;
 							tmp = nextLine[j].replaceAll("^\"|\"$", ""); // Remove the " chars
 
 							int patternLength = csvFormat.getDateFormat(j).toPattern().length();
@@ -98,6 +103,10 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 								tmp = sb.toString();
 								logger.debug("Next line padded with 0's: ->" + tmp);
 							}
+							
+							timeVal.append("-").append(tmp);
+							timeFor.append("-").append(csvFormat.getDateFormat(j).toPattern());
+							
 							date = csvFormat.getDateFormat(j).parse(tmp);
 							time += date.getTime();
 							serialized[j] = date.getTime();
@@ -158,14 +167,13 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 				}
 
 				// Adjust time
-				if (timefound == 0) {
+				if (! timefound) {
 					time = System.currentTimeMillis(); 
 				}
-				else if (timefound > 1) {
-					// it is a timestamp composed with many columns
-					time += timeZone.getRawOffset();
+				else {
+					SimpleDateFormat s = new SimpleDateFormat (timeFor.toString().substring(1)) ;
+					time = s.parse(timeVal.substring(1)).getTime();
 				}
-				
 
 				postStreamElement(time, serialized);
 
@@ -176,6 +184,8 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 			}
 			csvReader.close();
 		} catch (IOException e) {
+			logger.error(e.getMessage());
+		} catch (ParseException e) {
 			logger.error(e.getMessage());
 		}
 		return true;

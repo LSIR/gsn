@@ -45,7 +45,7 @@ public class MultiDataDownload extends HttpServlet {
 	 */
 	public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 
-		SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss z");
+		SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
 		boolean responseCVS = false;
 		boolean wantTimeStamp = false;
 		boolean commonReq = true;

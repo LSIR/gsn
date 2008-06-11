@@ -9,6 +9,9 @@ import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.collections.KeyValue;
@@ -20,7 +23,10 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
    private static transient Logger                                      logger                             = Logger.getLogger( OneShotQueryHandler.class );
    
    public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
-      String vsName = request.getParameter( "name" );
+      
+	   SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
+	   
+	   String vsName = request.getParameter( "name" );
       String vsCondition = request.getParameter( "condition" );
       if ( vsCondition == null || vsCondition.trim( ).length( ) == 0 )
          vsCondition = " ";
@@ -52,7 +58,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
                sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( se.getData( )[ i ].toString( ) ).append( "</field>\n" );
             else
                sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) ).append( "</field>\n" );
-         sb.append( "<field name=\"timed\" >" ).append( se.getTimeStamp( ) ).append( "</field>\n" );
+         sb.append( "<field name=\"timed\" >" ).append( sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
          VSensorConfig sensorConfig = Mappings.getVSensorConfig( vsName );
          if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( vsName ).append( "* received." ).toString( ) );
          //StringBuilder statement = new StringBuilder( "<virtual-sensor name=\"" ).append( vsName ).append( "\" last-modified=\"" ).append( new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\">\n" );

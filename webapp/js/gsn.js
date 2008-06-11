@@ -623,7 +623,7 @@ var GSN = {
 				value = $(this).text();
 				
 				if (name=="timed") {
-			  		if (value != "") value = GSN.util.printDate(value);
+			  		//if (value != "") value = GSN.util.printDate(value);
 					$(vsd).find("span.timed").empty().append(value);
 			  		return;
 			  	}
@@ -744,7 +744,7 @@ var GSN = {
 					}
 				}
 				value = $("field[@name=timed]",vs).text();
-				if (value != "") value = GSN.util.printDate(value);
+				//if (value != "") value = GSN.util.printDate(value);
 				$("span.timed", vsd).empty().append(value);
 				return false;
 			}

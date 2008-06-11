@@ -11,7 +11,9 @@ import gsn.storage.StorageManager;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +26,10 @@ public class ContainerInfoHandler implements RequestHandler {
   private static transient Logger logger             = Logger.getLogger( ContainerInfoHandler.class );
   
   public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
-    response.setStatus( HttpServletResponse.SC_OK );
+    
+	  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
+	  
+	  response.setStatus( HttpServletResponse.SC_OK );
     StringBuilder sb = new StringBuilder( "<gsn " );
     sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
     sb.append( "protected=\"" ).append( StringEscapeUtils.escapeXml( Boolean.toString(Main.getContainerConfig( ).isPrivacyEnabled())) ).append( "\" " );
@@ -64,7 +69,7 @@ public class ContainerInfoHandler implements RequestHandler {
                 sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
             sb.append("</field>\n");
           }
-          sb.append("\t<field name=\"timed\" type=\"long\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : se.getTimeStamp( ) ).append( "</field>\n" );
+          sb.append("\t<field name=\"timed\" type=\"string\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
           for ( KeyValue df : sensorConfig.getAddressing( )){
             sb.append("\t<field");
             sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
