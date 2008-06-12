@@ -43,6 +43,7 @@ public class DataDownload extends HttpServlet {
    */
   public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 	  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
+	  SimpleDateFormat sdf_from_ui = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ;
 	  TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
     boolean responseCVS = false;
     boolean wantTimeStamp = false;
@@ -143,8 +144,9 @@ public class DataDownload extends HttpServlet {
             }
             if (critfields[i].equals("timed")) {
               try {
-                Date d = sdf.parse(critval[i]);
-                where += d.getTime();
+                //Date d = sdf.parse(critval[i]);
+                Date d = sdf_from_ui.parse(critval[i]);
+            	where += d.getTime();
               } catch (Exception e) {
                 where += "0";
               }
@@ -160,10 +162,10 @@ public class DataDownload extends HttpServlet {
             }
             if (critfields[i].equals("timed")) {
               try {
-                Date d = sdf.parse(critval[i]);
+                //Date d = sdf.parse(critval[i]);
+            	  Date d = sdf_from_ui.parse(critval[i]);
                 where += d.getTime();
               } catch (Exception e) {
-                //System.out.println(e.toString());
                 where += "0";
               }
             } else {
