@@ -1,5 +1,6 @@
 package gsn.http;
 
+import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
@@ -45,7 +46,7 @@ public class MultiDataDownload extends HttpServlet {
 	 */
 	public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 
-		SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
+		SimpleDateFormat sdf = new SimpleDateFormat (Main.getInstance().getContainerConfig().getTimeFormat());
 		boolean responseCVS = false;
 		boolean wantTimeStamp = false;
 		boolean commonReq = true;

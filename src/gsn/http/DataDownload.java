@@ -43,8 +43,7 @@ public class DataDownload extends HttpServlet {
    * param-name: 
    */
   public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
-	  String format = Main.getInstance().getContainerConfig().getTimeFormat();
-	  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
+	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getInstance().getContainerConfig().getTimeFormat());
 	  SimpleDateFormat sdf_from_ui = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ;
 	  TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
     boolean responseCVS = false;

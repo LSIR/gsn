@@ -27,7 +27,7 @@ public class ContainerInfoHandler implements RequestHandler {
   
   public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
     
-	  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
+	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getInstance().getContainerConfig().getTimeFormat());
 	  
 	  response.setStatus( HttpServletResponse.SC_OK );
     StringBuilder sb = new StringBuilder( "<gsn " );

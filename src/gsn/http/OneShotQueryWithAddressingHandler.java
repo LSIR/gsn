@@ -1,6 +1,7 @@
 package gsn.http;
 
 import gsn.Container;
+import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
@@ -24,7 +25,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
    
    public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
       
-	   SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
+	   SimpleDateFormat sdf = new SimpleDateFormat (Main.getInstance().getContainerConfig().getTimeFormat());
 	   
 	   String vsName = request.getParameter( "name" );
       String vsCondition = request.getParameter( "condition" );
