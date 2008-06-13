@@ -1,6 +1,7 @@
 package gsn.http;
 
 import gsn.Container;
+import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
@@ -42,6 +43,7 @@ public class DataDownload extends HttpServlet {
    * param-name: 
    */
   public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
+	  String format = Main.getInstance().getContainerConfig().getTimeFormat();
 	  SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
 	  SimpleDateFormat sdf_from_ui = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ;
 	  TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();

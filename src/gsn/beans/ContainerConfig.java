@@ -532,6 +532,10 @@ public class ContainerConfig {
 		return msrMapCached;
 	}
 
+	private String timeFormat = "";
 
-
+	public String getTimeFormat() {
+		return timeFormat;
+	}
+	
 }
