@@ -604,7 +604,7 @@ var GSN = {
 			
 			var vsdl = $("dl", vsd);
 			var dynamic = vsdl.get(0);
-			var static = vsdl.get(1);
+			var static_ = vsdl.get(1);
 			var struct = vsdl.get(2);
 			var input = $("dl.input",vsdl.get(4));
 			dl = dynamic;
@@ -613,7 +613,7 @@ var GSN = {
 			var last_cmd,cmd;
 			var hiddenclass ="";
 			//update the vsbox the first time, when it's empty
-			if ($(dynamic).children().size()==0 && $(static).children().size()==0){
+			if ($(dynamic).children().size()==0 && $(static_).children().size()==0){
 			  var gotDynamic,gotStatic,gotInput = false;
 			  $("field",vs).each(function(){ 
 				name = $(this).attr("name");
@@ -635,7 +635,7 @@ var GSN = {
 						gotInput = true;
 					}
 				} else if (cat=="predicate") {
-					dl = static;
+					dl = static_;
 					if (!gotStatic) {	
 						$("a.tabstatic", vsd).show();
 			  			if (!gotDynamic) {
@@ -1337,6 +1337,9 @@ var GSN = {
    			
    			$("#step2Container .data :disabled").removeAttr("disabled");
    			$("#step3Container .data :disabled").removeAttr("disabled");
+   			if ( ! $("#someDatas").attr("checked") ) {
+   				$("#nbOfDatas").attr("disabled", "disabled");
+   			}
    			$("#step4Container .data :disabled").removeAttr("disabled");
    			
    			
@@ -1606,11 +1609,11 @@ var GSN = {
 					
 		   		
 		   		if(!$("#modData").attr("checked")){
-		   			x_step = GSN.data.modulo;
+		   			x_step = Math.max(GSN.data.modulo,1);
 		   		}	else { 
 		   			x_step = 2;
 		   		}
-		   		//GSN.log("x_step="+x_step);
+		   		GSN.log("x_step="+x_step);
 		   		
 		   		
 					so.addVariable("x_axis_steps",x_step);
@@ -1665,7 +1668,6 @@ var GSN = {
 					so.addVariable("y_min",minValue[m]);
 					so.addVariable("y_max",maxValue[m]);
 					
-					
 					if(typeChart == "barChart"){
 						GSN.data.makeBarChart(so,values,m);
 					}
@@ -1677,7 +1679,7 @@ var GSN = {
 				}
 				
 				
-				//GSN.log("X Label: "+x_label);
+				GSN.log("X Label: "+x_label);
 			}
    		// End Chart Part
    		
