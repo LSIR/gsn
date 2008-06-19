@@ -6,7 +6,7 @@
 var map;
 var GSN = { 
 	
-	debugmode: false
+	debugmode: true
 	,log: function (txt) {
 		if(typeof console != "undefined")
 			if(GSN.util.getURLParam("debug")==1 || GSN.debugmode) {
@@ -1250,6 +1250,9 @@ var GSN = {
 			$(".cvsFormat").hide();
 			
 			$("#step5Container .data").prev().click(function(){$(this).next().toggle("slow");});
+			
+			$("#step5Container").append("<div id=\"warningmsg\">" + "Warning: Not all the values are displayed. To get all the values, you have to download them." + "</div>");
+			$("#warningmsg").hide();
 	  },
    	
    	
@@ -1356,7 +1359,7 @@ var GSN = {
    	
    	displayDatas: function(request) {
    		
-   		
+   			//GSN.info("display data request: " + request.toString());
    		
 			$('#getDatas').attr("value","Update");
 			
@@ -1583,6 +1586,12 @@ var GSN = {
 			GSN.log("Nb Values requested="+$("#nbOfDatas").val());
 			GSN.log("Offset Values="+(nbValue-$("#nbOfDatas").val()));
 			
+			if ($("#allDatas").attr("checked") && $("#nbOfDatas").attr("value") < nbValue) {
+				$("#warningmsg").show(); 
+			}
+			else {
+				$("#warningmsg").hide();
+			}
 					
 			for(var m=0; m < nbSelectedFields; m++){
 				regularExpression = new RegExp("timed","i");
