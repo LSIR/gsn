@@ -15,6 +15,9 @@
                    </structure>
                 </collection>
               </structure>
+              <structure name="output-specification" usage="optional" >
+          		<value name="rate"  field="outputStreamRate" style="attribute"  />
+      		 </structure>
   		 <structure name="web-input"  usage="optional">  
 	          <value name="password"  field="webParameterPassword" style="attribute" usage="optional" />
    	       <collection field="webinput"  item-type="gsn.beans.WebInput" />
@@ -25,9 +28,6 @@
        <structure name="life-cycle"  usage="optional">  
           <value name="pool-size"  field="lifeCyclePoolSize" style="attribute" />
        </structure>
-      <structure name="output-specification" usage="optional" >
-          <value name="rate"  field="outputStreamRate" style="attribute"  />
-      </structure>
       <collection name="addressing"    field="addressing"  item-type="gsn.utils.KeyValueImp" usage="optional" />
       <structure name="storage" usage="optional" >
 	      <value name="history-size" field="storageHistorySize" style="attribute" usage="optional" />
