@@ -19,9 +19,7 @@ public class VSensorConfigModel extends Model {
 
 	public static final String PROPERTY_PRIORITY = "priority";
 
-	public static final String PROPERTY_GENERAL_PASSWORD = "generalPassword";
-
-	public static final String PROPERTY_MAIN_CLASS = "mainClass";
+		public static final String PROPERTY_MAIN_CLASS = "mainClass";
 
 	public static final String PROPERTY_DESCRIPTION = "description";
 
@@ -39,9 +37,7 @@ public class VSensorConfigModel extends Model {
 
 	private int priority;
 
-	private String generalPassword;
-
-	private String mainClass;
+		private String mainClass;
 
 	private String description;
 
@@ -78,7 +74,6 @@ public class VSensorConfigModel extends Model {
 	public VSensorConfigModel(VSensorConfig vSensorConfig) {
 		name = vSensorConfig.getName();
 		priority = vSensorConfig.getPriority();
-		generalPassword = vSensorConfig.getGeneralPassword();
 		mainClass = vSensorConfig.getProcessingClass();
 		description = vSensorConfig.getDescription();
 		lifeCyclePoolSize = vSensorConfig.getLifeCyclePoolSize();
@@ -238,15 +233,7 @@ public class VSensorConfigModel extends Model {
 		firePropertyChange(PROPERTY_WEB_PARAMETER_PASSWORD, oldWebParameterPassword, webParameterPassword);
 	}
 
-	public String getGeneralPassword() {
-		return generalPassword;
-	}
-
-	public void setGeneralPassword(String generalPassword) {
-		String oldGeneralPassword = getGeneralPassword();
-		this.generalPassword = generalPassword;
-		firePropertyChange(PROPERTY_GENERAL_PASSWORD, oldGeneralPassword, generalPassword);
-	}
+	
 
 	public boolean isRateUnlimited() {
 		return rateUnlimited;
@@ -302,7 +289,6 @@ public class VSensorConfigModel extends Model {
 		VSensorConfig vSensorConfig = new VSensorConfig();
 		vSensorConfig.setName(getName());
 		vSensorConfig.setDescription(getDescription());
-		vSensorConfig.setGeneralPassword(getGeneralPassword());
 		vSensorConfig.setLifeCyclePoolSize(getLifeCyclePoolSize());
 		vSensorConfig.setMainClass(getMainClass());
 		vSensorConfig.setOutputStreamRate(getOutputStreamRate());

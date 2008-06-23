@@ -56,9 +56,7 @@ public class VSensorConfig implements Serializable {
 
 	private String directoryQuery ;
 
-	private String generalPassword = null;
-
-	private WebInput[] webinput;
+		private WebInput[] webinput;
 
 	private String sensorMap = "false";
 
@@ -415,13 +413,6 @@ public class VSensorConfig implements Serializable {
 		}
 	}
 
-	public String getGeneralPassword(){
-		return generalPassword;
-	}
-
-	public void setGeneralPassword(String generalPassword){
-		this.generalPassword=generalPassword;
-	}
 
 
 	/**

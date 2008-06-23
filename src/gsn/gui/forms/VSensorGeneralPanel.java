@@ -26,7 +26,6 @@ public class VSensorGeneralPanel {
 	private VSensorConfigPresentationModel presentationModel;
 	private JTextField nameTextField;
 	private JTextField priorityTextField;
-	private JTextField generalPasswordTextField;
 	private JTextArea descriptionTextArea;
 	private JTextField poolSizeTextField;
 	private JTextField storageSizeTextField;
@@ -72,7 +71,6 @@ public class VSensorGeneralPanel {
 		builder.addLabel("Priority", cc.xy(5, 1));
 		builder.add(priorityTextField, cc.xyw(7, 1, 3));
 		builder.addLabel("Password" , cc.xy(1, 3));
-		builder.add(generalPasswordTextField, cc.xy(3, 3));
 		builder.addLabel("Pool size", cc.xy(5, 3));
 		builder.add(poolSizeTextField, cc.xyw(7, 3, 3));
 		builder.addLabel("Storage size" , cc.xy(1, 5));
@@ -88,7 +86,6 @@ public class VSensorGeneralPanel {
 	private void initComponents() {
 		nameTextField = BasicComponentFactory.createTextField(presentationModel.getBufferedModel(VSensorConfigModel.PROPERTY_NAME));
 		priorityTextField = BasicComponentFactory.createIntegerField(presentationModel.getModel(VSensorConfigModel.PROPERTY_PRIORITY));
-		generalPasswordTextField = BasicComponentFactory.createTextField(presentationModel.getModel(VSensorConfigModel.PROPERTY_GENERAL_PASSWORD));
 		descriptionTextArea = BasicComponentFactory.createTextArea(presentationModel.getModel(VSensorConfigModel.PROPERTY_DESCRIPTION));
 		descriptionTextArea.setLineWrap(true);
 		descriptionTextArea.setWrapStyleWord(true);
