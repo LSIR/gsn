@@ -499,8 +499,6 @@ public class VSVNodeWidget extends Widget implements StateModel.Listener, VSVMin
 		}
 
 		topWidget.addChild(createTitleValueWidget(scene, "Priority : ", String.valueOf(vSensorConfig.getPriority())));
-		if (vSensorConfig.getGeneralPassword() != null)
-			topWidget.addChild(createTitleValueWidget(scene, "Password : ", vSensorConfig.getGeneralPassword()));
 		topWidget.addChild(createTitleValueWidget(scene, "Pool size : ", String.valueOf(vSensorConfig.getLifeCyclePoolSize())));
 		topWidget.addChild(createTitleValueWidget(scene, "Storage size : ", vSensorConfig.getStorageHistorySize()));
 		int outputStreamRate = vSensorConfig.getOutputStreamRate();
