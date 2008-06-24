@@ -58,7 +58,7 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 						if (! nextLine.matches("\\s*$")) {
 							if (read_lines > parameters.getCsvSkipLines()) {
 								if (read_lines > nbOfProcessedLines) {
-									logger.warn("Next line: " + nextLine);
+									logger.debug("Next line: " + nextLine);
 									postStreamElement(nextLine, System.currentTimeMillis( ));
 									nbOfProcessedLines = read_lines;
 								}
