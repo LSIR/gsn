@@ -1,4 +1,4 @@
-#LyX 1.5.4 created this file. For more info see http://www.lyx.org/
+#LyX 1.5.1 created this file. For more info see http://www.lyx.org/
 \lyxformat 276
 \begin_document
 \begin_header
@@ -4462,6 +4462,43 @@ JOIN
 \family default
  SQL operations on the incoming data streams, if more than one source is
  defined.
+ In the stream queries, we can refer to a source by the value of 
+\family typewriter
+alias
+\family default
+ attribute of that source.
+ The combination of 
+\family typewriter
+storage-size
+\family default
+ and 
+\family typewriter
+slide
+\family default
+ attributes defines a sliding window over the data.
+ The 
+\family typewriter
+storage-size
+\family default
+ attribute specifies the size of the window and the 
+\family typewriter
+slide
+\family default
+ attibute specifies the sliding predicate.
+ Both of these attributes can be either time-based or count-based.
+ A time-based value can be specified by adding a 
+\emph on
+s
+\emph default
+, 
+\emph on
+m
+\emph default
+, or 
+\emph on
+h
+\emph default
+ character after the numeric value.
 \end_layout
 
 \begin_layout Standard
@@ -5816,8 +5853,20 @@ if(getActiveAddressBean().getPredicateValue("x") != null)
   {...} 
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Standard
+By default GSN assumes that the timestamps of the data produced in a wrapper
+ are local, that is, the wrapper produced them using the system (or GSN)
+ time.
+ If you have cases where this assumption is not valid and GSN should assume
+ remote timestamps for stream elements, add the following line in the 
+\family typewriter
+initialize()
+\family default
+ method:
+\end_layout
 
+\begin_layout LyX-Code
+setUsingRemoteTimestamp(true);
 \end_layout
 
 \begin_layout Subsection
@@ -7747,7 +7796,7 @@ This behaviour can be changed by using a trick which is to use a marker
 
  
 \begin_inset Graphics
-	filename ../BEFFA-2007/gsn2_hightrick2.png
+	filename figures/chapterWebInterface/gsn2_hightrick2.png
 
 \end_inset
 
@@ -8228,7 +8277,7 @@ key "firebug"
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename ../BEFFA-2007/firebug.png
+	filename figures/chapterWebInterface/firebug.png
 	width 100text%
 
 \end_inset

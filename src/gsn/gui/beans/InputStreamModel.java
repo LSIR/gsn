@@ -16,7 +16,7 @@ public class InputStreamModel extends Model {
 
 	private String inputStreamName;
 
-	private long count;
+	private Long count;
 
 	private int rate;
 
@@ -26,12 +26,16 @@ public class InputStreamModel extends Model {
 
 	public InputStreamModel() {
 		sources = new ArrayListModel();
-		count = Long.MAX_VALUE;
+//		count = Long.MAX_VALUE;
 	}
 
 	public InputStreamModel(InputStream inputStream) {
 		inputStreamName = inputStream.getInputStreamName();
 		count = inputStream.getCount();
+		
+		if(count == Long.MAX_VALUE)
+			count = null;
+		
 		rate = inputStream.getRate();
 		query = inputStream.getQuery();
 		sources = new ArrayListModel();
@@ -44,12 +48,12 @@ public class InputStreamModel extends Model {
 		}
 	}
 
-	public long getCount() {
+	public Long getCount() {
 		return count;
 	}
 
-	public void setCount(long count) {
-		long oldCount = getCount();
+	public void setCount(Long count) {
+		Long oldCount = getCount();
 		this.count = count;
 		firePropertyChange(PROPERTY_COUNT, oldCount, count);
 	}

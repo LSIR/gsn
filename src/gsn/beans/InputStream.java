@@ -3,15 +3,16 @@ package gsn.beans;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.VirtualSensorPool;
 import gsn.storage.PoolIsFullException;
-import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
+
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 
 public class InputStream implements Serializable{
@@ -24,7 +25,7 @@ public class InputStream implements Serializable{
 
 	private String                                      inputStreamName;
 
-	private long                                        count                 = Long.MAX_VALUE;
+	private Long                                        count                 /*= Long.MAX_VALUE*/;
 
 	private transient long                              currentCount          = 1;
 
@@ -66,12 +67,12 @@ public class InputStream implements Serializable{
 		 this.inputStreamName = inputStreamName;
 	 }
 
-	 public long getCount ( ) {
-		 if ( this.count == 0 ) this.count = Long.MAX_VALUE;
+	 public Long getCount ( ) {
+		 if ( this.count == null || this.count == 0 ) this.count = Long.MAX_VALUE;
 		 return this.count;
 	 }
 
-	 public void setCount ( final long count ) {
+	 public void setCount ( final Long count ) {
 		 this.count = count;
 	 }
 
