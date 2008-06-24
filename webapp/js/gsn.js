@@ -6,7 +6,7 @@
 var map;
 var GSN = { 
 	
-	debugmode: true
+	debugmode: false
 	,log: function (txt) {
 		if(typeof console != "undefined")
 			if(GSN.util.getURLParam("debug")==1 || GSN.debugmode) {
