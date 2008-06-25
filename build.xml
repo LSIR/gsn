@@ -1,7 +1,7 @@
 <project name="gsn" default="build" basedir=".">
    <property name="safe-storage-port" value="25000"/>
-   <property name="safe-storage-controller-port" value="25002"/>
-	<property name="gsn-controller-port" value="22222"/>
+   <property name="safe-storage-controller-port" value="25012"/>
+	<property name="gsn-controller-port" value="22232"/>
    <target name="init" description="initializes properties and initialization tasks">
       <tstamp>
          <format property="TODAY" pattern="yyyy-MMMM-d-'at'-hh-mm-aa" locale="en"/>
@@ -228,11 +228,18 @@
 	</target>
 	
 	<target name="start-acquisition"  depends="bind">
-		<java classname="gsn.acquisition2.server.SafeStorageServer"  fork="false" dir="${basedir}" classpathref="classpath">
+		<java classname="gsn.acquisition2.server.SafeStorageServer"  fork="true" dir="${basedir}" classpathref="classpath">
 			<arg id="ss-port" value="${safe-storage-port}"/>
 			<arg id="ssc-port" value="${safe-storage-controller-port}" />
 		</java>
 	</target>
+	
+	<target name="start-acquisition-nofork"  depends="bind">
+			<java classname="gsn.acquisition2.server.SafeStorageServer"  fork="false" dir="${basedir}" classpathref="classpath">
+				<arg id="ss-port" value="${safe-storage-port}"/>
+				<arg id="ssc-port" value="${safe-storage-controller-port}" />
+			</java>
+		</target>
 	
 	<target name="stop-acquisition" depends="bind">
 		<java classname="gsn.SafeStorageStop"  fork="true" dir="${basedir}" classpathref="classpath">
@@ -240,7 +247,7 @@
 		</java>
 	</target>
    
-	<target name="start-all" depends="start-acquisition,gsn"/>
+	<target name="start-all" depends="start-acquisition-nofork,gsn"/>
 	<target name="stop-all" depends="stop-acquisition,stop"/>
 </project>
 
