@@ -1,12 +1,9 @@
 package gsn.acquisition2.server;
 
-import gsn.*;
 import gsn.acquisition2.SafeStorage;
-
 import java.io.*;
 import java.net.*;
 import java.sql.SQLException;
-
 import org.apache.log4j.*;
 import org.apache.mina.common.*;
 import org.apache.mina.filter.codec.*;
@@ -16,6 +13,8 @@ import org.apache.mina.transport.socket.nio.*;
 public class SafeStorageServer {
   
 	public static transient Logger logger = Logger.getLogger(SafeStorageServer.class);
+	
+	private static final String DEFAULT_SAFESTORAGE_LOG4J_PROPERTIES = "conf/log4j_safestorage.properties";
 	
 	private IoAcceptor acceptor;
 	
@@ -38,7 +37,7 @@ public class SafeStorageServer {
   public static void main(String[] args) throws Exception {
 	  int safeStorageServerPort = Integer.parseInt(args[0]);
 	int safeStorageControllerPort = Integer.parseInt(args[1]);
-    PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
+    PropertyConfigurator.configure ( DEFAULT_SAFESTORAGE_LOG4J_PROPERTIES );
     SafeStorageServer sss = new SafeStorageServer(safeStorageServerPort);
     new SafeStorageController(sss, safeStorageControllerPort);
   }
