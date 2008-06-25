@@ -72,7 +72,7 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 			logger.error(e.getMessage(), e);
 			return false;
 		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage(), e);
+			logger.error("Unable to find the >" + parameters.getTinyosMessageName() + "< class.");
 			return false;
 		} catch (InstantiationException e) {
 			logger.error(e.getMessage(), e);

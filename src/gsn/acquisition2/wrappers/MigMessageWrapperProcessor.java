@@ -16,7 +16,7 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 	private MigMessageParameters parameters = null;
 
 	private Class classTemplate = null;
-	
+
 	private Constructor messageConstructor = null;
 
 	private final transient Logger logger = Logger.getLogger( MigMessageWrapperProcessor.class );
@@ -37,10 +37,10 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 			logger.error(e.getMessage());
 			return false;
 		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
+			logger.error("Unable to find the >" + parameters.getTinyosMessageName() + "< class.");
 			return false;
 		} catch (NoSuchMethodException e) {
-			logger.error(e.getMessage());
+			logger.error("Unable to find the >" + parameters.getTinyosMessageName() + "(byte[]) constructor.<");
 			return false;
 		}
 		logger.warn("tinyos processor wrapper initialize completed...");
@@ -49,27 +49,28 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 
 	@Override
 	public boolean messageToBeProcessed(DataMsg dataMessage) {
+
+		Method getter = null;
+		Object res = null;
+		Serializable resarray = null;
+		Long ts = (Long) dataMessage.getData()[1];
+		byte[] rawmsg = (byte[]) dataMessage.getData()[0];
+		
 		try {
 			
-			byte[] rawmsg = (byte[]) dataMessage.getData()[0];
-			Long ts = (Long) dataMessage.getData()[1];
-			
-			String val = "";
-			for (int i = 0 ; i < rawmsg.length ; i++) {
-				val += rawmsg[i] + " " ; 
+			if (logger.isDebugEnabled()) {
+				StringBuilder rawmsgoutput = new StringBuilder ();
+				for (int i = 0 ; i < rawmsg.length ; i++) {
+					rawmsgoutput.append(rawmsg[i]);
+				}
+				logger.debug("new message to be processed: " + rawmsgoutput.toString());
 			}
-			logger.debug("new message to be processed: " + val);
 			
-			
-			
+
 			Object msg = (Object) messageConstructor.newInstance(rawmsg);
-			
-			//
+
 			ArrayList<Serializable> output = new ArrayList<Serializable> () ;
 			Iterator<Method> iter = parameters.getGetters().iterator();
-			Method getter = null;
-			Object res = null;
-			Serializable resarray = null;
 			while (iter.hasNext()) {
 				getter = (Method) iter.next();
 				getter.setAccessible(true);
@@ -86,17 +87,18 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 					logger.debug("> " + getter.getName() + ": " + res);
 				}
 			}
-			
-			logger.debug("LENGTH: " + output.toArray().length);
+
+			// Update TIMED field
+			if (parameters.getTimedFieldGetter() != null) ts = (Long) getter.invoke(msg);
 			
 			postStreamElement(ts.longValue(), output.toArray(new Serializable[] {}));
 
 		} catch (InstantiationException e) {
-			logger.error(e.getMessage());
+			logger.error("Unable to instanciate the message");
 		} catch (IllegalAccessException e) {
-			logger.error(e.getMessage());
+			logger.error("Illegal Access to >" + getter + "<");
 		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage());
+			logger.error("Illegal argument to >" + getter + "<");
 		} catch (InvocationTargetException e) {
 			logger.error(e.getMessage());
 		} catch (SecurityException e) {
