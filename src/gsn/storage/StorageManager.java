@@ -960,7 +960,6 @@ public class StorageManager {
     dbConnectionProperties.put("cacheResultSetMetadata", "true");
     dbConnectionProperties.put("defaultFetchSize", "5");
     dbConnectionProperties.put("useLocalSessionState", "true");
-    dbConnectionProperties.put("characterEncoding", "sjis");
     dbConnectionProperties.put("useLocalSessionState", "true");
     dbConnectionProperties.put("useServerPrepStmts", "false");
     dbConnectionProperties.put("prepStmtCacheSize", "512");
