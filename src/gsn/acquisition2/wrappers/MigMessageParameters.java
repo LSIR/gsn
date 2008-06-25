@@ -94,7 +94,6 @@ public class MigMessageParameters {
 					type = typesMapping.get(method.getReturnType()) ;
 					if (type == null) {
 						logger.error("Not managed type: >" + method.getReturnType() + "< for getter >" + method.getName() + "<");
-						break;
 					}
 					else {
 						nextField = new DataField (method.getName().substring(tinyosGetterPrefix.length()).toUpperCase() , type) ;
