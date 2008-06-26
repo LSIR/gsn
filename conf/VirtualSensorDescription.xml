@@ -20,8 +20,8 @@
       		 </structure>
   		 <structure name="web-input"  usage="optional">  
 	          <value name="password"  field="webParameterPassword" style="attribute" usage="optional" />
-   	       <collection field="webinput"  item-type="gsn.beans.WebInput" />
-       </structure>
+   	          <collection field="webinput"  item-type="gsn.beans.WebInput" />
+         </structure>
        <collection name="output-structure"   field="outputStructure"  item-type="gsn.beans.DataField" />
        </structure>
        <value name="description" field="description"  usage="optional"/>

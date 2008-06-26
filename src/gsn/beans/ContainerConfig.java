@@ -88,9 +88,6 @@ public class ContainerConfig {
 
 	private String sslKeyPassword;
 
-	private String vs_protected_user;
-
-	private String vs_protected_password;
 
 	public String getContainerFileName ( ) {
 		return this.containerFileName;
@@ -505,17 +502,7 @@ public class ContainerConfig {
 	public String getSSLKeyPassword(){
 		return sslKeyPassword;
 	}
-	public String getVs_protected_user() {
-		return vs_protected_user;
-	}
-
-	public String getVs_protected_password() {
-		return vs_protected_password;
-	}
-	public boolean isPrivacyEnabled() {
-		return (vs_protected_password !=null && vs_protected_user!=null &&  vs_protected_user.trim().length()>0 && vs_protected_password.trim().length()>0);
-	}
-
+	
 	/**
 	 * MSR MAP PART.
 	 */

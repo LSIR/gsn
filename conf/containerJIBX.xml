@@ -15,11 +15,6 @@
 			<value name="password" field="jdbcPassword" style="attribute" />
 			<value name="url" field="jdbcURL" style="attribute" />
 		</structure>
-		<structure name="authentication" usage="optional">
-			<value name="user" field="vs_protected_user" style="attribute" />
-			<value name="password" field="vs_protected_password" style="attribute" />			
-		</structure>
-		
 	    <collection name="microsoft-research-sensormap"    field="msrMap"  item-type="gsn.utils.KeyValueImp" usage="optional" />  
 	</mapping>
     <mapping name="parameter" class="gsn.utils.KeyValueImp" >
