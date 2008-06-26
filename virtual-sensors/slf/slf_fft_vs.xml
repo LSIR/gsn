@@ -7,7 +7,7 @@
 		</init-params>
         <output-structure>
 			<field name="DF" type="DOUBLE" />
-			<field name="VALS" type="BLOB" />
+			<field name="VALS" type="binary:text/plain" />
        </output-structure>
     </processing-class>
     <description>FFT VS</description>

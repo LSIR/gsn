@@ -35,7 +35,7 @@ public class FFTRealOneSided extends WindowAwareVS {
 
 	private static final DataField [] outputStructure = new DataField[] { 
 		new DataField(DF, DataTypes.DOUBLE_NAME), 
-		new DataField(VALUES, "BLOB")
+		new DataField(VALUES, "BINARY:text/plain")
 	};
 
 	private static transient Logger logger  = Logger.getLogger ( FFTRealOneSided.class );

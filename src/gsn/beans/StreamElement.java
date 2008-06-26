@@ -105,11 +105,8 @@ public final class StreamElement implements Serializable {
 	public String toString ( ) {
 		final StringBuffer output = new StringBuffer( "timed = " );
 		output.append( this.getTimeStamp( ) ).append( "\t" );
-		for ( int i = 0 ; i < this.fieldNames.length ; i++ ) {
-			output.append( "," ).append( this.fieldNames[ i ] ).append( "/" ).append( this.fieldTypes[ i ] ).append( " = " );
-			if (fieldTypes[ i ] == DataTypes.BINARY) output.append( new String((byte[])fieldValues[ i ]) );
-			else output.append( this.fieldValues[ i ] );
-		}
+		for ( int i = 0 ; i < this.fieldNames.length ; i++ )
+			output.append( "," ).append( this.fieldNames[ i ] ).append( "/" ).append( this.fieldTypes[ i ] ).append( " = " ).append( this.fieldValues[ i ] );
 		return output.toString( );
 	}
 

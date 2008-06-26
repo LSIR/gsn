@@ -3,7 +3,6 @@ package gsn.storage;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import java.io.Serializable;
-import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -146,12 +145,11 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 						output[ innerIndex ] = resultSet.getLong( actualColIndex );
 						break;
 					case DataTypes.BINARY :
-						if ( linkBinaryData ) {
-							  output[ innerIndex ] = "/field?vs=" + resultSet.getMetaData( ).getTableName( actualColIndex ) + "&amp;field=" + resultSet.getMetaData( ).getColumnName( actualColIndex )
-							  + "&amp;pk=" + pkValue;
-						}
-						else
-							output[ innerIndex ] = new String(resultSet.getBytes( actualColIndex ));
+						if ( linkBinaryData )
+							output[ innerIndex ] = "/field?vs=" + resultSet.getMetaData( ).getTableName( actualColIndex ) + "&amp;field=" + resultSet.getMetaData( ).getColumnName( actualColIndex )
+							+ "&amp;pk=" + pkValue;
+							else
+								output[ innerIndex ] = resultSet.getBytes( actualColIndex );
 						break;
 					}
 					if (resultSet.wasNull())
