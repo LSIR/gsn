@@ -31,6 +31,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jibx.runtime.BindingDirectory;
@@ -43,6 +45,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SslSocketConnector;
+import org.mortbay.jetty.servlet.HashSessionIdManager;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
@@ -105,7 +108,7 @@ public final class Main {
     server.addHandler( webAppContext );
     server.setStopAtShutdown ( true );
     server.setSendServerVersion ( false );
-    
+    server.setSessionIdManager(new HashSessionIdManager(new Random()));
     server.addUserRealm(new HashUserRealm("GSNRealm","conf/realm.properties"));
     
     try {
