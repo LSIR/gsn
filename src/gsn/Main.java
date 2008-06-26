@@ -109,7 +109,9 @@ public final class Main {
     server.addUserRealm(new HashUserRealm("GSNRealm","conf/realm.properties"));
     
     try {
+      logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" ...");
       server.start ( );
+      logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
     } catch ( Exception e ) {
       logger.error ( "Start of the HTTP server failed. The HTTP protocol is used in most of the communications." );
       logger.error ( e.getMessage ( ) , e );
