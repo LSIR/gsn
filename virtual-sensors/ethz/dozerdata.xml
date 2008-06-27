@@ -2,17 +2,21 @@
     <processing-class>
        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
        <unique-timestamps>true</unique-timestamps>
-        <output-structure>        
-			<field name="SYSVOLTAGE" type="INTEGER" />
-			<field name="REALSYSVOLTAGE_V" type="DOUBLE" />
-			<field name="SDIVOLTAGE" type="INTEGER" />
-			<field name="REALSDIVOLTAGE_V" type="DOUBLE" />
-			<field name="TEMPERATURE" type="INTEGER" />
-			<field name="REALTEMPERATURE_C" type="DOUBLE" />
-			<field name="MOISTURE" type="INTEGER" />
-			<field name="APPROXMOISTURE_REL" type="DOUBLE" />
-			<field name="REALMOISTURE_REL" type="DOUBLE" />
-			<field name="TIMESTAMP" type="BIGINT" />
+        <output-structure>   
+        	<field name="APPROXMOISTURE_REL" type="DOUBLE" />
+        	<field name="MOISTURE" type="INTEGER" />
+        	<field name="REALMOISTURE_REL" type="DOUBLE" />
+        	<field name="REALSDIVOLTAGE_V" type="DOUBLE" />
+        	<field name="REALSYSVOLTAGE_V" type="DOUBLE" />
+        	<field name="REALTEMPERATURE_C" type="DOUBLE" />
+        	<field name="SDIVOLTAGE" type="INTEGER" />
+        	<field name="SYSVOLTAGE" type="INTEGER" />
+        	<field name="TEMPERATURE" type="INTEGER" />
+        	<field name="TIMESTAMP" type="BIGINT" />
+        	<field name="ATIME" type="INTEGER" />
+        	<field name="GENTIME" type="BIGINT" />
+        	<field name="ORIGINATORID" type="INTEGER" />
+       		<field name="SEQNR" type="INTEGER" />
        </output-structure>
     </processing-class>
     <description> TODO Add a description</description>

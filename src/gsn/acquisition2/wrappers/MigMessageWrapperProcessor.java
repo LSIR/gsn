@@ -29,9 +29,9 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 			parameters.initParameters(getActiveAddressBean());			
 			//
 			classTemplate = Class.forName(parameters.getTinyosMessageName());
-			parameters.buildOutputStructure(classTemplate);
+			parameters.buildOutputStructure(classTemplate, new ArrayList<DataField>(), new ArrayList<Method>());
 			//
-			messageConstructor = classTemplate.getConstructor(byte[].class) ;
+			messageConstructor = classTemplate.getConstructor(byte[].class) ;			
 		}
 		catch (RuntimeException e) {
 			logger.error(e.getMessage());

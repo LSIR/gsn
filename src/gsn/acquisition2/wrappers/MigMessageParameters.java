@@ -2,7 +2,12 @@ package gsn.acquisition2.wrappers;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
@@ -16,8 +21,23 @@ public class MigMessageParameters {
 	private ArrayList<Method> getters = null;
 
 	private DataField[] outputStructure = null;
-	
+
 	private Method timedFieldGetter = null;
+
+	private static final Comparator<Method> orderMethodComparator = new Comparator<Method>() { 
+		public int compare(Method m1, Method m2) { return m1.getName().compareTo(m2.getName()); }
+	};
+	
+	private static final Comparator<Method> equalMethodComparator = new Comparator<Method>() { 
+		public int compare(Method m1, Method m2) { 
+			boolean sameName = (m1.getName().compareTo(m2.getName()) == 0);
+			boolean sameReturnType = (m1.getReturnType().equals(m2.getReturnType()));
+			if (sameName && sameReturnType) return 0;
+			else return orderMethodComparator.compare(m1, m2);
+		}
+	};
+	
+
 
 	// Optional Parameters
 
@@ -66,49 +86,85 @@ public class MigMessageParameters {
 
 	}
 
-	public void buildOutputStructure (Class tosmsgClass) {
+	/**
+	 * <p>
+	 * Build recursively the output structure. This implementation use the refelexivity to get the names of the fields.
+	 * The fields which will compose the output structure must hold the following conditions:
+	 * </p>
+	 * <ul>
+	 * <li>The method name must be suffixed either by the specified <code>tinyosGetterPrefix</code> or <code>get_</code> by default.</li>
+	 * <li>The return type must be supprted. See <code>buildMappings</code> method for a list of supported types.</li>
+	 * </ul>
+	 * @param tosmsgClass
+	 * @param fields
+	 */
+	public void buildOutputStructure (Class tosmsgClass, ArrayList<DataField> fields, ArrayList<Method> getters) throws RuntimeException {
 		logger.debug("Building output structure for class: " + tosmsgClass.getCanonicalName() + " and prefix: " + tinyosGetterPrefix);
 
 		if (typesMapping == null) buildMappings() ;
 
-		getters = new ArrayList<Method> () ;
+		boolean tinyos1xMessageClassReached = tosmsgClass == net.tinyos1x.message.Message.class;
+		boolean tinyos2xMessageClassReached = tosmsgClass == net.tinyos.message.Message.class;
+		boolean tinyosMessageClassNotFound = tosmsgClass == Object.class;
 
-		ArrayList<DataField> fields = new ArrayList<DataField> () ;
-		DataField nextField = null;
+		if (tinyosMessageClassNotFound) {
+			fields = null;
+			getters = null;
+			throw new RuntimeException ("Neither TinyOS1x (net.tinyos1x.message.Message) nor TinyOS2x (net.tinyos.message.Message) message class where found in the >" + tinyosMessageName + "< class hierarchy") ;
+		} 
+		else if (tinyos1xMessageClassReached || tinyos2xMessageClassReached) {
+			this.outputStructure = fields.toArray(new DataField[] {});
+			this.getters = getters;
+		}
+		else {
 
-		Method[] methods = tosmsgClass.getDeclaredMethods();
-		Method method = null;
-		//Class returnType = null;
-		String type = null;
-		for (int i = 0 ; i < methods.length ; i++) {
+			Method[] methods = tosmsgClass.getDeclaredMethods();
+			Arrays.sort(methods, orderMethodComparator);
 
-			method = methods[i];
+			Method method = null;
+			String type = null;
+			DataField nextField = null;
+			for (int i = 0 ; i < methods.length ; i++) {
 
-			// select getters
-			if (method.getName().startsWith(tinyosGetterPrefix)) {
-				if (method.getName().toUpperCase().compareTo((tinyosGetterPrefix + "TIMED").toUpperCase()) == 0) {
-					logger.warn("next data field is the TIMED field");
-					timedFieldGetter = method;
-				}
-				else {
-					type = typesMapping.get(method.getReturnType()) ;
-					if (type == null) {
-						logger.warn("Not managed type: >" + method.getReturnType() + "< for getter >" + method.getName() + "<. This getter is skipped.");
+				method = methods[i];
+
+				// select getters
+				if (method.getName().startsWith(tinyosGetterPrefix)) {
+					
+					
+					if ( isInMethodList(getters, method) ) {
+						logger.warn("The method >" + method.getName() + "< is already defined in a subclass. This getter is skipped.");
+					}
+					else if (method.getName().compareToIgnoreCase(tinyosGetterPrefix + "TIMED") == 0) {
+						logger.warn("next data field is the TIMED field");
+						timedFieldGetter = method;
 					}
 					else {
-						nextField = new DataField (method.getName().substring(tinyosGetterPrefix.length()).toUpperCase() , type) ;
-						logger.debug("next data field: " + nextField);
-						fields.add(nextField);
-						getters.add(method);
+						type = typesMapping.get(method.getReturnType()) ;
+						if (type == null) {
+							logger.warn("Not managed type: >" + method.getReturnType() + "< for getter >" + method.getName() + "<. This getter is skipped.");
+						}
+						else {
+							nextField = new DataField (method.getName().substring(tinyosGetterPrefix.length()).toUpperCase() , type) ;
+							logger.debug("next data field: " + nextField);
+							fields.add(nextField);
+							getters.add(method);
+						}
 					}
 				}
 			}
+			buildOutputStructure (tosmsgClass.getSuperclass(), fields, getters) ;
 		}
-		DataField[] fieldsArray = new DataField[fields.size()];
-		
-		// Sort the outputStructure and the methods
-
-		this.outputStructure = fields.toArray(fieldsArray);
+	}
+	
+	private static boolean isInMethodList (ArrayList<Method> methods, Method amethod) {
+		Iterator<Method> iter = methods.iterator();
+		Method nextMethod = null;
+		while (iter.hasNext()) {
+			nextMethod = iter.next();
+			if (equalMethodComparator.compare(nextMethod, amethod) == 0) return true;
+		}
+		return false;
 	}
 
 	private static void buildMappings () {
