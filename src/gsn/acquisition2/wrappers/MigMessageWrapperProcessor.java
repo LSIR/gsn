@@ -89,7 +89,10 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 			}
 
 			// Update TIMED field
-			if (parameters.getTimedFieldGetter() != null) ts = (Long) getter.invoke(msg);
+			if (parameters.getTimedFieldGetter() != null) {
+				parameters.getTimedFieldGetter().setAccessible(true);
+				ts = (Long) parameters.getTimedFieldGetter().invoke(msg);
+			}
 			
 			postStreamElement(ts.longValue(), output.toArray(new Serializable[] {}));
 
@@ -100,9 +103,9 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 		} catch (IllegalArgumentException e) {
 			logger.error("Illegal argument to >" + getter + "<");
 		} catch (InvocationTargetException e) {
-			logger.error(e.getMessage());
+			logger.error("Invocation Target Exception " + e.getMessage());
 		} catch (SecurityException e) {
-			logger.error(e.getMessage());
+			logger.error("Security Exception " + e.getMessage());
 		}
 		return true;
 	}

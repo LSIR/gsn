@@ -87,13 +87,13 @@ public class MigMessageParameters {
 			// select getters
 			if (method.getName().startsWith(tinyosGetterPrefix)) {
 				if (method.getName().toUpperCase().compareTo((tinyosGetterPrefix + "TIMED").toUpperCase()) == 0) {
-					logger.debug("next data field is the TIMED field");
+					logger.warn("next data field is the TIMED field");
 					timedFieldGetter = method;
 				}
 				else {
 					type = typesMapping.get(method.getReturnType()) ;
 					if (type == null) {
-						logger.error("Not managed type: >" + method.getReturnType() + "< for getter >" + method.getName() + "<");
+						logger.warn("Not managed type: >" + method.getReturnType() + "< for getter >" + method.getName() + "<. This getter is skipped.");
 					}
 					else {
 						nextField = new DataField (method.getName().substring(tinyosGetterPrefix.length()).toUpperCase() , type) ;
@@ -104,7 +104,9 @@ public class MigMessageParameters {
 				}
 			}
 		}
-		DataField[] fieldsArray = new DataField[fields.size()]; // 
+		DataField[] fieldsArray = new DataField[fields.size()];
+		
+		// Sort the outputStructure and the methods
 
 		this.outputStructure = fields.toArray(fieldsArray);
 	}
