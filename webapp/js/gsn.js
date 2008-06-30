@@ -668,6 +668,16 @@ var GSN = {
 						value = '<embed type="image/svg+xml" width="400" height="400" src="'+value+'" PLUGINSPAGE="http://www.adobe.com/svg/viewer/install/" />';
 					} else if (type.indexOf("image") != -1){
 						value = '<img src="'+value+'"/>';
+					} else if (type.indexOf("text") != -1) {
+						$.ajax({
+   							async: false,
+							type: "GET",
+							cache: false,
+							url: value,
+							success: function(answer) {
+								value = '<span>' + GSN.util.resumelongsentences(answer) + '</span>';
+							}
+						});
 					} else if (type.indexOf("binary") != -1){
 						value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
 					}
@@ -736,6 +746,16 @@ var GSN = {
 							$("embed",dd).attr("src",value);
 						} else if (type.indexOf("image") != -1){
 							$("img",dd).attr("src",value);
+						} else if (type.indexOf("text") != -1) {
+							$.ajax({
+   								async: false,
+								type: "GET",
+								cache: false,
+								url: value,
+								success: function(answer) {
+									$("span",dd).text(GSN.util.resumelongsentences(answer));
+								}
+							});
 						} else if (type.indexOf("binary") != -1){
 							$("a",dd).attr("href",value);
 						} else {
@@ -1738,6 +1758,14 @@ var GSN = {
 			var value = GSN.util.addleadingzero(date.getDate())+"/"+GSN.util.addleadingzero(date.getMonth()+1)+"/"+date.getFullYear();
 	        value += " "+GSN.util.addleadingzero(date.getHours())+":"+GSN.util.addleadingzero(date.getMinutes())+":"+GSN.util.addleadingzero(date.getSeconds());	       
 	        return value;
+	    }
+	    
+	    ,resumelongsentences: function(sentence) {
+	    	if (sentence.toString().length > 50) {
+	    		sentence = sentence.toString().substring(0,46);
+	    		sentence += " ..."; 
+	    	} 
+	    	return sentence;
 	    }
 	    
 	    
