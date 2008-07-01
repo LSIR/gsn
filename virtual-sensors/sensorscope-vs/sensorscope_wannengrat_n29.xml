@@ -1,0 +1,46 @@
+<virtual-sensor name="sensorscope_wannengrat_n29" priority="10" >
+	<processing-class>
+		<class-name>gsn.vsensor.SensorscopeVS</class-name>
+		<output-structure>
+			<field name="AIRHUMIDITY" type="DOUBLE" />
+			<field name="AIRTEMPERATURE" type="DOUBLE" />
+			<field name="NTWCOSTTOBS" type="SMALLINT" />
+			<field name="NTWSENDERID" type="SMALLINT" />
+			<field name="RAINMETER" type="DOUBLE" />
+			<field name="REPORTERID" type="SMALLINT" />
+			<field name="SKINTEMPERATURE" type="DOUBLE" />
+			<field name="TIMESTAMP" type="BIGINT" />
+			<field name="SOILMOISTURE" type="DOUBLE" />
+			<field name="SOLARRADIATION" type="DOUBLE" />
+			<field name="TSPHOPCOUNT" type="SMALLINT" /> 
+			<field name="TSPPACKETSN" type="SMALLINT" />
+			<field name="WATERMARK" type="DOUBLE" />
+			<field name="WINDDIRECTION" type="DOUBLE" />
+			<field name="WINDSPEED" type="DOUBLE" />
+		</output-structure>
+	</processing-class>
+	<description>Node 29 from the Wannengrat Sensorscope deployment</description>
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">Node 29 from the Wannengrat Sensorscope deployment</predicate>
+		<predicate key="LATITUDE">46.80375</predicate>
+		<predicate key="LONGITUDE">9.77863</predicate>
+	</addressing>
+	<streams>
+    	<stream name="data">
+			<source alias="Sensorscope" storage-size="1" sampling-rate="1">
+				<address wrapper="ss_tinyos-mig">
+					<predicate key="ss-host">localhost</predicate>
+					<predicate key="ss-port">25000</predicate>
+					<predicate key="continue-on-error">true</predicate>
+					<predicate key="wrapper-name">mig2</predicate>
+					<predicate key="wrapper-keep-processed-ss-entries">false</predicate>
+					<predicate key="source">sf@sensorscop1.epfl.ch:2226</predicate>
+					<predicate key="message-classname">gsn.wrappers.tinyos2x.sensorscope.PayLoadMsg</predicate>
+				</address>
+				<query>select * from wrapper where REPORTERID = 29</query>
+			</source>
+			<query>select * from Sensorscope</query>
+		</stream>
+	</streams>
+</virtual-sensor>

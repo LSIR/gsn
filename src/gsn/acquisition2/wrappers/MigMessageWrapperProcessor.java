@@ -53,7 +53,6 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 		Method getter = null;
 		Object res = null;
 		Serializable resarray = null;
-		Long ts = (Long) dataMessage.getData()[1];
 		byte[] rawmsg = (byte[]) dataMessage.getData()[0];
 		
 		try {
@@ -91,11 +90,12 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 			// Update TIMED field
 			if (parameters.getTimedFieldGetter() != null) {
 				parameters.getTimedFieldGetter().setAccessible(true);
-				ts = (Long) parameters.getTimedFieldGetter().invoke(msg);
+				Long ts = (Long) parameters.getTimedFieldGetter().invoke(msg);
+				postStreamElement(ts.longValue(), output.toArray(new Serializable[] {}));
 			}
-			
-			postStreamElement(ts.longValue(), output.toArray(new Serializable[] {}));
-
+			else {
+				postStreamElement(output.toArray(new Serializable[] {}));
+			}
 		} catch (InstantiationException e) {
 			logger.error("Unable to instanciate the message");
 		} catch (IllegalAccessException e) {
@@ -113,5 +113,10 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 	@Override
 	public DataField[] getOutputFormat() {
 		return parameters.getOutputStructure() ;
+	}
+
+	@Override
+	public boolean isTimeStampUnique() {
+		return false;
 	}
 }
