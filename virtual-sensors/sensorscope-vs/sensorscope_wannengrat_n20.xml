@@ -35,7 +35,7 @@
 					<predicate key="continue-on-error">true</predicate>
 					<predicate key="wrapper-name">mig2</predicate>
 					<predicate key="wrapper-keep-processed-ss-entries">false</predicate>
-					<predicate key="source">sf@sensorscop1.epfl.ch:2226</predicate>
+					<predicate key="source">sf@micssrv32.epfl.ch:2226</predicate>
 					<predicate key="message-classname">gsn.wrappers.tinyos2x.sensorscope.PayLoadMsg</predicate>
 				</address>
 				<query>select * from wrapper where REPORTERID = 20</query>
