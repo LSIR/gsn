@@ -1,0 +1,66 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath}
+\usepackage{draftcopy}
+\draftcopyName{Review V1}{135}
+\title{Virtual Sensor Descriptors}
+\author{GSN Team}
+\begin{document}
+\maketitle
+\section{Introduction}
+Virtual Sensor is the main abstraction used by GSN to represent a well structured data stream.
+By well structured we mean, the structure of the stream is known in advanced and it is not going to be changed
+while GSN is running.
+\section{Graphical Representation}
+\section{}
+
+\section{Notes}
+\subsection{What if the structure of the virtual sensor changes?}
+We are not changing the structure of the database automatically (adding or droping fields). If your virtual sensors structure
+changes and if you are using \emph{permannet storages} such as MySQL or File-based HSQLDB, you have to change the structure of the
+table manually. 
+\subsection{Where is the DTD for the virtual sensor?}
+We are using JiBX Java-XML binding project. The structure of the virtual sensor descriptor file is defined in \texttt{conf/VirtualSensorDescription.xml}.
+\subsection{Which databases we support ?}
+At the moment we are supporting HSqlDB and MySQL. Checkout the mailing list for the latest issues regarding the other databases and their
+support status.
+\subsection{Which projects are using GSN ?}
+There are over 10 EU/Swiss funding research projects using GSN as their core technology.
+\section{GSN.XML file}
+\section{SafeStorage}
+\subsection{Why we need it? }
+\subsection{How to use it }
+\subsection{How to write a wrapper for the safe storage}
+\section{Wrappers}
+\section{Their mandatory parameters}
+\section{How it works}
+\section{Introduction}
+\section{GeoRSS}
+\section{SQL Syntax}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Network communication}
+Looking inside the GSN infrastructure, there are at least half a dozen difference network communication channels are used. In this section I would like to dive in to the details
+of the some major communication protocols designed and implemented in GSN. 
+
+\subsection{Reusing Data Streams}
+
+One of the main ideas behind the virtual sensors is resuability. The resuability comes in two forms.
+First being able to recreate the same processing logic on different data streams.
+Second being able to reuse streaming data produced by other parties over the internet and possibly create a new data stream but instrumenting the original streams.
+In this section, I present the both high level and low level details associated with the second aspect of the reusability.
+
+The virtual sensor descriptor file is the first place which specifies the intention of reusing streaming data from another virtual sensor. The source virtual sensor can be located
+anywhere as long as it is accessible through the network, this ofcourse includes the local machine and any other machine on the Internet. 
+
+
+In GSN, our vision is having an internet scale streaming world in which people can publish streaming data which
+can be produced directly using some sort of a measurement device which can range from a physical wireless sensor to stock ticks from a financial market. 
+
+
+
+\end{document}
