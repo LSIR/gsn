@@ -6,8 +6,6 @@ import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import au.com.bytecode.opencsv.CSVReader;
 import gsn.acquisition2.messages.DataMsg;
@@ -22,8 +20,6 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 	private CSVFileWrapperFormat csvFormat = null;
 	
-	private static final TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
-
 	public boolean initialize() {
 
 		logger.warn("cvsfile processor wrapper initialize started...");

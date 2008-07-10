@@ -16,8 +16,7 @@ public final class DataField implements Serializable {
    
    private String            type;
    
-   private DataField ( ) {
-   }
+   private DataField ( ) {}
    
    public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {
       this.name = fieldName;

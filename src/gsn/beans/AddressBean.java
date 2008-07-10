@@ -2,7 +2,6 @@ package gsn.beans;
 
 import java.io.Serializable;
 import org.apache.commons.collections.KeyValue;
-import org.apache.log4j.Logger;
 
 public final class AddressBean implements Serializable{
 
@@ -13,8 +12,6 @@ public final class AddressBean implements Serializable{
   private String                 wrapper;
   
   private  KeyValue[] predicates  = EMPTY_PREDICATES;
-  
-  private final static transient Logger    logger   = Logger.getLogger( AddressBean.class );
   
   public AddressBean ( final String wrapper , KeyValue... newPredicates ) {
     this.wrapper = wrapper;

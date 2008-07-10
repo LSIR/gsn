@@ -1,12 +1,9 @@
 package gsn.acquisition2.wrappers;
 
 import java.net.InetSocketAddress;
-
 import gsn.acquisition2.client.MessageHandler;
 import gsn.acquisition2.client.SafeStorageClientSessionHandler;
-import gsn.acquisition2.messages.DataMsg;
 import gsn.beans.AddressBean;
-import gsn.beans.DataField;
 import gsn.wrappers.AbstractWrapper;
 import org.apache.log4j.Logger;
 import org.apache.mina.common.ConnectFuture;

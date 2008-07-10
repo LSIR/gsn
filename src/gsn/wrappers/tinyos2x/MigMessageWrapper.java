@@ -54,7 +54,7 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
   private ArrayList<String> outputFieldsOrdered;
   
   // class and object variables used to extract data from packets using reflection
-  private Class packetClass;
+  private Class<?> packetClass;
   private Object packetObject;
   
   public boolean initialize ( ) {
@@ -228,7 +228,7 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
   public void messageReceived(int to, Message message) {
     logger.debug("Received message");
     try {
-      Constructor packetConstructor = packetClass.getDeclaredConstructor(Message.class, int.class, int.class);
+      Constructor<?> packetConstructor = packetClass.getDeclaredConstructor(Message.class, int.class, int.class);
       if(message == null) {
         logger.warn("Message was null!");
         return;

@@ -14,7 +14,6 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.OptionConverter;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -33,8 +32,6 @@ public class ContainerConfig {
 	public void removePropertyChangeListener ( PropertyChangeListener changeListener ) {
 		changeSupport.removePropertyChangeListener( changeListener );
 	}
-
-	private static final transient Logger logger                           = Logger.getLogger( ContainerConfig.class );
 
 	public static final String            NOT_PROVIDED                     = "Not Provided";
 
