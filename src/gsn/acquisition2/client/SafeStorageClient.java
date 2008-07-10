@@ -34,7 +34,13 @@ public class SafeStorageClient {
         public boolean messageToBeProcessed(DataMsg dataMessage) {
           System.out.println(dataMessage);
           return true;
-        }},"requester-1"), cfg);
+        }
+
+		@Override
+		public void restartConnection() {
+			// TODO Auto-generated method stub
+			
+		}},"requester-1"), cfg);
       future.join();
       session = future.getSession();
     } catch (RuntimeIOException e) {

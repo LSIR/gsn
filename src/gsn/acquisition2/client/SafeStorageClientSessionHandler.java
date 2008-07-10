@@ -23,7 +23,8 @@ public class SafeStorageClientSessionHandler extends IoHandlerAdapter {
   }
   
   public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-
+	  logger.error(cause.getMessage(), cause);
+	  session.close();
   }
   public void messageReceived(IoSession session, Object message) throws Exception {
     logger.debug("Received data from the server");
@@ -41,10 +42,12 @@ public class SafeStorageClientSessionHandler extends IoHandlerAdapter {
 
   }
   public void sessionClosed(IoSession session) throws Exception {
-
+	  logger.warn("Session >" + session + "< is closed");
+	  handler.restartConnection();
   }
   public void sessionOpened(IoSession session) throws Exception {
     session.write(helloMsg);
+    logger.warn("Session >" + session + "< is open");
   }
   
 }

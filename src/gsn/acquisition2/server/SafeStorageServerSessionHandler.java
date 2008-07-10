@@ -27,8 +27,6 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 	private static transient Logger                                logger                              = Logger.getLogger ( SafeStorageServerSessionHandler.class );
 
 	public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-		logger.error(cause.getMessage(),cause);
-		sessionStates.remove(session);
 		session.close();
 		// Update the number of clients using this wrapper.
 	}
@@ -120,10 +118,16 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 		if (sstate.getReaderPS() != null) sstate.getReaderPS().close();
 		if (sstate.getSuccessAckUpdatePS() != null) sstate.getSuccessAckUpdatePS().close();
 		sessionStates.remove(session);
+		
+		logger.warn("Session >" + session + "< is closed");
+		
 		// Update the number of clients using this wrapper.
 	}
 
 	public void sessionOpened(IoSession session) throws Exception {
+		
+		logger.warn("Session >" + session + "< is open");
+		
 		// Update the number of clients using this wrapper.
 	}
 

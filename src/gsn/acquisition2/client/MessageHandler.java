@@ -6,4 +6,6 @@ public interface MessageHandler {
   
   public boolean messageToBeProcessed(DataMsg dataMessage);
   
+  public void restartConnection () ;
+  
 }

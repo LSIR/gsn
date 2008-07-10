@@ -24,6 +24,8 @@ import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
  *
  */
 public abstract class SafeStorageAbstractWrapper extends AbstractWrapper implements MessageHandler{
+	
+	private static final long CONNECTION_RETRY_TIME = 10000;
   
   private final transient Logger     logger                 = Logger.getLogger ( SafeStorageAbstractWrapper.class );
 
@@ -50,13 +52,23 @@ public abstract class SafeStorageAbstractWrapper extends AbstractWrapper impleme
     return true;
   }
   public void run() {
-    connect(ss_host,ss_port,wrapperDetails,this,key); 
+	  boolean connected = false;
+	  while (! connected) {
+		  connected = connect(ss_host,ss_port,wrapperDetails,this,key);
+		  if (! connected) {
+			  try {
+				Thread.sleep(CONNECTION_RETRY_TIME);
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage());
+			}
+		  }
+	  } 
   }
   
  /**
   * HELPER METHOD FOR CONNECTING TO STORAGE SERVER
   */
-  public void connect(String host,int port,AddressBean wrapperDetails,MessageHandler handler,String requester) {
+  public boolean connect(String host,int port,AddressBean wrapperDetails,MessageHandler handler,String requester) {
     int CONNECT_TIMEOUT = 30; // seconds
     SocketConnector connector = new SocketConnector();
     // Change the worker timeout to 1 second to make the I/O thread quit soon
@@ -71,12 +83,18 @@ public abstract class SafeStorageAbstractWrapper extends AbstractWrapper impleme
       ConnectFuture future = connector.connect(new InetSocketAddress(host, port), new SafeStorageClientSessionHandler(wrapperDetails,handler,key ), cfg);
       future.join();
       session = future.getSession();
+      return true;
     } catch (RuntimeIOException e) {
-      logger.error("Failed to connect to "+host+":"+port); 
-      logger.error( e.getMessage(),e);
+      logger.error("Failed to connect to SafeStorage on "+host+":"+port); 
+      return false;
     }finally {
-      if (session!=null)
+      if (session!=null) {
         session.getCloseFuture().join();
+      }
     }
+  }
+  
+  public void restartConnection () {
+	  run();
   }
 }
