@@ -17,6 +17,8 @@ import org.apache.log4j.Logger;
 
 public class InputStream implements Serializable{
 	
+	private static final long serialVersionUID = 6910141410904878762L;
+
 	public static final int                             INITIAL_DELAY_5000MSC = 5000;
 
 	private transient static final Logger               logger                = Logger.getLogger( InputStream.class );

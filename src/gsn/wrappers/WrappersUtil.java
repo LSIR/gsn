@@ -1,6 +1,5 @@
 package gsn.wrappers;
 
-import gsn.Main;
 import java.util.HashMap;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;

@@ -10,16 +10,15 @@ import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TreeMap;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
 public  class StreamSource implements Serializable{
   
-  public static final String DEFAULT_QUERY = "select * from wrapper";
+	private static final long serialVersionUID = 5222853537667420098L;
+
+public static final String DEFAULT_QUERY = "select * from wrapper";
   
   private static final transient Logger logger             = Logger.getLogger( StreamSource.class );
   

@@ -1,7 +1,5 @@
 package gsn.acquisition2.messages;
 
-import java.io.*;
-
 public class DataMsg extends AbstractMessage {
 
   private static final long serialVersionUID = 6707634030386675571L;

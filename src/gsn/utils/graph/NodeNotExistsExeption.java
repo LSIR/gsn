@@ -2,6 +2,8 @@ package gsn.utils.graph;
 
 public class NodeNotExistsExeption extends Exception {
 
+	private static final long serialVersionUID = 2460464270692100205L;
+
 	public NodeNotExistsExeption() {
 		super();
 	}

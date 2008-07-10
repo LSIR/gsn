@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Node<T> implements Serializable{
+
+	private static final long serialVersionUID = -62301155506174334L;
+
 	private ArrayList<Edge<T>> inputEdges;
 
 	private ArrayList<Edge<T>> outputEdges;

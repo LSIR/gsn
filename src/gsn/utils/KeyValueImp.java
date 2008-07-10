@@ -11,7 +11,9 @@ import org.apache.log4j.Logger;
  */
 public class KeyValueImp implements KeyValue , Serializable {
    
-   private transient final Logger logger = Logger.getLogger( KeyValueImp.class );
+	private static final long serialVersionUID = 5739537343169906104L;
+
+	private transient final Logger logger = Logger.getLogger( KeyValueImp.class );
    
    private String                 key;
    

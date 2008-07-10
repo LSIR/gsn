@@ -2,6 +2,8 @@ package gsn.utils.graph;
 
 public class EdgeExistsException extends Exception {
 
+	private static final long serialVersionUID = 6890337360223725923L;
+
 	public EdgeExistsException() {
 		super();
 	}

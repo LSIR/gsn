@@ -8,7 +8,9 @@ package gsn.storage;
  */
 public class PoolIsFullException extends Exception {
    
-   public PoolIsFullException ( ) {
+private static final long serialVersionUID = 7651442184621067005L;
+
+public PoolIsFullException ( ) {
       super( "Pool is Full exception occured" );
    }
    

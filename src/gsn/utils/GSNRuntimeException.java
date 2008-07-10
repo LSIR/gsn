@@ -2,7 +2,9 @@ package gsn.utils;
 
 public class GSNRuntimeException extends RuntimeException {
    
-   private int             type                              = 0;
+private static final long serialVersionUID = 4843429837654814066L;
+
+private int             type                              = 0;
    
    public static final int UNEXPECTED_VIRTUAL_SENSOR_REMOVAL = 1;
    

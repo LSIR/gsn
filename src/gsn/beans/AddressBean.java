@@ -5,7 +5,9 @@ import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 
 public final class AddressBean implements Serializable{
-  
+
+  private static final long serialVersionUID = -8975180532136014200L;
+
   private static final   KeyValue[] EMPTY_PREDICATES = new  KeyValue[0];
   
   private String                 wrapper;

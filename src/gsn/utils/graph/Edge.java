@@ -3,6 +3,9 @@ package gsn.utils.graph;
 import java.io.Serializable;
 
 public class Edge<T> implements Serializable{
+
+	private static final long serialVersionUID = -8165242353963312649L;
+
 	private Node<T> startNode;
 
 	private Node<T> endNode;
