@@ -287,7 +287,7 @@ public class DozerDataMsg extends DozerAbstractMsg
     {
     	if (hopcount == null)
     	{
-    		hopcount = new Integer((int) getUIntElement(29 * 8, 4));
+    		hopcount = new Integer((int) getUIntElement((29 * 8) + 4, 4));
     	}
     		
     	return hopcount;
@@ -297,7 +297,7 @@ public class DozerDataMsg extends DozerAbstractMsg
     {
     	if (childcount == null)
     	{
-    		childcount = new Integer((int) getUIntElement((29 * 8) + 4, 4));
+    		childcount = new Integer((int) getUIntElement(29 * 8, 4));
     	}
     		
     	return childcount;
