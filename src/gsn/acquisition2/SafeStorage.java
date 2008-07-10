@@ -4,11 +4,12 @@ import gsn.acquisition2.messages.HelloMsg;
 import gsn.acquisition2.wrappers.AbstractWrapper2;
 import gsn.beans.AddressBean;
 import gsn.wrappers.WrappersUtil;
-
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.apache.mina.common.IoSession;
 
@@ -23,9 +24,26 @@ public class SafeStorage {
   private SafeStorageDB storage ;
   
   public SafeStorage(int safeStoragePort) throws ClassNotFoundException, SQLException {
-    wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>(),SAFE_STORAGE_WRAPPERS_PROPERTIES);
-    storage = new SafeStorageDB(safeStoragePort);
-    storage.executeSQL("create table if not exists SETUP (pk INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, table_name varchar not null unique, requester varchar not null unique,created_at TIMESTAMP default CURRENT_TIMESTAMP() not null )");
+
+	  storage = new SafeStorageDB(safeStoragePort);		
+	  wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>(),SAFE_STORAGE_WRAPPERS_PROPERTIES);
+	  storage.executeSQL("create table if not exists SETUP (pk INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, table_name varchar not null unique, requester varchar not null unique,created_at TIMESTAMP default CURRENT_TIMESTAMP() not null )");
+	  storage.executeSQL("create table if not exists HELLO (wrapper_id VARCHAR NOT NULL PRIMARY KEY, hellomsg OTHER NOT NULL)");
+
+	  Iterator<HelloMsg> iter = getHelloMessages().iterator();
+	  HelloMsg hello = null;
+	  while (iter.hasNext()) {
+		  hello = iter.next();
+		  String wrapper_name = hello.getWrapperDetails().getPredicateValue("wrapper-name" );
+		  logger.debug("Resuming the wrapper: " + wrapper_name + " for requester: " + hello.getRequster());
+		  try {
+			  prepareWrapper(hello, null);
+		  } catch (InstantiationException e) {
+			  logger.error(e.getMessage());
+		  } catch (IllegalAccessException e) {
+			  logger.error(e.getMessage());
+		  }
+	  }
   }
   
   
@@ -47,11 +65,28 @@ public class SafeStorage {
     wrapper.setActiveAddressBean ( addressBean );
     boolean initializationResult = wrapper.initialize (  );
     if ( initializationResult == false ) {
-       network.close();
+       if (network != null) network.close();
        return null; 
     }
     try {
       String table_name = storage.prepareTableIfNeeded(helloMsg.getRequster());
+
+      String wrapper_id = wrapper_name + table_name + helloMsg.getRequster();
+      logger.warn("Saving wrapper: " + table_name + " for resume feature wrapper_id: " + wrapper_id);
+      PreparedStatement psave = storage.createPreparedStatement("INSERT INTO hello VALUES (?,?)");
+      PreparedStatement pis = storage.createPreparedStatement("SELECT * FROM hello where wrapper_id=?");
+
+      pis.setString(1, wrapper_id);
+      ResultSet rs = pis.executeQuery();
+      if (! rs.next()) {
+    	  psave.setString(1, wrapper_id);
+    	  psave.setObject(2, helloMsg);
+    	  psave.execute();
+    	  psave.close();
+      }
+      pis.close();
+      rs.close();
+	  
       PreparedStatement ps = storage.createPreparedStatement("insert into "+table_name+" (stream_element) values (?)");
       wrapper.setTableName(table_name);
       wrapper.setNetwork(network);
@@ -60,9 +95,27 @@ public class SafeStorage {
     } catch ( SQLException e ) {
       logger.error ( e.getMessage ( ) , e );
       return null;
-    }
+    } 
     wrapper.start ( );
     return wrapper;
+  }
+  
+  public ArrayList<HelloMsg> getHelloMessages () {
+	  ArrayList<HelloMsg> helloMessages = new ArrayList<HelloMsg> () ;
+	  ResultSet rs = null;
+	  try {
+		  PreparedStatement ps = storage.createPreparedStatement("select * from hello");
+		  rs = ps.executeQuery();
+		  while (rs.next()) {
+			  Object hello = rs.getObject("hellomsg");
+			  helloMessages.add((HelloMsg) hello);
+		  }
+		  rs.close();
+		  ps.close();
+	  } catch (SQLException e) {
+		  e.printStackTrace();
+	  }
+	  return helloMessages;
   }
   
   public SafeStorageDB getStorage() {

@@ -65,6 +65,26 @@ public class SafeStorageDB {
     stmt.close();
     return toReturn;
   }
+  
+  
+  public void dropAllTables () {
+	  try {
+		// Works only with H2 DB
+		PreparedStatement psTableList = createPreparedStatement("select TABLE_NAME from INFORMATION_SCHEMA.TABLES where SQL is not null");
+		Statement sDrop = getConnection().createStatement();
+		ResultSet tableList = psTableList.executeQuery();
+		String tableName;
+		while (tableList.next()) {
+			tableName = tableList.getString(1);
+			logger.warn("Drop table >" + tableName + "<");
+			sDrop.execute("drop table " + tableName);
+		}
+		sDrop.close();
+		psTableList.close();
+	} catch (SQLException e) {
+		logger.error(e.getMessage());
+	} 
+  }
 
 
 
