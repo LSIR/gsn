@@ -68,7 +68,7 @@ public abstract class AbstractWrapper2  extends Thread{
     try {
       insertPS.clearParameters();
       insertPS.setObject(1,values);
-      int rows = insertPS.executeUpdate();
+      insertPS.executeUpdate();
 
       if (queue.isEmpty()) {
         final ResultSet generatedKeys = insertPS.getGeneratedKeys();

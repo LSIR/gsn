@@ -12,13 +12,10 @@ public class SafeStorageController {
 
 	public static final String SAFE_STORAGE_SHUTDOWN = "SS SHUTDOWN";
 
-	private SafeStorageServer safeStorageServer;
-
 	public static transient Logger logger = Logger.getLogger(SafeStorageController.class);
 
 	public SafeStorageController(final SafeStorageServer safeStorageServer, int safeStorageControllerPort) {
 		super();
-		this.safeStorageServer = safeStorageServer;
 		logger.info("Started Safe Storage Controller on port " + safeStorageControllerPort);
 		ActionPort.listen(safeStorageControllerPort, new NetworkAction(){
 			@Override

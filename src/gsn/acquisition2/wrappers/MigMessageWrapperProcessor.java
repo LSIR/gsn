@@ -15,9 +15,9 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 
 	private MigMessageParameters parameters = null;
 
-	private Class classTemplate = null;
+	private Class<?> classTemplate = null;
 
-	private Constructor messageConstructor = null;
+	private Constructor<?> messageConstructor = null;
 
 	private final transient Logger logger = Logger.getLogger( MigMessageWrapperProcessor.class );
 

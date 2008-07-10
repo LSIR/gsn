@@ -1,7 +1,5 @@
 package gsn.acquisition;
 
-import gsn.Main;
-
 import org.apache.log4j.Logger;
 
 public class AcquisitionConfig {

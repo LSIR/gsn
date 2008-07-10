@@ -30,7 +30,7 @@ public class AcquisitionManager {
     AcquisitionManager acquisitionMan = new AcquisitionManager();
 //    acquisitionMan.startServer();
     acquisitionMan.getDirectory().setWrappers(WrappersUtil.loadWrappers(new HashMap<String, Class<?>>()));
-    AcquisitionGUI gui = new AcquisitionGUI(acquisitionMan.getDirectory());
+    new AcquisitionGUI(acquisitionMan.getDirectory());
   }
   
   

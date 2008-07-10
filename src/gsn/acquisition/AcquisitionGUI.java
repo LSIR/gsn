@@ -1,6 +1,5 @@
 package gsn.acquisition;
 
-import gsn.wrappers.AbstractWrapper;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -11,6 +10,8 @@ import javax.swing.table.TableModel;
 
 public class AcquisitionGUI extends JFrame{
   
+  private static final long serialVersionUID = -8919399253033194054L;
+
   private AcquisitionDirectory directory;
 
   public AcquisitionGUI(AcquisitionDirectory directory) {
@@ -23,7 +24,7 @@ public class AcquisitionGUI extends JFrame{
   }
   
   public JTable getTableForWrapper() {
-    final ArrayList<Class> wrapperClasses = new ArrayList<Class>();
+    final ArrayList<Class<?>> wrapperClasses = new ArrayList<Class<?>>();
     final ArrayList<String> wrapperNames = new ArrayList<String>();
     for (String name : directory.getWrappers().keySet()) {
       wrapperClasses.add(directory.getWrappers().get(name));
@@ -31,7 +32,10 @@ public class AcquisitionGUI extends JFrame{
     }
       
     TableModel model = new AbstractTableModel() {
-     String[] columns = new String[] {"Name","Class"};
+
+	private static final long serialVersionUID = -1201690522528140440L;
+	
+	String[] columns = new String[] {"Name","Class"};
      
       public String getColumnName(int column) {
         return columns[column];

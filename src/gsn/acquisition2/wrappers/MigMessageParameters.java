@@ -3,18 +3,16 @@ package gsn.acquisition2.wrappers;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 
 public class MigMessageParameters {
 
-	private static Hashtable<Class,String> typesMapping = null;
+	private static Hashtable<Class<?>,String> typesMapping = null;
 
 	private final transient Logger logger = Logger.getLogger( MigMessageParameters.class );
 
@@ -72,7 +70,7 @@ public class MigMessageParameters {
 		// Define TinyOS version from the superclasses
 
 		try {
-			Class messageClass = Class.forName(tinyosMessageName);
+			Class<?> messageClass = Class.forName(tinyosMessageName);
 			findTinyOSVersionFromClassHierarchy(messageClass);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Unable to find the >" + tinyosMessageName + "< class.");
@@ -98,7 +96,7 @@ public class MigMessageParameters {
 	 * @param tosmsgClass
 	 * @param fields
 	 */
-	public void buildOutputStructure (Class tosmsgClass, ArrayList<DataField> fields, ArrayList<Method> getters) throws RuntimeException {
+	public void buildOutputStructure (Class<?> tosmsgClass, ArrayList<DataField> fields, ArrayList<Method> getters) throws RuntimeException {
 		logger.debug("Building output structure for class: " + tosmsgClass.getCanonicalName() + " and prefix: " + tinyosGetterPrefix);
 
 		if (typesMapping == null) buildMappings() ;
@@ -168,7 +166,7 @@ public class MigMessageParameters {
 	}
 
 	private static void buildMappings () {
-		typesMapping = new Hashtable<Class, String> () ;
+		typesMapping = new Hashtable<Class<?>, String> () ;
 		typesMapping.put(byte.class, "TINYINT") ;
 		typesMapping.put(short.class, "SMALLINT") ;
 		typesMapping.put(int.class, "INTEGER") ;
@@ -183,9 +181,9 @@ public class MigMessageParameters {
 		typesMapping.put(double[].class, "DOUBLE");
 	}
 
-	private void findTinyOSVersionFromClassHierarchy (Class messageClass) {
-		Class currentMessageClass = messageClass;
-		Class messageSuperClass;
+	private void findTinyOSVersionFromClassHierarchy (Class<?> messageClass) {
+		Class<?> currentMessageClass = messageClass;
+		Class<?> messageSuperClass;
 		boolean found = false;
 		while ( ! found ) {
 			messageSuperClass = currentMessageClass.getSuperclass();

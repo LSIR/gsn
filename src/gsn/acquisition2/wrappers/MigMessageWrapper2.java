@@ -39,12 +39,12 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 
 				// Register to the message type
 				logger.debug("Register message >" + parameters.getTinyosMessageName() + "< to source.");
-				Class messageClass = Class.forName(parameters.getTinyosMessageName());
+				Class<?> messageClass = Class.forName(parameters.getTinyosMessageName());
 				if (parameters.getTinyOSMessageLength() == -1) {
 					moteIFTinyOS1x.registerListener((net.tinyos1x.message.Message) messageClass.newInstance(), this);
 				}
 				else {
-					Constructor messageConstructor = messageClass.getConstructor(int.class);
+					Constructor<?> messageConstructor = messageClass.getConstructor(int.class);
 					moteIFTinyOS1x.registerListener((net.tinyos1x.message.Message) messageConstructor.newInstance(parameters.getTinyOSMessageLength()), this);
 				}
 			}
@@ -57,12 +57,12 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 
 				// Register to message type
 				logger.debug("Register message >" + parameters.getTinyosMessageName() + "< to source.");
-				Class messageClass = Class.forName(parameters.getTinyosMessageName());
+				Class<?> messageClass = Class.forName(parameters.getTinyosMessageName());
 				if (parameters.getTinyOSMessageLength() == -1) {
 					moteIFTinyOS2x.registerListener((net.tinyos.message.Message) messageClass.newInstance(), this);
 				}
 				else {
-					Constructor messageConstructor = messageClass.getConstructor(int.class);
+					Constructor<?> messageConstructor = messageClass.getConstructor(int.class);
 					moteIFTinyOS2x.registerListener((net.tinyos.message.Message) messageConstructor.newInstance(parameters.getTinyOSMessageLength()), this);
 				}
 			}
