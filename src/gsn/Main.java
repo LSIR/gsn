@@ -238,7 +238,7 @@ public final class Main {
     output.write ( pub.getEncoded ( ) );
     output.close ( );
     KeyStore ksca = KeyStore.getInstance ("JKS","SUN");
-    ksca.load (null);
+    ksca.load (null,null);
     logger.warn ("Public and Private keys are generated successfully.");
   }
 
