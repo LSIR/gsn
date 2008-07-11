@@ -1,0 +1,31 @@
+\usepackage{amsmath}
+\usepackage{draftcopy}
+\usepackage{color}
+\usepackage{listings}
+% Misc
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+
+% Listings
+\lstloadlanguages{Ruby,Java,XML,HTML}
+% Default parameters
+\lstset{
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	stepnumber=1
+}
+% Per language Parameters
+\lstnewenvironment{rubycode}
+	{\lstset{language=Ruby }}
+	{}
+\lstnewenvironment{javacode}
+	{\lstset{language=Java }}
+	{}
+\lstnewenvironment{xmlcode}
+	{\lstset{language=XML }}
+	{}
+\lstnewenvironment{htmlcode}
+	{\lstset{language=HTML }}
+	{}
+
+
