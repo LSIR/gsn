@@ -100,9 +100,15 @@ public class ServiceSkeleton {
 		org.tempuri.GetAggregateScalarDataInBatchResponse  toReturn = new  GetAggregateScalarDataInBatchResponse();
 		ArrayOfSensorData items = new ArrayOfSensorData();
 		for (String signalInfo: input.getSensorNames().getString()) {
-			SignalRequest req = new SignalRequest(signalInfo);
-			StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED, AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis());
-			items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
+			try {
+				SignalRequest req = new SignalRequest(signalInfo);
+				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED, AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis());
+				items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
+			}
+			catch (RuntimeException e) {
+				logger.debug("VS " + signalInfo + " not found");
+				items.addSensorData(null);
+			}
 		}
 		toReturn.setGetAggregateScalarDataInBatchResult(items);
 		return toReturn;
