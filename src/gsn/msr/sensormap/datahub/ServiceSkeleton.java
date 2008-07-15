@@ -81,10 +81,16 @@ public class ServiceSkeleton {
 		org.tempuri.GetLatestScalarDataInBatchResponse toReturn = new GetLatestScalarDataInBatchResponse();
 		ArrayOfSensorData items = new ArrayOfSensorData();
 		for (String signalInfo: input.getSensorNames().getString()) {
-			SignalRequest req = new SignalRequest(signalInfo);
-			StringBuilder query = new StringBuilder("select pk,TIMED, ").append(req.getFieldName()).append(" as data from ").append(req.getVsName()).append(" order by timed desc limit 0,1");
-//			logger.fatal(query);
-			items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
+			try {
+				SignalRequest req = new SignalRequest(signalInfo);
+				StringBuilder query = new StringBuilder("select pk,TIMED, ").append(req.getFieldName()).append(" as data from ").append(req.getVsName()).append(" order by timed desc limit 0,1");
+				//			logger.fatal(query);
+				items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
+			}
+			catch (RuntimeException e) {
+				logger.debug("VS " + signalInfo + " not found");
+				items.addSensorData(null);
+			}
 		}
 		toReturn.setGetLatestScalarDataInBatchResult(items);
 		return toReturn;
