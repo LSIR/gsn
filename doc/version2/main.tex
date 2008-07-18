@@ -1,14 +1,29 @@
-\documentclass[a4paper,10pt]{book}
+%__!TEX TS-program = xelatex
+%__!TEX encoding = UTF-8 Unicode
+
+\documentclass[a4paper,oneside,10pt]{book}
 
 %
 \input{helper.tex}
 %
 \draftcopyName{Review V1}{135}
-\title{Virtual Sensor Descriptors}
+\title{Global Sensors Network}
 \author{GSN Team}
 
 \begin{document}
 	\maketitle
-	\input{chapters/ch-virtualsensors/ch-virtual-sensor}
-	\input{chapters/ch-storage/ch-safestorage}
+	% Table of contents
+	\tableofcontents	
+	% Chapters
+%	\input{chapters/ch-virtualsensors/ch-virtual-sensor}
+	\input{chapters/ch-architecture/ch-architecture}
+	% Images index
+	\listoffigures
+	% Tables index
+	\listoftables	
+	% Listings index
+	\lstlistoflistings
+	% Bibliography
+	\bibliographystyle{plain} % abbrv, plain, alpha
+	\bibliography{references}
 \end{document}

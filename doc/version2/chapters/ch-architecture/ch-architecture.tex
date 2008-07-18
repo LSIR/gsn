@@ -1,0 +1,124 @@
+\graphicspath{{chapters/ch-architecture/figures/}}
+
+\chapter{Architecture}
+
+\section{Data Acquisition}
+
+ Before filtering and processing data, GSN needs to receive it. GSN considers two types of data sources: event-based and polling-based.
+ In the first case, data is sent by the source and a GSN method is called when it arrives.
+ Serial ports, network (TCP or UDP) connections, wireless webcams fall in this case. In the latter one, GSN periodically asks the 
+ source for new data. This is the case of an RSS feed or a POP3 email account.
+
+\section{Safe Storage}
+
+%Why? How? +(keep all the entries)/-(performance, delays) -> keep the possibility to run 
+%usual wrappers
+
+
+
+diagram (two processes)...
+\image{safestorage.pdf}{0.8}{0}{Safe Storage Software Architecture}{image:ss_software_architecture}
+
+\subsection{Use Cases}
+%if processes stop or communication breaks
+example with a concrete run, ss\_mem\_wrapper
+
+\subsection{Software Architecture}
+
+Abstract (SafeStorage wrapper or not) for GSN
+
+List of defaults parameters
+
+Configuration in the build.xml file
+
+\subsection{Safe Storage modes}
+
+\begin{bashcode}
+ant start-acquisition
+ant clean-acquisition
+ant stop-acquisition
+\end{bashcode}
+
+\subsection{How to develop a Safe Storage Wrapper}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\subsection{Examples}
+\begin{rubycode}[caption={Ruby Code Example}, label=listing:ruby:example]
+# A method
+def mymethod 
+	@foo.each { |bar| bar.to_s }
+	@@foobar = "a string"
+end
+\end{rubycode}
+
+\begin{javacode}
+/**
+ * Java Class
+ */
+public class Test {
+	private int test;
+	public Test () {}
+	public Test (int level) {
+		// A comment
+		String b = "my test string";
+		this.test = test;
+	}
+}
+\end{javacode}
+
+\begin{xmlcode}[caption={XML Code Example}, label=listing:xml:example]
+<!-- one comment -->
+<tag attribute="val1">
+	<tag2 p="5" />
+</tag>
+\end{xmlcode}
+
+\begin{htmlcode}
+<!-- one comment -->
+<html>
+	<head>
+		<title>Test Page</title>
+	</head>
+	<body>
+		<p style="display: none;">Test</p>
+	</body>
+</html>
+\end{htmlcode}
+
+\cite{dummyarticle}
+
