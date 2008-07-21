@@ -66,8 +66,11 @@ public class SimpleDozerSFListener implements MessageListener
 
 		System.out.println("connected.");
 		
-        mif.registerListener(new DozerDataMsg(), this);
-        mif.registerListener(new DozerBaseStatusMsg(), this);
+		mif.registerListener(new DozerBaseStatusMsg(), this);
+        mif.registerListener(new DozerDataMsg(), this);        
+        mif.registerListener(new DozerAdcMux1Msg(), this);
+        mif.registerListener(new DozerAdcMux2Msg(), this);
+        mif.registerListener(new DozerAdcComDiffMsg(), this);
         mif.start();
         
         System.out.println("message handler started...");
@@ -77,7 +80,19 @@ public class SimpleDozerSFListener implements MessageListener
 	public void messageReceived(int dest_addr, Message msg)
 	{
 		System.out.print(MsgFormatter.DF.format(System.currentTimeMillis()) + " - ");
-		if (msg instanceof DozerDataMsg)
+		if (msg instanceof DozerBaseStatusMsg)
+		{
+			if (msg.dataLength() != DozerBaseStatusMsg.DEFAULT_MESSAGE_SIZE)
+			{
+				System.out.print("received " + "base status" + " packet with invalid length (" +
+					msg.dataLength() + "-" + DozerBaseStatusMsg.DEFAULT_MESSAGE_SIZE +"): ");
+				Dump.printPacket(System.out, msg.dataGet());
+				System.out.println();
+				return;
+			}
+			System.out.print("base status");
+		}
+		else if (msg instanceof DozerDataMsg)
 		{
 			if (msg.dataLength() != DozerDataMsg.DEFAULT_MESSAGE_SIZE)
 			{
@@ -89,17 +104,41 @@ public class SimpleDozerSFListener implements MessageListener
 			}
 			System.out.print("data");
 		}
-		else if (msg instanceof DozerBaseStatusMsg)
+		else if (msg instanceof DozerAdcMux1Msg)
 		{
-			if (msg.dataLength() != DozerBaseStatusMsg.DEFAULT_MESSAGE_SIZE)
+			if (msg.dataLength() != DozerAdcMux1Msg.DEFAULT_MESSAGE_SIZE)
 			{
-				System.out.print("received " + "base status" + " packet with invalid length (" +
-					msg.dataLength() + "-" + DozerBaseStatusMsg.DEFAULT_MESSAGE_SIZE +"): ");
+				System.out.print("received " + "AdcMux1" + " packet with invalid length (" + 
+						msg.dataLength() + "-" + DozerAdcMux1Msg.DEFAULT_MESSAGE_SIZE +"): ");
 				Dump.printPacket(System.out, msg.dataGet());
 				System.out.println();
 				return;
 			}
-			System.out.print("base status");
+			System.out.print("AdcMux1");
+		}
+		else if (msg instanceof DozerAdcMux2Msg)
+		{
+			if (msg.dataLength() != DozerAdcMux2Msg.DEFAULT_MESSAGE_SIZE)
+			{
+				System.out.print("received " + "AdcMux2" + " packet with invalid length (" + 
+						msg.dataLength() + "-" + DozerAdcMux2Msg.DEFAULT_MESSAGE_SIZE +"): ");
+				Dump.printPacket(System.out, msg.dataGet());
+				System.out.println();
+				return;
+			}
+			System.out.print("AdcMux2");
+		}
+		else if (msg instanceof DozerAdcComDiffMsg)
+		{
+			if (msg.dataLength() != DozerAdcComDiffMsg.DEFAULT_MESSAGE_SIZE)
+			{
+				System.out.print("received " + "AdcComDiff" + " packet with invalid length (" + 
+						msg.dataLength() + "-" + DozerAdcComDiffMsg.DEFAULT_MESSAGE_SIZE +"): ");
+				Dump.printPacket(System.out, msg.dataGet());
+				System.out.println();
+				return;
+			}
+			System.out.print("AdcComDiff");
 		}
 		else
 		{

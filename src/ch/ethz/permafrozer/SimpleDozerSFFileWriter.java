@@ -87,8 +87,11 @@ public class SimpleDozerSFFileWriter implements MessageListener
 		
 		System.out.println("opened.");
 		
-        mif.registerListener(new DozerDataMsg(), this);
         mif.registerListener(new DozerBaseStatusMsg(), this);
+		mif.registerListener(new DozerDataMsg(), this);
+        mif.registerListener(new DozerAdcMux1Msg(), this);
+        mif.registerListener(new DozerAdcMux2Msg(), this);
+        mif.registerListener(new DozerAdcComDiffMsg(), this);
         mif.start();
         
         System.out.println("message handler started...");
@@ -99,7 +102,17 @@ public class SimpleDozerSFFileWriter implements MessageListener
 	{
 		String s;
 		
-		if (msg instanceof DozerDataMsg)
+		if (msg instanceof DozerBaseStatusMsg)
+		{
+			s = "base status";
+			if (msg.dataLength() != DozerBaseStatusMsg.DEFAULT_MESSAGE_SIZE)
+			{
+				System.out.print("received " + s + " packet with invalid length: ");
+				Dump.printPacket(System.out, msg.dataGet());
+				return;
+			}
+		}
+		else if (msg instanceof DozerDataMsg)
 		{
 			s = "data";
 			if (msg.dataLength() != DozerDataMsg.DEFAULT_MESSAGE_SIZE)
@@ -108,11 +121,31 @@ public class SimpleDozerSFFileWriter implements MessageListener
 				Dump.printPacket(System.out, msg.dataGet());
 				return;
 			}
-		}
-		else if (msg instanceof DozerBaseStatusMsg)
+		} 
+		else if (msg instanceof DozerAdcMux1Msg)
 		{
-			s = "base status";
-			if (msg.dataLength() != DozerBaseStatusMsg.DEFAULT_MESSAGE_SIZE)
+			s = "AdcMux1";
+			if (msg.dataLength() != DozerAdcMux1Msg.DEFAULT_MESSAGE_SIZE)
+			{
+				System.out.print("received " + s + " packet with invalid length: ");
+				Dump.printPacket(System.out, msg.dataGet());
+				return;
+			}
+		}
+		else if (msg instanceof DozerAdcMux2Msg)
+		{
+			s = "AdcMux2";
+			if (msg.dataLength() != DozerAdcMux2Msg.DEFAULT_MESSAGE_SIZE)
+			{
+				System.out.print("received " + s + " packet with invalid length: ");
+				Dump.printPacket(System.out, msg.dataGet());
+				return;
+			}
+		}
+		else if (msg instanceof DozerAdcComDiffMsg)
+		{
+			s = "AdcComDiff";
+			if (msg.dataLength() != DozerAdcComDiffMsg.DEFAULT_MESSAGE_SIZE)
 			{
 				System.out.print("received " + s + " packet with invalid length: ");
 				Dump.printPacket(System.out, msg.dataGet());
