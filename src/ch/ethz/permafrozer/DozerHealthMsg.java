@@ -2,7 +2,7 @@ package ch.ethz.permafrozer;
 
 import net.tinyos1x.message.Message;
 
-public class DozerDataMsg extends DozerAbstractMsg
+public class DozerHealthMsg extends DozerAbstractMsg
 {
 	/** The default size of this message type in bytes. */
     public static final int DEFAULT_MESSAGE_SIZE = 38;
@@ -31,42 +31,42 @@ public class DozerDataMsg extends DozerAbstractMsg
     private Integer hopcount = null;
     private Integer childcount = null;
     
-    public DozerDataMsg() {
+    public DozerHealthMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
     }
 
-    public DozerDataMsg(int data_length) {
+    public DozerHealthMsg(int data_length) {
         super(data_length);
         amTypeSet(AM_TYPE);
     }
 
-    public DozerDataMsg(int data_length, int base_offset) {
+    public DozerHealthMsg(int data_length, int base_offset) {
         super(data_length, base_offset);
         amTypeSet(AM_TYPE);
     }
 
-    public DozerDataMsg(byte[] data) {
+    public DozerHealthMsg(byte[] data) {
         super(data);
         amTypeSet(AM_TYPE);
     }
 
-    public DozerDataMsg(byte[] data, int base_offset) {
+    public DozerHealthMsg(byte[] data, int base_offset) {
         super(data, base_offset);
         amTypeSet(AM_TYPE);
     }
 
-    public DozerDataMsg(byte[] data, int base_offset, int data_length) {
+    public DozerHealthMsg(byte[] data, int base_offset, int data_length) {
         super(data, base_offset, data_length);
         amTypeSet(AM_TYPE);
     }
 
-    public DozerDataMsg(Message msg, int base_offset) {
+    public DozerHealthMsg(Message msg, int base_offset) {
         super(msg, base_offset, DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
     }
 
-    public DozerDataMsg(Message msg, int base_offset, int data_length) {
+    public DozerHealthMsg(Message msg, int base_offset, int data_length) {
         super(msg, base_offset, data_length);
         amTypeSet(AM_TYPE);
     }
