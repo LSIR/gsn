@@ -93,7 +93,7 @@ public class DozerDigitalDCXMsg extends DozerAbstractMsg
     	
     	if (getUIntElement((start +4)* 8 , 8) != 0)
     	{
-    		tmp=Double.MAX_VALUE;
+    		tmp = 0d;
     	}
     	
     	return tmp;
