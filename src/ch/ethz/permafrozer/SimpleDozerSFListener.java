@@ -71,6 +71,7 @@ public class SimpleDozerSFListener implements MessageListener
         mif.registerListener(new DozerAdcMux1Msg(), this);
         mif.registerListener(new DozerAdcMux2Msg(), this);
         mif.registerListener(new DozerAdcComDiffMsg(), this);
+        mif.registerListener(new DozerDigitalDCXMsg(), this);
         mif.start();
         
         System.out.println("message handler started...");
@@ -139,6 +140,18 @@ public class SimpleDozerSFListener implements MessageListener
 				return;
 			}
 			System.out.print("AdcComDiff");
+		}
+		else if (msg instanceof DozerDigitalDCXMsg)
+		{
+			if (msg.dataLength() != DozerDigitalDCXMsg.DEFAULT_MESSAGE_SIZE)
+			{
+				System.out.print("received " + "DigitalDCX" + " packet with invalid length (" + 
+						msg.dataLength() + "-" + DozerDigitalDCXMsg.DEFAULT_MESSAGE_SIZE +"): ");
+				Dump.printPacket(System.out, msg.dataGet());
+				System.out.println();
+				return;
+			}
+			System.out.print("DigitalDCX");
 		}
 		else
 		{

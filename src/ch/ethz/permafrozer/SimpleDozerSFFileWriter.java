@@ -92,6 +92,7 @@ public class SimpleDozerSFFileWriter implements MessageListener
         mif.registerListener(new DozerAdcMux1Msg(), this);
         mif.registerListener(new DozerAdcMux2Msg(), this);
         mif.registerListener(new DozerAdcComDiffMsg(), this);
+        mif.registerListener(new DozerDigitalDCXMsg(), this);
         mif.start();
         
         System.out.println("message handler started...");
@@ -146,6 +147,16 @@ public class SimpleDozerSFFileWriter implements MessageListener
 		{
 			s = "AdcComDiff";
 			if (msg.dataLength() != DozerAdcComDiffMsg.DEFAULT_MESSAGE_SIZE)
+			{
+				System.out.print("received " + s + " packet with invalid length: ");
+				Dump.printPacket(System.out, msg.dataGet());
+				return;
+			}
+		}
+		else if (msg instanceof DozerDigitalDCXMsg)
+		{
+			s = "DigitalDCX";
+			if (msg.dataLength() != DozerDigitalDCXMsg.DEFAULT_MESSAGE_SIZE)
 			{
 				System.out.print("received " + s + " packet with invalid length: ");
 				Dump.printPacket(System.out, msg.dataGet());
