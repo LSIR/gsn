@@ -105,7 +105,7 @@ public class SimpleDozerSFFileWriter implements MessageListener
 		
 		if (msg instanceof DozerBaseStatusMsg)
 		{
-			s = "base status";
+			s = "BaseStatus";
 			if (msg.dataLength() != DozerBaseStatusMsg.DEFAULT_MESSAGE_SIZE)
 			{
 				System.out.print("received " + s + " packet with invalid length: ");
@@ -115,7 +115,7 @@ public class SimpleDozerSFFileWriter implements MessageListener
 		}
 		else if (msg instanceof DozerHealthMsg)
 		{
-			s = "data";
+			s = "Health";
 			if (msg.dataLength() != DozerHealthMsg.DEFAULT_MESSAGE_SIZE)
 			{
 				System.out.print("received " + s + " packet with invalid length: ");

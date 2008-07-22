@@ -85,25 +85,25 @@ public class SimpleDozerSFListener implements MessageListener
 		{
 			if (msg.dataLength() != DozerBaseStatusMsg.DEFAULT_MESSAGE_SIZE)
 			{
-				System.out.print("received " + "base status" + " packet with invalid length (" +
+				System.out.print("received " + "BaseStatus" + " packet with invalid length (" +
 					msg.dataLength() + "-" + DozerBaseStatusMsg.DEFAULT_MESSAGE_SIZE +"): ");
 				Dump.printPacket(System.out, msg.dataGet());
 				System.out.println();
 				return;
 			}
-			System.out.print("base status");
+			System.out.print("BaseStatus");
 		}
 		else if (msg instanceof DozerHealthMsg)
 		{
 			if (msg.dataLength() != DozerHealthMsg.DEFAULT_MESSAGE_SIZE)
 			{
-				System.out.print("received " + "data" + " packet with invalid length (" + 
+				System.out.print("received " + "Health" + " packet with invalid length (" + 
 						msg.dataLength() + "-" + DozerHealthMsg.DEFAULT_MESSAGE_SIZE +"): ");
 				Dump.printPacket(System.out, msg.dataGet());
 				System.out.println();
 				return;
 			}
-			System.out.print("data");
+			System.out.print("Health");
 		}
 		else if (msg instanceof DozerAdcMux1Msg)
 		{
