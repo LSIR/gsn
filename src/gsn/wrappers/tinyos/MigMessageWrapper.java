@@ -1,4 +1,4 @@
-package gsn.wrappers.tinyos2x;
+package gsn.wrappers.tinyos;
 
 import gsn.wrappers.AbstractWrapper;
 import gsn.beans.AddressBean;

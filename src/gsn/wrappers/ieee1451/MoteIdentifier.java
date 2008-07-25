@@ -8,14 +8,16 @@ import gsn.beans.StreamElement;
 import gsn.utils.ChangeListener;
 import gsn.utils.LazyTimedHashMap;
 import gsn.wrappers.AbstractWrapper;
-import gsn.wrappers.tinyos1x.GSNMessage;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import net.tinyos1x.message.Message;
 import net.tinyos1x.message.MessageListener;
 import net.tinyos1x.message.MoteIF;
+
 import org.apache.log4j.Logger;
 
 
@@ -146,10 +148,7 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
          if ( logger.isInfoEnabled( ) ) logger.info( "A Message is dropped because buffer is full." );
          return;
       }
-      if ( m instanceof GSNMessage ) {
-         // We don't care about GSNMessages. They just contain data.
-         // We care about the TEDS messages.
-      } else if ( m instanceof TedsMessage ) {
+      if ( m instanceof TedsMessage ) {
          if ( ( ( TedsMessage ) m ).dataLength( ) == 1 ) {
             if ( logger.isDebugEnabled( ) ) {
                logger.debug( "TedsMessage Received." );

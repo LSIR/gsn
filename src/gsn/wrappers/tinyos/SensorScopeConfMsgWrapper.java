@@ -1,4 +1,4 @@
-package gsn.wrappers.tinyos2x.sensorscope;
+package gsn.wrappers.tinyos;
 
 import java.text.DecimalFormat;
 
