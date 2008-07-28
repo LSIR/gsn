@@ -71,7 +71,7 @@
 			</javac>
     </target>
 
-      <target name="bind" depends="build">
+      <target name="bind" depends="build,compile-reports">
       <echo>Compiling JIBX Mappings...</echo>
        <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
    	            failonerror="true">
@@ -223,6 +223,21 @@
               basedir="${basedir}/installer"
               izPackdir="${basedir}/izpack"/>
    </target>
+	
+	<target name="compile-reports">
+			<taskdef name="jrc" classname="net.sf.jasperreports.ant.JRAntCompileTask"> 
+				<classpath refid="classpath"/>
+			</taskdef>
+			<jrc destdir="./gsn-reports/compiled">
+				<src>
+					<fileset dir="./">
+						<include name="gsn-reports/*.jrxml"/>
+					</fileset>
+				</src>
+				<classpath refid="classpath"/>
+			</jrc> 
+		</target>
+	
 	<target name="cleandb" depends="bind">
 		 <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" classpathref="classpath"/>
 	</target>
