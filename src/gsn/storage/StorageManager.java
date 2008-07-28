@@ -21,7 +21,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 public class StorageManager {
-  
+
   /***************************************************************************
    * Various HELPER METHODS.
    **************************************************************************/
@@ -32,9 +32,7 @@ public class StorageManager {
   public static DATABASE getDatabaseForConnection(Connection connection)
   throws SQLException {
     String name = connection.getMetaData().getDatabaseProductName();
-    if (name.toLowerCase().indexOf("hsql") >= 0)
-      return DATABASE.HSQL;
-    else if (name.toLowerCase().indexOf("h2") >= 0)
+    if (name.toLowerCase().indexOf("h2") >= 0)
       return DATABASE.H2;
     else if (name.toLowerCase().indexOf("mysql") >= 0)
       return DATABASE.MYSQL;
@@ -44,7 +42,7 @@ public class StorageManager {
       return null;
     }
   }
-  
+
   /**
    * Returns false if the table doesnt exist. Uses the current default
    * connection.
@@ -56,7 +54,7 @@ public class StorageManager {
   public boolean tableExists(CharSequence tableName) throws SQLException {
     return tableExists(tableName, new DataField[] {}, getConnection());
   }
-  
+
   /**
    * Checks to see if the given tablename exists using the given connection.
    * 
@@ -69,8 +67,8 @@ public class StorageManager {
       Connection connection) throws SQLException {
     return tableExists(tableName, new DataField[] {}, connection);
   }
-  
-  
+
+
   public static DataField[] tableToStructure(CharSequence tableName,Connection connection) throws SQLException {
     StringBuilder sb = new StringBuilder("select * from ").append(tableName).append(" where 1=0 ");
     ResultSet rs = null;
@@ -82,7 +80,7 @@ public class StorageManager {
       for (int i=1;i<=structure.getColumnCount();i++) {
         String colName = structure.getColumnName(i);
         if (colName.equalsIgnoreCase("pk")) continue;
-        String colType = structure.getColumnTypeName(i);
+        int colType = structure.getColumnType(i);
         toReturnArr.add(new DataField(colName,colType));           
       }
       toReturn = toReturnArr.toArray(new DataField[] {});
@@ -92,7 +90,7 @@ public class StorageManager {
     }
     return toReturn;
   }
-  
+
   /**
    * Returns false if the table doesnt exist. If the table exists but the
    * structure is not compatible with the specified fields the method throws
@@ -106,9 +104,9 @@ public class StorageManager {
    * @throws SQLException
    * @Throws GSNRuntimeException
    */
-  
+
   public static boolean tableExists(CharSequence tableName, DataField[] fields, Connection connection) throws SQLException,
-      GSNRuntimeException {
+  GSNRuntimeException {
     if (!ValidityTools.isValidJavaVariable(tableName))
       throw new GSNRuntimeException("Table name is not valid");
     StringBuilder sb = new StringBuilder("select * from ").append(tableName).append(" where 1=0 ");
@@ -139,7 +137,7 @@ public class StorageManager {
 //    System.out.println(e.getErrorCode());
 //    e.printStackTrace();
       DATABASE database = getDatabaseForConnection(connection);
-      
+
       if (e.getErrorCode() == database.getTableNotExistsErrNo())
         return false;
       else {
@@ -151,12 +149,12 @@ public class StorageManager {
     }
     return true;
   }
-  
+
   public boolean tableExists(CharSequence tableName, DataField[] fields)
   throws SQLException {
     return tableExists(tableName, fields, getConnection());
   }
-  
+
   /**
    * Returns true if the specified query has any result in it's result set.
    * The created result set will be closed automatically.
@@ -179,7 +177,7 @@ public class StorageManager {
     }
     return toreturn;
   }
-  
+
   /**
    * Executes the query of the database. Returns the specified colIndex of the
    * first row. Useful for image recovery of the web interface.
@@ -192,19 +190,19 @@ public class StorageManager {
    * 
    * @throws SQLException
    */
-  
+
   public static ResultSet getBinaryFieldByQuery(StringBuilder query,
       String colName, long pk, Connection connection) throws SQLException {
     PreparedStatement ps = connection.prepareStatement(query.toString());
     ps.setLong(1, pk);
     return ps.executeQuery();
   }
-  
+
   public ResultSet getBinaryFieldByQuery(StringBuilder query, String colName,
       long pk) throws SQLException {
     return getBinaryFieldByQuery(query, colName, pk, getConnection());
   }
-  
+
   public static void closeStatement(Statement stmt) {
     try {
       if (stmt != null)
@@ -213,7 +211,7 @@ public class StorageManager {
       logger.error(e.getMessage(), e);
     }
   }
-  
+
   public static void close(ResultSet resultSet) {
     try {
       if (resultSet != null)
@@ -222,7 +220,7 @@ public class StorageManager {
       logger.error(e.getMessage(), e);
     }
   }
-  
+
   public static void close(PreparedStatement preparedStatement) {
     try {
       if (preparedStatement != null)
@@ -231,7 +229,7 @@ public class StorageManager {
       logger.error(e.getMessage(), e);
     }
   }
-  
+
   /**
    * This method only works with HSQLDB database. If one doesn't close the
    * HSQLDB properly with high probability, the DB goes into instable or in
@@ -240,32 +238,32 @@ public class StorageManager {
    * @throws SQLException
    */
   public void shutdown() throws SQLException {
-    if (StorageManager.isHsql()) {
+    if (StorageManager.isH2()) {
       getConnection().createStatement().execute("SHUTDOWN");
       logger.warn("Closing the database server (for HSqlDB) [done].");
     }
     logger.warn("Closing the connection pool [done].");
   }
-  
+
   /***************************************************************************
    * Various Statement Executors.
    **************************************************************************/
-  
+
   public void executeRenameTable(String oldName, String newName)
   throws SQLException {
     executeRenameTable(oldName, newName, getConnection());
   }
-  
+
   public void executeRenameTable(String oldName, String newName,
       Connection connection) throws SQLException {
     getConnection().prepareStatement(
         getStatementRenameTable(oldName, newName)).execute();
   }
-  
+
   public void executeDropTable(CharSequence tableName) throws SQLException {
     executeDropTable(tableName, getConnection());
   }
-  
+
   public void executeDropTable(CharSequence tableName, Connection connection) {
     PreparedStatement prepareStatement = null;
     try{
@@ -286,11 +284,11 @@ public class StorageManager {
       close(prepareStatement);
     }
   }
-  
+
   public void executeDropView(StringBuilder tableName) throws SQLException {
     executeDropView(tableName, getConnection());
   }
-  
+
   public void executeDropView(StringBuilder tableName, Connection connection)
   throws SQLException {
     if (logger.isDebugEnabled())
@@ -301,12 +299,12 @@ public class StorageManager {
     prepareStatement.execute();
     close(prepareStatement);
   }
-  
+
   public void executeCreateTable(CharSequence tableName, DataField[] structure,boolean unique)
   throws SQLException {
     executeCreateTable(tableName, structure,unique, getConnection());
   }
-  
+
   /**
    * Create a table with a index on the timed field.
    * 
@@ -318,16 +316,14 @@ public class StorageManager {
    */
   public static void executeCreateTable(CharSequence tableName,
       DataField[] structure,boolean unique, Connection connection) throws SQLException {
-    StringBuilder sql = getStatementCreateTable(tableName, structure,
-        connection);
+    StringBuilder sql = getStatementCreateTable(tableName, structure,connection);
     if (logger.isDebugEnabled())
       logger.debug(new StringBuilder().append(
       "The create table statement is : ").append(sql).toString());
-    PreparedStatement prepareStatement = connection.prepareStatement(sql
-        .toString());
+    PreparedStatement prepareStatement = connection.prepareStatement(sql.toString());
     prepareStatement.execute();
     prepareStatement.close();
-    
+
     sql = getStatementCreateIndexOnTimed(tableName,unique);
     if (logger.isDebugEnabled())
       logger.debug(new StringBuilder().append(
@@ -335,19 +331,19 @@ public class StorageManager {
     prepareStatement = connection.prepareStatement(sql.toString());
     prepareStatement.execute();
     prepareStatement.close();
-    
+
   }
-  
+
   public ResultSet executeQueryWithResultSet(StringBuilder query)
   throws SQLException {
     return executeQueryWithResultSet(query, getConnection());
   }
-  
+
   public static ResultSet executeQueryWithResultSet(StringBuilder query,
       Connection connection) throws SQLException {
     return connection.prepareStatement(query.toString()).executeQuery();
   }
-  
+
   public static DataEnumerator executeQuery(StringBuilder query,
       boolean binaryFieldsLinked, Connection connection)
   throws SQLException {
@@ -358,17 +354,17 @@ public class StorageManager {
         connection.prepareStatement(query.toString()),
         binaryFieldsLinked);
   }
-  
+
   public DataEnumerator executeQuery(StringBuilder query,
       boolean binaryFieldsLinked) throws SQLException {
     return executeQuery(query, binaryFieldsLinked, getConnection());
   }
-  
+
   public void executeCreateView(CharSequence viewName,
       CharSequence selectQuery) throws SQLException {
     executeCreateView(viewName, selectQuery, getConnection());
   }
-  
+
   public void executeCreateView(CharSequence viewName,
       CharSequence selectQuery, Connection connection)
   throws SQLException {
@@ -380,7 +376,7 @@ public class StorageManager {
     prepareStatement.execute();
     prepareStatement.close();
   }
-  
+
   /**
    * This method executes the provided statement over the connection. If there
    * is an error retruns -1 otherwise it returns the output of the
@@ -405,15 +401,15 @@ public class StorageManager {
     }
     return toReturn;
   }
-  
+
   public int executeUpdate(StringBuilder updateStatement) throws SQLException {
     return executeUpdate(updateStatement, getConnection());
   }
-  
+
   public void executeInsert(CharSequence tableName, DataField[] fields,StreamElement se) throws SQLException {
     executeInsert(tableName, fields, se, getConnection());
   }
-  
+
   public static void executeInsert(CharSequence tableName,DataField[] fields, StreamElement streamElement,Connection connection) throws SQLException {
     PreparedStatement ps = null;
     String query = getStatementInsert(tableName, fields).toString();
@@ -497,7 +493,7 @@ public class StorageManager {
       close(ps);
     }
   }
-  
+
   /***************************************************************************
    * Statement Generators
    **************************************************************************/
@@ -528,21 +524,21 @@ public class StorageManager {
     toReturn.append(")");
     return toReturn;
   }
-  
+
   public static String getStatementRenameTable(String oldName, String newName) {
     return new StringBuilder("alter table ").append(oldName).append(
     " rename to ").append(newName).toString();
   }
-  
+
   public static StringBuilder getStatementDropTable(CharSequence tableName,Connection conn) throws SQLException {
     StringBuilder sb = new StringBuilder("Drop table ");
     DATABASE db = getDatabaseForConnection(conn);
-    if (db.getDBType()==MYSQL_DB) sb.append(" if exists " );
+    if (db.getDBType()==MYSQL_DB || db.getDBType()== H2_DB) 
+      sb.append(" if exists " );
     sb.append(tableName);
-    if (db.getDBType()==HSQL_DB) sb.append(" if exists " );
     return sb;
   }
-  
+
   /**
    * First detects the appropriate DB Engine to use. Get's the drop index
    * statement syntax (which is DB dependent) and executes it.
@@ -558,14 +554,14 @@ public class StorageManager {
     return new StringBuilder(db.getStatementDropIndex().replace("#NAME",
         indexName).replace("#TABLE",tableName ));
   }
-  
+
   public static StringBuilder getStatementDropView(CharSequence viewName,
       Connection connection) throws SQLException {
     DATABASE db = getDatabaseForConnection(connection);
     return new StringBuilder(db.getStatementDropView().replace("#NAME",
         viewName));
   }
-  
+
   public static StringBuilder getStatementCreateIndexOnTimed(
       CharSequence tableName,boolean unique) throws SQLException {
     StringBuilder toReturn = new StringBuilder("CREATE ");
@@ -575,19 +571,17 @@ public class StorageManager {
     "_INDEX ON ").append(tableName).append(" (timed DESC)");
     return toReturn;
   }
-  
+
   public static StringBuilder getStatementCreateTable(CharSequence tableName,
       DataField[] structure, Connection connection) throws SQLException {
     StringBuilder result = new StringBuilder("CREATE ");
     DATABASE db = getDatabaseForConnection(connection);
-    if (db.getDBType()==HSQL_DB)
-      result.append(" CACHED ");
     result.append("TABLE ").append(tableName);
-    if (db.getDBType()== SQLSERVER_DB || db.getDBType()==HSQL_DB)
+    if (db.getDBType()== SQLSERVER_DB || db.getDBType()==H2_DB)
       result.append(" (PK BIGINT NOT NULL IDENTITY, timed BIGINT NOT NULL, ");
     else if (db.getDBType()==MYSQL_DB)
       result.append(" (PK BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT, timed BIGINT NOT NULL, ");
-    
+
     for (DataField field : structure) {
       if (field.getName().equalsIgnoreCase("pk")||field.getName().equalsIgnoreCase("timed")) continue;
       result.append(field.getName().toUpperCase()).append(' ');
@@ -606,7 +600,7 @@ public class StorageManager {
             result.append(DataTypes.TYPE_NAMES[field.getDataTypeID()]);
           break;
         }
-      } else if (db.getDBType()==HSQL_DB) {
+      } else if (db.getDBType()==H2_DB) {
         switch (field.getDataTypeID()) {
           case DataTypes.CHAR:
           case DataTypes.VARCHAR:
@@ -643,38 +637,35 @@ public class StorageManager {
     result.append(")");
     return result;
   }
-  
+
   public static boolean isSqlServer() {
     return sqlserver;
   }
-  
+
   public static StringBuilder getStatementCreateView(CharSequence viewName,
       CharSequence selectQuery) {
     return new StringBuilder("create view ").append(viewName).append(
     " AS ( ").append(selectQuery).append(" ) ");
   }
-  
+
   /***************************************************************************
    * INITIALIZATION PARAMETERS. SET IN THE FIRST TIME THIS CLASS USED.
    **************************************************************************/
   private static boolean mysql = false;
-  
-  private static boolean hsql = false;
-  
+
   public static final int MYSQL_DB=1;
   public static final int SQLSERVER_DB=2;
-  public static final int HSQL_DB=3;
   public static final int H2_DB=4;
-  
-  
+
+
   public static enum DATABASE {
-    
+
     MYSQL("jdbc:mysql:", "com.mysql.jdbc.Driver") {
-      
+
       public int getTableNotExistsErrNo() {
         return 1146;
       }
-      
+
       /*
        * Returns the MySQL data type that can store this gsn datafield.
        * @param field The datafield to be converted. @return convertedType
@@ -698,14 +689,14 @@ public class StorageManager {
         }
         return convertedType;
       }
-      
+
       public String getStatementDropIndex() {
         if (isSqlServer())
           return "DROP TABLE #NAME";
         else
           return "DROP TABLE IF EXISTS #NAME";
       }
-      
+
       public String getStatementDropView() {
         if (isSqlServer())
           return "DROP VIEW #NAME";
@@ -714,51 +705,11 @@ public class StorageManager {
       }
       public  int getDBType() {return MYSQL_DB;}
     },
-    HSQL("jdbc:hsql:", "org.hsqldb.jdbcDriver") {
-      
-      public int getTableNotExistsErrNo() {
-        return -22;
-      }
-      
-      /*
-       * Returns the HSQLDB data type that can store this gsn datafield.
-       * @param field The datafield to be converted. @return convertedType
-       * the data type used by hsql.
-       */
-      public String convertGSNTypeToLocalType(DataField field) {
-        String convertedType = null;
-        switch (field.getDataTypeID()) {
-          case DataTypes.CHAR:
-          case DataTypes.VARCHAR:
-            // Because the parameter for the varchar is not
-            // optional.
-            convertedType = field.getType();
-            break;
-          default:
-            convertedType = DataTypes.TYPE_NAMES[field.getDataTypeID()];
-          break;
-        }
-        return convertedType;
-      }
-      
-      public String getStatementDropIndex() {
-        if (StorageManager.isHsql()||StorageManager.isSqlServer())
-          return "DROP INDEX #NAME";
-        if (StorageManager.isMysqlDB())
-          return "DROP INDEX #NAME IF EXISTS";
-        return null;
-      }
-      
-      public String getStatementDropView() {
-        return "DROP VIEW #NAME IF EXISTS";
-      }
-      public  int getDBType() {return HSQL_DB;}
-    },
     H2("jdbc:h2:", "org.h2.Driver") {
       public int getTableNotExistsErrNo() {
         return 42102;
       }
-      
+
       /*
        * Returns the HSQLDB data type that can store this gsn datafield.
        * @param field The datafield to be converted. @return convertedType
@@ -779,26 +730,26 @@ public class StorageManager {
         }
         return convertedType;
       }
-      
+
       public String getStatementDropIndex() {
-        if (StorageManager.isHsql()||StorageManager.isSqlServer())
+        if (StorageManager.isH2()||StorageManager.isSqlServer())
           return "DROP INDEX #NAME";
         if (StorageManager.isMysqlDB())
           return "DROP INDEX #NAME IF EXISTS";
         return null;
       }
-      
+
       public String getStatementDropView() {
         return "DROP VIEW #NAME IF EXISTS";
       }
       public  int getDBType() {return H2_DB;}
     },
     SQLSERVER("jdbc:jtds:sqlserver:", "net.sourceforge.jtds.jdbc.Driver") {
-      
+
       public int getTableNotExistsErrNo() {
         return 208; //java.sql.SQLException: Invalid object name
       }
-      
+
       /*
        * Returns the HSQLDB data type that can store this gsn datafield.
        * @param field The datafield to be converted. @return convertedType
@@ -819,22 +770,22 @@ public class StorageManager {
         }
         return convertedType;
       }
-      
+
       public String getStatementDropIndex() {
         return "DROP INDEX #NAME ON #TABLE";
       }
-      
+
       public String getStatementDropView() {
         return "DROP VIEW #NAME";
       }
       public  int getDBType() {return SQLSERVER_DB;}
-      
+
     };
-    
+
     private final String jdbcPrefix;
-    
+
     private final String driver;
-    
+
     DATABASE(String jdbcPrefix, String driver) {
       this.jdbcPrefix = jdbcPrefix;
       this.driver = driver;
@@ -845,8 +796,8 @@ public class StorageManager {
 //    logger.error(e.getMessage(), e);
 //    }
     }
-    
-    
+
+
     /**
      * The prefix is in lower case
      * 
@@ -855,29 +806,29 @@ public class StorageManager {
     public String getJDBCPrefix() {
       return jdbcPrefix;
     }
-    
+
     public String getJDBCDriverClass() {
       return driver;
     }
-    
+
     /*
      * Converts from internal GSN data types to a supported DB data type.
      * @param field The DataField to be converted @return convertedType The
      * datatype name used by the target database.
      */
-    
+
     public abstract String convertGSNTypeToLocalType(DataField field);
-    
+
     public abstract String getStatementDropIndex();
-    
+
     public abstract String getStatementDropView();
-    
+
     public abstract int getTableNotExistsErrNo();
-    
+
     public abstract int getDBType();
-    
+
   };
-  
+
   /**
    * Determinse if the database used is MySql.
    * 
@@ -886,45 +837,47 @@ public class StorageManager {
   public static boolean isMysqlDB() {
     return mysql;
   }
-  
+
   /**
    * Determining if the database used is HSqlDB.
    * 
    * @return true if the database used is HSqlDB.
    */
-  public static boolean isHsql() {
-    return hsql;
+  public static boolean isH2() {
+    return h2;
   }
-  
+
   private static StorageManager singleton = new StorageManager();
-  
+
   private static final transient Logger logger = Logger.getLogger(StorageManager.class);
-  
+
   public static final int DEFAULT_STORAGE_POOL_SIZE = 100;
-  
+
   private static int MAX_DB_CONNECTIONS;
-  
+
   private String databaseURL;
-  
+
   private Properties dbConnectionProperties = new Properties();
-  
+
   private Connection connection = null;
-  
+
+  private static boolean h2;
+
   private static boolean sqlserver;
-  
+
   public static StorageManager getInstance() {
     return singleton;
   }
-  
+
   private StorageManager() {
   }
-  
+
   public void initialize(String databaseDriver, String username,
       String password, String databaseURL) {
     this.databaseURL = databaseURL;
     if (databaseDriver.trim().equalsIgnoreCase(
-        DATABASE.HSQL.getJDBCDriverClass()))
-      hsql = true;
+        DATABASE.H2.getJDBCDriverClass()))
+      h2 = true;
     else if (databaseDriver.trim().equalsIgnoreCase(
         DATABASE.MYSQL.getJDBCDriverClass()))
       mysql = true;
@@ -945,7 +898,7 @@ public class StorageManager {
       MAX_DB_CONNECTIONS = DEFAULT_STORAGE_POOL_SIZE;
     else
       MAX_DB_CONNECTIONS = Main.getContainerConfig().getStoragePoolSize();
-    
+
     dbConnectionProperties.put("user", username);
     dbConnectionProperties.put("password", password);
     dbConnectionProperties.put("username", username);
@@ -964,13 +917,13 @@ public class StorageManager {
     dbConnectionProperties.put("useServerPrepStmts", "false");
     dbConnectionProperties.put("prepStmtCacheSize", "512");
     logger.info("Initializing the access to the database server ...");
-    
+
     Connection con;
     Statement stmt = null;
     try {
       con = getConnection();
       stmt = con.createStatement();
-      if (StorageManager.isHsql()) {
+      if (StorageManager.isH2()) {
         stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
         stmt
         .execute("CREATE ALIAS NOW_MILLIS FOR \"java.lang.System.currentTimeMillis\";");
@@ -1021,22 +974,22 @@ public class StorageManager {
       closeStatement(stmt);
     }
   }
-  
+
   public Connection getConnection() throws SQLException {
     if (this.connection == null || this.connection.isClosed())
       this.connection = DriverManager.getConnection(databaseURL,
           dbConnectionProperties);
     return connection;
   }
-  
-  
+
+
   /**
    * Retruns an approximation of the difference between the current time of the DB and that of the local system
    * @return
    */
   public long getTimeDifferenceInMillis(){
     StringBuilder query = new StringBuilder();
-    if (StorageManager.isHsql())
+    if (StorageManager.isH2())
       query.append("call NOW_MILLIS()");
     else if (StorageManager.isMysqlDB())
       query.append("select  UNIX_TIMESTAMP()*1000");
@@ -1059,7 +1012,7 @@ public class StorageManager {
     }
     return 0;
   }
-  
+
   public ArrayList<String> getInternalTables() throws SQLException {
     ArrayList<String> toReturn = new ArrayList<String>();
     Connection c = getConnection();

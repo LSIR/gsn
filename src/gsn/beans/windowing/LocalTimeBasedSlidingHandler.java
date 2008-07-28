@@ -135,7 +135,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 
         if (maxTupleCount > 0) {
             StringBuilder query = new StringBuilder();
-            if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
+            if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
                 query.append(" select timed from ").append(wrapper.getDBAliasInStr()).append(" where timed <= ");
                 query.append(System.currentTimeMillis() - maxSlideForTupleBased).append(" order by timed desc limit 1 offset ").append(
                         maxTupleCount - 1);
@@ -256,7 +256,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             }
 
             if (streamSource.getSamplingRate() != 1) {
-                if (StorageManager.isHsql()) {
+                if (StorageManager.isH2()) {
                     toReturn.append("( timed - (timed / 100) * 100 < ").append(streamSource.getSamplingRate() * 100).append(") and ");
                 } else {
                     toReturn.append("( mod( timed , 100)< ").append(streamSource.getSamplingRate() * 100).append(") and ");
@@ -267,7 +267,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             if (windowingType == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE) {
 
                 toReturn.append("(wrapper.timed >");
-                if (StorageManager.isHsql()) {
+                if (StorageManager.isH2()) {
                     toReturn.append(" (NOW_MILLIS()");
                 } else if (StorageManager.isMysqlDB()) {
                     toReturn.append(" (UNIX_TIMESTAMP()*1000");
@@ -282,7 +282,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                 long timeDifferenceInMillis = storageManager.getTimeDifferenceInMillis();
                 // System.out.println(timeDifferenceInMillis);
                 toReturn.append(" - ").append(windowSize).append(" - ").append(timeDifferenceInMillis).append(" )");
-                if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
+                if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
                     toReturn.append(") order by timed desc ");
                 }
 
@@ -292,7 +292,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                     toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr()).append(
                             "') and timed >= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
                             " where UID='").append(streamSource.getUIDStr()).append("') - ").append(windowSize).append(" ) ");
-                    if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
+                    if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
                         toReturn.append(" order by timed desc ");
                     }
 
@@ -305,7 +305,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                         toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr());
                         toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" )");
                         toReturn.append(" order by timed desc ");
-                    } else if (StorageManager.isHsql()) {
+                    } else if (StorageManager.isH2()) {
                         toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
                                 " where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select distinct(timed) from ");
                         toReturn.append(wrapperAlias).append(" where timed in (select timed from ").append(wrapperAlias).append(

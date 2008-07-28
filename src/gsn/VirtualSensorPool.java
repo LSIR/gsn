@@ -131,7 +131,7 @@ public class VirtualSensorPool {
 		String virtualSensorName = config.getName( );
 		StringBuilder query = null;
 		if ( config.isStorageCountBased( ) ){
-			if ( StorageManager.isHsql( ) ) {
+			if ( StorageManager.isH2( ) ) {
 				query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed not in ( select " ).append(
 						virtualSensorName ).append( ".timed from " ).append( virtualSensorName ).append( " order by " ).append( virtualSensorName ).append( ".timed DESC  LIMIT  " ).append(
 								config.getParsedStorageSize( ) ).append( " offset 0 )" );

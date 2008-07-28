@@ -393,13 +393,13 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
 // toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
     
     if (isStorageCountBased()) {
-  		if (StorageManager.isHsql()||StorageManager.isMysqlDB())
+  		if (StorageManager.isH2()||StorageManager.isMysqlDB())
   			toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset " ).append(getParsedStorageSize()-1).append( " )" );
   		else if (StorageManager.isSqlServer())
   			toReturn.append("timed >= (select min(timed) from (select TOP ").append(getParsedStorageSize()).append(" timed from (select distinct(timed) from ").append(wrapperAlias).append(") as x  order by timed desc ) as y )" );
     }else { //time based
       toReturn.append("(wrapper.timed >");
-      if ( StorageManager.isHsql( ) ) 
+      if ( StorageManager.isH2( ) ) 
         toReturn.append( " (NOW_MILLIS()");
       else if ( StorageManager.isMysqlDB( ) ) 
         toReturn.append(" (UNIX_TIMESTAMP()*1000");

@@ -31,7 +31,13 @@ public final class DataField implements Serializable {
       this.dataTypeID = DataTypes.convertTypeNameToTypeID( type );
    }
  
-   public String getDescription ( ) {
+   public DataField(String colName, int jdbcColType) {
+     this.name=colName;
+     this.dataTypeID = DataTypes.convertFromJDBCToGSNFormat(jdbcColType);
+     this.type = DataTypes.TYPE_NAMES[this.dataTypeID];
+  }
+
+  public String getDescription ( ) {
       return this.description;
    }
    transient boolean fieldNameConvertedToLowerCase = false;

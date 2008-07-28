@@ -48,7 +48,7 @@ public class GSNNotification extends NotificationRequest {
 		this.prespectiveVirtualSensor = virtualSensorName;
 		TreeMap<CharSequence,CharSequence> rewritingInfo = new TreeMap<CharSequence,CharSequence>(new CaseInsensitiveComparator());
 		rewritingInfo.put("wrapper", virtualSensorName);
-		if (StorageManager.isHsql() || StorageManager.isMysqlDB()) {
+		if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
 			query += " order by timed desc limit 1 offset 0";
 		}
 		if (StorageManager.isSqlServer()) {

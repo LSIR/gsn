@@ -129,6 +129,7 @@ public class DataTypes {
             return DOUBLE;
          case Types.BINARY :
          case Types.BLOB :
+         case Types.VARBINARY:
          case Types.LONGVARBINARY :
             return BINARY;
          default :
