@@ -2,10 +2,11 @@ package gsn.notifications;
 
 import gsn.Main;
 import gsn.storage.DataEnumerator;
-
+/**
+ * Dummy notification for Testing Purposes.
+ *
+ */
 public class DummyNotification extends NotificationRequest {
-   
-   
    
    public DummyNotification (  ) {
       this.notificationCode = notificationCode;

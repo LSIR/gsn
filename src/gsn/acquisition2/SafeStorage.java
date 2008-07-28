@@ -1,15 +1,19 @@
 package gsn.acquisition2;
 
+import gsn.Main;
 import gsn.acquisition2.messages.HelloMsg;
 import gsn.acquisition2.wrappers.AbstractWrapper2;
 import gsn.beans.AddressBean;
 import gsn.wrappers.WrappersUtil;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Properties;
+
 import org.apache.log4j.Logger;
 import org.apache.mina.common.IoSession;
 
@@ -19,7 +23,7 @@ public class SafeStorage {
 
   private static transient Logger                                logger                              = Logger.getLogger ( SafeStorage.class );
   
-  private HashMap<String, Class<?>> wrappers;
+  private Properties wrappers;
   
   private SafeStorageDB storage ;
   
@@ -61,7 +65,10 @@ public class SafeStorage {
     	keepProcessed = Boolean.parseBoolean(wrapper_keep_processed_ss_entries);
     }
     
-    AbstractWrapper2 wrapper = ( AbstractWrapper2 ) wrappers.get ( wrapper_name ).newInstance ( );
+    AbstractWrapper2 wrapper = ( AbstractWrapper2 )(Main.getInstance().getWrapperClass ( wrapper_name )).newInstance ( );
+    if (wrapper ==null) {
+      logger.error("The requested wrapper: "+wrapper_name+" doesn't exist.");
+    }
     wrapper.setActiveAddressBean ( addressBean );
     boolean initializationResult = wrapper.initialize (  );
     if ( initializationResult == false ) {

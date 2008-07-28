@@ -24,12 +24,12 @@ public class AcquisitionGUI extends JFrame{
   }
   
   public JTable getTableForWrapper() {
-    final ArrayList<Class<?>> wrapperClasses = new ArrayList<Class<?>>();
+    final ArrayList<String> wrapperClasses = new ArrayList<String>();
     final ArrayList<String> wrapperNames = new ArrayList<String>();
-    for (String name : directory.getWrappers().keySet()) {
-      wrapperClasses.add(directory.getWrappers().get(name));
-      wrapperNames.add(name);
-    }
+//    for (String name : directory.getWrappers().keys()) {
+//      wrapperClasses.add(directory.getWrappers().get(name));
+//      wrapperNames.add(name);
+//    }
       
     TableModel model = new AbstractTableModel() {
 

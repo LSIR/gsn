@@ -31,6 +31,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -41,7 +42,6 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
-//import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SslSocketConnector;
@@ -55,7 +55,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
 public final class Main {
 
   private static Main singleton ;
-  
+
   private static int gsnControllerPort;
 
   private Main() throws Exception{
@@ -63,7 +63,7 @@ public final class Main {
     ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
     ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
-//    initializeConfiguration();
+//  initializeConfiguration();
     try {
       controlSocket = new GSNController(null, gsnControllerPort);
       containerConfig = loadContainerConfiguration();
@@ -110,7 +110,7 @@ public final class Main {
     server.setSendServerVersion ( false );
     server.setSessionIdManager(new HashSessionIdManager(new Random()));
     server.addUserRealm(new HashUserRealm("GSNRealm","conf/realm.properties"));
-    
+
     try {
       logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" ...");
       server.start ( );
@@ -132,11 +132,11 @@ public final class Main {
         logger.error(e.getMessage(),e);
         System.exit(1);
       }
-    return singleton;
+      return singleton;
   }
 
   private GSNController controlSocket;
-  
+
   public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 
   public static transient Logger logger= Logger.getLogger ( Main.class );
@@ -147,20 +147,18 @@ public final class Main {
 
   public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
 
-  
-  
+
+
   public static void main ( String [ ]  args)  {
-	  Main.gsnControllerPort = Integer.parseInt(args[0]) ;
-	Main.getInstance();
+    Main.gsnControllerPort = Integer.parseInt(args[0]) ;
+    Main.getInstance();
   }
-
-
 
   /**
    * Mapping between the wrapper name (used in addressing of stream source)
    * into the class implementing DataSource.
    */
-  private static  HashMap < String , Class < ? >> wrappers ;
+  private static  Properties wrappers ;
 
   private  ContainerConfig                       containerConfig;
 
@@ -208,7 +206,7 @@ public final class Main {
   }
 
 //FIXME: COPIED_FOR_SAFE_STOAGE
-  public static HashMap<String, Class<?>> getWrappers() throws ClassNotFoundException {
+  public static Properties getWrappers()  {
     if (singleton==null )
       return WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
     return singleton.wrappers;
@@ -261,17 +259,17 @@ public final class Main {
     KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
     return keyFactory.generatePublic (pubKeySpec);
   }
-// FIXME: COPIED_FOR_SAFE_STOAGE
-  public  static Class < ? > getWrapperClass ( String id )  {
-    Class toReturn = null;
+//FIXME: COPIED_FOR_SAFE_STOAGE
+  public  static Class < ? > getWrapperClass ( String id ) {
     try {
-      toReturn =  getWrappers().get ( id );
+      String className =  getWrappers().getProperty(id);
+      if (className ==null) 
+        logger.error("The requested wrapper: "+id+" doesn't exist in the wrappers.properties file.");
+      return Class.forName(className);  
     } catch (ClassNotFoundException e) {
       logger.error(e.getMessage(),e);
     }
-    finally {
-      return toReturn;
-    }
+    return null;
   }
 
   public final HashMap < String , VSensorConfig > getVirtualSensors ( ) {

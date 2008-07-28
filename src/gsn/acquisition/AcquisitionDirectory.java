@@ -1,16 +1,16 @@
 package gsn.acquisition;
 
-import java.util.HashMap;
+import java.util.Properties;
 
 public class AcquisitionDirectory {
   
-  private  HashMap < String , Class < ? >> wrappers ;
+  private  Properties wrappers ;
 
-  public void setWrappers(HashMap<String, Class<?>> wrappers) {
+  public void setWrappers(Properties wrappers) {
     this.wrappers = wrappers;
   }
 
-  public HashMap<String, Class<?>> getWrappers() {
+  public Properties getWrappers() {
     return wrappers;
   }
   
