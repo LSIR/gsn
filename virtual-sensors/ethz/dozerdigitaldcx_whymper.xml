@@ -1,0 +1,47 @@
+<virtual-sensor name="Whymper_Dozer_DigitalDCX_1433" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>true</unique-timestamps>
+        <output-structure>
+                <field name="SEQNR" type="INTEGER" />
+                <field name="ORIGINATORID" type="INTEGER" />
+
+                <field name="ATIME" type="INTEGER" />
+                <field name="GENTIME" type="BIGINT" />
+
+                <field name="SAMPLENO" type="INTEGER" />
+
+		<field name="BATTERY" type="INTEGER" />
+
+                <field name="PDIFF" type="DOUBLE" />
+                <field name="P2" type="DOUBLE" />
+                <field name="TOB1" type="DOUBLE" />
+                <field name="TOB2" type="DOUBLE" />
+
+                <field name="TIMESTAMP" type="BIGINT" />
+       </output-structure>
+    </processing-class>
+    <description>sensor node packets (digital DCX sensor) from whymper WSN </description>
+    <life-cycle pool-size="10" />
+    <addressing/>
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="ss_tinyos-mig">
+           		<predicate key="ss-host">localhost</predicate>
+          		<predicate key="ss-port">25000</predicate>
+          		<predicate key="continue-on-error">true</predicate>
+          		<predicate key="wrapper-name">mig2</predicate>
+          		<predicate key="wrapper-keep-processed-ss-entries">false</predicate>
+               <predicate key="source">sf@whymper.ethz.ch:9001</predicate>
+               <predicate key="message-classname">ch.ethz.permafrozer.DozerDigitalDCXMsg</predicate>
+               <predicate key="message-length">38</predicate>
+               <predicate key="getter-prefix">get</predicate>
+           </address>
+        <query> select * from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>
