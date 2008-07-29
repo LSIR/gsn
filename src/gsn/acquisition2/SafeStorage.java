@@ -50,6 +50,18 @@ public class SafeStorage {
 	  }
   }
   
+  public  Class < ? > getWrapperClass ( String id ) {
+    try {
+      String className =  wrappers.getProperty(id);
+      if (className ==null) 
+        logger.error("The requested wrapper: "+id+" doesn't exist in the "+SAFE_STORAGE_WRAPPERS_PROPERTIES+" file.");
+      return Class.forName(className);  
+    } catch (ClassNotFoundException e) {
+      logger.error(e.getMessage(),e);
+    }
+    return null;
+  }
+
   
   public AbstractWrapper2 prepareWrapper(HelloMsg helloMsg,IoSession network) throws InstantiationException, IllegalAccessException {
     AddressBean addressBean = helloMsg.getWrapperDetails();
@@ -65,7 +77,7 @@ public class SafeStorage {
     	keepProcessed = Boolean.parseBoolean(wrapper_keep_processed_ss_entries);
     }
     
-    AbstractWrapper2 wrapper = ( AbstractWrapper2 )(Main.getInstance().getWrapperClass ( wrapper_name )).newInstance ( );
+    AbstractWrapper2 wrapper = ( AbstractWrapper2 )(getWrapperClass ( wrapper_name )).newInstance ( );
     if (wrapper ==null) {
       logger.error("The requested wrapper: "+wrapper_name+" doesn't exist.");
     }
