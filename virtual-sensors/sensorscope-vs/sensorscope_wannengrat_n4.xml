@@ -36,7 +36,7 @@
 					<predicate key="wrapper-name">mig2</predicate>
 					<predicate key="wrapper-keep-processed-ss-entries">false</predicate>
 					<predicate key="source">sf@micssrv32.epfl.ch:2226</predicate>
-					<predicate key="message-classname">gsn.wrappers.tinyos2x.sensorscope.PayLoadMsg</predicate>
+					<predicate key="message-classname">gsn.wrappers.tinyos.PayLoadMsg</predicate>
 				</address>
 				<query>select * from wrapper where REPORTERID = 4</query>
 			</source>
