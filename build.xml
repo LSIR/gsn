@@ -228,14 +228,9 @@
 			<taskdef name="jrc" classname="net.sf.jasperreports.ant.JRAntCompileTask"> 
 				<classpath refid="classpath"/>
 			</taskdef>
-			<jrc destdir="./gsn-reports/compiled">
-				<src>
-					<fileset dir="./">
-						<include name="gsn-reports/*.jrxml"/>
-					</fileset>
-				</src>
+			<jrc srcdir="./gsn-reports">
 				<classpath refid="classpath"/>
-			</jrc> 
+			</jrc>
 		</target>
 	
 	<target name="cleandb" depends="bind">

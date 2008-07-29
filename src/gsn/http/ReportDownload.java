@@ -61,7 +61,7 @@ public class ReportDownload extends HttpServlet {
 		Collection<Report> reports = new ArrayList<Report> ();
 		reports.add(createReport ());
 		//
-		byte[] pdf = ReportManager.generateReport(reports, "gsn-reports/compiled/" + reportClass + ".jasper", new HashMap<String, String>());
+		byte[] pdf = ReportManager.generateReport(reports, "gsn-reports/" + reportClass + ".jasper", new HashMap<String, String>());
 		res.setContentType("application/pdf");
 		res.setHeader("content-disposition","attachment; filename=sample-report.pdf");
 		res.setContentLength(pdf.length);
