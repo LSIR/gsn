@@ -9,13 +9,12 @@ import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
 import gsn.wrappers.MockWrapper;
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -26,7 +25,7 @@ public class TestVSensorLoader {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		DriverManager.registerDriver( new org.hsqldb.jdbcDriver( ) );
+		DriverManager.registerDriver( new org.h2.Driver( ) );
 		StorageManager.getInstance ( ).initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
 	}
 
@@ -38,12 +37,10 @@ public class TestVSensorLoader {
 
 	@Before
 	public void setUp() throws Exception {
-	  PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-		propertiesConfiguration.addProperty("wrapper.name", "mock-test");
-		propertiesConfiguration.addProperty("wrapper.class", "gsn.wrappers.MockWrapper");
-		propertiesConfiguration.addProperty("wrapper.name", "system-time");
-		propertiesConfiguration.addProperty("wrapper.class", "gsn.wrappers.SystemTime");
-		Main.getInstance();
+	  Properties p = new Properties();
+	  p.put("mock-test", "gsn.wrappers.MockWrapper");
+	  p.put("system-time", "gsn.wrappers.SystemTime");
+	  Main.getInstance();
 	}
 
 	@After

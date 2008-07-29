@@ -42,7 +42,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
    public void tearDown ( ) {
       config = null;
       try {
-         DriverManager.registerDriver( new org.hsqldb.jdbcDriver() );
+         DriverManager.registerDriver( new org.h2.Driver() );
          Connection connection = DriverManager.getConnection( url , user , passwd );
          connection.createStatement( ).execute( "DROP TABLE IF EXISTS " + streamName );
       } catch ( SQLException e ) {

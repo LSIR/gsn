@@ -66,15 +66,15 @@ public class TestWindowing2 {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		initDB(StorageManager.HSQL_DB);
+		initDB(StorageManager.H2_DB);
 	}
 
 	private static void initDB(int dbType) throws SQLException {
 		if (StorageManager.MYSQL_DB == dbType) {
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
 			StorageManager.getInstance().initialize("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest");
-		} else if (StorageManager.HSQL_DB == dbType) {
-			DriverManager.registerDriver(new org.hsqldb.jdbcDriver());
+		} else if (StorageManager.H2_DB == dbType) {
+			DriverManager.registerDriver(new org.h2.Driver());
 			StorageManager.getInstance().initialize("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.");
 		} else {
 			DriverManager.registerDriver(new net.sourceforge.jtds.jdbc.Driver());

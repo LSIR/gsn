@@ -20,8 +20,9 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class TestDataPropogation {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		DriverManager.registerDriver( new org.hsqldb.jdbcDriver( ) );
+		DriverManager.registerDriver( new org.h2.Driver( ) );
 		StorageManager.getInstance ( ).initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
 	}
 
@@ -47,10 +48,9 @@ public class TestDataPropogation {
 	@Before
 	public void setUp() throws Exception {
 		sm = StorageManager.getInstance();
-		PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-		propertiesConfiguration.addProperty("wrapper.name", "mock-test");
-		propertiesConfiguration.addProperty("wrapper.class", "gsn.wrappers.MockWrapper");
-//		Main.loadWrapperList(propertiesConfiguration);
+		Properties p = new Properties();
+		p.put("mock-test", "gsn.wrappers.MockWrapper");
+	//		Main.loadWrapperList(propertiesConfiguration);
 		VSensorLoader loader = new VSensorLoader();
 		AddressBean addressBean= new AddressBean("mock-test");
 		wrapper = (MockWrapper) loader.findWrapper(addressBean);

@@ -31,8 +31,6 @@ public class RemoteWrapper extends AbstractWrapper {
 
 	private String                     remoteVSName;
 
-	private ArrayList < CharSequence > registeredWhereClauses = new ArrayList < CharSequence >( );
-	
 	private XmlRpcClient                    client             = new XmlRpcClient ( );
 
 	private  XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
@@ -117,8 +115,6 @@ public class RemoteWrapper extends AbstractWrapper {
 	 */
 	private void refreshRemotelyRegisteredQuery ( ) throws XmlRpcException {
 		int notificationCode = getDBAlias ( );
-//		String query = new StringBuffer ( "SELECT * FROM " ).append ( remoteVSName ).append ( " WHERE " ).append ( getWhereClausesAllTogher ( ) ).append ( " ORDER BY " ).append ( remoteVSName ).append (
-//		".TIMED DESC LIMIT 1 OFFSET 0" ).toString ( );
 		String query = new StringBuilder("select * from ").append(remoteVSName).toString();
 		Object [ ] params = new Object [ ] {local_gsn_port,remoteVSName,query.toString( ), notificationCode};
 		if ( logger.isDebugEnabled ( ) )
@@ -136,7 +132,6 @@ public class RemoteWrapper extends AbstractWrapper {
 	public void addListener ( StreamSource ss ) throws SQLException {
 		super.addListener(ss);
 		try {
-			registeredWhereClauses.add(ss.toSql());
 			refreshRemotelyRegisteredQuery();
 		}
 		catch (XmlRpcException ex) {
@@ -146,7 +141,6 @@ public class RemoteWrapper extends AbstractWrapper {
 
 	public void removeListener ( StreamSource ss ) throws SQLException {
 		super.removeListener ( ss );
-		registeredWhereClauses.remove ( ss );
 	}
 
 	/**
@@ -161,14 +155,6 @@ public class RemoteWrapper extends AbstractWrapper {
 
 	public  DataField [] getOutputFormat ( ) {
 		return strcture;
-	}
-
-	private String getWhereClausesAllTogher ( ) {
-		StringBuffer result = new StringBuffer ( );
-		for ( CharSequence whereClause : registeredWhereClauses ) {
-			result.append ( "(" ).append ( whereClause ).append ( ")" ).append ( " OR " );
-		}
-		return result.delete ( result.length ( ) - " OR ".length ( ) , result.length ( ) ).toString ( );
 	}
 
 	public void finalize ( ) {

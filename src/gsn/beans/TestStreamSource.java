@@ -29,7 +29,7 @@ public class TestStreamSource {
    
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		DriverManager.registerDriver( new org.hsqldb.jdbcDriver( ) );
+		DriverManager.registerDriver( new org.h2.Driver( ) );
 		StorageManager.getInstance ( ).initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
 		
 	}
