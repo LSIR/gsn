@@ -1,10 +1,10 @@
 package gsn.reports;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import gsn.reports.beans.Data;
 import gsn.reports.beans.Stream;
 import gsn.reports.beans.Report;
@@ -20,11 +20,20 @@ import net.sf.jasperreports.engine.util.JRLoader;
 
 public class ReportManager {	
 	
-	private static Map<String, String> parameters;
+	//private static Map<String, String> parameters;
 	
 	public static transient Logger logger= Logger.getLogger ( ReportManager.class );
 	
-	public static byte[] generateReport (Collection<Report> reports, String jasperFile, HashMap<String, String> params) {
+	public static void generatePdfReport (Collection<Report> reports, String jasperFile, HashMap<String, String> params, OutputStream os) {
+		try {
+			JasperPrint print = generate (reports, jasperFile, params) ;
+			JasperExportManager.exportReportToPdfStream(print, os);				
+		} catch (JRException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+	
+	public static byte[] generatePdfReport (Collection<Report> reports, String jasperFile, HashMap<String, String> params) {
 		byte[] report = null;
 		try {
 			JasperPrint print = generate (reports, jasperFile, params) ;
@@ -35,7 +44,7 @@ public class ReportManager {
 		return report;
 	}
 	
-	public static void generateReport (Collection<Report> reports, String jasperFile, HashMap<String, String> params, String PDFoutputPath) {
+	public static void generatePdfReport (Collection<Report> reports, String jasperFile, HashMap<String, String> params, String PDFoutputPath) {
 		try {
 			JasperPrint print = generate (reports, jasperFile, params) ;
 			JasperExportManager.exportReportToPdfFile(print, PDFoutputPath);				
@@ -46,22 +55,14 @@ public class ReportManager {
 	
 	private static JasperPrint generate (Collection<Report> reports, String jasperFile, HashMap<String, String> params) {
 		JasperPrint print = null;
-		JRBeanCollectionDataSource source = new JRBeanCollectionDataSource (reports) ;	
-		HashMap<String, String> finalParameters = defaultParameters();
-		finalParameters.putAll(params);	
+		JRBeanCollectionDataSource source = new JRBeanCollectionDataSource (reports) ;
 		try {
 			JasperReport report = (JasperReport) JRLoader.loadObjectFromLocation(jasperFile);
-			print = JasperFillManager.fillReport(report, parameters, source);
+			print = JasperFillManager.fillReport(report, params, source);
 		} catch (JRException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return print;
-	}
-	
-	private static HashMap<String, String> defaultParameters () {
-		HashMap<String, String> defaultParameters = new HashMap<String, String> () ;
-		defaultParameters.put("SUBREPORT_DIR", "./gsn-reports/compiled/");
-		return defaultParameters;
 	}
 
 	public static byte[] generateSampleReport () {
@@ -104,8 +105,8 @@ public class ReportManager {
 
 		// Build the source
 		
-		ReportManager.generateReport(reports, "gsn-reports/compiled/report-default.jasper", new HashMap<String, String>(), "sample-report.pdf");
-		byte[] rep = ReportManager.generateReport(reports, "gsn-reports/compiled/report-default.jasper", new HashMap<String, String>());
+		ReportManager.generatePdfReport(reports, "gsn-reports/report-default.jasper", new HashMap<String, String>(), "sample-report.pdf");
+		byte[] rep = ReportManager.generatePdfReport(reports, "gsn-reports/report-default.jasper", new HashMap<String, String>());
 		return rep;
 	}
 	

@@ -224,11 +224,11 @@
               izPackdir="${basedir}/izpack"/>
    </target>
 	
-	<target name="compile-reports">
+	<target name="compile-reports" depends="init">
 			<taskdef name="jrc" classname="net.sf.jasperreports.ant.JRAntCompileTask"> 
 				<classpath refid="classpath"/>
 			</taskdef>
-			<jrc destdir="./gsn-reports/">
+			<jrc destdir="./gsn-reports/" srcdir="./gsn-reports/">
 				<src>
 					<fileset dir="./">
 						<include name="gsn-reports/*.jrxml"/>

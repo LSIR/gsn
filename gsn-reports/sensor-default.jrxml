@@ -25,7 +25,7 @@
 	<import value="net.sf.jasperreports.engine.data.*" />
 
 	<parameter name="SUBREPORT_DIR" isForPrompting="true" class="java.lang.String">
-		<defaultValueExpression ><![CDATA["./gsn-reports/compiled/"]]></defaultValueExpression>
+		<defaultValueExpression ><![CDATA["./gsn-reports/"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="subFields" isForPrompting="false" class="net.sf.jasperreports.engine.JasperReport"/>
 

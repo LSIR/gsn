@@ -25,7 +25,7 @@
 	<import value="net.sf.jasperreports.engine.data.*" />
 
 	<parameter name="SUBREPORT_DIR" isForPrompting="true" class="java.lang.String">
-		<defaultValueExpression ><![CDATA["./gsn-reports/compiled/"]]></defaultValueExpression>
+		<defaultValueExpression ><![CDATA["./gsn-reports/"]]></defaultValueExpression>
 	</parameter>
 
 	<field name="virtualSensors" class="java.util.Collection"/>
@@ -197,7 +197,7 @@
 						key="image-1"/>
 					<box></box>
 					<graphicElement stretchType="NoStretch"/>
-					<imageExpression class="java.lang.String"><![CDATA["/home/marett/workspace/gsn/icons/gsn-mark.png"]]></imageExpression>
+					<imageExpression class="java.lang.String"><![CDATA["./icons/gsn-mark.png"]]></imageExpression>
 				</image>
 				<line direction="TopDown">
 					<reportElement
@@ -240,7 +240,7 @@
 					<reportElement
 						x="311"
 						y="82"
-						width="62"
+						width="44"
 						height="13"
 						key="staticText-6"/>
 					<box leftPadding="10"></box>
@@ -251,9 +251,9 @@
 				</staticText>
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="373"
+						x="355"
 						y="82"
-						width="143"
+						width="176"
 						height="14"
 						key="textField-8"
 						isPrintWhenDetailOverflows="true"/>
