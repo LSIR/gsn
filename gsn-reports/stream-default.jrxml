@@ -50,6 +50,16 @@
 	</variable>
 	<variable name="Chart" class="net.sf.jasperreports.engine.JRRenderable" resetType="Report" calculation="System">
 	</variable>
+	<variable name="samplingAverage" class="java.lang.String" resetType="Report" calculation="System">
+	</variable>
+	<variable name="samplingAverageUnit" class="java.lang.String" resetType="Report" calculation="System">
+	</variable>
+	<variable name="nbOfNull" class="java.lang.String" resetType="Report" calculation="Nothing">
+	</variable>
+	<variable name="samplingStdDeviation" class="java.lang.String" resetType="Report" calculation="System">
+	</variable>
+	<variable name="samplingStdDeviationUnit" class="java.lang.String" resetType="Report" calculation="System">
+	</variable>
 		<background>
 			<band height="0"  isSplitAllowed="true" >
 			</band>
@@ -67,7 +77,7 @@
 			</band>
 		</columnHeader>
 		<detail>
-			<band height="142"  isSplitAllowed="false" >
+			<band height="152"  isSplitAllowed="false" >
 				<rectangle radius="0" >
 					<reportElement
 						x="0"
@@ -94,9 +104,9 @@
 				</textField>
 				<staticText>
 					<reportElement
-						x="337"
-						y="38"
-						width="64"
+						x="338"
+						y="23"
+						width="60"
 						height="11"
 						key="staticText-3"/>
 					<box></box>
@@ -107,9 +117,9 @@
 				</staticText>
 				<staticText>
 					<reportElement
-						x="337"
-						y="71"
-						width="64"
+						x="338"
+						y="78"
+						width="60"
 						height="11"
 						key="staticText-4"/>
 					<box></box>
@@ -120,9 +130,9 @@
 				</staticText>
 				<staticText>
 					<reportElement
-						x="337"
-						y="82"
-						width="64"
+						x="338"
+						y="89"
+						width="60"
 						height="11"
 						key="staticText-5"/>
 					<box></box>
@@ -133,9 +143,9 @@
 				</staticText>
 				<staticText>
 					<reportElement
-						x="337"
-						y="93"
-						width="64"
+						x="338"
+						y="100"
+						width="60"
 						height="11"
 						key="staticText-6"/>
 					<box></box>
@@ -146,9 +156,9 @@
 				</staticText>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="401"
-						y="38"
-						width="132"
+						x="398"
+						y="23"
+						width="135"
 						height="11"
 						key="textField-2"/>
 					<box></box>
@@ -159,9 +169,9 @@
 				</textField>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="401"
-						y="71"
-						width="133"
+						x="398"
+						y="78"
+						width="135"
 						height="11"
 						key="textField-3"/>
 					<box></box>
@@ -172,9 +182,9 @@
 				</textField>
 				<staticText>
 					<reportElement
-						x="337"
-						y="49"
-						width="64"
+						x="338"
+						y="34"
+						width="60"
 						height="11"
 						key="staticText-7"/>
 					<box></box>
@@ -185,9 +195,9 @@
 				</staticText>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="401"
-						y="49"
-						width="132"
+						x="398"
+						y="34"
+						width="135"
 						height="11"
 						key="textField-6"/>
 					<box></box>
@@ -198,9 +208,9 @@
 				</textField>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="401"
-						y="82"
-						width="133"
+						x="398"
+						y="89"
+						width="135"
 						height="11"
 						key="textField-7"/>
 					<box></box>
@@ -211,9 +221,9 @@
 				</textField>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="401"
-						y="93"
-						width="133"
+						x="398"
+						y="100"
+						width="135"
 						height="11"
 						key="textField-8"/>
 					<box></box>
@@ -222,37 +232,24 @@
 					</textElement>
 				<textFieldExpression   class="java.lang.String"><![CDATA[$V{average}]]></textFieldExpression>
 				</textField>
-				<staticText>
-					<reportElement
-						x="337"
-						y="104"
-						width="64"
-						height="11"
-						key="staticText-8"/>
-					<box></box>
-					<textElement>
-						<font size="9"/>
-					</textElement>
-				<text><![CDATA[Std Deviation]]></text>
-				</staticText>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="401"
-						y="104"
-						width="133"
+						x="398"
+						y="111"
+						width="135"
 						height="11"
 						key="textField-9"/>
 					<box></box>
-					<textElement>
-						<font size="9"/>
+					<textElement textAlignment="Left">
+						<font size="9" isItalic="true"/>
 					</textElement>
 				<textFieldExpression   class="java.lang.String"><![CDATA[$V{stdDeviation}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement
-						x="337"
-						y="60"
-						width="64"
+						x="338"
+						y="45"
+						width="60"
 						height="11"
 						key="staticText-9"/>
 					<box></box>
@@ -263,9 +260,9 @@
 				</staticText>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="401"
-						y="60"
-						width="133"
+						x="398"
+						y="45"
+						width="135"
 						height="11"
 						key="textField-10"/>
 					<box></box>
@@ -289,9 +286,9 @@
 				</textField>
 				<staticText>
 					<reportElement
-						x="337"
-						y="115"
-						width="64"
+						x="338"
+						y="122"
+						width="60"
 						height="11"
 						key="staticText-10"/>
 					<box></box>
@@ -302,9 +299,9 @@
 				</staticText>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="401"
-						y="115"
-						width="133"
+						x="398"
+						y="122"
+						width="135"
 						height="11"
 						key="textField-12"/>
 					<box></box>
@@ -317,13 +314,238 @@
 					<reportElement
 						x="1"
 						y="23"
-						width="334"
-						height="117"
+						width="328"
+						height="122"
 						key="image-1"/>
 					<box></box>
 					<graphicElement stretchType="NoStretch"/>
 					<imageExpression class="net.sf.jasperreports.engine.JRRenderable"><![CDATA[$V{Chart}]]></imageExpression>
 				</image>
+				<staticText>
+					<reportElement
+						x="338"
+						y="56"
+						width="60"
+						height="11"
+						key="staticText-11"/>
+					<box></box>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+				<text><![CDATA[Sampling Avg]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="398"
+						y="56"
+						width="111"
+						height="11"
+						key="textField-13"/>
+					<box></box>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{samplingAverage}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="338"
+						y="133"
+						width="60"
+						height="11"
+						key="staticText-12"/>
+					<box></box>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+				<text><![CDATA[Nb Of null]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="398"
+						y="133"
+						width="135"
+						height="11"
+						key="textField-15"/>
+					<box></box>
+					<textElement>
+						<font size="9"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{nbOfNull}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="398"
+						y="67"
+						width="111"
+						height="11"
+						key="textField-16"/>
+					<box></box>
+					<textElement textAlignment="Left">
+						<font size="9" isItalic="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{samplingStdDeviation}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="338"
+						y="67"
+						width="60"
+						height="11"
+						key="staticText-16"/>
+					<box></box>
+					<textElement>
+						<font size="9" isItalic="true"/>
+					</textElement>
+				<text><![CDATA[Std. Dev.]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="509"
+						y="56"
+						width="24"
+						height="11"
+						key="textField-17"/>
+					<box></box>
+					<textElement textAlignment="Right">
+						<font size="9"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{samplingAverageUnit}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="338"
+						y="111"
+						width="60"
+						height="11"
+						key="staticText-17"/>
+					<box></box>
+					<textElement>
+						<font size="9" isItalic="true"/>
+					</textElement>
+				<text><![CDATA[Std. Dev.]]></text>
+				</staticText>
+				<line direction="BottomUp">
+					<reportElement
+						x="337"
+						y="23"
+						width="196"
+						height="0"
+						forecolor="#C1C1C1"
+						key="line-2"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="0.5"/>
+</graphicElement>
+				</line>
+				<line direction="BottomUp">
+					<reportElement
+						x="337"
+						y="45"
+						width="196"
+						height="0"
+						forecolor="#C1C1C1"
+						key="line-3"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="0.5"/>
+</graphicElement>
+				</line>
+				<line direction="BottomUp">
+					<reportElement
+						x="337"
+						y="56"
+						width="196"
+						height="0"
+						forecolor="#C1C1C1"
+						key="line-4"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="0.5"/>
+</graphicElement>
+				</line>
+				<line direction="BottomUp">
+					<reportElement
+						x="337"
+						y="78"
+						width="196"
+						height="0"
+						forecolor="#C1C1C1"
+						key="line-5"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="0.5"/>
+</graphicElement>
+				</line>
+				<line direction="BottomUp">
+					<reportElement
+						x="337"
+						y="89"
+						width="196"
+						height="0"
+						forecolor="#C1C1C1"
+						key="line-6"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="0.5"/>
+</graphicElement>
+				</line>
+				<line direction="BottomUp">
+					<reportElement
+						x="337"
+						y="100"
+						width="196"
+						height="0"
+						forecolor="#C1C1C1"
+						key="line-7"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="0.5"/>
+</graphicElement>
+				</line>
+				<line direction="BottomUp">
+					<reportElement
+						x="337"
+						y="122"
+						width="196"
+						height="0"
+						forecolor="#C1C1C1"
+						key="line-8"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="0.5"/>
+</graphicElement>
+				</line>
+				<line direction="BottomUp">
+					<reportElement
+						x="337"
+						y="133"
+						width="196"
+						height="0"
+						forecolor="#C1C1C1"
+						key="line-9"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="0.5"/>
+</graphicElement>
+				</line>
+				<line direction="BottomUp">
+					<reportElement
+						x="337"
+						y="144"
+						width="196"
+						height="0"
+						forecolor="#C1C1C1"
+						key="line-10"/>
+					<graphicElement stretchType="NoStretch">
+					<pen lineWidth="0.5"/>
+</graphicElement>
+				</line>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="509"
+						y="67"
+						width="24"
+						height="11"
+						key="textField-18"/>
+					<box></box>
+					<textElement textAlignment="Right">
+						<font size="9"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$V{samplingStdDeviationUnit}]]></textFieldExpression>
+				</textField>
 			</band>
 		</detail>
 		<columnFooter>

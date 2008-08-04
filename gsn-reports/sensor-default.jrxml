@@ -51,11 +51,11 @@
 			</band>
 		</columnHeader>
 		<detail>
-			<band height="126"  isSplitAllowed="true" >
+			<band height="100"  isSplitAllowed="true" >
 				<rectangle radius="3" >
 					<reportElement
 						x="0"
-						y="12"
+						y="5"
 						width="535"
 						height="20"
 						forecolor="#C1C1C1"
@@ -66,9 +66,9 @@
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						x="0"
-						y="13"
+						y="6"
 						width="468"
-						height="20"
+						height="18"
 						key="textField-1"/>
 					<box></box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -79,9 +79,9 @@
 				<subreport  isUsingCache="true">
 					<reportElement
 						x="0"
-						y="40"
+						y="28"
 						width="535"
-						height="80"
+						height="72"
 						key="subreport-1"/>
 					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{reportFields})]]></dataSourceExpression>
 					<subreportExpression  class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "stream-default.jasper"]]></subreportExpression>
@@ -89,7 +89,7 @@
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						x="467"
-						y="12"
+						y="5"
 						width="68"
 						height="10"
 						key="textField-2"/>
@@ -102,7 +102,7 @@
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						x="467"
-						y="22"
+						y="15"
 						width="68"
 						height="10"
 						key="textField-3"/>
@@ -115,7 +115,7 @@
 				<staticText>
 					<reportElement
 						x="425"
-						y="22"
+						y="15"
 						width="41"
 						height="10"
 						key="staticText-1"/>
@@ -128,7 +128,7 @@
 				<staticText>
 					<reportElement
 						x="425"
-						y="12"
+						y="5"
 						width="41"
 						height="10"
 						key="staticText-2"/>
@@ -149,7 +149,7 @@
 			</band>
 		</pageFooter>
 		<summary>
-			<band height="1"  isSplitAllowed="true" >
+			<band height="0"  isSplitAllowed="true" >
 			</band>
 		</summary>
 </jasperReport>

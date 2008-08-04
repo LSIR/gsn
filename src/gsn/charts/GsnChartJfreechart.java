@@ -58,7 +58,7 @@ public class GsnChartJfreechart implements GsnChartIF {
 		plot.setNoDataMessage("No Data to Display");
 		plot.setDomainGridlinesVisible(true);
 		plot.setBackgroundPaint(Color.WHITE);
-		plot.setInsets(new RectangleInsets(0,14,0,0));
+		plot.setInsets(new RectangleInsets(5,14,0,5));
 		//
 		DateAxis axis = (DateAxis) plot.getDomainAxis();
 		axis.setDateFormatOverride(ssdf);

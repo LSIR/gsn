@@ -77,8 +77,9 @@ public class ReportManager {
 		dat1.add(new Data(1, (now + 9 * twohours),95.0,"label 1"));
 		
 		Collection<Data> dat2 = new ArrayList<Data> ();
-		dat1.add(new Data(1, (now + twohours),100.0,"label 1"));
-		dat1.add(new Data(1, (now + 9 * twohours),95.0,"label 1"));
+		dat2.add(new Data(1, (now + twohours),110.0,"label 1"));
+		
+		Collection<Data> dat3 = new ArrayList<Data> ();
 		
 		Date lastUpdate = new Date ();
 		
@@ -86,9 +87,17 @@ public class ReportManager {
 		Collection<Stream> fields_v1 = new ArrayList<Stream> ();
 		fields_v1.add(new Stream("Temperature [°C]", lastUpdate.toString(), dat1));
 		fields_v1.add(new Stream("Humidity [%]", lastUpdate.toString(), dat2));
+		fields_v1.add(new Stream("Temp", lastUpdate.toString(), dat3));
 		fields_v1.add(new Stream("Solar", lastUpdate.toString(), dat1));
 		fields_v1.add(new Stream("Altitude", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Length", lastUpdate.toString(), dat1));
+		fields_v1.add(new Stream("Length 1", lastUpdate.toString(), dat1));
+		fields_v1.add(new Stream("Length 2", lastUpdate.toString(), dat1));
+		fields_v1.add(new Stream("Length 3", lastUpdate.toString(), dat1));
+		fields_v1.add(new Stream("Length 4", lastUpdate.toString(), dat1));
+		fields_v1.add(new Stream("Length 5", lastUpdate.toString(), dat1));
+		fields_v1.add(new Stream("Length 6", lastUpdate.toString(), dat1));
+		fields_v1.add(new Stream("Length 7", lastUpdate.toString(), dat1));
+		fields_v1.add(new Stream("Length 8", lastUpdate.toString(), dat1));
 		
 		Collection<Stream> fields_v2 = new ArrayList<Stream> ();
 		fields_v2.add(new Stream("Stream 1", lastUpdate.toString(), dat2));
