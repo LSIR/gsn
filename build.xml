@@ -273,9 +273,36 @@
 	</target>
 	
 	<target name="rails" depends="bind">
-		<java classname="gsn.RailsRunner"  fork="true" dir="${basedir}" classpathref="classpath" />
+		<java classname="gsn.RailsRunner"  fork="true" dir="${basedir}" classpathref="classpath" >
+			<sysproperty key="jruby.lib" value="${basedir}/ruby_gems/lib" />
+			<sysproperty key="jruby.base" value="${basedir}/ruby_gems" />
+			<sysproperty key="jruby.home" value="${basedir}/ruby_gems" />
+		</java>
+		
 	</target>
-   
+	
+    <target name="install" depends="bind">
+    	<mkdir dir="ruby_gems"/>
+    	<java classname="org.jruby.Main"  fork="true" dir="${basedir}" classpathref="classpath">
+    		<arg value="-S" />
+    		<arg value="gem" />
+    		<arg value="install" />
+    		<arg value="rails" />
+    		<arg value="mongrel" />
+    		<arg value="jruby-openssl" />
+    		<arg value="roxml" />
+    		<arg value="jdbc-wrapper" />
+    		<arg value="activerecord-jdbc-adapter" />
+    		<arg value="activerecord-jdbch2-adapter" />
+    		<arg value="--install-dir" />
+    		<arg value="ruby_gems" />
+    		<arg value="--no-ri" />
+    	 	<arg value="--no-rdoc" />
+    	</java>  
+	</target>
+	 
+
+	
 	<target name="start-all" depends="start-acquisition-nofork,gsn"/>
 	<target name="stop-all" depends="stop-acquisition,stop"/>
 </project>
