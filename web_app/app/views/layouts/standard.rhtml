@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="Content-Language" content="en-us" />
+	<meta name="robots" content="all" />
+	<title>GSN</title>
+	<%= stylesheet_tag 'gsn', :media =>'screen,projection' %>
+	<!-- TODO add the javascript depending on the action -->
+    </head>
+    <body>
+	<div id="container">
+	    <div id="header">
+		<h1><%=link_to 'GSN', {:controller => 'gsn', :action => 'home'}, :id => 'gsn-name' %></h1>
+	    </div>
+	    <div id="navigation">
+		<%= render :partial => 'shared/mainmenu' -%>
+	    </div>
+	    <div id="gsncontrol">
+		<ul>
+		    <li>Start</li>
+		    <li>Stop</li>
+		    <li>Send Bug Report :-)</li>
+		</ul>
+	    </div>
+	    <div id="main">
+		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
+		<%= yield :layout %>
+		<div id="control">
+		    <!--<iframe name="webupload" style="border:0;height:0;width:0;"></iframe>-->
+		</div>
+		<div id="homediv">
+		    <div id="vs">
+			<div class="loading">Virtual sensors are currently loading...</div>
+		    </div>
+		</div>
+	    </div>
+	    <div id="sidebar">
+		<%= render :partial => 'shared/sidebar' -%>
+	    </div>
+	    <div id="footer">
+		<p>Powered by <%=link_to 'GSN', 'http://globalsn.sourceforge.net/' %>,  Distributed Information Systems Lab, EPFL 2006</p>
+		<p>
+		    <%= link_to image_tag(image_path("html_valid.bmp"), :alt => 'HTML validator'), 'http://validator.w3.org/check?uri=referer' %>
+		    <%= link_to image_tag(image_path("css_valid.bmp"), :alt => 'CSS validator'), 'http://jigsaw.w3.org/css-validator/check?uri=referer' %>
+		</p>
+	    </div>
+	</div>
+    </body>
+</html>
