@@ -26,6 +26,8 @@ class ApplicationController < ActionController::Base
 	
   #public:
 	VS_ENABLED = Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(enabled_vs_files)
+	VS_NAME_TO_CONFIG = {}
+	VS_ENABLED.each {|k| VS_NAME_TO_CONFIG[k[1].name.chomp.upcase] = k[1] }
 	VS_DISABLED =  Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(disabled_vs_files)
 	  	  	
   	

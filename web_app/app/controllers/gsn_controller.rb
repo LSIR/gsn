@@ -39,8 +39,27 @@ class GsnController < ApplicationController
 
   end
 
+  # sample request: http://localhost:3000/gsn/structure/GPSVS
   def structure
-	render :nothing=>true
+    vs_config = VS_NAME_TO_CONFIG[params[:name].upcase.chomp]
+    if vs_config.nil?
+	   render :text => "requested virtual sensor #{params[:name]} is not found/accessible.",:layout=>false,:status => 500
+    else
+      to_return = vs_config.output_structure.inject('') {|sum,o| sum << "#{o.name}[#{o.type}],"} unless vs_config.nil?
+      render :text => (to_return||''), :layout => false,:status => 200
+    end
+    
+  end
+  
+  #gsn/register/GPSVS/1/2/notify/localhost/22001/12345/select * from wrapper
+  def register
+    vs_config = VS_NAME_TO_CONFIG[params[:name].upcase.chomp]
+    if vs_config.nil?
+      render :text => "requested virtual sensor #{params[:name]} is not found/accessible.",:layout=>false,:status => 500
+    else
+      Java::gsn.GSNRequestHandler::register_query params[:remote_host],params[:remote_port].to_i,params[:name],params[:query],params[:code].to_i    
+    end
+  render :text => "query:#{params[:query]} registered.", :layout => false,:status => 200
   end
 	
 end

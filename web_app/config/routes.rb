@@ -5,6 +5,7 @@ ActionController::Routing::Routes.draw do |map|
   #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
   # Keep in mind you can assign values other than :controller and :action
 map.connect 'gsn/structure/:name',:controller =>'gsn',:action=>'structure'
+map.connect 'gsn/register/:name/:window/:slide/notify/:remote_host/:remote_port/:code/:query',:controller =>'gsn',:action=>'register'
   # Sample of named route:
   #   map.purchase 'products/:id/purchase', :controller => 'catalog', :action => 'purchase'
   # This route can be invoked with purchase_url(:id => product.id)
