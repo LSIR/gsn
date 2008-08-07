@@ -170,7 +170,7 @@ public final class Main {
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
     ContainerConfig toReturn = null;
     try {
-      toReturn = loadContainerConfig ( );
+      toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FILE );
       wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
       if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Loading wrappers.properties at : " ).append ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE ).toString ( ) );
       if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
@@ -196,12 +196,12 @@ public final class Main {
     }
   }
 
-  private static ContainerConfig loadContainerConfig () throws JiBXException, FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
+  private static ContainerConfig loadContainerConfig (String path) throws JiBXException, FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
     IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
     IUnmarshallingContext uctx = bfact.createUnmarshallingContext ( );
-    ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( DEFAULT_GSN_CONF_FILE ) ) , null );
+    ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( path ) ) , null );
     Class.forName(conf.getJdbcDriver());
-    conf.setContainerConfigurationFileName (  DEFAULT_GSN_CONF_FILE );
+    conf.setContainerConfigurationFileName (  path );
     return conf;
   }
 
@@ -291,7 +291,7 @@ public final class Main {
   public static ContainerConfig getContainerConfig ( ) {
     if (singleton==null)
       try {
-        return loadContainerConfig();
+        return loadContainerConfig(DEFAULT_GSN_CONF_FILE);
       } catch (Exception e) {
         return null;
       }
