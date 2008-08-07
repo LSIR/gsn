@@ -271,6 +271,10 @@
 			<arg id="ssc-port" value="${safe-storage-controller-port}" />
 		</java>
 	</target>
+	
+	<target name="rails" depends="bind">
+		<java classname="gsn.RailsRunner"  fork="true" dir="${basedir}" classpathref="classpath" />
+	</target>
    
 	<target name="start-all" depends="start-acquisition-nofork,gsn"/>
 	<target name="stop-all" depends="stop-acquisition,stop"/>
