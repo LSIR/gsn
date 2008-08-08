@@ -1,0 +1,372 @@
+\graphicspath{{chapters/ch-quickref/figures/}}
+
+
+\chapter{Quick Reference Guide}
+
+\section{Virtual Sensors}
+
+\subsection{VSD DTD \label{quickref_vsd_dtd}}
+
+A graphical representation of the VSD Document Type Definition (DTD) is available on the \figref{figure:vsd_dtd}. The description of all these tags are given in the
+\tableref{table:vsd_dtd}.
+
+\image{vs-quick-ref-marked.pdf}{1.0}{90}{VSD DTD Quick Reference Card}{figure:vsd_dtd}
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|J|}%
+	\hline
+		\textbf{Tag Number} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		1 & \todo{TODO} \\ \hline
+		2 & \todo{TODO} \\ \hline
+		3 & \todo{TODO} \\ \hline
+		4 & \todo{TODO} \\ \hline
+		5 & \todo{TODO} \\ \hline
+		6 & \todo{TODO} \\ \hline
+		7 & \todo{TODO} \\ \hline
+		8 & \todo{TODO} \\ \hline
+		9 & \todo{TODO} \\ \hline
+		10 & \todo{TODO} \\ \hline
+		11 & \todo{TODO} \\ \hline
+		12 & \todo{TODO} \\ \hline
+		13 & \todo{TODO} \\ \hline
+		14 & \todo{TODO} \\ \hline
+		15 & \todo{TODO} \\ \hline
+		16 & \todo{TODO} \\ \hline
+		17 & \todo{TODO} \\ \hline
+		18 & \todo{TODO} \\ \hline
+		19 & \todo{TODO} \\ \hline
+		20 & \todo{TODO} \\ \hline
+		21 & \todo{TODO} \\ \hline
+		22 & \todo{TODO} \\ \hline
+		23 & \todo{TODO} \\ \hline
+		24 & \todo{TODO} \\ \hline
+		25 & \todo{TODO} \\ \hline
+		26 & \todo{TODO} \\ \hline
+		27 & \todo{TODO} \\ \hline
+		28 & \todo{TODO} \\ \hline
+		29 & \todo{TODO} \\ \hline
+		30 & \todo{TODO} \\ \hline
+		31 & \todo{TODO} \\ \hline
+		32 & \todo{TODO} \\ \hline
+		33 & \todo{TODO} \\ \hline
+		34 & \todo{TODO} \\ \hline
+		35 & \todo{TODO} \\ \hline
+		36 & \todo{TODO} \\ \hline
+		37 & \todo{TODO} \\ \hline
+		38 & \todo{TODO} \\ \hline
+		39 & \todo{TODO} \\ \hline
+		40 & \todo{TODO} \\ \hline
+		41 & \todo{TODO} \\ \hline
+		42 & \todo{TODO} \\ \hline
+		43 & \todo{TODO} \\ \hline
+		44 & \todo{TODO} \\ \hline
+		45 & \todo{TODO} \\ \hline
+		46 & \todo{TODO} \\ \hline
+		47 & \todo{TODO} \\ \hline
+		48 & \todo{TODO} \\ \hline
+		49 & \todo{TODO} \\ \hline
+		50 & \todo{TODO} \\ \hline
+		51 & \todo{TODO} \\ \hline
+		52 & \todo{TODO} \\ \hline
+	\end{tabulary}
+	}
+	\caption{VSD DTD Quick Reference Card Description}
+	\label{table:vsd_dtd}
+\end{table*}
+
+\subsection{Email Notification Virtual Sensor \label{quickref_email_notification_vs}}
+
+This virtual sensor implements an Email notification. The parameter for the virtual sensor are displayed on the \tableref{table:parameters_email_vs}
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|C|C|J|}%
+	\hline
+		\textbf{Parameter Name} &
+		\textbf{Type} &
+		\textbf{Mandatory} &
+		\textbf{Default} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		RECEIVER &
+		String &	
+		Yes &
+		None &
+		Name of the email recipient \\
+	\hline
+		receiver-email &
+		String &	
+		Yes &
+		None &	
+		Email address of the recipient \\
+	\hline
+		sender-email &
+		String &	
+		Yes &
+		None &	
+		Email address of the sender \\
+	\hline
+		mail-server &
+		String &	
+		Yes &
+		None &	
+		URL for the email (SMTP) server \\
+	\hline
+		subject &
+		String &	
+		Yes &
+		None &	
+		Subject of the email \\
+	\hline
+		message &
+		String &	
+		Yes &
+		None &	
+		Email message \\
+	\hline
+	\end{tabulary}
+	}
+	\caption{Parameters for Email VS}
+	\label{table:parameters_email_vs}
+\end{table*}
+
+An example of how to use this virtual sensor is shown on the \listingref{listing:xml:emailnotification_vsd}.
+
+\begin{xmlcode}[caption={Sample of Email Notification VSD file}, label=listing:xml:emailnotification_vsd]
+<virtual-sensor name="email" priority="10">
+	<processing-class>
+		<class-name>gsn.vsensor.EmailVirtualSensor</class-name>
+		<init-params>
+			<param name="RECEIVER">John Connor</param>
+			<param name="receiver-email">john.connor@gmail.com</param>
+			<param name="sender-email">admin@sensorinternet.com</param>
+			<param name="mail-server">smtp.gmail.com</param>
+			<param name="subject">Abnormal Temperature Detected</param>
+			<param name="MESSAGE">Sensor 114 has a value of 100 C.</param>   
+		</init-params>
+		<output-structure>
+			<field name="temp" type="double" />
+		</output-structure>
+	</processing-class>
+	<description>Send an Email Notification</description>
+	<life-cycle pool-size="10" />
+	<addressing />
+	<storage history-size="10m" />
+	<streams>
+		<stream name="in1">
+			<source alias="s1" sampling-rate="1" storage-size="1">
+				<address wrapper="multiformat">
+					<predicate key="HOST">localhost</predicate>
+					<predicate key="PORT">22001</predicate>
+				</address>
+				<query>SELECT * FROM wrapper</query>
+			</source>
+			<query>SELECT temperature FROM s1 WHERE temperature >= 100</query>
+		</stream>
+	</streams>
+</virtual-sensor>
+\end{xmlcode}
+
+
+\subsection{SMS Notification Virtual Sensor \label{quickref_sms_notification_vs}}
+
+This virtual sensor implements SMS (Short Message Service) notification. This virtual sensor is very similar to the email virtual sensor – an email is sent to a Mobile phone operator or SMS gateway provider based on the user's mobile account and the email is converted and send as a SMS to the given phone number. The parameter for the virtual sensor are described on the \tableref{table:parameters_sms_vs}.
+
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|C|C|J|}%
+	\hline
+		\textbf{Parameter Name} &
+		\textbf{Type} &
+		\textbf{Mandatory} &
+		\textbf{Default} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		phone-number &
+		String &	
+		Yes &
+		None &
+		The mobile phone number to send the message \\
+	\hline
+		password &
+		String &
+		Yes &
+		None &
+		The password to login to the mobile operator or SMS gateway provider \\
+	\hline
+		sms-server &
+		String &
+		Yes &
+		None &
+		URL address of the mobile phone operator or SMS gatewat provider \\
+	\hline
+		message-format &
+		String &
+		Yes &
+		None &
+		The format of the SMS message in StringTemplate-syntax, e.g. Temperature: \$TEMP\$ where TEMP has some value given from the GSN StreamElement \\
+	\hline
+	\end{tabulary}
+	}
+	\caption{Parameters for SMS VS}
+	\label{table:parameters_sms_vs}
+\end{table*}
+
+An example of how to use this virtual sensor is shown on the \listingref{listing:xml:smsnotification_vsd}.
+
+\begin{xmlcode}[caption={Sample of SMS Notification VSD file}, label=listing:xml:smsnotification_vsd]
+<virtual-sensor name="sms" priority="10">
+	<processing-class>
+		<class-name>gsn.vsensor.SMSVirtualSensor</class-name>
+		<init-params>
+			<param name="phone-number">004413243545</param>
+			<param name="password">3524</param>
+			<param name="sms-server">vodafone.co.uk</param>
+			<param name="message-format">Temperature: $TEMP$</param>
+		</init-params>
+		<output-structure>
+			<field name="temp" type="double" />
+		</output-structure>
+	</processing-class>
+	<description>Send a SMS Notification</description>
+	<life-cycle pool-size="10" />
+	<addressing />
+	<storage history-size="10m" />
+	<streams>
+		<stream name="in1">
+			<source alias="s1" sampling-rate="1" storage-size="1">
+				<address wrapper="multiformat">
+					<predicate key="HOST">localhost</predicate>
+					<predicate key="PORT">22001</predicate>
+				</address>
+				<query>SELECT * FROM wrapper</query>
+			</source>
+			<query>SELECT temperature FROM s1 WHERE temperature >= 100</query>
+		</stream>
+	</streams>
+</virtual-sensor>
+\end{xmlcode}
+
+Note that this virtual sensor will only work if you have an account with a mobile phone operator or an internet SMS gateway provider. 
+
+\section{Wrappers}
+
+\subsection{Safe Storage Wrappers Default parameters}
+
+The parameters shown on the \listingref{table:safe_storage_parameters} must be added to all the Wrappers that support the 
+Safe Storage feature.
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|C|C|J|}%
+	\hline
+		\textbf{Parameter Name} &
+		\textbf{Type} &
+		\textbf{Mandatory} &
+		\textbf{Default} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		ss-host &
+		String &	
+		Yes &
+		None &
+		The machine host name that runs the Safe Storage \\
+	\hline
+		ss-port &
+		Integer &	
+		Yes &
+		None &
+		The server port on which Safe Storage listen for connections \\
+	\hline
+		wrapper-name &
+		String &	
+		Yes &
+		None &
+		The Safe Storage side wrapper full classname (must extends \inlinecode{gsn.acquisition2.wrappers.AbstractWrapper2}) 
+		or the short name from the \path{conf/safe\_storage\_wrappers.properties} file. \\
+	\hline
+		wrapper-keep-processed-ss-entries &
+		Boolean &
+		No &
+		true &
+		If this option is set to \inlinecode{true}, all the entries (processed or not) kept into the Safe Storage storage.
+		If this option is set to \inlinecode{false}, the processed entries are removed from the Safe Storage storage once processed. \\
+	\hline
+		continue-on-error &
+		Boolean &	
+		No &
+		true &
+		Not yet implemented \\
+	\hline
+	\end{tabulary}
+	}
+	\caption{Safe Storage Parameters}
+	\label{table:safe_storage_parameters}
+\end{table*}
+
+\section{GSN ANT Tasks \label{quickref_ant_task}}
+
+{
+\setlength{\tymin}{10pt}
+\setlength{\tymax}{0.8\textwidth}
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|J|}%
+	\hline
+		\textbf{Task Name} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		start-all &
+		Start both the Safe Storage and the GSN processes. \\
+	\hline
+		stop-all &
+		Stop both the Safe Storage and the GSN processes. \\
+	\hline
+	\hline
+		start-acquisition &
+		Start the Safe Storage process. The wrapper that were loaded during the last runs will be automatically resumed and will directly start acquiring data. \\
+	\hline
+		clean-acquisition &
+		Delete all the Safe Storage permanent storage and flush the list of Wrappers to resume. Use this task with caution since it may delete some unprocessed data forever. \\
+	\hline
+		stop-acquisition &
+		Stop the Safe Storage process. \\
+	\hline
+	\hline
+		gsn &
+		Start the GSN process. You also have to start the Safe Storage process if you are using Safe Storage wrappers. \\
+	\hline
+		stop &
+		Stop the GSN process. The Safe Storage processes if any will continue running and acquire the data. \\
+	\hline
+		restart &
+		Stop and restart the GSN process. \\
+	\hline
+	\hline
+		compile-reports &
+		Compile the Jasper Reports located in the \path{gsn-reports} directory. Must be called after modification of any Jasper report 
+		configuration file (.jrxml). \\
+	\hline
+	\hline
+		\multicolumn{2}{|l|}{Use each of these tasks by typing in your terminal: \inlinecode{ant <Task Name>}} \\
+	\hline
+	\end{tabulary}
+	}
+	\caption{GSN ANT Tasks}
+	\label{table:gsn_ant_tasks}
+\end{table*}
+}

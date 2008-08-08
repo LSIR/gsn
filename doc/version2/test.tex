@@ -1,0 +1,107 @@
+\chapter{{\LaTeX} Examples}
+
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|C|C|J|}%
+	\hline
+		\textbf{Parameter Name} &
+		\textbf{Type} &
+		\textbf{Mandatory} &
+		\textbf{Default} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		param1 &
+		String &	
+		Yes &
+		None &
+		param1 description \\
+	\hline
+		\multicolumn{5}{|l|}{This Wrapper supports Safe Storage. Parameters listed on \tableref{table:safe_storage_parameters} must be added.} \\
+	\hline
+	\end{tabulary}
+	}
+	\caption{Parameters for example Wrapper (that support safe storage)}
+	\label{table:parameters_example_wrapper}
+\end{table*}
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|C|C|J|}%
+	\hline
+		\textbf{Parameter Name} &
+		\textbf{Type} &
+		\textbf{Mandatory} &
+		\textbf{Default} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		param1 &
+		String &	
+		Yes &
+		None &
+		param1 description \\
+	\hline
+	param2 &
+		String &	
+		Yes &
+		None &
+		param2 description \\
+	\hline
+	\end{tabulary}
+	}
+	\caption{Parameters for example Wrapper (that doensn't support safe storage)}
+	\label{table:parameters_example_no_wrapper}
+\end{table*}
+
+
+\begin{rubycode}[caption={Ruby Code Example}, label=listing:ruby:example]
+# A method
+def mymethod 
+	@foo.each { |bar| bar.to_s }
+	@@foobar = "a string"
+end
+\end{rubycode}
+
+\begin{javacode}
+/**
+ * Java Class
+ */
+public class Test {
+	private int test;
+	public Test () {}
+	public Test (int level) {
+		// A comment
+		String b = "my test string";
+		this.test = test;
+	}
+}
+\end{javacode}
+
+\begin{xmlcode}[caption={XML Code Example}, label=listing:xml:example]
+<!-- one comment -->
+<tag attribute="val1">
+	<tag2 p="5" />
+</tag>
+\end{xmlcode}
+
+\begin{htmlcode}
+<!-- one comment -->
+<html>
+	<head>
+		<title>Test Page</title>
+	</head>
+	<body>
+		<p style="display: none;">Test</p>
+	</body>
+</html>
+\end{htmlcode}
+
+citation \cite{dummyarticle}
+
+\url{http://www.google.ch}
+\href{http://www.google.ch}{www.google.ch}
+

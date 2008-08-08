@@ -14,6 +14,16 @@
 %
 \usepackage{graphicx}
 %
+\usepackage{hyperref}
+\definecolor{liens}{rgb}{0,0,0}
+\hypersetup  {colorlinks, citecolor=liens, filecolor=liens, linkcolor=liens, urlcolor=liens}
+\hypersetup  {
+	pdftitle = Global Sensors Network Handbook,
+	pdfauthor = GSN Team,
+	pdfsubject = Global Sensors Network,
+	pdfkeywords = 
+}
+%
 \usepackage{tabulary}
 \setlength{\tymin}{10pt}
 \setlength{\tymax}{0.5\textwidth}
@@ -52,7 +62,7 @@
 \lstloadlanguages{Ruby,Java,XML,HTML}
 % Default Settings
 \lstset{
-	basicstyle=\fontfamily{pcr}\fontseries{m}\fontshape{n}\small, % pcr | cmss
+	basicstyle=\fontfamily{pcr}\fontseries{m}\fontshape{n}\footnotesize, % pcr | cmss
 	keywordstyle=\color{l_keyword},
 	commentstyle=\color{l_comment},
 	stringstyle=\color{l_string},
@@ -112,3 +122,4 @@
 
 % Misc
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\inlinecode}[1]{\texttt{#1}}

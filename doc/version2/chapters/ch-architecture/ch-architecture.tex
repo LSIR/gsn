@@ -11,114 +11,184 @@
 
 \section{Safe Storage}
 
-%Why? How? +(keep all the entries)/-(performance, delays) -> keep the possibility to run 
-%usual wrappers
+Some acquisition systems do not internally store the data produced until GSN can process it. For instance 
+the TinyOS Serial Forwarder simply sends a copy of the incoming messages to all its alive listeners. If GSN is down 
+at that time, the data produced will be lost. Safe Storage is specialy developed to handle that case.
+Safe Storage runs in a separate process and it aims is to simply store persistently the incoming data until the GSN process can ask for them.
 
-
-
-diagram (two processes)...
-\image{safestorage.pdf}{0.8}{0}{Safe Storage Software Architecture}{image:ss_software_architecture}
+These two processes communicate together upon TCP sockets and could run on different machines. The Safe Storage process acts as 
+a server and GSN processes as clients. This communication and the primary storage increase the delay between the data production and the 
+final storage into GSN. This results in a tradeoff between the performances and the reliability. Thus Safe Storage is only supported for by the wrappers
+that are implemented for the less reliable interfaces.
 
 \subsection{Use Cases}
+
+If the GSN process crashes -> the SafeStorage will continue storing the next datas.
+once you restart GSN, all the data will be fetched from Safe Storage
+
+If the Safe Storage process crashes -> The data are not stored at all and GSN will periodically tries to connect to Safe Storage.
+once you restart, all the data will be fetched from the safe storage
+
+If both crashes, once you restart safe storage, it will 'resume' and start recording the incoming for the wrappers that were loaded.
+once you restart GSN the data stored will be fetched automatically.
+
 %if processes stop or communication breaks
 example with a concrete run, ss\_mem\_wrapper
 
+
+
 \subsection{Software Architecture}
 
-Abstract (SafeStorage wrapper or not) for GSN
+Safe Storage is generic and could be added to all the already existing wrappers. However small modifications need to be done since the
+Safe Storage wrappers are splitted in two parts, one that executes on the Safe Storage process and one that executes on the GSN process.
+Moreover, GSN can manage both simple wrappers and Safe Storage wrappers at the same time.
 
-List of defaults parameters
+The class that executes on the Safe Storage should be kept as simple as possible and must extends the
+\inlinecode{gsn.acquisition2.wrappers.AbstractWrapper2} abstract class.
+An implementation of this class must define the methods shown on the \listingref{listing:java:safestorage_methods_to_implement}.
 
-Configuration in the build.xml file
+\begin{javacode}[caption={Methods to implement for a Safe Storage Wrapper - Safe Storage Side}, label=listing:java:safestorage_methods_to_implement]
+public abstract boolean initialize ()
+public abstract void finalize ()
+public abstract String getWrapperName () 
+public abstract void run()
+\end{javacode}
+
+The class that executes on the GSN side should do the data processing and must extends the 
+\inlinecode{gsn.acquisition2.wrappers.SafeStorageAbstractWrapper} abstract class.
+An implementation of this class must define the methods shown on the \listingref{listing:java:safestorage_gsn_methods_to_implement}
+
+\begin{javacode}[caption={Methods to implement for a Safe Storage Wrapper - GSN Side}, label=listing:java:safestorage_gsn_methods_to_implement]
+public DataField[] getOutputFormat()
+public boolean messageToBeProcessed(DataMsg dataMessage)
+\end{javacode}
+
+\subsubsection{Safe Storage configuration}
+
+All the wrappers that are based on Safe Storage must provide the following list of parameters.
+
+
+
+\begin{xmlcode}[caption={Sample of Email Notification VSD file}, label=listing:xml:emailnotification_vsd]
+<virtual-sensor name="ss_mem_vs" priority="10" >
+	<processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<output-structure>
+			<field name="heap_memory_usage" type="bigint" />
+			<field name="non_heap_memory_usage" type="bigint" />
+			<field name="pending_finalization_count" type="int" />
+		</output-structure>
+	</processing-class>
+	<description> Mem VS for Safe Storage Test </description>
+	<life-cycle pool-size="10" />
+	<addressing />
+	<storage history-size="10"/>
+	<streams>
+		<stream name="data">
+			<source alias="source" storage-size="1" sampling-rate="1">
+				<address wrapper="ss_mem_processor">
+					<predicate key="ss-host">localhost</predicate>
+					<predicate key="ss-port">25000</predicate>
+					<predicate key="continue-on-error">true</predicate>
+					<predicate key="wrapper-name">mem2</predicate>
+				</address>
+				<query> select * from wrapper </query>
+			</source>
+			<query> select * from source </query>
+		</stream>
+	</streams>
+</virtual-sensor>
+\end{xmlcode}
+
+
+The Configuration in the build.xml file
+
+<property name="safe-storage-port" value="25000"/>
 
 \subsection{Safe Storage modes}
 
-\begin{bashcode}
-ant start-acquisition
-ant clean-acquisition
-ant stop-acquisition
-\end{bashcode}
+\section{Virtual Sensors}
+\section{Introduction}
+Virtual Sensor is the main abstraction used by GSN to represent a well structured data stream.
+By well structured we mean, the structure of the stream is known in advanced and it is not going to be changed
+while GSN is running.
+\section{Graphical Representation}
 
-\subsection{How to develop a Safe Storage Wrapper}
+\section{Notes}
+
+\subsection{What if the structure of the virtual sensor changes?}
+We are not changing the structure of the database automatically (adding or droping fields). If your virtual sensors structure
+changes and if you are using \emph{permannet storages} such as MySQL or File-based HSQLDB, you have to change the structure of the
+table manually.
+
+\subsection{Where is the DTD for the virtual sensor?}
+We are using JiBX Java-XML binding project. The structure of the virtual sensor descriptor file is defined in \texttt{conf/VirtualSensorDescription.xml}.
+
+Have a look to the \chapref{quickref_vsd_dtd}.
+
+\subsection{Which databases we support ?}
+At the moment we are supporting HSqlDB and MySQL. Checkout the mailing list for the latest issues regarding the other databases and their
+support status.
+\subsection{Which projects are using GSN ?}
+There are over 10 EU/Swiss funding research projects using GSN as their core technology.
+\section{GSN.XML file}
+\section{SafeStorage}
+\subsection{Why we need it? }
+\subsection{How to use it }
+\subsection{How to write a wrapper for the safe storage}
+\section{Wrappers}
+\section{Their mandatory parameters}
+\section{How it works}
+\section{Introduction}
+\section{GeoRSS}
+\section{SQL Syntax}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Introduction}
+\section{Network communication}
+Looking inside the GSN infrastructure, there are at least half a dozen difference network communication channels are used. In this section I would like to dive in to the details
+of the some major communication protocols designed and implemented in GSN. 
+
+\subsection{Reusing Data Streams}
+
+One of the main ideas behind the virtual sensors is resuability. The resuability comes in two forms.
+First being able to recreate the same processing logic on different data streams.
+Second being able to reuse streaming data produced by other parties over the internet and possibly create a new data stream but instrumenting the original streams.
+In this section, I present the both high level and low level details associated with the second aspect of the reusability.
+
+The virtual sensor descriptor file is the first place which specifies the intention of reusing streaming data from another virtual sensor. The source virtual sensor can be located
+anywhere as long as it is accessible through the network, this ofcourse includes the local machine and any other machine on the Internet. 
 
 
+In GSN, our vision is having an internet scale streaming world in which people can publish streaming data which
+can be produced directly using some sort of a measurement device which can range from a physical wireless sensor to stock ticks from a financial market.
 
+\section{GSN Notifications}
 
+\subsection{Introduction}
 
+In GSN, virtual sensors can be configured to notify users of certain events, e.g. to send an Email notification to an user informing them that a particular event has occurred. To implement notifications in GSN is very straight forward. The basic principle is that once the virtual sensor query is answered as specified in the virtual sensor description file, e.g.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\newpage
-\subsection{Examples}
-\begin{rubycode}[caption={Ruby Code Example}, label=listing:ruby:example]
-# A method
-def mymethod 
-	@foo.each { |bar| bar.to_s }
-	@@foobar = "a string"
-end
-\end{rubycode}
-
-\begin{javacode}
-/**
- * Java Class
- */
-public class Test {
-	private int test;
-	public Test () {}
-	public Test (int level) {
-		// A comment
-		String b = "my test string";
-		this.test = test;
-	}
-}
-\end{javacode}
-
-\begin{xmlcode}[caption={XML Code Example}, label=listing:xml:example]
-<!-- one comment -->
-<tag attribute="val1">
-	<tag2 p="5" />
-</tag>
+\begin{xmlcode}
+<query>SELECT temperature FROM s1 WHERE temperature >= 100</query>
 \end{xmlcode}
 
-\begin{htmlcode}
-<!-- one comment -->
-<html>
-	<head>
-		<title>Test Page</title>
-	</head>
-	<body>
-		<p style="display: none;">Test</p>
-	</body>
-</html>
-\end{htmlcode}
+a notification can be triggered  by the java processing class
 
-\cite{dummyarticle}
+\begin{xmlcode}
+<class-name>gsn.vsensor.EmailVirtualSensor</class-name>
+\end{xmlcode}
+
+see examples in next section. Thus, any type of notifications, e.g. Email, SMS, SIP, Fax, MMS can be implemented easily in a virtual sensor processing class. 
+
+The technical details of implementing notifications are left to the designer. Below are three examples of some of the notification services already implemented in GSN.
+
+
+
+
+
 
