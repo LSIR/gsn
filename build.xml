@@ -302,6 +302,15 @@
 	</target>
 	 
 
+
+    <target name="rails2" depends="bind">
+        <java classname="org.jruby.Main"  fork="true" dir="${basedir}/web_app" classpathref="classpath">
+                <arg value="-S" />
+                <arg value="script/server" />
+        </java>
+        </target>
+
+
 	
 	<target name="start-all" depends="start-acquisition-nofork,gsn"/>
 	<target name="stop-all" depends="stop-acquisition,stop"/>
