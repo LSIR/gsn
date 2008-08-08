@@ -1,8 +1,11 @@
 package gsn.reports.scriptlets;
 
+import gsn.Main;
 import gsn.charts.GsnChartIF;
 import gsn.charts.GsnChartJfreechart;
 import gsn.reports.beans.Data;
+import gsn.utils.Helpers;
+
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -14,7 +17,7 @@ import org.jfree.chart.JFreeChart;
 
 public class StreamScriptlet  extends JRDefaultScriptlet {
 
-	private static SimpleDateFormat sdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss Z");
+	private SimpleDateFormat sdf = new SimpleDateFormat (Main.getInstance().getContainerConfig().getTimeFormat());
 
 	private static GsnChartIF gsnChart = new GsnChartJfreechart();
 
@@ -58,7 +61,7 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 			Double sum_value = 0.0;
 			Long start_time_value = 0L;
 			Long end_time_value = 0L;
-			Double sampling_average_value = 0.0;
+			Long sampling_average_value = 0L;
 			Integer nb_value = 0;
 			Integer nb_of_null = 0;
 			Iterator<Data> iter = datas.iterator();
@@ -76,11 +79,11 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 					//					
 					if (datas.size() == 1 || nb_value == datas.size() / 2) 	median = nextDataValue.toString(); 
 					//
-					if (nb_value == 0)		{
+					if ( ! iter.hasNext()) {
 						startTime =  sdf.format(new Date((Long)nextData.getP2())).toString();
 						start_time_value = (Long)nextData.getP2();
 					}
-					if ( ! iter.hasNext()) 	{
+					if (nb_value == 0) 	{
 						endTime = sdf.format(new Date((Long)nextData.getP2())).toString();	
 						end_time_value = (Long)nextData.getP2();
 					}
@@ -99,11 +102,8 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 			nbOfNull 		= nb_of_null.toString();
 			//
 			if (datas.size() > 1) {
-				sampling_average_value = Double.parseDouble(((Long)(end_time_value - start_time_value)).toString()) / (nb_value - 1);
-				if      (sampling_average_value < 1000) 			{ samplingAverageUnit = "ms"; samplingAverage = sampling_average_value.toString(); }
-				else if (sampling_average_value < 60 * 1000)		{ samplingAverageUnit = "sec"; samplingAverage = ((Double)(sampling_average_value / 1000.0)).toString(); }
-				else if (sampling_average_value < 60 * 60 * 1000)	{ samplingAverageUnit = "min"; samplingAverage = ((Double)(sampling_average_value / (60.0 * 1000.0))).toString(); }
-				else												{ samplingAverageUnit = "h"; samplingAverage = ((Double)(sampling_average_value / (60.0 * 60.0 * 1000.0))).toString(); } 
+				sampling_average_value = (end_time_value - start_time_value) / (nb_value - 1);
+				samplingAverage = Helpers.formatTimePeriod(sampling_average_value);
 			}
 			//
 			iter = datas.iterator();
@@ -126,25 +126,20 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 			stdDeviation = ((Double)Math.sqrt(variance_value)).toString();
 			if (datas.size() > 1) {
 				Double sampling_std_deviation = (Double)Math.sqrt(sampling_variance_value);
-				if      (sampling_std_deviation < 1000) 			{ samplingStdDeviationUnit = "ms"; samplingStdDeviation = sampling_std_deviation.toString(); }
-				else if (sampling_std_deviation < 60 * 1000)		{ samplingStdDeviationUnit = "sec"; samplingStdDeviation = ((Double)(sampling_std_deviation / 1000.0)).toString(); }
-				else if (sampling_std_deviation < 60 * 60 * 1000)	{ samplingStdDeviationUnit = "min"; samplingStdDeviation = ((Double)(sampling_std_deviation / (60.0 * 1000.0))).toString(); }
-				else												{ samplingStdDeviationUnit = "h"; samplingStdDeviation = ((Double)(sampling_std_deviation / (60.0 * 60.0 * 1000.0))).toString(); }	
+				samplingStdDeviation = Helpers.formatTimePeriod(sampling_std_deviation.longValue());
 			}
 		}
 		
 		this.setVariableValue("max", max);												// ok
 		this.setVariableValue("min", min);												// ok
 		this.setVariableValue("average", average);										// ok
-		this.setVariableValue("stdDeviation", stdDeviation);
+		this.setVariableValue("stdDeviation", stdDeviation);							// ok
 		this.setVariableValue("median", median);										// ok
 		this.setVariableValue("nb", nb);												// ok
 		this.setVariableValue("startTime", startTime);									// ok
 		this.setVariableValue("endTime", endTime);										// ok
 		this.setVariableValue("samplingAverage", samplingAverage);						// ok
-		this.setVariableValue("samplingAverageUnit", samplingAverageUnit);  			// ok
 		this.setVariableValue("nbOfNull", nbOfNull);									// ok
 		this.setVariableValue("samplingStdDeviation", samplingStdDeviation);			// ok
-		this.setVariableValue("samplingStdDeviationUnit", samplingStdDeviationUnit);	
 	}
 }

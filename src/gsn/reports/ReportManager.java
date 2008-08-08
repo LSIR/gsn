@@ -20,8 +20,6 @@ import net.sf.jasperreports.engine.util.JRLoader;
 
 public class ReportManager {	
 	
-	//private static Map<String, String> parameters;
-	
 	public static transient Logger logger= Logger.getLogger ( ReportManager.class );
 	
 	public static void generatePdfReport (Collection<Report> reports, String jasperFile, HashMap<String, String> params, OutputStream os) {
@@ -110,7 +108,7 @@ public class ReportManager {
 		
 		// Report
 		Collection<Report> reports = new ArrayList<Report> ();
-		reports.add(new Report("montblanc.slf.ch:22001", new Date().toString(), new Date().toString(), new Date().toString(), virtualSensors));
+		reports.add(new Report("gsn-reports/report-default.jasper", new Date().toString(), null, null, null, virtualSensors));
 
 		// Build the source
 		

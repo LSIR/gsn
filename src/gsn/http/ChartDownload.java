@@ -37,22 +37,8 @@ public class ChartDownload extends HttpServlet {
 	}
 
 	/**
-	 * TODO Define the request structure
-	 * 
-	 * eg. /report?vsname=tramm_meadows_vs:toppvwc_1:toppvwc_3:toppvwc_6&vsname=ss_mem_vs:heap_memory_usage:non_heap_memory_usage:pending_finalization_count&starttime=1105436165944&endtime=1216908392125&reportclass=report-default
 	 */
 	public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
-//		//
-//		parseParameters (req);
-//		//
-//		Collection<Report> reports = new ArrayList<Report> ();
-//		reports.add(createReport ());
-//		//
-//		byte[] pdf = ReportManager.generatePDFReport(reports, "gsn-reports/compiled/" + reportClass + ".jasper", new HashMap<String, String>());
-//		res.setContentType("application/pdf");
-//		res.setHeader("content-disposition","attachment; filename=sample-report.pdf");
-//		res.setContentLength(pdf.length);
-//		res.getOutputStream().write(pdf);
-//		res.getOutputStream().flush();
+		
 	}
 }

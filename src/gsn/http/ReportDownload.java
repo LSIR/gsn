@@ -1,13 +1,18 @@
 package gsn.http;
 
+import gsn.Container;
 import gsn.Main;
 import gsn.Mappings;
+import gsn.http.datarequest.DataRequest;
+import gsn.http.datarequest.DataRequest.FieldsCollection;
 import gsn.reports.ReportManager;
 import gsn.reports.beans.Data;
 import gsn.reports.beans.Report;
 import gsn.reports.beans.Stream;
 import gsn.reports.beans.VirtualSensor;
 import gsn.storage.StorageManager;
+
+import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -27,60 +32,67 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import java.sql.Types;
 
+/**
+ * eg. /report?vsname=ss_mem_vs:heap_memory_usage&reportclass=report-default
+ */
 public class ReportDownload extends HttpServlet {
 
 	private static transient Logger logger = Logger.getLogger(ReportDownload.class);
 
 	private static SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 
-	private long startTime;
-	private long endTime;
-	private String reportClass;
-	private HashMap<String, String[]> virtualSensorsNamesAndStreams;
+	private String reportPath;
 
-	private static final String PARAM_VSNAME = "vsname";
-	private static final String PARAM_STARTTIME = "starttime";
-	private static final String PARAM_ENDTIME = "endtime";
-	private static final String PARAM_REPORTCLASS = "reportclass";
+	private static final String PARAM_REPORTCLASS 	= "reportclass";
 
-	private static final int[] ALLOWED_REPORT_TYPES = new int[]{ Types.BIGINT, Types.DOUBLE, Types.FLOAT, Types.INTEGER, Types.NUMERIC, Types.REAL, Types.SMALLINT, Types.TINYINT};
+	private DataRequest dr;
 
-	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	private static final int[] ALLOWED_REPORT_FIELDS_TYPES = new int[]{ Types.BIGINT, Types.DOUBLE, Types.FLOAT, Types.INTEGER, Types.NUMERIC, Types.REAL, Types.SMALLINT, Types.TINYINT};
+
+	public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		doPost(req, res);
 	}
 
-	/**
-	 * TODO Define the request structure
-	 * 
-	 * eg. /report?vsname=tramm_meadows_vs:toppvwc_1:toppvwc_3:toppvwc_6&vsname=ss_mem_vs:heap_memory_usage:non_heap_memory_usage:pending_finalization_count&starttime=1105436165944&endtime=1216908392125&reportclass=report-default
-	 */
-	public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
-		//
-		parseParameters (req);
-		//
-		Collection<Report> reports = new ArrayList<Report> ();
-		reports.add(createReport ());
-		//
-		res.setContentType("application/pdf");
-		res.setHeader("content-disposition","attachment; filename=sample-report.pdf");
-		ReportManager.generatePdfReport(reports, "gsn-reports/" + reportClass + ".jasper", new HashMap<String, String> (), res.getOutputStream());
-		res.getOutputStream().flush();
+	public void doPost (HttpServletRequest req , HttpServletResponse res) throws IOException {
+		try {
+			if (req.getParameter(PARAM_REPORTCLASS) == null) throw new ServletException ("The following >" + PARAM_REPORTCLASS + "< parameter is missing in your query >" + req.getQueryString() + "<.") ;
+			String reportClass = req.getParameter(PARAM_REPORTCLASS);
+			reportPath = "gsn-reports/" + reportClass + ".jasper";
+			File f = new File (reportPath) ;
+			if (f == null || ! f.exists() || ! f.isFile()) throw new ServletException ("The path to compiled jasper file >" + reportPath + "< is not valid.") ;
+			//
+			dr = new DataRequest (req);
+			//
+			Collection<Report> reports = new ArrayList<Report> ();
+			reports.add(createReport ());
+			//
+			res.setContentType("application/pdf");
+			res.setHeader("content-disposition","attachment; filename=" + reportClass + ".pdf");
+			ReportManager.generatePdfReport(reports, reportPath, new HashMap<String, String> (), res.getOutputStream());
+			res.getOutputStream().flush();
+		} catch (ServletException e) {
+			logger.error(e.getMessage());
+			res.sendError(Container.ERROR_INVALID_VSNAME, e.getMessage());
+			return;
+		}
 	}
 
 	private Report createReport () {
 		Collection<VirtualSensor> virtualSensors = new ArrayList<VirtualSensor> () ;
 		// create all the virtual sensors for the report
-		Iterator<Entry<String, String[]>> iter = virtualSensorsNamesAndStreams.entrySet().iterator();
-		Entry<String, String[]> vsNameAndStream;
+		Iterator<Entry<String, FieldsCollection>> iter = dr.getVsnamesAndStreams().entrySet().iterator();
+		Entry<String, FieldsCollection> vsNameAndStream;
 		VirtualSensor virtualSensor;
 		while (iter.hasNext()) {
 			vsNameAndStream = iter.next();
-			virtualSensor = createVirtualSensor(vsNameAndStream.getKey(), vsNameAndStream.getValue());
+			virtualSensor = createVirtualSensor(vsNameAndStream.getKey(), vsNameAndStream.getValue().getFields());
 			if (virtualSensor != null) virtualSensors.add(virtualSensor);		
 		}
-		//
-		logger.debug("New Report Created");
-		return new Report ("", sdf.format(new Date()), sdf.format(new Date(startTime)), sdf.format(new Date(endTime)), virtualSensors) ;
+		//		
+		String aggregationCrierion 	= dr.getAggregationCriterion() 	== null		? "None" 			: dr.getAggregationCriterion().toString();
+		String standardCriteria 	= dr.getStandardCriteria() 		== null		? "None" 			: dr.getStandardCriteria().toString();
+		String maxNumber			= dr.getMaxNumber()				== null		? "All"				: dr.getMaxNumber().toString();
+		return new Report (reportPath, sdf.format(new Date()), aggregationCrierion, standardCriteria,maxNumber, virtualSensors);
 	}
 
 	private VirtualSensor createVirtualSensor (String vsname, String[] vsstream) {
@@ -95,16 +107,17 @@ public class ReportDownload extends HttpServlet {
 			if (lastUpdateRs.next()) lastModified = sdf.format(new Date(lastUpdateRs.getLong(1)));
 			else                     lastModified = "No Data";
 			if (lastUpdateRs != null) lastUpdateRs.close();
-			
+
 			// Create the streams
-			sqlRequest = generateVirtualSensorRequest (vsname, vsstream) ;
-			ResultSet rs = StorageManager.getInstance( ).executeQueryWithResultSet(sqlRequest);
+			ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(dr.getSqlQueries().get(vsname));
 			ResultSetMetaData rsmd = rs.getMetaData();
 
 			Hashtable<String, Stream> dataStreams = new Hashtable<String, Stream> () ;
-			String[] streamNames = virtualSensorsNamesAndStreams.get(vsname);
-			for (int i = 0 ; i < streamNames.length ; i++) {
-				dataStreams.put(streamNames[i], new Stream (vsstream[i], lastModified, new ArrayList<Data> ()));
+			FieldsCollection streamNames = dr.getVsnamesAndStreams().get(vsname);
+			for (int i = 0 ; i < streamNames.getFields().length ; i++) {
+				if (streamNames.getFields()[i].compareToIgnoreCase("timed") != 0 || streamNames.isWantTimed()) {
+					dataStreams.put(streamNames.getFields()[i], new Stream (vsstream[i], lastModified, new ArrayList<Data> ()));
+				}
 			}
 
 			while (rs.next()) {
@@ -115,10 +128,9 @@ public class ReportDownload extends HttpServlet {
 					if (columnInResultSet != null) {
 						if (isAllowedReportType(rsmd.getColumnType(columnInResultSet))) {
 							astream = dataStreams.get(vsstream[i]);
-							if (astream == null) {
-								logger.error("Got a non requested field from the DATABASE, check SQL QUERY");
+							if (astream != null) {
+								astream.getDatas().add(new Data ("only",rs.getLong("timed"), rs.getDouble(vsstream[i]), "label"));
 							}
-							astream.getDatas().add(new Data ("only",rs.getLong("timed"), rs.getDouble(vsstream[i]), "label"));
 						}
 						else logger.debug("Column type >" + rsmd.getColumnType(columnInResultSet) + "< is not allowed for report.");
 					}
@@ -133,11 +145,12 @@ public class ReportDownload extends HttpServlet {
 			return null;
 		}
 		//
-		logger.debug("New Virtual Sensor Report created");
+		boolean mappedVirtualSensor = (Mappings.getVSensorConfig(vsname) != null);
+
 		String latitude = "NA";
-		if (Mappings.getVSensorConfig(vsname).getLatitude() != null) latitude =  Mappings.getVSensorConfig(vsname).getLatitude().toString();
+		if (mappedVirtualSensor && Mappings.getVSensorConfig(vsname).getLatitude() != null) latitude =  Mappings.getVSensorConfig(vsname).getLatitude().toString();
 		String longitude = "NA";
-		if (Mappings.getVSensorConfig(vsname).getLongitude() != null) longitude = Mappings.getVSensorConfig(vsname).getLongitude().toString(); 		
+		if (mappedVirtualSensor && Mappings.getVSensorConfig(vsname).getLongitude() != null) longitude = Mappings.getVSensorConfig(vsname).getLongitude().toString(); 		
 		return new VirtualSensor (
 				vsname,
 				latitude,
@@ -145,64 +158,9 @@ public class ReportDownload extends HttpServlet {
 				streams) ;
 	}
 
-	private boolean parseParameters (HttpServletRequest req) throws ServletException {
-		if (
-				req.getParameter(PARAM_VSNAME) == null ||
-				req.getParameter(PARAM_STARTTIME) == null ||
-				req.getParameter(PARAM_ENDTIME) == null ||
-				req.getParameter(PARAM_REPORTCLASS) == null
-		) throw new ServletException ("Wrong request. Check your query >" + req.getQueryString() + "<.") ;
-		//
-		startTime = Long.parseLong(req.getParameterValues(PARAM_STARTTIME)[0]);
-		//
-		endTime = Long.parseLong(req.getParameterValues(PARAM_ENDTIME)[0]);
-		//
-		reportClass = req.getParameterValues(PARAM_REPORTCLASS)[0];
-		//
-		virtualSensorsNamesAndStreams = new HashMap<String, String[]> () ;
-		String[] vsnames = req.getParameterValues(PARAM_VSNAME);
-		String name = null;
-		String[] streams = null;
-		int firstColumnIndex;
-		for (int i = 0 ; i < vsnames.length ; i++) {
-			firstColumnIndex = vsnames[i].indexOf(':');
-			if (firstColumnIndex == -1) {
-				name = vsnames[i];
-				streams = new String[0];
-			}
-			else {
-				name = vsnames[i].substring(0, firstColumnIndex);
-				streams = vsnames[i].substring(firstColumnIndex + 1).split(":");
-
-			}
-			virtualSensorsNamesAndStreams.put(name, streams);
-		}
-		return true;
-	}
-
-	private StringBuilder generateVirtualSensorRequest (String vsname, String[] streamnames) {
-		StringBuilder sb = new StringBuilder () ;
-		sb.append("select ");
-		for (int i = 0 ; i < streamnames.length ; i++) {
-			sb.append(streamnames[i]);
-			if (i < streamnames.length - 1) sb.append(",");                          
-		}
-		if (! sb.toString().toUpperCase().contains("TIMED")) sb.append(",timed");
-		sb.append(" ");
-		sb.append("from ");
-		sb.append(vsname + " ");
-		sb.append("where timed < ");
-		sb.append(endTime + " ");
-		sb.append("and timed >= ");
-		sb.append(startTime + " ");
-		sb.append("order by timed; ");
-		logger.debug("Generated request: >" + sb.toString() + "<");
-		return sb;
-	}
-
 	private static boolean isAllowedReportType (int type) {
-		for (int i = 0 ; i < ALLOWED_REPORT_TYPES.length ; i++) {
-			if (type == ALLOWED_REPORT_TYPES[i]) return true;
+		for (int i = 0 ; i < ALLOWED_REPORT_FIELDS_TYPES.length ; i++) {
+			if (type == ALLOWED_REPORT_FIELDS_TYPES[i]) return true;
 		}
 		return false;
 	}

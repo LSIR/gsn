@@ -52,13 +52,9 @@
 	</variable>
 	<variable name="samplingAverage" class="java.lang.String" resetType="Report" calculation="System">
 	</variable>
-	<variable name="samplingAverageUnit" class="java.lang.String" resetType="Report" calculation="System">
-	</variable>
 	<variable name="nbOfNull" class="java.lang.String" resetType="Report" calculation="Nothing">
 	</variable>
 	<variable name="samplingStdDeviation" class="java.lang.String" resetType="Report" calculation="System">
-	</variable>
-	<variable name="samplingStdDeviationUnit" class="java.lang.String" resetType="Report" calculation="System">
 	</variable>
 		<background>
 			<band height="0"  isSplitAllowed="true" >
@@ -338,7 +334,7 @@
 					<reportElement
 						x="398"
 						y="56"
-						width="111"
+						width="135"
 						height="11"
 						key="textField-13"/>
 					<box></box>
@@ -377,7 +373,7 @@
 					<reportElement
 						x="398"
 						y="67"
-						width="111"
+						width="135"
 						height="11"
 						key="textField-16"/>
 					<box></box>
@@ -399,19 +395,6 @@
 					</textElement>
 				<text><![CDATA[Std. Dev.]]></text>
 				</staticText>
-				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
-					<reportElement
-						x="509"
-						y="56"
-						width="24"
-						height="11"
-						key="textField-17"/>
-					<box></box>
-					<textElement textAlignment="Right">
-						<font size="9"/>
-					</textElement>
-				<textFieldExpression   class="java.lang.String"><![CDATA[$V{samplingAverageUnit}]]></textFieldExpression>
-				</textField>
 				<staticText>
 					<reportElement
 						x="338"
@@ -533,19 +516,6 @@
 					<pen lineWidth="0.5"/>
 </graphicElement>
 				</line>
-				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
-					<reportElement
-						x="509"
-						y="67"
-						width="24"
-						height="11"
-						key="textField-18"/>
-					<box></box>
-					<textElement textAlignment="Right">
-						<font size="9"/>
-					</textElement>
-				<textFieldExpression   class="java.lang.String"><![CDATA[$V{samplingStdDeviationUnit}]]></textFieldExpression>
-				</textField>
 			</band>
 		</detail>
 		<columnFooter>
