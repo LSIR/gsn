@@ -287,8 +287,14 @@
     		<arg value="-S" />
     		<arg value="gem" />
     		<arg value="install" />
-    		<arg value="rails" />
     		<arg value="gem_plugin" />
+    		<arg value="activesupport" />
+    		<arg value="activerecord" />
+    		<arg value="actionpack" />
+    		<arg value="actionmailer" />
+    		<arg value="activeresource" />
+
+    		<arg value="rails" />
     		<arg value="mongrel" />
     		<arg value="jruby-openssl" />
     		<arg value="roxml" />
