@@ -1,12 +1,11 @@
-require 'rubygems'
-#RAILS_ROOT = "#{File.dirname(__FILE__)}/.." unless defined?(RAILS_ROOT)
-#Gem.path << "#{RAILS_ROOT}/vendor/gems"
-#Gem.source_index.refresh!
-$LOAD_PATH << 'META-INF/jruby.home/lib/ruby/site_ruby/1.8'
-# Don't change this file!
-# Configure your app in config/environment.rb and config/environments/*.rb
-
 RAILS_ROOT = "#{File.dirname(__FILE__)}/.." unless defined?(RAILS_ROOT)
+
+ENV['GEM_PATH']="#{RAILS_ROOT}/../ruby_gems"
+ENV['GEM_HOME']=ENV['GEM_PATH']
+$LOAD_PATH << 'META-INF/jruby.home/lib/ruby/site_ruby/1.8'
+$LOAD_PATH << ENV['GEM_PATH']
+
+require 'rubygems'
 
 module Rails
   class << self
