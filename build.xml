@@ -293,6 +293,7 @@
     		<arg value="roxml" />
     		<arg value="jdbc-wrapper" />
     		<arg value="activerecord-jdbc-adapter" />
+    		<arg value="jdbc-h2" />
     		<arg value="activerecord-jdbch2-adapter" />
     		<arg value="--install-dir" />
     		<arg value="ruby_gems" />
