@@ -288,6 +288,7 @@
     		<arg value="gem" />
     		<arg value="install" />
     		<arg value="rails" />
+    		<arg value="gem_plugin" />
     		<arg value="mongrel" />
     		<arg value="jruby-openssl" />
     		<arg value="roxml" />
