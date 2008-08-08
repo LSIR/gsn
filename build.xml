@@ -7,6 +7,8 @@
          <format property="TODAY" pattern="yyyy-MMMM-d-'at'-hh-mm-aa" locale="en"/>
       </tstamp>
       <property environment="env"/>
+      <property name="env.GEM_PATH" value="${basedir}/ruby_gems" />
+
       <property name="conf.dir" value="${basedir}/conf"/>
       <property name="build.dir" value="build/classes"/>
       <property name="src.dir" value="src"/>
