@@ -107,11 +107,11 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 	
 	private void checkThisPoint(long read_lines, Checksum checkSum) {
 		if (checkPoints.check(read_lines, checkSum)) {
-			logger.debug("Check Point at line >" + read_lines + "< checked successfully.");
+			logger.warn("Check Point at line >" + read_lines + "< checked successfully. No new data to process from the last Check Point.");
 			lineBuffer.clear();
 		}
 		else {
-			logger.debug("Check Point at line >" + read_lines + "< doesn't match. Sending the data from the last Check Point.");
+			logger.warn("Check Point at line >" + read_lines + "< doesn't match. Sending the data from the last Check Point.");
 			sendBuffer();
 			checkPoints.update(read_lines, checkSum);
 		}
