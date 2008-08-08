@@ -313,6 +313,9 @@
 
     <target name="rails2" depends="bind">
         <java classname="org.jruby.Main"  fork="true" dir="${basedir}/web_app" classpathref="classpath">
+		 <sysproperty key="jruby.lib" value="${basedir}/ruby_gems/lib" />
+                 <sysproperty key="jruby.base" value="${basedir}/ruby_gems" />
+                 <sysproperty key="jruby.home" value="${basedir}/ruby_gems" />
                 <arg value="-S" />
                 <arg value="script/server" />
         </java>
