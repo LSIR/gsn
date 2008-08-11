@@ -39,7 +39,7 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 
 			AbstractWrapper2 wrapper = ss.prepareWrapper(hello, session);
 			if (wrapper == null) {
-				session.close();
+				//session.close();
 				return;
 			}
 			SessionState sstate = new SessionState () ;

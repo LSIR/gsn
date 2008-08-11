@@ -1,6 +1,9 @@
 package gsn.acquisition2.wrappers;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
@@ -17,6 +20,8 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 	private net.tinyos1x.message.Message messageTemplateTinyOS1x = null;
 	private net.tinyos.message.Message messageTemplateTinyOS2x = null;
 
+	private static Map<String,net.tinyos1x.message.MoteIF> moteIFList1x = Collections.synchronizedMap(new HashMap<String,net.tinyos1x.message.MoteIF>());
+
 	private final transient Logger logger = Logger.getLogger( MigMessageWrapper2.class );
 
 	@Override
@@ -30,12 +35,21 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 			//
 			logger.debug("Connecting to " + parameters.getTinyosSource());
 			if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
-
-				// Create the source
-				net.tinyos1x.packet.PhoenixSource phoenixSourceTinyOS1x = net.tinyos1x.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos1x.util.PrintStreamMessenger.err) ;
-				if (phoenixSourceTinyOS1x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
-				phoenixSourceTinyOS1x.setResurrection();
-				moteIFTinyOS1x = new net.tinyos1x.message.MoteIF(phoenixSourceTinyOS1x);
+				synchronized (moteIFList1x) {
+					if (!moteIFList1x.containsKey(parameters.getTinyosSource())) {
+						// Create the source
+						logger.debug("Create new source >" + parameters.getTinyosSource() + "<.");
+						net.tinyos1x.packet.PhoenixSource phoenixSourceTinyOS1x = net.tinyos1x.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos1x.util.PrintStreamMessenger.err);
+						if (phoenixSourceTinyOS1x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
+						phoenixSourceTinyOS1x.setResurrection();
+						moteIFTinyOS1x = new net.tinyos1x.message.MoteIF(phoenixSourceTinyOS1x);
+						moteIFList1x.put(parameters.getTinyosSource(), moteIFTinyOS1x);
+					}
+					else {
+						logger.debug("Reusing source >" + parameters.getTinyosSource() + "<.");
+						moteIFTinyOS1x = (net.tinyos1x.message.MoteIF) moteIFList1x.get(parameters.getTinyosSource());
+					}
+				}
 
 				// Register to the message type
 				logger.debug("Register message >" + parameters.getTinyosMessageName() + "< to source.");
