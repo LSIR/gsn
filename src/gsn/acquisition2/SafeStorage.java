@@ -84,7 +84,7 @@ public class SafeStorage {
     wrapper.setActiveAddressBean ( addressBean );
     boolean initializationResult = wrapper.initialize (  );
     if ( initializationResult == false ) {
-       if (network != null) network.close();
+       //if (network != null) network.close();
        return null; 
     }
     try {
