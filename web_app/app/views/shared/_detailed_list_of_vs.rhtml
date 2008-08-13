@@ -1,0 +1,17 @@
+<%= content_tag(:p, "Hello world!", :loaded =>"$('refresh_active_icon').hide()", :loading => "$('refresh_active_icon').show()") %>
+
+<div id="loaded_vss">
+
+	<% for vs in loaded_vs_list.values -%>
+	    <div class="vs-detailed">
+		<div class="vs-detailed-header">
+		    <div class="vs-general-infos">
+			<span class="vs-name"><%= vs.get_name %></span>
+			<span class="vs-timed">09/08/2008 00:49:09 +0200 (TODO)</span>
+		    </div>
+		    <div class="vs-menu"></div>
+		</div>
+		<div class="vs-detailed-body"></div>
+	    </div>
+	<% end -%>
+</div>

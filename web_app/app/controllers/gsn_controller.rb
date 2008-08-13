@@ -4,24 +4,13 @@ require 'roxml' # jruby -S gem install roxml
 require 'jdbc' # jruby -S gem install jdbc-wrapper
 
 class GsnController < ApplicationController
-
 	def test
-		
 		p CONTAINER_CONFIG.jdbc_username
-		
-		#p File.expand_path '.'
-		
-		
 		puts VS_ENABLED.size
 		puts VS_ENABLED.each {|k| puts "#{k[0]} == #{k[1]}" }
-		
 		puts VS_ENABLED.each {|k| puts "#{k[0]} == #{p k[1].methods}" }
-					
-							
 		render :nothing=>true		
 	end
-	
-
 
   def home
   end
@@ -35,8 +24,12 @@ class GsnController < ApplicationController
   def fullmap
   end  
 
-  def populate_list_of_vs
+  def populate_detailed_list_of_vs
+    render :partial => 'shared/detailed_list_of_vs', :locals => {:loaded_vs_list => VS_ENABLED}
+  end
 
+  def update_refreshbar
+    render :partial => 'shared/refreshbar'
   end
 
   # sample request: http://localhost:3000/gsn/structure/GPSVS

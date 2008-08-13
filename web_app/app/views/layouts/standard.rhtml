@@ -8,6 +8,7 @@
 	<title>GSN</title>
 	<%= stylesheet_tag 'gsn', :media =>'screen,projection' %>
 	<!-- TODO add the javascript depending on the action -->
+	<%= javascript_include_tag :defaults %>
     </head>
     <body>
 	<div id="container">
@@ -27,14 +28,6 @@
 	    <div id="main">
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
 		<%= yield :layout %>
-		<div id="control">
-		    <!--<iframe name="webupload" style="border:0;height:0;width:0;"></iframe>-->
-		</div>
-		<div id="homediv">
-		    <div id="vs">
-			<div class="loading">Virtual sensors are currently loading...</div>
-		    </div>
-		</div>
 	    </div>
 	    <div id="sidebar">
 		<%= render :partial => 'shared/sidebar' -%>
