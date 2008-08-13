@@ -138,4 +138,14 @@ public class SQLUtils {
 		out = newRewrite( extractProjection(query) , map );
 		System.out.println( out.toString( ) );
 	}
+	
+	public static int getWhereIndex(CharSequence c) {
+	  return c.toString().toLowerCase().lastIndexOf(" where ");
+	}
+	public static int getOrderByIndex(CharSequence c) {
+	  return c.toString().toLowerCase().lastIndexOf(" order by ");
+	}
+	public static int getGroupByIndex(CharSequence c) {
+	  return c.toString().toLowerCase().lastIndexOf(" group by ");
+	}
 }

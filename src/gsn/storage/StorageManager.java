@@ -7,6 +7,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.GSNRuntimeException;
 import gsn.utils.ValidityTools;
+
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -36,6 +37,8 @@ public class StorageManager {
       return DATABASE.H2;
     else if (name.toLowerCase().indexOf("mysql") >= 0)
       return DATABASE.MYSQL;
+    else if (name.toLowerCase().indexOf("oracle") >= 0)
+      return DATABASE.ORACLE;
     else if (name.toLowerCase().indexOf("sql server") >= 0 || name.toLowerCase().indexOf("sqlserver") > 0)
       return DATABASE.SQLSERVER;
     else {
@@ -652,14 +655,16 @@ public class StorageManager {
    * INITIALIZATION PARAMETERS. SET IN THE FIRST TIME THIS CLASS USED.
    **************************************************************************/
   private static boolean mysql = false;
+  private static boolean h2 = false;
+  private static boolean oracle = false;
 
   public static final int MYSQL_DB=1;
   public static final int SQLSERVER_DB=2;
   public static final int H2_DB=4;
+  public static final int ORACLE_DB=5;
 
 
   public static enum DATABASE {
-
     MYSQL("jdbc:mysql:", "com.mysql.jdbc.Driver") {
 
       public int getTableNotExistsErrNo() {
@@ -704,6 +709,10 @@ public class StorageManager {
           return "DROP VIEW IF EXISTS #NAME";
       }
       public  int getDBType() {return MYSQL_DB;}
+      public String addLimit(String query,int limit,int offset) {
+        return query+" LIMIT "+limit+" OFFSET "+offset;
+      }
+      
     },
     H2("jdbc:h2:", "org.h2.Driver") {
       public int getTableNotExistsErrNo() {
@@ -743,6 +752,78 @@ public class StorageManager {
         return "DROP VIEW #NAME IF EXISTS";
       }
       public  int getDBType() {return H2_DB;}
+      
+      public String addLimit(String query,int limit,int offset) {
+        return query+" LIMIT "+limit+" OFFSET "+offset;
+      }
+    },
+    ORACLE("jdbc:oracle:thin:", "oracle.jdbc.OracleDrive") {
+      public int getTableNotExistsErrNo() {
+        return 208; //java.sql.SQLException: Invalid object name
+      }
+
+      /*
+       * Returns the HSQLDB data type that can store this gsn datafield.
+       * @param field The datafield to be converted. @return convertedType
+       * the data type used by hsql.
+       */
+      public String convertGSNTypeToLocalType(DataField field) {
+        String convertedType = null;
+        switch (field.getDataTypeID()) {
+          case DataTypes.CHAR:
+          case DataTypes.VARCHAR:
+            // Because the parameter for the varchar is not
+            // optional.
+            convertedType = field.getType();
+            break;
+          default:
+            convertedType = DataTypes.TYPE_NAMES[field.getDataTypeID()];
+          break;
+        }
+        return convertedType;
+      }
+
+      public String getStatementDropIndex() {
+        return "DROP INDEX #NAME ON #TABLE";
+      }
+
+      public String getStatementDropView() {
+        return "DROP VIEW #NAME";
+      }
+      public  int getDBType() {return SQLSERVER_DB;}
+      
+      public String addLimit(String query,int limit,int offset) {
+        String toAppend = "";
+        if (offset==0)
+          toAppend=" ROWNUM <= "+limit;
+        else
+          toAppend=" ROWNUM BETWEEN "+offset+" AND "+(limit+offset)+" ";
+          
+        int indexOfWhere = SQLUtils.getWhereIndex(query);
+        int indexOfGroupBy = SQLUtils.getGroupByIndex(query);
+        int indexOfOrder = SQLUtils.getOrderByIndex(query);
+        
+        StringBuilder toReturn = new StringBuilder(query);
+        if (indexOfGroupBy<0 && indexOfWhere<0 && indexOfOrder<0)
+          return query+" WHERE "+toAppend;
+        if (indexOfWhere<0 && indexOfOrder>0) 
+          return toReturn.insert(indexOfOrder, " WHERE "+toAppend).toString();
+        if (indexOfWhere<0 && indexOfGroupBy>0) 
+          return toReturn.insert(indexOfGroupBy, " WHERE "+toAppend).toString();
+        if (indexOfWhere>0) {
+          StringBuilder tmp = toReturn.insert(indexOfWhere + " WHERE ".length(),toAppend+" AND (");
+          int endIndex = tmp.length();
+          if (indexOfGroupBy>0)
+            endIndex=SQLUtils.getGroupByIndex(tmp);
+          else if (indexOfOrder>0)
+            endIndex=SQLUtils.getOrderByIndex(tmp);
+          tmp.insert(endIndex, ")");
+          return tmp.toString();
+        }
+
+        return query+" LIMIT "+limit+" OFFSET "+offset;
+      }
+
     },
     SQLSERVER("jdbc:jtds:sqlserver:", "net.sourceforge.jtds.jdbc.Driver") {
 
@@ -779,6 +860,11 @@ public class StorageManager {
         return "DROP VIEW #NAME";
       }
       public  int getDBType() {return SQLSERVER_DB;}
+      
+      public String addLimit(String query,int limit,int offset) {
+        // FIXME, INCORRECT !
+        return query+" LIMIT "+limit+" OFFSET "+offset;
+      }
 
     };
 
@@ -826,6 +912,8 @@ public class StorageManager {
     public abstract int getTableNotExistsErrNo();
 
     public abstract int getDBType();
+    
+    public abstract String addLimit(String query,int limit,int offset);
 
   };
 
@@ -846,6 +934,9 @@ public class StorageManager {
   public static boolean isH2() {
     return h2;
   }
+  public static boolean isOracle() {
+    return oracle;
+  }
 
   private static StorageManager singleton = new StorageManager();
 
@@ -861,7 +952,7 @@ public class StorageManager {
 
   private Connection connection = null;
 
-  private static boolean h2;
+
 
   private static boolean sqlserver;
 
