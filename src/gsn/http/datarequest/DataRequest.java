@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  * <ul>
  * <li><strong>Minimal Parameters:</strong> <code>?vsname=ss_mem_vs:heap_memory_usage</code><br /> This request return a SQL query that select all the <code>heap_memory_usage</code> values from the <code>ss_me_vs</code> Virtual Sensor</li>
  * <li>
- *      <strong>Typical Parameters:</strong> <code>?vsname=tramm_meadows_vs:toppvwc_1:toppvwc_3&vsname=ss_mem_vs:heap_memory_usage&nb=5&critfield=and::timed:ge:1201600800000&critfield=and::timed:le:1211678800000&groupby=10000000:min</code><br />
+ *      <strong>Typical Parameters:</strong> <code>?vsname=tramm_meadows_vs:toppvwc_1:toppvwc_3&vsname=ss_mem_vs:heap_memory_usage&nb=0:5&critfield=and::timed:ge:1201600800000&critfield=and::timed:le:1211678800000&groupby=10000000:min</code><br />
  *      This request returns two SQL queries, one for <code>tramm_meadows_vs</code> and one for <code>ss_mem_vs</code> Virtual Sensor. The number of elements returned is limited to 5, are associated to a timestamp between <code>1201600800000</code> and <code>1211678800000</code>.
  *      The elements returned are the minimals values grouped by the timed field divided by <code>10000000</code>.
  * </li>
@@ -57,9 +57,9 @@ public class DataRequest {
 	private HashMap<String, FieldsCollection> 	vsnamesAndStreams 			= null;
 	private AggregationCriterion 				aggregationCriterion 		= null;
 	private ArrayList<StandardCriterion> 		standardCriteria 			= null;
-	private String 								maxNumber 					= null;
+	private LimitCriterion						limitCriterion				= null;
 
-	private Hashtable<String, StringBuilder> sqlQueries ;
+	private Hashtable<String, AbstractQuery> sqlQueries ;
 
 	public DataRequest (HttpServletRequest request) throws ServletException {
 		parseParameters(request);
@@ -102,16 +102,16 @@ public class DataRequest {
 			}
 		}
 
-		maxNumber = request.getParameter(PARAM_MAX_NB);
+		limitCriterion = new LimitCriterion (request.getParameter(PARAM_MAX_NB));
 	}
 
-	public Hashtable<String, StringBuilder> getSqlQueries() {
+	public Hashtable<String, AbstractQuery> getSqlQueries() {
 		return sqlQueries;
 	}
 
 	private void buildSQLQueries () {
 
-		this.sqlQueries = new Hashtable<String, StringBuilder> () ;
+		this.sqlQueries = new Hashtable<String, AbstractQuery> () ;
 
 		// Standard Criteria
 		StringBuilder partStandardCriteria = new StringBuilder () ;
@@ -132,15 +132,6 @@ public class DataRequest {
 
 				if (cc.getOperator().compareToIgnoreCase("like") == 0) partStandardCriteria.append("%'");
 				partStandardCriteria.append(" ");
-			}
-		}
-
-		// Limit
-		StringBuilder partLimit = new StringBuilder () ;
-		if (maxNumber != null) {
-			int nb = new Integer(maxNumber);
-			if (nb > 0) {
-				partLimit.append("limit " + nb + "  offset 0 ");
 			}
 		}
 
@@ -183,12 +174,10 @@ public class DataRequest {
 			sqlQuery.append(partStandardCriteria);
 			if (aggregationCriterion == null)	sqlQuery.append("order by timed desc ");
 			else 								sqlQuery.append("group by aggregated_period desc ");
-			sqlQuery.append(partLimit);
-			sqlQuery.append(";");
 
 			logger.debug("SQL Query built >" + sqlQuery.toString() + "<");
 
-			this.sqlQueries.put(vsname, sqlQuery);
+			this.sqlQueries.put(vsname, new AbstractQuery(sqlQuery, limitCriterion));
 		}
 	}
 
@@ -200,12 +189,12 @@ public class DataRequest {
 		return standardCriteria;
 	}
 
-	public String getMaxNumber() {
-		return maxNumber;
-	}
-
 	public HashMap<String, FieldsCollection> getVsnamesAndStreams() {
 		return vsnamesAndStreams;
+	}
+	
+	public LimitCriterion getLimitCriterion() {
+		return limitCriterion;
 	}
 
 	/**

@@ -91,7 +91,7 @@ public class ReportDownload extends HttpServlet {
 		//		
 		String aggregationCrierion 	= dr.getAggregationCriterion() 	== null		? "None" 			: dr.getAggregationCriterion().toString();
 		String standardCriteria 	= dr.getStandardCriteria() 		== null		? "None" 			: dr.getStandardCriteria().toString();
-		String maxNumber			= dr.getMaxNumber()				== null		? "All"				: dr.getMaxNumber().toString();
+		String maxNumber			= dr.getLimitCriterion()		== null		? "All"				: dr.getLimitCriterion().getSize().toString();
 		return new Report (reportPath, sdf.format(new Date()), aggregationCrierion, standardCriteria,maxNumber, virtualSensors);
 	}
 
@@ -109,7 +109,7 @@ public class ReportDownload extends HttpServlet {
 			if (lastUpdateRs != null) lastUpdateRs.close();
 
 			// Create the streams
-			ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(dr.getSqlQueries().get(vsname));
+			ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(dr.getSqlQueries().get(vsname), StorageManager.getInstance().getConnection());
 			ResultSetMetaData rsmd = rs.getMetaData();
 
 			Hashtable<String, Stream> dataStreams = new Hashtable<String, Stream> () ;
@@ -142,6 +142,7 @@ public class ReportDownload extends HttpServlet {
 		}
 		catch (SQLException e) {
 			logger.error("Error while executing the SQL request. Check your query.");
+			logger.debug("The query: ",e);
 			return null;
 		}
 		//

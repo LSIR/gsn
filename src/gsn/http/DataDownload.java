@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 public class DataDownload extends HttpServlet {
-  
-  private static transient Logger                                logger                              = Logger.getLogger ( DataDownload.class );
+	
+  private static transient Logger logger = Logger.getLogger ( DataDownload.class );
   
   public void  doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
     doPost(req, res);
