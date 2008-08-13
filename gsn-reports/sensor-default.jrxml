@@ -55,17 +55,17 @@
 				<rectangle radius="3" >
 					<reportElement
 						x="0"
-						y="5"
+						y="4"
 						width="535"
 						height="20"
-						forecolor="#C1C1C1"
-						backcolor="#C1C1C1"
+						forecolor="#FF6D00"
+						backcolor="#FF6D00"
 						key="header-1"/>
 					<graphicElement stretchType="NoStretch" fill="Solid" />
 				</rectangle>
 				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
-						x="0"
+						x="1"
 						y="6"
 						width="468"
 						height="18"

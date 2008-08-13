@@ -80,7 +80,7 @@
 						y="2"
 						width="535"
 						height="18"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						backcolor="#FFFFFF"
 						key="header-1"/>
 					<graphicElement stretchType="NoStretch" fill="Solid" />
@@ -414,7 +414,7 @@
 						y="23"
 						width="196"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-2"/>
 					<graphicElement stretchType="NoStretch">
 					<pen lineWidth="0.5"/>
@@ -426,7 +426,7 @@
 						y="45"
 						width="196"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-3"/>
 					<graphicElement stretchType="NoStretch">
 					<pen lineWidth="0.5"/>
@@ -438,7 +438,7 @@
 						y="56"
 						width="196"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-4"/>
 					<graphicElement stretchType="NoStretch">
 					<pen lineWidth="0.5"/>
@@ -450,7 +450,7 @@
 						y="78"
 						width="196"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-5"/>
 					<graphicElement stretchType="NoStretch">
 					<pen lineWidth="0.5"/>
@@ -462,7 +462,7 @@
 						y="89"
 						width="196"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-6"/>
 					<graphicElement stretchType="NoStretch">
 					<pen lineWidth="0.5"/>
@@ -474,7 +474,7 @@
 						y="100"
 						width="196"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-7"/>
 					<graphicElement stretchType="NoStretch">
 					<pen lineWidth="0.5"/>
@@ -486,7 +486,7 @@
 						y="122"
 						width="196"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-8"/>
 					<graphicElement stretchType="NoStretch">
 					<pen lineWidth="0.5"/>
@@ -498,7 +498,7 @@
 						y="133"
 						width="196"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-9"/>
 					<graphicElement stretchType="NoStretch">
 					<pen lineWidth="0.5"/>
@@ -510,7 +510,7 @@
 						y="144"
 						width="196"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-10"/>
 					<graphicElement stretchType="NoStretch">
 					<pen lineWidth="0.5"/>

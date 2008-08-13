@@ -51,7 +51,7 @@
 						y="1"
 						width="535"
 						height="153"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						backcolor="#FFFFFF"
 						key="header-1"/>
 					<graphicElement stretchType="NoStretch" fill="Solid" >
@@ -77,7 +77,7 @@
 						y="27"
 						width="535"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-1"/>
 					<graphicElement stretchType="NoStretch"/>
 				</line>
@@ -113,7 +113,7 @@
 						y="43"
 						width="535"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-2"/>
 					<graphicElement stretchType="NoStretch"/>
 				</line>
@@ -123,7 +123,7 @@
 						y="59"
 						width="535"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-3"/>
 					<graphicElement stretchType="NoStretch"/>
 				</line>
@@ -197,7 +197,7 @@
 						y="75"
 						width="535"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-4"/>
 					<graphicElement stretchType="NoStretch"/>
 				</line>
@@ -314,7 +314,7 @@
 						y="91"
 						width="535"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-5"/>
 					<graphicElement stretchType="NoStretch"/>
 				</line>
@@ -324,7 +324,7 @@
 						y="122"
 						width="535"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-6"/>
 					<graphicElement stretchType="NoStretch"/>
 				</line>
@@ -334,7 +334,7 @@
 						y="138"
 						width="535"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-7"/>
 					<graphicElement stretchType="NoStretch"/>
 				</line>
@@ -344,7 +344,7 @@
 						y="107"
 						width="535"
 						height="0"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="line-8"/>
 					<graphicElement stretchType="NoStretch"/>
 				</line>
@@ -410,7 +410,7 @@
 						y="0"
 						width="535"
 						height="21"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="rectangle-2"/>
 					<graphicElement stretchType="NoStretch"/>
 				</rectangle>
@@ -476,7 +476,7 @@
 						y="0"
 						width="535"
 						height="21"
-						forecolor="#C1C1C1"
+						forecolor="#FF6D00"
 						key="rectangle-3"/>
 					<graphicElement stretchType="NoStretch"/>
 				</rectangle>

@@ -109,7 +109,7 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 			iter = datas.iterator();
 			Double variance_value = 0.0;
 			Double sampling_variance_value = 0.0;
-			Long lastDataTime = start_time_value;
+			Long lastDataTime = end_time_value;
 			int i = 0;
 			while (iter.hasNext()) {
 				nextData = iter.next();
@@ -118,7 +118,7 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 					variance_value += Math.pow((average_value - nextDataValue), 2);
 				}
 				if (i > 0) {
-					sampling_variance_value += Math.pow((sampling_average_value - (((Long) nextData.getP2()) - lastDataTime)), 2);
+					sampling_variance_value += Math.pow((sampling_average_value - ((lastDataTime - (Long) nextData.getP2()))), 2);
 					lastDataTime = (Long) nextData.getP2();
 				}
 				i++;
