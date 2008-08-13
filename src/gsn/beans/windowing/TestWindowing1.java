@@ -83,13 +83,13 @@ public class TestWindowing1 {
 	private static void initDB(int dbType) throws SQLException {
 		if (StorageManager.MYSQL_DB == dbType) {
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-			StorageManager.getInstance().initialize("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest");
+			StorageManager.getInstance().init("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest");
 		} else if (StorageManager.H2_DB == dbType) {
 			DriverManager.registerDriver(new org.h2.Driver());
-			StorageManager.getInstance().initialize("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.");
+			StorageManager.getInstance().init("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.");
 		} else {
 			DriverManager.registerDriver(new net.sourceforge.jtds.jdbc.Driver());
-			StorageManager.getInstance().initialize("net.sourceforge.jtds.jdbc.Driver", "mehdi", "mehdi",
+			StorageManager.getInstance().init("net.sourceforge.jtds.jdbc.Driver", "mehdi", "mehdi",
 					"jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3");
 		}
 	}

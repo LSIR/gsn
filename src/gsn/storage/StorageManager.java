@@ -972,7 +972,7 @@ public class StorageManager {
   private StorageManager() {
   }
 
-  public void initialize(String databaseDriver, String username,
+  public void init(String databaseDriver, String username,
       String password, String databaseURL) {
     this.databaseURL = databaseURL;
     if (databaseDriver.trim().equalsIgnoreCase( DATABASE.H2.getJDBCDriverClass()))

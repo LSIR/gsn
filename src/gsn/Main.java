@@ -83,7 +83,7 @@ public final class Main {
       logger.error ( e.getMessage ( ),e );
       return;
     }
-    StorageManager.getInstance ( ).initialize ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) );
+    StorageManager.getInstance ( ).init ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) );
     if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
     final Server server = new Server ( );
     //Connector connector = new SelectChannelConnector( ); //using basic connector for windows bug

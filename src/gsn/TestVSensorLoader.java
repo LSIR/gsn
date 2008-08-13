@@ -26,7 +26,7 @@ public class TestVSensorLoader {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.h2.Driver( ) );
-		StorageManager.getInstance ( ).initialize ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
+		StorageManager.getInstance ( ).init ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
 	}
 
 	@AfterClass
