@@ -1,9 +1,9 @@
 package gsn.acquisition2.wrappers;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
@@ -20,7 +20,8 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 	private net.tinyos1x.message.Message messageTemplateTinyOS1x = null;
 	private net.tinyos.message.Message messageTemplateTinyOS2x = null;
 
-	private static Map<String,net.tinyos1x.message.MoteIF> moteIFList1x = Collections.synchronizedMap(new HashMap<String,net.tinyos1x.message.MoteIF>());
+	private static Map<String,Semaphore> moteIFList1xSemaphore = new HashMap<String,Semaphore>();
+	private static Map<String,net.tinyos1x.message.MoteIF> moteIFList1x = new HashMap<String,net.tinyos1x.message.MoteIF>();
 
 	private final transient Logger logger = Logger.getLogger( MigMessageWrapper2.class );
 
@@ -35,21 +36,35 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 			//
 			logger.debug("Connecting to " + parameters.getTinyosSource());
 			if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
-				synchronized (moteIFList1x) {
-					if (!moteIFList1x.containsKey(parameters.getTinyosSource())) {
-						// Create the source
-						logger.debug("Create new source >" + parameters.getTinyosSource() + "<.");
-						net.tinyos1x.packet.PhoenixSource phoenixSourceTinyOS1x = net.tinyos1x.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos1x.util.PrintStreamMessenger.err);
-						if (phoenixSourceTinyOS1x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
-						phoenixSourceTinyOS1x.setResurrection();
-						moteIFTinyOS1x = new net.tinyos1x.message.MoteIF(phoenixSourceTinyOS1x);
-						moteIFList1x.put(parameters.getTinyosSource(), moteIFTinyOS1x);
+				// create a semaphore for each source/address
+				Semaphore sem;
+				synchronized (moteIFList1xSemaphore) {
+					if (moteIFList1xSemaphore.containsKey(parameters.getTinyosSource())) {
+						sem = moteIFList1xSemaphore.get(parameters.getTinyosSource());
 					}
 					else {
-						logger.debug("Reusing source >" + parameters.getTinyosSource() + "<.");
-						moteIFTinyOS1x = (net.tinyos1x.message.MoteIF) moteIFList1x.get(parameters.getTinyosSource());
+						sem = new Semaphore(1);
+						moteIFList1xSemaphore.put(parameters.getTinyosSource(), sem);
 					}
 				}
+
+				sem.acquire();
+
+				if (!moteIFList1x.containsKey(parameters.getTinyosSource())) {
+					// Create the source
+					logger.debug("Create new source >" + parameters.getTinyosSource() + "<.");
+					net.tinyos1x.packet.PhoenixSource phoenixSourceTinyOS1x = net.tinyos1x.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos1x.util.PrintStreamMessenger.err);
+					if (phoenixSourceTinyOS1x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
+					phoenixSourceTinyOS1x.setResurrection();
+					moteIFTinyOS1x = new net.tinyos1x.message.MoteIF(phoenixSourceTinyOS1x);
+					moteIFList1x.put(parameters.getTinyosSource(), moteIFTinyOS1x);
+				}
+				else {
+					logger.debug("Reusing source >" + parameters.getTinyosSource() + "<.");
+					moteIFTinyOS1x = (net.tinyos1x.message.MoteIF) moteIFList1x.get(parameters.getTinyosSource());
+				}
+
+				sem.release();
 
 				// Register to the message type
 				logger.debug("Register message >" + parameters.getTinyosMessageName() + "< to source.");
@@ -82,25 +97,11 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 			}
 			logger.debug("Connected");
 		}
-		catch (RuntimeException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (ClassNotFoundException e) {
+		catch (ClassNotFoundException e) {
 			logger.error("Unable to find the >" + parameters.getTinyosMessageName() + "< class.");
 			return false;
-		} catch (InstantiationException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (IllegalAccessException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (NoSuchMethodException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (InvocationTargetException e) {
+		}
+		catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
