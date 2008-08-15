@@ -307,5 +307,14 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
   public String getWrapperName ( ) {
     return "TinyOS packet wrapper";
   }
+
+  /**
+   * Can be used by other classes which are extending this class to create elaborated communication such
+   * as send a packet back to the sensor network.
+   * @return
+   */
+  protected MoteIF getMoteIF() {
+    return moteIF;
+  }
   
 }
