@@ -10,9 +10,10 @@ ENV['GEM_HOME']=ENV['GEM_PATH']
 $LOAD_PATH << 'META-INF/jruby.home/lib/ruby/site_ruby/1.8'
 $LOAD_PATH << ENV['GEM_PATH']
 
+
 #p File.expand_path '.'
 
+require 'rubygems'
+ 
 require "#{File.expand_path '.'}/config/boot"
-require 'commands/destroy'
-
-
+require 'commands/server'
