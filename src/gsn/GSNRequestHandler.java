@@ -23,7 +23,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
 		RemoteWrapper remoteWrapper = Mappings.getContainer( ).getRemoteDSForANotificationCode( notificationCode );
 		if ( remoteWrapper == null ) { // This client is no more interested
 			// in this notificationCode.
-			if ( logger.isInfoEnabled( ) ) logger.info( "Invalid notification code recieved, query droped." );
+			if ( logger.isInfoEnabled( ) ) logger.info( "Invalid notification code recieved, query droped. Remote Address >" + remoteAddress + "<" );
 			return false;
 		} else {
 			// /**
@@ -48,7 +48,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
 	 */
 	public boolean registerQuery ( int port , String virtualSensorName , String query , int notificationCode ) {
 		if ( virtualSensorName == null || ( virtualSensorName = virtualSensorName.trim( ).toLowerCase( ) ).length( ) == 0 ) {
-			logger.warn( "Bad request received for Data_strctutes" );
+			logger.warn( "Bad request received for Data_structures. Remote Address >" + remoteAddress + "<" );
 			return false;
 		}
 		VSensorConfig sensorConfig = Mappings.getVSensorConfig( virtualSensorName );
@@ -93,12 +93,12 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
 	 */
 	public String [ ][ ] getOutputStructure ( String virtualSensorName ) {
 		if ( virtualSensorName == null || ( virtualSensorName = virtualSensorName.trim( ).toLowerCase( ) ).length( ) == 0 ) {
-			logger.warn( "Bad request received for Data_strctutes" );
+			logger.warn( "Bad request received for Data_structures. Remote Address >" + remoteAddress + "<" );
 			return new String [ ] [ ] {};
 		}
 		VSensorConfig sensorConfig = Mappings.getVSensorConfig( virtualSensorName );
 		if ( sensorConfig == null ) {
-			logger.warn( "Requested virtual sensor doesn't exist >" + virtualSensorName + "<." );
+			logger.warn( "Requested virtual sensor doesn't exist >" + virtualSensorName + "<.  Remote Address >" + remoteAddress + "<" );
 			return new String [ ] [ ] {};
 		}
 		if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( virtualSensorName ).append( "* received." ).toString( ) );
