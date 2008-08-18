@@ -983,11 +983,10 @@ public class StorageManager {
       sqlserver = true;
     else  if (databaseDriver.trim().equalsIgnoreCase(DATABASE.ORACLE.getJDBCDriverClass()))
       oracle = true;
-    else
-      logger.error(new StringBuilder().append("The GSN doesn't support the database driver : ").append(
-          databaseDriver).toString());
-    logger.error(new StringBuilder().append("Please check the storage element in the file : ").append(getContainerConfig().getContainerFileName()).toString());
-
+    else {
+      logger.error(new StringBuilder().append("The GSN doesn't support the database driver : ").append(databaseDriver).toString());
+      logger.error(new StringBuilder().append("Please check the storage element in the file : ").append(getContainerConfig().getContainerFileName()).toString());
+    }
 
     dbConnectionProperties.put("user", username);
     dbConnectionProperties.put("password", password);
