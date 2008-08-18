@@ -1,5 +1,21 @@
 \chapter{Introduction}
 
+\section{Terminology}
+
+\begin{itemize}
+	\item \textbf{Global Sensor Networks} (\gsn) defines both the project and the software described in this document. \\
+	\item A \textbf{Wrapper} (\wrapper) is a piece of Java code that does the data acquisition for a specific type of device. \\
+	\item A \textbf{Virtual Sensor} (\vs) is the main component in \gsn. It receives data from one or more \wrapper. It can combine their data, 
+		process and finally store it. A \vs is defined in a single \vsd and combines different pieces of software 
+		\begin{paraenum}
+			\item One \vsp
+			\item Zero or Many \wrapper
+		\end{paraenum}. \\	
+	\item A \textbf{Virtual Sensor Description file} (\vsd) is an XML file that contains the selection and the parametrization of the \vsp and \wrapper that compose a \vs.
+		This file also contains the SQL statements that connect them together. \\
+	\item A \textbf{Virtual Sensor Processing class} (\vsp) is a piece of Java code that process and stores the data upon reception from the \wrapper. \\
+\end{itemize}
+
 \section{Quick Start}
 
 GSN (for Global Sensor Networks) is a software project that started in
