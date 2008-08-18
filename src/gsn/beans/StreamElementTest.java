@@ -2,7 +2,6 @@ package gsn.beans;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import gsn.RailsRunner;
 
 import java.io.ByteArrayOutputStream;
@@ -10,13 +9,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class StreamElementTest {
 
   @Test
   public void testRestToAndFromBehaviors() throws IOException {
+    System.out.println("NOW TESTING");
     FileInputStream fis = new FileInputStream("webapp/img/button_cancel.png");
     byte[] binary = new byte[fis.available()];
     fis.read(binary);
@@ -35,14 +40,22 @@ public class StreamElementTest {
     testOutput.reset();
     toRest[7].send(testOutput);
     assertTrue(testOutput.toString().indexOf(new String(binary))>0);
-//    String rubyScript ="require 'rubygems';require 'mongrel';";
-//    org.jruby.Main.main(new String[] {"-e",rubyScript});
-    RailsRunner rails = new RailsRunner();
-    rails.start();
-//    RailsRunner.main(null);
-    System.out.println("YES");
+    PostMethod post = new PostMethod("http://localhost:3000/gsn/notify/123456");
+    
+    post.setRequestEntity(new MultipartRequestEntity(toRest,post.getParams()));
+    HttpClient client = new HttpClient();
+    int status = client.executeMethod(post);
+    assertEquals(201,status);
+    
       
-//    rails.stop();
+  }
+  private static RailsRunner runner = new RailsRunner();
+  @BeforeClass public static void startWebApp() throws InterruptedException {
+     runner.start();
+  }
+  
+  @AfterClass public static void stopWebApp() throws InterruptedException {
+    runner.stop();
   }
   
 }

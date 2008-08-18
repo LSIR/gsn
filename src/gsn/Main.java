@@ -263,8 +263,11 @@ public final class Main {
   public  static Class < ? > getWrapperClass ( String id ) {
     try {
       String className =  getWrappers().getProperty(id);
-      if (className ==null) 
+      if (className ==null) { 
         logger.error("The requested wrapper: "+id+" doesn't exist in the wrappers.properties file.");
+        return null;
+      }
+    
       return Class.forName(className);  
     } catch (ClassNotFoundException e) {
       logger.error(e.getMessage(),e);

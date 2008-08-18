@@ -270,13 +270,13 @@ public class ContainerConfig {
 
 	public static String [ ]       NETWORK_ADDRESSES;
 
-	public static final String [ ] JDBC_SYSTEMS                       = { "HSqlDB in Memory" , "HSqlDB in File" , "MySql", "SQL Server" };
+	public static final String [ ] JDBC_SYSTEMS                       = { "H2 in Memory" , "H2 in File" , "MySql", "SQL Server" };
 
-	public static final String [ ] JDBC_URLS                          = new String [ ] { "jdbc:hsqldb:mem:." , "jdbc:hsqldb:file:/path/to/file" , "jdbc:mysql://localhost:3306/gsn", "jdbc:jtds:sqlserver://localhost/gsn" };
+	public static final String [ ] JDBC_URLS                          = new String [ ] { "jdbc:h2:mem:." , "jdbc:h2:file:/path/to/file" , "jdbc:mysql://localhost:3306/gsn", "jdbc:jtds:sqlserver://localhost/gsn" };
 
-	public static final String [ ] JDBC_DRIVERS                       = new String [ ] { "org.hsqldb.jdbcDriver" , "org.hsqldb.jdbcDriver" , "com.mysql.jdbc.Driver", "net.sourceforge.jtds.jdbc.Driver" };
+	public static final String [ ] JDBC_DRIVERS                       = new String [ ] { "org.h2.Driver" , "org.h2.Driver" , "com.mysql.jdbc.Driver", "net.sourceforge.jtds.jdbc.Driver" };
 
-	public static final String [ ] JDBC_URLS_PREFIX                   = new String [ ] { "jdbc:hsqldb:mem:" , "jdbc:hsqldb:file:" , "jdbc:mysql:", "jdbc:jtds:sqlserver:" };
+	public static final String [ ] JDBC_URLS_PREFIX                   = new String [ ] { "jdbc:h2:mem:" , "jdbc:h2:file:" , "jdbc:mysql:", "jdbc:jtds:sqlserver:" };
 
 	public static final String     DEFAULT_LOGGING_LEVEL              = ContainerConfig.LOGGING_LEVELS[ 3 ];
 
