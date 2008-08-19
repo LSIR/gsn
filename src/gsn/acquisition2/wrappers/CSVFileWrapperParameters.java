@@ -1,5 +1,8 @@
 package gsn.acquisition2.wrappers;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 import gsn.beans.AddressBean;
 
 public class CSVFileWrapperParameters {
@@ -34,6 +37,10 @@ public class CSVFileWrapperParameters {
 	private static final String CSV_FORMAT_LINE_FORMAT_DEFAULT = "5";
 	private int csvFormatLineFormat;
 
+	private static final String CSV_NOT_A_NUMBER = "csv-not-a-number";
+	private static final String CSV_NOT_A_NUMBER_DEFAULT = "NaN,null";
+	private ArrayList<String> csvNotANumber;
+	
 	// Mandatory parameters
 
 	public static final String CSV_SOURCE_FILE_PATH = "csv-source-file-path";
@@ -57,6 +64,13 @@ public class CSVFileWrapperParameters {
 		csvupdateDelay = Long.parseLong(infos.getPredicateValueWithDefault(CSV_UPDATE_DELAY, CSV_UPDATE_DELAY_DEFAULT));
 
 		csvFormatLineNames = Integer.parseInt(infos.getPredicateValueWithDefault(CSV_FORMAT_LINE_NAMES, CSV_FORMAT_LINE_NAMES_DEFAULT));
+
+		String nanParams = infos.getPredicateValueWithDefault(CSV_NOT_A_NUMBER, CSV_NOT_A_NUMBER_DEFAULT);
+		String[] splittedNanParams = nanParams.split(",");
+		csvNotANumber = new ArrayList<String> () ;
+		for (int i = 0 ; i < splittedNanParams.length ; i++) {
+			csvNotANumber.add(splittedNanParams[i].trim().toUpperCase());
+		}
 
 		String[] tmpLineDescriptions = infos.getPredicateValue(CSV_FORMAT_LINE_DESCRIPTIONS).split(",");
 		if (tmpLineDescriptions != null){
@@ -104,5 +118,8 @@ public class CSVFileWrapperParameters {
 	}
 	public String getCsvFormatFilePath() {
 		return csvFormatFilePath;
+	}
+	public ArrayList<String> getCsvNotANumber() {
+		return csvNotANumber;
 	}
 }

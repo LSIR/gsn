@@ -188,7 +188,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 	}
 
 	private String filterNAN (String value) {
-		if (value.compareToIgnoreCase("NaN") == 0)  value = "NaN";
+		if (parameters.getCsvNotANumber().contains(value.toUpperCase())) value = null;		
 		return value;
 	}
 }
