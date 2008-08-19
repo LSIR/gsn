@@ -1,2 +1,6 @@
-// Place your application-specific JavaScript functions and classes here
-// This file is automatically included by javascript_include_tag :defaults
+var list_of_active_vs   = new Array();
+var list_of_unactive_vs = new Array();
+
+function navigate_in_vs_details (vs_detail_tag_id,pane_to_activate) {
+    alert($(vs_detail_tag_id))
+}
