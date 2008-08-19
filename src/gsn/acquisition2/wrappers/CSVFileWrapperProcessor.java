@@ -117,7 +117,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 							nextLine[j] = filterNAN(nextLine[j]);
 
-							Double d = Double.valueOf(nextLine[j]);
+							Double d = nextLine[j] == null ? null : Double.valueOf(nextLine[j]);
 							if (d==null) { 
 								logger.error("invalide double format for "+nextLine[j]+" at timestamp "+time);
 								serialized[j] = null;
@@ -134,7 +134,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 							nextLine[j] = filterNAN(nextLine[j]);
 
-							Integer d = Integer.valueOf(nextLine[j]);
+							Integer d = nextLine[j] == null ? null : Integer.valueOf(nextLine[j]);
 							if (d==null) { 
 								logger.error("invalide integer format for "+nextLine[j]+" at timestamp "+time);
 								serialized[j] = null;
@@ -188,7 +188,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 	}
 
 	private String filterNAN (String value) {
-		if (parameters.getCsvNotANumber().contains(value.toUpperCase())) value = null;		
+		if (parameters.getCsvNotANumber().contains(value.toUpperCase())) value = null;
 		return value;
 	}
 }
