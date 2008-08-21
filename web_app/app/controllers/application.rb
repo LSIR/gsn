@@ -31,4 +31,13 @@ class ApplicationController < ActionController::Base
 #	VS_DISABLED =  Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(disabled_vs_files)
 #	STORAGE_MANAGER = Java::gsn.storage::StorageManager.getInstance()
 #	STORAGE_MANAGER.init(CONTAINER_CONFIG.jdbc_driver, CONTAINER_CONFIG.jdbc_username, CONTAINER_CONFIG.jdbc_password, CONTAINER_CONFIG.jdbc_url)
+
+  # Check authorizations
+  def authorize
+    unless User.find_by_id(session[:user_id])
+      flash[:warning] = 'You have to Login first.'
+      redirect_to :controller => :gsn, :action => :home
+    end
+  end
+
 end

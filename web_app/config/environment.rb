@@ -1,3 +1,8 @@
+# GSN CONSTANTS
+
+GSN_DEFAULT_ADMIN_EMAIL	    = 'gsn@gsn.sourceforge.net'
+GSN_DEFAULT_ADMIN_PASSWORD  = 'gsn@gsn.sourceforge.net'
+
 # Be sure to restart your server when you modify this file
 
 # Uncomment below to force Rails into production mode when

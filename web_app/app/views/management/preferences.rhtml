@@ -1,0 +1,31 @@
+<h3>General Preferences</h3>
+<ul>
+    <li>Internationalization</li>
+    <li>Limits, Quotas</li>
+    <li>Edit gsn.conf (db, safe storage port, etc.)</li>
+</ul>
+
+<h3>Administrator</h3>
+<% form_for :user, :url => { :controller => :management, :action => :update_user} do |f| %>
+    <%= error_messages_for :user %>
+    <table>
+	<tbody>
+	    <tr>
+		<td>Email:</td>
+	        <td><%= f.text_field :email, :class => :textfield, :id => :user_email %> </td>
+	    </tr>
+	    <tr>
+		<td>New Password:</td>
+	        <td><%= f.password_field :password, :class => :passwordfield, :id => :user_password %></td>
+	    </tr>
+	    <tr>
+		<td>New Password Verification:</td>
+	        <td><%= f.password_field :password_confirmation, :class => :passwordfield, :id => :user_password %></td>
+	    </tr>
+	    <tr>
+		<td>&nbsp;</td>
+		<td><%= submit_tag "Update", :disable_with => "Updating..." %></td>
+	    </tr>
+	</tbody>
+    </table>
+<% end %>

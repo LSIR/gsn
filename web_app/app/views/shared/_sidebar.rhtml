@@ -1,9 +1,34 @@
-<h3>Description</h3>
-<p id="gsn-desc">none</p>
-<h3>Author</h3>
-<p id="gsn-author">none</p>
-<h3>Virtual sensors</h3>
-<ul id="vsmenu">
-    <li><a href="#">not loaded</a></li>
-</ul>
-<p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
+<div id="login_box">
+    <h3>Administration</h3>
+    <% if session[:user_id].nil? %>
+	<% form_for :user, :url => { :controller => :management, :action => :login} do |f| %>
+	    <table>
+		<tr>
+		    <td>Email</td>
+		    <td><%= f.text_field :email, :class => :textfield, :id => :user_email %></td>
+		</tr>
+		<tr>
+		    <td>Password</td>
+		    <td><%= f.password_field :password, :class => :passwordfield, :id => :user_password %></td>
+		</tr>
+		<tr>
+		    <td>&nbsp;</td>
+		    <td><%= submit_tag "Login", :disable_with => "Checking..." %></td>
+		</tr>
+	    </table>
+	    <% end %>
+	<% else %>
+	    <%= link_to "Logout", :controller => :management, :action => :logout, :id => 'logout_btn' %>
+	<% end %>
+</div>
+<div id="info_box">
+    <h3>Description</h3>
+    <p id="gsn-desc">none</p>
+    <h3>Author</h3>
+    <p id="gsn-author">none</p>
+    <h3>Virtual sensors</h3>
+    <ul id="vsmenu">
+	<li><a href="#">not loaded</a></li>
+    </ul>
+    <p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
+</div>

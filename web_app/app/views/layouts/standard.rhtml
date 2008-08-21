@@ -18,22 +18,20 @@
 	    <div id="navigation">
 		<%= render :partial => 'shared/mainmenu' -%>
 	    </div>
-	    <div id="gsncontrol">
-		<ul>
-		    <li>Start</li>
-		    <li>Stop</li>
-		    <li>Send Bug Report :-)</li>
-		</ul>
-	    </div>
 	    <div id="main">
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
+		<div id="feedback">
+		    <%= '<p class="feedback_failure">Error: '   + flash[:failure]	+ '</p>'    unless not flash[:failure] %>
+		    <%= '<p class="feedback_warning">Warning: ' + flash[:warning]	+ '</p>'    unless not flash[:warning] %>
+		    <%= '<p class="feedback_success">'		+ flash[:success]	+ '</p>'    unless not flash[:success] %>
+		</div>
 		<%= yield :layout %>
 	    </div>
 	    <div id="sidebar">
 		<%= render :partial => 'shared/sidebar' -%>
 	    </div>
 	    <div id="footer">
-		<p>Powered by <%=link_to 'GSN', 'http://globalsn.sourceforge.net/' %>,  Distributed Information Systems Lab, EPFL 2006</p>
+		<p>Powered by <%=link_to 'GSN', 'http://gsn.sourceforge.net/' %>,  Distributed Information Systems Lab, EPFL 2008</p>
 		<p>
 		    <%= link_to image_tag(image_path("html_valid.bmp"), :alt => 'HTML validator'), 'http://validator.w3.org/check?uri=referer' %>
 		    <%= link_to image_tag(image_path("css_valid.bmp"), :alt => 'CSS validator'), 'http://jigsaw.w3.org/css-validator/check?uri=referer' %>

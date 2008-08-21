@@ -4,14 +4,14 @@ require 'roxml' # jruby -S gem install roxml
 require 'jdbc'  # jruby -S gem install jdbc-wrapper
 
 class GsnController < ApplicationController
-	def test
-		p CONTAINER_CONFIG.jdbc_username
-		puts VS_ENABLED.size
-		puts VS_ENABLED.each {|k| puts "#{k[0]} == #{k[1]}" }
-		puts VS_ENABLED.each {|k| puts "#{k[0]} == #{p k[1].methods}" }
-		puts STORAGE_MANAGER.methods
-		render :nothing=>true
-	end
+  def test
+    p CONTAINER_CONFIG.jdbc_username
+    puts VS_ENABLED.size
+    puts VS_ENABLED.each {|k| puts "#{k[0]} == #{k[1]}" }
+    puts VS_ENABLED.each {|k| puts "#{k[0]} == #{p k[1].methods}" }
+    puts STORAGE_MANAGER.methods
+    render :nothing=>true
+  end
 
   def home
   end
@@ -74,6 +74,7 @@ class GsnController < ApplicationController
 
 
   def update_refreshbar
+    session[:refresh_time] = params[:refresh_time]
     render :partial => 'shared/refreshbar'
   end
 
@@ -81,7 +82,7 @@ class GsnController < ApplicationController
   def structure
     vs_config = VS_NAME_TO_CONFIG[params[:name].upcase.chomp]
     if vs_config.nil?
-	   render :text => "requested virtual sensor #{params[:name]} is not found/accessible.",:layout=>false,:status => 500
+      render :text => "requested virtual sensor #{params[:name]} is not found/accessible.",:layout=>false,:status => 500
     else
       to_return = vs_config.output_structure.inject('') {|sum,o| sum << "#{o.name}[#{o.type}],"} unless vs_config.nil?
       render :text => (to_return||''), :layout => false,:status => 200
@@ -97,7 +98,7 @@ class GsnController < ApplicationController
     else
       Java::gsn.GSNRequestHandler::register_query params[:remote_host],params[:remote_port].to_i,params[:name],params[:query],params[:code].to_i    
     end
-  render :text => "query:#{params[:query]} registered.", :layout => false,:status => 200
+    render :text => "query:#{params[:query]} registered.", :layout => false,:status => 200
   end
 	
 end

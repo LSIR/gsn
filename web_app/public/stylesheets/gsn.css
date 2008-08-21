@@ -1,4 +1,215 @@
-/* general style */
+/*******************************************************************************
+ * GLOBAL SENSOR NETWORKS (GSN) CSS
+ * © 2008
+ ******************************************************************************/
+
+/* -------------------- DEFAULT HTML TAGS LAYOUT -----------------------------*/
+
+* { margin: 0; padding: 0; }
+h1 { font-size: 1.75em; margin: 0 0 .67em 0 }
+h2 { font-size: 1.5em; margin: 0 0 .75em 0 }
+h3 { font-size: 1.17em; margin: 0 0 .83em 0 }
+div, h4, p, blockquote, ul, fieldset, form, ol, dl, dir, menu, cite { font-size: 1em; margin: 0 0 1.12em 0 }
+a { font-size: .83em; }
+h5 { font-size: .83em; margin: 0 0 1.5em 0 }
+h6 { font-size: .75em; margin: 0 0 1.67em 0 }
+cite{ display: block; position: relative; }
+ul {margin-left: 2em;}
+
+/* ------------------------ CONTAINER LAYOUT ---------------------------------*/
+
+body, html {
+	background:#dfdfdf;
+	color:#000000;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size:12px;
+	line-height:1.4em;
+}
+
+body {
+	min-width: 750px;
+	width: 100%;
+	height: 100%;
+}
+
+#container {
+	margin: 10px auto;
+	padding: 1px;
+	width: 750px;
+	background: white;
+}
+
+#header {
+    margin: 0;
+}
+
+#main {
+	float: left;
+	width: 490px;
+	padding: 0 10px;
+}
+
+#sidebar {
+	float: left;
+	width:220px;
+	text-align:left;
+	padding-top: 10px;
+}
+
+#footer {
+	clear:both;
+	color:#808080;
+}
+
+/* ------------------------ BLOCK CONTENT LAYOUT AND STYLE -------------------*/
+
+/* header */
+
+#header { background: #ffee00 url(../images/gsn-mark.png) no-repeat 4px center; }
+
+#header h1 {
+	padding: 36px 90px;
+	margin: 0;
+}
+
+#header a { color: black; }
+
+/* feedback */
+
+#feedback p {
+    margin: 10px 0 10px 0;
+    border-top: 2px solid #ffa84c;
+    border-bottom: 2px solid #ffa84c;
+    text-align: center;
+    height: 2.4em;
+    line-height: 2.4em;
+}
+#feedback .feedback_success { 
+	font-weight:normal;
+}
+#feedback .feedback_warning {
+    font-weight: bold;
+}
+#feedback .feedback_failure {
+    background: #ffe0bf;
+    color: red;
+}
+
+/* Model related errors */
+
+.errorExplanation {
+    border: solid 1px #de0404;
+    padding: 10px;
+}
+
+.errorExplanation h2,
+.errorExplanation p {
+    display: none;
+}
+
+div.fieldWithErrors {
+    margin: 0;
+    border: solid 2px #de0404;
+}
+
+.errorExplanation ul { margin-bottom: 0; }
+
+/* login */
+
+#sidebar #login_box {
+	width: 100%;
+}
+
+#sidebar #login_box .textfield,
+#sidebar #login_box .passwordfield { width: 100%; }
+
+/* navigation */
+
+#navigation {
+	height:2.2em;
+	line-height:2.2em;
+	background:#ffa84c;
+	margin: 0;
+}
+
+#navigation ul { margin:0; padding:0; }
+
+#navigation #menu li {
+	float: left;
+	list-style-type: none;
+	border-right: 1px solid white;
+	white-space: nowrap;
+}
+
+#navigation #linkWebsite li {
+	float: right;
+	list-style-type: none;
+	border-left: 1px solid #ffffff;
+	white-space: nowrap;
+}
+
+#navigation li a {
+	display: block;
+	padding: 0 10px;
+	font-size: 0.8em;
+	font-weight: bolder;
+	text-transform: uppercase;
+	background-color: inherit;
+	color: black;
+}
+
+#navigation .selected { background: white; }
+
+#navigation a:hover { background: #ffee00; }
+
+/* footer */
+
+#footer p {
+	padding:10px 0 5px 0;
+	margin:0;
+	text-align:center;
+ }
+
+/* ----------------------------- MISC ----------------------------------------*/
+
+a img { border: none; }
+
+a {
+    text-decoration: none;
+    color: #ffa84c;
+    font-weight: bold;
+}
+
+.textfield, .passwordfield {
+    height: 1.2em;
+}
+
+input[type=button],
+input[type=submit],
+.submit {
+	color: black;
+	text-align: center;
+	border: 0px;
+	cursor: pointer;
+	margin:1px;
+	border: 1px solid #FFA84C;
+	border-left: 10px solid #FFA84C;
+	background-color: #FCFDDC;
+}
+
+input[type=button]:active,
+input[type=button]:hover,
+input[type=submit]:active,
+input[type=submit]:hover,
+.sumbit:hover,
+.submit:active {
+	color: #FFA84C;
+	background-color: white;
+}
+
+
+
+/*
 form
 {
 	padding:0;
@@ -19,7 +230,7 @@ a
 
 a:hover
 {
-	color: #000000 /*#2a5a8a*/;
+	color: #000000;
 	text-decoration:none;
 	background-color:inherit;
 }
@@ -58,7 +269,7 @@ input[type=button]:active,input[type=button]:hover,input[type=submit]:active,inp
 	background-color: white;
 }
 
-/* container layout */
+/* container layout *_/
 body, html
 {
 	margin:0;
@@ -169,9 +380,9 @@ body
 }
 #navigation a:hover
 {
-	/*background:#80b0da;*/
-	/*color:#ffffff;*/
-	background:#FFEE00; /*#ff6f00;*/
+	/*background:#80b0da;*_/
+	/*color:#ffffff;*_/
+	background:#FFEE00; /*#ff6f00;*_/
 	color:#000000;
 	text-decoration:none;
 }
@@ -315,7 +526,7 @@ body
 
 #dropArea .sensorName:hover
 {
-	background-color: white;/*#F0F000;*/
+	background-color: white;/*#F0F000;*_/
 	border-left-color: #FFE2BF;
 }
 
@@ -387,7 +598,7 @@ html>body #vsmenu div a
 	color:red;
 }
 
-/* specific style for vsbox and core bellow */
+/* specific style for vsbox and core bellow *_/
 .tooltip
 {
 	border: 1px solid #FFA84C;
@@ -474,7 +685,7 @@ html>body #vsmenu div a
 
 .vsbox dd img
 {
-	/*height:150px;*/
+	/*height:150px;*_/
 }
 
 .vsbox input[type=submit], .vsbox dl p
@@ -579,7 +790,7 @@ html>body #vsmenu div a
 
 
 
-/* Date picker specific styles follow */
+/* Date picker specific styles follow *_/
 
 a.date-picker
 {
@@ -622,7 +833,7 @@ div.popup-calendar
 	position: absolute;
 	z-index: 2;
 	top: 0;
-	left: -16px; /* value for IE */
+	left: -16px; /* value for IE *_/
 	padding: 4px;
 	border: 2px solid #FFA84C;
 	background: #fff;
@@ -634,7 +845,7 @@ div.popup-calendar
 
 html>body div.popup-calendar
 {
-	left: 99px; /* value for decent browsers */
+	left: 99px; /* value for decent browsers *_/
 }
 
 div.popup-calendar div.link-close
@@ -733,7 +944,7 @@ input.date-picker
 .chart
 {
 	text-align:center;
-	border: 2px solid #404040;//#FFC29F;
+	border: 2px solid #404040;
 	background-color: #303030;
 	padding: 10px;
 }
@@ -769,4 +980,4 @@ input.date-picker
 {
 	float: left;
 }
-
+*/

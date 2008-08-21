@@ -1,5 +1,5 @@
 <div id="refresh_bar">
-    <%  @refresh_time = params[:refresh_time].nil? ? '60' : params[:refresh_time] %>
+    <%  @refresh_time = session[:refresh_time].nil? ? '60' : session[:refresh_time] %>
     <span>Auto-refresh every :</span>
     <select id="refresh_bar_selector">
 	<%= options_for_select({:disable => '0', :'1sec'  => '1', :'5sec'  => '5', :'30sec' => '30', :'1min'  => '60', :'10min' => '600', :'1hour' => '3600'}, @refresh_time) %>
