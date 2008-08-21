@@ -1,0 +1,57 @@
+\subsection{Voip Notification \vs \label{voip:vsp}}
+
+This virtual sensor implements a phone call notification. The virtual sensor makes a phone call when a condition 
+in the virtual sensor query is triggered. The virtual sensor is configured to work with Asterisk\footnote{\url{http://www.asterisk.org/}}. So, you will need to install\footnote{\url{http://www.trixbox.org/downloads}} or have an existing asterisk server running. To configure the sensor with asterisk you will need to add the following line: \textit{``\#include extensions\_gsn.conf''} to the \textit{extensions\_custom.conf} file in asterisk (/etc/asterisk/extensions\_custom.conf). Once the virtual sensor is deployed, it automatically creates a dial plan in asterisk and registers extensions needed to make the phone calls, minimal configuration is required.
+This will include the any extensions created by the virtual sensor in the file \textit{extensions\_gsn.conf}. Depending on the number of times the virtual sensor is deployed, an extension with the virtual sensor name and a random extension number (internal to asterisk) will be created.
+The virtual sensor uses the Manager API to connect (login) to asterisk and execute remote commands (e.g. load dial plan, make phone call, call forward). To loging to the asterisk manager, you have to create an account and add your IP address in the \textit{manager.conf} file in asterisk (/etc/asterisk/manager.conf):
+
+\begin{bashcode}[caption={Settings for Manager.conf file in Asterisk}, label=listing:bash:voip_vsd]
+[testuser]
+secret = mypassword
+permit=192.168.12.101/255.255.0.0
+read = system,call,log,verbose,command,agent,user
+write = system,call,log,verbose,command,agent,user
+\end{bashcode}
+
+Where, \textit{testuser} is the username and \textit{secret} is the password. In \textit{permit} add your IP address (otherwise asterisk will block you). As part of asterisk, you will also need to install the \textit{festival} text to speech system\footnote{\url{http://www.cstr.ed.ac.uk/projects/festival/}} and the \textit{sox} utility\footnote{\url{http://sox.sourceforge.net/}}. These programs are used by the virtual sensor to convert the notification message (string) to speech (audio) to be played by asterisk. If using linux/ubuntu, do an  \textit{``apt-get install festival sox''}.
+
+This \vs is based on the \chapref{voip:vsp} \vsp and the \chapref{multiformat:wrapper} \wrapper.
+The \listingref{listing:xml:voip_vsd} shows an example of \vsd for this \vs.
+
+\begin{xmlcode}[caption={Sample of VoIP VSD file}, label=listing:xml:voip_vsd]
+<virtual-sensor name="phone" priority="10">
+	<processing-class>
+	<class-name>gsn.vsensor.VoipVirtualSensor</class-name>
+		<init-params>
+			<param name="username">testuser</param>
+			<param name="password">mypassword</param>
+			<param name="host">asterisk-server.com</param>
+			<param name="number">0041786831809</param>
+			<param name="message">The temperature in the lab is too high.</param>
+		</init-params>
+		<output-structure>
+			<field name="temperature" type="double" />
+		</output-structure>
+	</processing-class>
+	<description>Makes a phone call when a query in the virtual sensor is satisfied.</description>
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key=""></predicate>
+	</addressing>
+	<storage history-size="1h" />
+  <streams>
+    <stream name="input1">
+    <source alias="source1" sampling-rate="1" storage-size="1">
+      <address wrapper="multiformat">
+          <predicate key="HOST">localhost</predicate>
+          <predicate key="PORT">22001</predicate>
+      </address>
+      <query>SELECT temperature, timed FROM wrapper WHERE packet_type=2</query>
+    </source>
+    <query>SELECT temperature, timed FROM source1</query>
+    </stream> 
+  </streams>
+</virtual-sensor>
+\end{xmlcode}
+
+Note that this virtual sensor will only work if you have an account with a mobile phone operator or an internet SMS gateway provider. 
