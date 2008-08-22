@@ -11,8 +11,7 @@ documentation in addition to being described in the lession 4 of the TinyOS 2
 tutorial
 \footnote{Further informations can be found at\\ \url{http://www.tinyos.net/tinyos-1.x/doc/nesc/mig.html}\\ \url{http://www.tinyos.net/tinyos-2.x/doc/html/tutorial/lesson4.html}\\ \url{http://www.tinyos.net/tinyos-1.x/doc/tutorial/lesson6.html}}.
 
-Due to strange java package management in
-TinyOS 2.x distribution, both TinyOS 1.x and 2.x are using very same package structures and class names which generates conflict when 
+Both TinyOS 1.x and 2.x are using very same package structures and class names which generates conflict when 
 you have both TinyOS1.x and 2.x jar files in your classpath (which is the case for \gsn).
 To solve this issue, \gsn provides a slightly modified version of the TinyOS 1.x java tools by renaming the \inlinecode{net.tinyos.xxx} package to \inlinecode{net.tinyos1x.xxx}.
 Thus the messages classes generated with MIG must be configured depending on the version of TinyOS your are using. The \tableref{table:tinyos_mig_version} shows the class that your
