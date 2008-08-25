@@ -1,6 +1,6 @@
 <project name="gsn" default="build" basedir=".">
    <property name="safe-storage-port" value="25000"/>
-   <property name="safe-storage-controller-port" value="25012"/>
+   <property name="sa	fe-storage-controller-port" value="25012"/>
 	<property name="gsn-controller-port" value="22232"/>
    <target name="init" description="initializes properties and initialization tasks">
       <tstamp>
@@ -279,11 +279,15 @@
 			<sysproperty key="jruby.lib" value="${basedir}/ruby_gems/lib" />
 			<sysproperty key="jruby.base" value="${basedir}/ruby_gems" />
 			<sysproperty key="jruby.home" value="${basedir}/ruby_gems" />
+			<jvmarg value="-Djruby.fork.enabled=true" /> <!-- For Running JUnit Tests.-->
 		</java>
 		
 	</target>
 	
     <target name="install" depends="bind">
+    	 <delete includeEmptyDirs="yes" failonerror="no">
+    	         <fileset dir="ruby_gems" includes="**/**"/>
+    	</delete>
     	<mkdir dir="ruby_gems"/>
     	<java classname="org.jruby.Main"  fork="true" dir="${basedir}" classpathref="classpath">
     		<arg value="-S" />
@@ -295,7 +299,6 @@
     		<arg value="actionpack" />
     		<arg value="actionmailer" />
     		<arg value="activeresource" />
-
     		<arg value="rails" />
     		<arg value="mongrel" />
     		<arg value="jruby-openssl" />
@@ -303,24 +306,44 @@
     		<arg value="jdbc-wrapper" />
     		<arg value="activerecord-jdbc-adapter" />
     		<arg value="jdbc-h2" />
+    		<arg value="jdbc-mysql" />
     		<arg value="activerecord-jdbch2-adapter" />
+    		<arg value="activerecord-jdbcmysql-adapter" />
     		<arg value="--install-dir" />
     		<arg value="ruby_gems" />
     		<arg value="--no-ri" />
     	 	<arg value="--no-rdoc" />
     	</java>  
 	</target>
-	 
+	
+	
+	<target name="migrate" depends="setup">
+	    	<java classname="org.jruby.Main"  fork="true" dir="${basedir}\web_app" classpathref="classpath">
+	    		<arg value="-r" />
+	    		<arg value="env_setup.rb" />
+	    		<arg value="-S" />
+	    		<arg value="rake" />
+	    		<arg value="db:migrate" />
+		   		<jvmarg value="-Djruby.lib=${basedir}/ruby_gems/lib" />
+		   	    <jvmarg value="-Djruby.home=${basedir}/ruby_gems" />
+		   	    <jvmarg value="-Djruby.base=${basedir}/ruby_gems" />
+	    	</java>  
+	</target>
+		 
 
 
     <target name="rails2" depends="bind">
         <java classname="org.jruby.Main"  fork="true" dir="${basedir}/web_app" classpathref="classpath">
 		 <sysproperty key="jruby.lib" value="${basedir}/ruby_gems/lib" />
-                 <sysproperty key="jruby.base" value="${basedir}/ruby_gems" />
-                 <sysproperty key="jruby.home" value="${basedir}/ruby_gems" />
-                <arg value="-S" />
-                <arg value="script/server" />
-        </java>
+         <sysproperty key="jruby.base" value="${basedir}/ruby_gems" />
+         <sysproperty key="jruby.home" value="${basedir}/ruby_gems" />
+	     <jvmarg value="-Djruby.lib=${basedir}/ruby_gems/lib" />
+	     <jvmarg value="-Djruby.home=${basedir}/ruby_gems" />
+	     <jvmarg value="-Djruby.base=${basedir}/ruby_gems" />
+	     <jvmarg value="-Djruby.fork.enabled=true" />
+	     <arg value="-S" />
+         <arg value="script/server" />
+    </java>
         </target>
 
 

@@ -4,6 +4,9 @@ require 'roxml' # jruby -S gem install roxml
 require 'jdbc'  # jruby -S gem install jdbc-wrapper
 
 class GsnController < ApplicationController
+	
+  protect_from_forgery :except => :notify 
+	
   def test
     p CONTAINER_CONFIG.jdbc_username
     puts VS_ENABLED.size
@@ -99,6 +102,13 @@ class GsnController < ApplicationController
       Java::gsn.GSNRequestHandler::register_query params[:remote_host],params[:remote_port].to_i,params[:name],params[:query],params[:code].to_i    
     end
     render :text => "query:#{params[:query]} registered.", :layout => false,:status => 200
+  end
+  
+  def notify
+  	puts 'called'
+  	puts params[:code]
+  	params.each {|key,value| puts "#{key} ==== #{value}" }
+  	render :text => "Accepted.", :layout => false,:status => 201
   end
 	
 end

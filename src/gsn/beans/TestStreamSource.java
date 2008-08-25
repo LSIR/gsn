@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import gsn.Main;
 import gsn.beans.windowing.WindowType;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
@@ -16,6 +17,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -29,8 +32,9 @@ public class TestStreamSource {
    
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		DriverManager.registerDriver( new org.h2.Driver( ) );
-		StorageManager.getInstance ( ).init ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
+	  PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
+	  DriverManager.registerDriver( new org.h2.Driver( ) );
+		StorageManager.getInstance ( ).init ( "org.h2.Driver","sa","" ,"jdbc:h2:mem:." );
 		
 	}
 

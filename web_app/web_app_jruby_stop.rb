@@ -1,4 +1,4 @@
-puts "Starting GSN's Rails Interface"
+puts "Stopping GSN's HTTP Interface"
 
 $LOAD_PATH << 'META-INF/jruby.home/lib/ruby/site_ruby/1.8'
 

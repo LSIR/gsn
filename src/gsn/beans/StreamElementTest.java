@@ -45,6 +45,7 @@ public class StreamElementTest {
     post.setRequestEntity(new MultipartRequestEntity(toRest,post.getParams()));
     HttpClient client = new HttpClient();
     int status = client.executeMethod(post);
+    System.out.println(post.getResponseBodyAsString());
     assertEquals(201,status);
     
       
