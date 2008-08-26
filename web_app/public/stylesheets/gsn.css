@@ -123,13 +123,107 @@ div.fieldWithErrors {
 #sidebar #login_box .textfield,
 #sidebar #login_box .passwordfield { width: 100%; }
 
+/* search bar */
+
+#search_vs_bar {
+    width: auto;
+    text-align: center;
+}
+
+#search_vs_bar #search-vs-field {
+    width: 60%;
+    margin: 10px;
+    padding: 3px;
+}
+
+#search-vs-results {
+    border: 2px solid #ffa84c;
+    background-color: #ffe0bf;
+    width: 600px;
+    margin-left: 75px;
+    position: absolute;
+}
+
+.result-vs {
+    padding: 4px;
+    margin: 4px;
+    border: 1px solid #ffa84c;
+}
+
+/* pagination */
+
+.pagination {
+  margin: 0;
+  background: white;
+}
+
+.pagination a, .pagination span {
+    padding: .2em .5em;
+    display: block;
+    float: left;
+    margin-right: 1px;
+}
+
+.pagination span.disabled {
+    color: #999;
+    border: 1px solid #DDD;
+}
+
+.pagination span.current {
+    font-weight: bold;
+    background: #2E6AB1;
+    color: white;
+    border: 1px solid #2E6AB1;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #105CB6;
+    border: 1px solid #9AAFE5;
+}
+
+.pagination a:hover, .pagination a:focus {
+      color: #003;
+      border-color: #003;
+}
+
+.pagination .page_info {
+    background: #2E6AB1;
+    color: white;
+    padding: .4em .6em;
+    width: 22em;
+    margin-bottom: .3em;
+    text-align: center;
+}
+
+.pagination .page_info b {
+      color: #003;
+      background: #6aa6ed;
+      padding: .1em .25em;
+}
+
+.pagination:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+* html .digg_pagination {
+    height: 1%;
+}
+
+*:first-child+html .pagination {
+    overflow: hidden;
+}
+
 /* navigation */
 
 #navigation {
 	height:2.2em;
 	line-height:2.2em;
 	background:#ffa84c;
-	margin: 0;
 }
 
 #navigation ul { margin:0; padding:0; }

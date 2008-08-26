@@ -1,0 +1,8 @@
+<% for vs in @page_results -%>
+    <div class="result-vs" id="result-vs-<%= vs.get_name %>">
+	<h4><%= vs.get_name %></h4>
+	<p>Enabled or not, position, ..</p>
+    </div>
+<% end -%>
+<%= will_paginate @page_results, :renderer => 'RemoteLinkRenderer', :remote => {:update => 'search-vs-results', :with => "'search_criteria=' + $('search-vs-field').value"} %>
+<%= page_entries_info page_results, :entry_name => 'item' %>
