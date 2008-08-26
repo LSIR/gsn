@@ -9,14 +9,3 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20080819141844) do
-
-  create_table "gsn_users", :force => true do |t|
-    t.string    "email",           :limit => 60, :null => false
-    t.string    "hashed_password",               :null => false
-    t.string    "salt",                          :null => false
-    t.timestamp "created_at",                    :null => false
-    t.timestamp "updated_at",                    :null => false
-  end
-
-end
