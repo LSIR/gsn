@@ -16,21 +16,21 @@ class ApplicationController < ActionController::Base
   # Uncomment this to filter the contents of submitted sensitive data parameters
   # from your application log (in this case, all fields with names like "password"). 
   # filter_parameter_logging :password
-  
-#  CONTAINER_CONFIG = Java::gsn.Main::load_container_configuration
+
+  CONTAINER_CONFIG = Java::gsn.Main::load_container_configuration
 
   #private:
- # 	vs_list = Java::gsn.gui.util::VSensorIOUtil.new('virtual-sensors/', 'virtual-sensors/Disabled/')
- # 	enabled_vs_files = vs_list.read_virtual_sensors
-#	disabled_vs_files = vs_list.read_disabled_virtual_sensors
+  	vs_list = Java::gsn.gui.util::VSensorIOUtil.new('virtual-sensors/', 'virtual-sensors/Disabled/')
+  	enabled_vs_files = vs_list.read_virtual_sensors
+	disabled_vs_files = vs_list.read_disabled_virtual_sensors
 	
   #public:
-#	VS_ENABLED = Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(enabled_vs_files)
-#	VS_NAME_TO_CONFIG = {}
-#	VS_ENABLED.each {|k| VS_NAME_TO_CONFIG[k[1].name.chomp.upcase] = k[1] }
-#	VS_DISABLED =  Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(disabled_vs_files)
-#	STORAGE_MANAGER = Java::gsn.storage::StorageManager.getInstance()
-#	STORAGE_MANAGER.init(CONTAINER_CONFIG.jdbc_driver, CONTAINER_CONFIG.jdbc_username, CONTAINER_CONFIG.jdbc_password, CONTAINER_CONFIG.jdbc_url)
+	VS_ENABLED = Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(enabled_vs_files)
+	VS_NAME_TO_CONFIG = {}
+	VS_ENABLED.each {|k| VS_NAME_TO_CONFIG[k[1].name.chomp.upcase] = k[1] }
+	VS_DISABLED =  Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(disabled_vs_files)
+	STORAGE_MANAGER = Java::gsn.storage::StorageManager.getInstance()
+	STORAGE_MANAGER.init(CONTAINER_CONFIG.jdbc_driver, CONTAINER_CONFIG.jdbc_username, CONTAINER_CONFIG.jdbc_password, CONTAINER_CONFIG.jdbc_url)
 
   # Check authorizations
   def authorize

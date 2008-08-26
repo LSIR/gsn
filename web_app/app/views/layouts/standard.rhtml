@@ -8,7 +8,8 @@
 	<title>GSN</title>
 	<%= stylesheet_tag 'gsn', :media =>'screen,projection' %>
 	<!-- TODO add the javascript depending on the action / see the possibility to cache those scripts in ROR -->
-	<%= javascript_include_tag :defaults %>
+	<!-- DEPLOYEMENT > Change the 'jquery-1.2.6' lib to the minified 'jquery-1.2.6.min'  -->
+	<%= javascript_include_tag :defaults, 'jquery-1.2.6' %>
     </head>
     <body>
 	<div id="container">

@@ -3,7 +3,7 @@ require 'java'
 
 class ManagementController < ApplicationController
 
-  before_filter :authorize, :except => :login
+  before_filter :authorize, :except => { :login => :logout }
 
   def index
     render :nothing=>true

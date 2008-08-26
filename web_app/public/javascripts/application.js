@@ -1,6 +1,14 @@
-var list_of_active_vs   = new Array();
-var list_of_unactive_vs = new Array();
+/*
+ * Let the Protoype lib handling the $() selector.
+ * Use $j() to access the jQuery selector.
+ */
+$j = jQuery.noConflict();
 
-function navigate_in_vs_details (vs_detail_tag_id,pane_to_activate) {
-    alert($(vs_detail_tag_id))
-}
+
+/* Use this to add behavior to DOM elements once the page is loaded. */
+jQuery(function() {
+    /*
+     * $j("#container #main").hide();
+     * alert('Content hidden by jQuery');
+     */
+})
