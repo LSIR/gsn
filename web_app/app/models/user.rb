@@ -2,6 +2,8 @@ require 'digest/sha1'
 
 class User < ActiveRecord::Base
 
+  set_table_name	    "gsn_users"
+
   validates_presence_of	    :email
   validates_uniqueness_of   :email
   validates_format_of	    :email,	:with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
