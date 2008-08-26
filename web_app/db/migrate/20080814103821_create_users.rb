@@ -1,6 +1,6 @@
 class CreateUsers < ActiveRecord::Migration
   def self.up
-    create_table :users do |t|
+    create_table    :gsn_users do |t|
       t.string	    :email,		:null => false,	:limit => 60
       t.string	    :hashed_password,	:null => false
       t.string	    :salt,		:null => false
