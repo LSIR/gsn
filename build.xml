@@ -284,7 +284,17 @@
 		
 	</target>
 	
-    <target name="install" depends="bind">
+	<target name="prepare-install">
+		<java classname="org.jruby.Main"  fork="true" dir="${basedir}" classpathref="classpath">
+    		<arg value="-S" />
+    		<arg value="gem" />
+    		<arg value="sources" />
+    		<arg value="-a" />
+    		<arg value="http://gems.github.com" />
+    	</java>  
+	</target>
+	
+    <target name="install" depends="bind,prepare-install">
     	 <delete includeEmptyDirs="yes" failonerror="no">
     	         <fileset dir="ruby_gems" includes="**/**"/>
     	</delete>
@@ -303,6 +313,7 @@
     		<arg value="mongrel" />
     		<arg value="jruby-openssl" />
     		<arg value="roxml" />
+    		<arg value="mislav-will_paginate" />
     		<arg value="jdbc-wrapper" />
     		<arg value="activerecord-jdbc-adapter" />
     		<arg value="jdbc-h2" />
