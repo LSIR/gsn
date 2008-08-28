@@ -1,28 +1,31 @@
-<virtual-sensor name="MultiFormatTemperatureHandler" priority="10" >
-    <processing-class>
+<virtual-sensor name="MultiFormatTemperatureHandler" priority="10">
+	<processing-class>
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
-		<init-params/>
+		<init-params />
 		<output-structure>
-        <field name="temperature" type="double"/>
-       </output-structure>
+			<field name="light" type="double"/>
+      <field name="temperature" type="double"/>
+      <field name="packet_type" type="int"/>       			
+		</output-structure>
 	</processing-class>
-        <description>Presents how you can have a virtual sensor handling and parsing only a specific groups of packets produced by a wrapper.</description>
-        <life-cycle pool-size="10" />
-        <addressing>
-	        	<predicate key="geographical">Not Specified, please edit the file $INSTALL_PATH/virtual-sensors/localTimeVS.xml.</predicate>
-    	  </addressing>
-        
-        <storage history-size="1m" />
-        <streams>
-           <stream name="input1">
-            <source alias="source1" sampling-rate="1" storage-size="1">
-                <address wrapper="multiformat">
-                    <predicate key="HOST">localhost</predicate>
-                    <predicate key="PORT">22001</predicate>
-                </address>
-                <query>select temperature, timed from wrapper  where packet_type=2</query>
-            </source>
-            <query>select temperature, timed from source1</query>
-        </stream> 
-        </streams>
-</virtual-sensor> 
+	<description>This sensor simulates light and temperature readings every one second.</description>
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">Sensor 114 @ EPFL</predicate>
+    <predicate key="LATITUDE">46.520000</predicate>
+    <predicate key="LONGITUDE">6.565000</predicate>			
+	</addressing>
+	<storage history-size="5m"/>
+	<streams>
+		<stream name="input1">
+			<source alias="source1" sampling-rate="1" storage-size="1">
+				<address wrapper="multiformat">
+					<predicate key="HOST">localhost</predicate>
+					<predicate key="PORT">22001</predicate>
+				</address>
+				<query>SELECT light, temperature, packet_type, timed FROM wrapper</query>
+			</source>
+			<query>SELECT light, temperature, packet_type, timed FROM source1</query>
+		</stream>
+	</streams>
+</virtual-sensor>
