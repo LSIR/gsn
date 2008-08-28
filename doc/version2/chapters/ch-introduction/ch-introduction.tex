@@ -41,7 +41,7 @@ Standard Query Language (SQL). Using it for basic operations is fairly
 intuitive and you should be able to start using it from the examples
 provided in this document.
 
-\section{Installing GSN (binary)}
+\section{Installing GSN from binary}
 
 Due to the quick development cycle of GSN, you should install the
 latest version.  It can always be found at
@@ -59,20 +59,15 @@ modify the supplied configuration file conf/gsn.xml to select the
 database that you will be using. To use the in memory database ensure
 that the following line is uncommented:
 
-\texttt{\begin{math}<\end{math}storage user="sa" password=""
-driver="org.hsqldb.jdbcDriver"
-url="jdbc:hsqldb:MEM:."/\begin{math}>\end{math}}
+\begin{bashcode}[caption={Database configuration in GSN.}, label=listing:bash:dbconfig]
+\texttt{\begin{math}<\end{math}storage user="sa" password="" driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:MEM:."/\begin{math}>\end{math}}
+\end{bashcode}
 
+This version includes no tools to run the GSN graphical user interface.
 
+\section{Installing GSN from source}
 
-This version includes no tools to run the GSN Gui.
-
-\section{Installing GSN (source)}
-
-If you wish to run the most recent version of GSN (or run the Gui),
-then you will need to run the source code version which is available
-from the SVN repository at
-\url{http://gsn.svn.sourceforge.net/viewvc/gsn/}.
+If you wish to run the most recent version of GSN (or run the GUI), then you will need to run the source code version which is available from the SVN repository at \url{http://gsn.svn.sourceforge.net/viewvc/gsn/}.
 
 \subsection{To run from a command line}
 
@@ -80,19 +75,12 @@ from the SVN repository at
 	\item Download the Jakarta apache ant version 1.7.x or higher.
 	\item Add ANT\_HOME/bin to your PATH.
 	\item Ensure you have the latest version Sun JDK installed.
-	\item Download and install TortoiseSVN (for windows) or SmartSvn (os
+	\item Download and install TortoiseSVN (for Windows) or SmartSvn (OS
 independent) or a command line SVN client:
 	\item svn co https://gsn.svn.sourceforge.net/svnroot/gsn/trunk gsn
 	\item Check out the GSN source code from link -
 \url{https://gsn.svn.sourceforge.net/svnroot/gsn}
-	\item Download the JMF, unzip and copy it to the same folder as the GSN
-files.
-	\item Here are the list of ant tasks:
 \end{itemize}
-
-
-
-Table  - GSN Ant Commands
 
 \setlength{\tymin}{10pt}
 \setlength{\tymax}{0.8\textwidth}
@@ -108,37 +96,37 @@ Name Description
  \\
 \hline
 
-Gsn
+gsn
  & 
 Starts the GSN server.
  \\
 \hline
 
-Restart
+restart
  & 
 Stops any running GSN server and starts it again.
  \\
 \hline
 
-Stop
+stop
  & 
 Stops the currently runing GSN server.
  \\
 \hline
 
-Gui
+gui
  & 
-Starts the GSN Gui
+Starts the GSN graphical user interface.
  \\
 \hline
 
-Jar
+jar
  & 
 Creates a jar \_le from the source.
  \\
 \hline
 
-Clean
+clean
  & 
 Removes the current build files and forces a rebuild. You may need to
 run this task once you TODO Something missing in existing pdf
@@ -148,16 +136,15 @@ run this task once you TODO Something missing in existing pdf
 cleandb
  & 
 Removes the redundant tables which are create for holding GSN's
-internal states. You can ru TODOSomething missing in existing pdf
+internal states.
  \\
 \hline
 \end{tabulary}
-}\caption{\todo{FIX CAPTION}}
+}\caption{List of Ant tasks for GSN.}
 \label{table:gsn_ant_tasks}
 \end{table*}
 
-{\footnotesize To run any of the aforementioned ant tasks simply
-write: ant task\_name}
+To run any of the aforementioned ant tasks simply write: ant task\_name.
 
 \subsection{Installing to Run and debug GSN in Eclipse.}
 
@@ -167,7 +154,7 @@ environment.
 \begin{itemize}
 	\item Download and install Eclipse SDK
 	\item Start Eclipse;
-	\item Download and install the Subclipse
+	\item Download and install the Subclipse\footnote{This guide works for Eclipse 3.2, for Eclipse 3.4 the steps have changed slightly.}
 (\url{http://subclipse.tigris.org/install.html});
 	\item File -\begin{math}>\end{math} Import -\begin{math}>\end{math} Other
 -\begin{math}>\end{math} Checkout Projects from SVN;
@@ -219,7 +206,7 @@ Path\textquotedblright{};
 
 \end{itemize}
 
-GSN is now ready to Run
+GSN is now ready to Run.
 
 Refer also to the \textquotedblleft{}How to Install Eclipse, Subclipse
 and GSN, Step-by-step walkthrough\textquotedblright{} on the GSN
