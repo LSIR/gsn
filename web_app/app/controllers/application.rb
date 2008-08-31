@@ -3,6 +3,8 @@ require 'java'
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+
+  
   helper :all # include all helpers, all the time
 
   # See ActionController::RequestForgeryProtection for details
@@ -17,7 +19,7 @@ class ApplicationController < ActionController::Base
   # from your application log (in this case, all fields with names like "password"). 
   # filter_parameter_logging :password
 
-  CONTAINER_CONFIG = Java::gsn.Main::load_container_configuration
+  CONTAINER_CONFIG = Java::gsn.Main::loadContainerConfig("#{RAILS_ROOT}/../conf/gsn.xml")
 
   #private:
   	vs_list = Java::gsn.gui.util::VSensorIOUtil.new('virtual-sensors/', 'virtual-sensors/Disabled/')
