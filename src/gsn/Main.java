@@ -196,12 +196,15 @@ public final class Main {
     }
   }
 
-  private static ContainerConfig loadContainerConfig (String path) throws JiBXException, FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
+  /**
+   * This method is called by Rails's Application.rb file.
+   */
+  public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws JiBXException, FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
     IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
     IUnmarshallingContext uctx = bfact.createUnmarshallingContext ( );
-    ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( path ) ) , null );
+    ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( gsnXMLpath ) ) , null );
     Class.forName(conf.getJdbcDriver());
-    conf.setContainerConfigurationFileName (  path );
+    conf.setContainerConfigurationFileName (  gsnXMLpath );
     return conf;
   }
 
