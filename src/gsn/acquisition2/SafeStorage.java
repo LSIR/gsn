@@ -1,19 +1,17 @@
 package gsn.acquisition2;
 
-import gsn.Main;
 import gsn.acquisition2.messages.HelloMsg;
 import gsn.acquisition2.wrappers.AbstractWrapper2;
 import gsn.beans.AddressBean;
 import gsn.wrappers.WrappersUtil;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
-
 import org.apache.log4j.Logger;
 import org.apache.mina.common.IoSession;
 
@@ -27,19 +25,22 @@ public class SafeStorage {
   
   private SafeStorageDB storage ;
   
+  private Hashtable<String, AbstractWrapper2> loadedWrappers;
+  
   public SafeStorage(int safeStoragePort) throws ClassNotFoundException, SQLException {
 
 	  storage = new SafeStorageDB(safeStoragePort);		
 	  wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>(),SAFE_STORAGE_WRAPPERS_PROPERTIES);
 	  storage.executeSQL("create table if not exists SETUP (pk INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, table_name varchar not null unique, requester varchar not null unique,created_at TIMESTAMP default CURRENT_TIMESTAMP() not null )");
 	  storage.executeSQL("create table if not exists HELLO (wrapper_id VARCHAR NOT NULL PRIMARY KEY, hellomsg OTHER NOT NULL)");
-
+	  loadedWrappers = new Hashtable<String, AbstractWrapper2>();	  
+	  
 	  Iterator<HelloMsg> iter = getHelloMessages().iterator();
 	  HelloMsg hello = null;
 	  while (iter.hasNext()) {
 		  hello = iter.next();
 		  String wrapper_name = hello.getWrapperDetails().getPredicateValue("wrapper-name" );
-		  logger.debug("Resuming the wrapper: " + wrapper_name + " for requester: " + hello.getRequster());
+	      logger.warn("Resuming Wrapper: " + wrapper_name + " (requester: " + hello.getRequster() + ") for resume feature");
 		  try {
 			  prepareWrapper(hello, null);
 		  } catch (InstantiationException e) {
@@ -77,7 +78,13 @@ public class SafeStorage {
     	keepProcessed = Boolean.parseBoolean(wrapper_keep_processed_ss_entries);
     }
     
-    AbstractWrapper2 wrapper = ( AbstractWrapper2 )(getWrapperClass ( wrapper_name )).newInstance ( );
+    AbstractWrapper2 wrapper = loadedWrappers.get(helloMsg.getRequster());
+    if (wrapper != null) {
+    	logger.debug("Wrapper: " + wrapper_name + " (requester: " + helloMsg.getRequster() + ") is already running");
+    	return wrapper;
+    }
+    		
+    wrapper = ( AbstractWrapper2 )(getWrapperClass ( wrapper_name )).newInstance ( );
     if (wrapper ==null) {
       logger.error("The requested wrapper: "+wrapper_name+" doesn't exist.");
     }
@@ -85,20 +92,19 @@ public class SafeStorage {
     boolean initializationResult = wrapper.initialize (  );
     if ( initializationResult == false ) {
        //if (network != null) network.close();
-       return null; 
+       return null;
     }
     try {
       String table_name = storage.prepareTableIfNeeded(helloMsg.getRequster());
 
-      String wrapper_id = wrapper_name + table_name + helloMsg.getRequster();
-      logger.warn("Saving wrapper: " + table_name + " for resume feature wrapper_id: " + wrapper_id);
       PreparedStatement psave = storage.createPreparedStatement("INSERT INTO hello VALUES (?,?)");
       PreparedStatement pis = storage.createPreparedStatement("SELECT * FROM hello where wrapper_id=?");
 
-      pis.setString(1, wrapper_id);
+      pis.setString(1, helloMsg.getRequster());
       ResultSet rs = pis.executeQuery();
       if (! rs.next()) {
-    	  psave.setString(1, wrapper_id);
+    	  logger.warn("Saving Wrapper: " + wrapper_name + " (requester: " + helloMsg.getRequster() + ") for resume feature");
+    	  psave.setString(1, helloMsg.getRequster());
     	  psave.setObject(2, helloMsg);
     	  psave.execute();
     	  psave.close();
@@ -116,6 +122,8 @@ public class SafeStorage {
       return null;
     } 
     wrapper.start ( );
+    loadedWrappers.put(helloMsg.getRequster(), wrapper);
+    logger.debug("Wrapper: " + wrapper_name + " (requester: " + helloMsg.getRequster() + ") is now running");
     return wrapper;
   }
   

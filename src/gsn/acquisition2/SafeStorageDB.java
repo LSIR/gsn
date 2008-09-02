@@ -46,6 +46,7 @@ public class SafeStorageDB {
   }
   
   public String prepareTableIfNeeded(String requester) throws SQLException {
+	// requester like: ss_mem_vs/data/mem2
     final Statement stmt = connection.createStatement();
     ResultSet rs = stmt.executeQuery("select table_name from SETUP where requester = '"+requester+"'");
     String toReturn = null;
