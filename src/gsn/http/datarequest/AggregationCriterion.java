@@ -1,9 +1,7 @@
 package gsn.http.datarequest;
 
 import gsn.utils.Helpers;
-
 import java.util.Hashtable;
-import javax.servlet.ServletException;
 
 public class AggregationCriterion extends AbstractCriterion {
 
@@ -28,11 +26,11 @@ public class AggregationCriterion extends AbstractCriterion {
 	 * @param inlinecrits
 	 * @throws ServletException
 	 */
-	public AggregationCriterion (String inlinecrits) throws ServletException {
+	public AggregationCriterion (String inlinecrits) throws DataRequestException {
 
 		String[] crits = inlinecrits.split(":");
 
-		if (crits.length != 2) throw new ServletException (GENERAL_ERROR_MSG + " >" + inlinecrits + "<.") ;
+		if (crits.length != 2) throw new DataRequestException (GENERAL_ERROR_MSG + " >" + inlinecrits + "<.") ;
 
 		critTimeRange		= crits[0];
 		critGroupOperator	= getCriterion(crits[1], allowedGroupOperator);

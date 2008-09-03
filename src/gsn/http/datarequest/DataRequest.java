@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 /**
@@ -61,16 +60,16 @@ public class DataRequest {
 
 	private Hashtable<String, AbstractQuery> sqlQueries ;
 
-	public DataRequest (HttpServletRequest request) throws ServletException {
-		parseParameters(request);
+	public DataRequest (Map<String, String[]> requestParameters) throws DataRequestException {
+		parseParameters(requestParameters);
 		buildSQLQueries () ;
 	}
 
-	private void parseParameters (HttpServletRequest request) throws ServletException {
+	private void parseParameters (Map<String, String[]> requestParameters) throws DataRequestException {
 
-		String[] vsnamesParameters = request.getParameterValues(PARAM_VSNAMES_AND_FIELDS);
+		String[] vsnamesParameters = requestParameters.get(PARAM_VSNAMES_AND_FIELDS);
 
-		if (vsnamesParameters.length == 0) throw new ServletException ("You must specify at least one >" + PARAM_VSNAMES_AND_FIELDS + "< parameter.") ; 
+		if (vsnamesParameters.length == 0) throw new DataRequestException ("You must specify at least one >" + PARAM_VSNAMES_AND_FIELDS + "< parameter.") ; 
 
 		vsnamesAndStreams = new HashMap<String, FieldsCollection> () ;
 		String name;
@@ -89,12 +88,12 @@ public class DataRequest {
 			vsnamesAndStreams.put(name, new FieldsCollection (streams));
 		}
 
-		String ac = request.getParameter(PARAM_AGGREGATE_CRITERIA);
+		String ac = getParameter(requestParameters, PARAM_AGGREGATE_CRITERIA);
 		if (ac != null) {
 			this.aggregationCriterion = new AggregationCriterion (ac) ;
 		}
 
-		String[] cc = request.getParameterValues(PARAM_STANDARD_CRITERIA);
+		String[] cc = requestParameters.get(PARAM_STANDARD_CRITERIA);
 		if (cc != null) {
 			standardCriteria = new ArrayList<StandardCriterion> ();
 			for (int i = 0 ; i < cc.length ; i++) {
@@ -102,7 +101,7 @@ public class DataRequest {
 			}
 		}
 
-		limitCriterion = new LimitCriterion (request.getParameter(PARAM_MAX_NB));
+		limitCriterion = new LimitCriterion (getParameter(requestParameters, PARAM_MAX_NB));
 	}
 
 	public Hashtable<String, AbstractQuery> getSqlQueries() {
@@ -229,5 +228,13 @@ public class DataRequest {
 		public String[] getFields() {
 			return fields;
 		}
+	}
+	
+	/**
+	 * Returns the value of a request parameter as a <code>String</code>, or <code>null</code> if the parameter does not exist.
+	 */
+	private static String getParameter (Map<String, String[]> parameters, String requestedParameter) {
+		String[] rpv = parameters.get(requestedParameter);
+		return (rpv == null || rpv.length == 0) ? null : rpv[0];
 	}
 }

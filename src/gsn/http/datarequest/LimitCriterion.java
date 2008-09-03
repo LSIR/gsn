@@ -1,7 +1,5 @@
 package gsn.http.datarequest;
 
-import javax.servlet.ServletException;
-
 public class LimitCriterion extends AbstractCriterion{
 	
 	private Integer offset,size	;
@@ -15,11 +13,11 @@ public class LimitCriterion extends AbstractCriterion{
 	 * @param inlinecrits
 	 * @return
 	 */
-	public LimitCriterion (String inlinecrits) throws ServletException {
+	public LimitCriterion (String inlinecrits) throws DataRequestException {
 		
 		String[] crits = inlinecrits.split(":");
 
-		if (crits.length != 2) throw new ServletException (GENERAL_ERROR_MSG + " >" + inlinecrits + "<.") ;
+		if (crits.length != 2) throw new DataRequestException (GENERAL_ERROR_MSG + " >" + inlinecrits + "<.") ;
 
 		offset	= Integer.parseInt(crits[0]);
 		size	= Integer.parseInt(crits[1]);

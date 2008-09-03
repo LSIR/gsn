@@ -1,11 +1,9 @@
 package gsn.http.datarequest;
 
 import gsn.Main;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
-import javax.servlet.ServletException;
 
 public class StandardCriterion extends AbstractCriterion {
 
@@ -48,11 +46,11 @@ public class StandardCriterion extends AbstractCriterion {
 	 * @param inlinecrits
 	 * @return
 	 */
-	public StandardCriterion (String inlinecrits) throws ServletException {
+	public StandardCriterion (String inlinecrits) throws DataRequestException {
 
 		String[] crits = inlinecrits.split(":");
 
-		if (crits.length != 5) throw new ServletException (GENERAL_ERROR_MSG + " >" + inlinecrits + "<.") ;
+		if (crits.length != 5) throw new DataRequestException (GENERAL_ERROR_MSG + " >" + inlinecrits + "<.") ;
 
 		critJoin 		= getCriterion(crits[0], allowedJoin);
 		critNeg			= getCriterion(crits[1], allowedNeg);
