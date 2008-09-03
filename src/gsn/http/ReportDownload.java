@@ -4,6 +4,7 @@ import gsn.Container;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.http.datarequest.DataRequest;
+import gsn.http.datarequest.DataRequestException;
 import gsn.http.datarequest.DataRequest.FieldsCollection;
 import gsn.reports.ReportManager;
 import gsn.reports.beans.Data;
@@ -55,13 +56,13 @@ public class ReportDownload extends HttpServlet {
 
 	public void doPost (HttpServletRequest req , HttpServletResponse res) throws IOException {
 		try {
-			if (req.getParameter(PARAM_REPORTCLASS) == null) throw new ServletException ("The following >" + PARAM_REPORTCLASS + "< parameter is missing in your query >" + req.getQueryString() + "<.") ;
+			if (req.getParameter(PARAM_REPORTCLASS) == null) throw new DataRequestException ("The following >" + PARAM_REPORTCLASS + "< parameter is missing in your query >" + req.getQueryString() + "<.") ;
 			String reportClass = req.getParameter(PARAM_REPORTCLASS);
 			reportPath = "gsn-reports/" + reportClass + ".jasper";
 			File f = new File (reportPath) ;
-			if (f == null || ! f.exists() || ! f.isFile()) throw new ServletException ("The path to compiled jasper file >" + reportPath + "< is not valid.") ;
+			if (f == null || ! f.exists() || ! f.isFile()) throw new DataRequestException ("The path to compiled jasper file >" + reportPath + "< is not valid.") ;
 			//
-			dr = new DataRequest (req);
+			dr = new DataRequest (req.getParameterMap());
 			//
 			Collection<Report> reports = new ArrayList<Report> ();
 			reports.add(createReport ());
@@ -70,7 +71,7 @@ public class ReportDownload extends HttpServlet {
 			res.setHeader("content-disposition","attachment; filename=" + reportClass + ".pdf");
 			ReportManager.generatePdfReport(reports, reportPath, new HashMap<String, String> (), res.getOutputStream());
 			res.getOutputStream().flush();
-		} catch (ServletException e) {
+		} catch (DataRequestException e) {
 			logger.error(e.getMessage());
 			res.sendError(Container.ERROR_INVALID_VSNAME, e.getMessage());
 			return;

@@ -5,6 +5,7 @@ import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.http.datarequest.DataRequest;
 import gsn.http.datarequest.AbstractQuery;
+import gsn.http.datarequest.DataRequestException;
 import gsn.http.datarequest.DataRequest.FieldsCollection;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
@@ -15,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,7 +76,7 @@ public class MultiDataDownload extends HttpServlet {
 				res.setContentType("text/html");
 			}
 			//
-			DataRequest dr = new DataRequest (req);
+			DataRequest dr = new DataRequest (req.getParameterMap());
 			//
 			Iterator<Entry<String, AbstractQuery>> iter = dr.getSqlQueries().entrySet().iterator();
 			Entry<String, AbstractQuery> nextSqlQuery;
@@ -109,7 +109,7 @@ public class MultiDataDownload extends HttpServlet {
 				de.close();
 			}
 			respond.flush();
-		} catch (ServletException e) {
+		} catch (DataRequestException e) {
 			handleError(res, Container.UNSUPPORTED_REQUEST_ERROR, e.getMessage());
 			return;
 		} catch (SQLException e) {
