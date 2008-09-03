@@ -143,7 +143,7 @@ public final class Main {
 
   public static final String     DEFAULT_GSN_CONF_FILE            = "conf/gsn.xml";
 
-  public static final String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
+  public static String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
 
   public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
 

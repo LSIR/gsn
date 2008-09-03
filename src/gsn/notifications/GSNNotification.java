@@ -28,6 +28,7 @@ public class GSNNotification extends NotificationRequest {
 	 * except without using any double quotation.
 	 */
 	private StringBuilder query;
+	private String originalQuery;
 
 	private String prespectiveVirtualSensor;
 
@@ -43,7 +44,8 @@ public class GSNNotification extends NotificationRequest {
 
 	public GSNNotification(int port, String remoteHost,
 			String virtualSensorName, String query, int notificationCode) {
-		this.remotePort = port;
+		this.originalQuery = query;
+	  this.remotePort = port;
 		this.remoteAddress = remoteHost;
 		this.prespectiveVirtualSensor = virtualSensorName;
 		TreeMap<CharSequence,CharSequence> rewritingInfo = new TreeMap<CharSequence,CharSequence>(new CaseInsensitiveComparator());
@@ -227,4 +229,9 @@ public class GSNNotification extends NotificationRequest {
 		}
 		return true;
 	}
+
+  
+  public String getOriginalQuery() {
+    return originalQuery;
+  }
 }

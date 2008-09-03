@@ -1,9 +1,11 @@
 package gsn.beans;
 
+import gsn.tests.StreamElementTest;
 import gsn.utils.CaseInsensitiveComparator;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.commons.codec.binary.Base64;
@@ -76,6 +78,11 @@ public final class StreamElement implements Serializable {
     for ( int i = 0 ; i < data.length ; i++ ) {
       if ( data[ i ] == null ) continue;
       switch ( fieldTypes[ i ] ) {
+        case DataTypes.TINYINT :
+          if ( !( data[ i ] instanceof Byte ) )
+            throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as " + DataTypes.TYPE_NAMES[ fieldTypes[i] ]
+                                                                                                                                                                               + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
+          break;
         case DataTypes.SMALLINT :
           if ( !( data[ i ] instanceof Short ) )
             throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as " + DataTypes.TYPE_NAMES[ fieldTypes[i] ]
@@ -122,6 +129,9 @@ public final class StreamElement implements Serializable {
     return this.fieldNames;
   }
 
+  /*
+   * Returns the field types in GSN format. Checkout gsn.beans.DataTypes
+   */
   public final Byte [ ] getFieldTypes ( ) {
     return this.fieldTypes;
   }
@@ -330,7 +340,11 @@ public final class StreamElement implements Serializable {
           toAdd = new StringPart(fieldNames[i],Long.toString((Long) fieldValues[i]));
           break;
         case DataTypes.TINYINT :
+          toAdd = new StringPart(fieldNames[i],Byte.toString((Byte) fieldValues[i]));
+          break;
         case DataTypes.SMALLINT :
+          toAdd = new StringPart(fieldNames[i],Short.toString((Short) fieldValues[i]));
+          break;
         case DataTypes.INTEGER :
           toAdd = new StringPart(fieldNames[i],Integer.toString((Integer) fieldValues[i]));
           break;
@@ -347,5 +361,67 @@ public final class StreamElement implements Serializable {
       toReturn[i+1]=toAdd;
     }
     return toReturn;
+  }
+
+  public static StreamElement createElementFromREST( DataField [ ] outputFormat , String [ ] fieldNames , Object[ ] fieldValues  ) {
+    ArrayList<Serializable> values = new ArrayList<Serializable>();
+    // ArrayList<String> fields = new ArrayList<String>();
+
+    long timestamp = -1;
+    for ( int i = 0 ; i < fieldNames.length ; i++ ) {
+      if (fieldNames[i].equalsIgnoreCase("TIMED")) {
+        timestamp = Long.parseLong((String) fieldValues[i]);
+        continue;
+      }
+      boolean found = false;
+      for (DataField f:outputFormat) {
+        if(f.getName().equalsIgnoreCase(fieldNames[i])) {
+          //     fields.add(fieldNames[i]);
+          found=true;
+          break;
+        }
+      }
+      if (found==false)
+        continue;
+
+      switch ( findIndexInDataField( outputFormat ,fieldNames[i] ) ) {
+        case DataTypes.DOUBLE :
+          values.add(Double.parseDouble( (String)fieldValues[ i ]));
+          break;
+        case DataTypes.BIGINT :
+          values.add( Long.parseLong( (String)  fieldValues[ i ] ));
+          break;
+        case DataTypes.TINYINT :
+          values.add(Byte.parseByte( (String)fieldValues[ i ]));
+          break;
+        case DataTypes.SMALLINT :
+          values.add( Short.parseShort(  (String)fieldValues[ i ] ));
+          break;
+        case DataTypes.INTEGER :
+          values.add( Integer.parseInt(  (String)fieldValues[ i ] ));
+          break;
+        case DataTypes.CHAR :
+        case DataTypes.VARCHAR :
+          values.add(new String((byte[]) fieldValues[ i ]));
+          break;
+        case DataTypes.BINARY :
+          try{ 
+//          StreamElementTest.md5Digest(fieldValues[ i ]);
+          }catch (Exception e) {
+            e.printStackTrace();
+          }
+//        System.out.println(fieldValues[ i ]);
+//        System.out.println(((String)fieldValues[ i ]).length());
+          values.add((byte[]) fieldValues[ i ]);
+          break;
+        case -1:
+        default :
+          logger.error( "The field name doesn't exit in the output structure : FieldName : "+(String)fieldNames[i]   );
+      }
+
+    }
+    if (timestamp==-1)
+      timestamp=System.currentTimeMillis();
+    return new StreamElement( outputFormat , values.toArray(new Serializable[] {}) , timestamp );
   }
 }

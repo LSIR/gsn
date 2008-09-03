@@ -31,9 +31,9 @@ public final class DataField implements Serializable {
       this.dataTypeID = DataTypes.convertTypeNameToTypeID( type );
    }
  
-   public DataField(String colName, int jdbcColType) {
+   public DataField(String colName,byte dataTypeID) {
      this.name=colName;
-     this.dataTypeID = DataTypes.convertFromJDBCToGSNFormat(jdbcColType);
+     this.dataTypeID = dataTypeID;
      this.type = DataTypes.TYPE_NAMES[this.dataTypeID];
   }
 

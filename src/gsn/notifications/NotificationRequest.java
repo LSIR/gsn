@@ -9,6 +9,8 @@ public abstract class NotificationRequest {
    
    public abstract StringBuilder getQuery ( );
    
+   public abstract String getOriginalQuery ( );
+   
    private transient ArrayList < CharSequence > cachedPrespectiveVirtualSensors = null;
    
    private static transient Logger        logger                          = Logger.getLogger( NotificationRequest.class );

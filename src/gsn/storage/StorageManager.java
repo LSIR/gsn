@@ -85,7 +85,8 @@ public class StorageManager {
         String colName = structure.getColumnName(i);
         if (colName.equalsIgnoreCase("pk")) continue;
         int colType = structure.getColumnType(i);
-        toReturnArr.add(new DataField(colName,colType));           
+        byte colTypeInGSN= DataTypes.convertFromJDBCToGSNFormat(colType);
+        toReturnArr.add(new DataField(colName,colTypeInGSN));           
       }
       toReturn = toReturnArr.toArray(new DataField[] {});
     }finally {
@@ -1014,8 +1015,7 @@ public class StorageManager {
       stmt = con.createStatement();
       if (StorageManager.isH2()) {
         stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
-        stmt
-        .execute("CREATE ALIAS NOW_MILLIS FOR \"java.lang.System.currentTimeMillis\";");
+        stmt.execute("CREATE ALIAS IF NOT EXISTS NOW_MILLIS FOR \"java.lang.System.currentTimeMillis\";");
       } else if (StorageManager.isMysqlDB()) {
         ResultSet rs = stmt.executeQuery("select version();");
         rs.next();

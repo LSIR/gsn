@@ -335,4 +335,8 @@ public abstract class AbstractWrapper extends Thread {
 	public boolean isTimeStampUnique() {
 	  return true;
 	}
+	
+	public boolean manualDataInsertion(StreamElement se) {
+	  throw new RuntimeException("Manual data insertion is not supported by this wrapper");
+	}
 }

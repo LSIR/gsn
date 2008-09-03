@@ -29,5 +29,9 @@ public class DummyNotification extends NotificationRequest {
    public CharSequence getNotificationCodeInString() {
       return notificationCodeS;
    }
+
+  public String getOriginalQuery() {
+    throw new UnsupportedOperationException( "This method shouldn't be called by others." );
+  }
    
 }

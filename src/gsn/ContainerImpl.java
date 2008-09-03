@@ -6,13 +6,14 @@ import gsn.notifications.NotificationRequest;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import gsn.vsensor.AbstractVirtualSensor;
-import gsn.wrappers.RemoteWrapper;
+import gsn.wrappers.AbstractWrapper;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 
 public class ContainerImpl implements Container {
@@ -29,11 +30,11 @@ public class ContainerImpl implements Container {
 	 * sensor name.
 	 */
 
-	private static ConcurrentHashMap<String , ArrayList < NotificationRequest >> notificationRequests               = new ConcurrentHashMap<String, ArrayList<NotificationRequest>>();
+	private static ConcurrentHashMap<String , ArrayList < NotificationRequest >> vsNameToRegisteredListeners               = new ConcurrentHashMap<String, ArrayList<NotificationRequest>>();
 
 	private static final Class < ContainerImpl >                         notificationRequestsLock           = ContainerImpl.class;
 
-	private static final HashMap < Integer , RemoteWrapper >             notificationCodeToRemoteDataSource = new HashMap < Integer , RemoteWrapper >( );
+	private static final HashMap < Integer , AbstractWrapper>             notificationCodeToRemoteDataSource = new HashMap < Integer , AbstractWrapper >( );
 
 	private static final Object                                          psLock                             = new Object( );
 
@@ -50,7 +51,7 @@ public class ContainerImpl implements Container {
 		// SimulationResult.addJustBeforeStartingToEvaluateQueries ();
 		ArrayList < NotificationRequest > registered;
 		synchronized ( notificationRequestsLock ) {
-			registered = notificationRequests.get( name );
+			registered = vsNameToRegisteredListeners.get( name );
 		}
 		if ( registered == null ) {
 			if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "No Query registered for >" ).append( name ).append( "<" ).toString( ) );
@@ -90,11 +91,11 @@ public class ContainerImpl implements Container {
 	public synchronized void addNotificationRequest ( String localVirtualSensorName , NotificationRequest notificationRequest ) {
 		localVirtualSensorName = localVirtualSensorName.toLowerCase( );
 		ArrayList < NotificationRequest > contents;
-		if ( notificationRequests.get( localVirtualSensorName ) == null ) {
+		if ( vsNameToRegisteredListeners.get( localVirtualSensorName ) == null ) {
 			contents = new ArrayList < NotificationRequest >( );
-			notificationRequests.put( localVirtualSensorName , contents );
+			vsNameToRegisteredListeners.put( localVirtualSensorName , contents );
 		} else
-			contents = notificationRequests.get( localVirtualSensorName );
+			contents = vsNameToRegisteredListeners.get( localVirtualSensorName );
 		if ( logger.isDebugEnabled( ) ) {
 			logger.debug( new StringBuilder( "Notification request added to " ).append( localVirtualSensorName ).toString( ) );
 		}
@@ -112,7 +113,7 @@ public class ContainerImpl implements Container {
 
 	public synchronized void removeNotificationRequest ( String localVirtualSensorName , NotificationRequest notificationRequest ) {
 		localVirtualSensorName = localVirtualSensorName.toLowerCase( );
-		ArrayList < NotificationRequest > contents = notificationRequests.get( localVirtualSensorName );
+		ArrayList < NotificationRequest > contents = vsNameToRegisteredListeners.get( localVirtualSensorName );
 		if ( contents == null ) {// when an invalid remove request recevied for
 			// a
 			// virtual sensor which doesn't have any query
@@ -125,10 +126,10 @@ public class ContainerImpl implements Container {
 	}
 
 	public synchronized void removeNotificationRequest ( NotificationRequest notificationRequest ) {
-		Iterator < String > virtualSensorNames = notificationRequests.keySet( ).iterator( );
+		Iterator < String > virtualSensorNames = vsNameToRegisteredListeners.keySet( ).iterator( );
 		while ( virtualSensorNames.hasNext( ) ) {
 			String virtualSensorName = virtualSensorNames.next( );
-			ArrayList < NotificationRequest > contents = notificationRequests.get( virtualSensorName );
+			ArrayList < NotificationRequest > contents = vsNameToRegisteredListeners.get( virtualSensorName );
 			if ( contents == null || contents.size( ) == 0 ) {// when an
 				// invalid
 				// remove request
@@ -145,14 +146,18 @@ public class ContainerImpl implements Container {
 		}
 	}
 
+	public synchronized ArrayList<NotificationRequest> getNotificationRequests ( String virtualSensorName) {
+	  return vsNameToRegisteredListeners.get(virtualSensorName);
+	}
+	
 	public synchronized NotificationRequest [ ] getAllNotificationRequests ( ) {
 		Vector < NotificationRequest > results = new Vector < NotificationRequest >( );
-		for ( ArrayList < NotificationRequest > notifications : notificationRequests.values( ) )
+		for ( ArrayList < NotificationRequest > notifications : vsNameToRegisteredListeners.values( ) )
 			results.addAll( notifications );
 		return results.toArray( new NotificationRequest [ ] {} );
 	}
 
-	public void addRemoteStreamSource ( int notificationCode , RemoteWrapper remoteWrapper ) {
+	public void addRemoteStreamSource ( int notificationCode , AbstractWrapper remoteWrapper ) {
 		notificationCodeToRemoteDataSource.put( notificationCode , remoteWrapper );
 		if ( logger.isDebugEnabled( ) )
 			logger.debug( new StringBuilder( ).append( "Remote DataSource DBALIAS *" ).append( remoteWrapper.getDBAlias( ) ).append( "* with the code : *" ).append( notificationCode )
@@ -161,7 +166,7 @@ public class ContainerImpl implements Container {
 
 	public void removeAllResourcesAssociatedWithVSName ( String vsensorName ) {
 		vsensorName = vsensorName.toLowerCase();
-		ArrayList < NotificationRequest > effected = notificationRequests.remove( vsensorName );
+		ArrayList < NotificationRequest > effected = vsNameToRegisteredListeners.remove( vsensorName );
 		// FIXME : The used prepare statements should be released from the
 		// stroagemanager using a timeout mechanism.
 		// PreparedStatement ps;
@@ -175,7 +180,7 @@ public class ContainerImpl implements Container {
 		notificationCodeToRemoteDataSource.remove( notificationCode );
 	}
 
-	public RemoteWrapper getRemoteDSForANotificationCode ( int code ) {
+	public AbstractWrapper findNotificationCodeListener ( int code ) {
 		return notificationCodeToRemoteDataSource.get( code );
 	}
 

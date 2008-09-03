@@ -40,31 +40,6 @@ public class TestAbstractWrapper {
 		sm = StorageManager.getInstance();
 		}
 
-	@After
-	public void tearDown() throws Exception {
-	}
-
-	@Test
-	public void testGetTableSizeEnforce() {
-
-	}
-
-	/**
-	 * Test method for {@link gsn.wrappers.AbstractWrapper#isActive()}.
-	 */
-	@Test
-	public void testIsActive() {
-
-	}
-
-	/**
-	 * Test method for {@link gsn.wrappers.AbstractWrapper#postStreamElement(java.io.Serializable[])}.
-	 */
-	@Test
-	public void testPostStreamElementSerializableArray() {
-
-	}
-
 
 	@Test (expected=OperationNotSupportedException.class)
 	public void testSendToWrapper1() throws OperationNotSupportedException {
