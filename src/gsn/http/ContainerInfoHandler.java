@@ -26,10 +26,17 @@ public class ContainerInfoHandler implements RequestHandler {
   private static transient Logger logger             = Logger.getLogger( ContainerInfoHandler.class );
   
   public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
-    
+	  response.setStatus( HttpServletResponse.SC_OK );
+	  String reqName = request.getParameter("name");
+
+    response.getWriter( ).write( buildOutput(reqName) );
+  }
+  
+  //return only the requested sensor if specified (otherwise use null)
+  public String buildOutput (String reqName) {
 	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getInstance().getContainerConfig().getTimeFormat());
 	  
-	  response.setStatus( HttpServletResponse.SC_OK );
+	  
     StringBuilder sb = new StringBuilder( "<gsn " );
     sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
     sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
@@ -37,8 +44,8 @@ public class ContainerInfoHandler implements RequestHandler {
     sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
     
     Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
-    //return only the requested sensor if specified
-    String reqName = request.getParameter("name");
+    
+    
     while ( vsIterator.hasNext( ) ) {
       VSensorConfig sensorConfig = vsIterator.next( );
       if ( reqName != null && !sensorConfig.getName().equals(reqName) ) continue;
@@ -96,7 +103,7 @@ public class ContainerInfoHandler implements RequestHandler {
       sb.append( "</virtual-sensor>\n" );
     }
     sb.append( "</gsn>\n" );
-    response.getWriter( ).write( sb.toString( ) );
+    return sb.toString();
   }
   
   public boolean isValid ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
