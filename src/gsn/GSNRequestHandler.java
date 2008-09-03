@@ -1,6 +1,11 @@
 package gsn;
 
-import static org.junit.Assert.assertEquals;
+import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
+import gsn.notifications.GSNNotification;
+import gsn.registry.MyConfig;
+import gsn.registry.RequestInitializableRequestProcessor;
+import gsn.wrappers.AbstractWrapper;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
@@ -9,15 +14,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import gsn.beans.StreamElement;
-import gsn.beans.VSensorConfig;
-import gsn.notifications.GSNNotification;
-import gsn.registry.MyConfig;
-import gsn.registry.RequestInitializableRequestProcessor;
-import gsn.wrappers.AbstractWrapper;
-import gsn.wrappers.RemoteWrapper;
 
 public class GSNRequestHandler implements RequestInitializableRequestProcessor {
 

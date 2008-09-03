@@ -1,7 +1,6 @@
 package gsn.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import gsn.GSNRequestHandler;
 import gsn.Main;
 import gsn.Mappings;
@@ -16,7 +15,6 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.httpclient.HttpClient;

@@ -1,12 +1,12 @@
 package gsn.tests;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
+
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class MockWrapper extends AbstractWrapper{
 
