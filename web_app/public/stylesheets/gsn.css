@@ -65,7 +65,7 @@ body {
 
 /* header */
 
-#header { background: #ffee00 url(../images/gsn-mark.png) no-repeat 4px center; }
+#header { background: #ffee00 url(/images/gsn-mark.png) no-repeat 4px center; }
 
 #header h1 {
 	padding: 36px 90px;
@@ -148,6 +148,10 @@ div.fieldWithErrors {
     padding: 4px;
     margin: 4px;
     border: 1px solid #ffa84c;
+}
+
+.flexigrid div {
+    margin: 0;
 }
 
 /* pagination */
