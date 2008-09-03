@@ -1,5 +1,9 @@
 package gsn.http.datarequest;
 
+import gsn.Main;
+
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -40,9 +44,9 @@ import org.apache.log4j.Logger;
  * <li>Notice that this class doesn't check if the Virtual Sensors and Fields names are corrects.</li>
  * </ul>
  */
-public class DataRequest {
+public abstract class AbstractDataRequest {
 
-	private static transient Logger 	logger 						= Logger.getLogger(DataRequest.class);
+	private static transient Logger 	logger 						= Logger.getLogger(AbstractDataRequest.class);
 
 	/* Mandatory Parameters */
 	public static final String 			PARAM_VSNAMES_AND_FIELDS 	= "vsname";
@@ -59,17 +63,22 @@ public class DataRequest {
 	private LimitCriterion						limitCriterion				= null;
 
 	private Hashtable<String, AbstractQuery> sqlQueries ;
+	
+	protected Map<String, String[]> requestParameters;
+	
+	protected static SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 
-	public DataRequest (Map<String, String[]> requestParameters) throws DataRequestException {
-		parseParameters(requestParameters);
+	public AbstractDataRequest (Map<String, String[]> requestParameters) throws DataRequestException {
+		this.requestParameters = requestParameters ; 
+		parseParameters();
 		buildSQLQueries () ;
 	}
 
-	private void parseParameters (Map<String, String[]> requestParameters) throws DataRequestException {
+	private void parseParameters () throws DataRequestException {
 
 		String[] vsnamesParameters = requestParameters.get(PARAM_VSNAMES_AND_FIELDS);
 
-		if (vsnamesParameters.length == 0) throw new DataRequestException ("You must specify at least one >" + PARAM_VSNAMES_AND_FIELDS + "< parameter.") ; 
+		if (vsnamesParameters == null) throw new DataRequestException ("You must specify at least one >" + PARAM_VSNAMES_AND_FIELDS + "< parameter.") ; 
 
 		vsnamesAndStreams = new HashMap<String, FieldsCollection> () ;
 		String name;
@@ -89,9 +98,7 @@ public class DataRequest {
 		}
 
 		String ac = getParameter(requestParameters, PARAM_AGGREGATE_CRITERIA);
-		if (ac != null) {
-			this.aggregationCriterion = new AggregationCriterion (ac) ;
-		}
+		if (ac != null) { aggregationCriterion = new AggregationCriterion (ac) ; }
 
 		String[] cc = requestParameters.get(PARAM_STANDARD_CRITERIA);
 		if (cc != null) {
@@ -100,8 +107,9 @@ public class DataRequest {
 				standardCriteria.add(new StandardCriterion (cc[i]));
 			}
 		}
-
-		limitCriterion = new LimitCriterion (getParameter(requestParameters, PARAM_MAX_NB));
+		
+		String lm = getParameter(requestParameters, PARAM_MAX_NB);
+		if (lm != null) limitCriterion = new LimitCriterion (lm);
 	}
 
 	public Hashtable<String, AbstractQuery> getSqlQueries() {
@@ -233,8 +241,13 @@ public class DataRequest {
 	/**
 	 * Returns the value of a request parameter as a <code>String</code>, or <code>null</code> if the parameter does not exist.
 	 */
-	private static String getParameter (Map<String, String[]> parameters, String requestedParameter) {
+	protected static String getParameter (Map<String, String[]> parameters, String requestedParameter) {
 		String[] rpv = parameters.get(requestedParameter);
 		return (rpv == null || rpv.length == 0) ? null : rpv[0];
 	}
+	
+	public abstract void process() throws DataRequestException ;
+	
+	public abstract void outputResult (OutputStream os) ;
+	
 }
