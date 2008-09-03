@@ -1,6 +1,6 @@
 <project name="gsn" default="build" basedir=".">
    <property name="safe-storage-port" value="25000"/>
-   <property name="sa	fe-storage-controller-port" value="25012"/>
+   <property name="safe-storage-controller-port" value="25012"/>
 	<property name="gsn-controller-port" value="22232"/>
    <target name="init" description="initializes properties and initialization tasks">
       <tstamp>
