@@ -61,6 +61,8 @@ class GsnController < ApplicationController
 
   def populate_search_list_of_vs
 
+    puts 'populate list called'
+
     page	=   params[:page]	?   params[:page].to_i	:   1
     rp		=   params[:rp]		?   params[:rp].to_i	:   30
     query	=   params[:query]	?   params[:query]	:   ''

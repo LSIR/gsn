@@ -1,21 +1,9 @@
-/*
- * Let the Protoype lib handling the $() selector.
- * Use $j() to access the jQuery selector.
- */
-$j = jQuery.noConflict();
-
-(function($) {
-  $(function() {
-    /* Uses the jQuery selector */
-  });
-})(jQuery);
-
 /* Use this to add behavior to DOM elements once the page is loaded. */
 jQuery(function() {
 
     /* Use the Flexigrid jQuery plugin to show the list of VS */
 
-    $j("#search_vs_bar").flexigrid
+    $("#flexi-search-bar").flexigrid
 	(
 	{
 			url: 'populate_search_list_of_vs',
