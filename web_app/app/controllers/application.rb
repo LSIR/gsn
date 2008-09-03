@@ -22,7 +22,8 @@ class ApplicationController < ActionController::Base
   CONTAINER_CONFIG = Java::gsn.Main::loadContainerConfig("#{RAILS_ROOT}/../conf/gsn.xml")
 
   #private:
-  	vs_list = Java::gsn.gui.util::VSensorIOUtil.new('virtual-sensors/', 'virtual-sensors/Disabled/')
+
+  	vs_list = Java::gsn.gui.util::VSensorIOUtil.new(Java::gsn.Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY, 'virtual-sensors/Disabled/')
   	enabled_vs_files = vs_list.read_virtual_sensors
 	disabled_vs_files = vs_list.read_disabled_virtual_sensors
 	

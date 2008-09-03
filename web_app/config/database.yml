@@ -7,19 +7,19 @@
 # jruby -S rake db:migrate
 
 development:
-  #adapter: jdbch2
-  #database: <%= RAILS_ROOT %>/db/gsn_h2_database
-  adapter: mysql
-  database: gsn
-  username: root
-  password:
-  host: 127.0.0.1
+  adapter: jdbch2
+  database: <%= RAILS_ROOT %>/db/gsn_h2_database
+  #adapter: mysql
+  #database: gsn
+  #username: root
+  #password:
+  #host: 127.0.0.1
 
 production:
-  #adapter: jdbch2
-  #database: <%= RAILS_ROOT %>/db/gsn_h2_database
-  adapter: mysql
-  database: gsn
-  username: root
-  password:
-  host: 127.0.0.1
+  adapter: jdbch2
+  database: <%= RAILS_ROOT %>/db/gsn_h2_database
+  #adapter: mysql
+  #database: gsn
+  #username: root
+  #password:
+  #host: 127.0.0.1

@@ -1,3 +1,4 @@
+require 'digest/md5'
 require 'rubygems'
 require 'java'
 require 'roxml'		# jruby -S gem install roxml
@@ -5,7 +6,7 @@ require 'jdbc'		# jruby -S gem install jdbc-wrapper
 
 class GsnController < ApplicationController
 	
-  protect_from_forgery :except => [:notify, :populate_search_list_of_vs]
+  protect_from_forgery :except =>[:notify ,:register,:structure, :populate_search_list_of_vs]
 	
   def test
     p CONTAINER_CONFIG.jdbc_username
@@ -101,8 +102,8 @@ class GsnController < ApplicationController
     if vs_config.nil?
       render :text => "requested virtual sensor #{params[:name]} is not found/accessible.",:layout=>false,:status => 500
     else
-      to_return = vs_config.output_structure.inject('') {|sum,o| sum << "#{o.name}[#{o.type}],"} unless vs_config.nil?
-      render :text => (to_return||''), :layout => false,:status => 200
+      to_return = vs_config.output_structure.inject('') {|sum,o| sum << "#{o.name}=>#{o.type},"}
+      render :text => (to_return||''), :layout => false,:status => 201
     end
     
   end
@@ -111,18 +112,32 @@ class GsnController < ApplicationController
   def register
     vs_config = VS_NAME_TO_CONFIG[params[:name].upcase.chomp]
     if vs_config.nil?
-      render :text => "requested virtual sensor #{params[:name]} is not found/accessible.",:layout=>false,:status => 500
+      render :text => "requested virtual sensor #{params[:name]} is not found/accessible.",:layout=>false,:status => 500	
     else
-      Java::gsn.GSNRequestHandler::register_query params[:remote_host],params[:remote_port].to_i,params[:name],params[:query],params[:code].to_i    
+      Java::gsn.GSNRequestHandler::consumeRegisterQueryRequest(params[:remote_host],params[:remote_port].to_i,params[:name],params[:query],params[:code].to_i)    
+      render :text => "query:#{params[:query]} registered.", :layout => false,:status => 201
     end
-    render :text => "query:#{params[:query]} registered.", :layout => false,:status => 200
+
   end
-  
+  #gsn/notify/:code
   def notify
-    puts 'called'
-    puts params[:code]
-    params.each {|key,value| puts "#{key} ==== #{value}" }
-    render :text => "Accepted.", :layout => false,:status => 201
+  	#puts params[:code]
+    #params.each {|key,value| puts "#{key} ==== #{value.to_s}" }
+    #params.each {|key,value| puts "#{key} ==== #{value.is_a?(ActionController::UploadedStringIO) ? value.string : value.to_s}" }
+  	keys,values = [],[]
+  	
+  	#params.each {|key,value| puts "#{key} => #{value.is_a?(ActionController::UploadedStringIO) ? Digest::MD5.hexdigest(value.string): value.to_s}" }
+  	#p "ABC".methods
+  	params.each do |key,value| 
+      keys<< key 
+      if value.is_a?(ActionController::UploadedStringIO)
+        values << value.string.to_java_bytes
+      else
+        values << value
+      end 
+    end
+   	Java::gsn.GSNRequestHandler::deliverDataFromRest(params[:code].to_i,keys.to_java(:string),values.to_java(:object))  	
+  	render :text => "Accepted.", :layout => false,:status => 201
   end
 
   :private
