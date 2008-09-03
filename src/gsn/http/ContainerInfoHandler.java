@@ -34,7 +34,7 @@ public class ContainerInfoHandler implements RequestHandler {
   
   //return only the requested sensor if specified (otherwise use null)
   public String buildOutput (String reqName) {
-	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getInstance().getContainerConfig().getTimeFormat());
+	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 	  
 	  
     StringBuilder sb = new StringBuilder( "<gsn " );
