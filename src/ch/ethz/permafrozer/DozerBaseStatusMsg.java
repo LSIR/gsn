@@ -5,7 +5,7 @@ import net.tinyos1x.message.Message;
 public class DozerBaseStatusMsg extends DozerAbstractMsg
 {
 	/** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 33;
+    public static final int DEFAULT_MESSAGE_SIZE = 35;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 0x88;
@@ -24,6 +24,8 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     private Integer queuesize = null;
     private Integer packetssent = null;
     private Integer packetsreceived = null;
+    private Integer childcount = null;
+    private Integer rssi = null;
         
     public DozerBaseStatusMsg() {
         super(DEFAULT_MESSAGE_SIZE);
@@ -231,6 +233,26 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     	return packetsreceived;
     }
     
+    public int getchildcount()
+    {
+    	if (childcount == null)
+    	{
+    		childcount = new Integer((int) getUIntElement(25 * 8, 8));
+    	}
+    	
+    	return childcount;
+    }
+    
+    public int getrssi()
+    {
+    	if (rssi == null)
+    	{
+    		rssi = new Integer((int) getUIntElement(26 * 8, 8));
+    	}
+    	
+    	return rssi;
+    }
+    
     public String toString()
     {
     	String temp = "invalid";
@@ -251,6 +273,6 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     		" uptime:" + getUptime() + "(" + getBootTime_date() + ")" +	
     		" temperature:" + getTemperature() + "(" + temp + ") moisture:" + getMoisture() + "(" + hum + ")" +
     		" mspvoltage:" + getMspVoltage() + " msptemperature:" + getMspTemperature() + " queuesize:" + getQueueSize() +
-    		" packetssend:" + getPacketsSent() + " packetsreceived:" + getPacketsReceived() + "\n";
+    		" packetssent:" + getPacketsSent() + " packetsreceived:" + getPacketsReceived() + " childcount:" + getchildcount()+ " rssi:" + getrssi()+ "\n";
     }
 }
