@@ -1,4 +1,4 @@
-<virtual-sensor name="Whymper_Dozer_Base_Status_1410" priority="10" >
+<virtual-sensor name="Whymper_Dozer_Base_Status_1534" priority="10" >
     <processing-class>
        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
        <unique-timestamps>true</unique-timestamps>
@@ -29,6 +29,9 @@
                 <field name="PACKETSSENT" type="INTEGER" />
                 <field name="PACKETSRECEIVED" type="INTEGER" />
 
+                <field name="CHILDCOUNT" type="INTEGER" />
+                <field name="RSSI" type="INTEGER" />
+
 		<field name="TIMESTAMP" type="BIGINT" />
        </output-structure>
     </processing-class>
@@ -40,16 +43,15 @@
     <stream name="data">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="ss_tinyos-mig">
-           		<predicate key="ss-host">localhost</predicate>
-          		<predicate key="ss-port">25000</predicate>
-          		<predicate key="continue-on-error">true</predicate>
-          		<predicate key="wrapper-name">mig2</predicate>
-          		<predicate key="wrapper-keep-processed-ss-entries">false</predicate>
-               <predicate key="source">sf@whymper.ethz.ch:9001</predicate>
-               <predicate key="message-classname">ch.ethz.permafrozer.DozerBaseStatusMsg</predicate>
-               <predicate key="message-length">33</predicate>
-               <predicate key="getter-prefix">get</predicate>
-           </address>
+      	  <predicate key="ss-host">localhost</predicate>
+          <predicate key="ss-port">25000</predicate>
+          <predicate key="continue-on-error">true</predicate>
+          <predicate key="wrapper-name">mig2</predicate>
+          <predicate key="wrapper-keep-processed-ss-entries">false</predicate>
+          <predicate key="source">sf@whymper.ethz.ch:9001</predicate>
+          <predicate key="message-classname">ch.ethz.permafrozer.DozerBaseStatusMsg</predicate>
+          <predicate key="getter-prefix">get</predicate>
+        </address>
         <query> select * from wrapper </query>
       </source>
       <query> select * from source</query>
