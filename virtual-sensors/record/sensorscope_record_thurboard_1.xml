@@ -1,0 +1,56 @@
+<virtual-sensor name="sensorscope_record_thurboard_1" priority="10" >
+	<processing-class>
+		<class-name>gsn.vsensor.SensorscopeVS</class-name>
+		<output-structure>
+			<field name="WIND_SPEED"			type="INTEGER" />
+			<field name="WIND_DIRECTION"		type="SMALLINT" />
+			<field name="SOLAR_RADIATION"		type="SMALLINT" />
+			<field name="SOIL_MOISTURE_1"		type="SMALLINT" />
+			<field name="SOIL_TEMPERATURE_1"	type="SMALLINT" />
+			<field name="SOIL_CONDUCTIVITY_1"	type="SMALLINT" />
+			<field name="SOIL_MOISTURE_2"		type="SMALLINT" />
+			<field name="SOIL_TEMPERATURE_2"	type="SMALLINT" />
+			<field name="SOIL_CONDUCTIVITY_2"	type="SMALLINT" />
+			<field name="SOIL_MOISTURE_3"		type="SMALLINT" />
+			<field name="SOIL_TEMPERATURE_3"	type="SMALLINT" />
+			<field name="SOIL_CONDUCTIVITY_3"	type="SMALLINT" />
+		</output-structure>
+	</processing-class>
+	<description>Node 1 from the Record Sensorscope deployment</description>
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">Node 1 from the Record Sensorscope deployment</predicate>
+		<predicate key="LATITUDE">47.591567</predicate>
+		<predicate key="LONGITUDE">8.770053</predicate>
+	</addressing>
+	<streams>
+    	<stream name="data">
+			<source alias="record" storage-size="1" sampling-rate="1">
+				<address wrapper="ss_tinyos-mig">
+					<predicate key="ss-host">localhost</predicate>
+					<predicate key="ss-port">25000</predicate>
+					<predicate key="continue-on-error">true</predicate>
+					<predicate key="wrapper-name">mig2</predicate>
+					<predicate key="wrapper-keep-processed-ss-entries">false</predicate>
+					<predicate key="source">sf@sensorscop1.epfl.ch:2106</predicate>
+					<predicate key="message-classname">gsn.wrappers.tinyos.ThurBoard2Data</predicate>
+				</address>
+				<query>select	TIMED,
+								WIND_SPEED,			
+								WIND_DIRECTION,		
+								SOLAR_RADIATION,		
+								SOIL_MOISTURE_1,	
+								SOIL_TEMPERATURE_1,	
+								SOIL_CONDUCTIVITY_1,	
+								SOIL_MOISTURE_2,	
+								SOIL_TEMPERATURE_2,	
+								SOIL_CONDUCTIVITY_2,	
+								SOIL_MOISTURE_3,		
+								SOIL_TEMPERATURE_3,	
+								SOIL_CONDUCTIVITY_3 from wrapper	
+				</query>
+			</source>
+			<query>select * from record</query>
+		</stream>
+	</streams>
+</virtual-sensor>
