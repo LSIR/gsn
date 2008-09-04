@@ -6,7 +6,7 @@ require 'jdbc'		# jruby -S gem install jdbc-wrapper
 
 class GsnController < ApplicationController
 	
-  protect_from_forgery :except =>[:notify ,:register,:structure, :populate_search_list_of_vs]
+  protect_from_forgery :except =>[:notify ,:register,:structure, :populate_search_list_of_vs, :jason_search_list_of_vs]
 	
   def test
     p CONTAINER_CONFIG.jdbc_username
@@ -35,13 +35,22 @@ class GsnController < ApplicationController
     render :xml => xml_output
   end
 
+  def populate_selectable_list_of_vs
+    @vss = get_list_of_vs
+    render :partial => 'shared/sidebar', :locals => {:vss => @vss}
+  end
+
+  def update_selectable_list_of_vs
+
+  end
+
   def jason_search_list_of_vs
 
     page	=   params[:page]	?   params[:page].to_i	:   1
     rp		=   params[:rp]		?   params[:rp].to_i	:   30
     query	=   params[:query]	?   params[:query]	:   ''
     qtype	=   params[:qtype]	?   params[:qtype]	:   'get_name'
-    sortorder	=   params[:sortorder]	?   params[:sortorder]	:   'desc'
+    sortorder	=   params[:sortorder]	?   params[:sortorder]	:   'asc'
     sortname	=   'get_name'
 
     offset = ((page-1) * rp).to_i
@@ -62,33 +71,21 @@ class GsnController < ApplicationController
 
   def populate_search_list_of_vs
 
-    puts 'populate list called'
-
     page	=   params[:page]	?   params[:page].to_i	:   1
-    rp		=   params[:rp]		?   params[:rp].to_i	:   30
+    rp		=   params[:rp]		?   params[:rp].to_i	:   5
     query	=   params[:query]	?   params[:query]	:   ''
     qtype	=   params[:qtype]	?   params[:qtype].to_a	:   ['get_name','get_description']
-    sortorder	=   params[:sortorder]	?   params[:sortorder]	:   'desc'
+    sortorder	=   params[:sortorder]	?   params[:sortorder]	:   'asc'
     sortname	=   'get_name'
     offset = ((page-1) * rp).to_i
 
     @vss = filter_list_of_vs(query.split(' '), qtype, sortname, sortorder)
-
-    if false #TODO Add a choice in the preferences
-      # Drop down search
-      @page_results = WillPaginate::Collection.create(page, rp, @vss.length) do |pager|
-	pager.replace(@vss[offset, rp])
-      end
-      render :partial => 'shared/search_list_of_vs', :locals => {:page_results => @page_results} #, :locals => {:loaded_vs_list => VS_ENABLED, :storage_manager => STORAGE_MANAGER}
-    else
-      # Flexigrid search      
-      @vss_limited = @vss.length > rp ? @vss[offset, rp] : @vss
-      list_of_vs = Hash.new()
-      list_of_vs[:page] = page
-      list_of_vs[:total] = @vss.length
-      list_of_vs[:rows] = @vss_limited.collect{ |vs| {:id => vs.get_name.to_s, :cell => [vs.get_name, "TODO Last Update", vs.get_description, vs.is_enabled,]}}
-      render :text => list_of_vs.to_json, :layout => false
+    # Drop down search
+    @page_results = WillPaginate::Collection.create(page, rp, @vss.length) do |pager|
+      pager.replace(@vss[offset, rp])
     end
+    render :action => 'populate_search_list_of_vs.rjs'
+    #render :partial => 'shared/search_list_of_vs', :locals => {:page_results => @page_results}
   end
 
   def update_refreshbar
@@ -121,14 +118,14 @@ class GsnController < ApplicationController
   end
   #gsn/notify/:code
   def notify
-  	#puts params[:code]
+    #puts params[:code]
     #params.each {|key,value| puts "#{key} ==== #{value.to_s}" }
     #params.each {|key,value| puts "#{key} ==== #{value.is_a?(ActionController::UploadedStringIO) ? value.string : value.to_s}" }
-  	keys,values = [],[]
+    keys,values = [],[]
   	
-  	#params.each {|key,value| puts "#{key} => #{value.is_a?(ActionController::UploadedStringIO) ? Digest::MD5.hexdigest(value.string): value.to_s}" }
-  	#p "ABC".methods
-  	params.each do |key,value| 
+    #params.each {|key,value| puts "#{key} => #{value.is_a?(ActionController::UploadedStringIO) ? Digest::MD5.hexdigest(value.string): value.to_s}" }
+    #p "ABC".methods
+    params.each do |key,value|
       keys<< key 
       if value.is_a?(ActionController::UploadedStringIO)
         values << value.string.to_java_bytes
@@ -136,8 +133,8 @@ class GsnController < ApplicationController
         values << value
       end 
     end
-   	Java::gsn.GSNRequestHandler::deliverDataFromRest(params[:code].to_i,keys.to_java(:string),values.to_java(:object))  	
-  	render :text => "Accepted.", :layout => false,:status => 201
+    Java::gsn.GSNRequestHandler::deliverDataFromRest(params[:code].to_i,keys.to_java(:string),values.to_java(:object))
+    render :text => "Accepted.", :layout => false,:status => 201
   end
 
   :private

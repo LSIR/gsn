@@ -1,8 +1,11 @@
+<div id="close-vs-search-result"><%= link_to_function(image_tag("button_cancel.png"), "$('#search-vs-results').hide()") %></div>
+<div id="search-result-info"><%= page_entries_info page_results, :entry_name => 'item' %></div>
+<%= will_paginate @page_results, :renderer => 'RemoteLinkRenderer', :remote => {:with => "'search_criteria=' + $('search-vs-field').value"} %>
 <% for vs in @page_results -%>
     <div class="result-vs" id="result-vs-<%= vs.get_name %>">
-	<h4><%= vs.get_name %></h4>
-	<p>Enabled or not, position, ..</p>
+	<div class="last-update">Last update: TODO</div>
+	<h4><%= vs.is_enabled ? image_tag('enabled.png') : image_tag('disabled.png') %> <%= vs.get_name %></h4>
+	<div class="description">Description: <%= vs.get_description.to_s %></div>
+	<%= link_to_remote "Add", :update => "posts", :url => { :action => "TODO" } %>
     </div>
 <% end -%>
-<%= will_paginate @page_results, :renderer => 'RemoteLinkRenderer', :remote => {:update => 'search-vs-results', :with => "'search_criteria=' + $('search-vs-field').value"} %>
-<%= page_entries_info page_results, :entry_name => 'item' %>

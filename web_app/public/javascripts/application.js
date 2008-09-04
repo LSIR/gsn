@@ -6,7 +6,7 @@ jQuery(function() {
     $("#flexi-search-bar").flexigrid
 	(
 	{
-			url: 'populate_search_list_of_vs',
+			url: 'jason_search_list_of_vs',
 			dataType: 'json',
 			colModel : [
 				{display: 'Name', name: 'get_name', width: 160, sortable: false, align: 'left', hide: false },
@@ -33,4 +33,6 @@ jQuery(function() {
 			height: 120
 	}
 	);
+
+	hiha
 })

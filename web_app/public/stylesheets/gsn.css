@@ -116,12 +116,14 @@ div.fieldWithErrors {
 
 /* login */
 
-#sidebar #login_box {
-	width: 100%;
+#header #login_box {
+	width: 200px;
+	float: right;
+	padding: 4px;
 }
 
-#sidebar #login_box .textfield,
-#sidebar #login_box .passwordfield { width: 100%; }
+#header #login_box .textfield,
+#header #login_box .passwordfield { width: 90%; }
 
 /* search bar */
 
@@ -137,6 +139,8 @@ div.fieldWithErrors {
 }
 
 #search-vs-results {
+    padding: 4px;
+    z-index: 10;
     border: 2px solid #ffa84c;
     background-color: #ffe0bf;
     width: 600px;
@@ -146,12 +150,78 @@ div.fieldWithErrors {
 
 .result-vs {
     padding: 4px;
-    margin: 4px;
-    border: 1px solid #ffa84c;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border-top: 1px solid #ffa84c;
+    text-align: left;
+}
+
+.result-vs h4,
+.result-vs p,
+.result-vs div {
+    margin: 0;
+}
+
+.result-vs .last-update {
+    float: right;
+    position: relative;
+}
+
+#close-vs-search-result {
+    float: right;
+    margin: 0;
+}
+
+#search-result-info {
+    margin: 0;
+    padding: 4px;
 }
 
 .flexigrid div {
     margin: 0;
+}
+
+/* selectable list of VS (sidebar) */
+
+#selectable-list-of-vs {
+}
+
+#selectable-list-of-vs ul {
+   margin: 0;
+   margin-bottom: 10px;
+    border: 1px solid #ffa84c;
+    background-color: #fcfddc;
+    min-height: 60px;
+}
+
+#selectable-list-of-vs li {
+    display: block;
+    list-style: none;
+}
+
+#selectable-list-of-vs .vs-name  {
+    display: block;
+}
+
+#selectable-list-of-vs .vs-name img {
+    position: relative;
+    top: 10px;
+    left: 15px;
+    float: left;
+}
+
+#selectable-list-of-vs .vs-name a {
+    display: block;
+    padding: 5px 5px 5px 20px;
+    font-weight: bold;
+    border-bottom: 1px solid white;
+    border-left: 10px solid #ffc29f;
+}
+
+#selectable-list-of-vs .vs-name a:hover {
+    background-color: #FFB25F;
+    border-left-color: #FFB25F;
+    color: white;
 }
 
 /* pagination */
