@@ -362,7 +362,10 @@ public class StorageManager {
   }
 
   public static DataEnumerator executeQuery(AbstractQuery abstractQuery,boolean binaryFieldsLinked, Connection connection) throws SQLException {
-    DATABASE db = getDatabaseForConnection(connection);
+	if (abstractQuery.getLimitCriterion() == null) {
+		return executeQuery(abstractQuery.getStandardQuery(), binaryFieldsLinked, connection);
+	}
+	DATABASE db = getDatabaseForConnection(connection);
     String query = db.addLimit(abstractQuery.getStandardQuery().toString(), abstractQuery.getLimitCriterion().getSize(), abstractQuery.getLimitCriterion().getOffset());		
     if (logger.isDebugEnabled())
       logger.debug("Executing query: " + query + "(" + binaryFieldsLinked	+ ")");

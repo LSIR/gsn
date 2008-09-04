@@ -50,6 +50,9 @@ public class SQLUtils {
 			if ( replacement != null ) matcher.appendReplacement( result , new StringBuilder( replacement ).append( "$4" ).toString( ) );
 		}
 		String toReturn = matcher.appendTail( result ).toString( ).toLowerCase( );
+		
+		//TODO " from " has to use regular expressions because now from is separated through space which is not always the case, for instance if the user uses \t(tab) for separating "from" from the rest of the query, then we get exception. The same issue with other sql keywords in this method.
+		
 		int indexOfFrom = toReturn.indexOf( " from " )>=0?toReturn.indexOf( " from " ) + " from ".length( ):0;
 		int indexOfWhere = ( toReturn.lastIndexOf( " where " ) > 0 ? ( toReturn.lastIndexOf( " where " ) ) : toReturn.length( ) );
 		String selection = toReturn.substring( indexOfFrom , indexOfWhere );
