@@ -1,2 +1,0 @@
-page.replace_html 'search-vs-results', :partial => 'shared/search_list_of_vs', :locals => {:page_results => @page_results}
-page["search-vs-results"].show()

@@ -1,5 +1,7 @@
-package gsn;
+package gsn.msr.sensormap;
 
+import gsn.GSNController;
+import gsn.VSensorLoader;
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
@@ -9,26 +11,14 @@ import gsn.wrappers.WrappersUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
@@ -208,77 +198,7 @@ public final class Main {
     return conf;
   }
 
-//FIXME: COPIED_FOR_SAFE_STOAGE
-  public static Properties getWrappers()  {
-    if (singleton==null )
-      return WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
-    return singleton.wrappers;
-  }
-
-  private static final String PUBLIC_KEY_FILE=".public_key";
-
-  private static final String PRIVATE_KEY_FILE=".private_key";
-
-  public static void initPKI ( String publicKeyFile,String privateKeyFile ) throws NoSuchAlgorithmException , NoSuchProviderException , FileNotFoundException , IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
-    // TODO  : Use the pri/pub keys if they exist. (needs verification first).
-    KeyPairGenerator keyGen = KeyPairGenerator.getInstance ( "DSA" , "SUN" );
-    SecureRandom random = SecureRandom.getInstance ( "SHA1PRNG" , "SUN" );
-    keyGen.initialize ( 512 , random );
-    KeyPair pair = keyGen.generateKeyPair ( );
-    PrivateKey priv = pair.getPrivate ( );
-    PublicKey pub = pair.getPublic ( );
-    CertificateFactory certificateFactory =  CertificateFactory.getInstance ("X.509");
-    File privateF = new File (privateKeyFile);
-    File publicF = new File (publicKeyFile);
-    publicF.createNewFile ();
-    privateF.createNewFile ();
-    OutputStream output = new FileOutputStream (privateF );
-    output.write ( priv.getEncoded ( ) );
-    output.close ( );
-    output = new FileOutputStream ( publicF );
-    output.write ( pub.getEncoded ( ) );
-    output.close ( );
-    KeyStore ksca = KeyStore.getInstance ("JKS","SUN");
-    ksca.load (null,null);
-    logger.warn ("Public and Private keys are generated successfully.");
-  }
-
-  private static PrivateKey readPrivateKey () throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException{
-    FileInputStream keyfis = new FileInputStream (PRIVATE_KEY_FILE);
-    byte[] encKey = new byte[keyfis.available ()];
-    keyfis.read (encKey);
-    keyfis.close ();
-    PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec (encKey);
-    KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
-    return keyFactory.generatePrivate (privKeySpec);
-  }
-
-  private static PublicKey readPublicKey () throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
-    FileInputStream keyfis = new FileInputStream (PUBLIC_KEY_FILE);
-    byte[] encKey = new byte[keyfis.available ()];
-    keyfis.read (encKey);
-    keyfis.close ();
-    PKCS8EncodedKeySpec pubKeySpec = new PKCS8EncodedKeySpec (encKey);
-    KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
-    return keyFactory.generatePublic (pubKeySpec);
-  }
-//FIXME: COPIED_FOR_SAFE_STOAGE
-  public  static Class < ? > getWrapperClass ( String id ) {
-    try {
-      String className =  getWrappers().getProperty(id);
-      if (className ==null) { 
-        logger.error("The requested wrapper: "+id+" doesn't exist in the wrappers.properties file.");
-        return null;
-      }
-    
-      return Class.forName(className);  
-    } catch (ClassNotFoundException e) {
-      logger.error(e.getMessage(),e);
-    }
-    return null;
-  }
-
-  public final HashMap < String , VSensorConfig > getVirtualSensors ( ) {
+public final HashMap < String , VSensorConfig > getVirtualSensors ( ) {
     return virtualSensors;
   }
 
@@ -305,25 +225,4 @@ public final class Main {
         return singleton.containerConfig;
   }
 
-  public static String randomTableNameGenerator ( int length ) {
-    byte oneCharacter;
-    StringBuffer result = new StringBuffer ( length );
-    for ( int i = 0 ; i < length ; i++ ) {
-      oneCharacter = ( byte ) ( ( Math.random ( ) * ( 'z' - 'a' + 1 ) ) + 'a' );
-      result.append ( ( char ) oneCharacter );
-    }
-    return result.toString ( );
-  }
-
-  public static int tableNameGenerator ( ) {
-    return randomTableNameGenerator ( 15 ).hashCode ( );
-  }
-
-  public static StringBuilder tableNameGeneratorInString (int code) {
-    StringBuilder sb = new StringBuilder ("_");
-    if (code<0)
-      sb.append ( "_" );
-    sb.append ( Math.abs (code) );
-    return sb;
-  }
 }

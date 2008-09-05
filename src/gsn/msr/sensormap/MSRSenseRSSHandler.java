@@ -1,6 +1,5 @@
 package gsn.msr.sensormap;
 
-import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;

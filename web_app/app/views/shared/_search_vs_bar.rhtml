@@ -1,6 +1,0 @@
-<% if true %>
-    <%= text_field_tag :'search-vs-field', nil, :id => 'search-vs-field' %>
-    <div id="search-vs-results" style="display:none;"></div>
-    <%= observe_field :'search-vs-field', :frequency => 0.5, :url => {:controller => 'gsn', :action => 'populate_search_list_of_vs'}, :with => :query %>
-    <div id="flexi-search-bar"></div>
-<% end %>
