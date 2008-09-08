@@ -1,0 +1,6 @@
+# Misc
+
+Active Scaffold installed with:
+(from the web_app folder)  git clone git://github.com/activescaffold/active_scaffold.git vendor/plugins/active_scaffold
+
+

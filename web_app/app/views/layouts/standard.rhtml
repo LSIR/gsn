@@ -6,45 +6,10 @@
 	<meta http-equiv="Content-Language" content="en-us" />
 	<meta name="robots" content="all" />
 	<title>GSN</title>
-	<%= stylesheet_tag 'gsn', :media =>'screen,projection' %>
-	<%= stylesheet_tag 'flexigrid', :media =>'screen,projection' %>
-	<!-- TODO add the javascript depending on the action / see the possibility to cache those scripts in ROR -->
-	<%=  javascript_include_tag :defaults, 'flexigrid.pack' %>
+	<%=  javascript_include_tag :defaults %>
 	<%= active_scaffold_includes %>
     </head>
     <body>
-	<div id="container">
-	    <div id="header">
-		<div id="login_box">
-		    <%= render :partial => 'shared/loginbox' -%>
-		</div>
-		<h1><%=link_to 'GSN', {:controller => 'gsn', :action => 'home'}, :id => 'gsn-name' %></h1>
-	    </div>
-	    <div id="navigation">
-		<%= render :partial => 'shared/mainmenu' -%>
-	    </div>
-	    <div id="search_vs_bar">
-		<!--<%= render :partial => 'shared/search_vs_bar' -%>-->
-	    </div>
-	    <div id="main">
-		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
-		<div id="feedback">
-		    <%= '<p class="feedback_failure">Error: '   + flash[:failure]	+ '</p>'    unless not flash[:failure] %>
-		    <%= '<p class="feedback_warning">Warning: ' + flash[:warning]	+ '</p>'    unless not flash[:warning] %>
-		    <%= '<p class="feedback_success">'		+ flash[:success]	+ '</p>'    unless not flash[:success] %>
-		</div>
-		<%= yield :layout %>
-	    </div>
-<!--	    <div id="sidebar">
-		<%= render_component :controller => 'gsn', :action => 'populate_selectable_list_of_vs' %>
-	    </div>
--->	    <div id="footer">
-		<p>Powered by <%=link_to 'GSN', 'http://gsn.sourceforge.net/' %>,  Distributed Information Systems Lab, EPFL 2008</p>
-		<p>
-		    <%= link_to image_tag(image_path("html_valid.bmp"), :alt => 'HTML validator'), 'http://validator.w3.org/check?uri=referer' %>
-		    <%= link_to image_tag(image_path("css_valid.bmp"), :alt => 'CSS validator'), 'http://jigsaw.w3.org/css-validator/check?uri=referer' %>
-		</p>
-	    </div>
-	</div>
+	<%= yield :layout %>
     </body>
 </html>
