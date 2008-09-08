@@ -1,0 +1,70 @@
+db\:abort_if_pending_migrations=Raises an error if there are pending migrations
+db\:charset=Retrieves the charset for the current environment's database
+db\:collation=Retrieves the collation for the current environment's database
+db\:create=Create the database defined in config/database.yml for the current RAILS_ENV
+db\:create\:all=Create all the local databases defined in config/database.yml
+db\:drop=Drops the database for the current RAILS_ENV
+db\:drop\:all=Drops all the local databases defined in config/database.yml
+db\:fixtures\:identify=Search for a fixture given a LABEL or ID.
+db\:fixtures\:load=Load fixtures into the current environment's database.  Load specific fixtures using FIXTURES=x,y
+db\:migrate=Migrate the database through scripts in db/migrate. Target specific version with VERSION=x. Turn off output with VERBOSE=false.
+db\:migrate\:down=Runs the "down" for a given migration VERSION.
+db\:migrate\:redo=Rollbacks the database one migration and re migrate up. If you want to rollback more than one step, define STEP=x
+db\:migrate\:reset=Resets your database using your migrations for the current environment
+db\:migrate\:up=Runs the "up" for a given migration VERSION.
+db\:reset=Drops and recreates the database from db/schema.rb for the current environment.
+db\:rollback=Rolls the schema back to the previous version. Specify the number of steps with STEP=n
+db\:schema\:dump=Create a db/schema.rb file that can be portably used against any DB supported by AR
+db\:schema\:load=Load a schema.rb file into the database
+db\:sessions\:clear=Clear the sessions table
+db\:sessions\:create=Creates a sessions migration for use with CGI::Session::ActiveRecordStore
+db\:structure\:dump=Dump the database structure to a SQL file
+db\:test\:clone=Recreate the test database from the current environment's database schema
+db\:test\:clone_structure=Recreate the test databases from the development structure
+db\:test\:prepare=Prepare the test database and load the schema
+db\:test\:purge=Empty the test database
+db\:version=Retrieves the current schema version number
+doc\:app=Build the app HTML Files
+doc\:clobber_app=Remove rdoc products
+doc\:clobber_plugins=Remove plugin documentation
+doc\:clobber_rails=Remove rdoc products
+doc\:plugins=Generate documentation for all installed plugins
+doc\:rails=Build the rails HTML Files
+doc\:reapp=Force a rebuild of the RDOC files
+doc\:rerails=Force a rebuild of the RDOC files
+gems=List the gems that this rails application depends on
+gems\:build=Build any native extensions for unpacked gems
+gems\:install=Installs all required gems for this application.
+gems\:unpack=Unpacks the specified gem into vendor/gems.
+gems\:unpack\:dependencies=Unpacks the specified gems and its dependencies into vendor/gems
+log\:clear=Truncates all *.log files in log/ to zero bytes
+notes=Enumerate all annotations
+notes\:fixme=Enumerate all FIXME annotations
+notes\:optimize=Enumerate all OPTIMIZE annotations
+notes\:todo=Enumerate all TODO annotations
+rails\:freeze\:edge=Lock to latest Edge Rails, for a specific release use RELEASE=1.2.0
+rails\:freeze\:gems=Lock this application to the current gems (by unpacking them into vendor/rails)
+rails\:unfreeze=Unlock this application from freeze of gems or edge and return to a fluid use of system gems
+rails\:update=Update both configs, scripts and public/javascripts from Rails
+rails\:update\:configs=Update config/boot.rb from your current rails install
+rails\:update\:javascripts=Update your javascripts from your current rails install
+rails\:update\:scripts=Add new scripts to the application script/ directory
+routes=Print out all defined routes in match order, with names.
+secret=Generate a crytographically secure secret key. This is typically used to generate a secret for cookie sessions. Pass a unique identifier to the generator using ID="some unique identifier" for greater security.
+stats=Report code statistics (KLOCs, etc) from the application
+test=Run all unit, functional and integration tests
+test\:functionals=Run tests for functionalsdb:test:prepare / Run the functional tests in test/functional
+test\:integration=Run tests for integrationdb:test:prepare / Run the integration tests in test/integration
+test\:plugins=Run tests for pluginsenvironment / Run the plugin tests in vendor/plugins/*/**/test (or specify with PLUGIN=name)
+test\:recent=Run tests for recentdb:test:prepare / Test recent changes
+test\:uncommitted=Run tests for uncommitteddb:test:prepare / Test changes since last checkin (only Subversion)
+test\:units=Run tests for unitsdb:test:prepare / Run the unit tests in test/unit
+time\:zones\:all=Displays names of all time zones recognized by the Rails TimeZone class, grouped by offset. Results can be filtered with optional OFFSET parameter, e.g., OFFSET=-6
+time\:zones\:local=Displays names of time zones recognized by the Rails TimeZone class with the same offset as the system local time
+time\:zones\:us=Displays names of US time zones recognized by the Rails TimeZone class, grouped by offset. Results can be filtered with optional OFFSET parameter, e.g., OFFSET=-6
+tmp\:cache\:clear=Clears all files and directories in tmp/cache
+tmp\:clear=Clear session, cache, and socket files from tmp/
+tmp\:create=Creates tmp directories for sessions, cache, and sockets
+tmp\:pids\:clear=Clears all files in tmp/pids
+tmp\:sessions\:clear=Clears all files in tmp/sessions
+tmp\:sockets\:clear=Clears all files in tmp/sockets
