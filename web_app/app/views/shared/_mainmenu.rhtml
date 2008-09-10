@@ -1,0 +1,12 @@
+<ul>
+    <li <%= current_page?(:action => :home) ? 'class="selected"':''%>><%= link_to 'Home', :controller => :gsn, :action => :home %></li>
+    <li <%= current_page?(:action => :deployments) ? 'class="selected"':''%>><%= link_to 'Deployments', :controller => :gsn, :action => :deployments %></li>
+    <li <%= current_page?(:action => :sensors) ? 'class="selected"':''%>><%= link_to 'Data', :controller => :gsn, :action => :sensors %></li>
+    <li <%= current_page?(:action => :map) ? 'class="selected"':''%>><%= link_to 'Map', :controller => :gsn, :action => :map %></li>
+    <% if true #not session[:user_id].nil?
+    %>
+	<li <%= current_page?(:action => :runtime) ? 'class="selected"':''%>><%= link_to 'Runtime', :controller => :management, :action => :runtime%></li>
+	<li <%= current_page?(:action => :preferences) ? 'class="selected"':''%>><%= link_to 'Preferences', :controller => :management, :action => :preferences %></li>
+    <% end %>
+    <li <%= current_page?(:action => :about) ? 'class="selected"':''%>><%= link_to 'About', :controller => :management, :action => :about %></li>
+</ul>

@@ -1,0 +1,2 @@
+class OutputFormatController < ApplicationController
+end

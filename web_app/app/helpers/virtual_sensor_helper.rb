@@ -1,0 +1,2 @@
+module VirtualSensorHelper
+end
