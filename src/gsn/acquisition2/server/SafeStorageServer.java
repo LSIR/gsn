@@ -29,7 +29,10 @@ public class SafeStorageServer {
 		// Prepare the service configuration.
 		SocketAcceptorConfig cfg = new SocketAcceptorConfig();
 		cfg.setReuseAddress(true);
-		cfg.getFilterChain().addLast("codec",   new ProtocolCodecFilter( new ObjectSerializationCodecFactory()));
+		ObjectSerializationCodecFactory oscf = new ObjectSerializationCodecFactory();
+	    oscf.setDecoderMaxObjectSize(oscf.getEncoderMaxObjectSize());
+	    logger.debug("MINA Decoder MAX: " + oscf.getDecoderMaxObjectSize() + " MINA Encoder MAX: " + oscf.getEncoderMaxObjectSize());
+		cfg.getFilterChain().addLast("codec",   new ProtocolCodecFilter(oscf));
 		acceptor.bind(new InetSocketAddress(portNo),   new SafeStorageServerSessionHandler(ss), cfg);
 		logger.info("Safe Storage Server is listening on port: " + portNo);
 	}
