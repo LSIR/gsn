@@ -1,0 +1,35 @@
+<virtual-sensor name="r_moving_average_vs" priority="10">
+	<processing-class>
+		<class-name>gsn.vsensor.RVirtualSensor</class-name>
+		<init-params>
+      <param name="script">./virtual-sensors/statistics/sma.r</param>
+			<param name="window_size">10</param>
+			<param name="step_size">1</param>
+      <param name="server">192.168.58.129</param>			
+		</init-params>
+		<output-structure>
+			<field name="output_data" type="double"/>
+			<field name="output_plot" type="binary:image/jpeg"/>
+		</output-structure>
+	</processing-class>
+	<description>R Script for calculating Simple Moving Average</description>
+	<life-cycle pool-size="10"/>
+  <addressing>
+    <predicate key="geographical">Sensor 115 @ EPFL</predicate>
+    <predicate key="LATITUDE">46.520190</predicate>
+    <predicate key="LONGITUDE">6.565010</predicate>     
+  </addressing>
+	<storage history-size="1h"/>
+  <streams>
+    <stream name="in1">
+      <source alias="s1" sampling-rate="1" storage-size="1">
+        <address wrapper="multiformat">
+          <predicate key="HOST">localhost</predicate>
+          <predicate key="PORT">22001</predicate>
+        </address>
+        <query>SELECT light, temperature, packet_type, timed FROM wrapper</query>
+      </source>
+      <query>SELECT temperature AS output_data, timed FROM s1</query>
+    </stream>
+  </streams>
+</virtual-sensor>
