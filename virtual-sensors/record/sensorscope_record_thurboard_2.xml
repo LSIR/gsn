@@ -1,4 +1,4 @@
-<virtual-sensor name="sensorscope_record_thurboard_2" priority="10" >
+<virtual-sensor name="record_sensorscope_2" priority="10" >
 	<processing-class>
 		<class-name>gsn.vsensor.SensorscopeVS</class-name>
 		<output-structure>
