@@ -61,6 +61,7 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 				StringBuilder rawmsgoutput = new StringBuilder ();
 				for (int i = 0 ; i < rawmsg.length ; i++) {
 					rawmsgoutput.append(rawmsg[i]);
+					rawmsgoutput.append(" ");
 				}
 				logger.debug("new message to be processed: " + rawmsgoutput.toString());
 			}
@@ -89,6 +90,7 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 
 			// Update TIMED field
 			if (parameters.getTimedFieldGetter() != null) {
+				logger.debug("Update TIMED field");
 				parameters.getTimedFieldGetter().setAccessible(true);
 				Long ts = (Long) parameters.getTimedFieldGetter().invoke(msg);
 				postStreamElement(ts.longValue(), output.toArray(new Serializable[] {}));

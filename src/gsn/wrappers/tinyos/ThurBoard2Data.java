@@ -9,12 +9,12 @@ package gsn.wrappers.tinyos;
 public class ThurBoard2Data extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 19;
+    public static final int DEFAULT_MESSAGE_SIZE = 28;
 
     /** The Active Message type associated with this message. */
-    public static final int AM_TYPE = 180;
+    public static final int AM_TYPE = 128;
 
-    /** Create a new ThurBoard2Data of size 19. */
+    /** Create a new ThurBoard2Data of size 28. */
     public ThurBoard2Data() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -87,6 +87,24 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     public String toString() {
       String s = "Message <ThurBoard2Data> \n";
       try {
+        s += "  [ntw_sender_id=0x"+Long.toHexString(get_ntw_sender_id())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [ntw_cost_to_bs=0x"+Long.toHexString(get_ntw_cost_to_bs())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [tsp_hop_count=0x"+Long.toHexString(get_tsp_hop_count())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [tsp_packet_sn=0x"+Long.toHexString(get_tsp_packet_sn())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [reporter_id=0x"+Long.toHexString(get_reporter_id())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [timestamp=0x"+Long.toHexString(get_timestamp())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
         s += "  [air_temperature=0x"+Long.toHexString(get_air_temperature())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
@@ -128,9 +146,387 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     // Message-type-specific access methods appear below.
 
     /////////////////////////////////////////////////////////
+    // Accessor methods for field: ntw_sender_id
+    //   Field type: short, unsigned
+    //   Offset (bits): 0
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'ntw_sender_id' is signed (false).
+     */
+    public static boolean isSigned_ntw_sender_id() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'ntw_sender_id' is an array (false).
+     */
+    public static boolean isArray_ntw_sender_id() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'ntw_sender_id'
+     */
+    public static int offset_ntw_sender_id() {
+        return (0 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'ntw_sender_id'
+     */
+    public static int offsetBits_ntw_sender_id() {
+        return 0;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'ntw_sender_id'
+     */
+    public short get_ntw_sender_id() {
+        return (short)getUIntBEElement(offsetBits_ntw_sender_id(), 8);
+    }
+
+    /**
+     * Set the value of the field 'ntw_sender_id'
+     */
+    public void set_ntw_sender_id(short value) {
+        setUIntBEElement(offsetBits_ntw_sender_id(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'ntw_sender_id'
+     */
+    public static int size_ntw_sender_id() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'ntw_sender_id'
+     */
+    public static int sizeBits_ntw_sender_id() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: ntw_cost_to_bs
+    //   Field type: short, unsigned
+    //   Offset (bits): 8
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'ntw_cost_to_bs' is signed (false).
+     */
+    public static boolean isSigned_ntw_cost_to_bs() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'ntw_cost_to_bs' is an array (false).
+     */
+    public static boolean isArray_ntw_cost_to_bs() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'ntw_cost_to_bs'
+     */
+    public static int offset_ntw_cost_to_bs() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'ntw_cost_to_bs'
+     */
+    public static int offsetBits_ntw_cost_to_bs() {
+        return 8;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'ntw_cost_to_bs'
+     */
+    public short get_ntw_cost_to_bs() {
+        return (short)getUIntBEElement(offsetBits_ntw_cost_to_bs(), 8);
+    }
+
+    /**
+     * Set the value of the field 'ntw_cost_to_bs'
+     */
+    public void set_ntw_cost_to_bs(short value) {
+        setUIntBEElement(offsetBits_ntw_cost_to_bs(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'ntw_cost_to_bs'
+     */
+    public static int size_ntw_cost_to_bs() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'ntw_cost_to_bs'
+     */
+    public static int sizeBits_ntw_cost_to_bs() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: tsp_hop_count
+    //   Field type: short, unsigned
+    //   Offset (bits): 16
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'tsp_hop_count' is signed (false).
+     */
+    public static boolean isSigned_tsp_hop_count() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'tsp_hop_count' is an array (false).
+     */
+    public static boolean isArray_tsp_hop_count() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'tsp_hop_count'
+     */
+    public static int offset_tsp_hop_count() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'tsp_hop_count'
+     */
+    public static int offsetBits_tsp_hop_count() {
+        return 16;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'tsp_hop_count'
+     */
+    public short get_tsp_hop_count() {
+        return (short)getUIntBEElement(offsetBits_tsp_hop_count(), 8);
+    }
+
+    /**
+     * Set the value of the field 'tsp_hop_count'
+     */
+    public void set_tsp_hop_count(short value) {
+        setUIntBEElement(offsetBits_tsp_hop_count(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'tsp_hop_count'
+     */
+    public static int size_tsp_hop_count() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'tsp_hop_count'
+     */
+    public static int sizeBits_tsp_hop_count() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: tsp_packet_sn
+    //   Field type: short, unsigned
+    //   Offset (bits): 24
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'tsp_packet_sn' is signed (false).
+     */
+    public static boolean isSigned_tsp_packet_sn() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'tsp_packet_sn' is an array (false).
+     */
+    public static boolean isArray_tsp_packet_sn() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'tsp_packet_sn'
+     */
+    public static int offset_tsp_packet_sn() {
+        return (24 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'tsp_packet_sn'
+     */
+    public static int offsetBits_tsp_packet_sn() {
+        return 24;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'tsp_packet_sn'
+     */
+    public short get_tsp_packet_sn() {
+        return (short)getUIntBEElement(offsetBits_tsp_packet_sn(), 8);
+    }
+
+    /**
+     * Set the value of the field 'tsp_packet_sn'
+     */
+    public void set_tsp_packet_sn(short value) {
+        setUIntBEElement(offsetBits_tsp_packet_sn(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'tsp_packet_sn'
+     */
+    public static int size_tsp_packet_sn() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'tsp_packet_sn'
+     */
+    public static int sizeBits_tsp_packet_sn() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: reporter_id
+    //   Field type: short, unsigned
+    //   Offset (bits): 32
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'reporter_id' is signed (false).
+     */
+    public static boolean isSigned_reporter_id() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'reporter_id' is an array (false).
+     */
+    public static boolean isArray_reporter_id() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'reporter_id'
+     */
+    public static int offset_reporter_id() {
+        return (32 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'reporter_id'
+     */
+    public static int offsetBits_reporter_id() {
+        return 32;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'reporter_id'
+     */
+    public short get_reporter_id() {
+        return (short)getUIntBEElement(offsetBits_reporter_id(), 8);
+    }
+
+    /**
+     * Set the value of the field 'reporter_id'
+     */
+    public void set_reporter_id(short value) {
+        setUIntBEElement(offsetBits_reporter_id(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'reporter_id'
+     */
+    public static int size_reporter_id() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'reporter_id'
+     */
+    public static int sizeBits_reporter_id() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: timestamp
+    //   Field type: long, unsigned
+    //   Offset (bits): 40
+    //   Size (bits): 32
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'timestamp' is signed (false).
+     */
+    public static boolean isSigned_timestamp() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'timestamp' is an array (false).
+     */
+    public static boolean isArray_timestamp() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'timestamp'
+     */
+    public static int offset_timestamp() {
+        return (40 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'timestamp'
+     */
+    public static int offsetBits_timestamp() {
+        return 40;
+    }
+
+    /**
+     * Return the value (as a long) of the field 'timestamp'
+     */
+    public long get_timestamp() {
+        return (long)getUIntBEElement(offsetBits_timestamp(), 32);
+    }
+
+    /**
+     * Set the value of the field 'timestamp'
+     */
+    public void set_timestamp(long value) {
+        setUIntBEElement(offsetBits_timestamp(), 32, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'timestamp'
+     */
+    public static int size_timestamp() {
+        return (32 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'timestamp'
+     */
+    public static int sizeBits_timestamp() {
+        return 32;
+    }
+
+    /////////////////////////////////////////////////////////
     // Accessor methods for field: air_temperature
     //   Field type: int, unsigned
-    //   Offset (bits): 0
+    //   Offset (bits): 72
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -152,14 +548,14 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'air_temperature'
      */
     public static int offset_air_temperature() {
-        return (0 / 8);
+        return (72 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'air_temperature'
      */
     public static int offsetBits_air_temperature() {
-        return 0;
+        return 72;
     }
 
     /**
@@ -193,7 +589,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: air_humidity
     //   Field type: short, unsigned
-    //   Offset (bits): 16
+    //   Offset (bits): 88
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -215,14 +611,14 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'air_humidity'
      */
     public static int offset_air_humidity() {
-        return (16 / 8);
+        return (88 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'air_humidity'
      */
     public static int offsetBits_air_humidity() {
-        return 16;
+        return 88;
     }
 
     /**
@@ -257,7 +653,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: surface_temperature
     //   Field type: short, unsigned
-    //   Offset (bits): 28
+    //   Offset (bits): 100
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -277,17 +673,17 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
 
     /**
      * Return the offset (in bytes) of the field 'surface_temperature'
-     * WARNING: This field is not byte-aligned (bit offset 28).
+     * WARNING: This field is not byte-aligned (bit offset 100).
      */
     public static int offset_surface_temperature() {
-        return (28 / 8);
+        return (100 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'surface_temperature'
      */
     public static int offsetBits_surface_temperature() {
-        return 28;
+        return 100;
     }
 
     /**
@@ -322,7 +718,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: soil_moisture_1
     //   Field type: short, unsigned
-    //   Offset (bits): 40
+    //   Offset (bits): 112
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -344,14 +740,14 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'soil_moisture_1'
      */
     public static int offset_soil_moisture_1() {
-        return (40 / 8);
+        return (112 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'soil_moisture_1'
      */
     public static int offsetBits_soil_moisture_1() {
-        return 40;
+        return 112;
     }
 
     /**
@@ -386,7 +782,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: soil_temperature_1
     //   Field type: short, unsigned
-    //   Offset (bits): 52
+    //   Offset (bits): 124
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -406,17 +802,17 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
 
     /**
      * Return the offset (in bytes) of the field 'soil_temperature_1'
-     * WARNING: This field is not byte-aligned (bit offset 52).
+     * WARNING: This field is not byte-aligned (bit offset 124).
      */
     public static int offset_soil_temperature_1() {
-        return (52 / 8);
+        return (124 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'soil_temperature_1'
      */
     public static int offsetBits_soil_temperature_1() {
-        return 52;
+        return 124;
     }
 
     /**
@@ -451,7 +847,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: soil_conductivity_1
     //   Field type: short, unsigned
-    //   Offset (bits): 64
+    //   Offset (bits): 136
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -473,14 +869,14 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'soil_conductivity_1'
      */
     public static int offset_soil_conductivity_1() {
-        return (64 / 8);
+        return (136 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'soil_conductivity_1'
      */
     public static int offsetBits_soil_conductivity_1() {
-        return 64;
+        return 136;
     }
 
     /**
@@ -515,7 +911,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: soil_moisture_2
     //   Field type: short, unsigned
-    //   Offset (bits): 76
+    //   Offset (bits): 148
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -535,17 +931,17 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
 
     /**
      * Return the offset (in bytes) of the field 'soil_moisture_2'
-     * WARNING: This field is not byte-aligned (bit offset 76).
+     * WARNING: This field is not byte-aligned (bit offset 148).
      */
     public static int offset_soil_moisture_2() {
-        return (76 / 8);
+        return (148 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'soil_moisture_2'
      */
     public static int offsetBits_soil_moisture_2() {
-        return 76;
+        return 148;
     }
 
     /**
@@ -580,7 +976,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: soil_temperature_2
     //   Field type: short, unsigned
-    //   Offset (bits): 88
+    //   Offset (bits): 160
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -602,14 +998,14 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'soil_temperature_2'
      */
     public static int offset_soil_temperature_2() {
-        return (88 / 8);
+        return (160 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'soil_temperature_2'
      */
     public static int offsetBits_soil_temperature_2() {
-        return 88;
+        return 160;
     }
 
     /**
@@ -644,7 +1040,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: soil_conductivity_2
     //   Field type: short, unsigned
-    //   Offset (bits): 100
+    //   Offset (bits): 172
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -664,17 +1060,17 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
 
     /**
      * Return the offset (in bytes) of the field 'soil_conductivity_2'
-     * WARNING: This field is not byte-aligned (bit offset 100).
+     * WARNING: This field is not byte-aligned (bit offset 172).
      */
     public static int offset_soil_conductivity_2() {
-        return (100 / 8);
+        return (172 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'soil_conductivity_2'
      */
     public static int offsetBits_soil_conductivity_2() {
-        return 100;
+        return 172;
     }
 
     /**
@@ -709,7 +1105,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: soil_moisture_3
     //   Field type: short, unsigned
-    //   Offset (bits): 112
+    //   Offset (bits): 184
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -731,14 +1127,14 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'soil_moisture_3'
      */
     public static int offset_soil_moisture_3() {
-        return (112 / 8);
+        return (184 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'soil_moisture_3'
      */
     public static int offsetBits_soil_moisture_3() {
-        return 112;
+        return 184;
     }
 
     /**
@@ -773,7 +1169,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: soil_temperature_3
     //   Field type: short, unsigned
-    //   Offset (bits): 124
+    //   Offset (bits): 196
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -793,17 +1189,17 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
 
     /**
      * Return the offset (in bytes) of the field 'soil_temperature_3'
-     * WARNING: This field is not byte-aligned (bit offset 124).
+     * WARNING: This field is not byte-aligned (bit offset 196).
      */
     public static int offset_soil_temperature_3() {
-        return (124 / 8);
+        return (196 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'soil_temperature_3'
      */
     public static int offsetBits_soil_temperature_3() {
-        return 124;
+        return 196;
     }
 
     /**
@@ -838,7 +1234,7 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: soil_conductivity_3
     //   Field type: short, unsigned
-    //   Offset (bits): 136
+    //   Offset (bits): 208
     //   Size (bits): 12
     /////////////////////////////////////////////////////////
 
@@ -860,14 +1256,14 @@ public class ThurBoard2Data extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'soil_conductivity_3'
      */
     public static int offset_soil_conductivity_3() {
-        return (136 / 8);
+        return (208 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'soil_conductivity_3'
      */
     public static int offsetBits_soil_conductivity_3() {
-        return 136;
+        return 208;
     }
 
     /**

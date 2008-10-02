@@ -34,6 +34,15 @@ public class SensorscopeVS extends AbstractVirtualSensor {
     private static final String SKIN_TEMPERATURE = "SKINTEMPERATURE";
     private static final String SOIL_MOISTURE = "SOILMOISTURE";
     private static final String WIND_DIRECTION = "WINDDIRECTION";
+    private static final String SOIL_CONDUCTIVITY_1 = "SOILCONDUCTIVITY1";
+    private static final String SOIL_CONDUCTIVITY_2 = "SOILCONDUCTIVITY2";
+    private static final String SOIL_CONDUCTIVITY_3 = "SOILCONDUCTIVITY3";
+    private static final String SOIL_MOISTURE_1	= "SOILMOISTURE1";
+    private static final String SOIL_MOISTURE_2	= "SOILMOISTURE2";
+    private static final String SOIL_MOISTURE_3	= "SOILMOISTURE3";
+    private static final String SOIL_TEMPERATURE_1 = "SOILTEMPERATURE1";
+    private static final String SOIL_TEMPERATURE_2 = "SOILTEMPERATURE2";
+    private static final String SOIL_TEMPERATURE_3 = "SOILTEMPERATURE3";
     private static final String FOO = "FOO";
     
     public boolean initialize ( ) {
@@ -66,6 +75,15 @@ public class SensorscopeVS extends AbstractVirtualSensor {
         double skinTemperature = NO_VALUE;
         double soilMoisture = NO_VALUE;
         double windDirection = NO_VALUE;
+        double soilConductivity1 = NO_VALUE;
+        double soilConductivity2 = NO_VALUE;
+        double soilConductivity3 = NO_VALUE;
+        short soilMoisture1 = NO_VALUE;
+        short soilMoisture2 = NO_VALUE;
+        short soilMoisture3 = NO_VALUE;
+        double soilTemperature1 = NO_VALUE;
+        double soilTemperature2 = NO_VALUE;
+        double soilTemperature3 = NO_VALUE;
         short foo = 0;
         
         // Air temperature is needed afterwards by watermark and humidity,
@@ -93,6 +111,63 @@ public class SensorscopeVS extends AbstractVirtualSensor {
         i=0;
         for(String fieldName : data.getFieldNames()) {
             fieldName = fieldName.toUpperCase();
+            if (fieldName.equals(SOIL_CONDUCTIVITY_1)) {
+            	soilConductivity1 = getSoilConductivity((Short)dataFields[i]);
+            	fieldNames.add(SOIL_CONDUCTIVITY_1);
+            	dataTypes.add(DataTypes.DOUBLE);
+            	datas.add(soilConductivity1);
+            }
+            if (fieldName.equals(SOIL_CONDUCTIVITY_2)) {
+            	soilConductivity2 = getSoilConductivity((Short)dataFields[i]);
+            	fieldNames.add(SOIL_CONDUCTIVITY_2);
+            	dataTypes.add(DataTypes.DOUBLE);
+            	datas.add(soilConductivity2);
+            }
+            if (fieldName.equals(SOIL_CONDUCTIVITY_3)) {
+            	soilConductivity3 = getSoilConductivity((Short)dataFields[i]);
+            	fieldNames.add(SOIL_CONDUCTIVITY_3);
+            	dataTypes.add(DataTypes.DOUBLE);
+            	datas.add(soilConductivity3);
+            }
+            //
+            if (fieldName.equals(SOIL_MOISTURE_1)) {
+            	soilMoisture1 = (Short)dataFields[i];
+            	fieldNames.add(SOIL_MOISTURE_1);
+            	dataTypes.add(DataTypes.SMALLINT);
+            	datas.add(soilMoisture1);
+            }
+            if (fieldName.equals(SOIL_MOISTURE_2)) {
+            	soilMoisture2 = (Short)dataFields[i];
+            	fieldNames.add(SOIL_MOISTURE_2);
+            	dataTypes.add(DataTypes.SMALLINT);
+            	datas.add(soilMoisture2);
+            }
+            if (fieldName.equals(SOIL_MOISTURE_3)) {
+            	soilMoisture3 = (Short)dataFields[i];
+            	fieldNames.add(SOIL_MOISTURE_3);
+            	dataTypes.add(DataTypes.SMALLINT);
+            	datas.add(soilMoisture3);
+            }
+            //
+            if (fieldName.equals(SOIL_TEMPERATURE_1)) {
+            	soilTemperature1 = getSoilTemperature((Short)dataFields[i]);
+            	fieldNames.add(SOIL_TEMPERATURE_1);
+            	dataTypes.add(DataTypes.DOUBLE);
+            	datas.add(soilTemperature1);
+            }
+            if (fieldName.equals(SOIL_TEMPERATURE_2)) {
+            	soilTemperature2 = getSoilTemperature((Short)dataFields[i]);
+            	fieldNames.add(SOIL_TEMPERATURE_2);
+            	dataTypes.add(DataTypes.DOUBLE);
+            	datas.add(soilTemperature2);
+            }
+            if (fieldName.equals(SOIL_TEMPERATURE_3)) {
+            	soilTemperature3 = getSoilTemperature((Short)dataFields[i]);
+            	fieldNames.add(SOIL_TEMPERATURE_3);
+            	dataTypes.add(DataTypes.DOUBLE);
+            	datas.add(soilTemperature3);
+            }
+            //
             if(fieldName.equals(NTW_SENDER_ID)) {
                 ntwSenderId = (Short) dataFields[i];
                 fieldNames.add(NTW_SENDER_ID);
@@ -148,22 +223,22 @@ public class SensorscopeVS extends AbstractVirtualSensor {
                 dataTypes.add(DataTypes.DOUBLE);
                 datas.add(airTemperature);
             } else if(fieldName.equals(AIR_HUMIDITY)) {
-                airHumidity = getHumidity((Integer) dataFields[i], airTemperature);
+                airHumidity = getHumidity((Integer) ((Number)dataFields[i]).intValue(), airTemperature);
                 fieldNames.add(AIR_HUMIDITY);
                 dataTypes.add(DataTypes.DOUBLE);
                 datas.add(airHumidity);
             } else if(fieldName.equals(SKIN_TEMPERATURE)) {
-                skinTemperature = getSkinTemperature((Integer) dataFields[i]);
+                skinTemperature = getSkinTemperature((Integer) ((Number)dataFields[i]).intValue());
                 fieldNames.add(SKIN_TEMPERATURE);
                 dataTypes.add(DataTypes.DOUBLE);
                 datas.add(skinTemperature);
             } else if(fieldName.equals(SOIL_MOISTURE)) {
-                soilMoisture = getSoilMoisture((Integer) dataFields[i]);
+                soilMoisture = getSoilMoisture((Integer) ((Number)dataFields[i]).intValue());
                 fieldNames.add(SOIL_MOISTURE);
                 dataTypes.add(DataTypes.DOUBLE);
                 datas.add(soilMoisture);
             } else if(fieldName.equals(WIND_DIRECTION)) {
-                windDirection = getWindDirection((Integer) dataFields[i]);
+                windDirection = getWindDirection((Integer) ((Number)dataFields[i]).intValue());
                 fieldNames.add(WIND_DIRECTION);
                 dataTypes.add(DataTypes.DOUBLE);
                 datas.add(windDirection);
@@ -183,6 +258,15 @@ public class SensorscopeVS extends AbstractVirtualSensor {
                 System.currentTimeMillis() );
         dataProduced( out, true );//flexibile output.
  }
+    
+    public double getSoilTemperature (short rawValue) {
+    	return ((double)rawValue - 400.0) / 10.0;
+    }
+    
+    public double getSoilConductivity (short rawValue) {
+    	if (rawValue <= 1000) return rawValue / 10;
+    	return (rawValue / 10) - 90;
+    }
     
    public double getRainMeter ( short rawValue ) {
       return rawValue * 0.254;
