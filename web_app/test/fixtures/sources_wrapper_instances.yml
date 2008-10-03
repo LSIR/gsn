@@ -1,0 +1,9 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  wrapper_instance_id: 1
+  source_id: 1
+
+two:
+  wrapper_instance_id: 1
+  source_id: 1

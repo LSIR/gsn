@@ -1,0 +1,17 @@
+<% @web_command = web_command %>
+<tr>
+    <td colspan="4">
+	<%= error_messages_for :web_command -%>
+    </td>
+</tr>
+<tr class="gsn_vsd_table">
+
+    <% new_or_existing = web_command.new_record? ? 'new' : 'existing' -%>
+    <% prefix = "processor[new_web_input_attributes][][#{new_or_existing}_web_command_attributes][]" -%>
+    <% fields_for prefix, web_command do |init_form| -%>
+      <td><%= init_form.text_field :name -%></td>
+      <td><%= init_form.text_field :description -%></td>
+      <td><%= init_form.text_field :rule -%></td>
+      <td><%= link_to_function "remove" , "$(this).parent().parent().prev().remove(); $(this).parent().parent().remove()" -%></td>
+    <% end -%>
+</tr>

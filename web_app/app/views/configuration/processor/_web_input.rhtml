@@ -1,0 +1,35 @@
+<% @web_input = web_input %>
+<tr >
+    <td colspan="3">
+	<%= error_messages_for :web_input -%>
+    </td>
+</tr>
+<tr class="gsn_vsd_table">
+    <% new_or_existing = web_input.new_record? ? 'new' : 'existing' -%>
+    <% prefix = "processor[#{new_or_existing}_web_input_attributes][]" -%>
+    <% fields_for prefix, web_input do |init_form| -%>
+      <td><%= init_form.text_field :name -%></td>
+      <td><%= init_form.text_field :description -%></td>
+      <td>
+	  <%= link_to_function "remove" , "$(this).parent().parent().prev().remove(); $(this).parent().parent().next().remove(); $(this).parent().parent().remove()" -%>
+      </td>
+    <% end -%>
+</tr>
+<tr>
+    <td colspan="3">
+	<h4>Web Commands</h4>
+	<table>
+	    <thead>
+		<tr>
+		    <td>Name</td>
+		    <td>Description</td>
+		    <td>Rule</td>
+		    <td><%= link_to_remote "Add Web Command", :url => { :action => "add_web_command", :id => web_input.id } -%></td>
+		</tr>
+	    </thead>
+	    <tbody id="web_input_<%= web_input.id %>_web_commands">
+		<%= render :partial => '/configuration/processor/web_command', :collection => web_input.web_commands -%>
+	    </tbody>
+	</table>
+    </td>
+</tr>

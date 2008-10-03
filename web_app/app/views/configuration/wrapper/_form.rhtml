@@ -1,0 +1,29 @@
+<% @wrapper = wrapper %>
+<%= error_messages_for :wrapper %>
+<% form_for wrapper, :url => { :action => (wrapper.new_record? ? :create_wrapper : :update_wrapper), :id => wrapper.id} do |form| -%>
+  <table class="gsn_vsd_table">
+      <tbody>
+	  <tr><td>Name</td><td><%=form.text_field :name%></td></tr>
+	  <tr><td>Class Name</td><td><%=form.text_field :class_name%></td></tr>
+	  <tr><td>Description</td><td><%=form.text_field :description%></td></tr>
+      </tbody>
+  </table>
+  <div id="wrapper_form">
+      <table>
+	  <thead>
+	      <tr>
+		  <td>Name</td>
+		  <td>Data Type</td>
+		  <td>Default Value</td>
+		  <td>Optional</td>
+		  <td>Description</td>
+		  <td><%= add_wrapper_init_link("Add a Parameter", wrapper.id) %></td>
+	      </tr>
+	  </thead>
+	  <tbody id="wrapper_<%=  wrapper.id %>_inits">
+	      <%= render :partial => '/configuration/wrapper/wrapper_init', :collection => wrapper.wrapper_inits %>
+	  </tbody>
+      </table>
+  </div>
+  <%=form.submit "Save" %>
+<% end %>

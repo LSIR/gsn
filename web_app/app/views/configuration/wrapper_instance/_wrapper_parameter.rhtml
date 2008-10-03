@@ -1,0 +1,23 @@
+<% new_or_existing = wrapper_instance.new_record? ? 'new' : 'existing' -%>
+<% prefix = "wrapper_instance[#{new_or_existing}_wrapper_parameter_attributes][]" -%>
+<% for wrapper_init in wrapper.wrapper_inits -%>
+  <% wrapper_parameter = wrapper_instance.wrapper_parameters.to_a.find { |parameter| parameter.wrapper_init_id == wrapper_init.id } -%>
+  <% wrapper_parameter = wrapper_parameter.nil? ? WrapperParameter.new : wrapper_parameter -%>
+  <% @wrapper_parameter = wrapper_parameter %>
+  <tr>
+      <td colspan="6">
+	  <%= error_messages_for :wrapper_parameter -%>
+      </td>
+  </tr>
+  <tr class="gsn_vsd_table">
+      <% fields_for prefix, wrapper_parameter do |init_form| -%>
+	<%= init_form.hidden_field :wrapper_init_id, :value => wrapper_init.id %>
+	<td><%= wrapper_init.name %></td>
+	<td><%= init_form.text_field :value -%></td>
+	<td><%= wrapper_init.data_type.name %></td>
+	<td><%= wrapper_init.default_value %></td>
+	<td><%= wrapper_init.optional %></td>
+	<td><%= init_form.text_field :note %></td>
+      <% end -%>
+  </tr>
+<% end -%>

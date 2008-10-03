@@ -1,0 +1,200 @@
+
+
+div#text {
+  padding: 10px 20px 20px 20px;
+  width: 540px;
+}
+
+div#text h1 {
+  color: #fff;
+  text-transform: none;
+  font-size: 1.8em;
+}
+
+div#text p {
+  color: #eee;
+  font-family: georgia;
+  font-size: 14px;
+  color: #ccc;
+}
+
+div#cta {
+  width: 270px;
+  float: right;
+  right: 0px;
+  padding: 10px;
+}
+
+div#cta h2 {
+  color: #fff;
+}
+
+div#cta p a {
+  background: url(/images/login.png) no-repeat;
+}
+
+div#content {
+  padding: 0;
+  width: 870px;
+}
+
+div.left {
+  background: #fff url(/images/bg_top-l.gif) repeat-x;
+  padding: 20px;
+}
+
+div.left h1 {
+  font-size: 16px;
+  border-bottom: 1px solid #666;
+  margin-bottom: 10px;
+}
+
+div.left h2 {
+  color: #000;
+  margin-top: 5px;
+}
+
+div.left p {
+  margin-bottom: 15px;
+  font-family: georgia;
+  font-size: 14px;
+}
+
+div.left ul {
+  margin-bottom: 20px;
+}
+
+div.left li {
+  margin-bottom: 5px;
+  list-style-type: square;
+  margin-left: 25px;
+  font-family: helvetica;
+  font-size: 12px;
+  line-height: 1.5em;
+  color: #666;
+}
+
+div.left table {
+  font-family: helvetica;
+  font-size: 12px;
+  margin: 20px 0;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+  background: #eee;
+}
+
+div.left td, th {
+  padding: 10px 5px;
+  border-top: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+div.left td {
+  background: #fff;
+}
+
+div.left td.alt {
+  background: url(/images/bg_alt00.gif);
+}
+
+div.left td.alt.plan {
+  background: #fff url(/images/bg_alt-p.gif) right no-repeat;
+}
+
+div.left td.alt.signup {
+  background: #fff url(/images/bg_alt-s.gif) left no-repeat;
+}
+
+div.left th {
+  font-weight: bold;
+  border-top: none;
+}
+
+div.left td.plan,
+div.left th.plan {
+}
+
+div.left table span.setup {
+  font-size: 10px;
+  color: #999;
+}
+
+div.left table th.signup {
+  border-right: none;
+}
+
+div.left table td.signup {
+  border-right: none;
+  width: 65px;
+}
+
+div.left table td.signup a {
+  background: url(/images/bg_sign-.gif);
+  text-indent: -9999px;
+  width: 65px;
+  height: 20px;
+  display: block;
+}
+
+div.left table td.signup a:hover {
+  background: url(/images/bg_sign0.gif);
+}
+
+div.right #top {
+   background: #d8d8d8 url(/images/bg_top-r.gif) repeat-x;
+}
+
+div.right #bottom {
+  background: #ababab url(/images/bg_botto.gif) repeat-x;
+  border-top: 1px solid #e9e9e9;
+}
+
+div.right {
+  width: 289px;
+  background: #ababab;
+  margin: 0 0 0 580px;
+  display: block;
+  padding-bottom: 11px;
+  border-left: 1px solid #999;
+  border-right: 1px solid #999;
+}
+
+div.right h1 {
+  font-size: 18px;
+  padding: 20px 20px 0 20px;
+  border-bottom: none;
+  font-family: georgia;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+div.right p {
+  font-family: helvetica;
+  font-size: 12px;
+  line-height: 1.5em;
+  margin: 10px 20px 20px 20px;
+}
+
+div.right #bottom p {
+  background: url(/images/bullet_g.gif) no-repeat;
+  padding: 0;
+  color: #333;
+  text-indent: 22px;
+}
+
+div.right p strong {
+ font-weight: bold;
+ color: #000;
+}
+
+div.right img {
+ float: left;
+ border: 1px solid #999;
+ padding: 5px;
+ background: #eee;
+ margin-right: 10px;
+}
+
+div#cta  input{
+ margin: 0 0 3px 0;
+}

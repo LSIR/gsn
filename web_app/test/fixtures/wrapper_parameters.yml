@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  wrapper_init_id: 1
+  value: MyString
+  note: MyString
+
+two:
+  wrapper_init_id: 1
+  value: MyString
+  note: MyString

@@ -1,0 +1,19 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  name: MyString
+  priority: 1
+  protected: false
+  pool_size: 1
+  storage_size: MyString
+  unique_timestamp: false
+  load_shedding: 1.5
+
+two:
+  name: MyString
+  priority: 1
+  protected: false
+  pool_size: 1
+  storage_size: MyString
+  unique_timestamp: false
+  load_shedding: 1.5

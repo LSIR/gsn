@@ -1,0 +1,17 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  name: MyString
+  window_size: MyString
+  sliding: MyString
+  load_shedding: 1.5
+  query: MyText
+  stream_id: 1
+
+two:
+  name: MyString
+  window_size: MyString
+  sliding: MyString
+  load_shedding: 1.5
+  query: MyText
+  stream_id: 1

@@ -1,0 +1,17 @@
+<% @output_format = output_format %>
+<tr>
+    <td colspan="4">
+	<%= error_messages_for :output_format -%>
+    </td>
+</tr>
+<tr class="gsn_vsd_table">
+    <% new_or_existing = output_format.new_record? ? 'new' : 'existing' -%>
+    <% prefix = "processor[#{new_or_existing}_output_format_attributes][]" -%>
+    <% fields_for prefix, output_format do |init_form| -%>
+      <td><%= init_form.text_field :name -%></td>
+      <td><%= init_form.select(:data_type_id, DataType.find(:all).collect {|c| [ c.name, c.id ] }) -%></td>
+      <td><%= init_form.text_field :description -%></td>
+      <td><%= link_to_function "remove" , "$(this).parent().parent().prev().remove(); $(this).parent().parent().remove()" -%></td>
+    <% end -%>
+</tr>
+

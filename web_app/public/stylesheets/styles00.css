@@ -1,0 +1,367 @@
+html, body, div, span,
+applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dd, dl, dt, li, ol, ul,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td
+	{
+	border: 0;
+	font-family: inherit;
+	font-size: 100%;
+	font-style: inherit;
+	font-weight: inherit;
+	line-height: 1;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	vertical-align: baseline;
+	}
+a img, :link img, :visited img
+	{
+	border: 0;
+	}
+table
+	{
+	border-collapse: collapse;
+	border-spacing: 0;
+	}
+ol, ul
+	{
+	list-style: none;
+	}
+q:before, q:after,
+blockquote:before, blockquote:after
+	{
+	content: "";
+	}	
+	
+body {
+  border-top: 4px solid #333;
+  background: #eee;
+  color: #444;
+}	
+
+h1, h2, h3 {
+  font-family: "Gill Sans";
+  text-transform: uppercase;
+  line-height: 1.5em;
+  color: #222;
+}	
+
+h4 {
+  font-family: georgia;
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+p {
+  line-height: 1.5em;
+  font-family: helvetica;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+a {
+  color: #a22a20;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  color: #000;
+}
+
+div.clear {
+  clear: both;
+}
+
+.bold {
+  font-weight: bold;
+  color: #000;
+}	
+	
+#header-outer {
+  background: #eee;
+  height: 79px;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #fff;
+}
+
+#header {
+  width: 850px;
+  margin: 0 auto;
+  padding: 10px;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  background: url(/images/bg_heade.gif);
+}
+
+#header #logo {
+    display: block;
+  width: 349px;
+  height: 62px;
+  float: left;
+  background: url(/images/logo.png) no-repeat 0px 0px;
+}
+
+div#start {
+  margin: 10px;
+}
+
+div#start h2,
+div#start p {
+  text-align: right;
+}
+
+div#start h2 {
+  font-size: 14px;
+}
+
+div#start p {
+  font-family: georgia;
+  font-size: 13px;
+}
+
+div#start a {
+  font-weight: normal;
+}
+
+div#nav-outer {
+  background: #a22a20;
+  border-top: 1px solid #9f2a20;
+  border-bottom: 1px solid #000;
+}
+
+div#navigation,
+div#footer {
+  background: url(/images/bg_nav00.gif);
+  border-left: 1px solid #811911;
+  border-right: 1px solid #811911;
+  font-family: "Gill Sans";
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 10px 9px 10px;
+  width: 850px;
+  margin: 0 auto;
+  height: 18px;
+}
+
+div#navigation li,
+div#footer li {
+  float: left;
+  margin: 0 10px;
+}
+
+div#navigation li {
+  display: block;
+  height: 19px;
+  margin-right: 5px;
+}
+
+div#navigation a,
+div#footer a {
+  color: #fff;
+  font-weight: normal;
+}
+
+div#navigation li:hover,
+div#navigation li.selected {
+  background: url(/images/bg_nav-l.gif) left no-repeat;
+}
+
+div#navigation a {
+  height: 15px;
+  padding: 4px 5px 0 3px;
+  margin-left: 2px;
+  display: block;
+}
+
+div#navigation a:hover,
+div#navigation li.selected a {
+  background: url(/images/bg_nav-r.gif) right no-repeat;
+}
+
+div#highlight-outer {
+  background: #222;
+  border-bottom: 1px solid #000;
+}
+
+div#highlight {
+  width: 870px;
+  margin: 0 auto;
+  min-height: 100px;
+  background: #292929 url(/images/bg_highl.png) -8px -5px no-repeat;
+  border-right: 1px solid #111;
+  border-left: 1px solid #111;
+}
+
+div#cta {
+  width: 250px;
+  float: right;
+  padding: 30px 20px;
+}
+
+div#cta h1 {
+  background: url(/images/headline.gif) no-repeat;
+  text-indent: -9999px;
+}
+
+div#cta h2 {
+  text-transform: none;
+  color: #c6c6c6;
+  font-size: 16px;
+  line-height: 1.5em;
+  font-family: georgia;
+  margin: 10px 0;
+}
+
+div#cta p a {
+  width: 169px;
+  height: 37px;
+  background: url(/images/login.png);
+  text-indent: -9999px;
+  display: block;
+  margin-top: 15px;
+  font-weight: normal;
+}
+
+
+div#icons {
+  width: 580px;
+  height: 158px;
+  background: url(/images/icons000.gif) center no-repeat;
+  padding-top: 50px;
+}
+
+div#content {
+  width: 870px;
+  margin: 0 auto;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  background: #fff;
+}
+
+div#top {
+  background: #d8d8d8;
+}
+
+div#top .left,
+div#bottom .left{
+  width: 540px;
+  float: left;
+  padding: 10px 20px;
+}
+
+div#top .left {
+  background: #fff url(/images/bg_top-l.gif) no-repeat;
+  border-right: 1px solid #a3a3a3;
+}
+
+div#top .left h1 {
+  font-size: 2em;
+  text-transform: none;
+}
+
+div#top .left p {
+  font-family: georgia;
+  font-size: 16px;
+}
+
+div#top .right {
+  background: #d8d8d8 url(/images/bg_top-r.gif) no-repeat;
+}
+
+div#top .right h2 {
+  font-size: 14px;
+  margin: 20px 0 5px 0;
+}
+
+div#top .right p.author {
+  text-align: right;
+  font-style: italic;
+}
+
+div#top .right,
+div#bottom .right {
+  width: 250px;
+  margin-left: 580px;
+  padding: 10px 20px;
+}
+
+div#bottom h3 {
+  font-size: 18px;
+  letter-spacing: .1em;
+  border-bottom: 1px solid #666;
+  margin-bottom: 10px;
+}
+
+div#top {
+  border-bottom: 1px solid #999;
+}
+
+div#bottom {
+  background: #fff url(/images/bg_botto.gif) repeat-x;
+  border-top: 1px solid #fff;
+}
+
+div#bottom .left a {
+ color: #a22a20;
+}
+
+div#bottom .left a:hover {
+  text-decoration: underline;
+}
+
+.left div#solutions {
+  float: left;
+  width: 250px;
+  margin-right: 20px;
+}
+
+.left div#hosting {
+  width: 250px;
+  margin-left: 290px;
+}
+
+#bottom .right {
+  background: #ababab url(/images/bg_botto.gif) repeat-x;
+  border-left: 1px solid #a3a3a3;
+  border-top: 1px solid #ddd;
+  margin-top: -1px;
+  display: block;
+  padding-bottom: 11px;
+}
+
+#footer-outer {
+  background: #222;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+div#footer {
+  background: #2e2e2e url(/images/bg_foote.gif) repeat-x;
+  margin: 0 auto;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+}
+
+div#footer li {
+  margin-top: 6px;
+  font-size: 10px;
+}
+
+div#footer p {
+  float: right;
+  color: #999;
+  font-family: helvetica;
+  text-transform: none;
+  font-size: 11px;
+}
+
+div#footer a:hover {
+  color: #999;
+}

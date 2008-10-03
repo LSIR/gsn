@@ -1,0 +1,12 @@
+/* ---- ADD/REMOVE/EDIT/VIEW WRAPPERS, VS, etc. ---- */
+.gsn_vsd_table {
+    width: 100%;
+}
+
+.gsn_vsd_table input {
+    width: 50px;
+}
+
+#text .selected a {
+    color: #990099;
+}
