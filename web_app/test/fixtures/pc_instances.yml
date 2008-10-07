@@ -1,7 +1,19 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  web_password: MyString
+  id: 1
+  web_password: -
+  name: Wannengrat SLF Processor
+  processor_id: 1
 
 two:
-  web_password: MyString
+  id: 2
+  web_password: -
+  name: Sensorscope Record Processor
+  processor_id: 2
+
+three:
+  id: 3
+  web_password: -
+  name: Wannengrat Memory Processor
+  processor_id: 3

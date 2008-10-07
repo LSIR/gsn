@@ -1,11 +1,19 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  name: MyString
-  query: MyText
+  id: 1
+  name: Wannengrat Stream
+  query: select * from wannengrat_source
   virtual_sensor_id: 1
 
 two:
-  name: MyString
-  query: MyText
-  virtual_sensor_id: 1
+  id: 2
+  name: Record Stream
+  query: select * from record_source
+  virtual_sensor_id: 2
+
+three:
+  id: 3
+  name: Memory Consumption Stream
+  query: select * from memory_source
+  virtual_sensor_id: 3

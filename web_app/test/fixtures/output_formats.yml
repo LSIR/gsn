@@ -1,9 +1,85 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  name: MyString
-  description: MyString
+  id: 1
+  name: RH
+  description: Relative Humidity [%]
+  processor_id: 1
+  data_type_id: 1
 
 two:
-  name: MyString
-  description: MyString
+  id: 2
+  name: TA
+  description: Ambiant Temperature [°C]
+  processor_id: 1
+  data_type_id: 1
+
+three:
+  id: 3
+  name: AP
+  description: Atmospherical Pressure [Bar]
+  processor_id: 1
+  data_type_id: 1
+
+four:
+  id: 4
+  name: AL
+  description: Altitude [m]
+  processor_id: 1
+  data_type_id: 1
+
+five:
+  id: 5
+  name: RH
+  description: Relative Humidity [%]
+  processor_id: 2
+  data_type_id: 1
+
+six:
+  id: 6
+  name: TA
+  description: Ambiant Temperature [°C]
+  processor_id: 2
+  data_type_id: 1
+
+seven:
+  id: 7
+  name: AP
+  description: Atmospherical Pressure [Bar]
+  processor_id: 2
+  data_type_id: 1
+
+height:
+  id: 8
+  name: AL
+  description: Altitude [m]
+  processor_id: 2
+  data_type_id: 1
+
+nine:
+  id: 9
+  name: HEAP
+  description: HEAP memory size [kB]
+  processor_id: 3
+  data_type_id: 1
+
+ten:
+  id: 10
+  name: CACHE
+  description: Cache memory size [kB]
+  processor_id: 3
+  data_type_id: 1
+
+eleven:
+  id: 11
+  name: RESIDENT
+  description: Resident memory size [kB]
+  processor_id: 3
+  data_type_id: 1
+
+twelve:
+  id: 12
+  name: UNMAPPED
+  description: Unmapped memory size [kB]
+  processor_id: 3
+  data_type_id: 1

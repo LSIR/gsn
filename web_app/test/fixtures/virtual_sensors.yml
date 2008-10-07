@@ -1,19 +1,37 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  name: MyString
-  priority: 1
+  id: 1
+  name: Wannengrat Virtual Sensor
+  priority: 5
   protected: false
-  pool_size: 1
-  storage_size: MyString
-  unique_timestamp: false
-  load_shedding: 1.5
+  pool_size: 10
+  storage_size: 10k
+  unique_timestamp: true
+  load_shedding: 1.0
+  deployment_id: 1
+  pc_instance_id: 1
 
 two:
-  name: MyString
-  priority: 1
+  id: 2
+  name: Record Virtual Sensor
+  priority: 10
   protected: false
-  pool_size: 1
-  storage_size: MyString
-  unique_timestamp: false
-  load_shedding: 1.5
+  pool_size: 100
+  storage_size: 24h
+  unique_timestamp: true
+  load_shedding: 0.6
+  deployment_id: 2
+  pc_instance_id: 2
+
+three:
+  id: 3
+  name: Montblanc Memory Virtual Sensor
+  priority: 10
+  protected: false
+  pool_size: 8
+  storage_size: 1h
+  unique_timestamp: true
+  load_shedding: 1.0
+  deployment_id: 1
+  pc_instance_id: 3

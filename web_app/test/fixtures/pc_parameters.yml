@@ -1,11 +1,29 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
+  id: 1
+  value: 512
+  note: -
   pc_init_id: 1
-  value: MyString
-  note: MyString
+  pc_instance_id: 1
 
 two:
-  pc_init_id: 1
-  value: MyString
-  note: MyString
+  id: 2
+  value: 64
+  note: -
+  pc_init_id: 2
+  pc_instance_id: 1
+
+three:
+  id: 3
+  value: 128
+  note: -
+  pc_init_id: 3
+  pc_instance_id: 2
+
+four:
+  id: 4
+  value: 512
+  note: -
+  pc_init_id: 4
+  pc_instance_id: 2

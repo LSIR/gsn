@@ -1,11 +1,13 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  name: MyString
-  description: MyString
-  class_name: MyString
+  id: 1
+  name: TinyOSWrapper
+  description: This wrapper can connect to any TinyOS source eg. serial forwarder
+  class_name: gsn.wrapper.MigMessageWrapper
 
 two:
-  name: MyString
-  description: MyString
-  class_name: MyString
+  id: 2
+  name: MemoryWrapper
+  description: This wrapper generates every second the memory status of the machine that runs GSN
+  class_name: gsn.wrapper.MemoryWrapper
