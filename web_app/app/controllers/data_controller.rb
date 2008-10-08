@@ -20,4 +20,8 @@ class DataController < ApplicationController
     end
   end
 
+  def download_data
+    render :text => 'bigre'
+  end
+
 end

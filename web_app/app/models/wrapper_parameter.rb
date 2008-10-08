@@ -1,7 +1,12 @@
 class WrapperParameter < ActiveRecord::Base
+
   belongs_to :wrapper_init
   belongs_to :wrapper_instance
- 
+
+  #Validation
+  validates_presence_of :value, :allow_nil => false, :allow_blank => false
+
+  #
   def to_label
     # TODO: ADDING H FUCKTION
     wrapper_init ? "#{wrapper_init.name}=#{value}" : ""
@@ -16,7 +21,4 @@ class WrapperParameter < ActiveRecord::Base
     wrapper_init ? wrapper_init.description : ""
   end
 
-  #Validate
-  validates_presence_of :value, :allow_nil => false, :allow_blank => false
-  
 end

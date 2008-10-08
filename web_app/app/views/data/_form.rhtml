@@ -7,7 +7,7 @@
 	    <%= select_tag('data_configuration_id', options_for_select([['Select a Configuration','-1']] | DataConfiguration.find(:all).collect{ |data_configuration| [data_configuration.name, data_configuration.id] })) -%>
 	    <%= observe_field 'data_configuration_id', :url => { :action => :select_data_configuration }, :update => :selected_data_configuration, :with => "'data_configuration_id=' + $('#data_configuration_id').val()" -%>
 	    <%= form.text_field :name -%>
-	    <%= form.submit "Save" -%>
+	    <%= form.submit 'Save' -%>
 	</p>
       <% end -%>
       <p>
@@ -16,6 +16,10 @@
       </p>
       <p>
 	  <%= form.radio_button :nb, :all -%> All Data | Last <%= form.text_field :nb -%> Values | Aggregation <%= select_tag('data_configuration_id', options_for_select([['No Aggregation','-1'],['AVG','1'],['MAX','2'],['MIN','3']])) -%>
+      </p>
+      <p>
+	  Format <%= select_tag('download_format', options_for_select([['CSV file','CSV'],['Report','REPORT']])) -%>
+	  <%= submit_to_remote 'download_btn', 'Download', :url => { :action => :download_data } -%>
       </p>
       <% @deployment_increment = @deployment_increment.nil? ? 0 : @deployment_increment + 1 %>
       <table>

@@ -1,10 +1,12 @@
 class WebInput < ActiveRecord::Base
+
   belongs_to :processor
   has_many :web_commands, :dependent => :destroy
 
-
-
-
+  # Validation
+  validates_identifier :name
+  
+  #
   after_update :save_web_commands
 
   #

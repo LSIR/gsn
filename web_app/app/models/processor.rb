@@ -1,19 +1,18 @@
 class Processor < ActiveRecord::Base
+
   has_many :pc_inits, :dependent => :destroy
   has_many :output_formats, :dependent => :destroy
   has_many :web_inputs, :dependent => :destroy
   has_many :pc_instances, :dependent => :destroy
 
   # Validation
-  validates_presence_of :class_name, :name, :description, :allow_nil => false, :allow_blank => false
-  validates_length_of :name, :in => 5..20
-  validates_length_of :description, :class_name, :maximum => 250
+  validates_identifier :name
   validates_uniqueness_of :name
-
-
-  after_update :save_output_formats, :save_pc_inits, :save_web_inputs
+  validates_class_name :class_name
 
   #
+  after_update :save_output_formats, :save_pc_inits, :save_web_inputs
+
   def new_output_format_attributes=(output_format_attributes)
     output_format_attributes.each do |attributes|
       output_formats.build(attributes)

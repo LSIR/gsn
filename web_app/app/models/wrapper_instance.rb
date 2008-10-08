@@ -1,11 +1,13 @@
 class WrapperInstance < ActiveRecord::Base
+
   belongs_to :wrapper
   has_many :wrapper_parameters, :dependent => :destroy
-  has_many :sources_wrapper_instances
-  has_many :sources, :through=>:sources_wrapper_instances
+  has_many :sources_wrapper_instances, :dependent => :destroy
+  has_many :sources, :through=>:sources_wrapper_instances, :dependent => :destroy
 
   # Validation
-  validates_presence_of :name, :allow_nil => false, :allow_blank => false
+  validates_identifier :name
+  validates_uniqueness_of :name
 
   #
   def new_wrapper_parameter_attributes=(wrapper_parameters_attributes)

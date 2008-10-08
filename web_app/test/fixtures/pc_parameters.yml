@@ -3,27 +3,27 @@
 one:
   id: 1
   value: 512
-  note: -
+  note: '-'
   pc_init_id: 1
   pc_instance_id: 1
 
 two:
   id: 2
   value: 64
-  note: -
+  note: '-'
   pc_init_id: 2
   pc_instance_id: 1
 
 three:
   id: 3
   value: 128
-  note: -
+  note: '-'
   pc_init_id: 3
   pc_instance_id: 2
 
 four:
   id: 4
   value: 512
-  note: -
+  note: '-'
   pc_init_id: 4
   pc_instance_id: 2

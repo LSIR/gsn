@@ -1,15 +1,18 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
+
   has_and_belongs_to_many :deployments
-  has_many :data_configurations
+  has_many :data_configurations, :dependent => :destroy
+
   # Validation
-  validates_presence_of :email
+  validates_email :email
   validates_uniqueness_of :email
+  validates_confirmation_of :password
+
   #
   attr_accessor :password_confirmation
-  validates_confirmation_of :password
-  #
+
   def validate
     errors.add_to_base("Missing password") if hashed_password.blank?
   end
