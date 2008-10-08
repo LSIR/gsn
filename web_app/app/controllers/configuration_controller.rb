@@ -1,5 +1,52 @@
 class ConfigurationController < ApplicationController
 
+  # User
+
+  def user
+    render :partial => 'configuration/user/user',
+      :layout => 'standard',
+      :locals => { :user => User.new, :users => User.find(:all) }
+  end
+
+  def create_user
+    user = User.new(params[:user])
+    user.deployments = Deployment.find(params[:deployment_ids]) if params[:deployment_ids]
+    if user.save
+      flash[:notice] = 'Successfully created the new user'
+      redirect_to :action => :user
+    else
+      flash.now[:notice] = 'Not Created'
+      render :partial => '/configuration/user/user',
+	:layout => 'standard',
+	:locals => { :user => user }
+    end
+  end
+
+  def update_user
+    user = User.find(params[:id])
+    user.password=(params[:user][:password])
+    if params[:deployment_ids]
+      user.deployments = Deployment.find(params[:deployment_ids])
+    else
+      user.deployments = {}
+    end
+    if user.save
+      flash[:notice] = 'Successfully updated the user'
+      redirect_to :action => :user
+    else
+      flash.now[:notice] = "Not Updated"
+      render :partial => '/configuration/user/user',
+	:layout => "standard",
+	:locals => { :user => user, :deployments => Deployment.find(:all) }
+    end
+  end
+
+  def delete_user
+    User.delete(params[:id])
+    flash[:notice] = 'Sucessfully deleted the user'
+    redirect_to :action => :user
+  end
+
   # Processor
 
   def processor

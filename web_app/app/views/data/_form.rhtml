@@ -1,0 +1,34 @@
+<div id="data">
+    <script type='text/javascript' >deployment_increment=0</script>
+    <% form_for data_configuration, :url => { :action => (data_configuration.new_record? ? :create_data_configuration : :update_data_configuration), :id => data_configuration.id} do |form| -%>
+      <% if logged_in? -%>
+	<p>
+	    Configuration:
+	    <%= select_tag('data_configuration_id', options_for_select([['Select a Configuration','-1']] | DataConfiguration.find(:all).collect{ |data_configuration| [data_configuration.name, data_configuration.id] })) -%>
+	    <%= observe_field 'data_configuration_id', :url => { :action => :select_data_configuration }, :update => :selected_data_configuration, :with => "'data_configuration_id=' + $('#data_configuration_id').val()" -%>
+	    <%= form.text_field :name -%>
+	    <%= form.submit "Save" -%>
+	</p>
+      <% end -%>
+      <p>
+	  From <%= form.text_field :from -%>
+	  To <%= form.text_field :to -%>
+      </p>
+      <p>
+	  <%= form.radio_button :nb, :all -%> All Data | Last <%= form.text_field :nb -%> Values | Aggregation <%= select_tag('data_configuration_id', options_for_select([['No Aggregation','-1'],['AVG','1'],['MAX','2'],['MIN','3']])) -%>
+      </p>
+      <% @deployment_increment = @deployment_increment.nil? ? 0 : @deployment_increment + 1 %>
+      <table>
+	  <thead>
+	      <tr>
+		  <td>Deployment</td>
+		  <td>Virtual Sensor</td>
+		  <td>Deployment</td>
+		  <td><%= link_to_remote :Add, :url => { :action => :deployment_selection }, :with => "'deployment_increment=' + (deployment_increment++) +  '&deployment_id=' + (-1)" -%></td>
+	      </tr>
+	  </thead>
+	  <tbody id="data_selections">
+	  </tbody>
+      </table>
+    <% end -%>
+</div>

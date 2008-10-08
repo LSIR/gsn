@@ -2,7 +2,7 @@
 
 one:
   id: 1
-  name: Wannengrat Virtual Sensor
+  name: DataSensor
   priority: 5
   protected: false
   pool_size: 10
@@ -14,7 +14,7 @@ one:
 
 two:
   id: 2
-  name: Record Virtual Sensor
+  name: DataSensor
   priority: 10
   protected: false
   pool_size: 100
@@ -26,7 +26,7 @@ two:
 
 three:
   id: 3
-  name: Montblanc Memory Virtual Sensor
+  name: MemoryMonitor
   priority: 10
   protected: false
   pool_size: 8

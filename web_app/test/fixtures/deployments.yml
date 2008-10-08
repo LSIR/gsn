@@ -2,14 +2,14 @@
 
 one:
   id: 1
-  name: Davos, Wannengrat Deployment
+  name: Wannengrat
   private: false
   description: Davos Wannengrat Montain deployment. Maintained by SLF.
   admin_id: 1
 
 two:
   id: 2
-  name: Record Deployment
+  name: Record
   private: false
   description: Sensorscope Record deployment. Maintained by Sensorscope.
   admin_id: 1

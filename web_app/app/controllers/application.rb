@@ -13,22 +13,31 @@ class ApplicationController < ActionController::Base
   # from your application log (in this case, all fields with names like "password"). 
   # filter_parameter_logging :password
   layout "standard"
+
+  before_filter :login_required
+
+  def login_required
+    unless session[:user_id]
+      flash[:notice] = 'Please log in!'
+      redirect_to :controller => :home, :action => :home
+    end
+  end
   
-   CONTAINER_CONFIG = Java::gsn.Main::loadContainerConfig("#{RAILS_ROOT}/../conf/gsn.xml")
+#   CONTAINER_CONFIG = Java::gsn.Main::loadContainerConfig("#{RAILS_ROOT}/../conf/gsn.xml")
 
   #private:
 
-  	vs_list = Java::gsn.gui.util::VSensorIOUtil.new(Java::gsn.Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY, 'virtual-sensors/Disabled/')
-  	enabled_vs_files = vs_list.read_virtual_sensors
-	disabled_vs_files = vs_list.read_disabled_virtual_sensors
+#  	vs_list = Java::gsn.gui.util::VSensorIOUtil.new(Java::gsn.Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY, 'virtual-sensors/Disabled/')
+#  	enabled_vs_files = vs_list.read_virtual_sensors
+#	disabled_vs_files = vs_list.read_disabled_virtual_sensors
 
   #public:
-	VS_ENABLED = Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(enabled_vs_files)
-	VS_NAME_TO_CONFIG = {}
-	VS_ENABLED.each {|k| VS_NAME_TO_CONFIG[k[1].name.chomp.upcase] = k[1] }
-	VS_DISABLED =  Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(disabled_vs_files)
-	STORAGE_MANAGER = Java::gsn.storage::StorageManager.getInstance()
-	STORAGE_MANAGER.init(CONTAINER_CONFIG.jdbc_driver, CONTAINER_CONFIG.jdbc_username, CONTAINER_CONFIG.jdbc_password, CONTAINER_CONFIG.jdbc_url)
-	CONTAINER_INFO_HANDLER = Java::gsn.http::ContainerInfoHandler.new
+#	VS_ENABLED = Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(enabled_vs_files)
+#	VS_NAME_TO_CONFIG = {}
+#	VS_ENABLED.each {|k| VS_NAME_TO_CONFIG[k[1].name.chomp.upcase] = k[1] }
+#	VS_DISABLED =  Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(disabled_vs_files)
+#	STORAGE_MANAGER = Java::gsn.storage::StorageManager.getInstance()
+#	STORAGE_MANAGER.init(CONTAINER_CONFIG.jdbc_driver, CONTAINER_CONFIG.jdbc_username, CONTAINER_CONFIG.jdbc_password, CONTAINER_CONFIG.jdbc_url)
+#	CONTAINER_INFO_HANDLER = Java::gsn.http::ContainerInfoHandler.new
   
 end

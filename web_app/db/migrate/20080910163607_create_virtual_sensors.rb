@@ -9,7 +9,7 @@ class CreateVirtualSensors < ActiveRecord::Migration
       t.boolean :unique_timestamp
       t.float :load_shedding
       t.integer :pc_instance_id
-
+      t.integer :deployment_id
       t.timestamps
     end
   end

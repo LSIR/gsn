@@ -35,7 +35,7 @@
 	<div id="highlight-outer">
 	    <div id="highlight">
 		<div id="cta">
-		    <%= render :partial => 'shared/login' %>
+		    <%= render :partial => 'session/new' -%>
 		</div>
 		<div id="text">
 		    <%= render :partial => controller.controller_name if has_specified_text(controller)  %>
@@ -47,6 +47,7 @@
 	    <div class="left">
 		<div id="feedback">
 		    <p><%= flash[:notice] %></p>
+		    <p><%= flash[:error] %></p>
 		</div>
 		<%= yield %>
 	    </div>

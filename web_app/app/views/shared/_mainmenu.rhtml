@@ -4,13 +4,9 @@
     <li <%= controller.controller_name == 'sensors' ? 'class="selected"':''%>><%= link_to 'Sensors', :controller => :sensors, :action => :sensors %></li>
     <li <%= controller.controller_name == 'data'  ? 'class="selected"':''%>><%= link_to 'Data', :controller => :data, :action => :data %></li>
     <li <%= controller.controller_name == 'map' ? 'class="selected"':''%>><%= link_to 'Map', :controller => :map, :action => :map %></li>
-    <li <%= controller.controller_name == 'configuration' ? 'class="selected"':''%>><%= link_to 'Configuration', :controller => :configuration, :action => :configuration %></li>
-    <li <%= controller.controller_name == 'runtime' ? 'class="selected"':''%>><%= link_to 'Runtime', :controller => :runtime, :action => :runtime %></li>
+    <% if logged_as_admin? -%>
+	    <li <%= controller.controller_name == 'configuration' ? 'class="selected"':''%>><%= link_to 'Configuration', :controller => :configuration, :action => :configuration %></li>
+            <li <%= controller.controller_name == 'runtime' ? 'class="selected"':''%>><%= link_to 'Runtime', :controller => :runtime, :action => :runtime %></li>
+    <% end -%>
     <li <%= controller.controller_name == 'about' ? 'class="selected"':''%>><%= link_to 'About' , :controller => :about, :action => :about %></li>
-    <%# if not session[:user_id].nil? %>
-    <!--
-	<li <%= current_page?(:controller => :runtime) ? 'class="selected"':''%>><%= link_to 'runtime', :controller => :management, :action => :runtime%></li>
-	<li <%= current_page?(:controller => :preferences) ? 'class="selected"':''%>><%= link_to 'preferences', :controller => :management, :action => :preferences %></li>
-    -->
-    <%# end %>
 </ul>

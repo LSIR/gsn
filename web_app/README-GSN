@@ -4,3 +4,8 @@
 #(from the web_app folder)  git clone git://github.com/activescaffold/active_scaffold.git vendor/plugins/active_scaffold
 
 
+Migrate the database
+$ rake db:migrate
+
+Load the Fixtures (for test purpose)
+$ rake db:fixtures:load

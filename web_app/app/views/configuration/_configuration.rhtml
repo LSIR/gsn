@@ -1,5 +1,7 @@
 <ul>
-    <li <%= controller.action_name == 'virtual_sensors' ? 'class="selected"':''%>><%= link_to 'Virtual Sensors', :action => :virtual_sensors %></li>
+    <li <%= controller.action_name == 'user' ? 'class="selected"':''%>><%= link_to 'Data Users', :action => :user %></li>
+    <li <%= controller.action_name == 'deployment' ? 'class="selected"':''%>><%= link_to 'Deployments', :action => :deployment %></li>
+    <li <%= controller.action_name == 'virtual_sensor' ? 'class="selected"':''%>><%= link_to 'Virtual Sensors', :action => :virtual_sensor %></li>
     <li <%= controller.action_name == 'processor' ? 'class="selected"':''%>><%= link_to 'Processor', :action => :processor %></li>
     <li <%= controller.action_name == 'wrapper' ? 'class="selected"':''%>><%= link_to 'Wrapper', :action => :wrapper %></li>
     <li <%= controller.action_name == 'wrapper_instance' ? 'class="selected"':''%>><%= link_to 'Wrapper Instance', :action => :wrapper_instance %></li>

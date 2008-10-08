@@ -1,0 +1,15 @@
+<% if logged_in? -%>
+  <%= link_to :Logout, :controller => :session, :action => :destroy %>
+<% else -%>
+  <table>
+      <% form_tag '/session/create' do -%>
+	<tr>
+	    <td><%= text_field_tag :email, params[:email] -%></td>
+	    <td rowspan="2"><%= submit_tag :Login -%></td>
+	</tr>
+	<tr>
+	    <td><%= password_field_tag :password, params[:password] -%></td>
+	</tr>
+      <% end -%>
+  </table>
+<% end -%>
