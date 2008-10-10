@@ -1,11 +1,91 @@
-# Misc
+# Checkout the GSN source code
 
-#Active Scaffold installed with:
-#(from the web_app folder)  git clone git://github.com/activescaffold/active_scaffold.git vendor/plugins/active_scaffold
+$ svn checkout https://gsn.svn.sourceforge.net/svnroot/gsn/branches/gsn_rails gsn
 
+# rails files are under the web_app directory
 
-Migrate the database
+# Install the ruby gems, from the gsn_rails directory (if not already installed, please install ANT from http://ant.apache.org/manual/install.html)
+
+$ ant install
+
+# Should give something like the following
+
+marett@marett-laptop:~/workspace/gsn_rails$ ant install
+Buildfile: build.xml
+
+init:
+
+setup:
+  [copydir] DEPRECATED - The copydir task is deprecated.  Use copy instead.
+  [copydir] DEPRECATED - The copydir task is deprecated.  Use copy instead.
+  [copydir] DEPRECATED - The copydir task is deprecated.  Use copy instead.
+  [copydir] DEPRECATED - The copydir task is deprecated.  Use copy instead.
+  [copydir] DEPRECATED - The copydir task is deprecated.  Use copy instead.
+
+build:
+
+bind:
+     [echo] Compiling JIBX Mappings...
+
+prepare-install:
+     [java] http://gems.github.com added to sources
+
+install:
+    [mkdir] Created dir: /home/marett/workspace/gsn_rails/ruby_gems
+     [java] Successfully installed gem_plugin-0.2.3
+     [java] Successfully installed activesupport-2.1.1
+     [java] Successfully installed activerecord-2.1.1
+     [java] Successfully installed actionpack-2.1.1
+     [java] Successfully installed actionmailer-2.1.1
+     [java] Successfully installed activeresource-2.1.1
+     [java] Successfully installed rake-0.8.3
+     [java] Successfully installed rails-2.1.1
+     [java] Successfully installed mongrel-1.1.5-java
+     [java] Successfully installed jruby-openssl-0.3
+     [java] Successfully installed Empact-roxml-2.1
+     [java] Successfully installed mislav-will_paginate-2.3.5
+     [java] Successfully installed jdbc-wrapper-0.4
+     [java] Successfully installed activerecord-jdbc-adapter-0.8.2
+     [java] Successfully installed jdbc-h2-1.0.63
+     [java] Successfully installed jdbc-mysql-5.0.4
+     [java] Successfully installed activerecord-jdbch2-adapter-0.8.2
+     [java] Successfully installed activerecord-jdbcmysql-adapter-0.8.2
+     [java] 18 gems installed
+
+# Migrate the database (by default the database is a mysql DB dbname=gsn, user=root, password='' and of course must exist before typing in the web_app directory). $ ant migrate works as well from the gsn_rails directory.
+
 $ rake db:migrate
 
-Load the Fixtures (for test purpose)
+# To load a data set for test purpose.
+
 $ rake db:fixtures:load
+
+# To start the web server (from the web_app directory). $ ant rails works as well from the gsn_rails directory.
+
+$ ruby -S script/server
+
+# The web interface is then accessible through the port 3000
+# Checkout: http://localhost:3000/home/home
+
+# IMPORTANT: Do only commit code under the web_app directory
+
+
+
+
+
+# jQuery
+
+build your customized jQuery library from http://ui.jquery.com/download_builder/
+
+Notice that jQuery UI compnents included in jRails 0.4
+
+*) interaction: draggable, droppable, sortable
+*) widget: slider
+*) effects: all except explode and transfer
+
+Already Added
+
+*) widget: datepicker
+
+
+# datepicker themes http://marcgrabanski.com/article/jquery-ui-datepicker-themes

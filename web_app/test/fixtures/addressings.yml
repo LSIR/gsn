@@ -1,0 +1,37 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+ one_latitude:
+   id: 1
+   addressing_type_id: 2
+   virtual_sensor_id: 1
+   value: 46.638278
+
+ one_longitude:
+   id: 2
+   addressing_type_id: 3
+   virtual_sensor_id: 1
+   value: 8.460972
+
+ one_altitude:
+   id: 3
+   addressing_type_id: 4
+   virtual_sensor_id: 1
+   value: 2025
+
+ two_latitude:
+   id: 4
+   addressing_type_id: 2
+   virtual_sensor_id: 2
+   value: 46.658278
+
+ two_longitude:
+   id: 5
+   addressing_type_id: 3
+   virtual_sensor_id: 2
+   value: 8.480972
+
+ two_altitude:
+   id: 6
+   addressing_type_id: 4
+   virtual_sensor_id: 2
+   value: 2230

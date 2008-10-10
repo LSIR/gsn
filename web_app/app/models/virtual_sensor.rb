@@ -8,7 +8,7 @@ class VirtualSensor < ActiveRecord::Base
   validates_identifier :name
   validates_uniqueness_of :name
   validates_numericality_of :priority, :pool_size, :greater_than => 0
-  validates_percentage :load_shedding
+  validates_ratio :load_shedding
   validates_storage_size :storage_size
   validates_inclusion_of :protected, :unique_timestamp, :in => [true, false]
 

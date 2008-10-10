@@ -11,8 +11,8 @@
 	</p>
       <% end -%>
       <p>
-	  From <%= form.text_field :from -%>
-	  To <%= form.text_field :to -%>
+	  From <%= form.text_field :from, :id => :datepicker_from -%>
+	  To <%= form.text_field :to, :id => :datepicker_to -%>
       </p>
       <p>
 	  <%= form.radio_button :nb, :all -%> All Data | Last <%= form.text_field :nb -%> Values | Aggregation <%= select_tag('data_configuration_id', options_for_select([['No Aggregation','-1'],['AVG','1'],['MAX','2'],['MIN','3']])) -%>

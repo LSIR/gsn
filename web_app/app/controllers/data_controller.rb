@@ -21,7 +21,10 @@ class DataController < ApplicationController
   end
 
   def download_data
-    render :text => 'bigre'
+    from = params[:data_configuration][:from]
+    to = params[:data_configuration][:to]
+
+    puts "FROM: #{from} TO: #{to}"
   end
 
 end
