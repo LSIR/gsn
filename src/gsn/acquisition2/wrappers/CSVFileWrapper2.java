@@ -2,14 +2,11 @@ package gsn.acquisition2.wrappers;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilterInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.zip.Adler32;
-import java.util.zip.CheckedInputStream;
 import java.util.zip.Checksum;
 import org.apache.log4j.Logger;
 
@@ -41,6 +38,7 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 				logger.error("The file >" + parameters.getCsvSourceFilePath() + "< does not exists.");
 				return false;
 			}
+			checkPoints = new CSVFileWrapperCheckPoints (parameters.getCsvSourceFilePath()) ;
 			lineBuffer = new ArrayList<String> () ;
 		}
 		catch (RuntimeException e) {
@@ -63,17 +61,19 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 				lastModified = dataFile.lastModified();
 				try {
 					Checksum checkSum = new Adler32 () ;
-					FilterInputStream cis = new CheckedInputStream(new FileInputStream(parameters.getCsvSourceFilePath()), checkSum);
-					fileReader = new BufferedReader (new InputStreamReader(cis)) ;
+					fileReader = new BufferedReader (new FileReader(parameters.getCsvSourceFilePath())) ;
 					// Produce the data by reading the file
 					int read_lines = 0;
 					while ((nextLine = fileReader.readLine()) != null) {
 						read_lines++;
+						checkSum.update(nextLine.getBytes(), 0 , nextLine.getBytes().length);
 						if (! nextLine.matches("\\s*$")) {
 							if (read_lines > parameters.getCsvSkipLines()) {
 								lineBuffer.add(nextLine);
 								if (read_lines % CHECK_POINT_DISTANCE == 0) {
-									checkThisPoint (read_lines, checkSum) ;
+									checkThisPoint (read_lines, checkSum.getValue()) ;
+									checkPoints.clean(read_lines - CHECK_POINT_DISTANCE, read_lines);
+									checkSum = new Adler32();
 								}
 							}
 							else logger.debug("Line skipped");
@@ -81,7 +81,8 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 						else logger.debug("Empty line skipped");
 					}
 					logger.debug("EOF reached");
-					checkThisPoint (read_lines, checkSum) ;					
+					checkThisPoint (read_lines, checkSum.getValue()) ;
+					checkSum.reset();
 					fileReader.close();
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
@@ -96,35 +97,24 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 		}
 	}
 	
-	private void sendBuffer () {
-		// send all the lines from the line buffer
-		Iterator<String> iter = lineBuffer.iterator();
-		while (iter.hasNext()) {
-			postStreamElement(iter.next(), System.currentTimeMillis());
-		}
-		lineBuffer.clear();
-	}
-	
-	private void checkThisPoint(long read_lines, Checksum checkSum) {
-		if (checkPoints.check(read_lines, checkSum)) {
+	private void checkThisPoint(long read_lines, long checksum) {
+		if (checkPoints.check(read_lines, checksum)) {
 			logger.warn("Check Point at line >" + read_lines + "< checked successfully. No new data to process from the last Check Point.");
-			lineBuffer.clear();
 		}
 		else {
 			logger.warn("Check Point at line >" + read_lines + "< doesn't match. Sending the data from the last Check Point.");
-			sendBuffer();
-			checkPoints.update(read_lines, checkSum);
+			// send all the lines from the line buffer
+			Iterator<String> iter = lineBuffer.iterator();
+			while (iter.hasNext()) {
+				postStreamElement(iter.next(), System.currentTimeMillis());
+			}
+			checkPoints.update(read_lines, checksum);
 		}
-		checkSum.reset();
+		lineBuffer.clear();
 	}
 
 	public void finalize (  ) {
 		threadCounter--;  
-	}
-
-	public void setTableName(String tableName) {
-		super.setTableName(tableName);
-		checkPoints = new CSVFileWrapperCheckPoints ("csv" + getTableName() + ".checkpoints") ;
 	}
 
 	public String getWrapperName() {

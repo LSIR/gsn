@@ -1,7 +1,6 @@
 package gsn.acquisition2.wrappers;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 import gsn.beans.AddressBean;
 
