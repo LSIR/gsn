@@ -91,7 +91,7 @@ public class CSVFileWrapperCheckPoints{
 			connection.prepareStatement("create table if not exists checkpoints (pk bigint not null identity primary key, csvfilepathHash bigint not null, line bigint not null, checksum bigint not null)").executeUpdate();
 			//
 			psReadCheckpoint = connection.prepareStatement("select checksum from checkpoints where csvfilepathHash = " + csvFilePathHash + " and line = ?");
-			psUpdateCheckPoint = connection.prepareStatement("merge into checkpoints key(line) values(null," + csvFilePathHash + ",?,?)");
+			psUpdateCheckPoint = connection.prepareStatement("merge into checkpoints key(line, csvfilepathHash) values(null," + csvFilePathHash + ",?,?)");
 			psCleanCheckPoint = connection.prepareStatement("delete from checkpoints where csvfilepathHash = " + csvFilePathHash + " and line < ? and line > ? ");
 		} catch (ClassNotFoundException e) {
 			connection = null;
