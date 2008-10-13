@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Checksum;
@@ -28,6 +29,8 @@ public class CSVFileWrapperCheckPoints{
 	private PreparedStatement psUpdateCheckPoint = null;
 	
 	private PreparedStatement psCleanCheckPoint = null;
+	
+	private PreparedStatement psListCheckpoint = null;
 
 	private long csvFilePathHash;
 		
@@ -83,6 +86,20 @@ public class CSVFileWrapperCheckPoints{
 		}
 	}
 	
+	public ArrayList<Long> list () {
+		ArrayList<Long> list = new ArrayList<Long> ();
+		if (connection == null) return list;
+		try {
+			ResultSet checkpoints = psListCheckpoint.executeQuery();
+			while (checkpoints.next()) {
+				list.add(checkpoints.getLong("line"));
+			}
+		} catch (SQLException e) {
+			logger.debug(e.getMessage());
+		}
+		return list;
+	}
+	
 	private void prepareConnectionAndTableIfNeeded () {
 		try {
 			Class.forName("org.h2.Driver");
@@ -93,6 +110,7 @@ public class CSVFileWrapperCheckPoints{
 			psReadCheckpoint = connection.prepareStatement("select checksum from checkpoints where csvfilepathHash = " + csvFilePathHash + " and line = ?");
 			psUpdateCheckPoint = connection.prepareStatement("merge into checkpoints key(line, csvfilepathHash) values(null," + csvFilePathHash + ",?,?)");
 			psCleanCheckPoint = connection.prepareStatement("delete from checkpoints where csvfilepathHash = " + csvFilePathHash + " and line < ? and line > ? ");
+			psListCheckpoint = connection.prepareStatement("select line from checkpoints where csvfilepathHash = " + csvFilePathHash);
 		} catch (ClassNotFoundException e) {
 			connection = null;
 			logger.warn("Unable to create the CSV checkpoint storage, wrapper will run without checkpoints.");

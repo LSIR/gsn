@@ -25,7 +25,7 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 	private CSVFileWrapperCheckPoints checkPoints = null;
 
 	private ArrayList<String> lineBuffer = null;
-	
+
 	private final transient Logger logger = Logger.getLogger( CSVFileWrapper2.class );
 
 	public boolean initialize (  ) {
@@ -55,11 +55,13 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 
 		BufferedReader fileReader = null;
 		String nextLine = null;
+		ArrayList<Long> listOfCheckPoints = null;
 
 		while (true) {
 			if (lastModified < dataFile.lastModified()) {
 				lastModified = dataFile.lastModified();
 				try {
+					listOfCheckPoints = checkPoints.list();
 					Checksum checkSum = new Adler32 () ;
 					fileReader = new BufferedReader (new FileReader(parameters.getCsvSourceFilePath())) ;
 					// Produce the data by reading the file
@@ -67,22 +69,21 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 					while ((nextLine = fileReader.readLine()) != null) {
 						read_lines++;
 						checkSum.update(nextLine.getBytes(), 0 , nextLine.getBytes().length);
-						if (! nextLine.matches("\\s*$")) {
-							if (read_lines > parameters.getCsvSkipLines()) {
+						if (read_lines > parameters.getCsvSkipLines()) {
+							if (! nextLine.matches("\\s*$")) {
 								lineBuffer.add(nextLine);
-								if (read_lines % CHECK_POINT_DISTANCE == 0) {
-									checkThisPoint (read_lines, checkSum.getValue()) ;
-									checkPoints.clean(read_lines - CHECK_POINT_DISTANCE, read_lines);
-									checkSum = new Adler32();
-								}
 							}
-							else logger.debug("Line skipped");
 						}
-						else logger.debug("Empty line skipped");
+						if (read_lines % CHECK_POINT_DISTANCE == 0) {
+							checkThisPoint (read_lines, checkSum.getValue()) ;
+							checkSum = new Adler32();
+						} 
+						else if (listOfCheckPoints.contains(new Long(read_lines))) {
+							checkThisPoint (read_lines, checkSum.getValue()) ;
+						}
 					}
 					logger.debug("EOF reached");
-					checkThisPoint (read_lines, checkSum.getValue()) ;
-					checkSum.reset();
+					if (! (read_lines % CHECK_POINT_DISTANCE == 0 || listOfCheckPoints.contains(new Long(read_lines)))) checkThisPoint (read_lines, checkSum.getValue()) ;
 					fileReader.close();
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
@@ -96,13 +97,13 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 			}
 		}
 	}
-	
+
 	private void checkThisPoint(long read_lines, long checksum) {
 		if (checkPoints.check(read_lines, checksum)) {
 			logger.warn("Check Point at line >" + read_lines + "< checked successfully. No new data to process from the last Check Point.");
 		}
 		else {
-			logger.warn("Check Point at line >" + read_lines + "< doesn't match. Sending the data from the last Check Point.");
+			logger.warn("Check Point at line >" + read_lines + "< doesn't match. Sending the data (" + lineBuffer.size() + " elt) from the last Check Point.");
 			// send all the lines from the line buffer
 			Iterator<String> iter = lineBuffer.iterator();
 			while (iter.hasNext()) {
@@ -111,6 +112,7 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 			checkPoints.update(read_lines, checksum);
 		}
 		lineBuffer.clear();
+		checkPoints.clean((read_lines / CHECK_POINT_DISTANCE) * CHECK_POINT_DISTANCE, read_lines);
 	}
 
 	public void finalize (  ) {
