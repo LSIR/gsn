@@ -2,7 +2,7 @@
 
 one:
   id: 1
-  name: DataSensor
+  name: DataSensor1
   priority: 5
   protected: false
   pool_size: 10
@@ -14,7 +14,7 @@ one:
 
 two:
   id: 2
-  name: DataSensor
+  name: DataSensor2
   priority: 10
   protected: false
   pool_size: 100
