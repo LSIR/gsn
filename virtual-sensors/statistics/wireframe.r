@@ -11,6 +11,7 @@ g <- expand.grid(x = x, y = y);
 
 # function to plot the wireframe sin(x)/x
 g$z <- sin(gsn_data)/gsn_data;
+g$z <- as.real(g$z);
 
 gsn_out_data <- sum(gsn_data) / window_size ;
 gsn_out_timestamp <- gsn_timestamps[1];

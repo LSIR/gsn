@@ -5,7 +5,10 @@ import java.io.Serializable;
 import net.tinyos.packet.Serial;
 
 import org.apache.log4j.Logger;
+
+import gsn.beans.AddressBean;
 import gsn.beans.DataField;
+import gsn.utils.ParamParser;
 
 /**
  * This wrapper presents a MultiFormat protocol in which the data comes from the
@@ -23,10 +26,22 @@ public class MultiFormatWrapper extends AbstractWrapper
       new DataField("temperature", "double", "Presents the temperature sensor."), new DataField("light", "double", "Presents the light sensor.") };
   private final transient Logger logger = Logger.getLogger(MultiFormatWrapper.class);
   private int counter;
+  private AddressBean params;
+  private long rate = 1000;
 
   public boolean initialize()
   {
     setName("MultiFormatWrapper" + counter++);
+    
+    params = getActiveAddressBean();
+    
+    if ( params.getPredicateValue( "rate" ) != null )
+    {
+      rate = (long) Integer.parseInt( params.getPredicateValue( "rate"));
+      
+      logger.info("Sampling rate set to " + params.getPredicateValue( "rate") + " msec.");
+    }
+    
     return true;
   }
 
@@ -39,8 +54,8 @@ public class MultiFormatWrapper extends AbstractWrapper
     {
       try
       {
-        // delay for one second
-        Thread.sleep(1000);
+        // delay 
+        Thread.sleep(rate);
       } catch (InterruptedException e)
       {
         logger.error(e.getMessage(), e);

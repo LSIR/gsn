@@ -30,7 +30,8 @@ public class RVirtualSensor extends AbstractVirtualSensor {
   private static final String OUTPUT_PLOT = "gsn_plot";  
   private static final String OUTPUT_TIMESTAMP = "gsn_out_timestamp";    
   private static final String SCRIPT = "script"; 
-  private static final String SERVER = "server"; 
+  private static final String SERVER = "server";
+  private static final String PORT = "port"; 
   
 	private static transient Logger logger = Logger.getLogger ( RVirtualSensor.class );
 
@@ -92,13 +93,15 @@ public class RVirtualSensor extends AbstractVirtualSensor {
     // connect to Rserve and assign global variables
     try
     {
-      rc = new RConnection(params.get(SERVER));
+      rc = new RConnection(params.get(SERVER), Integer.parseInt(params.get(PORT)));
       
       rc.assign(WINDOW_SIZE, params.get(WINDOW_SIZE).toString());
       rc.assign(STEP_SIZE, params.get(STEP_SIZE).toString() );         
       
       rc.voidEval("window_size <- as.numeric(window_size);");
-      rc.voidEval("step_size <- as.numeric(step_size);");      
+      rc.voidEval("step_size <- as.numeric(step_size);");
+      
+      logger.info("Connected to R server " + params.get(SERVER) + ":" + params.get(PORT));
     }
     catch (Exception e)
     { 
