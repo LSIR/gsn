@@ -1,29 +1,25 @@
-##------------------------------------------------------------------------##
-## R Script for calculating Simple Moving Average (SMA)                   ##
-## Author: GSN Team                                                       ##
-##------------------------------------------------------------------------##
+# R Script for calculating Simple Moving Average (SMA)
 
-## size of the window
-w_len <- length(input_data);
+# size of the window
+size <- length(gsn_data);
 
-## calculate the average
-output_data <- sum(input_data) / w_len ;
+# calculate the average
+gsn_out_data <- sum(gsn_data) / size ;
 
-## take the last timestamp in window as output_timestamp
-output_timestamp <- input_timestamps[1]; ## 1221476697
+# take the last timestamp in window as gsn_out_timestamp
+gsn_out_timestamp <- gsn_timestamps[1];
 
-##time <- input_timestamps;
-##seconds <- (time %% 60);
-##minutes <- (time %% 60)/60;
-##hours <- time/3600;
-
-## do some basic plotting
+# configure the graphics device to jpeg capture
 graphics.off();
-jpeg('test.jpg',quality=90); 
+jpeg("plot.jpg",quality=90);
 dev.cur();
-plot(input_data ~ input_timestamps, xlab='Time', ylab='Average', main='Simple Moving Average', type="l");
-dev.off(2);
 
-## save the plot as a binary (jpeg) object and assign to output_plot variable
-output_plot <- readBin('test.jpg','raw',512*512); 
-unlink('test.jpg');
+# plot the average
+plot(gsn_data ~ gsn_timestamps, xlab="Time (unix epoch)", ylab="Average", main="Simple Moving Average", type="l");
+
+# calling this function does the plot to jpeg capture
+dev.off(dev.cur());
+
+# save the plot as a binary (jpeg) object and assign to gsn_plot variable
+gsn_plot <- readBin("plot.jpg","raw",512*512);
+unlink("plot.jpg");

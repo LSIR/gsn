@@ -24,11 +24,11 @@ public class RVirtualSensor extends AbstractVirtualSensor {
 
 	private static final String WINDOW_SIZE = "window_size";
 	private static final String STEP_SIZE = "step_size";
-  private static final String INPUT_DATA = "input_data";
-  private static final String INPUT_TIMESTAMPS = "input_timestamps";
-  private static final String OUTPUT_DATA = "output_data";
-  private static final String OUTPUT_PLOT = "output_plot";  
-  private static final String OUTPUT_TIMESTAMP = "output_timestamp";    
+  private static final String INPUT_DATA = "gsn_data";
+  private static final String INPUT_TIMESTAMPS = "gsn_timestamps";
+  private static final String OUTPUT_DATA = "gsn_out_data";
+  private static final String OUTPUT_PLOT = "gsn_plot";  
+  private static final String OUTPUT_TIMESTAMP = "gsn_out_timestamp";    
   private static final String SCRIPT = "script"; 
   private static final String SERVER = "server"; 
   
@@ -226,7 +226,7 @@ public class RVirtualSensor extends AbstractVirtualSensor {
       output_timestamp = ((long)xp.asInteger()) * 1000L;
       
       // get the output timestamp
-      xp = rc.parseAndEval("output_plot");      
+      xp = rc.parseAndEval("gsn_plot");      
       byte[] image = xp.asBytes();
       
       // create and post the stream element 
