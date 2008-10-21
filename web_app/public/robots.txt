@@ -1,5 +1,32 @@
-# See http://www.robotstxt.org/wc/norobots.html for documentation on how to use the robots.txt file
-#
-# To ban all spiders from the entire site uncomment the next two lines:
-# User-Agent: *
-# Disallow: /
+<li>
+  <select class="field_selector" id="criteria[operator]" name="criteria[operator]"><option value="0">And</option>
+<option value="1">Or</option></select>  <select class="field_selector" id="criteria[deployment]" name="criteria[deployment]"><option value="Timed">Timed</option>
+<option value="AL">AL</option>
+<option value="AP">AP</option>
+
+<option value="CACHE">CACHE</option>
+<option value="HEAP">HEAP</option>
+<option value="RESIDENT">RESIDENT</option>
+<option value="RH">RH</option>
+<option value="TA">TA</option>
+<option value="UNMAPPED">UNMAPPED</option></select>  <select class="field_selector" id="criteria[virtual_sensor]" name="criteria[virtual_sensor]"><option value="Timed">Timed</option>
+<option value="AL">AL</option>
+<option value="AP">AP</option>
+
+<option value="CACHE">CACHE</option>
+<option value="HEAP">HEAP</option>
+<option value="RESIDENT">RESIDENT</option>
+<option value="RH">RH</option>
+<option value="TA">TA</option>
+<option value="UNMAPPED">UNMAPPED</option></select>  <select class="field_selector" id="criteria[fields]" name="criteria[fields]"><option value="Timed">Timed</option>
+<option value="AL">AL</option>
+<option value="AP">AP</option>
+
+<option value="CACHE">CACHE</option>
+<option value="HEAP">HEAP</option>
+<option value="RESIDENT">RESIDENT</option>
+<option value="RH">RH</option>
+<option value="TA">TA</option>
+<option value="UNMAPPED">UNMAPPED</option></select>    Between
+    <input id="criteria[mininterval]" name="criteria[mininterval]" size="5" value="-INF" type="text">    and
+    <input id="criteria[maxinterval]" name="criteria[maxinterval]" size="5" value="+INF" type="text">    <a href="#" onclick="$(this).parent().remove();; return false;">Remove</a></li>

@@ -94,7 +94,13 @@
 }
 
 label {
-    display: none;
+    text-indent: -999999px;
+    width: 1.3em;
+    height: 1.4em;
+    display: block;
+    font-size: 1em;
+    border: 1px solid #d3d3d3;
+    cursor: pointer;
 }
 
 .datepicker_time select {
