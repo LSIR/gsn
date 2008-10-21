@@ -88,21 +88,22 @@ public class DownloadData extends AbstractDataRequest {
 				de = StorageManager.getInstance().executeQuery(nextSqlQuery.getValue(), false,  StorageManager.getInstance().getConnection());
 				logger.debug("Data Enumerator: " + de);
 				if (ot == AllowedOutputType.csv) {
-					respond.println("#" + nextSqlQuery.getValue().getStandardQuery());
+					respond.println("#" + nextSqlQuery.getValue().getStandardQuery() + (nextSqlQuery.getValue().getLimitCriterion() == null ? "" : "(" + nextSqlQuery.getValue().getLimitCriterion() + ")"));
 				}
 				else if (ot == AllowedOutputType.xml) {
 					respond.println("\t<!-- " + nextSqlQuery.getValue().getStandardQuery() + " -->");
 					respond.println("\t<data vsname=\"" + nextSqlQuery.getKey() + "\">");
 				}
 				FieldsCollection fc = getVsnamesAndStreams().get(nextSqlQuery.getKey());
-				boolean wantTimed = fc != null ? fc.isWantTimed() : false;
+				//boolean wantTimed = fc != null ? fc.isWantTimed() : false;
+				boolean wantTimed = true;
 				boolean firstLine = true;
 				while (de.hasMoreElements()) {
 					if (ot == AllowedOutputType.csv) {
 						formatCSVElement(respond, de.nextElement(), wantTimed, csvDelimiter, firstLine);
 					}
 					else if	(ot == AllowedOutputType.xml) {
-						formatHTMLElement(respond, de.nextElement(), wantTimed, firstLine);
+						formatXMLElement(respond, de.nextElement(), wantTimed, firstLine);
 					}
 					firstLine = false;
 				}
@@ -132,11 +133,11 @@ public class DownloadData extends AbstractDataRequest {
 			respond.print(se.getData()[i].toString());
 			if (i != se.getData().length - 1) respond.print(cvsDelimiter); 
 		}
-		if (wantTimed) respond.print(sdf.format(new Date(se.getTimeStamp())));
+		if (wantTimed) respond.print(cvsDelimiter + sdf.format(new Date(se.getTimeStamp())));
 		respond.println();
 	}
 
-	private void formatHTMLElement (PrintWriter respond, StreamElement se, boolean wantTimed, boolean firstLine) {
+	private void formatXMLElement (PrintWriter respond, StreamElement se, boolean wantTimed, boolean firstLine) {
 		if (firstLine) {
 			respond.println("\t\t<line>");
 			for (int i = 0 ; i < se.getData().length ; i++) {

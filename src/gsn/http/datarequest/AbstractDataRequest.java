@@ -149,9 +149,9 @@ public abstract class AbstractDataRequest {
 						else {
 							partStandardCriteria.append(cc.getNegation() + " " + cc.getField() + " " + cc.getOperator() + " ");
 						}
-						
+
 						lastStandardCriterionLinkedToVs = cc;
-						
+
 						if (cc.getOperator().compareToIgnoreCase("like") == 0) partStandardCriteria.append("'%");
 
 						partStandardCriteria.append(cc.getValue());
@@ -164,30 +164,33 @@ public abstract class AbstractDataRequest {
 			}
 
 			partFields = new StringBuilder () ;
-			partVS = new StringBuilder () ;
-
 			for (int i = 0 ; i < fields.length ; i++) {
+				if (fields[i].equalsIgnoreCase("timed") && aggregationCriterion!=null)
+					continue;
+				if (partFields.length()>0)
+					partFields.append(", ");
 				if (aggregationCriterion != null) 	partFields.append(aggregationCriterion.getGroupOperator() + "(");
 				partFields.append(fields[i]);
 				if (aggregationCriterion != null)	partFields.append(") as " + fields[i]);
-				if (i != fields.length -1) 	partFields.append(", ");
+
 			}										
 
-			if (aggregationCriterion != null) 	partFields.append(", floor(timed/" + aggregationCriterion.getTimeRange() + ") as aggregated_period ");
+			if (aggregationCriterion != null) {
+				if (partFields.length() > 0)
+					partFields.append(", ");
+				partFields.append("floor(timed/" + aggregationCriterion.getTimeRange() + ") as timed ");
+			}
 			else 								partFields.append(" ");
 
-			partVS.append(vsname);
-			partVS.append(" ");
-
+		
 			// Build a final query
 			sqlQuery = new StringBuilder();
 			sqlQuery.append("select ");
 			sqlQuery.append(partFields);
-			sqlQuery.append("from ");
-			sqlQuery.append(partVS);
+			sqlQuery.append("from ").append(vsname).append(" ");
 			sqlQuery.append(partStandardCriteria);
 			if (aggregationCriterion == null)	sqlQuery.append("order by timed desc ");
-			else 								sqlQuery.append("group by aggregated_period desc ");
+			else 								sqlQuery.append("group by timed desc ");
 
 			logger.debug("SQL Query built >" + sqlQuery.toString() + "<");
 
