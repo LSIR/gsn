@@ -4,9 +4,11 @@ class CreateProcessors < ActiveRecord::Migration
       t.string :name
       t.string :description
       t.string :class_name
-
       t.timestamps
     end
+
+    add_index :processors, [:name], :unique
+
   end
 
   def self.down

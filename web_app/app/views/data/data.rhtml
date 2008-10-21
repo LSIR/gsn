@@ -1,0 +1,197 @@
+<div class="clearfix">
+    <% form_tag('/data/download_data') do -%>
+      <div class="accordion">
+	  <div class="ui-accordion-group">
+	      <h3 class="ui-accordion-header"><a href="#">Data Output</a></h3>
+	      <div class="ui-accordion-content">
+		  <div class="aggregations">
+		      <%= radio_button_tag 'nb', 'ALL', true -%><span> All Data</span> |
+		      <%= radio_button_tag 'nb', 'SPECIFIED', false -%><span> Last</span>
+		      <%= text_field_tag 'nb_value', '10', :size => 3, :disabled => true -%><span> Values | Aggregation</span>
+		      <%= select_tag('agg_function', options_for_select([['No Aggregation','-1'],['AVG','AVG'],['MAX','MAX'],['MIN','MIN']])) -%>
+		      <%= text_field_tag 'agg_period', '2', :size => 5, :disabled => true -%><%= select_tag('agg_unit', options_for_select([['Hours','3600000'],['Minutes','60000'],['Seconds','1000'],['Milli Seconds','1']])) -%>
+		  </div>
+		  <div class="data-outputs-container">
+		      <a id="add-data-output" href="#">Add Output</a>
+		      <ul id="data-outputs" ></ul>
+		  </div>
+	      </div>
+	  </div>
+	  <div class="ui-accordion-group">
+	      <h3 class="ui-accordion-header"><a href="#">Conditions</a></h3>
+	      <div class="ui-accordion-content">
+		  <div class="time-range">
+		      <span>From</span><%= text_field_tag :from, '', :id => :datepicker_from, :size => '16' -%>
+		      <span>To</span><%= text_field_tag :to, '', :id => :datepicker_to, :size => '16'-%>
+		  </div>
+		  <div class="conditions-container">
+		      <a id="add-condition" href="#">Add Condition</a>
+		      <ul id="conditions" ></ul>
+		  </div>
+	      </div>
+	  </div>
+	  <div class="ui-accordion-group">
+	      <h3 class="ui-accordion-header"><a href="#">Results</a></h3>
+	      <div class="ui-accordion-content">
+		  <div class="tabs">
+		      <ul>
+			  <li class="ui-tabs-nav-item"><a href="#fragment-1-1">Download</a></li>
+			  <li class="ui-tabs-nav-item"><a href="#fragment-1-2">Plot</a></li>
+			  <li class="ui-tabs-nav-item"><a href="#fragment-1-3"><span>Table</span></a></li>
+		      </ul>
+		      <div id="fragment-1-1">
+			  <span>Format </span><%= select_tag('download_format', options_for_select([['CSV file','CSV'],['XML file','XML'],['Report','REPORT']])) -%>
+			  <%= submit_tag "Download", {:class => "ui-default-state download_btn"} %>
+		      </div>
+		      <div id="fragment-1-2">
+			  <p>Plot (One Chart that contains all the curves)</p>
+		      </div>
+		      <div id="fragment-1-3">
+			  <p>Table (One Table that contains the data for all the selected Fields)</p>
+		      </div>
+		  </div>
+	      </div>
+	  </div>
+      </div>
+    <% end -%>
+</div>
+<script type="text/javascript">
+    $(function(){
+
+	function add_data_output () {
+	    $('#data-outputs').append('<li ' + option_list_key('deployments',dvos,"All Deployments") + option_list_key('vss',virtual_sensor_to_deployment,"All Virtual Sensors") + option_list_key('fields',fields_to_deployments,"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
+	    $('.deployments').change(function(){
+		deployment = $(this).val();
+		update_vss(deployment, $(this));
+	    });
+	    update_vss('All', $(this));
+	    $('.remove-criterion').click (function() {
+		$(this).parent().remove();
+		$('.join:first').hide();
+	    });
+	}
+
+	function add_condition () {
+	    $('#conditions').append('<li <select class="join" name="join"><option value="1">AND</option><option value="0">OR</option></select>' +  option_list_key('deployments',dvos,"All Deployments") + option_list_key('vss',virtual_sensor_to_deployment,"All Virtual Sensors") + option_list_key('fields',fields_to_deployments,"All Fields") + ' | Between <input class="min" type="text" size="3" value="-inf" /> and <input class="max" type="text" size="3" value="+inf" /><a class="remove-criterion" href="#"> Remove</a></li>');
+	    $('.deployments').change(function(){
+		deployment = $(this).val();
+		update_vss(deployment, $(this));
+	    });
+	    update_vss('All', $(this));
+	    $('.remove-criterion').click (function() {
+		$(this).parent().remove();
+		$('.join:first').hide();
+	    });
+	    $('.join:first').hide();
+	}
+
+	function update_vss(deployment, tag) {
+	    vss_to_replace = '';
+	    fields_to_replace = '';
+	    if(deployment == "All"){
+		vss_to_replace = option_list_key('vss',virtual_sensor_to_deployment,"All Virtual Sensors");
+		fields_to_replace = option_list_key('fields',fields_to_deployments,"All Fields");
+	    }
+	    else{
+		vss_to_replace = option_list_key('vss',dvos[deployment],"All Virtual Sensors");
+		fields_to_replace = option_list_value('fields',deployment_to_fields[deployment],"All Fields");
+	    }
+	    tag.next("select").replaceWith(vss_to_replace);
+	    tag.next("select").next("select").replaceWith(fields_to_replace);
+	    $('.vss').change(function () {
+		vs = $(this).val();
+		fields_to_replace = '';
+		if (vs == "All") {
+		    deployment = $(this).prev().val();
+		    if (deployment == "All") {
+			fields_to_replace = option_list_key('fields',fields_to_deployments,"All Fields");
+		    }
+		    else {
+			fields_to_replace = option_list_value('fields',deployment_to_fields[deployment], "All Fields");
+		    }
+		}
+		else {
+		    fields_to_replace = option_list_value('fields',virtual_sensor_to_fields[vs], "All Fields");
+		}
+		$(this).next("select").replaceWith(fields_to_replace);
+	    });
+	}
+
+	$('#add-data-output').click(function () {
+	    add_data_output();
+	});
+
+	$('#add-condition').click(function () {
+	    add_condition();
+	});
+    });
+</script>
+<script type="text/javascript">
+    $(function () {
+	$('#nb_all').click(function () {
+	    $('#nb_value').attr('disabled',true);
+	});
+
+	$('#nb_specified').click(function () {
+	    $('#nb_value').attr('disabled',false);
+	});
+	$('#agg_function').change(function(){
+	    if($(this).val() == '-1') {
+		$('#agg_period').attr('disabled',true);
+	    }
+	    else {
+		$('#agg_period').attr('disabled',false);
+	    }
+	});
+    });
+</script>
+<script type="text/javascript">
+    $(function(){
+	//accordion
+	$('.accordion').accordion({
+	    header: ".ui-accordion-header",
+	    clearStyle: true
+	});
+
+	//tabs
+	$('.tabs ul').tabs();
+
+	//datepicker
+	$('#ui-datepicker').datepicker({
+	    changeFirstDay: false
+	});
+
+	// buttons
+	$('.ui-default-state').hover(
+	function(){$(this).addClass('ui-hover-state');},
+	function(){$(this).removeClass('ui-hover-state');}
+    );
+
+    });
+</script>
+<script type="text/javascript">
+    $('.download_btn').click(function(){
+	var counter = 0;
+	$(this).parents('form').find('.data-outputs-container li').each(function(){
+	    $(this).find('.deployments').each(function(){$(this).attr('name','deployment['+counter+']');});
+	    $(this).find('.vss').each(function(){$(this).attr('name','vs['+counter+']');});
+	    $(this).find('.fields').each(function(){$(this).attr('name','field['+counter+']');});
+	    counter++;
+	});
+	counter = 0;
+	$(this).parents('form').find('.conditions-container li').each(function(){
+	    $(this).find('.deployments').each(function(){$(this).attr('name','c_deployment['+counter+']');});
+	    $(this).find('.vss').each(function(){$(this).attr('name','c_vs['+counter+']');});
+	    $(this).find('.fields').each(function(){$(this).attr('name','c_field['+counter+']');});
+	    $(this).find('.join').each(function(){$(this).attr('name','c_join['+counter+']');});
+	    $(this).find('.max').each(function(){$(this).attr('name','c_max['+counter+']');});
+	    $(this).find('.min').each(function(){$(this).attr('name','c_min['+counter+']');});
+	    counter++;
+	});
+
+	//$(this).parents('form').find('.data-outputs-container .deployments').each(function(){
+	//    alert($(this).parent().html());
+	//});
+	return true;
+    });
+</script>

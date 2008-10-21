@@ -5,9 +5,11 @@ class CreateWrapperInstances < ActiveRecord::Migration
       t.text    :description
       t.integer :wrapper_id
       t.integer :source_id
-
       t.timestamps
     end
+
+    add_index :wrapper_instances, [:name], :unique
+
   end
 
   def self.down

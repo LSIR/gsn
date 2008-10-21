@@ -5,6 +5,9 @@ class CreateAddressingTypes < ActiveRecord::Migration
       t.string :description
       t.timestamps
     end
+
+    add_index :addressing_types, [:name], :unique
+
   end
 
   def self.down

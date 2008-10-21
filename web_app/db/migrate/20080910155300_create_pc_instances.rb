@@ -4,9 +4,11 @@ class CreatePcInstances < ActiveRecord::Migration
       t.string :name
       t.string :web_password
       t.integer :processor_id
-
       t.timestamps
     end
+
+    add_index :pc_instances, [:name], :unique
+
   end
 
   def self.down

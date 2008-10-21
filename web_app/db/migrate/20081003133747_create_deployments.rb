@@ -7,6 +7,9 @@ class CreateDeployments < ActiveRecord::Migration
       t.text :description
       t.timestamps
     end
+
+    add_index :deployments, [:name], :unique
+
   end
 
   def self.down

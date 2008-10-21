@@ -89,3 +89,7 @@ Already Added
 
 
 # datepicker themes http://marcgrabanski.com/article/jquery-ui-datepicker-themes
+
+
+$ git clone http://www.vector-seven.com/git/rails/plugins/form_collections.git
+$ script/plugin install git://github.com/giraffesoft/attribute_fu.git

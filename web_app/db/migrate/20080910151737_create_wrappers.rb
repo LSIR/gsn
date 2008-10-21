@@ -7,6 +7,9 @@ class CreateWrappers < ActiveRecord::Migration
 
       t.timestamps
     end
+
+    add_index :wrappers, [:name], :unique
+
   end
 
   def self.down

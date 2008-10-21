@@ -8,6 +8,8 @@ class CreateUsers < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :users, [:email], :unique
+
     create_table :deployments_users, :id => false do |t|
       t.references :deployment, :null => false
       t.references :user, :null => false

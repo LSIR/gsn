@@ -7,21 +7,18 @@
 	<meta name="description" content="GSN :: Global Sensor Networks Platform, Software middleware for wireless sensor networks and environmental monitoring applications." />
 	<meta name="keywords" content="gsn,global sensor networks, wireless,sensor" />
 	<%= javascript_include_tag 'jquery' -%>
-	<%= javascript_include_tag 'jquery-ui' -%>
+	<%= javascript_include_tag 'jquery-ui-personalized-1.5.2.min.js' -%>
 	<%= javascript_include_tag 'jrails' -%>
 	<%= javascript_include_tag 'ui.datepicker' -%>
-<%# javascript_include_tag 'date' -%>
-<%# javascript_include_tag 'jquery.datePicker' -%>
 	<%= javascript_include_tag 'application' -%>
 
-
-
 	<%= stylesheet_link_tag 'styles00' -%>
-	<%= stylesheet_link_tag 'secondar' -%>
-	<%= stylesheet_link_tag 'gsn' -%>
+	<%# stylesheet_link_tag 'secondar' -%>
+	<%= stylesheet_link_tag 'jquery-ui-themeroller-one' -%>
+	<%# stylesheet_link_tag 'jquery-ui-themeroller-green' -%>
 	<%= stylesheet_link_tag 'ui.datepicker' -%>
+	<%= stylesheet_link_tag 'gsn' -%>
 
-<%# stylesheet_link_tag 'datePicker' -%>
 	<!--[if IE 7]>
 	<link href="/stylesheets/ieseven.css" media="screen" rel="stylesheet" type="text/css" />
 	<![endif]-->
@@ -60,6 +57,7 @@
 		<div id="feedback">
 		    <p><%= flash[:notice] -%></p>
 		    <p><%= flash[:error] -%></p>
+		
 		</div>
 		<%= yield %>
 	    </div>

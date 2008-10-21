@@ -12,6 +12,9 @@ class CreateVirtualSensors < ActiveRecord::Migration
       t.integer :deployment_id
       t.timestamps
     end
+
+    add_index :virtual_sensors, [:name], :unique
+
   end
 
   def self.down

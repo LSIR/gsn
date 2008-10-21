@@ -22,22 +22,5 @@ class ApplicationController < ActionController::Base
       redirect_to :controller => :home, :action => :home
     end
   end
-  
-#   CONTAINER_CONFIG = Java::gsn.Main::loadContainerConfig("#{RAILS_ROOT}/../conf/gsn.xml")
 
-  #private:
-
-#  	vs_list = Java::gsn.gui.util::VSensorIOUtil.new(Java::gsn.Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY, 'virtual-sensors/Disabled/')
-#  	enabled_vs_files = vs_list.read_virtual_sensors
-#	disabled_vs_files = vs_list.read_disabled_virtual_sensors
-
-  #public:
-#	VS_ENABLED = Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(enabled_vs_files)
-#	VS_NAME_TO_CONFIG = {}
-#	VS_ENABLED.each {|k| VS_NAME_TO_CONFIG[k[1].name.chomp.upcase] = k[1] }
-#	VS_DISABLED =  Java::gsn.gui.util::VSensorConfigUtil.getVSensorConfigs(disabled_vs_files)
-#	STORAGE_MANAGER = Java::gsn.storage::StorageManager.getInstance()
-#	STORAGE_MANAGER.init(CONTAINER_CONFIG.jdbc_driver, CONTAINER_CONFIG.jdbc_username, CONTAINER_CONFIG.jdbc_password, CONTAINER_CONFIG.jdbc_url)
-#	CONTAINER_INFO_HANDLER = Java::gsn.http::ContainerInfoHandler.new
-  
 end

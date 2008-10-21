@@ -3,7 +3,6 @@ require 'digest/sha1'
 class User < ActiveRecord::Base
 
   has_and_belongs_to_many :deployments
-  has_many :data_configurations, :dependent => :destroy
 
   # Validation
   validates_email :email
