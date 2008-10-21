@@ -27,7 +27,7 @@ public class MultiDataDownload extends HttpServlet {
 				res.setHeader("content-disposition","attachment; filename=data.csv");
 			}
 			else {
-				res.setContentType("text/html");
+				res.setContentType("text/xml");
 			}
 			dd.outputResult(res.getOutputStream());
 			res.getOutputStream().flush();

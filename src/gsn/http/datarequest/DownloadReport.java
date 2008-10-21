@@ -47,13 +47,17 @@ public class DownloadReport extends AbstractDataRequest {
 		File f = new File (reportPath) ;
 		if (f == null || ! f.exists() || ! f.isFile()) throw new DataRequestException ("The path to compiled jasper file >" + reportPath + "< is not valid.") ;
 		//
-		Collection<Report> reports = new ArrayList<Report> ();
+		reports = new ArrayList<Report> ();
 		reports.add(createReport ());
 	}
 	
 	@Override
 	public void outputResult (OutputStream os) {
 		ReportManager.generatePdfReport(reports, reportPath, new HashMap<String, String> (), os);
+	}
+	
+	public byte[] outputResult () {
+		return ReportManager.generatePdfReport(reports, reportPath, new HashMap<String, String> ());
 	}
 	
 	private Report createReport () {
@@ -65,7 +69,7 @@ public class DownloadReport extends AbstractDataRequest {
 		while (iter.hasNext()) {
 			vsNameAndStream = iter.next();
 			virtualSensor = createVirtualSensor(vsNameAndStream.getKey(), vsNameAndStream.getValue().getFields());
-			if (virtualSensor != null) virtualSensors.add(virtualSensor);		
+			if (virtualSensor != null) virtualSensors.add(virtualSensor);
 		}
 		//		
 		String aggregationCrierion 	= getAggregationCriterion() 	== null		? "None" 		: getAggregationCriterion().toString();
@@ -77,7 +81,6 @@ public class DownloadReport extends AbstractDataRequest {
 	private VirtualSensor createVirtualSensor (String vsname, String[] vsstream) {
 		Collection<Stream> streams = null;
 		// create all the streams for this Virtual Sensor
-		StringBuilder sqlRequest = null;
 		try {
 			// Get the last update for this Virtual Sensor (In GSN, all the Virtual Sensor streams are inserted in the same record)
 			StringBuilder lastUpdateSb = new StringBuilder().append("select timed from " + vsname + " order by timed limit 1"); //TODO does it work with other DB?

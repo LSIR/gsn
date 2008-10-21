@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * <ul>
  * <li><strong>Minimal Parameters:</strong> <code>?vsname=ss_mem_vs:heap_memory_usage</code><br /> This request return a SQL query that select all the <code>heap_memory_usage</code> values from the <code>ss_me_vs</code> Virtual Sensor</li>
  * <li>
- *      <strong>Typical Parameters:</strong> <code>?vsname=tramm_meadows_vs:toppvwc_1:toppvwc_3&vsname=ss_mem_vs:heap_memory_usage&nb=0:5&critfield=and::timed:ge:1201600800000&critfield=and::timed:le:1211678800000&groupby=10000000:min</code><br />
+ *      <strong>Typical Parameters:</strong> <code>?vsname=tramm_meadows_vs:toppvwc_1:toppvwc_3&vsname=ss_mem_vs:heap_memory_usage&nb=0:5&critfield=and:::timed:ge:1201600800000&critfield=and:::timed:le:1211678800000&groupby=10000000:min</code><br />
  *      This request returns two SQL queries, one for <code>tramm_meadows_vs</code> and one for <code>ss_mem_vs</code> Virtual Sensor. The number of elements returned is limited to 5, are associated to a timestamp between <code>1201600800000</code> and <code>1211678800000</code>.
  *      The elements returned are the minimals values grouped by the timed field divided by <code>10000000</code>.
  * </li>
@@ -63,9 +63,9 @@ public abstract class AbstractDataRequest {
 	private LimitCriterion						limitCriterion				= null;
 
 	private Hashtable<String, AbstractQuery> sqlQueries ;
-	
+
 	protected Map<String, String[]> requestParameters;
-	
+
 	protected static SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 
 	public AbstractDataRequest (Map<String, String[]> requestParameters) throws DataRequestException {
@@ -107,7 +107,7 @@ public abstract class AbstractDataRequest {
 				standardCriteria.add(new StandardCriterion (cc[i]));
 			}
 		}
-		
+
 		String lm = getParameter(requestParameters, PARAM_MAX_NB);
 		if (lm != null) limitCriterion = new LimitCriterion (lm);
 	}
@@ -119,28 +119,6 @@ public abstract class AbstractDataRequest {
 	private void buildSQLQueries () {
 
 		this.sqlQueries = new Hashtable<String, AbstractQuery> () ;
-
-		// Standard Criteria
-		StringBuilder partStandardCriteria = new StringBuilder () ;
-		if (standardCriteria != null) {
-			partStandardCriteria.append("where ");
-			StandardCriterion cc ;
-			for (int i = 0 ; i < standardCriteria.size() ; i++) {
-				cc = standardCriteria.get(i);
-				if (i > 0) {
-					partStandardCriteria.append(standardCriteria.get(i - 1).getCritJoin() + " " + cc.getNegation() + " " + cc.getField() + " " + cc.getOperator() + " ");
-				}
-				else {
-					partStandardCriteria.append(cc.getNegation() + " " + cc.getField() + " " + cc.getOperator() + " ");
-				}
-				if (cc.getOperator().compareToIgnoreCase("like") == 0) partStandardCriteria.append("'%");
-
-				partStandardCriteria.append(cc.getValue());
-
-				if (cc.getOperator().compareToIgnoreCase("like") == 0) partStandardCriteria.append("%'");
-				partStandardCriteria.append(" ");
-			}
-		}
 
 		// Fields and Virtual Sensors
 		Iterator<Entry<String, FieldsCollection>> iter 	= vsnamesAndStreams.entrySet().iterator();
@@ -155,6 +133,35 @@ public abstract class AbstractDataRequest {
 			next = iter.next();
 			fields = next.getValue().getFields();
 			vsname = next.getKey();
+
+			// Standard Criteria
+			StringBuilder partStandardCriteria = new StringBuilder () ;
+			if (standardCriteria != null) {
+				StandardCriterion lastStandardCriterionLinkedToVs = null;
+				StandardCriterion cc ;
+				for (int i = 0 ; i < standardCriteria.size() ; i++) {
+					cc = standardCriteria.get(i);
+					if (cc.getVsname().compareTo("") == 0 || cc.getVsname().compareToIgnoreCase(vsname) == 0) {
+
+						if (lastStandardCriterionLinkedToVs != null) {
+							partStandardCriteria.append(lastStandardCriterionLinkedToVs.getCritJoin() + " " + cc.getNegation() + " " + cc.getField() + " " + cc.getOperator() + " ");
+						}
+						else {
+							partStandardCriteria.append(cc.getNegation() + " " + cc.getField() + " " + cc.getOperator() + " ");
+						}
+						
+						lastStandardCriterionLinkedToVs = cc;
+						
+						if (cc.getOperator().compareToIgnoreCase("like") == 0) partStandardCriteria.append("'%");
+
+						partStandardCriteria.append(cc.getValue());
+
+						if (cc.getOperator().compareToIgnoreCase("like") == 0) partStandardCriteria.append("%'");
+						partStandardCriteria.append(" ");
+					}
+				}
+				if (lastStandardCriterionLinkedToVs != null) partStandardCriteria.insert(0, "where ");				
+			}
 
 			partFields = new StringBuilder () ;
 			partVS = new StringBuilder () ;
@@ -199,7 +206,7 @@ public abstract class AbstractDataRequest {
 	public HashMap<String, FieldsCollection> getVsnamesAndStreams() {
 		return vsnamesAndStreams;
 	}
-	
+
 	public LimitCriterion getLimitCriterion() {
 		return limitCriterion;
 	}
@@ -237,7 +244,7 @@ public abstract class AbstractDataRequest {
 			return fields;
 		}
 	}
-	
+
 	/**
 	 * Returns the value of a request parameter as a <code>String</code>, or <code>null</code> if the parameter does not exist.
 	 */
@@ -245,9 +252,9 @@ public abstract class AbstractDataRequest {
 		String[] rpv = parameters.get(requestedParameter);
 		return (rpv == null || rpv.length == 0) ? null : rpv[0];
 	}
-	
+
 	public abstract void process() throws DataRequestException ;
-	
+
 	public abstract void outputResult (OutputStream os) ;
-	
+
 }
