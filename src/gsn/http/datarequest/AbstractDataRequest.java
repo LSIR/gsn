@@ -1,7 +1,7 @@
 package gsn.http.datarequest;
 
 import gsn.Main;
-
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -182,7 +182,7 @@ public abstract class AbstractDataRequest {
 			}
 			else 								partFields.append(" ");
 
-		
+
 			// Build a final query
 			sqlQuery = new StringBuilder();
 			sqlQuery.append("select ");
@@ -258,6 +258,12 @@ public abstract class AbstractDataRequest {
 
 	public abstract void process() throws DataRequestException ;
 
-	public abstract void outputResult (OutputStream os) ;
+	public abstract void outputResult (OutputStream os, boolean closeStream) ;
+
+	public InputStream getInputResult(int bufferSize) {
+		OutputInputStream ois = new OutputInputStream (bufferSize) ;
+		outputResult(ois.getOutputStream(), true);
+		return ois.getInputStream();
+	}
 
 }

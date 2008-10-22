@@ -52,7 +52,7 @@ public class DownloadReport extends AbstractDataRequest {
 	}
 	
 	@Override
-	public void outputResult (OutputStream os) {
+	public void outputResult (OutputStream os, boolean closeStream) {
 		ReportManager.generatePdfReport(reports, reportPath, new HashMap<String, String> (), os);
 	}
 	

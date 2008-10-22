@@ -6,6 +6,7 @@ import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -69,12 +70,12 @@ public class DownloadData extends AbstractDataRequest {
 
 	public String outputResult () {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream () ;
-		outputResult(baos);
+		outputResult(baos, false);
 		return baos.toString();
 	}
 
 	@Override
-	public void outputResult(OutputStream os) {
+	public void outputResult(OutputStream os, boolean closeStream) {
 		PrintWriter respond = new PrintWriter(os);
 		Iterator<Entry<String, AbstractQuery>> iter = getSqlQueries().entrySet().iterator();
 		Entry<String, AbstractQuery> nextSqlQuery;
@@ -116,6 +117,13 @@ public class DownloadData extends AbstractDataRequest {
 			respond.println("</result>");
 		}
 		respond.flush();
+		if (closeStream) {
+			try {
+				os.close();
+			} catch (IOException e) {
+				logger.debug(e.getMessage());
+			} 
+		}
 	}
 
 
@@ -139,19 +147,19 @@ public class DownloadData extends AbstractDataRequest {
 
 	private void formatXMLElement (PrintWriter respond, StreamElement se, boolean wantTimed, boolean firstLine) {
 		if (firstLine) {
-			respond.println("\t\t<line>");
+			respond.println("\t\t<header>");
 			for (int i = 0 ; i < se.getData().length ; i++) {
 				respond.println("\t\t\t<field>" + se.getFieldNames()[i].toString()+"</field>");
 			}
 			if (wantTimed) respond.println("\t\t\t<field>timed</field>");
-			respond.println("\t\t</line>");
+			respond.println("\t\t</header>");
 		}
-		respond.println("\t\t<line>");
+		respond.println("\t\t<tuple>");
 		for (int i = 0 ; i < se.getData().length ; i++) {
 			respond.println("\t\t\t<field>" + se.getData()[i].toString()+"</field>");
 		}
-		if (wantTimed) respond.println("\t\t<field>" + sdf.format(new Date(se.getTimeStamp())) + "</field>");
-		respond.println("\t\t</line>");
+		if (wantTimed) respond.println("\t\t\t<field>" + se.getTimeStamp() + "</field>");
+		respond.println("\t\t</tuple>");
 	}
 
 	public AllowedOutputType getOt() {
