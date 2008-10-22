@@ -1,5 +1,7 @@
 require 'java'
 
+import 'java.io.InputStream'
+
 class DataController < ApplicationController
 
   verify :add_flash => {:error => "Please, select Fields as data output."}, :params => [:deployment],:only => [:download_data],:redirect_to => {:action => :data}
@@ -131,7 +133,12 @@ class DataController < ApplicationController
 	send_data(dat, :filename => 'data.csv', :type => 'text/csv', :disposition => 'attachment')
       when :xml
 	download_data = Java::gsn.http.datarequest.DownloadData::new(parameters_map)
-	download_data.process
+	download_data.process()
+#	is = download_data.get_input_result(65536)
+#	while true
+#	  puts "next read #{is.read}"
+ #       end
+#	return
 	dat = download_data.output_result
 	send_data(dat, :filename => 'data.xml', :type => 'text/xml', :disposition => 'attachement')
       else

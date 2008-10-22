@@ -114,3 +114,87 @@ background: url(/images/bg_heade.gif);
     margin: 20px 0;
     height: 600px;
 }
+
+/* flot chart */
+
+/* flexigrid, Selection support for flexigrid */
+.selectable-list .flexigrid div.bDiv tr.trSelected:hover td,
+.selectable-list .flexigrid div.bDiv tr.trSelected:hover td.sorted,
+.selectable-list .flexigrid div.bDiv tr.trOver.trSelected td.sorted,
+.selectable-list .flexigrid div.bDiv tr.trOver.trSelected td,
+.selectable-list .flexigrid tr.trSelected td.sorted,
+.selectable-list .flexigrid tr.trSelected td{
+    background-image: url(/images/add.png) ;
+    background-position: left center;
+    background-repeat: no-repeat;
+}
+.selectable-list .flexigrid tr td{
+    border-color: #fff;
+}
+
+.selectable-list .flexigrid tr.trSelected td{
+    background-image: url(/images/add.png) ;
+    background-position: left center;
+    background-repeat: no-repeat;
+    border-color: #fff;
+}
+.selectable-list {
+    max-width:200px;
+}
+.flexigrid div.bDiv table {
+border-bottom:none;
+}
+.flexigrid .ftitle {
+    background-color: #E6E6E6;
+    text-align: center;
+    color: #555555;
+}
+.flexigrid tr.erow td{
+    background-color: #f7f7f7;
+}
+.flexigrid div.bDiv td div {
+    padding-left: 30px;
+}
+.flexigrid{
+    width: 100%;
+}
+/* dialog - zomming - plotting */
+.ui-dialog-titlebar-close{
+    display: none; /* removing the close btn*/
+}
+.ui-dialog-container{
+    width:300px; /* For some reasons the actual size can't be specified through percentage !''*/
+    height: 600px;
+}
+.dlg_selector .overview{
+    width: 300px;
+    height: 100px;
+}
+
+.ui-dialog-content{
+    padding:0px;
+}
+.gsn_chart{
+    width:600px;
+    height:300px;
+}
+.miniature {
+    float: left;
+    margin-left:30px 30px ;
+}
+.overviewLegend{
+    padding-left:30px;
+}
+.miniature .legendColorBox{
+    padding-left:30px;
+    background-image: url(/images/eye.png) ;
+    background-position: left center;
+    background-repeat: no-repeat;
+}
+.miniature .no-img{
+    background-image: none;
+}
+.ui-dialog {
+    width:auto;
+    height:auto;
+}

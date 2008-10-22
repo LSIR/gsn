@@ -36,18 +36,27 @@
 		  <div class="tabs">
 		      <ul>
 			  <li class="ui-tabs-nav-item"><a href="#fragment-1-1">Download</a></li>
-			  <li class="ui-tabs-nav-item"><a href="#fragment-1-2">Plot</a></li>
-			  <li class="ui-tabs-nav-item"><a href="#fragment-1-3"><span>Table</span></a></li>
+			  <li class="ui-tabs-nav-item"><a class="plot" href="#fragment-1-2">Plot</a></li>
+			  <li class="ui-tabs-nav-item"><a class="grid" href="#fragment-1-3"><span>Table</span></a></li>
 		      </ul>
 		      <div id="fragment-1-1">
 			  <span>Format </span><%= select_tag('download_format', options_for_select([['CSV file','CSV'],['XML file','XML'],['Report','REPORT']])) -%>
 			  <%= submit_tag "Download", {:class => "ui-default-state download_btn"} %>
 		      </div>
 		      <div id="fragment-1-2">
-			  <p>Plot (One Chart that contains all the curves)</p>
+			  <div class="chart_box">
+			      <div id="vs_selector" class="dlg_selector" title="Output Selector">
+				  <div class="miniature">
+				      <div class="overview" ></div>
+				      <p class="overviewLegend" ></p>
+				  </div>
+
+			      </div>
+			      <div class="gsn_chart"></div>
+			  </div>
 		      </div>
 		      <div id="fragment-1-3">
-			  <p>Table (One Table that contains the data for all the selected Fields)</p>
+			  TABLE HERE
 		      </div>
 		  </div>
 	      </div>
@@ -170,16 +179,16 @@
     });
 </script>
 <script type="text/javascript">
-    $('.download_btn').click(function(){
+    function prepare_form_for_submission(tag){
 	var counter = 0;
-	$(this).parents('form').find('.data-outputs-container li').each(function(){
+	tag.parents('form').find('.data-outputs-container li').each(function(){
 	    $(this).find('.deployments').each(function(){$(this).attr('name','deployment['+counter+']');});
 	    $(this).find('.vss').each(function(){$(this).attr('name','vs['+counter+']');});
 	    $(this).find('.fields').each(function(){$(this).attr('name','field['+counter+']');});
 	    counter++;
 	});
 	counter = 0;
-	$(this).parents('form').find('.conditions-container li').each(function(){
+	tag.parents('form').find('.conditions-container li').each(function(){
 	    $(this).find('.deployments').each(function(){$(this).attr('name','c_deployment['+counter+']');});
 	    $(this).find('.vss').each(function(){$(this).attr('name','c_vs['+counter+']');});
 	    $(this).find('.fields').each(function(){$(this).attr('name','c_field['+counter+']');});
@@ -188,10 +197,187 @@
 	    $(this).find('.min').each(function(){$(this).attr('name','c_min['+counter+']');});
 	    counter++;
 	});
+    }
 
-	//$(this).parents('form').find('.data-outputs-container .deployments').each(function(){
-	//    alert($(this).parent().html());
-	//});
+    $('.download_btn').click(function(){
+	prepare_form_for_submission($(this));
 	return true;
+    });
+
+    //    function draw_google_chart(xml) {
+    //
+    //	var data = new google.visualization.DataTable();
+    //	$('data header',xml).each(function(){
+    //	    alert($(this).text());
+    //	});
+    //
+    //	data.addColumn('date', 'Date');
+    //	data.addColumn('number', 'Sold Pencils');
+    //	data.addColumn('string', 'title1');
+    //	data.addColumn('string', 'text1');
+    //	data.addColumn('number', 'Sold Pens');
+    //	data.addColumn('string', 'title2');
+    //	data.addColumn('string', 'text2');
+    //	data.addRows(6);
+    //	data.setValue(0, 0, new Date(2008, 1 ,1));
+    //	data.setValue(0, 1, 30000);
+    //	data.setValue(0, 4, 40645);
+    //	data.setValue(1, 0, new Date(2008, 1 ,2));
+    //	data.setValue(1, 1, 14045);
+    //	data.setValue(1, 4, 20374);
+    //	data.setValue(2, 0, new Date(2008, 1 ,3));
+    //	data.setValue(2, 1, 55022);
+    //	data.setValue(2, 4, 50766);
+    //	data.setValue(3, 0, new Date(2008, 1 ,4));
+    //	data.setValue(3, 1, 75284);
+    //	data.setValue(3, 4, 14334);
+    //	data.setValue(4, 0, new Date(2008, 1 ,5));
+    //	data.setValue(4, 1, 41476);
+    //	data.setValue(4, 4, 66467);
+    //	data.setValue(5, 0, new Date(2008, 1 ,6));
+    //	data.setValue(5, 1, 33322);
+    //	data.setValue(5, 4, 39463);
+    //
+    //	var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart_div'));
+    //	chart.draw(data, {displayAnnotations: true});
+    //    }
+    function draw_flot_chart (xml) {
+
+	$("#vs_selector").dialog({
+	    height:'auto',
+	    width:'auto'
+	});
+
+	var datasets = {}
+	$('data header',xml).each(function(){
+	    //	    datasets = datasets[$(this).text()]||[]
+	    //alert($(this).text());
+	    datasets[$(this).text()] = {
+		label: $(this).text(),
+		data: [[1988, 218000], [1989, 203000]]
+	    };
+	});
+
+
+	//	var datasets = {
+	//	    "usa": {
+	//		label: "USA",
+	//		data: [[1988, 483994], [1989, 479060], [1990, 457648], [1991, 401949], [1992, 424705], [1993, 402375], [1994, 377867], [1995, 357382], [1996, 337946], [1997, 336185], [1998, 328611], [1999, 329421], [2000, 342172], [2001, 344932], [2002, 387303], [2003, 440813], [2004, 480451], [2005, 504638], [2006, 528692]]
+	//	    },
+	//	    "russia": {
+	//		label: "Russia",
+	//		data: [[1988, 218000], [1989, 203000], [1990, 171000], [1992, 42500], [1993, 37600], [1994, 36600], [1995, 21700], [1996, 19200], [1997, 21300], [1998, 13600], [1999, 14000], [2000, 19100], [2001, 21300], [2002, 23600], [2003, 25100], [2004, 26100], [2005, 31100], [2006, 34700]]
+	//	    }
+	//	};
+
+
+
+
+	var options = {
+	    legend: { show: true },
+	    lines: { show: true },
+	    points: { show: false },
+	    selection: { mode: "xy" },
+	    xaxis: {mode: "time"} /* NEW */
+	};
+
+	// hard-code color indices to prevent them from shifting as
+	// countries are turned on/off
+	var i = 0;
+	$.each(datasets, function(key, val) {
+	    val.color = i;
+	    ++i;
+	});
+
+	plotting_keys = []; /* Initialy plotting everything*/
+	for (var d in datasets){
+	    plotting_keys.push(d);
+	}
+
+	all_data_sets = []; /* Used with the Overview chart [small one]*/
+	for (var d in datasets){
+	    all_data_sets.push(datasets[d]);
+	}
+
+	// setup overview
+	var overview = $.plot($("#vs_selector .overview"), all_data_sets, {
+	    legend: { show: true, container: $("#vs_selector .overviewLegend") },
+	    lines: { show: true, lineWidth: 1 },
+	    shadowSize: 0,
+	    grid: { color: "#999" },
+	    selection: { mode: "xy" },
+	    xaxis: {mode: "time"} /* NEW */
+	});
+	// now connect the two charts
+	$(".gsn_chart").bind("plotselected", function (event, ranges) {
+	    // clamp the zooming to prevent eternal zoom
+	    if (ranges.xaxis.to - ranges.xaxis.from < 0.00001)
+		ranges.xaxis.to = ranges.xaxis.from + 0.00001;
+	    if (ranges.yaxis.to - ranges.yaxis.from < 0.00001)
+		ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+
+	    // do the zooming
+	    plot = $.plot($(".gsn_chart"), get_data(),
+	    $.extend(true, {}, options, {
+		xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+		yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+	    }));
+	    // don't fire event on the overview to prevent eternal loop
+	    overview.setSelection(ranges, true);
+
+	    $("#vs_selector .overview").bind("plotselected", function (event, ranges) {
+		plot.setSelection(ranges);
+	    });
+	});
+
+	function get_data(){
+	    var data = [];
+	    for (key in plotting_keys){
+		data.push(datasets[plotting_keys[key]]);
+	    }
+	    return data;
+	}
+
+	function plotAccordingToChoices() {
+	    data= get_data();
+	    if (data.length > 0){
+		var plot = $.plot($(".gsn_chart"), data, options);
+	    }
+	}
+
+	plotAccordingToChoices();
+
+	$(".legendColorBox").click(function(){
+	    $(this).toggleClass('no-img');
+	    to_return = [];
+	    $('.miniature').find('.legendColorBox').not('.no-img').each(function(){
+		to_return.push($(this).next('.legendLabel').text().toLowerCase());
+	    });
+	    plotting_keys=to_return;
+	    plotAccordingToChoices();
+
+	});
+    }
+    $(".plot").click(function(){
+	prepare_form_for_submission($(this));
+	var old_val = $('#download_format').val();
+	$('#download_format').val('XML');
+	$.post('/data/download_data', $(this).parents('form').serializeArray(), function(response, text_status, request){
+	    //	    draw_google_chart(response);
+	    draw_flot_chart(response);
+	});
+	$('#download_format').val(old_val);
+    });
+
+    $(".grid").click(function(){
+	prepare_form_for_submission($(this));
+	var old_val = $('#download_format').val();
+	$('#download_format').val('XML'); // OR CSV
+	//
+        $.post('/data/download_data', $(this).parents('form').serializeArray(), function(response, text_status, request){
+	    //draw_flot_chart(response);
+	});
+	//
+	$('#download_format').val(old_val);
     });
 </script>

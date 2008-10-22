@@ -6,11 +6,20 @@
 	<title>GSN :: Global Sensor Networks Platform</title>
 	<meta name="description" content="GSN :: Global Sensor Networks Platform, Software middleware for wireless sensor networks and environmental monitoring applications." />
 	<meta name="keywords" content="gsn,global sensor networks, wireless,sensor" />
+
 	<%= javascript_include_tag 'jquery' -%>
 	<%= javascript_include_tag 'jquery-ui-personalized-1.5.2.min.js' -%>
 	<%= javascript_include_tag 'jrails' -%>
 	<%= javascript_include_tag 'ui.datepicker' -%>
 	<%= javascript_include_tag 'application' -%>
+	<!-- Google Visualization: Annotated Time Line
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+	<script type="text/javascript">
+	    google.load("visualization", "1", {packages:["annotatedtimeline"]});
+	    google.setOnLoadCallback(function(){});
+	</script>
+	-->
+	<%= javascript_include_tag 'jquery.flot.pack' -%>
 
 	<%= stylesheet_link_tag 'styles00' -%>
 	<%# stylesheet_link_tag 'secondar' -%>
@@ -57,7 +66,7 @@
 		<div id="feedback">
 		    <p><%= flash[:notice] -%></p>
 		    <p><%= flash[:error] -%></p>
-		
+
 		</div>
 		<%= yield %>
 	    </div>
