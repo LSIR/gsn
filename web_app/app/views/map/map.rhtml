@@ -1,6 +1,6 @@
 <div id="filters">
   <%= select_tag('last', options_for_select([['All','-1'],['Active in Past','1']])) -%>
-  <%= text_field_tag 'period', '2', :size => 5, :disabled => true -%><%= select_tag('unit', options_for_select([['Hours','3600000'],['Minutes','60000'],['Seconds','1000'],['Milli Seconds','1']]),:disabled => true) -%>
+  <%= text_field_tag 'period', '2', :size => 5, :disabled => true -%><%= select_tag('unit', options_for_select([['Hours','3600000'],['Minutes','60000']]),:disabled => true) -%>
   <script type="text/javascript">
     $(function () {
       $('#last').change(function(){

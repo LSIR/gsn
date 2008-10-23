@@ -19,11 +19,11 @@
                   $('#nb_value').attr('disabled', (val == 'ALL'));
                 });
 
-                $('#agg_function').change(function(){
-                  $('#agg_period').attr('disabled',$(this).val() == '-1');
-                  $('#agg_unit').attr('disabled',$(this).val() == '-1');
-                });
+              $('#agg_function').change(function(){
+                $('#agg_period').attr('disabled',$(this).val() == '-1');
+                $('#agg_unit').attr('disabled',$(this).val() == '-1');
               });
+            });
             </script>
           </div>
           <%= render :partial=>'/shared/dvos_selector' %>
@@ -55,7 +55,6 @@
               <%= submit_tag "Download CSV", {:class => "ui-default-state download_btn_csv"} %>
               <%= submit_tag "Download XML", {:class => "ui-default-state download_btn_xml"} %>
               <%= submit_tag "Generate PDF", {:class => "ui-default-state download_btn_pdf"} %>
-              <%= submit_tag "TEST", {:class => "ui-default-state download_btn_test"} %>
               <span>Time Format</span>
               <%= select_tag('time_format', options_for_select([['ISO 8601','ISO'],['UNIX','UNIX']])) -%>
               <input id="download_format" type="hidden" name="download_format" value="CSV"></input>
@@ -68,6 +67,7 @@
                     <p class="overviewLegend" ></p>
                   </div>
                   <div class="gsn_chart"></div>
+                  <div class="clear-both"></div>
                 </div>
               </div>
             </div>
@@ -82,254 +82,242 @@
 </div>
 
 <script type="text/javascript">
-  $(function(){
-    //accordion
-    $('.accordion').accordion({
-      header: ".ui-accordion-header",
-      clearStyle: true
-    });
-
-    //tabs
-    $('.tabs ul').tabs();
-
-    //datepicker
-    $('#ui-datepicker').datepicker({
-      changeFirstDay: false
-    });
-
-    // buttons
-    $('.ui-default-state').hover(
-    function(){$(this).addClass('ui-hover-state');},
-    function(){$(this).removeClass('ui-hover-state');}
-  );
-
+$(function(){
+  //accordion
+  $('.accordion').accordion({
+    header: ".ui-accordion-header",
+    clearStyle: true
   });
+
+  //tabs
+  $('.tabs ul').tabs();
+
+  //datepicker
+  $('#ui-datepicker').datepicker({
+    changeFirstDay: false
+  });
+
+  // buttons
+  $('.ui-default-state').hover(
+  function(){$(this).addClass('ui-hover-state');},
+  function(){$(this).removeClass('ui-hover-state');}
+);
+
+});
 </script>
 <script type="text/javascript">
-  function prepare_form_for_submission(tag){
-    var counter = 0;
-    tag.parents('form').find('.data-outputs-container li').each(function(){
-      $(this).find('.deployments').each(function(){$(this).attr('name','deployment['+counter+']');});
-      $(this).find('.vss').each(function(){$(this).attr('name','vs['+counter+']');});
-      $(this).find('.fields').each(function(){$(this).attr('name','field['+counter+']');});
-      counter++;
-    });
-    counter = 0;
-    tag.parents('form').find('.conditions-container li').each(function(){
-      $(this).find('.deployments').each(function(){$(this).attr('name','c_deployment['+counter+']');});
-      $(this).find('.vss').each(function(){$(this).attr('name','c_vs['+counter+']');});
-      $(this).find('.fields').each(function(){$(this).attr('name','c_field['+counter+']');});
-      $(this).find('.join').each(function(){$(this).attr('name','c_join['+counter+']');});
-      $(this).find('.max').each(function(){$(this).attr('name','c_max['+counter+']');});
-      $(this).find('.min').each(function(){$(this).attr('name','c_min['+counter+']');});
-      counter++;
-    });
-  }
+function prepare_form_for_submission(tag){
+  var counter = 0;
+  tag.parents('form').find('.data-outputs-container li').each(function(){
+    $(this).find('.deployments').each(function(){$(this).attr('name','deployment['+counter+']');});
+    $(this).find('.vss').each(function(){$(this).attr('name','vs['+counter+']');});
+    $(this).find('.fields').each(function(){$(this).attr('name','field['+counter+']');});
+    counter++;
+  });
+  counter = 0;
+  tag.parents('form').find('.conditions-container li').each(function(){
+    $(this).find('.deployments').each(function(){$(this).attr('name','c_deployment['+counter+']');});
+    $(this).find('.vss').each(function(){$(this).attr('name','c_vs['+counter+']');});
+    $(this).find('.fields').each(function(){$(this).attr('name','c_field['+counter+']');});
+    $(this).find('.join').each(function(){$(this).attr('name','c_join['+counter+']');});
+    $(this).find('.max').each(function(){$(this).attr('name','c_max['+counter+']');});
+    $(this).find('.min').each(function(){$(this).attr('name','c_min['+counter+']');});
+    counter++;
+  });
+}
 
 
-  function submit_form(tag,options,callback){
-    /* THIS IS A HELPER METHOD BUT NOT REALLY USED ANYWHRER ... */
-    options = options || [];
-    callback = callback || function(){};
-    prepare_form_for_submission(tag);
+function submit_form(tag,options,callback){
+  /* THIS IS A HELPER METHOD BUT NOT REALLY USED ANYWHRER ... */
+  options = options || [];
+  callback = callback || function(){};
+  prepare_form_for_submission(tag);
 
-    var to_send = tag.parents('form').serializeArray();
-    //  alert(to_send);
-    for (var format_key in options){
-      for(var idx in to_send){
-        //alert(to_send[idx] );
-        if (to_send[idx].name==format_key){
-          to_send[idx].value=options[format_key];
-        }
+  var to_send = tag.parents('form').serializeArray();
+  //  alert(to_send);
+  for (var format_key in options){
+    for(var idx in to_send){
+      //alert(to_send[idx] );
+      if (to_send[idx].name==format_key){
+        to_send[idx].value=options[format_key];
       }
     }
   }
+}
 
-  $('.download_btn_csv').click(function(){
-    $('#download_format').val('CSV');
-    prepare_form_for_submission($(this));
-    return true;
+$('.download_btn_csv').click(function(){
+  $('#download_format').val('CSV');
+  prepare_form_for_submission($(this));
+  return true;
+});
+
+$('.download_btn_xml').click(function(){
+  $('#download_format').val('XML');
+  prepare_form_for_submission($(this));
+  return true;
+});
+
+$('.download_btn_pdf').click(function(){
+  $('#download_format').val('REPORT');
+  prepare_form_for_submission($(this));
+  return true;
+});
+
+$(".plot").click(function(){
+  datasets={};
+  csv_to_json($(this),draw_flot_chart);
+});
+
+
+$(".grid").click(function(){
+  prepare_form_for_submission($(this));
+  var old_val = $('#download_format').val();
+  $('#download_format').val('XML'); // OR CSV
+  //
+  $.post('/data/download_data', $(this).parents('form').serializeArray(), function(response, text_status, request){
+    //draw_flot_chart(response);
   });
+  //
+  $('#download_format').val(old_val);
+});
 
-  $('.download_btn_xml').click(function(){
-    $('#download_format').val('XML');
-    prepare_form_for_submission($(this));
-    return true;
-  });
+function csv_to_json(tag,callback){
+  callback = callback || function(){};
+  var old_value = $('#time_format').val();
+  $('#download_format').val('CSV');
+  $('#time_format').val('UNIX');
+  prepare_form_for_submission(tag);
 
-  $('.download_btn_pdf').click(function(){
-    $('#download_format').val('REPORT');
-    prepare_form_for_submission($(this));
-    return true;
-  });
+  $.post('/data/download_data', tag.parents('form').serializeArray(), function(response, text_status, request){
+    var lines = response.split('\n');
+    var headers = [];
+    var timestamp_idx = -1;
+    var vs_name='';
+    var keys =[];
 
-  $(".plot").click(function(){
-    datasets={};
-    csv_to_json($(this),draw_flot_chart);
-  });
-
-  $(".grid").click(function(){
-    prepare_form_for_submission($(this));
-    var old_val = $('#download_format').val();
-    $('#download_format').val('XML'); // OR CSV
-    //
-    $.post('/data/download_data', $(this).parents('form').serializeArray(), function(response, text_status, request){
-      //draw_flot_chart(response);
-    });
-    //
-    $('#download_format').val(old_val);
-  });
-
-  function csv_to_json(tag,callback){
-    callback = callback || function(){};
-    var old_value = $('#time_format').val();
-    $('#download_format').val('CSV');
-    $('#time_format').val('UNIX');
-    prepare_form_for_submission(tag);
-
-    $.post('/data/download_data', tag.parents('form').serializeArray(), function(response, text_status, request){
-      var lines = response.split('\n');
-      var headers = [];
-      var timestamp_idx = -1;
-      var vs_name='';
-      var keys =[];
-
-      for (var line_no=0;line_no<lines.length;line_no++){
-        line = $.trim(lines[line_no]);
-        if(line[0]=='#'){
-          if (line.indexOf("##vsname:") >= 0){ //comment lines
-            vs_name = line.substring(9,line.length);
-            keys=[];
-            headers=[];
-          }
-          if (line[0]== '#' && line[1]!= '#') { //Header
-            headers = line.split(',');
-            for (var i=0;i<headers.length;i++){
-              headers[i] = headers[i].replace("#","");
-              if (headers[i]=='timed') {timestamp_idx=i;}
-              else {
-                var key = vs_name+':'+headers[i];
-                datasets[key]={label: vs_name+'('+headers[i]+')', data: []};
-                keys.push(key);
-              }
-            }
-          }
-        }else { // data line, at this stage we should have a header varialbe already set.
-          var data = line.split(',');
-          var timestamp = data[timestamp_idx];
-          for (i=0;i<headers.length;i++){
-            if(i != timestamp_idx && data[i]!=undefined ){
-              datasets[keys[i]].data.push([timestamp,data[i]]);
+    for (var line_no=0;line_no<lines.length;line_no++){
+      line = $.trim(lines[line_no]);
+      if(line[0]=='#'){
+        if (line.indexOf("##vsname:") >= 0){ //comment lines
+          vs_name = line.substring(9,line.length);
+          keys=[];
+          headers=[];
+        }
+        if (line[0]== '#' && line[1]!= '#') { //Header
+          headers = line.split(',');
+          for (var i=0;i<headers.length;i++){
+            headers[i] = headers[i].replace("#","");
+            if (headers[i]=='timed') {
+              timestamp_idx=i;
+            } else {
+              lbl = vs_name+' ('+headers[i]+')';
+              datasets[lbl]={label: lbl, data: []};
+              keys.push(lbl);
             }
           }
         }
+      }else { // data line, at this stage we should have a header varialbe already set.
+        var data = line.split(',');
+        var timestamp = data[timestamp_idx];
+        for (i=0;i<headers.length;i++){
+          if(i != timestamp_idx && data[i]!=undefined ){
+            datasets[keys[i]].data.push([timestamp,data[i]]);
+          }
+        }
       }
-      $('#time_format').val(old_value);
-      callback(datasets);
-    });
+    }
+    $('#time_format').val(old_value);
+    callback(datasets);
+  });
+}
+
+/******************************************************/
+/*                  CHARTING PART                      */
+/******************************************************/
+
+var datasets ={} ;
+var plotting_keys = []; /* Initialy plotting everything*/
+
+var options = {
+  legend: { show: false },
+  lines: { show: true },
+  points: { show: false },
+  selection: { mode: "xy" },
+  xaxis: {mode: "time"}
+};
+
+function draw_flot_chart(ds) {
+  datasets = ds;
+  plotting_keys = [];
+  for (var d in datasets){
+    plotting_keys.push(d);
   }
 
-  $('.download_btn_test').click(function(){
-    csv_to_json($(this));
-    return false;
+  // hard-code color indices to prevent them from shifting as
+  // countries are turned on/off
+  var i = 0;
+  $.each(datasets, function(key, val) {
+    val.color = i;
+    ++i;
   });
 
-  /******************************************************/
-  /*                  CHARTING PART                      */
-  /******************************************************/
 
-  var datasets ={} ;
+  all_data_sets = []; /* Used with the Overview chart [small one]*/
+  for (var d in datasets){
+    all_data_sets.push(datasets[d]);
+  }
 
-  var plotting_keys = []; /* Initialy plotting everything*/
-
-  var options = {
-    legend: { show: true },
-    lines: { show: true },
-    points: { show: false },
+  // setup overview
+  var overview = $.plot($("#vs_selector .overview"), all_data_sets, {
+    legend: { show: true, container: $("#vs_selector .overviewLegend") },
+    lines: { show: true, lineWidth: 1 },
+    shadowSize: 0,
+    grid: { color: "#999" },
     selection: { mode: "xy" },
     xaxis: {mode: "time"} /* NEW */
-  };
-  function draw_flot_chart(ds) {
-    datasets = ds;
+  });
+  // now connect the two charts
+  $(".gsn_chart").bind("plotselected", function (event, ranges) {
+    // clamp the zooming to prevent eternal zoom
+    if (ranges.xaxis.to - ranges.xaxis.from < 0.00001)
+      ranges.xaxis.to = ranges.xaxis.from + 0.00001;
+    if (ranges.yaxis.to - ranges.yaxis.from < 0.00001)
+      ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 
-    plotting_keys = [];
-    for (var d in datasets){
-      plotting_keys.push(d);
-    }
+    // do the zooming
+    plot = $.plot($(".gsn_chart"), all_data_sets,
+    $.extend(true, {}, options, {
+      xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+      yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+    }));
+    // don't fire event on the overview to prevent eternal loop
+    overview.setSelection(ranges, true);
 
-    // hard-code color indices to prevent them from shifting as
-    // countries are turned on/off
-    var i = 0;
-    $.each(datasets, function(key, val) {
-      val.color = i;
-      ++i;
+    $("#vs_selector .overview").bind("plotselected", function (event, ranges) {
+      plot.setSelection(ranges);
     });
-
-
-    all_data_sets = []; /* Used with the Overview chart [small one]*/
-    for (var d in datasets){
-      all_data_sets.push(datasets[d]);
-    }
-
-    // setup overview
-    var overview = $.plot($("#vs_selector .overview"), all_data_sets, {
-      legend: { show: true, container: $("#vs_selector .overviewLegend") },
-      lines: { show: true, lineWidth: 1 },
-      shadowSize: 0,
-      grid: { color: "#999" },
-      selection: { mode: "xy" },
-      xaxis: {mode: "time"} /* NEW */
-    });
-    // now connect the two charts
-    $(".gsn_chart").bind("plotselected", function (event, ranges) {
-      // clamp the zooming to prevent eternal zoom
-      if (ranges.xaxis.to - ranges.xaxis.from < 0.00001)
-        ranges.xaxis.to = ranges.xaxis.from + 0.00001;
-      if (ranges.yaxis.to - ranges.yaxis.from < 0.00001)
-        ranges.yaxis.to = ranges.yaxis.from + 0.00001;
-
-      // do the zooming
-      plot = $.plot($(".gsn_chart"), get_data(),
-      $.extend(true, {}, options, {
-        xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
-        yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
-      }));
-      // don't fire event on the overview to prevent eternal loop
-      overview.setSelection(ranges, true);
-
-      $("#vs_selector .overview").bind("plotselected", function (event, ranges) {
-        plot.setSelection(ranges);
-      });
-    });
-    plotAccordingToChoices();
-  }
-
-  function get_data(){
-    var data = [];
-    for (key in plotting_keys){
-      data.push(datasets[plotting_keys[key]]);
-    }
-    return data;
-  }
-
-  function plotAccordingToChoices() {
-    data= get_data();
-    if (data.length > 0){
-      var plot = $.plot($(".gsn_chart"), data, options);
-    }
-  }
+  });
+  plotAccordingToChoices();
 
   $(".legendColorBox").click(function(){
+    if ($('.miniature').find('.legendColorBox').not('.no-img').length <2 && !$(this).hasClass('no-img'))
+      return;
     $(this).toggleClass('no-img');
-    to_return = [];
+    plotting_keys = [];
     $('.miniature').find('.legendColorBox').not('.no-img').each(function(){
-      to_return.push($(this).next('.legendLabel').text().toLowerCase());
+      plotting_keys.push($(this).next('.legendLabel').text().toLowerCase());
     });
-    plotting_keys=to_return;
     plotAccordingToChoices();
-
   });
+}
 
-
-
+function plotAccordingToChoices() {
+  var to_plot= [];
+  for (key in plotting_keys){
+    to_plot.push(datasets[plotting_keys[key]]);
+  }
+  if (to_plot.length > 0){
+    $.plot($(".gsn_chart"), to_plot, options);
+  }
+}
 </script>

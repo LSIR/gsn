@@ -179,11 +179,11 @@ border-bottom:none;
     height:300px;
     /* position:absolute !important; */
 }
-/* .gsn_chart canvas{
+.gsn_chart canvas{
     position: absolute !important;
     left: 0px !important;
     top: 0px !important;
-}*/
+}
 .miniature {
     float: right;
     margin-left: 30px ;
@@ -204,6 +204,7 @@ border-bottom:none;
 .miniature .no-img{
     background-image: none;
 }
+
 .ui-dialog {
     width:auto;
     height:auto;
