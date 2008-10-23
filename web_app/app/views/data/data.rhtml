@@ -72,7 +72,10 @@
               </div>
             </div>
             <div id="fragment-1-3">
-              TABLE HERE
+              <select id="sensorSelect">
+                <option value="">(none)</option>
+              </select>
+              <div id="gridContainer"></div>
             </div>
           </div>
         </div>
@@ -169,23 +172,81 @@ $(".plot").click(function(){
 });
 
 
-$(".grid").click(function(){
-  prepare_form_for_submission($(this));
-  var old_val = $('#download_format').val();
-  $('#download_format').val('XML'); // OR CSV
-  //
-  $.post('/data/download_data', $(this).parents('form').serializeArray(), function(response, text_status, request){
-    //draw_flot_chart(response);
-  });
-  //
-  $('#download_format').val(old_val);
-});
 
-function csv_to_json(tag,callback){
+  $(".grid").click(function(){
+	function drawGrid(datasets){
+		$("#sensorSelect").empty();
+		$("#sensorSelect").append('<option value="">(none)</option>');
+		var displayed = [];
+		for (var sensor in datasets) {
+			sensor = sensor.split(' ')[0];
+			if ($.inArray(sensor, displayed) < 0) {
+				displayed.push(sensor);
+				option = $("<option value=\"" + sensor + "\">" + sensor + "</option>");
+				$("#sensorSelect").append(option);
+			}
+		}
+
+		$("#sensorSelect").change(function(){
+			var choice = $("#sensorSelect").val();
+
+			$('#gridContainer').empty();
+
+			if (choice == '') return;
+
+			// columns
+			var fields = [];
+
+			// column headers
+			var headers = [];
+
+			for (var sensor_field in datasets) {
+				if (sensor_field.substring(0, choice.length) == choice) {
+					fields.push(datasets[sensor_field]);
+					headers.push(sensor_field.substring(choice.length + 2, sensor_field.length - 1));
+				}
+			}
+
+			var data_length = fields[0]['data'].length;
+
+			var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>timestamp</th>';
+			for (var i = 0; i < headers.length; i++) {
+				grid += '<th>' + headers[i] + '</th>';
+			}
+			grid += '</tr></thead><tbody>';
+
+			for (var i = 0; i < data_length; i++) {
+				// bug with the csv_to_json function: the last row is empty
+				if (fields[0]['data'][i][0]) {
+					grid += '<tr><td>' + fields[0]['data'][i][0] + '</td>';
+
+					for (var j = 0; j < fields.length; j++) {
+						grid += '<td>' + fields[j]['data'][i][1] + '</td>'
+					}
+					grid += '</tr>';
+				}
+			}
+
+			grid += '</tbody></table>';
+
+			$('#gridContainer').html(grid);
+
+			$('#grid').tablesorter({
+				widthFixed: true,
+				widgets: ['zebra']
+			});
+		});
+	}
+	csv_to_json($(this), drawGrid, 'ISO');
+  });
+
+
+function csv_to_json(tag,callback,format){
   callback = callback || function(){};
   var old_value = $('#time_format').val();
   $('#download_format').val('CSV');
-  $('#time_format').val('UNIX');
+  format = format || 'UNIX';
+  $('#time_format').val(format);
   prepare_form_for_submission(tag);
 
   $.post('/data/download_data', tag.parents('form').serializeArray(), function(response, text_status, request){
