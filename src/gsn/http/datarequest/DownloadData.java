@@ -89,7 +89,8 @@ public class DownloadData extends AbstractDataRequest {
 				de = StorageManager.getInstance().executeQuery(nextSqlQuery.getValue(), false,  StorageManager.getInstance().getConnection());
 				logger.debug("Data Enumerator: " + de);
 				if (ot == AllowedOutputType.csv) {
-					respond.println("#" + nextSqlQuery.getValue().getStandardQuery() + (nextSqlQuery.getValue().getLimitCriterion() == null ? "" : "(" + nextSqlQuery.getValue().getLimitCriterion() + ")"));
+					respond.println("##vsname:" + nextSqlQuery.getKey());
+					respond.println("##query:" + nextSqlQuery.getValue().getStandardQuery() + (nextSqlQuery.getValue().getLimitCriterion() == null ? "" : "(" + nextSqlQuery.getValue().getLimitCriterion() + ")"));
 				}
 				else if (ot == AllowedOutputType.xml) {
 					respond.println("\t<!-- " + nextSqlQuery.getValue().getStandardQuery() + " -->");
