@@ -75,7 +75,8 @@ public class DownloadReport extends AbstractDataRequest {
 		String aggregationCrierion 	= getAggregationCriterion() 	== null		? "None" 		: getAggregationCriterion().toString();
 		String standardCriteria 	= getStandardCriteria() 		== null		? "None" 		: getStandardCriteria().toString();
 		String maxNumber			= getLimitCriterion()			== null		? "All"			: getLimitCriterion().getSize().toString();
-		return new Report (reportPath, sdf.format(new Date()), aggregationCrierion, standardCriteria,maxNumber, virtualSensors);
+		
+		return new Report (reportPath, (sdf == null ? "UNIX: " + new Date().getTime() : sdf.format(new Date())), aggregationCrierion, standardCriteria,maxNumber, virtualSensors);
 	}
 
 	private VirtualSensor createVirtualSensor (String vsname, String[] vsstream) {
@@ -86,7 +87,7 @@ public class DownloadReport extends AbstractDataRequest {
 			StringBuilder lastUpdateSb = new StringBuilder().append("select timed from " + vsname + " order by timed limit 1"); //TODO does it work with other DB?
 			ResultSet lastUpdateRs = StorageManager.getInstance( ).executeQueryWithResultSet(lastUpdateSb);
 			String lastModified;
-			if (lastUpdateRs.next()) lastModified = sdf.format(new Date(lastUpdateRs.getLong(1)));
+			if (lastUpdateRs.next()) lastModified = (sdf == null ? "UNIX: " + lastUpdateRs.getLong(1) : sdf.format(new Date(lastUpdateRs.getLong(1))));
 			else                     lastModified = "No Data";
 			if (lastUpdateRs != null) lastUpdateRs.close();
 

@@ -30,7 +30,7 @@ public class DownloadData extends AbstractDataRequest {
 
 	private AllowedOutputType ot;
 
-	private String csvDelimiter	= ";";
+	private String csvDelimiter	= ",";
 
 	public DownloadData(Map<String, String[]> requestParameters) throws DataRequestException {
 		super(requestParameters);
@@ -141,7 +141,10 @@ public class DownloadData extends AbstractDataRequest {
 			respond.print(se.getData()[i].toString());
 			if (i != se.getData().length - 1) respond.print(cvsDelimiter); 
 		}
-		if (wantTimed) respond.print(cvsDelimiter + sdf.format(new Date(se.getTimeStamp())));
+		if (wantTimed) {
+			respond.print(cvsDelimiter);
+			respond.print( sdf == null ? se.getTimeStamp() : sdf.format(new Date(se.getTimeStamp())));
+		}
 		respond.println();
 	}
 
@@ -158,7 +161,7 @@ public class DownloadData extends AbstractDataRequest {
 		for (int i = 0 ; i < se.getData().length ; i++) {
 			respond.println("\t\t\t<field>" + se.getData()[i].toString()+"</field>");
 		}
-		if (wantTimed) respond.println("\t\t\t<field>" + se.getTimeStamp() + "</field>");
+		if (wantTimed) respond.println("\t\t\t<field>" + ( sdf == null ? se.getTimeStamp() : sdf.format(new Date(se.getTimeStamp()))) + "</field>");
 		respond.println("\t\t</tuple>");
 	}
 

@@ -55,6 +55,7 @@ public abstract class AbstractDataRequest {
 	public static final String 			PARAM_AGGREGATE_CRITERIA	= "groupby";
 	public static final String 			PARAM_STANDARD_CRITERIA		= "critfield";
 	public static final String 			PARAM_MAX_NB				= "nb";
+	public static final String			PARAM_TIME_FORMAT			= "timeformat";
 
 	/* Parsed Parameters */
 	private HashMap<String, FieldsCollection> 	vsnamesAndStreams 			= null;
@@ -66,10 +67,18 @@ public abstract class AbstractDataRequest {
 
 	protected Map<String, String[]> requestParameters;
 
-	protected static SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
+	protected SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
+	
+	private static Hashtable<String, String> allowedTimeFormats = null;
+	
+	static {
+		allowedTimeFormats = new Hashtable<String, String> () ;
+		allowedTimeFormats.put("iso","yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		allowedTimeFormats.put("unix", "unix");
+	}
 
 	public AbstractDataRequest (Map<String, String[]> requestParameters) throws DataRequestException {
-		this.requestParameters = requestParameters ; 
+		this.requestParameters = requestParameters ;
 		parseParameters();
 		buildSQLQueries () ;
 	}
@@ -110,6 +119,12 @@ public abstract class AbstractDataRequest {
 
 		String lm = getParameter(requestParameters, PARAM_MAX_NB);
 		if (lm != null) limitCriterion = new LimitCriterion (lm);
+		
+		String timeformat = getParameter(requestParameters, PARAM_TIME_FORMAT);
+		if (timeformat != null && allowedTimeFormats.containsKey(timeformat)) {
+			String format = allowedTimeFormats.get(timeformat);
+			sdf = format.compareToIgnoreCase("unix") == 0 ? null : new SimpleDateFormat(format) ;
+		}
 	}
 
 	public Hashtable<String, AbstractQuery> getSqlQueries() {
