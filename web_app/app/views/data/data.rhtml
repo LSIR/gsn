@@ -255,11 +255,12 @@ function csv_to_json(tag,callback,format){
       var timestamp_idx = -1;
       var vs_name='';
       var keys =[];
-
+      var nb_elements = 0;
       for (var line_no=0;line_no<lines.length;line_no++){
         line = $.trim(lines[line_no]);
         if (line.length == 0)
           continue;
+
         if(line[0]=='#'){
           if (line.indexOf("##vsname:") >= 0){ //comment lines
             vs_name = line.substring(9,line.length);
