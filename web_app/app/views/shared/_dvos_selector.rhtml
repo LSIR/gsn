@@ -1,0 +1,74 @@
+<div class="data-outputs-container">
+  <a id="add-data-output" href="#">Add Output</a>
+  <ul id="data-outputs" ></ul>
+</div>
+<script type="text/javascript">
+  $(function(){
+    function add_data_output () {
+      $('#data-outputs').append('<li ' + option_list_key('deployments',dvos,"All Deployments") + option_list_key('vss',virtual_sensor_to_deployment,"All Virtual Sensors") + option_list_key('fields',fields_to_deployments,"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
+      $('.deployments').change(function(){
+        deployment = $(this).val();
+        update_vss(deployment, $(this));
+      });
+      update_vss('All', $(this));
+      $('.remove-criterion').click (function() {
+        $(this).parent().remove();
+        $('.join:first').hide();
+      });
+    }
+
+    function add_condition () {
+      $('#conditions').append('<li <select class="join" name="join"><option value="1">AND</option><option value="0">OR</option></select>' +  option_list_key('deployments',dvos,"All Deployments") + option_list_key('vss',virtual_sensor_to_deployment,"All Virtual Sensors") + option_list_key('fields',fields_to_deployments,"All Fields") + ' | Between <input class="min" type="text" size="3" value="-inf" /> and <input class="max" type="text" size="3" value="+inf" /><a class="remove-criterion" href="#"> Remove</a></li>');
+      $('.deployments').change(function(){
+        deployment = $(this).val();
+        update_vss(deployment, $(this));
+      });
+      update_vss('All', $(this));
+      $('.remove-criterion').click (function() {
+        $(this).parent().remove();
+        $('.join:first').hide();
+      });
+      $('.join:first').hide();
+    }
+
+    function update_vss(deployment, tag) {
+      vss_to_replace = '';
+      fields_to_replace = '';
+      if(deployment == "All"){
+        vss_to_replace = option_list_key('vss',virtual_sensor_to_deployment,"All Virtual Sensors");
+        fields_to_replace = option_list_key('fields',fields_to_deployments,"All Fields");
+      }
+      else{
+        vss_to_replace = option_list_key('vss',dvos[deployment],"All Virtual Sensors");
+        fields_to_replace = option_list_value('fields',deployment_to_fields[deployment],"All Fields");
+      }
+      tag.next("select").replaceWith(vss_to_replace);
+      tag.next("select").next("select").replaceWith(fields_to_replace);
+      $('.vss').change(function () {
+        vs = $(this).val();
+        fields_to_replace = '';
+        if (vs == "All") {
+          deployment = $(this).prev().val();
+          if (deployment == "All") {
+            fields_to_replace = option_list_key('fields',fields_to_deployments,"All Fields");
+          }
+          else {
+            fields_to_replace = option_list_value('fields',deployment_to_fields[deployment], "All Fields");
+          }
+        }
+        else {
+          fields_to_replace = option_list_value('fields',virtual_sensor_to_fields[vs], "All Fields");
+        }
+        $(this).next("select").replaceWith(fields_to_replace);
+      });
+    }
+
+    $('#add-data-output').click(function () {
+      add_data_output();
+    });
+
+    $('#add-condition').click(function () {
+      add_condition();
+    });
+  });
+</script>

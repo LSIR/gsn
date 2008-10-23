@@ -1,3 +1,38 @@
+/*************************************************/
+/********METHODS USED FOR DEBUGGING **************/
+/*************************************************/
+function array_to_str(array){
+    if (!isArray(array)){
+      return array;
+    }
+    to_return = "[";
+    var first = true;
+    for (var key in array){
+      if (first==false){
+        to_return+= " , ";
+      }
+      to_return+=key+" => "+ array_to_str(array[key]);
+      first = false;
+    }
+    to_return+=']';
+    return to_return;
+  }
+  function isArray(obj) {
+    if (obj.constructor.toString().indexOf("Array") == -1)
+      return false;
+    else
+      return true;
+  }
+
+
+/*************************************************/
+/********METHODS USED FOR UTILITY **************/
+/*************************************************/
+
+// EMPTY !
+
+/***************************************/
+
 /* DeploymentsVirtualsensorsOutputformatS */
 dvos = null;
 

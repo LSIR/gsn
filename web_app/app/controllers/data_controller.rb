@@ -49,6 +49,17 @@ class DataController < ApplicationController
       nil
     end
 
+    # TIME FORMAT
+    param = params[:time_format]
+    time_format = case param
+    when "ISO"
+      "iso"
+    when "UNIX"
+      "unix"
+    else
+      nil
+    end
+
     # DOWNLOAD FORMAT
     param = params[:download_format]
     download_format = case param
@@ -96,7 +107,12 @@ class DataController < ApplicationController
     unless aggregation.nil?
       period = aggregation_period * aggregation_unit
       parameters_map.put('groupby', JavaBeans.instance.ruby_to_java_string_a(["#{period}:#{aggregation}"]))
-    end 
+    end
+
+    # time format
+    unless time_format.nil?
+      parameters_map.put('timeformat', JavaBeans.instance.ruby_to_java_string_a(["#{time_format}"]))
+    end
 
     # download format
     case download_format

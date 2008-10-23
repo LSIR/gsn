@@ -1,6 +1,6 @@
 # Checkout the GSN source code
 
-$ svn checkout https://gsn.svn.sourceforge.net/svnroot/gsn/branches/gsn_rails gsn
+$ svn checkout https://gsn.svn.sourceforge.net/svnroot/gsn/branches/gsn_rails gsn_rails
 
 # rails files are under the web_app directory
 
@@ -60,7 +60,8 @@ $ rake db:migrate
 
 $ rake db:fixtures:load
 
-# To start the web server (from the web_app directory). $ ant rails works as well from the gsn_rails directory.
+# To start the web server (from the web_app directory). OR
+# ant rails works as well from the gsn_rails directory.
 
 $ ruby -S script/server
 
