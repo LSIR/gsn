@@ -4,6 +4,8 @@ import 'java.io.InputStream'
 
 class DataController < ApplicationController
 
+  skip_before_filter :login_required
+
   verify :add_flash => {:error => "Please, select Fields as data output."}, :params => [:deployment],:only => [:download_data],:redirect_to => {:action => :data}
 
   def data

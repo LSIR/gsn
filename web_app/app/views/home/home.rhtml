@@ -1,1 +1,16 @@
-<%= "home" %>
+<div id="page_home" class="page_container">
+  <h1>Welcome to The GSN Platform</h1>
+  <h2>GSN Statistics at <%= @last_data_count -%></h2>
+  <dl>
+    <dt>Nb of Data Elements</dt>
+    <dd><%= "#{@data_count.values.inject(0){ |sum,n| sum + n }}" %></dd>
+    <dt>Nb of Virtual Sensors</dt>
+    <dd><%= @deployments.inject(0) { |sum, dep| sum + dep.virtual_sensors.length } -%></dd>
+    <dt>Server Timezone</dt>
+    <dd><%= Time.now.zone -%></dd>
+  </dl>
+  <h2>Deployments</h2>
+  <% for deployment in @deployments -%>
+    <p><a href="/deployments/deployments/#dep_detail_<%= deployment.name -%>"><%= deployment.name -%></a>, nb fields <%= deployment.virtual_sensors.length -%>, nb elements <%= @data_count[deployment.name] -%></p>
+  <% end -%>
+</div>

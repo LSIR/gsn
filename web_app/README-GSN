@@ -60,6 +60,10 @@ $ rake db:migrate
 
 $ rake db:fixtures:load
 
+To load a set of data for the Virtual Sensors defined by these virtual sensors, use phpmyadmin to load the three
+scripts (datasensor1.sql, datasensor2.sql, memorymonitor.sql) in the following directory
+web_app/test/fixtures
+
 # To start the web server (from the web_app directory). OR
 # ant rails works as well from the gsn_rails directory.
 

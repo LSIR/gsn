@@ -4,12 +4,12 @@ one:
   id: 1
   name: Wannengrat
   private: false
-  description: Davos Wannengrat Montain deployment. Maintained by SLF.
+  description: <p>The Wannengrat site currently employs 7 fully instrumented permanent meteorological stations across the width of the field site. These stations allow scientists at SLF to monitor the parameters in the field site and compare them to model results. Sometimes however, higher resolution measurements are necessary in order to fully understand the complex processes which are occurring. At Wannengrat, the windfield is fairly complex and the current measurements do not fully reflect what is happening. In order to understand them, SLF have employed the assistance of SwissEx collaborators SensorScope during March 2008 and have deployed a dense network of 20 SensorScope stations for a month to measure the exact processes which are occurring on a small scale.</p><p>As the SensorScope stations are temporary, they have been deployed on top of the snow pack and are anchored into the snow.</p><table><caption> <b>Deployment summary</b></caption><tbody><tr><th> Location </th><th> From </th><th> To </th><th> Number of stations</th></tr><tr><td> Wannengrat (Davos, CH) </td><td> March 30, 2008 </td><td> n/a </td><td> 20</td></tr></tbody></table>
   admin_id: 1
 
 two:
   id: 2
   name: Record
   private: false
-  description: Sensorscope Record deployment. Maintained by Sensorscope.
+  description: <p>The 21st century has been defined as the century of nature restoration. For rivers, restoration is an essential tool to achieve “good ecological status” of water courses as required by European and Swiss legislation. Although the number of restoration projects has increased in recent years, scientific understanding of the underlying principles determining how hydromorphological variability in restored corridors of rivers relates to ecosystem functioning, to biodiversity and to water quality is still limited. Further, the extent to which river restoration increases the resilience of the ecosystem, improves groundwater quality, or even endangers drinking water supply from alluvial aquifers, is questionable.</p><p>The general scientific goal of the CCES project RECORD is to gain a mechanistic understanding of how the river-river corridor-groundwater system functions in hydrological, biogeochemical and ecological terms. The projects aim at estimating how these interactions are altered by river restoration measures. In particular, the projects intend to</p><ul><li>investigate how restoration affects water quality, both in the river itself and in groundwater,</li>    <li>relate groundwater ecology to sedimentological, hydraulic, and biogeochemical characteristics of the groundwater habitats, and ascertain possible feedback mechanisms.</li></ul><p>Thus, RECORD advances our contribution to building the scientific basis for sustainable management of water resources.</p>
   admin_id: 1

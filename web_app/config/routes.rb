@@ -1,7 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
 
   map.resources :data_configurations, :has_many => :deployments
-  map.resources :deployments, :has_many => :virtual_sensors
+  #map.resources :deployments, :has_many => :virtual_sensors
   map.resources :virtual_sensors, :has_many => :criterions
 
 
