@@ -1,0 +1,333 @@
+/*******************************************************************************
+/* Reset
+/******************************************************************************/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-weight: inherit;
+	font-style: inherit;
+	font-size: 100%;
+	font-family: inherit;
+	vertical-align: baseline;
+}
+:focus {
+	outline: 0;
+}
+body {
+	line-height: 1;
+	color: black;
+	background: white;
+}
+table {
+	border-collapse: separate;
+	border-spacing: 0;
+}
+caption, th, td {
+	text-align: left;
+	font-weight: normal;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: "";
+}
+blockquote, q {
+	quotes: "" "";
+}
+
+/*******************************************************************************
+/** Default values
+/******************************************************************************/
+h1 { font-size: 1.75em; margin: .67em 0 }
+h2 { font-size: 1.5em; margin: .75em 0 }
+h3 { font-size: 1.17em; margin: .83em 0 }
+h4, p, blockquote, ul, fieldset, form, ol, dl, dir, menu, cite { font-size: 1em; margin: 1.12em 0 }
+h5 { font-size: .83em; margin: 1.5em 0 }
+h6 { font-size: .75em; margin: 1.67em 0 }
+cite{ display: block; position: relative; }
+small { font-size: 0.8em; }
+big { font-size: 1.2em; }
+strong { font-weight: bold; }
+del { text-decoration: line-through; }
+em { font-style: italic; }
+sup { font-size : 0.8em; vertical-align: top; }
+sub { font-size : 0.8em; vertical-align: bottom; }
+pre, code, var { font-family: monospace; }
+body {
+  border-top: 4px solid #333;
+  background: #eee;
+  color: #444;
+}
+
+p {
+	text-align: justify;
+}
+
+fieldset {
+	border: 1px solid #444;
+	padding: 1em;
+}
+
+ol, ul, dir, menu, dd {
+	margin-left: 2em;
+}
+
+h1, h2, h3 {
+  font-family: "Gill Sans";
+  text-transform: uppercase;
+  line-height: 1.5em;
+  color: #222;
+}
+
+th {
+	font-weight: bold;
+}
+
+a {
+  color: #a22a20;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  color: #000;
+}
+
+a.pdf:after,
+a[href$="pdf"]:after {
+	content: " (PDF)";
+}
+
+div.clear {
+  clear: both;
+}
+
+/*******************************************************************************
+/** Header
+/******************************************************************************/
+div#header-outer {
+  background: #eee;
+  height: 79px;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #fff;
+  background: url(/images/bg_heade.gif);
+}
+
+div#header {
+  width: 850px;
+  margin: 0 auto;
+  padding: 10px;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  background: url(/images/bg_heade.gif);
+}
+
+#logo {
+  display: block;
+  width: 349px;
+  height: 62px;
+  float: left;
+  background: url(/images/logo.png) no-repeat 0px 0px;
+}
+
+div#start {
+  margin: 10px;
+}
+
+div#start h2 {
+  text-align: right;
+  font-size: 14px;
+  margin: 0;
+}
+
+div#start p {
+  text-align: right;
+  font-family: georgia;
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.5em;
+}
+
+div#start a {
+  font-weight: normal;
+}
+
+/*******************************************************************************
+/** Navigation / Footer
+/******************************************************************************/
+div#nav-outer {
+  background: #a22a20;
+  border-top: 1px solid #9f2a20;
+  border-bottom: 1px solid #000;
+}
+
+div#footer-outer {
+  background: #222;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+div#navigation,
+div#footer { 
+  font-family: "Gill Sans";
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 6px 10px 9px 10px;
+  width: 850px;
+  margin: 0 auto;
+  height: 18px;
+}
+
+div#navigation {
+  background: url(/images/bg_nav00.gif);
+  border-left: 1px solid #811911;
+  border-right: 1px solid #811911;	
+}
+
+div#footer {
+  background: #2e2e2e url(/images/bg_foote.gif) repeat-x;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+}
+
+div#navigation ul,
+div#footer ul {
+  list-style: none;
+  margin: 0;
+}
+
+div#navigation li,
+div#footer li {
+  float: left;
+  margin: 0 10px;
+  line-height: 1;
+}
+
+div#navigation li {
+  display: block;
+  height: 19px;
+  margin-right: 5px;
+}
+
+div#footer li {
+  margin-top: 6px;
+  font-size: 10px;
+}
+
+div#footer p {
+  float: right;
+  color: #999;
+  font-family: helvetica;
+  text-transform: none;
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.5em;
+}
+
+div#navigation a,
+div#footer a {
+  color: #fff;
+  font-weight: normal;
+}
+
+div#navigation li:hover,
+div#navigation li.selected {
+  background: url(/images/bg_nav-l.gif) left no-repeat;
+}
+
+div#navigation a {
+  height: 15px;
+  padding: 4px 5px 0 3px;
+  margin-left: 2px;
+  display: block;
+}
+
+div#navigation a:hover,
+div#navigation li.selected a {
+  background: url(/images/bg_nav-r.gif) right no-repeat;
+}
+
+div#footer a:hover {
+  color: #999;
+}
+
+/*******************************************************************************
+/** Highlight
+/******************************************************************************/
+div#highlight-outer {
+  background: #222;
+  border-bottom: 1px solid #000;
+}
+
+div#highlight {
+  width: 870px;
+  margin: 0 auto;
+  min-height: 100px;
+  background: #292929 url(/images/bg_highl.png) -8px -5px no-repeat;
+  border-right: 1px solid #111;
+  border-left: 1px solid #111;
+}
+
+div#highlight ul {
+  list-style: none;
+  margin: 0;
+}
+
+div#cta {
+  width: 250px;
+  float: right;
+  padding: 30px 20px;
+}
+
+div#cta h1 {
+  background: url(/images/headline.gif) no-repeat;
+  text-indent: -9999px;
+}
+
+div#cta h2 {
+  text-transform: none;
+  color: #c6c6c6;
+  font-size: 16px;
+  line-height: 1.5em;
+  font-family: georgia;
+  margin: 10px 0;
+}
+
+div#cta p a {
+  width: 169px;
+  height: 37px;
+  background: url(/images/login.png);
+  text-indent: -9999px;
+  display: block;
+  margin-top: 15px;
+  font-weight: normal;
+}
+
+/*******************************************************************************
+/** Content
+/******************************************************************************/
+div#content {
+  width: 870px;
+  margin: 0 auto;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  background: #fff;
+}
+
+div.left {
+  background: #fff url(/images/bg_top-l.gif) repeat-x;
+  padding: .6em .7em;
+}
+
+div#feedback {
+	line-height: 1;
+}
+

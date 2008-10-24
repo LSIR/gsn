@@ -16,8 +16,9 @@
 
 }
 
-.ui-tabs-hide { display: none; }
-
+.ui-tabs-hide {
+	display: none;
+}
 
 .drawers li{
     list-style: none;
@@ -42,43 +43,6 @@
 .ui-accordion-header a {
     font-size: .95em !important;
 }
-
-div.left {
-    background: #fff url(/images/bg_top-l.gif) repeat-x;
-    padding: .6em .7em;
-}
-
-#header-outer {
-    background: url(/images/bg_heade.gif);
-}
-
-
-/* greenish style
-
-div#navigation {
-background: url(/images/bg_nav00.gif);
-background: #327E04 url(/images/themes/green/327E04_40x100_textures_03_highlight_soft_25.png) 0 50% repeat-x;
-border-left: 1px solid #327E04;
-border-right: 1px solid #5A9D1A;
-}
-
-div.left {
-background: #fff url(/images/bg_top-l.gif) repeat-x;
-padding: .6em .7em;
-}
-
-div#nav-outer {
-background: #5A9D1A;
-border-top: 1px solid #5A9D1A;
-border-bottom: 1px solid #000;
-}
-
-#header-outer {
-background: url(/images/bg_heade.gif);
-}
-
-*/
-
 
 .ui-tabs-panel, .ui-accordion-content {
     padding: .7em .5em !important;

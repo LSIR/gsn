@@ -93,7 +93,7 @@
 
 }
 
-label {
+.datepicker_div, .ui-datepicker-inline, #datepicker_div label {
     text-indent: -999999px;
     width: 1.3em;
     height: 1.4em;

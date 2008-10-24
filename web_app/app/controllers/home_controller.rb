@@ -16,4 +16,7 @@ class HomeController < ApplicationController
     @last_data_count = Time.now
   end
   
+  def htmltest
+  end
+  
 end
