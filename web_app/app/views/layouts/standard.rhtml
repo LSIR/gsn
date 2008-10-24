@@ -67,10 +67,9 @@
 		<div id="feedback">
 		    <p><%= flash[:notice] -%></p>
 		    <p><%= flash[:error] -%></p>
-
-		</div>
-		<%= yield %>
-	    </div>
+        <div id="gsn_content">
+          <%= yield %>
+        </div>
 	</div>
 	<div id="footer-outer">
 	    <div id="footer">

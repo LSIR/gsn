@@ -1,4 +1,5 @@
 class VirtualSensor < ActiveRecord::Base
+  has_many :addressings, :dependent => :destroy
   has_many :streams, :dependent => :destroy
   belongs_to :pc_instance
   belongs_to :deployment

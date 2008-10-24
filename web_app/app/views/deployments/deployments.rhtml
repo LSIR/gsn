@@ -1,11 +1,9 @@
-<div id="page_deployments" class="page_container">
-  <h2>Deployments</h2>
-  <% for deployment in @deployments -%>
-    <div class="dep_details" id="dep_detail_<%= deployment -%>">
-      <h3><%= deployment.name -%>'s Details</h3>
-      <div class="dep_description">
-        <%= deployment.description  -%>
-      </div>
+<h2>Deployments</h2>
+<% for deployment in @deployments -%>
+  <div class="dep_details" id="dep_detail_<%= deployment -%>">
+    <h3><%= deployment.name -%>'s Details</h3>
+    <div class="dep_description">
+      <%= deployment.description  -%>
     </div>
-  <% end -%>
-</div>
+  </div>
+<% end -%>

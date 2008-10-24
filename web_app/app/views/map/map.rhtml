@@ -17,34 +17,53 @@
   </script>
   <%= render :partial=>'/shared/dvos_selector' %>
   <button id="apply">Apply</button>
+
+  <a href="#" id="test_btn">test adressings</a>
 </div>
 
 
 <script type="text/javascript" >
+
+  /* VirtualSensorAddressings */
+  vsa = null;
+
   $('#apply').click(function(){
     output = [];
     for (var dep in dvos) {
-       $('#filters').find('.deployments').each(function(){
-            dep_name= $(this).val();
-            vs_name = $(this).next('.vss').val();
-            field_name = $(this).next('.vss').next('.fields').val();
-            if (dep_name=='All' || dep==dep_name){
-              for (var vs in dvos[dep]) {
-                if (vs_name=='All' || vs==vs_name){   
-                  for (var field in dvos[dep][vs]){
-                    if (field_name == 'All' || field_name == field){
-                      output[dep]=output[dep]||[];
-                      output[dep][vs] = output[dep][vs] || [];
-                      output[dep][vs][field] = output[dep][vs][field] || [];
-                    }
-                  }
+      $('#filters').find('.deployments').each(function(){
+        dep_name= $(this).val();
+        vs_name = $(this).next('.vss').val();
+        field_name = $(this).next('.vss').next('.fields').val();
+        if (dep_name=='All' || dep==dep_name){
+          for (var vs in dvos[dep]) {
+            if (vs_name=='All' || vs==vs_name){
+              for (var field in dvos[dep][vs]){
+                if (field_name == 'All' || field_name == field){
+                  output[dep]=output[dep]||[];
+                  output[dep][vs] = output[dep][vs] || [];
+                  output[dep][vs][field] = output[dep][vs][field] || [];
                 }
               }
             }
-       });
+          }
+        }
+      });
     }
-    
-   alert(array_to_str(output));    
+
+    alert(array_to_str(output));
   });
+
+  $('#test_btn').click(function(){
+    alert(vsa["DataSensor1"].latitude);
+    alert(vsa["MemoryMonitor"].latitude);
+  });
+
+  $(function(){
+    $.getJSON("/map/vsa",
+    function(data){
+      vsa = data
+    });
+  });
+
 
 </script>
