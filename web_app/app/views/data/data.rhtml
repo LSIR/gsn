@@ -168,86 +168,86 @@
 
   $(".plot").click(function(){
     datasets={};
-    csv_to_json($(this),draw_flot_chart);
+    csv_to_json($(this),drawChart);
   });
 
 
   $(".grid").click(function(){
-	function drawGrid(datasets){
-		$("#sensorSelect").empty();
-		$("#sensorSelect").append('<option value="">(none)</option>');
-		var displayed = [];
-		for (var sensor in datasets) {
-			sensor = sensor.split(' ')[0];
-			if ($.inArray(sensor, displayed) < 0) {
-				displayed.push(sensor);
-				option = $("<option value=\"" + sensor + "\">" + sensor + "</option>");
-				$("#sensorSelect").append(option);
-			}
-		}
+    function drawGrid(datasets){
+      $("#sensorSelect").empty();
+      $("#sensorSelect").append('<option value="">(none)</option>');
+      var displayed = [];
+      for (var sensor in datasets) {
+        sensor = sensor.split(' ')[0];
+        if ($.inArray(sensor, displayed) < 0) {
+          displayed.push(sensor);
+          option = $("<option value=\"" + sensor + "\">" + sensor + "</option>");
+          $("#sensorSelect").append(option);
+        }
+      }
 
-		$("#sensorSelect").change(function(){
-			var choice = $("#sensorSelect").val();
+      $("#sensorSelect").change(function(){
+        var choice = $("#sensorSelect").val();
 
-			$('#gridContainer').empty();
+        $('#gridContainer').empty();
 
-			if (choice == '') return;
+        if (choice == '') return;
 
-			// columns
-			var fields = [];
+        // columns
+        var fields = [];
 
-			// column headers
-			var headers = [];
+        // column headers
+        var headers = [];
 
-			for (var sensor_field in datasets) {
-				if (sensor_field.substring(0, choice.length) == choice) {
-					fields.push(datasets[sensor_field]);
-					headers.push(sensor_field.substring(choice.length + 2, sensor_field.length - 1));
-				}
-			}
+        for (var sensor_field in datasets) {
+          if (sensor_field.substring(0, choice.length) == choice) {
+            fields.push(datasets[sensor_field]);
+            headers.push(sensor_field.substring(choice.length + 2, sensor_field.length - 1));
+          }
+        }
 
-			var data_length = fields[0]['data'].length;
+        var data_length = fields[0]['data'].length;
 
-			var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>timestamp</th>';
-			for (var i = 0; i < headers.length; i++) {
-				grid += '<th>' + headers[i] + '</th>';
-			}
-			grid += '</tr></thead><tbody>';
+        var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>timestamp</th>';
+        for (var i = 0; i < headers.length; i++) {
+          grid += '<th>' + headers[i] + '</th>';
+        }
+        grid += '</tr></thead><tbody>';
 
-			for (var i = 0; i < data_length; i++) {
-				// bug with the csv_to_json function: the last row is empty
-				if (fields[0]['data'][i][0]) {
-					grid += '<tr><td>' + fields[0]['data'][i][0] + '</td>';
+        for (var i = 0; i < data_length; i++) {
+          // bug with the csv_to_json function: the last row is empty
+          if (fields[0]['data'][i][0]) {
+            grid += '<tr><td>' + fields[0]['data'][i][0] + '</td>';
 
-					for (var j = 0; j < fields.length; j++) {
-						grid += '<td>' + fields[j]['data'][i][1] + '</td>'
-					}
-					grid += '</tr>';
-				}
-			}
+            for (var j = 0; j < fields.length; j++) {
+              grid += '<td>' + fields[j]['data'][i][1] + '</td>'
+            }
+            grid += '</tr>';
+          }
+        }
 
-			grid += '</tbody></table>';
+        grid += '</tbody></table>';
 
-			$('#gridContainer').html(grid);
+        $('#gridContainer').html(grid);
 
-			$('#grid').tablesorter({
-				widthFixed: true,
-				widgets: ['zebra']
-			});
-		});
-	}
-	csv_to_json($(this), drawGrid, 'ISO');
+        $('#grid').tablesorter({
+          widthFixed: true,
+          widgets: ['zebra']
+        });
+      });
+    }
+    csv_to_json($(this), drawGrid, 'ISO');
   });
 
 
 
-function csv_to_json(tag,callback,format){
-  callback = callback || function(){};
-  var old_value = $('#time_format').val();
-  $('#download_format').val('CSV');
-  format = format || 'UNIX';
-  $('#time_format').val(format);
-  prepare_form_for_submission(tag);
+  function csv_to_json(tag,callback,format){
+    callback = callback || function(){};
+    var old_value = $('#time_format').val();
+    $('#download_format').val('CSV');
+    format = format || 'UNIX';
+    $('#time_format').val(format);
+    prepare_form_for_submission(tag);
 
     $.post('/data/download_data', tag.parents('form').serializeArray(), function(response, text_status, request){
       var lines = response.split('\n');
@@ -256,6 +256,7 @@ function csv_to_json(tag,callback,format){
       var vs_name='';
       var keys =[];
       var nb_elements = 0;
+      var datasets = [];
       for (var line_no=0;line_no<lines.length;line_no++){
         line = $.trim(lines[line_no]);
         if (line.length == 0)
@@ -275,21 +276,20 @@ function csv_to_json(tag,callback,format){
                 timestamp_idx=i;
               } else {
                 lbl = vs_name+' ('+headers[i]+')';
-                datasets[lbl]={label: lbl, data: []};
-                keys.push(lbl);
+                datasets.push({label: lbl, data: []});
+                keys.push(datasets.length -1);
               }
             }
           }
         }else { // data line, at this stage we should have a header varialbe already set.
-            var data = line.split(',');
-            var timestamp = data[timestamp_idx];
-            for (i=0;i<headers.length;i++){
-              if(i != timestamp_idx && data[i]!=undefined ){
-                datasets[keys[i]].data.push([timestamp,data[i]]);
-                nb_elements++;
-              }
+          var data = line.split(',');
+          var timestamp = data[timestamp_idx];
+          for (i=0;i<headers.length;i++){
+            if(i != timestamp_idx && data[i]!=undefined ){
+              datasets[keys[i]].data.push([parseInt(timestamp),parseFloat(data[i])]);
+              nb_elements++;
             }
-          
+          }
         }
       }
       $('#time_format').val(old_value);
@@ -300,90 +300,89 @@ function csv_to_json(tag,callback,format){
   /******************************************************/
   /*                  CHARTING PART                      */
   /******************************************************/
+  function drawChart(datasets, nbElements){
+    var plotting_keys = []; /* Initialy plotting everything*/
+    var plot;
 
-  var datasets ={} ;
-  var plotting_keys = []; /* Initialy plotting everything*/
+    var options = {
+      legend: { show: false },
+      lines: { show: true },
+      points: { show: false },
+      selection: { mode: "xy" },
+      xaxis: {mode: "time",timeformat: "%H:%M:%S %y/%m/%d"}
+    };
+    function plotAccordingToChoices() {
+      var to_plot= [];
+      for (key in plotting_keys){
+        to_plot.push(datasets[plotting_keys[key]]);
+      }
 
-  var options = {
-    legend: { show: false },
-    lines: { show: true },
-    points: { show: false },
-    selection: { mode: "xy" },
-    xaxis: {mode: "time"}
-  };
+      if (to_plot.length > 0){
+        plot.setData(to_plot);
+        plot.setupGrid();
+        plot.draw();
+      }
+    }
 
-  function draw_flot_chart(ds,nb_elements) {
-    alert(nb_elements);
-    datasets = ds;
     plotting_keys = [];
     for (var d in datasets){
       plotting_keys.push(d);
     }
 
-    // hard-code color indices to prevent them from shifting as
-    // countries are turned on/off
+    // hard-code color indices to prevent them from shifting colors dynamically
+
     var i = 0;
     $.each(datasets, function(key, val) {
       val.color = i;
       ++i;
     });
 
+    plot = $.plot($(".gsn_chart"), [], options);
 
-    all_data_sets = []; /* Used with the Overview chart [small one]*/
-    for (var d in datasets){
-      all_data_sets.push(datasets[d]);
-    }
-
-    // setup overview
-    var overview = $.plot($("#vs_selector .overview"), all_data_sets, {
-      legend: { show: true, container: $("#vs_selector .overviewLegend") },
+    var overview = $.plot($(".overview"), datasets, {
       lines: { show: true, lineWidth: 1 },
-      shadowSize: 0,
+      legend: { show: true, container: $(".overviewLegend") },
       grid: { color: "#999" },
-      selection: { mode: "xy" },
-      xaxis: {mode: "time"} /* NEW */
+      shadowSize: 0,
+      xaxis: {ticks: [], mode: "time" },
+      yaxis: {ticks: [] },
+      selection: { mode: "xy" }
     });
-    // now connect the two charts
+
+    // now connect the two
+
     $(".gsn_chart").bind("plotselected", function (event, ranges) {
       // do the zooming
-      var to_plot= [];
-      for (key in plotting_keys){
-        to_plot.push(datasets[plotting_keys[key]]);
-      }
-      plot = $.plot($(".gsn_chart"), to_plot, $.extend(true, {}, options, {
-        
+      
+      $(".gsn_chart").empty();
+      plot = $.plot($(".gsn_chart"), datasets,
+
+      $.extend(true, {}, options, {
         xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
         yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
-
       }));
       // don't fire event on the overview to prevent eternal loop
-<%#*overview.setSelection(ranges, true);%>
-
-<%#*$("#vs_selector .overview").bind("plotselected", function (event, ranges) {%>
-    plot.setSelection(ranges);
-<%#*});%>
+      overview.setSelection(ranges, true);
     });
-    plotAccordingToChoices();
 
+    $(".overview").bind("plotselected", function (event, ranges) {
+      plot.setSelection(ranges);
+    });
     $(".legendColorBox").click(function(){
       if ($('.miniature').find('.legendColorBox').not('.no-img').length <2 && !$(this).hasClass('no-img'))
         return;
       $(this).toggleClass('no-img');
       plotting_keys = [];
       $('.miniature').find('.legendColorBox').not('.no-img').each(function(){
-        plotting_keys.push($(this).next('.legendLabel').text().toLowerCase());
+        legend = $(this).next('.legendLabel').text();
+        for(var idx in datasets){
+          if (datasets[idx].label == legend){
+            plotting_keys.push(idx);
+          }
+        }
       });
       plotAccordingToChoices();
     });
-  }
-
-  function plotAccordingToChoices() {
-    var to_plot= [];
-    for (key in plotting_keys){
-      to_plot.push(datasets[plotting_keys[key]]);
-    }
-    if (to_plot.length > 0){
-      $.plot($(".gsn_chart"), to_plot, options);
-    }
+    plotAccordingToChoices();
   }
 </script>

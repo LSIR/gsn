@@ -263,3 +263,7 @@ class DataController < ApplicationController
     render :json => to_return, :layout => false
   end
 end
+
+def data_2
+
+end
