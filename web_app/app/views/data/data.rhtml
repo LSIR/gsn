@@ -276,8 +276,8 @@
                 timestamp_idx=i;
               } else {
                 lbl = vs_name+' ('+headers[i]+')';
-                datasets.push({label: lbl, data: []});
-                keys.push(datasets.length -1);
+                datasets[lbl]={label: lbl, data: []};
+                keys.push(lbl);
               }
             }
           }
@@ -301,8 +301,15 @@
   /*                  CHARTING PART                      */
   /******************************************************/
   function drawChart(datasets, nbElements){
-    var plotting_keys = []; /* Initialy plotting everything*/
+    var full_dataset = datasets;
+    var selected_datasets = [];
     var plot;
+
+    var i = 0;
+    for (var d in datasets){
+      selected_datasets.push(full_dataset[d]);
+      full_dataset[d].color=i++;    // hard-code color indices to prevent them from shifting colors dynamically
+    }
 
     var options = {
       legend: { show: false },
@@ -312,34 +319,16 @@
       xaxis: {mode: "time",timeformat: "%H:%M:%S %y/%m/%d"}
     };
     function plotAccordingToChoices() {
-      var to_plot= [];
-      for (key in plotting_keys){
-        to_plot.push(datasets[plotting_keys[key]]);
-      }
-
-      if (to_plot.length > 0){
-        plot.setData(to_plot);
+      if (selected_datasets.length > 0){
+        plot.setData(selected_datasets);
         plot.setupGrid();
         plot.draw();
       }
     }
 
-    plotting_keys = [];
-    for (var d in datasets){
-      plotting_keys.push(d);
-    }
-
-    // hard-code color indices to prevent them from shifting colors dynamically
-
-    var i = 0;
-    $.each(datasets, function(key, val) {
-      val.color = i;
-      ++i;
-    });
-
     plot = $.plot($(".gsn_chart"), [], options);
 
-    var overview = $.plot($(".overview"), datasets, {
+    var overview = $.plot($(".overview"), selected_datasets, {
       lines: { show: true, lineWidth: 1 },
       legend: { show: true, container: $(".overviewLegend") },
       grid: { color: "#999" },
@@ -353,9 +342,9 @@
 
     $(".gsn_chart").bind("plotselected", function (event, ranges) {
       // do the zooming
-      
+
       $(".gsn_chart").empty();
-      plot = $.plot($(".gsn_chart"), datasets,
+      plot = $.plot($(".gsn_chart"), selected_datasets,
 
       $.extend(true, {}, options, {
         xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
@@ -372,12 +361,12 @@
       if ($('.miniature').find('.legendColorBox').not('.no-img').length <2 && !$(this).hasClass('no-img'))
         return;
       $(this).toggleClass('no-img');
-      plotting_keys = [];
+      selected_datasets = [];
       $('.miniature').find('.legendColorBox').not('.no-img').each(function(){
         legend = $(this).next('.legendLabel').text();
-        for(var idx in datasets){
-          if (datasets[idx].label == legend){
-            plotting_keys.push(idx);
+        for(var idx in full_dataset){
+          if (full_dataset[idx].label == legend){
+            selected_datasets.push(full_dataset[idx]);
           }
         }
       });
