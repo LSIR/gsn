@@ -13,15 +13,17 @@ public class OutputInputStream {
 	private boolean oisoClosed = false;
 	private ArrayBlockingQueue<Integer> circularBuffer = null;
 
-
 	public OutputInputStream (int bufferSize) {
 		circularBuffer = new ArrayBlockingQueue<Integer> (bufferSize) ;		
 	}
 
-	public void _close () throws IOException {
-		if (oisi != null) oisi.close();
-		if (oiso != null) oiso.close();
-		circularBuffer = null;
+	public void close () throws IOException {
+		synchronized (this) {
+			if (oisi != null && ! oisiClosed) oisi.close();
+			if (oiso != null && ! oisoClosed) oiso.close();
+			circularBuffer = null;
+//			System.out.println("OutputInputStream >" + this + "< has been closed");
+		}
 	}
 
 	public InputStream getInputStream () {
@@ -33,10 +35,11 @@ public class OutputInputStream {
 		if (oiso == null) oiso = new OISOutputStream () ;
 		return oiso;
 	}
-
+	
 	private class OISOutputStream extends OutputStream {
 		@Override
 		public void write(int b) throws IOException {
+			if (oisoClosed) throw new IOException("Outputstream is closed");
 			try {
 				circularBuffer.put(b);
 			} catch (InterruptedException e) {
@@ -45,30 +48,76 @@ public class OutputInputStream {
 		}
 		@Override
 		public void close () throws IOException {
-			super.close();
-			oisoClosed = true;
+			synchronized (OutputInputStream.this) {
+				oisoClosed = true;
+//				System.out.println("OISOutputStream >" + this + " has been closed<");
+				if (oisiClosed) OutputInputStream.this.close(); 
+			}
 		}
 	}
 
 	private class OISInputStream extends InputStream {
 		@Override
 		public int read() throws IOException {
+			if (oisiClosed) throw new IOException("InputStream has been closed");
 			int nextValue = -1;
 			try {
-				if ( ! oisoClosed ) nextValue = circularBuffer.take();
+				if ( ! oisoClosed) {
+					nextValue = circularBuffer.take();
+				}
+				else {
+					nextValue = available() > 0 ? circularBuffer.take() : -1 ;
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			return nextValue;
 		}
 		@Override
-		public void close () throws IOException {
-			super.close();
-			oisiClosed = true;
+		public int read (byte[] b) throws IOException {
+			if (oisiClosed) throw new IOException("InputStream has been closed");
+			if (b == null || b.length == 0) return 0;
+			int available = available () ;
+			if (available == 0) {
+				if (oisoClosed) return -1;
+				else {
+					try {
+						b[0] = circularBuffer.take().byteValue();  // TODO
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					return 1;
+				}
+			}
+			else {
+				int dataLength = Math.min(available, b.length);
+				for (int i = 0 ; i < dataLength ; i++) {
+					try {
+						b[i] = circularBuffer.take().byteValue();  // TODO
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				return dataLength;
+			}
+		}
+		@Override 
+		public void close() throws IOException {
+			synchronized (OutputInputStream.this) {
+				oisiClosed = true;
+//				System.out.println("OISInputStream >" + this + " has been closed<");
+				OutputInputStream.this.close();
+			}
+		}
+		@Override 
+		public int available () {
+			int available = 0;
+			synchronized (circularBuffer) {
+				available = circularBuffer.size();
+			}
+			return available;
 		}
 	}
-
-	public interface OISOutputStreamIF extends Runnable { }
 
 	public static void main (String[] args) {
 		final OutputInputStream ois = new OutputInputStream (4) ;
@@ -77,14 +126,8 @@ public class OutputInputStream {
 					public void run () {
 						try {
 							ois.getOutputStream().write("ABCDEFGHIJKLMNOPQRSTUVWXYZ".getBytes());
-							Thread.sleep(4000);
-							System.out.println("closing stream");
 							ois.getOutputStream().close();
-							ois._close();
 						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -96,6 +139,7 @@ public class OutputInputStream {
 			while ((nextValue = is.read()) != -1) {
 				System.out.println("read: " + nextValue);
 			}
+			ois.getInputStream().close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

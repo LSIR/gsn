@@ -28,7 +28,7 @@ public class ReportDownload extends HttpServlet {
 			rpd.process();
 			res.setContentType("application/pdf");
 			res.setHeader("content-disposition","attachment; filename=gsn_data.pdf");
-			rpd.outputResult(res.getOutputStream(), false);
+			rpd.outputResult(res.getOutputStream());
 			res.getOutputStream().flush();
 		} catch (DataRequestException e) {
 			logger.error(e.getMessage());

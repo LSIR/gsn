@@ -4,9 +4,7 @@ import gsn.beans.StreamElement;
 import gsn.http.MultiDataDownload;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -38,7 +36,7 @@ public class DownloadData extends AbstractDataRequest {
 
 	@Override
 	public void process() throws DataRequestException {
-		String outputType = getParameter(requestParameters, PARAM_OUTPUT_TYPE);
+		String outputType = QueriesBuilder.getParameter(requestParameters, PARAM_OUTPUT_TYPE);
 
 		try {
 			if (outputType == null) {
@@ -49,16 +47,16 @@ public class DownloadData extends AbstractDataRequest {
 
 			if (ot == AllowedOutputType.csv) {
 				//
-				if (getParameter(requestParameters, "delimiter") != null && !getParameter(requestParameters, "delimiter").equals("")) {
-					String reqdelimiter = getParameter(requestParameters, "delimiter");
+				if (QueriesBuilder.getParameter(requestParameters, "delimiter") != null && ! QueriesBuilder.getParameter(requestParameters, "delimiter").equals("")) {
+					String reqdelimiter = QueriesBuilder.getParameter(requestParameters, "delimiter");
 					if (reqdelimiter.equals("tab")) {
 						csvDelimiter = "\t";
 					} else if (reqdelimiter.equals("space")){
 						csvDelimiter = " ";
 					} else if (reqdelimiter.equals("semicolon")){
 						csvDelimiter = ";";
-					} else if (reqdelimiter.equals("other") && getParameter(requestParameters, "otherdelimiter") != null && !getParameter(requestParameters, "otherdelimiter").equals("")) {
-						csvDelimiter = getParameter(requestParameters, "otherdelimiter");
+					} else if (reqdelimiter.equals("other") && QueriesBuilder.getParameter(requestParameters, "otherdelimiter") != null && ! QueriesBuilder.getParameter(requestParameters, "otherdelimiter").equals("")) {
+						csvDelimiter = QueriesBuilder.getParameter(requestParameters, "otherdelimiter");
 					}
 				}
 			}
@@ -70,14 +68,14 @@ public class DownloadData extends AbstractDataRequest {
 
 	public String outputResult () {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream () ;
-		outputResult(baos, false);
+		outputResult(baos);
 		return baos.toString();
 	}
 
 	@Override
-	public void outputResult(OutputStream os, boolean closeStream) {
+	public void outputResult(OutputStream os) {
 		PrintWriter respond = new PrintWriter(os);
-		Iterator<Entry<String, AbstractQuery>> iter = getSqlQueries().entrySet().iterator();
+		Iterator<Entry<String, AbstractQuery>> iter = qbuilder.getSqlQueries().entrySet().iterator();
 		Entry<String, AbstractQuery> nextSqlQuery;
 		DataEnumerator de;
 		if (ot == AllowedOutputType.xml) {
@@ -96,7 +94,7 @@ public class DownloadData extends AbstractDataRequest {
 					respond.println("\t<!-- " + nextSqlQuery.getValue().getStandardQuery() + " -->");
 					respond.println("\t<data vsname=\"" + nextSqlQuery.getKey() + "\">");
 				}
-				FieldsCollection fc = getVsnamesAndStreams().get(nextSqlQuery.getKey());
+				FieldsCollection fc = qbuilder.getVsnamesAndStreams().get(nextSqlQuery.getKey());
 				//boolean wantTimed = fc != null ? fc.isWantTimed() : false;
 				boolean wantTimed = true;
 				boolean firstLine = true;
@@ -118,13 +116,6 @@ public class DownloadData extends AbstractDataRequest {
 			respond.println("</result>");
 		}
 		respond.flush();
-		if (closeStream) {
-			try {
-				os.close();
-			} catch (IOException e) {
-				logger.debug(e.getMessage());
-			} 
-		}
 	}
 
 
@@ -144,7 +135,7 @@ public class DownloadData extends AbstractDataRequest {
 		}
 		if (wantTimed) {
 			respond.print(cvsDelimiter);
-			respond.print( sdf == null ? se.getTimeStamp() : sdf.format(new Date(se.getTimeStamp())));
+			respond.print( qbuilder.getSdf() == null ? se.getTimeStamp() : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
 		}
 		respond.println();
 	}
@@ -162,7 +153,7 @@ public class DownloadData extends AbstractDataRequest {
 		for (int i = 0 ; i < se.getData().length ; i++) {
 			respond.println("\t\t\t<field>" + se.getData()[i].toString()+"</field>");
 		}
-		if (wantTimed) respond.println("\t\t\t<field>" + ( sdf == null ? se.getTimeStamp() : sdf.format(new Date(se.getTimeStamp()))) + "</field>");
+		if (wantTimed) respond.println("\t\t\t<field>" + ( qbuilder.getSdf() == null ? se.getTimeStamp() : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
 		respond.println("\t\t</tuple>");
 	}
 

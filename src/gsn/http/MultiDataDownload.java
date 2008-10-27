@@ -29,7 +29,7 @@ public class MultiDataDownload extends HttpServlet {
 			else {
 				res.setContentType("text/xml");
 			}
-			dd.outputResult(res.getOutputStream(), false);
+			dd.outputResult(res.getOutputStream());
 			res.getOutputStream().flush();
 		} catch (DataRequestException e) {
 			logger.error(e.getMessage());
