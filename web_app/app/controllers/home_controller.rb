@@ -10,7 +10,11 @@ class HomeController < ApplicationController
     @deployments.each { |deployment|
       deployment.virtual_sensors.each { |vs|
         @data_count[deployment.name] ||= 0
-        @data_count[deployment.name] += (ActiveRecord::Base.connection.select_one("select count(timed) from #{vs.name.downcase}")['count(timed)'].to_i * vs.pc_instance.processor.output_formats.size)
+        begin
+          @data_count[deployment.name] += (ActiveRecord::Base.connection.select_one("select count(timed) from #{vs.name.downcase}")['count(timed)'].to_i * vs.pc_instance.processor.output_formats.size)
+        rescue Exception => e
+          puts "The deployment >#{deployment.name}< does not have a data table."
+        end
       }
     }
     @last_data_count = Time.now

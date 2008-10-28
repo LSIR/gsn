@@ -80,30 +80,8 @@ ol, ul, dir, menu, dd {
 	margin-left: 2em;
 }
 
-h1, h2, h3 {
-  font-family: "Gill Sans";
-  text-transform: uppercase;
-  line-height: 1.5em;
-  color: #222;
-}
-
 th {
 	font-weight: bold;
-}
-
-a {
-  color: #a22a20;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-a:hover {
-  color: #000;
-}
-
-a.pdf:after,
-a[href$="pdf"]:after {
-	content: " (PDF)";
 }
 
 div.clear {
@@ -158,6 +136,8 @@ div#start p {
 
 div#start a {
   font-weight: normal;
+  text-decoration: none;
+  color: #a22a20;
 }
 
 /*******************************************************************************
@@ -236,6 +216,7 @@ div#navigation a,
 div#footer a {
   color: #fff;
   font-weight: normal;
+  text-decoration: none;
 }
 
 div#navigation li:hover,
@@ -324,7 +305,7 @@ div#content {
 
 div.left {
   background: #fff url(/images/bg_top-l.gif) repeat-x;
-  padding: .6em .7em;
+  padding: 0.5em 0.8em;
 }
 
 div#feedback {

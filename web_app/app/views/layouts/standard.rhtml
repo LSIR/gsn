@@ -1,93 +1,93 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-    <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>GSN :: Global Sensor Networks Platform</title>
-	<meta name="description" content="GSN :: Global Sensor Networks Platform, Software middleware for wireless sensor networks and environmental monitoring applications." />
-	<meta name="keywords" content="gsn,global sensor networks, wireless,sensor" />
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>GSN :: Global Sensor Networks Platform</title>
+    <meta name="description" content="GSN :: Global Sensor Networks Platform, Software middleware for wireless sensor networks and environmental monitoring applications." />
+    <meta name="keywords" content="gsn,global sensor networks, wireless,sensor" />
 
-	<%= javascript_include_tag 'jquery' -%>
-	<%= javascript_include_tag 'jquery-ui-personalized-1.5.2.min.js' -%>
-	<%= javascript_include_tag 'jrails' -%>
-	<%= javascript_include_tag 'map' -%>
-	<%= javascript_include_tag 'ui.datepicker' -%>
-	<%= javascript_include_tag 'jquery.tablesorter.min.js' -%>
-	<%= javascript_include_tag 'application' -%>
+    <%= javascript_include_tag 'jquery' -%>
+    <%= javascript_include_tag 'jquery-ui-personalized-1.5.2.min.js' -%>
+    <%= javascript_include_tag 'jrails' -%>
+    <%= javascript_include_tag 'ui.datepicker' -%>
+    <%= javascript_include_tag 'jquery.tablesorter.min.js' -%>
+    <%= javascript_include_tag 'application' -%>
 
-	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA9ZnsSrYqZW5p9w4gqsksmxT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSM6hfFC1LrxacaJ2htnZd52WET_w" type="text/javascript"></script>
-	<script type="text/javascript" src="http://map.search.ch/api/map.js"></script>>
+    <% if controller.controller_name == 'map' -%>
+      <%= javascript_include_tag 'map' -%>
+      <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA9ZnsSrYqZW5p9w4gqsksmxT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSM6hfFC1LrxacaJ2htnZd52WET_w" type="text/javascript"></script>
+      <script type="text/javascript" src="http://map.search.ch/api/map.js"></script>>
+    <% end -%>
+    <!-- Google Visualization: Annotated Time Line
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        google.load("visualization", "1", {packages:["annotatedtimeline"]});
+        google.setOnLoadCallback(function(){});
+    </script>
+    -->
+    <%= javascript_include_tag 'jquery.flot.pack' -%>
 
-	<!-- Google Visualization: Annotated Time Line
-	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-	<script type="text/javascript">
-	    google.load("visualization", "1", {packages:["annotatedtimeline"]});
-	    google.setOnLoadCallback(function(){});
-	</script>
-	-->
-	<%= javascript_include_tag 'jquery.flot' -%>
-
-
-	<%= stylesheet_link_tag 'style' -%>
-	<%#= stylesheet_link_tag 'styles00' %>
-	<%#= stylesheet_link_tag 'secondar' -%>
-
-	<%= stylesheet_link_tag 'jquery-ui-themeroller-one' -%>
-	<%# stylesheet_link_tag 'jquery-ui-themeroller-green' -%>
-	<%= stylesheet_link_tag 'ui.datepicker' -%>
-	<%= stylesheet_link_tag 'tablesorter' -%>
-	<%= stylesheet_link_tag 'gsn' -%>
-	<!--[if IE 7]>
-	<link href="/stylesheets/ieseven.css" media="screen" rel="stylesheet" type="text/css" />
-	<![endif]-->
-	<!--[if IE 6]>
-	<link href="/stylesheets/iesix.css" media="screen" rel="stylesheet" type="text/css" />
-	<![endif]-->
-    </head>
-    <body id="secondary">
-	<div id="header-outer">
-	    <div id="header">
-		<%= link_to '' , 'http://gsn.sourceforge.net', :id => "logo" -%>
-		<div id="start">
-		    <h2>Are you ready to get started?</h2>
-		    <p><%= link_to 'Check out GSN Here &#8250;' , 'http://gsn.sf.net' -%></p>
-		</div>
-	    </div>
-	</div>
-	<div id="nav-outer">
-	    <div id="navigation">
-		<%= render :partial => 'shared/mainmenu' -%>
-	    </div>
-	</div>
-	<div id="highlight-outer">
-	    <div id="highlight">
-		<div id="cta">
-		    <%= render :partial => 'session/new' -%>
-		</div>
-		<div id="text">
-		    <%= render :partial => controller.controller_name if has_specified_text(controller)  -%>
-		</div>
-		<div class="clear"></div>
-	    </div>
-	</div>
-	<div id="content">
-	    <div class="left">
-		<div id="feedback">
-		    <p><%= flash[:notice] -%></p>
-		    <p><%= flash[:error] -%></p>
-		</div>
+    <%= stylesheet_link_tag 'style' -%>
+    <%#= stylesheet_link_tag 'styles00' %>
+    <%#= stylesheet_link_tag 'secondar' -%>
+    <%= stylesheet_link_tag 'jquery-ui-themeroller-one' -%>
+    <%# stylesheet_link_tag 'jquery-ui-themeroller-green' -%>
+    <%= stylesheet_link_tag 'ui.datepicker' -%>
+    <%= stylesheet_link_tag 'tablesorter' -%>
+    <%= stylesheet_link_tag 'gsn' -%>
+    <!--[if IE 7]>
+    <link href="/stylesheets/ieseven.css" media="screen" rel="stylesheet" type="text/css" />
+    <![endif]-->
+    <!--[if IE 6]>
+    <link href="/stylesheets/iesix.css" media="screen" rel="stylesheet" type="text/css" />
+    <![endif]-->
+  </head>
+  <body id="secondary">
+    <div id="header-outer">
+      <div id="header">
+        <%= link_to '' , 'http://gsn.sourceforge.net', :id => "logo" -%>
+        <div id="start">
+          <h2>Are you ready to get started?</h2>
+          <p><%= link_to 'Check out GSN Here &#8250;' , 'http://gsn.sf.net' -%></p>
+        </div>
+      </div>
+    </div>
+    <div id="nav-outer">
+      <div id="navigation">
+        <%= render :partial => 'shared/mainmenu' -%>
+      </div>
+    </div>
+    <div id="highlight-outer">
+      <div id="highlight">
+        <div id="cta">
+          <%= render :partial => 'session/new' -%>
+        </div>
+        <div id="text">
+          <%= render :partial => controller.controller_name if has_specified_text(controller)  -%>
+        </div>
+        <div class="clear"></div>
+      </div>
+    </div>
+    <div id="content">
+      <div class="left">
+        <div id="feedback">
+          <p><%= flash[:notice] -%></p>
+          <p><%= flash[:error] -%></p>
+        </div>
+        <img src="/images/loading.gif" id="content_loading" style="display:none;" />
         <div id="gsn_content">
           <%= yield %>
         </div>
-		</div>
-	</div>
-	<div id="footer-outer">
-	    <div id="footer">
-		<p>Copyright &copy; 2008 LSIR Lab, EPFL, Switzerland.</p>
-		<ul>
-		    <li><%= link_to 'License' , '#' -%></li>
-		</ul>
-	    </div>
-	</div>
-    </body>
+      </div>
+    </div>
+    <div id="footer-outer">
+      <div id="footer">
+        <p>Copyright &copy; 2008 LSIR Lab, EPFL, Switzerland.</p>
+        <ul>
+          <li><%= link_to 'License' , '#' -%></li>
+        </ul>
+      </div>
+    </div>
+  </body>
 </html>

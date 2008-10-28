@@ -17,7 +17,7 @@
 }
 
 .ui-tabs-hide {
-	display: none;
+    display: none;
 }
 
 .drawers li{
@@ -106,7 +106,7 @@
     max-width:200px;
 }
 .flexigrid div.bDiv table {
-border-bottom:none;
+    border-bottom:none;
 }
 .flexigrid .ftitle {
     background-color: #E6E6E6;
@@ -176,3 +176,160 @@ border-bottom:none;
 .clear-both{
     clear:both;
 }
+
+
+/* */
+
+#content_loading {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+}
+
+/* General HTML tags */
+
+#gsn_content {
+    font-family: "Verdana, Geneva, sans-serif";
+    letter-spacing: 0em;
+    word-spacing: 0em;
+    line-height: 1.1em;
+}
+
+#gsn_content p {
+    margin-left: 0.4em;
+    margin-right: 0.4em;
+}
+
+#gsn_content h1,
+#gsn_content h2,
+#gsn_content h3,
+#gsn_content h4,
+#gsn_content h5,
+#gsn_content h6 {
+    line-height: 1.3em;
+    letter-spacing: 0;
+    word-spacing: 0;
+    font-family: "Gill Sans, sans-serif";
+    color: #222222;
+}
+
+#gsn_content h1 { font-size: 2.2em;  }
+#gsn_content h2 { font-size: 1.8em; border-bottom: 1px solid #606060; }
+#gsn_content h3 { font-size: 1.4em; text-transform: uppercase; }
+#gsn_content h4 { font-size: 1.2em; text-transform: uppercase; }
+#gsn_content h5 { font-size: 1em;   text-transform: uppercase; }
+#gsn_content h6 { font-size: 1em;   text-transform: uppercase; }
+
+
+#gsn_content a.pdf:after,
+#gsn_content a[href$="pdf"]:after {
+    content: '';
+    padding-right: 16px;
+    background: transparent url(/images/pdf-icon.png) no-repeat right top;
+}
+
+#gsn_content .ui-accordion-header a { color: white; }
+#gsn_content .ui-accordion-header a:hover { color: white; }
+
+#gsn_content a {
+    color: #a22a20;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#gsn_content a:hover {
+    color: #000;
+}
+
+
+#gsn_content table {
+    font-size: 0.8em;
+    border-top: 1px solid #d0d0d0;
+    border-left: 1px solid #d0d0d0;
+}
+
+#gsn_content table td,
+#gsn_content table th {
+    padding: 0.6em 0.3em;
+    vertical-align: middle;
+    border-bottom: 1px solid #d0d0d0;
+    border-right: 1px solid #d0d0d0;
+}
+
+#gsn_content table thead tr th,
+#gsn_content table thead tr td {
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 1px solid #d0d0d0;
+    padding: 0.8em;
+    background: #fafafa;
+    background: repeat-x url(/images/bg_top-l.gif) 0px 0px;
+}
+
+#gsn_content table tfoot tr td {
+    padding: 0.8em;
+}
+
+#gsn_content table caption {
+    font-style: italic;
+    font-size: 1em;
+    padding: 0.3em;
+}
+
+#gsn_content table caption:before {
+    content: 'Table: ';
+}
+
+#gsn_content select {
+    font: 1em;
+    vertical-align: middle;
+    padding: 0.3em;
+}
+
+#gsn_content option {
+    line-height: 0;
+    margin: 0.2em;
+}
+
+#gsn_content button {
+    font: 1em;
+    vertical-align: middle;
+    padding: 0.3em;
+}
+
+#gsn_content input {
+    padding: 0.4em;
+    margin-left: 1em;
+}
+
+/*
+#highlight {
+    display: none;
+    border: none;
+}
+div#highlight {
+}
+div#highlight-outer {
+    background: none;
+    border: none;
+}
+*/
+
+
+/* home > home */
+#home_home .Huge {
+        font-size: 1.8em;
+        display: block;
+    }
+
+#home_home .HUGE { font-size: 2.8em; display: block; padding: 0.4em;}
+
+#gsn_content #home_home table.layoutable {
+        width: 100%;
+}
+#home_home table.layoutable td {
+    width: 50%;
+    text-align: center;
+    padding: 1em;
+}
+

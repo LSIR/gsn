@@ -133,3 +133,16 @@ $(function(){
         //alert(option_list_key('abc',fields_to_deployments));
         })
 });
+
+
+/*  */
+
+
+
+$().ajaxSend(function(r,s){
+    $("#content_loading").show();
+});
+
+$().ajaxStop(function(r,s){
+    $("#content_loading").fadeOut("fast");
+});  

@@ -1,14 +1,42 @@
-<h1>Welcome to The GSN Platform</h1>
-<h2>GSN Statistics at <%= @last_data_count -%></h2>
-<dl>
-  <dt>Nb of Data Elements</dt>
-  <dd><%= "#{@data_count.values.inject(0){ |sum,n| sum + n }}" %></dd>
-  <dt>Nb of Virtual Sensors</dt>
-  <dd><%= @deployments.inject(0) { |sum, dep| sum + dep.virtual_sensors.length } -%></dd>
-  <dt>Server Timezone</dt>
-  <dd><%= Time.now.zone -%></dd>
-</dl>
-<h2>Deployments</h2>
-<% for deployment in @deployments -%>
-  <p><a href="/deployments/deployments/#dep_detail_<%= deployment.name -%>"><%= deployment.name -%></a>, nb fields <%= deployment.virtual_sensors.length -%>, nb elements <%= @data_count[deployment.name] -%></p>
-<% end -%>
+<div id="home_home">
+  <h1>Welcome to The GSN Platform</h1>
+  <table class="layoutable">
+    <thead>
+      <tr>
+        <td colspan="2">Statistics At <%= @last_data_count -%></td>
+      </tr>
+    </thead>
+    <tr>
+      <td><span class="HUGE"><%= "#{number_with_delimiter(@data_count.values.inject(0){ |sum,n| sum + n },"'")}" %></span></td>
+      <td><span class="Huge">Elements Stored</span></td>
+    </tr>
+    <tr>
+      <td><span class="HUGE"><%= @deployments.inject(0) { |sum, dep| sum + dep.virtual_sensors.length } -%></span></td>
+      <td><span class="Huge">Virtual Sensors</span></td>
+    </tr>
+    <tr>
+      <td><span class="HUGE"><%= Time.now.zone -%></span></td>
+      <td><span class="Huge">Server Timezone</span></td>
+    </tr>
+  </table>
+
+
+  <h2>Deployments</h2>
+  <table style="width: 100%;">
+    <thead>
+      <tr>
+        <td>Name</td>
+        <td>Nb Fields</td>
+        <td>Nb Elements</td>
+      </tr>
+    </thead>
+    <% for deployment in @deployments -%>
+      <tr>
+        <td><a href="/deployments/deployments/#dep_detail_<%= deployment.name -%>"><%= deployment.name -%></a></td>
+        <td><%= deployment.virtual_sensors.length -%></td>
+        <td><%= @data_count[deployment.name] -%></td>
+      </tr>
+    <% end -%>
+  </table>
+</div>
+

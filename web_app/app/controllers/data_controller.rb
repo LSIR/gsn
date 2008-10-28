@@ -133,34 +133,62 @@ class DataController < ApplicationController
   def download_data
 
     download_format, parameters_map  = parse_download_parameters(params)
-
-    render :nothing => true
-
     begin
       ## PROCESS
       case download_format
       when :report
-	report = Java::gsn.http.datarequest.DownloadReport::new(parameters_map)
-	report.process()
-	dat = String.from_java_bytes report.output_result()
-	send_data(dat, :filename => 'report.pdf', :type => 'application/pdf', :disposition => 'attachment')
+        report = Java::gsn.http.datarequest.DownloadReport::new(parameters_map)
+        report.process()
+        dat = String.from_java_bytes report.output_result()
+        send_data(dat, :filename => 'report.pdf', :type => 'application/pdf', :disposition => 'attachment')
       when :csv
-	download_data = Java::gsn.http.datarequest.DownloadData::new(parameters_map)
-	download_data.process
-	dat = download_data.output_result
-	send_data(dat, :filename => 'data.csv', :type => 'text/csv', :disposition => 'attachment')
+        download_data = Java::gsn.http.datarequest.DownloadData::new(parameters_map)
+        download_data.process
+        #        dat = download_data.output_result
+        #        send_data(dat, :filename => 'data.csv', :type => 'text/csv', :disposition => 'attachment')
+        headers.update(
+          'Content-Length'            => nil,
+          'Content-Type'              => 'text/csv',
+          'Content-Disposition'       => 'attachment; filename=data.csv'
+        )
+        render :text => proc { |response, output|
+          is = download_data.get_input_stream(4096)
+          java_byte_array = Java::byte[4096].new
+          read_length = 0
+          while ((read_length = is.read(java_byte_array)) != -1)
+            next_block = [read_length]
+            i = 0
+            while (i < read_length)
+              next_block[i] = java_byte_array[i].chr
+              i = i + 1
+            end
+            output.print(next_block)
+          end
+        }, :layout => false
       when :xml
-	download_data = Java::gsn.http.datarequest.DownloadData::new(parameters_map)
-	download_data.process()
-#	is = download_data.get_input_result(65536)
-#	while true
-#	  puts "next read #{is.read}"
- #       end
-#	return
-	dat = download_data.output_result
-	send_data(dat, :filename => 'data.xml', :type => 'text/xml', :disposition => 'attachement')
+        download_data = Java::gsn.http.datarequest.DownloadData::new(parameters_map)
+        download_data.process()
+        headers.update(
+          'Content-Length'            => nil,
+          'Content-Type'              => 'text/xml',
+          'Content-Disposition'       => 'attachment; filename=data.xml'
+        )
+        render :text => proc { |response, output|
+          is = download_data.get_input_stream(4096)
+          java_byte_array = Java::byte[4096].new
+          read_length = 0
+          while ((read_length = is.read(java_byte_array)) != -1)
+            next_block = [read_length]
+            i = 0
+            while (i < read_length)
+              next_block[i] = java_byte_array[i].chr
+              i = i + 1
+            end
+            output.print(next_block)
+          end
+        }, :layout => false
       else
-	raise Exception.new "The Download format #{download_format} is not implemented."
+        raise Exception.new "The Download format #{download_format} is not implemented."
       end
     rescue Exception => e
       flash[:error] = "#{e.backtrace}"
@@ -176,11 +204,11 @@ class DataController < ApplicationController
     conditions = []
     c_deployments.each_with_index { |_dep, i|
       deployment_to_vss(_dep, c_vss[i]).each { |_vs|
-	virtual_sensor_to_fields(_vs, c_fields[i]).each { |_field|
-	  join = c_joins[i] == '0' ? 'or' : 'and'
-	  conditions <<  ("#{join}::#{_vs.name.downcase}:#{_field.name.downcase}:le:#{c_maxs[i]}") unless (c_maxs[i] =='+inf')
-	  conditions <<  ("#{join}::#{_vs.name.downcase}:#{_field.name.downcase}:geq:#{c_mins[i]}") unless (c_mins[i] =='-inf')
-	}
+        virtual_sensor_to_fields(_vs, c_fields[i]).each { |_field|
+          join = c_joins[i] == '0' ? 'or' : 'and'
+          conditions <<  ("#{join}::#{_vs.name.downcase}:#{_field.name.downcase}:le:#{c_maxs[i]}") unless (c_maxs[i] =='+inf')
+          conditions <<  ("#{join}::#{_vs.name.downcase}:#{_field.name.downcase}:geq:#{c_mins[i]}") unless (c_mins[i] =='-inf')
+        }
       }
     }
     conditions
@@ -193,7 +221,7 @@ class DataController < ApplicationController
     vs_fields = {}
     deployment.each_with_index { |_dep, i|
       deployment_to_vss(_dep, virtual_sensor[i]).each { |_vs|
-	update_vs_fields(vs_fields, _vs, virtual_sensor_to_fields(_vs, field[i]))
+        update_vs_fields(vs_fields, _vs, virtual_sensor_to_fields(_vs, field[i]))
       }
     }
     vss_fields = []
@@ -209,15 +237,15 @@ class DataController < ApplicationController
     vss = nil
     begin
       if deployment_name == 'All'
-	deployment = Deployment.find(:all)
+        deployment = Deployment.find(:all)
       else
-	deployment = Deployment.find(:all, :conditions => { :name => deployment_name })
-	raise Exception.new "The Deployment #{deployment_name} does not exist." if deployment.empty?
+        deployment = Deployment.find(:all, :conditions => { :name => deployment_name })
+        raise Exception.new "The Deployment #{deployment_name} does not exist." if deployment.empty?
       end
       if vs_name == 'All'
-	vss = deployment.inject([]) { |list_of_vs, next_deployment| list_of_vs + next_deployment.virtual_sensors.find(:all) }
+        vss = deployment.inject([]) { |list_of_vs, next_deployment| list_of_vs + next_deployment.virtual_sensors.find(:all) }
       else
-	vss = deployment.inject([]) { |list_of_vs, next_deployment| list_of_vs + next_deployment.virtual_sensors.find(:all, :conditions => { :name => vs_name }) }
+        vss = deployment.inject([]) { |list_of_vs, next_deployment| list_of_vs + next_deployment.virtual_sensors.find(:all, :conditions => { :name => vs_name }) }
       end
     end
     vss
@@ -241,7 +269,7 @@ class DataController < ApplicationController
     if fields.size > 0
       vs_fields[vs.name] ||= []
       fields.each { |_field|
-	vs_fields[vs.name] << _field.name unless vs_fields[vs.name].include? _field.name
+        vs_fields[vs.name] << _field.name unless vs_fields[vs.name].include? _field.name
       }
     end
     vs_fields
@@ -253,10 +281,10 @@ class DataController < ApplicationController
     Deployment.find(:all).each do |deployment|
       to_return[deployment.name.to_sym] ||={}
       deployment.virtual_sensors.each do |vs|
-	to_return[deployment.name.to_sym][vs.name.to_sym]||={}
-	vs.pc_instance.processor.output_formats.each do |f|
-	  to_return[deployment.name.to_sym][vs.name.to_sym][ f.name.to_sym]=f.name.to_sym;
-	end
+        to_return[deployment.name.to_sym][vs.name.to_sym]||={}
+        vs.pc_instance.processor.output_formats.each do |f|
+          to_return[deployment.name.to_sym][vs.name.to_sym][ f.name.to_sym]=f.name.to_sym;
+        end
       end
     end
     #    p to_return
