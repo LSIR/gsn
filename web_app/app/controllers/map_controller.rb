@@ -10,6 +10,8 @@ class MapController < ApplicationController
       vs.addressings.each do |addressing|
         to_return[vs.name.to_sym][addressing.addressing_type.name.to_sym] = addressing.value.to_sym
       end
+      to_return[vs.name.to_sym][:deployment] = vs.deployment.name.to_sym
+      to_return[vs.name.to_sym][:id] = vs.id
     end
     # p to_return
     render :json => to_return, :layout => false
