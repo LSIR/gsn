@@ -1,0 +1,29 @@
+#stationInformation {
+	font-family: Arial;
+	font-size: 10pt;
+	line-height: 1.5em;
+}
+
+#stationInformationHeader {
+	padding-bottom: 5px;
+	border: 0px;
+	padding: 0px;
+}
+
+#selector {
+	background-color: #CCC;
+	z-index: 99999999;
+	position: absolute;
+	top: 0px;
+	text-align: center;
+	vertical-align: middle;
+	padding: 7px;
+	font-family: Verdana;
+	font-size: 9pt;
+}
+
+#sensor {
+	font-size: 9pt;
+	margin-bottom: 4px;
+	border-bottom: 1px dashed #555;
+}

@@ -5,8 +5,9 @@ var map = null;
 // The currently applied sensor filter
 var sensor_filter = null;
 
-// Map type to use, possible values: "street", "hybird", "satelite"
-var map_type = "satellite";
+// Map type to use, possible values: "street", "hybird", "satelite",
+// "earth" or "terrain"
+var map_type = "terrain";
 
 // The div that surrounds the map divs
 var container;
@@ -19,8 +20,8 @@ var selector;
 var vsa = null;
 
 // Map default parameters
-var width = 800;
-var height = 400;
+var width = 848;
+var height = 800;
 var center_lat = 46.82261;
 var center_lng = 8.22876;
 var zoom = 8;
@@ -131,17 +132,14 @@ function loadVsa() {
 function addSensorsToMap() {
 	for (var s in vsa) {
 		if (vsa[s]["latitude"] && vsa[s]["longitude"]) {
-			html = "<p><b>Station:</b> " + s + "</p>";
-			html += "<p><b>Deployment:</b> " + vsa[s]["deployment"] + "</p>";
-			html += "<p><b>Output:</b>  ";
+			html = '<div id="stationInformation">'
+			html += '<table id="stationInformationHeader"><tr><td><b>Deployment:&nbsp;&nbsp;</b></td><td>' + vsa[s]["deployment"] + '</td></tr>';
+			html += '<tr><td><b>Station:</b></td><td>' + s + '</td></tr>';
+			html += '<tr><td><b>Sensors:</b></td><td></td></tr></table>';
 			tmp = dvos[vsa[s]["deployment"]][s];
 			for (t in tmp) {
-				html += tmp[t];	
-				html += ", ";
+				html += '<div id="sensor">' + tmp[t] + '</div>';	
 			}
-			// Remove the last comma in the html string
-			html = html.substring(0,html.length-2);
-			html += "</p>";
 
 			map.addMarker(vsa[s]["id"], parseFloat(vsa[s]["latitude"]), parseFloat(vsa[s]["longitude"]), html);
 		}
@@ -166,22 +164,13 @@ function MapServiceSelector(map_service) {
 	}
 
 	this.div = document.createElement('div');
-	this.div.id = "map_service_selector"
-	this.div.style.zIndex = "999999999";
+	this.div.id = "selector"
 	this.div.style.width = width + "px";
-	this.div.style.position = "absolute";
-	this.div.style.top = "0px";
-	this.div.style.left = "" + ((800/2) - (250/2)) + "px";
-	this.div.style.textAlign = "center";
-	this.div.style.verticalAlign = "middle";
-	this.div.style.backgroundColor ="#CCC";
-	this.div.style.padding ="7px";
-	this.div.style.fontFamily ="Verdana";
-	this.div.style.fontSize ="9pt"
+	this.div.style.left = "" + ((window.height/2) - (width/2)) + "px";
 	this.div.innerHTML = ''
 		+ '<b>Map service:</b> <select id="map_service" onchange="setMapService(this.value);">'
 		+	'<option value="google"' + google_selected + '">Google Maps</option>'
-		+	'<option value="search_ch"' + search_ch_selected + '>Search.ch maps</option>'
+		+	'<option value="search_ch"' + search_ch_selected + '>Switzerland</option>'
 		+ '</select>';
 }
 
@@ -209,7 +198,9 @@ var Google = {
 
 				this.map = new GMap2(this.div);
 				this.map.addControl(new GLargeMapControl());
-				this.map.addControl(new GMapTypeControl());
+				this.map.addControl(new GHierarchicalMapTypeControl());
+				this.map.addMapType(G_PHYSICAL_MAP);
+				this.map.addMapType(G_SATELLITE_3D_MAP);
 			}
 			// If map already exists, just add it tot the DOM tree
 			else {
@@ -219,14 +210,15 @@ var Google = {
 
 			switch(map_type) {
 				case "street":
-					t = G_NORMAL_MAP;
-					break;
+					t = G_NORMAL_MAP; break;
 				case "satellite":
-					t = G_SATELLITE_MAP;
-					break;
+					t = G_SATELLITE_MAP; break;
 				case "hybrid":
-					t = G_HYBRID_MAP;
-					break;
+					t = G_HYBRID_MAP; break;
+				case "earth":
+					t = G_SATELLITE_3D_MAP; break;
+				case "terrain":
+					t = G_PHYSICAL_MAP; break;
 			}
 
 			this.map.setMapType(t)
@@ -244,14 +236,15 @@ var Google = {
 				// Save the map type
 				switch(map.getCurrentMapType()) {
 					case G_NORMAL_MAP:
-						map_type = "street";
-						break;
+						map_type = "street"; break;
 					case G_HYBRID_MAP:
-						map_type = "hybrid";
-						break;
+						map_type = "hybrid"; break;
 					case G_SATELLITE_MAP:
-						map_type = "satellite";
-						break;
+						map_type = "satellite"; break;
+					case G_SATELLITE_3D_MAP:
+						map_type = "earth"; break;
+					case G_PHYSICAL_MAP:
+						map_type = "terrain"; break;
 				}
 			}
 
@@ -336,12 +329,9 @@ var SearchCh = {
 
 			switch(map_type) {
 				case "street":
-					t = "street";
-					break;
-				case "satellite":
-				case "hybrid":
+					t = "street"; break;
+				default:
 					t = "aerial";
-					break;
 			}
 			this.map.set({type: t,
 					 container: "div_search_ch",
@@ -354,11 +344,9 @@ var SearchCh = {
 				// Save the map type
 				switch (map.get("type")) {
 					case "street":
-						map_type = "street";
-						break;
+						map_type = "street"; break;
 					case "aerial":
-						map_type = "satellite";
-						break;
+						map_type = "satellite"; break;
 				}
 
 				// Save latitude and longitude for the center of the map
