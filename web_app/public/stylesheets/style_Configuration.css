@@ -1,0 +1,41 @@
+/* 
+    Document   : testConfiguraiton
+    Created on : 26 oct. 2008, 12:36:21
+    Author     : fomene tierry alain
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+.configuration-menu {
+    /*resets*/margin: 0 ; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none;
+	float: left;
+    padding: .2em;
+	border-right: none;
+    background:  url(/images/themes/one/444444_40x100_textures_02_glass_25.png) 0 50% repeat-x;
+}
+
+.configuration-menu:hover{
+     background: url(/images/themes/one/333333_40x100_textures_02_glass_25.png) 0 50% repeat-x;
+}
+.configuration-menu a {
+    color:orange;
+}
+.selected{
+     background:  url(/images/themes/one/a21111_40x100_textures_02_glass_35.png) 0 50% repeat-x;
+     color:white;
+}
+
+.titi{
+    background:  url(/images/themes/one/a21111_40x100_textures_02_glass_35.png) 0 50% repeat-x;
+    color:orange;
+}
+
+.border{
+    border-left: 1px solid black;
+}
+

@@ -1,4 +1,4 @@
-<ul>
+<ul class="fragment">
     <li <%= controller.action_name == 'user' ? 'class="selected"':''%>><%= link_to 'Data Users', :action => :user %></li>
     <li <%= controller.action_name == 'deployment' ? 'class="selected"':''%>><%= link_to 'Deployments', :action => :deployment %></li>
     <li <%= controller.action_name == 'virtual_sensor' ? 'class="selected"':''%>><%= link_to 'Virtual Sensors', :action => :virtual_sensor %></li>
@@ -6,3 +6,14 @@
     <li <%= controller.action_name == 'wrapper' ? 'class="selected"':''%>><%= link_to 'Wrapper', :action => :wrapper %></li>
     <li <%= controller.action_name == 'wrapper_instance' ? 'class="selected"':''%>><%= link_to 'Wrapper Instance', :action => :wrapper_instance %></li>
 </ul>
+
+<script type="text/javascript">
+  $(function(){
+     $('.fragment li').addClass("configuration-menu");
+     $('.fragment li:not(:first)').addClass("border");
+     $('.fragment li').change(function () {
+          $(this).addClass("selected");
+          $(this).removeClass("configuration-menu");    
+     })
+  });
+</script>
