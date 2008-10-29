@@ -159,4 +159,13 @@ class ConfigurationController < ApplicationController
     redirect_to :action => :wrapper
   end
 
+  ##########################################################
+  #           DEPLOYMENT MANAGEMENT RELATED METHODS        #
+  ##########################################################
+  uses_tiny_mce
+
+  def deployment
+    
+  end
+
 end

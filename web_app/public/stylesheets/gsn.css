@@ -177,6 +177,19 @@
     clear:both;
 }
 
+/******* Configuration > Deployments *********/
+
+.item a.delete_btn {
+    float: right;
+    vertical-align: middle;
+}
+/******* Deployments > Show Action*********/
+
+.deployment .item {
+    border-bottom: 1px solid;
+    padding-bottom: 5px;
+}
+
 
 /* */
 
@@ -332,4 +345,3 @@ div#highlight-outer {
     text-align: center;
     padding: 1em;
 }
-

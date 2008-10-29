@@ -24,13 +24,6 @@ function isArray(obj) {
         return true;
 }
 
-
-/*************************************************/
-/********METHODS USED FOR UTILITY **************/
-/*************************************************/
-
-// EMPTY !
-
 /***************************************/
 
 /* DeploymentsVirtualsensorsOutputformatS */
