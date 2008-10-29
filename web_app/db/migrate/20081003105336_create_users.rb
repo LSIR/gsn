@@ -18,5 +18,6 @@ class CreateUsers < ActiveRecord::Migration
 
   def self.down
     drop_table :users
+    drop_table :deployments_users
   end
 end

@@ -1,0 +1,31 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+# one:
+#   column: value
+#
+# two:
+#   column: value
+
+one:
+  id: 1
+  name: geographical
+  description: Textual description of the location.
+  property_group_id: 1
+
+two:
+  id: 2
+  name: latitude
+  description: WGS84 latitude.
+  property_group_id: 1
+
+three:
+  id: 3
+  name: longitude.
+  description: WGS84 longitude.
+  property_group_id: 1
+
+four:
+  id: 4
+  name: altitude
+  description: WGS84 altitude.
+  property_group_id: 1
