@@ -14,6 +14,7 @@ public class StandardCriterion extends AbstractCriterion {
 	private String critJoin 	= null;
 	private String critNeg  	= null;
 	private String critField	= null;
+	private String critVsname	= null;
 	private String critValue	= null;
 	private String critOperator	= null;
 	
@@ -41,7 +42,9 @@ public class StandardCriterion extends AbstractCriterion {
 	 * <p>
 	 * Create a new Custom Criteria from a serialized Criteria description.
 	 * The description must follow the syntax:<br />
-	 * <code><critJoin>:<negation>:<field>:<operator>:<value></code>.
+	 * <code><critJoin>:<negation>:<vsname>:<field>:<operator>:<value></code>.
+	 * 
+	 * Note that if <vsname> is blank then the criteria applies to the field of all virtual sensors.
 	 * </p>
 	 * @param inlinecrits
 	 * @return
@@ -50,22 +53,24 @@ public class StandardCriterion extends AbstractCriterion {
 
 		String[] crits = inlinecrits.split(":");
 
-		if (crits.length != 5) throw new DataRequestException (GENERAL_ERROR_MSG + " >" + inlinecrits + "<.") ;
+		if (crits.length != 6) throw new DataRequestException (GENERAL_ERROR_MSG + " >" + inlinecrits + "<.") ;
 
 		critJoin 		= getCriterion(crits[0], allowedJoin);
 		critNeg			= getCriterion(crits[1], allowedNeg);
-		critOperator	= getCriterion(crits[3], allowedOp);
-		critField 		= crits[2];
-		critValue		= crits[4];
+		critVsname		= crits[2];
+		critField 		= crits[3];
+		critOperator	= getCriterion(crits[4], allowedOp);
+		critValue		= crits[5];
 	}
 	
 	public String toString () {
 		String hrtf = critField.compareToIgnoreCase("timed") == 0 ? sdf.format(new Date (Long.parseLong(critValue))) : critValue;
-		return critJoin + " " + critNeg + " " + critField + " " + critOperator + " " + hrtf;
+		return critJoin + " " + critNeg + " " + critVsname + " " + critField + " " + critOperator + " " + hrtf;
 	}
 
 	public String getCritJoin() { return this.critJoin; }
 	public String getNegation() { return this.critNeg; }
+	public String getVsname()	{ return this.critVsname; }
 	public String getField()    { return this.critField; }
 	public String getValue()    { return this.critValue; }
 	public String getOperator()	{ return this.critOperator; }
