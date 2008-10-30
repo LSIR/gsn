@@ -770,3 +770,153 @@ input.date-picker
 	float: left;
 }	
 
+/* gsn data part */
+#main {
+    width: 730px;
+}
+
+.ui-accordion h3 {
+    margin: 0;
+    padding: 0;
+}
+
+.ui-accordion {
+    height: 474px;
+    border: 1px solid #FFA84C;
+}
+
+.ui-accordion-content {
+    height: 350px;
+    overflow: auto;
+}
+
+.ui-accordion-header a {
+    display: block;
+    padding: 5px;
+    margin: 1px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 11px;
+    color: black;
+    background-color: #FFA84C;
+}
+
+.drawer-handle {
+    border: 1px solid black;
+}
+
+.drawers li {
+    list-style: none;
+}
+
+.tab-content {
+    border: 1px solid;
+}
+
+.ui-tabs-panel,.ui-accordion-content {
+    padding: 2px 2px;
+}
+
+.ui-tabs-hide {
+    display: none;
+}
+
+.ui-tabs-nav {
+    display: block;
+    width: auto;
+    height: 20px;
+    border-bottom: 1px solid #FFA84C;
+    padding: 0;
+}
+
+.ui-tabs-nav-item {
+    list-style: none;
+    float: left;
+}
+
+.ui-tabs-nav-item a {
+    border: 1px solid #FFA84C;
+    border-bottom: none;
+    text-align: center;
+    display: block;
+    width: 100px;
+    height: 16px;
+    padding: 2px;
+    margin-right: 4px;
+    font-weight: bold;
+    background-color: #FFE0BF;
+}
+
+.ui-tabs-selected a {
+    background-color: #FFA84C;
+}
+
+.clear-both {
+    clear: both;
+}
+
+.data-outputs-container ul,
+.conditions-container ul {
+    list-style: none;
+    padding: 4px;
+}
+
+#gridContainer table th {
+    background-color: #FFE0BF;
+}
+
+/* dialog - zomming - plotting */
+.ui-dialog-titlebar-close{
+    display: none; /* removing the close btn*/
+}
+.ui-dialog-container{
+    width:300px; /* For some reasons the actual size can't be specified through percentage !''*/
+    height: 600px;
+}
+.dlg_selector .overview{
+    width: 150px;
+    height: 100px;
+}
+
+.ui-dialog-content{
+    padding:0px;
+}
+.gsn_chart{
+    width:480px;
+    height:250px;
+    /* position:absolute !important; */
+}
+.gsn_chart canvas{
+    position: absolute !important;
+    left: 0px !important;
+    top: 0px !important;
+}
+.miniature {
+    float: right;
+    margin-left: 30px ;
+    max-width:200px;
+}
+.overviewLegend{
+    padding-left:30px;
+}
+.overview{
+    margin: auto;
+}
+.miniature .legendColorBox{
+    padding-left:30px;
+    background-image: url(eye.png) ;
+    background-position: left center;
+    background-repeat: no-repeat;
+}
+.miniature .no-img{
+    background-image: none;
+}
+
+.ui-dialog {
+    width:auto;
+    height:auto;
+}
+.clear-both{
+    clear:both;
+}
+
