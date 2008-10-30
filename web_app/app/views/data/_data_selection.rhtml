@@ -1,9 +1,0 @@
-<% virtual_sensors = deployment.nil? ? [] : deployment.virtual_sensors.collect{ |vs|  [vs.name, vs.id] } -%>
-
-<tr id="deployment_increment_<%= deployment_increment %>">
-    <td><%= select_tag("deployment_id_#{deployment_increment}", options_for_select( Deployment.find(:all).collect{ |dep|  [dep.name, dep.id] } , deployment.id)) -%></td>
-    <td><%= select_tag('virtual_sensor_id', options_for_select( [['All','-1']] | virtual_sensors )) -%></td>
-    <td>A</td>
-    <td><%= link_to_function "remove" , "$(this).parent().parent().remove();" -%></td>
-    <%= observe_field "deployment_id_#{deployment_increment}", :url => { :action => :update_deployment_selection }, :with => "'deployment_increment=' + (" + deployment_increment.to_s + ") + '&deployment_id=' + $('#deployment_id_" + deployment_increment.to_s + "').val()" -%>
-</tr>

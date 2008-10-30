@@ -1,2 +1,0 @@
-class GsnController < ApplicationController
-end

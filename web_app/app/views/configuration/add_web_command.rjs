@@ -1,1 +1,0 @@
-page.insert_html :bottom, "web_input_#{params[:id]}_web_commands", :partial => "/configuration/processor/web_command", :object => WebCommand.new
