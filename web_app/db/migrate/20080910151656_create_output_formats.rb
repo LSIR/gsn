@@ -5,6 +5,7 @@ class CreateOutputFormats < ActiveRecord::Migration
       t.string :description
       t.integer :data_type_id
       t.integer :processor_id
+      t.belongs_to :unit
       t.timestamps
     end
   end

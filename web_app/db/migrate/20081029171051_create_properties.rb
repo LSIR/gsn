@@ -3,7 +3,8 @@ class CreateProperties < ActiveRecord::Migration
     create_table :properties do |t|
       t.string :name
       t.string :description
-      t.integer :property_group_id
+      t.belongs_to :property_group
+      t.references :unit
       t.timestamps
     end
   end

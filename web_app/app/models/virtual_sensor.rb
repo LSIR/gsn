@@ -3,6 +3,7 @@ class VirtualSensor < ActiveRecord::Base
   has_many :streams, :dependent => :destroy
   belongs_to :pc_instance
   belongs_to :deployment
+  has_many :property_values, :as => :prop_value_owner
 
   # Validations
   validates_identifier :name

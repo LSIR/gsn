@@ -1,17 +1,32 @@
-#stationInformation {
+.stationInformation {
 	font-family: Arial;
 	font-size: 10pt;
 	line-height: 1.5em;
 }
 
-#stationInformationHeader {
+.stationInformation div {
+	font-size: 9pt;
+	margin-bottom: 4px;
+	border-bottom: 1px dashed #555;
+}
+
+
+.stationInformation2 {
+	background-color: yellow;
+	padding-bottom: 100px;
+	border: 0;
+	margin 0;
+	padding: 0;
+}
+
+.stationInformation table {
 	padding-bottom: 5px;
 	border: 0px;
 	padding: 0px;
 }
 
-#selector {
-	background-color: #CCC;
+#mapSelector {
+	background-color: #CCC999;
 	z-index: 99999999;
 	position: absolute;
 	top: 0px;
@@ -22,8 +37,7 @@
 	font-size: 9pt;
 }
 
-#sensor {
-	font-size: 9pt;
-	margin-bottom: 4px;
-	border-bottom: 1px dashed #555;
+#mapSelector select{
+	padding: 0.2em;
+	
 }

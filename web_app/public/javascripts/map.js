@@ -120,7 +120,7 @@ function setSensorFilter(filter) {
 // then add all the sensors to the map
 function loadVsa() {
 	$(function(){
-	    $.getJSON("/map/vsa",
+	    $.getJSON("/map/vsa2",
 	    function(data){
 			vsa = data;
 			addSensorsToMap();
@@ -132,8 +132,8 @@ function loadVsa() {
 function addSensorsToMap() {
 	for (var s in vsa) {
 		if (vsa[s]["latitude"] && vsa[s]["longitude"]) {
-			html = '<div id="stationInformation">'
-			html += '<table id="stationInformationHeader"><tr><td><b>Deployment:&nbsp;&nbsp;</b></td><td>' + vsa[s]["deployment"] + '</td></tr>';
+			html = '<div class="stationInformation">'
+			html += '<table><tr><td><b>Deployment:&nbsp;&nbsp;</b></td><td>' + vsa[s]["deployment"] + '</td></tr>';
 			html += '<tr><td><b>Station:</b></td><td>' + s + '</td></tr>';
 			html += '<tr><td><b>Sensors:</b></td><td></td></tr></table>';
 			tmp = dvos[vsa[s]["deployment"]][s];
@@ -142,6 +142,7 @@ function addSensorsToMap() {
 			}
 
 			map.addMarker(vsa[s]["id"], parseFloat(vsa[s]["latitude"]), parseFloat(vsa[s]["longitude"]), html);
+			alert(html)
 		}
 	}
 }
@@ -164,7 +165,7 @@ function MapServiceSelector(map_service) {
 	}
 
 	this.div = document.createElement('div');
-	this.div.id = "selector"
+	this.div.id = "mapSelector"
 	this.div.style.width = width + "px";
 	this.div.style.left = "" + ((window.height/2) - (width/2)) + "px";
 	this.div.innerHTML = ''

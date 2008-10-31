@@ -1,0 +1,50 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+# one:
+#   column: value
+#
+# two:
+#   column: value
+
+
+one:
+  id: 1
+  value: 46.638278
+  prop_value_owner_id: 1
+  prop_value_owner_type: VirtualSensor
+  property_id: 2
+
+two:
+  id: 2
+  value: 8.460972
+  prop_value_owner_id: 1
+  prop_value_owner_type: VirtualSensor
+  property_id: 3
+  
+three:
+  id: 3
+  value: 2025
+  prop_value_owner_id: 1
+  prop_value_owner_type: VirtualSensor
+  property_id: 4
+
+four:
+  id: 4
+  value: 46.658278
+  prop_value_owner_id: 2
+  prop_value_owner_type: VirtualSensor
+  property_id: 2
+
+five:
+  id: 5
+  value: 8.480972
+  prop_value_owner_id: 2
+  prop_value_owner_type: VirtualSensor
+  property_id: 3
+
+six:
+  id: 6
+  value: 2230
+  prop_value_owner_id: 2
+  prop_value_owner_type: VirtualSensor
+  property_id: 4
