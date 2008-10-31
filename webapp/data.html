@@ -10,6 +10,7 @@
         <script type="text/javascript" src="js/jquery-1.2.6/jquery-ui-1.5.2.js"></script>
         <script type="text/javascript" src="js/datePicker.js"></script>
         <script type="text/javascript" src="js/jquery.flot.pack.js"></script>
+        <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
         <script type="text/javascript">
             /* XML object loaded from the REQUEST_LIST_OF_VIRTUAL_SENSORS GSN request */
             var lovs = null;
@@ -61,7 +62,11 @@
                                 var timestamp = data[timestamp_idx];
                                 for (i=0;i<headers.length;i++){
                                     if(i != timestamp_idx && data[i]!=undefined ){
-                                        datasets[keys[i]].data.push([parseInt(timestamp),parseFloat(data[i])]);
+                                        if (format == 'unix') {
+                                            datasets[keys[i]].data.push([parseInt(timestamp),parseFloat(data[i])]);
+                                        } else {
+                                            datasets[keys[i]].data.push([timestamp,parseFloat(data[i])]);
+                                        }
                                         nb_elements++;
                                     }
                                 }
@@ -339,7 +344,7 @@
                                 }
                             }
                             var data_length = fields[0]['data'].length;
-                            var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>timestamp</th>';
+                            var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>timed</th>';
                             for (var i = 0; i < headers.length; i++) {
                                 grid += '<th>' + headers[i] + '</th>';
                             }
