@@ -771,7 +771,7 @@ input.date-picker
 }	
 
 /* gsn data part */
-#main {
+.full-page {
     width: 730px;
 }
 
