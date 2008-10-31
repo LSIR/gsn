@@ -309,7 +309,7 @@
     		<arg value="actionpack" />
     		<arg value="actionmailer" />
     		<arg value="activeresource" />
-    		<arg value="rails" />
+    		<arg value="rails" /> 
     		<arg value="mongrel" />
     		<arg value="jruby-openssl" />
     		<arg value="Empact-roxml" />
@@ -320,14 +320,14 @@
     		<arg value="jdbc-mysql" />
     		<arg value="activerecord-jdbch2-adapter" />
     		<arg value="activerecord-jdbcmysql-adapter" />
-    		<arg value="--install-dir" />
+		<arg value="--install-dir" />
     		<arg value="ruby_gems" />
     		<arg value="--no-ri" />
     	 	<arg value="--no-rdoc" />
     	</java>  
 	</target>
-	
-	
+
+
 	<target name="migrate" depends="setup">
 	    	<java classname="org.jruby.Main"  fork="true" dir="${basedir}\web_app" classpathref="classpath">
 	    		<arg value="-r" />
