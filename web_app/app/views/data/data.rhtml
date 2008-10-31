@@ -208,7 +208,7 @@
 
         var data_length = fields[0]['data'].length;
 
-        var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>timestamp</th>';
+        var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>timed</th>';
         for (var i = 0; i < headers.length; i++) {
           grid += '<th>' + headers[i] + '</th>';
         }
@@ -286,7 +286,11 @@
           var timestamp = data[timestamp_idx];
           for (i=0;i<headers.length;i++){
             if(i != timestamp_idx && data[i]!=undefined ){
-              datasets[keys[i]].data.push([parseInt(timestamp),parseFloat(data[i])]);
+	          if (format == 'UNIX') {
+                datasets[keys[i]].data.push([parseInt(timestamp),parseFloat(data[i])]);
+              } else {
+                datasets[keys[i]].data.push([timestamp,parseFloat(data[i])]);
+              }
               nb_elements++;
             }
           }
