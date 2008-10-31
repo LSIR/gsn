@@ -260,6 +260,22 @@
 		</java>
 	</target>
 	
+		<target name="generate-msr" depends="bind">
+			<java classname="org.apache.axis2.wsdl.WSDL2Java"  fork="false" dir="${basedir}" classpathref="classpath">
+				<arg value="-o"/>
+				<arg value="generated" />
+				<arg value="-p" />
+				<arg value="gsn.msr.sensormap.datahub" />
+				<arg value="-s" />
+				<arg value="-ss" />
+				<arg value="-sd" />
+				<arg value="-uri" />
+				<arg value="service.asmx.xml" />
+			</java>
+		</target>
+
+
+	
 	<target name="start-acquisition-nofork"  depends="bind">
 			<java classname="gsn.acquisition2.server.SafeStorageServer"  fork="false" dir="${basedir}" classpathref="classpath">
 				<arg id="ss-port" value="${safe-storage-port}"/>

@@ -134,36 +134,8 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                     envelope = toEnvelope(getSOAPFactory(msgContext),
                             getSensorsByPublisherResponse13, false);
                 } else
-                 if ("DebugSensorManager".equals(methodName)) {
-                    org.tempuri.DebugSensorManagerResponse debugSensorManagerResponse15 =
-                        null;
-                    org.tempuri.DebugSensorManager wrappedParam = (org.tempuri.DebugSensorManager) fromOM(msgContext.getEnvelope()
-                                                                                                                    .getBody()
-                                                                                                                    .getFirstElement(),
-                            org.tempuri.DebugSensorManager.class,
-                            getEnvelopeNamespaces(msgContext.getEnvelope()));
-
-                    debugSensorManagerResponse15 = skel.DebugSensorManager(wrappedParam);
-
-                    envelope = toEnvelope(getSOAPFactory(msgContext),
-                            debugSensorManagerResponse15, false);
-                } else
-                 if ("DebugVectorSensorManager".equals(methodName)) {
-                    org.tempuri.DebugVectorSensorManagerResponse debugVectorSensorManagerResponse17 =
-                        null;
-                    org.tempuri.DebugVectorSensorManager wrappedParam = (org.tempuri.DebugVectorSensorManager) fromOM(msgContext.getEnvelope()
-                                                                                                                                .getBody()
-                                                                                                                                .getFirstElement(),
-                            org.tempuri.DebugVectorSensorManager.class,
-                            getEnvelopeNamespaces(msgContext.getEnvelope()));
-
-                    debugVectorSensorManagerResponse17 = skel.DebugVectorSensorManager(wrappedParam);
-
-                    envelope = toEnvelope(getSOAPFactory(msgContext),
-                            debugVectorSensorManagerResponse17, false);
-                } else
                  if ("StoreScalarData".equals(methodName)) {
-                    org.tempuri.StoreScalarDataResponse storeScalarDataResponse19 =
+                    org.tempuri.StoreScalarDataResponse storeScalarDataResponse15 =
                         null;
                     org.tempuri.StoreScalarData wrappedParam = (org.tempuri.StoreScalarData) fromOM(msgContext.getEnvelope()
                                                                                                               .getBody()
@@ -171,13 +143,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.StoreScalarData.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    storeScalarDataResponse19 = skel.StoreScalarData(wrappedParam);
+                    storeScalarDataResponse15 = skel.StoreScalarData(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            storeScalarDataResponse19, false);
+                            storeScalarDataResponse15, false);
                 } else
                  if ("StoreScalarDataBatch".equals(methodName)) {
-                    org.tempuri.StoreScalarDataBatchResponse storeScalarDataBatchResponse21 =
+                    org.tempuri.StoreScalarDataBatchResponse storeScalarDataBatchResponse17 =
                         null;
                     org.tempuri.StoreScalarDataBatch wrappedParam = (org.tempuri.StoreScalarDataBatch) fromOM(msgContext.getEnvelope()
                                                                                                                         .getBody()
@@ -185,13 +157,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.StoreScalarDataBatch.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    storeScalarDataBatchResponse21 = skel.StoreScalarDataBatch(wrappedParam);
+                    storeScalarDataBatchResponse17 = skel.StoreScalarDataBatch(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            storeScalarDataBatchResponse21, false);
+                            storeScalarDataBatchResponse17, false);
                 } else
                  if ("GetLatestScalarData".equals(methodName)) {
-                    org.tempuri.GetLatestScalarDataResponse getLatestScalarDataResponse23 =
+                    org.tempuri.GetLatestScalarDataResponse getLatestScalarDataResponse19 =
                         null;
                     org.tempuri.GetLatestScalarData wrappedParam = (org.tempuri.GetLatestScalarData) fromOM(msgContext.getEnvelope()
                                                                                                                       .getBody()
@@ -199,13 +171,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetLatestScalarData.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getLatestScalarDataResponse23 = skel.GetLatestScalarData(wrappedParam);
+                    getLatestScalarDataResponse19 = skel.GetLatestScalarData(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getLatestScalarDataResponse23, false);
+                            getLatestScalarDataResponse19, false);
                 } else
                  if ("GetLatestScalarDataInBatch".equals(methodName)) {
-                    org.tempuri.GetLatestScalarDataInBatchResponse getLatestScalarDataInBatchResponse25 =
+                    org.tempuri.GetLatestScalarDataInBatchResponse getLatestScalarDataInBatchResponse21 =
                         null;
                     org.tempuri.GetLatestScalarDataInBatch wrappedParam = (org.tempuri.GetLatestScalarDataInBatch) fromOM(msgContext.getEnvelope()
                                                                                                                                     .getBody()
@@ -213,13 +185,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetLatestScalarDataInBatch.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getLatestScalarDataInBatchResponse25 = skel.GetLatestScalarDataInBatch(wrappedParam);
+                    getLatestScalarDataInBatchResponse21 = skel.GetLatestScalarDataInBatch(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getLatestScalarDataInBatchResponse25, false);
+                            getLatestScalarDataInBatchResponse21, false);
                 } else
                  if ("GetScalarDataSeries".equals(methodName)) {
-                    org.tempuri.GetScalarDataSeriesResponse getScalarDataSeriesResponse27 =
+                    org.tempuri.GetScalarDataSeriesResponse getScalarDataSeriesResponse23 =
                         null;
                     org.tempuri.GetScalarDataSeries wrappedParam = (org.tempuri.GetScalarDataSeries) fromOM(msgContext.getEnvelope()
                                                                                                                       .getBody()
@@ -227,13 +199,27 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetScalarDataSeries.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getScalarDataSeriesResponse27 = skel.GetScalarDataSeries(wrappedParam);
+                    getScalarDataSeriesResponse23 = skel.GetScalarDataSeries(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getScalarDataSeriesResponse27, false);
+                            getScalarDataSeriesResponse23, false);
+                } else
+                 if ("GetScalarDataSeriesInBatch".equals(methodName)) {
+                    org.tempuri.GetScalarDataSeriesInBatchResponse getScalarDataSeriesInBatchResponse25 =
+                        null;
+                    org.tempuri.GetScalarDataSeriesInBatch wrappedParam = (org.tempuri.GetScalarDataSeriesInBatch) fromOM(msgContext.getEnvelope()
+                                                                                                                                    .getBody()
+                                                                                                                                    .getFirstElement(),
+                            org.tempuri.GetScalarDataSeriesInBatch.class,
+                            getEnvelopeNamespaces(msgContext.getEnvelope()));
+
+                    getScalarDataSeriesInBatchResponse25 = skel.GetScalarDataSeriesInBatch(wrappedParam);
+
+                    envelope = toEnvelope(getSOAPFactory(msgContext),
+                            getScalarDataSeriesInBatchResponse25, false);
                 } else
                  if ("GetAggregateScalarData".equals(methodName)) {
-                    org.tempuri.GetAggregateScalarDataResponse getAggregateScalarDataResponse29 =
+                    org.tempuri.GetAggregateScalarDataResponse getAggregateScalarDataResponse27 =
                         null;
                     org.tempuri.GetAggregateScalarData wrappedParam = (org.tempuri.GetAggregateScalarData) fromOM(msgContext.getEnvelope()
                                                                                                                             .getBody()
@@ -241,13 +227,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetAggregateScalarData.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getAggregateScalarDataResponse29 = skel.GetAggregateScalarData(wrappedParam);
+                    getAggregateScalarDataResponse27 = skel.GetAggregateScalarData(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getAggregateScalarDataResponse29, false);
+                            getAggregateScalarDataResponse27, false);
                 } else
                  if ("GetAggregateScalarDataInBatch".equals(methodName)) {
-                    org.tempuri.GetAggregateScalarDataInBatchResponse getAggregateScalarDataInBatchResponse31 =
+                    org.tempuri.GetAggregateScalarDataInBatchResponse getAggregateScalarDataInBatchResponse29 =
                         null;
                     org.tempuri.GetAggregateScalarDataInBatch wrappedParam = (org.tempuri.GetAggregateScalarDataInBatch) fromOM(msgContext.getEnvelope()
                                                                                                                                           .getBody()
@@ -255,13 +241,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetAggregateScalarDataInBatch.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getAggregateScalarDataInBatchResponse31 = skel.GetAggregateScalarDataInBatch(wrappedParam);
+                    getAggregateScalarDataInBatchResponse29 = skel.GetAggregateScalarDataInBatch(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getAggregateScalarDataInBatchResponse31, false);
+                            getAggregateScalarDataInBatchResponse29, false);
                 } else
                  if ("GetAggregateScalarDataSeries".equals(methodName)) {
-                    org.tempuri.GetAggregateScalarDataSeriesResponse getAggregateScalarDataSeriesResponse33 =
+                    org.tempuri.GetAggregateScalarDataSeriesResponse getAggregateScalarDataSeriesResponse31 =
                         null;
                     org.tempuri.GetAggregateScalarDataSeries wrappedParam = (org.tempuri.GetAggregateScalarDataSeries) fromOM(msgContext.getEnvelope()
                                                                                                                                         .getBody()
@@ -269,14 +255,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetAggregateScalarDataSeries.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getAggregateScalarDataSeriesResponse33 = skel.GetAggregateScalarDataSeries(wrappedParam);
+                    getAggregateScalarDataSeriesResponse31 = skel.GetAggregateScalarDataSeries(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getAggregateScalarDataSeriesResponse33, false);
+                            getAggregateScalarDataSeriesResponse31, false);
                 } else
                  if ("GetAggregateScalarDataSeriesInBatch".equals(methodName)) {
-                	  
-                    org.tempuri.GetAggregateScalarDataSeriesInBatchResponse getAggregateScalarDataSeriesInBatchResponse35 =
+                    org.tempuri.GetAggregateScalarDataSeriesInBatchResponse getAggregateScalarDataSeriesInBatchResponse33 =
                         null;
                     org.tempuri.GetAggregateScalarDataSeriesInBatch wrappedParam =
                         (org.tempuri.GetAggregateScalarDataSeriesInBatch) fromOM(msgContext.getEnvelope()
@@ -285,13 +270,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetAggregateScalarDataSeriesInBatch.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getAggregateScalarDataSeriesInBatchResponse35 = skel.GetAggregateScalarDataSeriesInBatch(wrappedParam);
+                    getAggregateScalarDataSeriesInBatchResponse33 = skel.GetAggregateScalarDataSeriesInBatch(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getAggregateScalarDataSeriesInBatchResponse35, false);
+                            getAggregateScalarDataSeriesInBatchResponse33, false);
                 } else
                  if ("StoreVectorData".equals(methodName)) {
-                    org.tempuri.StoreVectorDataResponse storeVectorDataResponse37 =
+                    org.tempuri.StoreVectorDataResponse storeVectorDataResponse35 =
                         null;
                     org.tempuri.StoreVectorData wrappedParam = (org.tempuri.StoreVectorData) fromOM(msgContext.getEnvelope()
                                                                                                               .getBody()
@@ -299,13 +284,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.StoreVectorData.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    storeVectorDataResponse37 = skel.StoreVectorData(wrappedParam);
+                    storeVectorDataResponse35 = skel.StoreVectorData(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            storeVectorDataResponse37, false);
+                            storeVectorDataResponse35, false);
                 } else
                  if ("StoreVectorDataByComponentIndex".equals(methodName)) {
-                    org.tempuri.StoreVectorDataByComponentIndexResponse storeVectorDataByComponentIndexResponse39 =
+                    org.tempuri.StoreVectorDataByComponentIndexResponse storeVectorDataByComponentIndexResponse37 =
                         null;
                     org.tempuri.StoreVectorDataByComponentIndex wrappedParam = (org.tempuri.StoreVectorDataByComponentIndex) fromOM(msgContext.getEnvelope()
                                                                                                                                               .getBody()
@@ -313,13 +298,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.StoreVectorDataByComponentIndex.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    storeVectorDataByComponentIndexResponse39 = skel.StoreVectorDataByComponentIndex(wrappedParam);
+                    storeVectorDataByComponentIndexResponse37 = skel.StoreVectorDataByComponentIndex(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            storeVectorDataByComponentIndexResponse39, false);
+                            storeVectorDataByComponentIndexResponse37, false);
                 } else
                  if ("GetLatestVectorData".equals(methodName)) {
-                    org.tempuri.GetLatestVectorDataResponse getLatestVectorDataResponse41 =
+                    org.tempuri.GetLatestVectorDataResponse getLatestVectorDataResponse39 =
                         null;
                     org.tempuri.GetLatestVectorData wrappedParam = (org.tempuri.GetLatestVectorData) fromOM(msgContext.getEnvelope()
                                                                                                                       .getBody()
@@ -327,13 +312,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetLatestVectorData.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getLatestVectorDataResponse41 = skel.GetLatestVectorData(wrappedParam);
+                    getLatestVectorDataResponse39 = skel.GetLatestVectorData(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getLatestVectorDataResponse41, false);
+                            getLatestVectorDataResponse39, false);
                 } else
                  if ("GetLatestVectorDataByComponentIndex".equals(methodName)) {
-                    org.tempuri.GetLatestVectorDataByComponentIndexResponse getLatestVectorDataByComponentIndexResponse43 =
+                    org.tempuri.GetLatestVectorDataByComponentIndexResponse getLatestVectorDataByComponentIndexResponse41 =
                         null;
                     org.tempuri.GetLatestVectorDataByComponentIndex wrappedParam =
                         (org.tempuri.GetLatestVectorDataByComponentIndex) fromOM(msgContext.getEnvelope()
@@ -342,13 +327,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetLatestVectorDataByComponentIndex.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getLatestVectorDataByComponentIndexResponse43 = skel.GetLatestVectorDataByComponentIndex(wrappedParam);
+                    getLatestVectorDataByComponentIndexResponse41 = skel.GetLatestVectorDataByComponentIndex(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getLatestVectorDataByComponentIndexResponse43, false);
+                            getLatestVectorDataByComponentIndexResponse41, false);
                 } else
                  if ("StoreBinaryData".equals(methodName)) {
-                    org.tempuri.StoreBinaryDataResponse storeBinaryDataResponse45 =
+                    org.tempuri.StoreBinaryDataResponse storeBinaryDataResponse43 =
                         null;
                     org.tempuri.StoreBinaryData wrappedParam = (org.tempuri.StoreBinaryData) fromOM(msgContext.getEnvelope()
                                                                                                               .getBody()
@@ -356,13 +341,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.StoreBinaryData.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    storeBinaryDataResponse45 = skel.StoreBinaryData(wrappedParam);
+                    storeBinaryDataResponse43 = skel.StoreBinaryData(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            storeBinaryDataResponse45, false);
+                            storeBinaryDataResponse43, false);
                 } else
                  if ("GetLatestBinarySensorData".equals(methodName)) {
-                    org.tempuri.GetLatestBinarySensorDataResponse getLatestBinarySensorDataResponse47 =
+                    org.tempuri.GetLatestBinarySensorDataResponse getLatestBinarySensorDataResponse45 =
                         null;
                     org.tempuri.GetLatestBinarySensorData wrappedParam = (org.tempuri.GetLatestBinarySensorData) fromOM(msgContext.getEnvelope()
                                                                                                                                   .getBody()
@@ -370,65 +355,23 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                             org.tempuri.GetLatestBinarySensorData.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    getLatestBinarySensorDataResponse47 = skel.GetLatestBinarySensorData(wrappedParam);
+                    getLatestBinarySensorDataResponse45 = skel.GetLatestBinarySensorData(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            getLatestBinarySensorDataResponse47, false);
+                            getLatestBinarySensorDataResponse45, false);
                 } else
                  if ("DataToString".equals(methodName)) {
-                    org.tempuri.DataToStringResponse dataToStringResponse49 = null;
+                    org.tempuri.DataToStringResponse dataToStringResponse47 = null;
                     org.tempuri.DataToString wrappedParam = (org.tempuri.DataToString) fromOM(msgContext.getEnvelope()
                                                                                                         .getBody()
                                                                                                         .getFirstElement(),
                             org.tempuri.DataToString.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    dataToStringResponse49 = skel.DataToString(wrappedParam);
+                    dataToStringResponse47 = skel.DataToString(wrappedParam);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext),
-                            dataToStringResponse49, false);
-                } else
-                 if ("DebugScalarDataManager".equals(methodName)) {
-                    org.tempuri.DebugScalarDataManagerResponse debugScalarDataManagerResponse51 =
-                        null;
-                    org.tempuri.DebugScalarDataManager wrappedParam = (org.tempuri.DebugScalarDataManager) fromOM(msgContext.getEnvelope()
-                                                                                                                            .getBody()
-                                                                                                                            .getFirstElement(),
-                            org.tempuri.DebugScalarDataManager.class,
-                            getEnvelopeNamespaces(msgContext.getEnvelope()));
-
-                    debugScalarDataManagerResponse51 = skel.DebugScalarDataManager(wrappedParam);
-
-                    envelope = toEnvelope(getSOAPFactory(msgContext),
-                            debugScalarDataManagerResponse51, false);
-                } else
-                 if ("DebugBinaryDataManager".equals(methodName)) {
-                    org.tempuri.DebugBinaryDataManagerResponse debugBinaryDataManagerResponse53 =
-                        null;
-                    org.tempuri.DebugBinaryDataManager wrappedParam = (org.tempuri.DebugBinaryDataManager) fromOM(msgContext.getEnvelope()
-                                                                                                                            .getBody()
-                                                                                                                            .getFirstElement(),
-                            org.tempuri.DebugBinaryDataManager.class,
-                            getEnvelopeNamespaces(msgContext.getEnvelope()));
-
-                    debugBinaryDataManagerResponse53 = skel.DebugBinaryDataManager(wrappedParam);
-
-                    envelope = toEnvelope(getSOAPFactory(msgContext),
-                            debugBinaryDataManagerResponse53, false);
-                } else
-                 if ("DebugVectorDataManager".equals(methodName)) {
-                    org.tempuri.DebugVectorDataManagerResponse debugVectorDataManagerResponse55 =
-                        null;
-                    org.tempuri.DebugVectorDataManager wrappedParam = (org.tempuri.DebugVectorDataManager) fromOM(msgContext.getEnvelope()
-                                                                                                                            .getBody()
-                                                                                                                            .getFirstElement(),
-                            org.tempuri.DebugVectorDataManager.class,
-                            getEnvelopeNamespaces(msgContext.getEnvelope()));
-
-                    debugVectorDataManagerResponse55 = skel.DebugVectorDataManager(wrappedParam);
-
-                    envelope = toEnvelope(getSOAPFactory(msgContext),
-                            debugVectorDataManagerResponse55, false);
+                            dataToStringResponse47, false);
                 } else {
                     throw new java.lang.RuntimeException("method not found");
                 }
@@ -463,6 +406,28 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetLatestVectorDataByComponentIndex param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.GetLatestVectorDataByComponentIndex.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetLatestVectorDataByComponentIndexResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.GetLatestVectorDataByComponentIndexResponse.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
         org.tempuri.StoreScalarData param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
@@ -478,28 +443,6 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
         throws org.apache.axis2.AxisFault {
         try {
             return param.getOMElement(org.tempuri.StoreScalarDataResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugVectorSensorManager param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.DebugVectorSensorManager.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugVectorSensorManagerResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.DebugVectorSensorManagerResponse.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -529,10 +472,10 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugScalarDataManager param, boolean optimizeContent)
+        org.tempuri.StoreScalarDataBatch param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.DebugScalarDataManager.MY_QNAME,
+            return param.getOMElement(org.tempuri.StoreScalarDataBatch.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -540,10 +483,32 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugScalarDataManagerResponse param,
+        org.tempuri.StoreScalarDataBatchResponse param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.StoreScalarDataBatchResponse.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetAggregateScalarDataSeriesInBatch param,
         boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.DebugScalarDataManagerResponse.MY_QNAME,
+            return param.getOMElement(org.tempuri.GetAggregateScalarDataSeriesInBatch.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetAggregateScalarDataSeriesInBatchResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.GetAggregateScalarDataSeriesInBatchResponse.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -573,10 +538,10 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.StoreVectorData param, boolean optimizeContent)
+        org.tempuri.GetScalarDataSeriesInBatch param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.StoreVectorData.MY_QNAME,
+            return param.getOMElement(org.tempuri.GetScalarDataSeriesInBatch.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -584,10 +549,10 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.StoreVectorDataResponse param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
+        org.tempuri.GetScalarDataSeriesInBatchResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.StoreVectorDataResponse.MY_QNAME,
+            return param.getOMElement(org.tempuri.GetScalarDataSeriesInBatchResponse.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -610,6 +575,28 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
         boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
             return param.getOMElement(org.tempuri.GetLatestBinarySensorDataResponse.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.StoreVectorData param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.StoreVectorData.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.StoreVectorDataResponse param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.StoreVectorDataResponse.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -683,10 +670,10 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetSensorsByPublisher param, boolean optimizeContent)
+        org.tempuri.GetLatestVectorData param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.GetSensorsByPublisher.MY_QNAME,
+            return param.getOMElement(org.tempuri.GetLatestVectorData.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -694,185 +681,10 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetSensorsByPublisherResponse param, boolean optimizeContent)
+        org.tempuri.GetLatestVectorDataResponse param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.GetSensorsByPublisherResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(org.tempuri.DeleteSensor param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.DeleteSensor.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DeleteSensorResponse param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.DeleteSensorResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetSensorByPublisherAndName param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetSensorByPublisherAndName.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetSensorByPublisherAndNameResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetSensorByPublisherAndNameResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugVectorDataManager param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.DebugVectorDataManager.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugVectorDataManagerResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.DebugVectorDataManagerResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetAggregateScalarDataSeries param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetAggregateScalarDataSeries.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetAggregateScalarDataSeriesResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetAggregateScalarDataSeriesResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetLatestVectorDataByComponentIndex param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetLatestVectorDataByComponentIndex.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetLatestVectorDataByComponentIndexResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetLatestVectorDataByComponentIndexResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.StoreScalarDataBatch param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.StoreScalarDataBatch.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.StoreScalarDataBatchResponse param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.StoreScalarDataBatchResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetAggregateScalarDataSeriesInBatch param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetAggregateScalarDataSeriesInBatch.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetAggregateScalarDataSeriesInBatchResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetAggregateScalarDataSeriesInBatchResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.RegisterSensor param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.RegisterSensor.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.RegisterSensorResponse param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.RegisterSensorResponse.MY_QNAME,
+            return param.getOMElement(org.tempuri.GetLatestVectorDataResponse.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -902,10 +714,10 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetLatestVectorData param, boolean optimizeContent)
+        org.tempuri.RegisterSensor param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.GetLatestVectorData.MY_QNAME,
+            return param.getOMElement(org.tempuri.RegisterSensor.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -913,32 +725,75 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetLatestVectorDataResponse param, boolean optimizeContent)
+        org.tempuri.RegisterSensorResponse param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.GetLatestVectorDataResponse.MY_QNAME,
+            return param.getOMElement(org.tempuri.RegisterSensorResponse.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
         }
     }
 
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugBinaryDataManager param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.DebugBinaryDataManager.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugBinaryDataManagerResponse param,
+    private org.apache.axiom.om.OMElement toOM(org.tempuri.DeleteSensor param,
         boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.DebugBinaryDataManagerResponse.MY_QNAME,
+            return param.getOMElement(org.tempuri.DeleteSensor.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.DeleteSensorResponse param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.DeleteSensorResponse.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetSensorsByPublisher param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.GetSensorsByPublisher.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetSensorsByPublisherResponse param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.GetSensorsByPublisherResponse.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetSensorByPublisherAndName param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.GetSensorByPublisherAndName.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetSensorByPublisherAndNameResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.GetSensorByPublisherAndNameResponse.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -990,28 +845,6 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetLatestScalarDataInBatch param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetLatestScalarDataInBatch.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.GetLatestScalarDataInBatchResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            return param.getOMElement(org.tempuri.GetLatestScalarDataInBatchResponse.MY_QNAME,
-                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.om.OMElement toOM(
         org.tempuri.StoreVectorDataByComponentIndex param,
         boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
@@ -1034,10 +867,10 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugSensorManager param, boolean optimizeContent)
+        org.tempuri.GetLatestScalarDataInBatch param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.DebugSensorManager.MY_QNAME,
+            return param.getOMElement(org.tempuri.GetLatestScalarDataInBatch.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -1045,10 +878,32 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
     }
 
     private org.apache.axiom.om.OMElement toOM(
-        org.tempuri.DebugSensorManagerResponse param, boolean optimizeContent)
+        org.tempuri.GetLatestScalarDataInBatchResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.GetLatestScalarDataInBatchResponse.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetAggregateScalarDataSeries param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
-            return param.getOMElement(org.tempuri.DebugSensorManagerResponse.MY_QNAME,
+            return param.getOMElement(org.tempuri.GetAggregateScalarDataSeries.MY_QNAME,
+                org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.om.OMElement toOM(
+        org.tempuri.GetAggregateScalarDataSeriesResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
+        try {
+            return param.getOMElement(org.tempuri.GetAggregateScalarDataSeriesResponse.MY_QNAME,
                 org.apache.axiom.om.OMAbstractFactory.getOMFactory());
         } catch (org.apache.axis2.databinding.ADBException e) {
             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -1065,6 +920,24 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
             emptyEnvelope.getBody()
                          .addChild(param.getOMElement(
                     org.tempuri.DataToStringResponse.MY_QNAME, factory));
+
+            return emptyEnvelope;
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
+        org.apache.axiom.soap.SOAPFactory factory,
+        org.tempuri.GetLatestVectorDataByComponentIndexResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
+        try {
+            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+
+            emptyEnvelope.getBody()
+                         .addChild(param.getOMElement(
+                    org.tempuri.GetLatestVectorDataByComponentIndexResponse.MY_QNAME,
+                    factory));
 
             return emptyEnvelope;
         } catch (org.apache.axis2.databinding.ADBException e) {
@@ -1091,24 +964,6 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
         org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.DebugVectorSensorManagerResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.DebugVectorSensorManagerResponse.MY_QNAME,
-                    factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
         org.tempuri.StoreBinaryDataResponse param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
@@ -1126,14 +981,32 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
         org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.DebugScalarDataManagerResponse param,
+        org.tempuri.StoreScalarDataBatchResponse param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+
+            emptyEnvelope.getBody()
+                         .addChild(param.getOMElement(
+                    org.tempuri.StoreScalarDataBatchResponse.MY_QNAME, factory));
+
+            return emptyEnvelope;
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
+        org.apache.axiom.soap.SOAPFactory factory,
+        org.tempuri.GetAggregateScalarDataSeriesInBatchResponse param,
         boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
             org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
 
             emptyEnvelope.getBody()
                          .addChild(param.getOMElement(
-                    org.tempuri.DebugScalarDataManagerResponse.MY_QNAME, factory));
+                    org.tempuri.GetAggregateScalarDataSeriesInBatchResponse.MY_QNAME,
+                    factory));
 
             return emptyEnvelope;
         } catch (org.apache.axis2.databinding.ADBException e) {
@@ -1160,14 +1033,15 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
         org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.StoreVectorDataResponse param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
+        org.tempuri.GetScalarDataSeriesInBatchResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
             org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
 
             emptyEnvelope.getBody()
                          .addChild(param.getOMElement(
-                    org.tempuri.StoreVectorDataResponse.MY_QNAME, factory));
+                    org.tempuri.GetScalarDataSeriesInBatchResponse.MY_QNAME,
+                    factory));
 
             return emptyEnvelope;
         } catch (org.apache.axis2.databinding.ADBException e) {
@@ -1186,6 +1060,23 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                          .addChild(param.getOMElement(
                     org.tempuri.GetLatestBinarySensorDataResponse.MY_QNAME,
                     factory));
+
+            return emptyEnvelope;
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
+        org.apache.axiom.soap.SOAPFactory factory,
+        org.tempuri.StoreVectorDataResponse param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+
+            emptyEnvelope.getBody()
+                         .addChild(param.getOMElement(
+                    org.tempuri.StoreVectorDataResponse.MY_QNAME, factory));
 
             return emptyEnvelope;
         } catch (org.apache.axis2.databinding.ADBException e) {
@@ -1246,154 +1137,14 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
         org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.GetSensorsByPublisherResponse param, boolean optimizeContent)
+        org.tempuri.GetLatestVectorDataResponse param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
             org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
 
             emptyEnvelope.getBody()
                          .addChild(param.getOMElement(
-                    org.tempuri.GetSensorsByPublisherResponse.MY_QNAME, factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.DeleteSensorResponse param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.DeleteSensorResponse.MY_QNAME, factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.GetSensorByPublisherAndNameResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.GetSensorByPublisherAndNameResponse.MY_QNAME,
-                    factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.DebugVectorDataManagerResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.DebugVectorDataManagerResponse.MY_QNAME, factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.GetAggregateScalarDataSeriesResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.GetAggregateScalarDataSeriesResponse.MY_QNAME,
-                    factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.GetLatestVectorDataByComponentIndexResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.GetLatestVectorDataByComponentIndexResponse.MY_QNAME,
-                    factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.StoreScalarDataBatchResponse param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.StoreScalarDataBatchResponse.MY_QNAME, factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.GetAggregateScalarDataSeriesInBatchResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.GetAggregateScalarDataSeriesInBatchResponse.MY_QNAME,
-                    factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.RegisterSensorResponse param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.RegisterSensorResponse.MY_QNAME, factory));
+                    org.tempuri.GetLatestVectorDataResponse.MY_QNAME, factory));
 
             return emptyEnvelope;
         } catch (org.apache.axis2.databinding.ADBException e) {
@@ -1421,14 +1172,14 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
         org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.GetLatestVectorDataResponse param, boolean optimizeContent)
+        org.tempuri.RegisterSensorResponse param, boolean optimizeContent)
         throws org.apache.axis2.AxisFault {
         try {
             org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
 
             emptyEnvelope.getBody()
                          .addChild(param.getOMElement(
-                    org.tempuri.GetLatestVectorDataResponse.MY_QNAME, factory));
+                    org.tempuri.RegisterSensorResponse.MY_QNAME, factory));
 
             return emptyEnvelope;
         } catch (org.apache.axis2.databinding.ADBException e) {
@@ -1438,14 +1189,49 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
         org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.DebugBinaryDataManagerResponse param,
+        org.tempuri.DeleteSensorResponse param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+
+            emptyEnvelope.getBody()
+                         .addChild(param.getOMElement(
+                    org.tempuri.DeleteSensorResponse.MY_QNAME, factory));
+
+            return emptyEnvelope;
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
+        org.apache.axiom.soap.SOAPFactory factory,
+        org.tempuri.GetSensorsByPublisherResponse param, boolean optimizeContent)
+        throws org.apache.axis2.AxisFault {
+        try {
+            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+
+            emptyEnvelope.getBody()
+                         .addChild(param.getOMElement(
+                    org.tempuri.GetSensorsByPublisherResponse.MY_QNAME, factory));
+
+            return emptyEnvelope;
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
+        org.apache.axiom.soap.SOAPFactory factory,
+        org.tempuri.GetSensorByPublisherAndNameResponse param,
         boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
             org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
 
             emptyEnvelope.getBody()
                          .addChild(param.getOMElement(
-                    org.tempuri.DebugBinaryDataManagerResponse.MY_QNAME, factory));
+                    org.tempuri.GetSensorByPublisherAndNameResponse.MY_QNAME,
+                    factory));
 
             return emptyEnvelope;
         } catch (org.apache.axis2.databinding.ADBException e) {
@@ -1489,24 +1275,6 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
         org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.GetLatestScalarDataInBatchResponse param,
-        boolean optimizeContent) throws org.apache.axis2.AxisFault {
-        try {
-            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-
-            emptyEnvelope.getBody()
-                         .addChild(param.getOMElement(
-                    org.tempuri.GetLatestScalarDataInBatchResponse.MY_QNAME,
-                    factory));
-
-            return emptyEnvelope;
-        } catch (org.apache.axis2.databinding.ADBException e) {
-            throw org.apache.axis2.AxisFault.makeFault(e);
-        }
-    }
-
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-        org.apache.axiom.soap.SOAPFactory factory,
         org.tempuri.StoreVectorDataByComponentIndexResponse param,
         boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
@@ -1525,14 +1293,33 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
 
     private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
         org.apache.axiom.soap.SOAPFactory factory,
-        org.tempuri.DebugSensorManagerResponse param, boolean optimizeContent)
-        throws org.apache.axis2.AxisFault {
+        org.tempuri.GetLatestScalarDataInBatchResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
         try {
             org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
 
             emptyEnvelope.getBody()
                          .addChild(param.getOMElement(
-                    org.tempuri.DebugSensorManagerResponse.MY_QNAME, factory));
+                    org.tempuri.GetLatestScalarDataInBatchResponse.MY_QNAME,
+                    factory));
+
+            return emptyEnvelope;
+        } catch (org.apache.axis2.databinding.ADBException e) {
+            throw org.apache.axis2.AxisFault.makeFault(e);
+        }
+    }
+
+    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
+        org.apache.axiom.soap.SOAPFactory factory,
+        org.tempuri.GetAggregateScalarDataSeriesResponse param,
+        boolean optimizeContent) throws org.apache.axis2.AxisFault {
+        try {
+            org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+
+            emptyEnvelope.getBody()
+                         .addChild(param.getOMElement(
+                    org.tempuri.GetAggregateScalarDataSeriesResponse.MY_QNAME,
+                    factory));
 
             return emptyEnvelope;
         } catch (org.apache.axis2.databinding.ADBException e) {
@@ -1560,20 +1347,22 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                 return org.tempuri.DataToStringResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
+            if (org.tempuri.GetLatestVectorDataByComponentIndex.class.equals(
+                        type)) {
+                return org.tempuri.GetLatestVectorDataByComponentIndex.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.GetLatestVectorDataByComponentIndexResponse.class.equals(
+                        type)) {
+                return org.tempuri.GetLatestVectorDataByComponentIndexResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
             if (org.tempuri.StoreScalarData.class.equals(type)) {
                 return org.tempuri.StoreScalarData.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
             if (org.tempuri.StoreScalarDataResponse.class.equals(type)) {
                 return org.tempuri.StoreScalarDataResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.DebugVectorSensorManager.class.equals(type)) {
-                return org.tempuri.DebugVectorSensorManager.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.DebugVectorSensorManagerResponse.class.equals(type)) {
-                return org.tempuri.DebugVectorSensorManagerResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
             if (org.tempuri.StoreBinaryData.class.equals(type)) {
@@ -1584,12 +1373,22 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                 return org.tempuri.StoreBinaryDataResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.DebugScalarDataManager.class.equals(type)) {
-                return org.tempuri.DebugScalarDataManager.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.StoreScalarDataBatch.class.equals(type)) {
+                return org.tempuri.StoreScalarDataBatch.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.DebugScalarDataManagerResponse.class.equals(type)) {
-                return org.tempuri.DebugScalarDataManagerResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.StoreScalarDataBatchResponse.class.equals(type)) {
+                return org.tempuri.StoreScalarDataBatchResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.GetAggregateScalarDataSeriesInBatch.class.equals(
+                        type)) {
+                return org.tempuri.GetAggregateScalarDataSeriesInBatch.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.GetAggregateScalarDataSeriesInBatchResponse.class.equals(
+                        type)) {
+                return org.tempuri.GetAggregateScalarDataSeriesInBatchResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
             if (org.tempuri.UpdateSensorLocation.class.equals(type)) {
@@ -1600,12 +1399,13 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                 return org.tempuri.UpdateSensorLocationResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.StoreVectorData.class.equals(type)) {
-                return org.tempuri.StoreVectorData.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.GetScalarDataSeriesInBatch.class.equals(type)) {
+                return org.tempuri.GetScalarDataSeriesInBatch.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.StoreVectorDataResponse.class.equals(type)) {
-                return org.tempuri.StoreVectorDataResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.GetScalarDataSeriesInBatchResponse.class.equals(
+                        type)) {
+                return org.tempuri.GetScalarDataSeriesInBatchResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
             if (org.tempuri.GetLatestBinarySensorData.class.equals(type)) {
@@ -1614,6 +1414,14 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
 
             if (org.tempuri.GetLatestBinarySensorDataResponse.class.equals(type)) {
                 return org.tempuri.GetLatestBinarySensorDataResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.StoreVectorData.class.equals(type)) {
+                return org.tempuri.StoreVectorData.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.StoreVectorDataResponse.class.equals(type)) {
+                return org.tempuri.StoreVectorDataResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
             if (org.tempuri.RegisterVectorSensor.class.equals(type)) {
@@ -1640,82 +1448,12 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                 return org.tempuri.GetScalarDataSeriesResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.GetSensorsByPublisher.class.equals(type)) {
-                return org.tempuri.GetSensorsByPublisher.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.GetLatestVectorData.class.equals(type)) {
+                return org.tempuri.GetLatestVectorData.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.GetSensorsByPublisherResponse.class.equals(type)) {
-                return org.tempuri.GetSensorsByPublisherResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.DeleteSensor.class.equals(type)) {
-                return org.tempuri.DeleteSensor.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.DeleteSensorResponse.class.equals(type)) {
-                return org.tempuri.DeleteSensorResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.GetSensorByPublisherAndName.class.equals(type)) {
-                return org.tempuri.GetSensorByPublisherAndName.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.GetSensorByPublisherAndNameResponse.class.equals(
-                        type)) {
-                return org.tempuri.GetSensorByPublisherAndNameResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.DebugVectorDataManager.class.equals(type)) {
-                return org.tempuri.DebugVectorDataManager.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.DebugVectorDataManagerResponse.class.equals(type)) {
-                return org.tempuri.DebugVectorDataManagerResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.GetAggregateScalarDataSeries.class.equals(type)) {
-                return org.tempuri.GetAggregateScalarDataSeries.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.GetAggregateScalarDataSeriesResponse.class.equals(
-                        type)) {
-                return org.tempuri.GetAggregateScalarDataSeriesResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.GetLatestVectorDataByComponentIndex.class.equals(
-                        type)) {
-                return org.tempuri.GetLatestVectorDataByComponentIndex.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.GetLatestVectorDataByComponentIndexResponse.class.equals(
-                        type)) {
-                return org.tempuri.GetLatestVectorDataByComponentIndexResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.StoreScalarDataBatch.class.equals(type)) {
-                return org.tempuri.StoreScalarDataBatch.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.StoreScalarDataBatchResponse.class.equals(type)) {
-                return org.tempuri.StoreScalarDataBatchResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.GetAggregateScalarDataSeriesInBatch.class.equals(
-                        type)) {
-                return org.tempuri.GetAggregateScalarDataSeriesInBatch.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.GetAggregateScalarDataSeriesInBatchResponse.class.equals(
-                        type)) {
-                return org.tempuri.GetAggregateScalarDataSeriesInBatchResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.RegisterSensor.class.equals(type)) {
-                return org.tempuri.RegisterSensor.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.RegisterSensorResponse.class.equals(type)) {
-                return org.tempuri.RegisterSensorResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.GetLatestVectorDataResponse.class.equals(type)) {
+                return org.tempuri.GetLatestVectorDataResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
             if (org.tempuri.GetAggregateScalarDataInBatch.class.equals(type)) {
@@ -1727,20 +1465,37 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                 return org.tempuri.GetAggregateScalarDataInBatchResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.GetLatestVectorData.class.equals(type)) {
-                return org.tempuri.GetLatestVectorData.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.RegisterSensor.class.equals(type)) {
+                return org.tempuri.RegisterSensor.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.GetLatestVectorDataResponse.class.equals(type)) {
-                return org.tempuri.GetLatestVectorDataResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.RegisterSensorResponse.class.equals(type)) {
+                return org.tempuri.RegisterSensorResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.DebugBinaryDataManager.class.equals(type)) {
-                return org.tempuri.DebugBinaryDataManager.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.DeleteSensor.class.equals(type)) {
+                return org.tempuri.DeleteSensor.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.DebugBinaryDataManagerResponse.class.equals(type)) {
-                return org.tempuri.DebugBinaryDataManagerResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.DeleteSensorResponse.class.equals(type)) {
+                return org.tempuri.DeleteSensorResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.GetSensorsByPublisher.class.equals(type)) {
+                return org.tempuri.GetSensorsByPublisher.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.GetSensorsByPublisherResponse.class.equals(type)) {
+                return org.tempuri.GetSensorsByPublisherResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.GetSensorByPublisherAndName.class.equals(type)) {
+                return org.tempuri.GetSensorByPublisherAndName.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.GetSensorByPublisherAndNameResponse.class.equals(
+                        type)) {
+                return org.tempuri.GetSensorByPublisherAndNameResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
             if (org.tempuri.GetAggregateScalarData.class.equals(type)) {
@@ -1759,15 +1514,6 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                 return org.tempuri.DeleteVectorSensorResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.GetLatestScalarDataInBatch.class.equals(type)) {
-                return org.tempuri.GetLatestScalarDataInBatch.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
-            if (org.tempuri.GetLatestScalarDataInBatchResponse.class.equals(
-                        type)) {
-                return org.tempuri.GetLatestScalarDataInBatchResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-            }
-
             if (org.tempuri.StoreVectorDataByComponentIndex.class.equals(type)) {
                 return org.tempuri.StoreVectorDataByComponentIndex.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
@@ -1777,12 +1523,22 @@ public class ServiceMessageReceiverInOut extends org.apache.axis2.receivers.Abst
                 return org.tempuri.StoreVectorDataByComponentIndexResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.DebugSensorManager.class.equals(type)) {
-                return org.tempuri.DebugSensorManager.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.GetLatestScalarDataInBatch.class.equals(type)) {
+                return org.tempuri.GetLatestScalarDataInBatch.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
 
-            if (org.tempuri.DebugSensorManagerResponse.class.equals(type)) {
-                return org.tempuri.DebugSensorManagerResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            if (org.tempuri.GetLatestScalarDataInBatchResponse.class.equals(
+                        type)) {
+                return org.tempuri.GetLatestScalarDataInBatchResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.GetAggregateScalarDataSeries.class.equals(type)) {
+                return org.tempuri.GetAggregateScalarDataSeries.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+            }
+
+            if (org.tempuri.GetAggregateScalarDataSeriesResponse.class.equals(
+                        type)) {
+                return org.tempuri.GetAggregateScalarDataSeriesResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
             }
         } catch (java.lang.Exception e) {
             throw org.apache.axis2.AxisFault.makeFault(e);

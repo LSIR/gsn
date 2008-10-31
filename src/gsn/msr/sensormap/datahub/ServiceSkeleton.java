@@ -23,6 +23,7 @@ import org.tempuri.ArrayOfSensorData;
 import org.tempuri.GetAggregateScalarDataInBatchResponse;
 import org.tempuri.GetAggregateScalarDataSeriesInBatchResponse;
 import org.tempuri.GetLatestScalarDataInBatchResponse;
+import org.tempuri.GetScalarDataSeriesInBatchResponse;
 import org.tempuri.SensorData;
 
 /**
@@ -95,6 +96,30 @@ public class ServiceSkeleton {
 		toReturn.setGetLatestScalarDataInBatchResult(items);
 		return toReturn;
 	}
+	
+	/**
+	 * Gets the data published by a set of sensor within a specified time window
+	 * @param input
+	 * @return
+	 */
+    public org.tempuri.GetScalarDataSeriesInBatchResponse GetScalarDataSeriesInBatch(org.tempuri.GetScalarDataSeriesInBatch input) {
+    	//throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetScalarDataSeriesInBatch");
+        org.tempuri.GetScalarDataSeriesInBatchResponse toReturn = new GetScalarDataSeriesInBatchResponse () ;
+        ArrayOfSensorData items = new ArrayOfSensorData();
+        for (String signalInfo : input.getSensorNames().getString()) {
+        	try {
+        		SignalRequest req = new SignalRequest(signalInfo);
+        		StringBuilder query = new StringBuilder("select TIMED, ").append(req.getFieldName()).append(" from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis());
+        		items.addSensorData(transformToSensorDataArray(query, false).getSensorData()[0]);
+        	}
+        	catch (RuntimeException e) {
+        		logger.debug("VS " + signalInfo + " not found");
+				items.addSensorData(null);
+        	}
+        }
+        toReturn.setGetScalarDataSeriesInBatchResult(items);
+        return toReturn;
+    }
 
 	public org.tempuri.GetAggregateScalarDataInBatchResponse GetAggregateScalarDataInBatch(org.tempuri.GetAggregateScalarDataInBatch input) {
 		org.tempuri.GetAggregateScalarDataInBatchResponse  toReturn = new  GetAggregateScalarDataInBatchResponse();
@@ -135,15 +160,19 @@ public class ServiceSkeleton {
 			return conf.getName();
 		}
 	}
-
+	
 	private  ArrayOfSensorData transformToSensorDataArray(StringBuilder query) {
+		boolean is_binary_linked= true;
+		if (query.toString().replaceAll(" ","").toLowerCase().indexOf("avg(")>0)
+			is_binary_linked = false;
+		return transformToSensorDataArray(query, is_binary_linked);
+	}
+
+	private  ArrayOfSensorData transformToSensorDataArray(StringBuilder query, boolean is_binary_linked) {
 		System.out.println("QUERY : "+query);
 		ArrayOfSensorData toReturn = new ArrayOfSensorData();
 		try {
 			DataEnumerator output = null;
-			boolean is_binary_linked= true;
-			if (query.toString().replaceAll(" ","").toLowerCase().indexOf("avg(")>0)
-				is_binary_linked = false;
 			output = StorageManager.getInstance().executeQuery(query, is_binary_linked);
 			SensorData data = new SensorData(); 
 			ArrayOfDateTime arrayOfDateTime = new ArrayOfDateTime();
