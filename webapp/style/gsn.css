@@ -771,8 +771,8 @@ input.date-picker
 }	
 
 /* gsn data part */
-.full-page {
-    width: 730px;
+div.full-page {
+    width: 730px !important;
 }
 
 .ui-accordion h3 {
