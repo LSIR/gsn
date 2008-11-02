@@ -34,10 +34,10 @@ public class CSVFileWrapperCheckPoints{
 
 	private long csvFilePathHash;
 		
-	public CSVFileWrapperCheckPoints (String csvFilePath) {
-		// We use a hash of the file path instead of the actual path
+	public CSVFileWrapperCheckPoints (String csvFilePath, String requestername) {
+		// We use a hash of the file path instead of the actual path concatenated to the requestername
 		Checksum checkSum = new Adler32 () ;
-		FilterInputStream cis = new CheckedInputStream(new ByteArrayInputStream(csvFilePath.getBytes()), checkSum);
+		FilterInputStream cis = new CheckedInputStream(new ByteArrayInputStream((csvFilePath + requestername).getBytes()), checkSum);
 		BufferedReader reader = new BufferedReader (new InputStreamReader(cis)) ;
 		try {
 			while (reader.read() != -1) ;

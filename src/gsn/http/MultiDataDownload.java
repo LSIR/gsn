@@ -10,7 +10,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,17 +38,17 @@ public class MultiDataDownload extends HttpServlet {
 	throws IOException {
 		try {
 			logger.debug("Query string: " + req.getQueryString());
-			Enumeration e = req.getParameterNames();
-			String nextKey;
-			String[] values;
-			while (e.hasMoreElements()) {
-				nextKey = (String) e.nextElement();
-				values = req.getParameterValues(nextKey);
-				logger.debug("PARAMETER: " + nextKey);
-				for (int i = 0; i < values.length; i++) {
-					logger.debug("value: " + values[i]);
-				}
-			}
+//			Enumeration e = req.getParameterNames();
+//			String nextKey;
+//			String[] values;
+//			while (e.hasMoreElements()) {
+//				nextKey = (String) e.nextElement();
+//				values = req.getParameterValues(nextKey);
+//				logger.debug("PARAMETER: " + nextKey);
+//				for (int i = 0; i < values.length; i++) {
+//					logger.debug("value: " + values[i]);
+//				}
+//			}
 
 			Map<String, String[]> parameterMap = new Hashtable<String, String[]>();
 

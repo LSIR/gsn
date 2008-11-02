@@ -76,7 +76,7 @@ public abstract class SafeStorageAbstractWrapper extends AbstractWrapper impleme
     cfg.setConnectTimeout(CONNECT_TIMEOUT);
     ObjectSerializationCodecFactory oscf = new ObjectSerializationCodecFactory();
     oscf.setDecoderMaxObjectSize(oscf.getEncoderMaxObjectSize());
-    logger.debug("MINA Decoder MAX: " + oscf.getDecoderMaxObjectSize() + " MINA Encoder MAX: " + oscf.getEncoderMaxObjectSize());
+    //logger.debug("MINA Decoder MAX: " + oscf.getDecoderMaxObjectSize() + " MINA Encoder MAX: " + oscf.getEncoderMaxObjectSize());
     cfg.getFilterChain().addLast("codec",   new ProtocolCodecFilter(oscf));
     IoSession session = null;
     try {

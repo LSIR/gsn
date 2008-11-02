@@ -1,5 +1,6 @@
 package gsn.acquisition2.wrappers;
 
+import gsn.beans.AddressBean;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -38,7 +39,10 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 				logger.error("The file >" + parameters.getCsvSourceFilePath() + "< does not exists.");
 				return false;
 			}
-			checkPoints = new CSVFileWrapperCheckPoints (parameters.getCsvSourceFilePath()) ;
+			AddressBean ab = getActiveAddressBean();
+			StringBuilder requestername = new StringBuilder();
+			requestername.append(ab.getVirtualSensorName()).append("/").append(ab.getInputStreamName()).append("/").append(ab.getWrapper());			
+			checkPoints = new CSVFileWrapperCheckPoints (parameters.getCsvSourceFilePath(), requestername.toString()) ;
 			lineBuffer = new ArrayList<String> () ;
 		}
 		catch (RuntimeException e) {
