@@ -26,8 +26,7 @@ public class MultiDataDownload extends HttpServlet {
 
 	private static SimpleDateFormat sdfWeb = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ; // 29/10/2008 22:25:07
 
-	private static transient Logger logger = Logger
-	.getLogger(MultiDataDownload.class);
+	private static transient Logger logger = Logger.getLogger(MultiDataDownload.class);
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws IOException {
@@ -38,17 +37,6 @@ public class MultiDataDownload extends HttpServlet {
 	throws IOException {
 		try {
 			logger.debug("Query string: " + req.getQueryString());
-//			Enumeration e = req.getParameterNames();
-//			String nextKey;
-//			String[] values;
-//			while (e.hasMoreElements()) {
-//				nextKey = (String) e.nextElement();
-//				values = req.getParameterValues(nextKey);
-//				logger.debug("PARAMETER: " + nextKey);
-//				for (int i = 0; i < values.length; i++) {
-//					logger.debug("value: " + values[i]);
-//				}
-//			}
 
 			Map<String, String[]> parameterMap = new Hashtable<String, String[]>();
 
@@ -216,97 +204,6 @@ public class MultiDataDownload extends HttpServlet {
 				}
 			}
 
-
-//			// VSNAME
-//			// Create the fields and virtual sensors (the 'yellow' web interface
-//			// force all the virtual sensors to have the same set of selected
-//			// fields)
-//			StringBuilder fields = new StringBuilder();
-//			String[] req_fields = req.getParameterValues("fields");
-//			if (req_fields != null) {
-//			for (int i = 0; i < req_fields.length; i++) {
-//			fields.append(":").append(req_fields[i]);
-//			}
-//			}
-//			String[] req_vsnames = req.getParameterValues("vsname");
-//			if (req_vsnames != null) {
-//			for (int i = 0; i < req_vsnames.length; i++) {
-//			req_vsnames[i] += fields.toString();
-//			}
-//			parameterMap.put("vsname", req_vsnames);
-//			}
-//			// OUTPUTTYPE
-//			parameterMap.put("outputtype", new String[] { "csv" });
-//			// TIME LIMITS
-
-//			// NB LIMITS
-//			String req_selection = req.getParameter("nb_selection");
-
-//			if (req_selection != null) {
-//			if (req_selection.compareToIgnoreCase("SPECIFIED") == 0) {
-//			String req_nb_value = req.getParameter("nb_value");
-//			try {
-//			Integer checked_nb = Integer.parseInt(req_nb_value);
-//			parameterMap.put("nb", new String[] { "0:" + checked_nb });
-//			}
-//			catch (NumberFormatException e1) {
-//			logger.debug("The specified nb of data >" + req_nb_value + "< is not a number.");
-//			}
-//			}
-//			}
-
-//			// AGGREGATIONS
-//			String req_agg_function = req.getParameter("agg_function");
-//			if (req_agg_function != null) {
-//			if (req_agg_function.compareTo("-1") != 0) {
-//			//<timerange>:<groupoperator>				
-//			String req_agg_period = req.getParameter("agg_period");
-//			String req_agg_unit = req.getParameter("agg_unit");
-//			try {
-//			long timerange = Long.parseLong(req_agg_unit) * Long.parseLong(req_agg_period);
-//			parameterMap.put("groupby", new String[] { timerange + ":" + req_agg_function });
-//			}
-//			catch (NumberFormatException e2) {
-//			logger.debug(e2);
-//			}
-//			}
-//			}
-
-//			// STD CRITERIONS
-//			if (req.getParameter("cjoin") != null) { 
-//			String[] cjoins = req.getParameterValues("cjoin");
-//			String[] cfields = req.getParameterValues("cfield");
-//			String[] cmins = req.getParameterValues("cmin");
-//			String[] cmaxs = req.getParameterValues("cmax");
-//			ArrayList<String> criteria = new ArrayList<String> () ;
-//			for (int i = 0 ; i < cjoins.length ; i++) {
-//			//<critJoin>:<negation>:<vsname>:<field>:<operator>:<value>
-//			for (int j = 0 ; j < vsnames.length ; j++) {
-//			if (cfields[i].compareToIgnoreCase("timed") == 0) {
-//			try {
-//			Date minTimed = sdfWeb.parse(cmins[i]);
-//			Date maxTimed = sdfWeb.parse(cmaxs[i]);
-//			if (cmins[i].compareToIgnoreCase("-inf") != 0) criteria.add(cjoins[i] + "::" + vsnames[j] + ":" + cfields[i] + ":ge:" + minTimed.getTime());
-//			if (cmaxs[i].compareToIgnoreCase("+inf") != 0) criteria.add(cjoins[i] + "::" + vsnames[j] + ":" + cfields[i] + ":leq:" + maxTimed.getTime());
-//			} catch (ParseException e1) {
-//			logger.debug(e1.getMessage());
-//			}
-
-//			}
-//			else {
-//			if (cmins[i].compareToIgnoreCase("-inf") != 0) criteria.add(cjoins[i] + "::" + vsnames[j] + ":" + cfields[i] + ":ge:" + cmins[i]);
-//			if (cmaxs[i].compareToIgnoreCase("+inf") != 0) criteria.add(cjoins[i] + "::" + vsnames[j] + ":" + cfields[i] + ":leq:" + cmaxs[i]);
-//			}
-//			}
-//			}
-//			parameterMap.put("critfield", criteria.toArray(new String[] {}));
-//			}
-//			// TIMEFORMAT
-//			parameterMap.put("timeformat", new String[] { "iso" });
-
-//			// TIME RANGE
-
-
 			gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
 			dd.process();
 			if (dd.getOt() == gsn.http.datarequest.DownloadData.AllowedOutputType.csv) {
@@ -340,6 +237,7 @@ public class MultiDataDownload extends HttpServlet {
 		String field;
 		Set<Entry <String, ArrayList<String>>> entries ;
 		Entry<String, String> en2;
+		ArrayList<String> availableFields;
 		while (iter2.hasNext()) {
 			en2 = iter2.next();
 			vsname = (String) en2.getValue();
@@ -357,7 +255,10 @@ public class MultiDataDownload extends HttpServlet {
 				else {
 					while (inneriter.hasNext()) {
 						innerentry = inneriter.next();
-						updateMapping(vssfm, (String)innerentry.getKey(), field);	
+						availableFields = allVsAndFieldsMapping.get((String)innerentry.getKey());
+						if (availableFields != null && availableFields.contains(field)) {
+							updateMapping(vssfm, (String)innerentry.getKey(), field);	
+						}
 					}
 				}
 			}
@@ -422,7 +323,6 @@ public class MultiDataDownload extends HttpServlet {
 		while (iter.hasNext()) {
 			en = iter.next();
 			key = (String) en.getKey() ;
-			String webKey;
 			if (key.length() > prefix.length() && key.substring(0,prefix.length()).compareToIgnoreCase(prefix) == 0) {	// look for "vs["
 				String[] vals = (String[]) en.getValue();
 				mapping.put(key.substring(prefix.length() - 1), vals[0]);
