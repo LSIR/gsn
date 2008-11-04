@@ -179,7 +179,7 @@
                 }
 
                 function add_data_output () {
-                    $('#data-outputs').append('<li ' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors") + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
+                    $('#data-outputs').append('<li>' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors") + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
                     $('.vss').change(function(){
                         var vs = $(this).val();
                         if (vs == 'All') {
