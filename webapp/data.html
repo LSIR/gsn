@@ -4,11 +4,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <title>GSN</title>
-        <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
         <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="style/ui.datepicker.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+
         <script type="text/javascript" src="js/jquery-1.2.6/jquery-1.2.6.pack.js"></script>
-        <script type="text/javascript" src="js/jquery-1.2.6/jquery-ui-1.5.2.js"></script>
-        <script type="text/javascript" src="js/datePicker.js"></script>
+        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-core-1.5.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-accordion-1.5.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-tabs-1.5.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-datepicker-1.5.2.min.js"></script>
         <script type="text/javascript" src="js/jquery.flot.pack.js"></script>
         <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
         <script type="text/javascript">
@@ -253,6 +257,11 @@
                     }
                 }
 
+                function customRange(input) {
+                    return {minDate: (input.id == "datepicker_to" ? $("#datepicker_from").datepicker("getDate") : null),
+                        maxDate: (input.id == "datepicker_from" ? $("#datepicker_to").datepicker("getDate") : null)};
+                }
+
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
                 $.get("/gsn?REQUEST=0", function(xml){
                     lovs = xml
@@ -290,13 +299,7 @@
                     $('#agg_unit').attr('disabled',$(this).val() == '-1');
                 });
 
-                $('#datepicker_from').datePicker({
-                    startDate:'01/01/2006'
-                });
-
-                $('#datepicker_to').datePicker({
-                    startDate:'01/01/2006'
-                });
+                $("#datepicker_from, #datepicker_to").datepicker({beforeShow: customRange, prevText: "", nextText: "", firstDay: 1, showOn: "both", buttonImage: "/style/calendar.png", buttonImageOnly: true, dateFormat: "dd/mm/yy 00:00:00" });
 
                 $('.download_btn_csv').click(function(){
                     $('#download_format').val('csv');

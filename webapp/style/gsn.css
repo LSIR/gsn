@@ -920,3 +920,11 @@ div.full-page {
     clear:both;
 }
 
+/* datepicker */
+
+.ui-datepicker-prev, .ui-datepicker-next {
+    display: block;
+    width: 1.3em;
+    height: 1.4em;
+    background: #e6e6e6 url(/img/datepicker/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x;
+}
