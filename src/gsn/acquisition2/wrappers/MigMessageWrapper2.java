@@ -11,21 +11,21 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 
 	private static int threadCounter = 0;
 
-	private MigMessageParameters parameters = null;
+	protected MigMessageParameters parameters = null;
 
-	private net.tinyos1x.message.MoteIF moteIFTinyOS1x = null;
-	private net.tinyos.message.MoteIF moteIFTinyOS2x = null;
+	protected net.tinyos1x.message.MoteIF moteIFTinyOS1x = null;
+	protected net.tinyos.message.MoteIF moteIFTinyOS2x = null;
 
-	private net.tinyos1x.message.Message messageTemplateTinyOS1x = null;
-	private net.tinyos.message.Message messageTemplateTinyOS2x = null;
+	protected net.tinyos1x.message.Message messageTemplateTinyOS1x = null;
+	protected net.tinyos.message.Message messageTemplateTinyOS2x = null;
 	
-	private static Map<String,Semaphore> moteIFList1xSemaphore = new HashMap<String,Semaphore> () ;
-	private static Map<String,net.tinyos1x.message.MoteIF> moteIFList1x = new HashMap<String,net.tinyos1x.message.MoteIF> () ;
-	private static Map<String,net.tinyos1x.packet.PhoenixSource> phoenixSourceList1x = new HashMap<String, net.tinyos1x.packet.PhoenixSource> () ;
+	protected static Map<String,Semaphore> moteIFList1xSemaphore = new HashMap<String,Semaphore> () ;
+	protected static Map<String,net.tinyos1x.message.MoteIF> moteIFList1x = new HashMap<String,net.tinyos1x.message.MoteIF> () ;
+	protected static Map<String,net.tinyos1x.packet.PhoenixSource> phoenixSourceList1x = new HashMap<String, net.tinyos1x.packet.PhoenixSource> () ;
 
-	private static Map<String,Semaphore> moteIFList2xSemaphore = new HashMap<String,Semaphore>();
-	private static Map<String,net.tinyos.message.MoteIF> moteIFList2x = new HashMap<String,net.tinyos.message.MoteIF>();
-	private static Map<String,net.tinyos.packet.PhoenixSource> phoenixSourceList2x = new HashMap<String, net.tinyos.packet.PhoenixSource> () ;
+	protected static Map<String,Semaphore> moteIFList2xSemaphore = new HashMap<String,Semaphore>();
+	protected static Map<String,net.tinyos.message.MoteIF> moteIFList2x = new HashMap<String,net.tinyos.message.MoteIF>();
+	protected static Map<String,net.tinyos.packet.PhoenixSource> phoenixSourceList2x = new HashMap<String, net.tinyos.packet.PhoenixSource> () ;
 
 	private final transient Logger logger = Logger.getLogger( MigMessageWrapper2.class );
 

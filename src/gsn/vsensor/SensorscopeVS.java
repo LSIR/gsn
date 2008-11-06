@@ -37,6 +37,7 @@ public class SensorscopeVS extends AbstractVirtualSensor {
 	private static final String SKIN_TEMPERATURE = "SKINTEMPERATURE";
 	private static final String SOIL_MOISTURE = "SOILMOISTURE";
 	private static final String WIND_DIRECTION = "WINDDIRECTION";
+	private static final String WIND_DIRECTION2 = "WINDDIRECTION2";
 	private static final String SOIL_CONDUCTIVITY_1 = "SOILCONDUCTIVITY1";
 	private static final String SOIL_CONDUCTIVITY_2 = "SOILCONDUCTIVITY2";
 	private static final String SOIL_CONDUCTIVITY_3 = "SOILCONDUCTIVITY3";
@@ -91,6 +92,7 @@ public class SensorscopeVS extends AbstractVirtualSensor {
 		double skinTemperature = NO_VALUE;
 		double soilMoisture = NO_VALUE;
 		double windDirection = NO_VALUE;
+		double windDirection2 = NO_VALUE;
 		double soilConductivity1 = NO_VALUE;
 		double soilConductivity2 = NO_VALUE;
 		double soilConductivity3 = NO_VALUE;
@@ -254,10 +256,17 @@ public class SensorscopeVS extends AbstractVirtualSensor {
 				dataTypes.add(DataTypes.DOUBLE);
 				datas.add(soilMoisture);
 			} else if(fieldName.equals(WIND_DIRECTION)) {
+				logger.debug("WIND_DIRECTION found"); // TODO
 				windDirection = getWindDirection((Integer) ((Number)dataFields[i]).intValue());
 				fieldNames.add(WIND_DIRECTION);
 				dataTypes.add(DataTypes.DOUBLE);
 				datas.add(windDirection);
+			} else if(fieldName.equals(WIND_DIRECTION2)) {
+				logger.debug("WIND_DIRECTION2 found"); // TODO
+				windDirection2 = getWindDirection2((Integer) ((Number)dataFields[i]).intValue());
+				fieldNames.add(WIND_DIRECTION2);
+				dataTypes.add(DataTypes.DOUBLE);
+				datas.add(windDirection2);
 			} else if(fieldName.equals(FOO)) {
 				foo = (Short) dataFields[i];
 				fieldNames.add(FOO);
@@ -336,6 +345,34 @@ public class SensorscopeVS extends AbstractVirtualSensor {
 
 	public double getWindDirection (int rawValue) {
 		return ( ( rawValue * 2.5 * 1.4545 ) / 4095.0 ) * 360.0 / 3.3;
+	}
+	
+	public double getWindDirection2 (int rawValue) {
+		double v   = rawValue * 2.5 / 4095.0;
+		double vcc = 3.0;
+		double R1  = 20.0;
+		double R2  = 10.0;
+		double R30 = 22.0;
+		double R31 = 10.0;
+		double k = 360.0 / 337.0;
+		double R3;
+		if (R31 > 0) {
+			R3 = (R30 * R31) / (R30 + R31);
+		}
+		else {
+			R3 = R30;
+		}
+		double a = R1 * v;
+		
+		double b = 360.0 * (vcc * R3 - v * R1);
+		double c = -360.0 * 360.0 * v * (R2 + R3);
+		double d = Math.sqrt((b * b) - (4.0 * a * c));
+		if (v > 0.0) {
+			return (((d - b) / (2.0 * a)) * k) % 360.0;
+		}
+		else {
+			return NO_VALUE;
+		}
 	}
 
 	public double getWindSpeed (int rawValue) {

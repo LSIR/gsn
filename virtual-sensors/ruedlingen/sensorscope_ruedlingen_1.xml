@@ -14,14 +14,10 @@
 			<field name="SOILMOISTURE"		type="DOUBLE" />
 			<field name="SOLARRADIATION"	type="DOUBLE" />
 			<field name="WATERMARK"			type="DOUBLE" />
-			<field name="WINDDIRECTION"		type="DOUBLE" />
+			<field name="WINDDIRECTION2"	type="DOUBLE" />
 			<field name="WINDSPEED"			type="DOUBLE" />
 		</output-structure>
 	</processing-class>
-	
-	sampling-time
-	
-	
 	<description>Node 1 from the Ruedlingen deployment</description>
 	<life-cycle pool-size="10" />
 	<addressing>
@@ -37,14 +33,14 @@
 					<predicate key="ss-host">localhost</predicate>
 					<predicate key="ss-port">25000</predicate>
 					<predicate key="continue-on-error">true</predicate>
-					<predicate key="wrapper-name">mig2</predicate>
+					<predicate key="wrapper-name">sensmig2</predicate>
 					<predicate key="wrapper-keep-processed-ss-entries">false</predicate>
 					<predicate key="source">sf@micssrv32.epfl.ch:2233</predicate>
 					<predicate key="message-classname">gsn.wrappers.tinyos.RuedlingenData</predicate>
 				</address>
 				<query>select * from wrapper where REPORTER_ID = 1</query>
 			</source>
-			<query>select TIMED							AS TIMED,	
+			<query>select TIMED	* 1000					AS TIMED,	
 						  REPORTER_ID 					AS REPORTERID,		
 						  TIMESTAMP						AS TIMESTAMP,		
 						  AIRHUMIDITY					AS AIRHUMIDITY,		
@@ -54,7 +50,7 @@
 						  SOILMOISTURE					AS SOILMOISTURE,	
 						  SOLARRADIATION				AS SOLARRADIATION,	
 						  WATERMARK						AS WATERMARK,		
-						  WINDDIRECTION					AS WINDDIRECTION,	
+						  WINDDIRECTION					AS WINDDIRECTION2,	
 						  WINDSPEED						AS WINDSPEED from ruedlingen</query>
 		</stream>
 	</streams>
