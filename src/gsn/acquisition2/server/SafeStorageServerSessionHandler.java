@@ -8,19 +8,17 @@ import gsn.acquisition2.wrappers.AbstractWrapper2;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Hashtable;
 import org.apache.log4j.Logger;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 
 public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
-
-	private Hashtable<IoSession,SessionState> sessionStates;
+	
+	private static final String SESSION_STATE_KEY = "ssk";
 	
 	private SafeStorage ss;
 
 	public SafeStorageServerSessionHandler(SafeStorage ss) throws ClassNotFoundException, SQLException {
-		sessionStates = new Hashtable<IoSession, SessionState> () ;
 		this.ss = ss;
 	}
 
@@ -52,7 +50,7 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 			else {
 				sstate.setSuccessAckUpdatePS(ss.getStorage().createPreparedStatement("delete from " + wrapper.getTableName() + " where pk = ? "));
 			}
-			sessionStates.put(session, sstate) ;
+			session.setAttribute(SESSION_STATE_KEY, sstate);
 		}
 		if (message instanceof AcknowledgmentMsg) {
 			AcknowledgmentMsg ack = (AcknowledgmentMsg)message;
@@ -60,10 +58,9 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 				logger.error("Recieved Nack for Hello Message sent for "+((HelloMsg) message).getWrapperDetails().toString());
 				logger.error("Closing the connection to the SafeStorageServer...");
 				session.close();
-				sessionStates.remove(session);
 				return;
 			}else {
-				SessionState sstate = sessionStates.get(session);
+				SessionState sstate = (SessionState) session.getAttribute(SESSION_STATE_KEY);
 				if (sstate != null) {
 					sstate.getSuccessAckUpdatePS().clearParameters();
 					sstate.getSuccessAckUpdatePS().setLong(1, ack.getSeqNumber());
@@ -86,7 +83,7 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 	 */
 	private void postData(IoSession session) throws SQLException, InterruptedException{
 		
-		SessionState sstate = sessionStates.get(session);
+		SessionState sstate = (SessionState) session.getAttribute(SESSION_STATE_KEY);
 		if (sstate == null) {
 			logger.error("No Session State found for session >" + session + "<");
 			return ;
@@ -109,7 +106,7 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 
 	public void sessionClosed(IoSession session) throws Exception {
 		
-		SessionState sstate = sessionStates.get(session);
+		SessionState sstate =  (SessionState) session.getAttribute(SESSION_STATE_KEY);
 		if (sstate == null) {
 			logger.error("No Session State found for session >" + session + "<");
 			return ;
@@ -117,7 +114,6 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 		
 		if (sstate.getReaderPS() != null) sstate.getReaderPS().close();
 		if (sstate.getSuccessAckUpdatePS() != null) sstate.getSuccessAckUpdatePS().close();
-		sessionStates.remove(session);
 		
 		logger.warn("Session >" + session + "< is closed");
 		
