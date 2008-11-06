@@ -1,4 +1,4 @@
-<virtual-sensor name="ruedlingen_sensorscope_1" priority="10" >
+<virtual-sensor name="ruedlingen_sensorscope_n1" priority="10" >
 	<processing-class>
 		<class-name>gsn.vsensor.SensorscopeVS</class-name>
 		<init-params>
@@ -40,7 +40,7 @@
 				</address>
 				<query>select * from wrapper where REPORTER_ID = 1</query>
 			</source>
-			<query>select TIMED	* 1000					AS TIMED,	
+			<query>select TIMESTAMP	* 1000				AS TIMED,	
 						  REPORTER_ID 					AS REPORTERID,		
 						  TIMESTAMP						AS TIMESTAMP,		
 						  AIRHUMIDITY					AS AIRHUMIDITY,		
