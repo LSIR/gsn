@@ -18,12 +18,14 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 
 	private net.tinyos1x.message.Message messageTemplateTinyOS1x = null;
 	private net.tinyos.message.Message messageTemplateTinyOS2x = null;
-
-	private static Map<String,Semaphore> moteIFList1xSemaphore = new HashMap<String,Semaphore>();
-	private static Map<String,net.tinyos1x.message.MoteIF> moteIFList1x = new HashMap<String,net.tinyos1x.message.MoteIF>();
 	
+	private static Map<String,Semaphore> moteIFList1xSemaphore = new HashMap<String,Semaphore> () ;
+	private static Map<String,net.tinyos1x.message.MoteIF> moteIFList1x = new HashMap<String,net.tinyos1x.message.MoteIF> () ;
+	private static Map<String,net.tinyos1x.packet.PhoenixSource> phoenixSourceList1x = new HashMap<String, net.tinyos1x.packet.PhoenixSource> () ;
+
 	private static Map<String,Semaphore> moteIFList2xSemaphore = new HashMap<String,Semaphore>();
 	private static Map<String,net.tinyos.message.MoteIF> moteIFList2x = new HashMap<String,net.tinyos.message.MoteIF>();
+	private static Map<String,net.tinyos.packet.PhoenixSource> phoenixSourceList2x = new HashMap<String, net.tinyos.packet.PhoenixSource> () ;
 
 	private final transient Logger logger = Logger.getLogger( MigMessageWrapper2.class );
 
@@ -31,12 +33,8 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 	public boolean initialize() {
 		logger.warn("tinyos wrapper initialize started...");
 		try {
-
 			parameters = new MigMessageParameters();
 			parameters.initParameters(getActiveAddressBean());
-
-			//
-			logger.debug("Connecting to " + parameters.getTinyosSource());
 			if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
 				// create a semaphore for each source/address
 				Semaphore sem;
@@ -49,38 +47,19 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 						moteIFList1xSemaphore.put(parameters.getTinyosSource(), sem);
 					}
 				}
-
 				sem.acquire();
-
-				if (!moteIFList1x.containsKey(parameters.getTinyosSource())) {
+				// Create the source
+				if ( ! phoenixSourceList1x.containsKey(parameters.getTinyosSource())) {
 					// Create the source
 					logger.debug("Create new source >" + parameters.getTinyosSource() + "<.");
 					net.tinyos1x.packet.PhoenixSource phoenixSourceTinyOS1x = net.tinyos1x.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos1x.util.PrintStreamMessenger.err);
 					if (phoenixSourceTinyOS1x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
+					phoenixSourceList1x.put(parameters.getTinyosSource(), phoenixSourceTinyOS1x);
 					phoenixSourceTinyOS1x.setResurrection();
-					moteIFTinyOS1x = new net.tinyos1x.message.MoteIF(phoenixSourceTinyOS1x);
-					moteIFList1x.put(parameters.getTinyosSource(), moteIFTinyOS1x);
 				}
-				else {
-					logger.debug("Reusing source >" + parameters.getTinyosSource() + "<.");
-					moteIFTinyOS1x = (net.tinyos1x.message.MoteIF) moteIFList1x.get(parameters.getTinyosSource());
-				}
-
 				sem.release();
-
-				// Register to the message type
-				logger.debug("Register message >" + parameters.getTinyosMessageName() + "< to source.");
-				Class<?> messageClass = Class.forName(parameters.getTinyosMessageName());
-				if (parameters.getTinyOSMessageLength() == -1) {
-					moteIFTinyOS1x.registerListener((net.tinyos1x.message.Message) messageClass.newInstance(), this);
-				}
-				else {
-					Constructor<?> messageConstructor = messageClass.getConstructor(int.class);
-					moteIFTinyOS1x.registerListener((net.tinyos1x.message.Message) messageConstructor.newInstance(parameters.getTinyOSMessageLength()), this);
-				}
 			}
 			else {
-				
 				// create a semaphore for each source/address
 				Semaphore sem;
 				synchronized (moteIFList2xSemaphore) {
@@ -92,43 +71,19 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 						moteIFList2xSemaphore.put(parameters.getTinyosSource(), sem);
 					}
 				}
-
 				sem.acquire();
-				
-				if (! moteIFList2x.containsKey(parameters.getTinyosSource())) {
+				// Create the source
+				if ( ! phoenixSourceList2x.containsKey(parameters.getTinyosSource())) {
 					// Create the source
-					net.tinyos.packet.PhoenixSource phoenixSourceTinyOS2x = net.tinyos.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos.util.PrintStreamMessenger.err) ;
-					if (phoenixSourceTinyOS2x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.") ; 
-					phoenixSourceTinyOS2x.setResurrection() ;
-					phoenixSourceTinyOS2x.start();
-					moteIFTinyOS2x = new net.tinyos.message.MoteIF (phoenixSourceTinyOS2x) ;
-					moteIFList2x.put(parameters.getTinyosSource(), moteIFTinyOS2x);
+					logger.debug("Create new source >" + parameters.getTinyosSource() + "<.");
+					net.tinyos.packet.PhoenixSource phoenixSourceTinyOS2x = net.tinyos.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos.util.PrintStreamMessenger.err);
+					if (phoenixSourceTinyOS2x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
+					phoenixSourceList2x.put(parameters.getTinyosSource(), phoenixSourceTinyOS2x);
+					phoenixSourceTinyOS2x.setResurrection();
 				}
-				else {
-					logger.debug("Reusing source >" + parameters.getTinyosSource() + "<.");
-					moteIFTinyOS2x = (net.tinyos.message.MoteIF) moteIFList2x.get(parameters.getTinyosSource());
-				}
-				
 				sem.release();
-				
-				// Register to message type
-				logger.debug("Register message >" + parameters.getTinyosMessageName() + "< to source.");
-				Class<?> messageClass = Class.forName(parameters.getTinyosMessageName());
-				if (parameters.getTinyOSMessageLength() == -1) {
-					moteIFTinyOS2x.registerListener((net.tinyos.message.Message) messageClass.newInstance(), this);
-				}
-				else {
-					Constructor<?> messageConstructor = messageClass.getConstructor(int.class);
-					moteIFTinyOS2x.registerListener((net.tinyos.message.Message) messageConstructor.newInstance(parameters.getTinyOSMessageLength()), this);
-				}
 			}
-			logger.debug("Connected to >" + parameters.getTinyosSource() + "<");
-		}
-		catch (ClassNotFoundException e) {
-			logger.error("Unable to find the >" + parameters.getTinyosMessageName() + "< class.");
-			return false;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
@@ -138,7 +93,80 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 	}
 
 	@Override
-	public void run() {}
+	public void run() {
+		try {
+		//
+		logger.debug("Connecting to " + parameters.getTinyosSource());
+		if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
+
+			Semaphore sem = moteIFList1xSemaphore.get(parameters.getTinyosSource());
+			
+			// Build the Mote interface
+			sem.acquire();
+			if (! moteIFList1x.containsKey(parameters.getTinyosSource())) {
+				net.tinyos1x.packet.PhoenixSource phoenixSourceTinyOS1x = phoenixSourceList1x.get(parameters.getTinyosSource());
+				moteIFTinyOS1x = new net.tinyos1x.message.MoteIF(phoenixSourceTinyOS1x);
+				moteIFList1x.put(parameters.getTinyosSource(), moteIFTinyOS1x);
+			}
+			else {
+				logger.debug("Reusing source >" + parameters.getTinyosSource() + "<.");
+				moteIFTinyOS1x = (net.tinyos1x.message.MoteIF) moteIFList1x.get(parameters.getTinyosSource());
+			}
+			sem.release();
+
+			// Register to the message type
+			logger.debug("Register message >" + parameters.getTinyosMessageName() + "< to source.");
+			Class<?> messageClass = Class.forName(parameters.getTinyosMessageName());
+			
+			if (parameters.getTinyOSMessageLength() == -1) {
+				messageTemplateTinyOS1x = (net.tinyos1x.message.Message) messageClass.newInstance();
+			}
+			else {
+				Constructor<?> messageConstructor = messageClass.getConstructor(int.class);
+				messageTemplateTinyOS1x = (net.tinyos1x.message.Message) messageConstructor.newInstance(parameters.getTinyOSMessageLength());
+			}
+			moteIFTinyOS1x.registerListener(messageTemplateTinyOS1x, this);
+
+		}
+		else {
+			
+			Semaphore sem = moteIFList2xSemaphore.get(parameters.getTinyosSource());
+			
+			// Build the Mote interface
+			sem.acquire();
+			if (! moteIFList2x.containsKey(parameters.getTinyosSource())) {
+				net.tinyos.packet.PhoenixSource phoenixSourceTinyOS2x = phoenixSourceList2x.get(parameters.getTinyosSource());
+				moteIFTinyOS2x = new net.tinyos.message.MoteIF(phoenixSourceTinyOS2x);
+				moteIFList2x.put(parameters.getTinyosSource(), moteIFTinyOS2x);
+			}
+			else {
+				logger.debug("Reusing source >" + parameters.getTinyosSource() + "<.");
+				moteIFTinyOS2x = (net.tinyos.message.MoteIF) moteIFList2x.get(parameters.getTinyosSource());
+			}
+			sem.release();
+
+			// Register to the message type
+			logger.debug("Register message >" + parameters.getTinyosMessageName() + "< to source.");
+			Class<?> messageClass = Class.forName(parameters.getTinyosMessageName());
+			
+			if (parameters.getTinyOSMessageLength() == -1) {
+				messageTemplateTinyOS2x = (net.tinyos.message.Message) messageClass.newInstance();
+			}
+			else {
+				Constructor<?> messageConstructor = messageClass.getConstructor(int.class);
+				messageTemplateTinyOS2x = (net.tinyos.message.Message) messageConstructor.newInstance(parameters.getTinyOSMessageLength());
+			}
+			moteIFTinyOS2x.registerListener(messageTemplateTinyOS2x, this);
+			
+		}
+		logger.debug("Connected to >" + parameters.getTinyosSource() + "<");
+		}
+		catch (ClassNotFoundException e) {
+			logger.error("Unable to find the >" + parameters.getTinyosMessageName() + "< class.");
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
 
 	@Override
 	public void finalize() {
