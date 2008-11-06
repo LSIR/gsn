@@ -146,8 +146,6 @@ public class QueriesBuilder {
 
 			partFields = new StringBuilder () ;
 			for (int i = 0 ; i < fields.length ; i++) {
-				if (fields[i].equalsIgnoreCase("timed") && aggregationCriterion!=null)
-					continue;
 				if (partFields.length()>0)
 					partFields.append(", ");
 				if (aggregationCriterion != null) 	partFields.append(aggregationCriterion.getGroupOperator() + "(");
@@ -157,11 +155,12 @@ public class QueriesBuilder {
 			}										
 
 			if (aggregationCriterion != null) {
-				if (partFields.length() > 0)
+				if (partFields.length() > 0) {
 					partFields.append(", ");
-				partFields.append("floor(timed/" + aggregationCriterion.getTimeRange() + ") as timed ");
+				}
+				partFields.append("floor(timed/" + aggregationCriterion.getTimeRange() + ") as aggregation_interval ");
 			}
-			else 								partFields.append(" ");
+			else partFields.append(" ");
 
 
 			// Build a final query
@@ -171,7 +170,7 @@ public class QueriesBuilder {
 			sqlQuery.append("from ").append(vsname).append(" ");
 			sqlQuery.append(partStandardCriteria);
 			if (aggregationCriterion == null)	sqlQuery.append("order by timed desc ");
-			else 								sqlQuery.append("group by timed desc ");
+			else 								sqlQuery.append("group by aggregation_interval desc ");
 
 			logger.debug("SQL Query built >" + sqlQuery.toString() + "<");
 
