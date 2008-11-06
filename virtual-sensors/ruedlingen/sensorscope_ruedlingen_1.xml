@@ -1,4 +1,4 @@
-<virtual-sensor name="ruedlingen_sensorscope_n1" priority="10" >
+<virtual-sensor name="ruedlingen_sensorscope_s1" priority="10" >
 	<processing-class>
 		<class-name>gsn.vsensor.SensorscopeVS</class-name>
 		<init-params>
@@ -38,31 +38,21 @@
 					<predicate key="source">sf@micssrv32.epfl.ch:2233</predicate>
 					<predicate key="message-classname">gsn.wrappers.tinyos.RuedlingenData</predicate>
 				</address>
-                                <query>select TIMESTAMP * 1000                          AS TIMED,
-                                                  REPORTER_ID                           AS REPORTER_ID,
-                                                  TIMESTAMP                             AS TIMESTAMP,
-                                                  AIRHUMIDITY                           AS AIRHUMIDITY,
-                                                  AIRTEMPERATURE                        AS AIRTEMPERATURE,
-                                                  RAINMETER                             AS RAINMETER,
-                                                  SKINTEMPERATURE                       AS SKINTEMPERATURE,
-                                                  SOILMOISTURE                          AS SOILMOISTURE,
-                                                  SOLARRADIATION                        AS SOLARRADIATION,
-                                                  WATERMARK                             AS WATERMARK,
-                                                  WINDDIRECTION                         AS WINDDIRECTION,
-                                                  WINDSPEED                             AS WINDSPEED from wrapper where REPORTER_ID = 1</query>
+                <query>select TIMESTAMP * 1000		AS TIMED,
+                              REPORTER_ID           AS REPORTERID,
+                              TIMESTAMP             AS TIMESTAMP,
+                              AIRHUMIDITY           AS AIRHUMIDITY,
+                              AIRTEMPERATURE        AS AIRTEMPERATURE,
+                              RAINMETER             AS RAINMETER,
+                              SKINTEMPERATURE       AS SKINTEMPERATURE,
+                              SOILMOISTURE          AS SOILMOISTURE,
+                              SOLARRADIATION        AS SOLARRADIATION,
+                              WATERMARK             AS WATERMARK,
+                              WINDDIRECTION         AS WINDDIRECTION2,
+                              WINDSPEED             AS WINDSPEED from wrapper where REPORTER_ID = 1</query>
                         </source>
-                        <query>select             TIMED                                         AS TIMED,
-                                                  REPORTER_ID                                   AS REPORTERID,
-                                                  TIMESTAMP                                             AS TIMESTAMP,
-                                                  AIRHUMIDITY                                   AS AIRHUMIDITY,
-                                                  AIRTEMPERATURE                                AS AIRTEMPERATURE,
-                                                  RAINMETER                                             AS RAINMETER,
-                                                  SKINTEMPERATURE                               AS SKINTEMPERATURE,
-                                                  SOILMOISTURE                                  AS SOILMOISTURE,
-                                                  SOLARRADIATION                                AS SOLARRADIATION,
-                                                  WATERMARK                                             AS WATERMARK,
-                                                  WINDDIRECTION                                 AS WINDDIRECTION2,
-                                                  WINDSPEED                                             AS WINDSPEED from ruedlingen</query>
+                        <query>select * from ruedlingen</query>
 		</stream>
 	</streams>
 </virtual-sensor>
+
