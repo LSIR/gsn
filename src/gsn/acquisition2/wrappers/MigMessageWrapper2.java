@@ -47,17 +47,17 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 						moteIFList1xSemaphore.put(parameters.getTinyosSource(), sem);
 					}
 				}
-				sem.acquire();
-				// Create the source
-				if ( ! phoenixSourceList1x.containsKey(parameters.getTinyosSource())) {
+				synchronized (phoenixSourceList1x) {
 					// Create the source
-					logger.debug("Create new source >" + parameters.getTinyosSource() + "<.");
-					net.tinyos1x.packet.PhoenixSource phoenixSourceTinyOS1x = net.tinyos1x.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos1x.util.PrintStreamMessenger.err);
-					if (phoenixSourceTinyOS1x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
-					phoenixSourceList1x.put(parameters.getTinyosSource(), phoenixSourceTinyOS1x);
-					phoenixSourceTinyOS1x.setResurrection();
+					if ( ! phoenixSourceList1x.containsKey(parameters.getTinyosSource())) {
+						// Create the source
+						logger.debug("Create new source >" + parameters.getTinyosSource() + "<.");
+						net.tinyos1x.packet.PhoenixSource phoenixSourceTinyOS1x = net.tinyos1x.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos1x.util.PrintStreamMessenger.err);
+						if (phoenixSourceTinyOS1x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
+						phoenixSourceList1x.put(parameters.getTinyosSource(), phoenixSourceTinyOS1x);
+						phoenixSourceTinyOS1x.setResurrection();
+					}
 				}
-				sem.release();
 			}
 			else {
 				// create a semaphore for each source/address
@@ -71,17 +71,17 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 						moteIFList2xSemaphore.put(parameters.getTinyosSource(), sem);
 					}
 				}
-				sem.acquire();
-				// Create the source
-				if ( ! phoenixSourceList2x.containsKey(parameters.getTinyosSource())) {
+				synchronized (phoenixSourceList2x) {
 					// Create the source
-					logger.debug("Create new source >" + parameters.getTinyosSource() + "<.");
-					net.tinyos.packet.PhoenixSource phoenixSourceTinyOS2x = net.tinyos.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos.util.PrintStreamMessenger.err);
-					if (phoenixSourceTinyOS2x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
-					phoenixSourceList2x.put(parameters.getTinyosSource(), phoenixSourceTinyOS2x);
-					phoenixSourceTinyOS2x.setResurrection();
+					if ( ! phoenixSourceList2x.containsKey(parameters.getTinyosSource())) {
+						// Create the source
+						logger.debug("Create new source >" + parameters.getTinyosSource() + "<.");
+						net.tinyos.packet.PhoenixSource phoenixSourceTinyOS2x = net.tinyos.packet.BuildSource.makePhoenix(parameters.getTinyosSource(), net.tinyos.util.PrintStreamMessenger.err);
+						if (phoenixSourceTinyOS2x == null) throw new IOException ("The source >" + parameters.getTinyosSource() + "< is not valid.");
+						phoenixSourceList2x.put(parameters.getTinyosSource(), phoenixSourceTinyOS2x);
+						phoenixSourceTinyOS2x.setResurrection();
+					}
 				}
-				sem.release();
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
