@@ -29,7 +29,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
     this.remoteAddress = remoteAddress;
   }
 
-  public static boolean deliverData ( int notificationCode ,  Object [] fieldNamesInStreamElement ,  Object [] fieldValues , String timeStampStr ) {
+  public boolean deliverData ( int notificationCode ,  Object [] fieldNamesInStreamElement ,  Object [] fieldValues , String timeStampStr ) {
     long timeStamp = Long.parseLong( timeStampStr );
     AbstractWrapper remoteWrapper = Mappings.getContainer( ).findNotificationCodeListener( notificationCode );
     if ( remoteWrapper == null ) { // This client is no more interested
@@ -104,7 +104,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
    * @param virtualSensorName
    * @return
    */
-  public static String [ ][ ] getOutputStructure ( String virtualSensorName ) {
+  public String [ ][ ] getOutputStructure ( String virtualSensorName ) {
     if ( virtualSensorName == null || ( virtualSensorName = virtualSensorName.trim( ).toLowerCase( ) ).length( ) == 0 ) {
       logger.warn( "Bad request received for Data_strctutes" );
       return new String [ ] [ ] {};
