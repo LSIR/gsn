@@ -46,7 +46,7 @@ public class MigMessageSensorscopeWrapper extends MigMessageWrapper2 {
 			logger.debug("Sensorscope Maintenance message received");
 			// update the timestamp offset
 			gsn.wrappers.tinyos.SensorscopeMaintenance messageMaintenance = (gsn.wrappers.tinyos.SensorscopeMaintenance) tosmsg;
-			last_timestamp_offset = 1000 * messageMaintenance.get_timestamp_offset();
+			last_timestamp_offset = messageMaintenance.get_timestamp_offset();
 			logger.debug("New Sensorscope timestamp offset >" + last_timestamp_offset + "<");
 		}
 		else {
@@ -54,10 +54,10 @@ public class MigMessageSensorscopeWrapper extends MigMessageWrapper2 {
 			if (tosmsg instanceof gsn.wrappers.tinyos.RuedlingenData) {
 				// update the timestamp in the message
 				gsn.wrappers.tinyos.RuedlingenData m = (gsn.wrappers.tinyos.RuedlingenData) tosmsg;
-				long updatedTimeStamp = last_timestamp_offset + m.get_timestamp();
+				long updatedTimeStamp = last_timestamp_offset + (m.get_timestamp() / 1024);
 				logger.debug("timestamp from message >" + m.get_timestamp() + "<");
 				logger.debug("timestamp with offset >" + updatedTimeStamp + "<");
-				m.set_timestamp((long)(updatedTimeStamp / 1000));
+				m.set_timestamp(updatedTimeStamp);
 			}
 			else {
 				logger.error("Unknow message");
