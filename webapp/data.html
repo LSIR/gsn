@@ -221,14 +221,12 @@
                 function prepare_form_for_submission(tag){
                     var counter = 0;
                     tag.parents('form').find('.data-outputs-container li').each(function(){
-                        $(this).find('.deployments').each(function(){$(this).attr('name','deployment['+counter+']');});
                         $(this).find('.vss').each(function(){$(this).attr('name','vs['+counter+']');});
                         $(this).find('.fields').each(function(){$(this).attr('name','field['+counter+']');});
                         counter++;
                     });
                     counter = 0;
                     tag.parents('form').find('.conditions-container li').each(function(){
-                        $(this).find('.deployments').each(function(){$(this).attr('name','c_deployment['+counter+']');});
                         $(this).find('.vss').each(function(){$(this).attr('name','c_vs['+counter+']');});
                         $(this).find('.fields').each(function(){$(this).attr('name','c_field['+counter+']');});
                         $(this).find('.join').each(function(){$(this).attr('name','c_join['+counter+']');});
@@ -315,9 +313,20 @@
 
                 $('.download_btn_pdf').click(function(){
                     $('#download_format').val('pdf');
+                    var max_limit = 5000 ;
+                    var limit_enabled = $('#nb').val() != 'ALL';
+                    var limit = $('#nb_value').val();
+                    if (!limit_enabled || limit > max_limit) {
+                        $('#nb_value').val(max_limit);
+                        $('#nb_value').attr('disabled',false);
+                        $('#nb').val('SPECIFIED');
+                        alert("The report functionality is limited to " + max_limit + " rows per virtual sensor.");
+                    }
                     prepare_form_for_submission($(this));
                     return true;
                 });
+
+    
 
                 $(".plot").click(function(){
                     datasets={};
