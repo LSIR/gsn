@@ -350,9 +350,12 @@ public class StorageManager {
   }
 
   public ResultSet executeQueryWithResultSet(AbstractQuery abstractQuery,Connection c) throws SQLException {
-    DATABASE db = getDatabaseForConnection(c);
-    String query = db.addLimit(abstractQuery.getStandardQuery().toString(), abstractQuery.getLimitCriterion().getSize(), abstractQuery.getLimitCriterion().getOffset());
-    return executeQueryWithResultSet(new StringBuilder(query),c);
+	  if (abstractQuery.getLimitCriterion() == null) {
+		  return executeQueryWithResultSet(abstractQuery.getStandardQuery(), c);
+	  }
+	  DATABASE db = getDatabaseForConnection(c);
+	  String query = db.addLimit(abstractQuery.getStandardQuery().toString(), abstractQuery.getLimitCriterion().getSize(), abstractQuery.getLimitCriterion().getOffset());
+	  return executeQueryWithResultSet(new StringBuilder(query),c);
   }
 
   public static DataEnumerator executeQuery(StringBuilder query,boolean binaryFieldsLinked, Connection connection) throws SQLException {

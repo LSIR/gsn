@@ -1,11 +1,6 @@
 package gsn.http.datarequest;
 
-import gsn.Container;
-import gsn.ContainerImpl;
 import gsn.Mappings;
-import gsn.VSensorLoader;
-import gsn.VirtualSensorPool;
-import gsn.beans.ContainerConfig;
 import gsn.reports.ReportManager;
 import gsn.reports.beans.Data;
 import gsn.reports.beans.Report;
@@ -91,7 +86,7 @@ public class DownloadReport extends AbstractDataRequest {
 			// Get the last update for this Virtual Sensor (In GSN, all the Virtual Sensor streams are inserted in the same record)
 			String configFileName = Mappings.getVSensorConfig(vsname).getFileName();
 			long last = Mappings.getLastModifiedTime(configFileName);
-			String lastModified = lastModified = (qbuilder.getSdf() == null ? "UNIX: " + last : qbuilder.getSdf().format(new Date(last)));
+			String lastModified = (qbuilder.getSdf() == null ? "UNIX: " + last : qbuilder.getSdf().format(new Date(last)));
 
 			// Create the streams
 			ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(qbuilder.getSqlQueries().get(vsname), StorageManager.getInstance().getConnection());
