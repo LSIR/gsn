@@ -42,10 +42,6 @@
 			<web-resource-name>MultiDataDownload</web-resource-name>
 			<url-pattern>/multidata</url-pattern>
 		</web-resource-collection>
-		<web-resource-collection>
-			<web-resource-name>ReportDownload</web-resource-name>
-			<url-pattern>/report</url-pattern>
-		</web-resource-collection>
 		<auth-constraint>
 			<role-name>gsnuser</role-name>
 		</auth-constraint>
@@ -109,11 +105,6 @@
         <display-name>GSN Multiple Field Download</display-name>
         <servlet-class>gsn.http.MultiDataDownload</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>ReportDownload</servlet-name>
-        <display-name>GSN Report Download</display-name>
-        <servlet-class>gsn.http.ReportDownload</servlet-class>
-    </servlet>
    
 	<!-- mapping for GSN -->
 	<servlet-mapping>
@@ -143,10 +134,6 @@
 	<servlet-mapping>
         <servlet-name>MultiDataDownload</servlet-name>
         <url-pattern>/multidata</url-pattern>
-    </servlet-mapping>
-	<servlet-mapping>
-        <servlet-name>ReportDownload</servlet-name>
-        <url-pattern>/report</url-pattern>
     </servlet-mapping>
 	<!-- GSN END -->
 	
