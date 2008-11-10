@@ -313,6 +313,12 @@
                     return true;
                 });
 
+                $('.download_btn_pdf').click(function(){
+                    $('#download_format').val('pdf');
+                    prepare_form_for_submission($(this));
+                    return true;
+                });
+
                 $(".plot").click(function(){
                     datasets={};
                     csv_to_json($(this),drawChart);
@@ -454,10 +460,11 @@
                                             <div id="fragment-1-1">
                                                 <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
                                                 <input class="ui-default-state download_btn_xml" name="commit" type="submit" value="Download XML" />
-                                                <!--<input class="ui-default-state download_btn_pdf" name="commit" type="submit" value="Generate PDF" />-->
+                                                <input class="ui-default-state download_btn_pdf" name="commit" type="submit" value="Generate PDF" />
                                                 <span>Time Format</span>
                                                 <select id="time_format" name="time_format"><option value="iso">ISO 8601</option><option value="unix">UNIX</option></select>
                                                 <input id="download_format" type="hidden" name="download_format" value="csv"></input>
+                                                <input id="reportclass" type="hidden" name="reportclass" value="report-default"></input>
                                             </div>
                                             <div id="fragment-1-2">
                                                 <div class="chart_box">

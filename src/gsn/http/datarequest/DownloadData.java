@@ -123,7 +123,7 @@ public class DownloadData extends AbstractDataRequest {
 		if (firstLine) {
 			respond.print("#");
 			for (int i = 0 ; i < se.getData().length ; i++) {
-				respond.print(se.getFieldNames()[i].toString());
+				respond.print(se.getFieldNames()[i]);
 				if (i != se.getData().length - 1) respond.print(cvsDelimiter);
 			}
 			if (wantTimed && se.getData().length != 0) respond.print(cvsDelimiter);
@@ -131,7 +131,7 @@ public class DownloadData extends AbstractDataRequest {
 			respond.println();
 		}
 		for (int i = 0 ; i < se.getData().length ; i++) {
-			respond.print(se.getData()[i].toString());
+			respond.print(se.getData()[i]);
 			if (i != se.getData().length - 1) respond.print(cvsDelimiter); 
 		}
 		if (wantTimed) {
@@ -145,14 +145,14 @@ public class DownloadData extends AbstractDataRequest {
 		if (firstLine) {
 			respond.println("\t\t<header>");
 			for (int i = 0 ; i < se.getData().length ; i++) {
-				respond.println("\t\t\t<field>" + se.getFieldNames()[i].toString()+"</field>");
+				respond.println("\t\t\t<field>" + se.getFieldNames()[i] + "</field>");
 			}
 			if (wantTimed) respond.println("\t\t\t<field>timed</field>");
 			respond.println("\t\t</header>");
 		}
 		respond.println("\t\t<tuple>");
 		for (int i = 0 ; i < se.getData().length ; i++) {
-			respond.println("\t\t\t<field>" + se.getData()[i].toString()+"</field>");
+			respond.println("\t\t\t<field>" + se.getData()[i] + "</field>");
 		}
 		if (wantTimed) respond.println("\t\t\t<field>" + ( qbuilder.getSdf() == null ? se.getTimeStamp() : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
 		respond.println("\t\t</tuple>");

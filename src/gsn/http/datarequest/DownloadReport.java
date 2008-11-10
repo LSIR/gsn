@@ -1,6 +1,11 @@
 package gsn.http.datarequest;
 
+import gsn.Container;
+import gsn.ContainerImpl;
 import gsn.Mappings;
+import gsn.VSensorLoader;
+import gsn.VirtualSensorPool;
+import gsn.beans.ContainerConfig;
 import gsn.reports.ReportManager;
 import gsn.reports.beans.Data;
 import gsn.reports.beans.Report;
@@ -84,12 +89,9 @@ public class DownloadReport extends AbstractDataRequest {
 		// create all the streams for this Virtual Sensor
 		try {
 			// Get the last update for this Virtual Sensor (In GSN, all the Virtual Sensor streams are inserted in the same record)
-			StringBuilder lastUpdateSb = new StringBuilder().append("select timed from " + vsname + " order by timed limit 1"); //TODO does it work with other DB?
-			ResultSet lastUpdateRs = StorageManager.getInstance( ).executeQueryWithResultSet(lastUpdateSb);
-			String lastModified;
-			if (lastUpdateRs.next()) lastModified = (qbuilder.getSdf() == null ? "UNIX: " + lastUpdateRs.getLong(1) : qbuilder.getSdf().format(new Date(lastUpdateRs.getLong(1))));
-			else                     lastModified = "No Data";
-			if (lastUpdateRs != null) lastUpdateRs.close();
+			String configFileName = Mappings.getVSensorConfig(vsname).getFileName();
+			long last = Mappings.getLastModifiedTime(configFileName);
+			String lastModified = lastModified = (qbuilder.getSdf() == null ? "UNIX: " + last : qbuilder.getSdf().format(new Date(last)));
 
 			// Create the streams
 			ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(qbuilder.getSqlQueries().get(vsname), StorageManager.getInstance().getConnection());
@@ -112,7 +114,12 @@ public class DownloadReport extends AbstractDataRequest {
 						if (isAllowedReportType(rsmd.getColumnType(columnInResultSet))) {
 							astream = dataStreams.get(vsstream[i]);
 							if (astream != null) {
-								astream.getDatas().add(new Data ("only",rs.getLong("timed"), rs.getDouble(vsstream[i]), "label"));
+								if (rs.getObject(vsstream[i]) != null) {
+									astream.getDatas().add(new Data ("only",rs.getLong("timed"), rs.getDouble(vsstream[i]), "label"));
+								}
+								else {
+									astream.getDatas().add(new Data ("only",rs.getLong("timed"), null, "label"));
+								}
 							}
 						}
 						else logger.debug("Column type >" + rsmd.getColumnType(columnInResultSet) + "< is not allowed for report.");

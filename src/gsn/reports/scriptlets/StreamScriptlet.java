@@ -17,7 +17,7 @@ import org.jfree.chart.JFreeChart;
 
 public class StreamScriptlet  extends JRDefaultScriptlet {
 
-	private SimpleDateFormat sdf = new SimpleDateFormat (Main.getInstance().getContainerConfig().getTimeFormat());
+	private SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 
 	private static GsnChartIF gsnChart = new GsnChartJfreechart();
 
@@ -48,10 +48,10 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 		String startTime				= "NA";
 		String endTime					= "NA";
 		String samplingAverage			= "NA";
-		String samplingAverageUnit		= "NA";
+//		String samplingAverageUnit		= "NA";
 		String nbOfNull					= "0";
 		String samplingStdDeviation		= "NA";
-		String samplingStdDeviationUnit	= "NA";
+//		String samplingStdDeviationUnit	= "NA";
 		
 		Collection<Data> datas = (Collection<Data>) this.getFieldValue("datas");
 		if (datas.size() > 0) {
@@ -69,7 +69,7 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 			Double nextDataValue;
 			while (iter.hasNext()) {
 				nextData = iter.next();
-				if (nextData != null) {
+				if (nextData.getValue() != null) {
 					nextDataValue = (Double) nextData.getValue();
 					//
 					sum_value += nextDataValue;
@@ -94,8 +94,8 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 				nb_value++;
 			}
 			//
-			max 			= max_value.toString();
-			min 			= min_value.toString();
+			max 			= max_value == Double.MIN_VALUE ? "NA" : max_value.toString();
+			min 			= min_value == Double.MAX_VALUE ? "NA" : min_value.toString();
 			nb  			= nb_value.toString();
 			average_value 	= (Double)(sum_value / nb_value);
 			average 		= average_value.toString();
@@ -113,15 +113,15 @@ public class StreamScriptlet  extends JRDefaultScriptlet {
 			int i = 0;
 			while (iter.hasNext()) {
 				nextData = iter.next();
-				if (nextData != null) {
+				if (nextData.getValue() != null) {
 					nextDataValue = (Double) nextData.getValue();
 					variance_value += Math.pow((average_value - nextDataValue), 2);
+					if (i > 0) {
+						sampling_variance_value += Math.pow((sampling_average_value - ((lastDataTime - (Long) nextData.getP2()))), 2);
+						lastDataTime = (Long) nextData.getP2();
+					}
+					i++;
 				}
-				if (i > 0) {
-					sampling_variance_value += Math.pow((sampling_average_value - ((lastDataTime - (Long) nextData.getP2()))), 2);
-					lastDataTime = (Long) nextData.getP2();
-				}
-				i++;
 			}
 			stdDeviation = ((Double)Math.sqrt(variance_value)).toString();
 			if (datas.size() > 1) {

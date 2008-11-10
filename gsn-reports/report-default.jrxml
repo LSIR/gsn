@@ -427,7 +427,7 @@
 					</textElement>
 				<text><![CDATA[Powered by Global Sensor Networks, Ecole Polytechnique Fédérale de Lausanne, 2008]]></text>
 				</staticText>
-				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Page" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						x="425"
 						y="5"
@@ -438,7 +438,7 @@
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="9"/>
 					</textElement>
-				<textFieldExpression   class="java.lang.String"><![CDATA["Page " + String.valueOf($V{PAGE_COUNT}) + " of"]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.String"><![CDATA["Page " + String.valueOf($V{PAGE_NUMBER}) + " of"]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Report" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
