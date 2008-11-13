@@ -4,9 +4,100 @@
 
 \section{How to develop a wrapper}
 
-\subsection{How to develop a Simple Wrapper}
+\subsection{How to develop a Standard Wrapper}
 
 \subsection{How to develop a Safe Storage Wrapper}
-\todo{Refer to the email sent to Mustafa}
+
+This section describes step by step the development of wrappers that support the Safe Storage feature described in the \chapref{safe_storage}.
+As an example to picture this development we use the Safe Storage Memory Monitor wrapper (\inlinecode{ss\_mem\_wrapper}), based on the 
+standard one (\inlinecode{memory-usage}).
+
+\begin{enumerate}
+	\item In the package \inlinecode{gsn.acquisition2.wrappers},
+        create the class that will execute in the Safe Storage process. By convention we name these classes like the following:
+        \inlinecode{<Old wrapper name>2.java} (for our example \inlinecode{MemoryMontoringWrapper2.java}). This class must extend the abstract class
+        \inlinecode{gsn.acquisition2.wrappers.AbstractWrapper2}.
+
+	\item Add a short name link for this new class in the file:\\ \inlinecode{conf/safe\_storage\_wrappers.properties}.\\For our example we added: \\
+        \inlinecode{mem2=gsn.acquisition2.wrappers.MemoryMontoringWrapper2}.
+
+	\item Create the class that will execute on the GSN process. By convention we name these classes like the following:
+	\inlinecode{<Old wrapper name>Processor.java} (for our example \inlinecode{MemoryWrapperProcessor}). This class must extend the abstract class
+	\inlinecode{gsn.acquisition2.wrappers.SafeStorageAbstractWrapper}.
+
+	\item Add a short name definition to this new class in the file:\\ \inlinecode{conf/wrappers.properties}.\\ For our example we added:\\
+	\inlinecode{ss\_mem\_processor=gsn.acquisition2.wrappers.MemoryWrapperProcessor}.
+
+	\item Create a Virtual Sensor Description file for the sensor you will use to test your wrapper. For our example we created the file:\\
+	\inlinecode{virtual-sensors/safe-storage/ss\_mem\_vs.xml}. \\
+	Your \vsd file must contain at least the following predicates which are mandatory for Safe Storage feature as shown in the \tableref{table:safe_storage_parameters}.
+	\begin{xmlcode}
+	<address wrapper="GSN_SHORT_NAME (eg. ss_mem_processor)">
+		<predicate key="ss-host">SAFE_STORAGE_HOST (default: localhost)</predicate>
+		<predicate key="ss-port">SAFE_STORAGE_PORT (default: 25000)</predicate>
+		<predicate key="wrapper-name">SAFE_STORAGE_SHORT_NAME (eg. mem2)</predicate>
+	</address>
+	\end{xmlcode}
+
+	\item Edit the wrapper class that runs on the Safe Storage process (for our example: \inlinecode{MemoryMontoringWrapper2}).
+	Four methods have to be implemented
+
+	\begin{itemize}
+		\item \inlinecode{boolean initialize ()} \\
+		This method is called after the instanciation of the wrapper class.
+		It is used to create the resources according to the parameters set in the configuration file. 
+		Your implementation must return false if some mandatory parameters were missing or if any error
+		arise during this phase. 
+		In the other case, this method must return true.
+		%You can get the parameters values from the \vsd file (tags \inlinecode{<predicate key="..../>}) with the 
+		%\inlinecode{getPredicate[s|Value|ValueAsInt|...]} methods on the ActiveAddressBean instance accessible with the super class 
+		%\inlinecode{getActiveAddressBean()} method. Some of these accessors
+		%throw (Unmanaged) \inlinecode{RuntimeException} if the parameter if missing and should be used for mandatory parameters. If you have parameters that are
+		%optionnal, you should use the \inlinecode{getPredicateValueWithDefault(key, defaultValue)} accessor.
+		
+		\item \inlinecode{void finalize ()} \\
+		This method should be used to free the wrapper ressources. It is called when the wrapper is unloaded.
+
+		\item \inlinecode{String getWrapperName ()} \\
+		This method returns the SafeStorage wrapper's name.
+
+		\item \inlinecode{void run ()} \\
+		Each wrapper runs in a separate thread. Use the run method to get data from your device and store them to
+		the Safe Storage database with the method \inlinecode{postStreamElement (Serializable[])}.
+		Notice that you can pass has many parameters has you want to this method but you must set the current time as the last parameter. 
+		This parameter will tag the creation of the packet in SafeStorage and is only necessary for running SafeStorage. %TODO remove this parameter in the code.
+
+		For our example: \\
+		\inlinecode{postStreamElement(heapMemoryUsage,nonHeapMemoryUsage,pendingFinalizationCount,System.currentTimeMillis());}
+	\end{itemize}
+
+	\item Edit the wrapper class that runs on the GSN part (in our case \inlinecode{MemoryWrapperProcessor}).
+	Two methods have to be implemented
+
+	\begin{itemize}
+		\item \inlinecode{DataField[] getOutputFormat ()} \\
+		This method return an array of fields (names, and types) that are produced by the \wrapper.
+
+		\item \inlinecode{boolean messageToBeProcessed (DataMsg dataMessage)} \\
+		This method is called upon reception of a new message from the SafeStorage.
+		You can access the data (an array of Serializable objects) with the instance method \inlinecode{dataMessage.getData()}.
+		The last element in this array is still the TimeStamp that you added before.\\ % TODO remove this parameter in the code
+		Once you have parsed your data, you must use one of the \inlinecode{postStreamElement()} method to store data into GSN.
+%
+%		\item \inlinecode{postStreamElement(long timestamp, Serializable[] values)} \\
+%		use the specified timestamp.
+%	
+%		\item \inlinecode{postStreamElement(Serializable[] values)} \\
+%		use the current time as timestamp.
+	\end{itemize}
+
+	\item If you need to get some parameters from the VS XML configuration file, to initialize or finalize your wrapper, you can override 
+	the superclass methods:
+
+	\begin{itemize}
+		\item \inlinecode{boolean initialize()}
+		\item \inlinecode{void finalize()}
+	\end{itemize}
+\end{enumerate}
 
 \section{How to cutomize the GSN Reports}

@@ -9,7 +9,7 @@
  Serial ports, network (TCP or UDP) connections, wireless webcams fall in this case. In the latter one, GSN periodically asks the 
  source for new data. This is the case of an RSS feed or a POP3 email account.
 
-\section{Safe Storage}
+\section{Safe Storage \label{safe_storage}}
 
 Some acquisition systems do not internally store the data produced until GSN can process it. For instance 
 the TinyOS Serial Forwarder simply sends a copy of the incoming messages to all its alive listeners. If GSN is down 
@@ -18,32 +18,20 @@ Safe Storage runs in a separate process and it aims is to simply store persisten
 
 These two processes communicate together upon TCP sockets and could run on different machines. The Safe Storage process acts as 
 a server and GSN processes as clients. This communication and the primary storage increase the delay between the data production and the 
-final storage into GSN. This results in a tradeoff between the performances and the reliability. Thus Safe Storage is only supported for by the wrappers
-that are implemented for the less reliable interfaces.
-
-\subsection{Use Cases}
-
-If the GSN process crashes -> the SafeStorage will continue storing the next datas.
-once you restart GSN, all the data will be fetched from Safe Storage
-
-If the Safe Storage process crashes -> The data are not stored at all and GSN will periodically tries to connect to Safe Storage.
-once you restart, all the data will be fetched from the safe storage
-
-If both crashes, once you restart safe storage, it will 'resume' and start recording the incoming for the wrappers that were loaded.
-once you restart GSN the data stored will be fetched automatically.
-
-%if processes stop or communication breaks
-example with a concrete run, ss\_mem\_wrapper
-
-
+final storage into GSN. This results in a tradeoff between the performances and the reliability.
+Moreover, GSN can run both standard wrappers and Safe Storage wrappers at the same time.
 
 \subsection{Software Architecture}
 
-Safe Storage is generic and could be added to all the already existing wrappers. However small modifications need to be done since the
-Safe Storage wrappers are splitted in two parts, one that executes on the Safe Storage process and one that executes on the GSN process.
-Moreover, GSN can manage both simple wrappers and Safe Storage wrappers at the same time.
+Safe Storage is generic and could be added to all the already existing wrappers.
+However small modifications need to be done since the Safe Storage wrappers are splitted in the two following parts
 
-The class that executes on the Safe Storage should be kept as simple as possible and must extends the
+\begin{itemize}
+	\item The acquisition part that runs in the Safe Storage process
+	\item The processing part that runs in the GSN process
+\end{itemize}
+
+The wrapper class that executes on the Safe Storage should be kept as simple as possible and must extends the
 \inlinecode{gsn.acquisition2.wrappers.AbstractWrapper2} abstract class.
 An implementation of this class must define the methods shown on the \listingref{listing:java:safestorage_methods_to_implement}.
 
@@ -66,8 +54,6 @@ public boolean messageToBeProcessed(DataMsg dataMessage)
 \subsubsection{Safe Storage configuration}
 
 All the wrappers that are based on Safe Storage must provide the following list of parameters.
-
-
 
 \begin{xmlcode}[caption={Sample of Email Notification VSD file}, label=listing:xml:safestorage_vsd]
 <virtual-sensor name="ss_mem_vs" priority="10" >
@@ -105,7 +91,23 @@ The Configuration in the build.xml file
 
 <property name="safe-storage-port" value="25000"/>
 
-\subsection{Safe Storage modes}
+
+Controller port in build.xml
+SafeStorage instance port in ??
+
+\subsection{Use Cases}
+
+If the GSN process crashes -> the SafeStorage will continue storing the next datas.
+once you restart GSN, all the data will be fetched from Safe Storage
+
+If the Safe Storage process crashes -> The data are not stored at all and GSN will periodically tries to connect to Safe Storage.
+once you restart, all the data will be fetched from the safe storage
+
+If both crashes, once you restart safe storage, it will 'resume' and start recording the incoming for the wrappers that were loaded.
+once you restart GSN the data stored will be fetched automatically.
+
+%if processes stop or communication breaks
+example with a concrete run, ss\_mem\_wrapper
 
 \section{Virtual Sensors}
 \section{Introduction}
