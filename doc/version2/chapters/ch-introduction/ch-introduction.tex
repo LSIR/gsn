@@ -7,10 +7,10 @@
 	\item A \textbf{Wrapper} (\wrapper) is a piece of Java code that does the data acquisition for a specific type of device. \\
 	\item A \textbf{Virtual Sensor} (\vs) is the main component in \gsn. It receives data from one or more \wrapper. It can combine their data, 
 		process and finally store it. A \vs is defined in a single \vsd and combines different pieces of software 
-		\begin{paraenum}
-			\item One \vsp
-			\item Zero or Many \wrapper
-		\end{paraenum}. \\	
+	\begin{itemize}
+		\item One \vsp
+		\item Zero or Many \wrapper\textit{(s)}
+	\end{itemize}
 	\item A \textbf{Virtual Sensor Description file} (\vsd) is an XML file that contains the selection and the parametrization of the \vsp and \wrapper that compose a \vs.
 		This file also contains the SQL statements that connect them together. \\
 	\item A \textbf{Virtual Sensor Processing class} (\vsp) is a piece of Java code that process and stores the data upon reception from the \wrapper. \\
@@ -73,7 +73,7 @@ If you wish to run the most recent version of GSN (or run the GUI), then you wil
 
 \begin{itemize}
 	\item Download the Jakarta apache ant version 1.7.x or higher.
-	\item Add ANT\_HOME/bin to your PATH.
+	\item Add the full pathname to the ANT\_HOME/bin folder to your PATH
 	\item Ensure you have the latest version Sun JDK installed.
 	\item Download and install TortoiseSVN (for Windows) or SmartSvn (OS
 independent) or a command line SVN client:
@@ -217,9 +217,9 @@ documentation page at: http://gsn.sourceforge.net/documentation/.
 \textbf{Step 1: Setting the Ant Home :}
 
 \begin{itemize}
-	\item Download the Ant binaries (apache-ant-1.7.0-bin.zip) from
+	\item Download the Ant binaries (apache-ant-1.7.x-bin.zip) from
 \url{http://ant.apache.org/};
-	\item Extract the folder apache-ant-1.7.0 to a suitable location on your
+	\item Extract the folder apache-ant-1.7.x to a suitable location on your
 hard drive;
 	\item Open Eclipse and do the following steps to set the Ant Home:
 \begin{itemize}
@@ -228,7 +228,7 @@ ANT and then select Runtime.
 	\item In the Classpath tab (opened on the center of the window) select Ant
 Home Entries, click on the Ant Home button and browse toward the
 directory that contains the files from the jakarta-ant archive
-(\textbackslash apache-ant-1.7.0\textbackslash bin).
+(\textbackslash apache-ant-1.7.x\textbackslash bin).
 	\item Click on OK in the Browse window and again to exit the Preferences
 dialog.
 \end{itemize}
