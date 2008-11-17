@@ -24,14 +24,14 @@ Moreover, GSN can run both standard wrappers and Safe Storage wrappers at the sa
 \subsection{Software Architecture}
 
 Safe Storage is generic and could be added to all the already existing wrappers.
-However small modifications need to be done since the Safe Storage wrappers are splitted in the two following parts
+However small modifications need to be done since the Safe Storage wrappers are split into the two following parts
 
 \begin{itemize}
 	\item The acquisition part that runs in the Safe Storage process
 	\item The processing part that runs in the GSN process
 \end{itemize}
 
-The wrapper class that executes on the Safe Storage should be kept as simple as possible and must extends the
+The wrapper class that executes on the Safe Storage should be kept as simple as possible and must extend the
 \inlinecode{gsn.acquisition2.wrappers.AbstractWrapper2} abstract class.
 An implementation of this class must define the methods shown on the \listingref{listing:java:safestorage_methods_to_implement}.
 
@@ -42,7 +42,7 @@ public abstract String getWrapperName ()
 public abstract void run()
 \end{javacode}
 
-The class that executes on the GSN side should do the data processing and must extends the 
+The class that executes on the GSN side should do the data processing and must extend the 
 \inlinecode{gsn.acquisition2.wrappers.SafeStorageAbstractWrapper} abstract class.
 An implementation of this class must define the methods shown on the \listingref{listing:java:safestorage_gsn_methods_to_implement}
 
@@ -106,7 +106,7 @@ If the \wrapper was already running, it will be reused.
 If the GSN process fails or is shutted down, The Safe Storage \wrapper will continue to acquire the data. Once the GSN process is
 restarted, all the data will be fetched from the Safe Storage DB.
 
-If the Safe Storage process fails or is shutted down, the data are not stored anymore and the GSN process will try periodically to 
+If the Safe Storage process fails or is shut down, the data are not stored anymore and the GSN process will try periodically to 
 connect to the Safe Storage process until the latter has been restarted.
 When you restart the Safe Storage process, it will automatically create and start acquiring data for the wrappers that were loaded before.
 
