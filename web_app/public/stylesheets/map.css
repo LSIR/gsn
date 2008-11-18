@@ -1,43 +1,49 @@
-.stationInformation {
-	font-family: Arial;
-	font-size: 10pt;
-	line-height: 1.5em;
-}
-
-.stationInformation div {
-	font-size: 9pt;
-	margin-bottom: 4px;
-	border-bottom: 1px dashed #555;
-}
-
-
-.stationInformation2 {
-	background-color: yellow;
-	padding-bottom: 100px;
-	border: 0;
-	margin 0;
+#mapContainer {
 	padding: 0;
+	margin: 0;
 }
 
-.stationInformation table {
-	padding-bottom: 5px;
-	border: 0px;
-	padding: 0px;
+/*
+	Setting map selector styles
+*/
+#mapSelectorBg, #mapSelector {
+	height: 23px;
+	top: 0px;
+	position: absolute;
+}
+
+#mapSelectorBg {
+	background-color: black;
+	z-index: 99999998;
+	opacity: 0.7;
 }
 
 #mapSelector {
-	background-color: #CCC999;
 	z-index: 99999999;
-	position: absolute;
-	top: 0px;
 	text-align: center;
 	vertical-align: middle;
-	padding: 7px;
+	padding: 5px 0px 5px 0px;
 	font-family: Verdana;
+	color: white;
 	font-size: 9pt;
 }
 
-#mapSelector select{
-	padding: 0.2em;
-	
+#mapSelector a {
+	color: white;
+	font-weight: normal;
+}
+
+#mapSelector a:hover {
+	cursor:pointer; cursor:hand;
+	color: #AAA;
+}
+
+/*
+	Setting map loading styles
+*/
+#mapLoadingIndicator {
+	z-index: 99999998;
+	background-color: #000;
+	opacity: 0.8;
+	padding: 10px 10px 10px 10px;
 }

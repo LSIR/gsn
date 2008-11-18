@@ -14,13 +14,6 @@
     <%= javascript_include_tag 'jquery.tablesorter.min.js' -%>
     <%= javascript_include_tag 'application' -%>
 
-
-    <% if controller.controller_name == 'map' -%>
-		<%= stylesheet_link_tag 'map' -%>
-      <%= javascript_include_tag 'map' -%>
-      <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA9ZnsSrYqZW5p9w4gqsksmxT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSM6hfFC1LrxacaJ2htnZd52WET_w" type="text/javascript"></script>
-      <script type="text/javascript" src="http://map.search.ch/api/map.js"></script>
-    <% end -%>
     <!-- Google Visualization: Annotated Time Line
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -44,6 +37,18 @@
     <!--[if IE 6]>
     <link href="/stylesheets/iesix.css" media="screen" rel="stylesheet" type="text/css" />
     <![endif]-->
+
+
+	<!-- Stuff used by the map -->
+	<% if controller.controller_name == 'map' -%>
+		<%= stylesheet_link_tag 'map' -%>
+		<%= javascript_include_tag 'map' -%>
+		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA9ZnsSrYqZW5p9w4gqsksmxT2yXp_ZAY8_ufC3CFXhHIE1NvwkxSM6hfFC1LrxacaJ2htnZd52WET_w" type="text/javascript"></script>
+	  	<script type="text/javascript" src="http://map.search.ch/api/map.js"></script>
+		<%= javascript_include_tag 'curvycorners' -%>  
+	<% end -%>
+
+
   </head>
   <body id="secondary">
     <div id="header-outer">

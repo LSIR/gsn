@@ -12,9 +12,13 @@ var map_type = "terrain";
 // The div that surrounds the map divs
 var container;
 
+var overlays = new Array();
+
 // An instance of the selector which builds the div containing
 // the map service selector
 var selector;
+
+var loadingIndicator;
 
 // Virtual sensor addressing information
 var vsa = null;
@@ -28,7 +32,7 @@ var zoom = 8;
 
 // Delay used before updating the markers, is used since search.ch
 // is buggy and the map needs time to be drawn before you can modify markers
-var delay = 250;
+var delay = 1000;
 
 // Draws the map into to the div with id map_container and draws the sensors onto the map
 // filtered with information in sensor_filter (if null, draw all sensors). The map service
@@ -47,6 +51,7 @@ function init(map_service, map_container, sensor_filter) {
 	// Create a new div which will contain the map and
 	// the map service selector
 	container = document.createElement('div');
+	container.id = "mapContainer"
 	container.style.width = width + "px";
 	container.style.height = height + "px";
 	container.style.position ="absolute"
@@ -55,6 +60,7 @@ function init(map_service, map_container, sensor_filter) {
 	// Create the selector, it will be added on top of the map
 	// when the map is loaded
 	selector = new MapServiceSelector(map_service);
+	loadingIndicator = new LoadingIndicator();
 
 	sensor_filter = sensor_filter;
 
@@ -64,6 +70,8 @@ function init(map_service, map_container, sensor_filter) {
 
 // Switch the map service
 function setMapService(map_service) {
+	Map.unload();
+
 	switch (map_service) {
 		case "google":
 			map = Google;
@@ -75,8 +83,8 @@ function setMapService(map_service) {
 			alert(map_service + "is an unknown map service provider");
 	}
 
-	map.unload();
-	map.load();
+	Map.load();
+	selector.update();
 	
 	// If vsa is loaded but map has no markers then the sensors need to be added
 	if (vsa != null && map.markers == null)
@@ -113,12 +121,14 @@ function setSensorFilter(filter) {
 		map.hideMarkers();
 		for (i in ids)
 			map.showMarker(vsa[ids[i]]["id"]);
+		loadingIndicator.off();
 	},delay);
 }
 
 // Load all the sensor addressing information and
 // then add all the sensors to the map
 function loadVsa() {
+	loadingIndicator.on();
 	$(function(){
 	    $.getJSON("/map/vsa2",
 	    function(data){
@@ -132,17 +142,16 @@ function loadVsa() {
 function addSensorsToMap() {
 	for (var s in vsa) {
 		if (vsa[s]["latitude"] && vsa[s]["longitude"]) {
-			html = '<div class="stationInformation">'
-			html += '<table><tr><td><b>Deployment:&nbsp;&nbsp;</b></td><td>' + vsa[s]["deployment"] + '</td></tr>';
-			html += '<tr><td><b>Station:</b></td><td>' + s + '</td></tr>';
-			html += '<tr><td><b>Sensors:</b></td><td></td></tr></table>';
+			html = '<div style="font-family: Arial; line-height: 1.5em; font-size: 10pt;">'
+			html += '<b>Deployment: </b>' + vsa[s]["deployment"] + '<br />';
+			html += '<b>Station: </b>' + s + '<br />';
+			html += '<b>Sensors:</b><br />';
 			tmp = dvos[vsa[s]["deployment"]][s];
 			for (t in tmp) {
-				html += '<div id="sensor">' + tmp[t] + '</div>';	
+				html += '<div style="font-size: 9pt; margin-bottom: 4px; border-bottom: 1px dashed #555;">' + tmp[t] + '</div>';	
 			}
 
 			map.addMarker(vsa[s]["id"], parseFloat(vsa[s]["latitude"]), parseFloat(vsa[s]["longitude"]), html);
-			alert(html)
 		}
 	}
 }
@@ -150,30 +159,121 @@ function addSensorsToMap() {
 // A Class that creates the map service selector that is placed
 // on top of the map
 function MapServiceSelector(map_service) {
-	var width = 230;
+	var width = 250;
+	var left_pos = "" + ((window.width/2) - (width/2));
 
-	var google_selected = "";
-	var search_ch_selected = "";
+	this.div_bg = document.createElement('div');
+	this.div_bg.id = "mapSelectorBg"
+	this.div_bg.style.left = left_pos + "px";
+	this.div_bg.style.width = width + "px";
+
+	var cornersObj = new curvyCorners({
+	  tl: { radius: 0 },
+	  tr: { radius: 0 },
+	  bl: { radius: 10 },
+	  br: { radius: 10 },
+	  antiAlias: true,
+	  autoPad: false
+	}, this.div_bg);
+	cornersObj.applyCornersToAll();
+	overlays.push(this.div_bg);
 	
-	switch(map_service) {
-		case "google":
-			google_selected = ' selected="yes"'; break;
-		case "search_ch":
-			search_ch_selected = ' selected="yes"'; break;
-		default:
-			alert("Map service unknown");
-	}
-
 	this.div = document.createElement('div');
 	this.div.id = "mapSelector"
+	this.div.style.left = left_pos + "px";
 	this.div.style.width = width + "px";
-	this.div.style.left = "" + ((window.height/2) - (width/2)) + "px";
-	this.div.innerHTML = ''
-		+ '<b>Map service:</b> <select id="map_service" onchange="setMapService(this.value);">'
-		+	'<option value="google"' + google_selected + '">Google Maps</option>'
-		+	'<option value="search_ch"' + search_ch_selected + '>Switzerland</option>'
-		+ '</select>';
+	overlays.push(this.div);
+	
+	this.update = function() {
+		var html = '';
+		
+		if (map == Google)
+			html = '<b>Google Maps</b> &nbsp; &nbsp; &nbsp; <a onClick="setMapService(\'search_ch\');">Switzerland</a>';
+		else if (map == SearchCh)
+			html = '<a onClick="setMapService(\'google\')">Google Maps</a> &nbsp; &nbsp; &nbsp; <b>Switzerland</b>';
+		else
+			alert("Map service unknown");
+		
+		this.div.innerHTML = html;
+	}
 }
+
+function LoadingIndicator() {
+	var width =  150;
+	var height = 110;
+	var show = true;
+
+	this.div = document.createElement('div');
+	this.div.id = "mapLoadingIndicator"
+	this.div.style.top = ((window.height/2) - (height/2)) + "px";
+	this.div.style.left = ((window.width/2) - (width/2)) + "px";
+	this.div.style.width = width + "px";
+	this.div.style.height = height + "px";
+	this.div.innerHTML = '<img src="/images/map_loader.gif" />';
+	var cornersObj = new curvyCorners(	{
+		  tl: { radius: 10 },
+		  tr: { radius: 10 },
+		  bl: { radius: 10 },
+		  br: { radius: 10 },
+		  antiAlias: true,
+		  autoPad: false
+		}, this.div);
+	cornersObj.applyCornersToAll();
+	
+	overlays.push(this.div);
+		
+	this.toggle = function() {
+		if (show == false) {
+			this.div.style.visibility = "visible";
+			show = true;
+		}
+		else {
+			//this.div.style.visibility = "hidden";
+			show = false;
+		}
+	};
+	
+	this.on = function() {
+		if (show == false)
+			this.toggle();
+	}
+
+	this.off = function() {
+		if (show == true)
+			this.toggle();
+	}
+}
+
+var Map = {
+	unload: function() {
+		if (map == null)
+			return;
+
+		container.removeChild(map.div);
+		for (i in overlays)
+			container.removeChild(overlays[i]);
+	}
+	
+	,load: function() {
+		if (map.div == null) {
+			map.div = document.createElement('div');
+			map.div.style.width = width + "px";
+			map.div.style.height = height + "px";
+		}
+		
+		container.appendChild(map.div);
+		Map.addOverlays();
+		
+		loadingIndicator.on();
+		map.load();
+	}
+	
+	,addOverlays: function() {
+		for (o in overlays)
+			container.appendChild(overlays[o]);
+	}
+}
+
 
 var Google = {
 	// The map object
@@ -189,24 +289,13 @@ var Google = {
 		if (GBrowserIsCompatible()) {
 			// Create the map if it's not already done
 			if (this.map == null) {
-				this.div = document.createElement('div');
-				this.div.style.width = width + "px";
-				this.div.style.height = height + "px";
 				this.div.id = "div_google"
-
-				container.appendChild(this.div);
-				container.appendChild(selector.div);
-
+				
 				this.map = new GMap2(this.div);
 				this.map.addControl(new GLargeMapControl());
 				this.map.addControl(new GHierarchicalMapTypeControl());
 				this.map.addMapType(G_PHYSICAL_MAP);
 				this.map.addMapType(G_SATELLITE_3D_MAP);
-			}
-			// If map already exists, just add it tot the DOM tree
-			else {
-				container.appendChild(this.div);
-				container.appendChild(selector.div);
 			}
 
 			switch(map_type) {
@@ -257,17 +346,6 @@ var Google = {
 		}
 	}
 
-	,unload: function() {
-		a = container.childNodes[0];
-		b = container.childNodes[1];
-		
-		// Remove the map div from the DOM tree
-		if (a != null)
-			container.removeChild(a);
-		if (b != null)
-			container.removeChild(b);
-	}
-
 	,addMarker: function(id, latitude, longitude, html) {
 		if (this.markers == null)
 			this.markers = new Array();
@@ -312,19 +390,10 @@ var SearchCh = {
 		if (SearchChMap.isBrowserCompatible()) {
 			// Create the map if it's not already done
 			if(this.map == null) {
-				this.div = document.createElement('div');
 				this.div.id = "div_search_ch"
 				this.div.style.width = width + "px";
-				this.div.style.height = height + "px";
-				container.appendChild(this.div);
-				container.appendChild(selector.div);
 
 				this.map = new SearchChMap({ circle: false, container: "div_search_ch", poigroups: "" });
-			}
-			// If map already exists, just add it tot the DOM tree
-			else {
-				container.appendChild(this.div);
-				container.appendChild(selector.div);
 			}
 
 
@@ -368,11 +437,6 @@ var SearchCh = {
 			this.map.addEventListener("dragend", map_state_changed);
 			this.map.addEventListener("zoomend", map_state_changed);
 		}
-	}
-
-	,unload: function() {
-		// Exactly the same as for unloading a google map
-		Google.unload();
 	}
 
 	,showMarker: function(id) {
@@ -441,5 +505,9 @@ var Util =  {
 		return new Array(lambda, phi);    
 	}
 };
+
+setInterval(function() {
+	//loadingIndicator.toggle();
+},2000);
 
 //}
