@@ -1,6 +1,5 @@
 \chapter{GSN in Nutshell}%: Stream Processing Infrastructure for Large-scale Interconnected Streaming World
 
-
 \section*{Abstract}
   With the price of wireless sensor technologies diminishing rapidly we can
   expect large numbers of autonomous sensor networks being deployed in the near
@@ -859,6 +858,123 @@ it from the database, for example, periodically at regular intervals. In
 practice the former can be implemented using views or triggers and the latter
 can be implemented using inner selects or stored procedures.
 
+\section{GSN to GSN communication Protocol}
+In this section we would like to present the the low level details of GSN to GSN communication protocol.
+In order to enable data sharing and distributed collaborative data stream processing, we have introduced
+two special type of wrappers in GSN. First, the \texttt{local} wrapper, which enables data stream sharing
+among virtual sensors on the same machine. Second, the \texttt{remote} wrapper, which enables data stream
+sharing among multiple distributed virtual sensors each of which located on different machine accessible through the network. 
+
+In GSN whenever a virtual sensor wants to use another virtual sensor located on a different GSN server, the 
+communication between two GSN server is triggered (during the loading process of the local virtual sensor).
+Once GSN notices that a remote virtual sensor is required by 
+a local virtual sensor, GSN temporary suspends the local virtual sensor's loading process to confirm the existence of the remote virtual
+sensor. Therefore, GSN to GSN communication is initiated whenever a virtual sensor in a node $A$ wants to use the data stream
+provided by another virtual sensor in a node $B$ ($A \neq B$).
+
+Using this kind of architecture, GSN mediates all the outgoing and incoming connections therefore the local virtual sensor
+does not interact directly with the remote virtual sensor (and vise versa). The packets exchanged between
+two GSN servers during GSN to GSN communication is depicted in figure \ref{fig:gsn-network-firewall} (all communications
+are implemented using XML-RPC calls). In the following we provide a brief description of each packet:
+\begin{description}
+	\item[structure-request/structure] is used by the local GSN server to discover the output structure of the remote virtual sensor. The response
+	to this packet, confirms the existence and availability of the remote virtual sensor and contains the details of the  output-structure of the remote virtual
+	sensor.	
+	\item[register/confirm] is used by the local GSN server to send the query and the contact address of the stream consumer. The query will be added to the notification
+	list associated with the prospective virtual sensor at the stream producer, therefore whenever the remote virtual sensor produces a stream element, the query
+	will be evaluated and the output of the evaluation(in case it is not empty) is delivered to the stream consumer.
+	The remote virtual sensor uses the addressing information (received in the registration packet) to contact the stream consumer in order to
+	deliver the stream elements. As there might be multiple virtual sensors at the stream consumer side be interested in one virtual sensor hosted
+	at the stream producer, any register request has a UUID associated with it which is used by the stream producer whenever it wants to deliver stream elements 
+	to the stream consumer.
+	\item[data] represents the stream of tuples which are going to be delivered to the stream consumer. At the stream consumer, GSN server receives the data and based
+	on the UUID of the tuples, GSN server disseminates the tuples to the appropriate local virtual sensors.
+\end{description}
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.8\columnwidth]{ch-gsn-figures/gsn-network-firewall}
+  \caption{Experimental setup}
+  \label{fig:gsn-network-firewall}
+\end{figure}
+
+In order to make the GSN to GSN communication more concrete, we provide more system level details below.
+For using a remote virtual sensor, the first step is locating the \emph{contact point} of the GSN server which
+hosts the prospective virtual sensor. By default, the contact point is \texttt{http://ip-address:gsn-port/gsn-handler}\footnote{The port is specified in the \texttt{conf/gsn.xml} file.}\footnote{The exact mapping is specified in \texttt{webapp/WEB-INF/web.xml} file.}.
+If  the contact point is correctly identified, the response to a plain HTTP POST request 
+returns a XML output.\footnote{The actual output represents an error as the request is not properly formatted.}\footnote{For sending plain HTTP POST requests
+to \texttt{http://ip-address:gsn-port/gsn-handler}, you may want to use \url{http://code.google.com/p/rest-client/}. }
+
+Correct identification of the contact point is crucial in success of using the remote virtual sensor.
+Once the contact points identified successfully, one can define a stream which consume data from the other data source.
+Note that consuming data from a remote virtual sensor doesn't require any kind of modifications at the remote host and in fact 
+due to GSN's decoupled architecture, the remote virtual sensor is not even aware of its data consumers. In figure \ref{gsn2gsn-simple-figure},
+the virtual sensor \texttt{ConsumerVS} running at the GSN server with the IP address of \texttt{3.3.3.3} under the port \texttt{22001} is interested
+in getting data from the \texttt{CoolVS} running at the GSN server with the IP address of \texttt{4.4.4.4} under the port \texttt{22001}. To enable this
+communication one has to use a source configuration similar to the one in figure \ref{gsn2gsn-simple}.
+
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.8\columnwidth]{ch-gsn-figures/gsn-comm-no-firewall}
+  \caption{Simple GSN to GSN communication}
+  \label{gsn2gsn-simple-figure}
+\end{figure}
+
+
+\begin{figure}%[htb]
+  \centering
+  \lstset{numbers=left, numberstyle=\footnotesize}
+\begin{lstlisting}
+<address wrapper="remote">
+  <predicate key="name">CoolVS</predicate>
+  <predicate key="host">4.4.4.4</predicate>
+  <predicate key="port">22001</predicate>
+</address>        
+\end{lstlisting}
+  \caption{Source configuration for simple GSN to GSN communication.}
+  \label{gsn2gsn-simple}
+\end{figure}
+
+In some deployments, GSN servers are hosted behind a NAT an apache web server\footnote{The instruction for using GSN behind a apache web server is provided in appendix \ref{app:gsn-apache}.} which can cause port and/or IP change. This can be true for both the GSN data stream consumer and GSN data stream producer.
+In these cases, one can use the more advanced form of the remote wrapper. Figure \ref{gsn2gsn-nat-figure} presents a sample setup in which both of the GSN data stream
+consumer and data producer are behind firewall. The firewall at the consumer side has mapped \texttt{3.3.3.3:22001} into \texttt{1.1.1.1:82} and at the stream producer side
+firewall has mapped \texttt{4.4.4.4:22001} into \texttt{2.2.2.2:80}.  To enable this kind of
+communication one has to use a source configuration similar to the one in figure \ref{gsn2gsn-nat}.
+
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.8\columnwidth]{ch-gsn-figures/gsn-comm-firewall}
+  \caption{Simple GSN to GSN communication}
+  \label{gsn2gsn-nat-figure}
+\end{figure}
+
+\begin{figure}%[htb]
+  \centering
+  \lstset{numbers=left, numberstyle=\footnotesize,basicstyle=\small}
+\begin{lstlisting}
+<address wrapper="remote">
+  <predicate key="name">CoolVS</predicate>
+  <predicate key="local-contact-point">http://1.1.1.1:82/gsn-2</predicate>
+  <predicate key="remote-contact-point">http://2.2.2.2:80/gsn-server</predicate>
+</address>        
+\end{lstlisting}
+  \caption{Source configuration for NATed GSN to GSN communication.}
+  \label{gsn2gsn-nat}
+\end{figure}
+
+\subsection{\texttt{local} wrapper}
+The \verb|local| wrapper is special version of \texttt{remote} wrapper (host = ``\texttt{127.0.0.1}'') which is optimized
+for communication among two different virtual sensors inside the same GSN server. By having the
+\texttt{local} wrapper optimized, we imply that most of the overhead associated with TCP/IP networking
+calls are eliminated by using internal GSN calls instead. The \texttt{local} wrapper is recommend whenever
+the end to end delay between two virtual sensors is important. In GSN, we have implemented the 
+notification system so that the GSN server always gives priority to the local virtual sensors when it wans to disseminate
+the stream elements thus the local virtual sensors usually get notified earlier.
+
+
+
 \section{Evaluation\footnote{The evaluation results in this section correspond to GSN release 0.90.}}
 \label{sec:evaluation}
 
@@ -990,7 +1106,6 @@ configuration for large memory systems.
 Figure~\ref{fig:QueryProcessingLatency} shows the results for a stream element
 size (SES) of 30 Bytes. Using SES=32KB gives the same latencies. Due
 to space limitations we do not include this figure.
-
 
 \begin{figure}%[htb]
   \centering
@@ -1137,4 +1252,7 @@ The experimental evaluation of GSN demonstrates that the implementation is
 highly efficient, offers very good performance and throughput even under high
 loads and scales gracefully in the number of nodes, queries, and query
 complexity.
+
+
+
 
