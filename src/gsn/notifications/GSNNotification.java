@@ -42,11 +42,11 @@ public class GSNNotification extends NotificationRequest {
 
 	private XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 
-	public GSNNotification(int port, String remoteHost,
-			String virtualSensorName, String query, int notificationCode) {
+	private String url;
+
+	public GSNNotification(String url, String virtualSensorName, String query, int notificationCode) {
 		this.originalQuery = query;
-	  this.remotePort = port;
-		this.remoteAddress = remoteHost;
+		this.url = url; //"http://" + remoteHost + ":" + remotePort + "/gsn-handler";
 		this.prespectiveVirtualSensor = virtualSensorName;
 		TreeMap<CharSequence,CharSequence> rewritingInfo = new TreeMap<CharSequence,CharSequence>(new CaseInsensitiveComparator());
 		rewritingInfo.put("wrapper", virtualSensorName);
@@ -59,8 +59,7 @@ public class GSNNotification extends NotificationRequest {
 		this.query = SQLUtils.newRewrite(query, rewritingInfo);
 		this.notificationCode = notificationCode;
 		try {
-			config.setServerURL(new URL("http://" + remoteHost + ":"
-					+ remotePort + "/gsn-handler"));
+			config.setServerURL(new URL(url));
 			client.setConfig(config);
 		} catch (MalformedURLException e1) {
 			logger.warn("GSNNotification initialization failed! : "

@@ -20,13 +20,13 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
 
   private static transient Logger logger = Logger.getLogger( GSNRequestHandler.class );
 
-  private String                  remoteAddress;
+  private String                  remoteIP;
 
   public void init ( MyConfig pConfig ) {
-    this.remoteAddress = pConfig.getRemoteAddress( );
+    this.remoteIP = pConfig.getRemoteAddress( );
   }
   public void init ( String remoteAddress) {
-    this.remoteAddress = remoteAddress;
+    this.remoteIP = remoteAddress;
   }
 
   public boolean deliverData ( int notificationCode ,  Object [] fieldNamesInStreamElement ,  Object [] fieldValues , String timeStampStr ) {
@@ -57,7 +57,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
    * @param notificationCode.
    * @return
    */
-  public boolean registerQuery ( int port , String virtualSensorName , String query , int notificationCode ) {
+  public boolean registerQuery ( String url, String virtualSensorName , String query , int notificationCode ) {
     if ( virtualSensorName == null || ( virtualSensorName = virtualSensorName.trim( ).toLowerCase( ) ).length( ) == 0 ) {
       logger.warn( "Bad request received for Data_strctutes" );
       return false;
@@ -68,8 +68,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
       return false;
     }
 
-
-    GSNNotification interest = new GSNNotification( port , remoteAddress , virtualSensorName , query , notificationCode );
+    GSNNotification interest = new GSNNotification( url , virtualSensorName , query , notificationCode );
     if ( logger.isInfoEnabled( ) )
       logger.info( new StringBuilder( ).append( "REGISTER REQUEST FOR " ).append( virtualSensorName ).append( " received from :" ).append( interest.getRemoteAddress( ) ).append( ":" ).append(
           interest.getRemotePort( ) ).append( " under the code " ).append( notificationCode ).append( " With the query of *" ).append( query ).append( "*" )
@@ -127,8 +126,9 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
    * @param notificationCode.
    * @return
    */
-  public static void consumeRegisterQueryRequest ( String remoteAddress, int port , String virtualSensorName , String query , int notificationCode ) {
-    GSNNotification interest = new GSNNotification( port , remoteAddress , virtualSensorName , query , notificationCode );
+  public void consumeRegisterQueryRequest ( String url , String virtualSensorName , String query , int notificationCode ) {
+	  url = url.replace("/127.0.0.1:", "/"+remoteIP+":");
+    GSNNotification interest = new GSNNotification( url, virtualSensorName , query , notificationCode );
     if ( logger.isInfoEnabled( ) )
       logger.info( new StringBuilder( ).append( "REGISTER REQUEST FOR " ).append( virtualSensorName ).append( " received from :" ).append( interest.getRemoteAddress( ) ).append( ":" ).append(
           interest.getRemotePort( ) ).append( " under the code " ).append( notificationCode ).append( " With the query of *" ).append( query ).append( "*" )
