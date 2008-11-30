@@ -1,0 +1,1140 @@
+\chapter{GSN in Nutshell}%: Stream Processing Infrastructure for Large-scale Interconnected Streaming World
+
+
+\section*{Abstract}
+  With the price of wireless sensor technologies diminishing rapidly we can
+  expect large numbers of autonomous sensor networks being deployed in the near
+  future. These sensor networks will typically not remain isolated but the need
+  of interconnecting them on the network level to enable integrated data
+  processing will arise, thus realizing the vision of a global ``Sensor
+  Internet.'' This requires a flexible middleware layer which abstracts from
+  the underlying, heterogeneous sensor network technologies and supports fast
+  and simple deployment and addition of new platforms, facilitates efficient
+  distributed query processing and combination of sensor data, provides support
+  for sensor mobility, and enables the dynamic adaption of the system
+  configuration during runtime with minimal (zero-programming) effort. This
+  paper describes the Global Sensor Networks (GSN) middleware which addresses
+  these goals. We present GSN's conceptual model, abstractions, and
+  architecture, and demonstrate the efficiency of the implementation through
+  experiments with typical high-load application profiles. The GSN
+  implementation is available from \url{http://gsn.sourceforge.net/}.
+\newpage
+\section*{Related Publications:}
+Different parts of the work presented in this chapter is published in the form of articles in international conferences and workshops.
+Parts of this chapter is also published in the form of internal technical reports.
+\begin{itemize}
+\item \emph{Infrastructure for data processing in large-scale interconnected sensor networks}, Karl Aberer , Manfred Hauswirth , Ali Salehi. Mobile Data Management (MDM), Germany, 2007.
+\item \emph{GSN, Quick and Simple Sensor Network Deployment}, Ali Salehi, Karl Aberer. European conference on Wireless Sensor Networks (EWSN), Netherlands, 2007.
+\item \emph{Zero-programming Sensor Network Deployment}, Karl Aberer , Manfred Hauswirth , Ali Salehi. Next Generation Service Platforms for Future Mobile Systems (SPMS), Japan, 2007.
+\item \emph{A middleware for fast and flexible sensor network deployment}, Karl Aberer , Manfred Hauswirth , Ali Salehi. Very Large Data Bases (VLDB) Seoul, Korea, 2006.
+\item \emph{Middleware support for the "Internet of Things"}, Karl Aberer , Manfred Hauswirth , Ali Salehi. 5. GI/ITG KuVS Fachgesprch "Drahtlose Sensornetze", Universitt Stuttgart, 2006.
+\item \emph{The Global Sensor Networks middleware for efficient and flexible deployment and interconnection of sensor networks}, Karl Aberer , Manfred Hauswirth , Ali Salehi.
+Technical Report, LSIR-2006-006.
+\item \emph{Global Sensor Networks}, Karl Aberer , Manfred Hauswirth , Ali Salehi. Technical Report, LSIR-2006-001.
+\end{itemize}
+\newpage
+\section{Introduction}
+\label{sec:introduction}
+
+Until now, research in the sensor network domain has mainly focused on
+routing, data aggregation, and energy conservation inside a single
+sensor network while the integration of multiple sensor networks has
+only been studied to a limited extent. However, as the price of
+wireless sensors diminishes rapidly we can soon expect large numbers
+of autonomous sensor networks being deployed. These sensor networks
+will be managed by different organizations but the interconnection of
+their infrastructures along with data integration and distributed
+query processing will soon become an issue to fully exploit the
+potential of this ``Sensor Internet.'' This requires platforms which
+enable the dynamic integration and management of sensor networks and
+the produced data streams.
+
+The Global Sensor Networks (GSN) platform aims at providing a flexible
+middleware to accomplish these goals.  GSN assumes the simple model
+shown in Figure~\ref{fig:setup}: A sensor network internally may use
+arbitrary multi-hop, ad-hoc routing algorithms to deliver sensor
+readings to one or more sink node(s). A sink node is a node which is
+connected to a more powerful base computer which in turn runs the GSN
+middleware and may participate in a (large-scale) network of base
+computers, each running GSN and servicing one or more sensor networks.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\columnwidth]{ch-gsn-figures/model}
+  \caption{GSN model}
+  \label{fig:setup}
+\end{figure}
+
+We do not make any assumptions on the internals of a sensor network
+other than that the sink node is connected to the base computer via a
+software wrapper conforming to the GSN API. On top of this physical
+access layer GSN provides so-called \textit{virtual sensors} which
+abstract from implementation details of access to sensor data and
+define the data stream processing to be performed. Local and remote
+virtual sensors, their data streams and the associated query
+processing can be combined in arbitrary ways and thus enable the user
+to build a data-oriented ``Sensor Internet'' consisting of sensor
+networks connected via GSN.
+
+In the following we start with a detailed description of the virtual
+sensor abstraction in Section~\ref{sec:virt-sens-spec}, discuss GSN's
+data stream processing and time model in
+Section~\ref{sec:data-stre-proc}, and present GSN's system architecture
+along with a discussion of essential implementation details
+in Section~\ref{sec:system-architecture}. We
+evaluate the performance of GSN in Section~\ref{sec:evaluation} and
+discuss related work in Section~\ref{sec:relatedwork} before
+concluding.
+
+\section{Virtual sensors}
+\label{sec:virt-sens-spec}
+
+The key abstraction in GSN is the \textit{virtual sensor}. Virtual
+sensors abstract from implementation details of access to sensor data
+and correspond either to a data stream received directly from sensors
+or to a data stream derived from other virtual sensors. A virtual
+sensor can be any kind of data producer, for example, a real sensor, a
+wireless camera, a desktop computer, or any combination of virtual sensors.
+A virtual sensor may have any number of input data
+streams and produces exactly one output data stream (with predefined format) based on the input
+data streams and arbitrary local processing. The specification of a
+virtual sensor provides all necessary information required for
+deploying and using it, including (1) metadata used for identification
+and discovery, (2) the details of the data streams which the virtual
+sensor consumes and produces (3) an SQL-based specification of the
+stream processing (filtering and integration) performed in a virtual sensor, (4)
+the processing class which preforms the more advanced and complex data processing (if needed) on the output
+stream before releasing it and (5) functional properties related to persistency, error handling, life-cycle,
+management, and physical deployment.
+
+To support rapid deployment, the virtual sensors are provided
+in human readable declarative forms (XML). Figure~\ref{fig:ComplexVS} shows an
+example which defines a virtual sensor that reads two temperature sensors and
+in case both of them have the same reading above a certain threshold in the
+last minute, the virtual sensor returns the latest picture from the webcam in
+the same room together with the measured temperature.
+
+
+\begin{figure}%[htb]
+  \centering
+  \lstset{numbers=left, numberstyle=\footnotesize}
+\begin{lstlisting}
+<virtual-sensor name="room-monitor" priority="10" 
+         protected="false" >
+  <processing-class>
+     <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+     <init-params/>
+     <output-structure>
+        <field name="image" type="binary:jpeg" />
+        <field name="temp"  type="int" />
+     </output-structure>
+  </processing-class>
+  <life-cycle pool-size="10" />
+  <addressing>
+      <predicate key="geographical">BC143</predicate>
+      <predicate key="usage">room monitoring</predicate>
+      <predicate key="latitude">46.5214</predicate>
+      <predicate key="longitude">6.5676</predicate>
+  </addressing>
+  <storage history-size="10h" />
+  <streams>
+      <stream name="cam">
+         <source name="cam"  storage-size="1" >
+            <address wrapper="remote">
+               <predicate key="geographical">BC143</predicate>
+               <predicate key="type">Camera</predicate>
+            </address>
+            <query>select * from WRAPPER</query>
+         </source>
+         <source name="temperature1" storage-size="1m" >
+            <address wrapper="remote">
+               <predicate key="type">temperature</predicate>
+               <predicate key="geographical">BC143-N</predicate>
+            </address>
+            <query>select AVG(temp1) as T1 from WRAPPER</query>
+         </source>
+         <source name="temperature2"  storage-size="1m" >
+            <address wrapper="remote">
+               <predicate key="type">temperature</predicate>
+               <predicate key="geographical">BC143-S</predicate>
+            </address>
+            <query>select AVG(temp2) as T2 from WRAPPER</query>
+         </source>
+         <query>
+            select cam.picture as image, temperature.T1 as temp
+            from   cam, temperature1
+            where  temperature1.T1 > 30 AND
+                   temperature1.T1 = temperature2.T2
+         </query>
+      </stream>
+   </streams>
+</virtual-sensor>
+\end{lstlisting}
+  \caption{A virtual sensor definition}
+  \label{fig:ComplexVS}
+\end{figure}
+
+A virtual sensor has a unique name (the \verb|name| attribute in line 1) and
+can be equipped with a set of key-value pairs representing the logical addressing of the
+virtual sensor (lines 12--17), i.e., associated with metadata. The addressing information can be registered and
+discovered in GSN and other virtual sensors can use either the unique name or
+logical addressing based on the metadata to refer to a virtual sensor. 
+We have defined certain addressing keys which are specifically used by the GSN's web interface. In GSN if a given
+virtual sensor has the addressing values for the both \texttt{latitude} (line 15) and \texttt{longitude} (line 16) keys, the default GSN
+web interface uses these geographical locations to show the sensor on the global map.
+
+The example specification above defines a virtual sensor with three input streams
+which are identified by their metadata\footnote{Note that the support for distributed directory/registry service had been removed
+from GSN's source code thus as of \today, we only support physical addressing for identifying the data sources.},
+i.e., by logical addressing. For example, the first temperature sensor is
+addressed by specifying two requirements on its metadata, namely
+that it is of type temperature sensor and at a certain physical certain
+location. By using multiple input streams Figure \ref{fig:ComplexVS} also
+demonstrates GSN's ability to access multiple stream producers simultaneously.
+For the moment, we assume that the input streams (two temperature sensors and a
+webcam) have already been defined in other virtual sensor definitions (how this
+is done, will be described below).
+
+In GSN data streams are temporal sequences of timestamped tuples (also known as \texttt{Stream Elements}).
+This is in line with the model used in most stream processing systems. The structure of
+the output data stream a virtual sensor produces is encoded in XML as shown in lines 6 -- 9 (the \texttt{output-structure} part).
+The structure of the input streams is learned from the respective specifications of their virtual sensor definitions. 
+
+In GSN data stream processing is separated into three stages:
+\begin{itemize}
+\item processing applied to sources (lines 26, 33, and 40).
+\item processing for combining data from the different input streams and producing the temporary output stream (lines 43-46).
+\item producing the final output stream by passing the temporary output stream from a processing class (a processing logic represented in some programming languages). This part is presented by lines 3 -- 10. Note that as the final output is produced by the processing class, the actual output structure of the virtual sensor should strictly
+conform the output format of the processing class \footnote{As of \today, the order and the types should be exactly match.}.
+\end{itemize}
+
+To specify the processing of the sources we use SQL queries which refer to the actual data source
+by the reserved keyword \verb|WRAPPER| (the data sources are logically represented as relational tables all of which called \verb|wrapper|).
+The attribute \verb|wrapper="remote"| indicates that the data stream is obtained through the
+network from another virtual sensor which can be located in any other GSN instance accessible through the network.
+
+
+In the case of a directly connected local sensor, the \verb|wrapper| attribute would reference the required wrapper\footnote{As of \today, all the wrappers has to written in Java language. The actual code for accessing the sensor can be written in any language as long as there is a possibility of communicating the data to the hardware
+through Java (e.g., interfacing Java to existing C code or the serial ports).}.
+For example, \verb|wrapper="tinyos"| would denote a TinyOS-based sensor whose data
+stream is accessed via GSN's TinyOS wrapper \footnote{In GSN, we have multiple TinyOS wrappers each corresponding to different
+versions and packet formats. Those details are out of the score of this chapter.}.
+GSN already includes wrappers for all major TinyOS platforms (Mica2, Mica2Dot, etc.), for wired and wireless
+(HTTP-based) cameras (e.g., AXIS 206W), several RFID readers (Texas
+Instruments, Alien Technology), Bluetooth devices, Shockfish, WiseNodes, epuck
+robots, etc. The implementation effort for wrappers is rather low, for example,
+the RFID reader wrapper has 50 lines of code (LOC), the TinyOS wrapper has 120
+LOC, and the generic serial wrapper has 180 LOC.
+
+In the given example the output stream joins the data received from two
+temperature sensors and returns a camera image if certain conditions on the
+temperature are satisfied (lines 43--46). To enable the SQL statement in lines
+43--46 to produce the output stream, it needs to be able to reference the
+required sources which is accomplished by the \verb|name| attribute
+(lines 21, 28, and 35) that defines a symbolic name for each stream source.
+
+The definition of the structure of the output stream directly relates to the data
+stream processing that is performed by the virtual sensor's processing class and needs to be
+consistent with it. GSN provides multiple processing classes each of which are designed
+to perform different tasks (e.g., charts, network plots, filtering, ...). In our example we are using
+\texttt{gsn.vsensor.BridgeVirtualSensor} as our processing class. The \texttt{gsn.vsensor.BridgeVirtualSensor}
+class is special in the sense that unlike most of the other GSN's processing classes, this class does not
+perform any further processing on its input stream thus it does not alter the data nor the structure of its input.
+
+Since the structure of the virtual sensor output is not altered through using the \texttt{gsn.vsensor.BridgeVirtualSensor} processing class hence the final
+structure of the virtual sensor's output is determined through the SQL statement at line 43, we need to make sure that,
+the data fields in the \verb|select| clause matches the definition of the output structure in lines 6--9 (the order is important).
+It is recommended to use \texttt{gsn.vsensor.BridgeVirtualSensor} as long as the processing preformed in the virtual
+sensor through the SQL queries are sufficient enough and no further processing is required before publishing the sensor 
+data to the outside.
+
+In the design of GSN specifications we decided to separate the temporal aspects
+from the relational data processing using SQL. The temporal processing is
+controlled by various attributes provided in the input and output stream
+specifications, e.g., the attribute \verb|storage-size| (lines 21, 28, and 35)
+defines the window size used for producing the input stream's data elements.
+Due to its specific importance the temporal processing will be discussed in
+detail in Section~\ref{sec:data-stre-proc}.
+
+In addition to the specification of the data-related properties a virtual
+sensor also includes high-level specifications of functional properties: The
+\verb|priority| attribute (line 1) controls the processing priority of a
+virtual sensor, the \verb|<life-cycle>| element (line 11) enables the control
+and management of resources provided to a virtual sensor such as the maximum
+number of threads/queues available for processing, the \verb|<storage>| element
+(line 18) allows the user to control how output stream data is persistently
+stored.
+
+For example, in Figure~\ref{fig:ComplexVS} the \verb|priority| attribute in
+line 1 assigns a priority of 10 to this virtual sensor (1 is the lowest
+priority and 20 the highest, default is 10), the \verb|<life-cycle>| element in
+line 11 specifies a maximum number of 10 threads, which means that if the pool
+size is reached, data will be dropped (if no pool size is specified, it will be
+controlled by GSN depending on the current load), the \verb|<storage>| element
+in line 18 defines that the output stream's data elements of the last 10 hours
+(\verb|history-size| attribute) are stored to enable off-line processing.
+The \verb|storage-size| attribute in line 21 defines the window size of 1 stream element. That's the most recent
+image taken by the webcam irrespective of the time it was
+taken.
+
+In GSN, we can specify the set of values either by time or count. In the count based representation
+one only presents the values through integers. For instance \verb|slide='2'| or \verb|history-size='100'|. The count based representation is consists of
+an integer directly postfixed (without any space characters) with one of the time measurement units. As of \today, we have \texttt{d},\texttt{h},\texttt{m},\texttt{s} time measurement units which are corresponding to days, hours, minutes and seconds. As a time based example, we might have \verb|storage-size='1m'|.
+
+The \verb|storage-size| attributes in lines 28 and 35 define a window of one minute for the amount of sensor readings subsequent queries
+will be run on, i.e., the \verb|AVG| operations in lines 33 and 40 are executed
+on the sensor readings received in the last minute which of course depends on
+the rate at which the underlying temperature virtual sensor produces its
+readings. Note that when the \verb|storage-size| is anything other than \emph{1}, the
+virtual sensor author should be aware of the possibility of duplicated stream elements (discussed in more
+detail in section \ref{sec:data-stre-proc}).
+
+The query producing the output stream (lines 43--46) also demonstrates another
+interesting capability of GSN as it also mediates among three different flavors
+of queries: The virtual sensor itself uses continuous queries on the
+temperature data, a ``normal'' database query on the camera data and
+produces a result only if certain conditions are satisfied, i.e., a
+notification analogous to pub/sub or active rules.
+
+Virtual sensors are a powerful abstraction mechanism which enables the user to
+declaratively specify sensors and combinations of arbitrary complexity. Virtual
+sensors can be defined and deployed to a running GSN instance at any time
+without having to stop the system. Also dynamic unloading is supported but
+should be used carefully as unloading a virtual sensor may have undesired
+(cascading) effects. 
+
+\section{Data stream processing and time model}
+\label{sec:data-stre-proc}
+
+Data stream processing has received substantial attention in the
+recent years in other application domains, such as network monitoring
+or telecommunications. As a result, a rich set of query languages and
+query processing approaches for data streams exist on which we can
+build. A central building block in data stream processing is the time
+model as it defines the temporal semantics of data and thus determines
+the design and implementation of a system. Currently, most stream
+processing systems use a global reference time as the basis for their
+temporal semantics because they were designed for centralized
+architectures in the first place. As GSN is targeted at enabling a
+distributed ``Sensor Internet,'' imposing a specific temporal semantics
+seems inadequate and maintaining it might come at unacceptable cost.
+GSN provides the essential building blocks for dealing with time, but
+leaves temporal semantics largely to applications allowing them to
+express and satisfy their specific, largely varying requirements. In
+our opinion, this pragmatic approach is viable as it reflects the
+requirements and capabilities of sensor network processing.
+
+In GSN a data stream is a set of timestamped tuples also known as Stream Elements.
+The order of the data stream is derived from the ordering of the timestamps and GSN
+provides basic support for managing and manipulating the timestamps.
+The following essential services are provided:
+
+\begin{enumerate}
+\item a local clock at each GSN Server
+\item implicit management of a timestamp attribute (reserved field called \texttt{TIMED})\footnote{All timestamps in GSN are represented in milliseconds using 64-bit integers.}\footnote{As the timestamp (e.g., the \texttt{TIMED} field) is always present, it is not required to specify the \texttt{TIMED} field in the  \texttt{output-structure} section of the virtual sensors. In fact, specifying the \texttt{TIMED} field in the output structure causes error therefore GSN refuses to load the virtual sensor.}
+\item automatic timestamping of tuples upon arrival at the GSN in case the tuples (stream elements) don't have
+any timestamp (no \texttt{TIMED} field available)
+\item a windowing mechanism which allows the user to define count- or
+  time-based windows on data streams.
+\item a sliding mechanism which allows the user to define count- or  time-based sliding behaviors on data streams.
+\end{enumerate}
+
+In this way it is always possible to trace the temporal history of
+data stream elements throughout the processing history.  Multiple time
+attributes can be associated with data streams (as long as only one of them called \texttt{TIMED})
+and can be manipulated through SQL queries. Thus sensor networks can be used as observation
+tools for the physical world, in which network and processing delays
+are inherent properties of the observation process which cannot be
+made transparent by abstraction.  Let us illustrate this by a simple
+example: Assume a bank is being robbed and images of the crime scene
+taken by the security cameras are transmitted to the police. For the
+insurance company the time at which the images are taken in the bank
+will be relevant when processing a claim, whereas for the police
+report the time the images arrived at the police station will be
+relevant to justify the time of intervention. Depending on the context
+the robbery is thus taking place at different times.
+
+As tuples (sensor readings) are timestamped, queries can also deal
+explicitly with time. For example, the query in lines 43--46 of
+Figure~\ref{fig:ComplexVS} could be extended such that it explicitly
+specifies the maximum time interval between the readings of the two
+temperatures and the maximum age of the readings. This would
+additionally require changes in the source definitions as the
+sources then must provide this information (more detailed example below), and also the
+averaging of the temperature readings (lines 33 and 40) would have to
+be changed to be explicit in respect to the time dimension.
+
+In order to concretely show the time management inside GSN, we would like to
+simulate above scenario through two different virtual sensors (only the input stream parts presented).
+Say there exist a virtual sensor called \emph{camera-vs} hosted on a GSN server which listens to port \texttt{80} on a machine with IP address of \texttt{1.2.3.4}.
+The virtual sensor used by the police and the one used by the insurance are depicted in figures \ref{vs:police} and \ref{vs:insurance}.
+The stream specified in figure \ref{vs:police} has a query in line 7 for retrieving both the picture and the time stamp from the remote virtual sensor therefore
+the remote timestamp is used by GSN for the internal calculations. Now consider the stream specified in figure \ref{vs:insurance} which has a small change compared to the one in figure \ref{vs:police}, the latter is not selecting the timestamp field hence GSN automatically adds the local reception time to every tuple it receives from the remote source.
+
+In order to further elaborate the time management issue, consider the stream source specified in figure \ref{vs:complex-time}. This example combines both
+the local time and remote time in order to measure the latency associated with each tuple and uses the latency as a condition as the selection
+criteria (e.g., only accepting the tuples which are not delayed by the network for more than 5 milliseconds).
+
+\begin{figure}%[htb]
+  \centering
+  \lstset{numbers=left, numberstyle=\footnotesize}
+\begin{lstlisting}
+<stream name="cam">
+   <source name="cam"  storage-size="1" >
+      <address wrapper="remote">
+         <predicate key="host">1.2.3.4</predicate>
+         <predicate key="port">80</predicate>
+         <predicate key="name">camera-vs</predicate>
+      </address>
+      <query>select PICTURE, TIMED from WRAPPER</query>
+   </source>
+	 <query>
+      select PICTURE, TIMED from cam
+   </query>
+</stream>
+\end{lstlisting}
+  \caption{A stream using the remote timestamp.}
+  \label{vs:police}
+\end{figure}
+
+\begin{figure}%[htb]
+  \centering
+  \lstset{numbers=left, numberstyle=\footnotesize}
+\begin{lstlisting}
+<stream name="cam">
+   <source name="cam"  storage-size="1" >
+      <address wrapper="remote">
+         <predicate key="host">1.2.3.4</predicate>
+         <predicate key="port">80</predicate>
+         <predicate key="name">camera-vs</predicate>
+      </address>
+      <query>select PICTURE from WRAPPER</query>
+   </source>
+   <query>
+      select PICTURE, TIMED from cam
+   </query>
+</stream>
+\end{lstlisting}
+ \caption{A stream using the local (arrival) timestamp.}
+  \label{vs:insurance}
+\end{figure}
+
+\begin{figure}%[htb]
+  \centering
+  \lstset{numbers=left, numberstyle=\footnotesize}
+\begin{lstlisting}
+<stream name="cam">
+   <source name="cam"  storage-size="1" >
+      <address wrapper="remote">
+         <predicate key="host">1.2.3.4</predicate>
+         <predicate key="port">80</predicate>
+         <predicate key="name">camera-vs</predicate>
+      </address>
+      <query>select PICTURE, TIMED as REMOTE_TIMED from WRAPPER</query>
+   </source>
+   <query>
+      select PICTURE, REMOTE_TIMED AS TIMED from cam where 
+      (cam.TIMED - cam.REMOTE_TIMED) < 5
+   </query>
+</stream>
+\end{lstlisting}
+   \caption{A stream using both local and remote timestamps.}
+  \label{vs:complex-time}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1\columnwidth]{ch-gsn-figures/sliding-window-visually}
+  \caption{Illustration of the different sample sliding and window values.}
+  \label{fig:sliding-window-visually}
+\end{figure}
+
+In order to deal with the streaming data, the standard way is to specify
+a query with at least two extra properties associated with it,
+window size and sliding value. The window size is used to limit
+the actual data used for the processing (execution)  to a certain range
+in time or number of values. The sliding value is introduced to
+specify the execution condition for the query. The execution of the
+query is triggered whenever the sliding condition is satisfied implying a possibly infinitely long periodic
+execution of the query, therefore in stream processing systems, continuous queries are executed whenever the sliding occurs.
+
+For instance, one can express the interest
+of obtaining the average of a temperature sensor over the last $10$
+minutes, and doing so periodically every $2$ minutes, by simply
+providing the window size of $10$ minutes and sliding value of $2$
+minutes to the stream processing engine. As indicated before, each
+time the sliding condition is satisfied (e.g., $2$ minutes passed from
+the previous execution) the actual action, computing the average over the last $10$
+minutes, is performed. Note that in some research papers the
+execution of the action is also called \emph{movement of the sliding
+window}. 
+
+The temporal processing in GSN is defined using the sliding and window values. Every data source in
+GSN can have at most one \verb|slide|\footnote{Default value is 1, therefore this attribute can be omitted}
+and \verb|storage-size|\footnote{No default value defined} attributes. Both values can be represented
+in the form of count-based or time-based values (described earlier in this section).
+Figure \ref{fig:sliding-window-visually} visually represents the query execution inside GSN with different sliding and window values.
+We used a black dot in the figure to represent the triggering of execution. For instance, if both the window size and the sliding 
+values are 3, and say we have received 5 stream elements in total, our continuous query have been executed only once (at the \emph{Time 3}) during its life time. 
+One can extend above paradigm to create virtual sensors to support the integration of continuous and
+historical data. For example, if the user wants to be notified when the temperature is 10 degrees above the average temperature in the
+last 24 hours, he/she can simply define two sources, getting data from the same wrapper but with different window sizes, i.e., 1
+(count) and 24h (time), and then simply write a query specifying the original condition with these sources.
+
+
+The production of a new output stream element of a virtual sensor is always triggered
+by the arrival of a data stream element from one of its input streams, thus processing is event-driven.
+As described before, a stream can have multiple sources. 
+Once the window of one of the sources of a stream slides, the 
+following processing steps are performed:
+
+\begin{enumerate}
+%\item By default the new data stream element is timestamped using the local
+%  clock of the virtual sensor provided that the stream element had no
+%  timestamp.
+\item Based on the timestamps for each stream the stream elements are
+  selected according to the definition of the time window and the resulting
+  sets of relations are unnested into flat relations.
+\item The queries defined on the source are evaluated and stored into temporary
+  relations.
+\item The stream query for producing the input of the processing class is executed
+  based on the temporary relations.
+\item The resulted stream elements are forwarded to the processing class.
+\item The output of the processing class is stored and simultaneously forwarded (notification) to
+ all consumers of the virtual sensor.
+\end{enumerate}
+
+Figure~\ref{fig:ConceptualDataFlow} shows the logical data flow inside
+a GSN node.
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.7\columnwidth]{ch-gsn-figures/conceptual-dataflow}
+  \caption{Conceptual data flow in a GSN node}
+  \label{fig:ConceptualDataFlow}
+\end{figure}
+
+Additionally, GSN provides a number of attributes in the virtual sensor file to control data rates.
+The values used for controlling these rates are usually float numbers between 0 to 1.
+The data rate controlling is useful whenever one wants to drop the stream elements with some random probability for load shedding. 
+For instance, if one has a temperature source that keeps producing 
+data with very high rate, one might want to sample the produced values 
+thus making the processing lighter. For instance if one sets the 
+sampling-rate to 0.75, any received stream element from the wrapper is going to be 
+included in the window (the window and sliding values are explained above) with a probability of 75 out of 100.
+Thus, on average 25 random stream elements will be dropped out of the last 100 elements.
+In most of the cases one typically sets the rate control attributes to "1" to make sure nothing is dropped.
+
+The rate control can be applied in the following three different levels (please refer to the virtual sensor quick reference for the syntactical
+information about different portions of the virtual sensor file):
+\begin{itemize}
+\item At the source level by providing \texttt{sampling-rate} attribute (float value in [0 .. 1]).
+\item At the stream level by providing \texttt{rate} attribute (integer value above zero).
+\item At the virtual sensor output level by providing \texttt{output-specification} $\rightarrow$ \texttt{rate} attribute (integer value above zero).
+\end{itemize}
+
+As noted above, if the rate control is a positive integer, it defines the minimum allowed time difference between to successive stream elements.
+For instance, if one is interested in receiving an average of a given sensor once an hour but the sensor underneath can produce arbitrary number of stream elements 
+(e.g., due to uncontrollable packet losses in the internal network), he can express this behavior by setting the rate attribute of the virtual sensor output 
+(\texttt{output-specification} $\rightarrow$ \texttt{rate}) to ``3600000'' (one hour is 3,600,000 milliseconds).
+
+To specify the data stream processing a suitable language is needed. A number
+of proposals exist already, so we compare the language approach of GSN to the
+major proposals from the literature. In the Aurora project~\cite{Cherniack03}
+(\url{http://www.cs.brown.edu/research/aurora/}) users can compose stream
+relationships and construct queries in a graphical representation which is then
+used as input for the query planner.  The Continuous Query Language (CQL)
+suggested by the STREAM project~\cite{Arasu06}
+(\url{http://www-db.stanford.edu/stream/}) extends standard SQL syntax with new
+constructs for temporal semantics and defines a mapping between streams and
+relations. Similarly, in Cougar~\cite{Yao03}
+(\url{http://www.cs.cornell.edu/database/cougar/}) an extended version of SQL
+is used, modeling temporal characteristics in the language itself. The
+StreaQuel language suggested by the TelegraphCQ project~\cite{Chandrasekaran03}
+(\url{http://telegraph.cs.berkeley.edu/}) follows a different path and tries to
+isolate temporal semantics from the query language through external definitions
+in a C-like syntax. For example, for specifying a sliding window for a query a
+\textit{for}-loop is used. The actual query is then formulated in an SQL-like
+syntax.
+
+GSN's approach is related to TelegraphCQ's as it separates the
+time-related constructs from the actual query. Temporal
+specifications, e.g., the window size and rates, are specified in XML in the
+virtual sensor specification, while data processing is specified in
+SQL. Using this design, GSN can support SQL queries with the full range of
+operations allowed by the standard SQL syntax, i.e., joins,
+sub-queries, ordering, grouping, unions, intersections, etc.
+The advantage of using SQL is that it is well-known and SQL query
+optimization and planning techniques can be directly applied.
+
+\section{System architecture}
+\label{sec:system-architecture}
+
+GSN uses a container-based architecture for hosting virtual sensors.
+Similar to application servers, GSN provides an environment in which
+sensor networks can easily and flexibly be specified and deployed by
+hiding most of the system complexity in the GSN Server.  Using the
+declarative specifications, virtual sensors can be deployed and
+reconfigured in GSN Servers at runtime. Communication and
+processing among different GSN Servers is performed in a
+peer-to-peer style through standard Internet and Web Services protocols. By
+viewing GSN Servers as cooperating peers in a decentralized system,
+we tried avoid some of the intrinsic scalability problems of many
+other systems which rely on a centralized or hierarchical
+architecture. Targeting a ``Sensor Internet'' as the long-term goal we
+also need to take into account that such a system will consist of
+``Autonomous Sensor Systems'' with a large degree of freedom and only
+limited possibilities of control, similarly as in the Internet.
+
+Figure~\ref{fig:NodeArchitecture} shows the layered architecture of a
+GSN Server.
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.45\columnwidth]{ch-gsn-figures/NodeArchitecture}
+  \caption{GSN Server architecture}
+  \label{fig:NodeArchitecture}
+\end{figure}
+
+Each GSN server hosts a number of virtual sensors it is responsible
+for. The virtual sensor manager (VSM) is responsible for providing
+access to the virtual sensors, managing the delivery of sensor data,
+and providing the necessary administrative infrastructure. The VSM has
+two subcomponents: The life-cycle manager (LCM) provides and manages
+the resources provided to a virtual sensor and manages the
+interactions with a virtual sensor (sensor readings, etc.). The input
+stream manager (ISM) is responsible for managing the streams,
+allocating resources to them, and enabling resource sharing among them
+while its stream quality manager subcomponent (SQM) handles sensor
+disconnections, missing values, unexpected delays, etc., thus ensuring
+the QoS of streams. All data from/to the VSM passes through the
+storage layer which is in charge of providing and managing persistent
+storage for data streams. Query processing in turn relies on all of
+the above layers and is done by the query manager (QM) which includes
+the query processor being in charge of SQL parsing, query planning,
+and execution of queries (using an adaptive query execution plan). The
+query repository manages all registered queries (subscriptions) and
+defines and maintains the set of currently active queries for the
+query processor.  The notification manager deals with the delivery of
+events and query results to registered, local or remote virtual sensors. The
+notification manager has an extensible architecture which allows the
+user to largely customize its functionality, for example, having
+results mailed or being notified via SMS.
+
+The top three layers of the architecture deal with access to the GSN
+server. The interface layer provides access functions for other GSN
+servers and via the Web (through a browser or via web services).
+These functionalities are protected and shielded by the access control
+layer providing access only to entitled parties and the data integrity
+layer which provides data integrity and confidentiality through
+electronic signatures and encryption. Data access and data integrity
+can be defined at different levels, for example, for the whole GSN
+server or at a virtual sensor level.
+
+In connection with RFID tags this ``plug-and-play'' feature of GSN
+provides new and interesting types of mobility which we will
+investigate in future work. For example, an RFID tag may store queries
+which are executed as soon as the tag is detected by a reader, thus
+transforming RFID tags from simple means for identification and
+description into a GSN server for physically mobile queries which opens
+up new and interesting possibilities for mobile information systems.
+
+%\section{Self Identifying Devices}
+%An interesting feature of GSN's architecture is the support for sensor
+%mobility based on automatic detection of sensors and zero-programing
+%deployment: A large number of sensors already support the IEEE 1451
+%standard which describes a sensor's properties and measurement
+%characteristics such as type of measurement, scaling, and calibration
+%information in a so-called Transducer Electronic Data Sheet (TEDS)
+%which is stored inside the sensor. When a new sensor node is detected
+%by GSN, for example, by moving into the transmission range of a sink
+%node, GSN requests its TEDS and uses the contained information for the
+%dynamic generation of a virtual sensor description by using a virtual
+%sensor description template and deriving the sensor-specific fields
+%of the template from the data extracted from the TEDS. At the moment
+%TEDS provides only that information about a sensor which enables
+%interaction with it.  Thus for some parts of the generated virtual
+%sensor description, e.g., security requirements, storage and resource
+%management, etc., we use default values. Then GSN dynamically
+%instantiates the new virtual sensor based on this synthesized
+%description and all local and remote processing dependent on the new
+%sensor is executed. This is done on-the-fly while GSN is running. The
+%inverse process is performed if a sensor is no longer associated with
+%a GSN node, e.g., it has moved away.
+
+\section{Implementation}
+\label{sec:implementation}
+
+The GSN implementation consists of the GSN-CORE, implemented in Java, and the
+platform-specific GSN-WRAPPERS, implemented in Java, C, and Ruby, depending on
+the available toolkits for accessing specific types of sensors or sensor
+networks. The implementation currently has approximately 80,000 lines of code
+and is available from SourceForge (\url{http://gsn.sourceforge.net/}). GSN
+is implemented to be highly modular in order to be deployable on various
+hardware platforms from workstations to small programmable PDAs, i.e.,
+depending on the specific platforms only a subset of modules may be used. GSN
+also includes visualization systems for plotting data and visualizing the
+network structure. In the following sections we are going to discuss some of
+the key aspects of the GSN implementation
+
+\subsection{Adding new sensor platforms}
+\label{sec:adding-new-sensor}
+
+For deploying a virtual sensor the user only has to specify an XML document as described in Section \ref{sec:virt-sens-spec}, if GSN already
+includes software support for the concerned hardware/software. Adding a new
+type of sensor or sensor network can be done by supplying the name of the wrapper (specified in \texttt{/conf/wrappers.properties})
+conforming to the GSN API. At the moment GSN provides the following wrappers:
+
+\begin{description}
+\item[HTTP generic wrapper] is used to pull data from devices via HTTP GET
+  or POST requests, for example, the AXIS206W wireless camera.
+
+\item[TinyOS wrapper] enables interaction with TinyOS compatible
+motes (version 1.x and 2.x). This wrapper uses the serial forwarder which is
+the standard access tool for TinyOS provided in the TinyOS package.
+
+\item[USB camera wrapper] is used for dealing with cameras connected via USB 
+  to the local machine. As USB cameras are very cheap, they are quite
+  popular as sensing devices. The wrapper supports cameras
+  with OV518 and OV511 chips (see \url{http://alpha.dyndns.org/ov511/}).
+  
+\item[TI-RFID wrapper] enables access to Texas Instruments Series 6000 S6700
+  multi-protocol RFID readers.
+
+\item[Generic UDP wrapper] can be used for any device using the UDP protocol to
+  send data.
+  
+\item[Generic serial wrapper] supports sensing devices which send data through
+  the serial port.
+\end{description}
+
+Additionally, we provide template implementations for standard cases and
+frequently used platforms. If wrapper implementations are shared publicly this
+also facilitates building a reusable code base for virtually any sensor
+platform. The effort to implement wrappers is quite low.
+
+New wrappers can be added to GSN without having to rebuild or modify the GSN
+server (plug-and-play). Upon startup GSN locates the wrapper mappings through reading
+the \texttt{/conf/wrapper.properties} file and loads each wrapper whenever needed by the system.
+
+%After that the wrappers for which virtual sensors
+%have been initialized while unused wrappers do not consume
+%resources.  Wrappers can also be parameterized, so that a virtual sensor can
+%provide initialization parameters to the wrapper, e.g., the acceptable packet
+%format for TinyOS.
+
+\subsection{Dynamic resource management}
+\label{sec:dynam-reso-manag}
+
+The highly dynamic processing environment we target with GSN requires adaptive
+dynamic resource management to allow the system to quickly react to changing
+processing needs and environmental conditions. Dynamic resource management
+accomplishes three main tasks:
+
+\begin{description}
+\item[Resource sharing:] As the user can modify/remove/add virtual sensors
+  on-the-fly during runtime, the system needs to keep track of all resources
+  used by the individual virtual sensors and enforce resource sharing among
+  sensors (wrappers) where possible.
+\item[Failure management:] If GSN detects a faulty virtual sensor or wrapper,
+    e.g., by runtime exceptions, GSN undeploys it and releases the associated
+    resources. 
+  \item[Explicit resource control:] The user can specify explicit memory and
+    processing requirements and restrictions. While restrictions are always
+    enforced, requirements are handled depending of the globally available
+    resources of the GSN instance. GSN tries to share the available resources
+    in a fair way taking into account the explicitly specified resource
+    requirements, if provided.
+\end{description}
+
+Dynamic resource management is performed at several levels in GSN as
+shown in Figure~\ref{fig:resource-layers}. Separating the resource
+sharing into several layers logically decouples the requirements and
+allows us to achieve a higher level of reuse of resources. In the
+following we will discuss the different levels.
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.5\columnwidth]{ch-gsn-figures/gsn-reuse}
+  \caption{Hierarchical resource sharing in GSN}
+  \label{fig:resource-layers}
+\end{figure}
+
+\textbf{Wrapper sharing.} Wrappers communicate directly with the sensors which
+involves expensive I/O operations via a serial connection or wireless/wired
+network communication. To minimize the costs incurred by these operations GSN
+shares wrappers among virtual sensors accessing the same physical/virtual
+sensors. To do so each GSN node maintains a repository of active wrappers. If a
+new virtual sensor is deployed, the node first checks with the wrapper
+repository whether an identical wrapper already exists, i.e., wrapper name and
+initialization parameters (and their corresponding values) of the \verb|<wrapper>| element in the virtual sensor
+definitions are identical. If a match is found, the new virtual sensor is
+registered to the existing wrapper as a consumer. If not, a new wrapper
+instance is created and registered with the wrapper repository. In the case of
+remote sensor accesses this strategy is applied at both the sending and
+receiving sides to maximize the sharing, i.e., multiple virtual sensors on one
+GSN node share a wrapper for the same remote sensor and on the node hosting the
+sensor the wrapper is shared among all nodes accessing it.
+
+\textbf{Data sharing.} The raw input data produced by the wrappers is processed
+and filtered by the source queries to generate the actual input data for the
+input streams of a virtual sensor. For this purpose a source defines
+what part of the raw input data is used by the associated source query
+to produce the source's output data, i.e., by defining the available
+storage, sampling rates, and window sizes a view on the raw data is defined on
+which the source query is executed. In terms of the implementation each
+wrapper is assigned a storage holding the raw data and source queries
+are then defined as \emph{SQL views} on this data store.
+
+This has a number of advantages: (1) It minimizes the storage consumption as
+raw data is only stored once. Especially if the sensor data is large, e.g.,
+image data, this is relevant. (2) If the sensor data comes from a
+power-constrained or slow device, power is conserved and processing is sped up.
+(3) Different processing strategies can be applied to the same data without
+having to replicate it, for example, image enhancement algorithms and object
+detection can use the same raw image data.
+
+In the same way as a wrapper can be shared by multiple sources, a source
+can also be shared among multiple streams at a higher level, and
+streams in turn are shared by multiple virtual sensors. In essence each
+of the layers in Figure~\ref{fig:resource-layers} can be viewed as a resource
+pool where each of the individual resources in the pool can be shared among
+multiple resources at the next higher level. Conversely, each higher level
+resource can also use any number of lower level resources.
+
+\subsection{Query planning and execution}
+\label{sec:query-proc-optim}
+
+In GSN each virtual sensor corresponds to a database table and each sensor
+reading corresponds to a new tuple in the related table. As we use a standard
+SQL database as our low-level query processing engine, the question is how to
+represent the streaming logic in a form understandable for a standard database
+engine (as already described, GSN separates the stream processing directives
+from the query). We address this problem by using a query translator which gets
+an SQL query and the stream processing directives as provided in the virtual
+sensor definition as inputs and translates this into a query executable in a
+standard database. The query translator relies on special support functions
+which emulate stream-oriented constructs in a database. These support functions
+are dependent on the database used and are provided by GSN (currently we
+provide adapters for HSQLDB and MySQL). Translated queries are cached for subsequent use.
+
+Upon deployment of a virtual sensor $VS$, all queries $Q_i$ contained in its
+specification are extracted. Each query $Q_i(VS_1,\dots,VS_n)$ accesses one or
+more relations $VS_1,\dots,VS_n$ which correspond to virtual sensors. Then the
+query translator translates each $Q_i(VS_1,\dots,VS_n)$ into an executable
+query $Q^t_i(VS_1,\dots,VS_n)$ as described above and each
+$Q^t_i(VS_1,\dots,VS_n)$ is declared as a view in the database with a unique
+identifier $Id_i$. This means whenever a new tuple, i.e., sensor reading, is
+added to the database, the concerned views will automatically be updated by the
+database. Additionally, a tuple $(VS_j, Id_i, VS)$ for each $VS_j \in
+{VS_1,\dots,VS_n}$ is added to a special view registration table. This
+procedure is done once when a virtual sensor is deployed.
+
+With this setup it is now simple to execute queries over the data streams
+produced by virtual sensors: As soon a new sensor reading for a virtual sensor
+$VS_d$ becomes available, it is entered into the according database relation.
+Then the database server queries the registration table using $VS_d$ as the key
+and gets all identifiers $Id_r$ registered for new data of $VS_d$. Then simply
+all views $V_r$ affected by the new data item can be retrieved using the $Id_r$
+and all $V_r$ can be queried using a \texttt{SELECT * FROM} $\mathtt{V_r}$
+statement and the resulting data can be returned to the virtual sensor
+containing $V_r$ (third column in the registration table). Since views are
+automatically updated by the database querying them is efficient. However, with
+many registered views (thousands or more) scalability may suffer. Thus GSN does
+not produce an individual query for each view but merges all queries into a
+large select statement, and the result will then be joined with the view
+registration table on the view identifier. Thus the result will hold tuples
+that identify the virtual sensor to notify of the new data.  The reasons for
+applying this strategy are that (1) database connections are expensive, (2)
+with increasing number of clients and virtual sensor definitions, the
+probability of overlaps in the result sets increases which automatically will
+be exploited by the database's query processor, and (3) query execution in the
+database is expensive, so one large query is much less costly than many
+(possibly thousands) small ones.
+
+Immediate notification of new sensor data is currently implemented in GSN and
+is an eager strategy. As an alternative also a lazy strategy could be used
+where the query execution would only take place when the GSN instance requests
+it from the database, for example, periodically at regular intervals. In
+practice the former can be implemented using views or triggers and the latter
+can be implemented using inner selects or stored procedures.
+
+\section{Evaluation\footnote{The evaluation results in this section correspond to GSN release 0.90.}}
+\label{sec:evaluation}
+
+GSN aims at providing a zero-programming and efficient infrastructure for
+large-scale interconnected sensor networks. To justify this claim we
+experimentally evaluate the throughput of the local sensor data processing and
+the performance and scalability of query processing as the key influencing
+factors.  As virtual sensors are addressed explicitly and GSN nodes communicate
+directly in a point-to-point (peer-to-peer) style, we can reasonably
+extrapolate the experimental results presented in this section to larger
+network sizes.  For our experiments, we used the setup shown in
+Figure~\ref{fig:ExperimentalSetup}.
+
+The GSN network consisted of 5 standard Dell desktop PCs with Pentium 4, 3.2GHz
+Intel processors with 1MB cache, 1GB memory, 100Mbit Ethernet, running Debian
+3.1 Linux with an unmodified kernel 2.4.27. For the storage layer use standard
+MySQL 5.18.  The PCs were attached to the following sensor networks as shown in
+Figure~\ref{fig:ExperimentalSetup}.
+
+\begin{itemize}
+  
+\item A sensor network consisting of 10 Mica2 motes, each mote being equipped
+  with light and temperature sensors. The packet size was configured to 15
+  Bytes (data portion excluding the headers).
+  
+\item A sensor network consisting of 8 Mica2 motes, each equipped with light,
+  temperature, acceleration, and sound sensors. The packet size was
+  configured to 100 Bytes (data portion excluding the headers).  The maximum
+  possible packet size for TinyOS 1.x packets of the current TinyOS
+  implementation is 128 bytes (including headers).
+  
+\item A sensor network consisting of 4 Tiny-Nodes (TinyOS compatible motes
+  produced by Shockfish, \url{http://www.shockfish.com/}), each equipped with a
+  light and two temperature sensors with TinyOS standard packet size of 29
+  Bytes.
+  
+\item 15 Wireless network cameras (AXIS 206W) which can capture 640x480 JPEG
+  pictures with a rate of 30 frames per second. 5 cameras use the highest
+  available compression (16kB average image size), 5 use medium compression
+  (32kB average image size), and 5 use no compression (75kB average image
+  size). The cameras are connected to a Linksys WRT54G wireless access point
+  via 802.11b and the access point is connected via 100Mbit Ethernet to a GSN
+  node.
+  
+\item A Texas Instruments Series 6000 S6700 multi-protocol RFID reader with
+  three different kind of tags, which can keep up to 8KB of data.
+  128 Bytes capacity.
+  
+\end{itemize}
+
+The motes in each sensor network form a sensor network and routing among the
+motes is done with the surge multi-hop ad-hoc routing algorithm provided by
+TinyOS.
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.8\columnwidth]{ch-gsn-figures/setup}
+  \caption{Experimental setup}
+  \label{fig:ExperimentalSetup}
+\end{figure}
+
+
+\subsection{Internal processing time}
+\label{sec:exepr-eval}
+
+In the first experiment we wanted to determine the internal processing time a
+GSN node requires for processing sensor readings, i.e., the time interval when
+the wrapper gets the sensor data until the data can be provided to clients by
+the associated virtual sensor. This delay depends on the size of the sensor
+data and the rate at which the data is produced, but is independent of the
+number of clients wanting to receive the sensor data. Thus it is a lower bound
+and characterizes the efficiency of the implementation. 
+
+We configured the 22 motes and 15 cameras to produce data every 10, 25, 50,
+100, 250, 500, and 1000 milliseconds. As the cameras have a maximum rate of 30
+frames/second, i.e., a frame every 33 milliseconds, we added a proxy between
+the GSN node and the WRT54G access point which repeated the last available
+frame in order to reach a frame interval of 10 milliseconds. All GSN instances
+used the Sun Java Virtual Machine (1.5.0 update 6) with memory restricted to
+64MB.
+
+The experiment was conducted as follows: All motes and cameras were set to the
+same rate and produced data for 8 hours and we measured the processing delay.
+This was repeated 3 times for each rate and the measurements were averaged.
+Figure~\ref{fig:TimeTriggeredLoad} shows the results of the experiment for the
+different data sizes produced by the motes and the cameras.
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.8\columnwidth]{ch-gsn-figures/rates}
+  \caption{GSN node under time-triggered load}
+  \label{fig:TimeTriggeredLoad}
+\end{figure}
+
+High data rates put some stress on the system but the absolute delays are still
+quite tolerable. The delays drop sharply if the interval is increased and then
+converge to a nearly constant time at a rate of approximately 4 readings/second
+or less. This result shows that GSN can tolerate high rates and incurs low
+overhead for realistic rates as in practical sensor deployments lower rates are
+more probable due to energy constraints of the sensor devices while still being
+able to deal also with high rates.
+
+
+\subsection{Scalability in the number of queries and clients}
+\label{sec:scal-towards-numb}
+
+In this experiment the goal was to measure GSN's scalability in the number of
+clients and queries. To do so, we used two 1.8 GHz Centrino laptops with 1GB
+memory as shown in Figure~\ref{fig:ExperimentalSetup} which each ran 250
+lightweight GSN instances. The lightweight GSN instance only included those
+components that we needed for the experiment. Each GSN-light instance used a
+random query generator to generate queries with varying table names, varying
+filtering condition complexity, and varying configuration parameters such as
+history size, sampling rate, etc. For the experiments we configured the query
+generator to produce random queries with 3 filtering predicates in the
+\texttt{where} clause on average, using random history sizes from 1 second up
+to 30 minutes and uniformly distributed random sampling rates (seconds) in the
+interval $[0.01,1]$.
+
+Then we configured the motes such that they produce a measurement each second
+but would deliver it with a probability $P<1$, i.e., a reading would be dropped
+with probability $1-P>0$.  Additionally, each mote could produce a burst of $R$
+readings at the highest possible speed depending on the hardware with
+probability $B>0$, where $R$ is a uniformly random integer from the interval
+$[1,100]$. I.e., a burst would occur with a probability of $P * B$ and would
+produce randomly 1 up to 100 data items.  In the experiments we used $P=0.85$
+and $B=0.3$. On the desktops we used MySQL as the database with the recommended
+configuration for large memory systems.
+Figure~\ref{fig:QueryProcessingLatency} shows the results for a stream element
+size (SES) of 30 Bytes. Using SES=32KB gives the same latencies. Due
+to space limitations we do not include this figure.
+
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.8\columnwidth]{ch-gsn-figures/query-processing-time-30bytes}
+%  \hspace{0.05\columnwidth}
+%  \includegraphics[width=0.45\columnwidth]{query-processing-time-32KB}
+  \caption{Query processing latencies in a node}
+  \label{fig:QueryProcessingLatency}
+\end{figure}
+
+The spikes in the graphs are bursts as described above. Basically this
+experiment measures the performance of the database server under various loads
+which heavily depends on the used database. As expected the database server's
+performance is directly related to the number of the clients as with the
+increasing number of clients more queries are sent to the database and also the
+cost of the query compiling increases. Nevertheless, the query processing time
+is reasonably low as the graphs show that the average time to process a query
+if 500 clients issue queries is less than 50ms, i.e., approximately 0.5ms per
+client. If required, a cluster could be used to the improve query processing
+times which is supported by most of the existing databases already.
+
+In the next experiment shown in Figure~\ref{fig:ProcessingTimePerClient} we
+look at the average processing time for a client excluding the query processing
+part. In this experiment we used $P=0.85$, $B=0.05$, and $R$ is as above. 
+
+We can make three interesting observations from
+Figure~\ref{fig:ProcessingTimePerClient}:
+
+\begin{enumerate}
+\item  GSN only allocates resources for virtual sensors that are being
+  used. The left side of the graph shows the situation when the first
+  clients arrive and use virtual sensors. The system has to instantiate
+  the virtual sensor and activates the necessary resources for query
+  processing, notification, connection caching, etc. Thus for the
+  first clients to arrive average processing times are a bit
+  higher. CPU usage is around 34\% in this interval. After a short
+  time (around 30 clients) the initialization phase is over and the
+  average processing time decreases as the newly arriving clients can
+  already use the services in place. CPU usage then drops to around
+  12\%.
+  
+\item Again the spikes in the graph relate to bursts. Although the processing
+  time increases considerably during the bursts, the system immediately
+  restores its normal behavior with low processing times when the bursts are
+  over, i.e., it is very responsive and quickly adopts to varying loads.
+
+\item As the number of clients increases, the average processing time
+  for each client decreases. This is due to the implemented data
+  sharing functionalities. As the number of clients increases, also
+  the probability of using common resources and data items grows.
+\end{enumerate}
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.8\columnwidth]{ch-gsn-figures/processing-time-per-client}
+  \caption{Processing time per client}
+  \label{fig:ProcessingTimePerClient}
+\end{figure}
+
+\section{Related work}
+\label{sec:relatedwork}
+
+So far only few architectures to support interconnected sensor networks exist.
+Sgroi et al.~\cite{Sgroi05} suggest basic abstractions, a standard set of
+services, and an API to free application developers from the details of the
+underlying sensor networks.  However, the focus is on systematic definition and
+classification of abstractions and services, while GSN takes a more general
+view and provides not only APIs but a complete query processing and management
+infrastructure with a declarative language interface.
+
+Hourglass~\cite{Shneidman04} provides an Internet-based infrastructure for
+connecting sensor networks to applications and offers topic-based discovery and
+data-processing services. Similar to GSN it tries to hide internals of sensors
+from the user but focuses on maintaining quality of service of data streams in
+the presence of disconnections while GSN is more targeted at flexible
+configurations, general abstractions, and distributed query support.
+
+HiFi~\cite{Franklin05} provides efficient, hierarchical data stream query
+processing to acquire, filter, and aggregate data from multiple devices in a
+static environment while GSN takes a peer-to-peer perspective assuming a
+dynamic environment and allowing any node to be a data source, data sink, or
+data aggregator.
+
+IrisNet~\cite{Gibbons03} proposes a two-tier architecture consisting of sensing
+agents (SA) which collect and pre-process sensor data and organizing agents
+(OA) which store sensor data in a hierarchical, distributed XML database. This
+database is modeled after the design of the Internet DNS and supports XPath
+queries. In contrast to that, GSN follows a symmetric peer-to-peer approach as
+already mentioned and supports relational queries using SQL.
+
+Rooney et al.~\cite{Rooney06} propose so-called EdgeServers to integrate sensor
+networks into enterprise networks. EdgeServers filter and aggregate raw sensor
+data (using application specific code) to reduce the amount of data forwarded
+to application servers. The system uses publish/subscribe style communication
+and also includes specialized protocols for the integration of sensor
+networks. While GSN provides a general-purpose infrastructure for sensor
+network deployment and distributed query processing, the EdgeServer system
+targets enterprise networks with application-based customization to reduce
+sensor data traffic in closed environments.
+
+Besides these architectures, a large number of systems for query processing in
+sensor networks exist. Aurora~\cite{Cherniack03} (Brandeis University, Braun
+University, MIT), STREAM~\cite{Arasu06} (Stanford),
+TelegraphCQ~\cite{Chandrasekaran03} (UC Berkeley), and Cougar~\cite{Yao03}
+(Cornell) have already been discussed and related to GSN in
+Section~\ref{sec:data-stre-proc}.
+
+%The Aurora project~\cite{Cherniack03} is a general-purpose centralized stream
+%processing engine. Streams are modeled as sequences of time-stamped tuples, and
+%users can compose stream relationships and construct queries in a graphical
+%representation which is then used as input for the query planner.
+
+In the Medusa distributed stream-processing system~\cite{Zdonik03}, Aurora is
+being used as the processing engine on each of the participating nodes. Medusa
+takes Aurora queries and distributes them across multiple nodes and
+particularly focuses on load management using economic principles and high
+availability issues. The Borealis stream processing engine~\cite{Abadi05} is
+based on the work in Medusa and Aurora and supports dynamic query modification,
+dynamic revision of query results, and flexible optimization. These systems
+focus on (distributed) query processing only, which is only one specific
+component of GSN, and focus on sensor heavy and server heavy application
+domains.
+
+Additionally, several systems providing publish/subscribe-style query
+processing comparable to GSN exist, for example, \cite{Gray05}.
+
+\section{Conclusions}
+\label{sec:conclusions}
+
+The full potential of sensor technology will be unleashed through large-scale
+(up to global scale) data-oriented integration of sensor networks. To realize
+this vision of a ``Sensor Internet'' we suggest our Global Sensor Networks
+(GSN) middleware which enables fast and flexible deployment and interconnection
+of sensor networks. Through its virtual sensor abstraction which can abstract
+from arbitrary stream data sources and its powerful declarative specification
+and query tools, GSN provides simple and uniform access to the host of
+heterogeneous technologies. GSN offers zero-programming deployment and
+data-oriented integration of sensor networks and supports dynamic configuration
+and adaptation at runtime. Zero-programming deployment in conjunction with
+GSN's plug-and-play detection and deployment feature provides a basic
+functionality to enable sensor mobility. GSN is implemented in Java and C/C++
+and is available from SourceForge at \url{http://gsn.sourcefourge.net/}.
+The experimental evaluation of GSN demonstrates that the implementation is
+highly efficient, offers very good performance and throughput even under high
+loads and scales gracefully in the number of nodes, queries, and query
+complexity.
+

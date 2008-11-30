@@ -1,3 +1,28 @@
+\usepackage[stable]{footmisc} %Support for adding footnote for the sections.
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{listings}
+
+\newcommand{\footnoteremember}[2]{
+  \footnote{#2}
+  \newcounter{#1}
+  \setcounter{#1}{\value{footnote}}
+}
+\newcommand{\footnoterecall}[1]{
+  \footnotemark[\value{#1}]
+}
+% \footnoteremember{myfootnote}{This is my footnote}
+% \footnoterecall{myfootnote}.
+
+\lstloadlanguages{XML,Java}
+\lstset{language=XML, commentstyle=\tiny}
+\urlstyle{rm}
+
+
+
 \usepackage{lastpage}
 %
 \usepackage{fancyhdr} 
@@ -137,3 +162,5 @@
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
 \newcommand{\inlinecode}[1]{\texttt{#1}}
 \newenvironment{paraenum}{\begin{inparaenum}[\itshape(1)\upshape]}{\end{inparaenum}}
+
+
