@@ -3,7 +3,6 @@ package gsn.wrappers;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.wrappers.AbstractWrapper;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,12 +15,11 @@ import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.DOMException;
@@ -113,12 +111,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 		else if (seperator_text.equals("space")) seperator=' ';
 		else seperator = seperator_text.charAt(0);
 
-		// initialization of status of the wrapper
-//		boolean ret;
 		if (!readStatus()) return false; 
-
-//		if (file_handling) ret = fileBasedInit();
-//		else ret = svnBasedInit();
 
 		logger.warn("wrapper correctly initialized");
 		return true;
@@ -129,17 +122,9 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 		String contents = null;
 		if (statusFile.exists()){
 			try {
-				//use buffering, reading one line at a time
-				//FileReader always assumes default encoding is OK!
 				BufferedReader input =  new BufferedReader(new FileReader(statusFile));
 				try {
 					String line = null; //not declared within while loop
-					/*
-					 * readLine is a bit quirky :
-					 * it returns the content of a line MINUS the newline.
-					 * it returns null only for the END of the stream.
-					 * it returns an empty String if two newlines appear in a row.
-					 */
 					while (( line = input.readLine()) != null){
 						contents = line;
 					}
@@ -170,72 +155,14 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 
 	private void writeStatus(){
 		try{
-			// Create file 
 			FileWriter fstream = new FileWriter(statusFile);
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.write(lastEnteredStreamelement+";"+lastModified);
-			//Close the output stream
 			out.close();
 		}catch (Exception e){//Catch exception if any
 			logger.error("Error: " + e.getMessage());
 		}
 	}
-
-//	private boolean fileBasedInit(){
-//	File dir = new File(directory);
-//	if (!dir.exists()){
-//	logger.error("the specified directory "+directory+"does not link to a valid directory!");
-//	return false;
-//	}
-
-//	File[] list = dir.listFiles();
-//	File file = null;
-//	for (int i=0;i<list.length;i++){
-//	if (list[i].getTotalSpace()>10 && !list[i].equals(statusFile)){
-//	long l = list[i].lastModified();
-//	if (l>this.lastModified) {
-//	this.lastModified=l;
-//	file = list[i];
-//	}
-//	}
-//	}
-//	if (file==null){
-//	this.lastEnteredStreamelement = 0;
-//	this.lastModified = 0;
-//	} else {
-//	logger.warn("last file modified "+file.getAbsolutePath());
-//	CSVReader reader;
-//	try {
-//	reader = new CSVReader(new FileReader(file),seperator,'\"',skip_lines);
-//	String[] data;
-//	String timeString = null;
-//	String dateString = null;
-//	while ((data =reader.readNext()) !=null) {
-//	timeString = data[0];
-//	dateString = data[1];
-//	}
-//	if ((timeString!=null) && (dateString !=null)){
-//	Date date = dateTimeFormat.parse(timeString+" "+dateString);
-//	this.lastEnteredStreamelement = date.getTime();
-//	}
-//	} catch (FileNotFoundException e) {
-//	logger.error("last file during initialization not found!");
-//	e.printStackTrace();
-//	} catch (IOException e) {
-//	logger.error("IO exception while reading the last modified file during initialization!");
-//	e.printStackTrace();
-//	} catch (ParseException e) {
-//	logger.error("exception while parsing the timestamp of the last modified file during initialization!");
-//	e.printStackTrace();
-//	}
-
-//	}
-//	return true;
-//	}
-
-//	private boolean svnBasedInit(){
-//	return true;
-//	}
 
 	public  StreamElement rowToSE(String[] data) {
 		Date date;
@@ -285,9 +212,9 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 				Thread.sleep(sampling);
 				logger.warn("new sampling started "+file_handling);
 				if (file_handling){
-					Collection<File> list = getNewFileDataAvailable();
-					list.remove(statusFile);
-					for(File file: list){
+					TreeMap<Long,File> list = getNewFileDataAvailable();
+					for (Long modified: list.keySet()){
+						File file = list.get(modified);
 						logger.warn("processing the received file list "+file.getAbsolutePath());
 						try {
 							String[] data = null;
@@ -305,7 +232,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 									this.lastEnteredStreamelement = streamElement.getTimeStamp();
 								}
 							}
-							this.lastModified = file.lastModified();
+							this.lastModified = modified.longValue();
 							writeStatus();
 						} catch (Exception e) {
 							logger.error("Error in reading/processing "+file);
@@ -320,9 +247,10 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 					}
 				} else {
 					logger.warn("start svn data processing");
-					Collection<String> list = getNewSvnDataAvailable();
+					TreeMap<Long,String> list = getNewSvnDataAvailable();
 					logger.warn("the list has been derived; there are elements: "+list.size());
-					for(String name: list){
+					for (Long modified:list.keySet()){
+						String name = list.get(modified);
 						logger.warn("processing the received file list "+name);
 						try {
 							String[] data = null;
@@ -343,6 +271,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 									this.lastEnteredStreamelement = streamElement.getTimeStamp();
 								}
 							}
+							this.lastModified = modified.longValue();
 							writeStatus();
 						} catch (Exception e) {
 							logger.error("Error in reading/processing "+name);
@@ -362,26 +291,17 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 		}
 	}
 
-	private Collection<String> getNewSvnDataAvailable(){
-		TreeSet<String> nameList = new TreeSet<String>();
+	private TreeMap<Long,String> getNewSvnDataAvailable(){
+		TreeMap<Long,String> nameList = new TreeMap<Long,String>();
 		try{
-logger.warn("start getNewSvnDataAvailable()");
-logger.warn("svnlogin:"+svnlogin+"   svnpasswd:"+svnpasswd);
-logger.warn("svnurl:"+svnurl);
-String cmd = "/usr/bin/svn info "+svnurl+"/ --username "+svnlogin+" --password "+svnpasswd+" -R --xml";
-//String cmd ="ls";
-logger.warn(cmd);
+			logger.warn("start getNewSvnDataAvailable()");
+			logger.warn("svnlogin:"+svnlogin+"   svnpasswd:"+svnpasswd);
+			logger.warn("svnurl:"+svnurl);
+			String cmd = "/usr/bin/svn info "+svnurl+"/ --username "+svnlogin+" --password "+svnpasswd+" -R --xml";
 			Process p = Runtime.getRuntime().exec(cmd);
-logger.warn("process initialized");
+			logger.warn("process initialized");
 			InputStream in = p.getInputStream();
 
-//BufferedReader d = new BufferedReader(new InputStreamReader(in));
-//String data;
-//logger.warn("command call executed"); 
-//  while ((data=d.readLine()) != null)  {
-//	logger.warn(data);
-//}
-//logger.warn("process exit code: "+p.exitValue());
 			DOMParser parser = new DOMParser();
 			InputSource source = new InputSource(in);
 			parser.parse(source);
@@ -391,35 +311,36 @@ logger.warn("process initialized");
 			logger.warn("entries: "+entries.getLength());
 			for(int i=0;i<entries.getLength();i++){
 				Element e = (Element) entries.item(i);
-logger.warn("kind: "+e.getAttribute("kind"));
+				logger.warn("kind: "+e.getAttribute("kind"));
 				if( e.getAttribute("kind").equals("file")){
 					String name = e.getAttribute("path");
 					Element urlElem = (Element) e.getElementsByTagName("url").item(0);
-NodeList l = urlElem.getChildNodes();
-String url =null;
-String dateStr = null;
-for (int j=0;j<l.getLength();j++){
-	Node n = l.item(j);
-	if (n.getNodeType()==Node.TEXT_NODE){
-		url = n.getNodeValue();
-		break;
-	}
-}
- Element dateElem = (Element) e.getElementsByTagName("date").item(0);
-l = dateElem.getChildNodes();
-for (int j=0;j<l.getLength();j++){
-        Node n = l.item(j);
-        if (n.getNodeType()==Node.TEXT_NODE){
-                dateStr = n.getNodeValue();
-                break;
-        }
-}
-if (url!=null) logger.warn("url: "+url);
-if (dateStr!=null) logger.warn("dateStr: "+dateStr);
+					NodeList l = urlElem.getChildNodes();
+					String url =null;
+					String dateStr = null;
+					for (int j=0;j<l.getLength();j++){
+						Node n = l.item(j);
+						if (n.getNodeType()==Node.TEXT_NODE){
+							url = n.getNodeValue();
+							break;
+						}
+					}
+					Element dateElem = (Element) e.getElementsByTagName("date").item(0);
+					l = dateElem.getChildNodes();
+					for (int j=0;j<l.getLength();j++){
+						Node n = l.item(j);
+						if (n.getNodeType()==Node.TEXT_NODE){
+							dateStr = n.getNodeValue();
+							break;
+						}
+					}
+					if (url!=null) logger.warn("url: "+url);
+					if (dateStr!=null) logger.warn("dateStr: "+dateStr);
 					Date date = svnDateTimeFormat.parse(dateStr.substring(0, SvnDateFormat.length()-2));
-					if (date.getTime() > this.lastModified && !name.equals("status.txt"))
-						nameList.add(url);
-					logger.warn("path name: "+name+"   url: "+url);
+					if (date.getTime() > this.lastModified && !name.equals("status.txt")){
+						nameList.put(new Long(date.getTime()),url);
+						logger.warn("add file: path name: "+name+"   url: "+url+"    date: "+dateStr);
+					}
 				}
 
 			}
@@ -457,7 +378,7 @@ if (dateStr!=null) logger.warn("dateStr: "+dateStr);
 	 * if there are no new files
 	 * @return
 	 */
-	public Collection<File> getNewFileDataAvailable(){
+	public TreeMap<Long,File> getNewFileDataAvailable(){
 		File dir = new File(directory);
 		File[] list = dir.listFiles();
 		TreeMap<Long,File> map = new TreeMap<Long,File>();
@@ -472,8 +393,7 @@ if (dateStr!=null) logger.warn("dateStr: "+dateStr);
 				}
 			}
 		}
-		this.lastModified = modified;
-		return map.values();
+		return map;
 	}
 }
 
