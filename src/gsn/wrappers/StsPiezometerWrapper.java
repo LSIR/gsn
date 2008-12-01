@@ -27,6 +27,7 @@ import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -39,7 +40,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 	// The 2nd, 3rd and 4th lines are going to have data structure information for rest of the output
 	// Time stamp is always the first column in the output.
 	private static final String DateFormat = "HH:mm:ss dd.MM.yyyy";
-	private static final String SvnDateFormat = "yyyy-MM-ddTHH:mm:ss";
+	private static final String SvnDateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
 	private static final String QUOTE = "\"";
 	private static final String SAMPLING = "sampling";
@@ -68,12 +69,11 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 	private DataField[] structure = {
 			new DataField( "pressure" , "double" , "pressure"),
 			new DataField( "temperature" , "double" , "water temperatured"),
-			new DataField( "conductivity" , "double" , "electric conductivity"),
-			new DataField( "counter" , "double" , "counter") };
+			new DataField( "conductivity" , "double" , "electric conductivity") };
 	private int threadCounter=0;
 	private SimpleDateFormat dateTimeFormat ;
 	private SimpleDateFormat svnDateTimeFormat ;
-	private long lastModified= -1;
+	private long lastModified= 0;
 	private long lastEnteredStreamelement =0;
 	private int skip_lines = 3;
 	private char seperator = '\t';
@@ -125,7 +125,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 	}
 
 	private boolean readStatus(){
-		statusFile = new File(directory+File.pathSeparator+"status.txt");
+		statusFile = new File(directory+File.separator+"status.txt");
 		String contents = null;
 		if (statusFile.exists()){
 			try {
@@ -153,6 +153,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 			}
 			logger.warn("Content of the last line of the status file: "+contents);
 			String[] list = contents.split(";");
+			logger.warn("number of split elements: "+list.length+"  0:"+list[0]+"  1:"+list[1]);
 			this.lastEnteredStreamelement = Long.getLong(list[0]).longValue();
 			this.lastModified = Long.getLong(list[1]).longValue();
 		} else {
@@ -282,7 +283,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 		while (true) {
 			try{
 				Thread.sleep(sampling);
-				logger.warn("new sampling started");
+				logger.warn("new sampling started "+file_handling);
 				if (file_handling){
 					Collection<File> list = getNewFileDataAvailable();
 					list.remove(statusFile);
@@ -304,6 +305,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 									this.lastEnteredStreamelement = streamElement.getTimeStamp();
 								}
 							}
+							this.lastModified = file.lastModified();
 							writeStatus();
 						} catch (Exception e) {
 							logger.error("Error in reading/processing "+file);
@@ -317,12 +319,14 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 						}
 					}
 				} else {
+					logger.warn("start svn data processing");
 					Collection<String> list = getNewSvnDataAvailable();
+					logger.warn("the list has been derived; there are elements: "+list.size());
 					for(String name: list){
 						logger.warn("processing the received file list "+name);
 						try {
 							String[] data = null;
-							Process p = Runtime.getRuntime().exec("svn cat "+name+" --username '"+svnlogin+"' --password '"+svnpasswd+"' ");
+							Process p = Runtime.getRuntime().exec("svn cat "+name+" --username "+svnlogin+" --password "+svnpasswd+" ");
 							InputStream in = p.getInputStream();
 							BufferedReader d = new BufferedReader(new InputStreamReader(in));
 							reader = new CSVReader(d,seperator,'\"',skip_lines);
@@ -361,24 +365,61 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 	private Collection<String> getNewSvnDataAvailable(){
 		TreeSet<String> nameList = new TreeSet<String>();
 		try{
-			Process p = Runtime.getRuntime().exec("svn info "+svnurl+" --username '"+svnlogin+"' --password '"+svnpasswd+"' -R --xml");
+logger.warn("start getNewSvnDataAvailable()");
+logger.warn("svnlogin:"+svnlogin+"   svnpasswd:"+svnpasswd);
+logger.warn("svnurl:"+svnurl);
+String cmd = "/usr/bin/svn info "+svnurl+"/ --username "+svnlogin+" --password "+svnpasswd+" -R --xml";
+//String cmd ="ls";
+logger.warn(cmd);
+			Process p = Runtime.getRuntime().exec(cmd);
+logger.warn("process initialized");
 			InputStream in = p.getInputStream();
+
+//BufferedReader d = new BufferedReader(new InputStreamReader(in));
+//String data;
+//logger.warn("command call executed"); 
+//  while ((data=d.readLine()) != null)  {
+//	logger.warn(data);
+//}
+//logger.warn("process exit code: "+p.exitValue());
 			DOMParser parser = new DOMParser();
 			InputSource source = new InputSource(in);
 			parser.parse(source);
 
 			Document doc = parser.getDocument();
 			NodeList entries = doc.getElementsByTagName("entry");
+			logger.warn("entries: "+entries.getLength());
 			for(int i=0;i<entries.getLength();i++){
 				Element e = (Element) entries.item(i);
+logger.warn("kind: "+e.getAttribute("kind"));
 				if( e.getAttribute("kind").equals("file")){
 					String name = e.getAttribute("path");
 					Element urlElem = (Element) e.getElementsByTagName("url").item(0);
-					String url = urlElem.getNodeValue();
-					Element dateElem = (Element) e.getElementsByTagName("date").item(0);
-					Date date = svnDateTimeFormat.parse(dateElem.getNodeValue().substring(0, SvnDateFormat.length()));
+NodeList l = urlElem.getChildNodes();
+String url =null;
+String dateStr = null;
+for (int j=0;j<l.getLength();j++){
+	Node n = l.item(j);
+	if (n.getNodeType()==Node.TEXT_NODE){
+		url = n.getNodeValue();
+		break;
+	}
+}
+ Element dateElem = (Element) e.getElementsByTagName("date").item(0);
+l = dateElem.getChildNodes();
+for (int j=0;j<l.getLength();j++){
+        Node n = l.item(j);
+        if (n.getNodeType()==Node.TEXT_NODE){
+                dateStr = n.getNodeValue();
+                break;
+        }
+}
+if (url!=null) logger.warn("url: "+url);
+if (dateStr!=null) logger.warn("dateStr: "+dateStr);
+					Date date = svnDateTimeFormat.parse(dateStr.substring(0, SvnDateFormat.length()-2));
 					if (date.getTime() > this.lastModified && !name.equals("status.txt"))
 						nameList.add(url);
+					logger.warn("path name: "+name+"   url: "+url);
 				}
 
 			}
@@ -392,6 +433,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 		} catch (ParseException e) {
 			logger.error("the date format provided by the svn resulted in a parsing exception "+e.getMessage());
 		}
+
 		return nameList;
 	}
 
