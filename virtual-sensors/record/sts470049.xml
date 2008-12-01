@@ -1,0 +1,37 @@
+<virtual-sensor name="sts470049" priority="10" >
+    <processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		  <init-params/>
+	    <output-structure>
+				<field name="pressure"     				type="double" />
+				<field name="temperature"    			type="double" />
+				<field name="conductivity"     			type="double" />
+	    </output-structure>
+    </processing-class>
+    <description>STS logger connected to a conductivity instrument.</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+		<predicate key="geographical">R001, Thur, Switzerland.</predicate>
+	 	<predicate key="depth">3</predicate>
+		<predicate key="NAME">sts470049</predicate>
+	</addressing>
+	<storage/>
+    <streams>
+	    <stream name="DATA" >
+	         <source alias="source" storage-size="1" sampling-rate="1">
+	            <address wrapper="stspiezometer">
+	               <predicate key="directory">sts470049</predicate>
+	               <predicate key="svnurl">http://silo1.ewi.utwente.nl/svn/wiki/trunk/record_sts_data/470049</predicate>
+	               <predicate key="svnlogin">gsn</predicate>
+	               <predicate key="svnpasswd">admmdb2</predicate>
+	               <predicate key="not_a_number">NaN,7999,-7999</predicate>
+	               <predicate key="sampling">600000</predicate> <!-- 10 mins, the value is in msc.-->
+	               <predicate key="skip_lines">3</predicate>
+	               <predicate key="seperator">tab</predicate>
+	            </address>
+	            <query>select * from wrapper</query>
+	         </source>
+	         <query>select * from source</query>
+	    </stream>
+    </streams>
+</virtual-sensor> 
