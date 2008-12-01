@@ -118,7 +118,11 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 	}
 
 	private boolean readStatus(){
-		statusFile = new File(directory+File.separator+"status.txt");
+		String filename = svnurl;
+		filename = filename.replace('/','_');
+		filename = filename.replace(':','_');
+		filename = filename.replace('\\','_');
+		statusFile = new File(directory+File.separator+filename+"_status.txt");
 		String contents = null;
 		if (statusFile.exists()){
 			try {
@@ -337,7 +341,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 					if (url!=null) logger.warn("url: "+url);
 					if (dateStr!=null) logger.warn("dateStr: "+dateStr);
 					Date date = svnDateTimeFormat.parse(dateStr.substring(0, SvnDateFormat.length()-2));
-					if (date.getTime() > this.lastModified && !name.equals("status.txt")){
+					if (date.getTime() > this.lastModified ){
 						nameList.put(new Long(date.getTime()),url);
 						logger.warn("add file: path name: "+name+"   url: "+url+"    date: "+dateStr);
 					}
