@@ -139,8 +139,8 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 			logger.warn("Content of the last line of the status file: "+contents);
 			String[] list = contents.split(";");
 			logger.warn("number of split elements: "+list.length+"  0:"+list[0]+"  1:"+list[1]);
-			this.lastEnteredStreamelement = Long.getLong(list[0]).longValue();
-			this.lastModified = Long.getLong(list[1]).longValue();
+			this.lastEnteredStreamelement = new Long(list[0]);
+			this.lastModified = new Long(list[1]);
 		} else {
 			try {
 				statusFile.createNewFile();
@@ -297,7 +297,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 			logger.warn("start getNewSvnDataAvailable()");
 			logger.warn("svnlogin:"+svnlogin+"   svnpasswd:"+svnpasswd);
 			logger.warn("svnurl:"+svnurl);
-			String cmd = "/usr/bin/svn info "+svnurl+"/ --username "+svnlogin+" --password "+svnpasswd+" -R --xml";
+			String cmd = "svn info "+svnurl+"/ --username "+svnlogin+" --password "+svnpasswd+" -R --xml";
 			Process p = Runtime.getRuntime().exec(cmd);
 			logger.warn("process initialized");
 			InputStream in = p.getInputStream();
