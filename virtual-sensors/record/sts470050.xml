@@ -20,7 +20,7 @@
 	    <stream name="DATA" >
 	         <source alias="source" storage-size="1" sampling-rate="1">
 	            <address wrapper="stspiezometer">
-	               <predicate key="directory">sts470050</predicate>
+	               <predicate key="directory">sts_status</predicate>
 	               <predicate key="svnurl">http://silo1.ewi.utwente.nl/svn/wiki/trunk/record_sts_data/470050</predicate>
 	               <predicate key="svnlogin">gsn</predicate>
 	               <predicate key="svnpasswd">admmdb2</predicate>
