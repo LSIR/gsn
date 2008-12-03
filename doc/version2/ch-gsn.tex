@@ -815,7 +815,7 @@ sensor definition as inputs and translates this into a query executable in a
 standard database. The query translator relies on special support functions
 which emulate stream-oriented constructs in a database. These support functions
 are dependent on the database used and are provided by GSN (currently we
-provide adapters for HSQLDB and MySQL). Translated queries are cached for subsequent use.
+provide adapters for H2 and MySQL). Translated queries are cached for subsequent use.
 
 Upon deployment of a virtual sensor $VS$, all queries $Q_i$ contained in its
 specification are extracted. Each query $Q_i(VS_1,\dots,VS_n)$ accesses one or
@@ -900,7 +900,7 @@ are implemented using XML-RPC calls). In the following we provide a brief descri
 
 In order to make the GSN to GSN communication more concrete, we provide more system level details below.
 For using a remote virtual sensor, the first step is locating the \emph{contact point} of the GSN server which
-hosts the prospective virtual sensor. By default, the contact point is \texttt{http://ip-address:gsn-port/gsn-handler}\footnote{The port is specified in the \texttt{conf/gsn.xml} file.}\footnote{The exact mapping is specified in \texttt{webapp/WEB-INF/web.xml} file.}.
+hosts the prospective virtual sensor. By default, the contact point is \texttt{http://ip-address:gsn-port/gsn-handler}\footnote{The port is specified in the \texttt{conf/gsn.xml} file.}\footnote{In the \texttt{webapp/WEB-INF/web.xml} file, the GSN's RPC handler (the \texttt{gsn.GSNRPC} class) is mapped to \texttt{/gsn-handler}. One shouldn't confuse the \texttt{/gsn-handler} with \texttt{/gsn} which is designed to be used solely by the web/ajax interface and does not involved in XML-RPC calls.}.
 If  the contact point is correctly identified, the response to a plain HTTP POST request 
 returns a XML output.\footnote{The actual output represents an error as the request is not properly formatted.}\footnote{For sending plain HTTP POST requests
 to \texttt{http://ip-address:gsn-port/gsn-handler}, you may want to use \url{http://code.google.com/p/rest-client/}. }
