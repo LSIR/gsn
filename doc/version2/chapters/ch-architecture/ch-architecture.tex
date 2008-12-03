@@ -2,14 +2,40 @@
 
 \chapter{GSN Architecture}
 
+\gsn is composed of three parts: data acquisition, data processing, and output
+dispatching (also called notification subsystem).
+
 \section{Data Acquisition}
 
- Before filtering and processing data, GSN needs to receive it. GSN considers two types of data sources: event-based and polling-based.
- In the first case, data is sent by the source and a GSN method is called when it arrives.
- Serial ports, network (TCP or UDP) connections, wireless webcams fall in this case. In the latter one, GSN periodically asks the 
- source for new data. This is the case of an RSS feed or a POP3 email account.
+Before filtering and processing data, \gsn needs to receive it. \gsn considers two types of data sources: event-based and polling-based.
+In the first case, data is sent by the source and a \gsn method is called when it arrives.
+Serial ports, network (TCP or UDP) connections, wireless webcams fall in this case. In the latter one, GSN periodically asks the 
+source for new data. This is the case of an RSS feed or a POP3 email account.
 
-\section{Safe Storage \label{safe_storage}}
+\subsection{\gsn Wrappers \label{gsn_wrappers}}
+
+\gsn can receive data from various data sources. This is done by using so called
+wrappers. They are used to encapsulate the data received from the data source
+into the standard GSN data model, called a StreamElement. A StreamElement
+is an object representing a row of a SQL table.
+Each wrapper is a Java class that extends the AbstractWrapper parent class.
+Usually a wrapper initializes a specialized third-party library in its constructor.
+It also provides a method which is called each time the library receives data from
+the monitored device. This method will extract the interesting data, optionally
+parse it, and create one or more StreamElement(s) with one or more columns.
+From this point on, the received data has been mapped to a SQL data structure
+with fields that have a name and a type. \gsn is then able to filter this using
+its enhanced SQL-like syntax. You will learn more about that in section \todo{TODO: Add proper reference}
+A wrapper is implemented in a Java class. For simplicity, \gsn uses short
+names to refer to these wrappers. These associations are defined in the file
+conf/wrappers.properties. For now on it is assumed that you use the default
+names provided at installation time.
+
+The standard \gsn wrappers are documented in Appendix \ref{sec:quickref_wrappers}.
+
+The development of \gsn wrappers is described in Appendix \ref{sec:developer-guide_wrappers}.
+
+\subsection{Safe Storage \label{safe_storage}}
 
 Some acquisition systems do not internally store the data produced until GSN can process it. For instance 
 the TinyOS Serial Forwarder simply sends a copy of the incoming messages to all its alive listeners. If GSN is down 
@@ -21,7 +47,7 @@ a server and GSN processes as clients. This communication and the primary storag
 final storage into GSN. This results in a tradeoff between the performances and the reliability.
 Moreover, GSN can run both standard wrappers and Safe Storage wrappers at the same time.
 
-\subsection{Software Architecture}
+\subsubsection{Software Architecture}
 
 Safe Storage is generic and could be added to all the already existing wrappers.
 However small modifications need to be done since the Safe Storage wrappers are split into the two following parts
@@ -51,7 +77,7 @@ public DataField[] getOutputFormat()
 public boolean messageToBeProcessed(DataMsg dataMessage)
 \end{javacode}
 
-\subsection{Safe Storage configuration}
+\subsubsection{Safe Storage configuration}
 
 All the wrappers that are based on Safe Storage must set the list of parameters defined in \listingref{table:safe_storage_parameters}.
 The Safe Storage and Safe Storage controller port are defined in the \inlinecode{build.xml} file.
@@ -94,7 +120,7 @@ The \listingref{listing:xml:safestorage_vsd} shows an example of \vsd that use a
 </virtual-sensor>
 \end{xmlcode}
 
-\subsection{Use Cases}
+\subsubsection{Use Cases}
 
 When a virtual sensor that use a Safe Storage \wrapper is loaded into GSN,
 a request is made to Safe Storage for the \wrapper. If the \wrapper is not already
@@ -103,14 +129,14 @@ created\footnote{In the current implementation, a Safe Storage \wrapper is ident
 this will create, initialize and run a new instance of the \wrapper in the Safe Storage process.
 If the \wrapper was already running, it will be reused.
 
-If the GSN process fails or is shutted down, The Safe Storage \wrapper will continue to acquire the data. Once the GSN process is
+If the GSN process fails or is shut down, The Safe Storage \wrapper will continue to acquire the data. Once the GSN process is
 restarted, all the data will be fetched from the Safe Storage DB.
 
 If the Safe Storage process fails or is shut down, the data are not stored anymore and the GSN process will try periodically to 
 connect to the Safe Storage process until the latter has been restarted.
 When you restart the Safe Storage process, it will automatically create and start acquiring data for the wrappers that were loaded before.
 
-\subsection{Safe Storage Management}
+\subsubsection{Safe Storage Management}
 
 {
 \setlength{\tymin}{10pt}
@@ -151,48 +177,48 @@ When you restart the Safe Storage process, it will automatically create and star
 Virtual Sensor is the main abstraction used by GSN to represent a well structured data stream.
 By well structured we mean, the structure of the stream is known in advanced and it is not going to be changed
 while GSN is running.
-\section{Graphical Representation}
+\subsection{Graphical Representation}
 
-\section{Notes}
+\subsection{Notes}
 
-\subsection{What if the structure of the virtual sensor changes?}
+\subsubsection{What if the structure of the virtual sensor changes?}
 We are not changing the structure of the database automatically (adding or droping fields). If your virtual sensors structure
 changes and if you are using \emph{permannet storages} such as MySQL or File-based HSQLDB, you have to change the structure of the
 table manually.
 
-\subsection{Where is the DTD for the virtual sensor?}
+\subsubsection{Where is the DTD for the virtual sensor?}
 We are using JiBX Java-XML binding project. The structure of the virtual sensor descriptor file is defined in \texttt{conf/VirtualSensorDescription.xml}.
 
 Have a look to the \chapref{quickref_vsd_dtd}.
 
-\subsection{Which databases we support ?}
+\subsubsection{Which databases we support ?}
 At the moment we are supporting HSqlDB and MySQL. Checkout the mailing list for the latest issues regarding the other databases and their
 support status.
-\subsection{Which projects are using GSN ?}
+\subsubsection{Which projects are using GSN ?}
 There are over 10 EU/Swiss funding research projects using GSN as their core technology.
-\section{GSN.XML file}
-\section{SafeStorage}
-\subsection{Why we need it? }
-\subsection{How to use it }
-\subsection{How to write a wrapper for the safe storage}
-\section{Wrappers}
-\section{Their mandatory parameters}
-\section{How it works}
-\section{Introduction}
-\section{GeoRSS}
-\section{SQL Syntax}
-\section{Introduction}
-\section{Introduction}
-\section{Introduction}
-\section{Introduction}
-\section{Introduction}
-\section{Introduction}
-\section{Introduction}
-\section{Network communication}
+\subsection{GSN.XML file}
+\subsection{SafeStorage}
+\subsubsection{Why we need it? }
+\subsubsection{How to use it }
+\subsubsection{How to write a wrapper for the safe storage}
+\subsection{Wrappers}
+\subsection{Their mandatory parameters}
+\subsection{How it works}
+\subsection{Introduction}
+\subsection{GeoRSS}
+\subsection{SQL Syntax}
+\subsection{Introduction}
+\subsection{Introduction}
+\subsection{Introduction}
+\subsection{Introduction}
+\subsection{Introduction}
+\subsection{Introduction}
+\subsection{Introduction}
+\subsection{Network communication}
 Looking inside the GSN infrastructure, there are at least half a dozen difference network communication channels are used. In this section I would like to dive in to the details
 of the some major communication protocols designed and implemented in GSN. 
 
-\subsection{Reusing Data Streams}
+\subsubsection{Reusing Data Streams}
 
 One of the main ideas behind the virtual sensors is resuability. The resuability comes in two forms.
 First being able to recreate the same processing logic on different data streams.
@@ -206,9 +232,9 @@ anywhere as long as it is accessible through the network, this ofcourse includes
 In GSN, our vision is having an internet scale streaming world in which people can publish streaming data which
 can be produced directly using some sort of a measurement device which can range from a physical wireless sensor to stock ticks from a financial market.
 
-\section{GSN Notifications}
+\subsection{GSN Notifications}
 
-\subsection{Introduction}
+\subsubsection{Introduction}
 
 In GSN, virtual sensors can be configured to notify users of certain events, e.g. to send an Email notification to an user informing them that a particular event has occurred. To implement notifications in GSN is very straight forward. The basic principle is that once the virtual sensor query is answered as specified in the virtual sensor description file, e.g.
 

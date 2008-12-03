@@ -19,8 +19,8 @@
   implementation is available from \url{http://gsn.sourceforge.net/}.
 \newpage
 \section*{Related Publications:}
-Different parts of the work presented in this chapter is published in the form of articles in international conferences and workshops.
-Parts of this chapter is also published in the form of internal technical reports.
+Different parts of the work presented in this chapter are published in the form of articles in international conferences and workshops.
+Parts of this chapter are also published in the form of internal technical reports.
 \begin{itemize}
 \item \emph{Infrastructure for data processing in large-scale interconnected sensor networks}, Karl Aberer , Manfred Hauswirth , Ali Salehi. Mobile Data Management (MDM), Germany, 2007.
 \item \emph{GSN, Quick and Simple Sensor Network Deployment}, Ali Salehi, Karl Aberer. European conference on Wireless Sensor Networks (EWSN), Netherlands, 2007.
@@ -102,7 +102,7 @@ deploying and using it, including (1) metadata used for identification
 and discovery, (2) the details of the data streams which the virtual
 sensor consumes and produces (3) an SQL-based specification of the
 stream processing (filtering and integration) performed in a virtual sensor, (4)
-the processing class which preforms the more advanced and complex data processing (if needed) on the output
+the processing class which performs the more advanced and complex data processing (if needed) on the output
 stream before releasing it and (5) functional properties related to persistency, error handling, life-cycle,
 management, and physical deployment.
 
@@ -194,7 +194,7 @@ For the moment, we assume that the input streams (two temperature sensors and a
 webcam) have already been defined in other virtual sensor definitions (how this
 is done, will be described below).
 
-In GSN data streams are temporal sequences of timestamped tuples (also known as \texttt{Stream Elements}).
+In GSN, data streams are temporal sequences of timestamped tuples (also known as \texttt{Stream Elements}).
 This is in line with the model used in most stream processing systems. The structure of
 the output data stream a virtual sensor produces is encoded in XML as shown in lines 6 -- 9 (the \texttt{output-structure} part).
 The structure of the input streams is learned from the respective specifications of their virtual sensor definitions. 
@@ -208,16 +208,16 @@ conform the output format of the processing class \footnote{As of \today, the or
 \end{itemize}
 
 To specify the processing of the sources we use SQL queries which refer to the actual data source
-by the reserved keyword \verb|WRAPPER| (the data sources are logically represented as relational tables all of which called \verb|wrapper|).
+by the reserved keyword \verb|WRAPPER| (the data sources are logically represented as relational tables all of which are called \verb|wrapper|).
 The attribute \verb|wrapper="remote"| indicates that the data stream is obtained through the
 network from another virtual sensor which can be located in any other GSN instance accessible through the network.
 
 
-In the case of a directly connected local sensor, the \verb|wrapper| attribute would reference the required wrapper\footnote{As of \today, all the wrappers has to written in Java language. The actual code for accessing the sensor can be written in any language as long as there is a possibility of communicating the data to the hardware
+In the case of a directly connected local sensor, the \verb|wrapper| attribute would reference the required wrapper\footnote{As of \today, all the wrappers have to written in Java language. The actual code for accessing the sensor can be written in any language as long as there is a possibility of communicating the data to the hardware
 through Java (e.g., interfacing Java to existing C code or the serial ports).}.
 For example, \verb|wrapper="tinyos"| would denote a TinyOS-based sensor whose data
 stream is accessed via GSN's TinyOS wrapper \footnote{In GSN, we have multiple TinyOS wrappers each corresponding to different
-versions and packet formats. Those details are out of the score of this chapter.}.
+versions and packet formats. Those details are out of the scope of this chapter.}.
 GSN already includes wrappers for all major TinyOS platforms (Mica2, Mica2Dot, etc.), for wired and wireless
 (HTTP-based) cameras (e.g., AXIS 206W), several RFID readers (Texas
 Instruments, Alien Technology), Bluetooth devices, Shockfish, WiseNodes, epuck
@@ -831,7 +831,7 @@ procedure is done once when a virtual sensor is deployed.
 
 With this setup it is now simple to execute queries over the data streams
 produced by virtual sensors: As soon a new sensor reading for a virtual sensor
-$VS_d$ becomes available, it is entered into the according database relation.
+$VS_d$ becomes available, it is entered into the appropriate database relation.
 Then the database server queries the registration table using $VS_d$ as the key
 and gets all identifiers $Id_r$ registered for new data of $VS_d$. Then simply
 all views $V_r$ affected by the new data item can be retrieved using the $Id_r$
@@ -866,7 +866,7 @@ among virtual sensors on the same machine. Second, the \texttt{remote} wrapper, 
 sharing among multiple distributed virtual sensors each of which located on different machine accessible through the network. 
 
 In GSN whenever a virtual sensor wants to use another virtual sensor located on a different GSN server, the 
-communication between two GSN server is triggered (during the loading process of the local virtual sensor).
+communication between two GSN servers is triggered (during the loading process of the local virtual sensor).
 Once GSN notices that a remote virtual sensor is required by 
 a local virtual sensor, GSN temporary suspends the local virtual sensor's loading process to confirm the existence of the remote virtual
 sensor. Therefore, GSN to GSN communication is initiated whenever a virtual sensor in a node $A$ wants to use the data stream
