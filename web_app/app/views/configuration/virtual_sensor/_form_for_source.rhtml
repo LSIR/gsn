@@ -1,0 +1,36 @@
+<%= error_messages_for 'Source', :object => source %>
+<% fields_for prefix, source do |form| %>
+<div id="<%= form.associated_form_id %>">
+	<h3>Add a new source</h3>
+	<table style="width:100%">
+		<tfoot>
+			<tr>
+				<th style="width:30%"></th>
+				<td><%= form.link_to_delete_associated_form "Remove source" %></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<tr>
+				<th>Name</th>
+				<td><%= form.text_field :name %></td>
+			</tr>
+			<tr>
+				<th>Window size</th>
+				<td><%= form.text_field :window_size %></td>
+			</tr>
+			<tr>
+				<th>Sliding</th>
+				<td><%= form.text_field :sliding %></td>
+			</tr>
+			<tr>
+				<th>Load shedding</th>
+				<td><%= form.text_field :load_shedding %></td>
+			</tr>
+			<tr>
+				<th>Query</th>
+				<td><%= form.text_field :query %></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<% end %>

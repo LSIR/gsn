@@ -1,6 +1,6 @@
 class Stream < ActiveRecord::Base
 
-  has_many :sources, :dependent => :destroy
+  has_many :sources, :dependent => :destroy, :attributes => true
   belongs_to :virtual_sensor
 
   # Validation

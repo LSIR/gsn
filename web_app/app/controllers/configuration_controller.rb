@@ -162,10 +162,38 @@ class ConfigurationController < ApplicationController
   ##########################################################
   #           DEPLOYMENT MANAGEMENT RELATED METHODS        #
   ##########################################################
-  uses_tiny_mce
+  #uses_tiny_mce
 
   def deployment
     
   end
-
+  
+  # Virtual Sensor
+  def virtual_sensor
+    render :partial => '/configuration/virtual_sensor/virtual_sensor',
+      :layout => "standard",
+      :locals => {  :virtual_sensor => VirtualSensor.new, :virtual_sensors => VirtualSensor.find(:all) }
+  end
+  
+  def create_virtual_sensor
+    virtual_sensor = VirtualSensor.new(params[:virtual_sensor])
+    
+    if virtual_sensor.save
+      flash[:notice] = "Successfully created the virtual sensor and its children"
+      redirect_to :action => :virtual_sensor
+    else
+      render :partial => "configuration/virtual_sensor/virtual_sensor", :layout => "standard",
+        :locals => { :virtual_sensor => virtual_sensor, :virtual_sensors => VirtualSensor.find(:all) }
+    end
+  end
+    
+  def form_for_stream
+    render :partial => '/configuration/virtual_sensor/form_for_stream',
+      :locals => { :stream => Stream.new, :prefix => params[:prefix] || '' }
+  end
+  
+  def form_for_source
+    render :partial => '/configuration/virtual_sensor/form_for_source',
+      :locals => { :source => Source.new, :prefix => params[:prefix] || '' }
+  end
 end

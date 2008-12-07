@@ -1,0 +1,99 @@
+<h3>List of Virtual Sensors</h3>
+<table class="gsn_vsd_table">
+	<thead>
+		<tr>
+			<td>Name</td>
+			<td>Priority</td>
+			<td>Protected</td>
+			<td>Pool size</td>
+			<td>Storage size</td>
+			<td>Unique timestamp</td>
+			<td>Load shedding</td>
+			<td>&nbsp;</td>
+		</tr>
+	</thead>
+	<tbody>
+		<% for vs in virtual_sensors -%>
+		<tr>
+			<td><%= vs.name %></td>
+			<td><%= vs.priority %></td>
+			<td><%= vs.protected %></td>
+			<td><%= vs.pool_size %></td>
+			<td><%= vs.storage_size %></td>
+			<td><%= vs.unique_timestamp %></td>
+			<td><%= vs.load_shedding %></td>
+			<td>
+				<%= link_to_function :Show, "$('#virtual_sensor_show_#{vs.id}').toggle(); $('#virtual_sensor_update_#{vs.id}').hide()" unless vs.streams.empty? %>
+				<%= link_to_function :Edit, "$('#virtual_sensor_update_#{vs.id}').toggle(); $('#virtual_sensor_show_#{vs.id}').hide();" %>
+				<%= link_to :Delete, :action => :delete_virtual_sensor, :id => vs.id %>
+			</td>
+		</tr>
+		<% unless vs.streams.empty? -%>
+		<tr id="virtual_sensor_show_<%= vs.id %>" style="display: none;">
+			<td colspan="8">
+				<h4>Streams</h4>
+				<table>
+					<thead>
+						<tr>
+							<td>Name</td>
+							<td>Query</td>
+							<td>&nbsp;</td>
+						</tr>
+					</thead>
+					<tbody>
+						<% for vs_stream in vs.streams %>
+						<tr>
+							<td><%= vs_stream.name %></td>
+							<td><%= vs_stream.query %></td>
+							<td>
+								<%= link_to_function :Show, "$('#virtual_sensor_stream_show_#{vs_stream.id}').toggle(); $('#virtual_sensor_stream_update_#{vs_stream.id}').hide()" unless vs_stream.sources.empty? %>
+								<%= link_to_function :Edit, "$('#virtual_sensor_stream_update_#{vs_stream.id}').toggle(); $('#virtual_sensor_stream_show_#{vs_stream.id}').hide();" %>
+								<%= link_to :Delete, :action => :delete_virtual_sensor_stream, :id => vs_stream.id %>
+							</td>
+						</tr>
+						<% unless vs.streams.empty? -%>
+						<tr id="virtual_sensor_stream_show_<%= vs_stream.id %>" style="display: none;">
+							<td colspan="8">
+								<h4>Sources</h4>
+								<table>
+									<thead>
+										<tr>
+											<td>Name</td>
+											<td>Window size</td>
+											<td>Sliding</td>
+											<td>Load shedding</td>
+											<td>Query</td>
+										</tr>
+									</thead>
+									<tbody>
+										<% for vs_stream_source in vs_stream.sources %>
+										<tr>
+											<td><%= vs_stream_source.name %></td>
+											<td><%= vs_stream_source.window_size %></td>
+											<td><%= vs_stream_source.sliding %></td>
+											<td><%= vs_stream_source.load_shedding %></td>
+											<td><%= vs_stream_source.query %></td>
+										</tr>
+										<% end -%>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<% end -%>
+						<% end -%>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+		<tr id="virtual_sensor_update_<%= vs.id %>" style="display: none;">
+			<td colspan="8">todo</td>
+		</tr>
+		<% end -%>
+		<% end -%>
+	</tbody>
+</table>
+
+<h3>Add a new Virtual Sensor</h3>
+<div id="add_new_virtual_sensor">
+<%= render :partial => "/configuration/virtual_sensor/form_for_virtual_sensor", :locals => { :virtual_sensor => virtual_sensor } %>
+</div>

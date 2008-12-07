@@ -1,6 +1,6 @@
 class VirtualSensor < ActiveRecord::Base
   has_many :addressings, :dependent => :destroy
-  has_many :streams, :dependent => :destroy
+  has_many :streams, :dependent => :destroy, :attributes => true
   belongs_to :pc_instance
   belongs_to :deployment
   has_many :property_values, :as => :prop_value_owner
