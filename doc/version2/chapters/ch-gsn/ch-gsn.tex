@@ -116,10 +116,12 @@ last minute, the virtual sensor returns the latest picture from the webcam in
 the same room together with the measured temperature.
 
 
-\begin{figure}%[htb]
-  \centering
-  \lstset{numbers=left, numberstyle=\footnotesize}
-\begin{lstlisting}
+%\begin{figure}%[htb]
+%  \centering
+%  \lstset{numbers=left, numberstyle=\footnotesize}
+%\begin{lstlisting}
+\begin{xmlcode}[caption={A virtual sensor definition}, label=fig:ComplexVS]
+
 <virtual-sensor name="room-monitor" priority="10" 
          protected="false" >
   <processing-class>
@@ -170,10 +172,10 @@ the same room together with the measured temperature.
       </stream>
    </streams>
 </virtual-sensor>
-\end{lstlisting}
-  \caption{A virtual sensor definition}
-  \label{fig:ComplexVS}
-\end{figure}
+\end{xmlcode}
+%  \caption{A virtual sensor definition}
+%  \label{fig:ComplexVS}}
+%\end{figure}
 
 A virtual sensor has a unique name (the \verb|name| attribute in line 1) and
 can be equipped with a set of key-value pairs representing the logical addressing of the
@@ -376,11 +378,10 @@ In order to further elaborate the time management issue, consider the stream sou
 the local time and remote time in order to measure the latency associated with each tuple and uses the latency as a condition as the selection
 criteria (e.g., only accepting the tuples which are not delayed by the network for more than 5 milliseconds).
 
-\begin{figure}%[htb]
-  \centering
-  \lstset{numbers=left, numberstyle=\footnotesize}
-\begin{lstlisting}
-<stream name="cam">
+%  \centering
+%\begin{lstlisting}
+% <stream name="cam">
+\begin{xmlcode}[caption={A stream using the remote timestamp.}, label=vs:police]
    <source name="cam"  storage-size="1" >
       <address wrapper="remote">
          <predicate key="host">1.2.3.4</predicate>
@@ -393,15 +394,17 @@ criteria (e.g., only accepting the tuples which are not delayed by the network f
       select PICTURE, TIMED from cam
    </query>
 </stream>
-\end{lstlisting}
-  \caption{A stream using the remote timestamp.}
-  \label{vs:police}
-\end{figure}
+\end{xmlcode}
+%\end{lstlisting}
+%  \caption{A stream using the remote timestamp.}
+%  \label{vs:police}
+%\end{figure}
 
-\begin{figure}%[htb]
-  \centering
-  \lstset{numbers=left, numberstyle=\footnotesize}
-\begin{lstlisting}
+%\begin{figure}%[htb]
+%  \centering
+%  \lstset{numbers=left, numberstyle=\footnotesize}
+%\begin{lstlisting}
+\begin{xmlcode}[caption={A stream using the local (arrival) timestamp.}, label=vs:insurance]
 <stream name="cam">
    <source name="cam"  storage-size="1" >
       <address wrapper="remote">
@@ -415,15 +418,16 @@ criteria (e.g., only accepting the tuples which are not delayed by the network f
       select PICTURE, TIMED from cam
    </query>
 </stream>
-\end{lstlisting}
- \caption{A stream using the local (arrival) timestamp.}
-  \label{vs:insurance}
-\end{figure}
+\end{xmlcode}
+% \caption{A stream using the local (arrival) timestamp.}
+%  \label{vs:insurance}
+%\end{figure}
 
-\begin{figure}%[htb]
-  \centering
-  \lstset{numbers=left, numberstyle=\footnotesize}
-\begin{lstlisting}
+%\begin{figure}%[htb]
+%  \centering
+%  \lstset{numbers=left, numberstyle=\footnotesize}
+%\begin{lstlisting}
+\begin{xmlcode}[caption={A stream using both local and remote timestamps.}, label=vs:complex-time]
 <stream name="cam">
    <source name="cam"  storage-size="1" >
       <address wrapper="remote">
@@ -438,10 +442,10 @@ criteria (e.g., only accepting the tuples which are not delayed by the network f
       (cam.TIMED - cam.REMOTE_TIMED) < 5
    </query>
 </stream>
-\end{lstlisting}
-   \caption{A stream using both local and remote timestamps.}
-  \label{vs:complex-time}
-\end{figure}
+\end{xmlcode}
+%   \caption{A stream using both local and remote timestamps.}
+%  \label{vs:complex-time}
+%\end{figure}
 
 \begin{figure}
   \centering
@@ -930,19 +934,20 @@ communication one has to use a source configuration similar to the one in figure
 \end{figure}
 
 
-\begin{figure}%[htb]
-  \centering
-  \lstset{numbers=left, numberstyle=\footnotesize}
-\begin{lstlisting}
+%\begin{figure}%[htb]
+% \centering
+%  \lstset{numbers=left, numberstyle=\footnotesize}
+%\begin{lstlisting}
+\begin{xmlcode}[caption={Source configuration for simple GSN to GSN communication.}, label=gsn2gsn-simple]
 <address wrapper="remote">
   <predicate key="name">CoolVS</predicate>
   <predicate key="host">4.4.4.4</predicate>
   <predicate key="port">22001</predicate>
 </address>        
-\end{lstlisting}
-  \caption{Source configuration for simple GSN to GSN communication.}
-  \label{gsn2gsn-simple}
-\end{figure}
+\end{xmlcode}
+%  \caption{Source configuration for simple GSN to GSN communication.}
+%  \label{gsn2gsn-simple}
+%\end{figure}
 
 In some deployments, GSN servers are hosted behind a NAT an apache web server\footnote{The instruction for using GSN behind a apache web server is provided in appendix \ref{app:gsn-apache}.} which can cause port and/or IP change. This can be true for both the GSN data stream consumer and GSN data stream producer.
 In these cases, one can use the more advanced form of the remote wrapper. Figure \ref{gsn2gsn-nat-figure} presents a sample setup in which both of the GSN data stream
@@ -958,19 +963,20 @@ communication one has to use a source configuration similar to the one in figure
   \label{gsn2gsn-nat-figure}
 \end{figure}
 
-\begin{figure}%[htb]
-  \centering
-  \lstset{numbers=left, numberstyle=\footnotesize,basicstyle=\small}
-\begin{lstlisting}
+%\begin{figure}%[htb]
+%  \centering
+%  \lstset{numbers=left, numberstyle=\footnotesize,basicstyle=\small}
+%\begin{lstlisting}
+\begin{xmlcode}[caption={Source configuration for NATed GSN to GSN communication.}, label=listing:xml:safestorage_vsd]
 <address wrapper="remote">
   <predicate key="name">CoolVS</predicate>
   <predicate key="local-contact-point">http://1.1.1.1:82/gsn-2</predicate>
   <predicate key="remote-contact-point">http://2.2.2.2:80/gsn-server</predicate>
 </address>        
-\end{lstlisting}
-  \caption{Source configuration for NATed GSN to GSN communication.}
-  \label{gsn2gsn-nat}
-\end{figure}
+\end{xmlcode}
+%  \caption{Source configuration for NATed GSN to GSN communication.}
+%  \label{gsn2gsn-nat}
+%\end{figure}
 
 \subsection{\texttt{local} wrapper}
 The \verb|local| wrapper is special version of \texttt{remote} wrapper (host = ``\texttt{127.0.0.1}'') which is optimized
