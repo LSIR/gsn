@@ -89,10 +89,21 @@
 		restart &
 		Stop and restart the GSN process. \\
 	\hline
+    gui & 
+    Starts the GSN graphical user interface. \\
+  \hline
+    jar & 
+    Creates a jar \_le from the source. \\
+  \hline
+    clean & 
+    Removes the current build files and forces a rebuild. \\
+  \hline
+    cleandb & 
+    Removes the redundant tables which are create for holding GSN's internal states. \\
+	\hline
 	\hline
 		compile-reports &
-		Compile the Jasper Reports located in the \path{gsn-reports} directory. Must be called after modification of any Jasper report 
-		configuration file (.jrxml). \\
+		Compile the Jasper Reports located in the \path{gsn-reports} directory. Must be called after modification of any Jasper report configuration file (.jrxml). \\
 	\hline
 	\hline
 		\multicolumn{2}{|l|}{Use each of these tasks by typing in your terminal: \inlinecode{ant <Task Name>}} \\

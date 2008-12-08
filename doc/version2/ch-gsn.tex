@@ -514,8 +514,9 @@ a GSN node.
 \end{figure}
 
 Additionally, GSN provides a number of attributes in the virtual sensor file to control data rates.
-The values used for controlling these rates are usually float numbers between 0 to 1.
-The data rate controlling is useful whenever one wants to drop the stream elements with some random probability for load shedding. 
+
+At the source level by providing the \texttt{sampling-rate} attribute to allow the dropping of stream elements with some random probability for load shedding.
+The values used for \texttt{sampling-rate} are float numbers between 0 to 1.
 For instance, if one has a temperature source that keeps producing 
 data with very high rate, one might want to sample the produced values 
 thus making the processing lighter. For instance if one sets the 
@@ -524,18 +525,21 @@ included in the window (the window and sliding values are explained above) with 
 Thus, on average 25 random stream elements will be dropped out of the last 100 elements.
 In most of the cases one typically sets the rate control attributes to "1" to make sure nothing is dropped.
 
-The rate control can be applied in the following three different levels (please refer to the virtual sensor quick reference for the syntactical
-information about different portions of the virtual sensor file):
+Two other rate controls that function in a different manner are:
 \begin{itemize}
-\item At the source level by providing \texttt{sampling-rate} attribute (float value in [0 .. 1]).
 \item At the stream level by providing \texttt{rate} attribute (integer value above zero).
 \item At the virtual sensor output level by providing \texttt{output-specification} $\rightarrow$ \texttt{rate} attribute (integer value above zero).
 \end{itemize}
 
-As noted above, if the rate control is a positive integer, it defines the minimum allowed time difference between to successive stream elements.
+The rate control is a positive integer, and defines the minimum allowed time difference between two successive stream elements.
 For instance, if one is interested in receiving an average of a given sensor once an hour but the sensor underneath can produce arbitrary number of stream elements 
 (e.g., due to uncontrollable packet losses in the internal network), he can express this behavior by setting the rate attribute of the virtual sensor output 
 (\texttt{output-specification} $\rightarrow$ \texttt{rate}) to ``3600000'' (one hour is 3,600,000 milliseconds).
+
+
+Refer to the virtual sensor quick reference for the syntactical
+information about different portions of the virtual sensor file.
+
 
 To specify the data stream processing a suitable language is needed. A number
 of proposals exist already, so we compare the language approach of GSN to the
@@ -561,7 +565,9 @@ time-related constructs from the actual query. Temporal
 specifications, e.g., the window size and rates, are specified in XML in the
 virtual sensor specification, while data processing is specified in
 SQL. Using this design, GSN can support SQL queries with the full range of
-operations allowed by the standard SQL syntax, i.e., joins,
+operations allowed by the standard SQL syntax \footnote{As of \today, GSN does not support the following standard SQL keywords: Group-By, Limit, Top and Offset.}
+
+, i.e., joins,
 sub-queries, ordering, grouping, unions, intersections, etc.
 The advantage of using SQL is that it is well-known and SQL query
 optimization and planning techniques can be directly applied.
@@ -900,7 +906,7 @@ are implemented using XML-RPC calls). In the following we provide a brief descri
 
 In order to make the GSN to GSN communication more concrete, we provide more system level details below.
 For using a remote virtual sensor, the first step is locating the \emph{contact point} of the GSN server which
-hosts the prospective virtual sensor. By default, the contact point is \texttt{http://ip-address:gsn-port/gsn-handler}\footnote{The port is specified in the \texttt{conf/gsn.xml} file.}\footnote{In the \texttt{webapp/WEB-INF/web.xml} file, the GSN's RPC handler (the \texttt{gsn.GSNRPC} class) is mapped to \texttt{/gsn-handler}. One shouldn't confuse the \texttt{/gsn-handler} with \texttt{/gsn} which is designed to be used solely by the web/ajax interface and does not involved in XML-RPC calls.}.
+hosts the prospective virtual sensor. By default, the contact point is \texttt{http://ip-address:gsn-port/gsn-handler}\footnote{The GSN port is specified in the \texttt{conf/gsn.xml} file and will be 22001 unless changed.}\footnote{In the \texttt{webapp/WEB-INF/web.xml} file, the GSN's RPC handler (the \texttt{gsn.GSNRPC} class) is mapped to \texttt{/gsn-handler}. One shouldn't confuse the \texttt{/gsn-handler} with \texttt{/gsn} which is designed to be used solely by the web/ajax interface and does not involved in XML-RPC calls.}.
 If  the contact point is correctly identified, the response to a plain HTTP POST request 
 returns a XML output.\footnote{The actual output represents an error as the request is not properly formatted.}\footnote{For sending plain HTTP POST requests
 to \texttt{http://ip-address:gsn-port/gsn-handler}, you may want to use \url{http://code.google.com/p/rest-client/}. }
