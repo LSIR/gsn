@@ -5,10 +5,11 @@
     <li <%= controller.action_name == 'processor' ? 'class="selected"':''%>><%= link_to 'Processor', :action => :processor %></li>
     <li <%= controller.action_name == 'wrapper' ? 'class="selected"':''%>><%= link_to 'Wrapper', :action => :wrapper %></li>
     <li <%= controller.action_name == 'wrapper_instance' ? 'class="selected"':''%>><%= link_to 'Wrapper Instance', :action => :wrapper_instance %></li>
+    <li <%= controller.action_name == 'property_group' ? 'class="selected"':''%>><%= link_to 'Property Group', :action => :property_group %></li>
 </ul>
 
 <script type="text/javascript">
-  $(function(){
+  $(document).ready(function(){
      $('.fragment li').addClass("configuration-menu");
      $('.fragment li:not(:first)').addClass("border");
      $('.fragment li').change(function () {

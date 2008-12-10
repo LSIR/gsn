@@ -165,7 +165,10 @@ class ConfigurationController < ApplicationController
   #uses_tiny_mce
 
   def deployment
-    
+    #by tierry
+    render :partial => 'configuration/deployment/deployment',
+      :layout => 'standard',
+      :locals => { :deployment => Deployment.new }
   end
   
   # Virtual Sensor
@@ -196,4 +199,53 @@ class ConfigurationController < ApplicationController
     render :partial => '/configuration/virtual_sensor/form_for_source',
       :locals => { :source => Source.new, :prefix => params[:prefix] || '' }
   end
+   def create_deployment
+    deployment = Deployment.new(params[:deployment])
+    if deployment.save
+      flash[:notice] = "Successfully created the deployment"
+      redirect_to :action => :deployment
+    else
+      flash.now[:notice] = "Not Created"
+      render :partial => '/configuration/deployment/deployment',
+	:layout => 'standard',
+	:locals => { :deployment => deployment }
+    end
+  end
+
+  #Property_group
+  
+  def property_group
+    @property_group = PropertyGroup.new
+    @property_group.properties.build
+    render :partial => 'configuration/property_group/form',
+    :layout => 'standard'
+  end
+  
+  def create_property_group
+    @property_group = PropertyGroup.new(params[:property_group])
+    if @property_group.save
+      flash[:notice] = "Successfully created property_group and properties."
+      redirect_to :action => :property_group
+    else
+      flash.now[:notice] = "Not Created"
+      render :action => 'configuration/property_group/form',
+      :layout => "standard"
+    end
+  end
+
+  def update_property_group
+    params[:property_group][:existing_property_attributes] ||= {}
+    @property_group = PropertyGroup.find(params[:id])
+    if @property_group.update_attributes(params[:property_group])
+      flash[:notice] = "Successfully updated property_group and properties."
+      redirect_to :action => :property_group
+    else
+      flash.now[:notice] = "Not Updated"
+      render :partial => "/configuration/wrapper/form",
+	    :layout => "standard"
+    end
+  end
+
+  #end property_group
+
 end

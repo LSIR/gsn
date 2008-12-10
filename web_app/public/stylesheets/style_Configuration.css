@@ -24,6 +24,7 @@
 }
 .configuration-menu a {
     color:orange;
+    text-decoration:none;
 }
 .selected{
      background:  url(/images/themes/one/a21111_40x100_textures_02_glass_35.png) 0 50% repeat-x;

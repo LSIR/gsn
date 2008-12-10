@@ -24,4 +24,16 @@ module ConfigurationHelper
     end
   end
 
+  def add_property_link(link_name)
+    link_to_function link_name do |page|
+      page.insert_html :bottom, :properties, :partial => "/configuration/property_group/property", :object => Property.new
+    end
+  end
+
+  def add_property_value_link(link_name, deployment_id)
+    link_to_function link_name do |page|
+      page.insert_html :bottom, "deployment_#{deployment_id}_property_values", :partial => "/configuration/deployment/property_value", :object => PropertyValue.new
+    end
+  end
+
 end
