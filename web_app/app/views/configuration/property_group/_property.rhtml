@@ -1,0 +1,18 @@
+<tr class="property">
+  <% new_or_existing = property.new_record? ? 'new' : 'existing' %>
+  <% prefix = "property_group[#{new_or_existing}_property_attributes][]" %>
+
+  <% fields_for prefix, property do |property_form| -%>
+    
+      <td>Property:</td> <td><%=  property_form.text_field :name%></td>
+      <td><a href="#">remove</a></td>
+  <% end  -%>
+</tr>
+<script type="text/javascript">
+  $(document).ready(function(){
+     $('.property a').click(function(){
+       $(this).parent().parent().remove();
+     });
+
+  });
+</script>
