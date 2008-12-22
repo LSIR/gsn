@@ -172,65 +172,120 @@ When you restart the Safe Storage process, it will automatically create and star
 \end{table*}
 }
 
-\section{Virtual Sensors}
-\section{Introduction}
+\section{Data Filtering and Processing}
+
+GSN provides two complementary mechanisms to work on data.
+The first one is based on a SQL syntax enhanced with specialized semantics
+for timed sliding windows and event counting.
+The second one allows to manipulate data with specialized programs called
+virtual sensors. GSN comes with a library of virtual sensors that you can use
+without programming. If you have more sophisticated needs, you can write your
+own virtual sensors (See \todo{add reference to Appendix ?}).
+
+GSN always processes the data according to a virtual sensor configuration.
+If you only want to use the SQL filtering mechanism, without any data trans-
+formation, you can use the BridgeVirtualSensor (see \todo{add reference to Appendix ?}).
+If you don't want to use the SQL filtering mechanism, simply select all data
+from the wrapper.
+
+\subsection{Virtual Sensors}
+
 Virtual Sensor is the main abstraction used by GSN to represent a well structured data stream.
 By well structured we mean, the structure of the stream is known in advanced and it is not going to be changed
 while GSN is running.
-\subsection{Graphical Representation}
+\subsubsection{Introduction}
+Virtual sensors are small Java programs that register to GSN with a specific
+SQL query for their data input. This query is configured by the user. When
+GSN receives data that matches the filter at the entry of a virtual sensor, this
+data is sent to the virtual sensor, which usually performs some sort of operation
+depending of the received data, and finally publishes some data (it may also
+produce nothing).
+Virtual sensors are configured in the virtual-sensors directory. You can edit
+the configuration of a virtual sensor online while GSN is running, because GSN
+periodically scans this directory for updates. This can be very useful when you
+are learning how to use GSN: you can immediately see the effect of modifying
+a query.
 
-\subsection{Notes}
+\subsubsection{The virtual-sensor xml configuration file}
+
+A virtual sensor configuration file starts with the virtual-sensor tag. It takes
+three parameters, name, priority and password. The first one is mandatory
+and arbitrary (the only constraint is that the name should be unique in this
+GSN configuration), and the two others are optional. 0 is the highest priority
+and 20 is the lowest. The default priority is 10.
+The first tag inside a virtual-sensor is usually processing-class. The first tag
+inside this group is class-name, and gives the class name of the \vsp
+to be used in this coniguration. After this comes an optional init-params
+section.
+We will work with an example to better understand these concepts. We
+present here a configuration for the ChartVirtualSensor that gets data from
+another virtual sensor, named MemoryMonitorVS. These two configurations can
+be found in the default installation of GSN under the names memoryDataVS.xml
+and memoryPlotVS.xml.
+
+\begin{xmlcode}[caption={\vsd Example}, label=listing:xml:vsd-example]
+<virtual-sensor name="MemoryPlotVS" >
+	<processing-class>
+	<class-name>gsn.vsensor.ChartVirtualSensor</class-name>
+		<init-params>
+			<param name="input-Stream">DATA</param>
+			<param name="title">GSN Memory Usage</param>
+			<param name="type">ANY</param>
+			<param name="height">200</param>
+			<param name="width">300</param>
+			<param name="vertical-axis">Sensor Readings</param>
+			<param name="history-size">100</param>
+		</init-params>
+		<output-structure>
+			<field name="DATA" type="binary:image/jpeg"/>
+		</output-structure>
+	</processing-class>
+	<description>My chart virtual sensor<description>
+	<life-cycle pool-size="10"/>
+	<addressing>
+		<predicate key="geographical">BC building EPFL</predicat>
+	</addressing>
+	<storage history-size="1" />
+	<streams>
+		<stream name="DATA" rate="100">
+			<source alias="source1" storage-size="1 sampling-rate="1">
+				<address wrapper="remote">
+					<predicate key="HOST"> localhost </predicate>
+					<predicate key="PORT"> 22001  </predicate>
+					<predicate key="NAME">  MemoryMonitorVS  </predicate>
+				</address>
+				<query>
+					select HEAP,NON_HEAP,
+					PENDING_FINALIZATION_COUNT,TIMED
+					from wrapper
+				</query>
+			</source>
+			<query>	select * from source1 </query>
+		</stream>
+	</streams>
+</virtual-sensor>
+\end{xmlcode}
 
 \subsubsection{What if the structure of the virtual sensor changes?}
 We are not changing the structure of the database automatically (adding or droping fields). If your virtual sensors structure
 changes and if you are using \emph{permannet storages} such as MySQL or File-based HSQLDB, you have to change the structure of the
-table manually.
+table manually.\subsection{Graphical Representation}
 
-\subsubsection{Where is the DTD for the virtual sensor?}
-We are using JiBX Java-XML binding project. The structure of the virtual sensor descriptor file is defined in \texttt{conf/VirtualSensorDescription.xml}.
+\subsubsection{SQL Syntax}
 
-Have a look to the \chapref{quickref_vsd_dtd}.
+\section{Data publishing}
 
-\subsubsection{Which databases we support ?}
-At the moment we are supporting HSqlDB and MySQL. Checkout the mailing list for the latest issues regarding the other databases and their
-support status.
-\subsubsection{Which projects are using GSN ?}
-There are over 10 EU/Swiss funding research projects using GSN as their core technology.
-\subsection{GSN.XML file}
-\subsection{SafeStorage}
-\subsubsection{Why we need it? }
-\subsubsection{How to use it }
-\subsubsection{How to write a wrapper for the safe storage}
-\subsection{Wrappers}
-\subsection{Their mandatory parameters}
-\subsection{How it works}
-\subsection{Introduction}
-\subsection{GeoRSS}
-\subsection{SQL Syntax}
-\subsection{Introduction}
-\subsection{Introduction}
-\subsection{Introduction}
-\subsection{Introduction}
-\subsection{Introduction}
-\subsection{Introduction}
-\subsection{Introduction}
-\subsection{Network communication}
-Looking inside the GSN infrastructure, there are at least half a dozen difference network communication channels are used. In this section I would like to dive in to the details
-of the some major communication protocols designed and implemented in GSN. 
+\subsection{Web Interface}
 
-\subsubsection{Reusing Data Streams}
+GSN ships with an elegant and easy to use web interface. The only thing
+you have to do is to open a web browser and go the following address: http:
+//127.0.0.1:22001 .
 
-One of the main ideas behind the virtual sensors is resuability. The resuability comes in two forms.
-First being able to recreate the same processing logic on different data streams.
-Second being able to reuse streaming data produced by other parties over the internet and possibly create a new data stream but instrumenting the original streams.
-In this section, I present the both high level and low level details associated with the second aspect of the reusability.
-
-The virtual sensor descriptor file is the first place which specifies the intention of reusing streaming data from another virtual sensor. The source virtual sensor can be located
-anywhere as long as it is accessible through the network, this ofcourse includes the local machine and any other machine on the Internet. 
-
-
-In GSN, our vision is having an internet scale streaming world in which people can publish streaming data which
-can be produced directly using some sort of a measurement device which can range from a physical wireless sensor to stock ticks from a financial market.
+\subsubsection{GoogleMaps integration}
+GSN can associate your data with GPS positions and then display these on
+a world map retrieved from Google's GoogleMaps service. You need a special
+identification key from Google. For more information, please refer to the docu-
+mentation file doc/README.txt, section 'How to use GoogleMaps with GSN'.
 
 \subsection{GSN Notifications}
 
@@ -251,6 +306,41 @@ a notification can be triggered  by the java processing class
 see examples in next section. Thus, any type of notifications, e.g. Email, SMS, SIP, Fax, MMS can be implemented easily in a virtual sensor processing class. 
 
 The technical details of implementing notifications are left to the designer. Below are three examples of some of the notification services already implemented in GSN.
+
+
+\section{Notes}
+
+
+\subsubsection{Where is the DTD for the virtual sensor?}
+We are using JiBX Java-XML binding project. The structure of the virtual sensor descriptor file is defined in \texttt{conf/VirtualSensorDescription.xml}.
+
+Have a look to the \chapref{quickref_vsd_dtd}.
+
+\subsubsection{Which databases we support ?}
+At the moment we are supporting HSqlDB and MySQL. Checkout the mailing list for the latest issues regarding the other databases and their
+support status.
+\subsubsection{Which projects are using GSN ?}
+There are over 10 EU/Swiss funding research projects using GSN as their core technology.
+\subsubsection{GSN.XML file}
+\subsection{GeoRSS}
+\subsection{Network communication}
+Looking inside the GSN infrastructure, there are at least half a dozen difference network communication channels are used. In this section I would like to dive in to the details
+of the some major communication protocols designed and implemented in GSN. 
+
+\subsubsection{Reusing Data Streams}
+
+One of the main ideas behind the virtual sensors is resuability. The resuability comes in two forms.
+First being able to recreate the same processing logic on different data streams.
+Second being able to reuse streaming data produced by other parties over the internet and possibly create a new data stream but instrumenting the original streams.
+In this section, I present the both high level and low level details associated with the second aspect of the reusability.
+
+The virtual sensor descriptor file is the first place which specifies the intention of reusing streaming data from another virtual sensor. The source virtual sensor can be located
+anywhere as long as it is accessible through the network, this ofcourse includes the local machine and any other machine on the Internet. 
+
+
+In GSN, our vision is having an internet scale streaming world in which people can publish streaming data which
+can be produced directly using some sort of a measurement device which can range from a physical wireless sensor to stock ticks from a financial market.
+
 
 
 
