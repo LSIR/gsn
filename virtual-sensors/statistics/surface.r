@@ -2,7 +2,7 @@
 size <- length(gsn_data);
 
 # create the matrix=row*col
-col <- size / 10;
+col <- size / 100; # was 10 for 100
 row <- col;
 
 # apply the FFT on the input data
@@ -21,9 +21,10 @@ jpeg("plot.jpg",quality=90);
 dev.cur();
 
 # plot the surface!
-par(bg = "white",mar=c(0.5,0.5,2.5,0.5));
-persp(z,col="yellow", shade=0.40, box=TRUE, scale=TRUE,expand=0.5);
-title(main = "Fast Fourier Transform");
+#par(bg = "white",mar=c(0.5,0.5,2.5,0.5));
+persp(z);
+#persp(z,col="yellow", shade=0.40, box=TRUE, scale=TRUE,expand=0.5);
+#title(main = "Fast Fourier Transform");
 
 # calling this function does the plot to jpeg capture
 dev.off(dev.cur());
