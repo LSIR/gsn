@@ -146,12 +146,10 @@ function loadVsa() {
 			// Make sure that the sensor array is loaded. If not wait 
 			// 2s and try again.
 			if (dvos == null) {
-				popUp.show(POPUP_IMAGE_LOADING, "Please wait", "starting 3s timeout", false);
 				setTimeout(function() {
 					if (dvos != null)
 						vsaLoaded();
 					else {
-						popUp.show(POPUP_IMAGE_LOADING, "Please wait", "starting 7s timeout", false);
 						// If failure after 3s wait 7s and if failure
 						// after this time give an error message.
 						setTimeout(function() {
