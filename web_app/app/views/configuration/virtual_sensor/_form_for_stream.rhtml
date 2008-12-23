@@ -1,7 +1,6 @@
 <%= error_messages_for 'Stream', :object => stream %>
 <% fields_for prefix, stream do |form| %>
 <div id="<%= form.associated_form_id %>">
-	<h3>Add a new stream</h3>
 	<table style="width:100%">
 		<tfoot>
 			<tr>
@@ -29,6 +28,7 @@
 						<%= form.render_associated_form stream.sources, :partial => 'configuration/virtual_sensor/form_for_source', :local_name => :source %>
 					</div>
 				</td>
+			</tr>
 		</tbody>
 	</table>
 </div>

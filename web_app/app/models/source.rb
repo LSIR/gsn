@@ -2,7 +2,7 @@ class Source < ActiveRecord::Base
 
   belongs_to :stream
   has_many :sources_wrapper_instances, :dependent => :destroy
-  has_many :wrapper_instances, :through => :sources_wrapper_instances, :dependent => :destroy
+  has_many :wrapper_instances, :through => :sources_wrapper_instances#, :dependent => :destroy
 
   # Validation
   validates_identifier :name

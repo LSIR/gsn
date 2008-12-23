@@ -171,11 +171,24 @@ class ConfigurationController < ApplicationController
       :locals => { :deployment => Deployment.new }
   end
   
+  def create_deployment
+    deployment = Deployment.new(params[:deployment])
+    if deployment.save
+      flash[:notice] = "Successfully created the deployment"
+      redirect_to :action => :deployment
+    else
+      flash.now[:notice] = "Not Created"
+      render :partial => '/configuration/deployment/deployment',
+        :layout => 'standard',
+        :locals => { :deployment => deployment }
+    end
+  end
+  
   # Virtual Sensor
   def virtual_sensor
     render :partial => '/configuration/virtual_sensor/virtual_sensor',
       :layout => "standard",
-      :locals => {  :virtual_sensor => VirtualSensor.new, :virtual_sensors => VirtualSensor.find(:all) }
+      :locals => {  :new_virtual_sensor => VirtualSensor.new, :virtual_sensors => VirtualSensor.find(:all) }
   end
   
   def create_virtual_sensor
@@ -186,7 +199,30 @@ class ConfigurationController < ApplicationController
       redirect_to :action => :virtual_sensor
     else
       render :partial => "configuration/virtual_sensor/virtual_sensor", :layout => "standard",
-        :locals => { :virtual_sensor => virtual_sensor, :virtual_sensors => VirtualSensor.find(:all) }
+        :locals => { :new_virtual_sensor => virtual_sensor, :virtual_sensors => VirtualSensor.find(:all) }
+    end
+  end
+  
+  def update_or_delete_virtual_sensor
+    if (params[:delete]) then
+      VirtualSensor.destroy(params[:id])
+      flash[:notice] = "Successfully deleted the virtual sensor"
+      redirect_to :action => :virtual_sensor
+    else
+      params[:virtual_sensor][:stream_attributes] ||= {}
+      params[:virtual_sensor][:stream_attributes].each { |key, value|
+        params[:virtual_sensor][:stream_attributes][key][:source_attributes] ||= {} unless key == 'new'
+      }
+      
+      virtual_sensor = VirtualSensor.find(params[:id])
+      if virtual_sensor.update_attributes params[:virtual_sensor] then
+        flash[:notice] = "Successfully updated the virtual sensor"
+        redirect_to :action => :virtual_sensor
+      else
+        flash[:notice] = "Error while saving virtual sensor"
+        render :partial => "configuration/virtual_sensor/virtual_sensor", :layout => "standard",
+          :locals => { :new_virtual_sensor => VirtualSensor.new, :virtual_sensors => VirtualSensor.find(:all, :conditions => "id <> #{params[:id]}") << virtual_sensor }
+      end
     end
   end
     
@@ -198,18 +234,6 @@ class ConfigurationController < ApplicationController
   def form_for_source
     render :partial => '/configuration/virtual_sensor/form_for_source',
       :locals => { :source => Source.new, :prefix => params[:prefix] || '' }
-  end
-   def create_deployment
-    deployment = Deployment.new(params[:deployment])
-    if deployment.save
-      flash[:notice] = "Successfully created the deployment"
-      redirect_to :action => :deployment
-    else
-      flash.now[:notice] = "Not Created"
-      render :partial => '/configuration/deployment/deployment',
-	:layout => 'standard',
-	:locals => { :deployment => deployment }
-    end
   end
 
   #Property_group

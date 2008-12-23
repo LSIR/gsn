@@ -126,12 +126,12 @@ module MultilevelForms
 
     # Returns the id to be used for the container of the associated forms
     def associated_form_container_id
-      '__multilevel_forms_container__' + @object_name.gsub(/\[|\]/, '_')
+      '__multilevel_forms_container__' + @object_name.gsub(/\[|\]/, '_') + '_' + @object.id.to_s
     end
 
     # Returns the id to be used for the associated form
     def associated_form_id
-      '__multilevel_forms_form__' + @object_name.gsub(/\[|\]/, '_')
+      '__multilevel_forms_form__' + @object_name.gsub(/\[|\]/, '_') + '_' + @object.id.to_s
     end
     
     def initialize_form_counter

@@ -1,54 +1,73 @@
-<%= error_messages_for 'Virtual Sensor', :object => virtual_sensor %>
-<% form_for virtual_sensor, :url => { :action => :create_virtual_sensor, :id => virtual_sensor.id } do |form| -%>
-<table style="width:100%">
-	<tfoot>
+<div class="vs_all" id="vs_<%= !virtual_sensor.new_record? ? virtual_sensor.id : 'new' %>" style="display:none">
+	<%= error_messages_for 'Virtual Sensor', :object => virtual_sensor %>
+	<% form_for virtual_sensor, :url => { :id => virtual_sensor.id, :action => (virtual_sensor.new_record? ? :create_virtual_sensor : :update_or_delete_virtual_sensor) } do |form| -%>
+	
+	<a name="vs_<%= !virtual_sensor.new_record? ? virtual_sensor.id : 'new' %>"></a>
+
+	<h3><%= virtual_sensor.new_record? ? 'New Virtual Sensor' : virtual_sensor.name %></h3>
+
+	<table style="width:100%">
+		<tfoot>
+			<tr>
+				<th style="width:30%"></th>
+				<td>
+					<%= form.submit "Save" %>
+					<%= form.submit "Delete", :name => 'delete', :onclick => "return confirm('Are you sure?');" %>
+				</td>
+			</tr>
+		</tfoot>
+		<tbody>
 		<tr>
-			<th style="width:30%"></th>
-			<td><%= form.submit "Save" %></td>
+			<th>Deployment</th>
+			<td>
+				<%= form.collection_select(:deployment_id, Deployment.find(:all), :id, :name, {:prompt => true}) %>
+			</td>
 		</tr>
-	</tfoot>
-	<tbody>
-	<tr>
-		<th>Name</th>
-		<td><%= form.text_field :name %></td>
-	</tr>
-	<tr>
-		<th>Priority</th>
-		<td><%= form.text_field :priority %></td>
-	</tr>
-	<tr>
-		<th>Protected</th>
-		<td><%= form.check_box :protected %>
-	</tr>
-	<tr>
-		<th>Pool size</th>
-		<td><%= form.text_field :pool_size %></td>
-	</tr>
-	<tr>
-		<th>Storage size</th>
-		<td><%= form.text_field :storage_size %></td>
-	</tr>
-	<tr>
-		<th>Unique timestamp</th>
-		<td><%= form.check_box :unique_timestamp %>
-	</tr>
-	<tr>
-		<th>Load shedding</th>
-		<td><%= form.text_field :load_shedding %></td>
-	</tr>
-	<tr>
-		<th style="vertical-align: top">
-			Streams<br />
-			<%= form.link_to_remote_associated_form "New stream", :stream, url_for(:action => 'form_for_stream'), :position => 'bottom' %>
-		</th>
-		<td>
-			<!--a href="#" onclick="if ($(this).text() == 'Show') { $('#<%= form.associated_form_container_id %>').slideDown(500); $(this).text('Hide'); } else { $('#<%= form.associated_form_container_id %>').slideUp(500); $(this).text('Show'); } return false;">Hide</a-->
-			<div id="<%= form.associated_form_container_id %>">
-				<%= form.render_associated_form virtual_sensor.streams, :partial => 'configuration/virtual_sensor/form_for_stream', :local_name => :stream %>
-			</div>
-		</td>
-	</tr>
-	</tbody>
-</table>
-<%= form.initialize_form_counter %>
-<% end -%>
+		<tr>
+			<th>PcInstance</th>
+			<td><%= form.collection_select(:pc_instance_id, PcInstance.find(:all), :id, :name, {:prompt => true}) %></td>
+		</tr>
+		<tr>
+			<th>Name</th>
+			<td><%= form.text_field :name %></td>
+		</tr>
+		<tr>
+			<th>Priority</th>
+			<td><%= form.text_field :priority %></td>
+		</tr>
+		<tr>
+			<th>Protected</th>
+			<td><%= form.check_box :protected %></td>
+		</tr>
+		<tr>
+			<th>Pool size</th>
+			<td><%= form.text_field :pool_size %></td>
+		</tr>
+		<tr>
+			<th>Storage size</th>
+			<td><%= form.text_field :storage_size %></td>
+		</tr>
+		<tr>
+			<th>Unique timestamp</th>
+			<td><%= form.check_box :unique_timestamp %></td>
+		</tr>
+		<tr>
+			<th>Load shedding</th>
+			<td><%= form.text_field :load_shedding %></td>
+		</tr>
+		<tr>
+			<th style="vertical-align: top">
+				Streams<br />
+				<%= form.link_to_remote_associated_form "New stream", :stream, url_for(:action => 'form_for_stream'), :position => 'bottom' %>
+			</th>
+			<td>
+				<div id="<%= form.associated_form_container_id %>">
+					<%= form.render_associated_form virtual_sensor.streams, :partial => 'configuration/virtual_sensor/form_for_stream', :local_name => :stream %>
+				</div>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	<%= form.initialize_form_counter %>
+	<% end -%>
+</div>
