@@ -6,20 +6,11 @@
 /*
 	Setting map selector styles
 */
-#mapSelectorBg, #mapSelector {
-	height: 23px;
-	top: 0px;
-	position: absolute;
-}
-
-#mapSelectorBg {
-	background-color: black;
-	z-index: 99999998;
-	opacity: 0.7;
-}
-
-#mapSelector {
-	z-index: 99999999;
+#mapSelector, mapPopUp {
+	background-color: #444;
+	border-bottom: 1px solid #BBB;
+	border-left: 1px solid #BBB;
+	border-right: 1px solid #BBB;
 	text-align: center;
 	vertical-align: middle;
 	padding: 5px 0px 5px 0px;
@@ -28,22 +19,51 @@
 	font-size: 9pt;
 }
 
+#mapSelector {
+	z-index: 99999997;
+	position: absolute;
+	height: 21px;
+	top: 0px;
+}
+
 #mapSelector a {
 	color: white;
 	font-weight: normal;
 }
 
 #mapSelector a:hover {
-	cursor:pointer; cursor:hand;
 	color: #AAA;
 }
 
 /*
-	Setting map loading styles
+	Styles for the pop up div
 */
-#mapLoadingIndicator {
+#mapPopUp {
+	z-index: 99999999;
+	background-color: #DDD;
+	border: 1px solid #999;
+	padding: 10px 20px 20px 20px;
+	text-align: center;
+	vertical-align: middle;
+	font-family: Verdana;
+	color: #555;
+	line-height: 1.6em;
+	font-size: 9pt;
+	position: absolute;
+	visibility: hidden
+}
+
+/*
+	Semi transparant div placed on top of the map
+	to deactivate it while displaying a message
+*/
+#mapDim {
 	z-index: 99999998;
-	background-color: #000;
+	background-color: black;
 	opacity: 0.8;
-	padding: 10px 10px 10px 10px;
+	filter: alpha(opacity = 80);
+	top: 0px;
+	left: 0px;
+	position: absolute;
+	visibility: hidden
 }

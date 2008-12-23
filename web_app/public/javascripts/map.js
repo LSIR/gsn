@@ -9,7 +9,7 @@ var sensor_filter = null;
 // "earth" or "terrain"
 var map_type = "terrain";
 
-// The div that surrounds the map divs
+// The div that surrounds the map dia
 var container;
 
 var overlays = new Array();
@@ -18,17 +18,21 @@ var overlays = new Array();
 // the map service selector
 var selector;
 
-var loadingIndicator;
+var popUp;
 
 // Virtual sensor addressing information
 var vsa = null;
 
 // Map default parameters
 var width = 848;
-var height = 800;
+var height = 700;
 var center_lat = 46.82261;
 var center_lng = 8.22876;
 var zoom = 8;
+
+// Tells whether the error message about missing coordinates has
+// been shown. To avoid showing it again when switching map
+var coordinatesMissingErrorShown = false;
 
 // Delay used before updating the markers, is used since search.ch
 // is buggy and the map needs time to be drawn before you can modify markers
@@ -40,7 +44,7 @@ var delay = 1000;
 function init(map_service, map_container, sensor_filter) {
 	// Make google the default map
 	if (map_service == null)
-		map_service = "google";
+		map_service = "search_ch";
 	
 	// Get the div which contains the map
 	var div = document.getElementById(map_container);
@@ -60,7 +64,7 @@ function init(map_service, map_container, sensor_filter) {
 	// Create the selector, it will be added on top of the map
 	// when the map is loaded
 	selector = new MapServiceSelector(map_service);
-	loadingIndicator = new LoadingIndicator();
+	popUp = new PopUp();
 
 	sensor_filter = sensor_filter;
 
@@ -82,7 +86,6 @@ function setMapService(map_service) {
 		default:
 			alert(map_service + "is an unknown map service provider");
 	}
-
 	Map.load();
 	selector.update();
 	
@@ -112,7 +115,6 @@ function setSensorFilter(filter) {
 							break;
 						}
 					}
-					
 				}
 			}
 		}
@@ -121,22 +123,56 @@ function setSensorFilter(filter) {
 		map.hideMarkers();
 		for (i in ids)
 			map.showMarker(vsa[ids[i]]["id"]);
-		loadingIndicator.off();
 	},delay);
 }
 
 // Load all the sensor addressing information and
 // then add all the sensors to the map
 function loadVsa() {
-	loadingIndicator.on();
-	$(function(){
-	    $.getJSON("/map/vsa2",
+	// Show loading message
+	popUp.show(POPUP_IMAGE_LOADING, "Please wait", "loading sensor information...", false);
+	
+	// Is called when all the addressing information is recieved
+	var vsaLoaded = function () {
+		popUp.off();
+		addSensorsToMap();
+		setSensorFilter(sensor_filter);
+	};
+	
+	// Use an ajax call with timeout 10s to retrieve sensor information
+	$.ajax({url:"/map/vsa2", dataType:'json', timeout: 10000, success:
 	    function(data){
 			vsa = data;
-			addSensorsToMap();
-			setSensorFilter(sensor_filter);
-	    });
+			// Make sure that the sensor array is loaded. If not wait 
+			// 2s and try again.
+			if (dvos == null) {
+				popUp.show(POPUP_IMAGE_LOADING, "Please wait", "starting 3s timeout", false);
+				setTimeout(function() {
+					if (dvos != null)
+						vsaLoaded();
+					else {
+						popUp.show(POPUP_IMAGE_LOADING, "Please wait", "starting 7s timeout", false);
+						// If failure after 3s wait 7s and if failure
+						// after this time give an error message.
+						setTimeout(function() {
+							if (dvos != null)
+								vsaLoaded();
+							else
+								popUp.show(POPUP_IMAGE_ERROR, "Error", "Unable to retrieve sensor information.<br>Try to reload this page...", false);
+						},7000);
+					}
+				},3000);
+			}
+			else
+				vsaLoaded();
+	    }
 	  });
+
+	// A timeout set to 11s. If addressing information is not loaded by then give an error mesage.
+	setTimeout(function() {
+		if (vsa == null)
+			popUp.show(POPUP_IMAGE_ERROR, "Error", "Unable to retrieve sensor information.<br>Try to reload this page...", false);
+	},11000);
 }
 
 function addSensorsToMap() {
@@ -153,6 +189,12 @@ function addSensorsToMap() {
 
 			map.addMarker(vsa[s]["id"], parseFloat(vsa[s]["latitude"]), parseFloat(vsa[s]["longitude"]), html);
 		}
+		else
+			if (coordinatesMissingErrorShown == false) {
+				popUp.show(null, null, "Some sensor could not be placed on the map " +
+									   "because of missing loongitude and latitude coordinates", true);
+				coordinatesMissingErrorShown = true;
+			} 
 	}
 }
 
@@ -161,97 +203,101 @@ function addSensorsToMap() {
 function MapServiceSelector(map_service) {
 	var width = 250;
 	var left_pos = "" + ((window.width/2) - (width/2));
-
-	this.div_bg = document.createElement('div');
-	this.div_bg.id = "mapSelectorBg"
-	this.div_bg.style.left = left_pos + "px";
-	this.div_bg.style.width = width + "px";
-
-	var cornersObj = new curvyCorners({
-	  tl: { radius: 0 },
-	  tr: { radius: 0 },
-	  bl: { radius: 10 },
-	  br: { radius: 10 },
-	  antiAlias: true,
-	  autoPad: false
-	}, this.div_bg);
-	cornersObj.applyCornersToAll();
-	overlays.push(this.div_bg);
 	
 	this.div = document.createElement('div');
 	this.div.id = "mapSelector"
 	this.div.style.left = left_pos + "px";
 	this.div.style.width = width + "px";
-	overlays.push(this.div);
 	
 	this.update = function() {
 		var html = '';
 		
 		if (map == Google)
-			html = '<b>Google Maps</b> &nbsp; &nbsp; &nbsp; <a onClick="setMapService(\'search_ch\');">Switzerland</a>';
+			html = '<b>Google Maps</b> &nbsp; &nbsp; &nbsp; <a style="cursor:pointer;cursor:hand;" onClick="setMapService(\'search_ch\');">Switzerland</a>';
 		else if (map == SearchCh)
-			html = '<a onClick="setMapService(\'google\')">Google Maps</a> &nbsp; &nbsp; &nbsp; <b>Switzerland</b>';
+			html = '<a style="cursor:pointer;cursor:hand;" onClick="setMapService(\'google\')">Google Maps</a> &nbsp; &nbsp; &nbsp; <b>Switzerland</b>';
 		else
 			alert("Map service unknown");
 		
 		this.div.innerHTML = html;
 	}
+
+	overlays.push(this.div);
 }
 
-function LoadingIndicator() {
-	var width =  150;
-	var height = 110;
-	var show = true;
+var POPUP_IMAGE_ERROR = "map_warning.gif";
+var POPUP_IMAGE_LOADING = "map_loader.gif";
+function PopUp() {
+	var width =  300;
+	var height = 200;
+	var top_pos = "" + ((window.height/2) - (height/2));
+	var left_pos = "" + ((window.width/2) - (width/2));
+
+	this.div_bg = document.createElement('div');
+	this.div_bg.id = "mapDim"
+	this.div_bg.style.width = window.width + "px";
+	this.div_bg.style.height = window.height + "px";
+	overlays.push(this.div_bg);
 
 	this.div = document.createElement('div');
-	this.div.id = "mapLoadingIndicator"
-	this.div.style.top = ((window.height/2) - (height/2)) + "px";
-	this.div.style.left = ((window.width/2) - (width/2)) + "px";
+	this.div.id = "mapPopUp"
 	this.div.style.width = width + "px";
-	this.div.style.height = height + "px";
-	this.div.innerHTML = '<img src="/images/map_loader.gif" />';
-	var cornersObj = new curvyCorners(	{
-		  tl: { radius: 10 },
-		  tr: { radius: 10 },
-		  bl: { radius: 10 },
-		  br: { radius: 10 },
-		  antiAlias: true,
-		  autoPad: false
-		}, this.div);
-	cornersObj.applyCornersToAll();
-	
+	this.div.style.left = left_pos + "px";
+	this.div.style.top = top_pos + "px";
 	overlays.push(this.div);
-		
-	this.toggle = function() {
-		if (show == false) {
-			this.div.style.visibility = "visible";
-			show = true;
-		}
-		else {
-			//this.div.style.visibility = "hidden";
-			show = false;
-		}
-	};
 	
-	this.on = function() {
-		if (show == false)
-			this.toggle();
+	this.show = function(image, header, text, allowClose) {
+		
+		if (allowClose == true)
+			this.div.innerHTML = '<div style="position: absolute; left:320px; top: 3px;" width: 300px; text-align: right;">' + 
+							 	 '<span style="cursor:pointer; cursor: hand;" onClick="window.popUp.off()"><b>X</b></span></div><br>';
+		else
+			this.div.innerHTML = "<br>";
+
+		if (image != null)
+			this.div.innerHTML += '<img src="/images/' + image + '" style="margin-bottom: 10px;"/><br>';
+
+		if (header != null)
+			this.div.innerHTML += '<b>' + header + '</b><br><br>';
+		
+		if (text != null)
+			this.div.innerHTML += '<span style="color: #555">' + text + '</span>';
+		
+		if (allowClose == true)
+			this.div.innerHTML += '<br><div style="padding-top: 10px; cursor:pointer; cursor: hand;" ' +
+								  'onClick="window.popUp.off()"><u>Close</u></span></div><br>';
+		
+		this.on();
 	}
 
-	this.off = function() {
-		if (show == true)
-			this.toggle();
+	this.on = function() {
+		this.div.style.visibility = "visible";
+		this.div_bg.style.visibility = "visible";
 	}
+	
+	this.off = function() {
+		this.div.style.visibility = "hidden";
+		this.div_bg.style.visibility = "hidden";
+	}
+	
+	this.off();
 }
+
 
 var Map = {
 	unload: function() {
+		// return if map is not loaded
 		if (map == null)
 			return;
+		
+		// Save the state of the map such as the zoom level
+		// the map type and the position
+		map.saveState();
 
+		// Remove all the DOM elements from the DOM tree
 		container.removeChild(map.div);
-		for (i in overlays)
-			container.removeChild(overlays[i]);
+		for (o in overlays)
+			container.removeChild(overlays[o]);
 	}
 	
 	,load: function() {
@@ -264,7 +310,6 @@ var Map = {
 		container.appendChild(map.div);
 		Map.addOverlays();
 		
-		loadingIndicator.on();
 		map.load();
 	}
 	
@@ -313,36 +358,6 @@ var Google = {
 
 			this.map.setMapType(t)
 			this.map.setCenter(new GLatLng(center_lat, center_lng), zoom);
-
-			var map = this.map;
-			var map_state_changed = function() {
-				// Save the zoom level
-				zoom = map.getZoom();
-
-				// Save latitude and longitude for the center of the map
-				center_lat = map.getCenter().lat();
-				center_lng = map.getCenter().lng();
-
-				// Save the map type
-				switch(map.getCurrentMapType()) {
-					case G_NORMAL_MAP:
-						map_type = "street"; break;
-					case G_HYBRID_MAP:
-						map_type = "hybrid"; break;
-					case G_SATELLITE_MAP:
-						map_type = "satellite"; break;
-					case G_SATELLITE_3D_MAP:
-						map_type = "earth"; break;
-					case G_PHYSICAL_MAP:
-						map_type = "terrain"; break;
-				}
-			}
-
-			// Add event listeners for updating the global variables when the user
-			// change the parameters of the map
-			GEvent.addListener(map, "zoomend", map_state_changed);
-			GEvent.addListener(map, "moveend", map_state_changed);
-			GEvent.addListener(map, "maptypechanged", map_state_changed);
 		}
 	}
 
@@ -374,7 +389,32 @@ var Google = {
 		for (var i in this.markers)
 			this.markers[i].hide();
 	}
+	
+	// Saves the state of the map before unloading the map
+	,saveState: function() {
+		// Save the zoom level
+		zoom = this.map.getZoom();
+
+		// Save latitude and longitude for the center of the map
+		center_lat = this.map.getCenter().lat();
+		center_lng = this.map.getCenter().lng();
+
+		// Save the map type
+		switch(this.map.getCurrentMapType()) {
+			case G_NORMAL_MAP:
+				map_type = "street"; break;
+			case G_HYBRID_MAP:
+				map_type = "hybrid"; break;
+			case G_SATELLITE_MAP:
+				map_type = "satellite"; break;
+			case G_SATELLITE_3D_MAP:
+				map_type = "earth"; break;
+			case G_PHYSICAL_MAP:
+				map_type = "terrain"; break;
+		}
+	}
 };
+
 
 var SearchCh = {
 	// The map object
@@ -408,34 +448,13 @@ var SearchCh = {
 					 center: [center_lat, center_lng],
 					 zoom: Util.googleZoom2searchCh(zoom)
 			});
-
-			var map = this.map;
-			var map_state_changed = function(e) {
-				// Save the map type
-				switch (map.get("type")) {
-					case "street":
-						map_type = "street"; break;
-					case "aerial":
-						map_type = "satellite"; break;
-				}
-
-				// Save latitude and longitude for the center of the map
-				var coords = map.get('center').split(',');
-		        var cox = Math.round(parseInt(coords[1]) - (map.centery * map.get().zoom)); 
-		        var coy = Math.round(parseInt(coords[0]) + (map.centerx * map.get().zoom));
-		        var wgs84coords = Util.fromCH1903toWGS84(cox , coy);
-				center_lat = wgs84coords[1];
-				center_lng = wgs84coords[0];
-
-				// Save the zoom level
-				zoom = Util.searchChZoom2google(map.get("zoom"));
-			}
-
-			// Add event listeners for updating the global variables when the user
-			// change the parameters of the map
-			this.map.addEventListener("maptypechanged", map_state_changed);
-			this.map.addEventListener("dragend", map_state_changed);
-			this.map.addEventListener("zoomend", map_state_changed);
+			
+			// This event is a workaround for a bug in search.ch maps.
+			// When zoom level is changed all hidden markers become visible.
+			// This force a redraw of the markers after each zoom change
+			this.map.addEventListener("zoomend", function(e) {
+				setSensorFilter(sensor_filter);
+			});
 		}
 	}
 
@@ -459,7 +478,29 @@ var SearchCh = {
 		for (var i in this.markers)
 			this.markers[i].hide();
 	}
+	
+	,saveState: function() {
+		// Save the map type
+		switch (this.map.get("type")) {
+			case "street":
+				map_type = "street"; break;
+			case "aerial":
+				map_type = "satellite"; break;
+		}
+
+		// Save latitude and longitude for the center of the map
+		var coords = this.map.get('center').split(',');
+        var cox = Math.round(parseInt(coords[1]) - (this.map.centery * this.map.get().zoom)); 
+        var coy = Math.round(parseInt(coords[0]) + (this.map.centerx * this.map.get().zoom));
+        var wgs84coords = Util.fromCH1903toWGS84(cox , coy);
+		center_lat = wgs84coords[1];
+		center_lng = wgs84coords[0];
+
+		// Save the zoom level
+		zoom = Util.searchChZoom2google(this.map.get("zoom"));	
+	}
 };
+
 
 var Util =  {
 	// An array for transforming from google zoom levels to search.ch levels and back.
@@ -477,7 +518,7 @@ var Util =  {
 		// find the last occurance of the zoom in the transformation array
 		for (var i=0; i != -1;) {
 			z = i;
-			i = this.zoomTransformation.indexOf(zoom, ++i);
+			i = Util.indexOfElement(this.zoomTransformation, zoom, ++i);
 		}
 		return z;
 	}
@@ -504,10 +545,13 @@ var Util =  {
 
 		return new Array(lambda, phi);    
 	}
+	
+	// My own indexOf function for arrays, needed since IE doesn't provide one
+	,indexOfElement: function(array, element, start) {
+	    for (var i = (start || 0); i < array.length; i++) {
+	      if (array[i] == element)
+	        return i;
+	    }
+		return -1;
+	}
 };
-
-setInterval(function() {
-	//loadingIndicator.toggle();
-},2000);
-
-//}
