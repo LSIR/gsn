@@ -1,4 +1,4 @@
-# multidimensional.r - Example R script to plot multidimensional data
+# simpleplot.r - Example R script to produce a simple plot
 #
 # To use R scripts from GSN these are the following conventions:
 # 
@@ -27,11 +27,7 @@
 
 temp <- gsn_temp;
 light <- gsn_light;
-packet <- gsn_packet;
 epoch <- gsn_epoch;
-
-# make a data frame of all the variables
-dataset <- data.frame(temp,light,packet,epoch);
 
 # CONFIGURE THE GRAPHICS DEVICE TO CAPTURE PLOTS AS JPEG IMAGES
 graphics.off();
@@ -39,7 +35,9 @@ jpeg("plot.jpg",quality=90);
 dev.cur();
 
 # PLOT THE DATA
-plot(dataset, col="blue", main="Multidimensional Plot");
+plot(light, col="red", type="l");
+lines(temp, col="blue");
+title(main = "Temperature and Light");
 
 # calling this function does the plot to jpeg capture
 dev.off(dev.cur());

@@ -1,4 +1,4 @@
-# multidimensional.r - Example R script to plot multidimensional data
+# sma.r - Example R script to compute the simple moving average
 #
 # To use R scripts from GSN these are the following conventions:
 # 
@@ -26,12 +26,10 @@
 # they still need to be declared in the script. See the example below.
 
 temp <- gsn_temp;
-light <- gsn_light;
-packet <- gsn_packet;
 epoch <- gsn_epoch;
 
-# make a data frame of all the variables
-dataset <- data.frame(temp,light,packet,epoch);
+# compute the average
+sma <- mean(gsn_temp);
 
 # CONFIGURE THE GRAPHICS DEVICE TO CAPTURE PLOTS AS JPEG IMAGES
 graphics.off();
@@ -39,7 +37,7 @@ jpeg("plot.jpg",quality=90);
 dev.cur();
 
 # PLOT THE DATA
-plot(dataset, col="blue", main="Multidimensional Plot");
+plot(sma, xlab="Time (unix epoch)", ylab="Temperature (Average)", main="Sample Data", type="b");
 
 # calling this function does the plot to jpeg capture
 dev.off(dev.cur());

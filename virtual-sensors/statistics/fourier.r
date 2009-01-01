@@ -1,4 +1,4 @@
-# multidimensional.r - Example R script to plot multidimensional data
+# fourier.r - Example R script to compute the fast fourier transform
 #
 # To use R scripts from GSN these are the following conventions:
 # 
@@ -18,20 +18,23 @@
 #    this implementation up to 20,000 items.
 #
 
+
+# Get the lenght of the data window
+size <- length(gsn_temp);
+
+# Create the matrix=row*col
+col <- size / 10; # was 10 for 100
+row <- col;
+
+# Apply the FFT on the input data
+res <- fft(gsn_temp);
+z <- as.real(res);
+out <- z;
+dim(z) <- c(row,col);
+
 # VARIABLE/VECTOR MAPPING
-# variables with prefix 'gsn_' are input variables (from GSN to Rserve) and variables without
-# the prefix, represent the output of the R script (from Rserve to GSN).
-# It is important that they match the virtual sensor's output structure, otherwise
-# Rserve and GSN will return errors/exceptions. If the variables are not used, 
-# they still need to be declared in the script. See the example below.
-
-temp <- gsn_temp;
-light <- gsn_light;
-packet <- gsn_packet;
+temp <- as.numeric(out);
 epoch <- gsn_epoch;
-
-# make a data frame of all the variables
-dataset <- data.frame(temp,light,packet,epoch);
 
 # CONFIGURE THE GRAPHICS DEVICE TO CAPTURE PLOTS AS JPEG IMAGES
 graphics.off();
@@ -39,7 +42,10 @@ jpeg("plot.jpg",quality=90);
 dev.cur();
 
 # PLOT THE DATA
-plot(dataset, col="blue", main="Multidimensional Plot");
+#par(bg = "white",mar=c(0.5,0.5,2.5,0.5));
+#persp(z);
+persp(z,col="yellow", shade=0.40, box=TRUE, scale=TRUE,expand=0.5);
+title(main = "Fast Fourier Transform");
 
 # calling this function does the plot to jpeg capture
 dev.off(dev.cur());
@@ -47,3 +53,4 @@ dev.off(dev.cur());
 # save the plot as a binary (jpeg) object and assign to gsn_plot variable
 gsn_plot <- readBin("plot.jpg","raw",512*512);
 unlink("plot.jpg");
+
