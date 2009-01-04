@@ -1,0 +1,24 @@
+<h3>Add a new Pc Instance</h3>
+
+<% @pc_instance = pc_instance %>
+<%= error_messages_for :pc_instance %>
+<% form_for pc_instance, :url => { :action => (pc_instance.new_record? ? :create_pc_instance : :update_pc_instance), :id => pc_instance.id} do |form| -%>
+  <table class="gsn_vsd_table">
+      <tbody>
+        <tr><td>Name</td><td><%= form.text_field :name -%></td></tr>
+        <tr><td>Web password</td><td><%= form.password_field :web_password -%></td></tr>
+      </tbody>
+  </table>
+  <br/>
+  <%#= choose_virtual_sensor "Choose virtual sensors" %>
+  <div id="virtual_sensors">
+  </div>
+  <br/>
+    <%= form.select(:processor_id,processors.collect {|c| [ c.name, c.id ] }, {:prompt => "Select a Processor"}, {:onchange =>remote_function(:update => "#pc_parameters", :url => url_for(:action =>'form_for_parameter'), :with => "'procid='+value")}) -%>
+   <span id="init"></span><br/>
+ 
+  <div id="pc_parameters">
+  </div>
+  <br/>
+  <%= form.submit "Save" %>
+<% end %>

@@ -1,0 +1,25 @@
+<div class="pc_parameter">
+  <% new_or_existing = pc_parameter.new_record? ? 'new' : 'existing' %>
+  <% prefix = "pc_instance[#{new_or_existing}_pc_parameter_attributes][]" %>
+   <% fields_for prefix, pc_parameter do |pc_parameter_form| -%>
+   
+  <table class="gsn_vsd_table" id="table_parameter">
+  <% for pcinit in pcinits do %>
+
+     <% pc_parameter.value = pcinit.default_value %>
+     <% pc_parameter.pc_init_id = pcinit.id %>
+     <tr>
+      <td><%=pcinit.name%></td>
+      <td>Value: <%=  pc_parameter_form.text_field :value%></td>
+      <td> Note: <%=  pc_parameter_form.text_field :note%></td>
+     </tr>
+     <span id="pc_init"><%= pc_parameter_form.text_field :pc_init_id%></span>
+     <%end%>
+    </table>
+  <% end  -%>
+</div>
+<script type="text/javascript">
+  $(document).ready(function(){
+     $('span').hide();
+  });
+</script>
