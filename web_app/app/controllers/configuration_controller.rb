@@ -165,10 +165,9 @@ class ConfigurationController < ApplicationController
   #uses_tiny_mce
 
   def deployment
-    #by tierry
     render :partial => 'configuration/deployment/deployment',
       :layout => 'standard',
-      :locals => { :deployment => Deployment.new }
+      :locals => { :deployment => Deployment.new, :virtualsensors => VirtualSensor.find(:all) }
   end
   
   def create_deployment
@@ -182,6 +181,11 @@ class ConfigurationController < ApplicationController
         :layout => 'standard',
         :locals => { :deployment => deployment }
     end
+  end
+  def form_for_property_value
+    properties = Property.find(:all,:conditions => "property_group_id = #{params[:pg_id]}")
+    render :partial => '/configuration/deployment/property_value',
+    :locals => { :properties => properties , :property_value => PropertyValue.new, :vs => VirtualSensor.find(:all), :out_format => OutputFormat.find(:all)}
   end
   
   # Virtual Sensor
@@ -211,7 +215,7 @@ class ConfigurationController < ApplicationController
     else
       params[:virtual_sensor][:stream_attributes] ||= {}
       params[:virtual_sensor][:stream_attributes].each { |key, value|
-        params[:virtual_sensor][:stream_attributes][key][:source_attributes] ||= {} unless key == 'new'
+      params[:virtual_sensor][:stream_attributes][key][:source_attributes] ||= {} unless key == 'new'
       }
       
       virtual_sensor = VirtualSensor.find(params[:id])
@@ -241,8 +245,9 @@ class ConfigurationController < ApplicationController
   def property_group
     @property_group = PropertyGroup.new
     @property_group.properties.build
-    render :partial => 'configuration/property_group/form',
-    :layout => 'standard'
+    render :partial => 'configuration/property_group/property_group',
+    :layout => 'standard',
+    :locals => {:properties_group => PropertyGroup.find(:all)}
   end
   
   def create_property_group
@@ -272,4 +277,28 @@ class ConfigurationController < ApplicationController
 
   #end property_group
 
+  #pc_instance
+  def pc_instance
+    render :partial => 'configuration/pc_instance/form',
+      :layout => 'standard',
+      :locals => { :pc_instance => PcInstance.new, :processors => Processor.find(:all)}
+  end
+
+  def create_pc_instance
+      pc_instance = PcInstance.new(params[:pc_instance])
+    if pc_instance.save
+      flash[:notice] = "Successfully created the processor instance"
+      redirect_to :action => :pc_instance
+    else
+      flash.now[:notice] = "Not Created"
+      render :partial => '/configuration/pc_instance/form',
+	:layout => 'standard',
+	:locals => { :pc_instance => pc_instance, :processors => Processor.find(:all) }
+    end
+  end
+  def form_for_parameter
+    pcinits = PcInit.find(:all,:conditions => "processor_id = #{params[:procid]}")
+    render :partial => '/configuration/pc_instance/pc_parameter',
+    :locals => { :pcinits => pcinits, :pc_parameter => PcParameter.new}
+  end
 end

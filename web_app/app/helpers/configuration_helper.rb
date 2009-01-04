@@ -30,6 +30,20 @@ module ConfigurationHelper
     end
   end
 
+  def choose_virtual_sensor(link_name)
+    link_to_function link_name do |page|
+      page.insert_html :bottom, :virtual_sensors, :partial =>"/configuration/pc_instance/virtual_sensor", :locals =>{:virtual_sensors => VirtualSensor.find(:all)}
+    end
+  end
+
+  def choose_user(link_name, form)
+    users = User.find(:all,:conditions => "type = 'User'")
+    admins = User.find(:all,:conditions => "type = 'Admin'")
+    link_to_function link_name do |page|
+      page.insert_html :bottom, :users, :partial =>"/configuration/deployment/user", :locals =>{:users => users, :admins => admins, :form => form}
+    end
+  end
+
   def add_property_value_link(link_name, deployment_id)
     link_to_function link_name do |page|
       page.insert_html :bottom, "deployment_#{deployment_id}_property_values", :partial => "/configuration/deployment/property_value", :object => PropertyValue.new
