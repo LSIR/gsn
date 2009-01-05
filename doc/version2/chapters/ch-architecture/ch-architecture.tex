@@ -120,6 +120,64 @@ The \listingref{listing:xml:safestorage_vsd} shows an example of a \vsd that use
 </virtual-sensor>
 \end{xmlcode}
 
+\subsection{Safe Storage Wrappers Default parameters}
+
+The parameters shown on the \listingref{table:safe_storage_parameters} must be added to each \wrapper that support the 
+Safe Storage feature. An example of \wrapper that use this feature is described in \chapref{tinyos-mig:wrapper}.
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|C|C|J|}%
+	\hline
+		\multicolumn{5}{|c|}{\textbf{Safe Storage Parameters}} \\
+	\hline
+	\hline
+		\textbf{Parameter Name} &
+		\textbf{Type} &
+		\textbf{Mandatory} &
+		\textbf{Default} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		ss-host &
+		String &	
+		Yes &
+		None &
+		The machine host name that runs the Safe Storage \\
+	\hline
+		ss-port &
+		Integer &	
+		Yes &
+		None &
+		The server port on which Safe Storage listen for connections \\
+	\hline
+		wrapper-name &
+		String &	
+		Yes &
+		None &
+		The Safe Storage side wrapper full classname (must extends \inlinecode{gsn.acquisition2.wrappers.AbstractWrapper2}) 
+		or the short name from the \path{conf/safe\_storage\_wrappers.properties} file. \\
+	\hline
+		wrapper-keep-processed-ss-entries &
+		Boolean &
+		No &
+		true &
+		If this option is set to \inlinecode{true}, all the entries (processed or not) kept into the Safe Storage storage.
+		If this option is set to \inlinecode{false}, the processed entries are removed from the Safe Storage storage once processed. \\
+	\hline
+		continue-on-error &
+		Boolean &	
+		No &
+		true &
+		Not yet implemented \\
+	\hline
+	\end{tabulary}
+	}
+	\caption{Safe Storage Parameters}
+	\label{table:safe_storage_parameters}
+\end{table*}
+
 \subsubsection{Use Cases}
 
 When a virtual sensor that use a Safe Storage \wrapper is loaded into GSN,
@@ -172,6 +230,28 @@ When you restart the Safe Storage process, it will automatically create and star
 \end{table*}
 }
 
+
+\subsection{Safe Storage in Nutshell}
+
+In order to coordinate the activities between the GSN and Safe Storage(SS), a custom protocol has defined. The GSN <-> SS protocol 
+constitutes of the following messages:
+\begin{description}
+	\item[HelloMessage\footnote{Implemented by \texttt{gsn.acquisition2.messages.HelloMsg} class.}] is the first message sent from GSN to SS in order to represent the request to use a wrapper at the SS. In order to SS to instantiate the wrapper, SS has to know the following
+	information about the requested wrapper:
+	\begin{itemize}
+		\item \texttt{wrapper's initialization parameters}, these are the original wrapper initialization parameters (exactly as they are specified in the virtual sensor file) sent from the GSN server to the SS. 
+		\item \texttt{requester} or \emph{unique wrapper identifier} is a string which uniquely identifies the wrapper at the safe storage. As one safe storage component can be used to host multiple wrappers at the same time, SS has to create internal mapping between every request
+		and the cooresponding wrapper at the SS. The mapping is used by the reconnection requests from the GSN (in the case of network disconnectivity or GSN crash) in order to resume the sensor data feed toward the GSN server.
+		\item \texttt{continue-on-error} Which is a boolean ...
+	\end{itemize}
+	Once the HelloMessage received by the SS, SS stores the original HelloMessage into its internal storage. The reason behind this to 
+	make sure SafeStorage as all the necessary information when its gets started. Whenever Safe Storage gets restarted, it resume the
+	data acquisition process for all its previously active wrappers (without receiving HelloMessages).
+\end{description}
+
+\section{Virtual Sensors}
+\section{Introduction}
+
 \section{Data Filtering and Processing}
 
 GSN provides two complementary mechanisms to work on data.
@@ -189,6 +269,7 @@ If you don't want to use the SQL filtering mechanism, simply select all data
 from the wrapper.
 
 \subsection{Virtual Sensors}
+
 
 Virtual Sensor is the main abstraction used by GSN to represent a well structured data stream.
 By well structured we mean, the structure of the stream is known in advanced and it is not going to be changed
