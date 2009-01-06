@@ -9,5 +9,12 @@ class Deployment < ActiveRecord::Base
   validates_identifier :name
   validates_uniqueness_of :name
   validates_inclusion_of :private, :in => [true, false]
+  validates_presence_of :admin_id, :nil => false, :blank => false
+
+  def new_property_value_attributes=(property_value_attributes)
+    property_value_attributes.each do |attributes|
+      property_values.build(attributes)
+    end
+  end
 
 end

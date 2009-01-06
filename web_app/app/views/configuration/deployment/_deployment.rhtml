@@ -1,0 +1,4 @@
+<h3>Add a new Deployment</h3>
+  <%  users = User.find(:all,:conditions => "type = 'User'")-%>
+  <%  admins = User.find(:all,:conditions => "type = 'Admin'") -%>
+<%= render :partial => "/configuration/deployment/form", :locals => { :deployment => deployment, :property_group => PropertyGroup.find(:all), :users => users, :admins => admins} %>

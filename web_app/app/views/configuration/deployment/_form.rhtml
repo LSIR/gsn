@@ -1,0 +1,31 @@
+<% @depoyment = deployment %>
+<%= error_messages_for :deployment %>
+<% form_for deployment, :url => { :action => (deployment.new_record? ? :create_deployment : :update_deployment), :id => deployment.id} do |form| -%>
+  <table class="gsn_vsd_table">
+      <tbody>
+	  <tr><td>Name</td><td><%= form.text_field :name -%></td></tr>
+	  <tr><td>Private</td><td><%= form.check_box :private -%></td></tr>
+	  <tr><td>Description</td><td><%= form.text_field :description -%></td></tr>
+      </tbody>
+  </table>
+  <div id="processor_fom">
+  
+      <!-- user -->
+      <h4>User</h4>
+  <div id="user_admins">
+    <table class="gsn_vsd_table">
+    <% for us in users do %>
+
+     <tr>
+      <td><%=us.email%></td>
+      <td><input type="checkbox" id="<%=us.id%>" name="user_ids[]" value="<%=us.id%>"></td>
+     </tr>
+
+    <% end  -%>
+    </table>
+    <%=form.select(:admin_id,admins.collect {|a| [ a.email, a.id ] }, {:prompt => "Select an admin"}) -%>
+  </div>
+</div>
+<br/>
+  <%= form.submit "Save" %>
+<% end %>

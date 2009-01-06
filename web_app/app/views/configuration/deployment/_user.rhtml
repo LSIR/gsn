@@ -1,0 +1,15 @@
+<div class="user">
+  <h5>Users</h5>
+  <table class="gsn_vsd_table">
+  <% for us in users do %>
+
+     <tr>
+      <td><%=us.email%></td>
+      <td><%= form.check_box :admin_id%></td>
+     </tr>
+
+  <% end  -%>
+  </table>
+  <h5>Admins</h5>
+ <%=form.select(:admin_id,admins.collect {|a| [ a.email, a.id ] }, {:prompt => "Select an admin"}) -%>
+</div>

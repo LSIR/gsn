@@ -172,6 +172,7 @@ class ConfigurationController < ApplicationController
   
   def create_deployment
     deployment = Deployment.new(params[:deployment])
+    deployment.users = User.find(params[:user_ids])
     if deployment.save
       flash[:notice] = "Successfully created the deployment"
       redirect_to :action => :deployment
@@ -185,7 +186,7 @@ class ConfigurationController < ApplicationController
   def form_for_property_value
     properties = Property.find(:all,:conditions => "property_group_id = #{params[:pg_id]}")
     render :partial => '/configuration/deployment/property_value',
-    :locals => { :properties => properties , :property_value => PropertyValue.new, :vs => VirtualSensor.find(:all), :out_format => OutputFormat.find(:all)}
+    :locals => { :properties => properties , :property_value => PropertyValue.new, :output_format => OutputFormat.find(:all)}
   end
   
   # Virtual Sensor
