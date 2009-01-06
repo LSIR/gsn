@@ -1,0 +1,17 @@
+<% @property_value = property_value %>
+<%= error_messages_for :property %>
+<% form_for property_value, :url => { :action => (property_value.new_record? ? :create_property_value : :update_property_value), :id => property_value.id} do |form| -%>
+
+<td><%= form.collection_select(:property_id, Property.find(:all), :id, :name) -%></td>
+<td><%= form.text_field :value , :style => "width:150px;"-%></td>
+<td>
+<%= form.select(:prop_value_owner_type, {"VirtualSensor" => "VirtualSensor", "Deployment" => "Deployment", "OutputFormat" => "OutputFormat"}, {}, {:onChange => "owner_type_changed(this.value, '#{property_value.id}');"}) -%>
+
+<%= form.collection_select(:prop_value_owner_id, VirtualSensor.find(:all), :id, :name, {}, {:id => "VirtualSensor_select_#{property_value.id}"})-%>
+<%= form.collection_select(:prop_value_owner_id, Deployment.find(:all), :id, :name, {}, {:id => "Deployment_select_#{property_value.id}"}) -%>
+<%= form.collection_select(:prop_value_owner_id, OutputFormat.find(:all), :id, :name, {}, {:id => "OutputFormat_select_#{property_value.id}"}) -%>
+</td>
+<td><%= form.submit "Save" -%><button type="button" onClick="$('#property_value_update_<%= property_value.id %>').toggle(); $('#property_value_info_<%= property_value.id %>').toggle();">Cancel</button></td>
+
+<% end -%>
+

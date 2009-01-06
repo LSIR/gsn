@@ -1,0 +1,9 @@
+<% @property_group = property_group %>
+<%= error_messages_for :property %>
+<% form_for property_group, :url => { :action => (property_group.new_record? ? :create_property_group : :update_property_group), :id => property_group.id} do |form| -%>
+
+<td><%= form.text_field :name, :style => "width:230px;" -%></td>
+<td><%= form.text_field :description, :style => "width:330px;" -%></td>
+<td><%= form.submit "Save" -%> 
+<button type="button" onClick="$('#property_group_update_<%= property_group.id %>').toggle(); $('#property_group_info_<%= property_group.id %>').toggle();">Cancel</button></td>
+<% end -%>

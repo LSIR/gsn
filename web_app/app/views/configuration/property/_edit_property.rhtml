@@ -1,0 +1,11 @@
+<% @property = property %>
+<%= error_messages_for :property %>
+<% form_for property, :url => { :action => (property.new_record? ? :create_property : :update_property), :id => property.id} do |form| -%>
+
+<td><%= form.text_field :name, :style => "width:100px;" -%></td>
+<td><%= form.text_field :description, :style => "width:220px;" -%></td>
+<td><%= form.collection_select(:property_group_id, PropertyGroup.find(:all), :id, :name) -%></td>
+<td><%= form.collection_select(:unit_id, Unit.find(:all), :id, :name) -%></td>
+<td><%= form.submit "Save" -%><button type="button" onClick="$('#property_update_<%= property.id %>').toggle(); $('#property_info_<%= property.id %>').toggle();">Cancel</button></td>
+<% end -%>
+

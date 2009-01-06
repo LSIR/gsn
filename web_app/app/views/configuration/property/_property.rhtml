@@ -1,0 +1,128 @@
+<h3>Property Groups</h3>
+<% p_group_new = PropertyGroup.new %>
+
+<table class="gsn_vsd_table">
+    <thead>
+	<tr>
+	    <td width="250">Name</td>
+	    <td width="350">Description</td>
+		<td><%= link_to_function :"Create new", "$('#property_group_update_#{p_group_new.id}').toggle();" %></td>
+	</tr>
+    </thead>
+    <tbody>
+		  <tr id="property_group_update_<%= p_group_new.id %>" style="display: none;">
+			  <%= render :partial => "/configuration/property/edit_group", :locals => { :property_group => PropertyGroup.new } %>
+		  </tr>
+		<% for p in property_groups -%>
+		  <tr id="property_group_info_<%= p.id %>">
+		      <td><a style="color:black" name="property_group_<%= p.id -%>"><%= p.name -%></a></td>
+			  <td><%= p.description -%></td>
+		      <td><%= link_to_function :Edit, "$('#property_group_update_#{p.id}').toggle(); $('#property_group_info_#{p.id}').toggle();" %>
+			  <%= link_to :Delete, :action => :delete_property_group, :id => p.id  %>
+		      </td>
+		  </tr>
+		  <tr id="property_group_update_<%= p.id %>" style="display: none;">
+			  <%= render :partial => "/configuration/property/edit_group", :locals => { :property_group => p }   %>
+		  </tr>
+		<% end -%>
+    </tbody>
+</table>
+
+
+
+
+<h3>Properties</h3>
+<% p_new = Property.new %>
+
+<table class="gsn_vsd_table">
+    <thead>
+	<tr>
+	    <td>Name</td>
+	    <td>Description</td>
+		<td>Property group</td>
+		<td>Unit</td>
+		<td><%= link_to_function :"Create new", "$('#property_update_#{p_new.id}').toggle();" %></td>
+	</tr>
+    </thead>
+    <tbody>
+		  <tr id="property_update_<%= p_new.id %>" style="display: none;">
+			  <%= render :partial => "/configuration/property/edit_property", :locals => { :property => Property.new } %>
+		  </tr>
+		<% for p in properties -%>
+		  <tr id="property_info_<%= p.id %>">
+		      <td><a style="color:black" name="property_<%= p.id -%>"><%= p.name -%></a></td>
+			  <td><%= p.description -%></td>
+			  <td>
+			<%= if p.property_group != nil then "<a href=\"#property_group_#{p.property_group.id}\">" + p.property_group.name + "</a>" else "<em><b style=\"color: red\">ref error</b></em>" end -%></td>
+			  <td><%= if p.unit != nil then p.unit.name else "<em><b style=\"color: red\">ref error</b></em>" end -%></td>
+		      <td><%= link_to_function :Edit, "$('#property_update_#{p.id}').toggle(); $('#property_info_#{p.id}').toggle();" %>
+			  <%= link_to :Delete, :action => :delete_property, :id => p.id  %>
+		      </td>
+		  </tr>
+		  <tr id="property_update_<%= p.id %>" style="display: none;">
+			  <%= render :partial => "/configuration/property/edit_property", :locals => { :property => p }   %>
+		  </tr>
+		<% end -%>
+    </tbody>
+</table>
+<br />
+
+
+
+<h3>Property Values</h3>
+<% p_value_new = PropertyValue.new %>
+<script type="text/javascript">
+
+var name = "property_value[prop_value_owner_id]";
+
+function owner_type_changed(new_value, property_value_id) {
+	$('#VirtualSensor_select_' + property_value_id).hide();
+	$('#VirtualSensor_select_' + property_value_id).attr("name","inactivated");
+	$('#Deployment_select_' + property_value_id).hide();
+	$('#Deployment_select_' + property_value_id).attr("name","inactivated");
+	$('#OutputFormat_select_' + property_value_id).hide();
+	$('#OutputFormat_select_' + property_value_id).attr("name","inactivated");
+	$('#' + new_value + '_select_' + property_value_id).toggle();
+	$('#' + new_value + '_select_' + property_value_id).attr("name",name)
+}
+
+</script>
+
+
+<table class="gsn_vsd_table">
+    <thead>
+	<tr>	
+		<td>Property</td>
+	    <td>Value</td>
+	    <td>Belonging to</td>
+		<td><%= link_to_function :"Create new", "owner_type_changed('VirtualSensor', '#{p_value_new.id}');$('#property_value_update_#{p_value_new.id}').toggle();" %></td>
+	</tr>
+    </thead>
+    <tbody>
+		  <tr id="property_value_update_<%= p_value_new.id %>" style="display: none;">
+			  <%= render :partial => "/configuration/property/edit_value", :locals => { :property_value => p_value_new } %>
+		  </tr>
+		<% for p in property_values -%>
+		  <tr id="property_value_info_<%= p.id %>">
+		      <td>
+		<%= if p.property != nil then "<a href=\"#property_group_#{p.property.id}\">" + p.property.name + "</a>" else "<em><b style=\"color: red\">ref error</b></em>" end -%>
+</td>
+			  <td><%= p.value -%></td>
+			  <td><%=
+				case p.prop_value_owner_type
+					when "VirtualSensor" then VirtualSensor.find(p.prop_value_owner_id).name
+					when "OutputFormat" then OutputFormat.find(p.prop_value_owner_id).name
+					when "Deployment" then Deployment.find(p.prop_value_owner_id).name
+				end
+-%> (<%= p.prop_value_owner_type -%>)</td>
+		      <td><%= link_to_function :Edit, "owner_type_changed('#{p.prop_value_owner_type}', '#{p.id}'); $('#property_value_update_#{p.id}').toggle(); $('#property_value_info_#{p.id}').toggle();" %>
+			  <%= link_to :Delete, :action => :delete_property_value, :id => p.id  %>
+		      </td>
+		  </tr>
+		  <tr id="property_value_update_<%= p.id %>" style="display: none;">
+			  <%= render :partial => "/configuration/property/edit_value", :locals => { :property_value => p }   %>
+		  </tr>
+		<% end -%>
+    </tbody>
+</table>
+<br />
