@@ -172,7 +172,7 @@ class ConfigurationController < ApplicationController
   
   def create_deployment
     deployment = Deployment.new(params[:deployment])
-    deployment.users = User.find(params[:user_ids])
+    deployment.users = User.find(params[:user_ids]) if (params[:user_ids])
     if deployment.save
       flash[:notice] = "Successfully created the deployment"
       redirect_to :action => :deployment
