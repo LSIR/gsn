@@ -11,6 +11,7 @@ one:
   name: geographical
   description: Textual description of the location.
   property_group_id: 1
+  unit_id: 3
 
 two:
   id: 2
@@ -21,7 +22,7 @@ two:
 
 three:
   id: 3
-  name: longitude.
+  name: longitude
   description: WGS84 longitude.
   property_group_id: 1
   unit_id: 2
