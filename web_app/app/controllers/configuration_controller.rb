@@ -209,7 +209,14 @@ class ConfigurationController < ApplicationController
   
   def update_or_delete_virtual_sensor
     if (params[:delete]) then
+
+      # Delete all the property values belonging to this VirtualSensor
+      vs = VirtualSensor.find(params[:id])
+      vs.property_values.each { |p| PropertyValue.destroy(p.id) }
+      
+      # Delete the VirtualSensor itself
       VirtualSensor.destroy(params[:id])
+
       flash[:notice] = "Successfully deleted the virtual sensor"
       redirect_to :action => :virtual_sensor
     else
@@ -240,42 +247,98 @@ class ConfigurationController < ApplicationController
       :locals => { :source => Source.new, :prefix => params[:prefix] || '' }
   end
 
-  #Property_group
   
-  def property_group
-    @property_group = PropertyGroup.new
-    @property_group.properties.build
-    render :partial => 'configuration/property_group/property_group',
-    :layout => 'standard',
-    :locals => {:properties_group => PropertyGroup.find(:all)}
+  def property
+    render :partial => 'configuration/property/property',
+           :layout => 'standard',
+           :locals => { :property_groups => PropertyGroup.find(:all),
+                        :properties => Property.find(:all),
+                        :property_values => PropertyValue.find(:all)  }
   end
   
   def create_property_group
     @property_group = PropertyGroup.new(params[:property_group])
     if @property_group.save
-      flash[:notice] = "Successfully created property_group and properties."
-      redirect_to :action => :property_group
+      flash[:notice] = "Successfully created the property group."
+      redirect_to :action => :property
     else
       flash.now[:notice] = "Not Created"
-      render :action => 'configuration/property_group/form',
-      :layout => "standard"
+      redirect_to :action => :property
     end
   end
 
   def update_property_group
-    params[:property_group][:existing_property_attributes] ||= {}
     @property_group = PropertyGroup.find(params[:id])
     if @property_group.update_attributes(params[:property_group])
-      flash[:notice] = "Successfully updated property_group and properties."
-      redirect_to :action => :property_group
+      flash[:notice] = "Successfully updated the property group."
+      redirect_to :action => :property
     else
       flash.now[:notice] = "Not Updated"
-      render :partial => "/configuration/wrapper/form",
-	    :layout => "standard"
+      redirect_to :action => :property
+    end
+  end
+  
+  def delete_property_group
+    PropertyGroup.delete(params[:id])
+    flash[:notice] = "Successfully deleted the property group"
+    redirect_to :action => :property
+  end
+
+  def create_property
+    @property = Property.new(params[:property])
+    if @property.save
+      flash[:notice] = "Successfully created property."
+      redirect_to :action => :property
+    else
+      flash.now[:notice] = "Not Created"
+      redirect_to :action => :property
+    end
+  end
+  
+  def update_property
+    @property = Property.find(params[:id])
+    if @property.update_attributes(params[:property])
+      flash[:notice] = "Successfully updated property and properties."
+      redirect_to :action => :property
+    else
+      flash.now[:notice] = "Not Updated"
+      redirect_to :action => :property
     end
   end
 
-  #end property_group
+  def delete_property
+    Property.delete(params[:id])
+    flash[:notice] = "Successfully deleted the property"
+    redirect_to :action => :property
+  end
+
+  def create_property_value
+    @property_value = PropertyValue.new(params[:property_value])
+    if @property_value.save
+      flash[:notice] = "Successfully created property value."
+      redirect_to :action => :property
+    else
+      flash.now[:notice] = "Not Created"
+      redirect_to :action => :property
+    end
+  end
+
+  def update_property_value
+    @property_value = PropertyValue.find(params[:id])
+    if @property_value.update_attributes(params[:property_value])
+      flash[:notice] = "Successfully updated the property value."
+      redirect_to :action => :property
+    else
+      flash.now[:notice] = "Not Updated"
+      redirect_to :action => :property
+    end
+  end
+  
+  def delete_property_value
+    PropertyValue.delete(params[:id])
+    flash[:notice] = "Successfully deleted the property value"
+    redirect_to :action => :property
+  end
 
   #pc_instance
   def pc_instance
