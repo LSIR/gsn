@@ -1,28 +1,31 @@
-<% @user = user %>
-<%= error_messages_for :user %>
+<%= error_messages_for 'User', :object => user, :header_tag => 'h4' %>
 <% form_for user, :url => { :action => (user.new_record? ? :create_user : :update_user), :id => user.id} do |form| -%>
-  <table class="gsn_vsd_table">
-      <tbody>
-	  <tr><td>Email</td><td><%= form.text_field :email -%></td></tr>
-	  <tr><td>Password</td><td><%= form.password_field :password -%></td></tr>
-      </tbody>
-  </table>
-  <% unless is_admin?(user) -%>
-    <div id="deployment_form">
+<h3>User Information</h3>
+<table class="gsn_vsd_table">
+	<tbody>
+		<% if user.new_record? -%>
+		<tr><td>Email</td><td><%= form.text_field :email -%></td></tr>
+		<% end -%>
+		<tr><td>Password</td><td><%= form.password_field :password -%></td></tr>
+		<tr><td>Is admin?</td><td><input type="checkbox" name="is_admin" id="is_admin" onclick="$('#deployments_<%=user.id%>').toggle(200)" value="1"<% if is_admin? user -%> checked="checked"<% end -%>></td></tr>
+	</tbody>
+</table>
+
+<div id="deployments_<%=user.id%>"<%= ' style="display: none;"' if is_admin? user %>>
+	<h3>Deployments</h3>
 	<table>
-	    <thead>
-		<tr>
-		    <td>Name</td>
-		    <td>Private</td>
-		    <td>Description</td>
-		    <td>Grant Access</td>
-		</tr>
-	    </thead>
-	    <tbody id="deployment_<%= user.id %>_inits">
+		<thead>
+			<tr>
+				<td>Name</td>
+				<td>Private</td>
+				<td>Description</td>
+				<td>Grant Access</td>
+			</tr>
+		</thead>
+		<tbody>
 		<%= render :partial => '/configuration/user/deployment', :locals => { :user => user, :deployments => Deployment.find(:all) } %>
-	    </tbody>
+		</tbody>
 	</table>
-    </div>
-  <% end -%>
-  <%= form.submit "Save" -%>
+</div>
+<%= form.submit (user.new_record? ? 'Add' : 'Save' ) -%>
 <% end -%>

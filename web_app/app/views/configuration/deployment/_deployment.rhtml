@@ -1,4 +1,34 @@
-<h3>Add a new Deployment</h3>
-  <%  users = User.find(:all,:conditions => "type = 'User'")-%>
-  <%  admins = User.find(:all,:conditions => "type = 'Admin'") -%>
-<%= render :partial => "/configuration/deployment/form", :locals => { :deployment => deployment, :property_group => PropertyGroup.find(:all), :users => users, :admins => admins} %>
+<h2>List of Deployments</h2>
+<a href="#new_deployment">New Deployment</a>
+<table class="gsn_vsd_table">
+	<thead>
+		<tr>
+			<td>Name</td>
+			<td>Description</td>
+			<td>Is private?</td>
+			<td>&nbsp;</td>
+		</tr>
+	</thead>
+	<tbody>
+		<% for deployment in deployments do -%>
+		<tr>
+			<td><%= deployment.name -%></td>
+			<td><%= deployment.description -%></td>
+			<td><%= deployment.private? ? 'yes' : 'no' %></td>
+			<td>
+				<%= link_to_function 'edit', "$('#deployment_update_#{deployment.id}').toggle();" %>
+				| <%= link_to 'delete', :action => :delete_deployment, :id => deployment.id %>
+			</td>
+		</tr>
+		<tr id="deployment_update_<%= deployment.id %>"<%= ' style="display: none;"' if deployment.valid? %>>
+			<td colspan="4">
+				<%= render :partial => "/configuration/deployment/form", :locals => { :deployment => deployment }   %>
+			</td>
+		</tr>
+		<% end -%>
+	</tbody>
+</table>
+
+<a name="new_deployment"></a>
+<h2>Add a new Deployment</h2>
+<%= render :partial => "/configuration/deployment/form", :locals => { :deployment => new_deployment } %>

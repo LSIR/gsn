@@ -7,6 +7,8 @@ class Wrapper < ActiveRecord::Base
   validates_identifier :name
   validates_uniqueness_of :name
   validates_class_name :class_name
+  
+  validates_associated :wrapper_inits
 
   #
   def new_wrapper_init_attributes=(wrapper_inits_attributes)
@@ -18,12 +20,12 @@ class Wrapper < ActiveRecord::Base
   after_update :save_wrapper_inits
 
   def existing_wrapper_init_attributes=(wrapper_inits_attributes)
-  wrapper_inits.reject(&:new_record?).each do |init|
+    wrapper_inits.reject(&:new_record?).each do |init|
       attributes = wrapper_inits_attributes[init.id.to_s]
       if attributes
-	init.attributes = attributes
+        init.attributes = attributes
       else
-	wrapper_inits.delete(init)
+        wrapper_inits.delete(init)
       end
     end
   end

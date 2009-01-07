@@ -3,11 +3,13 @@ class WrapperInstance < ActiveRecord::Base
   belongs_to :wrapper
   has_many :wrapper_parameters, :dependent => :destroy
   has_many :sources_wrapper_instances, :dependent => :destroy
-  has_many :sources, :through=>:sources_wrapper_instances, :dependent => :destroy
+  has_many :sources, :through => :sources_wrapper_instances#, :dependent => :destroy
 
   # Validation
   validates_identifier :name
   validates_uniqueness_of :name
+  
+  validates_associated :wrapper_parameters
 
   #
   def new_wrapper_parameter_attributes=(wrapper_parameters_attributes)
@@ -22,9 +24,9 @@ class WrapperInstance < ActiveRecord::Base
     wrapper_parameters.reject(&:new_record?).each do |init|
       attributes = wrapper_parameters_attributes[init.id.to_s]
       if attributes
-	init.attributes = attributes
+        init.attributes = attributes
       else
-	wrapper_parameters.delete(init)
+        wrapper_parameters.delete(init)
       end
     end
   end

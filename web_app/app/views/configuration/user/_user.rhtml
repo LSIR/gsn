@@ -1,26 +1,32 @@
-<h3>List of Data Users</h3>
+<h2>List of Data Users</h2>
+<a href="#new_user">New User</a>
 <table class="gsn_vsd_table">
     <thead>
 	<tr>
-	    <td>email</td>
+	    <td>Email</td>
+		<td>Is admin?</td>
 	    <td>&nbsp;</td>
 	</tr>
     </thead>
     <tbody>
-	<% for u in users -%>
+	<% for user in users -%>
 	  <tr>
-	      <td><%= u.email -%></td>
-	      <td><%= link_to_function :Edit, "$('#user_update_#{u.id}').toggle(); $('#user_show_#{u.id}').hide();" %>
-		  <%= link_to :Delete, :action => :delete_user, :id => u.id unless is_admin? u %>
+	      <td><%= user.email -%></td>
+		  <td><%= (is_admin? user) ? 'yes' : 'no' %></td>
+	      <td>
+			<%= link_to_function 'edit', "$('#user_update_#{user.id}').toggle();" %>
+		  	<% if !is_admin? user -%> | <%= link_to 'delete', :action => :delete_user, :id => user.id %><% end -%>
 	      </td>
 	  </tr>
-	  <tr id="user_update_<%= u.id %>" style="display: none;">
-	      <td colspan="2">
-		  <%= render :partial => "/configuration/user/form", :locals => { :user => u, :deployments => Deployment.find(:all) }   %>
+	  <tr id="user_update_<%= user.id %>"<%= ' style="display: none;"' unless !user.valid? %>>
+	      <td colspan="3">
+		  <%= render :partial => "/configuration/user/form", :locals => { :user => user }   %>
 	      </td>
 	  </tr>
 	<% end -%>
     </tbody>
 </table>
-<h3>Add a new User</h3>
-<%= render :partial => "/configuration/user/form", :locals => { :user => user } %>
+
+<a name="new_user"></a>
+<h2>Add a new User</h2>
+<%= render :partial => "/configuration/user/form", :locals => { :user => new_user } %>

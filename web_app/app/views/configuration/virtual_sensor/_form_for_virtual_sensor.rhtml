@@ -1,18 +1,17 @@
-<div class="vs_all" id="vs_<%= !virtual_sensor.new_record? ? virtual_sensor.id : 'new' %>" style="display:none">
-	<%= error_messages_for 'Virtual Sensor', :object => virtual_sensor %>
+<%= '<a name="new"></a>' if virtual_sensor.new_record? %>
+<div<%= ' class="vs_all"' unless virtual_sensor.new_record? -%> id="vs_<%= virtual_sensor.id %>"<%= ' style="display:none"' unless (virtual_sensor.new_record? || !virtual_sensor.valid?) -%>>
+	<h2><%= virtual_sensor.new_record? ? 'New Virtual Sensor' : virtual_sensor.name %></h2>
+	
+	<%= error_messages_for 'Virtual Sensor', :object => virtual_sensor, :header_tag => 'h4' %>
 	<% form_for virtual_sensor, :url => { :id => virtual_sensor.id, :action => (virtual_sensor.new_record? ? :create_virtual_sensor : :update_or_delete_virtual_sensor) } do |form| -%>
 	
-	<a name="vs_<%= !virtual_sensor.new_record? ? virtual_sensor.id : 'new' %>"></a>
-
-	<h3><%= virtual_sensor.new_record? ? 'New Virtual Sensor' : virtual_sensor.name %></h3>
-
 	<table style="width:100%">
 		<tfoot>
 			<tr>
 				<th style="width:30%"></th>
 				<td>
-					<%= form.submit "Save" %>
-					<%= form.submit "Delete", :name => 'delete', :onclick => "return confirm('Are you sure?');" %>
+					<%= form.submit (virtual_sensor.new_record? ? 'Add' : 'Save') %>
+					<%= form.submit "Delete", :name => 'delete', :onclick => "return confirm('Are you sure?');" unless virtual_sensor.new_record? %>
 				</td>
 			</tr>
 		</tfoot>

@@ -1,31 +1,39 @@
-<% @depoyment = deployment %>
-<%= error_messages_for :deployment %>
+<%= error_messages_for 'Deployment', :object => deployment, :header_tag => 'h4' %>
 <% form_for deployment, :url => { :action => (deployment.new_record? ? :create_deployment : :update_deployment), :id => deployment.id} do |form| -%>
-  <table class="gsn_vsd_table">
-      <tbody>
-	  <tr><td>Name</td><td><%= form.text_field :name -%></td></tr>
-	  <tr><td>Private</td><td><%= form.check_box :private -%></td></tr>
-	  <tr><td>Description</td><td><%= form.text_field :description -%></td></tr>
-      </tbody>
-  </table>
-  <div id="processor_fom">
-  
-      <!-- user -->
-      <h4>User</h4>
-  <div id="user_admins">
-    <table class="gsn_vsd_table">
-    <% for us in users do %>
+<h3>Deployment Information</h3>
+<table class="gsn_vsd_table">
+	<tbody>
+		<tr><td>Name</td><td><%= form.text_field :name -%></td></tr>
+		<tr><td>Description</td><td><%= form.text_area :description -%></td></tr>
+			<tr><td>Is private?</td><td><%= form.check_box :private -%></td></tr>
+	</tbody>
+</table>
+	
+<h3>Users</h3>
+<table class="gsn_vsd_table">
+	<thead>
+		<tr>
+			<th>User</th>
+			<th>Is an user for this deployment?</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% for user in User.find(:all, :conditions => "type <> '#{Admin.to_s}'") do %>
+		<tr>
+			<td><%= user.email %></td>
+			<td><input type="checkbox" id="<%=user.id%>" name="user_ids[]" value="<%=user.id%>"<%= ' checked="checked"' if deployment.users.include? user %>></td>
+		</tr>
+		<% end -%>
+	</tbody>
+</table>
 
-     <tr>
-      <td><%=us.email%></td>
-      <td><input type="checkbox" id="<%=us.id%>" name="user_ids[]" value="<%=us.id%>"></td>
-     </tr>
+<h3>Admin</h3>
+<table class="gsn_vsd_table">
+	<tr>
+		<th>Administrator</th>
+		<td><%= form.select :admin_id, Admin.find(:all).collect { |a| [ a.email, a.id ] }, { :prompt => '' } -%></td>
+	</tr>
+</table>
 
-    <% end  -%>
-    </table>
-    <%=form.select(:admin_id,admins.collect {|a| [ a.email, a.id ] }, {:prompt => "Select an admin"}) -%>
-  </div>
-</div>
-<br/>
-  <%= form.submit "Save" %>
+<%= form.submit (deployment.new_record? ? 'Add' : 'Save') %>
 <% end %>

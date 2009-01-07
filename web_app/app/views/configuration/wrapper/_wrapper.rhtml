@@ -1,4 +1,5 @@
-<h3>List of Wrapper</h3>
+<h2>List of Wrapper</h2>
+<a href="#new_wrapper">New Wrapper</a>
 <table class="gsn_vsd_table">
     <thead>
 	<tr>
@@ -9,20 +10,20 @@
 	</tr>
     </thead>
     <tbody>
-	<% for w in wrappers -%>
+	<% for wrapper in wrappers -%>
 	  <tr>
-	      <td><%= w.name %></td>
-	      <td><%= w.class_name %></td>
-	      <td><%= w.description %></td>
-	      <td><%= link_to_function :Show, "$('#wrapper_show_#{w.id}').toggle(); $('#wrapper_update_#{w.id}').hide()" unless w.wrapper_inits.empty? %>
-		  <%= link_to_function :Edit, "$('#wrapper_update_#{w.id}').toggle(); $('#wrapper_show_#{w.id}').hide();" %>
-		  <%= link_to :Delete, :action => :delete_wrapper, :id => w.id %>
+	      <td><%= wrapper.name %></td>
+	      <td><%= wrapper.class_name %></td>
+	      <td><%= wrapper.description %></td>
+	      <td><%= link_to_function 'show', "$('#wrapper_show_#{wrapper.id}').toggle(); $('#wrapper_update_#{wrapper.id}').hide()" unless wrapper.wrapper_inits.empty? %>
+		  | <%= link_to_function 'edit', "$('#wrapper_update_#{wrapper.id}').toggle(); $('#wrapper_show_#{wrapper.id}').hide();" %>
+		  | <%= link_to 'delete', :action => :delete_wrapper, :id => wrapper.id %>
 	      </td>
 	  </tr>
-	  <% unless w.wrapper_inits.empty? -%>
-	    <tr id="wrapper_show_<%= w.id %>" style="display: none;">
+	  <% unless wrapper.wrapper_inits.empty? -%>
+	    <tr id="wrapper_show_<%= wrapper.id %>" style="display: none;">
 		<td colspan="4">
-		    <h4>Wrapper Inits</h4>
+		    <h3>Wrapper Inits</h3>
 		    <table>
 			<thead>
 			    <tr>
@@ -34,13 +35,13 @@
 			    </tr>
 			</thead>
 			<tbody>
-			    <% for w_init in w.wrapper_inits %>
+			    <% for wrapper_init in wrapper.wrapper_inits %>
 			      <tr>
-				  <td><%= w_init.name %></td>
-				  <td><%= w_init.data_type.name %></td>
-				  <td><%= w_init.default_value.blank? ? "-" : w_init.default_value %></td>
-				  <td><%= w_init.optional %></td>
-				  <td><p><%= w_init.description %></p></td>
+				  <td><%= wrapper_init.name %></td>
+				  <td><%= wrapper_init.data_type.name %></td>
+				  <td><%= wrapper_init.default_value.blank? ? "-" : wrapper_init.default_value %></td>
+				  <td><%= wrapper_init.optional %></td>
+				  <td><p><%= wrapper_init.description %></p></td>
 			      </tr>
 			    <% end -%>
 			</tbody>
@@ -48,13 +49,15 @@
 		</td>
 	    </tr>
 	  <% end -%>
-	  <tr id="wrapper_update_<%= w.id %>" style="display: none;">
+	  <tr id="wrapper_update_<%= wrapper.id %>"<%= ' style="display: none;"' if wrapper.valid? %>>
 	      <td colspan="4">
-		  <%= render :partial => "/configuration/wrapper/form", :locals => { :wrapper => w }   %>
+		  <%= render :partial => "/configuration/wrapper/form", :locals => { :wrapper => wrapper }   %>
 	      </td>
 	  </tr>
 	<% end -%>
     </tbody>
 </table>
-<h3>Add a new Wrapper</h3>
-<%= render :partial => "/configuration/wrapper/form", :locals => { :wrapper => wrapper } %>
+
+<a name="new_wrapper"></a>
+<h2>Add a new Wrapper</h2>
+<%= render :partial => "/configuration/wrapper/form", :locals => { :wrapper => new_wrapper } %>

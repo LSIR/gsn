@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
     if user
       exprected_password = encripted_password(password, user.salt)
       if user.hashed_password != exprected_password
-	user = nil
+        user = nil
       end
     end
     user

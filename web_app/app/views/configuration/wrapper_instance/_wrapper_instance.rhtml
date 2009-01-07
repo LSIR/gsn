@@ -1,67 +1,70 @@
-<h3>List of Wrapper Instances</h3>
+<h2>List of Wrapper Instances</h2>
+<a href="#new_wrapper_instance">New Wrapper Instance</a>
 <table class="gsn_vsd_table">
-    <thead>
-	<tr>
-	    <td>Name</td>
-	    <td>Wrapper Class Name</td>
-	    <td>Wrapper Name</td>
-	    <td>Description</td>
-	    <td>&nbsp;</td>
-	</tr>
-    </thead>
-    <tbody>
-	<% for wi in wrapper_instances -%>
-	  <tr>
-	      <td><%= wi.name -%></td>
-	      <td><%= wi.wrapper.class_name -%></td>
-	      <td><%= wi.wrapper.name -%></td>
-	      <td><%= wi.description -%></td>
-	      <td>
-		  <%= link_to_function :Show, "$('#wrapper_instance_show_#{wi.id}').toggle(); $('#wrapper_instance_update_#{wi.id}').hide()" %>
-		  <%= link_to_function :Edit, "$('#wrapper_instance_update_#{wi.id}').toggle(); $('#wrapper_instance_show_#{wi.id}').hide();" %>
-		  <%= link_to :Delete, :action => :delete_wrapper_instance, :id => wi.id %>
-	      </td>
-	  </tr>
-	  <tr id="wrapper_instance_show_<%= wi.id %>" style="display: none;">
-	      <td colspan="5">
-		  <h4>Wrapper Parameters</h4>
-		  <table>
-		      <thead>
-			  <tr>
-			      <td>Name</td>
-			      <td>Value</td>
-			      <td>Data Type</td>
-			      <td>Default Value</td>
-			      <td>Optional</td>
-			      <td>Description</td>
-			  </tr>
-		      </thead>
-		      <tbody>
-			  <% for wp in wi.wrapper_parameters %>
-			    <tr>
-				<td><%= wp.wrapper_init.name %></td>
-				<td><%= wp.value %></td>
-				<td><%= wp.wrapper_init.data_type.name %></td>
-				<td><%= wp.wrapper_init.default_value.blank? ? "-" : wp.wrapper_init.default_value %></td>
-				<td><%= wp.wrapper_init.optional %></td>
-				<td><p><%= wp.note %></p></td>
-			    </tr>
-			  <% end -%>
-		      </tbody>
-		  </table>
-	      </td>
-	  </tr>
-	  <tr id="wrapper_instance_update_<%= wi.id %>" style="display: none;">
-	      <td colspan="5">
-		  <%= render :partial => "/configuration/wrapper_instance/form", :locals => { :wrapper => wi.wrapper, :wrapper_instance => wi }   %>
-	      </td>
-	  </tr>
-	<% end -%>
-    </tbody>
+	<thead>
+		<tr>
+			<td>Name</td>
+			<td>Wrapper Class Name</td>
+			<td>Wrapper Name</td>
+			<td>Description</td>
+			<td>&nbsp;</td>
+		</tr>
+	</thead>
+	<tbody>
+		<% for wi in wrapper_instances -%>
+		<tr>
+			<td><%= wi.name -%></td>
+			<td><%= wi.wrapper.class_name -%></td>
+			<td><%= wi.wrapper.name -%></td>
+			<td><%= wi.description -%></td>
+			<td>
+				<%= link_to_function :Show, "$('#wrapper_instance_show_#{wi.id}').toggle(); $('#wrapper_instance_update_#{wi.id}').hide()" %>
+				| <%= link_to_function :Edit, "$('#wrapper_instance_update_#{wi.id}').toggle(); $('#wrapper_instance_show_#{wi.id}').hide();" %>
+				| <%= link_to :Delete, :action => :delete_wrapper_instance, :id => wi.id %>
+			</td>
+		</tr>
+		<tr id="wrapper_instance_show_<%= wi.id %>" style="display: none;">
+			<td colspan="5">
+				<h4>Wrapper Parameters</h4>
+				<table>
+					<thead>
+						<tr>
+							<td>Name</td>
+							<td>Value</td>
+							<td>Data Type</td>
+							<td>Default Value</td>
+							<td>Optional</td>
+							<td>Description</td>
+						</tr>
+					</thead>
+					<tbody>
+						<% for wp in wi.wrapper_parameters %>
+						<tr>
+							<td><%= wp.wrapper_init.name %></td>
+							<td><%= wp.value %></td>
+							<td><%= wp.wrapper_init.data_type.name %></td>
+							<td><%= wp.wrapper_init.default_value.blank? ? "-" : wp.wrapper_init.default_value %></td>
+							<td><%= wp.wrapper_init.optional %></td>
+							<td><p><%= wp.note %></p></td>
+						</tr>
+						<% end -%>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+		<tr id="wrapper_instance_update_<%= wi.id %>"<%= ' style="display: none;"' if wi.valid? %>>
+			<td colspan="5">
+				<%= render :partial => "/configuration/wrapper_instance/form", :locals => { :wrapper => wi.wrapper, :wrapper_instance => wi }   %>
+			</td>
+		</tr>
+		<% end -%>
+	</tbody>
 </table>
-<h3>Add a new Wrapper Instance</h3>
+
+<h2>Add a new Wrapper Instance</h2>
+<a href="#new_wrapper_instance"></a>
 <%= select_tag('wrapper_id', options_for_select([['Select a Wrapper','-1']] | Wrapper.find(:all).collect{ |wrapper| [wrapper.name, wrapper.id] })) %>
 <div id="selected_wrapper">
-    <%= render :partial => "/configuration/wrapper_instance/form", :locals => { :wrapper_instance => wrapper_instance, :wrapper => Wrapper.find(wrapper_instance.wrapper_id) } unless wrapper_instance.wrapper_id.nil? %>
+	<%= render :partial => "/configuration/wrapper_instance/form", :locals => { :wrapper_instance => new_wrapper_instance, :wrapper => Wrapper.find(new_wrapper_instance.wrapper_id) } unless new_wrapper_instance.wrapper_id.nil? %>
 </div>
 <%= observe_field 'wrapper_id', :url => { :action => :select_wrapper }, :update => :selected_wrapper, :with => "'wrapper_id=' + $('#wrapper_id').val()" %>
