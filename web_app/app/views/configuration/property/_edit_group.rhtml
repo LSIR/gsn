@@ -1,5 +1,4 @@
-<% @property_group = property_group %>
-<%= error_messages_for :property %>
+
 <% form_for property_group, :url => { :action => (property_group.new_record? ? :create_property_group : :update_property_group), :id => property_group.id} do |form| -%>
 
 <td><%= form.text_field :name, :style => "width:230px;" -%></td>
