@@ -311,24 +311,34 @@ class ConfigurationController < ApplicationController
   end
   
   def create_property_group
-    @property_group = PropertyGroup.new(params[:property_group])
-    if @property_group.save
+    property_group = PropertyGroup.new(params[:property_group])
+    if property_group.save
       flash[:notice] = "Successfully created the property group."
       redirect_to :action => :property
     else
       flash.now[:notice] = "Not Created"
-      redirect_to :action => :property
+      render :partial => 'configuration/property/property',
+             :layout => 'standard',
+             :locals => { :property_group => property_group,
+                          :property_groups => PropertyGroup.find(:all),
+                          :properties => Property.find(:all),
+                          :property_values => PropertyValue.find(:all)  }
     end
   end
 
   def update_property_group
-    @property_group = PropertyGroup.find(params[:id])
-    if @property_group.update_attributes(params[:property_group])
+    property_group = PropertyGroup.find(params[:id])
+    if property_group.update_attributes(params[:property_group])
       flash[:notice] = "Successfully updated the property group."
       redirect_to :action => :property
     else
       flash.now[:notice] = "Not Updated"
-      redirect_to :action => :property
+      render :partial => 'configuration/property/property',
+             :layout => 'standard',
+             :locals => { :property_group => property_group,
+                          :property_groups => PropertyGroup.find(:all),
+                          :properties => Property.find(:all),
+                          :property_values => PropertyValue.find(:all)  }
     end
   end
   
