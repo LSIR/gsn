@@ -1,2 +1,18 @@
-<%= "configuration" %>
 
+<table width="840" style="border: none; margin: 0; padding: 0;">
+	<tr style="border: none; margin: 0; padding: 0;">
+		<td width="50%" style="vertical-align: top; border: none; margin: 0; padding: 0;">
+			<h3>DataSensor1</h1>
+			<div id="whatever"></div>
+		</td>
+		<td width="50%" style="vertical-align: top; border: none; margin: 0; padding: 0;">
+			<h3>DataSensor2</h1>
+			<div id="whatever2"></div>
+		</td>
+	</tr>
+</table>
+<br /><br />
+<script type="text/javascript">
+	new PropertyEditor("VirtualSensor", 1, "whatever", true);
+	new PropertyEditor("VirtualSensor", 2, "whatever2", false);
+</script>

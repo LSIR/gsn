@@ -290,6 +290,76 @@ class DataController < ApplicationController
     #    p to_return
     render :json => to_return, :layout => false
   end
+  
+  # Used by PropertyEditor javascript to receive needed data
+  def get_properties
+    groups = {}
+    PropertyGroup.find(:all).each do |group|
+      groups[group.id] = group.name.to_sym
+    end
+    
+    properties = {}
+    Property.find(:all).each do |prop|
+      properties[prop.id] = {}
+      properties[prop.id]["name".to_sym] = prop.name.to_sym;
+      properties[prop.id]["group_id".to_sym] = prop.property_group_id;
+    end
+
+    values = {}
+    PropertyValue.find(:all, :conditions => "prop_value_owner_id = '#{params[:id]}' AND " + 
+                                            "prop_value_owner_type = '#{params[:type]}'").each do |value|
+      values[value.id] = {}
+      values[value.id]["value".to_sym] = value.value.to_sym;
+      values[value.id]["property_id".to_sym] = value.property_id;
+    end
+
+    render :json => [groups, properties, values], :layout => false
+  end
+  
+  def delete_value
+    if PropertyValue.delete(params[:id]) then
+      render :json => "success".to_sym, :layout => false
+    else
+      render :json => "failed".to_sym, :layout => false 
+    end
+  end
+
+  def add_value
+    begin
+      value = PropertyValue.new()
+    rescue
+      render :json => "failed".to_sym, :layout => false 
+      return
+    end
+
+    value[:value] = params[:value]
+    value[:prop_value_owner_type] = params[:owner_type]
+    value[:prop_value_owner_id] = params[:owner_id]
+    value[:property_id] = params[:property_id]
+
+    if value.save then
+      render :json => value.id, :layout => false
+    else
+      render :json => "failed".to_sym, :layout => false 
+    end
+  end
+  
+  def update_value
+    begin
+      value = PropertyValue.find(params[:id])
+    rescue
+      render :json => "failed".to_sym, :layout => false 
+      return
+    end
+
+    value[:value] = params[:value]
+
+    if value.save then
+      render :json => "success".to_sym, :layout => false
+    else
+      render :json => "failed".to_sym, :layout => false 
+    end
+  end
 end
 
 def data_2
