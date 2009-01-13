@@ -85,6 +85,22 @@ class Processor < ActiveRecord::Base
     end
   end
 
-  # temp
+  def save_output_formats
+    output_formats.each do |param|
+      param.save(false)
+    end
+  end
 
+  def save_pc_inits
+    pc_inits.each do |param|
+      param.save(false)
+    end
+  end
+
+  def save_web_inputs
+    web_inputs.each do |param|
+      param.save(false)
+    end
+  end
+  # temp
 end

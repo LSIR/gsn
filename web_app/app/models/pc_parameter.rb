@@ -5,6 +5,7 @@ class PcParameter < ActiveRecord::Base
 
   # Validation
   validates_presence_of :value, :nil => false, :blank => false
+  validates_numericality_of :value
 
 #  def param_name
 #    pc_init ? pc_init.name : ""

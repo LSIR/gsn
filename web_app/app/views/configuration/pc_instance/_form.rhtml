@@ -1,7 +1,7 @@
-<h3>Add a new Pc Instance</h3>
+<h2>Add a new Pc Instance</h2>
 
 <% @pc_instance = pc_instance %>
-<%= error_messages_for :pc_instance %>
+<%= error_messages_for 'pc_instance', :object => pc_instance, :header_tag => 'h4' %>
 <% form_for pc_instance, :url => { :action => (pc_instance.new_record? ? :create_pc_instance : :update_pc_instance), :id => pc_instance.id} do |form| -%>
   <table class="gsn_vsd_table">
       <tbody>
@@ -11,11 +11,25 @@
   </table>
   <br/>
   <br/>
-    <%= form.select(:processor_id,processors.collect {|c| [ c.name, c.id ] }, {:prompt => "Select a Processor"}, {:onchange =>remote_function(:update => "#pc_parameters", :url => url_for(:action =>'form_for_parameter'), :with => "'procid='+value")}) -%>
-   <span id="init"></span><br/>
- 
-  <div id="pc_parameters">
+    <%if pc_instance.new_record?%>
+      <%pc_instance.processor_id = nil%>
+    <%end%>
+    <%= form.select(:processor_id,processors.collect {|c| [ c.name, c.id ] }, {:prompt => "Select a Processor"}, {:onchange =>remote_function(:update => "#pc_parameters_#{pi_id}", :url => url_for(:action =>'form_for_parameter'), :with => "'procid='+value")}) -%>
+   
+  <div id="pc_parameters_<%=pi_id%>" >
   </div>
+  <% unless pc_instance.new_record?%>
+    <%pcinits = PcInit.find(:all,:conditions => "processor_id = #{pc_id}")%>
+    <%params = PcParameter.find(:all,:conditions => "pc_instance_id = #{pi_id}")%>
+    
+    <%for param in params%>
+      <%=  render :partial => '/configuration/pc_instance/pc_parameter',:locals => { :pcinits => pcinits, :pc_parameter => param, :params => params}%>
+      <%break%>
+    <%end%>
+  <%end%>
+  <span></span>
+  <span></span>
+  <span></span>
   <br/>
   <%= form.submit "Save" %>
 <% end %>

@@ -76,7 +76,7 @@ class ConfigurationController < ApplicationController
   def processor
     render :partial => 'configuration/processor/processor',
       :layout => 'standard',
-      :locals => { :processor => Processor.new }
+      :locals => { :processor => Processor.new, :processors => Processor.find(:all)}
   end
 
   def create_processor
@@ -88,8 +88,30 @@ class ConfigurationController < ApplicationController
       flash.now[:notice] = "Not Created"
       render :partial => '/configuration/processor/processor',
 	:layout => 'standard',
-	:locals => { :processor => processor }
+	:locals => { :processor => processor, :processors => Processor.find(:all) }
     end
+  end
+
+  def update_processor
+    params[:processor][:existing_pc_init_attributes] ||= {}
+    params[:processor][:existing_output_format_attributes] ||= {}
+    params[:processor][:existing_web_input_attributes] ||= {}
+    processor = Processor.find(params[:id])
+     if processor.update_attributes(params[:pc_instance])
+      flash[:notice] = "Successfully updated Processor and its values."
+      redirect_to :action => :processor
+     else
+       flash.now[:notice] = "Not Updated"
+       redirect_to :action => :processor
+     end
+  end
+
+  def delete_pc_instance
+    pci = PcInstance.find(params[:id])
+    pci.pc_parameters.each { |p| PcParameter.destroy(p.id) }
+    PcInstance.delete(params[:id])
+    flash[:notice] = "Successfully deleted the PcInstance"
+    redirect_to :action => :pc_instance
   end
 
   ##############################################################################
@@ -409,9 +431,9 @@ class ConfigurationController < ApplicationController
   # PCInstance
   ##############################################################################
   def pc_instance
-    render :partial => 'configuration/pc_instance/form',
+    render :partial => 'configuration/pc_instance/pc_instance',
       :layout => 'standard',
-      :locals => { :pc_instance => PcInstance.new, :processors => Processor.find(:all)}
+      :locals => { :pc_instance => PcInstance.new, :processors => Processor.find(:all), :pc_instances => PcInstance.find(:all)}
   end
 
   def create_pc_instance
@@ -421,11 +443,34 @@ class ConfigurationController < ApplicationController
       redirect_to :action => :pc_instance
     else
       flash.now[:notice] = "Not Created"
-      render :partial => '/configuration/pc_instance/form',
-	:layout => 'standard',
-	:locals => { :pc_instance => pc_instance, :processors => Processor.find(:all) }
+      render :partial => '/configuration/pc_instance/pc_instance',
+        :layout => 'standard',
+        :locals => { :pc_instance => pc_instance, :processors => Processor.find(:all), :pc_instances => PcInstance.find(:all)}
     end
   end
+
+  def update_pc_instance
+    params[:pc_instance][:existing_pc_parameter_attributes] ||= {}
+    pc_instance = PcInstance.find(params[:id])
+     if pc_instance.update_attributes(params[:pc_instance])
+      flash[:notice] = "Successfully updated Pc Instance and its values."
+      redirect_to :action => :pc_instance
+     else
+       flash.now[:notice] = "Not Updated"
+       render :partial => '/configuration/pc_instance/pc_instance',
+              :layout => "standard",
+              :locals => { :pc_instance => PcInstance.new, :processors => Processor.find(:all), :pc_instances => PcInstance.find(:all, :conditions => "id <> #{params[:id]}") << pc_instance }
+     end
+  end
+
+  def delete_pc_instance
+    pci = PcInstance.find(params[:id])
+    pci.pc_parameters.each { |p| PcParameter.destroy(p.id) }
+    PcInstance.delete(params[:id])
+    flash[:notice] = "Successfully deleted the PcInstance"
+    redirect_to :action => :pc_instance
+  end
+
   def form_for_parameter
     pcinits = PcInit.find(:all,:conditions => "processor_id = #{params[:procid]}")
     render :partial => '/configuration/pc_instance/pc_parameter',

@@ -7,7 +7,7 @@ class Wrapper < ActiveRecord::Base
   validates_identifier :name
   validates_uniqueness_of :name
   validates_class_name :class_name
-  
+
   validates_associated :wrapper_inits
 
   #
