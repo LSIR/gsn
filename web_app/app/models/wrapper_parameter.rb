@@ -6,6 +6,14 @@ class WrapperParameter < ActiveRecord::Base
   #Validation
   validates_presence_of :value, :allow_nil => false, :allow_blank => false
 
+  before_validation :set_default_value
+  
+  def set_default_value
+    if self[:value].blank?
+      self[:value] = default_value
+    end
+  end
+    
   #
   def to_label
     # TODO: ADDING H FUCKTION

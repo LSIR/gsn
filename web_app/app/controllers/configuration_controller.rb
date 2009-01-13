@@ -159,7 +159,7 @@ class ConfigurationController < ApplicationController
 
   def delete_wrapper_instance
     WrapperInstance.destroy(params[:id])
-    flash[:notice] = "Successfully deleted the wrapper_instance"
+    flash[:notice] = "Successfully deleted the Wrapper Instance"
     redirect_to :action => :wrapper_instance
   end
 
