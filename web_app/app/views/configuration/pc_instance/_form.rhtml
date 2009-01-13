@@ -1,35 +1,28 @@
-<h2>Add a new Pc Instance</h2>
-
 <% @pc_instance = pc_instance %>
 <%= error_messages_for 'pc_instance', :object => pc_instance, :header_tag => 'h4' %>
 <% form_for pc_instance, :url => { :action => (pc_instance.new_record? ? :create_pc_instance : :update_pc_instance), :id => pc_instance.id} do |form| -%>
-  <table class="gsn_vsd_table">
-      <tbody>
-        <tr><td>Name</td><td><%= form.text_field :name -%></td></tr>
-        <tr><td>Web password</td><td><%= form.password_field :web_password -%></td></tr>
-      </tbody>
-  </table>
-  <br/>
-  <br/>
-    <%if pc_instance.new_record?%>
-      <%pc_instance.processor_id = nil%>
-    <%end%>
-    <%= form.select(:processor_id,processors.collect {|c| [ c.name, c.id ] }, {:prompt => "Select a Processor"}, {:onchange =>remote_function(:update => "#pc_parameters_#{pi_id}", :url => url_for(:action =>'form_for_parameter'), :with => "'procid='+value")}) -%>
-   
-  <div id="pc_parameters_<%=pi_id%>" >
-  </div>
-  <% unless pc_instance.new_record?%>
-    <%pcinits = PcInit.find(:all,:conditions => "processor_id = #{pc_id}")%>
-    <%params = PcParameter.find(:all,:conditions => "pc_instance_id = #{pi_id}")%>
-    
-    <%for param in params%>
-      <%=  render :partial => '/configuration/pc_instance/pc_parameter',:locals => { :pcinits => pcinits, :pc_parameter => param, :params => params}%>
-      <%break%>
-    <%end%>
-  <%end%>
-  <span></span>
-  <span></span>
-  <span></span>
-  <br/>
-  <%= form.submit "Save" %>
+<h3>Pc Instance Properties</h3>
+<table class="gsn_vsd_table">
+	<tbody>
+		<tr><td>Name</td><td><%= form.text_field :name -%></td></tr>
+		<tr><td>Web password</td><td><%= form.password_field :web_password -%></td></tr>
+	</tbody>
+</table>
+<h3>Processor</h3>
+<% if pc_instance.new_record? then pc_instance.processor_id = nil end %>
+Select a processor <%= form.select(:processor_id, processors.collect {|c| [ c.name, c.id ] }, {:prompt => "Select a Processor"}, { :onchange => remote_function(:update => "#pc_parameters_#{pi_id}", :url => url_for(:action =>'form_for_parameter'), :with => "'procid='+value")}) -%>
+<div id="pc_parameters_<%= pi_id %>">
+</div>
+<% unless pc_instance.new_record? %>
+	<% pcinits = PcInit.find(:all,:conditions => "processor_id = #{pc_id}") %>
+	<% params = PcParameter.find(:all,:conditions => "pc_instance_id = #{pi_id}") %>
+
+	<% for param in params %>
+		<%= render :partial => '/configuration/pc_instance/pc_parameter',
+			:locals => { :pcinits => pcinits, :pc_parameter => param, :params => params} %>
+		<% break %>
+    <% end %>
+  <% end %>
 <% end %>
+
+<%= form.submit (pc_instance.new_record? ? 'Add' : 'Save') %>

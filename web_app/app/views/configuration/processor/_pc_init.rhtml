@@ -11,7 +11,7 @@
       <td><%= init_form.text_field :name -%></td>
       <td><%= init_form.select(:data_type_id, DataType.find(:all).collect {|c| [ c.name, c.id ] }) -%></td>
       <td><%= init_form.text_field :default_value -%></td>
-      <td><%= init_form.select :optional, [['No' , :false], ['Yes' , :true]] -%></td>
+      <td><%= init_form.select :optional, [['No' , false], ['Yes' , true]] -%></td>
       <td><%= init_form.text_field :description -%></td>
       <td><%= link_to_function "remove" , "$(this).parent().parent().prev().remove(); $(this).parent().parent().remove()" -%></td>
     <% end -%>

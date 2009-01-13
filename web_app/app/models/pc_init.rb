@@ -6,7 +6,7 @@ class PcInit < ActiveRecord::Base
 
   # Validation
   validates_identifier :name
-  validates_presence_of :default_value, :allow_nil => false, :allow_blank => false, :if => Proc.new { |u| ! u.optional }
+  validates_presence_of :default_value, :allow_nil => false, :allow_blank => false, :if => Proc.new { |u| u.optional }
   validates_inclusion_of :optional, :in => [true, false]
   
   #  def to_label
