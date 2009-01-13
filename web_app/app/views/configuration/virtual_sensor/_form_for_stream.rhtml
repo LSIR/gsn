@@ -1,6 +1,6 @@
-<%= error_messages_for 'Stream', :object => stream %>
 <% fields_for prefix, stream do |form| %>
 <div id="<%= form.associated_form_id %>">
+	<%= error_messages_for 'Stream', :object => stream %>
 	<table style="width:100%">
 		<tfoot>
 			<tr>

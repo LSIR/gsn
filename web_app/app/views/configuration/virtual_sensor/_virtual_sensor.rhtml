@@ -1,5 +1,5 @@
 <h2>List of Virtual Sensors</h2>
-<a href="#new_virtual_sensor">New Virtual Sensor</a>
+Go to the <a href="#new_virtual_sensor">new Virtual Sensor</a> form
 <ul>
 	<% for virtual_sensor in virtual_sensors do %>
 	<li><%= link_to_function virtual_sensor.name, "$('.vs_all').hide(200);$('#vs_#{virtual_sensor.id}').show(200);" %></li>
