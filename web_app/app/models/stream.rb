@@ -7,5 +7,5 @@ class Stream < ActiveRecord::Base
   validates_identifier :name
   validates_presence_of :query, :allow_nil => false, :allow_blank => false
 
-
+  validates_associated :sources
 end

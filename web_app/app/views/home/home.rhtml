@@ -7,16 +7,16 @@
       </tr>
     </thead>
     <tr>
+	  <td><span class="Huge">Elements Stored</span></td>
       <td><span class="HUGE"><%= "#{number_with_delimiter(@data_count.values.inject(0){ |sum,n| sum + n },"'")}" %></span></td>
-      <td><span class="Huge">Elements Stored</span></td>
     </tr>
     <tr>
+	  <td><span class="Huge">Virtual Sensors</span></td>
       <td><span class="HUGE"><%= @deployments.inject(0) { |sum, dep| sum + dep.virtual_sensors.length } -%></span></td>
-      <td><span class="Huge">Virtual Sensors</span></td>
     </tr>
     <tr>
+	  <td><span class="Huge">Server Timezone</span></td>
       <td><span class="HUGE"><%= Time.now.zone -%></span></td>
-      <td><span class="Huge">Server Timezone</span></td>
     </tr>
   </table>
 

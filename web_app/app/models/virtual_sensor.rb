@@ -13,4 +13,5 @@ class VirtualSensor < ActiveRecord::Base
   validates_storage_size :storage_size
   validates_inclusion_of :protected, :unique_timestamp, :in => [true, false]
 
+  validates_associated :streams
 end

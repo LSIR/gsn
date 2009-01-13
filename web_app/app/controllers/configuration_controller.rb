@@ -278,6 +278,7 @@ class ConfigurationController < ApplicationController
       }
       
       virtual_sensor = VirtualSensor.find(params[:id])
+      
       if virtual_sensor.update_attributes params[:virtual_sensor] then
         flash[:notice] = "Successfully updated the virtual sensor"
         redirect_to :action => :virtual_sensor
