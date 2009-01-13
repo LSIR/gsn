@@ -1,0 +1,37 @@
+<h2>List of Pc Instance</h2>
+<table class="gsn_vsd_table">
+    <thead>
+	<tr>
+	    <td>Name</td>
+         
+        <td>&nbsp;</td>
+	</tr>
+    </thead>
+    <tbody>
+	<% for pci in pc_instances -%>
+	  <tr>
+	      <td><%= pci.name %></td>
+	      <td>
+		  <%= link_to_function :Edit, "$('#pc_instance_update_#{pci.id}').toggle();" %>
+		 | <%= link_to :Delete, :action => :delete_pc_instance, :id => pci.id %>
+	      </td>
+	  </tr>
+      
+	 
+	  <tr id="pc_instance_update_<%= pci.id %>" <%= ' style="display: none;"' unless (pci.new_record? || !(pci.valid?))%>>
+	      <td colspan="4">
+		  <%= render :partial => "/configuration/pc_instance/form", :locals => { :pc_instance => pci, :processors => processors, :pi_id => pci.id, :pc_id => pci.processor_id} %>
+	      </td>
+	  </tr>
+	<% end -%>
+    </tbody>
+</table>
+<%= render :partial => "/configuration/pc_instance/form", :locals => { :pc_instance => pc_instance, :processors => processors, :pi_id => 0} %>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+     $('select').change(function(){
+      $(this).next().next().remove();
+     })
+  });
+</script>
