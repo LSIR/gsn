@@ -33,8 +33,11 @@ class WebInput < ActiveRecord::Base
     end
   end
 
-
-
+def save_web_commands
+    web_commands.each do |param|
+      param.save(false)
+    end
+  end
 
 
 

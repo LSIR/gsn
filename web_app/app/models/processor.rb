@@ -9,6 +9,9 @@ class Processor < ActiveRecord::Base
   validates_identifier :name
   validates_uniqueness_of :name
   validates_class_name :class_name
+  validates_associated :pc_inits
+  validates_associated :output_formats
+  validates_associated :web_inputs
 
   #
   after_update :save_output_formats, :save_pc_inits, :save_web_inputs
@@ -23,9 +26,9 @@ class Processor < ActiveRecord::Base
     output_formats.reject(&:new_record?).each do |init|
       attributes = output_format_attributes[init.id.to_s]
       if attributes
-	init.attributes = attributes
+        init.attributes = attributes
       else
-	output_formats.delete(init)
+        output_formats.delete(init)
       end
     end
   end

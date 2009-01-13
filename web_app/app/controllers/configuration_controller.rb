@@ -97,21 +97,26 @@ class ConfigurationController < ApplicationController
     params[:processor][:existing_output_format_attributes] ||= {}
     params[:processor][:existing_web_input_attributes] ||= {}
     processor = Processor.find(params[:id])
-     if processor.update_attributes(params[:pc_instance])
+     if processor.update_attributes(params[:processor])
       flash[:notice] = "Successfully updated Processor and its values."
       redirect_to :action => :processor
      else
-       flash.now[:notice] = "Not Updated"
        redirect_to :action => :processor
+       flash.now[:notice] = "Not Updated"
+       render :partial => '/configuration/processor/processor',
+              :layout => "standard",
+              :locals => { :processor => Processor.new, :processors => Processor.find(:all, :conditions => "id <> #{params[:id]}") << processor }
      end
   end
 
-  def delete_pc_instance
-    pci = PcInstance.find(params[:id])
-    pci.pc_parameters.each { |p| PcParameter.destroy(p.id) }
-    PcInstance.delete(params[:id])
-    flash[:notice] = "Successfully deleted the PcInstance"
-    redirect_to :action => :pc_instance
+  def delete_processor
+    proc = Processor.find(params[:id])
+    proc.output_formats.each { |o| OutputFormat.destroy(o.id) }
+    proc.pc_inits.each { |p| PcInit.destroy(p.id) }
+    proc.web_inputs.each { |w| WebInput.destroy(w.id) }
+    Processor.delete(params[:id])
+    flash[:notice] = "Successfully deleted the Processor"
+    redirect_to :action => :processor
   end
 
   ##############################################################################
