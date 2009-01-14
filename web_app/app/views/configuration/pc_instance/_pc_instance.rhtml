@@ -29,11 +29,3 @@
 
 <h2>Add a new Pc Instance</h2>
 <%= render :partial => "/configuration/pc_instance/form", :locals => { :pc_instance => pc_instance, :processors => processors, :pi_id => 0} %>
-
-<script type="text/javascript">
-  $(document).ready(function(){
-     $('select').change(function(){
-      $(this).next().next().remove();
-     })
-  });
-</script>

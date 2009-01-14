@@ -1,6 +1,6 @@
 <% @output_format = output_format %>
 <tr>
-    <td colspan="4">
+    <td colspan="5">
 	<%= error_messages_for :output_format -%>
     </td>
 </tr>
@@ -10,6 +10,7 @@
     <% fields_for prefix, output_format do |init_form| -%>
       <td><%= init_form.text_field :name -%></td>
       <td><%= init_form.select(:data_type_id, DataType.find(:all).collect {|c| [ c.name, c.id ] }) -%></td>
+	  <td><%= init_form.select(:unit_id, Unit.find(:all).collect {|u| [ u.name, u.id ]} ) -%></td>
       <td><%= init_form.text_field :description -%></td>
       <td><%= link_to_function "remove" , "$(this).parent().parent().prev().remove(); $(this).parent().parent().remove()" -%></td>
     <% end -%>
