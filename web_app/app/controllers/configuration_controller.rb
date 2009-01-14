@@ -332,7 +332,8 @@ class ConfigurationController < ApplicationController
   def property
     render :partial => 'configuration/property/property',
            :layout => 'standard',
-           :locals => { :property_groups => PropertyGroup.find(:all),
+           :locals => { :property_group => PropertyGroup.new,
+                        :property_groups => PropertyGroup.find(:all),
                         :properties => Property.find(:all),
                         :property_values => PropertyValue.find(:all)  }
   end
