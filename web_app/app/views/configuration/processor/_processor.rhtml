@@ -21,7 +21,7 @@
 	  </tr>
 
 
-	  <tr id="processor_update_<%= proc.id %>" style="display: none;">
+	  <tr id="processor_update_<%= proc.id %>"<%= ' style="display: none;"' if (proc.valid?) %>>
 	      <td colspan="4">
 		  <%= render :partial => "/configuration/processor/form", :locals => { :processor => proc} %>
 	      </td>

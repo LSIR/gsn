@@ -101,7 +101,6 @@ class ConfigurationController < ApplicationController
       flash[:notice] = "Successfully updated Processor and its values."
       redirect_to :action => :processor
      else
-       redirect_to :action => :processor
        flash.now[:notice] = "Not Updated"
        render :partial => '/configuration/processor/processor',
               :layout => "standard",
