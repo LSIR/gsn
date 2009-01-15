@@ -114,7 +114,7 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
          this.name = tokens.nextToken( );
          this.type = tokens.nextToken( );
          this.description = tokens.nextToken( );
-         this.dataType = DataTypes.convertTypeNameToTypeID( type );
+         this.dataType = DataTypes.convertTypeNameToGSNTypeID( type );
       }
       
       public TEDSDataField ( ) {

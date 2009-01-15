@@ -16,6 +16,7 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.taskdefs.Length;
 
 public class ValidityTools {
 
@@ -178,10 +179,10 @@ public class ValidityTools {
 		StringBuilder sb = new StringBuilder(string);
 		if (sb.length()==0)
 			return false;
-		if (!Character.isJavaIdentifierStart(sb.charAt(0)))
+		if (!Character.isJavaIdentifierStart(sb.charAt(0)) && string.charAt(0)!='\"' )
 			return false;
 		for (int i=1;i<sb.length();i++)
-			if (!Character.isJavaIdentifierPart(sb.charAt(i)))
+			if (!Character.isJavaIdentifierPart(sb.charAt(i)) && (i==sb.length()-1 && string.charAt(sb.length()-1)!='\"'))
 				return false;
 		return true;
 	}

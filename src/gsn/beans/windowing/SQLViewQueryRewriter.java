@@ -1,5 +1,6 @@
 package gsn.beans.windowing;
 
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.storage.SQLUtils;
@@ -14,8 +15,8 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
 
     private static final transient Logger logger = Logger.getLogger(SQLViewQueryRewriter.class);
     protected static StorageManager storageManager = StorageManager.getInstance();
-    public static final String VIEW_HELPER_TABLE = "__SQL_VIEW_HELPER_TABLE__".toLowerCase();
-    private static DataField[] viewHelperFields = new DataField[]{new DataField("UID", "varchar(17)")};
+    public static final CharSequence VIEW_HELPER_TABLE = Main.tableNameGeneratorInString("_SQL_VIEW_HELPER_".toLowerCase());
+    private static DataField[] viewHelperFields = new DataField[]{new DataField("u_id", "varchar(17)")};
 
     static {
         try {
@@ -72,7 +73,7 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
         try {
             //TODO : can we use prepareStatement instead of creating a new query each time
             StringBuilder query = new StringBuilder("update ").append(VIEW_HELPER_TABLE);
-            query.append(" set timed=").append(timestamp).append(" where UID='").append(streamSource.getUIDStr());
+            query.append(" set timed=").append(timestamp).append(" where u_id='").append(streamSource.getUIDStr());
             query.append("' ");
             storageManager.executeUpdate(query);
             if (storageManager.isThereAnyResult(new StringBuilder("select * from ").append(streamSource.getUIDStr()))) {

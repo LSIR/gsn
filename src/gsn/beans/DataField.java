@@ -21,14 +21,14 @@ public final class DataField implements Serializable {
    public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {
       this.name = fieldName;
       this.type = type;
-      this.dataTypeID = DataTypes.convertTypeNameToTypeID( type );
+      this.dataTypeID = DataTypes.convertTypeNameToGSNTypeID( type );
       this.description = description;
    }
    
    public DataField ( final String name , final String type ) {
       this.name = name;
       this.type = type;
-      this.dataTypeID = DataTypes.convertTypeNameToTypeID( type );
+      this.dataTypeID = DataTypes.convertTypeNameToGSNTypeID( type );
    }
  
    public DataField(String colName,byte dataTypeID) {
@@ -62,7 +62,7 @@ public final class DataField implements Serializable {
     * @return Returns the dataTypeID.
     */
    public byte getDataTypeID ( ) {
-      if ( this.dataTypeID == -1 ) this.dataTypeID = DataTypes.convertTypeNameToTypeID( this.type );
+      if ( this.dataTypeID == -1 ) this.dataTypeID = DataTypes.convertTypeNameToGSNTypeID( this.type );
       return this.dataTypeID;
    }
    

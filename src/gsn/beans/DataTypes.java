@@ -1,11 +1,8 @@
 package gsn.beans;
 
 import gsn.utils.GSNRuntimeException;
-
-import java.sql.Types;
 import java.util.Date;
 import java.util.regex.Pattern;
-
 import org.apache.log4j.Logger;
 
 public class DataTypes {
@@ -101,7 +98,7 @@ public class DataTypes {
    public final static Object [ ]        TYPE_SAMPLE_VALUES        = { "A chain of chars" , 'c' , new Integer( 32 ) , new Integer( 66000 ) , new Byte( ( byte ) 12 ) , new Double( 3.141592 ) ,
          new Date( ).getTime( ) , new Integer( 1 ) , new Integer( 9 ) };
    
-   public static byte convertTypeNameToTypeID ( final String type ) {
+   public static byte convertTypeNameToGSNTypeID ( final String type ) {
        if ( type == null ) throw new GSNRuntimeException( new StringBuilder( "The type *null* is not recoginzed by GSN." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
       for ( byte i = 0 ; i < DataTypes.ALL_PATTERNS.length ; i++ )
          if ( DataTypes.ALL_PATTERNS[ i ].matcher( type ).matches( ) ){
@@ -109,37 +106,7 @@ public class DataTypes {
          }
       throw new GSNRuntimeException( new StringBuilder( "The type *" ).append( type ).append( "* is not recognized." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
    }
-   // TODO: THIS METHOD NEEDS REWRITE FOR SQL SERVER
-   public static Byte convertFromJDBCToGSNFormat ( final int colTypeInJDBCFormat ) {
-      switch ( colTypeInJDBCFormat ) {
-         case Types.BIGINT :
-            return BIGINT;
-         case Types.INTEGER :
-            return INTEGER;
-         case Types.SMALLINT :
-            return SMALLINT;
-         case Types.TINYINT :
-            return TINYINT;
-         case Types.VARCHAR :
-            return VARCHAR;
-         case Types.CHAR :
-            return CHAR;
-//         case Types.TIME :
-//            return TIME;
-         case Types.DOUBLE :
-         case Types.DECIMAL:	// This is needed for doing aggregates in datadownload servlet.
-            return DOUBLE;
-         case Types.BINARY :
-         case Types.BLOB :
-         case Types.VARBINARY:
-         case Types.LONGVARBINARY :
-            return BINARY;
-         default :
-            logger.error( "The type can't be converted to GSN form : " + colTypeInJDBCFormat );
-            break;
-      }
-      return null;
-   }
+   
    public Object[] streamElementToStandardXMLRPC(StreamElement se) {
       Object[] toReturn = new Object[se.getData( ).length];
       for (int i=0;i<se.getData( ).length;i++) {

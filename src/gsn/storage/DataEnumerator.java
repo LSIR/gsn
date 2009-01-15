@@ -75,13 +75,14 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 			for ( int i = 1 ; i <= resultSet.getMetaData( ).getColumnCount( ) ; i++ ) {
 				String colName = resultSet.getMetaData( ).getColumnName( i );
 				int colTypeInJDBCFormat = resultSet.getMetaData( ).getColumnType( i );
+				int colScale=resultSet.getMetaData().getScale(i);
 				if ( colName.equalsIgnoreCase( "PK" ) ) {
 					indexofPK = i;
 				} else if ( colName.equalsIgnoreCase( "timed" ) ) {
 					indexOfTimedField = i;
 				} else {
 					fieldNames.add( colName );
-					fieldTypes.add( DataTypes.convertFromJDBCToGSNFormat( colTypeInJDBCFormat ) );
+					fieldTypes.add( StorageManager.getDatabaseForConnection(preparedStatement.getConnection()).convertLocalTypeToGSN(colTypeInJDBCFormat,colScale ) );
 				}
 			}
 			dataFieldNames = fieldNames.toArray( new String [ ] {} );
@@ -148,8 +149,8 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 						if ( linkBinaryData )
 							output[ innerIndex ] = "/field?vs=" + resultSet.getMetaData( ).getTableName( actualColIndex ) + "&amp;field=" + resultSet.getMetaData( ).getColumnName( actualColIndex )
 							+ "&amp;pk=" + pkValue;
-							else
-								output[ innerIndex ] = resultSet.getBytes( actualColIndex );
+						else
+							output[ innerIndex ] = resultSet.getBytes( actualColIndex );
 						break;
 					}
 					if (resultSet.wasNull())
