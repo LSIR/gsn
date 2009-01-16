@@ -373,7 +373,7 @@ public class StorageManager {
 
 	public static DataEnumerator executeQuery(StringBuilder query,boolean binaryFieldsLinked, Connection connection) throws SQLException {
 		if (logger.isDebugEnabled())
-			logger.debug("Executing query: " + query + "(" + binaryFieldsLinked	+ ")");
+			logger.debug("Executing query: " + query + "( Binary Field Linked:" + binaryFieldsLinked	+ ")");
 		return new DataEnumerator(connection.prepareStatement(query.toString()),binaryFieldsLinked);
 	}
 
@@ -509,7 +509,7 @@ public class StorageManager {
 					if (value == null)
 						ps.setNull(counter, Types.TINYINT);
 					else
-						ps.setByte(counter, (Byte) value);
+						ps.setByte(counter, ((Number) value).byteValue());
 					break;
 				case DataTypes.DOUBLE:
 					if (value == null)
@@ -521,7 +521,7 @@ public class StorageManager {
 					if (value == null)
 						ps.setNull(counter, Types.BIGINT);
 					else
-						ps.setLong(counter, (Long) value);
+						ps.setLong(counter, ((Number) value).longValue());
 					break;
 				case DataTypes.BINARY:
 					if (value == null)

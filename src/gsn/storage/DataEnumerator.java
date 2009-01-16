@@ -68,7 +68,6 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 		try {
 			this.resultSet = preparedStatement.executeQuery( );
 			hasNext = resultSet.next( );
-
 			// Initializing the fieldNames and fieldTypes.
 			// Also setting the values for <code> hasTimedFieldInResultSet</code>
 			// if the timed field is present in the result set.
