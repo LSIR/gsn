@@ -1,5 +1,4 @@
 \documentclass[a4paper,oneside,10pt]{book}
-
 \input{helper.tex}
 
 \draftcopyName{Review V1}{135}
@@ -19,11 +18,23 @@
 \newcommand{\vsp}{\textit{VSP}\xspace}
 
 \begin{document}
-	\setcounter{secnumdepth}{3} %add another level of numbered headings.
-	\maketitle
-	% Table of contents
+\frontmatter
+\maketitle
+\pagenumbering{roman}
+%\setcounter{secnumdepth}{1}
+\input{front-matter/abstract}
+
+% Table of contents
 	\tableofcontents	
-	% Chapters
+\newpage	
+\input {front-matter/publications}	
+
+
+	% Chapters	
+\mainmatter %start numbering with arabic numerals
+%	\newpage
+%	\pagenumbering{arabic}
+	\setcounter{secnumdepth}{4}	
 	\input{chapters/ch-introduction/ch-introduction}
 	\input{chapters/ch-architecture/ch-architecture}
 	\input{chapters/ch-gsn/ch-gsn}

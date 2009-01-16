@@ -1,5 +1,60 @@
+\graphicspath{{chapters/ch-introduction/figures/}}
 \chapter{Introduction}
 
+
+\label{sec:introduction}
+
+Until now, research in the sensor network domain has mainly focused on
+routing, data aggregation, and energy conservation inside a single
+sensor network while the integration of multiple sensor networks has
+only been studied to a limited extent. However, as the price of
+wireless sensors diminishes rapidly we can soon expect large numbers
+of autonomous sensor networks being deployed. These sensor networks
+will be managed by different organizations but the interconnection of
+their infrastructures along with data integration and distributed
+query processing will soon become an issue to fully exploit the
+potential of this ``Sensor Internet.'' This requires platforms which
+enable the dynamic integration and management of sensor networks and
+the produced data streams.
+
+The Global Sensor Networks (GSN) platform aims at providing a flexible
+middleware to accomplish these goals.  GSN assumes the simple model
+shown in Figure~\ref{fig:setup}. A sensor network internally may use
+arbitrary multi-hop, ad-hoc routing algorithms to deliver sensor
+readings to one or more sink node(s). A sink node is a node which is
+connected to a more powerful base computer which in turn runs the GSN
+middleware and may participate in a (large-scale) network of base
+computers, each running GSN and servicing one or more sensor networks.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\columnwidth]{model}
+  \caption{GSN model}
+  \label{fig:setup}
+\end{figure}
+
+We do not make any assumptions on the internals of a sensor network
+other than that the sink node is connected to the base computer via a
+software wrapper conforming to the GSN API. On top of this physical
+access layer GSN provides so-called \textit{virtual sensors} which
+abstract from implementation details of access to sensor data and
+define the data stream processing to be performed. Local and remote
+virtual sensors, their data streams and the associated query
+processing can be combined in arbitrary ways and thus enable the user
+to build a data-oriented ``Sensor Internet'' consisting of sensor
+networks connected via GSN.
+
+\begin{comment} %following paragraph not really relevant in this context
+In the following we start with a detailed description of the virtual
+sensor abstraction in Section~\ref{sec:virt-sens-spec}, discuss GSN's
+data stream processing and time model in
+Section~\ref{sec:data-stre-proc}, and present GSN's system architecture
+along with a discussion of essential implementation details
+in Section~\ref{sec:system-architecture}. We
+evaluate the performance of GSN in Section~\ref{sec:evaluation} and
+discuss related work in Section~\ref{sec:relatedwork} before
+concluding.
+\end{comment}
 \section{Terminology}
 
 \begin{itemize}
@@ -232,7 +287,6 @@ directory that contains the files from the jakarta-ant archive
 	\item Click on OK in the Browse window and again to exit the Preferences
 dialog.
 \end{itemize}
-
 \end{itemize}
 
 \textbf{Step 2: Setting an Ant Build System for your GSN project :}

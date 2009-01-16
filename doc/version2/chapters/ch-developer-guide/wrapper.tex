@@ -69,11 +69,11 @@ This description is an array of \inlinecode{DataField} objects. A \inlinecode{Da
 can be created with a call to the constructor \inlinecode{public DataField(String name,
 String type, String Description)}. The name is the field name, the type
 is one of GSN data types \inlinecode{(TINYINT, SMALLINT, INTEGER, BIGINT, CHAR(\#),
-BINARY[(\#)], VARCHAR(\#), DOUBLE, TIME}. See \inlinecode{gsn.beans.DataTypes)} and
+BINARY[(\#)], VARCHAR(\#), DOUBLE, TIME)}. See \inlinecode{gsn.beans.DataTypes} and
 \inlinecode{Description} is a text describing the field.
 The following examples should help you get started.
 
-\subsubsubsection {Wireless Sensor Network Example}
+\subsubsubsection* {Wireless Sensor Network Example}
 Assuming that you have a wrapper for a wireless sensor network which produces
 the average temperature and light value of the nodes in the network, you can
 implement \inlinecode{getOutputFormat()} as follows:
@@ -89,7 +89,7 @@ implement \inlinecode{getOutputFormat()} as follows:
 	}
 \end{javacode}
 
-\subsubsubsection {Webcam Example}
+\subsubsubsection* {Webcam Example}
 If you have a wrapper producing jpeg images as output (e.g., from wireless
 camera), the method is similar to below :
 
@@ -131,7 +131,7 @@ The method should be implemented as below :
 	}
 \end{javacode}
 
-\subsubsubsection{Webcam example}
+\subsubsubsection*{Webcam example}
 Assume that we have a wireless camera which runs a HTTP server and provides
 pictures whenever it receives a \inlinecode{GET} request. In this case we are in a data on
 demand scenario (most of the network cameras are like this). To get the data
@@ -154,7 +154,7 @@ at the rate of 1 picture every 5 seconds we can do the following :
 	}
 \end{javacode}
 
-\subsubsubsection{Data driven systems}
+\subsubsubsection*{Data driven systems}
 Compared to the previous example, we do sometimes deal with devices that are
 data driven. This means that we don't have control of either when the data is
 produced by them (e.g., when they do the capturing) or the rate at which
