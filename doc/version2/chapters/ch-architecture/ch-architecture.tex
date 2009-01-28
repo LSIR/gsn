@@ -1016,6 +1016,203 @@ see examples in next section. Thus, any type of notifications, e.g. Email, SMS, 
 
 The technical details of implementing notifications are left to the designer. Below are three examples of some of the notification services already implemented in GSN.
 
+\section{Implementation}
+\label{sec:implementation}
+
+The GSN implementation consists of the GSN-CORE, implemented in Java, and the
+platform-specific GSN-WRAPPERS, implemented in Java, C, and Ruby, depending on
+the available toolkits for accessing specific types of sensors or sensor
+networks. The implementation currently has approximately 80,000 lines of code
+and is available from SourceForge (\url{http://gsn.sourceforge.net/}). GSN
+is implemented to be highly modular in order to be deployable on various
+hardware platforms from workstations to small programmable PDAs, i.e.,
+depending on the specific platforms only a subset of modules may be used. GSN
+also includes visualization systems for plotting data and visualizing the
+network structure. In the following sections we are going to discuss some of
+the key aspects of the GSN implementation
+
+\subsection{Adding new sensor platforms}
+\label{sec:adding-new-sensor}
+
+For deploying a virtual sensor the user only has to specify an XML document as described in Section \ref{sec:virt-sens-spec}, if GSN already
+includes software support for the concerned hardware/software. Adding a new
+type of sensor or sensor network can be done by supplying the name of the wrapper (specified in \texttt{/conf/wrappers.properties})
+conforming to the GSN API. At the moment GSN provides the following wrappers:
+
+\begin{description}
+\item[HTTP generic wrapper] is used to pull data from devices via HTTP GET
+  or POST requests, for example, the AXIS206W wireless camera.
+
+\item[TinyOS wrapper] enables interaction with TinyOS compatible
+motes (version 1.x and 2.x). This wrapper uses the serial forwarder which is
+the standard access tool for TinyOS provided in the TinyOS package.
+
+\item[USB camera wrapper] is used for dealing with cameras connected via USB 
+  to the local machine. As USB cameras are very cheap, they are quite
+  popular as sensing devices. The wrapper supports cameras
+  with OV518 and OV511 chips (see \url{http://alpha.dyndns.org/ov511/}).
+  
+\item[TI-RFID wrapper] enables access to Texas Instruments Series 6000 S6700
+  multi-protocol RFID readers.
+
+\item[Generic UDP wrapper] can be used for any device using the UDP protocol to
+  send data.
+  
+\item[Generic serial wrapper] supports sensing devices which send data through
+  the serial port.
+\end{description}
+
+Additionally, we provide template implementations for standard cases and
+frequently used platforms. If wrapper implementations are shared publicly this
+also facilitates building a reusable code base for virtually any sensor
+platform. The effort to implement wrappers is quite low.
+
+New wrappers can be added to GSN without having to rebuild or modify the GSN
+server (plug-and-play). Upon startup GSN locates the wrapper mappings through reading
+the \texttt{/conf/wrapper.properties} file and loads each wrapper whenever needed by the system.
+
+%After that the wrappers for which virtual sensors
+%have been initialized while unused wrappers do not consume
+%resources.  Wrappers can also be parameterized, so that a virtual sensor can
+%provide initialization parameters to the wrapper, e.g., the acceptable packet
+%format for TinyOS.
+
+\subsection{Dynamic resource management}
+\label{sec:dynam-reso-manag}
+
+The highly dynamic processing environment we target with GSN requires adaptive
+dynamic resource management to allow the system to quickly react to changing
+processing needs and environmental conditions. Dynamic resource management
+accomplishes three main tasks:
+
+\begin{description}
+\item[Resource sharing:] As the user can modify/remove/add virtual sensors
+  on-the-fly during runtime, the system needs to keep track of all resources
+  used by the individual virtual sensors and enforce resource sharing among
+  sensors (wrappers) where possible.
+\item[Failure management:] If GSN detects a faulty virtual sensor or wrapper,
+    e.g., by runtime exceptions, GSN undeploys it and releases the associated
+    resources. 
+  \item[Explicit resource control:] The user can specify explicit memory and
+    processing requirements and restrictions. While restrictions are always
+    enforced, requirements are handled depending of the globally available
+    resources of the GSN instance. GSN tries to share the available resources
+    in a fair way taking into account the explicitly specified resource
+    requirements, if provided.
+\end{description}
+
+Dynamic resource management is performed at several levels in GSN as
+shown in Figure~\ref{fig:resource-layers}. Separating the resource
+sharing into several layers logically decouples the requirements and
+allows us to achieve a higher level of reuse of resources. In the
+following we will discuss the different levels.
+
+\begin{figure}%[htb]
+  \centering
+  \includegraphics[width=0.5\columnwidth]{gsn-reuse}
+  \caption{Hierarchical resource sharing in GSN}
+  \label{fig:resource-layers}
+\end{figure}
+
+\textbf{Wrapper sharing.} Wrappers communicate directly with the sensors which
+involves expensive I/O operations via a serial connection or wireless/wired
+network communication. To minimize the costs incurred by these operations GSN
+shares wrappers among virtual sensors accessing the same physical/virtual
+sensors. To do so each GSN node maintains a repository of active wrappers. If a
+new virtual sensor is deployed, the node first checks with the wrapper
+repository whether an identical wrapper already exists, i.e., wrapper name and
+initialization parameters (and their corresponding values) of the \verb|<wrapper>| element in the virtual sensor
+definitions are identical. If a match is found, the new virtual sensor is
+registered to the existing wrapper as a consumer. If not, a new wrapper
+instance is created and registered with the wrapper repository. In the case of
+remote sensor accesses this strategy is applied at both the sending and
+receiving sides to maximize the sharing, i.e., multiple virtual sensors on one
+GSN node share a wrapper for the same remote sensor and on the node hosting the
+sensor the wrapper is shared among all nodes accessing it.
+
+\textbf{Data sharing.} The raw input data produced by the wrappers is processed
+and filtered by the source queries to generate the actual input data for the
+input streams of a virtual sensor. For this purpose a source defines
+what part of the raw input data is used by the associated source query
+to produce the source's output data, i.e., by defining the available
+storage, sampling rates, and window sizes a view on the raw data is defined on
+which the source query is executed. In terms of the implementation each
+wrapper is assigned a storage holding the raw data and source queries
+are then defined as \emph{SQL views} on this data store.
+
+This has a number of advantages: (1) It minimizes the storage consumption as
+raw data is only stored once. Especially if the sensor data is large, e.g.,
+image data, this is relevant. (2) If the sensor data comes from a
+power-constrained or slow device, power is conserved and processing is sped up.
+(3) Different processing strategies can be applied to the same data without
+having to replicate it, for example, image enhancement algorithms and object
+detection can use the same raw image data.
+
+In the same way as a wrapper can be shared by multiple sources, a source
+can also be shared among multiple streams at a higher level, and
+streams in turn are shared by multiple virtual sensors. In essence each
+of the layers in Figure~\ref{fig:resource-layers} can be viewed as a resource
+pool where each of the individual resources in the pool can be shared among
+multiple resources at the next higher level. Conversely, each higher level
+resource can also use any number of lower level resources.
+
+\subsection{Query planning and execution}
+\label{sec:query-proc-optim}
+
+In GSN each virtual sensor corresponds to a database table and each sensor
+reading corresponds to a new tuple in the related table. As we use a standard
+SQL database as our low-level query processing engine, the question is how to
+represent the streaming logic in a form understandable for a standard database
+engine (as already described, GSN separates the stream processing directives
+from the query). We address this problem by using a query translator which gets
+an SQL query and the stream processing directives as provided in the virtual
+sensor definition as inputs and translates this into a query executable in a
+standard database. The query translator relies on special support functions
+which emulate stream-oriented constructs in a database. These support functions
+are dependent on the database used and are provided by GSN (currently we
+provide adapters for H2 and MySQL). Translated queries are cached for subsequent use.
+
+Upon deployment of a virtual sensor $VS$, all queries $Q_i$ contained in its
+specification are extracted. Each query $Q_i(VS_1,\dots,VS_n)$ accesses one or
+more relations $VS_1,\dots,VS_n$ which correspond to virtual sensors. Then the
+query translator translates each $Q_i(VS_1,\dots,VS_n)$ into an executable
+query $Q^t_i(VS_1,\dots,VS_n)$ as described above and each
+$Q^t_i(VS_1,\dots,VS_n)$ is declared as a view in the database with a unique
+identifier $Id_i$. This means whenever a new tuple, i.e., sensor reading, is
+added to the database, the concerned views will automatically be updated by the
+database. Additionally, a tuple $(VS_j, Id_i, VS)$ for each $VS_j \in
+{VS_1,\dots,VS_n}$ is added to a special view registration table. This
+procedure is done once when a virtual sensor is deployed.
+
+With this setup it is now simple to execute queries over the data streams
+produced by virtual sensors: As soon a new sensor reading for a virtual sensor
+$VS_d$ becomes available, it is entered into the appropriate database relation.
+Then the database server queries the registration table using $VS_d$ as the key
+and gets all identifiers $Id_r$ registered for new data of $VS_d$. Then simply
+all views $V_r$ affected by the new data item can be retrieved using the $Id_r$
+and all $V_r$ can be queried using a \texttt{SELECT * FROM} $\mathtt{V_r}$
+statement and the resulting data can be returned to the virtual sensor
+containing $V_r$ (third column in the registration table). Since views are
+automatically updated by the database querying them is efficient. However, with
+many registered views (thousands or more) scalability may suffer. Thus GSN does
+not produce an individual query for each view but merges all queries into a
+large select statement, and the result will then be joined with the view
+registration table on the view identifier. Thus the result will hold tuples
+that identify the virtual sensor to notify of the new data.  The reasons for
+applying this strategy are that (1) database connections are expensive, (2)
+with increasing number of clients and virtual sensor definitions, the
+probability of overlaps in the result sets increases which automatically will
+be exploited by the database's query processor, and (3) query execution in the
+database is expensive, so one large query is much less costly than many
+(possibly thousands) small ones.
+
+Immediate notification of new sensor data is currently implemented in GSN and
+is an eager strategy. As an alternative also a lazy strategy could be used
+where the query execution would only take place when the GSN instance requests
+it from the database, for example, periodically at regular intervals. In
+practice the former can be implemented using views or triggers and the latter
+can be implemented using inner selects or stored procedures.
+
 \section{Notes}
 
 

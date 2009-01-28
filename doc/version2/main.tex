@@ -9,6 +9,7 @@
     project supported by Science Foundation Ireland under grant no.
     SFI/02/CE1/I131.}}
 \author{GSN Team}
+
 %
 % Document specific shortcuts
 \newcommand{\gsn}{\textit{GSN}\xspace}
@@ -18,14 +19,15 @@
 \newcommand{\vsp}{\textit{VSP}\xspace}
 
 \begin{document}
-\frontmatter
 \maketitle
+
+\frontmatter
 \pagenumbering{roman}
 %\setcounter{secnumdepth}{1}
 \input{front-matter/abstract}
 
 % Table of contents
-	\tableofcontents	
+\tableofcontents	
 \newpage	
 \input {front-matter/publications}	
 
@@ -37,7 +39,6 @@
 	\setcounter{secnumdepth}{4}	
 	\input{chapters/ch-introduction/ch-introduction}
 	\input{chapters/ch-architecture/ch-architecture}
-	\input{chapters/ch-gsn/ch-gsn}
 	% Images index
 	\listoffigures
 	% Tables index
@@ -52,6 +53,8 @@
 	\input{chapters/ch-developer-guide/ch-developer-guide}
 	\input{chapters/ch-quickref/ch-quickref}
 	\input{chapters/ch-tutorial/ch-tutorial}
+	\input{chapters/ch-gsn/ch-gsn}
+
 	%
 	\input{test}
 	
