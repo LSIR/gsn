@@ -1,4 +1,4 @@
-package src.gsn.utils;
+package gsn.utils;
 
 
 import org.junit.After;
