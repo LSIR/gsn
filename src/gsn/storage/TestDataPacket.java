@@ -1,4 +1,4 @@
-package src.gsn.storage;
+package gsn.storage;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
