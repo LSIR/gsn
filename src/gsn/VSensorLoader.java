@@ -167,7 +167,7 @@ public class VSensorLoader extends Thread {
       return;
     }
     try {
-      PublicToMSRTest.register_to_sensor_map(userName, password, host, Main.getContainerConfig(), config);
+      TestPublicToMSR.register_to_sensor_map(userName, password, host, Main.getContainerConfig(), config);
     } catch (SOAPException e) {
       logger.error(e.getMessage(),e);
     } catch (IOException e) {

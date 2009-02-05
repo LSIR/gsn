@@ -1,4 +1,4 @@
-package gsn.storage;
+package src.gsn.storage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -8,7 +8,7 @@ import gsn.storage.StorageManager.DATABASE;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class StorageManagerTest {
+public class TestStorageManager {
   
   @Test public void testOracleRewrites() {
     DATABASE db = StorageManager.DATABASE.ORACLE;

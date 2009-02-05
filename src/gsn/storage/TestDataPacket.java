@@ -1,4 +1,4 @@
-package gsn.storage;
+package src.gsn.storage;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 import junit.framework.TestCase;
 
-public class DataPacketTest extends TestCase {
+public class TestDataPacket extends TestCase {
    
    String     dbURL = "jdbc:hsqldb:mem:.";
    

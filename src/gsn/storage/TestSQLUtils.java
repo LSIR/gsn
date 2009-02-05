@@ -1,11 +1,11 @@
-package gsn.storage;
+package src.gsn.storage;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 
 import junit.framework.TestCase;
 
-public class SQLUtilsTest extends TestCase {
+public class TestSQLUtils extends TestCase {
    
    protected void setUp ( ) throws Exception {
       super.setUp( );

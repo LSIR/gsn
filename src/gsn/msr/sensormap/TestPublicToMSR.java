@@ -1,4 +1,4 @@
-package gsn.msr.sensormap;
+package src.gsn.msr.sensormap;
 
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
@@ -19,11 +19,11 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import org.apache.log4j.Logger;
 
-public class PublicToMSRTest {
+public class TestPublicToMSR {
   
   private static final String HTTP_RESEARCH_MICROSOFT_COM_NEC = "http://research.microsoft.com/nec/";
   
-  private static transient Logger logger             = Logger.getLogger( PublicToMSRTest.class );
+  private static transient Logger logger             = Logger.getLogger( TestPublicToMSR.class );
   
   public static boolean register_to_sensor_map(String user,String password,String host,ContainerConfig container_conf ,VSensorConfig conf) throws SOAPException, IOException {
     URL wsdl = new URL("http://atom.research.microsoft.com/sensordatahub/service.asmx?WSDL");

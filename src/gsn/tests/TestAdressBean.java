@@ -1,4 +1,4 @@
-package gsn.tests;
+package src.gsn.tests;
 
 import static org.junit.Assert.*;
 import gsn.beans.AddressBean;
@@ -7,7 +7,7 @@ import org.apache.commons.collections.KeyValue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class AdressBeanTest {
+public class TestAdressBean {
 	private AddressBean addressBean1;
 	private AddressBean addressBean2;
 	

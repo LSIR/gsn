@@ -4,13 +4,13 @@
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.3  Built on : Aug 10, 2007 (04:45:47 LKT)
  */
-package gsn.msr.sensormap.sensorman;
+package src.gsn.msr.sensormap.sensorman;
 
 
 /*
- *  ServiceTest Junit test case
+ *  TestService Junit test case
  */
-public class ServiceTest extends junit.framework.TestCase {
+public class TestService extends junit.framework.TestCase {
     /**
      * Auto generated test method
      */

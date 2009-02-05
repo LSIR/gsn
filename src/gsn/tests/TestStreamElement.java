@@ -1,4 +1,4 @@
-package gsn.tests;
+package src.gsn.tests;
 
 import static org.junit.Assert.assertEquals;
 import gsn.GSNRequestHandler;
@@ -25,7 +25,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class StreamElementTest {
+public class TestStreamElement {
 
   @Test
   public void testRequestStructure() throws IOException {    

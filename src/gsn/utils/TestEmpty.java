@@ -1,4 +1,4 @@
-package gsn.utils;
+package src.gsn.utils;
 
 
 import org.junit.After;
@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import junit.framework.JUnit4TestAdapter;
 
-public class EmptyTest {
+public class TestEmpty {
    @After public void clean()  throws Exception{
       
    }
@@ -27,6 +27,6 @@ public class EmptyTest {
    }
   
    public static junit.framework.Test suite() {
-      return new JUnit4TestAdapter(EmptyTest.class);
+      return new JUnit4TestAdapter(TestEmpty.class);
    }   
 }
