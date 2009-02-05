@@ -176,9 +176,25 @@
      <!--       <fileset dir="${build.dir}" includes="**/*Test*.class" excludes="**/TestStreamExporterVirtualSensor*.class"/> -->
          	 <fileset dir="${src.dir}">
          	      <include name="**/*Test*.java"/>
-         	      <exclude name="**/TestStreamExporterVirtualSensor.java"/>
-	      	      <exclude name="**/TestContainerImpl.java"/>
+         <!--	      <exclude name="**/TestStreamExporterVirtualSensor.java"/>
+	      	      <exclude name="**/TestContainerImpl.java"/> -->
    	   	      <exclude name="**/RFIDTest.java"/>
+         	 	<exclude name="**/TestDataPropogation.java"/>
+         	 	<exclude name="**/TestVSensorLoader.java"/>
+         	 	<exclude name="**/TestStreamSource.java"/>
+         	 	<exclude name="**/TestWindowing1.java"/>
+         	 	<exclude name="**/TestWindowing2.java"/>
+         	 	<exclude name="**/TestPublicToMSR.java"/>
+         	 	<exclude name="**/TestService.java"/>
+         	 	<exclude name="**/TestDataPacket.java"/>
+         	 	<exclude name="**/TestSQLUtils.java"/>
+         	 	<exclude name="**/TestStreamElement.java"/>
+         	 	<exclude name="**/TestValidityTools.java"/>
+         	 	<exclude name="**/TestGraph.java"/>
+         	 	<exclude name="**/TestContainerImpl.java"/>
+         	 	<exclude name="**/TestStreamExporterVirtualSensor.java"/>
+         	 	<exclude name="**/TestStorageManager.java"/>
+         	 	<exclude name="**/TestAbstractWrapper.java"/>
          	 </fileset>
 <!--         	<fileset dir="${build.dir}" includes="**/TestStreamSource.*,**/TestAbstractWrapper.*,**/TestVSensorLoader.*" />-->
         </batchtest>
