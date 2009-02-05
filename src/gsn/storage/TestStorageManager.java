@@ -1,4 +1,4 @@
-package src.gsn.storage;
+package gsn.storage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
