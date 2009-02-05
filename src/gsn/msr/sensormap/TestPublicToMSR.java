@@ -1,4 +1,4 @@
-package src.gsn.msr.sensormap;
+package gsn.msr.sensormap;
 
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
