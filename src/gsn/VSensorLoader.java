@@ -6,7 +6,7 @@ import gsn.beans.InputStream;
 import gsn.beans.Modifications;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
-import gsn.msr.sensormap.PublicToMSRTest;
+import gsn.msr.sensormap.TestPublicToMSR;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;

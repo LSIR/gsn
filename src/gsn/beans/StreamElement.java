@@ -1,6 +1,5 @@
 package gsn.beans;
 
-import gsn.tests.StreamElementTest;
 import gsn.utils.CaseInsensitiveComparator;
 
 import java.io.Serializable;
