@@ -1,4 +1,4 @@
-package src.gsn.tests;
+package gsn.tests;
 
 import static org.junit.Assert.assertEquals;
 import gsn.GSNRequestHandler;
