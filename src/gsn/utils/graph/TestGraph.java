@@ -1,4 +1,4 @@
-package src.gsn.utils.graph;
+package gsn.utils.graph;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
