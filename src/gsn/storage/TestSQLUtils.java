@@ -1,4 +1,4 @@
-package src.gsn.storage;
+package gsn.storage;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
