@@ -209,7 +209,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
             }
             WindowType windowingType = streamSource.getWindowingType();
             if (windowingType == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE) {
-                toReturn.append("(wrapper.timed >= (select timed from ").append(VIEW_HELPER_TABLE).append(" where UID='").append(
+                toReturn.append("(wrapper.timed >= (select timed from ").append(VIEW_HELPER_TABLE).append(" where U_ID='").append(
                         streamSource.getUIDStr());
                 toReturn.append("') - ").append(windowSize).append(") ");
                 if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
@@ -217,31 +217,31 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
                 }
             } else {
                 if (windowingType == WindowType.TIME_BASED) {
-                    toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr()).append(
+                    toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where U_ID='").append(streamSource.getUIDStr()).append(
                             "') and timed >= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
-                            " where UID='").append(streamSource.getUIDStr()).append("') - ").append(windowSize).append(" ) ");
+                            " where U_ID='").append(streamSource.getUIDStr()).append("') - ").append(windowSize).append(" ) ");
                     if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
                         toReturn.append(" order by timed desc ");
                     }
                 } else {// WindowType.TUPLE_BASED_WIN_TIME_BASED_SLIDE
                     if (StorageManager.isMysqlDB()) {
                         toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
-                                " where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
+                                " where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
                         toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");
-                        toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr());
+                        toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where U_ID='").append(streamSource.getUIDStr());
                         toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" )");
                         toReturn.append(" order by timed desc ");
                     } else if (StorageManager.isH2()) {
                         toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
-                                " where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select distinct(timed) from ");
+                                " where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select distinct(timed) from ");
                         toReturn.append(wrapperAlias).append(" where timed in (select timed from ").append(wrapperAlias).append(
                                 " where timed <= (select timed from ");
-                        toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr());
+                        toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where U_ID='").append(streamSource.getUIDStr());
                         toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ))");
                         toReturn.append(" order by timed desc ");
                     } else if (StorageManager.isSqlServer()) {
                         toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(
-                                " where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='").append(streamSource.getUIDStr()).append("') order by timed desc ) ");
+                                " where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where U_ID='").append(streamSource.getUIDStr()).append("') order by timed desc ) ");
                     }
                 }
             }

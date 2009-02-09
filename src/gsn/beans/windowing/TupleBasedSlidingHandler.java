@@ -271,27 +271,27 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 				if (windowingType == WindowType.TUPLE_BASED) {
 					if (StorageManager.isMysqlDB()) {
 						toReturn.append("timed <= (select timed from ").append(viewHelperTableName).append(
-						" where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
+						" where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
 						toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");
-						toReturn.append(viewHelperTableName).append(" where UID='").append(streamSource.getUIDStr());
+						toReturn.append(viewHelperTableName).append(" where U_ID='").append(streamSource.getUIDStr());
 						toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" )");
 						toReturn.append(" order by timed desc ");
 					} else if (StorageManager.isH2()) {
 						toReturn.append("timed <= (select timed from ").append(viewHelperTableName).append(
-						" where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select distinct(timed) from ");
+						" where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select distinct(timed) from ");
 						toReturn.append(wrapperAlias).append(" where timed in (select timed from ").append(wrapperAlias).append(
 						" where timed <= (select timed from ");
-						toReturn.append(viewHelperTableName).append(" where UID='").append(streamSource.getUIDStr());
+						toReturn.append(viewHelperTableName).append(" where U_ID='").append(streamSource.getUIDStr());
 						toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ))");
 						toReturn.append(" order by timed desc ");
 					} else if (StorageManager.isSqlServer()) {
 						toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(
-						" where timed <= (select timed from ").append(viewHelperTableName).append(" where UID='").append(streamSource.getUIDStr()).append("') order by timed desc) ");
+						" where timed <= (select timed from ").append(viewHelperTableName).append(" where U_ID='").append(streamSource.getUIDStr()).append("') order by timed desc) ");
 					}else if (StorageManager.isOracle()) {
 						toReturn.append("timed <= (select timed from ").append(Main.tableNameGeneratorInString(viewHelperTableName)).append(
-						" where UID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
+						" where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
 						toReturn.append(wrapperAlias).append(" where timed <= (select * from (select timed from ");
-						toReturn.append(viewHelperTableName).append(" where UID='").append(Main.tableNameGeneratorInString(streamSource.getUIDStr()));
+						toReturn.append(viewHelperTableName).append(" where U_ID='").append(Main.tableNameGeneratorInString(streamSource.getUIDStr()));
 						toReturn.append("' order by timed desc  ) where rownum = "+windowSize+")  ").append(" )");
 						toReturn.append(" order by timed desc ");
 						// Note, in oracle rownum starts with 1.
@@ -299,9 +299,9 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 						logger.fatal("Not supported DB!");
 					}
 				} else { // WindowType.TIME_BASED_WIN_TUPLE_BASED_SLIDE
-					toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(viewHelperTableName).append(" where UID='").append(Main.tableNameGeneratorInString(streamSource.getUIDStr())).append(
+					toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(viewHelperTableName).append(" where U_ID='").append(Main.tableNameGeneratorInString(streamSource.getUIDStr())).append(
 					"') and timed >= (select timed from ").append(viewHelperTableName).append(
-					" where UID='").append(Main.tableNameGeneratorInString(streamSource.getUIDStr())).append("') - ").append(windowSize).append(" ) ");
+					" where U_ID='").append(Main.tableNameGeneratorInString(streamSource.getUIDStr())).append("') - ").append(windowSize).append(" ) ");
 					//					if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
 					toReturn.append(" order by timed desc ");
 					//					} else if (StorageManager.isOracle()) {
