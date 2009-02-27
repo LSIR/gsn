@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 import java.util.TreeMap;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
 public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements ActionListener {
 
@@ -30,7 +31,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
         String rate_value = params.get(RATE_PARAM);
 
         if (rate_value == null){
-            logger.warn("Parameter \"rate\" not provider in Virtual Sensor file");
+            logger.warn("Parameter \""+ RATE_PARAM +"\" not provider in Virtual Sensor file");
             return false;
         }
 
@@ -39,7 +40,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
         String table_name_value = params.get(TABLE_NAME_PARAM);
 
         if (table_name_value == null){
-            logger.warn("Parameter \"table_name\" not provider in Virtual Sensor file");
+            logger.warn("Parameter \""+ TABLE_NAME_PARAM +"\" not provider in Virtual Sensor file");
             return false;
         }
 
@@ -49,8 +50,28 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 
         timer.start( );
 
-        // TODO read current time
-        last_updated = -1 ;
+        last_updated = -1 ; // reading the whole table, this value can be overriden, if some tuples were already read 
+
+        /*******************************************/
+        // select latest update time of VS output table
+        String output_table_name = getVirtualSensorConfiguration().getName();
+        logger.warn("OUTPUT TABLE NAME: "+ output_table_name);
+
+        StringBuilder query = new StringBuilder("select max(timed) from "+output_table_name);
+        logger.warn("select max(timed) from "+output_table_name);
+
+        try {
+            ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query, StorageManager.getInstance().getConnection());
+            if (rs.next()) {
+               Long i = rs.getLong(1); // get result from first column (1)
+               logger.warn("LAST UPDATE: "+ Long.toString(i));
+               last_updated = i;                          // override initial value -1
+            } 
+        } catch (SQLException e) {
+            logger.error(e.getMessage(),e);
+        }
+
+        /*******************************************/
 
         return true;
     }
@@ -67,8 +88,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 
     public void actionPerformed ( ActionEvent actionEvent ) {
 
-        /*check if new data is posted*/
-        /*call dataProduced(StreamElement se)*/
+        // check if new data is available since last update then call dataProduced(StreamElement se)
         StringBuilder query = new StringBuilder("select * from "+table_name+" where timed > "+last_updated+" order by timed asc");
 
         try {
@@ -81,19 +101,6 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);
         }
-
-
-
-
-//		    StreamElement streamElement = new StreamElement( EMPTY_FIELD_LIST , EMPTY_FIELD_TYPES , EMPTY_DATA_PART , actionEvent.getWhen( ) );
-//		    if(delayPostingElements){
-//		    	streamElementBuffer.add(streamElement);
-//		    	synchronized(objectLock){
-//		    		objectLock.notifyAll();
-//		    	}
-//		    }
-//		    else
-//		    	postStreamElement( streamElement );
     }
-
 }
+
