@@ -7,6 +7,7 @@ import gsn.beans.Modifications;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.msr.sensormap.TestPublicToMSR;
+import gsn.msr.sensormap.LoginToMSRSense;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.rmi.RemoteException;
 
 import javax.xml.soap.SOAPException;
 
@@ -167,8 +169,9 @@ public class VSensorLoader extends Thread {
       return;
     }
     try {
-      TestPublicToMSR.register_to_sensor_map(userName, password, host, Main.getContainerConfig(), config);
-    } catch (SOAPException e) {
+        LoginToMSRSense.register_sensor(userName, password, config, host);
+      //TestPublicToMSR.register_to_sensor_map(userName, password, host, Main.getContainerConfig(), config);
+    } catch (RemoteException e) {
       logger.error(e.getMessage(),e);
     } catch (IOException e) {
       logger.error(e.getMessage(),e);
