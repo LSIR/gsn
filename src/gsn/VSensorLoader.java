@@ -154,8 +154,9 @@ public class VSensorLoader extends Thread {
     logger.warn("Virtual Sensor: "+config.getName()+" wants to publish its data to sensor map.");
     Double lat = config.getLatitude();
     Double lng = config.getLongitude();
-    if (lat==null || lng ==null) {
-      logger.warn("Err, Virtual Sensor can be registered to sensor map as it doesn't have latitude and/or longitude addressing attributes.");
+    Double alt = config.getAltitude();
+    if (lat==null || lng ==null || alt==null) {
+      logger.warn("Err, Virtual Sensor cannot be registered to sensor map as it doesn't have latitude, longitude and/or altitude addressing attributes.");
       return;
     }
     HashMap<String,String> params = Main.getContainerConfig().getMsrMap();
