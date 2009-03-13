@@ -350,7 +350,7 @@ public class StorageManager {
                     "The create index statement is : ").append(sql).toString());
         prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
-        prepareStatement.close();
+        close(prepareStatement);
 
     }
 
