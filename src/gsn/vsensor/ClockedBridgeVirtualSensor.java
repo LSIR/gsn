@@ -60,8 +60,9 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
         StringBuilder query = new StringBuilder("select max(timed) from "+output_table_name);
         logger.warn("select max(timed) from "+output_table_name);
 
+        ResultSet rs = null;
         try {
-            ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query, StorageManager.getInstance().getConnection());
+            rs = StorageManager.getInstance().executeQueryWithResultSet(query, StorageManager.getInstance().getConnection());
             if (rs.next()) {
                Long i = rs.getLong(1); // get result from first column (1)
                logger.warn("LAST UPDATE: "+ Long.toString(i));
@@ -69,7 +70,10 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
             } 
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);
+        } finally {
+            StorageManager.close(rs);
         }
+
 
         /*******************************************/
 
