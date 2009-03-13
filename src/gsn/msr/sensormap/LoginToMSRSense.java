@@ -52,7 +52,7 @@ public class LoginToMSRSense {
     gsn.msr.sensormap.userman.ServiceStub login = new gsn.msr.sensormap.userman.ServiceStub();
     gsn.msr.sensormap.userman.ServiceStub.GetPassCode getPassCodeParams = new gsn.msr.sensormap.userman.ServiceStub.GetPassCode();
 
-    logger.warn("Using username:"+username+" password:"+password);
+    logger.warn("Using username:"+username+" password:*****"); // mask password
     getPassCodeParams.setUserName(username);
     getPassCodeParams.setPassword(password);
     String passcodeStr = login.GetPassCode(getPassCodeParams).getGetPassCodeResult().getGuid();
@@ -81,7 +81,7 @@ public class LoginToMSRSense {
     if (call_output.indexOf("OK")>0)
         logger.warn("Type "+createVSensorTypeParams.getName()+" created correctly. SensorMap says: "+call_output);
     else
-        logger.error("Type "+createVSensorTypeParams.getName()+"was not created. SensorMap says: "+call_output);
+        logger.warn("Type "+createVSensorTypeParams.getName()+"was not created. SensorMap says: "+call_output);
 
     //System.out.println(">>OUTPUT OF CREATION OF SENSOR TYPE: "+call_output);
   
@@ -115,11 +115,11 @@ public class LoginToMSRSense {
     }
 
     if (call_output.indexOf("Error: Sensor with the same publisher name and sensor name already exists")>0){
-        logger.error("Sensor "+conf.getName()+" not registered (already exists). SensorMap says: "+call_output);
+        logger.warn("Sensor "+conf.getName()+" not registered (already exists). SensorMap says: "+call_output);
         return REGISTER_SENSOR_ERROR_ALREADY_EXISTS;
     }
 
-    logger.error("Sensor "+conf.getName()+" not registered. SensorMap says: "+call_output);
+    logger.warn("Sensor "+conf.getName()+" not registered. SensorMap says: "+call_output);
     return REGISTER_SENSOR_ERROR_NOT_CREATED;
 
 
@@ -151,7 +151,7 @@ public class LoginToMSRSense {
       gsn.msr.sensormap.userman.ServiceStub login = new gsn.msr.sensormap.userman.ServiceStub();
       gsn.msr.sensormap.userman.ServiceStub.GetPassCode getPassCodeParams = new gsn.msr.sensormap.userman.ServiceStub.GetPassCode();
 
-      logger.warn("Using username:"+username+" password:"+password);
+      logger.warn("Using username:"+username+" password:*****"); // mask password
       getPassCodeParams.setUserName(username);
       getPassCodeParams.setPassword(password);
       String passcodeStr = login.GetPassCode(getPassCodeParams).getGetPassCodeResult().getGuid();
@@ -185,7 +185,7 @@ public class LoginToMSRSense {
           return DELETE_SENSOR_OK;
       }
       else {
-          logger.error("Sensor "+conf.getName()+" not deleted. SensorMap says: "+call_output);
+          logger.warn("Sensor "+conf.getName()+" not deleted. SensorMap says: "+call_output);
           return DELETE_SENSOR_ERROR_DOESNT_EXIST;
       }
     }
