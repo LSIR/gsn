@@ -212,7 +212,7 @@ public class StorageManager {
     public static void closeStatement(Statement stmt) {
         try {
             if (stmt != null)
-                stmt.close();
+                stmt.getConnection().close();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         }
@@ -221,7 +221,7 @@ public class StorageManager {
     public static void close(ResultSet resultSet) {
         try {
             if (resultSet != null)
-                resultSet.getStatement().close();
+                resultSet.getStatement().getConnection().close();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         }
@@ -230,7 +230,7 @@ public class StorageManager {
     public static void close(PreparedStatement preparedStatement) {
         try {
             if (preparedStatement != null)
-                preparedStatement.close();
+                preparedStatement.getConnection().close();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         }
@@ -1140,14 +1140,21 @@ public class StorageManager {
         dbConnectionProperties.put("useLocalSessionState", "true");
         dbConnectionProperties.put("useServerPrepStmts", "false");
         dbConnectionProperties.put("prepStmtCacheSize", "512");
+        if (logger.isDebugEnabled()){
+            dbConnectionProperties.put("debugUnreturnedConnectionStackTraces","true");
+            dbConnectionProperties.put("unreturnedConnectionTimeout","10");//10 seconds
+        }
         try {
             pool.setDriverClass(databaseDriver);
         } catch (PropertyVetoException e) {
             logger.fatal(e.getMessage(),e);
             System.exit(1);
         }
+
         pool.setJdbcUrl(databaseURL);
         pool.setProperties(dbConnectionProperties);
+        pool.setMaxPoolSize(50);
+        pool.setInitialPoolSize(10);
         logger.info("Initializing the access to the database server ...");
 
         Connection con;
@@ -1200,6 +1207,7 @@ public class StorageManager {
 //            this.connection = DriverManager.getConnection(databaseURL,
 //                    dbConnectionProperties);
 //        return connection;
+        logger.debug("Asking for connections to default DB=> busy: "+pool.getNumBusyConnections()+", max-size:"+pool.getMaxPoolSize()+", idle:"+pool.getNumIdleConnections());
         return pool.getConnection();
     }
 
