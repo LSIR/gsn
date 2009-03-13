@@ -1142,9 +1142,10 @@ public class StorageManager {
         dbConnectionProperties.put("useServerPrepStmts", "false");
         dbConnectionProperties.put("prepStmtCacheSize", "512");
         pool = new ComboPooledDataSource();
+
         if (logger.isDebugEnabled()){
-            pool.setDebugUnreturnedConnectionStackTraces(true);
-     //       pool.setUnreturnedConnectionTimeout(10);//10 seconds
+             pool.setDebugUnreturnedConnectionStackTraces(true);
+             pool.setUnreturnedConnectionTimeout(10);//10 seconds
         }
 
         try {
@@ -1156,8 +1157,9 @@ public class StorageManager {
 
         pool.setJdbcUrl(databaseURL);
         pool.setProperties(dbConnectionProperties);
-        pool.setMaxPoolSize(50);
-        pool.setInitialPoolSize(10);
+        pool.setMaxPoolSize(5);
+        pool.setInitialPoolSize(5);
+        
         logger.info("Initializing the access to the database server ...");
 
         Connection con;
