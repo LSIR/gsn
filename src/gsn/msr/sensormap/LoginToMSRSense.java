@@ -100,7 +100,7 @@ public class LoginToMSRSense {
     sensor.setSensorName(conf.getName());
     sensor.setSensorType(gsnURI+"#"+conf.getName());
     sensor.setEntryTime(new GregorianCalendar());
-    sensor.setWebServiceUrl(gsnURI);
+    sensor.setWebServiceUrl(gsnURI+"services/Service?wsdl");
     registerVectorSensorParams.setPassCode(passGUID);
     registerVectorSensorParams.setPublisherName(username);
     registerVectorSensorParams.setSensor(sensor);
