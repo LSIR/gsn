@@ -91,12 +91,7 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 			logger.error( e.getMessage( ) , e );
 			hasNext = false;
 		}finally {
-			if (hasNext==false)
-				try {
-					preparedStatement.close();
-				} catch (SQLException e) {
-					logger.error( e.getMessage( ) , e );
-				}
+			if (hasNext==false) close();
 		}
 	}
 

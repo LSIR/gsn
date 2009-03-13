@@ -1104,7 +1104,7 @@ public class StorageManager {
 
     private Properties dbConnectionProperties = new Properties();
 
-    private ComboPooledDataSource pool = new ComboPooledDataSource();
+    private ComboPooledDataSource pool;
 
 
     public void init(String databaseDriver, String username,
@@ -1125,6 +1125,7 @@ public class StorageManager {
 
         dbConnectionProperties.put("user", username);
         dbConnectionProperties.put("password", password);
+        
         dbConnectionProperties.put("username", username);
         dbConnectionProperties.put("ignorecase", "true");
         dbConnectionProperties.put("autocommit", "true");
@@ -1140,10 +1141,12 @@ public class StorageManager {
         dbConnectionProperties.put("useLocalSessionState", "true");
         dbConnectionProperties.put("useServerPrepStmts", "false");
         dbConnectionProperties.put("prepStmtCacheSize", "512");
+        pool = new ComboPooledDataSource();
         if (logger.isDebugEnabled()){
-            dbConnectionProperties.put("debugUnreturnedConnectionStackTraces","true");
-            dbConnectionProperties.put("unreturnedConnectionTimeout","10");//10 seconds
+            pool.setDebugUnreturnedConnectionStackTraces(true);
+     //       pool.setUnreturnedConnectionTimeout(10);//10 seconds
         }
+
         try {
             pool.setDriverClass(databaseDriver);
         } catch (PropertyVetoException e) {
