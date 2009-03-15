@@ -409,7 +409,7 @@ public class StorageManager {
         final PreparedStatement prepareStatement = connection
                 .prepareStatement(statement.toString());
         prepareStatement.execute();
-        prepareStatement.close();
+        close(prepareStatement);
     }
 
     /**
@@ -1258,6 +1258,7 @@ public class StorageManager {
             while (rs.next())
                 if (rs.getString(1).startsWith("_"))
                     toReturn.add(rs.getString(1));
+        close(rs);
         return toReturn;
     }
 }

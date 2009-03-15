@@ -122,7 +122,7 @@ public class DownloadReport extends AbstractDataRequest {
 					else logger.debug("Column >" + vsstream[i] + "< not found in the ResultSetMetaData");
 				}
 			}
-			if (rs != null) rs.close(); 
+			StorageManager.close(rs); 
 			streams = dataStreams.values();
 		}
 		catch (SQLException e) {

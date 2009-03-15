@@ -65,6 +65,8 @@ public class FieldDownloadServlet extends HttpServlet {
 			logger.error(e1.getMessage(),e1);
 			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
 			return;
+		} finally {
+			StorageManager.close(rs);
 		}
 		boolean binary = false;
 		for ( DataField df : sensorConfig.getOutputStructure( ) )
@@ -86,11 +88,7 @@ public class FieldDownloadServlet extends HttpServlet {
 		} catch ( Exception e ) {
 			logger.info( e.getMessage( ) , e );
 		} finally {
-			if ( rs != null ) try {
-				rs.close( );
-			} catch ( SQLException e ) {
-				e.printStackTrace( );
-			}
+			StorageManager.close(rs);
 		}
 	}
 
