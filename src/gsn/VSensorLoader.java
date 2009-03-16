@@ -179,8 +179,6 @@ public class VSensorLoader extends Thread {
     }
   }
   
-  private static int                                       TABLE_SIZE_ENFORCING_THREAD_COUNTER = 0;
-  
   public boolean isVirtualSensorValid(VSensorConfig configuration) {
     for ( InputStream is : configuration.getInputStreams ( ) ) {
       if ( !is.validate ( ) ) {

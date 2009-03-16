@@ -170,10 +170,7 @@ public class ContainerImpl implements Container {
 		// FIXME : The used prepare statements should be released from the
 		// stroagemanager using a timeout mechanism.
 		// PreparedStatement ps;
-		// synchronized (psLock) {
-		// ps = preparedStatements.remove(vsensorName);
-		// }
-		// StorageManager.getInstance().returnPrepaedStatement(ps);
+		
 	}
 
 	public void removeRemoteStreamSource ( int notificationCode ) {

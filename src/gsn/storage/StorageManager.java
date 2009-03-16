@@ -158,7 +158,14 @@ public class StorageManager {
 
     public boolean tableExists(CharSequence tableName, DataField[] fields)
             throws SQLException {
-        return tableExists(tableName, fields, getConnection());
+        Connection conn = getConnection();
+        boolean to_return = true;
+        try{
+            to_return=  tableExists(tableName, fields, conn);
+        }finally {
+            close(conn);
+        }
+        return to_return;
     }
 
     /**
@@ -257,17 +264,36 @@ public class StorageManager {
 
     public void executeRenameTable(String oldName, String newName)
             throws SQLException {
-        executeRenameTable(oldName, newName, getConnection());
+        Connection conn = getConnection();
+        try {
+            executeRenameTable(oldName, newName, conn);
+        }finally{
+            close(conn);
+        }
+
     }
 
     public void executeRenameTable(String oldName, String newName,
                                    Connection connection) throws SQLException {
-        getConnection().prepareStatement(
-                getStatementRenameTable(oldName, newName)).execute();
+        connection.prepareStatement(getStatementRenameTable(oldName, newName)).execute();
     }
 
     public void executeDropTable(CharSequence tableName) throws SQLException {
-        executeDropTable(tableName, getConnection());
+        Connection conn = getConnection();
+        try {
+            executeDropTable(tableName,conn );
+        }finally{
+            close(conn);
+        }
+    }
+
+    private void close(Connection conn) {
+        try{
+            if (conn!=null & !conn.isClosed())
+                conn.close();
+        }catch (SQLException e){
+            logger.debug(e.getMessage(),e);
+        }
     }
 
     public void executeDropTable(CharSequence tableName, Connection connection) {
@@ -290,13 +316,16 @@ public class StorageManager {
             }
         }catch (SQLException e) {
             logger.info(e.getMessage(),e);
-        }finally{
-            close(prepareStatement);
         }
     }
 
     public void executeDropView(StringBuilder tableName) throws SQLException {
-        executeDropView(tableName, getConnection());
+        Connection conn = getConnection();
+        try {
+            executeDropView(tableName, conn);
+        }finally{
+            close(conn);
+        }
     }
 
     public void executeDropView(StringBuilder tableName, Connection connection)
@@ -312,7 +341,12 @@ public class StorageManager {
 
     public void executeCreateTable(CharSequence tableName, DataField[] structure,boolean unique)
             throws SQLException {
-        executeCreateTable(tableName, structure,unique, getConnection());
+        Connection conn = getConnection();
+        try{
+            executeCreateTable(tableName, structure,unique, conn);
+        }finally {
+            close(conn);
+        }
     }
 
     /**
@@ -350,7 +384,6 @@ public class StorageManager {
                     "The create index statement is : ").append(sql).toString());
         prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
-        close(prepareStatement);
 
     }
 
@@ -455,13 +488,21 @@ public class StorageManager {
             toReturn = prepareStatement.executeUpdate();
         } catch (SQLException error) {
             logger.error(error.getMessage(), error);
-        } finally {
-            close(prepareStatement);
         }
         return toReturn;
     }
     public static int executeUpdate(StringBuilder updateStatement, Connection connection) {
-        return executeUpdate(updateStatement.toString(), connection);
+        int to_return = -1;
+        try{
+            to_return = executeUpdate(updateStatement.toString(), connection);
+        }finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                logger.error(e.getMessage(),e);
+            }
+        }
+        return to_return;
     }
 
     public int executeUpdate(StringBuilder updateStatement) throws SQLException {
@@ -1125,7 +1166,7 @@ public class StorageManager {
 
         dbConnectionProperties.put("user", username);
         dbConnectionProperties.put("password", password);
-        
+
         dbConnectionProperties.put("username", username);
         dbConnectionProperties.put("ignorecase", "true");
         dbConnectionProperties.put("autocommit", "true");
@@ -1144,8 +1185,8 @@ public class StorageManager {
         pool = new ComboPooledDataSource();
 
         if (logger.isDebugEnabled()){
-             pool.setDebugUnreturnedConnectionStackTraces(true);
-             pool.setUnreturnedConnectionTimeout(10);//10 seconds
+            pool.setDebugUnreturnedConnectionStackTraces(true);
+            pool.setUnreturnedConnectionTimeout(10);//10 seconds
         }
 
         try {
@@ -1159,15 +1200,14 @@ public class StorageManager {
         pool.setProperties(dbConnectionProperties);
         pool.setMaxPoolSize(5);
         pool.setInitialPoolSize(5);
-        
+
         logger.info("Initializing the access to the database server ...");
 
-        Connection con;
-        Statement stmt = null;
-        try {
+        Connection con = null;
 
+        try {
             con = getConnection();
-            stmt = con.createStatement();
+            Statement stmt = con.createStatement();
             if (StorageManager.isH2()) {
                 stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
                 stmt.execute("CREATE ALIAS IF NOT EXISTS NOW_MILLIS FOR \"java.lang.System.currentTimeMillis\";");
@@ -1197,7 +1237,7 @@ public class StorageManager {
             if (logger.isInfoEnabled())
                 logger.info(e.getMessage(), e);
         } finally {
-            closeStatement(stmt);
+            close(con);
         }
     }
 
@@ -1213,6 +1253,11 @@ public class StorageManager {
 //                    dbConnectionProperties);
 //        return connection;
         logger.debug("Asking for connections to default DB=> busy: "+pool.getNumBusyConnections()+", max-size:"+pool.getMaxPoolSize()+", idle:"+pool.getNumIdleConnections());
+       // try{ // used for tracking the calls to this method.
+       //     throw new RuntimeException("Trackeeer");
+       // }   catch (Exception e){
+       //     logger.fatal(e.getMessage(),e);
+       // }
         return pool.getConnection();
     }
 
