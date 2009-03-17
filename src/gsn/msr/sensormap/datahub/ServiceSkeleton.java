@@ -84,7 +84,14 @@ public class ServiceSkeleton {
 		for (String signalInfo: input.getSensorNames().getString()) {
 			try {
 				SignalRequest req = new SignalRequest(signalInfo);
-				StringBuilder query = new StringBuilder("select pk,TIMED, ").append(req.getFieldName()).append(" as data from ").append(req.getVsName()).append(" order by timed desc limit 0,1");
+                StringBuilder query = new StringBuilder("select pk,TIMED, ").append(req.getFieldName()).append(" as data from ").append(req.getVsName());
+                //if oracle
+                if (StorageManager.getInstance().isOracle()) {
+                    query.append(" where rownum<=1 order by timed desc");
+                }
+                else {
+				    query.append(" order by timed desc limit 0,1");
+                }
 				//			logger.fatal(query);
 				items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
 			}
