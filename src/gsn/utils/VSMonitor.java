@@ -9,27 +9,27 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import org.apache.http.ConnectionReuseStrategy;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.impl.DefaultConnectionReuseStrategy;
-import org.apache.http.impl.DefaultHttpClientConnection;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.message.BasicHttpRequest;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.protocol.BasicHttpProcessor;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.ExecutionContext;
-import org.apache.http.protocol.HttpRequestExecutor;
-import org.apache.http.protocol.RequestConnControl;
-import org.apache.http.protocol.RequestContent;
-import org.apache.http.protocol.RequestExpectContinue;
-import org.apache.http.protocol.RequestTargetHost;
-import org.apache.http.protocol.RequestUserAgent;
-import org.apache.http.util.EntityUtils;
+//import org.apache.http.ConnectionReuseStrategy;
+//import org.apache.http.HttpHost;
+//import org.apache.http.HttpResponse;
+//import org.apache.http.HttpVersion;
+//import org.apache.http.impl.DefaultConnectionReuseStrategy;
+//import org.apache.http.impl.DefaultHttpClientConnection;
+//import org.apache.http.params.BasicHttpParams;
+//import org.apache.http.message.BasicHttpRequest;
+//import org.apache.http.params.HttpParams;
+//import org.apache.http.params.HttpProtocolParams;
+//import org.apache.http.protocol.BasicHttpProcessor;
+//import org.apache.http.protocol.HttpContext;
+//import org.apache.http.protocol.BasicHttpContext;
+//import org.apache.http.protocol.ExecutionContext;
+//import org.apache.http.protocol.HttpRequestExecutor;
+//import org.apache.http.protocol.RequestConnControl;
+//import org.apache.http.protocol.RequestContent;
+//import org.apache.http.protocol.RequestExpectContinue;
+//import org.apache.http.protocol.RequestTargetHost;
+//import org.apache.http.protocol.RequestUserAgent;
+//import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import gsn.beans.VSensorMonitorConfig;
@@ -142,7 +142,7 @@ public class VSMonitor {
     }
 
     public static void readStatus() throws Exception {
-         HttpParams params = new BasicHttpParams();
+         /*HttpParams params = new BasicHttpParams();
             HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
             HttpProtocolParams.setContentCharset(params, "UTF-8");
             HttpProtocolParams.setUserAgent(params, "HttpComponents/1.1");
@@ -210,7 +210,7 @@ public class VSMonitor {
                 }
             } finally {
                 conn.close();
-            }
+            }*/
         }
 
 
