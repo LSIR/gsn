@@ -72,7 +72,10 @@ public abstract class AbstractVirtualSensor {
 		try {
 			Mappings.getContainer( ).publishData( this );
 		} catch (SQLException e) {
-			logger.error(e.getMessage(),e);
+            if (e.getMessage().toLowerCase().contains("duplicate entry"))
+                logger.info(e.getMessage(),e);
+			else
+                logger.error(e.getMessage(),e);
 		}
 	}
 	/**
