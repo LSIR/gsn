@@ -589,7 +589,10 @@ public class StorageManager {
                 logger.warn("Inserting a stream element failed : "
                         + streamElement.toString(), e);
         }catch (SQLException e) {
-            logger.warn("Error occurred on inserting data to the database, an stream element dropped due to: "+e.getMessage()+". (Stream element: "+streamElement.toString()+")+ Query: "+query);
+            if (e.getMessage().toLowerCase().contains("duplicate entry"))
+                logger.info("Error occurred on inserting data to the database, an stream element dropped due to: "+e.getMessage()+". (Stream element: "+streamElement.toString()+")+ Query: "+query);
+            else
+                logger.warn("Error occurred on inserting data to the database, an stream element dropped due to: "+e.getMessage()+". (Stream element: "+streamElement.toString()+")+ Query: "+query);
             throw e;
         }
         finally {
@@ -1253,11 +1256,11 @@ public class StorageManager {
 //                    dbConnectionProperties);
 //        return connection;
         logger.debug("Asking for connections to default DB=> busy: "+pool.getNumBusyConnections()+", max-size:"+pool.getMaxPoolSize()+", idle:"+pool.getNumIdleConnections());
-       // try{ // used for tracking the calls to this method.
-       //     throw new RuntimeException("Trackeeer");
-       // }   catch (Exception e){
-       //     logger.fatal(e.getMessage(),e);
-       // }
+        // try{ // used for tracking the calls to this method.
+        //     throw new RuntimeException("Trackeeer");
+        // }   catch (Exception e){
+        //     logger.fatal(e.getMessage(),e);
+        // }
         return pool.getConnection();
     }
 
