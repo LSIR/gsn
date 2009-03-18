@@ -80,7 +80,7 @@ public abstract class AbstractVirtualSensor {
 	 * @param streamElement
 	 */
 	protected synchronized void dataProduced ( StreamElement streamElement ) {
-		dataProduced(streamElement,false);
+		dataProduced(streamElement,true);
 	}
 	/**
 	 * First checks compatibility of the data type of each output data item in the stream element with the
