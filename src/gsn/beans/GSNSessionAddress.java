@@ -74,12 +74,16 @@ public class GSNSessionAddress {
         this.password = password;
     }
 
+    public String getURL() {
+        return "http://" + host+ ":"+ port + path;
+    }
+
     @Override
     public String toString() {
         if (this.needspassword)
-            return "http://" + host+ ":"+ port + path+"@"+username+":"+password;
+            return getURL()+"@"+username+":"+password;
         else
-            return "http://" + host+ ":"+ port + path;
+            return getURL();
     }
 
     @Override
