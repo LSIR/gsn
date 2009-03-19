@@ -104,7 +104,9 @@ public class VSensorMonitorConfig {
     }
 
     public String getTimeoutAsString() {
-        return Long.toString(timeout); //TODO: compute timeout and return it as string, e.g. 10h20m5s30ms
+
+        //System.out.println("getTimeoutAsString: "+ timeout +"=>" + ms2dhms(timeout));
+        return ms2dhms(timeout);
     }
 
     public int hashCode(){
@@ -131,15 +133,83 @@ public class VSensorMonitorConfig {
 		return false;
 	}
 
-    public static String timeOutToString(){
-        return "";
-    }
-    
     public static long timeOutFromString(String s) {
-        return Long.parseLong(s);
+        return dhms2ms(s);
     }
 
-    public static int getHoursFromTimeOut(String t){
-        return 0;
+    /* converts timeout given as a long value (in msecs)
+    *  into a string of the form #d#h#m#s# (days, hours, minutes, seconds, msecs) 
+    */
+    public static String ms2dhms(long l) {
+        StringBuilder sb = new StringBuilder();
+        long d, h, m, s, ms;
+        ms = l % 1000L;
+        l = l /1000L;
+        s = l % 60L;
+        l = l / 60L;
+        m = l % 60L;
+        l = l/60L;
+        h = l % 24L;
+        d = l /60L;
+        if (d>0L)
+            sb.append(d).append("d");
+        if (h>0L)
+            sb.append(h).append("h");
+        if (m>0L)
+            sb.append(m).append("m");
+        if (s>0L)
+            sb.append(s).append("s");
+        if (ms>0L)
+            sb.append(ms);
+        return sb.toString();
+    }
+
+    /* converts timeout given as a string
+    *  with (days, hours, minutes, seconds, msecs)
+    * to msecs
+    */
+    public static long dhms2ms(String str){
+        int index;
+        long d=0L;
+        long h=0L;
+        long m=0L;
+        long s=0L;
+        long ms=0L;
+        StringBuilder sb = new StringBuilder(str.toLowerCase());
+
+        // days
+        index = sb.indexOf("d");
+        if (index>0) {
+            d = Long.parseLong(sb.substring(0,index));
+            sb.delete(0,index+1); // removes ####d
+        }
+
+        // hours
+        index = sb.indexOf("h");
+        if (index>0) {
+            h = Long.parseLong(sb.substring(0,index));
+            sb.delete(0,index+1); // removes ####h
+        }
+
+        // minutes
+        index = sb.indexOf("m");
+        if (index>0) {
+            m = Long.parseLong(sb.substring(0,index));
+            sb.delete(0,index+1); // removes ####m
+        }
+
+        // seconds
+        index = sb.indexOf("s");
+        if (index>0) {
+            s = Long.parseLong(sb.substring(0,index));
+            sb.delete(0,index+1); // removes ####s
+        }
+
+        //millisecs
+        if (sb.length()>0) {
+            ms = Long.parseLong(sb.toString());
+        }
+
+        return (d*86400L+h*3600L+m*60L+s)*1000L+ms;
     }
 }
