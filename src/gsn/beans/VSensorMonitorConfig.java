@@ -143,6 +143,7 @@ public class VSensorMonitorConfig {
     public static String ms2dhms(long l) {
         StringBuilder sb = new StringBuilder();
         long d, h, m, s, ms;
+        
         ms = l % 1000L;
         l = l /1000L;
         s = l % 60L;
@@ -150,15 +151,15 @@ public class VSensorMonitorConfig {
         m = l % 60L;
         l = l/60L;
         h = l % 24L;
-        d = l /60L;
+        d = l /24L;
         if (d>0L)
-            sb.append(d).append("d");
+            sb.append(d).append("d ");
         if (h>0L)
-            sb.append(h).append("h");
+            sb.append(h).append("h ");
         if (m>0L)
-            sb.append(m).append("m");
+            sb.append(m).append("m ");
         if (s>0L)
-            sb.append(s).append("s");
+            sb.append(s).append("s ");
         if (ms>0L)
             sb.append(ms);
         return sb.toString();
