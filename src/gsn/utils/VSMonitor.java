@@ -19,6 +19,24 @@ import org.apache.commons.mail.EmailException;
 import gsn.beans.VSensorMonitorConfig;
 import gsn.beans.GSNSessionAddress;
 
+/*
+* VSMonitor
+* Monitors a series of Virtual Sensors (last update time)
+* and creates a report shown on standard output and sent by e-mail
+* You can put this program in a Cron job and run it regularely to check status.
+* Syntax for calling:
+* java -jar VSMonitor.jar <config_file> <list_of_mails>
+*  e.g.  java -jar VSMonitor.jar conf/monitoring.cfg user@gmail.com admin@gmail.com
+* As input, a config file containing list sensors described by: 
+* name of sensor,
+* timeout (expressing expected update period, for example every 1h),
+* gsn session address (e.g. www.server.com:22001/gsn)
+* and possibly a username and password, in case session requieres authentication.
+* See conf/monitoring.cfg for a sample file
+* List of e-mails used for notification are given as arguments to the program
+* e-mail account parameters (currently gmail only) are given in the config file
+*
+* */
 public class VSMonitor {
 
     public static final String CONFIG_SEPARATOR ="@";
@@ -32,11 +50,22 @@ public class VSMonitor {
 
     public static StringBuilder errorsBuffer = new StringBuilder();
     public static StringBuilder noErrorsBuffer = new StringBuilder();
+    public static StringBuilder summary = new StringBuilder();
     private static final String GSN_REALM = "GSNRealm";
     private static String gmail_username;
     private static String gmail_password;
     private static final String SMTP_GMAIL_COM = "smtp.gmail.com";
+    private static int nHostsDown = 0;
+    private static int nSensorsLate = 0;
 
+    /*
+    * Reads config file and initializes:
+    * e-mail config (gmail_username, gmail_password)
+    * lists
+    * - monitoredSensors: list of monitored sensors (including expected update delay)
+    * - sensorsUpdateDelay: list of sensors update delays (initialized to -1)
+    * - listOfSessions: list of GSN sessions
+    * */
     public static void initFromFile(String fileName){
         long timeout;
         String vsensorname;
@@ -142,7 +171,7 @@ public class VSMonitor {
 
 
                         //System.out.println("VS: "+"\""+vsensorname+"\""+" timeout: " + Long.toString(timeout));
-                        System.out.println("Added: "+ monitoredSensors.get(vsensorname));
+                        //System.out.println("Added: "+ monitoredSensors.get(vsensorname));
                         logger.warn("Added:"+ monitoredSensors.get(vsensorname));
                     }
                 }
@@ -153,7 +182,15 @@ public class VSMonitor {
         }
     }
 
-   
+    /*
+    * Queries a GSN session for status
+    * Uses Http Get method to read xml status (usually under /gsn)
+    * parses the xml and initializes global variables :
+    * - errorsBuffer
+    * - noErrrorsBuffer
+    * - nHostsDown
+    * - nSensorsLate
+    * */
     public static void readStatus(GSNSessionAddress gsnSessionAddress) throws Exception {
 
         String httpAddress = gsnSessionAddress.getURL();
@@ -177,10 +214,13 @@ public class VSMonitor {
 
             if (status==404){
                 System.out.println("Http Error 404 Not Found: "+ httpAddress);
+                errorsBuffer.append("Http Error 404 Not Found: "+ httpAddress);
+                nHostsDown++;
             }
 
             else if (status==401){
                     System.out.println("Http Error 401 Authentication Needed: "+ httpAddress);
+                    errorsBuffer.append("Http Error 401 Authentication Needed: "+ httpAddress);
                 }
 
                 else {
@@ -188,7 +228,7 @@ public class VSMonitor {
                     String[] lines = myResponse.split("\n");
                     //System.out.println("Length of list:"+lines.length);
                     for (int lineNumber=0;lineNumber<lines.length;lineNumber++){
-                        if (lines[lineNumber].toLowerCase().indexOf("virtual-sensor name")>0) { //TODO: more robust with regular expressions
+                        if (lines[lineNumber].toLowerCase().indexOf("virtual-sensor name")>0) {
                             //System.out.println(lineNumber+" : "+lines[lineNumber]);
                             String sensorName = parseSensorName(lines[lineNumber]);
 
@@ -199,10 +239,12 @@ public class VSMonitor {
                                 sensorsUpdateDelay.put(sensorName, lastUpdateDelay);
 
                                 if (sensorsUpdateDelay.get(sensorName)>monitoredSensors.get(sensorName).getTimeout()) {
-                                    //System.out.println("Sensor "+sensorName+" delayed");
+
+                                    //System.out.println("Sensor "+sensorName+" delayed: "+sensorsUpdateDelay.get(sensorName)+" >> "+monitoredSensors.get(sensorName).getTimeout());
                                     errorsBuffer.append(sensorName+"@"+gsnSessionAddress.getURL()+" not updated for "+VSensorMonitorConfig.ms2dhms(sensorsUpdateDelay.get(sensorName))
                                             + " (expected <"+VSensorMonitorConfig.ms2dhms(monitoredSensors.get(sensorName).getTimeout())
                                             +")\n");
+                                    nSensorsLate++;
                                 }
                                 else {
                                     //System.out.println("Sensor "+sensorName+" in time");
@@ -214,11 +256,11 @@ public class VSMonitor {
                 }
             }
         catch (UnknownHostException e) {
-            System.out.println("Error: unknown host <"+gsnSessionAddress.getHost()+">\n");
+            //System.out.println("Error: unknown host <"+gsnSessionAddress.getHost()+">\n");
             errorsBuffer.append("Error: unknown host <"+gsnSessionAddress.getHost()+">\n");
         }
         catch (ConnectException e) {
-            System.out.println("Error: connection refused to host <"+gsnSessionAddress.getHost()+">\n");
+            //System.out.println("Error: connection refused to host <"+gsnSessionAddress.getHost()+">\n");
             errorsBuffer.append("Error: connection refused to host <"+gsnSessionAddress.getHost()+">\n");
         }
         finally {
@@ -227,6 +269,9 @@ public class VSMonitor {
         }
     }
 
+    /*
+    * returns last modification time of a sensor from a string (a line in the xml file)
+    * */
     private static long parseLastModified(String s){
         int start = s.indexOf("last-modified=\"")+15;
         int end = s.indexOf("\" description");
@@ -234,18 +279,28 @@ public class VSMonitor {
         return Long.parseLong(s.substring(start,end));
     }
 
+    /*
+    * returns sensor name of a sensor from a string (a line in the xml file)
+    * */
     private static String parseSensorName(String s){
         int start = s.indexOf("name=\"")+6;
         int end = s.indexOf("\" last-modified");
         return s.substring(start,end);
     }
 
+    /*
+    * Sends an e-mail to recipients specified in command line
+    * (through global listOfMails)
+    * with the global summary as subject
+    * and global errorsBuffer as body
+    * */
     private static void sendMail() throws EmailException {
         // hardcoded send mail
         SimpleEmail email = new SimpleEmail();
-        email.setDebug(true);  // TODO: comment this line
+        //email.setDebug(true);
         email.setHostName(SMTP_GMAIL_COM);
         email.setAuthentication(gmail_username, gmail_password);
+        //System.out.println(gmail_username +" "+ gmail_password);
         email.getMailSession().getProperties().put("mail.smtp.starttls.enable", "true");
         email.getMailSession().getProperties().put("mail.smtp.auth", "true");
         email.getMailSession().getProperties().put("mail.debug", "true");
@@ -260,7 +315,7 @@ public class VSMonitor {
         }
           email.setFrom(gmail_username +"@gmail.com", gmail_username);
         
-          email.setSubject("GSN Alert");
+          email.setSubject("[GSN Alert] "+summary.toString());
           email.setMsg(errorsBuffer.toString());
           email.send();
 
@@ -298,14 +353,26 @@ public class VSMonitor {
                 }
             }
 
-        System.out.println("Errors:\n"+errorsBuffer);
-        System.out.println("Ok:\n"+ noErrorsBuffer);
+        if ((nSensorsLate>0)||(nHostsDown>0)){
+            summary.append("WARNING: ");
+            if (nHostsDown>0)
+                summary.append(nHostsDown+ " host(s) down. ");
+            if (nSensorsLate>0)
+                summary.append(nSensorsLate+ " sensor(s) not updated. ");
 
-        try {
-            sendMail();
-        } catch (EmailException e) {
-            e.printStackTrace();
+            // Send e-mail only if there are errors
+            try {
+                sendMail();
+            } catch (EmailException e) {
+                logger.warn("Cannot send e-mail.");
+                e.printStackTrace();
+            }
         }
+
+        // Showing report
+        System.out.println(summary);
+        System.out.println("[WARNINGS]\n"+errorsBuffer);
+        System.out.println("[INFO]\n"+ noErrorsBuffer);
 
     }
 }
