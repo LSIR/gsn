@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 
 public class LoginToMSRSense {
@@ -19,20 +20,22 @@ public class LoginToMSRSense {
     public static int DELETE_SENSOR_ERROR_DOESNT_EXIST = 0;
 
     private static transient Logger logger = Logger.getLogger ( LoginToMSRSense.class );
-
+    public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 
     public static void main(String[] args) throws RemoteException {
-    String host= "http://micssrv22.epfl.ch/";
-    VSensorConfig conf = new VSensorConfig();
-    conf.setName("Test99");
-    conf.setDescription("Desc1");
-    conf.setAddressing(new KeyValue[] {new KeyValueImp("latitude","1"),new KeyValueImp("Longitude","1"),new KeyValueImp("Altitude","1")});
-    conf.setOutputStructure(new DataField[] {new DataField("temperature","integer"),new DataField("light","double") });
-    String username = "GSN@gsn.com";
-    String password = "GSN@gsn.com";
 
-    register_sensor(username, password, conf, host);
-    delete_sensor(username, password, conf);
+        PropertyConfigurator.configure ( DEFAULT_GSN_LOG4J_PROPERTIES );
+        String host= "http://micssrv22.epfl.ch/";
+        VSensorConfig conf = new VSensorConfig();
+        conf.setName("Test99");
+        conf.setDescription("Desc1");
+        conf.setAddressing(new KeyValue[] {new KeyValueImp("latitude","1"),new KeyValueImp("Longitude","1"),new KeyValueImp("Altitude","1")});
+        conf.setOutputStructure(new DataField[] {new DataField("temperature","integer"),new DataField("light","double") });
+        String username = "GSNTEST@gsn.com";
+        String password = "GSNTEST@gsn.com";
+
+        register_sensor(username, password, conf, host);
+        delete_sensor(username, password, conf);
   }
 
     /**
@@ -47,7 +50,7 @@ public class LoginToMSRSense {
      */
 
   public static int register_sensor(String username,String password,VSensorConfig conf,String gsnURI ) throws RemoteException {
-    
+
     logger.warn("Registering sensor "+conf.getName()+" on Sensormap...");
     gsn.msr.sensormap.userman.ServiceStub login = new gsn.msr.sensormap.userman.ServiceStub();
     gsn.msr.sensormap.userman.ServiceStub.GetPassCode getPassCodeParams = new gsn.msr.sensormap.userman.ServiceStub.GetPassCode();
@@ -58,7 +61,6 @@ public class LoginToMSRSense {
     String passcodeStr = login.GetPassCode(getPassCodeParams).getGetPassCodeResult().getGuid();
 
     logger.warn("Got GUID passcode:"+passcodeStr);
-    //System.out.println(passcodeStr);
 
     gsn.msr.sensormap.sensorman.ServiceStub stub = new gsn.msr.sensormap.sensorman.ServiceStub(); //the default implementation should point to the right endpoint
     gsn.msr.sensormap.sensorman.ServiceStub.Guid passGUID = new gsn.msr.sensormap.sensorman.ServiceStub.Guid();
@@ -76,21 +78,19 @@ public class LoginToMSRSense {
     arrayOfString.setString(fields.toArray(new String[] {}));
     createVSensorTypeParams.setComponentTypes(arrayOfString);
 
-    logger.warn("Creating new sensor type "+createVSensorTypeParams.getName());
+    logger.warn("Creating new vector sensor type "+createVSensorTypeParams.getName());
     String call_output = stub.CreateVectorSensorType(createVSensorTypeParams).getCreateVectorSensorTypeResult();
-    if (call_output.indexOf("OK")>0)
+    if (call_output.indexOf("OK")>=0)
         logger.warn("Type "+createVSensorTypeParams.getName()+" created correctly. SensorMap says: "+call_output);
     else
-        logger.warn("Type "+createVSensorTypeParams.getName()+"was not created. SensorMap says: "+call_output);
+        logger.warn("Type "+createVSensorTypeParams.getName()+" was not created. SensorMap says: "+call_output);
 
-    //System.out.println(">>OUTPUT OF CREATION OF SENSOR TYPE: "+call_output);
-  
     gsn.msr.sensormap.sensorman.ServiceStub.RegisterVectorSensor registerVectorSensorParams = new gsn.msr.sensormap.sensorman.ServiceStub.RegisterVectorSensor();
-    
+
     gsn.msr.sensormap.sensorman.ServiceStub.SensorInfo sensor = new gsn.msr.sensormap.sensorman.ServiceStub.SensorInfo();
     sensor.setDataType("Vector");
     sensor.setPublisherName(username);
-    sensor.setOriginalPublisherName(username);  
+    sensor.setOriginalPublisherName(username);
     sensor.setUrl(gsnURI);
     //logger.warn("ALTITUDE:"+conf.getAltitude());
     sensor.setAltitude(conf.getAltitude());
@@ -104,17 +104,16 @@ public class LoginToMSRSense {
     registerVectorSensorParams.setPassCode(passGUID);
     registerVectorSensorParams.setPublisherName(username);
     registerVectorSensorParams.setSensor(sensor);
-    
-    
-    call_output = stub.RegisterVectorSensor(registerVectorSensorParams).getRegisterVectorSensorResult();
-    //System.out.println(">>OUTPUT OF CREATION OF VECTOR SENSOR: "+call_output);
 
-    if (call_output.indexOf("OK")>0){
+
+    call_output = stub.RegisterVectorSensor(registerVectorSensorParams).getRegisterVectorSensorResult();
+
+    if (call_output.indexOf("OK")>=0){
         logger.warn("Sensor "+conf.getName()+" registered correctly. SensorMap says: "+call_output);
         return REGISTER_SENSOR_OK_CREATED_NEW;
     }
 
-    if (call_output.indexOf("Error: Sensor with the same publisher name and sensor name already exists")>0){
+    if (call_output.indexOf("Error: Sensor with the same publisher name and sensor name already exists")>=0){
         logger.warn("Sensor "+conf.getName()+" not registered (already exists). SensorMap says: "+call_output);
         return REGISTER_SENSOR_ERROR_ALREADY_EXISTS;
     }
@@ -122,16 +121,6 @@ public class LoginToMSRSense {
     logger.warn("Sensor "+conf.getName()+" not registered. SensorMap says: "+call_output);
     return REGISTER_SENSOR_ERROR_NOT_CREATED;
 
-
-//    
-//    out = sensors.insertVectorSensor(username, passcode, sensor );
-//    System.out.println(">>OUTPUT OF INSERTION: "+out);
-//    System.out.println("Registered Sensors ...");
-//    List<SensorInfo> info = sensors.getSensorsByPublisher(username, passcode).getSensorInfo();
-//    for (SensorInfo si : info) {
-//      System.out.println(si.getSensorName());
-//      sensors.deleteSensor(username, passcode, si.getSensorName());
-//    }
   }
 
         /**
@@ -156,31 +145,27 @@ public class LoginToMSRSense {
       getPassCodeParams.setPassword(password);
       String passcodeStr = login.GetPassCode(getPassCodeParams).getGetPassCodeResult().getGuid();
       logger.warn("Got GUID passcode:"+passcodeStr);
-      //System.out.println(passcodeStr);
 
       gsn.msr.sensormap.sensorman.ServiceStub.Guid passGUID = new gsn.msr.sensormap.sensorman.ServiceStub.Guid();
       passGUID.setGuid(passcodeStr);
 
-      // create DeleteSensor object
-      gsn.msr.sensormap.sensorman.ServiceStub.DeleteSensor deleteSensorParams = new gsn.msr.sensormap.sensorman.ServiceStub.DeleteSensor();
-      deleteSensorParams.setPassCode(passGUID);
-      deleteSensorParams.setPublisherName(username);
-      deleteSensorParams.setOriginalPublisherName(username);
-      deleteSensorParams.setSensorName(conf.getName());
+      // create DeleteVectorSensor object
+      gsn.msr.sensormap.sensorman.ServiceStub.DeleteVectorSensor deleteVectorSensorParams = new gsn.msr.sensormap.sensorman.ServiceStub.DeleteVectorSensor();
+      deleteVectorSensorParams.setPassCode(passGUID);
+      deleteVectorSensorParams.setPublisherName(username);
+      deleteVectorSensorParams.setOriginalPublisherName(username);
+      deleteVectorSensorParams.setSensorName(conf.getName());
 
-      //System.out.println("calling DeleteSensor with parameters: \n...passCode:"+passGUID.toString());
-      //System.out.println("...PublisherName:"+username);
-      //System.out.println("...OriginalPublisherName:"+username);
-      //System.out.println("...SensorName:"+conf.getName());
+      logger.warn("calling DeleteVectorSensor with parameters:");
+      logger.warn("...passCode:"+deleteVectorSensorParams.getPassCode());
+      logger.warn("...PublisherName:"+deleteVectorSensorParams.getPublisherName());
+      logger.warn("...OriginalPublisherName:"+deleteVectorSensorParams.getOriginalPublisherName());
+      logger.warn("...SensorName:"+deleteVectorSensorParams.getSensorName());
 
-      stub.DeleteSensor(deleteSensorParams);
+      gsn.msr.sensormap.sensorman.ServiceStub.DeleteVectorSensorResponse output = stub.DeleteVectorSensor(deleteVectorSensorParams);
+      String call_output = output.getDeleteVectorSensorResult();
 
-      gsn.msr.sensormap.sensorman.ServiceStub.DeleteSensorResponse output = stub.DeleteSensor(deleteSensorParams);
-      String call_output = output.getDeleteSensorResult();
-
-      //System.out.println("OUTPUT OF CREATION OF DELETE SENSOR: "+call_output);
-
-      if (call_output.indexOf("OK")>0) {
+      if (call_output.indexOf("OK")>=0) {
           logger.warn("Sensor "+conf.getName()+" deleted correctly. SensorMap says: "+call_output);
           return DELETE_SENSOR_OK;
       }
