@@ -151,7 +151,7 @@ public class VSensorLoader extends Thread {
   }
   
   private void register_to_microsoft_sensor_map(VSensorConfig config) {
-    logger.warn("Virtual Sensor: "+config.getName()+" wants to publish its data to sensor map.");
+    logger.warn("Virtual Sensor: "+config.getName()+" wants to publish its data to SensorMap.");
     Double lat = config.getLatitude();
     Double lng = config.getLongitude();
     Double alt = config.getAltitude();
@@ -172,6 +172,27 @@ public class VSensorLoader extends Thread {
     try {
         LoginToMSRSense.register_sensor(userName, password, config, host);
       //TestPublicToMSR.register_to_sensor_map(userName, password, host, Main.getContainerConfig(), config);
+    } catch (RemoteException e) {
+      logger.error(e.getMessage(),e);
+    } catch (IOException e) {
+      logger.error(e.getMessage(),e);
+    }
+  }
+
+  private void unregister_from_microsoft_sensor_map(VSensorConfig config) {
+    logger.warn("Virtual Sensor: "+config.getName()+" wants to unregister from SensorMap.");
+
+    HashMap<String,String> params = Main.getContainerConfig().getMsrMap();
+    String userName = params.get("user");
+    String password = params.get("password");
+
+    if (userName==null||password==null) {
+      logger.warn("user and/or password parameters are missing from the gsn.xml file from the microsoft-research-sensormap path.");
+      logger.warn("unregistering from microsoft research sensormap failed.");
+      return;
+    }
+    try {
+        LoginToMSRSense.delete_sensor(userName, password, config);
     } catch (RemoteException e) {
       logger.error(e.getMessage(),e);
     } catch (IOException e) {
@@ -238,6 +259,8 @@ public class VSensorLoader extends Thread {
     }
     // sm.renameTable(vsensorName,vsensorName+"Before"+System.currentTimeMillis());
     Mappings.getContainer ( ).removeAllResourcesAssociatedWithVSName ( vsensorName );
+    if (pool.getConfig().getPublishToSensorMap())
+          unregister_from_microsoft_sensor_map(pool.getConfig());
 //  this.sm.dropTable ( config.getName ( ) );
   }
   
