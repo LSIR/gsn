@@ -13,4 +13,10 @@
 <!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/gsn" /> -->
 <!--  <storage user="gsn" password="gsn" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521" /> -->
 <!-- <storage user="gsn" password="ge-S3-ne" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@dom.slf.local:1521:sdbt" /> -->
+<microsoft-research-sensormap>
+     <parameter key="user">***</parameter>
+     <parameter key="password">***</parameter>
+     <parameter key="host">http://***</parameter>
+ </microsoft-research-sensormap>
+
  </sensor-server>
