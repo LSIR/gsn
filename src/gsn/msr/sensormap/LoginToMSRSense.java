@@ -1,4 +1,5 @@
 package gsn.msr.sensormap;
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
 import gsn.msr.sensormap.sensorman.ServiceStub.CreateVectorSensorType;
@@ -69,7 +70,9 @@ public class LoginToMSRSense {
     createVSensorTypeParams.setPassCode(passGUID);
     createVSensorTypeParams.setPublisherName(username);
     createVSensorTypeParams.setName("GSNStreamElement-"+conf.getName());
-    createVSensorTypeParams.setUri(gsnURI+"#"+conf.getName());
+    String uri = gsnURI+"#"+conf.getName();
+	createVSensorTypeParams.setUri(uri);
+        
 
     gsn.msr.sensormap.sensorman.ServiceStub.ArrayOfString arrayOfString = new gsn.msr.sensormap.sensorman.ServiceStub.ArrayOfString ();
     ArrayList<String> fields=  new ArrayList<String>();
@@ -78,8 +81,9 @@ public class LoginToMSRSense {
     arrayOfString.setString(fields.toArray(new String[] {}));
     createVSensorTypeParams.setComponentTypes(arrayOfString);
 
-    logger.warn("Creating new vector sensor type "+createVSensorTypeParams.getName());
+    logger.warn("Creating new vector sensor type "+createVSensorTypeParams.getName()+" With URI: "+uri);
     String call_output = stub.CreateVectorSensorType(createVSensorTypeParams).getCreateVectorSensorTypeResult();
+        
     if (call_output.indexOf("OK")>=0)
         logger.warn("Type "+createVSensorTypeParams.getName()+" created correctly. SensorMap says: "+call_output);
     else
@@ -98,13 +102,18 @@ public class LoginToMSRSense {
     sensor.setLongitude(conf.getLongitude());
     sensor.setDescription(conf.getDescription());
     sensor.setSensorName(conf.getName());
-    sensor.setSensorType(gsnURI+"#"+conf.getName());
+    sensor.setSensorType(uri);
     sensor.setEntryTime(new GregorianCalendar());
+    sensor.setAccessControl("protected");
+    String groupName= Main.getContainerConfig().getMsrMap().get("group-name");
+    if (groupName != null && groupName.trim().length()>0)
+    	sensor.setGroupName(groupName);
+    
     sensor.setWebServiceUrl(gsnURI+"services/Service?wsdl");
     registerVectorSensorParams.setPassCode(passGUID);
     registerVectorSensorParams.setPublisherName(username);
     registerVectorSensorParams.setSensor(sensor);
-
+        
 
     call_output = stub.RegisterVectorSensor(registerVectorSensorParams).getRegisterVectorSensorResult();
 

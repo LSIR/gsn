@@ -10,10 +10,13 @@ import gsn.wrappers.AbstractWrapper;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
 public class GSNRequestHandler implements RequestInitializableRequestProcessor {
@@ -147,22 +150,33 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
     }
     return toReturn;
   }
-
+/**
+ * This method has to be modified to be adapted to httpclient/httpcore library version 4.0
+ * @param query
+ * @param remoteVSName
+ * @param windowSize
+ * @param slideValue
+ * @param remoteHost
+ * @param remotePort
+ * @param localHost
+ * @param localPort
+ * @param notificationCode
+ * @return
+ */
   public static boolean sendRegisterQueryRequest(String query,String remoteVSName, String windowSize, String slideValue, String remoteHost,int remotePort,String localHost, int  localPort,int notificationCode) {
     String url = "http://"+remoteHost+":"+remotePort+"/gsn/register/"+remoteVSName+"/"+windowSize+"/"+slideValue+"/notify/"+localHost+"/"+localPort+"/"+notificationCode;
-    PostMethod post = new PostMethod(url);
-    HttpClient client = new HttpClient();
-    post.setRequestBody(new org.apache.commons.httpclient.NameValuePair[] {new NameValuePair("query",query)});
-    int status = -1;
+    HttpPost post = new HttpPost(url);
+    HttpClient client = new DefaultHttpClient();
+//    post.setEntity(new HttpEntity(new NameValuePair[] {new NameValuePair("query",query)});
+    HttpResponse status = null;
     try {
-      status = client.executeMethod(post);
-      System.out.println(post.getResponseBodyAsString());
-    } catch (HttpException e) {
-      e.printStackTrace();
+      status = client.execute(post);
+      System.out.println(status.toString());
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return status == 201;
+    return true;
+//    return status.get == 201;
 
   }
 

@@ -423,8 +423,7 @@ public class StorageManager {
         return new DataEnumerator(connection.prepareStatement(query.toString()),binaryFieldsLinked);
     }
 
-    public DataEnumerator executeQuery(StringBuilder query,
-                                       boolean binaryFieldsLinked) throws SQLException {
+    public DataEnumerator executeQuery(StringBuilder query,boolean binaryFieldsLinked) throws SQLException {
         return executeQuery(query, binaryFieldsLinked, getConnection());
     }
 

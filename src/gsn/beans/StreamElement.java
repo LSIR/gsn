@@ -7,11 +7,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.apache.axiom.attachments.Part;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.log4j.Logger;
 
 public final class StreamElement implements Serializable {
@@ -325,42 +322,45 @@ public final class StreamElement implements Serializable {
     }
     return new StreamElement( outputFormat , values , Long.parseLong(timestamp ));
   }
-
-  public Part[] toREST() {
-    Part[] toReturn = new Part[fieldNames.length+1] ;
-    toReturn[0] = new StringPart("TIMED",Long.toString(getTimeStamp()));
-    for (int i=0;i<fieldNames.length;i++) {
-      Part toAdd = null ;
-      switch ( fieldTypes[ i ] ) {
-        case DataTypes.DOUBLE :
-          toAdd = new StringPart(fieldNames[i],Double.toString((Double) fieldValues[i]));
-          break;
-        case DataTypes.BIGINT :
-          toAdd = new StringPart(fieldNames[i],Long.toString((Long) fieldValues[i]));
-          break;
-        case DataTypes.TINYINT :
-          toAdd = new StringPart(fieldNames[i],Byte.toString((Byte) fieldValues[i]));
-          break;
-        case DataTypes.SMALLINT :
-          toAdd = new StringPart(fieldNames[i],Short.toString((Short) fieldValues[i]));
-          break;
-        case DataTypes.INTEGER :
-          toAdd = new StringPart(fieldNames[i],Integer.toString((Integer) fieldValues[i]));
-          break;
-        case DataTypes.CHAR :
-        case DataTypes.VARCHAR :
-          toAdd = new FilePart(fieldNames[i],new ByteArrayPartSource(fieldNames[i],((String)fieldValues[i]).getBytes(Charset.forName("UTF-8"))));
-          break;
-        case DataTypes.BINARY :
-          toAdd = new FilePart(fieldNames[i],new ByteArrayPartSource(fieldNames[i],(byte[])fieldValues[i]));
-          break;
-        default :
-          logger.error( "Type can't be converted : TypeID : " + fieldTypes[ i ] );
-      }
-      toReturn[i+1]=toAdd;
-    }
-    return toReturn;
-  }
+/**
+ *  This method has to be modified to be adapted to httpclient/httpcore library version 4.0
+ * @return
+ */
+//  public Part[] toREST() {
+//    Part[] toReturn = new Part[fieldNames.length+1] ;
+//    toReturn[0] = new StringPart("TIMED",Long.toString(getTimeStamp()));
+//    for (int i=0;i<fieldNames.length;i++) {
+//      Part toAdd = null ;
+//      switch ( fieldTypes[ i ] ) {
+//        case DataTypes.DOUBLE :
+//          toAdd = new StringPart(fieldNames[i],Double.toString((Double) fieldValues[i]));
+//          break;
+//        case DataTypes.BIGINT :
+//          toAdd = new StringPart(fieldNames[i],Long.toString((Long) fieldValues[i]));
+//          break;
+//        case DataTypes.TINYINT :
+//          toAdd = new StringPart(fieldNames[i],Byte.toString((Byte) fieldValues[i]));
+//          break;
+//        case DataTypes.SMALLINT :
+//          toAdd = new StringPart(fieldNames[i],Short.toString((Short) fieldValues[i]));
+//          break;
+//        case DataTypes.INTEGER :
+//          toAdd = new StringPart(fieldNames[i],Integer.toString((Integer) fieldValues[i]));
+//          break;
+//        case DataTypes.CHAR :
+//        case DataTypes.VARCHAR :
+//          toAdd = new FilePart(fieldNames[i],new ByteArrayPartSource(fieldNames[i],((String)fieldValues[i]).getBytes(Charset.forName("UTF-8"))));
+//          break;
+//        case DataTypes.BINARY :
+//          toAdd = new FilePart(fieldNames[i],new ByteArrayPartSource(fieldNames[i],(byte[])fieldValues[i]));
+//          break;
+//        default :
+//          logger.error( "Type can't be converted : TypeID : " + fieldTypes[ i ] );
+//      }
+//      toReturn[i+1]=toAdd;
+//    }
+//    return toReturn;
+//  }
 
   public static StreamElement createElementFromREST( DataField [ ] outputFormat , String [ ] fieldNames , Object[ ] fieldValues  ) {
     ArrayList<Serializable> values = new ArrayList<Serializable>();

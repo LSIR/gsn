@@ -14,9 +14,11 @@
 <!--  <storage user="gsn" password="gsn" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521" /> -->
 <!-- <storage user="gsn" password="ge-S3-ne" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@dom.slf.local:1521:sdbt" /> -->
 <microsoft-research-sensormap>
-     <parameter key="user">***</parameter>
-     <parameter key="password">***</parameter>
-     <parameter key="host">http://***</parameter>
+     <parameter key="user">gsn-user@gsn.com</parameter>
+     <parameter key="password">****</parameter>
+     <parameter key="group-name">group1</parameter>
+     <parameter key="meta-data">conf/ms-metadata.csv</parameter><!-- Information on metadata for the sensors-->
+     <parameter key="host">http://abc.com/</parameter><!-- This should start with http:// and end with / -->
  </microsoft-research-sensormap>
 
  </sensor-server>
