@@ -1,25 +1,5 @@
 package gsn.tests;
 
-import static org.junit.Assert.assertEquals;
-import gsn.GSNRequestHandler;
-import gsn.Main;
-import gsn.Mappings;
-import gsn.RailsRunner;
-import gsn.beans.DataField;
-import gsn.beans.DataTypes;
-import gsn.beans.StreamElement;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-import org.apache.commons.codec.EncoderException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class TestStreamElement {
 

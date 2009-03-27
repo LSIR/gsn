@@ -7,6 +7,8 @@ import gsn.utils.KeyValueImp;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+
+import org.apache.axis2.AxisFault;
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -47,25 +49,32 @@ public class LoginToMSRSense {
      * @param  conf     configuration of the virtual sensor
      * @param  gsnURI   URI of the GSN instance
      * @return status of operation is integer. 0 for not created, 1 for created new, 2 for already exists.
+     * @throws RemoteException 
      * @throws java.rmi.RemoteException java.rmi.RemoteException
      */
-
+    
+    
+  public static gsn.msr.sensormap.sensorman.ServiceStub.Guid login_to_sensor_map(String username,String password) throws RemoteException{
+	  logger.warn("Using username:"+username+" password:*****"); // mask password
+	  gsn.msr.sensormap.sensorman.ServiceStub.Guid passGUID;
+	    gsn.msr.sensormap.userman.ServiceStub login = new gsn.msr.sensormap.userman.ServiceStub();
+	    gsn.msr.sensormap.userman.ServiceStub.GetPassCode getPassCodeParams = new gsn.msr.sensormap.userman.ServiceStub.GetPassCode();
+	    getPassCodeParams.setUserName(username);
+	    getPassCodeParams.setPassword(password);
+	    String passcodeStr = login.GetPassCode(getPassCodeParams).getGetPassCodeResult().getGuid();
+	    passGUID = new gsn.msr.sensormap.sensorman.ServiceStub.Guid();
+	    passGUID.setGuid(passcodeStr);
+	    logger.warn("Got GUID passcode:"+passcodeStr);
+	    return passGUID;
+  }
+  
   public static int register_sensor(String username,String password,VSensorConfig conf,String gsnURI ) throws RemoteException {
 
+    gsn.msr.sensormap.sensorman.ServiceStub.Guid passGUID = login_to_sensor_map(username, password);
+	  
     logger.warn("Registering sensor "+conf.getName()+" on Sensormap...");
-    gsn.msr.sensormap.userman.ServiceStub login = new gsn.msr.sensormap.userman.ServiceStub();
-    gsn.msr.sensormap.userman.ServiceStub.GetPassCode getPassCodeParams = new gsn.msr.sensormap.userman.ServiceStub.GetPassCode();
-
-    logger.warn("Using username:"+username+" password:*****"); // mask password
-    getPassCodeParams.setUserName(username);
-    getPassCodeParams.setPassword(password);
-    String passcodeStr = login.GetPassCode(getPassCodeParams).getGetPassCodeResult().getGuid();
-
-    logger.warn("Got GUID passcode:"+passcodeStr);
-
+ 
     gsn.msr.sensormap.sensorman.ServiceStub stub = new gsn.msr.sensormap.sensorman.ServiceStub(); //the default implementation should point to the right endpoint
-    gsn.msr.sensormap.sensorman.ServiceStub.Guid passGUID = new gsn.msr.sensormap.sensorman.ServiceStub.Guid();
-    passGUID.setGuid(passcodeStr);
     CreateVectorSensorType createVSensorTypeParams = new gsn.msr.sensormap.sensorman.ServiceStub.CreateVectorSensorType();
     createVSensorTypeParams.setPassCode(passGUID);
     createVSensorTypeParams.setPublisherName(username);
@@ -145,19 +154,8 @@ public class LoginToMSRSense {
 
       logger.warn("Deleting sensor "+conf.getName()+" from Sensormap...");
       gsn.msr.sensormap.sensorman.ServiceStub stub = new gsn.msr.sensormap.sensorman.ServiceStub();
-
-      gsn.msr.sensormap.userman.ServiceStub login = new gsn.msr.sensormap.userman.ServiceStub();
-      gsn.msr.sensormap.userman.ServiceStub.GetPassCode getPassCodeParams = new gsn.msr.sensormap.userman.ServiceStub.GetPassCode();
-
-      logger.warn("Using username:"+username+" password:*****"); // mask password
-      getPassCodeParams.setUserName(username);
-      getPassCodeParams.setPassword(password);
-      String passcodeStr = login.GetPassCode(getPassCodeParams).getGetPassCodeResult().getGuid();
-      logger.warn("Got GUID passcode:"+passcodeStr);
-
-      gsn.msr.sensormap.sensorman.ServiceStub.Guid passGUID = new gsn.msr.sensormap.sensorman.ServiceStub.Guid();
-      passGUID.setGuid(passcodeStr);
-
+      gsn.msr.sensormap.sensorman.ServiceStub.Guid passGUID = login_to_sensor_map(username, password);
+      
       // create DeleteVectorSensor object
       gsn.msr.sensormap.sensorman.ServiceStub.DeleteVectorSensor deleteVectorSensorParams = new gsn.msr.sensormap.sensorman.ServiceStub.DeleteVectorSensor();
       deleteVectorSensorParams.setPassCode(passGUID);
