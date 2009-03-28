@@ -30,8 +30,8 @@ public class LoginToMSRSense {
 		VSensorConfig conf = new VSensorConfig();
 		conf.setName("GSNTest");
 		conf.setDescription("Desc1");
-		conf.setAddressing(new KeyValue[] {new KeyValueImp("latitude","1"),new KeyValueImp("Longitude","1"),new KeyValueImp("Altitude","1")});
-		conf.setOutputStructure(new DataField[] {new DataField("temperature","integer"),new DataField("Temperature","double") });
+		conf.setAddressing(new KeyValue[] {new KeyValueImp("latitude","46.4823313875"),new KeyValueImp("Longitude","6.9873408131"),new KeyValueImp("Altitude","2043.1780")});
+		conf.setOutputStructure(new DataField[] {new DataField("rh","integer"),new DataField("ths","double") });
 		String username = "gsn-user@gsn.com";
 		String password = "NK3GHFYm";
 
@@ -148,8 +148,8 @@ public class LoginToMSRSense {
 		registerVectorSensorParams.setPNames(pNames.toString());
 		registerVectorSensorParams.setAccessControl("protected");
 		registerVectorSensorParams.setDataType("vector");
-		
-//		registerVectorSensorParams.setGroupName(conf.getName());
+		registerVectorSensorParams.setIcon("image/CImg/weather_tower.gif");
+		registerVectorSensorParams.setGroupName(conf.getName());
 
 		call_output = stub.CreateVectorSensorTypeAndRegisterSensor(registerVectorSensorParams).getCreateVectorSensorTypeAndRegisterSensorResult();
 

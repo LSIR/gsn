@@ -80,7 +80,7 @@ public class MetaData {
 	    List<MetaData> list = csv.parse(strat, new FileReader(path));
 	    for (MetaData m : list) {
 	    	to_return.put(m.getKey().toLowerCase().trim(), m);
-	    	//System.out.println(m.toString());
+	    	System.out.println(m.toString());
 	    }
 		return to_return;
 	}
