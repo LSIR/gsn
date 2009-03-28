@@ -6,13 +6,11 @@ import gsn.beans.InputStream;
 import gsn.beans.Modifications;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
-import gsn.msr.sensormap.TestPublicToMSR;
 import gsn.msr.sensormap.LoginToMSRSense;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.WrappersUtil;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -21,9 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.rmi.RemoteException;
-
-import javax.xml.soap.SOAPException;
-
 import org.apache.log4j.Logger;
 import org.jibx.runtime.JiBXException;
 

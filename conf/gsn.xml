@@ -17,7 +17,7 @@
      <parameter key="user">gsn-user@gsn.com</parameter>
      <parameter key="password">****</parameter>
      <parameter key="group-name">group1</parameter>
-     <parameter key="meta-data">conf/ms-metadata.csv</parameter><!-- Information on metadata for the sensors-->
+     <parameter key="metadata">conf/ms-metadata.csv</parameter><!-- Information on metadata for the sensors-->
      <parameter key="host">http://abc.com/</parameter><!-- This should start with http:// and end with / -->
  </microsoft-research-sensormap>
 

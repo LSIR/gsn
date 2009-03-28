@@ -200,6 +200,10 @@ public final class Main {
 	 * This method is called by Rails's Application.rb file.
 	 */
 	public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws JiBXException, FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
+		if (!new File(gsnXMLpath).isFile()) {
+			logger.fatal("Couldn't find the gsn.xml file @: "+(new File(gsnXMLpath).getAbsolutePath()));
+			System.exit(1);
+		}
 		IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
 		IUnmarshallingContext uctx = bfact.createUnmarshallingContext ( );
 		ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( gsnXMLpath ) ) , null );
@@ -294,15 +298,15 @@ public final class Main {
 	 * @return
 	 * @throws Exception
 	 */
-	public static ContainerConfig getContainerConfig ( ) {
-		if (singleton==null)
+	public static ContainerConfig getContainerConfig() {
+		if (singleton == null)
 			try {
 				return loadContainerConfig(DEFAULT_GSN_CONF_FILE);
 			} catch (Exception e) {
 				return null;
 			}
-			else
-				return singleton.containerConfig;
+		else
+			return singleton.containerConfig;
 	}
 
 	public static String randomTableNameGenerator ( int length ) {

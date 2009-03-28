@@ -1,11 +1,10 @@
 package gsn.msr.sensormap;
 
+import gsn.Main;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
-
 import au.com.bytecode.opencsv.bean.ColumnPositionMappingStrategy;
 import au.com.bytecode.opencsv.bean.CsvToBean;
 
@@ -75,19 +74,19 @@ public class MetaData {
 		HashMap<String, MetaData> to_return = new HashMap<String, MetaData>();
 		ColumnPositionMappingStrategy strat = new ColumnPositionMappingStrategy();
 	    strat.setType(MetaData.class);
-	    String[] columns = new String[] {"key","sensorName", "sensorType", "unit", "metadata", "comments"}; // the fields to bind do in your JavaBeab
+	    String[] columns = new String[] {"key","sensorName", "sensorType", "metadata", "comments", "unit"}; // the fields to bind do in your JavaBeab
         strat.setColumnMapping(columns);
 	    CsvToBean csv = new CsvToBean();
 	    List<MetaData> list = csv.parse(strat, new FileReader(path));
 	    for (MetaData m : list) {
 	    	to_return.put(m.getKey().toLowerCase().trim(), m);
-	    	System.out.println(m.toString());
+	    	//System.out.println(m.toString());
 	    }
 		return to_return;
 	}
 	
 	public static void main(String args[]) throws FileNotFoundException {
-		HashMap<String, MetaData> output = createMetaData("c://test.csv");
+		HashMap<String, MetaData> output = createMetaData(Main.getContainerConfig().getMsrMap().get("metadata"));
 	}
 	
 	
