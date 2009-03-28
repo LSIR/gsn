@@ -7,6 +7,7 @@ import gsn.msr.sensormap.sensorman.ServiceStub.Guid;
 import gsn.utils.KeyValueImp;
 import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
@@ -23,6 +24,7 @@ public class LoginToMSRSense {
 	private static transient Logger logger = Logger.getLogger ( LoginToMSRSense.class );
 	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 
+	private static ArrayList<String> dataTypeCache = new ArrayList<String>();
 	public static void main(String[] args) throws RemoteException, FileNotFoundException {
 
 		PropertyConfigurator.configure ( DEFAULT_GSN_LOG4J_PROPERTIES );
@@ -31,7 +33,7 @@ public class LoginToMSRSense {
 		conf.setName("GSNTest");
 		conf.setDescription("Desc1");
 		conf.setAddressing(new KeyValue[] {new KeyValueImp("latitude","46.4823313875"),new KeyValueImp("Longitude","6.9873408131"),new KeyValueImp("Altitude","2043.1780")});
-		conf.setOutputStructure(new DataField[] {new DataField("rh","integer"),new DataField("ths","double") });
+		conf.setOutputStructure(new DataField[] {new DataField("rh","integer"),new DataField("ths","double"),new DataField("rh","double") });
 		String username = "gsn-user@gsn.com";
 		String password = "NK3GHFYm";
 
@@ -98,7 +100,7 @@ public class LoginToMSRSense {
 				pNames.append(df.getName()).append("|");
 				pType = df.getName();
 			}
-			
+			if (!dataTypeCache.contains(pType)) {
 			gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorTypeWithDT createType = new gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorTypeWithDT();
 			createType.setPublisherName(username);
 			createType.setPassCode(passGUID);
@@ -108,6 +110,9 @@ public class LoginToMSRSense {
 			createType.setIconUrl("");
 			String result = stub.CreateSensorTypeWithDT(createType).getCreateSensorTypeWithDTResult();
 			logger.info("Registering data type: "+pType+" , MSR's output: "+result);
+			dataTypeCache.add(pType);
+			}
+			
 		}
 		
 		gsn.msr.sensormap.userman.ServiceStub.AddGroup createGroup = new gsn.msr.sensormap.userman.ServiceStub.AddGroup();
