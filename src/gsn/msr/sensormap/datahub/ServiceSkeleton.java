@@ -55,11 +55,7 @@ private static final transient Logger         logger          = Logger.getLogger
 	 * public  int HTML = 6;
 	 */
 
-	/**
-	 * Auto generated method signature
-	 * @param getAggregateScalarDataSeriesInBatch
-	 * TODO
-	 */                  
+
 	public org.tempuri.GetAggregateScalarDataSeriesInBatchResponse GetAggregateScalarDataSeriesInBatch(org.tempuri.GetAggregateScalarDataSeriesInBatch input) {
 		GetAggregateScalarDataSeriesInBatchResponse toReturn = new GetAggregateScalarDataSeriesInBatchResponse();
 		
@@ -87,15 +83,17 @@ private static final transient Logger         logger          = Logger.getLogger
 		SensorData items = new SensorData () ;
 		String signalInfo =input.getSensorName(); 
 		
-//			try {
-//				SignalRequest req = new SignalRequest(signalInfo);
-//				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by FLOOR(TIMED/").append(aggInMSec).append(") order by TIMED");
-//				items.setData(transformToSensorDataArray(query).getSensorData() );
-//			}
-//			catch (RuntimeException e) {
-//				logger.debug("VS " + signalInfo + " not found");
-//				items.setData(null);
-//			}
+			try {
+				SignalRequest req = new SignalRequest(signalInfo);
+				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by FLOOR(TIMED/").append(aggInMSec).append(") order by TIMED");
+
+                items.setData(transformToSensorDataArray(query).getSensorData()[0].getData() );
+
+			}
+			catch (RuntimeException e) {
+				logger.debug("VS " + signalInfo + " not found");
+				items.setData(null);
+			}
 		toReturn.setGetAggregateScalarDataSeriesResult(items);
 		return toReturn;
 		
