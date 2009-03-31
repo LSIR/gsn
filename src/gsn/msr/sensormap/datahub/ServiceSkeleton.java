@@ -1,4 +1,3 @@
-
 /**
  * ServiceSkeleton.java
  *
@@ -24,6 +23,7 @@ import org.tempuri.ArrayOfDateTime;
 import org.tempuri.ArrayOfDouble;
 import org.tempuri.ArrayOfSensorData;
 import org.tempuri.GetAggregateScalarDataInBatchResponse;
+import org.tempuri.GetAggregateScalarDataResponse;
 import org.tempuri.GetAggregateScalarDataSeriesInBatchResponse;
 import org.tempuri.GetLatestScalarDataInBatchResponse;
 import org.tempuri.GetScalarDataSeriesInBatchResponse;
@@ -79,6 +79,49 @@ private static final transient Logger         logger          = Logger.getLogger
 		toReturn.setGetAggregateScalarDataSeriesInBatchResult(items);
 		return toReturn;
 	}
+	
+    public org.tempuri.GetAggregateScalarDataSeriesResponse GetAggregateScalarDataSeries(org.tempuri.GetAggregateScalarDataSeries input){
+    	org.tempuri.GetAggregateScalarDataSeriesResponse toReturn = new org.tempuri.GetAggregateScalarDataSeriesResponse();
+		
+		long aggInMSec = input.getAggregateIntervalInSeconds()*1000;
+		SensorData items = new SensorData () ;
+		String signalInfo =input.getSensorName(); 
+		
+//			try {
+//				SignalRequest req = new SignalRequest(signalInfo);
+//				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by FLOOR(TIMED/").append(aggInMSec).append(") order by TIMED");
+//				items.setData(transformToSensorDataArray(query).getSensorData() );
+//			}
+//			catch (RuntimeException e) {
+//				logger.debug("VS " + signalInfo + " not found");
+//				items.setData(null);
+//			}
+		toReturn.setGetAggregateScalarDataSeriesResult(items);
+		return toReturn;
+		
+    }
+    
+    public org.tempuri.GetAggregateScalarDataResponse GetAggregateScalarData(org.tempuri.GetAggregateScalarData input){
+    	GetAggregateScalarDataResponse toReturn = new GetAggregateScalarDataResponse();
+		
+//		long aggInMSec = input.getAggregateIntervalInSeconds()*1000;
+//		SensorData items = new SensorData () ;
+//		String signalInfo =input.getSensorName(); 
+//		
+//			try {
+//				SignalRequest req = new SignalRequest(signalInfo);
+//				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by FLOOR(TIMED/").append(aggInMSec).append(") order by TIMED");
+//				items.setData(transformToSensorDataArray(query).getSensorData() );
+//			}
+//			catch (RuntimeException e) {
+//				logger.debug("VS " + signalInfo + " not found");
+//				items.setData(null);
+//			}
+//		toReturn.setGetAggregateScalarDataResult(items);
+		return toReturn;
+	
+    }
+
 
 	public org.tempuri.GetLatestScalarDataInBatchResponse GetLatestScalarDataInBatch(org.tempuri.GetLatestScalarDataInBatch input) {
 		org.tempuri.GetLatestScalarDataInBatchResponse toReturn = new GetLatestScalarDataInBatchResponse();
@@ -203,6 +246,7 @@ private static final transient Logger         logger          = Logger.getLogger
 		}catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 		}
+		
 		return toReturn;
 	}
 
@@ -379,20 +423,6 @@ private static final transient Logger         logger          = Logger.getLogger
          
     
          
-        /**
-         * Auto generated method signature
-         * Gets the aggregate data published by a sensor within a specified time window
-                                     * @param getAggregateScalarData
-         */
-        
-                 public org.tempuri.GetAggregateScalarDataResponse GetAggregateScalarData
-                  (
-                  org.tempuri.GetAggregateScalarData getAggregateScalarData
-                  )
-            {
-                //TODO : fill this with the necessary business logic
-                throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetAggregateScalarData");
-        }
      
          
         /**
@@ -525,20 +555,7 @@ private static final transient Logger         logger          = Logger.getLogger
         }
      
          
-        /**
-         * Auto generated method signature
-         * Gets the series of aggregate data published by a sensor within a specified time window
-                                     * @param getAggregateScalarDataSeries
-         */
-        
-                 public org.tempuri.GetAggregateScalarDataSeriesResponse GetAggregateScalarDataSeries
-                  (
-                  org.tempuri.GetAggregateScalarDataSeries getAggregateScalarDataSeries
-                  )
-            {
-                //TODO : fill this with the necessary business logic
-                throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetAggregateScalarDataSeries");
-        }
+          
      
     }
     
