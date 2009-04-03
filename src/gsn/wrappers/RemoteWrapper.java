@@ -36,7 +36,8 @@ public class RemoteWrapper extends AbstractWrapper {
 
 	private  XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
 
-	private String remote_contact_point, local_contact_point;
+	private String remote_contact_point, local_contact_point, username, password;
+    boolean requiresAuthentication= false;
 
 	public boolean initialize (  ) {
 		/**
@@ -46,6 +47,20 @@ public class RemoteWrapper extends AbstractWrapper {
 		AddressBean addressBean =getActiveAddressBean ( );
 
 		this.remoteVSName = addressBean.getPredicateValue ( "name" );
+
+        // needed for remote hosts with http authentication
+
+        this.username = addressBean.getPredicateValue( "username" );
+        this.password = addressBean.getPredicateValue( "password" );
+
+        if ((this.username!=null) && (this.password!=null)) {
+            this.requiresAuthentication = true;
+            logger.warn(this.requiresAuthentication);
+            if (logger.isDebugEnabled())
+                logger.debug("Remote host requires authentication");
+        }
+        ////////////////////
+
 		if ( this.remoteVSName == null ) {
 			logger.warn ( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
 			return false;
@@ -74,6 +89,10 @@ public class RemoteWrapper extends AbstractWrapper {
 		remote_contact_point = remote_contact_point.trim();
 		try {
 			config.setServerURL ( new URL (remote_contact_point) );
+            if (this.requiresAuthentication) {
+                config.setBasicUserName(this.username);
+                config.setBasicPassword(this.password);
+            }
 			client.setConfig ( config );
 		} catch ( MalformedURLException e1 ) {
 			logger.warn ( "Remote Wrapper initialization failed : "+e1.getMessage ( ) , e1 );
