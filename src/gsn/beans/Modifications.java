@@ -344,6 +344,20 @@ public final class Modifications {
 
 		String remoteVSName;
 		remoteVSName = addressBean.getPredicateValue ( "name" );
+
+        // needed for remote hosts with http authentication
+        boolean requiresAuthentication= false;
+        String username = addressBean.getPredicateValue( "username" );
+        String password = addressBean.getPredicateValue( "password" );
+
+        if ((username!=null) && (password!=null)) {
+            requiresAuthentication = true;
+            //logger.warn(this.requiresAuthentication);
+            if (logger.isDebugEnabled())
+                logger.debug("Remote host requires authentication");
+        }
+        ////////////////////
+
 		if ( remoteVSName == null ) {
 			logger.warn ( "The \"NAME\" paramter of the AddressBean which corresponds to the remote Virtual Sensor is missing" );
 			return false;
@@ -372,6 +386,10 @@ public final class Modifications {
 
 		try {
 			config.setServerURL ( new URL ( remote_contact_point) );
+            if (requiresAuthentication) {
+                config.setBasicUserName(username);
+                config.setBasicPassword(password);
+            }
 			client.setConfig ( config );
 		} catch ( MalformedURLException e1 ) {
 			logger.warn ( "Remote Wrapper initialization failed : "+e1.getMessage ( ) , e1 );
