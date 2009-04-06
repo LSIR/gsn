@@ -43,11 +43,29 @@ public class GSNNotification extends NotificationRequest {
 	private XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 
 	private String url;
+    private boolean wrapperRequiresLocalAuthentication;
+    private String wrapper_username;
+    private String wrapper_password;
 
-	public GSNNotification(String url, String virtualSensorName, String query, int notificationCode) {
-		this.originalQuery = query;
+	public GSNNotification(String url, String virtualSensorName, String query, int notificationCode,
+     boolean wrapperRequiresLocalAuthentication, String wrapper_username, String wrapper_password ) {
+
+        logger.warn("Calling GSNNotification with parameters: url="+url
+                  +" virtualSensorName= "+virtualSensorName
+                  +" query="+query
+                  +" notificationCode="+notificationCode
+                  +" wrapper requires authentication"+ wrapperRequiresLocalAuthentication
+                  +" wrapper's username"+ wrapper_username
+                  +" wrapper's password"+ wrapper_password);
+
+        this.originalQuery = query;
 		this.url = url; //"http://" + remoteHost + ":" + remotePort + "/gsn-handler";
 		this.prespectiveVirtualSensor = virtualSensorName;
+
+        this.wrapperRequiresLocalAuthentication = wrapperRequiresLocalAuthentication;
+        this.wrapper_username = wrapper_username;
+        this.wrapper_password = wrapper_password;
+
 		TreeMap<CharSequence,CharSequence> rewritingInfo = new TreeMap<CharSequence,CharSequence>(new CaseInsensitiveComparator());
 		rewritingInfo.put("wrapper", virtualSensorName);
 		if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
@@ -60,12 +78,19 @@ public class GSNNotification extends NotificationRequest {
 		this.notificationCode = notificationCode;
 		try {
 			config.setServerURL(new URL(url));
-			client.setConfig(config);
+
+            // if authentication is needed on wrapper's side
+            if (this.wrapperRequiresLocalAuthentication)  {
+                config.setBasicUserName(this.wrapper_username);
+                config.setBasicPassword(this.wrapper_password);
+            }
+
+            client.setConfig(config);
 		} catch (MalformedURLException e1) {
 			logger.warn("GSNNotification initialization failed! : "
 					+ e1.getMessage(), e1);
 		}
-	}
+    }
 
 	/**
 	 * @return Returns the query.
@@ -178,7 +203,8 @@ public class GSNNotification extends NotificationRequest {
 		result.append("]");
 		return result.toString();
 	}
-	int query_removal_counter=0;
+
+    int query_removal_counter=0;
 	int query_removal_threshold=3;
 	private boolean notifyPeerAboutData(StreamElement data) {
 		boolean result = false;

@@ -60,25 +60,37 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
    * @param notificationCode.
    * @return
    */
-  public boolean registerQuery ( String url, String virtualSensorName , String query , int notificationCode ) {
-    if ( virtualSensorName == null || ( virtualSensorName = virtualSensorName.trim( ).toLowerCase( ) ).length( ) == 0 ) {
-      logger.warn( "Bad request received for Data_strctutes" );
-      return false;
-    }
-    VSensorConfig sensorConfig = Mappings.getVSensorConfig( virtualSensorName );
-    if ( sensorConfig == null ) {
-      logger.info( "Request received for unknown v-sensor : " + virtualSensorName );
-      return false;
-    }
+  public boolean registerQuery ( String url, String virtualSensorName , String query , int notificationCode, boolean wrapperRequiresLocalAuthentication, String wrapper_username, String wrapper_password ) {
 
-    GSNNotification interest = new GSNNotification( url , virtualSensorName , query , notificationCode );
-    if ( logger.isInfoEnabled( ) )
-      logger.info( new StringBuilder( ).append( "REGISTER REQUEST FOR " ).append( virtualSensorName ).append( " received from :" ).append( interest.getRemoteAddress( ) ).append( ":" ).append(
-          interest.getRemotePort( ) ).append( " under the code " ).append( notificationCode ).append( " With the query of *" ).append( query ).append( "*" )
-          .toString( ) );
-    Mappings.getContainer( ).addNotificationRequest( virtualSensorName , interest );
-    if ( logger.isDebugEnabled( ) ) logger.debug( "Respond sent to the requestee." );
-    return true;
+      if (logger.isDebugEnabled()) {
+          logger.debug("Calling gsn.registerQuery with parameters: url="+url
+                  +" virtualSensorName= "+virtualSensorName
+                  +" query="+query
+                  +" notificationCode="+notificationCode
+                  +" wrapper requires authentication"+ wrapperRequiresLocalAuthentication
+                  +" wrapper's username"+ wrapper_username
+                  +" wrapper's password"+ wrapper_password
+          );
+      }
+      if (virtualSensorName == null || (virtualSensorName = virtualSensorName.trim().toLowerCase()).length() == 0) {
+          logger.warn("Bad request received for Data_structures");
+          return false;
+      }
+      VSensorConfig sensorConfig = Mappings.getVSensorConfig(virtualSensorName);
+      if (sensorConfig == null) {
+          logger.info("Request received for unknown v-sensor : " + virtualSensorName);
+          return false;
+      }
+
+      GSNNotification interest = new GSNNotification(url, virtualSensorName, query, notificationCode,
+              wrapperRequiresLocalAuthentication, wrapper_username, wrapper_password);
+      if (logger.isInfoEnabled())
+          logger.info(new StringBuilder().append("REGISTER REQUEST FOR ").append(virtualSensorName).append(" received from :").append(interest.getRemoteAddress()).append(":").append(
+                  interest.getRemotePort()).append(" under the code ").append(notificationCode).append(" With the query of *").append(query).append("*")
+                  .toString());
+      Mappings.getContainer().addNotificationRequest(virtualSensorName, interest);
+      if (logger.isDebugEnabled()) logger.debug("Respond sent to the requestee.");
+      return true;
   }
 
   /**
@@ -131,7 +143,7 @@ public class GSNRequestHandler implements RequestInitializableRequestProcessor {
    */
   public void consumeRegisterQueryRequest ( String url , String virtualSensorName , String query , int notificationCode ) {
 	  url = url.replace("/127.0.0.1:", "/"+remoteIP+":");
-    GSNNotification interest = new GSNNotification( url, virtualSensorName , query , notificationCode );
+    GSNNotification interest = new GSNNotification( url, virtualSensorName , query , notificationCode,false, "", "" );
     if ( logger.isInfoEnabled( ) )
       logger.info( new StringBuilder( ).append( "REGISTER REQUEST FOR " ).append( virtualSensorName ).append( " received from :" ).append( interest.getRemoteAddress( ) ).append( ":" ).append(
           interest.getRemotePort( ) ).append( " under the code " ).append( notificationCode ).append( " With the query of *" ).append( query ).append( "*" )

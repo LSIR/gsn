@@ -11,9 +11,7 @@ import gsn.beans.StreamSource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
-import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -36,10 +34,11 @@ public class RemoteWrapper extends AbstractWrapper {
 
 	private  XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl ( );
 
-	private String remote_contact_point, local_contact_point, username, password;
-    boolean requiresAuthentication= false;
+	private String remote_contact_point, local_contact_point, username, password, local_username, local_password;
+    boolean requiresRemoteAuthentication = false;
+    boolean requiresLocalAuthentication = false;
 
-	public boolean initialize (  ) {
+    public boolean initialize (  ) {
 		/**
 		 * First looks for URL parameter, if it is there it will be used otherwise
 		 * looks for host and port parameters.
@@ -48,16 +47,35 @@ public class RemoteWrapper extends AbstractWrapper {
 
 		this.remoteVSName = addressBean.getPredicateValue ( "name" );
 
+        logger.warn("REMOTE WRAPPER INIT for vsensor: "+this.remoteVSName);
+
         // needed for remote hosts with http authentication
 
         this.username = addressBean.getPredicateValue( "username" );
         this.password = addressBean.getPredicateValue( "password" );
 
         if ((this.username!=null) && (this.password!=null)) {
-            this.requiresAuthentication = true;
-            logger.warn(this.requiresAuthentication);
+            this.requiresRemoteAuthentication = true;
+            logger.warn(this.requiresRemoteAuthentication);
             if (logger.isDebugEnabled())
                 logger.debug("Remote host requires authentication");
+        }
+        ////////////////////
+
+        // needed for local hosts with http authentication, to be transmied to wrappee
+
+        this.local_username = addressBean.getPredicateValue( "local-username" );
+        this.local_password = addressBean.getPredicateValue( "local-password" );
+
+   
+        if ((this.local_username != null) && (this.local_password != null)) {
+            this.requiresLocalAuthentication = true;
+            logger.warn(this.requiresLocalAuthentication);
+            if (logger.isDebugEnabled())
+                logger.debug("Local host requires authentication");
+        } else {
+            this.local_username=""; // in order not to transmit null through xml-rpc
+            this.local_password="";
         }
         ////////////////////
 
@@ -89,7 +107,7 @@ public class RemoteWrapper extends AbstractWrapper {
 		remote_contact_point = remote_contact_point.trim();
 		try {
 			config.setServerURL ( new URL (remote_contact_point) );
-            if (this.requiresAuthentication) {
+            if (this.requiresRemoteAuthentication) {
                 config.setBasicUserName(this.username);
                 config.setBasicPassword(this.password);
             }
@@ -98,10 +116,12 @@ public class RemoteWrapper extends AbstractWrapper {
 			logger.warn ( "Remote Wrapper initialization failed : "+e1.getMessage ( ) , e1 );
 		}
 		this.strcture = askForStrcture ( );
-		if ( this.strcture == null ) {
-			logger.warn ( "The initialization of the ** virtual sensor failed due to *askForStrcture* failure." );
-			return false;
-		}
+        if (this.strcture == null) {
+            logger.warn("The initialization of the ** virtual sensor failed due to *askForStrcture* failure.");
+            return false;
+        } else {
+            logger.warn("The initialization of the ** virtual sensor succeeded after call to *askForStrcture*.");
+        }
 		Mappings.getContainer ( ).addRemoteStreamSource ( getDBAlias ( ) , this );
 		setUsingRemoteTimestamp(true);
 		return true;
@@ -129,6 +149,7 @@ public class RemoteWrapper extends AbstractWrapper {
 		for (int i=0;i<result.length;i++){
 			Object values [] = (Object[]) result[i];
 			toReturn[i]= new DataField (values[0].toString (),values[1].toString (),"");
+            logger.warn("askForStructure "+i+" "+ values[0].toString ()+" "+values[1].toString ());
 		}
 		return toReturn;
 	}
@@ -138,9 +159,26 @@ public class RemoteWrapper extends AbstractWrapper {
 	private void refreshRemotelyRegisteredQuery ( ) throws XmlRpcException {
 		int notificationCode = getDBAlias ( );
 		String query = new StringBuilder("select * from ").append(remoteVSName).toString();
-		Object [ ] params = new Object [ ] {local_contact_point,remoteVSName,query.toString( ), notificationCode};
+        //TODO: adding local_username, local_password
+		Object [ ] params;
+        params = new Object [ ] {local_contact_point,remoteVSName,query.toString( ), notificationCode, requiresLocalAuthentication, local_username, local_password};
+
+        //TODO: debug ony, cleanup
+        logger.warn ( new StringBuilder ( ).append ( "Wants to send message to : " )
+                    .append ( remote_contact_point).append("--").append (remoteVSName)
+                    .append ( " with the query ->" ).append ( query ).append ( "<-" )
+                    .append (" requires local authentication: ").append(requiresLocalAuthentication)
+                    .append (" user:").append(local_username)
+                    .append (" password:").append(local_password).toString ( ));
+        //TODO: end cleanup
+
 		if ( logger.isDebugEnabled ( ) )
-			logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " ).append ( remote_contact_point).append("--").append (remoteVSName).append ( " with the query ->" ).append ( query ).append ( "<-" ).toString ( ) );
+			logger.debug ( new StringBuilder ( ).append ( "Wants to send message to : " )
+                    .append ( remote_contact_point).append("--").append (remoteVSName)
+                    .append ( " with the query ->" ).append ( query ).append ( "<-" )
+                    .append (" requires local authentication: ").append(requiresLocalAuthentication)
+                    .append (" user:").append(local_username)
+                    .append (" password:").append(local_password).toString ( ));
 		Boolean bool = (Boolean) client.execute ("gsn.registerQuery", params);
 		if (bool==false) {
 			logger.warn ( new StringBuilder ( ).append ( "Query Registeration for the remote virtual sensor : ").append (remoteVSName).append (" failed.").toString ( ) );
