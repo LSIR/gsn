@@ -2,6 +2,10 @@ package gsn.beans;
 
 import org.apache.log4j.Logger;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.text.ParseException;
+
 public class VSensorMonitorConfig {
 
     private String SEPARATOR = "@";
@@ -15,7 +19,7 @@ public class VSensorMonitorConfig {
     protected String username;
     protected String password;
 
-    private transient final Logger logger = Logger.getLogger( VSensorMonitorConfig.class );
+    private transient final Logger logger = Logger.getLogger(VSensorMonitorConfig.class);
 
     public VSensorMonitorConfig(String name, String host, int port, long timeout, String path, boolean needspassword, String username, String password) {
         this.name = name;
@@ -109,29 +113,28 @@ public class VSensorMonitorConfig {
         return ms2dhms(timeout);
     }
 
-    public int hashCode(){
-		if(name != null){
-			return name.hashCode();
-		}
-		else{
-			return super.hashCode();
-		}
-	}
+    public int hashCode() {
+        if (name != null) {
+            return name.hashCode();
+        } else {
+            return super.hashCode();
+        }
+    }
 
     public String toString() {
         if (this.needspassword)
-            return name+SEPARATOR+getTimeoutAsString()+SEPARATOR+"http://"+host+":"+port+path+SEPARATOR+username+":"+password;
+            return name + SEPARATOR + getTimeoutAsString() + SEPARATOR + "http://" + host + ":" + port + path + SEPARATOR + username + ":" + password;
         else
-            return name+SEPARATOR+getTimeoutAsString()+SEPARATOR+"http://"+host+":"+port+path;
+            return name + SEPARATOR + getTimeoutAsString() + SEPARATOR + "http://" + host + ":" + port + path;
     }
 
-    public boolean equals(Object obj){
-		if (obj instanceof VSensorMonitorConfig) {
-			VSensorMonitorConfig vSensorMonitorConfig = (VSensorMonitorConfig) obj;
-			return name.equals(vSensorMonitorConfig.getName());
-		}
-		return false;
-	}
+    public boolean equals(Object obj) {
+        if (obj instanceof VSensorMonitorConfig) {
+            VSensorMonitorConfig vSensorMonitorConfig = (VSensorMonitorConfig) obj;
+            return name.equals(vSensorMonitorConfig.getName());
+        }
+        return false;
+    }
 
     public static long timeOutFromString(String s) {
         return dhms2ms(s);
@@ -143,24 +146,24 @@ public class VSensorMonitorConfig {
     public static String ms2dhms(long l) {
         StringBuilder sb = new StringBuilder();
         long d, h, m, s, ms;
-        
+
         ms = l % 1000L;
-        l = l /1000L;
+        l = l / 1000L;
         s = l % 60L;
         l = l / 60L;
         m = l % 60L;
-        l = l/60L;
+        l = l / 60L;
         h = l % 24L;
-        d = l /24L;
-        if (d>0L)
+        d = l / 24L;
+        if (d > 0L)
             sb.append(d).append("d ");
-        if (h>0L)
+        if (h > 0L)
             sb.append(h).append("h ");
-        if (m>0L)
+        if (m > 0L)
             sb.append(m).append("m ");
-        if (s>0L)
+        if (s > 0L)
             sb.append(s).append("s ");
-        if (ms>0L)
+        if (ms > 0L)
             sb.append(ms);
         return sb.toString();
     }
@@ -169,48 +172,75 @@ public class VSensorMonitorConfig {
     *  with (days, hours, minutes, seconds, msecs)
     * to msecs
     */
-    public static long dhms2ms(String str){
+    public static long dhms2ms(String str) {
         int index;
-        long d=0L;
-        long h=0L;
-        long m=0L;
-        long s=0L;
-        long ms=0L;
+        long d = 0L;
+        long h = 0L;
+        long m = 0L;
+        long s = 0L;
+        long ms = 0L;
         StringBuilder sb = new StringBuilder(str.toLowerCase());
 
         // days
         index = sb.indexOf("d");
-        if (index>0) {
-            d = Long.parseLong(sb.substring(0,index));
-            sb.delete(0,index+1); // removes ####d
+        if (index > 0) {
+            d = Long.parseLong(sb.substring(0, index));
+            sb.delete(0, index + 1); // removes ####d
         }
 
         // hours
         index = sb.indexOf("h");
-        if (index>0) {
-            h = Long.parseLong(sb.substring(0,index));
-            sb.delete(0,index+1); // removes ####h
+        if (index > 0) {
+            h = Long.parseLong(sb.substring(0, index));
+            sb.delete(0, index + 1); // removes ####h
         }
 
         // minutes
         index = sb.indexOf("m");
-        if (index>0) {
-            m = Long.parseLong(sb.substring(0,index));
-            sb.delete(0,index+1); // removes ####m
+        if (index > 0) {
+            m = Long.parseLong(sb.substring(0, index));
+            sb.delete(0, index + 1); // removes ####m
         }
 
         // seconds
         index = sb.indexOf("s");
-        if (index>0) {
-            s = Long.parseLong(sb.substring(0,index));
-            sb.delete(0,index+1); // removes ####s
+        if (index > 0) {
+            s = Long.parseLong(sb.substring(0, index));
+            sb.delete(0, index + 1); // removes ####s
         }
 
         //millisecs
-        if (sb.length()>0) {
+        if (sb.length() > 0) {
             ms = Long.parseLong(sb.toString());
         }
 
-        return (d*86400L+h*3600L+m*60L+s)*1000L+ms;
+        return (d * 86400L + h * 3600L + m * 60L + s) * 1000L + ms;
     }
+
+    /*
+   * converts a date and times in the format 06/02/2008 23:50:00 +0100
+   * into a Unix timestamp
+   * */
+    public static long datetime2timestamp(String s) throws ParseException {
+
+        return  new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(s).getTime();
+
+        /*
+        Pattern datePattern = Pattern.compile("(\\d{2})/(\\d{2})/(\\d{4}) (\\d{2}):(\\d{2}):(\\d{2})");
+        Matcher dateMatcher = datePattern.matcher(s);
+        if (dateMatcher.find()) {
+            System.out.println("Month is: " + dateMatcher.group(2));
+            System.out.println("Day is:   " + dateMatcher.group(1));
+            System.out.println("Year is:  " + dateMatcher.group(3));
+
+            System.out.println("Hour is:  " + dateMatcher.group(4));
+            System.out.println("Minute is:  " + dateMatcher.group(5));
+            System.out.println("Second is:  " + dateMatcher.group(6));
+        */
+    }
+
+
+
 }
+
+

@@ -6,6 +6,8 @@ import java.util.*;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.StringReader;
+import java.text.ParseException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -21,9 +23,14 @@ import org.apache.http.impl.client.BasicResponseHandler;
 
 import org.apache.commons.mail.SimpleEmail;
 import org.apache.commons.mail.EmailException;
+import org.w3c.dom.*;
+import org.xml.sax.InputSource;
 
 import gsn.beans.VSensorMonitorConfig;
 import gsn.beans.GSNSessionAddress;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 
 /*
 * VSMonitor
@@ -45,14 +52,14 @@ import gsn.beans.GSNSessionAddress;
 * */
 public class VSMonitor {
 
-    public static final String CONFIG_SEPARATOR ="@";
+    public static final String CONFIG_SEPARATOR = "@";
     public static final String DEFAULT_GSN_LOG4J_PROPERTIES = "conf/log4j.properties";
 
-    private static transient final Logger logger = Logger.getLogger( VSMonitor.class );
+    private static transient final Logger logger = Logger.getLogger(VSMonitor.class);
 
     public static HashMap<String, VSensorMonitorConfig> monitoredSensors = new HashMap<String, VSensorMonitorConfig>();
     public static HashMap<String, Long> sensorsUpdateDelay = new HashMap<String, Long>();
-    public static List<GSNSessionAddress> listOfSessions = new Vector<GSNSessionAddress>();
+    public static List<GSNSessionAddress> listOfGSNSessions = new Vector<GSNSessionAddress>();
     public static List<String> listOfMails = new Vector<String>();
 
     public static StringBuilder errorsBuffer = new StringBuilder();
@@ -74,9 +81,9 @@ public class VSMonitor {
     * lists
     * - monitoredSensors: list of monitored sensors (including expected update delay)
     * - sensorsUpdateDelay: list of sensors update delays (initialized to -1)
-    * - listOfSessions: list of GSN sessions
+    * - listOfGSNSessions: list of GSN sessions
     * */
-    public static void initFromFile(String fileName){
+    public static void initFromFile(String fileName) {
         long timeout;
         String vsensorname;
         String host;
@@ -85,21 +92,21 @@ public class VSMonitor {
         boolean needspassword;
         String password;
         String username;
-        logger.warn("Trying to initialize VSMonitor from file <"+ fileName + ">");
-        try{
+        logger.warn("Trying to initialize VSMonitor from file <" + fileName + ">");
+        try {
             BufferedReader in = new BufferedReader(new FileReader(fileName));
             String str;
             while ((str = in.readLine()) != null) {
                 // ignore comments starting with #
-                if (str.trim().indexOf("#")==0) {
-                   continue;
+                if (str.trim().indexOf("#") == 0) {
+                    continue;
                 }
-                if (str.trim().indexOf("@gmail-username")>=0) {
+                if (str.trim().indexOf("@gmail-username") >= 0) {
                     gmail_username = str.trim().split(" ")[1];
                     //System.out.println("GMAIL Username: "+ gmail_username);
                     continue;
                 }
-                if (str.trim().indexOf("@gmail-password")>=0) {
+                if (str.trim().indexOf("@gmail-password") >= 0) {
                     gmail_password = str.trim().split(" ")[1];
                     //System.out.println("GMAIL password: "+ gmail_password);
                     continue;
@@ -107,28 +114,26 @@ public class VSMonitor {
                 //@gmail-username
                 //@gmail-password
                 String[] s = str.trim().split(CONFIG_SEPARATOR);
-                if (s.length<3) {
-                    logger.warn("Malformed monitoring line in file <"+ fileName + "> : "+str);
+                if (s.length < 3) {
+                    logger.warn("Malformed monitoring line in file <" + fileName + "> : " + str);
                     //System.out.println("Malformed monitoring line in file <"+ fileName + "> : "+str);
-                }
-                else {
+                } else {
                     //System.out.println(s.length+" Elements found");
 
                     vsensorname = s[0].trim();
-                    timeout= VSensorMonitorConfig.timeOutFromString(s[1].trim());
+                    timeout = VSensorMonitorConfig.timeOutFromString(s[1].trim());
                     //System.out.println("\""+s[2]+"\"");
                     String[] host_port_path = s[2].split(":");
                     //System.out.println(host_port_path.length);
-                    if (host_port_path.length!=2) {
-                        logger.warn("Malformed monitoring line in file <"+ fileName + "> : "+str);
+                    if (host_port_path.length != 2) {
+                        logger.warn("Malformed monitoring line in file <" + fileName + "> : " + str);
                         //System.out.println("Malformed monitoring line in file <"+ fileName + "> : "+str);
                         continue;
-                    }
-                    else {
+                    } else {
                         //System.out.println("["+host_port_path[0].trim()+"]["+host_port_path[1].trim()+"]");
                         host = host_port_path[0].trim();
-                        int j= host_port_path[1].trim().indexOf("/");
-                        String portStr = host_port_path[1].trim().substring(0,j);
+                        int j = host_port_path[1].trim().indexOf("/");
+                        String portStr = host_port_path[1].trim().substring(0, j);
                         //System.out.println("Port:"+portStr);
                         path = host_port_path[1].trim().substring(j);
                         //System.out.println("Path:"+"\""+path+"\"");
@@ -138,25 +143,23 @@ public class VSMonitor {
                             //System.out.println(">>"+port);
                         }
                         catch (NumberFormatException e) {
-                            logger.warn("Malformed monitoring line in file <"+ fileName + "> : "+str);
+                            logger.warn("Malformed monitoring line in file <" + fileName + "> : " + str);
                             //System.out.println("Malformed monitoring line in file <"+ fileName + "> : "+str);
                             continue;
                         }
 
-                        if (s.length>3) { // needs password
+                        if (s.length > 3) { // needs password
                             needspassword = true;
                             String[] username_password = s[3].split(":");
-                            if (username_password.length>1){
+                            if (username_password.length > 1) {
                                 username = username_password[0].trim();
                                 password = username_password[1].trim();
-                            }
-                            else {
-                                logger.warn("Malformed monitoring line in file <"+ fileName + "> : "+str);
+                            } else {
+                                logger.warn("Malformed monitoring line in file <" + fileName + "> : " + str);
                                 //System.out.println("Malformed monitoring line in file <"+ fileName + "> : "+str);
                                 continue;
                             }
-                        }
-                        else{
+                        } else {
                             needspassword = false;
                             username = "";
                             password = "";
@@ -164,7 +167,7 @@ public class VSMonitor {
                         // DEBUG INFO
                         //System.out.println("TIMEOUT: "+timeout);
                         //System.out.println("Creating object with : "+vsensorname+" "+host+" "+port+" "+timeout+" "+path+" "+needspassword+" "+username+" "+password);
-                        monitoredSensors.put(vsensorname, new VSensorMonitorConfig(vsensorname, host,port,timeout, path, needspassword,username,password));
+                        monitoredSensors.put(vsensorname, new VSensorMonitorConfig(vsensorname, host, port, timeout, path, needspassword, username, password));
 
                         // DEBUG INFO
                         //System.out.println("RESULT: "+ monitoredSensors.get(vsensorname).toString());
@@ -172,23 +175,22 @@ public class VSMonitor {
                         sensorsUpdateDelay.put(vsensorname, new Long(-1)); // not yes initialized, to be initialized when web server is queried
 
 
+                        GSNSessionAddress gsnSessionAdress = new GSNSessionAddress(host, path, port, needspassword, username, password); //TODO: insitialize it
 
-                        GSNSessionAddress gsnSessionAdress = new GSNSessionAddress(host,path, port, needspassword,username, password); //TODO: insitialize it
-
-                        if (!listOfSessions.contains(gsnSessionAdress)){
-                             listOfSessions.add(gsnSessionAdress);
+                        if (!listOfGSNSessions.contains(gsnSessionAdress)) {
+                            listOfGSNSessions.add(gsnSessionAdress);
                         }
 
 
                         //System.out.println("VS: "+"\""+vsensorname+"\""+" timeout: " + Long.toString(timeout));
                         //System.out.println("Added: "+ monitoredSensors.get(vsensorname));
-                        logger.warn("Added:"+ monitoredSensors.get(vsensorname));
+                        logger.warn("Added:" + monitoredSensors.get(vsensorname));
                     }
                 }
             }
         }
         catch (IOException e) {
-            logger.warn("IO Exception while trying to open file <"+ fileName + "> "+e);
+            logger.warn("IO Exception while trying to open file <" + fileName + "> " + e);
         }
     }
 
@@ -196,81 +198,52 @@ public class VSMonitor {
     /*
     * Queries a GSN session for status
     * Uses Http Get method to read xml status (usually under /gsn)
-    * parses the xml and initializes global variables :
+    * and initializes global variables :
     * - errorsBuffer
     * - noErrrorsBuffer
     * - nHostsDown
-    * - nSensorsLate
     * */
     public static void readStatus(GSNSessionAddress gsnSessionAddress) throws Exception {
 
         String httpAddress = gsnSessionAddress.getURL();
 
-        DefaultHttpClient   client = new DefaultHttpClient ();
+        DefaultHttpClient client = new DefaultHttpClient();
 
 
         if (gsnSessionAddress.needsPassword()) {
             client.getCredentialsProvider().setCredentials(
-                        new AuthScope(gsnSessionAddress.getHost(), gsnSessionAddress.getPort()/*, GSN_REALM*/),
-                        new UsernamePasswordCredentials(gsnSessionAddress.getUsername(), gsnSessionAddress.getPassword())
-                    );
+                    new AuthScope(gsnSessionAddress.getHost(), gsnSessionAddress.getPort()/*, GSN_REALM*/),
+                    new UsernamePasswordCredentials(gsnSessionAddress.getUsername(), gsnSessionAddress.getPassword())
+            );
         }
 
-        //System.out.println("Querying server: "+httpAddress);
-        logger.warn("Querying server: "+httpAddress);
-        HttpGet  get = new HttpGet (httpAddress);
+        logger.warn("Querying server: " + httpAddress);
+        HttpGet get = new HttpGet(httpAddress);
 
         try {
             // execute the GET, getting string directly
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String responseBody = client.execute( get, responseHandler );
+            String responseBody = client.execute(get, responseHandler);
 
-            String myResponse = responseBody;
-            String[] lines = myResponse.split("\n");
-            //System.out.println("Length of list:"+lines.length);
-            for (int lineNumber=0;lineNumber<lines.length;lineNumber++){
-                 if (lines[lineNumber].toLowerCase().indexOf("virtual-sensor name")>0) {
-                     //System.out.println(lineNumber+" : "+lines[lineNumber]);
-                     String sensorName = parseSensorName(lines[lineNumber]);
+            parseXML(responseBody);
 
-                     if (sensorsUpdateDelay.containsKey(sensorName)) {
-                        long lastUpdate = parseLastModified(lines[lineNumber]);
-                        long lastUpdateDelay =GregorianCalendar.getInstance().getTimeInMillis()- lastUpdate;
-                        //System.out.println(sensorName+" last updated ("+VSensorMonitorConfig.ms2dhms(lastUpdateDelay) +" ago) "+new Date(lastUpdate).toString());
-                        sensorsUpdateDelay.put(sensorName, lastUpdateDelay);
-
-                        if (sensorsUpdateDelay.get(sensorName)>monitoredSensors.get(sensorName).getTimeout()) {
-
-                            //System.out.println("Sensor "+sensorName+" delayed: "+sensorsUpdateDelay.get(sensorName)+" >> "+monitoredSensors.get(sensorName).getTimeout());
-                            warningsBuffer.append(sensorName+"@"+gsnSessionAddress.getURL()+" not updated for "+VSensorMonitorConfig.ms2dhms(sensorsUpdateDelay.get(sensorName))
-                                            + " (expected <"+VSensorMonitorConfig.ms2dhms(monitoredSensors.get(sensorName).getTimeout())
-                                            +")\n");
-                            nSensorsLate++;
-                        }
-                        else {
-                              //System.out.println("Sensor "+sensorName+" in time");
-                              infosBuffer.append(sensorName+"@"+gsnSessionAddress.getURL()+" (on time)\n");
-                        }
-                     }
-                 }
-            }
         }
         catch (HttpResponseException e) {
-             errorsBuffer.append ( "HTTP 401 Authentication Needed for : " )
-                         .append ( httpAddress )
-                         .append ( "\n" );
+            errorsBuffer.append("HTTP 401 Authentication Needed for : ")
+                    .append(httpAddress)
+                    .append("\n");
         }
 
         catch (UnknownHostException e) {
-            errorsBuffer.append("Unknown host: " )
-                         .append ( httpAddress )
-                         .append ( "\n" );
+            errorsBuffer.append("Unknown host: ")
+                    .append(httpAddress)
+                    .append("\n");
             nHostsDown++;
         }
         catch (ConnectException e) {
-            errorsBuffer.append("Connection refused to host: " )
-                         .append ( httpAddress )
-                         .append ( "\n" );
+            errorsBuffer.append("Connection refused to host: ")
+                    .append(httpAddress)
+                    .append("\n");
             nHostsDown++;
         }
         finally {
@@ -280,22 +253,29 @@ public class VSMonitor {
     }
 
     /*
-    * returns last modification time of a sensor from a string (a line in the xml file)
+    * Checks update times
     * */
-    private static long parseLastModified(String s){
-        int start = s.indexOf("last-modified=\"")+15;
-        int end = s.indexOf("\" description");
+    public static void checkUpdateTimes() {
+        for (int i = 0; i < sensorsUpdateDelay.size(); i++) {
+            Long lastUpdated = (Long) sensorsUpdateDelay.values().toArray()[i];
+            String sensorName = (String) sensorsUpdateDelay.keySet().toArray()[i];
+            if (lastUpdated.longValue() > monitoredSensors.get(sensorName).getTimeout()) {
 
-        return Long.parseLong(s.substring(start,end));
-    }
-
-    /*
-    * returns sensor name of a sensor from a string (a line in the xml file)
-    * */
-    private static String parseSensorName(String s){
-        int start = s.indexOf("name=\"")+6;
-        int end = s.indexOf("\" last-modified");
-        return s.substring(start,end);
+                warningsBuffer.append(sensorName)
+                        .append("@")
+                        .append(monitoredSensors.get(sensorName).getHost())
+                        .append(" not updated for ")
+                        .append(VSensorMonitorConfig.ms2dhms(sensorsUpdateDelay.get(sensorName)))
+                        .append(" (expected <")
+                        .append(VSensorMonitorConfig.ms2dhms(monitoredSensors.get(sensorName).getTimeout()))
+                        .append(")\n");
+                nSensorsLate++;
+            } else {
+                infosBuffer.append(sensorName).append("@")
+                        .append(monitoredSensors.get(sensorName).getHost())
+                        .append(" (on time)\n");
+            }
+        }
     }
 
     /*
@@ -320,31 +300,91 @@ public class VSMonitor {
         email.getMailSession().getProperties().put("mail.smtp.socketFactory.fallback", "false");
         email.getMailSession().getProperties().put("mail.smtp.starttls.enable", "true");
 
-        for (String s: listOfMails) {
+        for (String s : listOfMails) {
             email.addTo(s);
         }
-          email.setFrom(gmail_username +"@gmail.com", gmail_username);
+        email.setFrom(gmail_username + "@gmail.com", gmail_username);
 
-          email.setSubject("[GSN Alert] "+summary.toString());
-          email.setMsg(report.toString());
-          email.send();
+        email.setSubject("[GSN Alert] " + summary.toString());
+        email.setMsg(report.toString());
+        email.send();
 
     }
 
-    public static void main(String[] args)  {
+    /*
+    * parses the XML string
+    * and initializes sensorsUpdateDelay
+    * with update delays for relevant sensors
+    * */
+    public static void parseXML(String s) {
+        try {
+
+            DocumentBuilderFactory documentBuilderFactory =
+                    DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            InputSource inputSource = new InputSource();
+            inputSource.setCharacterStream(new StringReader(s));
+
+            Document document = documentBuilder.parse(inputSource);
+            NodeList nodes = document.getElementsByTagName("virtual-sensor");
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Element element = (Element) nodes.item(i);
+
+                String sensor_name = element.getAttribute("name");
+
+
+                if (!sensorsUpdateDelay.containsKey(sensor_name))
+                    continue;                         // skip sensors that are not monitored
+
+                logger.warn("Sensor: " + sensor_name);
+
+                NodeList listOfField = element.getElementsByTagName("field");
+                for (int j = 0; j < listOfField.getLength(); j++) {
+                    Element line = (Element) listOfField.item(j);
+
+                    if (line.getAttribute("name").indexOf("timed") >= 0) {
+                        String last_updated_as_string = line.getTextContent();
+
+                        try {
+                            Long last_updated_as_Long = GregorianCalendar.getInstance().getTimeInMillis() - VSensorMonitorConfig.datetime2timestamp(last_updated_as_string);
+                            logger.warn(new StringBuilder(last_updated_as_string)
+                                    .append(" => ")
+                                    .append(last_updated_as_Long.toString()
+                                    ).toString());
+
+                            sensorsUpdateDelay.put(sensor_name, last_updated_as_Long);
+                        }
+                        catch (ParseException e) {
+                            errorsBuffer.append("Last update time for sensor ")
+                                    .append(sensor_name)
+                                    .append(" cannot be read. Error while parsing > ")
+                                    .append(last_updated_as_string)
+                                    .append(" <\n");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            logger.warn("Exception while parsing XML\n");
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
 
         PropertyConfigurator.configure(DEFAULT_GSN_LOG4J_PROPERTIES);
         String configFileName;
 
-        if (args.length>=2) {
+        if (args.length >= 2) {
             configFileName = args[0];
-            System.out.println("Using config file: "+ configFileName);
-            for (int i=1;i<args.length;i++){
-                 System.out.println("Adding e-mail: "+args[i]);
-                 listOfMails.add(args[i]);
+            System.out.println("Using config file: " + configFileName);
+            for (int i = 1; i < args.length; i++) {
+                System.out.println("Adding e-mail: " + args[i]);
+                listOfMails.add(args[i]);
             }
-        }
-        else {
+        } else {
             System.out.println("Usage java -jar VSMonitor.jar <config_file> <list_of_mails>");
             System.out.println("e.g.  java -jar VSMonitor.jar conf/monitoring.cfg user@gmail.com admin@gmail.com");
             return;
@@ -352,29 +392,32 @@ public class VSMonitor {
 
         initFromFile(configFileName);
 
-        Iterator iter = listOfSessions.iterator();
-        while (iter.hasNext()){
+        // for each monitored GSN server
+        Iterator iter = listOfGSNSessions.iterator();
+        while (iter.hasNext()) {
 
-                try{
-                    readStatus((GSNSessionAddress)iter.next());
-                }
-                catch( Exception e){
-                    System.out.println("Exception: "+ e.getMessage());
-                    e.printStackTrace();
-                }
+            try {
+                readStatus((GSNSessionAddress) iter.next());
             }
+            catch (Exception e) {
+                System.out.println("Exception: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        checkUpdateTimes();
 
         // Generate Report
-        report  . append("\n[ERROR]\n" + errorsBuffer)
-                . append("\n[WARNING]\n" + warningsBuffer)
-                . append("\n[INFO]\n" + infosBuffer);
+        report.append("\n[ERROR]\n" + errorsBuffer)
+                .append("\n[WARNING]\n" + warningsBuffer)
+                .append("\n[INFO]\n" + infosBuffer);
 
-        if ((nSensorsLate>0)||(nHostsDown>0)){
+        if ((nSensorsLate > 0) || (nHostsDown > 0)) {
             summary.append("WARNING: ");
-            if (nHostsDown>0)
-                summary.append(nHostsDown+ " host(s) down. ");
-            if (nSensorsLate>0)
-                summary.append(nSensorsLate+ " sensor(s) not updated. ");
+            if (nHostsDown > 0)
+                summary.append(nHostsDown + " host(s) down. ");
+            if (nSensorsLate > 0)
+                summary.append(nSensorsLate + " sensor(s) not updated. ");
 
             // Send e-mail only if there are errors
             try {
@@ -388,5 +431,7 @@ public class VSMonitor {
         // Showing report
         System.out.println(summary);
         System.out.println(report);
+
     }
+
 }
