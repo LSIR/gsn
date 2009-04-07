@@ -3,10 +3,7 @@ package gsn.utils;
 import java.net.UnknownHostException;
 import java.net.ConnectException;
 import java.util.*;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.StringReader;
+import java.io.*;
 import java.text.ParseException;
 
 import org.apache.log4j.Logger;
@@ -350,8 +347,8 @@ public class VSMonitor {
                             Long last_updated_as_Long = GregorianCalendar.getInstance().getTimeInMillis() - VSensorMonitorConfig.datetime2timestamp(last_updated_as_string);
                             logger.warn(new StringBuilder(last_updated_as_string)
                                     .append(" => ")
-                                    .append(last_updated_as_Long.toString()
-                                    ).toString());
+                                    .append(VSensorMonitorConfig.ms2dhms(last_updated_as_Long))
+                                    .toString());
 
                             sensorsUpdateDelay.put(sensor_name, last_updated_as_Long);
                         }
@@ -371,6 +368,19 @@ public class VSMonitor {
             e.printStackTrace();
         }
     }
+    /*
+    * Prints the stack trace of the exception to a string.
+    * */
+    public static String getStackTrace(Throwable t)
+    {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter, true);
+        t.printStackTrace(printWriter);
+        printWriter.flush();
+        stringWriter.flush();
+        return stringWriter.toString();
+    }
+
 
     public static void main(String[] args) {
 
@@ -400,8 +410,8 @@ public class VSMonitor {
                 readStatus((GSNSessionAddress) iter.next());
             }
             catch (Exception e) {
-                System.out.println("Exception: " + e.getMessage());
-                e.printStackTrace();
+                logger.error("Exception: " + e.getMessage());
+                logger.error("StackTrace:\n"+getStackTrace(e));
             }
         }
 
@@ -423,8 +433,8 @@ public class VSMonitor {
             try {
                 sendMail();
             } catch (EmailException e) {
-                logger.warn("Cannot send e-mail.");
-                e.printStackTrace();
+                logger.error("Cannot send e-mail. " + e.getMessage());
+                logger.error("StackTrace:\n"+getStackTrace(e));
             }
         }
 
@@ -432,6 +442,8 @@ public class VSMonitor {
         System.out.println(summary);
         System.out.println(report);
 
+        // Logging report
+        logger.warn(summary);
+        logger.warn(report);
     }
-
 }
