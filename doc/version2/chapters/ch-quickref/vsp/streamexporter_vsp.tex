@@ -1,0 +1,67 @@
+\subsection{gsn.vsensor.StreamExporterVirtualSensor \vsp \label{streamexporter:vsp}}
+
+This virtual sensor exports the data it receives to the database of your choice.
+This can be interesting when debugging your GSN configuration or to easily
+back up critical data on an independent machine. It can also be used to log
+unexpected events for later off-line, manual analysis. It can receive any number
+of input streams. Each one will be saved into a separate table named after the
+input stream.
+
+It requires a JDBC URL and a user name and password so that it knows
+where is the database server and how to authenticate. This virtual sensor inserts
+the data into the specified table. If the table doesn't exist, GSN first create ths
+table and if the table exists, GSN first verifies the structure of the table with
+the structure of the produced stream elements. If the structure matches, GSN
+starts inserting data into the table otherwise it stops with an error message to
+inform the user about the uncompatible strucutres.
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|C|C|J|}%
+	\hline
+		\multicolumn{5}{|c|}{\textbf{Parameters for gsn.vsensor.StreamExportVirtualSensor \vsp}} \\
+	\hline
+	\hline
+		\textbf{Parameter Name} &
+		\textbf{Type} &
+		\textbf{Mandatory} &
+		\textbf{Default} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		url &
+		String &	
+		Yes &
+		None &
+		A JDBC url that specifies how to connect to the database server. \\
+	\hline
+		user &
+		String &	
+		Yes &
+		None &	
+		The username for authentication with the database server. \\
+	\hline
+		password &
+		String &	
+		Yes &
+		None &	
+		the password for authentication with the database server. \\
+	\hline
+		driver &
+		String &	
+		Yes &
+		None &	
+		The name of the database driver. \\
+	\hline
+		table &
+		String &	
+		Yes &
+		None &	
+		The name of the table into which GSN will store the sensor data. \\
+	\hline
+	\end{tabulary}
+	}
+	\caption{Parameters for gsn.vsensor.EmailVirtualSensor \vsp}
+	\label{table:parameters_email_vsp}
+\end{table*}
