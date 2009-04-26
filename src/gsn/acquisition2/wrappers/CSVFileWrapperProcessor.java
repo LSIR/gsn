@@ -60,9 +60,13 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 		Serializable[] serialized = new Serializable[csvFormat.getFields().length];
 
 		String msg = (String) dataMessage.getData()[0];
+
+        // add support for empty fields, e.g. ,value,,,value => null, value, null, null, value
+        msg = empty2null(msg, Character.toString(parameters.getCsvSeparator()), Character.toString(parameters.getCsvQuoteChar()));
+
 		CSVReader csvReader = new CSVReader (new StringReader(msg), parameters.getCsvSeparator(), parameters.getCsvQuoteChar()) ;
 
-		logger.debug("message to be processed: " + msg + " with vsf format: " + csvFormat + " and csv reader: " + csvReader);
+        logger.warn("Message to be processed: " + msg );
 
 		String[] nextLine = null;
 		try {
@@ -79,7 +83,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 				
 				for (int j = 0 ; j < nextLine.length ; j++) {
 
-					logger.debug("Next line to parse: " + nextLine[j] + " dataType: " + csvFormat.getFields()[j].getDataTypeID());
+					logger.debug("Next item to parse: " + nextLine[j] + " dataType: " + csvFormat.getFields()[j].getDataTypeID());
 
 					String tmp = null;
 					if(csvFormat.getFields()[j].getDataTypeID() == DataTypes.BIGINT){
@@ -115,11 +119,12 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 					if(csvFormat.getFields()[j].getDataTypeID() == DataTypes.DOUBLE){
 						try{
 
-							nextLine[j] = filterNAN(nextLine[j]);
+                            nextLine[j] = filterNAN(nextLine[j]);
 
-							Double d = nextLine[j] == null ? null : Double.valueOf(nextLine[j]);
-							if (d==null) { 
-								logger.error("invalide double format for "+nextLine[j]+" at timestamp "+time);
+                            Double d = nextLine[j] == null ? null : Double.valueOf(nextLine[j]);
+							if (d==null) {
+                                // no ! this is not an error, actually null is put on purpose
+								//logger.error("invalid double format for "+nextLine[j]+" at timestamp "+time);
 								serialized[j] = null;
 							} else serialized[j] = d.doubleValue();
 						}catch(NumberFormatException e){
@@ -136,7 +141,8 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 							Integer d = nextLine[j] == null ? null : Integer.valueOf(nextLine[j]);
 							if (d==null) { 
-								logger.error("invalide integer format for "+nextLine[j]+" at timestamp "+time);
+								// no ! this is not an error, actually null is put on purpose
+                                //logger.error("invalid integer format for "+nextLine[j]+" at timestamp "+time);
 								serialized[j] = null;
 							} else serialized[j] = d.intValue();
 						}catch(NumberFormatException e){
@@ -191,4 +197,32 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 		if (parameters.getCsvNotANumber().contains(value.toUpperCase())) value = null;
 		return value;
 	}
+
+    /*
+    * Transforms empty fields into null values
+    * e.g. ,value,,,value => "null", value, "null", "null", value
+    * */
+    public static String empty2null( String line, String separator, String quote) {
+
+        String newLine = line;
+        String NULL_STR = quote + "NULL" + quote;
+
+        newLine = newLine.replaceAll( "^" + separator, NULL_STR + separator );   // begin of line
+
+        newLine = newLine.replaceAll( separator + "$", separator + NULL_STR );  // end of line
+
+        while (newLine.contains( separator + separator ))  {
+            newLine = newLine.replaceAll( separator + separator, separator + NULL_STR + separator ); // middle
+        }
+
+        return newLine;
+    }
+
+    /*
+    * Transforms empty fields into null values
+    * e.g. ,value,,,value => "null", value, "null", "null", value
+    * */
+    public static String empty2null( String line) {
+        return empty2null(line, ",","\"");
+    }
 }
