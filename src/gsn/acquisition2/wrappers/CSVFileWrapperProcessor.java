@@ -66,7 +66,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 
 		CSVReader csvReader = new CSVReader (new StringReader(msg), parameters.getCsvSeparator(), parameters.getCsvQuoteChar()) ;
 
-        logger.warn("Message to be processed: " + msg );
+        logger.debug("Message to be processed: " + msg );
 
 		String[] nextLine = null;
 		try {
