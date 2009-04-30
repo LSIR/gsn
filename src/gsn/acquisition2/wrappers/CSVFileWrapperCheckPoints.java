@@ -15,13 +15,14 @@ import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Checksum;
 import org.apache.log4j.Logger;
+import gsn.acquisition2.SafeStorageDB;
 
 public class CSVFileWrapperCheckPoints{
 
 	private final transient Logger logger = Logger.getLogger( CSVFileWrapperCheckPoints.class );
 	
-	private static final String DB_URL = "jdbc:h2:csv_checkpoints.h2";
-		
+    private String dbUrl = null;
+
 	private Connection connection = null;
 	
 	private PreparedStatement psReadCheckpoint = null;
@@ -101,9 +102,14 @@ public class CSVFileWrapperCheckPoints{
 	}
 	
 	private void prepareConnectionAndTableIfNeeded () {
-		try {
+        try {
 			Class.forName("org.h2.Driver");
-			if (connection ==null || connection.isClosed()) connection = DriverManager.getConnection(DB_URL, "sa", "");
+
+            dbUrl = SafeStorageDB.getDBUrl("csv_checkpoints");
+
+            logger.warn("Connecting to : " + dbUrl);
+
+			if (connection ==null || connection.isClosed()) connection = DriverManager.getConnection(dbUrl, "sa", "");
 			// Create checkpoints table if not exists
 			connection.prepareStatement("create table if not exists checkpoints (pk bigint not null identity primary key, csvfilepathHash bigint not null, line bigint not null, checksum bigint not null)").executeUpdate();
 			//

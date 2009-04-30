@@ -6,23 +6,30 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
 public class SafeStorageDB {
-  
+
   public static transient Logger logger= Logger.getLogger ( SafeStorageDB.class );
-  
+
   private Connection connection;
-  
+
   private String dbUrl = null;
-  
+
+  private static final String SAFESTORAGE_PROPERTIES_FILE = "conf/safestorage.properties";
+  private static final String DEFAULT_SAFESTORAGE_PATH = "."; //by default db files are saved in GSN's default directory
+
   public SafeStorageDB(int safeStoragePort) throws ClassNotFoundException, SQLException {
     Class.forName("org.h2.Driver");
-    dbUrl = "jdbc:h2:storage" + safeStoragePort + ".h2";
+    dbUrl = getDBUrl(SAFESTORAGE_PROPERTIES_FILE, "storage" + safeStoragePort);
+    logger.warn("Connecting to : " + dbUrl);
     connection = getConnection();
   }
-  
+
   private void close(Connection c) {
     try {
       if (c!=null && !c.isClosed())
@@ -30,21 +37,21 @@ public class SafeStorageDB {
     }catch (Exception e) {
     }
   }
-  
+
   public Connection getConnection() throws SQLException {
     if (connection ==null || connection.isClosed())
      connection = DriverManager.getConnection(dbUrl, "sa", "");
     return connection;
   }
-  
-  
-  
+
+
+
   public void executeSQL(String string) throws SQLException {
     Statement stmt = connection.createStatement();
     stmt.execute(string);
     stmt.close();
   }
-  
+
   public String prepareTableIfNeeded(String requester) throws SQLException {
 	// requester like: ss_mem_vs/data/mem2
     final Statement stmt = connection.createStatement();
@@ -66,8 +73,8 @@ public class SafeStorageDB {
     stmt.close();
     return toReturn;
   }
-  
-  
+
+
   public void dropAllTables () {
 	  try {
 		// Works only with H2 DB
@@ -84,7 +91,7 @@ public class SafeStorageDB {
 		psTableList.close();
 	} catch (SQLException e) {
 		logger.error(e.getMessage());
-	} 
+	}
   }
 
 
@@ -93,4 +100,40 @@ public class SafeStorageDB {
     PreparedStatement ps = getConnection().prepareStatement(sqlCommand);
     return ps;
   }
+
+    /*
+    * Creates a well-formed h2 jdb url
+    * using the path given in properties file 
+    * and the database name
+    * */
+    public static String getDBUrl(String safe_storage_properties_file, String databaseName) {
+
+        Properties props = new Properties();
+        String dbPath = null;
+
+        try { //try to retrieve path to db files from properties file
+
+            props.load(new FileInputStream(safe_storage_properties_file));
+            dbPath = props.getProperty("path", DEFAULT_SAFESTORAGE_PATH);
+            if (dbPath.isEmpty())
+                dbPath = DEFAULT_SAFESTORAGE_PATH;
+            logger.warn("Path for safestorage db files: " + dbPath);
+        }
+        catch (IOException e) { //catch exception in case properties file does not exist
+            dbPath = DEFAULT_SAFESTORAGE_PATH;
+            logger.warn("Couldn't find safe storage properties file: " + safe_storage_properties_file + " , using defaults ");
+            logger.warn("Path for safestorage db files: " + dbPath);
+        }
+
+        return "jdbc:h2:" + dbPath + "/"+ databaseName + ".h2";
+
+    }
+
+    /*
+    * Creates a well-formed db url using the path given the database name
+    * and default properties files
+    * */
+    public static String getDBUrl(String databaseName) {
+          return getDBUrl(SAFESTORAGE_PROPERTIES_FILE, databaseName);
+    }
 }
