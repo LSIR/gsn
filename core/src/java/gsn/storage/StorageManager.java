@@ -242,7 +242,7 @@ public class StorageManager {
     public void shutdown() throws SQLException {
         if (StorageManager.isH2()) {
             getConnection().createStatement().execute("SHUTDOWN");
-            logger.warn("Closing the database server (for HSqlDB) [done].");
+            logger.warn("Closing the database server (for H2) [done].");
         }
         logger.warn("Closing the connection pool [done].");
     }
@@ -1204,8 +1204,8 @@ public class StorageManager {
 
         pool.setJdbcUrl(databaseURL);
         pool.setProperties(dbConnectionProperties);
-        pool.setMaxPoolSize(5);
-        pool.setInitialPoolSize(5);
+        pool.setMaxPoolSize(50);
+        pool.setInitialPoolSize(50);
 
         logger.info("Initializing the access to the database server ...");
 

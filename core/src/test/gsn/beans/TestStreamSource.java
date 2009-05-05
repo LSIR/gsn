@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
@@ -75,21 +74,21 @@ public class TestStreamSource {
         StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10m");
         assertTrue(ss.validate());
         assertFalse(ss.isStorageCountBased());
-        assertEquals(ss.getParsedStorageSize(), 10 * 60 * 1000);
+        assertEquals(ss.getParsedWindowSize(), 10 * 60 * 1000);
         ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  m").setInputStream(is);
         assertFalse(ss.isStorageCountBased());
-        assertEquals(ss.getParsedStorageSize(), 10 * 60 * 1000);
+        assertEquals(ss.getParsedWindowSize(), 10 * 60 * 1000);
 
 
         ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  s").setInputStream(is);
         assertFalse(ss.isStorageCountBased());
-        assertEquals(ss.getParsedStorageSize(), 10 * 1000);
+        assertEquals(ss.getParsedWindowSize(), 10 * 1000);
         assertFalse(ss.isStorageCountBased());
 
 
         ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("2 h").setInputStream(is);
         assertFalse(ss.isStorageCountBased());
-        assertEquals(ss.getParsedStorageSize(), 2 * 60 * 60 * 1000);
+        assertEquals(ss.getParsedWindowSize(), 2 * 60 * 60 * 1000);
     }
 
     @Test(expected = GSNRuntimeException.class)

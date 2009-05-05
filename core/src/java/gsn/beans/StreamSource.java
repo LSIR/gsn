@@ -1,7 +1,7 @@
 package gsn.beans;
 
 import gsn.Main;
-import gsn.beans.windowing.QueryRewriter;
+import gsn.beans.windowing.QueryHandler;
 import gsn.beans.windowing.WindowType;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
@@ -47,6 +47,8 @@ public class StreamSource implements Serializable {
 
     private transient Date endDate;
 
+    private boolean triggerSliding = true;
+
     public static final AddressBean[] EMPTY_ADDRESS_BEAN = new AddressBean[]{};
 
     private AddressBean addressing[] = EMPTY_ADDRESS_BEAN;
@@ -57,11 +59,18 @@ public class StreamSource implements Serializable {
 
     private AddressBean activeAddressBean; // To be used by the gui
 
-    private transient QueryRewriter queryRewriter;
+    private transient QueryHandler queryHandler;
 
     public StreamSource() {
     }
 
+    public boolean isTriggerSliding(){
+        return triggerSliding;
+    }
+
+    public void setTriggerSliding(boolean triggerSliding){
+        this.triggerSliding = triggerSliding;
+    }
 
     public String getRawHistorySize() {
         return rawHistorySize;
@@ -185,7 +194,7 @@ public class StreamSource implements Serializable {
     public static final int DEFAULT_SLIDE_VALUE = 1;
     public static final WindowType DEFAULT_WINDOW_TYPE = WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE;
 
-    private transient int parsedStorageSize = STORAGE_SIZE_NOT_SET;
+    private transient int parsedWindowSize = STORAGE_SIZE_NOT_SET;
 
     private transient int parsedSlideValue = DEFAULT_SLIDE_VALUE;
 
@@ -226,7 +235,7 @@ public class StreamSource implements Serializable {
             final int sIndex = this.rawHistorySize.indexOf("s");
             if (mIndex < 0 && hIndex < 0 && sIndex < 0) {
                 try {
-                    this.parsedStorageSize = Integer.parseInt(this.rawHistorySize);
+                    this.parsedWindowSize = Integer.parseInt(this.rawHistorySize);
                     this.isStorageCountBased = true;
                     windowingType = WindowType.TUPLE_BASED;
                 } catch (final NumberFormatException e) {
@@ -238,11 +247,11 @@ public class StreamSource implements Serializable {
                 try {
                     final StringBuilder shs = new StringBuilder(this.rawHistorySize);
                     if (mIndex >= 0 && mIndex == shs.length() - 1)
-                        this.parsedStorageSize = Integer.parseInt(shs.deleteCharAt(mIndex).toString()) * minute;
+                        this.parsedWindowSize = Integer.parseInt(shs.deleteCharAt(mIndex).toString()) * minute;
                     else if (hIndex >= 0 && hIndex == shs.length() - 1)
-                        this.parsedStorageSize = Integer.parseInt(shs.deleteCharAt(hIndex).toString()) * hour;
+                        this.parsedWindowSize = Integer.parseInt(shs.deleteCharAt(hIndex).toString()) * hour;
                     else if (sIndex >= 0 && sIndex == shs.length() - 1)
-                        this.parsedStorageSize = Integer.parseInt(shs.deleteCharAt(sIndex).toString()) * second;
+                        this.parsedWindowSize = Integer.parseInt(shs.deleteCharAt(sIndex).toString()) * second;
                     else Integer.parseInt("");
                     this.isStorageCountBased = false;
                     windowingType = WindowType.TIME_BASED;
@@ -311,9 +320,9 @@ public class StreamSource implements Serializable {
         return this.isStorageCountBased;
     }
 
-    public int getParsedStorageSize() {
+    public int getParsedWindowSize() {
         validate();
-        return this.parsedStorageSize;
+        return this.parsedWindowSize;
     }
 
     public WindowType getWindowingType() {
@@ -327,23 +336,30 @@ public class StreamSource implements Serializable {
     }
 
     public boolean windowSlided() throws SQLException {
-        if (logger.isDebugEnabled())
+        if(!triggerSliding){
+            if (logger.isDebugEnabled()){
+                logger.debug(new StringBuilder().append("Non triggering data avialble in the stream *").append(getAlias()).append("*").toString());
+            }
+            return true;    
+        }
+
+         if (logger.isDebugEnabled())
             logger.debug(new StringBuilder().append("Data avialble in the stream *").append(getAlias()).append("*").toString());
         return inputStream.executeQuery(getUIDStr());
 
     }
 
-    public void setQueryRewriter(QueryRewriter rewriter) {
-        this.queryRewriter = rewriter;
+    public void setQueryHandler(QueryHandler handler) {
+        this.queryHandler = handler;
     }
 
-    public QueryRewriter getQueryRewriter() {
-        return queryRewriter;
+    public QueryHandler getQueryHandler() {
+        return queryHandler;
     }
 
     public StringBuilder rewrite(String query) {
-        if (queryRewriter != null) {
-            return queryRewriter.rewrite(query);
+        if (queryHandler != null) {
+            return queryHandler.rewrite(query);
         } else {
             //TODO ??
             return null;
@@ -365,11 +381,6 @@ public class StreamSource implements Serializable {
         return getUIDStr().hashCode();
     }
 
-//  public Boolean dataAvailable ( ) throws SQLException {
-//    if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data avialble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
-//    return inputStream.dataAvailable( getUIDStr() );
-//  }
-
     private StringBuilder cachedSqlQuery = null;
 
     /**
@@ -389,7 +400,7 @@ public class StreamSource implements Serializable {
         if (validate() == false)
             throw new GSNRuntimeException("Validation of this object the stream source failed, please check the logs.");
         CharSequence wrapperAlias = getWrapper().getDBAliasInStr();
-        if (samplingRate == 0 || (isStorageCountBased && getParsedStorageSize() == 0))
+        if (samplingRate == 0 || (isStorageCountBased && getParsedWindowSize() == 0))
             return cachedSqlQuery = new StringBuilder("select * from ").append(wrapperAlias).append(" where 1=0");
         TreeMap<CharSequence, CharSequence> rewritingMapping = new TreeMap<CharSequence, CharSequence>(new CaseInsensitiveComparator());
         rewritingMapping.put("wrapper", wrapperAlias);
@@ -403,9 +414,9 @@ public class StreamSource implements Serializable {
 
         if (isStorageCountBased()) {
             if (StorageManager.isH2() || StorageManager.isMysqlDB())
-                toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(getParsedStorageSize() - 1).append(" )");
+                toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(getParsedWindowSize() - 1).append(" )");
             else if (StorageManager.isSqlServer())
-                toReturn.append("timed >= (select min(timed) from (select TOP ").append(getParsedStorageSize()).append(" timed from (select distinct(timed) from ").append(wrapperAlias).append(") as x  order by timed desc ) as y )");
+                toReturn.append("timed >= (select min(timed) from (select TOP ").append(getParsedWindowSize()).append(" timed from (select distinct(timed) from ").append(wrapperAlias).append(") as x  order by timed desc ) as y )");
         } else { //time based
             toReturn.append("(wrapper.timed >");
             if (StorageManager.isH2())
@@ -417,7 +428,7 @@ public class StreamSource implements Serializable {
                 // NOTE2 : There is no time in the date for the epoch, maybe doesn't match with the current system time, needs checking.
                 toReturn.append(" (convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 )");
             }
-            toReturn.append(" - ").append(getParsedStorageSize()).append(" ) ) ");
+            toReturn.append(" - ").append(getParsedWindowSize()).append(" ) ) ");
         }
         if (samplingRate != 1)
             toReturn.append(" and ( mod( timed , 100)< ").append(samplingRate * 100).append(")");

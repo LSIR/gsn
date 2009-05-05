@@ -51,6 +51,7 @@
 	         <value  name="slide" field="rawSlideValue" style="attribute" usage="optional" />
 	         <value  name="disconnect-buffer-size" field="disconnectedBufferSize" style="attribute" usage="optional" />
 	         <value  name="sampling-rate" field="samplingRate" style="attribute" usage="optional" />
+             <value  name="no-slide" field="triggerSliding" style="attribute" usage="optional" />
                 <collection field="addressing">
                       <structure name="address" type="gsn.beans.AddressBean">
                          <value name="wrapper"  field="wrapper" style="attribute"/>

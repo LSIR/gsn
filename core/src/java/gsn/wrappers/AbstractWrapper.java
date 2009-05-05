@@ -80,8 +80,9 @@ public abstract class AbstractWrapper extends Thread {
         listeners.remove(ss);
 //		getStorageManager( ).executeDropView( ss.getUIDStr() );
         for (SlidingHandler slidingHandler : slidingHandlers.values()) {
-            if (slidingHandler.isInterestedIn(ss))
+            if (slidingHandler.isInterestedIn(ss)) {
                 slidingHandler.removeStreamSource(ss);
+            }
         }
         if (listeners.size() == 0)
             releaseResources();

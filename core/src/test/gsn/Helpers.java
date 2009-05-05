@@ -1,4 +1,4 @@
-package gsn.utils;
+package gsn;
 
 import java.util.Properties;
 

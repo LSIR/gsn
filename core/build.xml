@@ -43,6 +43,7 @@
             <fileset dir="${jars}" includes="**/*"/>
         </delete>
     </target>
+    
     <target name="setup" depends="init">
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${test-build.dir}"/>
@@ -97,7 +98,9 @@
         </java>
     </target>
 
-    <target name="init-coverage" depends="build">
+    <target name="init-reports" depends="build">
+        <delete dir="${reports}/junit"/>
+        <mkdir dir="${reports}/junit"/>
         <delete dir="${instrumented.dir}"/>
         <mkdir dir="${instrumented.dir}"/>
         <delete dir="${reports}/cobertura"/>
@@ -111,9 +114,8 @@
         </cobertura-instrument>
     </target>
 
-    <target name="test" depends="init-coverage, bind" description="Runs JUnit tests">
-        <junit printsummary="true" fork="true" haltonerror="true"
-               errorproperty="errorOccuredInTests" haltonfailure="true"
+    <target name="test" depends="init-reports, bind" description="Runs JUnit tests">
+        <junit printsummary="true" fork="true" haltonerror="true" haltonfailure="false"
                failureproperty="tests.failed" showoutput="true">
 
             <formatter type="xml" usefile="true"/>
@@ -132,16 +134,18 @@
                     <exclude name="**/TestDataPropogation.java"/>
                     <exclude name="**/TestVSensorLoader.java"/>
                     <exclude name="**/TestStreamSource.java"/>
-                    <exclude name="**/TestWindowing1.java"/>
-                    <exclude name="**/TestWindowing2.java"/>
+                    <!--<exclude name="**/TestTupleBasedSliding.java"/>-->
+                    <exclude name="**/TestSlidingWindowDefinition.java"/>
+                    <exclude name="**/TestLocalTimeBasedSliding.java"/>
                     <exclude name="**/TestDataPacket.java"/>
                     <exclude name="**/TestSQLUtils.java"/>
                     <exclude name="**/TestStreamElement.java"/>
                     <exclude name="**/TestValidityTools.java"/>
-                    <!--<exclude name="**/TestGraph.java"/>-->
+                    <exclude name="**/TestGraph.java"/>
                     <exclude name="**/TestContainerImpl.java"/>
                     <exclude name="**/TestStorageManager.java"/>
                     <exclude name="**/TestEmpty.java"/>
+                    <exclude name="**/TestUtils.java"/>
                     <!--<exclude name="**/TestAbstractWrapper.java"/>-->
                 </fileset>
                 <!--         	<fileset dir="${build.dir}" includes="**/TestStreamSource.*,**/TestAbstractWrapper.*,**/TestVSensorLoader.*" />-->
@@ -152,7 +156,7 @@
             <fileset dir="${reports}/junit">
                 <include name="TEST-*.xml"/>
             </fileset>
-            <report format="frames" todir="${reports}/junit"/>
+            <report todir="${reports}/junit"/>
         </junitreport>
 
         <cobertura-report format="html" destdir="${reports}/cobertura" srcdir="${src.dir}"/>

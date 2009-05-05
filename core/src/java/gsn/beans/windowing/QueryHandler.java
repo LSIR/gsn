@@ -1,15 +1,16 @@
 package gsn.beans.windowing;
 
+import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 
-public abstract class QueryRewriter {
+public abstract class QueryHandler {
     protected StreamSource streamSource;
 
-    public QueryRewriter() {
+    public QueryHandler() {
 
     }
 
-    public QueryRewriter(StreamSource streamSource) {
+    public QueryHandler(StreamSource streamSource) {
         setStreamSource(streamSource);
     }
 
@@ -19,7 +20,7 @@ public abstract class QueryRewriter {
 
     public abstract void finilize();
 
-    public abstract boolean dataAvailable(long timestamp);
+    public abstract boolean dataAvailable(StreamElement streamElement);
 
     public StreamSource getStreamSource() {
         return streamSource;
@@ -27,7 +28,7 @@ public abstract class QueryRewriter {
 
     public void setStreamSource(StreamSource streamSource) {
         this.streamSource = streamSource;
-        streamSource.setQueryRewriter(this);
+        streamSource.setQueryHandler(this);
     }
 
 
