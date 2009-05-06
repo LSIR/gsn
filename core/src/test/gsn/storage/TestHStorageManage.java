@@ -47,7 +47,7 @@ public class TestHStorageManage {
                         "    \n" +
                         "</hibernate-mapping>";
 
-        System.out.println(entityMapping);
+        
         SessionFactory sessionFactory = HStorageManager.getSessionFactory(dialect, driverClass, url, username, password, entityMapping);
         Session session = sessionFactory.getCurrentSession();
 

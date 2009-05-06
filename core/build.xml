@@ -115,7 +115,7 @@
     </target>
 
     <target name="test" depends="init-reports, bind" description="Runs JUnit tests">
-        <junit printsummary="true" fork="true" haltonerror="true" haltonfailure="false"
+        <junit printsummary="true" fork="true" haltonerror="false" haltonfailure="false"
                failureproperty="tests.failed" showoutput="true">
 
             <formatter type="xml" usefile="true"/>
