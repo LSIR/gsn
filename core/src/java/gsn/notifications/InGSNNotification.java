@@ -20,12 +20,8 @@ public class InGSNNotification extends NotificationRequest {
     public InGSNNotification(InVMPipeWrapper listener, String remoteVSName) {
         this.inVMPipeWrapper = listener;
         this.remoteVSName = remoteVSName;
-        if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
-            query = new StringBuilder("select * from ").append(remoteVSName).append(" order by timed desc limit 1 offset 0");
-        }
-        if (StorageManager.isSqlServer()) {
-            query = new StringBuilder("select top 1 * from ").append(remoteVSName);
-        }
+        query = new StringBuilder("select * from ").append(remoteVSName).append(" order by timed desc limit 1 offset 0");
+
     }
 
     private int notificationCode = Main.tableNameGenerator();

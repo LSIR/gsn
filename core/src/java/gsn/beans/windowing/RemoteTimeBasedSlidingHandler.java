@@ -157,5 +157,5 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
     public boolean isInterestedIn(StreamSource streamSource) {
         return WindowType.isTimeBased(streamSource.getWindowingType());
     }
- 
+
 }

@@ -113,7 +113,7 @@ public abstract class AbstractVirtualSensor {
             for (int j = 0; j < se.getFieldNames().length; j++)
                 if (outputStructure[i].getName().equalsIgnoreCase(se.getFieldNames()[j])) {
                     if (outputStructure[i].getDataTypeID() != se.getFieldTypes()[j]) {
-                        if (outputStructure[i].getDataTypeID() == DataTypes.BIGINT && (se.getFieldTypes()[j] == DataTypes.INTEGER || se.getFieldTypes()[j] == DataTypes.SMALLINT || se.getFieldTypes()[j] == DataTypes.TINYINT))
+                        if (outputStructure[i].getDataTypeID() == DataTypes.NUMERIC && (se.getFieldTypes()[j] == DataTypes.NUMERIC))
                             continue;
                         logger.warn("Validation problem for output field >" + outputStructure[i].getName() + ", The field type declared as >" + DataTypes.TYPE_NAMES[se.getFieldTypes()[j]] + "< while in VSD it is defined as >" + DataTypes.TYPE_NAMES[outputStructure[i].getDataTypeID()]);
                         return false;
@@ -176,5 +176,5 @@ public abstract class AbstractVirtualSensor {
      *                        is actually the real data which is produced by the input stream and should
      *                        be delivered to the virtual sensor for possible processing.
      */
-	public abstract void dataAvailable ( String inputStreamName , StreamElement streamElement );
+    public abstract void dataAvailable(String inputStreamName , StreamElement streamElement );
 }

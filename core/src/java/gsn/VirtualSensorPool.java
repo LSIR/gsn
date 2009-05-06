@@ -135,22 +135,13 @@ public class VirtualSensorPool {
         String virtualSensorName = config.getName();
         StringBuilder query = null;
         if (config.isStorageCountBased()) {
-            if (StorageManager.isH2()) {
-                query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed not in ( select ").append(
-                        virtualSensorName).append(".timed from ").append(virtualSensorName).append(" order by ").append(virtualSensorName).append(".timed DESC  LIMIT  ").append(
-                        config.getParsedStorageSize()).append(" offset 0 )");
-            } else if (StorageManager.isMysqlDB()) {
-                query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed <= ( SELECT * FROM ( SELECT timed FROM ")
-                        .append(virtualSensorName).append(" group by ").append(virtualSensorName).append(".timed ORDER BY ").append(virtualSensorName).append(".timed DESC LIMIT 1 offset ")
-                        .append(config.getParsedStorageSize()).append("  ) AS TMP)");
-            } else if (StorageManager.isSqlServer()) {
-                query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed < (select min(timed) from (select top ").append(config.getParsedStorageSize()).append(
-                        " * ").append(" from ").append(virtualSensorName).append(" order by ").append(virtualSensorName).append(".timed DESC ) as x ) ");
-            } else if (StorageManager.isOracle()) {
-                query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where timed <= ( SELECT * FROM ( SELECT timed FROM ")
-                        .append(virtualSensorName).append(" group by timed ORDER BY timed DESC) where rownum = ")
-                        .append(config.getParsedStorageSize() + 1).append(" )");
-            }
+            // TODO Here we should use Hibernate's SQL
+            query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed not in ( select ").append(
+                    virtualSensorName).append(".timed from ").append(virtualSensorName).append(" order by ").append(virtualSensorName).append(".timed DESC  LIMIT  ").append(
+                    config.getParsedStorageSize()).append(" offset 0 )"); //H2
+//           query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed <= ( SELECT * FROM ( SELECT timed FROM ")
+//                        .append(virtualSensorName).append(" group by ").append(virtualSensorName).append(".timed ORDER BY ").append(virtualSensorName).append(".timed DESC LIMIT 1 offset ")
+//                        .append(config.getParsedStorageSize()).append("  ) AS TMP)"); // MYSQL
         } else {
             long timedToRemove = -1;
             ResultSet rs = null;
@@ -169,6 +160,6 @@ public class VirtualSensorPool {
         if (logger.isDebugEnabled())
             this.logger.debug(new StringBuilder().append("Enforcing the limit size on the VS table by : ").append(query).toString());
         return query;
-	}
+    }
 }
 

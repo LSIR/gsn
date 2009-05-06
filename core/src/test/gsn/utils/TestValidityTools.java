@@ -20,7 +20,7 @@ public class TestValidityTools {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         DriverManager.registerDriver(new org.h2.Driver());
-        sm.init("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.");
+        sm.init("jdbc:h2:mem:.");
     }
 
     @AfterClass

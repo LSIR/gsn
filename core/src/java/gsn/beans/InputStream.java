@@ -254,5 +254,5 @@ public class InputStream implements Serializable {
         }
         rewrittenSQL = new StringBuilder(query);
         queryCached = true;
-	}
+    }
 }

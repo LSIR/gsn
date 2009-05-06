@@ -53,7 +53,7 @@ public final class Main {
             logger.error(e.getMessage(), e);
             return;
         }
-        StorageManager.getInstance().init(containerConfig.getJdbcDriver(), containerConfig.getJdbcUsername(), containerConfig.getJdbcPassword(), containerConfig.getJdbcURL());
+        StorageManager.getInstance().init(containerConfig.getJdbcURL());
         if (logger.isInfoEnabled()) logger.info("The Container Configuration file loaded successfully.");
 
         final VSensorLoader vsloader = new VSensorLoader(DEFAULT_VIRTUAL_SENSOR_DIRECTORY);
@@ -262,8 +262,6 @@ public final class Main {
     }
 
     public static StringBuilder tableNameGeneratorInString(CharSequence tableName) {
-        if (tableName.charAt(0) == '_' && StorageManager.isOracle())
-            return new StringBuilder("\"").append(tableName).append("\"");
         return new StringBuilder(tableName);
     }
 
@@ -273,5 +271,5 @@ public final class Main {
             sb.append("_");
         sb.append(Math.abs(code));
         return tableNameGeneratorInString(sb);
-	}
+    }
 }

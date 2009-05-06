@@ -187,7 +187,7 @@ public class ValidityTools {
         for (int i = 1; i < sb.length(); i++)
             if (!Character.isJavaIdentifierPart(sb.charAt(i)) && (i == sb.length() - 1 && string.charAt(sb.length() - 1) != '\"'))
                 return false;
-		return true;
-	}
-	
+        return true;
+    }
+
 }

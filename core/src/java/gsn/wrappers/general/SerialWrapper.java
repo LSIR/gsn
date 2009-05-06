@@ -480,7 +480,7 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
     }
 
     public String getWrapperName() {
-		return "serial port wrapper rs-232";
-	}
+        return "serial port wrapper rs-232";
+    }
 
 }

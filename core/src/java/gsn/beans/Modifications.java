@@ -416,7 +416,7 @@ public final class Modifications {
     public static Graph<VSensorConfig> buildDependencyGraphFromIterator(Iterator<VSensorConfig> vsensorIterator) {
         Graph<VSensorConfig> graph = new Graph<VSensorConfig>();
         fillGraph(graph, vsensorIterator);
-		return graph;
-	}
+        return graph;
+    }
 
 }

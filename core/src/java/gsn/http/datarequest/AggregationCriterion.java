@@ -53,5 +53,5 @@ public class AggregationCriterion extends AbstractCriterion {
         if (timestamp < 60 * 60 * 1000) return (timestamp / (1000 * 60)) + " min";
         if (timestamp < 24 * 60 * 60 * 1000) return (timestamp / (1000 * 60 * 60)) + " h";
         return (timestamp / (24 * 1000 * 60 * 60)) + " day";
-	}
+    }
 }

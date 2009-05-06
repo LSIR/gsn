@@ -33,8 +33,7 @@ public class TestStreamSource {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         PropertyConfigurator.configure(Main.DEFAULT_GSN_LOG4J_PROPERTIES);
-        DriverManager.registerDriver(new org.h2.Driver());
-        StorageManager.getInstance().init("org.h2.Driver", "sa", "", "jdbc:h2:mem:.");
+        StorageManager.getInstance().init("jdbc:h2:mem:.");
 
     }
 
@@ -329,6 +328,6 @@ public class TestStreamSource {
                 System.out.print(se.getFieldNames()[i] + "=" + se.getData()[i] + " , ");
             }
             System.out.println("TimeStamp=" + se.getTimeStamp());
-		}
-	}
+        }
+    }
 }

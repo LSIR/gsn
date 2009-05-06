@@ -34,5 +34,5 @@ public class LimitCriterion extends AbstractCriterion {
 
     public String toString() {
         return "size: " + size + " offset: " + offset;
-	}
+    }
 }

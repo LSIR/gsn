@@ -489,9 +489,8 @@ public class VSensorConfig implements Serializable {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-		}
-	}
-
+        }
+    }
 
 
 }

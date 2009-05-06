@@ -6,28 +6,28 @@ import gsn.beans.StreamElement;
 
 public class MockWrapper extends AbstractWrapper {
 
-        @Override
-        public void finalize() {
+    @Override
+    public void finalize() {
 
-        }
+    }
 
-        @Override
-        public DataField[] getOutputFormat() {
-            return new DataField[]{};
-        }
+    @Override
+    public DataField[] getOutputFormat() {
+        return new DataField[]{};
+    }
 
-        @Override
-        public String getWrapperName() {
-            return "WrapperForTest1";
-        }
+    @Override
+    public String getWrapperName() {
+        return "WrapperForTest1";
+    }
 
-        @Override
-        public boolean initialize() {
-            return true;
-        }
+    @Override
+    public boolean initialize() {
+        return true;
+    }
 
-        @Override
-        public Boolean postStreamElement(StreamElement streamElement) {
-            return super.postStreamElement(streamElement);
-        }
+    @Override
+    public Boolean postStreamElement(StreamElement streamElement) {
+        return super.postStreamElement(streamElement);
+    }
 }

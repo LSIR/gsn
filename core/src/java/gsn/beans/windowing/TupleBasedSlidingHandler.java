@@ -162,5 +162,5 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
     public boolean isInterestedIn(StreamSource streamSource) {
         return WindowType.isTupleBased(streamSource.getWindowingType());
     }
-    
+
 }

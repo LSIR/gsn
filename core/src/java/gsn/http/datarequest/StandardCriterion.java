@@ -90,5 +90,7 @@ public class StandardCriterion extends AbstractCriterion {
         return this.critValue;
     }
 
-    public String getOperator()	{ return this.critOperator; }
+    public String getOperator() {
+        return this.critOperator;
+    }
 }

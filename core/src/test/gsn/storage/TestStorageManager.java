@@ -12,7 +12,8 @@ public class TestStorageManager {
 
     @Test
     public void testOracleRewrites() {
-        DATABASE db = StorageManager.DATABASE.ORACLE;
+        DATABASE db = StorageManager.DATABASE.H2;
+        // These tests are written for Oracle, has to be changed to H2.
         final String sampleQuery1 = "SELECT * FROM SYSTEM.HELP";
         String oracle = db.addLimit(sampleQuery1, 10, 0);
         assertEquals("SELECT * FROM SYSTEM.HELP WHERE ROWNUM <= 10", oracle.replace("  ", " "));

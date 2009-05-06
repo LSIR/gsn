@@ -24,8 +24,7 @@ public class TestAbstractWrapper {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        DriverManager.registerDriver(new org.h2.Driver());
-        StorageManager.getInstance().init("org.h2.Driver", "sa", "", "jdbc:h2:mem:gsn_mem_db");
+        StorageManager.getInstance().init("jdbc:h2:mem:gsn_mem_db");
 //		StorageManager.getInstance ( ).initialize ( "com.mysql.jdbc.Driver","root","" , "jdbc:mysql://localhost/gsn");
     }
 
@@ -86,6 +85,6 @@ public class TestAbstractWrapper {
 //    System.out.println(rs.getInt(1));
         assertTrue(rs.getInt(1) <= (AbstractWrapper.GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS * 2));
         wrapper.releaseResources();
-	}
+    }
 
 }

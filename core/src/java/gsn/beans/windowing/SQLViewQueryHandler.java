@@ -18,13 +18,11 @@ public class SQLViewQueryHandler extends QueryHandler {
     private static final transient Logger logger = Logger.getLogger(SQLViewQueryHandler.class);
     protected static StorageManager storageManager = StorageManager.getInstance();
     public static final CharSequence VIEW_HELPER_TABLE = Main.tableNameGeneratorInString("_SQL_VIEW_HELPER_".toLowerCase());
-    private static DataField[] viewHelperFields = new DataField[]{new DataField("u_id", "varchar(17)")};
+    private static DataField[] viewHelperFields = new DataField[]{new DataField("u_id", "string")};
 
     static {
         try {
-            if (storageManager.tableExists(VIEW_HELPER_TABLE)) {
-                storageManager.executeDropTable(VIEW_HELPER_TABLE);
-            }
+            storageManager.executeDropTable(VIEW_HELPER_TABLE);
             storageManager.executeCreateTable(VIEW_HELPER_TABLE, viewHelperFields, false);
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);

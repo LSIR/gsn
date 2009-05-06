@@ -75,39 +75,17 @@ public final class StreamElement implements Serializable {
         for (int i = 0; i < data.length; i++) {
             if (data[i] == null) continue;
             switch (fieldTypes[i]) {
-                case DataTypes.TINYINT:
-                    if (!(data[i] instanceof Byte))
-                        throw new IllegalArgumentException("The newly constructed Stream Element is not consistant. The " + (i + 1) + "th field is defined as " + DataTypes.TYPE_NAMES[fieldTypes[i]]
-                                + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
-                    break;
-                case DataTypes.SMALLINT:
-                    if (!(data[i] instanceof Short))
-                        throw new IllegalArgumentException("The newly constructed Stream Element is not consistant. The " + (i + 1) + "th field is defined as " + DataTypes.TYPE_NAMES[fieldTypes[i]]
-                                + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
-                    break;
-                case DataTypes.BIGINT:
-                    if (!(data[i] instanceof Long)) {
-                        throw new IllegalArgumentException("The newly constructed Stream Element is not consistant. The " + (i + 1) + "th field is defined as "
-                                + DataTypes.TYPE_NAMES[fieldTypes[i]] + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
-                    }
-                    break;
-                case DataTypes.CHAR:
-                case DataTypes.VARCHAR:
+                case DataTypes.STRING:
                     if (!(data[i] instanceof String)) {
                         throw new IllegalArgumentException("The newly constructed Stream Element is not consistant. The " + (i + 1) + "th field is defined as "
                                 + DataTypes.TYPE_NAMES[fieldTypes[i]] + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
                     }
                     break;
-                case DataTypes.INTEGER:
-                    if (!(data[i] instanceof Integer)) {
+                case DataTypes.NUMERIC:
+                    if (!(data[i] instanceof Number)) {
                         throw new IllegalArgumentException("The newly constructed Stream Element is not consistant. The " + (i + 1) + "th field is defined as "
                                 + DataTypes.TYPE_NAMES[fieldTypes[i]] + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
                     }
-                    break;
-                case DataTypes.DOUBLE:
-                    if (!(data[i] instanceof Double || data[i] instanceof Float))
-                        throw new IllegalArgumentException("The newly constructed Stream Element is not consistant. The " + (i + 1) + "th field is defined as " + DataTypes.TYPE_NAMES[fieldTypes[i]]
-                                + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
                     break;
                 case DataTypes.BINARY:
                     // if ( data[ i ] instanceof String ) data[ i ] = ( ( String )
@@ -221,22 +199,17 @@ public final class StreamElement implements Serializable {
         Object[] toReturn = new Object[fieldValues.length];
         for (int i = 0; i < toReturn.length; i++) {
             switch (fieldTypes[i]) {
-                case DataTypes.DOUBLE:
+                case DataTypes.NUMERIC:
                     toReturn[i] = fieldValues[i];
                     break;
-                case DataTypes.BIGINT:
+                case DataTypes.TIME:
                     toReturn[i] = Long.toString((Long) fieldValues[i]);
                     break;
 //        case DataTypes.TIME :
 //        toReturn[ i ] = Long.toString( ( Long ) fieldValues[ i ] );
 //        break;
-                case DataTypes.TINYINT:
-                case DataTypes.SMALLINT:
-                case DataTypes.INTEGER:
-                    toReturn[i] = new Integer((Integer) fieldValues[i]);
-                    break;
-                case DataTypes.CHAR:
-                case DataTypes.VARCHAR:
+
+                case DataTypes.STRING:
                 case DataTypes.BINARY:
                     toReturn[i] = fieldValues[i];
                     break;
@@ -252,22 +225,14 @@ public final class StreamElement implements Serializable {
         Serializable[] values = new Serializable[outputFormat.length];
         for (int i = 0; i < fieldNames.length; i++) {
             switch (findIndexInDataField(outputFormat, (String) fieldNames[i])) {
-                case DataTypes.DOUBLE:
+                case DataTypes.NUMERIC:
                     values[i] = (Double) fieldValues[i];
                     break;
-                case DataTypes.BIGINT:
+                case DataTypes.TIME:
 //        case DataTypes.TIME :
                     values[i] = Long.parseLong((String) fieldValues[i]);
                     break;
-                case DataTypes.TINYINT:
-                    values[i] = Byte.parseByte((String) fieldValues[i]);
-                    break;
-                case DataTypes.SMALLINT:
-                case DataTypes.INTEGER:
-                    values[i] = new Integer((Integer) fieldValues[i]);
-                    break;
-                case DataTypes.CHAR:
-                case DataTypes.VARCHAR:
+                case DataTypes.STRING:
                     values[i] = (String) fieldValues[i];
                     break;
                 case DataTypes.BINARY:
@@ -304,22 +269,14 @@ public final class StreamElement implements Serializable {
         Serializable[] values = new Serializable[outputFormat.length];
         for (int i = 0; i < fieldNames.length; i++) {
             switch (findIndexInDataField(outputFormat, (String) fieldNames[i])) {
-                case DataTypes.DOUBLE:
+                case DataTypes.NUMERIC:
                     values[i] = Double.parseDouble(fieldValues[i]);
                     break;
-                case DataTypes.BIGINT:
+                case DataTypes.TIME:
 //        case DataTypes.TIME :
                     values[i] = Long.parseLong((String) fieldValues[i]);
                     break;
-                case DataTypes.TINYINT:
-                    values[i] = Byte.parseByte((String) fieldValues[i]);
-                    break;
-                case DataTypes.SMALLINT:
-                case DataTypes.INTEGER:
-                    values[i] = Integer.parseInt(fieldValues[i]);
-                    break;
-                case DataTypes.CHAR:
-                case DataTypes.VARCHAR:
+                case DataTypes.STRING:
                     values[i] = new String(Base64.decodeBase64(fieldValues[i].getBytes()));
                     break;
                 case DataTypes.BINARY:
@@ -356,11 +313,11 @@ public final class StreamElement implements Serializable {
 //        case DataTypes.SMALLINT :
 //          toAdd = new StringPart(fieldNames[i],Short.toString((Short) fieldValues[i]));
 //          break;
-//        case DataTypes.INTEGER :
+//        case DataTypes.NUMERIC :
 //          toAdd = new StringPart(fieldNames[i],Integer.toString((Integer) fieldValues[i]));
 //          break;
 //        case DataTypes.CHAR :
-//        case DataTypes.VARCHAR :
+//        case DataTypes.STRING :
 //          toAdd = new FilePart(fieldNames[i],new ByteArrayPartSource(fieldNames[i],((String)fieldValues[i]).getBytes(Charset.forName("UTF-8"))));
 //          break;
 //        case DataTypes.BINARY :
@@ -395,23 +352,13 @@ public final class StreamElement implements Serializable {
                 continue;
 
             switch (findIndexInDataField(outputFormat, fieldNames[i])) {
-                case DataTypes.DOUBLE:
+                case DataTypes.NUMERIC:
                     values.add(Double.parseDouble((String) fieldValues[i]));
                     break;
-                case DataTypes.BIGINT:
+                case DataTypes.TIME:
                     values.add(Long.parseLong((String) fieldValues[i]));
                     break;
-                case DataTypes.TINYINT:
-                    values.add(Byte.parseByte((String) fieldValues[i]));
-                    break;
-                case DataTypes.SMALLINT:
-                    values.add(Short.parseShort((String) fieldValues[i]));
-                    break;
-                case DataTypes.INTEGER:
-                    values.add(Integer.parseInt((String) fieldValues[i]));
-                    break;
-                case DataTypes.CHAR:
-                case DataTypes.VARCHAR:
+                case DataTypes.STRING:
                     values.add(new String((byte[]) fieldValues[i]));
                     break;
                 case DataTypes.BINARY:

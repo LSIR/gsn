@@ -58,7 +58,7 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
             long nonHeapMemoryUsage = mbean.getNonHeapMemoryUsage().getUsed();
             int pendingFinalizationCount = mbean.getObjectPendingFinalizationCount();
 
-            StreamElement streamElement = new StreamElement(FIELD_NAMES, new Byte[]{DataTypes.BIGINT, DataTypes.BIGINT, DataTypes.INTEGER}, new Serializable[]{heapMemoryUsage,
+            StreamElement streamElement = new StreamElement(FIELD_NAMES, new Byte[]{DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.NUMERIC}, new Serializable[]{heapMemoryUsage,
                     nonHeapMemoryUsage, pendingFinalizationCount}, System.currentTimeMillis());
             postStreamElement(streamElement);
         }

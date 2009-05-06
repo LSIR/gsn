@@ -28,8 +28,7 @@ public class TestTupleBasedSliding {
     }
 
     private static void initDB() throws SQLException {
-        DriverManager.registerDriver(new org.h2.Driver());
-        StorageManager.getInstance().init("org.h2.Driver", "sa", "", "jdbc:h2:mem:gsn_mem_db");
+        StorageManager.getInstance().init("jdbc:h2:mem:gsn_mem_db");
     }
 
     @AfterClass

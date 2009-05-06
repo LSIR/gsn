@@ -28,18 +28,7 @@ public class StorageManager {
      */
     public static DATABASE getDatabaseForConnection(Connection connection)
             throws SQLException {
-        String name = connection.getMetaData().getDatabaseProductName();
-        if (name.toLowerCase().indexOf("h2") >= 0)
-            return DATABASE.H2;
-        else if (name.toLowerCase().indexOf("mysql") >= 0)
-            return DATABASE.MYSQL;
-        else if (name.toLowerCase().indexOf("oracle") >= 0)
-            return DATABASE.ORACLE;
-        else if (name.toLowerCase().indexOf("sql server") >= 0 || name.toLowerCase().indexOf("sqlserver") > 0)
-            return DATABASE.SQLSERVER;
-        else {
-            return null;
-        }
+        return DATABASE.H2;
     }
 
     /**
@@ -240,11 +229,9 @@ public class StorageManager {
      * @throws SQLException
      */
     public void shutdown() throws SQLException {
-        if (StorageManager.isH2()) {
-            getConnection().createStatement().execute("SHUTDOWN");
-            logger.warn("Closing the database server (for H2) [done].");
-        }
-        logger.warn("Closing the connection pool [done].");
+        getConnection().createStatement().execute("SHUTDOWN");
+        logger.warn("Closing the database server (for H2) [done].");
+
     }
 
     /**
@@ -301,10 +288,7 @@ public class StorageManager {
                 logger.debug("Dropping table structure: " + tableName + " With query: " + stmt);
             prepareStatement = connection.prepareStatement(stmt);
             prepareStatement.execute();
-            if (isOracle()) {
-                executeCommand("drop sequence " + Main.tableNamePostFixAppender(tableName, "_SEQ"), connection);
-                executeCommand("drop trigger " + Main.tableNamePostFixAppender(tableName, "_TRIG"), connection);
-            }
+
         } catch (SQLException e) {
             logger.info(e.getMessage(), e);
         }
@@ -349,8 +333,7 @@ public class StorageManager {
      * @param connection
      * @throws SQLException
      */
-    public static void executeCreateTable(CharSequence tableName,
-                                          DataField[] structure, boolean unique, Connection connection) throws SQLException {
+    public static void executeCreateTable(CharSequence tableName,  DataField[] structure, boolean unique, Connection connection) throws SQLException {
         StringBuilder sql = getStatementCreateTable(tableName, structure, connection);
         if (logger.isDebugEnabled())
             logger.debug(new StringBuilder().append("The create table statement is : ").append(sql).toString());
@@ -359,20 +342,9 @@ public class StorageManager {
         prepareStatement.execute();
         prepareStatement.close();
 
-        if (isOracle()) { // need to make a sequence and trigger.
-            String oracleSeq = "create sequence " + Main.tableNamePostFixAppender(tableName, "_SEQ");
-            String oracleTrigger = "create or replace trigger " + Main.tableNamePostFixAppender(tableName, "_TRIG") + " before insert on " + tableName + " for each row begin select " + Main.tableNamePostFixAppender(tableName, "_SEQ") + ".nextval into :NEW.pk from dual; end;";
-            logger.debug(oracleSeq);
-            logger.debug(oracleTrigger);
-            executeCommand(oracleSeq, connection);
-            executeCommand(oracleTrigger, connection);
-
-        }
-
         sql = getStatementCreateIndexOnTimed(tableName, unique);
         if (logger.isDebugEnabled())
-            logger.debug(new StringBuilder().append(
-                    "The create index statement is : ").append(sql).toString());
+            logger.debug(new StringBuilder().append("The create index statement is : ").append(sql).toString());
         prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
 
@@ -452,15 +424,7 @@ public class StorageManager {
             stmt = connection.createStatement();
             stmt.execute(sql);
         } catch (SQLException error) {
-            if (isOracle() && (
-                    (sql.toLowerCase().contains("drop trigger") && error.getMessage().contains("does not exist")) ||
-                            (sql.toLowerCase().contains("create sequence") && error.getMessage().contains("name is already used"))
-            )
-                    )
-                // ignore it for oracle
-                ;
-            else
-                logger.error(error.getMessage() + " FOR: " + sql, error);
+            logger.error(error.getMessage() + " FOR: " + sql, error);
         } finally {
             try {
                 if (stmt != null && !stmt.isClosed())
@@ -516,48 +480,20 @@ public class StorageManager {
                     continue;
                 Serializable value = streamElement.getData(dataField.getName());
                 switch (dataField.getDataTypeID()) {
-                    case DataTypes.VARCHAR:
+                    case DataTypes.STRING:
                         if (value == null)
                             ps.setNull(counter, Types.VARCHAR);
                         else
                             ps.setString(counter, value.toString());
                         break;
-                    case DataTypes.CHAR:
+
+                    case DataTypes.NUMERIC:
                         if (value == null)
-                            ps.setNull(counter, Types.CHAR);
-                        else
-                            ps.setString(counter, value.toString());
-                        break;
-                    case DataTypes.INTEGER:
-                        if (value == null)
-                            ps.setNull(counter, Types.INTEGER);
-                        else
-                            ps.setInt(counter, (Integer) value);
-                        break;
-                    case DataTypes.SMALLINT:
-                        if (value == null)
-                            ps.setNull(counter, Types.SMALLINT);
-                        else
-                            ps.setShort(counter, (Short) value);
-                        break;
-                    case DataTypes.TINYINT:
-                        if (value == null)
-                            ps.setNull(counter, Types.TINYINT);
-                        else
-                            ps.setByte(counter, ((Number) value).byteValue());
-                        break;
-                    case DataTypes.DOUBLE:
-                        if (value == null)
-                            ps.setNull(counter, Types.DOUBLE);
+                            ps.setNull(counter, Types.NUMERIC);
                         else
                             ps.setDouble(counter, (Double) value);
                         break;
-                    case DataTypes.BIGINT:
-                        if (value == null)
-                            ps.setNull(counter, Types.BIGINT);
-                        else
-                            ps.setLong(counter, ((Number) value).longValue());
-                        break;
+
                     case DataTypes.BINARY:
                         if (value == null)
                             ps.setNull(counter, Types.BINARY);
@@ -627,11 +563,7 @@ public class StorageManager {
     }
 
     public static StringBuilder getStatementDropTable(CharSequence tableName, Connection conn) throws SQLException {
-        StringBuilder sb = new StringBuilder("Drop table ");
-        DATABASE db = getDatabaseForConnection(conn);
-        if (db.getDBType() == MYSQL_DB || db.getDBType() == H2_DB)
-            sb.append(" if exists ");
-        sb.append(tableName);
+        StringBuilder sb = new StringBuilder("Drop table ").append(" if exists ").append(tableName);
         return sb;
     }
 
@@ -667,30 +599,20 @@ public class StorageManager {
         return toReturn;
     }
 
-    public static StringBuilder getStatementCreateTable(CharSequence tableName,
-                                                        DataField[] structure, Connection connection) throws SQLException {
+    public static StringBuilder getStatementCreateTable(CharSequence tableName, DataField[] structure, Connection connection) throws SQLException {
         StringBuilder result = new StringBuilder("CREATE TABLE ").append(tableName);
         DATABASE db = getDatabaseForConnection(connection);
-        if (db.getDBType() == SQLSERVER_DB || db.getDBType() == H2_DB)
-            result.append(" (PK BIGINT NOT NULL IDENTITY, timed BIGINT NOT NULL, ");
-        else if (db.getDBType() == MYSQL_DB)
-            result.append(" (PK BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT, timed BIGINT NOT NULL, ");
-        else if (db.getDBType() == ORACLE_DB)
-            result.append(" (PK number(38) PRIMARY KEY, timed number(38) NOT NULL, ");
+        result.append(" (PK BIGINT NOT NULL IDENTITY, timed BIGINT NOT NULL, ");
 
         for (DataField field : structure) {
             if (field.getName().equalsIgnoreCase("pk") || field.getName().equalsIgnoreCase("timed")) continue;
             result.append(field.getName().toUpperCase()).append(' ');
-            result.append(db.convertGSNTypeToLocalType(field));
+            result.append(DataTypes.convertGSNTypeNameToSQLTypeString(field.getType()));
             result.append(" ,");
         }
         result.delete(result.length() - 2, result.length());
         result.append(")");
         return result;
-    }
-
-    public static boolean isSqlServer() {
-        return sqlserver;
     }
 
     public static StringBuilder getStatementCreateView(CharSequence viewName,
@@ -704,140 +626,21 @@ public class StorageManager {
      * INITIALIZATION PARAMETERS. SET IN THE FIRST TIME THIS CLASS USED.
      * ************************************************************************
      */
-    private static boolean mysql = false;
-    private static boolean h2 = false;
-    private static boolean oracle = false;
-
-    public static final int MYSQL_DB = 1;
-    public static final int SQLSERVER_DB = 2;
-    public static final int H2_DB = 4;
-    public static final int ORACLE_DB = 5;
-
 
     public static enum DATABASE {
-        MYSQL("jdbc:mysql:", "com.mysql.jdbc.Driver") {
-
-            public int getTableNotExistsErrNo() {
-                return 1146;
-            }
-
-            /*
-                * Returns the MySQL data type that can store this gsn datafield.
-                * @param field The datafield to be converted. @return convertedType
-                * the data type used by Mysql.
-                */
-            public String convertGSNTypeToLocalType(DataField field) {
-                String convertedType;
-                switch (field.getDataTypeID()) {
-                    case DataTypes.CHAR:
-                    case DataTypes.VARCHAR:
-                        // Because the parameter for the varchar is not
-                        // optional.
-
-                        convertedType = field.getType();
-                        break;
-                    case DataTypes.BINARY:
-                        convertedType = "BLOB";
-                        break;
-                    case DataTypes.DOUBLE:
-                        convertedType = "double precision";
-                        break;
-                    default:
-                        convertedType = DataTypes.TYPE_NAMES[field.getDataTypeID()];
-                        break;
-                }
-                return convertedType;
-            }
-
-            public String getStatementDropIndex() {
-                if (isSqlServer())
-                    return "DROP TABLE #NAME";
-                else
-                    return "DROP TABLE IF EXISTS #NAME";
-            }
-
-            public String getStatementDropView() {
-                if (isSqlServer())
-                    return "DROP VIEW #NAME";
-                else
-                    return "DROP VIEW IF EXISTS #NAME";
-            }
-            public int getDBType() {
-                return MYSQL_DB;
-            }
-            public String addLimit(String query, int limit, int offset) {
-                return query + " LIMIT " + limit + " OFFSET " + offset;
-            }
-
-            public byte convertLocalTypeToGSN(int colTypeInJDBCFormat, int colPrecision) {
-                switch (colTypeInJDBCFormat) {
-                    case Types.BIGINT:
-                        return DataTypes.BIGINT;
-                    case Types.INTEGER:
-                        return DataTypes.INTEGER;
-                    case Types.SMALLINT:
-                        return DataTypes.SMALLINT;
-                    case Types.TINYINT:
-                        return DataTypes.TINYINT;
-                    case Types.VARCHAR:
-                        return DataTypes.VARCHAR;
-                    case Types.CHAR:
-                        return DataTypes.CHAR;
-                    case Types.DOUBLE:
-                    case Types.DECIMAL:    // This is needed for doing aggregates in datadownload servlet.
-                        return DataTypes.DOUBLE;
-                    case Types.BINARY:
-                    case Types.BLOB:
-                    case Types.VARBINARY:
-                    case Types.LONGVARBINARY:
-                        return DataTypes.BINARY;
-                    default:
-                        logger.error("The type can't be converted to GSN form : " + colTypeInJDBCFormat);
-                        break;
-                }
-                return -100;
-            }
-
-        },
         H2("jdbc:h2:", "org.h2.Driver") {
             public int getTableNotExistsErrNo() {
                 return 42102;
             }
 
-            /*
-                * Returns the HSQLDB data type that can store this gsn datafield.
-                * @param field The datafield to be converted. @return convertedType
-                * the data type used by hsql.
-                */
-            public String convertGSNTypeToLocalType(DataField field) {
-                String convertedType = null;
-                switch (field.getDataTypeID()) {
-                    case DataTypes.CHAR:
-                    case DataTypes.VARCHAR:
-                        // Because the parameter for the varchar is not
-                        // optional.
-                        convertedType = field.getType();
-                        break;
-                    default:
-                        convertedType = DataTypes.TYPE_NAMES[field.getDataTypeID()];
-                        break;
-                }
-                return convertedType;
-            }
+
 
             public String getStatementDropIndex() {
-                if (StorageManager.isH2() || StorageManager.isSqlServer())
-                    return "DROP INDEX #NAME";
-                if (StorageManager.isMysqlDB())
-                    return "DROP INDEX #NAME IF EXISTS";
-                return null;
+                return "DROP INDEX #NAME";
             }
 
             public String getStatementDropView() {
                 return "DROP VIEW #NAME IF EXISTS";
-            }
-            public int getDBType() {
-                return H2_DB;
             }
 
             public String addLimit(String query, int limit, int offset) {
@@ -847,20 +650,20 @@ public class StorageManager {
             public byte convertLocalTypeToGSN(int colTypeInJDBCFormat, int colScale) {
                 switch (colTypeInJDBCFormat) {
                     case Types.BIGINT:
-                        return DataTypes.BIGINT;
+                        return DataTypes.NUMERIC;
                     case Types.INTEGER:
-                        return DataTypes.INTEGER;
+                        return DataTypes.NUMERIC;
                     case Types.SMALLINT:
-                        return DataTypes.SMALLINT;
+                        return DataTypes.NUMERIC;
                     case Types.TINYINT:
-                        return DataTypes.TINYINT;
+                        return DataTypes.NUMERIC;
                     case Types.VARCHAR:
-                        return DataTypes.VARCHAR;
+                        return DataTypes.STRING;
                     case Types.CHAR:
-                        return DataTypes.CHAR;
+                        return DataTypes.STRING;
                     case Types.DOUBLE:
                     case Types.DECIMAL:    // This is needed for doing aggregates in datadownload servlet.
-                        return DataTypes.DOUBLE;
+                        return DataTypes.NUMERIC;
                     case Types.BINARY:
                     case Types.BLOB:
                     case Types.VARBINARY:
@@ -872,184 +675,6 @@ public class StorageManager {
                 }
                 return -100;
             }
-        },
-        ORACLE("jdbc:oracle:thin:", "oracle.jdbc.driver.OracleDriver") {
-            public int getTableNotExistsErrNo() {
-                return 208; //java.sql.SQLException: Invalid object name
-            }
-
-            /*
-                * Returns the HSQLDB data type that can store this gsn datafield.
-                * @param field The datafield to be converted. @return convertedType
-                * the data type used by hsql.
-                */
-            public String convertGSNTypeToLocalType(DataField field) {
-                String convertedType = null;
-                switch (field.getDataTypeID()) {
-                    case DataTypes.BIGINT:
-                    case DataTypes.SMALLINT:
-                    case DataTypes.INTEGER:
-                    case DataTypes.TINYINT:
-                        convertedType = "number(38,0)";
-                        break;
-                    case DataTypes.DOUBLE:
-                        convertedType = "number(38,16)";
-                        break;
-                    case DataTypes.CHAR:
-                    case DataTypes.VARCHAR:
-                        // Because the parameter for the varchar is not
-                        // optional.
-                        convertedType = field.getType();
-                        convertedType = convertedType.toLowerCase().replace("varchar", "varchar2");
-                        break;
-                    case DataTypes.BINARY:
-                        convertedType = "LONG RAW";
-                        break;
-                    default:
-                        convertedType = DataTypes.TYPE_NAMES[field.getDataTypeID()];
-                        break;
-                }
-                return convertedType;
-            }
-
-            public String getStatementDropIndex() {
-                return "DROP INDEX #NAME ON #TABLE";
-            }
-
-            public String getStatementDropView() {
-                return "DROP VIEW #NAME";
-            }
-            public int getDBType() {
-                return ORACLE_DB;
-            }
-
-            public String addLimit(String query, int limit, int offset) {
-                String toAppend = "";
-                if (offset == 0)
-                    toAppend = " ROWNUM <= " + limit;
-                else
-                    toAppend = " ROWNUM BETWEEN " + offset + " AND " + (limit + offset) + " ";
-
-                int indexOfWhere = SQLUtils.getWhereIndex(query);
-                int indexOfGroupBy = SQLUtils.getGroupByIndex(query);
-                int indexOfOrder = SQLUtils.getOrderByIndex(query);
-
-                StringBuilder toReturn = new StringBuilder(query);
-                if (indexOfGroupBy < 0 && indexOfWhere < 0 && indexOfOrder < 0)
-                    return query + " WHERE " + toAppend;
-                if (indexOfWhere < 0 && indexOfOrder > 0)
-                    return toReturn.insert(indexOfOrder, " WHERE " + toAppend).toString();
-                if (indexOfWhere < 0 && indexOfGroupBy > 0)
-                    return toReturn.insert(indexOfGroupBy, " WHERE " + toAppend).toString();
-                if (indexOfWhere > 0) {
-                    StringBuilder tmp = toReturn.insert(indexOfWhere + " WHERE ".length(), toAppend + " AND (");
-                    int endIndex = tmp.length();
-                    if (indexOfGroupBy > 0)
-                        endIndex = SQLUtils.getGroupByIndex(tmp);
-                    else if (indexOfOrder > 0)
-                        endIndex = SQLUtils.getOrderByIndex(tmp);
-                    tmp.insert(endIndex, ")");
-                    return tmp.toString();
-                }
-
-                return query + " LIMIT " + limit + " OFFSET " + offset;
-            }
-
-            public byte convertLocalTypeToGSN(int colTypeInJDBCFormat, int colPrecision) {
-                switch (colTypeInJDBCFormat) {
-                    case Types.NUMERIC:
-                        if (colPrecision == 0)
-                            return DataTypes.BIGINT;
-                        else
-                            return DataTypes.DOUBLE;
-                    case Types.VARCHAR:
-                        return DataTypes.VARCHAR;
-                    case Types.CHAR:
-                        return DataTypes.CHAR;
-                    case Types.BINARY:
-                    case Types.BLOB:
-                    case Types.VARBINARY:
-                    case Types.LONGVARBINARY:
-                        return DataTypes.BINARY;
-                    default:
-                        logger.error("The type can't be converted to GSN form : " + colTypeInJDBCFormat);
-                        break;
-                }
-                return -100;
-            }
-        },
-        SQLSERVER("jdbc:jtds:sqlserver:", "net.sourceforge.jtds.jdbc.Driver") {
-
-            public int getTableNotExistsErrNo() {
-                return 208; //java.sql.SQLException: Invalid object name
-            }
-
-            /*
-                * Returns the HSQLDB data type that can store this gsn datafield.
-                * @param field The datafield to be converted. @return convertedType
-                * the data type used by hsql.
-                */
-            public String convertGSNTypeToLocalType(DataField field) {
-                String convertedType = null;
-                switch (field.getDataTypeID()) {
-                    case DataTypes.CHAR:
-                    case DataTypes.VARCHAR:
-                        // Because the parameter for the varchar is not
-                        // optional.
-                        convertedType = field.getType();
-                        break;
-                    default:
-                        convertedType = DataTypes.TYPE_NAMES[field.getDataTypeID()];
-                        break;
-                }
-                return convertedType;
-            }
-
-            public String getStatementDropIndex() {
-                return "DROP INDEX #NAME ON #TABLE";
-            }
-
-            public String getStatementDropView() {
-                return "DROP VIEW #NAME";
-            }
-            public int getDBType() {
-                return SQLSERVER_DB;
-            }
-
-            public String addLimit(String query, int limit, int offset) {
-                // FIXME, INCORRECT !
-                return query + " LIMIT " + limit + " OFFSET " + offset;
-            }
-
-            public byte convertLocalTypeToGSN(int colTypeInJDBCFormat, int colPrecision) {
-                switch (colTypeInJDBCFormat) {
-                    case Types.BIGINT:
-                        return DataTypes.BIGINT;
-                    case Types.INTEGER:
-                        return DataTypes.INTEGER;
-                    case Types.SMALLINT:
-                        return DataTypes.SMALLINT;
-                    case Types.TINYINT:
-                        return DataTypes.TINYINT;
-                    case Types.VARCHAR:
-                        return DataTypes.VARCHAR;
-                    case Types.CHAR:
-                        return DataTypes.CHAR;
-                    case Types.DOUBLE:
-                    case Types.DECIMAL:    // This is needed for doing aggregates in datadownload servlet.
-                        return DataTypes.DOUBLE;
-                    case Types.BINARY:
-                    case Types.BLOB:
-                    case Types.VARBINARY:
-                    case Types.LONGVARBINARY:
-                        return DataTypes.BINARY;
-                    default:
-                        logger.error("The type can't be converted to GSN form : " + colTypeInJDBCFormat);
-                        break;
-                }
-                return -100;
-            }
-
         };
 
         private final String jdbcPrefix;
@@ -1059,12 +684,6 @@ public class StorageManager {
         DATABASE(String jdbcPrefix, String driver) {
             this.jdbcPrefix = jdbcPrefix;
             this.driver = driver;
-            //    try {
-            //    Class.forName(driver);
-            //    } catch (ClassNotFoundException e) {
-            //    logger.error("Error in loading the database driver. !");
-            //    logger.error(e.getMessage(), e);
-            //    }
         }
 
 
@@ -1087,7 +706,7 @@ public class StorageManager {
            * datatype name used by the target database.
            */
 
-        public abstract String convertGSNTypeToLocalType(DataField gsnType);
+
 
         public byte convertLocalTypeToGSN(int jdbcType) {
             return convertLocalTypeToGSN(jdbcType, 0);
@@ -1101,34 +720,8 @@ public class StorageManager {
 
         public abstract int getTableNotExistsErrNo();
 
-        public abstract int getDBType();
-
         public abstract String addLimit(String query, int limit, int offset);
 
-    }
-
-    ;
-
-    /**
-     * Determinse if the database used is MySql.
-     *
-     * @return Returns true if the database used is mysql.
-     */
-    public static boolean isMysqlDB() {
-        return mysql;
-    }
-
-    /**
-     * Determining if the database used is HSqlDB.
-     *
-     * @return true if the database used is HSqlDB.
-     */
-    public static boolean isH2() {
-        return h2;
-    }
-
-    public static boolean isOracle() {
-        return oracle;
     }
 
     private static StorageManager singleton = new StorageManager();
@@ -1154,26 +747,13 @@ public class StorageManager {
     private ComboPooledDataSource pool;
 
 
-    public void init(String databaseDriver, String username,
-                     String password, String databaseURL) {
+    public void init(String databaseURL) {
         this.databaseURL = databaseURL;
-        if (databaseDriver.trim().equalsIgnoreCase(DATABASE.H2.getJDBCDriverClass()))
-            h2 = true;
-        else if (databaseDriver.trim().equalsIgnoreCase(DATABASE.MYSQL.getJDBCDriverClass()))
-            mysql = true;
-        else if (databaseDriver.trim().equalsIgnoreCase(DATABASE.SQLSERVER.getJDBCDriverClass()))
-            sqlserver = true;
-        else if (databaseDriver.trim().equalsIgnoreCase(DATABASE.ORACLE.getJDBCDriverClass()))
-            oracle = true;
-        else {
-            logger.error(new StringBuilder().append("The GSN doesn't support the database driver : ").append(databaseDriver).toString());
-            logger.error(new StringBuilder().append("Please check the storage element in the file : ").append(getContainerConfig().getContainerFileName()).toString());
-        }
 
-        dbConnectionProperties.put("user", username);
-        dbConnectionProperties.put("password", password);
+        dbConnectionProperties.put("user", "sa");
+        dbConnectionProperties.put("password", "");
 
-        dbConnectionProperties.put("username", username);
+        dbConnectionProperties.put("username", "sa");
         dbConnectionProperties.put("ignorecase", "true");
         dbConnectionProperties.put("autocommit", "true");
         dbConnectionProperties.put("useUnicode", "true");
@@ -1196,7 +776,7 @@ public class StorageManager {
         }
 
         try {
-            pool.setDriverClass(databaseDriver);
+            pool.setDriverClass("org.h2.Driver");
         } catch (PropertyVetoException e) {
             logger.fatal(e.getMessage(), e);
             System.exit(1);
@@ -1214,29 +794,11 @@ public class StorageManager {
         try {
             con = getConnection();
             Statement stmt = con.createStatement();
-            if (StorageManager.isH2()) {
-                stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
-                stmt.execute("CREATE ALIAS IF NOT EXISTS NOW_MILLIS FOR \"java.lang.System.currentTimeMillis\";");
-            } else if (StorageManager.isMysqlDB()) {
-                ResultSet rs = stmt.executeQuery("select version();");
-                rs.next();
-                String versionInfo = rs.getString(1);
-                if (!versionInfo.trim().startsWith("5.")) {
-                    logger.error(new StringBuilder().append(
-                            "You are using MySQL version : ").append(
-                            versionInfo).toString());
-                    logger
-                            .error("To run GSN using MySQL, you need version 5.0 or later.");
-                    System.exit(1);
-                }
-            } else if (sqlserver || oracle) {
-                // Do the configurations related to sql server here.
-            } else {
-                logger.error("Unknow database server provided. GSN runs only under MySQL, HSqlDB and Oracle.");
-            }
+            stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
+            stmt.execute("CREATE ALIAS IF NOT EXISTS NOW_MILLIS FOR \"java.lang.System.currentTimeMillis\";");
         } catch (SQLException e) {
             logger.error(new StringBuilder().append("Connecting to the database with the following properties failed :")
-                    .append("\n\t UserName :").append(username).append("\n\t Password : ").append(password).append("\n\t Driver class : ").append(databaseDriver).append("\n\t Database URL : ").append(databaseURL).toString());
+                    .append("\n\t Database URL : ").append(databaseURL).toString());
             logger.error(new StringBuilder().append(e.getMessage()).append(", Please refer to the logs for more detailed information.").toString());
             logger.error("Make sure in the : " + getContainerConfig().getContainerFileName() + " file, the <storage ...> element is correct.");
             e.printStackTrace();
@@ -1276,13 +838,8 @@ public class StorageManager {
      */
     public long getTimeDifferenceInMillis() {
         StringBuilder query = new StringBuilder();
-        if (StorageManager.isH2())
-            query.append("call NOW_MILLIS()");
-        else if (StorageManager.isMysqlDB())
-            query.append("select  UNIX_TIMESTAMP()*1000");
-        else if (StorageManager.isSqlServer()) {
-            query.append("select convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 ");
-        }
+        query.append("call NOW_MILLIS()");
+
         PreparedStatement prepareStatement = null;
         try {
             prepareStatement = getConnection().prepareStatement(query.toString());
@@ -1304,9 +861,6 @@ public class StorageManager {
         ArrayList<String> toReturn = new ArrayList<String>();
         Connection c = getConnection();
         ResultSet rs = null;
-        if (isMysqlDB()) {
-            rs = executeQueryWithResultSet(new StringBuilder("show tables"), c);
-        }
         if (rs != null)
             while (rs.next())
                 if (rs.getString(1).startsWith("_"))

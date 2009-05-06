@@ -64,11 +64,11 @@ public class StreamSource implements Serializable {
     public StreamSource() {
     }
 
-    public boolean isTriggerSliding(){
+    public boolean isTriggerSliding() {
         return triggerSliding;
     }
 
-    public void setTriggerSliding(boolean triggerSliding){
+    public void setTriggerSliding(boolean triggerSliding) {
         this.triggerSliding = triggerSliding;
     }
 
@@ -336,14 +336,14 @@ public class StreamSource implements Serializable {
     }
 
     public boolean windowSlided() throws SQLException {
-        if(!triggerSliding){
-            if (logger.isDebugEnabled()){
+        if (!triggerSliding) {
+            if (logger.isDebugEnabled()) {
                 logger.debug(new StringBuilder().append("Non triggering data avialble in the stream *").append(getAlias()).append("*").toString());
             }
-            return true;    
+            return true;
         }
 
-         if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
             logger.debug(new StringBuilder().append("Data avialble in the stream *").append(getAlias()).append("*").toString());
         return inputStream.executeQuery(getUIDStr());
 
@@ -413,21 +413,10 @@ public class StreamSource implements Serializable {
 // toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
 
         if (isStorageCountBased()) {
-            if (StorageManager.isH2() || StorageManager.isMysqlDB())
-                toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(getParsedWindowSize() - 1).append(" )");
-            else if (StorageManager.isSqlServer())
-                toReturn.append("timed >= (select min(timed) from (select TOP ").append(getParsedWindowSize()).append(" timed from (select distinct(timed) from ").append(wrapperAlias).append(") as x  order by timed desc ) as y )");
+            toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(getParsedWindowSize() - 1).append(" )");
         } else { //time based
             toReturn.append("(wrapper.timed >");
-            if (StorageManager.isH2())
-                toReturn.append(" (NOW_MILLIS()");
-            else if (StorageManager.isMysqlDB())
-                toReturn.append(" (UNIX_TIMESTAMP()*1000");
-            else if (StorageManager.isSqlServer()) {
-                // NOTE1 : The value retuend is in seconds (hence 1000)
-                // NOTE2 : There is no time in the date for the epoch, maybe doesn't match with the current system time, needs checking.
-                toReturn.append(" (convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 )");
-            }
+            toReturn.append(" (NOW_MILLIS()");
             toReturn.append(" - ").append(getParsedWindowSize()).append(" ) ) ");
         }
         if (samplingRate != 1)

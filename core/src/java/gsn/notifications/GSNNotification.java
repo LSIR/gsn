@@ -69,12 +69,7 @@ public class GSNNotification extends NotificationRequest {
 
         TreeMap<CharSequence, CharSequence> rewritingInfo = new TreeMap<CharSequence, CharSequence>(new CaseInsensitiveComparator());
         rewritingInfo.put("wrapper", virtualSensorName);
-        if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
-            query += " order by timed desc limit 1 offset 0";
-        }
-        if (StorageManager.isSqlServer()) {
-            query = "select top 1 * from " + virtualSensorName;
-        }
+        query += " order by timed desc limit 1 offset 0";
         this.query = SQLUtils.newRewrite(query, rewritingInfo);
         this.notificationCode = notificationCode;
         try {
@@ -258,5 +253,5 @@ public class GSNNotification extends NotificationRequest {
 
     public String getOriginalQuery() {
         return originalQuery;
-  }
+    }
 }

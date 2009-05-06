@@ -104,7 +104,7 @@ public class CSVFileWrapper extends AbstractWrapper {
                 logger.debug("length: " + nextLine.length);
                 for (int j = 0; j < Math.min(columns, nextLine.length); j++) {
                     logger.debug("Type ID of " + nextLine[j] + "  : " + structure[j].getDataTypeID());
-                    if (structure[j].getDataTypeID() == DataTypes.BIGINT) {
+                    if (structure[j].getDataTypeID() == DataTypes.NUMERIC) {
                         date = dateTimeForm.parse(nextLine[j]);
                         if (date == null) {
                             logger.error("invalide date format! " + nextLine[j]);
@@ -114,7 +114,7 @@ public class CSVFileWrapper extends AbstractWrapper {
                             serialized[k++] = time;
                         }
                     }
-                    if (structure[j].getDataTypeID() == DataTypes.DOUBLE) {
+                    if (structure[j].getDataTypeID() == DataTypes.NUMERIC) {
                         try {
                             Double d = Double.valueOf(nextLine[j]);
                             if (d == null) {

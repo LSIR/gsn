@@ -34,7 +34,7 @@ public class TestDataPropogation {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         DriverManager.registerDriver(new org.h2.Driver());
-        StorageManager.getInstance().init("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.");
+        StorageManager.getInstance().init("jdbc:h2:mem:.");
     }
 
     @AfterClass
@@ -153,7 +153,7 @@ public class TestDataPropogation {
         assertTrue(wrapper.publishStreamElement(se1));
         assertTrue(wrapper.publishStreamElement(se2));
         assertFalse(wrapper.publishStreamElement(se3));
-		assertTrue(streamSource.toSql().toString().toLowerCase().indexOf("mod")<0);
-		verify(streamSource);
-	}
+        assertTrue(streamSource.toSql().toString().toLowerCase().indexOf("mod") < 0);
+        verify(streamSource);
+    }
 }

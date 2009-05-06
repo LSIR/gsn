@@ -155,5 +155,5 @@ public class SQLUtils {
 
     public static int getGroupByIndex(CharSequence c) {
         return c.toString().toLowerCase().lastIndexOf(" group by ");
-	}
+    }
 }

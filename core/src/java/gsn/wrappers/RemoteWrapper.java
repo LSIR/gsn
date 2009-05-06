@@ -221,6 +221,6 @@ public class RemoteWrapper extends AbstractWrapper {
 
     public boolean manualDataInsertion(StreamElement se) {
         return postStreamElement(se);
-	}
+    }
 
 }
