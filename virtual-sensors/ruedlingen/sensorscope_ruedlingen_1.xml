@@ -3,6 +3,35 @@
 		<class-name>gsn.vsensor.SensorscopeVS</class-name>
 		<init-params>
             <param name="sampling">30000</param>
+			<!-- If you want to rename any field in the output structure,
+			you need to uncomment it and rename it here too.
+			Field names in the query should also be renamed -->
+			<!--<param name="NTWSENDERID">NTWSENDERID</param> -->
+    		<!-- <param name="NTWDISTTOBS">NTWDISTTOBS</param> -->
+			<!-- <param name="TSPHOPCOUNT">TSPHOPCOUNT</param> -->
+			<!-- <param name="TSPPACKETSN">TSPPACKETSN</param> -->
+			<!-- <param name="REPORTERID">REPORTERID</param> -->
+			<!-- <param name="TIMESTAMP">TIMESTAMP</param> -->
+			<!-- <param name="RAINMETER">RAINMETER</param> -->
+			<!-- <param name="WINDSPEED">WINDSPEED</param> -->
+			<!-- <param name="WATERMARK">WATERMARK</param> -->
+			<!-- <param name="SOLARRADIATION">SOLARRADIATION</param> -->
+			<!-- <param name="AIRTEMPERATURE">AIRTEMPERATURE</param> -->
+			<!-- <param name="AIRHUMIDITY">AIRHUMIDITY</param> -->
+			<!-- <param name="SKINTEMPERATURE">SKINTEMPERATURE</param> -->
+			<!-- <param name="SOILMOISTURE">SOILMOISTURE</param> -->
+			<!-- <param name="WINDDIRECTION">WINDDIRECTION</param> -->
+			<!-- <param name="WINDDIRECTION2">WINDDIRECTION2</param> -->
+			<!-- <param name="SOILCONDUCTIVITY1">SOILCONDUCTIVITY1</param> -->
+			<!-- <param name="SOILCONDUCTIVITY2">SOILCONDUCTIVITY2</param> -->
+			<!-- <param name="SOILCONDUCTIVITY3">SOILCONDUCTIVITY3</param> -->
+			<!-- <param name="SOILMOISTURE1">SOILMOISTURE1</param> -->
+			<!-- <param name="SOILMOISTURE2">SOILMOISTURE2</param> -->
+			<!-- <param name="SOILMOISTURE3">SOILMOISTURE3</param> -->
+			<!-- <param name="SOILTEMPERATURE1">SOILTEMPERATURE1</param> -->
+			<!-- <param name="SOILTEMPERATURE2">SOILTEMPERATURE2</param> -->
+			<!-- <param name="SOILTEMPERATURE3">SOILTEMPERATURE3</param> -->
+			<!-- <param name="FOO">FOO</param> -->
         </init-params>
 		<output-structure>
 			<field name="REPORTERID"		type="SMALLINT" />
