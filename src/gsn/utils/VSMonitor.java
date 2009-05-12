@@ -261,6 +261,8 @@ public class VSMonitor {
                 warningsBuffer.append(sensorName)
                         .append("@")
                         .append(monitoredSensors.get(sensorName).getHost())
+                        .append(":")
+                        .append(monitoredSensors.get(sensorName).getPort())
                         .append(" not updated for ")
                         .append(VSensorMonitorConfig.ms2dhms(sensorsUpdateDelay.get(sensorName)))
                         .append(" (expected <")
@@ -270,6 +272,8 @@ public class VSMonitor {
             } else {
                 infosBuffer.append(sensorName).append("@")
                         .append(monitoredSensors.get(sensorName).getHost())
+                        .append(":")
+                        .append(monitoredSensors.get(sensorName).getPort())
                         .append(" (on time)\n");
             }
         }
@@ -441,9 +445,5 @@ public class VSMonitor {
         // Showing report
         System.out.println(summary);
         System.out.println(report);
-
-        // Logging report
-        logger.warn(summary);
-        logger.warn(report);
     }
 }
