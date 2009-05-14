@@ -22,7 +22,7 @@ public class WrappersUtil {
             logger.error(new StringBuilder().append("Check the :").append(location).append(" file and make sure it's syntactically correct.").toString());
             logger.error("Sample wrappers extention properties file is provided in GSN distribution.");
             logger.error(e.getMessage(), e);
-            System.exit(1);
+//            System.exit(1);
         }
         // TODO: Checking for duplicates in the wrappers file.
         return config;

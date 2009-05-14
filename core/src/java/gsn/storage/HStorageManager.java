@@ -25,4 +25,8 @@ public class HStorageManager {
 
         return cfg.buildSessionFactory();
     }
+
+    public static void closeSessionFactory(SessionFactory sessionFactory){
+        sessionFactory.close();
+    }
 }

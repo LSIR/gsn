@@ -23,6 +23,7 @@
             <fileset dir="${libdir}">
                 <include name="**/*.jar"/>
             </fileset>
+            <pathelement location="${conf.dir}"/>
         </path>
 
         <path id="cobertura.classpath">
@@ -108,6 +109,8 @@
         <cobertura-instrument todir="${instrumented.dir}">
             <fileset dir="${build.dir}">
                 <include name="**/*.class"/>
+                <exclude name="**/ContainerConfig.class"/>
+                <exclude name="**/JiBX.class"/>
                 <exclude name="**/Test*.class"/>
                 <exclude name="**/*Test.class"/>
             </fileset>
