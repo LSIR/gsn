@@ -6,13 +6,13 @@ import java.util.List;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "childType", discriminatorType = DiscriminatorType.STRING)
-public abstract class DataNode extends NameDescriptionClass {
+public abstract class DataNode extends NameDescriptionClass implements DataNodeInterface {
 
     @ManyToMany(mappedBy = "parents")
-    private List<DataNode> children;
+    private List<DataNodeInterface> children;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<DataNode> parents;
+    private List<DataNodeInterface> parents;
 
     @OneToOne(optional = false, mappedBy = "dataNode")
     private Window window;
@@ -23,11 +23,11 @@ public abstract class DataNode extends NameDescriptionClass {
     @ManyToOne(optional = true)
     private VirtualSensor virtualSensor;
 
-    public List<DataNode> getParents() {
+    public List<DataNodeInterface> getParents() {
         return parents;
     }
 
-    public void setParents(List<DataNode> parents) {
+    public void setParents(List<DataNodeInterface> parents) {
         this.parents = parents;
     }
 
@@ -47,11 +47,11 @@ public abstract class DataNode extends NameDescriptionClass {
         this.sliding = sliding;
     }
 
-    public List<DataNode> getChildren() {
+    public List<DataNodeInterface> getChildren() {
         return children;
     }
 
-    public void setChildren(List<DataNode> children) {
+    public void setChildren(List<DataNodeInterface> children) {
         this.children = children;
     }
 
@@ -65,7 +65,7 @@ public abstract class DataNode extends NameDescriptionClass {
 
     public boolean equals(Object other) {
         if (this == other) return true;
-        if (other == null || !(other instanceof DataNode)) return false;
+        if (other == null || !(other instanceof DataNodeInterface)) return false;
 
         DataNode that = (DataNode) other;
 
@@ -92,4 +92,6 @@ public abstract class DataNode extends NameDescriptionClass {
         result = 31 * result + (getChildren() != null ? getChildren().hashCode() : 0);
         return result;
     }
+
 }
+

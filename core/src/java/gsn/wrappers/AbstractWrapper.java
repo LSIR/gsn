@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class AbstractWrapper extends Thread {
+public abstract class AbstractWrapper implements Runnable {
 
     private final static transient Logger logger = Logger.getLogger(AbstractWrapper.class);
 
