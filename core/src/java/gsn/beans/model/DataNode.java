@@ -8,11 +8,11 @@ import java.util.List;
 @DiscriminatorColumn(name = "childType", discriminatorType = DiscriminatorType.STRING)
 public abstract class DataNode extends NameDescriptionClass {
 
-    @OneToMany(mappedBy = "parent")
+    @ManyToMany(mappedBy = "parents")
     private List<DataNode> children;
 
-    @ManyToOne
-    private DataNode parent;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<DataNode> parents;
 
     @OneToOne(optional = false, mappedBy = "dataNode")
     private Window window;
@@ -23,12 +23,12 @@ public abstract class DataNode extends NameDescriptionClass {
     @ManyToOne(optional = true)
     private VirtualSensor virtualSensor;
 
-    public DataNode getParent() {
-        return parent;
+    public List<DataNode> getParents() {
+        return parents;
     }
 
-    public void setParent(DataNode parent) {
-        this.parent = parent;
+    public void setParents(List<DataNode> parents) {
+        this.parents = parents;
     }
 
     public Window getWindow() {
@@ -75,7 +75,7 @@ public abstract class DataNode extends NameDescriptionClass {
             return false;
         if (getSliding() != null ? !getSliding().equals(that.getSliding()) : that.getSliding() != null)
             return false;
-        if (getParent() != null ? !getParent().equals(that.getParent()) : that.getParent() != null) return false;
+        if (getParents() != null ? !getParents().equals(that.getParents()) : that.getParents() != null) return false;
         if (getChildren() != null ? !getChildren().equals(that.getChildren()) : that.getChildren() != null)
             return false;
 
@@ -88,7 +88,7 @@ public abstract class DataNode extends NameDescriptionClass {
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
         result = 31 * result + (getWindow() != null ? getWindow().hashCode() : 0);
         result = 31 * result + (getSliding() != null ? getSliding().hashCode() : 0);
-        result = 31 * result + (getParent() != null ? getParent().hashCode() : 0);
+        result = 31 * result + (getParents() != null ? getParents().hashCode() : 0);
         result = 31 * result + (getChildren() != null ? getChildren().hashCode() : 0);
         return result;
     }
