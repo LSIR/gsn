@@ -5,13 +5,13 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
-public class WindowPredicate implements Serializable {
+public class Window implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(optional = false)
-    private WindowPredicateModel model;
+    private WindowModel model;
 
     @OneToMany
     private List<Parameter> parameters;
@@ -23,11 +23,11 @@ public class WindowPredicate implements Serializable {
         return id;
     }
 
-    public WindowPredicateModel getModel() {
+    public WindowModel getModel() {
         return model;
     }
 
-    public void setModel(WindowPredicateModel model) {
+    public void setModel(WindowModel model) {
         this.model = model;
     }
 
@@ -50,9 +50,9 @@ public class WindowPredicate implements Serializable {
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        if (other == null || !(other instanceof WindowPredicate)) return false;
+        if (other == null || !(other instanceof Window)) return false;
 
-        WindowPredicate that = (WindowPredicate) other;
+        Window that = (Window) other;
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         if (getModel() != null ? !getModel().equals(that.getModel()) : that.getModel() != null) return false;

@@ -4,19 +4,21 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-public class WindowPredicateModel extends NameDescriptionClass {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "modelType", discriminatorType = DiscriminatorType.STRING)
+public class BasicModel extends NameDescriptionClass {
+    @Column(nullable = false)
+    private String className;
 
     @OneToMany
     private List<ParameterModel> parameters;
 
-    @OneToMany
-    private List<WindowPredicate> windowPredicates;
+    public String getClassName() {
+        return className;
+    }
 
-    public Long getId() {
-        return id;
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     public List<ParameterModel> getParameters() {
@@ -27,20 +29,12 @@ public class WindowPredicateModel extends NameDescriptionClass {
         this.parameters = parameters;
     }
 
-    public List<WindowPredicate> getWindowPredicates() {
-        return windowPredicates;
-    }
-
-    public void setWindowPredicates(List<WindowPredicate> windowPredicates) {
-        this.windowPredicates = windowPredicates;
-    }
-
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        if (other == null || !(other instanceof WindowPredicateModel)) return false;
+        if (other == null || !(other instanceof BasicModel)) return false;
 
-        WindowPredicateModel that = (WindowPredicateModel) other;
+        BasicModel that = (BasicModel) other;
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;

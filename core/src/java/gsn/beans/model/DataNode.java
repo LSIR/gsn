@@ -1,29 +1,27 @@
 package gsn.beans.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "childType", discriminatorType = DiscriminatorType.STRING)
 public abstract class DataNode extends NameDescriptionClass {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
+    @OneToMany(mappedBy = "parent")
+    private List<DataNode> children;
 
     @ManyToOne
     private DataNode parent;
 
-    @Column(length = (1024 * 8), nullable = false)
-    private String query;
+    @OneToOne(optional = false, mappedBy = "dataNode")
+    private Window window;
 
     @OneToOne(optional = false, mappedBy = "dataNode")
-    private WindowPredicate windowPredicate;
+    private Sliding sliding;
 
-    private float loadShedding = 0.0F;
-
-    public Long getId() {
-        return id;
-    }
+    @ManyToOne(optional = true)
+    private VirtualSensor virtualSensor;
 
     public DataNode getParent() {
         return parent;
@@ -33,28 +31,36 @@ public abstract class DataNode extends NameDescriptionClass {
         this.parent = parent;
     }
 
-    public String getQuery() {
-        return query;
+    public Window getWindow() {
+        return window;
     }
 
-    public void setQuery(String query) {
-        this.query = query;
+    public void setWindow(Window window) {
+        this.window = window;
     }
 
-    public float getLoadShedding() {
-        return loadShedding;
+    public Sliding getSliding() {
+        return sliding;
     }
 
-    public void setLoadShedding(float loadShedding) {
-        this.loadShedding = loadShedding;
+    public void setSliding(Sliding sliding) {
+        this.sliding = sliding;
     }
 
-    public WindowPredicate getWindowPredicate() {
-        return windowPredicate;
+    public List<DataNode> getChildren() {
+        return children;
     }
 
-    public void setWindowPredicate(WindowPredicate windowPredicate) {
-        this.windowPredicate = windowPredicate;
+    public void setChildren(List<DataNode> children) {
+        this.children = children;
+    }
+
+    public VirtualSensor getVirtualSensor() {
+        return virtualSensor;
+    }
+
+    public void setVirtualSensor(VirtualSensor virtualSensor) {
+        this.virtualSensor = virtualSensor;
     }
 
     public boolean equals(Object other) {
@@ -65,10 +71,13 @@ public abstract class DataNode extends NameDescriptionClass {
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
-        if (getQuery() != null ? !getQuery().equals(that.getQuery()) : that.getQuery() != null) return false;
-        if (getWindowPredicate() != null ? !getWindowPredicate().equals(that.getWindowPredicate()) : that.getWindowPredicate() != null)
+        if (getWindow() != null ? !getWindow().equals(that.getWindow()) : that.getWindow() != null)
+            return false;
+        if (getSliding() != null ? !getSliding().equals(that.getSliding()) : that.getSliding() != null)
             return false;
         if (getParent() != null ? !getParent().equals(that.getParent()) : that.getParent() != null) return false;
+        if (getChildren() != null ? !getChildren().equals(that.getChildren()) : that.getChildren() != null)
+            return false;
 
         return true;
     }
@@ -77,9 +86,10 @@ public abstract class DataNode extends NameDescriptionClass {
     public int hashCode() {
         int result = getId() != null ? getId().hashCode() : 0;
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-        result = 31 * result + (getQuery() != null ? getQuery().hashCode() : 0);
-        result = 31 * result + (getWindowPredicate() != null ? getWindowPredicate().hashCode() : 0);
+        result = 31 * result + (getWindow() != null ? getWindow().hashCode() : 0);
+        result = 31 * result + (getSliding() != null ? getSliding().hashCode() : 0);
         result = 31 * result + (getParent() != null ? getParent().hashCode() : 0);
+        result = 31 * result + (getChildren() != null ? getChildren().hashCode() : 0);
         return result;
     }
 }

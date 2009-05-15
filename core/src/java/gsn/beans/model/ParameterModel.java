@@ -2,14 +2,13 @@ package gsn.beans.model;
 
 import gsn.beans.DataType;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Entity
 public class ParameterModel extends NameDescriptionClass {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(length = 100)
     private String defaultValue;
 
@@ -18,10 +17,6 @@ public class ParameterModel extends NameDescriptionClass {
     @Enumerated(EnumType.STRING)
     @Column(length = 100)
     private DataType dataType;
-
-    public Long getId() {
-        return id;
-    }
 
     public String getDefaultValue() {
         return defaultValue;

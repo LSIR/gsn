@@ -4,7 +4,6 @@ import gsn.Main;
 import gsn.beans.windowing.QueryHandler;
 import gsn.beans.windowing.WindowType;
 import gsn.storage.SQLUtils;
-import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;

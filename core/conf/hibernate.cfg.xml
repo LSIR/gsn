@@ -15,19 +15,23 @@
         <property name="hibernate.show_sql">true</property>
 
         <mapping package="gsn.beans.model"/>
-        <mapping class="gsn.beans.model.InputStream"/>
         <mapping class="gsn.beans.model.DataNode"/>
+        <mapping class="gsn.beans.model.QueryNode"/>
+        <mapping class="gsn.beans.model.ModelNode"/>
+        <mapping class="gsn.beans.model.DataModel"/>
         <mapping class="gsn.beans.model.OutputFormat"/>
         <mapping class="gsn.beans.model.Parameter"/>
         <mapping class="gsn.beans.model.ParameterModel"/>
-        <mapping class="gsn.beans.model.StreamSource"/>
         <mapping class="gsn.beans.model.VirtualSensor"/>
         <mapping class="gsn.beans.model.VirtualSensorProcessor"/>
         <mapping class="gsn.beans.model.VirtualSensorProcessorModel"/>
         <mapping class="gsn.beans.model.WebInput"/>
         <mapping class="gsn.beans.model.WebCommand"/>
-        <mapping class="gsn.beans.model.WindowPredicate"/>
-        <mapping class="gsn.beans.model.WindowPredicateModel"/>
+        <mapping class="gsn.beans.model.BasicModel"/>
+        <mapping class="gsn.beans.model.Window"/>
+        <mapping class="gsn.beans.model.WindowModel"/>
+        <mapping class="gsn.beans.model.Sliding"/>
+        <mapping class="gsn.beans.model.SlidingModel"/>
         <mapping class="gsn.beans.model.Wrapper"/>
         <mapping class="gsn.beans.model.WrapperModel"/>
         

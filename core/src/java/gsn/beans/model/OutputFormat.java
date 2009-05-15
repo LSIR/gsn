@@ -6,20 +6,12 @@ import javax.persistence.*;
 
 @Entity
 public class OutputFormat extends NameDescriptionClass {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Enumerated(EnumType.STRING)
     @Column(length = 100)
     private DataType dataType;
 
     @ManyToOne(optional = false)
     private VirtualSensorProcessorModel virtualSensorProcessorModel;
-
-    public Long getId() {
-        return id;
-    }
 
     public DataType getDataType() {
         return dataType;

@@ -32,7 +32,7 @@ public class VirtualSensor implements Serializable {
     private VirtualSensorProcessor processor;
 
     @OneToMany(mappedBy = "virtualSensor")
-    private List<InputStream> inputStream;
+    private List<DataNode> dataNodes;
 
     private boolean accessProtected = false;
 
@@ -96,12 +96,12 @@ public class VirtualSensor implements Serializable {
         this.processor = processor;
     }
 
-    public List<InputStream> getInputStream() {
-        return inputStream;
+    public List<DataNode> getDataNodes() {
+        return dataNodes;
     }
 
-    public void setInputStream(List<InputStream> inputStream) {
-        this.inputStream = inputStream;
+    public void setDataNodes(List<DataNode> dataNodes) {
+        this.dataNodes = dataNodes;
     }
 
     @Override

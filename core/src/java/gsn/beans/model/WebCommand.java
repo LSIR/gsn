@@ -1,21 +1,14 @@
 package gsn.beans.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class WebCommand extends NameDescriptionClass {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     private String rule;
 
     @ManyToOne
     private WebInput webInput;
-
-    public Long getId() {
-        return id;
-    }
 
     public String getRule() {
         return rule;

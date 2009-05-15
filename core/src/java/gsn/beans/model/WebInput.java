@@ -1,24 +1,18 @@
 package gsn.beans.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
 public class WebInput extends NameDescriptionClass {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @OneToMany(mappedBy = "webInput")
     private List<WebCommand> commands;
 
     @ManyToOne(optional = false)
     private VirtualSensorProcessorModel virtualSensorProcessorModel;
-
-    public Long getId() {
-        return id;
-    }
 
     public List<WebCommand> getCommands() {
         return commands;

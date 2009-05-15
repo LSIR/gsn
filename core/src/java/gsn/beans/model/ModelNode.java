@@ -11,20 +11,20 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-@DiscriminatorValue("WR")
-public class Wrapper extends DataNode {
+@DiscriminatorValue("MN")
+public class ModelNode extends DataNode {
     @ManyToOne(optional = false)
-    private WrapperModel model;
+    private DataModel model;
 
     @OneToMany
     @Cascade({ALL, DELETE_ORPHAN})
     private List<Parameter> parameters;
 
-    public WrapperModel getModel() {
+    public DataModel getModel() {
         return model;
     }
 
-    public void setModel(WrapperModel model) {
+    public void setModel(DataModel model) {
         this.model = model;
     }
 
@@ -39,9 +39,9 @@ public class Wrapper extends DataNode {
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        if (other == null || !(other instanceof Wrapper)) return false;
+        if (other == null || !(other instanceof ModelNode)) return false;
 
-        Wrapper that = (Wrapper) other;
+        ModelNode that = (ModelNode) other;
 
         if (!super.equals(other)) return false;
         if (getModel() != null ? !getModel().equals(that.getModel()) : that.getModel() != null) return false;
