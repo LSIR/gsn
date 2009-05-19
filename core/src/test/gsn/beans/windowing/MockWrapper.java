@@ -30,4 +30,8 @@ public class MockWrapper extends AbstractWrapper {
     public Boolean postStreamElement(StreamElement streamElement) {
         return super.postStreamElement(streamElement);
     }
+
+    public void run() {
+        
+    }
 }

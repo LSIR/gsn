@@ -77,7 +77,6 @@ public class CSVFileWrapper extends AbstractWrapper {
         this.structure = new DataField[columns];
         for (int i = 0; i < columns; i++)
             structure[i] = (DataField) v.get(i);
-        setName("CVSFileWrapper-Thread:" + (++threadCounter));
         logger.warn("cvsfile wrapper initialize completed ...");
         return true;
     }

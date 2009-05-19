@@ -33,19 +33,11 @@ public class VSensorLoader extends Thread {
 
     private StorageManager sm = StorageManager.getInstance();
 
-    private String pluginsDir;
-
-    private boolean isActive = true;
+   private boolean isActive = true;
 
     private static int VSENSOR_LOADER_THREAD_COUNTER = 0;
 
-
     public VSensorLoader() {
-
-    }
-
-    public VSensorLoader(String pluginsPath) {
-        this.pluginsDir = pluginsPath;
         Thread thread = new Thread(this);
         thread.setName("VSensorLoader-Thread" + VSENSOR_LOADER_THREAD_COUNTER++);
         thread.start();
@@ -66,7 +58,7 @@ public class VSensorLoader extends Thread {
     }
 
     public void loadPlugin() throws SQLException, JiBXException {
-        Modifications modifications = getUpdateStatus(pluginsDir);
+        Modifications modifications = null ;// TODO: getUpdateStatus(pluginsDir); Has to be changed
         ArrayList<VSensorConfig> removeIt = modifications.getRemove();
         ArrayList<VSensorConfig> addIt = modifications.getAdd();
         for (VSensorConfig configFile : removeIt) {
@@ -346,7 +338,7 @@ public class VSensorLoader extends Thread {
                 logger.error(e.getMessage(), e);
                 return null;
             }
-            wrapper.start();
+        //    wrapper.start();
             activeWrappers.put(wrapper.getActiveAddressBean(), wrapper);
         } else if (logger.isDebugEnabled())
             logger.debug("Existing wrapper found and reused. [name :" + addressBean.getWrapper());

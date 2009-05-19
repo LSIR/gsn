@@ -6,7 +6,7 @@ import gsn.beans.model.Parameter;
 
 import java.util.ArrayList;
 
-public class WrapperDecorator extends  ThreadDataNodeDecorator {
+public class WrapperDecorator extends QueryDecorator {
 
     ArrayList<StreamElement> totalWindow = new ArrayList<StreamElement>();
     BetterQueue slidingQueue = new BetterQueue(); // get Queue from Slider.

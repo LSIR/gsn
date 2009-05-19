@@ -89,4 +89,7 @@ public class InVMPipeWrapper extends AbstractWrapper {
         return sb.toString();
     }
 
+    public void run() {
+        
+    }
 }

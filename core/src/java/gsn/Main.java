@@ -32,7 +32,7 @@ public final class Main {
     private Main() throws Exception {
         System.out.println("GSN Starting ...");
         ValidityTools.checkAccessibilityOfFiles(DEFAULT_GSN_LOG4J_PROPERTIES, WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE, DEFAULT_GSN_CONF_FILE);
-        ValidityTools.checkAccessibilityOfDirs(DEFAULT_VIRTUAL_SENSOR_DIRECTORY);
+
         PropertyConfigurator.configure(Main.DEFAULT_GSN_LOG4J_PROPERTIES);
         //  initializeConfiguration();
         try {
@@ -56,7 +56,7 @@ public final class Main {
         StorageManager.getInstance().init(containerConfig.getJdbcURL());
         if (logger.isInfoEnabled()) logger.info("The Container Configuration file loaded successfully.");
 
-        final VSensorLoader vsloader = new VSensorLoader(DEFAULT_VIRTUAL_SENSOR_DIRECTORY);
+        final VSensorLoader vsloader = new VSensorLoader();
     }
 
     public synchronized static Main getInstance() {
@@ -76,8 +76,6 @@ public final class Main {
 
     public static final String DEFAULT_GSN_CONF_FILE = "conf/gsn.xml";
 
-    public static String DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
-
     public static final String DEFAULT_WEB_APP_PATH = "webapp";
 
 
@@ -95,7 +93,7 @@ public final class Main {
 
     public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException {
         ValidityTools.checkAccessibilityOfFiles(Main.DEFAULT_GSN_LOG4J_PROPERTIES, WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE, Main.DEFAULT_GSN_CONF_FILE);
-        ValidityTools.checkAccessibilityOfDirs(Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY);
+        ValidityTools.checkAccessibilityOfDirs();
         PropertyConfigurator.configure(Main.DEFAULT_GSN_LOG4J_PROPERTIES);
         ContainerConfig toReturn = null;
         try {
