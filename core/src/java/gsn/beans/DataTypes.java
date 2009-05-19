@@ -3,8 +3,8 @@ package gsn.beans;
 import gsn.utils.GSNRuntimeException;
 import org.apache.log4j.Logger;
 
-import java.util.regex.Pattern;
 import java.sql.Types;
+import java.util.regex.Pattern;
 
 public class DataTypes {
 

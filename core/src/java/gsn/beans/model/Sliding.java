@@ -17,7 +17,7 @@ public class Sliding implements Serializable {
     private List<Parameter> parameters;
 
     @OneToOne(optional = false)
-    private DataNodeInterface dataNodeInterface;
+    private DataNode dataNode;
 
     public Long getId() {
         return id;
@@ -39,12 +39,12 @@ public class Sliding implements Serializable {
         this.parameters = parameters;
     }
 
-    public DataNodeInterface getNode() {
-        return dataNodeInterface;
+    public DataNode getNode() {
+        return dataNode;
     }
 
-    public void setNode(DataNodeInterface dataNodeInterface) {
-        this.dataNodeInterface = dataNodeInterface;
+    public void setNode(DataNode dataNodeInterface) {
+        this.dataNode = dataNodeInterface;
     }
 
     @Override

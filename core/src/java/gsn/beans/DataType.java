@@ -1,7 +1,5 @@
 package gsn.beans;
 
-import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Types;
 
 public enum DataType {
@@ -9,7 +7,7 @@ public enum DataType {
     STRING("string", "String", "", "varchar", Types.VARCHAR, "STRING"),
     NUMERIC("numeric", "Numeric", "", "double", Types.NUMERIC, "NUMERIC"),
     BINARY("binary", "Binary", "", "blob", Types.BINARY, "BINARY\\s*(:.*)?\\s*"),
-    TIMESTAMP("timestamp", "Timestamp", "", "bigint", Types.BIGINT, "TIMESTAMP");     
+    TIMESTAMP("timestamp", "Timestamp", "", "bigint", Types.BIGINT, "TIMESTAMP");
 
     private String name;
     private String description;

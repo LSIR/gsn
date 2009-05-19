@@ -1,9 +1,9 @@
 package gsn.beans;
 
-import java.util.Queue;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Queue;
 
 public class BetterQueue<T> {
     private Queue<T> queue = new LinkedList<T>();
@@ -43,42 +43,39 @@ public class BetterQueue<T> {
         return insertCounter;
     }
 
-    public void addListener(QueueChangeListener<T> listener){
+    public void addListener(QueueChangeListener<T> listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(QueueChangeListener<T> listener){
+    public void removeListener(QueueChangeListener<T> listener) {
         listeners.remove(listener);
     }
 
-    /************************************************
+    /**
+     * *********************************************
      * Events
-     ************************************************/
+     * **********************************************
+     */
 
-    public void fireAddItemListener(T object){
+    public void fireAddItemListener(T object) {
         for (QueueChangeListener listener : listeners)
             listener.itemAdded(object);
     }
 
-    public void fireRemovedItemListener(T object){
+    public void fireRemovedItemListener(T object) {
         for (QueueChangeListener listener : listeners)
             listener.itemRemove(object);
     }
 
-    public void fireEmptyListener(T object){
+    public void fireEmptyListener(T object) {
         for (QueueChangeListener listener : listeners)
             listener.queueEmpty();
     }
 
-    public void fireNotEmptyListener(T object){
+    public void fireNotEmptyListener(T object) {
         for (QueueChangeListener listener : listeners)
             listener.queueNotEmpty();
     }
-
-    /*******************************************
-     * Original Methods required by the interface. 
-     *
-     ********************************************/
 
     public int size() {
         return queue.size();
@@ -88,14 +85,14 @@ public class BetterQueue<T> {
         return queue.isEmpty();
     }
 
-    public boolean contains(Object o) {
-        return queue.contains(o);
+    public boolean contains(T t) {
+        return queue.contains(t);
     }
 
-    // TODO : the notification doesn't work with the remove method of the iterator.
     public Iterator<T> iterator() {
-        return new Iterator<T>(){
+        return new Iterator<T>() {
             Iterator<T> it = queue.iterator();
+
             public boolean hasNext() {
                 return it.hasNext();
             }
@@ -118,8 +115,8 @@ public class BetterQueue<T> {
     public boolean add(T t) {
         insertCounter++;
         lastInsert = System.currentTimeMillis();
-              if (firstInsert == -1)
-                  firstInsert = lastInsert;
+        if (firstInsert == -1)
+            firstInsert = lastInsert;
         boolean isEmpty = queue.isEmpty();
         boolean toReturn = queue.offer(t);
         if (isEmpty)
@@ -134,7 +131,7 @@ public class BetterQueue<T> {
             return null;
         lastRemove = System.currentTimeMillis();
         if (firstRemove == -1)
-        firstRemove= lastRemove ;
+            firstRemove = lastRemove;
 
         T toReturn = queue.poll();
         if (queue.isEmpty())

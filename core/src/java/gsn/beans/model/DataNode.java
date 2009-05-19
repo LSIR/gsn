@@ -8,10 +8,10 @@ import java.util.List;
 @DiscriminatorColumn(name = "childType", discriminatorType = DiscriminatorType.STRING)
 public abstract class DataNode extends NameDescriptionClass implements DataNodeInterface {
 
-    @ManyToMany(mappedBy = "parents")
+    @ManyToMany(mappedBy = "parents", targetEntity = DataNode.class)
     private List<DataNodeInterface> children;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(targetEntity = DataNode.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<DataNodeInterface> parents;
 
     @OneToOne(optional = false, mappedBy = "dataNode")

@@ -1,18 +1,14 @@
 package gsn.beans.decorators;
 
 import gsn.beans.model.*;
-import gsn.beans.QueueChangeListener;
-import gsn.wrappers.AbstractWrapper;
-import gsn.wrappers.SystemTime;
 
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class ThreadDataNodeDecorator implements DataNodeInterface, Runnable {
 
     private QueueDataNodeDecorator node;
 
-    public ThreadDataNodeDecorator(QueueDataNodeDecorator node){
+    public ThreadDataNodeDecorator(QueueDataNodeDecorator node) {
         this.node = node;
     }
 
@@ -21,7 +17,7 @@ public class ThreadDataNodeDecorator implements DataNodeInterface, Runnable {
     }
 
     public List<DataNodeInterface> getParents() {
-       return node.getParents();
+        return node.getParents();
     }
 
     public void setParents(List<DataNodeInterface> parents) {
@@ -61,21 +57,19 @@ public class ThreadDataNodeDecorator implements DataNodeInterface, Runnable {
     }
 
 
-
     public void run() {
-       // There is something to be processed.
-       // insert the final output into my window.
-       // distribute my window to the parent nodes.
+        // There is something to be processed.
+        // insert the final output into my window.
+        // distribute my window to the parent nodes.
 
     }
 
-    protected void distribute(Window data){
-        for (DataNodeInterface parent : getParents()){
-            QueueDataNodeDecorator parentDec = (QueueDataNodeDecorator)  parent;
+    protected void distribute(Window data) {
+        for (DataNodeInterface parent : getParents()) {
+            QueueDataNodeDecorator parentDec = (QueueDataNodeDecorator) parent;
             parentDec.getQueue(this).add(data);
         }
     }
 
 
-    
 }

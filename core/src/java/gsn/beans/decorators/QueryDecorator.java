@@ -1,11 +1,11 @@
 package gsn.beans.decorators;
 
-import gsn.beans.model.DataNodeInterface;
 import gsn.beans.QueueChangeListener;
+import gsn.beans.model.DataNodeInterface;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class QueryDecorator extends ThreadDataNodeDecorator{
+public class QueryDecorator extends ThreadDataNodeDecorator {
 
     private LinkedBlockingQueue lockQueue = new LinkedBlockingQueue();
 
@@ -14,10 +14,10 @@ public class QueryDecorator extends ThreadDataNodeDecorator{
     }
 
 
-    protected void initializeBlockingQueue(){
-        for (DataNodeInterface child : getChildren()){
-            QueueDataNodeDecorator childDec = (QueueDataNodeDecorator)  child;
-            childDec.getQueue(this).addListener(new QueueChangeListener(){
+    protected void initializeBlockingQueue() {
+        for (DataNodeInterface child : getChildren()) {
+            QueueDataNodeDecorator childDec = (QueueDataNodeDecorator) child;
+            childDec.getQueue(this).addListener(new QueueChangeListener() {
 
                 public void itemAdded(Object obj) {
 
@@ -37,7 +37,8 @@ public class QueryDecorator extends ThreadDataNodeDecorator{
             });
         }
     }
-    public void run(){
+
+    public void run() {
         if (lockQueue.isEmpty()) {
             try {
                 lockQueue.take();

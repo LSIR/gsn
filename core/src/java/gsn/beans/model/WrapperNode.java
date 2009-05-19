@@ -12,7 +12,7 @@ import java.util.List;
 
 @Entity
 @DiscriminatorValue("WR")
-public class Wrapper extends DataNode {
+public class WrapperNode extends DataNode {
     @ManyToOne(optional = false)
     private WrapperModel model;
 
@@ -39,9 +39,9 @@ public class Wrapper extends DataNode {
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        if (other == null || !(other instanceof Wrapper)) return false;
+        if (other == null || !(other instanceof WrapperNode)) return false;
 
-        Wrapper that = (Wrapper) other;
+        WrapperNode that = (WrapperNode) other;
 
         if (!super.equals(other)) return false;
         if (getModel() != null ? !getModel().equals(that.getModel()) : that.getModel() != null) return false;

@@ -32,7 +32,7 @@
         <mapping class="gsn.beans.model.WindowModel"/>
         <mapping class="gsn.beans.model.Sliding"/>
         <mapping class="gsn.beans.model.SlidingModel"/>
-        <mapping class="gsn.beans.model.Wrapper"/>
+        <mapping class="gsn.beans.model.WrapperNode"/>
         <mapping class="gsn.beans.model.WrapperModel"/>
         
     </session-factory>

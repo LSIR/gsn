@@ -17,6 +17,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
     private Map<StreamSource, Long> slidingHashMap;
     private AbstractWrapper wrapper;
     private long timediff;
+    private long lastTimestamp = 0;
 
     public RemoteTimeBasedSlidingHandler(AbstractWrapper wrapper) {
         streamSources = Collections.synchronizedList(new ArrayList<StreamSource>());
@@ -36,30 +37,28 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 
     public synchronized boolean dataAvailable(StreamElement streamElement) {
         boolean toReturn = false;
-        synchronized (streamSources) {
-            for (StreamSource streamSource : streamSources) {
-                if (streamSource.getWindowingType() == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE) {
-                    toReturn = streamSource.getQueryHandler().dataAvailable(streamElement) || toReturn;
-                } else {
-                    long nextSlide = slidingHashMap.get(streamSource);
-                    // this is the first stream element
-                    if (nextSlide == -1) {
-                        slidingHashMap.put(streamSource, streamElement.getTimeStamp() + streamSource.getParsedSlideValue());
+        if (streamElement.getTimeStamp() > lastTimestamp) {
+            synchronized (streamSources) {
+                for (StreamSource streamSource : streamSources) {
+                    if (streamSource.getWindowingType() == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE) {
+                        toReturn = streamSource.getQueryHandler().dataAvailable(streamElement) || toReturn;
                     } else {
-                        long timeStamp = streamElement.getTimeStamp();
-                        if (nextSlide <= timeStamp) {
-                            // long timestampDiff = timeStamp - nextSlide;
-                            // int slideValue =
-                            // streamSource.getParsedSlideValue();
-                            // nextSlide = nextSlide + (timestampDiff /
-                            // slideValue + 1) * slideValue;
-                            nextSlide = timeStamp + streamSource.getParsedSlideValue();
-                            toReturn = streamSource.getQueryHandler().dataAvailable(streamElement) || toReturn;
-                            slidingHashMap.put(streamSource, nextSlide);
+                        long nextSlide = slidingHashMap.get(streamSource);
+                        // this is the first stream element
+                        if (nextSlide == -1) {
+                            slidingHashMap.put(streamSource, streamElement.getTimeStamp() + streamSource.getParsedSlideValue());
+                        } else {
+                            long timeStamp = streamElement.getTimeStamp();
+                            if (nextSlide <= timeStamp) {
+                                nextSlide = timeStamp + streamSource.getParsedSlideValue();
+                                toReturn = streamSource.getQueryHandler().dataAvailable(streamElement) || toReturn;
+                                slidingHashMap.put(streamSource, nextSlide);
+                            }
                         }
                     }
                 }
             }
+            lastTimestamp = streamElement.getTimeStamp();
         }
         return toReturn;
     }

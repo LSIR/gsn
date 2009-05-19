@@ -31,7 +31,7 @@ public class VirtualSensor implements Serializable {
     @OneToOne(optional = false, mappedBy = "virtualSensor")
     private VirtualSensorProcessor processor;
 
-    @OneToMany(mappedBy = "virtualSensor")
+    @OneToMany(targetEntity = DataNode.class, mappedBy = "virtualSensor")
     private List<DataNodeInterface> dataNodeInterfaces;
 
     private boolean accessProtected = false;

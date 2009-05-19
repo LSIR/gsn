@@ -16,6 +16,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
     private List<StreamSource> streamSources; //only holds WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE types of stream sources
     private Map<StreamSource, Integer> slidingHashMap;
     private AbstractWrapper wrapper;
+    private long lastTimestamp = 0;
 
     public TupleBasedSlidingHandler(AbstractWrapper wrapper) {
         streamSources = Collections.synchronizedList(new ArrayList<StreamSource>());
@@ -40,20 +41,23 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 
     public boolean dataAvailable(StreamElement streamElement) {
         boolean toReturn = false;
-        synchronized (streamSources) {
-            for (StreamSource streamSource : streamSources) {
-                toReturn = streamSource.getQueryHandler().dataAvailable(streamElement) || toReturn;
-            }
-        }
-        synchronized (slidingHashMap) {
-            for (StreamSource streamSource : slidingHashMap.keySet()) {
-                int slideVar = slidingHashMap.get(streamSource) + 1;
-                if (slideVar == streamSource.getParsedSlideValue()) {
+        if (streamElement.getTimeStamp() > lastTimestamp) {
+            synchronized (streamSources) {
+                for (StreamSource streamSource : streamSources) {
                     toReturn = streamSource.getQueryHandler().dataAvailable(streamElement) || toReturn;
-                    slideVar = 0;
                 }
-                slidingHashMap.put(streamSource, slideVar);
             }
+            synchronized (slidingHashMap) {
+                for (StreamSource streamSource : slidingHashMap.keySet()) {
+                    int slideVar = slidingHashMap.get(streamSource) + 1;
+                    if (slideVar == streamSource.getParsedSlideValue()) {
+                        toReturn = streamSource.getQueryHandler().dataAvailable(streamElement) || toReturn;
+                        slideVar = 0;
+                    }
+                    slidingHashMap.put(streamSource, slideVar);
+                }
+            }
+            lastTimestamp = streamElement.getTimeStamp();
         }
         return toReturn;
     }

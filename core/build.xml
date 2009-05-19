@@ -40,6 +40,7 @@
         <delete includeEmptyDirs="yes" failonerror="no">
             <fileset dir="${build.dir}" includes="**/*.class,**/*.xml"/>
             <fileset dir="${build.dir}" includes="**/*.xml"/>
+            <fileset dir="${test-build.dir}" />
             <fileset dir="${reports}" includes="**/*html,**/*htm,**/*xml"/>
             <fileset dir="${jars}" includes="**/*"/>
         </delete>

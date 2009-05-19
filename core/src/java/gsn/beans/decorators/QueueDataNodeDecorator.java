@@ -1,28 +1,33 @@
 package gsn.beans.decorators;
 
-import gsn.beans.model.*;
 import gsn.beans.BetterQueue;
+import gsn.beans.QueueFactory;
+import gsn.beans.model.*;
 
-import java.util.List;
-import java.util.Queue;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class QueueDataNodeDecorator  implements DataNodeInterface{
+public class QueueDataNodeDecorator implements DataNodeInterface {
 
-    private DataNodeInterface node;
+    protected DataNodeInterface node;
 
-    private HashMap<DataNodeInterface, BetterQueue> childQueues = new HashMap<DataNodeInterface, BetterQueue>();
+    private HashMap<DataNodeInterface, BetterQueue<Window>> childQueues = new HashMap<DataNodeInterface, BetterQueue<Window>>();
 
-    public QueueDataNodeDecorator(DataNodeInterface node){
+    public QueueDataNodeDecorator(DataNodeInterface node) {
         this.node = node;
-        for(DataNodeInterface child : node.getChildren()){
+        for (DataNodeInterface child : node.getChildren()) {
             BetterQueue<Window> queue = QueueFactory.createBetterQueue();
-            childQueues.put(child,queue);
+            childQueues.put(child, queue);
         }
     }
+
+    public DataNodeInterface getDecoratedNode(){
+        return node;
+    }
+
     public List<DataNodeInterface> getParents() {
-       return node.getParents();
+        return node.getParents();
     }
 
     public void setParents(List<DataNodeInterface> parents) {
@@ -61,11 +66,11 @@ public class QueueDataNodeDecorator  implements DataNodeInterface{
         node.setVirtualSensor(virtualSensor);
     }
 
-    public HashMap<DataNodeInterface, BetterQueue> getChildrenQueues(){
+    public HashMap<DataNodeInterface, BetterQueue<Window>> getChildrenQueues() {
         return childQueues;
     }
 
-    public BetterQueue<Window> getQueue(DataNodeInterface childNode){
+    public BetterQueue<Window> getQueue(DataNodeInterface childNode) {
         return childQueues.get(childNode);
     }
 
