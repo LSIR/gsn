@@ -1,10 +1,8 @@
 package gsn.wrappers2;
 
 
-import gsn.beans.StreamElement;
 import gsn.beans.DataField;
-import gsn.beans.decorators.WrapperDecorator;
-import gsn.beans.decorators.QueueDataNodeDecorator;
+import gsn.beans.StreamElement;
 import gsn.beans.model.Parameter;
 import org.apache.log4j.Logger;
 
@@ -14,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.List;
 
-public class SystemTimeWrapper2 extends AbstractWrapper2 implements ActionListener{
+public class SystemTimeWrapper2 extends AbstractWrapper2 implements ActionListener {
 
     private static final Serializable[] EMPTY_DATA_PART = new Serializable[]{};
 
@@ -26,17 +24,45 @@ public class SystemTimeWrapper2 extends AbstractWrapper2 implements ActionListen
 
     private Timer timer;
 
+    private long nextTimestamp;
+
+    private int period;
+
     public DataField[] getOutputFormat() {
-        return new DataField[0]; 
+        return new DataField[0];
     }
 
     public boolean initialize(List<Parameter> parameters) {
-        timer = new Timer(0, this);
+        boolean auto = true;
+        for (Parameter parameter : parameters) {
+            if ("mode".equals(parameter.getModel().getName())) {
+                String mode = parameter.getValue();
+                if (!"auto".equals(mode)) {
+                    auto = false;
+                }
+            } else if ("period".equals(parameter.getModel().getName())) {
+                period = Integer.getInteger(parameter.getValue());
+            }
+        }
+
+        if (auto) {
+            timer = new Timer(period, this);
+        }
         return true;
     }
 
     public void run() {
-        timer.start();
+        if (timer != null) {
+            timer.start();
+        } else {
+            nextTimestamp = System.currentTimeMillis();
+        }
+    }
+
+    public void produceNext() {
+        nextTimestamp += period;
+        StreamElement streamElement = new StreamElement(EMPTY_FIELD_LIST, EMPTY_FIELD_TYPES, EMPTY_DATA_PART, nextTimestamp);
+        postStreamElement(streamElement);
     }
 
     public void actionPerformed(ActionEvent actionEvent) {
@@ -45,8 +71,9 @@ public class SystemTimeWrapper2 extends AbstractWrapper2 implements ActionListen
     }
 
     public void finalize() {
-        timer.stop();
-
+        if (timer != null) {
+            timer.stop();
+        }
     }
 }
 

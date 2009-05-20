@@ -1,23 +1,23 @@
 package gsn.beans.decorators;
 
-import gsn.beans.BetterQueue;
+import gsn.beans.DataWindow;
 import gsn.beans.StreamElement;
 import gsn.beans.model.Parameter;
-import gsn.beans.model.WrapperNode;
 import gsn.beans.model.WrapperModel;
-import gsn.wrappers2.WrapperListener;
+import gsn.beans.model.WrapperNode;
+import gsn.beans.windowing.CountBasedSlidingHandler;
 import gsn.wrappers2.AbstractWrapper2;
-
-import java.util.ArrayList;
-
+import gsn.wrappers2.WrapperListener;
 import org.apache.log4j.Logger;
 
-public class WrapperDecorator extends ThreadDataNodeDecorator implements WrapperListener{
+import java.util.ArrayList;
+import java.util.ListIterator;
+
+public class WrapperDecorator extends ThreadDataNodeDecorator implements WrapperListener {
 
     private final static transient Logger logger = Logger.getLogger(WrapperDecorator.class);
 
     ArrayList<StreamElement> totalWindow = new ArrayList<StreamElement>();
-    BetterQueue slidingQueue = new BetterQueue(); // get Queue from Slider.
 
     public WrapperDecorator(QueueDataNodeDecorator node) {
         super(node);
@@ -27,6 +27,7 @@ public class WrapperDecorator extends ThreadDataNodeDecorator implements Wrapper
                     "You provided an instance of \"" + node.getDecoratedNode().getClass().getName() + "\"");
         }
 
+        slidingHandler = new CountBasedSlidingHandler(this, getSliding());
         wrapperNode = (WrapperNode) node.getDecoratedNode();
         initializeWrapper(wrapperNode);
     }
@@ -51,11 +52,29 @@ public class WrapperDecorator extends ThreadDataNodeDecorator implements Wrapper
     }
 
     public void post(StreamElement se) {
-        totalWindow.add(se);
-        slidingQueue.add(se.getTimeStamp());
+        synchronized (this) {
+            totalWindow.add(se);
+        }
+        slidingHandler.addNewElement(se.getTimeStamp());
     }
 
     public void dataProduced(StreamElement se) {
-        post(se);       
+        post(se);
+    }
+
+    public void slide(long timestamp) {
+        //update window if necessary
+        //distrubute data
+        DataWindow dataWindow = new DataWindow(getWindow());
+        synchronized (this) {
+            for (ListIterator<StreamElement> iter = totalWindow.listIterator(); iter.hasNext(); ) {
+                StreamElement streamElement = iter.next();
+                if(streamElement.getTimeStamp() <= timestamp && streamElement.getTimeStamp() >= timestamp - dataWindow.getSize()){
+                    dataWindow.addElement(streamElement);
+                    iter.remove();
+                }
+            }
+        }
+        distribute(dataWindow);
     }
 }

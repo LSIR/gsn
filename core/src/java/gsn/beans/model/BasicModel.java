@@ -1,6 +1,10 @@
 package gsn.beans.model;
 
+import org.hibernate.annotations.*;
+
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.CascadeType;
 import java.util.List;
 
 @Entity
@@ -10,7 +14,8 @@ public class BasicModel extends NameDescriptionClass {
     @Column(nullable = false)
     private String className;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private List<ParameterModel> parameters;
 
     public String getClassName() {

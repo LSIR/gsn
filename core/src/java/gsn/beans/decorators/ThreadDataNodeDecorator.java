@@ -1,12 +1,15 @@
 package gsn.beans.decorators;
 
 import gsn.beans.model.*;
+import gsn.beans.DataWindow;
+import gsn.beans.windowing.SlidingHandler2;
 
 import java.util.List;
 
 public class ThreadDataNodeDecorator implements DataNodeInterface, Runnable {
 
     private QueueDataNodeDecorator node;
+    protected SlidingHandler2 slidingHandler;
 
     public ThreadDataNodeDecorator(QueueDataNodeDecorator node) {
         this.node = node;
@@ -64,7 +67,7 @@ public class ThreadDataNodeDecorator implements DataNodeInterface, Runnable {
 
     }
 
-    protected void distribute(Window data) {
+    protected void distribute(DataWindow data) {
         for (DataNodeInterface parent : getParents()) {
             QueueDataNodeDecorator parentDec = (QueueDataNodeDecorator) parent;
             parentDec.getQueue(this).add(data);
@@ -72,4 +75,7 @@ public class ThreadDataNodeDecorator implements DataNodeInterface, Runnable {
     }
 
 
+    public void slide(long timestamp) {
+        
+    }
 }

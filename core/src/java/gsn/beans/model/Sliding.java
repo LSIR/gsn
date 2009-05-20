@@ -1,6 +1,10 @@
 package gsn.beans.model;
 
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
+
 import javax.persistence.*;
+import javax.persistence.Entity;
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,9 +18,10 @@ public class Sliding implements Serializable {
     private SlidingModel model;
 
     @OneToMany
+    @Cascade({org.hibernate.annotations.CascadeType.ALL, CascadeType.DELETE_ORPHAN})
     private List<Parameter> parameters;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = true)
     private DataNode dataNode;
 
     public Long getId() {

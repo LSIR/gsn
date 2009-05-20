@@ -5,7 +5,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("QN")
 public class QueryNode extends DataNode {
 
     @Column(length = (1024 * 8), nullable = false)

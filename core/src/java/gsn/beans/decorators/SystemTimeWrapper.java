@@ -1,6 +1,5 @@
 package gsn.beans.decorators;
 
-import gsn.beans.interfaces.Wrapper;
 import gsn.beans.BetterQueue;
 import gsn.beans.StreamElement;
 import javax.swing.*;
@@ -10,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.io.Serializable;
 import org.apache.log4j.Logger;
 
-public class SystemTimeWrapper implements Wrapper, ActionListener {
+public class SystemTimeWrapper implements  ActionListener {
     private Timer timer;
     private BetterQueue queue;
     private Logger logger = Logger.getLogger(this.getClass());

@@ -11,7 +11,6 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-@DiscriminatorValue("MN")
 public class ModelNode extends DataNode {
     @ManyToOne(optional = false)
     private DataModel model;

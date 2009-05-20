@@ -2,6 +2,7 @@ package gsn.beans.decorators;
 
 import gsn.beans.BetterQueue;
 import gsn.beans.QueueFactory;
+import gsn.beans.DataWindow;
 import gsn.beans.model.*;
 
 import java.util.HashMap;
@@ -12,12 +13,12 @@ public class QueueDataNodeDecorator implements DataNodeInterface {
 
     protected DataNodeInterface node;
 
-    private HashMap<DataNodeInterface, BetterQueue<Window>> childQueues = new HashMap<DataNodeInterface, BetterQueue<Window>>();
+    private HashMap<DataNodeInterface, BetterQueue<DataWindow>> childQueues = new HashMap<DataNodeInterface, BetterQueue<DataWindow>>();
 
     public QueueDataNodeDecorator(DataNodeInterface node) {
         this.node = node;
         for (DataNodeInterface child : node.getChildren()) {
-            BetterQueue<Window> queue = QueueFactory.createBetterQueue();
+            BetterQueue<DataWindow> queue = QueueFactory.createBetterQueue();
             childQueues.put(child, queue);
         }
     }
@@ -66,11 +67,11 @@ public class QueueDataNodeDecorator implements DataNodeInterface {
         node.setVirtualSensor(virtualSensor);
     }
 
-    public HashMap<DataNodeInterface, BetterQueue<Window>> getChildrenQueues() {
+    public HashMap<DataNodeInterface, BetterQueue<DataWindow>> getChildrenQueues() {
         return childQueues;
     }
 
-    public BetterQueue<Window> getQueue(DataNodeInterface childNode) {
+    public BetterQueue<DataWindow> getQueue(DataNodeInterface childNode) {
         return childQueues.get(childNode);
     }
 

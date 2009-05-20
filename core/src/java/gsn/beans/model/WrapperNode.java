@@ -11,7 +11,6 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-@DiscriminatorValue("WR")
 public class WrapperNode extends DataNode {
     @ManyToOne(optional = false)
     private WrapperModel model;

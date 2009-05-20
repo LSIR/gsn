@@ -4,8 +4,8 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "childType", discriminatorType = DiscriminatorType.STRING)
+@Inheritance(strategy = InheritanceType.JOINED)
+//@DiscriminatorColumn(name = "childType", discriminatorType = DiscriminatorType.STRING)
 public abstract class DataNode extends NameDescriptionClass implements DataNodeInterface {
 
     @ManyToMany(mappedBy = "parents", targetEntity = DataNode.class)
