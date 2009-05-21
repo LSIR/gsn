@@ -258,7 +258,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 						logger.warn("processing the received file list "+name);
 						try {
 							String[] data = null;
-							Process p = Runtime.getRuntime().exec("svn cat "+name+" --username "+svnlogin+" --password "+svnpasswd+" ");
+							Process p = Runtime.getRuntime().exec("svn cat "+name+" --username '"+svnlogin+"' --password '"+svnpasswd+"' ");
 							InputStream in = p.getInputStream();
 							BufferedReader d = new BufferedReader(new InputStreamReader(in));
 							reader = new CSVReader(d,seperator,'\"',skip_lines);
@@ -301,7 +301,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 			logger.warn("start getNewSvnDataAvailable()");
 			logger.warn("svnlogin:"+svnlogin+"   svnpasswd:"+svnpasswd);
 			logger.warn("svnurl:"+svnurl);
-			String cmd = "svn info "+svnurl+"/ --username "+svnlogin+" --password "+svnpasswd+" -R --xml";
+			String cmd = "svn info "+svnurl+"/ --username '"+svnlogin+"' --password '"+svnpasswd+"' -R --xml";
 			Process p = Runtime.getRuntime().exec(cmd);
 			logger.warn("process initialized");
 			InputStream in = p.getInputStream();
