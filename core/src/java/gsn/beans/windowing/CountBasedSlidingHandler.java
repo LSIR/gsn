@@ -18,7 +18,7 @@ public class CountBasedSlidingHandler extends SlidingHandler2 implements Runnabl
         List<Parameter> parameters = sliding.getParameters();
         for (Parameter parameter : parameters) {
             if("slide".equals(parameter.getModel().getName())){
-                slideCount = Integer.getInteger(parameter.getValue());
+                slideCount = Integer.parseInt(parameter.getValue());
                 break;
             }
         }

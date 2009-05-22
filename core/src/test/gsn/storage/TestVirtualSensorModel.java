@@ -143,7 +143,7 @@ public class TestVirtualSensorModel {
     }
 
     @Test
-    public void testCreateSampleWindowl() {
+    public void testCreateSampleWindow() {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
         WindowModel windowModel = createSampleWindowModel();
@@ -156,7 +156,7 @@ public class TestVirtualSensorModel {
     }
 
     @Test
-    public void testCreateSampleSlidingl() {
+    public void testCreateSampleSliding() {
         Session session = HibernateUtil.getCurrentSession();
         Transaction tx = session.beginTransaction();
         SlidingModel slidingModel = createSampleSlidingModel();
@@ -202,7 +202,7 @@ public class TestVirtualSensorModel {
 
         tx.commit();
         
-//        WrapperDecorator wrapperDeco = new WrapperDecorator(new QueueDataNodeDecorator(wrapperNode));
+        WrapperDecorator wrapperDeco = new WrapperDecorator(new QueueDataNodeDecorator(wrapperNode));
     }
 
     @Test

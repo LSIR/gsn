@@ -2,6 +2,7 @@ package gsn.beans.model;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -9,10 +10,10 @@ import java.util.List;
 public abstract class DataNode extends NameDescriptionClass implements DataNodeInterface {
 
     @ManyToMany(mappedBy = "parents", targetEntity = DataNode.class)
-    private List<DataNodeInterface> children;
+    private List<DataNodeInterface> children = new ArrayList<DataNodeInterface>();
 
     @ManyToMany(targetEntity = DataNode.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<DataNodeInterface> parents;
+    private List<DataNodeInterface> parents = new ArrayList<DataNodeInterface>();
 
     @OneToOne(optional = false, mappedBy = "dataNode")
     private Window window;

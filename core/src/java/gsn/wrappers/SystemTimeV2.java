@@ -3,12 +3,10 @@ package gsn.wrappers;
 import gsn.beans.interfaces.Wrapper;
 import gsn.beans.BetterQueue;
 import gsn.beans.StreamElement;
-import gsn.beans.model.Parameter;
 import gsn.utils.EasyParamWrapper;
 
 import javax.naming.OperationNotSupportedException;
 import javax.swing.*;
-import java.util.HashMap;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.Serializable;

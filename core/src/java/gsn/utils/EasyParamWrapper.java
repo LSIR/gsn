@@ -17,7 +17,7 @@ public class EasyParamWrapper {
      public String getPredicateValue(String key) {
         key = key.trim();
         for ( Parameter predicate : this.parameters )
-            if (predicate.getName().trim().equalsIgnoreCase(key)) return predicate.getValue();
+            if (predicate.getModel().getName().trim().equalsIgnoreCase(key)) return predicate.getValue();
         return null;
     }
 
