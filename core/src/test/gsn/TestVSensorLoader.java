@@ -117,7 +117,6 @@ public class TestVSensorLoader {
         loader.releaseStreamSource(ss);
         assertTrue(is.getRenamingMapping().isEmpty());
         assertFalse(StorageManager.getInstance().tableExists(ss.getUIDStr()));
-        assertFalse(ss.getWrapper().isActive());
         assertFalse(StorageManager.getInstance().tableExists(ss.getWrapper().getDBAliasInStr()));
         assertTrue(is.getRenamingMapping().isEmpty());
         ss = new StreamSource().setAlias("my-stream1").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("2").setInputStream(is);

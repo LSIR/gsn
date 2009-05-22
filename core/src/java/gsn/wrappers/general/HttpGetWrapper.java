@@ -61,15 +61,15 @@ public class HttpGetWrapper extends AbstractWrapper {
     }
 
     public void run() {
+
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream(1024 * 20);
         byte[] buffer = new byte[16 * 1024];
         BufferedInputStream content;
-        while (isActive()) {
             try {
                 Thread.sleep(rate);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.connect();
-                if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_ACCEPTED) continue;
+               // if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_ACCEPTED) 
                 content = new BufferedInputStream(httpURLConnection.getInputStream(), 4096);
                 arrayOutputStream.reset();
                 int readIndex = -1;
@@ -82,7 +82,7 @@ public class HttpGetWrapper extends AbstractWrapper {
                 logger.error(e.getMessage(), e);
             }
         }
-    }
+    
 
     public String getWrapperName() {
         return "Http Receiver";

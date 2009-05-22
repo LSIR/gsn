@@ -20,9 +20,7 @@ public class EmptyWrapper extends AbstractWrapper {
     }
 
     public void run() {
-        while (isActive()) {
-            // do something
-        }
+
     }
 
     public DataField[] getOutputFormat() {

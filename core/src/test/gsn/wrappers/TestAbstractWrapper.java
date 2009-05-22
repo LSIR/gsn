@@ -54,7 +54,7 @@ public class TestAbstractWrapper {
      * @throws OperationNotSupportedException
      * @throws SQLException
      */
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expected = OperationNotSupportedException.class)
     public void testSendToWrapper2() throws OperationNotSupportedException, SQLException {
         SystemTime systemTimeWrapper = new SystemTime();
         systemTimeWrapper.setActiveAddressBean(new AddressBean("system-time"));

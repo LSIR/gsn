@@ -42,9 +42,7 @@ public class InGSNNotification extends NotificationRequest {
         if (logger.isDebugEnabled())
             logger.debug("InVMPipe received the stream elements.");
         try {
-            if (!inVMPipeWrapper.isActive())
-                return false;
-            while (data.hasMoreElements()) {
+             while (data.hasMoreElements()) {
                 StreamElement nextElement = data.nextElement();
                 if (logger.isDebugEnabled())
                     logger.debug("InVMPipe submit a stream element.");

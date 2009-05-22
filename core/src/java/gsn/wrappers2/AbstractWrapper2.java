@@ -19,10 +19,8 @@ public abstract class AbstractWrapper2 implements Runnable {
 
     protected final List<WrapperListener> listeners = Collections.synchronizedList(new ArrayList<WrapperListener>());
 
-    private boolean isActive = true;
 
-
-    public void addListener(WrapperListener listener) {
+     public void addListener(WrapperListener listener) {
         listeners.add(listener);
         if (logger.isDebugEnabled())
             logger.debug("Adding listeners: " + listener.toString());
@@ -41,20 +39,7 @@ public abstract class AbstractWrapper2 implements Runnable {
         return listeners;
     }
 
-    /**
-     * This method is called whenever the wrapper wants to send a data item back
-     * to the source where the data is coming from. For example, If the data is
-     * coming from a wireless sensor network (WSN), This method sends a data item
-     * to the sink node of the virtual sensor. So this method is the
-     * communication between the System and actual source of data. The data sent
-     * back to the WSN could be a command message or a configuration message.
-     *
-     * @return True if the send operation is successful.
-     * @throws javax.naming.OperationNotSupportedException If the wrapper doesn't support
-     *                                        sending the data back to the source. Note that by default this method
-     *                                        throws this exception unless the wrapper overrides it.
-     */
-
+  
     public boolean sendToWrapper(String action, String[] paramNames, Object[] paramValues) throws OperationNotSupportedException {
         throw new OperationNotSupportedException("This wrapper doesn't support sending data back to the source.");
     }
@@ -63,10 +48,6 @@ public abstract class AbstractWrapper2 implements Runnable {
     private final CharSequence aliasCodeS = Main.tableNameGeneratorInString(aliasCode);
 
     public abstract DataField[] getOutputFormat();
-
-    public boolean isActive() {
-        return isActive;
-    }
 
     protected void postStreamElement(Serializable... values) {
         StreamElement se = new StreamElement(getOutputFormat(), values, System.currentTimeMillis());
@@ -111,19 +92,14 @@ public abstract class AbstractWrapper2 implements Runnable {
      */
 
     public boolean sendToWrapper(Object dataItem) throws OperationNotSupportedException {
-        if (isActive == false)
-            throw new GSNRuntimeException("Sending to an inactive/disabled wrapper is not allowed !");
         throw new OperationNotSupportedException("This wrapper doesn't support sending data back to the source.");
     }
 
     public void releaseResources() {
-        isActive = false;
         finalize();
-        if (logger.isInfoEnabled()) logger.info("Finalized called");
+        logger.info("Finalized called");
         listeners.clear();
     }
-
-    public static final String TIME_FIELD = "timed";
 
     public abstract boolean initialize(List<Parameter> parameters);
 

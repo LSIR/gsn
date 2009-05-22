@@ -2,12 +2,17 @@ package gsn.beans.decorators;
 
 import gsn.beans.DataWindow;
 import gsn.beans.StreamElement;
+import gsn.beans.BetterQueue;
+import gsn.beans.QueueChangeListener;
+import gsn.beans.interfaces.Wrapper;
 import gsn.beans.model.Parameter;
 import gsn.beans.model.WrapperModel;
 import gsn.beans.model.WrapperNode;
+import gsn.beans.model.DataNodeInterface;
 import gsn.beans.windowing.CountBasedSlidingHandler;
 import gsn.wrappers2.AbstractWrapper2;
 import gsn.wrappers2.WrapperListener;
+import gsn.utils.EasyParamWrapper;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -17,7 +22,7 @@ public class WrapperDecorator extends ThreadDataNodeDecorator implements Wrapper
 
     private final static transient Logger logger = Logger.getLogger(WrapperDecorator.class);
 
-    ArrayList<StreamElement> totalWindow = new ArrayList<StreamElement>();
+    private  ArrayList<StreamElement> totalWindow = new ArrayList<StreamElement>();
 
     public WrapperDecorator(QueueDataNodeDecorator node) {
         super(node);
@@ -34,18 +39,41 @@ public class WrapperDecorator extends ThreadDataNodeDecorator implements Wrapper
 
     private void initializeWrapper(WrapperNode wrapperNode) {
         WrapperModel wrapperModel = wrapperNode.getModel();
-        AbstractWrapper2 wrapper = null;
+        Wrapper wrapper = null;
         try {
-            wrapper = (AbstractWrapper2) Class.forName(wrapperModel.getClassName()).newInstance();
+            wrapper = (Wrapper) Class.forName(wrapperModel.getClassName()).newInstance();
         } catch (Exception e) {
             logger.error("Error in initializing wrapper class of type: [" + wrapperModel.getClassName() + "]", e);
             //todo ?
         }
+        BetterQueue distributerQueue = new BetterQueue();
+        distributerQueue.addListener(new QueueChangeListener(){
+            public void itemAdded(Object obj) {
+                for (DataNodeInterface parent : getParents()){
+                    QueueDataNodeDecorator p = (QueueDataNodeDecorator) parent;
+                    // TODO: data dissemination, how !
+                }
+            }
 
-        wrapper.initialize(wrapperNode.getParameters());
-        wrapper.addListener(this);
+            public void itemRemove(Object obj) {
+
+            }
+
+            public void queueEmpty() {
+
+            }
+
+            public void queueNotEmpty() {
+
+            }
+        });
+
+        wrapper.initialize(new EasyParamWrapper(wrapperNode.getParameters()),distributerQueue);
+
         // start the wrapper in a thread
     }
+
+
 
     public boolean initialize(Parameter parameters) {
         return false;

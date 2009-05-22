@@ -47,7 +47,6 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
     }
 
     public void run() {
-        while (isActive()) {
             try {
                 Thread.sleep(samplingRate);
             } catch (InterruptedException e) {
@@ -61,7 +60,6 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
                     nonHeapMemoryUsage, pendingFinalizationCount}, System.currentTimeMillis());
             postStreamElement(streamElement);
         }
-    }
 
     public void finalize() {
         threadCounter--;

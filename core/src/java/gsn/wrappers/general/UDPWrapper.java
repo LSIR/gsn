@@ -53,7 +53,6 @@ public class UDPWrapper extends AbstractWrapper {
     public void run() {
         byte[] receivedData = new byte[50];
         DatagramPacket receivedPacket = null;
-        while (isActive()) {
             try {
                 receivedPacket = new DatagramPacket(receivedData, receivedData.length);
                 socket.receive(receivedPacket);
@@ -65,7 +64,7 @@ public class UDPWrapper extends AbstractWrapper {
             } catch (IOException e) {
                 logger.warn("Error while receiving data on UDP socket : " + e.getMessage());
             }
-        }
+        
     }
 
     public DataField[] getOutputFormat() {

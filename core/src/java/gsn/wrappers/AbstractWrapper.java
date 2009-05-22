@@ -26,8 +26,6 @@ public abstract class AbstractWrapper extends Thread{
 
     private AddressBean activeAddressBean;
 
-    private boolean isActive = true;
-
     private SlidingHandler tupleBasedSlidingHandler;
 
     private SlidingHandler timeBasedSlidingHandler;
@@ -153,9 +151,7 @@ public abstract class AbstractWrapper extends Thread{
 
     public abstract DataField[] getOutputFormat();
 
-    public boolean isActive() {
-        return isActive;
-    }
+
 
     protected void postStreamElement(Serializable... values) {
         StreamElement se = new StreamElement(getOutputFormat(), values, System.currentTimeMillis());
@@ -182,7 +178,7 @@ public abstract class AbstractWrapper extends Thread{
             return false;
         }
         try {
-            if (!isActive() || listeners.size() == 0)
+            if ( listeners.size() == 0)
                 return false;
             if (!insertIntoWrapperTable(streamElement))
                 return false;
@@ -237,9 +233,7 @@ public abstract class AbstractWrapper extends Thread{
      */
 
     public boolean sendToWrapper(Object dataItem) throws OperationNotSupportedException {
-        if (isActive == false)
-            throw new GSNRuntimeException("Sending to an inactive/disabled wrapper is not allowed !");
-        throw new OperationNotSupportedException("This wrapper doesn't support sending data back to the source.");
+           throw new OperationNotSupportedException("This wrapper doesn't support sending data back to the source.");
     }
 
 
@@ -284,7 +278,6 @@ public abstract class AbstractWrapper extends Thread{
     }
 
     public void releaseResources() throws SQLException {
-        isActive = false;
         finalize();
         if (logger.isInfoEnabled()) logger.info("Finalized called");
         listeners.clear();

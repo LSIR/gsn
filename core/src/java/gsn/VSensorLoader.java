@@ -239,10 +239,7 @@ public class VSensorLoader extends Thread {
             logger.error(e.getMessage(), e);
             logger.error("Release the resources failed !");
         }
-        if (!wrapper.isActive()) {//This stream source is the only listener
-            activeWrappers.remove(wrapper.getActiveAddressBean());
-            Mappings.getContainer().removeRemoteStreamSource(wrapper.getDBAlias());
-        }
+       
     }
 
     public static Modifications getUpdateStatus(String virtualSensorsPath) {

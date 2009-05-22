@@ -70,7 +70,6 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
         if (delayPostingElements) {
             if (logger.isDebugEnabled())
                 logger.warn("Starting <" + getWrapperName() + "> with delayed elements.");
-            while (isActive()) {
                 synchronized (objectLock) {
                     while (streamElementBuffer.isEmpty()) {
                         try {
@@ -93,7 +92,6 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
                     postStreamElement(nextStreamElement);
                 }
             }
-        }
     }
 
     public DataField[] getOutputFormat() {

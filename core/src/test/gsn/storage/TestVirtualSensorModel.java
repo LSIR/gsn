@@ -1,6 +1,8 @@
 package gsn.storage;
 
 import gsn.beans.DataType;
+import gsn.beans.decorators.WrapperDecorator;
+import gsn.beans.decorators.QueueDataNodeDecorator;
 import gsn.beans.model.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -9,6 +11,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 
 public class TestVirtualSensorModel {
+
 
     private WindowModel createSampleWindowModel() {
 
@@ -61,7 +64,7 @@ public class TestVirtualSensorModel {
 
         WrapperModel wrapperModel = new WrapperModel();
         wrapperModel.setName("system-time-2");
-        wrapperModel.setClassName("gsn.wrappers2.SystemTimeWrapper2");
+        wrapperModel.setClassName("gsn.wrappers.SystemTimeV2");
         wrapperModel.setParameters(models);
 
         return wrapperModel;
@@ -148,7 +151,7 @@ public class TestVirtualSensorModel {
 
         Window window = createSampleWindow(windowModel);
         session.save(window);
-        
+
         tx.commit();
     }
 
@@ -161,7 +164,7 @@ public class TestVirtualSensorModel {
 
         Sliding sliding = createSampleSliding(slidingModel);
         session.save(sliding);
-        
+
         tx.commit();
     }
 
@@ -173,6 +176,8 @@ public class TestVirtualSensorModel {
         session.save(wrapperModel);
         tx.commit();
     }
+
+
 
     @Test
     public void testCreateSampleWrapper() {
@@ -196,6 +201,8 @@ public class TestVirtualSensorModel {
         session.save(wrapperNode);
 
         tx.commit();
+        
+//        WrapperDecorator wrapperDeco = new WrapperDecorator(new QueueDataNodeDecorator(wrapperNode));
     }
 
     @Test
@@ -206,4 +213,6 @@ public class TestVirtualSensorModel {
 
         tx.commit();
     }
+
+
 }
