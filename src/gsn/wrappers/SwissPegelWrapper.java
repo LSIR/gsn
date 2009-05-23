@@ -32,12 +32,12 @@ import org.xml.sax.SAXException;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-public class StsPiezometerWrapper extends AbstractWrapper {
+public class SwissPegelWrapper extends AbstractWrapper {
 
 	// The first line describes the data logger, had to check for each file it reads.
 	// The 2nd, 3rd and 4th lines are going to have data structure information for rest of the output
 	// Time stamp is always the first column in the output.
-	private static final String DateFormat = "HH:mm:ss dd.MM.yyyy";
+	private static final String DateFormat = "HH:mm dd.MM.yyyy";
 	private static final String SvnDateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
 	private static final String QUOTE = "\"";
@@ -66,11 +66,12 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 
 	private boolean file_handling = true;
 
-	private final transient Logger   logger             = Logger.getLogger( StsPiezometerWrapper.class );
+	private final transient Logger   logger             = Logger.getLogger( SwissPegelWrapper.class );
 	private DataField[] structure = {
-			new DataField( "pressure" , "double" , "pressure"),
-			new DataField( "temperature" , "double" , "water temperatured"),
-			new DataField( "conductivity" , "double" , "electric conductivity") };
+			new DataField( "pegel" , "double" , "pegel"),
+			new DataField( "minterval" , "double" , "measurement interval"),
+			new DataField( "quality" , "double" , "measurement quality"),
+			new DataField( "measurementType", "double", "measurement type") };
 	private int threadCounter=0;
 	private SimpleDateFormat dateTimeFormat ;
 	private SimpleDateFormat svnDateTimeFormat ;
@@ -85,7 +86,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 	private List<String> not_a_number_constants = new ArrayList<String>() ;
 
 	public boolean initialize() {
-		setName( "StsPiezometerWrapper-Thread:" + ( ++threadCounter ) );
+		setName( "SwissPegelWrapper-Thread:" + ( ++threadCounter ) );
 		dateTimeFormat = new SimpleDateFormat( DateFormat );
 		svnDateTimeFormat = new SimpleDateFormat( SvnDateFormat );
 		sampling = getActiveAddressBean( ).getPredicateValueAsInt(SAMPLING, SAMPLING_DEFAULT);
@@ -148,10 +149,15 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 				ex.printStackTrace();
 			}
 			logger.warn("Content of the last line of the status file: "+contents);
-			String[] list = contents.split(";");
-			logger.warn("number of split elements: "+list.length+"  0:"+list[0]+"  1:"+list[1]);
-			this.lastEnteredStreamelement = new Long(list[0]);
-			this.lastModified = new Long(list[1]);
+			if (contents!=null){
+				String[] list = contents.split(";");
+				logger.warn("number of split elements: "+list.length+"  0:"+list[0]+"  1:"+list[1]);
+				this.lastEnteredStreamelement = new Long(list[0]);
+				this.lastModified = new Long(list[1]);
+			} else {
+				this.lastEnteredStreamelement = new Long(0);
+                                this.lastModified = new Long(0);
+			}
 		} else {
 			try {
 				statusFile.createNewFile();
@@ -179,10 +185,10 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 		Date date;
 		StreamElement se = null;
 		try {
-			date = dateTimeFormat.parse(data[0]+" "+data[1]);
+			date = dateTimeFormat.parse(data[1]+" "+data[0]);
 			se = new StreamElement(structure,removeTimestampFromRow(data),date.getTime());
 		} catch (ParseException e) {
-			logger.error("invalide date format! "+data[0]+" "+data[1]);
+			logger.error("invalide date format! "+data[1]+" "+data[0]);
 			logger.error(e.getMessage(),e);
 		}finally {
 			return se;
