@@ -65,9 +65,8 @@ public class FieldDownloadServlet extends HttpServlet {
 			logger.error(e1.getMessage(),e1);
 			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
 			return;
-		} finally {
-			StorageManager.close(rs);
 		}
+        
 		boolean binary = false;
 		for ( DataField df : sensorConfig.getOutputStructure( ) )
 			if ( df.getName( ).toLowerCase( ).equals( colName.trim( ).toLowerCase( ) ) ) if ( df.getDataTypeID( ) == DataTypes.BINARY ) {
@@ -86,7 +85,7 @@ public class FieldDownloadServlet extends HttpServlet {
 				res.getWriter( ).write( rs.getString( colName ) );
 			}
 		} catch ( Exception e ) {
-			logger.info( e.getMessage( ) , e );
+			logger.error( e.getMessage( ) , e );
 		} finally {
 			StorageManager.close(rs);
 		}
