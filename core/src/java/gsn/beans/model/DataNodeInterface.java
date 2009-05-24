@@ -3,6 +3,7 @@ package gsn.beans.model;
 import java.util.List;
 
 public interface DataNodeInterface {
+
     List<DataNodeInterface> getParents();
 
     void setParents(List<DataNodeInterface> parents);
