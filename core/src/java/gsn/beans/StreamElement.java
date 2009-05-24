@@ -51,7 +51,7 @@ public final class StreamElement implements Serializable {
         }
         if (this.fieldNames.length != data.length)
             throw new IllegalArgumentException("The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match.");
-        this.verifyTypesCompatibility(this.fieldTypes, data);
+        // Lots of issues here: this.verifyTypesCompatibility(this.fieldTypes, data);
         this.fieldValues = data;
     }
 
@@ -78,13 +78,13 @@ public final class StreamElement implements Serializable {
                 case DataTypes.STRING:
                     if (!(data[i] instanceof String)) {
                         throw new IllegalArgumentException("The newly constructed Stream Element is not consistant. The " + (i + 1) + "th field is defined as "
-                                + DataTypes.TYPE_NAMES[fieldTypes[i]] + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
+                                + DataTypes.getTypeName(fieldTypes[i]) + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
                     }
                     break;
                 case DataTypes.NUMERIC:
                     if (!(data[i] instanceof Number)) {
                         throw new IllegalArgumentException("The newly constructed Stream Element is not consistant. The " + (i + 1) + "th field is defined as "
-                                + DataTypes.TYPE_NAMES[fieldTypes[i]] + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
+                                + DataTypes.getTypeName(fieldTypes[i]) + " while the actual data in the field is of type : *" + data[i].getClass().getCanonicalName() + "*");
                     }
                     break;
                 case DataTypes.BINARY:

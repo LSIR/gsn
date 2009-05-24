@@ -1,14 +1,10 @@
 package gsn.beans;
 
 import gsn.utils.GSNRuntimeException;
-import org.apache.log4j.Logger;
-
 import java.sql.Types;
 import java.util.regex.Pattern;
 
 public class DataTypes {
-
-    private final static transient Logger logger = Logger.getLogger(DataTypes.class);
 
     // NEXT FIELD
     public final static String STRING_PATTERN = "STRING";
@@ -87,6 +83,13 @@ public class DataTypes {
                 return TYPE_IDS[i];
             }
         throw new GSNRuntimeException(new StringBuilder("The type *").append(type).append("* is not recognized.").append(DataTypes.ERROR_MESSAGE).toString());
+    }
+
+    public static String getTypeName(int typeID){
+        for (int i=0;i<TYPE_IDS.length;i++)
+            if(TYPE_IDS[i] == typeID)
+                return TYPE_NAMES[i];
+        return "UNKOWN Type("+typeID+")";
     }
 }
 

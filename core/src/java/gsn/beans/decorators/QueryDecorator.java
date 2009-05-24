@@ -13,7 +13,6 @@ public class QueryDecorator extends ThreadDataNodeDecorator {
         super(node);
     }
 
-
     protected void initializeBlockingQueue() {
         for (DataNodeInterface child : getChildren()) {
             QueueDataNodeDecorator childDec = (QueueDataNodeDecorator) child;

@@ -1,6 +1,7 @@
 package gsn.beans.interfaces;
 
 import gsn.beans.BetterQueue;
+import gsn.beans.DataDispatcher;
 import gsn.utils.EasyParamWrapper;
 
 import javax.naming.OperationNotSupportedException;
@@ -8,7 +9,7 @@ import java.util.HashMap;
 
 
 public interface Wrapper extends Runnable{
-    public boolean initialize(EasyParamWrapper parameters, BetterQueue outputQueue);
+    public boolean initialize(EasyParamWrapper parameters, DataDispatcher outputQueue);
     /**
        * This method is called whenever the wrapper wants to send a data item back
        * to the source where the data is coming from. For example, If the data is

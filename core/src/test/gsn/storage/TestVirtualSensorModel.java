@@ -22,7 +22,7 @@ public class TestVirtualSensorModel {
 
         WindowModel windowModel = new WindowModel();
         windowModel.setName("CountbasedWindow");
-        windowModel.setClassName("gsn.beans.DataWindow");
+        windowModel.setClassName("gsn.beans.WindowInstance");
         ArrayList<ParameterModel> models = new ArrayList<ParameterModel>();
         models.add(parameterModel);
         windowModel.setParameters(models);

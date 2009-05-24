@@ -45,8 +45,7 @@ public abstract class AbstractWrapper2 implements Runnable {
     }
 
     private final transient int aliasCode = Main.tableNameGenerator();
-    private final CharSequence aliasCodeS = Main.tableNameGeneratorInString(aliasCode);
-
+   
     public abstract DataField[] getOutputFormat();
 
     protected void postStreamElement(Serializable... values) {

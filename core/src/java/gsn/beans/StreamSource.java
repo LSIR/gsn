@@ -408,7 +408,7 @@ public class StreamSource implements Serializable {
             toReturn.append(" where ");
         else
             toReturn.append(" and ");
-//  Applying the ** START  AND END TIME ** for all types of windows based windows
+//  Applying the ** START  AND END TIME ** for all types of TestWindows based TestWindows
 // toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
 
         if (isStorageCountBased()) {

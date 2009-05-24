@@ -75,5 +75,5 @@ public class QueueDataNodeDecorator implements DataNodeInterface {
         return childQueues.get(childNode);
     }
 
-    ArrayBlockingQueue q;
+    private ArrayBlockingQueue q;
 }

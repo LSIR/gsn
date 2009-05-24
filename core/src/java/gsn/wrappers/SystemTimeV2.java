@@ -3,6 +3,7 @@ package gsn.wrappers;
 import gsn.beans.interfaces.Wrapper;
 import gsn.beans.BetterQueue;
 import gsn.beans.StreamElement;
+import gsn.beans.DataDispatcher;
 import gsn.utils.EasyParamWrapper;
 
 import javax.naming.OperationNotSupportedException;
@@ -20,10 +21,10 @@ public class SystemTimeV2 implements Wrapper, ActionListener {
     private int period;
     private boolean isEnabled = false;
     private long nextTimestamp = System.currentTimeMillis();
-    private BetterQueue queue;
+    private DataDispatcher dispatcher;
 
-    public boolean initialize(EasyParamWrapper parameters, BetterQueue outputQueue) {
-        this.queue=outputQueue;
+    public boolean initialize(EasyParamWrapper parameters, DataDispatcher dispatcher) {
+        this.dispatcher=dispatcher;
         boolean auto = parameters.getPredicateValueAsBoolean("mode",false);
         period  = parameters.getPredicateValueAsInt("period",10); //defaults to 10msc
 
@@ -69,6 +70,6 @@ public class SystemTimeV2 implements Wrapper, ActionListener {
 
         nextTimestamp += period;
         StreamElement streamElement = new StreamElement(EMPTY_FIELD_LIST, EMPTY_FIELD_TYPES, EMPTY_DATA_PART, nextTimestamp);
-        queue.add(streamElement);
+        dispatcher.addStreamElement(streamElement);
     }
 }

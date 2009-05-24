@@ -1,9 +1,6 @@
 package gsn.beans.decorators;
 
-import gsn.beans.DataWindow;
-import gsn.beans.StreamElement;
-import gsn.beans.BetterQueue;
-import gsn.beans.QueueChangeListener;
+import gsn.beans.*;
 import gsn.beans.interfaces.Wrapper;
 import gsn.beans.model.Parameter;
 import gsn.beans.model.WrapperModel;
@@ -68,15 +65,10 @@ public class WrapperDecorator extends ThreadDataNodeDecorator implements Wrapper
             }
         });
 
-        wrapper.initialize(new EasyParamWrapper(wrapperNode.getParameters()),distributerQueue);
+        DataDispatcher dispatcher = new DataDispatcher(getParents());
+        wrapper.initialize(new EasyParamWrapper(wrapperNode.getParameters()),dispatcher);
 
         // start the wrapper in a thread
-    }
-
-
-
-    public boolean initialize(Parameter parameters) {
-        return false;
     }
 
     public void post(StreamElement se) {

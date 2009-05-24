@@ -69,7 +69,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
         int maxTupleForTimeBased = 0;
         int maxWindowSize = 0;
 
-        //WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE sliding windows are saved in streamSources list
+        //WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE sliding TestWindows are saved in streamSources list
         synchronized (streamSources) {
             for (StreamSource streamSource : streamSources) {
                 maxTupleCount = Math.max(maxTupleCount, streamSource.getParsedWindowSize());
