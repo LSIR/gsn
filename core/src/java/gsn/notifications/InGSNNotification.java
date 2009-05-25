@@ -3,7 +3,6 @@ package gsn.notifications;
 import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 import gsn.wrappers.InVMPipeWrapper;
 import org.apache.log4j.Logger;
 
@@ -42,7 +41,7 @@ public class InGSNNotification extends NotificationRequest {
         if (logger.isDebugEnabled())
             logger.debug("InVMPipe received the stream elements.");
         try {
-             while (data.hasMoreElements()) {
+            while (data.hasMoreElements()) {
                 StreamElement nextElement = data.nextElement();
                 if (logger.isDebugEnabled())
                     logger.debug("InVMPipe submit a stream element.");

@@ -4,7 +4,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.url">jdbc:h2:mem:gsn_mem_db</property>
-        <property name="hibernate.connection.username"></property>
+        <property name="hibernate.connection.username">sa</property>
         <property name="hibernate.connection.password"></property>
         <property name="hibernate.connection.driver_class">org.h2.Driver</property>
         <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
@@ -34,6 +34,7 @@
         <mapping class="gsn.beans.model.SlidingModel"/>
         <mapping class="gsn.beans.model.WrapperNode"/>
         <mapping class="gsn.beans.model.WrapperModel"/>
-        
+        <mapping class="gsn.beans.model.DataChannel"/>
+
     </session-factory>
 </hibernate-configuration>

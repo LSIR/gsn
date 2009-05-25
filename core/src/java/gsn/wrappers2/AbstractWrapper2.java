@@ -3,8 +3,8 @@ package gsn.wrappers2;
 import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+import gsn.beans.interfaces.WrapperListener;
 import gsn.beans.model.Parameter;
-import gsn.utils.GSNRuntimeException;
 import org.apache.log4j.Logger;
 
 import javax.naming.OperationNotSupportedException;
@@ -20,13 +20,13 @@ public abstract class AbstractWrapper2 implements Runnable {
     protected final List<WrapperListener> listeners = Collections.synchronizedList(new ArrayList<WrapperListener>());
 
 
-     public void addListener(WrapperListener listener) {
+    public void addListener(WrapperListener listener) {
         listeners.add(listener);
         if (logger.isDebugEnabled())
             logger.debug("Adding listeners: " + listener.toString());
     }
 
-    public void removeListener(WrapperListener listener){
+    public void removeListener(WrapperListener listener) {
         listeners.remove(listener);
         if (listeners.size() == 0)
             releaseResources();
@@ -39,13 +39,13 @@ public abstract class AbstractWrapper2 implements Runnable {
         return listeners;
     }
 
-  
+
     public boolean sendToWrapper(String action, String[] paramNames, Object[] paramValues) throws OperationNotSupportedException {
         throw new OperationNotSupportedException("This wrapper doesn't support sending data back to the source.");
     }
 
     private final transient int aliasCode = Main.tableNameGenerator();
-   
+
     public abstract DataField[] getOutputFormat();
 
     protected void postStreamElement(Serializable... values) {
@@ -85,9 +85,10 @@ public abstract class AbstractWrapper2 implements Runnable {
      * @param dataItem : The data which is going to be send to the source of the
      *                 data for this wrapper.
      * @return True if the send operation is successful.
-     * @throws javax.naming.OperationNotSupportedException If the wrapper doesn't support
-     *                                        sending the data back to the source. Note that by default this method
-     *                                        throws this exception unless the wrapper overrides it.
+     * @throws javax.naming.OperationNotSupportedException
+     *          If the wrapper doesn't support
+     *          sending the data back to the source. Note that by default this method
+     *          throws this exception unless the wrapper overrides it.
      */
 
     public boolean sendToWrapper(Object dataItem) throws OperationNotSupportedException {

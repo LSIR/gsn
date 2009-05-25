@@ -176,5 +176,5 @@ public abstract class AbstractVirtualSensor {
      *                        is actually the real data which is produced by the input stream and should
      *                        be delivered to the virtual sensor for possible processing.
      */
-    public abstract void dataAvailable(String inputStreamName , StreamElement streamElement );
+    public abstract void dataAvailable(String inputStreamName, StreamElement streamElement);
 }

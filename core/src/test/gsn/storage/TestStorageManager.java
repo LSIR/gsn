@@ -1,12 +1,9 @@
 package gsn.storage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 import gsn.storage.StorageManager.DATABASE;
+import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class TestStorageManager {
 

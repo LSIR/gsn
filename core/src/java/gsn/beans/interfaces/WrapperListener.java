@@ -1,4 +1,4 @@
-package gsn.wrappers2;
+package gsn.beans.interfaces;
 
 import gsn.beans.StreamElement;
 

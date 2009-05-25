@@ -65,24 +65,24 @@ public class HttpGetWrapper extends AbstractWrapper {
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream(1024 * 20);
         byte[] buffer = new byte[16 * 1024];
         BufferedInputStream content;
-            try {
-                Thread.sleep(rate);
-                httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.connect();
-               // if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_ACCEPTED) 
-                content = new BufferedInputStream(httpURLConnection.getInputStream(), 4096);
-                arrayOutputStream.reset();
-                int readIndex = -1;
-                while ((readIndex = content.read(buffer)) != -1)
-                    arrayOutputStream.write(buffer, 0, readIndex);
-                postStreamElement(arrayOutputStream.toByteArray());
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
+        try {
+            Thread.sleep(rate);
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.connect();
+            // if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_ACCEPTED)
+            content = new BufferedInputStream(httpURLConnection.getInputStream(), 4096);
+            arrayOutputStream.reset();
+            int readIndex = -1;
+            while ((readIndex = content.read(buffer)) != -1)
+                arrayOutputStream.write(buffer, 0, readIndex);
+            postStreamElement(arrayOutputStream.toByteArray());
+        } catch (InterruptedException e) {
+            logger.error(e.getMessage(), e);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
         }
-    
+    }
+
 
     public String getWrapperName() {
         return "Http Receiver";

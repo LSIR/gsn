@@ -1,23 +1,16 @@
 package gsn.vsensor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import gsn.Container;
-import junit.framework.JUnit4TestAdapter;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
+import gsn.Container;
+import static org.testng.Assert.*;
+import org.testng.annotations.*;
 
 public class TestContainerImpl {
 
-    @After
+    @AfterMethod
     public void clean() {
 
     }
@@ -43,7 +36,7 @@ public class TestContainerImpl {
         assertNull(response.getHeaderField(Container.RESPONSE));
     }
 
-    @Before
+    @BeforeMethod
     public void setup() {
 
     }
@@ -56,10 +49,6 @@ public class TestContainerImpl {
     @AfterClass
     public static void cleanAll() {
 
-    }
-
-    public static junit.framework.Test suite() {
-        return new JUnit4TestAdapter(TestContainerImpl.class);
     }
 
 }

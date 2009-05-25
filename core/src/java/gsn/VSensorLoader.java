@@ -33,7 +33,7 @@ public class VSensorLoader extends Thread {
 
     private StorageManager sm = StorageManager.getInstance();
 
-   private boolean isActive = true;
+    private boolean isActive = true;
 
     private static int VSENSOR_LOADER_THREAD_COUNTER = 0;
 
@@ -58,7 +58,7 @@ public class VSensorLoader extends Thread {
     }
 
     public void loadPlugin() throws SQLException, JiBXException {
-        Modifications modifications = null ;// TODO: getUpdateStatus(pluginsDir); Has to be changed
+        Modifications modifications = null;// TODO: getUpdateStatus(pluginsDir); Has to be changed
         ArrayList<VSensorConfig> removeIt = modifications.getRemove();
         ArrayList<VSensorConfig> addIt = modifications.getAdd();
         for (VSensorConfig configFile : removeIt) {
@@ -239,7 +239,7 @@ public class VSensorLoader extends Thread {
             logger.error(e.getMessage(), e);
             logger.error("Release the resources failed !");
         }
-       
+
     }
 
     public static Modifications getUpdateStatus(String virtualSensorsPath) {
@@ -335,7 +335,7 @@ public class VSensorLoader extends Thread {
                 logger.error(e.getMessage(), e);
                 return null;
             }
-        //    wrapper.start();
+            //    wrapper.start();
             activeWrappers.put(wrapper.getActiveAddressBean(), wrapper);
         } else if (logger.isDebugEnabled())
             logger.debug("Existing wrapper found and reused. [name :" + addressBean.getWrapper());

@@ -1,27 +1,19 @@
 package gsn.beans.windowing;
 
 import gsn.beans.BetterQueue;
-import gsn.beans.decorators.ThreadDataNodeDecorator;
+import gsn.beans.interfaces.SlideListener;
 import gsn.beans.model.Sliding;
-import gsn.beans.model.Parameter;
+import gsn.utils.EasyParamWrapper;
 
-import java.util.List;
-
-public class CountBasedSlidingHandler extends SlidingHandler2 implements Runnable {
+public class CountBasedSlidingHandler extends SlidingHandler2 {
     private BetterQueue<Long> slidingQueue;
-    private long nextTimestamp;
     private int counter;
     private int slideCount;
 
-    public CountBasedSlidingHandler(ThreadDataNodeDecorator dec, Sliding sliding) {
-        super(dec, sliding);
-        List<Parameter> parameters = sliding.getParameters();
-        for (Parameter parameter : parameters) {
-            if("slide".equals(parameter.getModel().getName())){
-                slideCount = Integer.parseInt(parameter.getValue());
-                break;
-            }
-        }
+    public CountBasedSlidingHandler(SlideListener listener, Sliding sliding) {
+        super(listener, sliding);
+        EasyParamWrapper easyParamWrapper = new EasyParamWrapper(sliding.getParameters());
+        slideCount = easyParamWrapper.getPredicateValueAsInt("slide", 1);
         slidingQueue = new BetterQueue<Long>();
         counter = 0;
     }
@@ -35,6 +27,7 @@ public class CountBasedSlidingHandler extends SlidingHandler2 implements Runnabl
 
     public void run() {
         while (true) {
+            long nextTimestamp;
             synchronized (this) {
                 while (slidingQueue.isEmpty()) {
                     try {
@@ -47,7 +40,7 @@ public class CountBasedSlidingHandler extends SlidingHandler2 implements Runnabl
                 nextTimestamp = slidingQueue.dequeue();
             }
 
-            if(counter++ == slideCount){
+            if (++counter == slideCount) {
                 notify(nextTimestamp);
                 counter = 0;
             }

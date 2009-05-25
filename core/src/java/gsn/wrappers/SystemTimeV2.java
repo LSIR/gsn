@@ -1,18 +1,16 @@
 package gsn.wrappers;
 
-import gsn.beans.interfaces.Wrapper;
-import gsn.beans.BetterQueue;
 import gsn.beans.StreamElement;
-import gsn.beans.DataDispatcher;
+import gsn.beans.interfaces.Wrapper;
+import gsn.beans.interfaces.WrapperListener;
 import gsn.utils.EasyParamWrapper;
+import org.apache.log4j.Logger;
 
 import javax.naming.OperationNotSupportedException;
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.Serializable;
-
-import org.apache.log4j.Logger;
 
 public class SystemTimeV2 implements Wrapper, ActionListener {
 
@@ -21,12 +19,12 @@ public class SystemTimeV2 implements Wrapper, ActionListener {
     private int period;
     private boolean isEnabled = false;
     private long nextTimestamp = System.currentTimeMillis();
-    private DataDispatcher dispatcher;
+    private WrapperListener dispatcher;
 
-    public boolean initialize(EasyParamWrapper parameters, DataDispatcher dispatcher) {
-        this.dispatcher=dispatcher;
-        boolean auto = parameters.getPredicateValueAsBoolean("mode",false);
-        period  = parameters.getPredicateValueAsInt("period",10); //defaults to 10msc
+    public boolean initialize(EasyParamWrapper parameters, WrapperListener listener) {
+        this.dispatcher = listener;
+        boolean auto = parameters.getPredicateValueAsBoolean("mode", false);
+        period = parameters.getPredicateValueAsInt("period", 10); //defaults to 10msc
 
         if (auto) {
             isEnabled = true;
@@ -41,25 +39,25 @@ public class SystemTimeV2 implements Wrapper, ActionListener {
     }
 
     public void releaseResources() {
-           timer.stop();
+        timer.stop();
     }
 
-    public synchronized  void setEnable(boolean newEnabled) {
+    public synchronized void setEnabled(boolean newEnabled) {
         if (newEnabled == this.isEnabled)
-           return;
-        if (newEnabled==false)
+            return;
+        if (newEnabled == false)
             timer.stop();
-        if (newEnabled==true)
+        if (newEnabled == true)
             timer.restart();
-        this.isEnabled=newEnabled;
+        this.isEnabled = newEnabled;
     }
 
-    public synchronized  boolean getEnabled() {
-        return isEnabled;  
+    public synchronized boolean getEnabled() {
+        return isEnabled;
     }
 
     public void run() {
-       
+
     }
 
 
@@ -70,6 +68,6 @@ public class SystemTimeV2 implements Wrapper, ActionListener {
 
         nextTimestamp += period;
         StreamElement streamElement = new StreamElement(EMPTY_FIELD_LIST, EMPTY_FIELD_TYPES, EMPTY_DATA_PART, nextTimestamp);
-        dispatcher.addStreamElement(streamElement);
+        dispatcher.dataProduced(streamElement);
     }
 }

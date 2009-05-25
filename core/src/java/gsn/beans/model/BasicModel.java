@@ -1,10 +1,8 @@
 package gsn.beans.model;
 
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.CascadeType;
 import java.util.List;
 
 @Entity

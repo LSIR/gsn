@@ -1,59 +1,41 @@
 package gsn.beans.model;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 import javax.persistence.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-//@DiscriminatorColumn(name = "childType", discriminatorType = DiscriminatorType.STRING)
 public abstract class DataNode extends NameDescriptionClass implements DataNodeInterface {
 
-    @ManyToMany(mappedBy = "parents", targetEntity = DataNode.class)
-    private List<DataNodeInterface> children = new ArrayList<DataNodeInterface>();
+    @OneToMany(mappedBy = "consumer")
+    @Cascade({org.hibernate.annotations.CascadeType.ALL, CascadeType.DELETE_ORPHAN})
+    private List<DataChannel> inChannels = new ArrayList<DataChannel>();
 
-    @ManyToMany(targetEntity = DataNode.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<DataNodeInterface> parents = new ArrayList<DataNodeInterface>();
-
-    @OneToOne(optional = false, mappedBy = "dataNode")
-    private Window window;
-
-    @OneToOne(optional = false, mappedBy = "dataNode")
-    private Sliding sliding;
+    @OneToMany(mappedBy = "producer")
+     @Cascade({org.hibernate.annotations.CascadeType.ALL, CascadeType.DELETE_ORPHAN})
+    private List<DataChannel> outChannels = new ArrayList<DataChannel>();
 
     @ManyToOne(optional = true)
     private VirtualSensor virtualSensor;
 
-    public List<DataNodeInterface> getParents() {
-        return parents;
+    public List<DataChannel> getInChannels() {
+        return inChannels;
     }
 
-    public void setParents(List<DataNodeInterface> parents) {
-        this.parents = parents;
+    public void setInChannels(List<DataChannel> inChannels) {
+        this.inChannels = inChannels;
     }
 
-    public Window getWindow() {
-        return window;
+    public List<DataChannel> getOutChannels() {
+        return outChannels;
     }
 
-    public void setWindow(Window window) {
-        this.window = window;
-    }
-
-    public Sliding getSliding() {
-        return sliding;
-    }
-
-    public void setSliding(Sliding sliding) {
-        this.sliding = sliding;
-    }
-
-    public List<DataNodeInterface> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<DataNodeInterface> children) {
-        this.children = children;
+    public void setOutChannels(List<DataChannel> outChannels) {
+        this.outChannels = outChannels;
     }
 
     public VirtualSensor getVirtualSensor() {
@@ -72,12 +54,8 @@ public abstract class DataNode extends NameDescriptionClass implements DataNodeI
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
-        if (getWindow() != null ? !getWindow().equals(that.getWindow()) : that.getWindow() != null)
-            return false;
-        if (getSliding() != null ? !getSliding().equals(that.getSliding()) : that.getSliding() != null)
-            return false;
-        if (getParents() != null ? !getParents().equals(that.getParents()) : that.getParents() != null) return false;
-        if (getChildren() != null ? !getChildren().equals(that.getChildren()) : that.getChildren() != null)
+        if (getInChannels() != null ? !getInChannels().equals(that.getInChannels()) : that.getInChannels() != null) return false;
+        if (getOutChannels() != null ? !getOutChannels().equals(that.getOutChannels()) : that.getOutChannels() != null)
             return false;
 
         return true;
@@ -87,10 +65,8 @@ public abstract class DataNode extends NameDescriptionClass implements DataNodeI
     public int hashCode() {
         int result = getId() != null ? getId().hashCode() : 0;
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-        result = 31 * result + (getWindow() != null ? getWindow().hashCode() : 0);
-        result = 31 * result + (getSliding() != null ? getSliding().hashCode() : 0);
-        result = 31 * result + (getParents() != null ? getParents().hashCode() : 0);
-        result = 31 * result + (getChildren() != null ? getChildren().hashCode() : 0);
+        result = 31 * result + (getInChannels() != null ? getInChannels().hashCode() : 0);
+        result = 31 * result + (getOutChannels() != null ? getOutChannels().hashCode() : 0);
         return result;
     }
 

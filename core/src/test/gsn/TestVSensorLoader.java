@@ -1,26 +1,19 @@
 package gsn;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import gsn.beans.AddressBean;
 import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
 import gsn.wrappers.MockWrapper;
+import static org.testng.Assert.*;
+import org.testng.annotations.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class TestVSensorLoader {
 
@@ -36,7 +29,7 @@ public class TestVSensorLoader {
 
     private AddressBean[] addressing = new AddressBean[]{new AddressBean("mock-test")};
 
-    @Before
+    @BeforeMethod
     public void setUp() throws Exception {
         Properties p = new Properties();
         p.put("mock-test", "gsn.wrappers.MockWrapper");
@@ -44,7 +37,7 @@ public class TestVSensorLoader {
         Main.getInstance();
     }
 
-    @After
+    @AfterMethod
     public void tearDown() throws Exception {
 
     }

@@ -1,100 +1,66 @@
 package gsn.beans.decorators;
 
-import gsn.beans.*;
+import gsn.beans.StreamElement;
 import gsn.beans.interfaces.Wrapper;
-import gsn.beans.model.Parameter;
+import gsn.beans.interfaces.WrapperListener;
 import gsn.beans.model.WrapperModel;
 import gsn.beans.model.WrapperNode;
-import gsn.beans.model.DataNodeInterface;
-import gsn.beans.windowing.CountBasedSlidingHandler;
-import gsn.wrappers2.AbstractWrapper2;
-import gsn.wrappers2.WrapperListener;
+import gsn.sliding.SlidingListener;
 import gsn.utils.EasyParamWrapper;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.ListIterator;
 
-public class WrapperDecorator extends ThreadDataNodeDecorator implements WrapperListener {
+public class WrapperDecorator extends ThreadDataNodeDecorator implements WrapperListener, SlidingListener {
 
     private final static transient Logger logger = Logger.getLogger(WrapperDecorator.class);
 
-    private  ArrayList<StreamElement> totalWindow = new ArrayList<StreamElement>();
+    private ArrayList<StreamElement> totalWindow = new ArrayList<StreamElement>();
+    private Wrapper wrapper;
 
     public WrapperDecorator(QueueDataNodeDecorator node) {
         super(node);
-        WrapperNode wrapperNode;
-        if (!(node.getDecoratedNode() instanceof WrapperNode)) {
-            throw new IllegalArgumentException("WrapperDecorator only accepts a decorated WrapperNode parameter. " +
-                    "You provided an instance of \"" + node.getDecoratedNode().getClass().getName() + "\"");
-        }
-
-        slidingHandler = new CountBasedSlidingHandler(this, getSliding());
-        wrapperNode = (WrapperNode) node.getDecoratedNode();
-        initializeWrapper(wrapperNode);
+        // start the wrapper in a thread
     }
 
-    private void initializeWrapper(WrapperNode wrapperNode) {
-        WrapperModel wrapperModel = wrapperNode.getModel();
-        Wrapper wrapper = null;
-        try {
-            wrapper = (Wrapper) Class.forName(wrapperModel.getClassName()).newInstance();
-        } catch (Exception e) {
-            logger.error("Error in initializing wrapper class of type: [" + wrapperModel.getClassName() + "]", e);
-            //todo ?
+    public boolean initialize() {
+        boolean result = super.initialize();
+        if (result) {
+            WrapperNode wrapperNode;
+            if (!(getDecoratedNode() instanceof WrapperNode)) {
+                throw new IllegalArgumentException("WrapperDecorator only accepts a decorated WrapperNode parameter. " +
+                        "You provided an instance of \"" + getDecoratedNode().getClass().getName() + "\"");
+            }
+
+            wrapperNode = (WrapperNode) getDecoratedNode();
+
+            WrapperModel wrapperModel = wrapperNode.getModel();
+            try {
+                wrapper = (Wrapper) Class.forName(wrapperModel.getClassName()).newInstance();
+                result = wrapper.initialize(new EasyParamWrapper(wrapperNode.getParameters()), this);
+            } catch (Exception e) {
+                logger.error("Error in initializing wrapper class of type: [" + wrapperModel.getClassName() + "]", e);
+                //todo ?
+            }
+//            result = slidingHandler.initialize(new EasyParamWrapper(getSliding().getParameters()), this);
+//            result = windowHandler.initialize(new EasyParamWrapper(getWindow().getParameters()));
         }
-        BetterQueue distributerQueue = new BetterQueue();
-        distributerQueue.addListener(new QueueChangeListener(){
-            public void itemAdded(Object obj) {
-                for (DataNodeInterface parent : getParents()){
-                    QueueDataNodeDecorator p = (QueueDataNodeDecorator) parent;
-                    // TODO: data dissemination, how !
-                }
-            }
-
-            public void itemRemove(Object obj) {
-
-            }
-
-            public void queueEmpty() {
-
-            }
-
-            public void queueNotEmpty() {
-
-            }
-        });
-
-        DataDispatcher dispatcher = new DataDispatcher(getParents());
-        wrapper.initialize(new EasyParamWrapper(wrapperNode.getParameters()),dispatcher);
-
-        // start the wrapper in a thread
+        return result;
     }
 
     public void post(StreamElement se) {
         synchronized (this) {
             totalWindow.add(se);
         }
-        slidingHandler.addNewElement(se.getTimeStamp());
+        windowHandler.postData(se);
+        slidingHandler.postData(se);
     }
 
     public void dataProduced(StreamElement se) {
         post(se);
     }
 
-    public void slide(long timestamp) {
-        //update window if necessary
-        //distrubute data
-        DataWindow dataWindow = new DataWindow(getWindow());
-        synchronized (this) {
-            for (ListIterator<StreamElement> iter = totalWindow.listIterator(); iter.hasNext(); ) {
-                StreamElement streamElement = iter.next();
-                if(streamElement.getTimeStamp() <= timestamp && streamElement.getTimeStamp() >= timestamp - dataWindow.getSize()){
-                    dataWindow.addElement(streamElement);
-                    iter.remove();
-                }
-            }
-        }
-        distribute(dataWindow);
+    public Wrapper getWrapper() {
+        return wrapper;
     }
 }

@@ -1,16 +1,19 @@
 package gsn.windows;
 
-import gsn.utils.EasyParamWrapper;
 import gsn.beans.StreamElement;
+import gsn.utils.EasyParamWrapper;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Iterator;
+import java.util.ListIterator;
 
-public class CountBasedWindow implements  WindowInterface{
+public class CountBasedWindow implements WindowInterface {
 
     private int size;
     private LinkedList<StreamElement> items = new LinkedList<StreamElement>();
+    private long minimumRequiredTimestamp;
+
     public boolean initialize(EasyParamWrapper easyParamWrapper) {
         size = easyParamWrapper.getPredicateValueAsIntWithException("size");
         return true;
@@ -21,7 +24,7 @@ public class CountBasedWindow implements  WindowInterface{
     }
 
     public void postData(StreamElement se) {
-        items.add(se);
+        items.addFirst(se);
 
     }
 
@@ -29,22 +32,33 @@ public class CountBasedWindow implements  WindowInterface{
         items.clear();
     }
 
-    public List<StreamElement> nextWindow() {
-        List<StreamElement> toReturn =checkNextWindow();
+    public List<StreamElement> nextWindow(long timestamp) {
+        List<StreamElement> toReturn = checkNextWindow(timestamp);
         Iterator<StreamElement> it = toReturn.iterator();
-        while (it.hasNext() && it.next()!=null)
-            items.poll(); //retirives and removes the first element of the items.
+
+        for (ListIterator<StreamElement> iter = items.listIterator(); iter.hasNext();) {
+            if (iter.next().getTimeStamp() < minimumRequiredTimestamp) {
+                iter.remove();
+            }
+        }
         return toReturn;
     }
 
-    public List<StreamElement> checkNextWindow() {
-        LinkedList<StreamElement> toReturn = new LinkedList();
-        Iterator<StreamElement> it = items.iterator();
-        for (int i=0;i<size;i++){
-            if (it.hasNext())
-                toReturn.add(it.next());
-            else
-                toReturn.add(null);
+    public List<StreamElement> checkNextWindow(long timestamp) {
+        LinkedList<StreamElement> toReturn = new LinkedList<StreamElement>();
+
+        for (int i = 0; i < items.size(); i++) {
+            StreamElement se = items.get(i);
+            if (se.getTimeStamp() <= timestamp) {
+                toReturn.add(se);
+                minimumRequiredTimestamp = se.getTimeStamp();
+            }
+            if (toReturn.size() == size) break;
+        }
+
+        int emptySlots = size - toReturn.size();
+        for (int i = 0; i < emptySlots; i++) {
+            toReturn.add(null);
         }
         return toReturn;
     }

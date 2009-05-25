@@ -1,15 +1,13 @@
 package gsn.storage;
 
-import org.junit.Test;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.classic.Session;
+import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.io.Serializable;
-
-import static junit.framework.Assert.assertEquals;
 
 public class TestHStorageManage {
 
@@ -18,7 +16,7 @@ public class TestHStorageManage {
         String dialect = "org.hibernate.dialect.H2Dialect";
         String driverClass = "org.h2.Driver";
         String url = "jdbc:h2:mem:gsn_mem_db";
-        String username = "";
+        String username = "sa";
         String password = "";
 
         String entityMapping =
@@ -47,7 +45,7 @@ public class TestHStorageManage {
                         "    \n" +
                         "</hibernate-mapping>";
 
-        
+
         SessionFactory sessionFactory = HStorageManager.getSessionFactory(dialect, driverClass, url, username, password, entityMapping);
         Session session = sessionFactory.getCurrentSession();
 
@@ -68,7 +66,7 @@ public class TestHStorageManage {
         session = sessionFactory.getCurrentSession();
         tx = session.beginTransaction();
         Map savedDavid = (Map) session.get("Customer", id);
-        tx.commit();      
+        tx.commit();
         assertEquals(savedDavid.get("name"), "David");
 
         sessionFactory.close();

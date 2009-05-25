@@ -1,8 +1,8 @@
 package gsn.beans.windowing;
 
-import gsn.wrappers.AbstractWrapper;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+import gsn.wrappers.AbstractWrapper;
 
 public class MockWrapper extends AbstractWrapper {
 
@@ -32,6 +32,6 @@ public class MockWrapper extends AbstractWrapper {
     }
 
     public void run() {
-        
+
     }
 }

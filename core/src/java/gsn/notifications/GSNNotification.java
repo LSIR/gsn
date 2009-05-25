@@ -3,7 +3,6 @@ package gsn.notifications;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLUtils;
-import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;

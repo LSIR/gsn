@@ -14,27 +14,27 @@ public class QueryDecorator extends ThreadDataNodeDecorator {
     }
 
     protected void initializeBlockingQueue() {
-        for (DataNodeInterface child : getChildren()) {
-            QueueDataNodeDecorator childDec = (QueueDataNodeDecorator) child;
-            childDec.getQueue(this).addListener(new QueueChangeListener() {
-
-                public void itemAdded(Object obj) {
-
-                }
-
-                public void itemRemove(Object obj) {
-
-                }
-
-                public void queueEmpty() {
-                    lockQueue.poll();
-                }
-
-                public void queueNotEmpty() {
-                    lockQueue.add(Boolean.TRUE);
-                }
-            });
-        }
+//        for (DataNodeInterface child : getChildren()) {
+//            QueueDataNodeDecorator childDec = (QueueDataNodeDecorator) child;
+//            childDec.getQueue(this).addListener(new QueueChangeListener() {
+//
+//                public void itemAdded(Object obj) {
+//
+//                }
+//
+//                public void itemRemove(Object obj) {
+//
+//                }
+//
+//                public void queueEmpty() {
+//                    lockQueue.poll();
+//                }
+//
+//                public void queueNotEmpty() {
+//                    lockQueue.add(Boolean.TRUE);
+//                }
+//            });
+//        }
     }
 
     public void run() {

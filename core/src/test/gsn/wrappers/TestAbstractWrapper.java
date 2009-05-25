@@ -1,24 +1,21 @@
 package gsn.wrappers;
 
-import static org.junit.Assert.*;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
 import gsn.storage.StorageManager;
-import gsn.utils.GSNRuntimeException;
 import gsn.utils.KeyValueImp;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import java.sql.DriverManager;
+import javax.naming.OperationNotSupportedException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.naming.OperationNotSupportedException;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class TestAbstractWrapper {
 
@@ -35,13 +32,13 @@ public class TestAbstractWrapper {
     private StorageManager sm;
 
 
-    @Before
+    @BeforeMethod
     public void setUp() throws Exception {
         sm = StorageManager.getInstance();
     }
 
 
-    @Test(expected = OperationNotSupportedException.class)
+    @Test(expectedExceptions = OperationNotSupportedException.class)
     public void testSendToWrapper1() throws OperationNotSupportedException {
         SystemTime systemTimeWrapper = new SystemTime();
         systemTimeWrapper.sendToWrapper("bla");
@@ -54,7 +51,7 @@ public class TestAbstractWrapper {
      * @throws OperationNotSupportedException
      * @throws SQLException
      */
-    @Test(expected = OperationNotSupportedException.class)
+    @Test(expectedExceptions = OperationNotSupportedException.class)
     public void testSendToWrapper2() throws OperationNotSupportedException, SQLException {
         SystemTime systemTimeWrapper = new SystemTime();
         systemTimeWrapper.setActiveAddressBean(new AddressBean("system-time"));

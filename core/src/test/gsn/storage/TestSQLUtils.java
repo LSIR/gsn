@@ -1,24 +1,26 @@
 package gsn.storage;
 
-import java.util.ArrayList;
-import java.util.regex.Matcher;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import junit.framework.TestCase;
+public class TestSQLUtils {
 
-public class TestSQLUtils extends TestCase {
-
+    @BeforeMethod
     protected void setUp() throws Exception {
-        super.setUp();
+
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception {
-        super.tearDown();
+
     }
 
     /*
     * Test method for 'gsn.storage.SQLUtils.rewriteQuery(String, HashMap<String,
     * String>)'
     */
+    @Test
     public void testRewriteQuery() {
 
     }
@@ -27,6 +29,7 @@ public class TestSQLUtils extends TestCase {
     * Test method for
     * 'gsn.storage.SQLUtils.extractTableNamesUsedInQuery(String)'
     */
+    @Test
     public void testExtractTableNamesUsedInQuery() {
 
     }

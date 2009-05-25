@@ -1,12 +1,13 @@
 package gsn.windows;
 
-import gsn.utils.EasyParamWrapper;
 import gsn.beans.StreamElement;
+import gsn.utils.EasyParamWrapper;
+
 import java.util.List;
 
 public interface WindowInterface {
-    
-    public boolean initialize(EasyParamWrapper easyParamWrapper) ;
+
+    public boolean initialize(EasyParamWrapper easyParamWrapper);
 
     public List<StreamElement> getTotalContent(); // returns all the un processes data items.
 
@@ -14,7 +15,7 @@ public interface WindowInterface {
 
     public void reset(); //removes everything from the current window
 
-    public List<StreamElement> nextWindow(); //consumes the window and moves next.
-    
-    public List<StreamElement> checkNextWindow(); // doesn't consume
+    public List<StreamElement> nextWindow(long timestamp); //consumes the window and moves next.
+
+    public List<StreamElement> checkNextWindow(long timestamp); // doesn't consume
 }

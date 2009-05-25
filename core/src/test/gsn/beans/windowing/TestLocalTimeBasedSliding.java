@@ -10,7 +10,6 @@ import gsn.vsensor.BridgeVirtualSensor;
 import static org.testng.Assert.*;
 import org.testng.annotations.*;
 
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 

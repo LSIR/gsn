@@ -1,21 +1,23 @@
 package gsn.storage;
 
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
-public class TestDataPacket extends TestCase {
+public class TestDataPacket {
 
     String dbURL = "jdbc:hsqldb:mem:.";
 
     Connection con;
 
+    @BeforeMethod
     protected void setUp() throws Exception {
-        super.setUp();
         Class.forName("org.hsqldb.jdbcDriver");
         Properties properties = new Properties();
         properties.put("user", "sa");
@@ -30,10 +32,12 @@ public class TestDataPacket extends TestCase {
 
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception {
-        super.tearDown();
+
     }
 
+    @Test
     public void testResultSetToStreamElements() throws Exception {
         // Test 1
         cleanTables();

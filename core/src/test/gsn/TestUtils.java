@@ -1,7 +1,7 @@
 package gsn;
 
-import gsn.beans.StreamElement;
 import gsn.beans.DataField;
+import gsn.beans.StreamElement;
 
 import java.io.Serializable;
 

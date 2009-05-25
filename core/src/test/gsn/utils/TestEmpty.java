@@ -1,16 +1,10 @@
 package gsn.utils;
 
+import org.testng.annotations.*;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.JUnit4TestAdapter;
 
 public class TestEmpty {
-    @After
+    @AfterMethod
     public void clean() throws Exception {
 
     }
@@ -20,7 +14,7 @@ public class TestEmpty {
 
     }
 
-    @Before
+    @BeforeMethod
     public void setup() throws Exception {
 
     }
@@ -35,7 +29,4 @@ public class TestEmpty {
 
     }
 
-    public static junit.framework.Test suite() {
-        return new JUnit4TestAdapter(TestEmpty.class);
-    }
 }

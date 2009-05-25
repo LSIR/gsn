@@ -1,10 +1,10 @@
 package slidingwindow;
 
-import gsn.beans.model.Window;
-import gsn.windows.WindowInterface;
 import gsn.beans.StreamElement;
+import gsn.beans.model.Window;
 import gsn.utils.EasyParamWrapper;
 import gsn.utils.ParameterValidityCheck;
+import gsn.windows.WindowInterface;
 
 import java.util.List;
 
@@ -23,17 +23,17 @@ public class WindowInstance {
         boolean initialization = windowHandler.initialize(new EasyParamWrapper(window.getParameters()));
         // TODO: check on initialization.
 
-        if (!initialization){
+        if (!initialization) {
             //TODO: ERROR
             return;
         }
     }
 
-    public void addDataToWindow(StreamElement se){
+    public void addDataToWindow(StreamElement se) {
         windowHandler.postData(se);
     }
 
-    public List<StreamElement> getWindow(){
+    public List<StreamElement> getWindow() {
         return windowHandler.getTotalContent();
     }
 }

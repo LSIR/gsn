@@ -333,7 +333,7 @@ public class StorageManager {
      * @param connection
      * @throws SQLException
      */
-    public static void executeCreateTable(CharSequence tableName,  DataField[] structure, boolean unique, Connection connection) throws SQLException {
+    public static void executeCreateTable(CharSequence tableName, DataField[] structure, boolean unique, Connection connection) throws SQLException {
         StringBuilder sql = getStatementCreateTable(tableName, structure, connection);
         if (logger.isDebugEnabled())
             logger.debug(new StringBuilder().append("The create table statement is : ").append(sql).toString());
@@ -634,7 +634,6 @@ public class StorageManager {
             }
 
 
-
             public String getStatementDropIndex() {
                 return "DROP INDEX #NAME";
             }
@@ -705,7 +704,6 @@ public class StorageManager {
            * @param field The DataField to be converted @return convertedType The
            * datatype name used by the target database.
            */
-
 
 
         public byte convertLocalTypeToGSN(int jdbcType) {

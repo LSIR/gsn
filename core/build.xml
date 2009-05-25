@@ -34,25 +34,26 @@
 
         <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
         <property name="instrumented.dir" value="build/instrumened"/>
+        <taskdef resource="testngtasks" classpathref="classpath"/>
     </target>
 
     <target name="clean" description="remove the previously compiled class files" depends="init">
         <delete includeEmptyDirs="yes" failonerror="no">
             <fileset dir="${build.dir}" includes="**/*.class,**/*.xml"/>
             <fileset dir="${build.dir}" includes="**/*.xml"/>
-            <fileset dir="${test-build.dir}" />
+            <fileset dir="${test-build.dir}"/>
             <fileset dir="${reports}" includes="**/*html,**/*htm,**/*xml"/>
             <fileset dir="${jars}" includes="**/*"/>
         </delete>
     </target>
-    
+
     <target name="setup" depends="init">
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${test-build.dir}"/>
         <mkdir dir="logs"/>
         <mkdir dir="${reports}/todos"/>
         <mkdir dir="${reports}/javadoc"/>
-        <mkdir dir="${reports}/junit"/>
+        <mkdir dir="${reports}/testng"/>
         <condition property="java6">
             <equals arg1="${ant.java.version}" arg2="1.6"/>
         </condition>
@@ -101,8 +102,8 @@
     </target>
 
     <target name="init-reports" depends="build">
-        <delete dir="${reports}/junit"/>
-        <mkdir dir="${reports}/junit"/>
+        <delete dir="${reports}/testng"/>
+        <mkdir dir="${reports}/testng"/>
         <delete dir="${instrumented.dir}"/>
         <mkdir dir="${instrumented.dir}"/>
         <delete dir="${reports}/cobertura"/>
@@ -118,7 +119,42 @@
         </cobertura-instrument>
     </target>
 
-    <target name="test" depends="init-reports, bind" description="Runs JUnit tests">
+    <target name="test" depends="init-reports, bind" description="Runs TestNG tests">
+        <testng failureproperty="tests.failed" outputdir="${reports}/testng" parallel="false">
+            <!--Note: the classpath order is important. -->
+            <classpath location="${instrumented.dir}"/>
+            <classpath refid="classpath"/>
+            <classpath refid="cobertura.classpath"/>
+
+            <classfileset dir="${test-build.dir}">
+                    <!--	      <exclude name="**/TestStreamExporterVirtualSensor.java"/>
+                         <exclude name="**/TestContainerImpl.java"/> -->
+                    <exclude name="**/TestDataPropogation.class"/>
+                    <exclude name="**/TestVSensorLoader.class"/>
+                    <exclude name="**/TestStreamSource.class"/>
+                    <!--<exclude name="**/TestTupleBasedSliding.class"/>-->
+                    <exclude name="**/TestSlidingWindowDefinition.class"/>
+                    <exclude name="**/TestLocalTimeBasedSliding.class"/>
+                    <exclude name="**/TestDataPacket.class"/>
+                    <exclude name="**/TestSQLUtils.class"/>
+                    <exclude name="**/TestStreamElement.class"/>
+                    <exclude name="**/TestValidityTools.class"/>
+                    <exclude name="**/TestGraph.class"/>
+                    <exclude name="**/TestContainerImpl.class"/>
+                    <exclude name="**/TestStorageManager.class"/>
+                    <exclude name="**/TestEmpty.class"/>
+                    <exclude name="**/TestUtils.class"/>
+                    <!--<exclude name="**/TestAbstractWrapper.class"/>-->
+            </classfileset>
+        </testng>
+
+        <cobertura-report format="html" destdir="${reports}/cobertura" srcdir="${src.dir}"/>
+
+        <fail if="tests.failed">At least one test Failed !</fail>
+    </target>
+
+
+    <target name="test-junit" depends="init-reports, bind" description="Runs JUnit tests">
         <junit printsummary="true" fork="true" haltonerror="false" haltonfailure="false"
                failureproperty="tests.failed" showoutput="true">
 

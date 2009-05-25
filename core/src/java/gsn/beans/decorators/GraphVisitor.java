@@ -2,6 +2,7 @@ package gsn.beans.decorators;
 
 import gsn.beans.model.DataNode;
 import gsn.beans.model.DataNodeInterface;
+import gsn.beans.model.DataChannel;
 
 import java.util.ArrayList;
 
@@ -9,10 +10,10 @@ public class GraphVisitor {
     private Object visit(DataNodeInterface node, ArrayList<DataNodeInterface> visitedNodes, DecoratorFactory factory) {
         visitedNodes.add(node);
         node = factory.createDecorator(node);
-        for (DataNodeInterface child : node.getChildren()) {
-            if (!visitedNodes.contains(child)) {
-                visitedNodes.add(child);
-                visit(child, visitedNodes, factory);
+        for (DataChannel child : node.getInChannels()) {
+            if (!visitedNodes.contains(child.getProducer())) {
+                visitedNodes.add(child.getProducer());
+                visit(child.getProducer(), visitedNodes, factory);
             }
         }
         return node;

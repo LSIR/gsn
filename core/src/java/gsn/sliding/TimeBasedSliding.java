@@ -3,24 +3,34 @@ package gsn.sliding;
 import gsn.beans.StreamElement;
 import gsn.utils.EasyParamWrapper;
 
-public class CountBasedSliding implements SlidingInterface {
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TimeBasedSliding implements SlidingInterface, ActionListener {
     private int size;
     private SlidingListener listener;
-    private int tempCounter = 0;
+    private Timer timer;
 
     public boolean initialize(EasyParamWrapper easyParamWrapper, SlidingListener listener) {
         this.size = easyParamWrapper.getPredicateValueAsIntWithException("size");
         this.listener = listener;
+        timer = new Timer(size, this);
+        timer.start();
         return true;
     }
 
     public void postData(StreamElement se) {
-        tempCounter++;
-        if (tempCounter % size == 0)
-            listener.slide(se.getTimeStamp());
+
     }
 
     public void reset() {
-        tempCounter = 0;
+        timer.stop();
+        timer = new Timer(size, this);
+        timer.start();
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        listener.slide(System.currentTimeMillis());
     }
 }

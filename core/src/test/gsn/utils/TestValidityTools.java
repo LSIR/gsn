@@ -1,17 +1,13 @@
 package gsn.utils;
 
-import static org.junit.Assert.*;
 import gsn.beans.DataField;
 import gsn.storage.StorageManager;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import org.testng.annotations.*;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class TestValidityTools {
 
@@ -27,11 +23,11 @@ public class TestValidityTools {
     public static void tearDownAfterClass() throws Exception {
     }
 
-    @Before
+    @BeforeMethod
     public void setUp() throws Exception {
     }
 
-    @After
+    @AfterMethod
     public void tearDown() throws Exception {
     }
 
@@ -83,7 +79,7 @@ public class TestValidityTools {
 
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void testTableExists() throws SQLException {
         assertFalse(sm.tableExists("myTable"));
         sm.executeCreateTable("table1", new DataField[]{}, true);
@@ -94,12 +90,12 @@ public class TestValidityTools {
         assertFalse(sm.tableExists(null));
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void testTableExistsWithEmptyTableName() throws SQLException {
         assertFalse(sm.tableExists(""));
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void testTableExistsWithBadParameters() throws SQLException {
         assertFalse(sm.tableExists("'f\\"));
     }

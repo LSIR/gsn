@@ -53,18 +53,18 @@ public class UDPWrapper extends AbstractWrapper {
     public void run() {
         byte[] receivedData = new byte[50];
         DatagramPacket receivedPacket = null;
-            try {
-                receivedPacket = new DatagramPacket(receivedData, receivedData.length);
-                socket.receive(receivedPacket);
-                String dataRead = new String(receivedPacket.getData());
-                if (logger.isDebugEnabled()) logger.debug("UDPWrapper received a packet : " + dataRead);
-                StreamElement streamElement = new StreamElement(new String[]{RAW_PACKET}, new Byte[]{DataTypes.BINARY}, new Serializable[]{receivedPacket.getData()}, System
-                        .currentTimeMillis());
-                postStreamElement(streamElement);
-            } catch (IOException e) {
-                logger.warn("Error while receiving data on UDP socket : " + e.getMessage());
-            }
-        
+        try {
+            receivedPacket = new DatagramPacket(receivedData, receivedData.length);
+            socket.receive(receivedPacket);
+            String dataRead = new String(receivedPacket.getData());
+            if (logger.isDebugEnabled()) logger.debug("UDPWrapper received a packet : " + dataRead);
+            StreamElement streamElement = new StreamElement(new String[]{RAW_PACKET}, new Byte[]{DataTypes.BINARY}, new Serializable[]{receivedPacket.getData()}, System
+                    .currentTimeMillis());
+            postStreamElement(streamElement);
+        } catch (IOException e) {
+            logger.warn("Error while receiving data on UDP socket : " + e.getMessage());
+        }
+
     }
 
     public DataField[] getOutputFormat() {

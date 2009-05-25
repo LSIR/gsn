@@ -1,8 +1,8 @@
 package gsn;
 
-import java.util.Properties;
-
 import org.apache.log4j.PropertyConfigurator;
+
+import java.util.Properties;
 
 public class Helpers {
     public static void initLoggerToDebug() {

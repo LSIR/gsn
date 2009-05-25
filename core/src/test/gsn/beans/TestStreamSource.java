@@ -1,10 +1,5 @@
 package gsn.beans;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import gsn.Main;
 import gsn.beans.windowing.WindowType;
 import gsn.storage.DataEnumerator;
@@ -12,17 +7,16 @@ import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.SystemTime;
+import org.apache.log4j.PropertyConfigurator;
+import static org.testng.Assert.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.io.Serializable;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.apache.log4j.PropertyConfigurator;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class TestStreamSource {
 
@@ -37,14 +31,14 @@ public class TestStreamSource {
 
     }
 
-    @Before
+    @BeforeMethod
     public void setup() throws SQLException {
         sm.executeCreateTable(wrapper.getDBAliasInStr(), new DataField[]{}, true);
         wrapper.setActiveAddressBean(new AddressBean("system-time"));
         assertTrue(wrapper.initialize());
     }
 
-    @After
+    @AfterMethod
     public void teardown() throws SQLException {
         sm.executeDropTable(wrapper.getDBAliasInStr());
     }
@@ -90,19 +84,19 @@ public class TestStreamSource {
         assertEquals(ss.getParsedWindowSize(), 2 * 60 * 60 * 1000);
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void testBadStreamSources() throws GSNRuntimeException {
         InputStream is = new InputStream();
         StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  min").setInputStream(is);
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void testBadStreamSources2() throws GSNRuntimeException {
         InputStream is = new InputStream();
         StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("10  m20").setInputStream(is);
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void testBadStreamSources3() throws GSNRuntimeException {
         InputStream is = new InputStream();
         StreamSource ss = new StreamSource().setAlias("my-stream").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("m").setInputStream(is);
@@ -179,13 +173,13 @@ public class TestStreamSource {
         wrapper.removeListener(ss);
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void badSamplingRate() {
         StreamSource ss = new StreamSource().setAlias("my-stream").setSqlQuery("select * from wrapper").setRawHistorySize("10  s");
         ss.setSamplingRate(-0.1f);
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void badSamplingRateBadOrder() throws SQLException {
         StreamSource ss = new StreamSource().setAlias("my-stream").setSqlQuery("select * from wrapper").setRawHistorySize("10  s");
         ss.setWrapper(wrapper);
@@ -203,13 +197,13 @@ public class TestStreamSource {
         wrapper.removeListener(ss);
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void testNullWrapper() {
         StreamSource ss = new StreamSource().setAlias("my-stream").setSqlQuery("select * from wrapper").setRawHistorySize("10  s");
         ss.toSql();
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void testInvalidStreamSource() throws SQLException {
         InputStream is = new InputStream();
         StreamSource ss = new StreamSource().setAlias("my-stream").setSqlQuery("select * from wrapper").setRawHistorySize("10  s").setInputStream(is);

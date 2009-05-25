@@ -1,16 +1,15 @@
 package gsn.beans.windowing;
 
+import gsn.Helpers;
 import gsn.TestUtils;
 import gsn.VirtualSensorPool;
-import gsn.Helpers;
 import gsn.beans.*;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import gsn.vsensor.BridgeVirtualSensor;
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
+import org.testng.annotations.*;
 
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -42,14 +41,14 @@ public class TestRemoteTimeBasedSliding {
         StorageManager.getInstance().shutdown();
     }
 
-    @Before
+    @BeforeMethod
     public void setup() throws SQLException {
         sm.executeCreateTable(wrapper.getDBAliasInStr(), new DataField[]{}, true);
         wrapper.setActiveAddressBean(new AddressBean("system-time"));
         assertTrue(wrapper.initialize());
     }
 
-    @After
+    @AfterMethod
     public void teardown() throws SQLException {
         sm.executeDropTable(wrapper.getDBAliasInStr());
     }

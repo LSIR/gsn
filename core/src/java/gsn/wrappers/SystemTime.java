@@ -70,28 +70,28 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
         if (delayPostingElements) {
             if (logger.isDebugEnabled())
                 logger.warn("Starting <" + getWrapperName() + "> with delayed elements.");
-                synchronized (objectLock) {
-                    while (streamElementBuffer.isEmpty()) {
-                        try {
-                            objectLock.wait();
-                        } catch (InterruptedException e) {
-                            logger.error(e.getMessage(), e);
-                        }
+            synchronized (objectLock) {
+                while (streamElementBuffer.isEmpty()) {
+                    try {
+                        objectLock.wait();
+                    } catch (InterruptedException e) {
+                        logger.error(e.getMessage(), e);
                     }
                 }
-                try {
-                    int nextInt = RandomUtils.nextInt(maximumDelay);
-                    Thread.sleep(nextInt);
-//				System.out.println("next delay : " + nextInt + "   -->    buffer size : " + streamElementBuffer.size());
-                } catch (InterruptedException e) {
-                    logger.error(e.getMessage(), e);
-                }
-
-                if (!streamElementBuffer.isEmpty()) {
-                    StreamElement nextStreamElement = (StreamElement) streamElementBuffer.remove();
-                    postStreamElement(nextStreamElement);
-                }
             }
+            try {
+                int nextInt = RandomUtils.nextInt(maximumDelay);
+                Thread.sleep(nextInt);
+//				System.out.println("next delay : " + nextInt + "   -->    buffer size : " + streamElementBuffer.size());
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage(), e);
+            }
+
+            if (!streamElementBuffer.isEmpty()) {
+                StreamElement nextStreamElement = (StreamElement) streamElementBuffer.remove();
+                postStreamElement(nextStreamElement);
+            }
+        }
     }
 
     public DataField[] getOutputFormat() {

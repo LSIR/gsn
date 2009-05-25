@@ -1,17 +1,25 @@
 package gsn.storage;
 
+import gsn.Helpers;
 import gsn.beans.DataType;
-import gsn.beans.decorators.WrapperDecorator;
 import gsn.beans.decorators.QueueDataNodeDecorator;
+import gsn.beans.decorators.WrapperDecorator;
 import gsn.beans.model.*;
+import gsn.wrappers2.SystemTimeWrapper2;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 
+@Test
 public class TestVirtualSensorModel {
 
+    @BeforeClass
+    public void setup() {
+        Helpers.initLoggerToDebug();
+    }
 
     private WindowModel createSampleWindowModel() {
 
@@ -22,7 +30,7 @@ public class TestVirtualSensorModel {
 
         WindowModel windowModel = new WindowModel();
         windowModel.setName("CountbasedWindow");
-        windowModel.setClassName("gsn.beans.WindowInstance");
+        windowModel.setClassName("gsn.windows.CountBasedWindow");
         ArrayList<ParameterModel> models = new ArrayList<ParameterModel>();
         models.add(parameterModel);
         windowModel.setParameters(models);
@@ -33,13 +41,13 @@ public class TestVirtualSensorModel {
     private SlidingModel createSampleSlidingModel() {
 
         ParameterModel parameterModel = new ParameterModel();
-        parameterModel.setName("slide");
+        parameterModel.setName("size");
         parameterModel.setDataType(DataType.NUMERIC);
         parameterModel.setDefaultValue("1");
 
         SlidingModel slidingModel = new SlidingModel();
         slidingModel.setName("CountbasedSlide");
-        slidingModel.setClassName("gsn.beans.windowing.SlidingHandler2");
+        slidingModel.setClassName("gsn.sliding.CountBasedSliding");
         ArrayList<ParameterModel> models = new ArrayList<ParameterModel>();
         models.add(parameterModel);
         slidingModel.setParameters(models);
@@ -53,7 +61,7 @@ public class TestVirtualSensorModel {
         ParameterModel parameterModel = new ParameterModel();
         parameterModel.setName("mode");
         parameterModel.setDataType(DataType.STRING);
-        parameterModel.setDefaultValue("auto");
+        parameterModel.setDefaultValue("manual");
         models.add(parameterModel);
 
         parameterModel = new ParameterModel();
@@ -64,7 +72,7 @@ public class TestVirtualSensorModel {
 
         WrapperModel wrapperModel = new WrapperModel();
         wrapperModel.setName("system-time-2");
-        wrapperModel.setClassName("gsn.wrappers.SystemTimeV2");
+        wrapperModel.setClassName("gsn.wrappers2.SystemTimeWrapper2");
         wrapperModel.setParameters(models);
 
         return wrapperModel;
@@ -118,8 +126,8 @@ public class TestVirtualSensorModel {
         wrapperNode.setModel(model);
         wrapperNode.setParameters(parameters);
 
-        wrapperNode.setSliding(sliding);
-        wrapperNode.setWindow(window);
+//        wrapperNode.setSliding(sliding);
+//        wrapperNode.setWindow(window);
 
         return wrapperNode;
     }
@@ -178,7 +186,6 @@ public class TestVirtualSensorModel {
     }
 
 
-
     @Test
     public void testCreateSampleWrapper() {
         Session session = HibernateUtil.getCurrentSession();
@@ -201,8 +208,17 @@ public class TestVirtualSensorModel {
         session.save(wrapperNode);
 
         tx.commit();
-        
+
         WrapperDecorator wrapperDeco = new WrapperDecorator(new QueueDataNodeDecorator(wrapperNode));
+        wrapperDeco.initialize();
+        SystemTimeWrapper2 wrapper = (SystemTimeWrapper2) wrapperDeco.getWrapper();
+        wrapper.produceNext();
+        wrapper.produceNext();
+        wrapper.produceNext();
+        wrapper.produceNext();
+        wrapper.produceNext();
+        wrapper.produceNext();
+        wrapper.produceNext();
     }
 
     @Test

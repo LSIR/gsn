@@ -7,7 +7,6 @@ import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.beans.windowing.*;
 import gsn.storage.StorageManager;
-import gsn.utils.GSNRuntimeException;
 import org.apache.log4j.Logger;
 
 import javax.naming.OperationNotSupportedException;
@@ -18,7 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class AbstractWrapper extends Thread{
+public abstract class AbstractWrapper extends Thread {
 
     private final static transient Logger logger = Logger.getLogger(AbstractWrapper.class);
 
@@ -152,7 +151,6 @@ public abstract class AbstractWrapper extends Thread{
     public abstract DataField[] getOutputFormat();
 
 
-
     protected void postStreamElement(Serializable... values) {
         StreamElement se = new StreamElement(getOutputFormat(), values, System.currentTimeMillis());
         postStreamElement(se);
@@ -178,7 +176,7 @@ public abstract class AbstractWrapper extends Thread{
             return false;
         }
         try {
-            if ( listeners.size() == 0)
+            if (listeners.size() == 0)
                 return false;
             if (!insertIntoWrapperTable(streamElement))
                 return false;
@@ -233,7 +231,7 @@ public abstract class AbstractWrapper extends Thread{
      */
 
     public boolean sendToWrapper(Object dataItem) throws OperationNotSupportedException {
-           throw new OperationNotSupportedException("This wrapper doesn't support sending data back to the source.");
+        throw new OperationNotSupportedException("This wrapper doesn't support sending data back to the source.");
     }
 
 
@@ -336,5 +334,5 @@ public abstract class AbstractWrapper extends Thread{
 
     public boolean manualDataInsertion(StreamElement se) {
         throw new RuntimeException("Manual data insertion is not supported by this wrapper");
-	}
+    }
 }

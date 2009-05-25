@@ -1,10 +1,9 @@
 package gsn.beans.model;
 
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
 import java.io.Serializable;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class Window implements Serializable {
     private List<Parameter> parameters;
 
     @OneToOne(optional = true)
-    private DataNode dataNode;
+    private DataChannel dataChannel;
 
     public Long getId() {
         return id;
@@ -44,12 +43,12 @@ public class Window implements Serializable {
         this.parameters = parameters;
     }
 
-    public DataNode getNode() {
-        return dataNode;
+    public DataChannel getDataChannel() {
+        return dataChannel;
     }
 
-    public void setNode(DataNode dataNodeInterface) {
-        this.dataNode = dataNodeInterface;
+    public void setDataChannel(DataChannel dataChannel) {
+        this.dataChannel = dataChannel;
     }
 
     @Override

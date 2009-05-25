@@ -47,19 +47,19 @@ public class MemoryMonitoringWrapper extends AbstractWrapper {
     }
 
     public void run() {
-            try {
-                Thread.sleep(samplingRate);
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
-            }
-            long heapMemoryUsage = mbean.getHeapMemoryUsage().getUsed();
-            long nonHeapMemoryUsage = mbean.getNonHeapMemoryUsage().getUsed();
-            int pendingFinalizationCount = mbean.getObjectPendingFinalizationCount();
-
-            StreamElement streamElement = new StreamElement(FIELD_NAMES, new Byte[]{DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.NUMERIC}, new Serializable[]{heapMemoryUsage,
-                    nonHeapMemoryUsage, pendingFinalizationCount}, System.currentTimeMillis());
-            postStreamElement(streamElement);
+        try {
+            Thread.sleep(samplingRate);
+        } catch (InterruptedException e) {
+            logger.error(e.getMessage(), e);
         }
+        long heapMemoryUsage = mbean.getHeapMemoryUsage().getUsed();
+        long nonHeapMemoryUsage = mbean.getNonHeapMemoryUsage().getUsed();
+        int pendingFinalizationCount = mbean.getObjectPendingFinalizationCount();
+
+        StreamElement streamElement = new StreamElement(FIELD_NAMES, new Byte[]{DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.NUMERIC}, new Serializable[]{heapMemoryUsage,
+                nonHeapMemoryUsage, pendingFinalizationCount}, System.currentTimeMillis());
+        postStreamElement(streamElement);
+    }
 
     public void finalize() {
         threadCounter--;

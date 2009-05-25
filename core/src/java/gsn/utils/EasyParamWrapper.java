@@ -1,21 +1,19 @@
 package gsn.utils;
 
 import gsn.beans.model.Parameter;
-import org.apache.commons.collections.KeyValue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class EasyParamWrapper {
     private List<Parameter> parameters;
 
-    public EasyParamWrapper(List<Parameter> parameters){
+    public EasyParamWrapper(List<Parameter> parameters) {
         this.parameters = parameters;
     }
 
     public String getPredicateValue(String key) {
         key = key.trim();
-        for ( Parameter predicate : this.parameters )
+        for (Parameter predicate : this.parameters)
             if (predicate.getModel().getName().trim().equalsIgnoreCase(key)) return predicate.getValue();
         return null;
     }

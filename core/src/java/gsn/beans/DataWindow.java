@@ -23,7 +23,7 @@ public class DataWindow {
         List<Parameter> list = window.getParameters();
         for (Parameter parameter : list) {
             if ("size".equals(parameter.getModel().getName())) {
-                return Integer.getInteger(parameter.getValue());
+                return Integer.parseInt(parameter.getValue());
             }
         }
         return 0;
@@ -33,7 +33,14 @@ public class DataWindow {
         dataList.add(se);
     }
 
-    public int getElementCount(){
+    public int getElementCount() {
         return dataList.size();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("window size: ").append(getSize()).append(", data=").append(dataList.toString());
+        return sb.toString();
     }
 }

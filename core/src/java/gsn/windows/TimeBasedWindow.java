@@ -1,32 +1,53 @@
 package gsn.windows;
 
-import gsn.utils.EasyParamWrapper;
 import gsn.beans.StreamElement;
+import gsn.utils.EasyParamWrapper;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
-public class TimeBasedWindow implements WindowInterface{
+public class TimeBasedWindow implements WindowInterface {
+
+    private int size;
+    private LinkedList<StreamElement> items = new LinkedList<StreamElement>();
+
     public boolean initialize(EasyParamWrapper easyParamWrapper) {
-        return false;
+        size = easyParamWrapper.getPredicateValueAsIntWithException("size");
+        return true;
     }
 
-    public ArrayList<StreamElement> getTotalContent() {
-        return null; 
+    public List<StreamElement> getTotalContent() {
+        return items;
     }
 
     public void postData(StreamElement se) {
-
+        items.addFirst(se);
     }
 
     public void reset() {
-
+        items.clear();
     }
 
-    public ArrayList<StreamElement> nextWindow() {
-        return null;
+    public List<StreamElement> nextWindow(long timestamp) {
+        List<StreamElement> toReturn = checkNextWindow(timestamp);
+
+        for (ListIterator<StreamElement> iter = items.listIterator(); iter.hasNext();) {
+            if (iter.next().getTimeStamp() <= timestamp - size) {
+                iter.remove();
+            }
+        }
+        
+        return toReturn;
     }
 
-    public ArrayList<StreamElement> checkNextWindow() {
-        return null;
+    public List<StreamElement> checkNextWindow(long timestamp) {
+        LinkedList<StreamElement> toReturn = new LinkedList<StreamElement>();
+        for (StreamElement se : items) {
+            if (se.getTimeStamp() <= timestamp && se.getTimeStamp() > timestamp - size) {
+                toReturn.add(se);
+            }
+        }
+        return toReturn;
     }
 }

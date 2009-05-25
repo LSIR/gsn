@@ -12,8 +12,8 @@ public class DataDispatcher {
         this.consumers = parents;
     }
 
-    public void addStreamElement(StreamElement se){
-            for (DataNodeInterface node : consumers)
-                ; // Consume !
+    public void addStreamElement(StreamElement se) {
+        for (DataNodeInterface node : consumers)
+            ; // Consume !
     }
 }

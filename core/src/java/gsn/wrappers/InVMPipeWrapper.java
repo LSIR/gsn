@@ -90,6 +90,6 @@ public class InVMPipeWrapper extends AbstractWrapper {
     }
 
     public void run() {
-        
+
     }
 }

@@ -1,11 +1,11 @@
 package gsn.sliding;
 
-import gsn.utils.EasyParamWrapper;
 import gsn.beans.StreamElement;
+import gsn.utils.EasyParamWrapper;
 
 public interface SlidingInterface {
 
-    public boolean initialize(EasyParamWrapper easyParamWrapper,SlidingListener notify);
+    public boolean initialize(EasyParamWrapper easyParamWrapper, SlidingListener listener);
 
     public void postData(StreamElement se);
 

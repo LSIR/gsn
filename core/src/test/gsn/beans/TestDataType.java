@@ -1,10 +1,9 @@
 package gsn.beans;
 
-import org.junit.*;
-import static org.junit.Assert.*;
 import gsn.utils.GSNRuntimeException;
+import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
 
-import java.sql.Types;
 
 public class TestDataType {
     @Test
@@ -23,14 +22,14 @@ public class TestDataType {
 
     @Test
     public void testConvertSQLTypeToGSNType() {
-        
+
 //        byte type = Types.VARCHAR;
 //        assertEquals(DataTypes.STRING,DataTypes.convertSQLTypeToGSNType(type));
         // TODO: Hibernate Mapping method to be implemented.
 
     }
 
-    @Test(expected = GSNRuntimeException.class)
+    @Test(expectedExceptions = GSNRuntimeException.class)
     public void testConvertGSNTypeNameToTypeIDBadInput() {
         String type = "   TiMe ";
         DataTypes.convertGSNTypeNameToTypeID(type);
