@@ -15,10 +15,10 @@ public class DataChannel implements Serializable {
     @OneToOne(optional = false, mappedBy = "dataChannel")
     private Sliding sliding;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     private DataNode producer;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     private DataNode consumer;
 
     public Long getId() {
@@ -47,6 +47,7 @@ public class DataChannel implements Serializable {
 
     public void setProducer(DataNode producer) {
         this.producer = producer;
+        producer.getOutChannels().add(this);
     }
 
     public DataNode getConsumer() {
@@ -55,6 +56,7 @@ public class DataChannel implements Serializable {
 
     public void setConsumer(DataNode consumer) {
         this.consumer = consumer;
+        consumer.getInChannels().add(this);
     }
 
     @Override

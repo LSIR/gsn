@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class TestTupleBasedSliding {
-    private MockWrapper wrapper = new MockWrapper();
+    private MockWrapper wrapper;
 
     private StorageManager sm = StorageManager.getInstance();
 
@@ -38,6 +38,7 @@ public class TestTupleBasedSliding {
 
     @BeforeMethod
     public void setup() throws SQLException {
+        wrapper = new MockWrapper();
         sm.executeCreateTable(wrapper.getDBAliasInStr(), new DataField[]{}, true);
         wrapper.setActiveAddressBean(new AddressBean("system-time"));
         assertTrue(wrapper.initialize());

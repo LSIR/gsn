@@ -14,13 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class TestRemoteTimeBasedSliding {
-    private MockWrapper wrapper = new MockWrapper() {
-        @Override
-        public boolean initialize() {
-            setUsingRemoteTimestamp(true);
-            return super.initialize();
-        }
-    };
+    private MockWrapper wrapper;
 
     private StorageManager sm = StorageManager.getInstance();
 
@@ -43,6 +37,13 @@ public class TestRemoteTimeBasedSliding {
 
     @BeforeMethod
     public void setup() throws SQLException {
+        wrapper = new MockWrapper() {
+            @Override
+            public boolean initialize() {
+                setUsingRemoteTimestamp(true);
+                return super.initialize();
+            }
+        };
         sm.executeCreateTable(wrapper.getDBAliasInStr(), new DataField[]{}, true);
         wrapper.setActiveAddressBean(new AddressBean("system-time"));
         assertTrue(wrapper.initialize());

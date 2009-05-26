@@ -16,7 +16,7 @@ public abstract class DataNode extends NameDescriptionClass implements DataNodeI
     private List<DataChannel> inChannels = new ArrayList<DataChannel>();
 
     @OneToMany(mappedBy = "producer")
-     @Cascade({org.hibernate.annotations.CascadeType.ALL, CascadeType.DELETE_ORPHAN})
+    @Cascade({org.hibernate.annotations.CascadeType.ALL, CascadeType.DELETE_ORPHAN})
     private List<DataChannel> outChannels = new ArrayList<DataChannel>();
 
     @ManyToOne(optional = true)
@@ -54,7 +54,8 @@ public abstract class DataNode extends NameDescriptionClass implements DataNodeI
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
-        if (getInChannels() != null ? !getInChannels().equals(that.getInChannels()) : that.getInChannels() != null) return false;
+        if (getInChannels() != null ? !getInChannels().equals(that.getInChannels()) : that.getInChannels() != null)
+            return false;
         if (getOutChannels() != null ? !getOutChannels().equals(that.getOutChannels()) : that.getOutChannels() != null)
             return false;
 

@@ -127,77 +127,26 @@
             <classpath refid="cobertura.classpath"/>
 
             <classfileset dir="${test-build.dir}">
-                    <!--	      <exclude name="**/TestStreamExporterVirtualSensor.java"/>
-                         <exclude name="**/TestContainerImpl.java"/> -->
-                    <exclude name="**/TestDataPropogation.class"/>
-                    <exclude name="**/TestVSensorLoader.class"/>
-                    <exclude name="**/TestStreamSource.class"/>
-                    <!--<exclude name="**/TestTupleBasedSliding.class"/>-->
-                    <exclude name="**/TestSlidingWindowDefinition.class"/>
-                    <exclude name="**/TestLocalTimeBasedSliding.class"/>
-                    <exclude name="**/TestDataPacket.class"/>
-                    <exclude name="**/TestSQLUtils.class"/>
-                    <exclude name="**/TestStreamElement.class"/>
-                    <exclude name="**/TestValidityTools.class"/>
-                    <exclude name="**/TestGraph.class"/>
-                    <exclude name="**/TestContainerImpl.class"/>
-                    <exclude name="**/TestStorageManager.class"/>
-                    <exclude name="**/TestEmpty.class"/>
-                    <exclude name="**/TestUtils.class"/>
-                    <!--<exclude name="**/TestAbstractWrapper.class"/>-->
+                <!--	      <exclude name="**/TestStreamExporterVirtualSensor.java"/>
+              <exclude name="**/TestContainerImpl.java"/> -->
+                <exclude name="**/TestDataPropogation.class"/>
+                <exclude name="**/TestVSensorLoader.class"/>
+                <exclude name="**/TestStreamSource.class"/>
+                <!--<exclude name="**/TestTupleBasedSliding.class"/>-->
+                <exclude name="**/TestSlidingWindowDefinition.class"/>
+                <exclude name="**/TestDataPacket.class"/>
+                <exclude name="**/TestSQLUtils.class"/>
+                <exclude name="**/TestStreamElement.class"/>
+                <exclude name="**/TestValidityTools.class"/>
+                <exclude name="**/TestGraph.class"/>
+                <exclude name="**/TestContainerImpl.class"/>
+                <exclude name="**/TestStorageManager.class"/>
+                <exclude name="**/TestEmpty.class"/>
+                <exclude name="**/TestUtils.class"/>
+                <exclude name="**/windowing/**"/>
+                <!--<exclude name="**/TestAbstractWrapper.class"/>-->
             </classfileset>
         </testng>
-
-        <cobertura-report format="html" destdir="${reports}/cobertura" srcdir="${src.dir}"/>
-
-        <fail if="tests.failed">At least one test Failed !</fail>
-    </target>
-
-
-    <target name="test-junit" depends="init-reports, bind" description="Runs JUnit tests">
-        <junit printsummary="true" fork="true" haltonerror="false" haltonfailure="false"
-               failureproperty="tests.failed" showoutput="true">
-
-            <formatter type="xml" usefile="true"/>
-
-            <!--Note: the classpath order is important. -->
-            <classpath location="${instrumented.dir}"/>
-            <classpath refid="classpath"/>
-            <classpath refid="cobertura.classpath"/>
-
-            <batchtest todir="${reports}/junit">
-                <!--       <fileset dir="${build.dir}" includes="**/*Test*.class" excludes="**/TestStreamExporterVirtualSensor*.class"/> -->
-                <fileset dir="${test.dir}">
-                    <include name="**/*Test*.java"/>
-                    <!--	      <exclude name="**/TestStreamExporterVirtualSensor.java"/>
-                         <exclude name="**/TestContainerImpl.java"/> -->
-                    <exclude name="**/TestDataPropogation.java"/>
-                    <exclude name="**/TestVSensorLoader.java"/>
-                    <exclude name="**/TestStreamSource.java"/>
-                    <!--<exclude name="**/TestTupleBasedSliding.java"/>-->
-                    <exclude name="**/TestSlidingWindowDefinition.java"/>
-                    <exclude name="**/TestLocalTimeBasedSliding.java"/>
-                    <exclude name="**/TestDataPacket.java"/>
-                    <exclude name="**/TestSQLUtils.java"/>
-                    <exclude name="**/TestStreamElement.java"/>
-                    <exclude name="**/TestValidityTools.java"/>
-                    <exclude name="**/TestGraph.java"/>
-                    <exclude name="**/TestContainerImpl.java"/>
-                    <exclude name="**/TestStorageManager.java"/>
-                    <exclude name="**/TestEmpty.java"/>
-                    <exclude name="**/TestUtils.java"/>
-                    <!--<exclude name="**/TestAbstractWrapper.java"/>-->
-                </fileset>
-                <!--         	<fileset dir="${build.dir}" includes="**/TestStreamSource.*,**/TestAbstractWrapper.*,**/TestVSensorLoader.*" />-->
-            </batchtest>
-        </junit>
-
-        <junitreport todir="${reports}/junit">
-            <fileset dir="${reports}/junit">
-                <include name="TEST-*.xml"/>
-            </fileset>
-            <report todir="${reports}/junit"/>
-        </junitreport>
 
         <cobertura-report format="html" destdir="${reports}/cobertura" srcdir="${src.dir}"/>
 

@@ -52,8 +52,8 @@ public class WrapperDecorator extends ThreadDataNodeDecorator implements Wrapper
         synchronized (this) {
             totalWindow.add(se);
         }
-        windowHandler.postData(se);
-        slidingHandler.postData(se);
+//        windowHandler.postData(se);
+//        slidingHandler.postData(se);
     }
 
     public void dataProduced(StreamElement se) {
