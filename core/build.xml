@@ -120,7 +120,7 @@
     </target>
 
     <target name="test" depends="init-reports, bind" description="Runs TestNG tests">
-        <testng failureproperty="tests.failed" outputdir="${reports}/testng" parallel="false">
+        <testng failureproperty="tests.failed" outputdir="${reports}/testng" parallel="false" haltonfailure="true">
             <!--Note: the classpath order is important. -->
             <classpath location="${instrumented.dir}"/>
             <classpath refid="classpath"/>
