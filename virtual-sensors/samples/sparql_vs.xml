@@ -1,0 +1,43 @@
+<virtual-sensor name="sparq_location_test" priority="10">
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+        <field name="station_name" type="varchar(100)"/>
+        <field name="sensor_serialno" type="varchar(100)"/>
+        <field name="project_name" type="varchar(100)"/>
+        <field name="start_date" type="bigint"/>
+        <field name="end_date" type="bigint"/>
+    </output-structure>
+
+    </processing-class>
+    <description>Description</description>
+    
+    <addressing/>
+
+    <streams>
+        <stream name="input1">
+            <source alias="source1" sampling-rate="1">
+                <address wrapper="sparql">
+                    <predicate key="url">http://www.swiss-experiment.ch/sparql/model</predicate>
+                    <predicate key="rate">600000</predicate>
+                    <predicate key="query"><![CDATA[
+                        PREFIX a: <http://128.178.156.248/index.php/Special:URIResolver/>
+                        PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>
+                        SELECT DISTINCT ?Project_name ?Station_name ?Start_date ?End_date ?Sensor_serialno
+                        WHERE {
+                        ?page a:Property-3AStation_name ?Station_name .
+                        ?page a:Property-3ASensor_serialno ?Sensor_serialno .
+                        ?page a:Property-3AProject_name ?Project_name .
+                        ?page a:Property-3AStart_date ?Start_date .
+                        ?page a:Property-3AEnd_date ?End_date .
+                        }
+                    ]]>
+                    </predicate>
+                </address>
+                <query>select *  from wrapper</query>
+            </source>
+            <query>select * from source1</query>
+        </stream>
+    </streams>
+</virtual-sensor>
