@@ -183,6 +183,8 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 			}
 			else {
 				logger.error("The length of the line (" + nextLine.length + ") doesn't match the structure length (" + csvFormat.getFields().length + ")");
+                logger.error("Line: >> "+msg + "<<");
+                logger.error("File: " + parameters.getCsvSourceFilePath());
 			}
 			csvReader.close();
 		} catch (IOException e) {
