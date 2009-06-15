@@ -111,7 +111,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 							time += date.getTime();
 							serialized[j] = date.getTime();
 						} catch (ParseException e) {
-							logger.error("invalide date format! (Pattern: " + csvFormat.getDateFormat(j).toLocalizedPattern() + ") "+nextLine[j]);
+							logger.error("invalide date format! (Pattern: " + csvFormat.getDateFormat(j).toLocalizedPattern() + ") "+nextLine[j] + " , file: "+ parameters.getCsvSourceFilePath());
 							serialized[j] = new Date (0).getTime();
 						}
 						logger.debug("time: "+tmp);
@@ -128,7 +128,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 								serialized[j] = null;
 							} else serialized[j] = d.doubleValue();
 						}catch(NumberFormatException e){
-							logger.error("wrong double format for :"+nextLine[j]+" at timestamp "+time);
+							logger.error("wrong double format for :"+nextLine[j]+" at timestamp "+time+ " , file: "+ parameters.getCsvSourceFilePath());
 							logger.error(e);
 							serialized[j] = null;
 						}
@@ -146,7 +146,7 @@ public class CSVFileWrapperProcessor extends SafeStorageAbstractWrapper {
 								serialized[j] = null;
 							} else serialized[j] = d.intValue();
 						}catch(NumberFormatException e){
-							logger.error("wrong integer format for :"+nextLine[j]+" at timestamp "+time);
+							logger.error("wrong integer format for :"+nextLine[j]+" at timestamp "+time + " , file: "+ parameters.getCsvSourceFilePath());
 							logger.error(e);
 							serialized[j] = null;
 						}
