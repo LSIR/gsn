@@ -3,48 +3,62 @@ package gsn.wrappers;
 import org.apache.log4j.Logger;
 import gsn.beans.DataField;
 import gsn.beans.AddressBean;
+import gsn.beans.DataTypes;
+import gsn.utils.GSNRuntimeException;
 
 import com.hp.hpl.jena.query.*;
 
 import java.io.Serializable;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.*;
 import java.text.ParseException;
 
 
+/*
+* Sparql Wrapper
+*
+* Reads semantic data from a Sparql-enabled server
+*
+* Requieres:
+* - url of the server
+* - rate (in milliseconds) for refresh
+* - list of fields to export with their types
+* - query specified in sparql
+* All those parameters are specified as predicates in the xml file of the virtual sensor
+*
+* Currently supported types for fields are:
+* - varchar() for strings
+* - integer for integer numbers
+* - double for floating numbers
+* - bigint for dates (in ISO-8609 format)
+*
+* A sample VS file is provided in virtual-sensors/samples/sparql_vs.xml
+*
+* */
 public class SparqlWrapper extends AbstractWrapper {
 
     private transient Logger logger = Logger.getLogger(this.getClass());
 
-    private int DEFAULT_SAMPLING_RATE_IN_MSEC = 60000; //every 60 seconds.
+    private int DEFAULT_SAMPLING_RATE_IN_MSEC = 60000; //default rate, every 60 seconds.
 
     public static final String DEFAULT_SERVICE_URL = "http://www.swiss-experiment.ch/sparql/model";
 
     private int threadCounter = 0;
 
-    private transient final DataField[] outputStructure = new DataField[]{
-            new DataField("station_name", "varchar(100)", "station_name"),
-            new DataField("sensor_serialno", "varchar(100)", "sensor_serialno"),
-            new DataField("project_name", "varchar(100)", "project_name"),
-            new DataField("start_date", "bigint", "start_date"),
-            new DataField("end_date", "bigint", "end_date")
-    };
+    private Map<String, String> listOfSparqlFields = new LinkedHashMap<String, String>(); // list of fields to export
 
-    /*private transient final DataField[] outputStructure = new DataField[]{
-            new DataField("action", "varchar(100)", "action"),
-            new DataField("addinfo", "varchar(200)", "addinfo"),
-            new DataField("start_date", "bigint", "start_date"),
-            new DataField("end_date", "bigint", "end_date"),
-            new DataField("parameter_name", "varchar(100)", "parameter_name")
-    };*/
+    private DataField[] outputStructure;
 
     private int rate;
     private String url;
-    //private String query_file;
     private String query;
+    private String fields;
+    private static final byte DATA_TYPE_NONE = -1;
 
     public boolean initialize() {
 
+        boolean init_result = true;
         setName("SparqlWrapper-Thread" + (++threadCounter));
         AddressBean addressBean = getActiveAddressBean();
         rate = addressBean.getPredicateValueAsInt("rate", DEFAULT_SAMPLING_RATE_IN_MSEC);
@@ -52,27 +66,67 @@ public class SparqlWrapper extends AbstractWrapper {
 
         query = addressBean.getPredicateValue("query");
 
-        logger.info("Sparql query => "+ query);
+        fields = addressBean.getPredicateValue("fields");
 
-        return true;
+        if (query != null) {
+            logger.info("Sparql query => " + query);
+        } else {
+            init_result = false;
+            logger.error("No sparql query provided for VS " + addressBean.getVirtualSensorName());
+        }
+
+        if (fields != null) {
+            parseFields(fields);
+            logger.info("Sparql fields => " + fields);
+        } else {
+            init_result = false;
+            logger.error("No sparql fields provided for VS " + addressBean.getVirtualSensorName());
+        }
+
+        return init_result;
+    }
+
+    private void parseFields(String fields) {
+        String[] allFields = fields.trim().split(",");
+        for (int i = 0; i < allFields.length; i++) {
+            String[] keyAndValue = allFields[i].trim().split(":");
+            logger.info("Field \"" + keyAndValue[0] + "\":\"" + keyAndValue[1] + "\"");
+            String _key = keyAndValue[0].trim();
+            String _value = keyAndValue[1].trim();
+            listOfSparqlFields.put(_key, _value);
+        }
+        // initializing output structure
+        outputStructure = new DataField[listOfSparqlFields.size()];
+        int index = 0;
+        for (String key : listOfSparqlFields.keySet()) {
+            outputStructure[index] = new DataField(key, listOfSparqlFields.get(key));
+            logger.debug(key + " => " + listOfSparqlFields.get(key));
+            index++;
+        }
+
+        if (logger.isDebugEnabled())
+            for (int j = 0; j < outputStructure.length; j++) {
+                logger.debug("outputStructure[" + j + "] = " + outputStructure[j]);
+            }
     }
 
     public void run() {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         while (isActive()) {
             try {
-                runRemoteQueryWithIteration();
+                executeRemoteSparqlQuery();
                 Thread.sleep(rate);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
             }
         }
     }
+
 
     public DataField[] getOutputFormat() {
         return outputStructure;
@@ -89,70 +143,105 @@ public class SparqlWrapper extends AbstractWrapper {
 
 
     /**
-     * *****************************************************************************
+     *
      */
 
-    public void runRemoteQueryWithIteration() {
-
-        String station_name;
-        String sensor_serialno;
-        String start_date;
-        String end_date;
-        String project_name;
-        long start_date_as_long;
-        long end_date_as_long;
+    public void executeRemoteSparqlQuery() {
 
         Query arqQuery = QueryFactory.create(query); // create from text query
-        //Query query = QueryFactory.read (query_file); // read from file
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(url, arqQuery);
 
-
-
         try {
             com.hp.hpl.jena.query.ResultSet results = qexec.execSelect();
-            // Output query results
-            //ResultSetFormatter.out(System.out, results, query);
-
 
             for (; results.hasNext();) {
                 QuerySolution soln = results.nextSolution();
 
-                station_name = soln.getLiteral("Station_name").getString();
-                sensor_serialno = soln.getLiteral("Sensor_serialno").getString();
-                start_date = soln.getLiteral("Start_date").getString();
-                end_date = soln.getLiteral("End_date").getString();
-                project_name = soln.getLiteral("Project_name").getString();
-
-                start_date_as_long = parse_date(start_date);
-                //logger.info("start_date_as_long => " + start_date_as_long);
-
-                end_date_as_long = parse_date(end_date);
-                //logger.info("end_date_as_long => " + end_date_as_long);
-
                 long epoch = System.currentTimeMillis();
 
-                if (logger.isDebugEnabled()) {
-                logger.warn("timestamp => " + epoch);
-                logger.warn(
-                        "* \""
-                        + station_name
-                        + "\"\t=>\t"
-                        + sensor_serialno
-                        + "\"\t=>\t"
-                        + start_date
-                        + "\"\t=>\t"
-                        + project_name
-                        + "\"\t=>\t"
-                        + end_date
-                );
+                List<Serializable> tuples = new Vector<Serializable>(); // list of tuples to publish by wrapper
+
+                boolean validResult = true;
+
+                for (String fieldName : listOfSparqlFields.keySet()) {
+                    logger.debug("Accessing field " + fieldName + " : " + listOfSparqlFields.get(fieldName));
+                    String dataTypeAsString = listOfSparqlFields.get(fieldName);
+
+                    //Check if fieldName exists in the returned sparql result
+                    if (soln.getLiteral(fieldName) == null) {
+                        logger.warn("Field " + fieldName + " not found in Sparql result set");
+                        validResult = false;
+                    }
+
+                    byte fieldtype = DATA_TYPE_NONE;
+
+                    try {
+                        fieldtype = DataTypes.convertTypeNameToGSNTypeID(dataTypeAsString);
+                    }
+                    catch (GSNRuntimeException e) {
+                        validResult = false;
+                        logger.warn(e.getMessage(), e);
+                    }
+
+                    switch (fieldtype) {
+
+                        case DataTypes.BIGINT:
+                            logger.debug("date => " + soln.getLiteral(fieldName).getString());
+                            long _date = parse_date(soln.getLiteral(fieldName).getString());
+                            if (_date==-1) {
+                                validResult = false;
+                                logger.warn("invalid date: "+parse_date(soln.getLiteral(fieldName).getString()));
+                            }
+                            tuples.add(_date);
+                            break;
+
+                        case DataTypes.DOUBLE:
+                            logger.debug("double => " + soln.getLiteral(fieldName).getDouble());
+                            double _double = soln.getLiteral(fieldName).getDouble();
+                            tuples.add(_double);
+                            break;
+
+                        case DataTypes.INTEGER:
+                            logger.debug("integer => " + soln.getLiteral(fieldName).getInt());
+                            int _int = soln.getLiteral(fieldName).getInt();
+                            tuples.add(_int);
+                            break;
+
+                        case DataTypes.VARCHAR:
+                            logger.debug("varchar (string) => " + soln.getLiteral(fieldName).getString());
+                            String _string = soln.getLiteral(fieldName).getString();
+                            tuples.add(_string);
+                            break;
+
+                        //TODO: if needed, add other datatypes: smallint, char, etc...
+
+                        case DATA_TYPE_NONE:
+                        default:
+                            logger.warn("Unknown data type: " + dataTypeAsString + " for field: "+ fieldName);
+                            validResult = false;
+                            break;
+                    }
                 }
 
-                postStreamElement(epoch, new Serializable[]{station_name, sensor_serialno, project_name, start_date_as_long, end_date_as_long});
+                //List tuples
+                logger.debug("Read (" + tuples.size() + ") tuples from Sparql result set");
+                Serializable[] s = new Serializable[tuples.size()];
+                int index = 0;
+                for (Serializable tuple : tuples) {
+                    s[index] = tuple;
+                    logger.debug("tuple[" + index  + "]" + s[index]);
+                    index++;
 
-                Thread.sleep(100); // avoid duplicate timestamps
+                }
+
+                if (validResult)
+                    postStreamElement(epoch, s);
+                else
+                    logger.warn("Invalid result for Sparql query");
+
+                Thread.sleep(100); // avoid duplicate timestamps when publishing with postStreamElement
             }
-
 
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
@@ -162,6 +251,11 @@ public class SparqlWrapper extends AbstractWrapper {
 
     }
 
+    /*
+    * returns epoch date, 
+    * given string date in ISO-8609 format (as returned in sparql queries)
+    *
+    */
     private long parse_date(String s) {
         long l;
 
@@ -186,11 +280,9 @@ public class SparqlWrapper extends AbstractWrapper {
                 logger.warn(e.getMessage(), e);
             }
 
-
         } else l = -1;
         return l;
     }
-
 
 
 }
