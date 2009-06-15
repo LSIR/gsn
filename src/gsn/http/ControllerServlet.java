@@ -9,36 +9,38 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 public class ControllerServlet extends HttpServlet {
-   
+
    private static transient Logger                                      logger                             = Logger.getLogger ( ControllerServlet.class );
-   
+
    /**
     * HTTP RETURN CODES :
     * ---------------------------------------------------------------------
     */
-   
+
    public static final int    CORRECT_REQUEST                        = 200;
-   
+
    public static final int    UNSUPPORTED_REQUEST_ERROR              = 400;
-   
+
    public static final int    MISSING_VSNAME_ERROR                   = 401;
-   
+
    public static final int    ERROR_INVALID_VSNAME                   = 402;
-   
+
    public static final int    WRONG_VSFIELD_ERROR                    = 403;
    /**
     * HTTP REQUEST CODE ==================================================
     */
-   
+
    public static final int    REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING = 116;
-   
+
    public static final int    REQUEST_ONE_SHOT_QUERY                 = 114;
-   
+
    public static final int    REQUEST_OUTPUT_FORMAT                  = 113;
-   
+
    public static final int    REQUEST_ADDRESSING                     = 115;
-   
-   
+
+   public static final int    REQUEST_GML		             = 901;
+
+
    /**
     * getting the request from the web and handling it.
     */
@@ -49,7 +51,7 @@ public class ControllerServlet extends HttpServlet {
       response.setHeader ( "Cache-Control" , "no-store, no-cache, must-revalidate" );
       response.addHeader ( "Cache-Control" , "post-check=0, pre-check=0" );
       response.setHeader ( "Pragma" , "no-cache" );
-      
+
       String rawRequest = request.getParameter ( Container.REQUEST );
       int requestType = -1;
       if ( rawRequest == null || rawRequest.trim ( ).length ( ) == 0 ) {
@@ -65,12 +67,16 @@ public class ControllerServlet extends HttpServlet {
       response.getWriter ( ).write ( sb.toString ( ) );
       RequestHandler handler;
       if ( logger.isDebugEnabled ( ) ) logger.debug ( "Received a request with code : " + requestType );
-      
+
       switch ( requestType ) {
       case 0 : //default case pointing to the /gsn
           handler = new ContainerInfoHandler ( );
           if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
-          break;   
+          break;
+      case REQUEST_GML : //case pointing to gml (v2) output
+          handler = new GMLHandler ( );
+          if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
+          break;
       case REQUEST_ONE_SHOT_QUERY :
             handler = new OneShotQueryHandler ( );
             if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
@@ -92,9 +98,9 @@ public class ControllerServlet extends HttpServlet {
             break;
       }
    }
-   
+
    public void doPost ( HttpServletRequest request , HttpServletResponse res ) throws ServletException , IOException {
       doGet ( request , res );
    }
- 
+
 }
