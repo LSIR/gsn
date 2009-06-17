@@ -15,7 +15,9 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 
 	private File dataFile = null;
 
-	private long lastModified = 0; 
+    private String fileName = null;
+
+	private long lastModified = 0;
 
 	private static final int CHECK_POINT_DISTANCE = 100; // nb of lines between two check points
 
@@ -39,9 +41,10 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 				logger.error("The file >" + parameters.getCsvSourceFilePath() + "< does not exists.");
 				return false;
 			}
+            fileName = dataFile.getAbsolutePath();
 			AddressBean ab = getActiveAddressBean();
 			StringBuilder requestername = new StringBuilder();
-			requestername.append(ab.getVirtualSensorName()).append("/").append(ab.getInputStreamName()).append("/").append(ab.getWrapper());			
+			requestername.append(ab.getVirtualSensorName()).append("/").append(ab.getInputStreamName()).append("/").append(ab.getWrapper());
 			checkPoints = new CSVFileWrapperCheckPoints (parameters.getCsvSourceFilePath(), requestername.toString()) ;
 			lineBuffer = new ArrayList<String> () ;
 		}
@@ -81,19 +84,19 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 						if (read_lines % CHECK_POINT_DISTANCE == 0) {
 							checkThisPoint (read_lines, checkSum.getValue()) ;
 							checkSum = new Adler32();
-						} 
+						}
 						else if (listOfCheckPoints.contains(new Long(read_lines))) {
 							checkThisPoint (read_lines, checkSum.getValue()) ;
 						}
 					}
-					logger.debug("EOF reached");
+					logger.debug("EOF reached [ " + fileName + " ]");
 					if (! (read_lines % CHECK_POINT_DISTANCE == 0 || listOfCheckPoints.contains(new Long(read_lines)))) checkThisPoint (read_lines, checkSum.getValue()) ;
 					fileReader.close();
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
 				}
 			}
-			else logger.debug("The data file has not been modified.");
+			else logger.debug("The data file has not been modified [ " + fileName + " ]");
 			try {
 				Thread.sleep(parameters.getCsvUpdateDelay());
 			} catch (InterruptedException e1) {
@@ -104,10 +107,10 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 
 	private void checkThisPoint(long read_lines, long checksum) {
 		if (checkPoints.check(read_lines, checksum)) {
-			logger.debug("Check Point at line >" + read_lines + "< checked successfully. No new data to process from the last Check Point.");
+			logger.debug("Check Point at line >" + read_lines + "< checked successfully. No new data to process from the last Check Point. [" + fileName + " ]");
 		}
 		else {
-			logger.debug("Check Point at line >" + read_lines + "< doesn't match. Sending the data (" + lineBuffer.size() + " elt) from the last Check Point.");
+			logger.debug("Check Point at line >" + read_lines + "< doesn't match. Sending the data (" + lineBuffer.size() + " elt) from the last Check Point. [" + fileName + " ]");
 			// send all the lines from the line buffer
 			Iterator<String> iter = lineBuffer.iterator();
 			while (iter.hasNext()) {
@@ -120,7 +123,7 @@ public class CSVFileWrapper2 extends AbstractWrapper2 {
 	}
 
 	public void finalize (  ) {
-		threadCounter--;  
+		threadCounter--;
 	}
 
 	public String getWrapperName() {

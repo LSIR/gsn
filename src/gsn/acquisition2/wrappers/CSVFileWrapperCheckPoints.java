@@ -20,21 +20,21 @@ import gsn.acquisition2.SafeStorageDB;
 public class CSVFileWrapperCheckPoints{
 
 	private final transient Logger logger = Logger.getLogger( CSVFileWrapperCheckPoints.class );
-	
+
     private String dbUrl = null;
 
 	private Connection connection = null;
-	
+
 	private PreparedStatement psReadCheckpoint = null;
-	
+
 	private PreparedStatement psUpdateCheckPoint = null;
-	
+
 	private PreparedStatement psCleanCheckPoint = null;
-	
+
 	private PreparedStatement psListCheckpoint = null;
 
 	private long csvFilePathHash;
-		
+
 	public CSVFileWrapperCheckPoints (String csvFilePath, String requestername) {
 		// We use a hash of the file path instead of the actual path concatenated to the requestername
 		Checksum checkSum = new Adler32 () ;
@@ -46,12 +46,18 @@ public class CSVFileWrapperCheckPoints{
 			logger.debug(e.getMessage());
 		}
 		this.csvFilePathHash = checkSum.getValue();
+        if (logger.isDebugEnabled())
+            logger.debug(new StringBuilder("Checkpoint - ")
+                    .append(" path: ").append(csvFilePath)
+                    .append(", requester: ").append(requestername)
+                    .append(", hash: ")
+                    .append(this.csvFilePathHash));
 		//
 		prepareConnectionAndTableIfNeeded();
 	}
 
 	public void update (long line, long checksum) {
-		if (connection == null) return;		
+		if (connection == null) return;
 		try {
 			psUpdateCheckPoint.setLong(1, line);
 			psUpdateCheckPoint.setLong(2, checksum);
@@ -61,9 +67,9 @@ public class CSVFileWrapperCheckPoints{
 		}
 
 	}
-	
+
 	public boolean check (long line, long checksum) {
-		if (connection == null) return false;		
+		if (connection == null) return false;
 		try {
 			psReadCheckpoint.setLong(1, line);
 			ResultSet rs = psReadCheckpoint.executeQuery();
@@ -75,7 +81,7 @@ public class CSVFileWrapperCheckPoints{
 		}
 		return false;
 	}
-	
+
 	public void clean (long fromLine, long toLine) {
 		if (connection == null) return;
 		try {
@@ -86,7 +92,7 @@ public class CSVFileWrapperCheckPoints{
 			logger.debug(e.getMessage());
 		}
 	}
-	
+
 	public ArrayList<Long> list () {
 		ArrayList<Long> list = new ArrayList<Long> ();
 		if (connection == null) return list;
@@ -100,7 +106,7 @@ public class CSVFileWrapperCheckPoints{
 		}
 		return list;
 	}
-	
+
 	private void prepareConnectionAndTableIfNeeded () {
         try {
 			Class.forName("org.h2.Driver");
