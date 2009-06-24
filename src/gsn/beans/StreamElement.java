@@ -29,6 +29,8 @@ public final class StreamElement implements Serializable {
 
   private long                                   internalPrimayKey = -1;
 
+  private static final String NULL_ENCODING = "NULL"; // null encoding for transmission over xml-rpc
+
   public StreamElement (StreamElement other) {
     this.fieldNames=new String[other.fieldNames.length];
     for (int i=0;i<other.fieldNames.length;i++) {
@@ -213,6 +215,11 @@ public final class StreamElement implements Serializable {
   public Object [ ] getDataInRPCFriendly ( ) {
     Object [ ] toReturn = new Object [ fieldValues.length ];
     for ( int i = 0 ; i < toReturn.length ; i++ ) {
+        //process null values
+        if (fieldValues[i]==null) {
+            toReturn[i] = NULL_ENCODING;
+            continue;
+        }
       switch ( fieldTypes[ i ] ) {
         case DataTypes.DOUBLE :
           toReturn[ i ] = fieldValues[ i ];
@@ -244,6 +251,11 @@ public final class StreamElement implements Serializable {
   public static StreamElement createElementFromXMLRPC ( DataField [ ] outputFormat , Object [ ] fieldNames , Object [ ] fieldValues ,  long timestamp ) {
     Serializable [ ] values = new Serializable [ outputFormat.length ];
     for ( int i = 0 ; i < fieldNames.length ; i++ ) {
+        //process null values
+        if (fieldValues[i] instanceof String && fieldValues[i].equals(NULL_ENCODING)) {
+            values[i] = null;
+            continue;
+        }
       switch ( findIndexInDataField( outputFormat , (String)fieldNames[i] ) ) {
         case DataTypes.DOUBLE :
           values[ i ] = ( Double ) fieldValues[ i ];
