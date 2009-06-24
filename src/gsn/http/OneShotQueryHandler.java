@@ -50,17 +50,21 @@ public class OneShotQueryHandler implements RequestHandler{
 		return;
 		}
 	StringBuilder sb = new StringBuilder("<result>\n");
-      while ( result.hasMoreElements( ) ) {
-         StreamElement se = result.nextElement( );
-         sb.append( "<stream-element>\n" );
-         for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ )
-            if ( se.getFieldTypes( )[ i ] == DataTypes.BINARY )
-               sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( se.getData( )[ i ].toString( ) ).append( "</field>\n" );
-            else
-               sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) ).append( "</field>\n" );
-         sb.append( "<field name=\"timed\" >" ).append( sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
-         sb.append( "</stream-element>\n" );
-      }
+       while ( result.hasMoreElements( ) ) {
+           StreamElement se = result.nextElement( );
+           sb.append( "<stream-element>\n" );
+           for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {
+               sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\" >" );
+               if (se.getData()[i] != null)
+                   if ( se.getFieldTypes( )[ i ] == DataTypes.BINARY )
+                       sb.append( se.getData( )[ i ].toString( ) );
+                   else
+                       sb.append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) );
+               sb.append( "</field>\n");
+           }
+           sb.append( "<field name=\"timed\" >" ).append( sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
+           sb.append( "</stream-element>\n" );
+       }
       result.close();
       sb.append( "</result>" );
       response.getWriter( ).write( sb.toString( ) );

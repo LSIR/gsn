@@ -85,10 +85,11 @@
    
    <target name="runcam" depends="bind">
       <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"
-            dir="${build.dir}">
+            dir="${basedir}">
          <env key="LD_LIBRARY_PATH"
               value="${jmf.dir}/lib:${env.JAVA_HOME}/jre/lib/i386:${env.JAVA_HOME}/jre/lib/i386/client:${env.JAVA_HOME}/jre/lib/i386/xawt"/>
          <env key="LD_PRELOAD" value="${env.JAVA_HOME}/jre/lib/i386/libjawt.so"/>
+          <arg id="gsnc-port" value="${gsn-controller-port}" />
       </java>
    </target>
    
@@ -144,6 +145,7 @@
 	      	 <env key="LD_LIBRARY_PATH" value="${jmf.dir}/lib:${env.JAVA_HOME}/jre/lib/i386:${env.JAVA_HOME}/jre/lib/i386/client:${env.JAVA_HOME}/jre/lib/i386/xawt"/>
 	      	 <env key="LD_PRELOAD" value="${env.JAVA_HOME}/jre/lib/i386/libjawt.so"/>
 	       	<arg value="${dev}" />
+            
 	      </java>
 	   </target>
 
