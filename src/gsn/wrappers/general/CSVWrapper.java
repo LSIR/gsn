@@ -75,7 +75,8 @@ public class CSVWrapper extends AbstractWrapper {
 				ArrayList<TreeMap<String, Serializable>> output = handler.run(new FileReader(handler.getDataFile()), checkPointDir);
 				for (TreeMap<String, Serializable> se : output) {
 					StreamElement streamElement = new StreamElement(se,getOutputFormat());
-					postStreamElement(streamElement);
+					boolean insertionSuccess = postStreamElement(streamElement);
+					System.out.println(insertionSuccess+" -- "+streamElement.toString());
 					handler.updateCheckPointFile(streamElement.getTimeStamp());
 				}
 				Thread.sleep(samplingPeriodInMsc);

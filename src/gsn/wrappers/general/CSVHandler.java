@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -203,6 +204,9 @@ public class CSVHandler {
 					value+=separator;
 					format+=separator;
 				}
+				if (isTimeStampLeftPaddedFormat(formats[i]))
+					values[i]=StringUtils.leftPad(values[i], getTimeStampFormat(formats[i]).length(), '0');
+
 				value+=values[i];
 				format+=getTimeStampFormat(formats[i]);
 				streamElement.put(fields[i], value);
@@ -212,20 +216,33 @@ public class CSVHandler {
 		for (String timeField: timeStampFormats.keySet()) {
 			String timeFormat = timeStampFormats.get(timeField);
 			String timeValue =  (String) streamElement.get(timeField);
-			DateTime x = DateTimeFormat.forPattern(timeFormat).withZone(getTimeZone()).parseDateTime(timeValue);
-			streamElement.put(timeField, x.getMillis());
+			try {
+				DateTime x = DateTimeFormat.forPattern(timeFormat).withZone(getTimeZone()).parseDateTime(timeValue);
+				streamElement.put(timeField, x.getMillis());
+			}catch (IllegalArgumentException e) {
+				logger.error("Parsing error: TimeFormat="+timeFormat+" , TimeValue="+timeValue);
+				logger.error(e.getMessage(),e);
+			}
 		}
 		
 		return streamElement;
 	}
 
 	public static String getTimeStampFormat(String input) {
-		return input.substring("timestamp(".length(),input.indexOf(")")).trim();
+		if (input.indexOf("timestampl(")>=0)
+			return input.substring("timestampl(".length(),input.indexOf(")")).trim();
+		else
+			return input.substring("timestamp(".length(),input.indexOf(")")).trim();
 	}
 
 	public static boolean isTimeStampFormat(String input) {
-		return input.toLowerCase().startsWith("timestamp(") && input.endsWith(")");
+		return (input.toLowerCase().startsWith("timestamp(") || input.toLowerCase().startsWith("timestampl(") )&& input.endsWith(")") ;
 	}
+	
+	public static boolean isTimeStampLeftPaddedFormat(String input) {
+		return input.toLowerCase().startsWith("timestampl(")&& input.endsWith(")") ;
+	}
+
 
 	public char getSeparator() {
 		return separator;
