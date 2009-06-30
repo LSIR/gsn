@@ -136,7 +136,7 @@ public final class AddressBean implements Serializable{
     int result;
     result = this.wrapper.hashCode( );
     for ( final KeyValue predicate : this.predicates ) {
-      result = 29 * result + predicate.hashCode();
+      result = 29 * result + predicate.getKey().hashCode() + predicate.getValue().hashCode();
     }
     return result;
   }

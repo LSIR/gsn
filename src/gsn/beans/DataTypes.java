@@ -104,6 +104,9 @@ public class DataTypes {
          if ( DataTypes.ALL_PATTERNS[ i ].matcher( type ).matches( ) ){
              return i;
          }
+      if(type.trim().equalsIgnoreCase("numeric")) return DataTypes.DOUBLE;
+      if(type.trim().equalsIgnoreCase("string")) return DataTypes.VARCHAR;
+      
       throw new GSNRuntimeException( new StringBuilder( "The type *" ).append( type ).append( "* is not recognized." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
    }
    

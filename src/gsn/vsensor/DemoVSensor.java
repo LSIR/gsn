@@ -86,11 +86,7 @@ public class DemoVSensor extends AbstractVirtualSensor {
                logger.warn( new StringBuilder( ).append( "Shouldn't happen.>" ).append( counter ).append( "<" ).toString( ) );
          }
          graphics.fillOval( locX , locY , size , size );
-         try {
-            codec.encode( bufferedImage );
-         } catch ( IOException e ) {
-            e.printStackTrace( );
-         }
+         codec.encode( bufferedImage );
          
          StreamElement outputSE = new StreamElement( OUTPUT_FIELDS , OUTPUT_TYPES , new Serializable [ ] { outputStream.toByteArray( ) } , data.getTimeStamp( ) );
          dataProduced( outputSE );
