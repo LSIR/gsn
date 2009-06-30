@@ -102,11 +102,11 @@ public class TestAbstractWrapper {
 		assertTrue(ss.validate());
 
 		StreamElement se = new StreamElement(wrapper.getOutputFormat(), new Serializable[]{1000}, 1000L);
-		assertTrue(wrapper.postStreamElement(se));
+		assertTrue(wrapper.insertIntoWrapperTable(se));
 		se = new StreamElement(wrapper.getOutputFormat(), new Serializable[]{2000}, 2000L);
-		assertTrue(wrapper.postStreamElement(se));
+		assertTrue(wrapper.insertIntoWrapperTable(se));
 		se = new StreamElement(wrapper.getOutputFormat(), new Serializable[]{1500}, 1500L);
-		assertFalse(wrapper.postStreamElement(se));
+		assertFalse(wrapper.insertIntoWrapperTable(se));
 		
 		wrapper.releaseResources();
 	}

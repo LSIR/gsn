@@ -14,6 +14,7 @@ import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +42,8 @@ public abstract class AbstractWrapper extends Thread {
 	private HashMap<Class, SlidingHandler> slidingHandlers = new HashMap<Class, SlidingHandler>();
 	
 	private boolean usingRemoteTimestamp = false;
+	
+	private Long lastInOrderTimestamp;
 
 	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
 	/**
@@ -214,15 +217,25 @@ public abstract class AbstractWrapper extends Thread {
 	public boolean insertIntoWrapperTable(StreamElement se) throws SQLException {
 		if (listeners.size()==0)
 			return false;
-		
+
 		//Checks if the stream element is out of order
-		StringBuilder query = new StringBuilder();
-		query.append("select * from ").append(aliasCodeS).append(" where timed >= ").append(se.getTimeStamp());
-		if(getStorageManager().isThereAnyResult(query)){
+		if(lastInOrderTimestamp == null){
+			StringBuilder query = new StringBuilder();
+			query.append("select max(timed) from ").append(aliasCodeS);
+			ResultSet rs = getStorageManager().executeQueryWithResultSet(query);
+			if(rs.next()){
+				lastInOrderTimestamp = rs.getLong(1);
+			}else{
+				lastInOrderTimestamp = Long.MIN_VALUE; //Table is empty
+			}
+		}
+		
+		if(se.getTimeStamp() <= lastInOrderTimestamp){
 			logger.warn("Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
 			return false;
 		}
-		
+
+		lastInOrderTimestamp = se.getTimeStamp();
 		getStorageManager( ).executeInsert( aliasCodeS , getOutputFormat(),se );
 		return true;
 	}
