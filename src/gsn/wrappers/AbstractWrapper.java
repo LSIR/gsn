@@ -214,6 +214,15 @@ public abstract class AbstractWrapper extends Thread {
 	public boolean insertIntoWrapperTable(StreamElement se) throws SQLException {
 		if (listeners.size()==0)
 			return false;
+		
+		//Checks if the stream element is out of order
+		StringBuilder query = new StringBuilder();
+		query.append("select * from ").append(aliasCodeS).append(" where timed >= ").append(se.getTimeStamp());
+		if(getStorageManager().isThereAnyResult(query)){
+			logger.warn("Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
+			return false;
+		}
+		
 		getStorageManager( ).executeInsert( aliasCodeS , getOutputFormat(),se );
 		return true;
 	}
