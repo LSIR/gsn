@@ -153,6 +153,7 @@ public class CSVHandler {
 	}
 	
 	private boolean loggedNoChange=false; // to avoid duplicate logging messages when there is no change
+	
 	public  ArrayList<TreeMap<String, Serializable>> parseValues(Reader datainput, long previousCheckPoint) throws IOException {
 		ArrayList<TreeMap<String, Serializable>>  toReturn = new ArrayList<TreeMap<String, Serializable>>();	
 		CSVReader reader = new CSVReader(datainput,getSeparator(),getStringSeparator(),getSkipFirstXLines());
@@ -167,6 +168,8 @@ public class CSVHandler {
 			}
 			toReturn.add(se);
 			loggedNoChange=false;
+			if(toReturn.size()>250) 
+				break; // Move outside the loop as in each call we only read 250 values;
 		}
 		if (logger.isDebugEnabled() && toReturn.size()==0 && loggedNoChange==false) {
 			logger.debug("There is no new item after most recent checkpoint(previousCheckPoint:"+new DateTime(previousCheckPoint)+").");
