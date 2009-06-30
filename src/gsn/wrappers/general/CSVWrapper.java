@@ -24,7 +24,7 @@ public class CSVWrapper extends AbstractWrapper {
 
 	private int                                  threadCounter = 0;
 
-	private static   DataField [] dataField  ;
+	private DataField [] dataField  ;
 
 	private CSVHandler handler = new CSVHandler();
 
