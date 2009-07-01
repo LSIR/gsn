@@ -187,7 +187,7 @@ public class CSVHandler {
 				return false;
 		return true;
 	}
-	public  TreeMap<String,Serializable> convertTo(String[] formats,String[] fields,String nullValues[], String[] values,char separator) {
+	public  TreeMap<String,Serializable> convertTo(String[] formats,String[] fields,String nullValues[], String[] values,char separator)  {
 		TreeMap<String, Serializable> streamElement = new TreeMap<String, Serializable>(new CaseInsensitiveComparator());
 		for (String field:fields)
 			streamElement.put(field, null);
@@ -195,9 +195,14 @@ public class CSVHandler {
 		for (int i=0;i<Math.min(fields.length,values.length);i++) {
 			if (isNull(nullValues, values[i]) ) {
 				continue;
-			}else if (formats[i].equalsIgnoreCase("numeric"))
-				streamElement.put(fields[i], Double.parseDouble(values[i]));
-			else if (formats[i].equalsIgnoreCase("string"))
+			}else if (formats[i].equalsIgnoreCase("numeric")) {
+				try {
+					streamElement.put(fields[i], Double.parseDouble(values[i]));
+				}catch (java.lang.NumberFormatException e) {
+					logger.error("Parsing to Numeric fails: Value to parse="+values[i]);
+					throw e;
+				}
+			}else if (formats[i].equalsIgnoreCase("string"))
 				streamElement.put(fields[i], values[i]);
 			else if (isTimeStampFormat(formats[i])) {
 				String value = "";
