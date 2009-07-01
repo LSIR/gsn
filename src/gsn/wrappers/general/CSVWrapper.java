@@ -72,6 +72,7 @@ public class CSVWrapper extends AbstractWrapper {
 	}
 
 	public void run ( ) {
+		Exception preivousError = null;
 		while ( isActive( ) ) {
 			try {
 				ArrayList<TreeMap<String, Serializable>> output = handler.run(new FileReader(handler.getDataFile()), checkPointDir);
@@ -83,7 +84,10 @@ public class CSVWrapper extends AbstractWrapper {
 				if (output.size()==0) //More intelligent sleeping, being more proactive once the wrapper receives huge files.
 					Thread.sleep(samplingPeriodInMsc);
 			}catch (Exception e) {
+				if (preivousError!=null && preivousError.getMessage().equals(e.getMessage()))
+					continue;
 				logger.error(e.getMessage()+" :: "+dataFile,e);
+				preivousError = e;
 			}
 		}
 	}
