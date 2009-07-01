@@ -32,10 +32,12 @@ public class CSVWrapper extends AbstractWrapper {
 
 	private String checkPointDir;
 
+	private String dataFile;
+
 	public boolean initialize (  ) {
 		setName( "CSVWrapper-Thread" + ( ++threadCounter ) );
 		AddressBean addressBean = getActiveAddressBean( );
-		String dataFile = addressBean.getPredicateValueWithException("file");
+		dataFile = addressBean.getPredicateValueWithException("file");
 		String csvFields = addressBean.getPredicateValueWithException("fields");
 		String csvFormats = addressBean.getPredicateValueWithException("formats");
 		String csvSeparator = addressBean.getPredicateValueWithDefault("separator",",");
@@ -81,7 +83,7 @@ public class CSVWrapper extends AbstractWrapper {
 				if (output.size()==0) //More intelligent sleeping, being more proactive once the wrapper receives huge files.
 					Thread.sleep(samplingPeriodInMsc);
 			}catch (Exception e) {
-				logger.error(e.getMessage(),e);
+				logger.error(e.getMessage()+" :: "+dataFile,e);
 			}
 		}
 	}
