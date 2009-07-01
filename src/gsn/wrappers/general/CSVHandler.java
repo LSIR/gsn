@@ -134,18 +134,15 @@ public class CSVHandler {
 		return toReturn;
 	}
 
-	public ArrayList<TreeMap<String, Serializable>> run(Reader dataFile,String checkpointDir) {
+	public ArrayList<TreeMap<String, Serializable>> run(Reader dataFile,String checkpointDir) throws IOException {
 		ArrayList<TreeMap<String, Serializable>> items = null;
-		try {
 			setupCheckPointFileIfNeeded();
 			String val = FileUtils.readFileToString(new File(checkPointFile),"UTF-8");
 			long lastItem = 0;
 			if (val!=null && val.trim().length()>0)
 				lastItem = Long.parseLong(val.trim());
 			items = parseValues(dataFile,lastItem);
-		}catch (IOException e) {
-			logger.error(e.getMessage(),e);
-		}
+		
 		return items;
 	}
 	
@@ -187,7 +184,7 @@ public class CSVHandler {
 				return false;
 		return true;
 	}
-	public  TreeMap<String,Serializable> convertTo(String[] formats,String[] fields,String nullValues[], String[] values,char separator)  {
+	public  TreeMap<String,Serializable> convertTo(String[] formats,String[] fields,String nullValues[], String[] values,char separator)   {
 		TreeMap<String, Serializable> streamElement = new TreeMap<String, Serializable>(new CaseInsensitiveComparator());
 		for (String field:fields)
 			streamElement.put(field, null);
