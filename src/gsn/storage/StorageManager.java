@@ -740,7 +740,9 @@ public class StorageManager {
                     case DataTypes.VARCHAR:
                         // Because the parameter for the varchar is not
                         // optional.
-
+                    	if(field.getType().trim().equalsIgnoreCase("string"))
+                    		convertedType="TEXT";
+                    	else
                         convertedType = field.getType();
                         break;
                     case DataTypes.BINARY:
