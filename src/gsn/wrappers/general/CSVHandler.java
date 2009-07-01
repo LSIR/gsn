@@ -63,7 +63,8 @@ public class CSVHandler {
 		File file = new File(dataFile);
 		
 		if (!file.isFile()) {
-			
+			logger.error("The specified CSV data file: "+dataFile+" doesn't exists.");
+			return false;
 		}
 		
 		try {
