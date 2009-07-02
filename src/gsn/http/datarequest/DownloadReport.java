@@ -9,6 +9,7 @@ import gsn.reports.beans.VirtualSensor;
 import gsn.storage.StorageManager;
 import java.io.File;
 import java.io.OutputStream;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -82,6 +83,8 @@ public class DownloadReport extends AbstractDataRequest {
 	private VirtualSensor createVirtualSensor (String vsname, String[] vsstream) {
 		Collection<Stream> streams = null;
 		// create all the streams for this Virtual Sensor
+		Connection connection = null;
+		
 		try {
 			// Get the last update for this Virtual Sensor (In GSN, all the Virtual Sensor streams are inserted in the same record)
 			String configFileName = Mappings.getVSensorConfig(vsname).getFileName();
@@ -89,7 +92,8 @@ public class DownloadReport extends AbstractDataRequest {
 			String lastModified = (qbuilder.getSdf() == null ? "UNIX: " + last : qbuilder.getSdf().format(new Date(last)));
 
 			// Create the streams
-			ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(qbuilder.getSqlQueries().get(vsname), StorageManager.getInstance().getConnection());
+			connection = StorageManager.getInstance().getConnection();
+			ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(qbuilder.getSqlQueries().get(vsname), connection);
 			ResultSetMetaData rsmd = rs.getMetaData();
 
 			Hashtable<String, Stream> dataStreams = new Hashtable<String, Stream> () ;
@@ -122,13 +126,14 @@ public class DownloadReport extends AbstractDataRequest {
 					else logger.debug("Column >" + vsstream[i] + "< not found in the ResultSetMetaData");
 				}
 			}
-			StorageManager.close(rs); 
 			streams = dataStreams.values();
 		}
 		catch (SQLException e) {
 			logger.error("Error while executing the SQL request. Check your query.");
 			logger.debug("The query: ",e);
 			return null;
+		}finally{
+			StorageManager.close(connection);
 		}
 		//
 		boolean mappedVirtualSensor = (Mappings.getVSensorConfig(vsname) != null);

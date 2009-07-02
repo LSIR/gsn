@@ -1,4 +1,5 @@
 package gsn.wrappers;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Timer;
@@ -51,12 +52,17 @@ public class ReplayWrapper  extends AbstractWrapper{
       logger.warn("Invalid speed, speed is set to 1.");
       speed=1;
     }
+    Connection connection = null;
+    
     try {
       logger.info("Initializing the ReplayWrapper with : "+dbname +". Loading the table structure ...");
-      output = StorageManager.tableToStructure(dbname,StorageManager.getInstance().getConnection() );
+      connection = StorageManager.getInstance().getConnection();
+	output = StorageManager.tableToStructure(dbname,connection );
     } catch (SQLException e) {
       logger.error(e.getMessage(),e);
       return false;
+    }finally{
+    	StorageManager.close(connection);
     }
     
     dt= new DelayedDataEnumerator(dbname,speed);

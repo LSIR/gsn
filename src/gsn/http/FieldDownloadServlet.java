@@ -6,14 +6,18 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
+
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 
 //path="/WEB-INF/file_not_found.jpg"
@@ -48,46 +52,40 @@ public class FieldDownloadServlet extends HttpServlet {
 		colName = colName.trim( );
 		// TODO : Check to see if the requested column exists.
 		StringBuilder query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
-		ResultSet rs = null;
+		Connection conn = null;
 		try {
-			rs = StorageManager.getInstance( ).getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) );
+			conn = StorageManager.getInstance().getConnection();
+			ResultSet rs = StorageManager.getInstance( ).getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) ,conn);
 			if ( !rs.next() ) {
 				res.sendError( res.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
-				return;
+			}else {
+				boolean binary = false;
+				for ( DataField df : sensorConfig.getOutputStructure( ) )
+					if ( df.getName( ).toLowerCase( ).equals( colName.trim( ).toLowerCase( ) ) ) if ( df.getDataTypeID( ) == DataTypes.BINARY ) {
+						StringTokenizer st = new StringTokenizer( df.getType( ) , ":" );
+						binary = true;
+						if ( st.countTokens( ) != 2 ) break;
+						st.nextToken( );// Ignoring the first token.
+						res.setContentType( st.nextToken( ) );
+						// if ( type.equalsIgnoreCase( "svg" ) ) res.setContentType( "" );
+					}
+				if ( binary )
+					res.getOutputStream( ).write( rs.getBytes( colName ) );
+				else {
+					res.setContentType( "text/xml" );
+					res.getWriter( ).write( rs.getString( colName ) );
+				}
 			}
 		} catch (NumberFormatException e1) {
 			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey);
 			logger.error(e1.getMessage(),e1);
 			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
-			return;
 		} catch (SQLException e1) {
 			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey);
 			logger.error(e1.getMessage(),e1);
 			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
-			return;
-		}
-        
-		boolean binary = false;
-		for ( DataField df : sensorConfig.getOutputStructure( ) )
-			if ( df.getName( ).toLowerCase( ).equals( colName.trim( ).toLowerCase( ) ) ) if ( df.getDataTypeID( ) == DataTypes.BINARY ) {
-				StringTokenizer st = new StringTokenizer( df.getType( ) , ":" );
-				binary = true;
-				if ( st.countTokens( ) != 2 ) break;
-				st.nextToken( );// Ignoring the first token.
-				res.setContentType( st.nextToken( ) );
-				// if ( type.equalsIgnoreCase( "svg" ) ) res.setContentType( "" );
-			}
-		try {
-			if ( binary )
-				res.getOutputStream( ).write( rs.getBytes( colName ) );
-			else {
-				res.setContentType( "text/xml" );
-				res.getWriter( ).write( rs.getString( colName ) );
-			}
-		} catch ( Exception e ) {
-			logger.error( e.getMessage( ) , e );
-		} finally {
-			StorageManager.close(rs);
+		}finally{
+			StorageManager.close(conn);
 		}
 	}
 

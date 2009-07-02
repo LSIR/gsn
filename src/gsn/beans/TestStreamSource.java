@@ -13,6 +13,7 @@ import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.SystemTime;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -227,7 +228,8 @@ public class TestStreamSource {
 		DataEnumerator dm = sm.executeQuery(query, true);
 		assertFalse(dm.hasMoreElements());
 		sm.executeInsert(ss.getWrapper().getDBAliasInStr(), ss.getWrapper().getOutputFormat(),new StreamElement(new DataField[] {},new Serializable[] {},System.currentTimeMillis())) ;
-		ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet(query);
+		Connection conn = StorageManager.getInstance().getConnection();
+		ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet(query, conn);
 		assertTrue(rs.next());
 		assertFalse(rs.next());
 		dm = sm.executeQuery(query, true);
@@ -296,7 +298,8 @@ public class TestStreamSource {
 		long time2 = System.currentTimeMillis()+100;
 		sm.executeInsert(ss.getWrapper().getDBAliasInStr(), ss.getWrapper().getOutputFormat(),new StreamElement(new DataField[] {},new Serializable[] {},time2) );
 		DataEnumerator dm = sm.executeQuery(query, true);
-		ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet(query);
+		Connection conn = StorageManager.getInstance().getConnection();
+		ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet(query, conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
@@ -306,6 +309,7 @@ public class TestStreamSource {
 		assertEquals(dm.nextElement().getTimeStamp(), time1);
 		assertFalse(dm.hasMoreElements());
 		wrapper.removeListener(ss);
+		StorageManager.close(rs.getStatement().getConnection());
 	}
 
 	/**

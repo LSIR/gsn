@@ -7,6 +7,7 @@ import gsn.storage.StorageManager;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
@@ -83,8 +84,10 @@ public class DownloadData extends AbstractDataRequest {
 		}
 		while (iter.hasNext()) {
 			nextSqlQuery = iter.next();
+			Connection connection = null;
 			try {
-				de = StorageManager.getInstance().executeQuery(nextSqlQuery.getValue(), false,  StorageManager.getInstance().getConnection());
+				connection = StorageManager.getInstance().getConnection();
+				de = StorageManager.getInstance().executeQuery(nextSqlQuery.getValue(), false,  connection);
 				logger.debug("Data Enumerator: " + de); 
 				if (ot == AllowedOutputType.csv) {
 					respond.println("##vsname:" + nextSqlQuery.getKey());
@@ -110,6 +113,8 @@ public class DownloadData extends AbstractDataRequest {
 				if (ot == AllowedOutputType.xml) respond.println("\t</data>");	
 			} catch (SQLException e) {
 				logger.debug(e.getMessage());
+			}finally{
+				StorageManager.close(connection);
 			}
 		}
 		if (ot == AllowedOutputType.xml) {

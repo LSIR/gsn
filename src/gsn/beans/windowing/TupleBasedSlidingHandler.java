@@ -9,6 +9,7 @@ import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -108,9 +109,9 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query1 for getting oldest timestamp : " + query);
 			}
-			ResultSet resultSet = null;
+			Connection conn = null;
 			try {
-				resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
+				ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query,conn=StorageManager.getInstance().getConnection());
 				if (resultSet.next()) {
 					timed1 = resultSet.getLong(1);
 				} else {
@@ -119,7 +120,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				StorageManager.close(resultSet);
+				StorageManager.close(conn);
 			}
 		}
 
@@ -138,9 +139,9 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query1 for getting oldest timestamp : " + query);
 			}
-			ResultSet resultSet = null;
+			Connection conn = null;
 			try {
-				resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
+				ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query,conn=StorageManager.getInstance().getConnection());
 				if (resultSet.next()) {
 					timed1 = resultSet.getLong(1);
 				} else {
@@ -149,7 +150,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				StorageManager.close(resultSet);
+				StorageManager.close(conn);
 			}
 		}
 
@@ -171,9 +172,9 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query2 for getting oldest timestamp : " + query);
 			}
-			ResultSet resultSet = null;
+			Connection conn = null;
 			try {
-				resultSet = StorageManager.getInstance().executeQueryWithResultSet(query);
+				ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query,conn=StorageManager.getInstance().getConnection());
 				if (resultSet.next()) {
 					timed2 = resultSet.getLong(1);
 				} else {
@@ -182,7 +183,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				StorageManager.close(resultSet);
+				StorageManager.close(conn);
 			}
 		}
 

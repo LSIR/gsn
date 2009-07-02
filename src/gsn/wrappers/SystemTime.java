@@ -30,7 +30,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
   
   private static final int              DEFAULT_CLOCK_PERIODS     = 1 * 1000;
   
-  private static final int DEFAULT_MAX_DELAY = 5000 ;//5 seconds;
+  private static final int DEFAULT_MAX_DELAY = -1 ;//5 seconds;
   
   private String [ ]                    EMPTY_FIELD_LIST  = new String [ ] {};
   

@@ -17,7 +17,9 @@ import gsn.storage.StorageManager;
 import gsn.vsensor.BridgeVirtualSensor;
 import gsn.wrappers.AbstractWrapper;
 
+import java.awt.Stroke;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -137,14 +139,15 @@ public class TestWindowing2 {
 
 		long time = System.currentTimeMillis();
 		wrapper.postStreamElement(createStreamElement(time));
-		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query);
+		Connection conn = StorageManager.getInstance().getConnection();
+		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertFalse(rs.next());
 
 		StringBuilder vsQuery = new StringBuilder("select * from ").append(config.getName());
 		StringBuilder sb = new StringBuilder("SELECT timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='")
 				.append(ss.getUIDStr()).append("'");
-		rs = sm.executeQueryWithResultSet(sb);
+		rs = sm.executeQueryWithResultSet(sb,conn);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time);
 
@@ -154,7 +157,7 @@ public class TestWindowing2 {
 		wrapper.postStreamElement(createStreamElement(time2));
 
 		DataEnumerator dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
+		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
@@ -210,13 +213,14 @@ public class TestWindowing2 {
 
 		long time = System.currentTimeMillis() + 2000;
 		wrapper.postStreamElement(createStreamElement(time));
-		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query);
+		Connection conn = StorageManager.getInstance().getConnection();
+		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
 		assertFalse(rs.next());
 
 		StringBuilder vsQuery = new StringBuilder("select * from ").append(config.getName());
 		StringBuilder sb = new StringBuilder("SELECT timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='")
 				.append(ss.getUIDStr()).append("'");
-		rs = sm.executeQueryWithResultSet(sb);
+		rs = sm.executeQueryWithResultSet(sb,conn);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), -1L);
 
@@ -225,14 +229,14 @@ public class TestWindowing2 {
 		long time2 = time + 3800;
 		wrapper.postStreamElement(createStreamElement(time2));
 
-		rs = sm.executeQueryWithResultSet(sb);
+		rs = sm.executeQueryWithResultSet(sb,conn);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time2);
 
 		long time3 = time + 4200;
 		wrapper.postStreamElement(createStreamElement(time3));
 		DataEnumerator dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
+		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
@@ -245,12 +249,12 @@ public class TestWindowing2 {
 
 		long time4 = time + 5800;
 		wrapper.postStreamElement(createStreamElement(time4));
-		rs = sm.executeQueryWithResultSet(sb);
+		rs = sm.executeQueryWithResultSet(sb,conn);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time4);
 
 		dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
+		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertTrue(rs.next());
@@ -309,13 +313,14 @@ public class TestWindowing2 {
 
 		long time = System.currentTimeMillis() + 2000;
 		wrapper.postStreamElement(createStreamElement(time));
-		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query);
+		Connection conn = StorageManager.getInstance().getConnection();
+		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
 		assertFalse(rs.next());
 
 		StringBuilder vsQuery = new StringBuilder("select * from ").append(config.getName());
 		StringBuilder sb = new StringBuilder("SELECT timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where UID='")
 				.append(ss.getUIDStr()).append("'");
-		rs = sm.executeQueryWithResultSet(sb);
+		rs = sm.executeQueryWithResultSet(sb,conn);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), -1L);
 
@@ -324,7 +329,7 @@ public class TestWindowing2 {
 		long time2 = time + 2500;
 		wrapper.postStreamElement(createStreamElement(time2));
 
-		rs = sm.executeQueryWithResultSet(sb);
+		rs = sm.executeQueryWithResultSet(sb,conn);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time2);
 
@@ -332,7 +337,7 @@ public class TestWindowing2 {
 		wrapper.postStreamElement(createStreamElement(time3));
 
 		DataEnumerator dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
+		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
@@ -345,12 +350,12 @@ public class TestWindowing2 {
 
 		long time4 = time + 4600;
 		wrapper.postStreamElement(createStreamElement(time4));
-		rs = sm.executeQueryWithResultSet(sb);
+		rs = sm.executeQueryWithResultSet(sb,conn);
 		assertTrue(rs.next());
 		assertEquals(rs.getLong(1), time4);
 
 		dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query);
+		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());

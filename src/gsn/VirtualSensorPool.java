@@ -6,6 +6,7 @@ import gsn.storage.StorageManager;
 import gsn.vsensor.AbstractVirtualSensor;
 
 import java.io.File;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -149,15 +150,16 @@ public class VirtualSensorPool {
 			}
 		}else{
 			long timedToRemove = -1;
-			ResultSet rs = null;
+			Connection conn = null; 
 			try {
-				rs = StorageManager.getInstance().executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName));
+				ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName),conn=StorageManager.getInstance().getConnection());
 				if(rs.next())
 					timedToRemove = rs.getLong(1);
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			}finally {
-				StorageManager.close(rs);
+				StorageManager.close(conn);
+				
 			}
 			query = new StringBuilder( ).append( "delete from " ).append( virtualSensorName ).append( " where " ).append( virtualSensorName ).append( ".timed < " ).append(timedToRemove);
 			query.append(" - ").append(config.getParsedStorageSize( ) );

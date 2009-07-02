@@ -165,6 +165,11 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 
 	public void close ( ) {
 		this.hasNext = false;
-		StorageManager.close(resultSet);
+		try {
+			StorageManager.close(resultSet.getStatement().getConnection());
+		} catch (SQLException e) {
+			logger.error(e.getMessage(),e);
+			e.printStackTrace();
+		}
 	} 
 }

@@ -80,7 +80,8 @@ public class TestAbstractWrapper {
 		assertEquals(wrapper.getTimerClockPeriod(), 100);
 		thread.start();
 		Thread.sleep(1000);
-		ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet(new StringBuilder("select count(*) from ").append(wrapper.getDBAliasInStr()));
+		
+		ResultSet rs =StorageManager.getInstance().executeQueryWithResultSet(new StringBuilder("select count(*) from ").append(wrapper.getDBAliasInStr()), StorageManager.getInstance().getConnection());
 		assertTrue(rs.next());
 		//    System.out.println(rs.getInt(1));
 		assertTrue(rs.getInt(1)<=(AbstractWrapper.GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS*2));
