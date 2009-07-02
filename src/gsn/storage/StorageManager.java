@@ -9,10 +9,8 @@ import gsn.http.datarequest.AbstractQuery;
 import gsn.utils.GSNRuntimeException;
 import gsn.utils.ValidityTools;
 
-import java.beans.PropertyVetoException;
 import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -22,9 +20,10 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import javax.sql.DataSource;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.log4j.Logger;
 
 public class StorageManager {
 
@@ -1173,8 +1172,7 @@ public class StorageManager {
 
 	private Properties dbConnectionProperties = new Properties();
 
-	private ComboPooledDataSource pool;
-
+	private BasicDataSource pool;
 
 	public void init(String databaseDriver, String username,
 			String password, String databaseURL) {
@@ -1192,58 +1190,17 @@ public class StorageManager {
 			logger.error(new StringBuilder().append("Please check the storage element in the file : ").append(getContainerConfig().getContainerFileName()).toString());
 		}
 
-		dbConnectionProperties.put("user", username);
-		dbConnectionProperties.put("password", password);
-
-		dbConnectionProperties.put("driverClass", databaseDriver);
-		dbConnectionProperties.put("driverURL", databaseURL);
-		dbConnectionProperties.put("poolName", "primrose");
-
-		dbConnectionProperties.put("username", username);
-		dbConnectionProperties.put("ignorecase", "true");
-		dbConnectionProperties.put("autocommit", "true");
-		dbConnectionProperties.put("useUnicode", "true");
-		dbConnectionProperties.put("autoReconnect", "true");
-		dbConnectionProperties.put("autoReconnectForPools", "true");
-		dbConnectionProperties.put("cacheCallableStmts", "true");
-		dbConnectionProperties.put("cachePrepStmts", "true");
-		dbConnectionProperties.put("cacheResultSetMetadata", "true");
-		dbConnectionProperties.put("cacheResultSetMetadata", "true");
-		dbConnectionProperties.put("defaultFetchSize", "5");
-		dbConnectionProperties.put("useLocalSessionState", "true");
-		dbConnectionProperties.put("useLocalSessionState", "true");
-		dbConnectionProperties.put("useServerPrepStmts", "false");
-		dbConnectionProperties.put("prepStmtCacheSize", "512");
-		        pool = new ComboPooledDataSource();
-
-
-		        if (logger.isDebugEnabled()){
-		            pool.setDebugUnreturnedConnectionStackTraces(true);
-		            pool.setUnreturnedConnectionTimeout(10);//10 seconds
-		        }
-
-		        try {
-		            pool.setDriverClass(databaseDriver);
-		        } catch (PropertyVetoException e) {
-		            logger.fatal(e.getMessage(),e);
-		            System.exit(1);
-		        }
-
-		        pool.setJdbcUrl(databaseURL);
-		        pool.setProperties(dbConnectionProperties);
-		        pool.setMaxPoolSize(100);
-		        pool.setInitialPoolSize(5);
-
+	
 		logger.info("Initializing the access to the database server ...");
 
 		Connection con = null;
-
+		pool = new BasicDataSource();
+	        pool.setDriverClassName(databaseDriver);
+	        pool.setUsername(username);
+	        pool.setPassword(password);
+	        pool.setUrl(databaseURL);
 		try {
-			//        	PrimroseLoader.load(dbConnectionProperties, false);
-			//        	PrimroseWebConsoleLoader.load("gsn","gsn",8090, "/tmp/webconsole.log", "info,warn,error,crisis"); 
-			//            Context ctx = new InitialContext();
-			//    		pool = (DataSource)ctx.lookup("java:comp/env/primrose" );
-
+		
 			con = getConnection();
 			Statement stmt = con.createStatement();
 			if (StorageManager.isH2()) {
@@ -1292,16 +1249,17 @@ public class StorageManager {
 		//            this.connection = DriverManager.getConnection(databaseURL,
 		//                    dbConnectionProperties);
 		//        return connection;
-		        logger.debug("Asking for connections to default DB=> busy: "+pool.getNumBusyConnections()+", max-size:"+pool.getMaxPoolSize()+", idle:"+pool.getNumIdleConnections());
+		if (logger.isDebugEnabled())
+			logger.debug("Asking for connections to default DB=> busy: "+pool.getNumActive()+", max-size:"+pool.getMaxActive()+", idle:"+pool.getNumIdle());
 		// try{ // used for tracking the calls to this method.
 		//     throw new RuntimeException("Trackeeer");
 		// }   catch (Exception e){
 		//     logger.fatal(e.getMessage(),e);
 		// }
-		        return pool.getConnection();
-//		connectionCount++;
-//		logger.debug("Asking for a new connection. current count : " + connectionCount);
-//		return DriverManager.getConnection(databaseURL, dbConnectionProperties);
+		return pool.getConnection();
+		//		connectionCount++;
+		//		logger.debug("Asking for a new connection. current count : " + connectionCount);
+		//		return DriverManager.getConnection(databaseURL, dbConnectionProperties);
 	}
 
 
