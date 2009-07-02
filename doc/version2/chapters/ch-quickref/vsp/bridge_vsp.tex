@@ -1,5 +1,12 @@
 \subsection{gsn.vsensor.BridgeVirtualSensor \vsp \label{bridge:vsp}}
 
+This virtual sensor immediately publishes any data that it receives without
+modifying it. The StreamElement object is not modified.
+It does not take any parameter. Its main use is to filter and join sensor data
+using SQL syntax without any other kind of post processing operation on the data. For
+using this wrapper the output structure of the virtual sensor must match strictly
+with the structure of the query.
+
 \begin{table*}[!htp]
 	\centering
 	{\normalfont\footnotesize
@@ -15,11 +22,7 @@
 		\textbf{Description} \\
 	\hline
 	\hline
-		\todo{TODO} &
-		\todo{TODO} &	
-		\todo{TODO} &
-		\todo{TODO} &
-		\todo{TODO} \\
+		\multicolumn{5}{|c|}{\textbf{gsn.vsensor.BridgeVirtualSensor \vsp has no parameters}} \\
 	\hline
 	\end{tabulary}
 	}
