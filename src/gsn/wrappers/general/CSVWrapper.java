@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.log4j.Logger;
 /**
  * Timezones: http://joda-time.sourceforge.net/timezones.html
@@ -74,11 +75,20 @@ public class CSVWrapper extends AbstractWrapper {
 	public void run ( ) {
 		Exception preivousError = null;
 		long previousModTime = -1;
+		long previousCheckModTime = -1;
 		while ( isActive( ) ) {
-			long lastModified = new File(handler.getDataFile()).lastModified();
+			File dataFile =  new File(handler.getDataFile());
+			File chkPointFile =  new File(handler.getCheckPointFile());
+			long lastModified = -1;
+			long lastModifiedCheckPoint = -1;
+			if (dataFile.isFile())
+				lastModified = dataFile.lastModified();
+			if (chkPointFile.isFile())
+				lastModifiedCheckPoint = chkPointFile.lastModified();
+			
 			try {
 				ArrayList<TreeMap<String, Serializable>> output = null;
-				if (preivousError==null || (preivousError!=null && lastModified != previousModTime)){
+				if (preivousError==null || (preivousError!=null && (lastModified != previousModTime || lastModifiedCheckPoint!=previousCheckModTime))){
 					output = handler.run(new FileReader(handler.getDataFile()), checkPointDir);
 					for (TreeMap<String, Serializable> se : output) {
 						StreamElement streamElement = new StreamElement(se,getOutputFormat());
@@ -94,6 +104,7 @@ public class CSVWrapper extends AbstractWrapper {
 				logger.error(e.getMessage()+" :: "+dataFile,e);
 				preivousError = e;
 				previousModTime=lastModified;
+				previousCheckModTime=lastModifiedCheckPoint;
 			}
 		}
 	}
