@@ -1202,7 +1202,7 @@ public class StorageManager {
 
         pool.setJdbcUrl(databaseURL);
         pool.setProperties(dbConnectionProperties);
-        pool.setMaxPoolSize(00);
+        pool.setMaxPoolSize(100);
         pool.setInitialPoolSize(5);
 
         logger.info("Initializing the access to the database server ...");
