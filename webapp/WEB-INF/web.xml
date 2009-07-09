@@ -3,50 +3,6 @@
 
 <web-app>
     <display-name>GSN Server</display-name>
-<!-- **********************************
-         AUTHENTICATION INOFRMATION 
-   ********************************** -->
-<!--
-
-	<login-config>
-    	<auth-method>BASIC</auth-method>
-    	<realm-name>GSNRealm</realm-name>
-	</login-config>
-	<security-constraint>
-		<display-name>GSN Realms</display-name>
-		<web-resource-collection>
-			<web-resource-name>GSNRPC</web-resource-name>
-			<url-pattern>/gsn-handler</url-pattern>
-		</web-resource-collection>
-		<web-resource-collection>
-			<web-resource-name>ControllerServlet</web-resource-name>
-			<url-pattern>/gsn</url-pattern>
-		</web-resource-collection>
-		<web-resource-collection>
-			<web-resource-name>DataDownload</web-resource-name>
-			<url-pattern>/data</url-pattern>
-		</web-resource-collection>
-		<web-resource-collection>
-			<web-resource-name>FieldDownloadServlet</web-resource-name>
-			<url-pattern>/field</url-pattern>
-		</web-resource-collection>
-		<web-resource-collection>
-			<web-resource-name>FieldUpload</web-resource-name>
-			<url-pattern>/upload</url-pattern>
-		</web-resource-collection>
-		<web-resource-collection>
-			<web-resource-name>MSRSenseRSSHandler</web-resource-name>
-			<url-pattern>/rss</url-pattern>
-		</web-resource-collection>
-		<web-resource-collection>
-			<web-resource-name>MultiDataDownload</web-resource-name>
-			<url-pattern>/multidata</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>gsnuser</role-name>
-		</auth-constraint>
-	</security-constraint>
--->
 <!-- 
      *******************************************************************************     
       WEB SERVICES CALL [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] ; there is
@@ -71,11 +27,6 @@
     
 	<!-- GSN START -->
 	<servlet>
-        <servlet-name>GSNRPC</servlet-name>
-        <display-name>GSN XML-RPC Call manager</display-name>
-        <servlet-class>gsn.GSNRPC</servlet-class>
-    </servlet>
-	<servlet>
         <servlet-name>ControllerServlet</servlet-name>
         <display-name>GSN XML Output</display-name>
         <servlet-class>gsn.http.ControllerServlet</servlet-class>
@@ -96,21 +47,18 @@
         <servlet-class>gsn.http.FieldUpload</servlet-class>
     </servlet>
 	<servlet>
-        <servlet-name>MSRSenseRSSHandler</servlet-name>
-        <display-name>GSN GeoRSS Feed</display-name>
-        <servlet-class>gsn.msr.sensormap.MSRSenseRSSHandler</servlet-class>
-    </servlet>
-	<servlet>
         <servlet-name>MultiDataDownload</servlet-name>
         <display-name>GSN Multiple Field Download</display-name>
         <servlet-class>gsn.http.MultiDataDownload</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Streaming</servlet-name>
+        <display-name>GSN Data Streaming Interface</display-name>
+        <servlet-class>gsn.http.rest.RestStreamHanlder</servlet-class>
+    </servlet>
    
 	<!-- mapping for GSN -->
-	<servlet-mapping>
-        <servlet-name>GSNRPC</servlet-name>
-        <url-pattern>/gsn-handler</url-pattern>
-    </servlet-mapping>
+	
 	<servlet-mapping>
         <servlet-name>ControllerServlet</servlet-name>
         <url-pattern>/gsn</url-pattern>
@@ -128,12 +76,12 @@
         <url-pattern>/upload</url-pattern>
     </servlet-mapping>
 	<servlet-mapping>
-        <servlet-name>MSRSenseRSSHandler</servlet-name>
-        <url-pattern>/rss</url-pattern>
-    </servlet-mapping>
-	<servlet-mapping>
         <servlet-name>MultiDataDownload</servlet-name>
         <url-pattern>/multidata</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Streaming</servlet-name>
+        <url-pattern>/streaming/*</url-pattern>
     </servlet-mapping>
 	<!-- GSN END -->
 	
