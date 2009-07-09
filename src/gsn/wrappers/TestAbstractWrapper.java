@@ -1,6 +1,8 @@
 package gsn.wrappers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.InputStream;
@@ -14,8 +16,9 @@ import java.io.Serializable;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import javax.naming.OperationNotSupportedException;
-import org.junit.After;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;

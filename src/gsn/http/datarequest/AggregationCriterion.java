@@ -1,7 +1,10 @@
 package gsn.http.datarequest;
 
 import gsn.utils.Helpers;
+
 import java.util.Hashtable;
+
+import javax.servlet.ServletException;
 
 public class AggregationCriterion extends AbstractCriterion {
 

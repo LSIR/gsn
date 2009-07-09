@@ -10,7 +10,9 @@ import java.io.InputStream;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeMap;
+
 import javax.imageio.ImageIO;
+
 import org.antlr.stringtemplate.StringTemplate;
 
 public class SVGPage {

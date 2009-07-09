@@ -1,6 +1,7 @@
 package gsn.utils;
 
 import java.io.Serializable;
+
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 

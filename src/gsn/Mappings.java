@@ -2,9 +2,11 @@ package gsn;
 
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
+
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 
 public final class Mappings {
@@ -16,8 +18,6 @@ public final class Mappings {
    private static final ConcurrentHashMap < String , TreeMap < String , Boolean >> vsNamesToOutputStructureFields = new ConcurrentHashMap < String , TreeMap < String , Boolean >>( );
    
    private static final transient Logger                                 logger                         = Logger.getLogger( Mappings.class );
-   
-   private static ContainerImpl                                              container                      = new ContainerImpl ( );
    
    public static boolean addVSensorInstance ( VirtualSensorPool sensorPool ) {
       try {
@@ -72,10 +72,6 @@ public final class Mappings {
       return ( fileNameToVSInstance.get( fileName ) ).getConfig( );
    }
    
-   public static ContainerImpl getContainer ( ) {
-      return container;
-   }
-   
    public static Iterator < VSensorConfig > getAllVSensorConfigs ( ) {
       return vsNameTOVSConfig.values( ).iterator( );
    }
@@ -86,5 +82,18 @@ public final class Mappings {
       if ( vSensorConfig == null ) return null;
       return getVSensorInstanceByFileName( vSensorConfig.getFileName( ) );
    }
-   
+   /**
+    * Case insensitive matching.
+    * @param vsName
+    * @return
+    */
+   public static VSensorConfig getConfig(String vsName) {
+		Iterator<VSensorConfig> configs = Mappings.getAllVSensorConfigs();
+		while(configs.hasNext()) {
+			VSensorConfig config = configs.next();
+			if (config.getName().equalsIgnoreCase(vsName))
+				return config;
+		}
+		return null;
+	}  
 }

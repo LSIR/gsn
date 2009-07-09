@@ -1,10 +1,11 @@
 package gsn.reports.scriptlets;
 
+import gsn.reports.beans.VirtualSensor;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.TimeZone;
 
-import gsn.reports.beans.VirtualSensor;
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
 import net.sf.jasperreports.engine.JRScriptletException;
 

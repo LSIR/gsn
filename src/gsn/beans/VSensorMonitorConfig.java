@@ -1,10 +1,8 @@
 package gsn.beans;
 
-import org.apache.log4j.Logger;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.text.ParseException;
+
+import org.apache.log4j.Logger;
 
 public class VSensorMonitorConfig {
 

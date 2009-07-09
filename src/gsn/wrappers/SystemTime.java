@@ -3,9 +3,11 @@ package gsn.wrappers;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+
 import javax.swing.Timer;
 
 import org.apache.commons.collections.Buffer;

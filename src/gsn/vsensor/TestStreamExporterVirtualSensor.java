@@ -5,6 +5,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.KeyValueImp;
+
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,7 +14,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
+
 import junit.framework.TestCase;
+
 import org.apache.commons.collections.KeyValue;
 
 public class TestStreamExporterVirtualSensor extends TestCase {

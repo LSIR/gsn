@@ -1,11 +1,11 @@
 package gsn.storage;
 
+import gsn.Main;
+import gsn.beans.ContainerConfig;
+
 import java.util.ArrayList;
 
 import org.apache.log4j.PropertyConfigurator;
-
-import gsn.Main;
-import gsn.beans.ContainerConfig;
 /**
  * Removes the temporary tables, tables starting with underscore.
  */

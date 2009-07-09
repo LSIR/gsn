@@ -1,10 +1,12 @@
 package gsn.msr.sensormap;
 
 import gsn.Main;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.List;
+
 import au.com.bytecode.opencsv.bean.ColumnPositionMappingStrategy;
 import au.com.bytecode.opencsv.bean.CsvToBean;
 

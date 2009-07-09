@@ -2,10 +2,12 @@ package gsn.acquisition2.server;
 
 import gsn.networking.ActionPort;
 import gsn.networking.NetworkAction;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+
 import org.apache.log4j.Logger;
 
 public class SafeStorageController {
@@ -18,7 +20,6 @@ public class SafeStorageController {
 		super();
 		logger.info("Started Safe Storage Controller on port " + safeStorageControllerPort);
 		ActionPort.listen(safeStorageControllerPort, new NetworkAction(){
-			@Override
 			public boolean actionPerformed(Socket socket) {
 				try {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));

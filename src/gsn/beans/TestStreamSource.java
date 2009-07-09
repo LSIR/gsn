@@ -12,12 +12,12 @@ import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.SystemTime;
+
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;

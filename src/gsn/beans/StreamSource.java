@@ -8,10 +8,12 @@ import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;
+
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 
 public  class StreamSource implements Serializable{
@@ -319,7 +321,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
   }
   
   public boolean windowSlided() throws SQLException{
-	  if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data avialble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
+	  if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data availble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
 	  return inputStream.executeQuery( getUIDStr() );
 	  
   }

@@ -2,8 +2,15 @@ package gsn;
 
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
+import gsn.http.rest.DefaultDistributionRequest;
+import gsn.http.rest.LocalDeliveryWrapper;
+import gsn.http.rest.PushDelivery;
+import gsn.http.rest.RestDelivery;
+import gsn.msr.sensormap.SensorMapIntegration;
+import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
+import gsn.vsensor.SQLValidatorIntegration;
 import gsn.wrappers.WrappersUtil;
 
 import java.io.File;
@@ -36,17 +43,22 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.session.HashSessionIdManager;
+import org.eclipse.jetty.server.ssl.SslSocketConnector;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.SslSocketConnector;
-import org.mortbay.jetty.servlet.HashSessionIdManager;
-import org.mortbay.jetty.webapp.WebAppContext;
+
 
 /**
  * Web Service URL : http://localhost:22001/services/Service?wsdl
@@ -59,7 +71,7 @@ public final class Main {
 	private static int gsnControllerPort;
 
 	private Main() throws Exception{
-		System.out.println("GSN Starting ...");
+		System.out.println("Global Sensor Networks (GSN) is Starting ...");
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
@@ -85,43 +97,30 @@ public final class Main {
 		}
 		StorageManager.getInstance ( ).init ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) );
 		if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
-		final Server server = new Server ( );
-		//Connector connector = new SelectChannelConnector( ); //using basic connector for windows bug
-		Connector httpConnector = new SocketConnector ();
-		httpConnector.setPort ( containerConfig.getContainerPort ( ) );
-		SslSocketConnector sslSocketConnector = null;
-		if (getContainerConfig().getSSLPort()>10){
-			sslSocketConnector = new SslSocketConnector();
-			sslSocketConnector.setKeystore("conf/gsn.jks");
-			sslSocketConnector.setKeyPassword(getContainerConfig().getSSLKeyPassword());
-			sslSocketConnector.setPassword(getContainerConfig().getSSLKeyStorePassword());
-			sslSocketConnector.setPort(getContainerConfig().getSSLPort());
-		}
-
-		if (sslSocketConnector==null)
-			server.setConnectors ( new Connector [ ] { httpConnector } );
-		else
-			server.setConnectors ( new Connector [ ] { httpConnector,sslSocketConnector } );
-		WebAppContext webAppContext = new WebAppContext ( );
-		webAppContext.setContextPath ( "/" );
-		webAppContext.setResourceBase ( DEFAULT_WEB_APP_PATH );
-		server.addHandler( webAppContext );
-		server.setStopAtShutdown ( true );
-		server.setSendServerVersion ( false );
-		server.setSessionIdManager(new HashSessionIdManager(new Random()));
-		server.addUserRealm(new HashUserRealm("GSNRealm","conf/realm.properties"));
 
 		try {
 			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" ...");
-			server.start ( );
+			Server jettyServer = getJettyServer(Main.getContainerConfig().getContainerPort());
+			jettyServer.start ( );
 			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
 		} catch ( Exception e ) {
 			logger.error ( "Start of the HTTP server failed. The HTTP protocol is used in most of the communications." );
 			logger.error ( e.getMessage ( ) , e );
 			return;
 		}
-		final VSensorLoader vsloader = new VSensorLoader ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+		VSensorLoader vsloader = new VSensorLoader ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
+
+		vsloader.addVSensorStateChangeListener(new SensorMapIntegration());
+		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));
+		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
+		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(PushDelivery.class));
+		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(RestDelivery.class));
+		
+		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
+		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
+		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
+		vsloader.startLoading();
 	}
 
 	public synchronized static Main getInstance() {
@@ -305,8 +304,8 @@ public final class Main {
 			} catch (Exception e) {
 				return null;
 			}
-		else
-			return singleton.containerConfig;
+			else
+				return singleton.containerConfig;
 	}
 
 	public static String randomTableNameGenerator ( int length ) {
@@ -348,5 +347,63 @@ public final class Main {
 			sb.append ( "_" );
 		sb.append ( Math.abs (code) );
 		return tableNameGeneratorInString(sb);
+	}
+
+	public Server getJettyServer(int port) throws IOException {
+		Server server = new Server();
+		Connector connector=new SelectChannelConnector();//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
+		HandlerCollection handlers = new HandlerCollection();
+		ContextHandlerCollection contexts = new ContextHandlerCollection();
+		server.setThreadPool(new QueuedThreadPool(100));
+		connector.setPort ( port );
+
+		SslSocketConnector sslSocketConnector = null;
+		if (getContainerConfig().getSSLPort()>10){
+			sslSocketConnector = new SslSocketConnector();
+			sslSocketConnector.setKeystore("conf/gsn.jks");
+			sslSocketConnector.setKeyPassword(getContainerConfig().getSSLKeyPassword());
+			sslSocketConnector.setPassword(getContainerConfig().getSSLKeyStorePassword());
+			sslSocketConnector.setPort(getContainerConfig().getSSLPort());
+		}
+
+		if (sslSocketConnector==null)
+			server.setConnectors ( new Connector [ ] { connector } );
+		else
+			server.setConnectors ( new Connector [ ] { connector,sslSocketConnector } );
+
+		WebAppContext webAppContext = new WebAppContext(contexts, DEFAULT_WEB_APP_PATH ,"/");
+
+		handlers.setHandlers(new Handler[]{contexts,new DefaultHandler()});
+		server.setHandler(handlers);
+		
+//		HashLoginService loginService = new HashLoginService();
+//		loginService.setName("GSNRealm");
+//		loginService.setConfig("conf/realm.properties");
+//		loginService.setRefreshInterval(5000); //re-reads the file every 2 seconds.
+//
+//		Constraint constraint = new Constraint();
+//        constraint.setName("GSN User");
+//        constraint.setRoles(new String[]{"gsnuser"});
+//        constraint.setAuthenticate(true);
+//
+//        ConstraintMapping cm = new ConstraintMapping();
+//        cm.setConstraint(constraint);
+//        cm.setPathSpec("/*");
+//        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+//        securityHandler.setLoginService(loginService);
+//        securityHandler.setConstraintMappings(new ConstraintMapping[]{cm});
+//        securityHandler.setAuthenticator(new BasicAuthenticator());
+//        
+//        Properties usernames = new Properties();
+//        usernames.load(new FileReader("conf/realm.properties"));
+//        if (!usernames.isEmpty())
+//        	webAppContext.setSecurityHandler(securityHandler);
+		
+		server.setSendServerVersion(true);
+		server.setStopAtShutdown ( true );
+		server.setSendServerVersion ( false );
+		server.setSessionIdManager(new HashSessionIdManager(new Random()));
+
+		return server;
 	}
 }

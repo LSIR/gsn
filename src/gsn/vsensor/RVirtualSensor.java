@@ -3,24 +3,17 @@ package gsn.vsensor;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.vsensor.AbstractVirtualSensor;
 
-import java.awt.Image;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RConnection;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 public class RVirtualSensor extends AbstractVirtualSensor
 {

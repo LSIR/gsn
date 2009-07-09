@@ -1,6 +1,6 @@
 package gsn.simulation;
 
-import gsn.Container;
+import gsn.http.WebConstants;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,10 +26,10 @@ public class SimHttpListener extends HttpServlet {
    private final transient Logger logger    = Logger.getLogger( SimHttpListener.class );
    
    public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
-      int requestType = Integer.parseInt( ( String ) req.getHeader( Container.REQUEST ) );
+      int requestType = Integer.parseInt( ( String ) req.getHeader( WebConstants.REQUEST ) );
       switch ( requestType ) {
-         case Container.DATA_PACKET :
-            res.setHeader( Container.RESPONSE_STATUS , Container.REQUEST_HANDLED_SUCCESSFULLY );
+         case WebConstants.DATA_PACKET :
+            res.setHeader( WebConstants.RESPONSE_STATUS , WebConstants.REQUEST_HANDLED_SUCCESSFULLY );
             if ( req.getLocalPort( ) == ( START_PORT_INDEX + 1 ) ) {
                if ( outputLog == null ) {
                   outputLog = new File( "SuperLight-ReceivedTimes.log" );

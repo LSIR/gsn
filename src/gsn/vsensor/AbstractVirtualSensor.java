@@ -1,13 +1,14 @@
 package gsn.vsensor;
 
-import gsn.Mappings;
+import gsn.ContainerImpl;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 public abstract class AbstractVirtualSensor {
@@ -15,8 +16,6 @@ public abstract class AbstractVirtualSensor {
 	private static final transient Logger logger           = Logger.getLogger( AbstractVirtualSensor.class );
 
 	private VSensorConfig                 virtualSensorConfiguration;
-
-	private ArrayList < StreamElement >   producedDataBuffer     = new ArrayList < StreamElement >( );
 
 	private long                          lastVisitiedTime = 0;
 
@@ -66,16 +65,14 @@ public abstract class AbstractVirtualSensor {
 			return;
 		}
 		lastVisitiedTime = currentTime;
-		synchronized ( producedDataBuffer ) {
-			producedDataBuffer.add( streamElement );
-		}
+
 		try {
-			Mappings.getContainer( ).publishData( this );
+			ContainerImpl.getInstance().publishData( this ,streamElement);
 		} catch (SQLException e) {
-            if (e.getMessage().toLowerCase().contains("duplicate entry"))
-                logger.info(e.getMessage(),e);
+			if (e.getMessage().toLowerCase().contains("duplicate entry"))
+				logger.info(e.getMessage(),e);
 			else
-                logger.error(e.getMessage(),e);
+				logger.error(e.getMessage(),e);
 		}
 	}
 	/**
@@ -104,25 +101,26 @@ public abstract class AbstractVirtualSensor {
 			logger.warn( "Validation problem, the number of field doesn't match the number of output data strcture of the virtual sensor" );
 			return false;
 		}
-		for ( int i = 0 ; i < outputStructure.length ; i++ ) 
-			for (int j=0;j<se.getFieldNames().length;j++)
-				if ( outputStructure[i].getName().equalsIgnoreCase(se.getFieldNames()[j])) {
-					if (outputStructure[ i ].getDataTypeID( ) != se.getFieldTypes()[ j ] ) {
-						if (outputStructure[ i ].getDataTypeID( ) == DataTypes.BIGINT && (se.getFieldTypes()[ j ]==DataTypes.INTEGER ||se.getFieldTypes()[ j ]==DataTypes.SMALLINT ||se.getFieldTypes()[ j ]==DataTypes.TINYINT ))
-							continue;
-						logger.warn( "Validation problem for output field >" + outputStructure[ i ].getName( ) + ", The field type declared as >" + DataTypes.TYPE_NAMES[ se.getFieldTypes()[ j ] ]+"< while in VSD it is defined as >"+DataTypes.TYPE_NAMES[outputStructure[ i ].getDataTypeID( )]);
-						return false;
-					}
-				}
-		return true;
-	}
-
-	public synchronized StreamElement getData ( ) {
-		StreamElement toReturn;
-		synchronized ( producedDataBuffer ) {
-			toReturn = producedDataBuffer.remove( 0 );
+		int i =-1;
+		for (DataField field: outputStructure) {
+			Serializable value = se.getData(field.getName());
+			i++;
+			if (value==null)
+				continue;
+			if ( ( (  field.getDataTypeID() == DataTypes.BIGINT ||
+					field.getDataTypeID() == DataTypes.DOUBLE ||
+					field.getDataTypeID() == DataTypes.INTEGER||
+					field.getDataTypeID() == DataTypes.SMALLINT||
+					field.getDataTypeID() == DataTypes.TINYINT ) &&!(value instanceof Number)) 
+					||
+					( (field.getDataTypeID() == DataTypes.VARCHAR || field.getDataTypeID() == DataTypes.CHAR) && !(value instanceof String)) ||
+					( (field.getDataTypeID() == DataTypes.BINARY) && !(value instanceof byte[])) 
+			){ 
+				logger.warn( "Validation problem for output field >" + field.getName( ) + ", The field type declared as >" + field.getType()+"< while in VSD it is defined as >"+DataTypes.TYPE_NAMES[outputStructure[ i ].getDataTypeID( )]);
+				return false;
+			}
 		}
-		return toReturn;
+		return true;
 	}
 
 	/**

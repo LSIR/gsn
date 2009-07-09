@@ -1,10 +1,13 @@
 package gsn.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import gsn.beans.DataField;
 import gsn.storage.StorageManager;
+
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

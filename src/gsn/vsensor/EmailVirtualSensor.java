@@ -2,9 +2,10 @@ package gsn.vsensor;
 
 import gsn.beans.StreamElement;
 
-import org.apache.log4j.Logger;
-import org.apache.commons.mail.SimpleEmail;
 import java.util.TreeMap;
+
+import org.apache.commons.mail.SimpleEmail;
+import org.apache.log4j.Logger;
 
 /**
  * Virtual sensor for sending email. 

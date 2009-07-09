@@ -1,17 +1,16 @@
 package gsn.tests;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
-
 import gsn.acquisition2.SafeStorageDB;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Properties;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /*
 * Unit test for creation of SafeStorage DB Path

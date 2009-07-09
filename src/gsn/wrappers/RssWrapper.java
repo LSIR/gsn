@@ -2,15 +2,18 @@ package gsn.wrappers;
 
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
-import java.net.URL;
-import java.util.List;
+
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
-import org.apache.log4j.Logger;
 
 /*
  * This wrapper allows GSN to extract Rss Feed from a given URL of Rss Feed.

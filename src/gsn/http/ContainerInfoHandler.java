@@ -3,11 +3,12 @@ package gsn.http;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
-import gsn.beans.WebInput;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.beans.WebInput;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -15,8 +16,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;

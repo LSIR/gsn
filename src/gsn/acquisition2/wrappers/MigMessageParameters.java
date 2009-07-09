@@ -1,14 +1,16 @@
 package gsn.acquisition2.wrappers;
 
+import gsn.beans.AddressBean;
+import gsn.beans.DataField;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
+
 import org.apache.log4j.Logger;
-import gsn.beans.AddressBean;
-import gsn.beans.DataField;
 
 public class MigMessageParameters {
 

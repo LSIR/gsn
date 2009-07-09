@@ -1,7 +1,10 @@
 package gsn.utils;
 
 import java.util.Properties;
+
 import org.apache.log4j.PropertyConfigurator;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 public class Helpers {
 	public static void initLoggerToDebug(){
@@ -24,4 +27,10 @@ public class Helpers {
 		if (timestamp < 24 * 60 * 60 * 1000) return (timestamp / (1000 * 60 * 60)) + " h";
 		return (timestamp / (24 * 1000 * 60 * 60)) + " day";	  
 	}
+	public static long convertTimeFromIsoToLong(String time) throws Exception {
+		DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+		return fmt.parseDateTime(time).getMillis();
+	}
 }
+
+

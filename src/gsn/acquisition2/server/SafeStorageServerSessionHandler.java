@@ -5,9 +5,11 @@ import gsn.acquisition2.messages.AcknowledgmentMsg;
 import gsn.acquisition2.messages.DataMsg;
 import gsn.acquisition2.messages.HelloMsg;
 import gsn.acquisition2.wrappers.AbstractWrapper2;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;

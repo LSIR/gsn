@@ -10,9 +10,11 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
 import net.sf.jasperreports.engine.JRScriptletException;
 import net.sf.jasperreports.renderers.JCommonDrawableRenderer;
+
 import org.jfree.chart.JFreeChart;
 
 public class StreamScriptlet  extends JRDefaultScriptlet {

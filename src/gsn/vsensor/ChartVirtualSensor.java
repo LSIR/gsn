@@ -3,11 +3,13 @@ package gsn.vsensor;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;

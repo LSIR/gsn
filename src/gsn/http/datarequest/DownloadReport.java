@@ -7,6 +7,7 @@ import gsn.reports.beans.Report;
 import gsn.reports.beans.Stream;
 import gsn.reports.beans.VirtualSensor;
 import gsn.storage.StorageManager;
+
 import java.io.File;
 import java.io.OutputStream;
 import java.sql.Connection;
@@ -22,6 +23,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 
 public class DownloadReport extends AbstractDataRequest {

@@ -1,15 +1,17 @@
 package gsn.wrappers;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.Timer;
-import java.util.TimerTask;
-import org.apache.log4j.Logger;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Enumeration;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.apache.log4j.Logger;
 
 /**
  * This wrapper enables one to reply the existing stream from a database.

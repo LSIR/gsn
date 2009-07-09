@@ -9,12 +9,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
+
 import org.eclipse.mylar.zest.layout.HorizontalTreeLayoutAlgorithm;
 import org.eclipse.mylar.zest.layout.LayoutAlgorithm;
 import org.eclipse.mylar.zest.layout.LayoutEntity;

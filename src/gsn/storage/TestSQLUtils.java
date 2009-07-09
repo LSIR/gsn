@@ -1,8 +1,5 @@
 package gsn.storage;
 
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-
 import junit.framework.TestCase;
 
 public class TestSQLUtils extends TestCase {

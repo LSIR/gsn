@@ -1,17 +1,19 @@
 package gsn.vsensor;
 
 import gsn.beans.StreamElement;
-import org.apache.log4j.Logger;
-import gsn.storage.StorageManager;
 import gsn.storage.DataEnumerator;
+import gsn.storage.StorageManager;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.Timer;
-import java.util.TreeMap;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.TreeMap;
+
+import javax.swing.Timer;
+
+import org.apache.log4j.Logger;
 
 public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements ActionListener {
 

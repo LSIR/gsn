@@ -3,13 +3,13 @@ package gsn.msr.sensormap;
 import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
-import gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorTypeWithDT;
-import gsn.msr.sensormap.sensorman.ServiceStub.Guid;
 import gsn.utils.KeyValueImp;
+
 import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;

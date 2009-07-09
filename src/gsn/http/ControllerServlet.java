@@ -1,11 +1,12 @@
 package gsn.http;
 
-import gsn.Container;
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 
 public class ControllerServlet extends HttpServlet {
@@ -52,7 +53,7 @@ public class ControllerServlet extends HttpServlet {
       response.addHeader ( "Cache-Control" , "post-check=0, pre-check=0" );
       response.setHeader ( "Pragma" , "no-cache" );
 
-      String rawRequest = request.getParameter ( Container.REQUEST );
+      String rawRequest = request.getParameter ( WebConstants.REQUEST );
       int requestType = -1;
       if ( rawRequest == null || rawRequest.trim ( ).length ( ) == 0 ) {
          requestType = 0;

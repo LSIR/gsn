@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
-import org.apache.tools.ant.taskdefs.Length;
 
 public class ValidityTools {
 

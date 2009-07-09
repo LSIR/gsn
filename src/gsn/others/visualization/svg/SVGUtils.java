@@ -5,6 +5,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.StringTokenizer;
+
 import org.eclipse.mylar.zest.layout.HorizontalTreeLayoutAlgorithm;
 import org.eclipse.mylar.zest.layout.InvalidLayoutConfiguration;
 import org.eclipse.mylar.zest.layout.LayoutAlgorithm;

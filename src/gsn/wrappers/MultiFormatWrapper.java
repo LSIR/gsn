@@ -1,14 +1,11 @@
 package gsn.wrappers;
 
-import java.io.Serializable;
-
-import net.tinyos.packet.Serial;
-
-import org.apache.log4j.Logger;
-
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
-import gsn.utils.ParamParser;
+
+import java.io.Serializable;
+
+import org.apache.log4j.Logger;
 
 /**
  * This wrapper presents a MultiFormat protocol in which the data comes from the

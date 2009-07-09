@@ -5,9 +5,11 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+
 import org.apache.log4j.Logger;
 
 /**

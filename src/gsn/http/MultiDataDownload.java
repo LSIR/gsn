@@ -1,11 +1,11 @@
 package gsn.http;
 
-import gsn.Container;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
 import gsn.http.datarequest.DataRequestException;
 import gsn.http.datarequest.DownloadReport;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,9 +16,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -73,7 +75,7 @@ public class MultiDataDownload extends HttpServlet {
 			}
 		} catch (DataRequestException e) {
 			logger.error(e.getMessage());
-			res.sendError(Container.ERROR_INVALID_VSNAME, e.getMessage());
+			res.sendError(WebConstants.ERROR_INVALID_VSNAME, e.getMessage());
 			return;
 		}
 	}

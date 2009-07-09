@@ -1,6 +1,5 @@
 package gsn.http;
 
-import gsn.Container;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
@@ -33,7 +32,7 @@ public class FieldDownloadServlet extends HttpServlet {
 	public void doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 		String vsName = req.getParameter( "vs" );
 		if ( vsName == null || (vsName =vsName.trim( ).toLowerCase()).length( ) == 0 ) {
-			res.sendError( Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
+			res.sendError( WebConstants.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
 			return;
 		}
 		String primaryKey = req.getParameter( "pk" );
@@ -44,7 +43,7 @@ public class FieldDownloadServlet extends HttpServlet {
 		}
 		VSensorConfig sensorConfig = Mappings.getVSensorConfig( vsName );
 		if ( sensorConfig == null ) {
-			res.sendError( Container.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist." );
+			res.sendError( WebConstants.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist." );
 			return;
 		}
 

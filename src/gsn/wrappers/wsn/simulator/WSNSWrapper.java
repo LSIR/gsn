@@ -6,8 +6,10 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
 import gsn.wrappers.AbstractWrapper;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 public class WSNSWrapper extends AbstractWrapper implements DataListener {

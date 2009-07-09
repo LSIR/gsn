@@ -96,8 +96,10 @@ public abstract class AbstractWrapper extends Thread {
 			if (slidingHandler.isInterestedIn(ss))
 				slidingHandler.removeStreamSource(ss);
 		}
-		if (listeners.size() == 0)
+		if (listeners.size() == 0) {
 			releaseResources();
+		}
+		
 	}
 
 	/**

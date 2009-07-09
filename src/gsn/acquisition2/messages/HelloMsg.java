@@ -1,6 +1,6 @@
 package gsn.acquisition2.messages;
 
-import gsn.beans.*;
+import gsn.beans.AddressBean;
 
 public class HelloMsg extends AbstractMessage {
 

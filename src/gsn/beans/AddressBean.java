@@ -1,6 +1,7 @@
 package gsn.beans;
 
 import java.io.Serializable;
+
 import org.apache.commons.collections.KeyValue;
 
 public final class AddressBean implements Serializable{

@@ -1,15 +1,21 @@
 package gsn.acquisition2.client;
 
-import gsn.*;
+import gsn.Main;
 import gsn.acquisition2.messages.DataMsg;
-import gsn.beans.*;
-import gsn.utils.*;
-import java.net.*;
-import org.apache.log4j.*;
-import org.apache.mina.common.*;
-import org.apache.mina.filter.codec.*;
-import org.apache.mina.filter.codec.serialization.*;
-import org.apache.mina.transport.socket.nio.*;
+import gsn.beans.AddressBean;
+import gsn.utils.KeyValueImp;
+
+import java.net.InetSocketAddress;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.IoSession;
+import org.apache.mina.common.RuntimeIOException;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
+import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.transport.socket.nio.SocketConnectorConfig;
 
 public class SafeStorageClient {
   
@@ -36,7 +42,6 @@ public class SafeStorageClient {
           return true;
         }
 
-		@Override
 		public void restartConnection() {
 			// TODO Auto-generated method stub
 			

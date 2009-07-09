@@ -1,13 +1,13 @@
 package gsn.utils;
 
 
+import junit.framework.JUnit4TestAdapter;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.JUnit4TestAdapter;
 
 public class TestEmpty {
    @After public void clean()  throws Exception{

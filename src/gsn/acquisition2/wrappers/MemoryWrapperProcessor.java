@@ -1,9 +1,9 @@
 package gsn.acquisition2.wrappers;
 
-import java.io.Serializable;
-
 import gsn.acquisition2.messages.DataMsg;
 import gsn.beans.DataField;
+
+import java.io.Serializable;
 
 public class MemoryWrapperProcessor extends SafeStorageAbstractWrapper{
 

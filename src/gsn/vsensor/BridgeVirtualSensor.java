@@ -1,6 +1,7 @@
 package gsn.vsensor;
 
 import gsn.beans.StreamElement;
+
 import org.apache.log4j.Logger;
 
 public class BridgeVirtualSensor extends AbstractVirtualSensor {

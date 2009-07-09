@@ -1,15 +1,16 @@
 package gsn.reports;
 
+import gsn.reports.beans.Data;
+import gsn.reports.beans.Report;
+import gsn.reports.beans.Stream;
+import gsn.reports.beans.VirtualSensor;
+
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import gsn.reports.beans.Data;
-import gsn.reports.beans.Stream;
-import gsn.reports.beans.Report;
-import gsn.reports.beans.VirtualSensor;
-import org.apache.log4j.Logger;
+
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -17,6 +18,8 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
+
+import org.apache.log4j.Logger;
 
 public class ReportManager {	
 	

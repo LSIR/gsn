@@ -10,11 +10,14 @@ import gsn.others.visualization.svg.SVGPage;
 import gsn.others.visualization.svg.SVGUtils;
 import gsn.utils.LazyTimedHashMap;
 import gsn.utils.ParamParser;
+
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.TreeMap;
+
 import javax.naming.OperationNotSupportedException;
+
 import org.apache.log4j.Logger;
 
 public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {

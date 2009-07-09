@@ -5,6 +5,7 @@ import gsn.acquisition2.messages.AcknowledgmentMsg;
 import gsn.acquisition2.messages.DataMsg;
 import gsn.acquisition2.messages.HelloMsg;
 import gsn.beans.AddressBean;
+
 import org.apache.log4j.Logger;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;

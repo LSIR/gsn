@@ -4,10 +4,12 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 
 /**

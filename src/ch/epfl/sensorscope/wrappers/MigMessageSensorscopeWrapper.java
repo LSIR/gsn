@@ -1,8 +1,9 @@
 package ch.epfl.sensorscope.wrappers;
 
-import org.apache.log4j.Logger;
 import gsn.acquisition2.wrappers.MigMessageParameters;
 import gsn.acquisition2.wrappers.MigMessageWrapper2;
+
+import org.apache.log4j.Logger;
 
 public class MigMessageSensorscopeWrapper extends MigMessageWrapper2 {
 

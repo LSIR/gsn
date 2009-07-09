@@ -1,10 +1,10 @@
 package gsn.http;
 
-import gsn.Container;
 import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 
 public class DataDownload extends HttpServlet {
@@ -55,7 +56,7 @@ public class DataDownload extends HttpServlet {
 		if (vsName ==null)
 			vsName = HttpRequestUtils.getStringParameter("vsname", null,req) ;
 		if (vsName==null) {
-			res.sendError( Container.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
+			res.sendError( WebConstants.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
 			return;
 		}
 		if (req.getParameter("display") != null && req.getParameter("display").equals("CSV")) {

@@ -1,5 +1,8 @@
 package gsn.wrappers;
 
+import gsn.beans.DataField;
+import gsn.beans.StreamElement;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,9 +12,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
-import gsn.beans.DataField;
-import gsn.beans.StreamElement;
+
 import org.apache.log4j.Logger;
+
 import au.com.bytecode.opencsv.CSVReader;
 
 public class WanWrapper extends AbstractWrapper {

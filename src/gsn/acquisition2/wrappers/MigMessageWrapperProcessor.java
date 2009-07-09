@@ -1,5 +1,8 @@
 package gsn.acquisition2.wrappers;
 
+import gsn.acquisition2.messages.DataMsg;
+import gsn.beans.DataField;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -7,9 +10,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import org.apache.log4j.Logger;
-import gsn.acquisition2.messages.DataMsg;
-import gsn.beans.DataField;
 
 public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 
@@ -47,7 +49,6 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 		return true;
 	}
 
-	@Override
 	public boolean messageToBeProcessed(DataMsg dataMessage) {
 
 		Method getter = null;
@@ -112,12 +113,10 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 		return true;
 	}
 
-	@Override
 	public DataField[] getOutputFormat() {
 		return parameters.getOutputStructure() ;
 	}
 
-	@Override
 	public boolean isTimeStampUnique() {
 		return false;
 	}

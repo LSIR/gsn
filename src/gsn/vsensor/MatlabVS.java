@@ -1,13 +1,15 @@
 package gsn.vsensor;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.TreeMap;
-import org.apache.log4j.Logger;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.MatlabEngine;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 
 public class MatlabVS extends AbstractVirtualSensor {
 

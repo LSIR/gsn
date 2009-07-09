@@ -3,6 +3,7 @@ package gsn.wrappers.general;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.wrappers.AbstractWrapper;
+
 import org.apache.log4j.Logger;
 
 public class EmptyWrapper extends AbstractWrapper {

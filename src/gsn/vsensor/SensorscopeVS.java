@@ -4,10 +4,11 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 
-import org.apache.log4j.Logger;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 
 /**
  * This virtual sensor is used for accessing Sensorscope data with

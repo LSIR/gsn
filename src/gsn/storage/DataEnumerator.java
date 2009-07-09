@@ -2,12 +2,14 @@ package gsn.storage;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -41,6 +43,11 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 
 	boolean                  linkBinaryData           = false;
 
+	private boolean manualCloseConnection;
+
+	/**
+	 * Creats an empty data enumerator.
+	 */
 	public DataEnumerator ( ) {
 		hasNext = false;
 	}
@@ -49,8 +56,12 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 		return resultSet == null;
 	}
 
-
 	public DataEnumerator ( PreparedStatement preparedStatement , boolean binaryLinked ) {
+		this(preparedStatement,binaryLinked,false);
+	}
+	
+	public DataEnumerator ( PreparedStatement preparedStatement , boolean binaryLinked ,boolean manualClose) {
+		this.manualCloseConnection=manualClose;
 		try {
 			preparedStatement.setFetchSize(50);
 		} catch (SQLException e1) {
@@ -155,7 +166,8 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 			streamElement = new StreamElement( dataFieldNames , dataFieldTypes , output , indexOfTimedField == -1 ? System.currentTimeMillis( ) : timestamp );
 			if ( indexofPK != -1 ) streamElement.setInternalPrimayKey( pkValue );
 			hasNext = resultSet.next( );
-			if ( hasNext == false )close( );
+			if ( hasNext == false )
+				close( );
 		} catch ( SQLException e ) {
 			logger.error( e.getMessage( ) , e );
 			close();
@@ -166,7 +178,16 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 	public void close ( ) {
 		this.hasNext = false;
 		try {
-			StorageManager.close(resultSet.getStatement().getConnection());
+			if (!manualCloseConnection) {
+				StorageManager.close(resultSet.getStatement().getConnection());
+			}else {
+				try {
+					resultSet.close();
+				}catch (SQLException e) {
+					logger.debug(e.getMessage(),e);
+				}
+			}
+
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 			e.printStackTrace();

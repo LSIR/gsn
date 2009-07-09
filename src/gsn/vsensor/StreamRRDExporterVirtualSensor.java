@@ -1,5 +1,8 @@
 package gsn.vsensor;
 
+import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -8,9 +11,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
-import gsn.beans.StreamElement;
-import gsn.beans.VSensorConfig;
 
 public class StreamRRDExporterVirtualSensor extends AbstractVirtualSensor {
 	public static final String            PARAM_RRDFILE    = "rrdfile" ;

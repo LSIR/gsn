@@ -1,33 +1,41 @@
 package gsn.utils;
 
-import java.net.UnknownHostException;
+import gsn.beans.GSNSessionAddress;
+import gsn.beans.VSensorMonitorConfig;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.ConnectException;
-import java.util.*;
-import java.io.*;
+import java.net.UnknownHostException;
 import java.text.ParseException;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.HttpResponseException;
-
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
-
-import org.apache.commons.mail.SimpleEmail;
-import org.apache.commons.mail.EmailException;
-import org.w3c.dom.*;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
-import gsn.beans.VSensorMonitorConfig;
-import gsn.beans.GSNSessionAddress;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
 
 /*
 * VSMonitor

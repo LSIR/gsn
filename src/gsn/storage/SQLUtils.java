@@ -2,27 +2,14 @@ package gsn.storage;
 
 import gsn.utils.CaseInsensitiveComparator;
 
-import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
 
 public class SQLUtils {
-
-	public static ArrayList < CharSequence > extractTableNamesUsedInQuery ( CharSequence query ) {
-		ArrayList<CharSequence> toReturn = new ArrayList < CharSequence >();
-		Pattern pattern = Pattern.compile( "(\"[^\"]*\")|((\\w+)(\\.((\\w+)|\\*)))" , Pattern.CASE_INSENSITIVE );
-		Matcher matcher = pattern.matcher( query );
-		while ( matcher.find( ) ) {
-			if ( matcher.group( 2 ) == null ) continue;
-			String tableName = matcher.group( 3 );
-			// System.out.println(matcher.group(3));
-			toReturn.add(tableName);
-		}
-
-		return toReturn;
-	}
 
 	/**
 	 * Table renaming, note that the renameMapping should be a tree map. This
@@ -50,9 +37,9 @@ public class SQLUtils {
 			if ( replacement != null ) matcher.appendReplacement( result , new StringBuilder( replacement ).append( "$4" ).toString( ) );
 		}
 		String toReturn = matcher.appendTail( result ).toString( ).toLowerCase( );
-		
+
 		//TODO " from " has to use regular expressions because now from is separated through space which is not always the case, for instance if the user uses \t(tab) for separating "from" from the rest of the query, then we get exception. The same issue with other sql keywords in this method.
-		
+
 		int indexOfFrom = toReturn.indexOf( " from " )>=0?toReturn.indexOf( " from " ) + " from ".length( ):0;
 		int indexOfWhere = ( toReturn.lastIndexOf( " where " ) > 0 ? ( toReturn.lastIndexOf( " where " ) ) : toReturn.length( ) );
 		String selection = toReturn.substring( indexOfFrom , indexOfWhere );
@@ -70,7 +57,7 @@ public class SQLUtils {
 		String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
 		return new StringBuilder(finalResult);
 	}
-	
+
 	/**
 	 * This method gets a sql query and changes the table names which are equal to 
 	 * <code>tableNameToRename</code> to the <code>replacement</code> 
@@ -81,11 +68,21 @@ public class SQLUtils {
 	 * @param replaceTo 
 	 * @return
 	 */
+
+	private static Pattern pattern = Pattern.compile( "(\"[^\"]*\")|((\\w+)(\\.((\\w+)|\\*)))" , Pattern.CASE_INSENSITIVE );
+
+	public static String getTableName ( String query ) {
+		String q = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(query)).toLowerCase();
+		StringTokenizer tokens = new StringTokenizer(q," ");
+		while(tokens.hasMoreElements())
+			if (tokens.nextToken().equalsIgnoreCase("from") && tokens.hasMoreTokens()) 
+				return tokens.nextToken();
+		return null;
+	}
 	public static StringBuilder newRewrite ( CharSequence query , CharSequence tableNameToRename, CharSequence replaceTo ) {
 		// Selecting strings between pair of "" : (\"[^\"]*\")
 		// Selecting tableID.tableName or tableID.* : (\\w+(\\.(\w+)|\\*))
 		// The combined pattern is : (\"[^\"]*\")|(\\w+\\.((\\w+)|\\*))
-		Pattern pattern = Pattern.compile( "(\"[^\"]*\")|((\\w+)(\\.((\\w+)|\\*)))" , Pattern.CASE_INSENSITIVE );
 		Matcher matcher = pattern.matcher( query );
 		StringBuffer result = new StringBuffer( );
 		while ( matcher.find( ) ) {
@@ -141,14 +138,14 @@ public class SQLUtils {
 		out = newRewrite( extractProjection(query) , map );
 		System.out.println( out.toString( ) );
 	}
-	
+
 	public static int getWhereIndex(CharSequence c) {
-	  return c.toString().toLowerCase().lastIndexOf(" where ");
+		return c.toString().toLowerCase().lastIndexOf(" where ");
 	}
 	public static int getOrderByIndex(CharSequence c) {
-	  return c.toString().toLowerCase().lastIndexOf(" order by ");
+		return c.toString().toLowerCase().lastIndexOf(" order by ");
 	}
 	public static int getGroupByIndex(CharSequence c) {
-	  return c.toString().toLowerCase().lastIndexOf(" group by ");
+		return c.toString().toLowerCase().lastIndexOf(" group by ");
 	}
 }

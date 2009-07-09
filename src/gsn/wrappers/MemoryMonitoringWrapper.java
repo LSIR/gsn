@@ -5,9 +5,11 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
+
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
+
 import org.apache.log4j.Logger;
 
 public class MemoryMonitoringWrapper extends AbstractWrapper {

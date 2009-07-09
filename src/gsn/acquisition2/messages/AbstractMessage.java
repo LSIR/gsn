@@ -1,7 +1,8 @@
 package gsn.acquisition2.messages;
 
-import java.io.*;
-import org.apache.log4j.*;
+import java.io.Serializable;
+
+import org.apache.log4j.Logger;
 
 public class AbstractMessage implements Serializable {
   

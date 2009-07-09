@@ -2,19 +2,23 @@ package gsn.acquisition2.server;
 
 import gsn.acquisition2.SafeStorage;
 import gsn.acquisition2.SafeStorageDB;
-import java.io.*;
-import java.net.*;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.sql.SQLException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.*;
-import org.apache.mina.common.*;
-import org.apache.mina.filter.codec.*;
-import org.apache.mina.filter.codec.serialization.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.mina.common.IoAcceptor;
+import org.apache.mina.common.ThreadModel;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.filter.executor.ExecutorFilter;
-import org.apache.mina.transport.socket.nio.*;
+import org.apache.mina.transport.socket.nio.SocketAcceptor;
+import org.apache.mina.transport.socket.nio.SocketAcceptorConfig;
 
 public class SafeStorageServer {
 	

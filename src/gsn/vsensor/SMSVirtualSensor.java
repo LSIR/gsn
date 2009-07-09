@@ -4,13 +4,13 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
-import org.apache.log4j.Logger;
-import org.antlr.stringtemplate.StringTemplate;
-
 import java.io.Serializable;
-import java.util.TreeMap;
 import java.util.Iterator;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.antlr.stringtemplate.StringTemplate;
+import org.apache.log4j.Logger;
 
 /**
  * Virtual sensor for sending SMS'es.

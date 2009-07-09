@@ -1,6 +1,7 @@
 package gsn.utils.protocols.EPuck;
 
 import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
+
 import java.util.Vector;
 
 public class Reset extends AbstractHCIQueryWithoutAnswer {

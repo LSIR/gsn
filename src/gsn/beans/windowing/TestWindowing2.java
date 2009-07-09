@@ -17,7 +17,6 @@ import gsn.storage.StorageManager;
 import gsn.vsensor.BridgeVirtualSensor;
 import gsn.wrappers.AbstractWrapper;
 
-import java.awt.Stroke;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;

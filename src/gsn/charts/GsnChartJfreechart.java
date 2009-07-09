@@ -1,6 +1,7 @@
 package gsn.charts;
 
 import gsn.reports.beans.Data;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.text.SimpleDateFormat;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimeZone;
+
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -31,7 +33,6 @@ public class GsnChartJfreechart implements GsnChartIF {
 	
 	public GsnChartJfreechart () {}
 	
-	@Override
 	public JFreeChart createChart(Collection<Data> datas) {
 		TimeSeries t1 = new TimeSeries("S1");
 		Iterator<Data> iter = datas.iterator() ; 

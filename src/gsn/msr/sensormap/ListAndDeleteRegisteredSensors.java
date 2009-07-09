@@ -1,7 +1,13 @@
 package gsn.msr.sensormap;
 
+import gsn.Main;
+import gsn.beans.ContainerConfig;
+import gsn.msr.sensormap.sensorman.ServiceStub.ArrayOfSensorInfo;
+import gsn.msr.sensormap.sensorman.ServiceStub.GetSensorsByPublisher;
+import gsn.msr.sensormap.sensorman.ServiceStub.Guid;
+import gsn.msr.sensormap.sensorman.ServiceStub.SensorInfo;
+
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -10,14 +16,6 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 
 import org.apache.log4j.Logger;
-
-import gsn.Main;
-import gsn.beans.ContainerConfig;
-import gsn.msr.sensormap.sensorman.ServiceStub.ArrayOfSensorInfo;
-import gsn.msr.sensormap.sensorman.ServiceStub.GetSensorsByPublisher;
-import gsn.msr.sensormap.sensorman.ServiceStub.GetSensorsByPublisherResponse;
-import gsn.msr.sensormap.sensorman.ServiceStub.Guid;
-import gsn.msr.sensormap.sensorman.ServiceStub.SensorInfo;
 
 public class ListAndDeleteRegisteredSensors {
 	

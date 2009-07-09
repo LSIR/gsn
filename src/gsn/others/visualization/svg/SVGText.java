@@ -2,6 +2,7 @@ package gsn.others.visualization.svg;
 
 import java.awt.Color;
 import java.awt.Font;
+
 import org.antlr.stringtemplate.StringTemplate;
 import org.eclipse.mylar.zest.layout.LayoutEntity;
 

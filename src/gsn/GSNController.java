@@ -4,6 +4,7 @@ import gsn.beans.Modifications;
 import gsn.beans.VSensorConfig;
 import gsn.utils.ValidityTools;
 import gsn.utils.graph.Graph;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -11,7 +12,12 @@ import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
 import org.apache.log4j.Logger;
 
 public class GSNController extends Thread {

@@ -41,15 +41,10 @@ package gsn.vsensor;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.TreeMap;
 import java.util.Random;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.asteriskjava.manager.ManagerConnection;
 import org.asteriskjava.manager.ManagerConnectionFactory;

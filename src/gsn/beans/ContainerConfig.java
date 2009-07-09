@@ -2,7 +2,7 @@ package gsn.beans;
 
 import gsn.utils.KeyValueImp;
 import gsn.utils.ValidityTools;
-import java.beans.PropertyChangeListener;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.apache.log4j.helpers.OptionConverter;
@@ -19,19 +20,8 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import com.jgoodies.binding.beans.ExtendedPropertyChangeSupport;
 
 public class ContainerConfig {
-
-	private ExtendedPropertyChangeSupport changeSupport = new ExtendedPropertyChangeSupport( this );
-
-	public void addPropertyChangeListener ( PropertyChangeListener changeListener ) {
-		changeSupport.addPropertyChangeListener( changeListener );
-	}
-
-	public void removePropertyChangeListener ( PropertyChangeListener changeListener ) {
-		changeSupport.removePropertyChangeListener( changeListener );
-	}
 
 	public static final String            NOT_PROVIDED                     = "Not Provided";
 
@@ -123,25 +113,21 @@ public class ContainerConfig {
 	public void setJdbcDriver ( String newValue ) {
 		String oldValue = this.jdbcDriver;
 		this.jdbcDriver = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_jdbcDriver , oldValue , newValue );
 	}
 
 	public void setJdbcPassword ( String newValue ) {
 		String oldValue = this.jdbcPassword;
 		this.jdbcPassword = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_jdbcPassword , oldValue , newValue );
 	}
 
 	public void setJdbcUsername ( String newValue ) {
 		String oldValue = this.jdbcUsername;
 		this.jdbcUsername = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_jdbcUsername , oldValue , newValue );
 	}
 
 	public void setJdbcURL ( String newValue ) {
 		String oldValue = this.jdbcURL;
 		this.jdbcURL = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_jdbcURL , oldValue , newValue );
 	}
 
 	public String getJdbcURL ( ) {
@@ -160,7 +146,6 @@ public class ContainerConfig {
 	public void setContainerPort ( int newValue ) {
 		int oldValue = this.containerPort;
 		this.containerPort = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_gsnPortNo , oldValue , newValue );
 	}
 
 	/**
@@ -191,19 +176,16 @@ public class ContainerConfig {
 	public void setWebEmail ( String newValue ) {
 		String oldValue = this.webEmail;
 		this.webEmail = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_webEmail , oldValue , newValue );
 	}
 
 	public void setWebAuthor ( String newValue ) {
 		String oldValue = this.webAuthor;
 		this.webAuthor = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_webAuthor , oldValue , newValue );
 	}
 
 	public void setWebName ( String newValue ) {
 		String oldValue = this.webName;
 		this.webName = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_webName , oldValue , newValue );
 	}
 
 	/**
@@ -294,7 +276,6 @@ public class ContainerConfig {
 	public void setDirectoryLoggingLevel ( String newValue ) {
 		String oldValue = this.directoryLoggingLevel;
 		this.directoryLoggingLevel = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_directoryLoggingLevel , oldValue , newValue );
 	}
 
 	public String getDirectoryLoggingLevel ( ) {
@@ -304,7 +285,6 @@ public class ContainerConfig {
 	public void setMaxDirectoryLogSizeInMB ( long newValue ) {
 		long oldValue = this.maxDirectoryLogSizeInMB;
 		this.maxDirectoryLogSizeInMB = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_maxDirectoryLogSizeInMB , oldValue , newValue );
 	}
 
 	public long getMaxDirectoryLogSizeInMB ( ) {
@@ -314,7 +294,6 @@ public class ContainerConfig {
 	public void setGsnLoggingLevel ( String newValue ) {
 		String oldValue = this.gsnLoggingLevel;
 		this.gsnLoggingLevel = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_gsnLoggingLevel , oldValue , newValue );
 	}
 
 	public String getGsnLoggingLevel ( ) {
@@ -324,7 +303,6 @@ public class ContainerConfig {
 	public void setMaxGSNLogSizeInMB ( long newValue ) {
 		long oldValue = this.maxGSNLogSizeInMB;
 		this.maxGSNLogSizeInMB = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_maxGSNLogSizeInMB , oldValue , newValue );
 	}
 
 	public long getMaxGSNLogSizeInMB ( ) {
@@ -334,7 +312,6 @@ public class ContainerConfig {
 	public void setDirectoryLogFileName ( String newValue ) {
 		String oldValue = this.directoryLogFileName;
 		this.directoryLogFileName = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_directoryLogFileName , oldValue , newValue );
 	}
 
 	public String getDirectoryLogFileName ( ) {
@@ -344,7 +321,6 @@ public class ContainerConfig {
 	public void setGsnLogFileName ( String newValue ) {
 		String oldValue = this.gsnLogFileName;
 		this.gsnLogFileName = newValue;
-		changeSupport.firePropertyChange( FIELD_NAME_gsnLogFileName , oldValue , newValue );
 	}
 
 	public String getGsnLogFileName ( ) {
@@ -423,7 +399,6 @@ public class ContainerConfig {
 		} else if ( newValue == JDBC_SYSTEMS[ 3 ] ) {
 			setJdbcURL( JDBC_URLS[ 3 ] );
 		}
-		changeSupport.firePropertyChange( FIELD_NAME_databaseSystem , oldValue , newValue );
 	}
 
 	public String getdatabaseSystem ( ) {

@@ -1,8 +1,8 @@
 package gsn.vsensor;
 
-import java.io.BufferedReader;
+import gsn.beans.StreamElement;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -15,8 +15,8 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
-import gsn.beans.StreamElement;
 
 public class SensorInternetVS extends AbstractVirtualSensor {
 

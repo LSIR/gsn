@@ -1,8 +1,9 @@
 package gsn.utils.protocols.EPuck;
 
+import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Vector;
-import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
 
 public class BodyLED extends AbstractHCIQueryWithoutAnswer {
 

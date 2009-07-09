@@ -4,6 +4,7 @@ import gsn.acquisition2.messages.HelloMsg;
 import gsn.acquisition2.wrappers.AbstractWrapper2;
 import gsn.beans.AddressBean;
 import gsn.wrappers.WrappersUtil;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
+
 import org.apache.log4j.Logger;
 import org.apache.mina.common.IoSession;
 

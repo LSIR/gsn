@@ -1,16 +1,12 @@
 package gsn.beans;
 
+import gsn.http.rest.StreamElement4Rest;
 import gsn.utils.CaseInsensitiveComparator;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.TreeMap;
 
-import org.apache.axiom.attachments.Part;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
@@ -28,9 +24,9 @@ public final class StreamElement implements Serializable {
 
 	private Serializable [ ]                       fieldValues;
 
-	private Byte [ ]                               fieldTypes;
+	private transient Byte [ ]                               fieldTypes;
 
-	private long                                   internalPrimayKey = -1;
+	private transient long                                   internalPrimayKey = -1;
 
 	private static final String NULL_ENCODING = "NULL"; // null encoding for transmission over xml-rpc
 
@@ -285,43 +281,7 @@ public final class StreamElement implements Serializable {
 
 	}
 
-	public static StreamElement createElementFromXMLRPC ( DataField [ ] outputFormat , Object [ ] fieldNames , Object [ ] fieldValues ,  long timestamp ) {
-		Serializable [ ] values = new Serializable [ outputFormat.length ];
-		for ( int i = 0 ; i < fieldNames.length ; i++ ) {
-			//process null values
-			if (fieldValues[i] instanceof String && fieldValues[i].equals(NULL_ENCODING)) {
-				values[i] = null;
-				continue;
-			}
-			switch ( findIndexInDataField( outputFormat , (String)fieldNames[i] ) ) {
-			case DataTypes.DOUBLE :
-				values[ i ] = ( Double ) fieldValues[ i ];
-				break;
-			case DataTypes.BIGINT :
-				//        case DataTypes.TIME :
-				values[ i ] = Long.parseLong( ( String ) fieldValues[ i ] );
-				break;
-			case DataTypes.TINYINT :
-				values[ i ] = Byte.parseByte( ( String ) fieldValues[ i ] );
-				break;
-			case DataTypes.SMALLINT :
-			case DataTypes.INTEGER :
-				values[ i ] = new Integer( ( Integer ) fieldValues[ i ] );
-				break;
-			case DataTypes.CHAR :
-			case DataTypes.VARCHAR :
-				values[ i ] = ( String ) fieldValues[ i ];
-				break;
-			case DataTypes.BINARY :
-				values[ i ] = ( byte [ ] ) fieldValues[ i ];
-				break;
-			case -1:
-			default :
-				logger.error( "The field name doesn't exit in the output structure : FieldName : "+(String)fieldNames[i]   );
-			}
-		}
-		return new StreamElement( outputFormat , values , timestamp );
-	}
+	
 	/**
 	 * Returns the type of the field in the output format or -1 if the field doesn't exit.
 	 * @param outputFormat
@@ -371,46 +331,7 @@ public final class StreamElement implements Serializable {
 		}
 		return new StreamElement( outputFormat , values , Long.parseLong(timestamp ));
 	}
-	/**
-	 *  This method has to be modified to be adapted to httpclient/httpcore library version 4.0
-	 * @return
-	 */
-	//  public Part[] toREST() {
-	//    Part[] toReturn = new Part[fieldNames.length+1] ;
-	//    toReturn[0] = new StringPart("TIMED",Long.toString(getTimeStamp()));
-	//    for (int i=0;i<fieldNames.length;i++) {
-	//      Part toAdd = null ;
-	//      switch ( fieldTypes[ i ] ) {
-	//        case DataTypes.DOUBLE :
-	//          toAdd = new StringPart(fieldNames[i],Double.toString((Double) fieldValues[i]));
-	//          break;
-	//        case DataTypes.BIGINT :
-	//          toAdd = new StringPart(fieldNames[i],Long.toString((Long) fieldValues[i]));
-	//          break;
-	//        case DataTypes.TINYINT :
-	//          toAdd = new StringPart(fieldNames[i],Byte.toString((Byte) fieldValues[i]));
-	//          break;
-	//        case DataTypes.SMALLINT :
-	//          toAdd = new StringPart(fieldNames[i],Short.toString((Short) fieldValues[i]));
-	//          break;
-	//        case DataTypes.INTEGER :
-	//          toAdd = new StringPart(fieldNames[i],Integer.toString((Integer) fieldValues[i]));
-	//          break;
-	//        case DataTypes.CHAR :
-	//        case DataTypes.VARCHAR :
-	//          toAdd = new FilePart(fieldNames[i],new ByteArrayPartSource(fieldNames[i],((String)fieldValues[i]).getBytes(Charset.forName("UTF-8"))));
-	//          break;
-	//        case DataTypes.BINARY :
-	//          toAdd = new FilePart(fieldNames[i],new ByteArrayPartSource(fieldNames[i],(byte[])fieldValues[i]));
-	//          break;
-	//        default :
-	//          logger.error( "Type can't be converted : TypeID : " + fieldTypes[ i ] );
-	//      }
-	//      toReturn[i+1]=toAdd;
-	//    }
-	//    return toReturn;
-	//  }
-
+	
 	public static StreamElement createElementFromREST( DataField [ ] outputFormat , String [ ] fieldNames , Object[ ] fieldValues  ) {
 		ArrayList<Serializable> values = new ArrayList<Serializable>();
 		// ArrayList<String> fields = new ArrayList<String>();
@@ -458,8 +379,6 @@ public final class StreamElement implements Serializable {
 				}catch (Exception e) {
 					e.printStackTrace();
 				}
-				//        System.out.println(fieldValues[ i ]);
-				//        System.out.println(((String)fieldValues[ i ]).length());
 				values.add((byte[]) fieldValues[ i ]);
 				break;
 			case -1:
@@ -471,5 +390,9 @@ public final class StreamElement implements Serializable {
 		if (timestamp==-1)
 			timestamp=System.currentTimeMillis();
 		return new StreamElement( outputFormat , values.toArray(new Serializable[] {}) , timestamp );
+	}
+	public StreamElement4Rest toRest() {
+		StreamElement4Rest toReturn = new StreamElement4Rest(this);
+		return toReturn;
 	}
 }

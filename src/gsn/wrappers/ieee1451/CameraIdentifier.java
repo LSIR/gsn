@@ -6,10 +6,12 @@ import gsn.beans.DataTypes;
 import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 public class CameraIdentifier extends AbstractWrapper {

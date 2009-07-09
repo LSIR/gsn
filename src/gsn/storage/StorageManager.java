@@ -20,8 +20,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
 
@@ -545,6 +543,7 @@ public class StorageManager {
 				if (dataField.getName().equalsIgnoreCase("timed"))
 					continue;
 				Serializable value = streamElement.getData(dataField.getName());
+				
 				switch (dataField.getDataTypeID()) {
 				case DataTypes.VARCHAR:
 					if (value == null)
@@ -562,13 +561,13 @@ public class StorageManager {
 					if (value == null)
 						ps.setNull(counter, Types.INTEGER);
 					else
-						ps.setInt(counter, (Integer) value);
+						ps.setInt(counter, ((Number) value).intValue());
 					break;
 				case DataTypes.SMALLINT:
 					if (value == null)
 						ps.setNull(counter, Types.SMALLINT);
 					else
-						ps.setShort(counter, (Short) value);
+						ps.setShort(counter, ((Number) value).shortValue());
 					break;
 				case DataTypes.TINYINT:
 					if (value == null)
@@ -580,7 +579,7 @@ public class StorageManager {
 					if (value == null)
 						ps.setNull(counter, Types.DOUBLE);
 					else
-						ps.setDouble(counter, (Double) value);
+						ps.setDouble(counter, ((Number) value).doubleValue());
 					break;
 				case DataTypes.BIGINT:
 					if (value == null)

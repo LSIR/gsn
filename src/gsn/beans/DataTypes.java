@@ -1,8 +1,11 @@
 package gsn.beans;
 
 import gsn.utils.GSNRuntimeException;
+
+import java.sql.Types;
 import java.util.Date;
 import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 
 public class DataTypes {
@@ -111,18 +114,18 @@ public class DataTypes {
       throw new GSNRuntimeException( new StringBuilder( "The type *" ).append( type ).append( "* is not recognized." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );
    }
    
-   public Object[] streamElementToStandardXMLRPC(StreamElement se) {
-      Object[] toReturn = new Object[se.getData( ).length];
-      for (int i=0;i<se.getData( ).length;i++) {
-         switch ( se.getFieldTypes( )[i] ) {
-            case DataTypes.BIGINT :
-               
-               break;
-            
-            default :
-               break;
-         }
-      }
-      return toReturn;
+   /**
+    * throws runtime exception if the type conversion fails.
+    * @param sqlType
+    * @return
+    */
+   public static byte SQLTypeToGSNTypeSimplified(int sqlType) {
+	   if (sqlType == Types.BIGINT || sqlType == Types.SMALLINT || sqlType == Types.DOUBLE || sqlType==Types.INTEGER || sqlType == Types.DECIMAL||sqlType == Types.REAL || sqlType == Types.FLOAT|| sqlType == Types.NUMERIC )
+			return  DataTypes.DOUBLE;
+		else if (sqlType == Types.VARCHAR || sqlType == Types.CHAR|| sqlType == Types.LONGNVARCHAR || sqlType == Types.LONGVARCHAR || sqlType== Types.NCHAR )
+			return  DataTypes.VARCHAR;
+		else if (sqlType == Types.BINARY || sqlType == Types.BLOB|| sqlType == Types.VARBINARY )
+			return  DataTypes.BINARY;
+	   throw new RuntimeException("Can't convert SQL type id of: "+sqlType+ " to GSN type id.");
    }
 }

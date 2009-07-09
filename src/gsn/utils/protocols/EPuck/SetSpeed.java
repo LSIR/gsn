@@ -1,7 +1,9 @@
 package gsn.utils.protocols.EPuck;
 
 import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
+
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 
 public class SetSpeed extends AbstractHCIQueryWithoutAnswer {
