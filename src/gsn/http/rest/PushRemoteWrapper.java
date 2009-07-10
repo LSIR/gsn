@@ -41,7 +41,7 @@ public class PushRemoteWrapper extends AbstractWrapper {
 
 	List <NameValuePair> postParameters;
 
-	public void finalize() {
+	public void dispose() {
 		NotificationRegistry.getInstance().removeNotification(uid);
 	}
 

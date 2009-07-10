@@ -90,7 +90,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 		if ( logger.isDebugEnabled( ) ) logger.debug( "Data received under the name: " + inputStreamName );
 	}
 
-	public void finalize ( ) {
+	public void dispose ( ) {
 		timer.stop( );
 
 	}

@@ -57,7 +57,7 @@ public class EPuckVS extends AbstractVirtualSensor {
       }
    }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
       try {
          vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper().sendToWrapper( "R\n",null,null );
       } catch ( OperationNotSupportedException e ) {

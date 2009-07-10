@@ -195,7 +195,7 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       return outputStructure;
    }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
       threadCounter--;
    }
    

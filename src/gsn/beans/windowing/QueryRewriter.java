@@ -17,7 +17,7 @@ public abstract class QueryRewriter {
 	
 	public abstract StringBuilder rewrite(String query);
 	
-	public abstract void finilize();
+	public abstract void dispose();
 
 	public abstract boolean dataAvailable(long timestamp);
 	

@@ -180,7 +180,7 @@ public class WanWrapper extends AbstractWrapper {
     return "WanWrapper";
   }
   
-  public void finalize() {
+  public void dispose() {
     threadCounter--;  
   }
   

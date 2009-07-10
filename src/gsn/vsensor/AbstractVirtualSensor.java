@@ -131,7 +131,7 @@ public abstract class AbstractVirtualSensor {
 	 * aquired during the <code>initialize</code> call. <p/> Called once while
 	 * finalizing an instance of the virtual sensor
 	 */
-	public abstract void finalize ( );
+	public abstract void dispose ( );
 
 	public boolean dataFromWeb ( String action,String[] paramNames, Serializable[] paramValues ) {
 		return false;

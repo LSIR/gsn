@@ -187,7 +187,7 @@ public class VoipVirtualSensor extends AbstractVirtualSensor
     return connected;
   }  
    
-  public void finalize()
+  public void dispose()
   {
     if (connected)
     {
@@ -204,7 +204,7 @@ public class VoipVirtualSensor extends AbstractVirtualSensor
           
           originateResponse = managerConnection.sendAction(originateAction, CALL_TIMEOUT);
           
-          logger.info("finalize() : Removed " + DIAL_PLAN + " from Asterisk configuration. " + originateResponse.getResponse());
+          logger.info("dispose() : Removed " + DIAL_PLAN + " from Asterisk configuration. " + originateResponse.getResponse());
           
           // and finally log off and disconnect
           managerConnection.logoff();
@@ -216,7 +216,7 @@ public class VoipVirtualSensor extends AbstractVirtualSensor
           
           originateResponse = managerConnection.sendAction(originateAction, CALL_TIMEOUT);
           
-          logger.info("finalize() : Removed /tmp/gsn_tmp /tmp/" + vs_name + ".ulaw files." + " " + originateResponse.getResponse());
+          logger.info("dispose() : Removed /tmp/gsn_tmp /tmp/" + vs_name + ".ulaw files." + " " + originateResponse.getResponse());
           
           // and finally log off and disconnect
           managerConnection.logoff();
@@ -229,7 +229,7 @@ public class VoipVirtualSensor extends AbstractVirtualSensor
       logger.error("Error removing the virtual sensor." + e);
     }
     
-    logger.info("finalize() : Virtual Sensor removed [" + vs_name + "].");
+    logger.info("dispose() : Virtual Sensor removed [" + vs_name + "].");
     }
   }
   

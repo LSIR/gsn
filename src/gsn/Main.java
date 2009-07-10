@@ -2,7 +2,6 @@ package gsn;
 
 import gsn.beans.ContainerConfig;
 import gsn.beans.VSensorConfig;
-import gsn.http.rest.DefaultDistributionRequest;
 import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
 import gsn.http.rest.RestDelivery;

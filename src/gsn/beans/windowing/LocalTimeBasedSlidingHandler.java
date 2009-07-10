@@ -173,7 +173,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
     public void removeStreamSource(StreamSource streamSource) {
         streamSources.remove(streamSource);
         slidingHashMap.remove(streamSource);
-        streamSource.getQueryRewriter().finilize();
+        streamSource.getQueryRewriter().dispose();
         updateTimerTick();
     }
 
@@ -210,16 +210,16 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
         }
     }
 
-    public void finilize() {
+    public void dispose() {
         synchronized (streamSources) {
             for (StreamSource streamSource : streamSources) {
-                streamSource.getQueryRewriter().finilize();
+                streamSource.getQueryRewriter().dispose();
             }
             streamSources.clear();
         }
         synchronized (slidingHashMap) {
             for (StreamSource streamSource : slidingHashMap.keySet()) {
-                streamSource.getQueryRewriter().finilize();
+                streamSource.getQueryRewriter().dispose();
             }
             slidingHashMap.clear();
         }

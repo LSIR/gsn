@@ -17,7 +17,7 @@ public class BridgeVirtualSensor extends AbstractVirtualSensor {
 		if ( logger.isDebugEnabled( ) ) logger.debug( "Data received under the name: " + inputStreamName );
 	}
 
-	public void finalize ( ) {
+	public void dispose ( ) {
 
 	}
 

@@ -28,7 +28,9 @@ public class RestRemoteWrapper extends AbstractWrapper {
 	private ObjectInputStream inputStream;
 	
 	private long lastReceivedTimestamp = -1;
-
+	
+	
+	private HttpResponse response;
 
 	public DataField[] getOutputFormat() {
 		return structure;
@@ -56,19 +58,20 @@ public class RestRemoteWrapper extends AbstractWrapper {
 	public DataField[] connectToRemote() throws ClientProtocolException, IOException, ClassNotFoundException {
 		HttpGet httpget = new HttpGet(params.getRemoteContactPointEncoded(lastReceivedTimestamp));
 		//TODO: set the authentication.
-		HttpResponse response = httpclient.execute(httpget);
+		response = httpclient.execute(httpget);
 		logger.debug ( new StringBuilder ( ).append ( "Wants to consume the strcture packet from " ).append(params.getRemoteContactPoint()));
-		inputStream = XSTREAM.createObjectInputStream( (response.getEntity().getContent()));
+		inputStream = XSTREAM.createObjectInputStream( response.getEntity().getContent());
 		DataField[] structure = (DataField[]) inputStream.readObject();
 		logger.debug("Connection established for: "+ params.getRemoteContactPoint());
 		return structure;
 	}
 
-	public void finalize() {
+	public void dispose() {
 		try {
-			inputStream.close();
+			response.getEntity().consumeContent(); //can't close without consuming
+			response.getEntity().getContent().close();
 		} catch (IOException e) {
-			logger.error(e.getMessage(),e);
+			logger.debug(e.getMessage(),e);
 		}
 	}
 

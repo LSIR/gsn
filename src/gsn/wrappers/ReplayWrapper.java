@@ -33,7 +33,7 @@ public class ReplayWrapper  extends AbstractWrapper{
   
   private DelayedDataEnumerator dt ;
   
-  public void finalize() {
+  public void dispose() {
     threadCounter--;
   }
   

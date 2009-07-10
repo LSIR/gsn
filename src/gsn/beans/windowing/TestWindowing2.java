@@ -32,7 +32,7 @@ public class TestWindowing2 {
 	public static class WrapperForTest2 extends AbstractWrapper {
 
 		@Override
-		public void finalize() {
+		public void dispose() {
 
 		}
 

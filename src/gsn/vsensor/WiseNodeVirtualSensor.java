@@ -61,7 +61,7 @@ public class WiseNodeVirtualSensor extends AbstractVirtualSensor {
       }
    }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
 
    }
    

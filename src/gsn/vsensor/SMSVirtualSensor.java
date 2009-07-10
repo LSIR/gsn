@@ -220,7 +220,7 @@ public class SMSVirtualSensor extends AbstractVirtualSensor {
 		return true;
 	}
 
-	public void finalize ( ) {
+	public void dispose ( ) {
 
 	}
 

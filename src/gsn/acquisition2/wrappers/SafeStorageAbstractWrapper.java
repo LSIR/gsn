@@ -28,7 +28,7 @@ public abstract class SafeStorageAbstractWrapper extends AbstractWrapper impleme
   
   private final transient Logger     logger                 = Logger.getLogger ( SafeStorageAbstractWrapper.class );
 
-  public void finalize() {
+  public void dispose() {
     // TODO
   }
 

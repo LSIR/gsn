@@ -142,7 +142,7 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		return true;
 	}
 
-	public void finalize() {
+	public void dispose() {
 		
 	}
 

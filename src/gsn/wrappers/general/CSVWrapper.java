@@ -113,7 +113,7 @@ public class CSVWrapper extends AbstractWrapper {
 	public String getWrapperName() {
 		return this.getClass().getName();
 	}
-	public void finalize ( ) {
+	public void dispose ( ) {
 		threadCounter--;
 	}
 

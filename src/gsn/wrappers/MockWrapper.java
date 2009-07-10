@@ -25,7 +25,7 @@ public class MockWrapper extends AbstractWrapper {
 		return postStreamElement(se);
 	}
 
-	public void finalize() {
+	public void dispose() {
 		threadCounter--;
 	}
 

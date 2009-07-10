@@ -75,7 +75,7 @@ public class UDPWrapper extends AbstractWrapper {
      
    }
    
-   public void finalize (  ) {
+   public void dispose (  ) {
       threadCounter--;
    }
    public String getWrapperName() {

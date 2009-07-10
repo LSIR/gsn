@@ -106,7 +106,7 @@ public abstract class AbstractWrapper2  extends Thread{
   
   public abstract boolean initialize ( );
   
-  public abstract void finalize ( ); // TODO, the safe storage should stop the acquisition part.
+  public abstract void dispose ( ); // TODO, the safe storage should stop the acquisition part.
   
   public abstract String getWrapperName ( ); 
   

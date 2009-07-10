@@ -510,7 +510,7 @@ public class SensorscopeVS extends AbstractVirtualSensor {
         }
     }
 
-    public void finalize() {
+    public void dispose() {
 
     }
 

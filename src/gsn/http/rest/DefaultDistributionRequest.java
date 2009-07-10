@@ -6,7 +6,6 @@ import gsn.storage.SQLValidator;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
 
@@ -44,7 +43,6 @@ public class DefaultDistributionRequest implements DistributionRequest {
 		boolean success = deliverySystem.writeStreamElement(se);
 		if (success)
 			lastVisitedTime=se.getTimeStamp();
-		logger.fatal(new Date(lastVisitedTime));
 		return success;
 	}
 

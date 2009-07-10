@@ -110,7 +110,7 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
       return toReturn.toString( );
    }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
 
    }
    

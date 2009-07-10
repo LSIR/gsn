@@ -61,10 +61,10 @@ public class MatlabVS extends AbstractVirtualSensor {
 	}
 
 	/* (non-Javadoc)
-	 * @see gsn.vsensor.AbstractVirtualSensor#finalize()
+	 * @see gsn.vsensor.AbstractVirtualSensor#dispose()
 	 */
 	@Override
-	public void finalize() {
+	public void dispose() {
 		try {
 			engine.close();
 		} catch (InterruptedException e) {

@@ -86,7 +86,7 @@ public class VirtualSensorPool {
 
 	public synchronized void closePool ( ) {
 		for ( AbstractVirtualSensor o : allInstances )
-			o.finalize( );
+			o.dispose( );
 		if ( logger.isDebugEnabled() ) logger.debug( new StringBuilder( ).append( "The VSPool Of " ).append( config.getName( ) ).append( " is now closed." ).toString( ) );
 	}
 
@@ -108,7 +108,7 @@ public class VirtualSensorPool {
 		return lastModified;
 	}
 
-	public void finalize ( ) {
+	public void dispose ( ) {
 
 	}
 	public void DoUselessDataRemoval ( ) {

@@ -79,14 +79,14 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 	public void removeStreamSource(StreamSource streamSource) {
 		streamSources.remove(streamSource);
 		slidingHashMap.remove(streamSource);
-		streamSource.getQueryRewriter().finilize();
+		streamSource.getQueryRewriter().dispose();
 	}
 
-	public void finilize() {
+	public void dispose() {
 		synchronized (streamSources) {
 			for (Iterator<StreamSource> iterator = streamSources.iterator(); iterator.hasNext();) {
 				StreamSource streamSource = iterator.next();
-				streamSource.getQueryRewriter().finilize();
+				streamSource.getQueryRewriter().dispose();
 				iterator.remove();
 				slidingHashMap.remove(streamSource);
 			}

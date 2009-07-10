@@ -391,7 +391,7 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
 		return dataField;
 	}
 
-	public void finalize ( ) {
+	public void dispose ( ) {
 		wnetPort.closeConnection( );
 		threadCounter--;
 	}

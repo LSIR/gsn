@@ -307,7 +307,7 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
       }
    }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
       source.disconnect( );
       deviceProc.stop( );
       deviceProc.deallocate( );

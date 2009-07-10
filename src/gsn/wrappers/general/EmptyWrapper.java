@@ -33,7 +33,7 @@ public class EmptyWrapper extends AbstractWrapper {
    public String getWrapperName() {
     return "empty template";
 }
-   public void finalize ( ) {
+   public void dispose ( ) {
       threadCounter--;
    }
    

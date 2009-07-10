@@ -206,7 +206,7 @@ public class CameraIdentifier extends AbstractWrapper {
     return "IEEE1451 IEEE 1451 camera wireless AXIS 206W";
 }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
       threadCounter--;
    }
      

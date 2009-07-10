@@ -6,7 +6,7 @@ public abstract class RubyWrapperAdapter  extends AbstractWrapper{
     return bootstrap();
   }
 
-  public void finalize() {
+  public void dispose() {
     shutdown();
   }
 

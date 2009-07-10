@@ -84,7 +84,7 @@ public class RssWrapper extends AbstractWrapper {
     return "Rss Wrapper";
   }
   
-  public void finalize (  ) {
+  public void dispose (  ) {
     threadCounter--;
   }
   

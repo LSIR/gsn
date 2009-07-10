@@ -92,7 +92,7 @@ public abstract class WindowAwareVS extends AbstractVirtualSensor {
 		}
 	}
 
-	public void finalize() {
+	public void dispose() {
 		
 	}
 

@@ -383,7 +383,7 @@ public class SwissPegelWrapper extends AbstractWrapper {
 		return "STS Piezometer Wrapper";
 	}
 
-	public void finalize() {
+	public void dispose() {
 		threadCounter--; 
 		writeStatus();
 	}

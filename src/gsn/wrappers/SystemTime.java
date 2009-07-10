@@ -115,7 +115,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
     	postStreamElement( streamElement );
   }
   
-  public void finalize ( ) {
+  public void dispose ( ) {
     timer.stop( );
     threadCounter--;
   }

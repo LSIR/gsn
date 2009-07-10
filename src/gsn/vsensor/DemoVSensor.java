@@ -108,7 +108,7 @@ public class DemoVSensor extends AbstractVirtualSensor {
 		return true;
 	}
 
-	public void finalize ( ) {
+	public void dispose ( ) {
 
 	}
 }

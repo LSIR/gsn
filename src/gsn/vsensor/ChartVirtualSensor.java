@@ -150,7 +150,7 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
       if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );
    }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
 
    }
    

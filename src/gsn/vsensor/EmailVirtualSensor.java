@@ -114,7 +114,7 @@ public class EmailVirtualSensor extends AbstractVirtualSensor {
 		return true;
 	}
 
-	public void finalize ( ) {
+	public void dispose ( ) {
 
 	}
 

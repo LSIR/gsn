@@ -78,7 +78,7 @@ public class MultiFormatWrapper extends AbstractWrapper
     return "MultiFormat Sample Wrapper";
   }  
 
-  public void finalize()
+  public void dispose()
   {
     counter--;
   }

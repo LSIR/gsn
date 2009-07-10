@@ -15,6 +15,6 @@ public interface SlidingHandler {
 
 	public long getOldestTimestamp();
 	
-	public void finilize();
+	public void dispose();
 
 }

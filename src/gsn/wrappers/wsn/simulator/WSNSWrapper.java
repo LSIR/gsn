@@ -148,7 +148,7 @@ public class WSNSWrapper extends AbstractWrapper implements DataListener {
       }
    }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
       
    }
 

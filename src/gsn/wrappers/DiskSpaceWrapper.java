@@ -54,7 +54,7 @@ public class DiskSpaceWrapper extends AbstractWrapper{
         }
     }
     
-    public void finalize() {
+    public void dispose() {
         threadCounter--;
     }
     

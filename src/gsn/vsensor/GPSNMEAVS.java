@@ -101,7 +101,7 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
       
    }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
    }
    
 }

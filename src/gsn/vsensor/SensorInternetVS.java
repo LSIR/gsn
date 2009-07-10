@@ -129,7 +129,7 @@ public class SensorInternetVS extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public void finalize() {
+	public void dispose() {
 
 	}
 

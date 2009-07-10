@@ -170,7 +170,7 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 	}
 
 	@Override
-	public void finalize() {
+	public void dispose() {
 		if (moteIFTinyOS1x != null && messageTemplateTinyOS1x != null) moteIFTinyOS1x.deregisterListener(messageTemplateTinyOS1x, this);
 		if (moteIFTinyOS2x != null && messageTemplateTinyOS2x != null) moteIFTinyOS2x.deregisterListener(messageTemplateTinyOS2x, this);
 		threadCounter--;

@@ -303,7 +303,7 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
   public void run ( ) {
   }
   
-  public void finalize ( ) {
+  public void dispose ( ) {
     threadCounter--;
   }
   

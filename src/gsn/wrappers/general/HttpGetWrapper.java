@@ -89,7 +89,7 @@ public class HttpGetWrapper extends AbstractWrapper {
     return "Http Receiver";
 }
    
-   public void finalize (  ) {
+   public void dispose (  ) {
       threadCounter--;
    }
    

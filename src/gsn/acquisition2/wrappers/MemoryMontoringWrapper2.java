@@ -53,7 +53,7 @@ public class MemoryMontoringWrapper2 extends AbstractWrapper2{
      }
   }
   
-  public void finalize ( ) {
+  public void dispose ( ) {
      threadCounter--;
   }
   

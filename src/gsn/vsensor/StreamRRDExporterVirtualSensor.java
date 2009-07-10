@@ -134,6 +134,6 @@ public class StreamRRDExporterVirtualSensor extends AbstractVirtualSensor {
 		} 
 	}
 
-	public void finalize ( ) {
+	public void dispose ( ) {
 	}
 }

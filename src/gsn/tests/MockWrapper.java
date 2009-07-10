@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class MockWrapper extends AbstractWrapper{
 
-  private boolean finalizedCalled = false;
+  private boolean disposedCalled = false;
   private boolean initializedCalled = false;
   private ArrayList<StreamElement> streamElements= new ArrayList<StreamElement>();
   private boolean releaseResourcesCalled=false;
@@ -19,12 +19,12 @@ public class MockWrapper extends AbstractWrapper{
   private int dbAlias;
 
 
-  public boolean isFinalizedCalled() {
-    return finalizedCalled;
+  public boolean isdisposedCalled() {
+    return disposedCalled;
   }
 
-  public void setFinalizedCalled(boolean finalizedCalled) {
-    this.finalizedCalled = finalizedCalled;
+  public void setdisposedCalled(boolean disposedCalled) {
+    this.disposedCalled = disposedCalled;
   }
 
   public boolean isInitializedCalled() {
@@ -43,8 +43,8 @@ public class MockWrapper extends AbstractWrapper{
     this.outputStructure = outputStructure;
   }
 
-  public void finalize() {
-    finalizedCalled = true;
+  public void dispose() {
+    disposedCalled = true;
   }
 
   public DataField[] getOutputFormat() {

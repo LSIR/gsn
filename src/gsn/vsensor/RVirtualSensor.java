@@ -264,7 +264,7 @@ public class RVirtualSensor extends AbstractVirtualSensor
     
   }
   
-  public void finalize()
+  public void dispose()
   {
     
   }

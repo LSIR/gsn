@@ -362,12 +362,12 @@ public abstract class AbstractWrapper extends Thread {
 
 	public void releaseResources() throws SQLException {
 		isActive = false;
-		finalize();
+		dispose();
 		if (logger.isInfoEnabled())
-			logger.info("Finalized called");
+			logger.info("disposed called");
 		listeners.clear();
 		for (SlidingHandler slidingHandler : slidingHandlers.values()) {
-			slidingHandler.finilize();
+			slidingHandler.dispose();
 		}
 		getStorageManager().executeDropTable(aliasCodeS);
 	}
@@ -387,7 +387,7 @@ public abstract class AbstractWrapper extends Thread {
 
 	public abstract boolean initialize();
 
-	public abstract void finalize();
+	public abstract void dispose();
 
 	public abstract String getWrapperName();
 

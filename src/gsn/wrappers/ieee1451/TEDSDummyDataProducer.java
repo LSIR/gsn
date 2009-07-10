@@ -93,7 +93,7 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
       
    }
    
-   public void finalize ( ) {
+   public void dispose ( ) {
       threadCounter--;
    }
    

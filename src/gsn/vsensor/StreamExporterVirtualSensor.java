@@ -90,6 +90,6 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 	}
 
 
-	public void finalize ( ) {
+	public void dispose ( ) {
 	}
 }

@@ -57,7 +57,7 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
     }
 
     @Override
-    public void finilize() {
+    public void dispose() {
         if (streamSource == null) {
             throw new RuntimeException("Null Pointer Exception: streamSource is null");
         }
