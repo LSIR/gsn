@@ -100,7 +100,7 @@ provided in this document.
 
 Due to the quick development cycle of GSN, you should install the
 latest version.  It can always be found at
-\url{http://gsn.sourceforge.net/download/}.
+\url{http://sourceforge.net/apps/trac/gsn/wiki/Download}.
 
 Before installing GSN, please download the latest version (at least
 version 6) of the Java Development Kit from http://www.java.com. The
@@ -131,10 +131,14 @@ If you wish to run the most recent version of GSN (or run the GUI), then you wil
 	\item Add the full pathname to the ANT\_HOME/bin folder to your PATH
 	\item Ensure you have the latest version Sun JDK installed.
 	\item Download and install TortoiseSVN (for Windows) or SmartSvn (OS
-independent) or a command line SVN client:
-	\item svn co https://gsn.svn.sourceforge.net/svnroot/gsn/trunk gsn
-	\item Check out the GSN source code from link -
-\url{https://gsn.svn.sourceforge.net/svnroot/gsn}
+independent) or a command line SVN client. and check out the source code
+	\item Check out the GSN source code from link:
+	\begin{itemize}
+	\item For production use and for new users it is best, due to the current pace of development to stay with the stable code at version 1249 so use:\\
+	svn co https://gsn.svn.sourceforge.net/svnroot/gsn/trunk gsn -r 1249
+	\item If you are interested in the bleading edge you can get the latest release at:\\
+	svn co https://gsn.svn.sourceforge.net/svnroot/gsn/trunk gsn
+\end{itemize}
 \end{itemize}
 
 \setlength{\tymin}{10pt}
@@ -209,9 +213,9 @@ environment.
 \begin{itemize}
 	\item Download and install Eclipse SDK
 	\item Start Eclipse;
-	\item Download and install the Subclipse\footnote{This guide works for Eclipse 3.2, for Eclipse 3.4 the steps have changed slightly.}
+	\item Download and install the Subclipse\footnote{This guide works for Eclipse 3.4.2 and Subclipse 1.4.2.  For earlier versions, some steps may be slightly different.}
 (\url{http://subclipse.tigris.org/install.html});
-	\item File -\begin{math}>\end{math} Import -\begin{math}>\end{math} Other
+	\item File -\begin{math}>\end{math} Import -\begin{math}>\end{math} SVN
 -\begin{math}>\end{math} Checkout Projects from SVN;
 \begin{itemize}
 	\item Check \textquotedblleft{}Create a new repository
@@ -220,9 +224,17 @@ location\textquotedblright{};
 \textquotedblleft{}https://gsn.svn.sourceforge.net/svnroot/gsn\textquotedblright{};
 	\item Select \textquotedblleft{}trunk\textquotedblright{} and click
 \textquotedblleft{}Next\textquotedblright{};
+	\item In the \textquotedblleft{}Check Out As\textquotedblright{} dialog:
+
+\begin{itemize}
 	\item Select \textquotedblleft{}Check out project configured using the New
-Projects Wizard\textquotedblright{} and click
+Projects Wizard\textquotedblright{}
+\item If you are a new user or using GSN in a production environment uncheck \textquotedblleft{}Check out HEAD revision\textquotedblright{} and enter \textquotedblleft1249\textquotedblright{} in the Revision box, or if you wish to experiment with the latest code development accept the default HEAD revision.
+\item click
 \textquotedblleft{}Finish\textquotedblright{};
+
+\end{itemize}
+
 	\item In the New Projects Wizard select \textquotedblleft{}Java
 Project\textquotedblright{} and click
 \textquotedblleft{}Next\textquotedblright{};
