@@ -1,0 +1,52 @@
+<virtual-sensor name="biglink_hutte_vs" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>true</unique-timestamps>
+        <output-structure>        
+			<field name="STATION_ID" type="INTEGER" />
+			<field name="YEAR" type="BIGINT" />
+			<field name="JDAY" type="BIGINT" />
+			<field name="TIME" type="BIGINT" />
+			<field name="TA" type="DOUBLE" />
+			<field name="RH" type="DOUBLE" />
+			<field name="WS_MEAN" type="DOUBLE" />
+			<field name="WS_MAX" type="DOUBLE" />
+			<field name="WD" type="DOUBLE" />
+			<field name="SWR_REFL" type="DOUBLE" />
+			<field name="HS" type="DOUBLE" />
+			<field name="TSS" type="DOUBLE" />
+			<field name="TS1" type="DOUBLE" />
+			<field name="TS2" type="DOUBLE" />
+			<field name="TS3" type="DOUBLE" />
+			<field name="PLUVIO" type="DOUBLE" />
+			<field name="VENTILATION" type="DOUBLE" />
+			<field name="U_BATTERY" type="DOUBLE" />
+			<field name="T_LOGGER" type="DOUBLE" />
+       </output-structure>
+    </processing-class>
+    <description>BIGLINK HUTTE VS</description>
+    <life-cycle pool-size="10" />
+    <addressing/>
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="ss_csv">
+          <predicate key="ss-host">localhost</predicate>
+          <predicate key="ss-port">25010</predicate>
+          <predicate key="continue-on-error">true</predicate>
+          <predicate key="wrapper-name">csv2</predicate>
+          <predicate key="csv-format-file-path">virtual-sensors/slf/damma_hutte.format</predicate>
+          <predicate key="csv-skip-lines">0</predicate>
+          <predicate key="csv-separator">,</predicate>
+          <predicate key="csv-source-file-path">/usr/local/pub/SLdata/Ede/SHD/DAMMA_huette.DAT</predicate>
+          <predicate key="csv-format-line-names">2</predicate>
+          <predicate key="csv-format-line-descriptions">3,4</predicate>
+          <predicate key="csv-format-line-format">5</predicate>
+        </address>
+        <query> select * from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor> 
