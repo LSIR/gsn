@@ -177,8 +177,10 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 
 	public void close ( ) {
 		this.hasNext = false;
+		if(resultSet == null)
+			return;
 		try {
-			if (!manualCloseConnection) {
+			if (!manualCloseConnection && resultSet.getStatement() != null) {
 				StorageManager.close(resultSet.getStatement().getConnection());
 			}else {
 				try {
@@ -190,7 +192,6 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
-			e.printStackTrace();
 		}
 	} 
 }
