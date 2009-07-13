@@ -1,6 +1,6 @@
 <virtual-sensor name="phone" priority="10">
 	<processing-class>
-	<class-name>gsn.vsensor.VoipVirtualSensor</class-name>
+		<class-name>gsn.vsensor.VoipVirtualSensor</class-name>
 		<init-params>
 			<param name="username">testuser</param>
 			<param name="password">mypassword</param>
@@ -12,22 +12,23 @@
 			<field name="temperature" type="double" />
 		</output-structure>
 	</processing-class>
-	<description>Makes a phone call when a query in the virtual sensor is satisfied.</description>
+	<description>Makes a phone call when a query in the virtual sensor
+		is satisfied.</description>
 	<life-cycle pool-size="10" />
 	<addressing>
 		<predicate key=""></predicate>
 	</addressing>
 	<storage history-size="1h" />
-  <streams>
-    <stream name="input1">
-    <source alias="source1" sampling-rate="1" storage-size="1">
-      <address wrapper="multiformat">
-          <predicate key="HOST">localhost</predicate>
-          <predicate key="PORT">22001</predicate>
-      </address>
-      <query>SELECT temperature, timed FROM wrapper WHERE packet_type=2</query>
-    </source>
-    <query>SELECT temperature, timed FROM source1</query>
-    </stream> 
-  </streams>
+	<streams>
+		<stream name="input1">
+			<source alias="source1" sampling-rate="1" storage-size="1">
+				<address wrapper="multiformat">
+					<predicate key="HOST">localhost</predicate>
+					<predicate key="PORT">22001</predicate>
+				</address>
+				<query>SELECT temperature, timed FROM wrapper WHERE packet_type=2</query>
+			</source>
+			<query>SELECT temperature, timed FROM source1</query>
+		</stream>
+	</streams>
 </virtual-sensor>

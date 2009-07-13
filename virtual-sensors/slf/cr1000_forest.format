@@ -1,5 +1,0 @@
-"TOA5","CR1000_FOREST","CR1000","9203","CR1000.Std.13","CPU:Wiler_PaoloC_26_10_2007_FOREST.CR1","21985","Data_TDR"
-"TIMESTAMP","RECORD","Batt_Volt_Avg","Panel_temp_Avg","ToppVWC(1)","ToppVWC(2)","ToppVWC(3)","ToppVWC(4)","ToppVWC(5)","ToppVWC(6)","ToppVWC(7)","ToppVWC(8)","ToppVWC(9)","ToppVWC(10)","ToppVWC(11)","ToppVWC(12)","ToppVWC(13)","ToppVWC(14)","ToppVWC(15)","ToppVWC(16)","ToppVWC(17)","ToppVWC(18)"
-"TS","RN","Volts","","","","","","","","","","","","","","","","","","",""
-"","","Avg","Avg","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp","Smp"
-"TS:y-M-d k:m:s","integer","double","double","double","double","double","double","double","double","double","double","double","double","double","double","double","double","double","double","double","double"
