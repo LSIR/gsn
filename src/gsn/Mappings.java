@@ -54,9 +54,11 @@ public final class Mappings {
    }
    
    public static void removeFilename ( String fileName ) {
-      VSensorConfig config = ( fileNameToVSInstance.get( fileName ) ).getConfig( );
-      vsNameTOVSConfig.remove( config.getName( ) );
-      fileNameToVSInstance.remove( fileName );
+	   if(fileNameToVSInstance.contains(fileName)){
+		   VSensorConfig config = ( fileNameToVSInstance.get( fileName ) ).getConfig( );
+		   vsNameTOVSConfig.remove( config.getName( ) );
+		   fileNameToVSInstance.remove( fileName );
+	   }
    }
    
    public static Long getLastModifiedTime ( String configFileName ) {

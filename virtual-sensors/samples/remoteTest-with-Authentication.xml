@@ -1,8 +1,10 @@
-<virtual-sensor name="RemoteAccessDemoAuth" priority="11">
+<virtual-sensor name="RemotePushTestWithAuth" priority="11">
 	<processing-class>
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<output-structure>
-			<field name="DATA" type="binary:image/jpeg" />
+			<field name="HEAP" type="double" />
+			<field name="NON_HEAP" type="double" />
+			<field name="PENDING_FINALIZATION_COUNT" type="double" />
 		</output-structure>
 
 	</processing-class>
@@ -20,16 +22,16 @@
 				<address wrapper="remote">
 					<predicate key="HOST">localhost</predicate>
 					<predicate key="PORT">22001</predicate>
-					<predicate key="NAME">MemoryPlotVS</predicate>
-					<predicate key="USERNAME">http-user</predicate> <!-- for http://localhost:22001, running remote VS-->
-					<predicate key="PASSWORD">http-pass</predicate>
-					<predicate key="LOCAL-USERNAME">local-http-user</predicate>  <!-- local GSN session -->
-					<predicate key="LOCAL-PASSWORD">local-https-pass</predicate>
+					<predicate key="QUERY">select * from MemoryMonitorVS</predicate>
+					<predicate key="local-contact-point">http://localhost:22001/streaming/</predicate>
+					<predicate key="username">username1</predicate>
+					<predicate key="password">password1</predicate>
 				</address>
-				<query>select DATA,Timed from wrapper</query>
+				<query>select * from wrapper</query>
 			</source>
-			<query>select source1.DATA,Timed from source1</query>
+			<query>select * from source1</query>
 		</stream>
 	</streams>
 </virtual-sensor>
+
 

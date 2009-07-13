@@ -105,10 +105,7 @@ public class VSensorLoader extends Thread {
 		ArrayList < VSensorConfig > removeIt = modifications.getRemove ( );
 		ArrayList<VSensorConfig> addIt = modifications.getAdd();
 		for ( VSensorConfig configFile : removeIt ) {
-			logger.warn ( new StringBuilder ( ).append ( "removing : " ).append ( configFile.getName ( ) ).toString ( ) );
-			VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile.getFileName ( ) );
-			Mappings.removeFilename ( configFile.getFileName ( ) );
-			removeAllVSResources ( sensorInstance );
+			removeVirtualSensor(configFile);
 		}
 		try {
 			Thread.sleep ( 3000 );
@@ -159,18 +156,28 @@ public class VSensorLoader extends Thread {
 				continue;
 			}
 			logger.warn ( new StringBuilder ( "adding : " ).append ( vs.getName() ).append ( " virtual sensor[" ).append ( vs.getFileName ( ) ).append ( "]" ).toString ( ) );
-			Mappings.addVSensorInstance ( pool );
-			try {
-				fireVSensorLoading(pool.getConfig());
-				pool.start ( );
-			} catch ( PoolIsFullException e1 ) {
-				logger.error ( "Creating the virtual sensor >" + vs.getName ( ) + "< failed." , e1 );
-				continue;
-			} catch ( VirtualSensorInitializationFailedException e1 ) {
-				logger.error ( "Creating the virtual sensor >" + vs.getName ( ) + "< failed." , e1 );
-				continue;
+			if (Mappings.addVSensorInstance ( pool )) {
+				try {
+					fireVSensorLoading(pool.getConfig());
+					pool.start ( );
+				} catch ( PoolIsFullException e1 ) {
+					logger.error ( "Creating the virtual sensor >" + vs.getName ( ) + "< failed." , e1 );
+					continue;
+				} catch ( VirtualSensorInitializationFailedException e1 ) {
+					logger.error ( "Creating the virtual sensor >" + vs.getName ( ) + "< failed." , e1 );
+					removeVirtualSensor(vs);
+				}
+			} else {
+				//TODO: release all vs resources
 			}
 		}
+	}
+
+	private void removeVirtualSensor(VSensorConfig configFile) {
+		logger.warn ( new StringBuilder ( ).append ( "removing : " ).append ( configFile.getName ( ) ).toString ( ) );
+		VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile.getFileName ( ) );
+		Mappings.removeFilename ( configFile.getFileName ( ) );
+		removeAllVSResources ( sensorInstance );
 	}
 
 	public boolean isVirtualSensorValid(VSensorConfig configuration) {

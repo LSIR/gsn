@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.UnknownHostException;
@@ -42,6 +43,11 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.eclipse.jetty.http.security.Constraint;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -375,28 +381,35 @@ public final class Main {
 		handlers.setHandlers(new Handler[]{contexts,new DefaultHandler()});
 		server.setHandler(handlers);
 		
-//		HashLoginService loginService = new HashLoginService();
-//		loginService.setName("GSNRealm");
-//		loginService.setConfig("conf/realm.properties");
-//		loginService.setRefreshInterval(5000); //re-reads the file every 2 seconds.
-//
-//		Constraint constraint = new Constraint();
-//        constraint.setName("GSN User");
-//        constraint.setRoles(new String[]{"gsnuser"});
-//        constraint.setAuthenticate(true);
-//
-//        ConstraintMapping cm = new ConstraintMapping();
-//        cm.setConstraint(constraint);
-//        cm.setPathSpec("/*");
-//        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-//        securityHandler.setLoginService(loginService);
-//        securityHandler.setConstraintMappings(new ConstraintMapping[]{cm});
-//        securityHandler.setAuthenticator(new BasicAuthenticator());
-//        
-//        Properties usernames = new Properties();
-//        usernames.load(new FileReader("conf/realm.properties"));
-//        if (!usernames.isEmpty())
-//        	webAppContext.setSecurityHandler(securityHandler);
+		Properties usernames = new Properties();
+        usernames.load(new FileReader("conf/realm.properties"));
+        if (!usernames.isEmpty()){
+			HashLoginService loginService = new HashLoginService();
+			loginService.setName("GSNRealm");
+			loginService.setConfig("conf/realm.properties");
+			loginService.setRefreshInterval(10000); //re-reads the file every 10 seconds.
+	
+			Constraint constraint = new Constraint();
+	        constraint.setName("GSN User");
+	        constraint.setRoles(new String[]{"gsnuser"});
+	        constraint.setAuthenticate(true);
+	
+	        ConstraintMapping cm = new ConstraintMapping();
+	        cm.setConstraint(constraint);
+	        cm.setPathSpec("/*");
+	        cm.setMethod("GET");
+	        
+	        ConstraintMapping cm2 = new ConstraintMapping();
+	        cm2.setConstraint(constraint);
+	        cm2.setPathSpec("/*");
+	        cm2.setMethod("POST");
+	        
+	        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+	        securityHandler.setLoginService(loginService);
+	        securityHandler.setConstraintMappings(new ConstraintMapping[]{cm, cm2});
+	        securityHandler.setAuthenticator(new BasicAuthenticator());
+	        webAppContext.setSecurityHandler(securityHandler);
+        }
 		
 		server.setSendServerVersion(true);
 		server.setStopAtShutdown ( true );
