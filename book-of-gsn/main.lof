@@ -3,21 +3,20 @@
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {1.1}{\ignorespaces GSN model}}{1}{figure.1.1}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces GSN Server architecture}}{8}{figure.2.1}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Illustration of the different sample sliding and window values.}}{19}{figure.2.2}
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Conceptual data flow in a GSN node}}{20}{figure.2.3}
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Experimental setup}}{22}{figure.2.4}
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Simple GSN to GSN communication}}{23}{figure.2.5}
-\contentsline {figure}{\numberline {2.6}{\ignorespaces GSN to GSN communication with NAT}}{23}{figure.2.6}
-\contentsline {figure}{\numberline {2.7}{\ignorespaces Hierarchical resource sharing in GSN}}{25}{figure.2.7}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces GSN Server architecture}}{4}{figure.2.1}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Illustration of the different sample sliding and window values.}}{12}{figure.2.2}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Conceptual data flow in a GSN node}}{13}{figure.2.3}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Experimental setup}}{15}{figure.2.4}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Simple GSN to GSN communication}}{15}{figure.2.5}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces GSN to GSN communication with NAT}}{16}{figure.2.6}
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Hierarchical resource sharing in GSN}}{18}{figure.2.7}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces \textit {VSD}\xspace DTD Quick Reference Card}}{28}{figure.A.1}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {B.1}{\ignorespaces \textit {VSD}\xspace DTD Quick Reference Card}}{42}{figure.B.1}
+\contentsline {figure}{\numberline {B.1}{\ignorespaces }}{32}{figure.B.1}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {C.1}{\ignorespaces }}{62}{figure.C.1}
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {D.1}{\ignorespaces Experimental setup}}{69}{figure.D.1}
-\contentsline {figure}{\numberline {D.2}{\ignorespaces GSN node under time-triggered load}}{70}{figure.D.2}
-\contentsline {figure}{\numberline {D.3}{\ignorespaces Query processing latencies in a node}}{71}{figure.D.3}
-\contentsline {figure}{\numberline {D.4}{\ignorespaces Processing time per client}}{72}{figure.D.4}
+\contentsline {figure}{\numberline {C.1}{\ignorespaces Experimental setup}}{39}{figure.C.1}
+\contentsline {figure}{\numberline {C.2}{\ignorespaces GSN node under time-triggered load}}{40}{figure.C.2}
+\contentsline {figure}{\numberline {C.3}{\ignorespaces Query processing latencies in a node}}{41}{figure.C.3}
+\contentsline {figure}{\numberline {C.4}{\ignorespaces Processing time per client}}{42}{figure.C.4}
 \addvspace {10\p@ }
