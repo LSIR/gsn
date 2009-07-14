@@ -7,6 +7,7 @@ import gsn.wrappers.AbstractWrapper;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -83,11 +84,13 @@ public class CSVWrapper extends AbstractWrapper {
 				lastModified = dataFile.lastModified();
 			if (chkPointFile.isFile())
 				lastModifiedCheckPoint = chkPointFile.lastModified();
-			
+			FileReader reader = null;
 			try {
 				ArrayList<TreeMap<String, Serializable>> output = null;
 				if (preivousError==null || (preivousError!=null && (lastModified != previousModTime || lastModifiedCheckPoint!=previousCheckModTime))){
-					output = handler.run(new FileReader(handler.getDataFile()), checkPointDir);
+
+					reader = new FileReader(handler.getDataFile());
+					output = handler.run(reader, checkPointDir);
 					for (TreeMap<String, Serializable> se : output) {
 						StreamElement streamElement = new StreamElement(se,getOutputFormat());
 						boolean insertionSuccess = postStreamElement(streamElement);
@@ -103,6 +106,13 @@ public class CSVWrapper extends AbstractWrapper {
 				preivousError = e;
 				previousModTime=lastModified;
 				previousCheckModTime=lastModifiedCheckPoint;
+			}finally {
+				if (reader!=null)
+					try {
+						reader.close();
+					} catch (IOException e) {
+						logger.debug(e.getMessage(),e);
+					}
 			}
 		}
 	}
