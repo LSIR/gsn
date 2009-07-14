@@ -1,0 +1,109 @@
+\contentsline {chapter}{Abstract}{i}{chapter*.1}
+\contentsline {chapter}{Related Publications}{iii}{chapter*.3}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Terminology}{2}{section.1.1}
+\contentsline {section}{\numberline {1.2}Quick Start}{2}{section.1.2}
+\contentsline {section}{\numberline {1.3}Installing GSN from binary}{2}{section.1.3}
+\contentsline {section}{\numberline {1.4}Installing GSN from source}{3}{section.1.4}
+\contentsline {subsection}{\numberline {1.4.1}To run from a command line}{3}{subsection.1.4.1}
+\contentsline {subsection}{\numberline {1.4.2}Installing to Run and debug GSN in Eclipse.}{4}{subsection.1.4.2}
+\contentsline {subsection}{\numberline {1.4.3}Configuring eclipse to run/debug GSN through Eclipse.}{5}{subsection.1.4.3}
+\contentsline {subsection}{\numberline {1.4.4}Trying it out}{5}{subsection.1.4.4}
+\contentsline {chapter}{\numberline {2}GSN Architecture}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}Data Acquisition}{8}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}\textit {GSN}\xspace Wrappers }{8}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}Safe Storage }{9}{subsection.2.1.2}
+\contentsline {subsubsection}{\numberline {2.1.2.1}Software Architecture}{9}{subsubsection.2.1.2.1}
+\contentsline {subsubsection}{\numberline {2.1.2.2}Safe Storage configuration}{10}{subsubsection.2.1.2.2}
+\contentsline {subsection}{\numberline {2.1.3}Safe Storage Wrappers Default parameters}{10}{subsection.2.1.3}
+\contentsline {subsubsection}{\numberline {2.1.3.1}Use Cases}{11}{subsubsection.2.1.3.1}
+\contentsline {subsubsection}{\numberline {2.1.3.2}Safe Storage Management}{11}{subsubsection.2.1.3.2}
+\contentsline {subsection}{\numberline {2.1.4}Safe Storage in Nutshell}{11}{subsection.2.1.4}
+\contentsline {section}{\numberline {2.2}Data Filtering and Processing}{12}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Virtual Sensors}{12}{subsection.2.2.1}
+\contentsline {subsection}{\numberline {2.2.2}Graphical Representation}{16}{subsection.2.2.2}
+\contentsline {subsubsection}{\numberline {2.2.2.1}SQL Syntax}{16}{subsubsection.2.2.2.1}
+\contentsline {section}{\numberline {2.3}Data publishing}{16}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Web Interface}{16}{subsection.2.3.1}
+\contentsline {subsubsection}{\numberline {2.3.1.1}GoogleMaps integration}{16}{subsubsection.2.3.1.1}
+\contentsline {section}{\numberline {2.4}Data stream processing and time model}{16}{section.2.4}
+\contentsline {section}{\numberline {2.5}GSN to GSN communication Protocol}{21}{section.2.5}
+\contentsline {subsection}{\numberline {2.5.1}\texttt {remote} wrapper}{21}{subsection.2.5.1}
+\contentsline {subsection}{\numberline {2.5.2}\texttt {local} wrapper}{23}{subsection.2.5.2}
+\contentsline {section}{\numberline {2.6}GSN Notifications}{24}{section.2.6}
+\contentsline {subsubsection}{\numberline {2.6.0.1}Introduction}{24}{subsubsection.2.6.0.1}
+\contentsline {section}{\numberline {2.7}Implementation}{24}{section.2.7}
+\contentsline {subsection}{\numberline {2.7.1}Adding new sensor platforms}{24}{subsection.2.7.1}
+\contentsline {subsection}{\numberline {2.7.2}Dynamic resource management}{25}{subsection.2.7.2}
+\contentsline {subsection}{\numberline {2.7.3}Query planning and execution}{26}{subsection.2.7.3}
+\contentsline {section}{\numberline {2.8}Notes}{27}{section.2.8}
+\contentsline {subsubsection}{\numberline {2.8.0.1}Where is the DTD for the virtual sensor?}{27}{subsubsection.2.8.0.1}
+\contentsline {subsubsection}{\numberline {2.8.0.2}Which databases we support ?}{27}{subsubsection.2.8.0.2}
+\contentsline {subsubsection}{\numberline {2.8.0.3}Which projects are using GSN ?}{27}{subsubsection.2.8.0.3}
+\contentsline {subsubsection}{\numberline {2.8.0.4}GSN.XML file}{28}{subsubsection.2.8.0.4}
+\contentsline {subsection}{\numberline {2.8.1}GeoRSS}{28}{subsection.2.8.1}
+\contentsline {subsection}{\numberline {2.8.2}Network communication}{28}{subsection.2.8.2}
+\contentsline {subsubsection}{\numberline {2.8.2.1}Reusing Data Streams}{28}{subsubsection.2.8.2.1}
+\contentsline {chapter}{\numberline {A}Developer's Guide}{32}{appendix.A}
+\contentsline {section}{\numberline {A.1}Writing a Virtual Processing Class }{32}{section.A.1}
+\contentsline {subsection}{\numberline {A.1.1}The AbstractVirualSensor class}{32}{subsection.A.1.1}
+\contentsline {subsection}{\numberline {A.1.2}Reading Initialisation Parameters}{33}{subsection.A.1.2}
+\contentsline {subsection}{\numberline {A.1.3}The StreamElement class}{33}{subsection.A.1.3}
+\contentsline {subsection}{\numberline {A.1.4}Writing your own graphical user interface}{33}{subsection.A.1.4}
+\contentsline {subsection}{\numberline {A.1.5}Feedback channel to a Virtual Sensor}{33}{subsection.A.1.5}
+\contentsline {section}{\numberline {A.2}How to develop a wrapper}{33}{section.A.2}
+\contentsline {subsection}{\numberline {A.2.1}How to develop a Standard Wrapper }{33}{subsection.A.2.1}
+\contentsline {subsubsection}{\numberline {A.2.1.1}initialize()}{34}{subsubsection.A.2.1.1}
+\contentsline {subsubsection}{\numberline {A.2.1.2}finalize()}{34}{subsubsection.A.2.1.2}
+\contentsline {subsubsection}{\numberline {A.2.1.3}getWrapperName()}{34}{subsubsection.A.2.1.3}
+\contentsline {subsubsection}{\numberline {A.2.1.4}getOutputFormat()}{35}{subsubsection.A.2.1.4}
+\contentsline {subsubsection}{\numberline {A.2.1.5}run()}{35}{subsubsection.A.2.1.5}
+\contentsline {subsubsection}{\numberline {A.2.1.6}sendToWrapper()}{36}{subsubsection.A.2.1.6}
+\contentsline {subsection}{\numberline {A.2.2}A detailed description of the AbstractWrapper class}{36}{subsection.A.2.2}
+\contentsline {subsection}{\numberline {A.2.3}The life cycle of a wrapper}{37}{subsection.A.2.3}
+\contentsline {subsection}{\numberline {A.2.4}How to develop a Safe Storage Wrapper}{39}{subsection.A.2.4}
+\contentsline {section}{\numberline {A.3}How to cutomize the GSN Reports}{40}{section.A.3}
+\contentsline {chapter}{\numberline {B}Quick Reference Guide}{41}{appendix.B}
+\contentsline {section}{\numberline {B.1}Virtual Sensors (\textit {VS}\xspace )}{41}{section.B.1}
+\contentsline {subsection}{\numberline {B.1.1}\textit {VSD}\xspace DTD }{41}{subsection.B.1.1}
+\contentsline {subsection}{\numberline {B.1.2}Email Notification \textit {VS}\xspace }{44}{subsection.B.1.2}
+\contentsline {subsection}{\numberline {B.1.3}SMS Notification \textit {VS}\xspace }{45}{subsection.B.1.3}
+\contentsline {subsection}{\numberline {B.1.4}Voip Notification \textit {VS}\xspace }{46}{subsection.B.1.4}
+\contentsline {subsection}{\numberline {B.1.5}R \textit {VS}\xspace }{48}{subsection.B.1.5}
+\contentsline {subsubsection}{\numberline {B.1.5.1}Installation and Setup}{48}{subsubsection.B.1.5.1}
+\contentsline {subsection}{\numberline {B.1.6}GPS \textit {VS}\xspace }{50}{subsection.B.1.6}
+\contentsline {subsection}{\numberline {B.1.7}TinyOS \textit {VS}\xspace }{51}{subsection.B.1.7}
+\contentsline {section}{\numberline {B.2}Virtual Sensor Processing classes (\textit {VSP}\xspace ) }{52}{section.B.2}
+\contentsline {subsection}{\numberline {B.2.1}gsn.vsensor.StreamExporterVirtualSensor \textit {VSP}\xspace }{52}{subsection.B.2.1}
+\contentsline {subsection}{\numberline {B.2.2}gsn.vsensor.EmailVirtualSensor \textit {VSP}\xspace }{52}{subsection.B.2.2}
+\contentsline {subsection}{\numberline {B.2.3}gsn.vsensor.SMSVirtualSensor \textit {VSP}\xspace }{54}{subsection.B.2.3}
+\contentsline {subsection}{\numberline {B.2.4}gsn.vsensor.VoipVirtualSensor \textit {VSP}\xspace }{54}{subsection.B.2.4}
+\contentsline {subsection}{\numberline {B.2.5}gsn.vsensor.RVirtualSensor \textit {VSP}\xspace }{54}{subsection.B.2.5}
+\contentsline {subsection}{\numberline {B.2.6}gsn.vsensor.BridgeVirtualSensor \textit {VSP}\xspace }{54}{subsection.B.2.6}
+\contentsline {section}{\numberline {B.3}Wrappers }{55}{section.B.3}
+\contentsline {subsection}{\numberline {B.3.1}Safe Storage Wrappers Default parameters}{55}{subsection.B.3.1}
+\contentsline {subsection}{\numberline {B.3.2}multiformat \textit {Wrapper}\xspace }{55}{subsection.B.3.2}
+\contentsline {subsection}{\numberline {B.3.3}ss\_tinyos-mig \textit {Wrapper}\xspace }{55}{subsection.B.3.3}
+\contentsline {subsection}{\numberline {B.3.4}\leavevmode {\color {red}GpsdWrapper} \textit {Wrapper}\xspace }{56}{subsection.B.3.4}
+\contentsline {subsubsection}{\numberline {B.3.4.1}Connecting a GPS device to gpsd}{58}{subsubsection.B.3.4.1}
+\contentsline {subsubsection}{\numberline {B.3.4.2}Using Bluetooth}{58}{subsubsection.B.3.4.2}
+\contentsline {subsubsection}{\numberline {B.3.4.3}Using SSH reverse tunneling}{59}{subsubsection.B.3.4.3}
+\contentsline {section}{\numberline {B.4}GSN ANT Tasks }{60}{section.B.4}
+\contentsline {chapter}{\numberline {C}GSN Tutorials}{61}{appendix.C}
+\contentsline {section}{\numberline {C.1}Understanding GSN Virtual Sensors}{61}{section.C.1}
+\contentsline {subsection}{\numberline {C.1.1}The multiFormatSample Virtual Sensor.}{62}{subsection.C.1.1}
+\contentsline {subsection}{\numberline {C.1.2}Virtual Sensor Description File }{62}{subsection.C.1.2}
+\contentsline {subsection}{\numberline {C.1.3}Wrapper}{63}{subsection.C.1.3}
+\contentsline {subsection}{\numberline {C.1.4}Source}{64}{subsection.C.1.4}
+\contentsline {subsection}{\numberline {C.1.5}Stream}{65}{subsection.C.1.5}
+\contentsline {subsection}{\numberline {C.1.6}Virtual Sensor}{66}{subsection.C.1.6}
+\contentsline {subsubsection}{\numberline {C.1.6.1}Virtual Sensor Processing Class}{66}{subsubsection.C.1.6.1}
+\contentsline {subsubsection}{\numberline {C.1.6.2}Other Elements of a VSD}{66}{subsubsection.C.1.6.2}
+\contentsline {subsection}{\numberline {C.1.7}Summary}{67}{subsection.C.1.7}
+\contentsline {chapter}{\numberline {D}GSN an Evaluation}{68}{appendix.D}
+\contentsline {section}{\numberline {D.1}Evaluation \FN@sf@gobble@opt {The evaluation results in this section correspond to GSN release 0.90}}{68}{section.D.1}
+\contentsline {subsection}{\numberline {D.1.1}Internal processing time}{69}{subsection.D.1.1}
+\contentsline {subsection}{\numberline {D.1.2}Scalability in the number of queries and clients}{70}{subsection.D.1.2}
+\contentsline {section}{\numberline {D.2}Related work}{72}{section.D.2}
+\contentsline {section}{\numberline {D.3}Conclusions}{73}{section.D.3}
+\contentsline {chapter}{\numberline {E}{\LaTeX } Examples}{74}{appendix.E}

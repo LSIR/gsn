@@ -1,0 +1,209 @@
+\subsection{\todo{GpsdWrapper} \wrapper \label{gpsd:wrapper}} 
+
+GpsdWrapper is a GSN wrapper for communicating with gpsd and supports querying GPS devices compliant to
+
+\begin{itemize}
+ \item NMEA 0183 protocol
+ \item Rockwell binary protocol
+ \item TSIP binary protocol
+ \item SiRF protocol
+ \item Garmin binary protocol
+ \item Evermore binary protocol
+\end{itemize}
+
+\todo{Where are the source files?}
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|C|C|J|}%
+	\hline
+		\multicolumn{5}{|c|}{\textbf{\todo{GpsdWrapper} \wrapper Parameters}} \\
+	\hline
+	\hline
+		\textbf{Parameter Name} &
+		\textbf{Type} &
+		\textbf{Mandatory} &
+		\textbf{Default} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		HostName &
+		String &	
+		No &
+		localhost &
+		The hostname of GPS Daemon \\
+	\hline
+		ListenerPort &
+		Integer &
+		No &
+		2947 &
+		The listener port of GPS Daemon \\
+	\hline
+		Timeout &
+		Long &
+		No &
+		20000 &
+		The timeout for Telnet session to GPS Daemon in ms \\
+	\hline 
+		SamplingRate &
+		Long &
+		No &
+		2000 &
+		the rate of GPS sampling in ms \\
+	\hline 
+	\hline
+		\multicolumn{2}{|l}{Support Safe Storage} &
+		\multicolumn{3}{l|}{No} \\
+		\multicolumn{2}{|l}{GSN \wrapper Classname} &
+		\multicolumn{3}{l|}{\todo{gsn.acquisition.wrappers.??} (\todo{short name)}} \\
+
+	\hline
+	\end{tabulary}
+	}
+	\caption{\todo{GpsdWrapper} \wrapper Parameters}
+	\label{table:gpsd_wrapper_parameters}
+\end{table*}
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|J|}%
+	\hline
+		\multicolumn{3}{|c|}{\textbf{\todo{GpsdWrapper} Output Structure}} \\
+	\hline
+	\hline
+		\textbf{Name} &
+		\textbf{Type} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		Latitude &
+		\todo{type?} &
+		Current latitude in degrees \\
+	\hline 
+		Longitude &
+		\todo{type?} &
+		Current longitude in degrees \\
+	\hline 
+		Altitude &
+		\todo{type?} &
+		Current altitude in meters above sea level \\
+	\hline 
+		RateOfClimb &
+		\todo{type?} &
+		Current rate of climb in meters per second \\
+	\hline 
+		SpeedOverGround &
+		\todo{type?} &
+		Current speed over ground in meters per second \\
+	\hline 
+		GpsDeviceName &
+		\todo{type?} &
+		Active GPS device name on the GPS host \\
+	\hline 
+		GpsProtocol &
+		\todo{type?} &
+		GPS protocol in use \\
+	\hline 
+		VerticalDOP &
+		\todo{type?} &
+		Vertical dilution of precision \\
+	\hline 
+		HorizontalDOP &
+		\todo{type?} &
+		Horizontal dilution of precision \\
+	\hline 
+		PositionalDOP &
+		\todo{type?} &
+		Positional dilution of precision \\
+	\hline 
+		TimeDOP &
+		\todo{type?} &
+		Time dilution of precision \\
+	\hline 
+		GeometricDOP &
+		\todo{type?} &
+		Geometric dilution of precision \\
+	\hline 
+	\end{tabulary}
+	}
+	\caption{\todo{GpsdWrapper} \wrapper Output Structure}
+	\label{table:gpsd_wrapper_output_structure}
+\end{table*}
+
+\subsubsection{Connecting a GPS device to gpsd}
+\textbf{gpsd} is a Linux daemon that monitors one or more GPS devices attached to a host computer through serial or USB ports. All data of the GPS devices is made available to be queried on TCP port 2947 of the host computer. With gpsd, multiple GPS client applications (such as navigational and wardriving software) can share access to GPS devices without contention or loss of data. Also, gpsd responds to queries with a format that is substantially easier to parse than the NMEA 0183 emitted by most GPS devices.
+
+\subsubsection{Using Bluetooth}
+We are given a Bluetooth GPS device that we want to connect to a Linux host. In this tutorial, it's a HOLUX GPSlim 236.\\
+\\
+First, we need to start bluetooth services:
+\begin{verbatim}
+sudo /etc/init.d/bluetooth start
+\end{verbatim}
+Now, let's scan for bluetooth devices:
+\begin{verbatim}
+hcitool scan
+\end{verbatim}
+This should return a list of devices like
+\begin{verbatim}
+00:0B:0D:85:77:79 HOLUX GPSlim236
+00:16:4E:D7:AE:5F Nokia N70
+00:12:62:AF:C0:6E Nino
+00:11:67:80:41:96 BT-GPS
+\end{verbatim}
+As already mentioned, we are going to use the HOLUX GPSlim 236. We want to map the HOLUX GPSlim 236 to a emulated RS-232 serial port. To this end, we use the Bluetooth protocol RFCOMM. That's pretty simple and goes as follows. First we create a config file for the RFCOMM:
+\begin{verbatim}
+sudo nano /etc/bluetooth/rfcomm.conf
+\end{verbatim}
+and add an entry for our HOLUX GPSlim 236 to this file
+\begin{verbatim}
+rfcomm0 {
+	bind yes;
+	device ''00:0B:0D:85:77:79'';
+	channel 1;
+	comment "Your comment here";
+}
+\end{verbatim}
+This way, we are mapping the HOLUX to a emulated RS-232 serial port
+\begin{verbatim}
+/dev/rfcomm0
+\end{verbatim}
+by using the shell command
+\begin{verbatim}
+sudo rfcomm connect 0
+\end{verbatim}
+We should get the following return
+\begin{verbatim}
+Connected /dev/rfcomm0 to 00:0B:0D:85:77:79 on channel 1
+Press CTRL-C for hangup
+\end{verbatim}
+Great, now we open a second terminal and connect the gpsd to our /dev/rfcomm0
+\begin{verbatim}
+sudo gpsd -b -N -D 4 /dev/rfcomm0
+\end{verbatim}
+You can telnet into the gpsd to play around and check if it's working correctly
+\begin{verbatim}
+telnet localhost 2947
+\end{verbatim}
+Cool, now we have a Bluetooth GPS device connected to a Linux host! A GSN server can use a GpsdWrapper to connect to this machine and read the GPS data.
+
+\subsubsection{Using SSH reverse tunneling}
+As you might already guess, the GpsdWrapper uses telnet to connect to gpsd. 
+
+If you are concerned about security, or can not telnet into the GPS host machine, e.g. a mobile phone, or just want to be fancy, let's do some SSH reverse tunneling! By the way, this also would allow access to the GPS host if it were behind a firewall.
+
+In this scenario, we connect a HOLUX GPSlim 236 via Bluetooth to a Nokia N810 which runs gpsd by default. Usually, the N810 doesn't have a static IP address and looking up the IP address and manually typing it in is annoying so we set up SSH reverse tunneling.\\
+\\
+\textbf{On the N810}, we simply execute 
+\begin{verbatim}
+ssh -N -R 1234:localhost:2947 user@gsn-server.com
+\end{verbatim}
+This forwards the port 1234 on gsn-server.com to the default gpsd port 2947 on the N810.\\
+\\
+\textbf{On the GSN host}, we can telnet into gpsd and play around by
+\begin{verbatim}
+telnet localhost 1234
+\end{verbatim}
+

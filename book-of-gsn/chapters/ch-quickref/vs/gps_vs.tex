@@ -1,0 +1,46 @@
+\subsection{GPS \vs \label{quickref_gps_vs}}
+
+This virtual sensor integrates Generic NMEA GPS Devices with \gsn.
+This \vs is based on the \chapref{bridge:vsp} \vsp and the \chapref{gpsd:wrapper} \wrapper.
+The \listingref{listing:xml:gpsd_vsd} shows an example of \vsd for this \vs.
+
+\begin{xmlcode}[caption={Sample of VSD using the Gpsd Wrapper}, label=listing:xml:gpsd_vsd]
+<virtual-sensor name="gpsd" priority="10">
+	<processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<init-params/>
+		<output-structure>
+			<field name="Latitude" type="double"/>
+			<field name="Longitude" type="double"/>
+			<field name="Altitude" type="double"/>
+			<field name="RateOfClimb" type="double"/>
+			<field name="SpeedOverGround" type="double"/>
+			<field name="GpsDeviceName" type="char(255)"/>
+			<field name="GpsProtocol" type="char(255)"/>
+			<field name="CountOfSatellites" type="int"/>
+			<field name="VerticalDOP" type="double"/>
+			<field name="HorizontalDOP" type="double"/>
+			<field name="PositionalDOP" type="double"/>
+			<field name="TimeDOP" type="double"/>
+			<field name="GeometricDOP" type="double"/>
+		</output-structure>
+	</processing-class>
+	<description>Send a SMS Notification</description>
+	<life-cycle pool-size="10" />
+	<addressing />
+	<storage history-size="10m" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1" sampling-rate="1" storage-size="1">
+				<address wrapper="gpsd">
+					<predicate key="ListenerPort">2947</predicate>
+					<predicate key="SamplingRate">2000</predicate>
+					<predicate key="Timeout">22000</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from source1</query>
+		</stream> 
+	</streams>
+</virtual-sensor>
+\end{xmlcode}

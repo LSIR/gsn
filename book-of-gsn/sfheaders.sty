@@ -1,0 +1,177 @@
+%%%% debut macro %%%%
+% Package: SFheaders.sty
+% Sans-Serif headers; modified from {book|report|article}.cls
+% defaults.
+% Last modified: MLO 1997-05-06
+%
+% Author: Maurizio Loreti, aka MLO or (HAM) I3NOO
+% Work:   University of Padova - Department of Physics
+%         Via F. Marzolo, 8 - 35131 PADOVA - Italy
+% EMail:  loreti at padova.infn.it
+% WWW:    http://wwwcdf.pd.infn.it/~loreti/mlo.html
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sfheaders}[1997/05/06 Sans-Serif headers]
+
+\@ifclassloaded{article}{
+% Here if \documentclass{article}
+  \def\@part[#1]#2{%
+      \ifnum \c@secnumdepth >\m@ne
+        \refstepcounter{part}%
+        \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+      \else
+        \addcontentsline{toc}{part}{#1}%
+      \fi
+      {\parindent \z@ \raggedright
+       \interlinepenalty \@M
+       \normalfont
+       \ifnum \c@secnumdepth >\m@ne
+         \Large \sffamily \bfseries \partname~\thepart
+         \par\nobreak
+       \fi
+       \huge \sffamily \bfseries #2%
+       \markboth{}{}\par}%
+      \nobreak
+      \vskip 3ex
+      \@afterheading}
+  \def\@spart#1{%
+      {\parindent \z@ \raggedright
+       \interlinepenalty \@M
+       \normalfont
+       \huge \sffamily \bfseries #1\par}%
+       \nobreak
+       \vskip 3ex
+       \@afterheading}}
+{\@ifclassloaded{book}{
+% Here if \documentclass{book}
+  \def\@part[#1]#2{%
+      \ifnum \c@secnumdepth >-2\relax
+        \refstepcounter{part}%
+        \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+      \else
+        \addcontentsline{toc}{part}{#1}%
+      \fi
+      \markboth{}{}%
+      {\centering
+       \interlinepenalty \@M
+       \normalfont
+       \ifnum \c@secnumdepth >-2\relax
+         \huge \sffamily \bfseries \partname~\thepart
+         \par
+         \vskip 20\p@
+       \fi
+       \Huge \sffamily \bfseries #2\par}%
+      \@endpart}
+
+  \def\@spart#1{%
+      {\centering
+       \interlinepenalty \@M
+       \normalfont
+       \Huge \sffamily \bfseries #1\par}%
+      \@endpart}
+
+  \def\@makechapterhead#1{%
+    \vspace*{50\p@}%
+    {\parindent \z@ \raggedright \normalfont
+      \ifnum \c@secnumdepth >\m@ne
+        \if@mainmatter
+          \huge \sffamily \bfseries \@chapapp\space \thechapter
+          \par\nobreak
+          \vskip 20\p@
+        \fi
+      \fi
+      \interlinepenalty\@M
+      \Huge \sffamily\ bfseries #1\par\nobreak
+      \vskip 40\p@
+    }}
+
+  \def\@makeschapterhead#1{%
+    \vspace*{50\p@}%
+    {\parindent \z@ \raggedright
+      \normalfont
+      \interlinepenalty\@M
+      \Huge \sffamily \bfseries #1\par\nobreak
+      \vskip 40\p@
+  }}
+}{
+% Here if none of the above (\documentclass{report} ?)
+  \def\@part[#1]#2{%
+      \ifnum \c@secnumdepth >-2\relax
+        \refstepcounter{part}%
+        \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+      \else
+        \addcontentsline{toc}{part}{#1}%
+      \fi
+      \markboth{}{}%
+      {\centering
+       \interlinepenalty \@M
+       \normalfont
+       \ifnum \c@secnumdepth >-2\relax
+         \huge \sffamily \bfseries \partname~\thepart
+         \par
+         \vskip 20\p@
+       \fi
+       \Huge \sffamily \bfseries #2\par}%
+      \@endpart}
+
+  \def\@spart#1{%
+      {\centering
+       \interlinepenalty \@M
+       \normalfont
+       \Huge \sffamily \bfseries #1\par}%
+      \@endpart}
+
+  \def\@makechapterhead#1{%
+    \vspace*{50\p@}%
+    {\parindent \z@ \raggedright \normalfont
+      \ifnum \c@secnumdepth >\m@ne
+          \huge \sffamily \bfseries \@chapapp\space \thechapter
+          \par\nobreak
+          \vskip 20\p@
+      \fi
+      \interlinepenalty\@M
+      \Huge \sffamily \bfseries #1\par\nobreak
+      \vskip 40\p@
+    }}
+
+  \def\@makeschapterhead#1{%
+    \vspace*{50\p@}%
+    {\parindent \z@ \raggedright
+      \normalfont
+      \interlinepenalty\@M
+      \Huge \sffamily \bfseries #1\par\nobreak
+      \vskip 40\p@
+    }}
+}}
+
+\renewcommand{\section}{\@startsection {section}{1}{\z@}%
+             {-3.5ex \@plus -1ex \@minus -.2ex}%
+             {2.3ex \@plus.2ex}%
+             {\normalfont\Large\sffamily\bfseries}}
+
+\renewcommand{\subsection}{\@startsection{subsection}{2}{\z@}%
+             {-3.25ex\@plus -1ex \@minus -.2ex}%
+             {1.5ex \@plus .2ex}%
+             {\normalfont\large\sffamily\bfseries}}
+
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}%
+	     {\z@}%
+	     {-3.25ex\@plus -1ex \@minus -.2ex}%
+             {1.5ex \@plus .2ex}%
+             {\normalfont\normalsize\sffamily\bfseries}}
+
+\renewcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}%
+             {3.25ex \@plus1ex \@minus.2ex}%
+             {-1em}%
+             {\normalfont\normalsize\sffamily\bfseries}}
+
+\renewcommand{\subparagraph}{\@startsection{subparagraph}{5}%
+	     {\parindent}%
+             {3.25ex \@plus1ex \@minus .2ex}%
+             {-1em}%
+             {\normalfont\normalsize\sffamily\bfseries}}
+\endinput
+
+%%
+%% End of `SFheaders.sty'.
+%%%% fin macro %%%%

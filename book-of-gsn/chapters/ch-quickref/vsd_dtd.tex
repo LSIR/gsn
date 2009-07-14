@@ -1,0 +1,70 @@
+\subsection{\vsd DTD \label{quickref_vsd_dtd}}
+
+All the \vs are configured with an XML Virtual Sensor Description file (\vsd).
+A graphical representation of the \vsd Document Type Definition (DTD) is available on the \figref{figure:vsd_dtd}. The description of all these tags are given in the
+\tableref{table:vsd_dtd}.
+
+\image{vs-quick-ref-marked.pdf}{1.0}{90}{\vsd DTD Quick Reference Card}{figure:vsd_dtd}
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|J|C|J|J|}%
+	\hline
+		\multicolumn{5}{|c|}{\textbf{VSD DTD Quick Reference Card Description}} \\
+	\hline
+	\hline
+		\textbf{Tag} &
+		\textbf{Name} &
+		\textbf{Mandatory} &
+		\textbf{Allowed Values} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		1 & name & 1 only & alpha&Identifies the VS and must be unique in an instance of GSN \\ \hline
+		2 & protected & 0 or 1 & \todo{TODO} &\todo{TODO}  \\ \hline
+		3 & priority & 0 or 1 & 0 - 20& Defaults to 10, 0 is highest and 20 lowest\\ \hline
+		4 & publish-to-microsoft-research-map & 0 or 1 & & \\ \hline
+		5 & processing-class & & & Container for \vsp specification   \\ \hline
+		6 & class-name  & 1 only & valid path & Path to Java implementation of \vsp   \\ \hline
+		7 - 10 & init-params & 0 or 1 & & Parameter specific to \vsp (Refer to section \ref{sec:quickref_vsp})  \\ \hline
+		11 & unique-timestamps & 0 or 1 & true/false & Unless set to false duplicate timestamps are dropped with a warning   \\ \hline
+		12 & output-structure & 1 only & & Sensor data structure  \\ \hline
+		13 & field & 0 or more & & field definition (Name and type must match source query  \\ \hline
+		14 & name & 1 per field & alpha  & unique field name  \\ \hline
+		15 & type & 1 per field & valid type & Field data type    \\ \hline
+		16 & description & 1 per field & Free text & Description of output item  \\ \hline
+		17 , 18 & output-specification rate & 1 only & numeric & Minimum interval between generated data items.  \\ \hline
+		19 & web-input & 0 or 1 &\todo{TODO} &\todo{TODO}  \\ \hline
+		20 & password & 0 or 1 &\todo{TODO} &\todo{TODO}  \\ \hline
+		21 & command & 0 or more &\todo{TODO} &\todo{TODO}  \\ \hline
+		22 & name &  1 only  &\todo{TODO} &\todo{TODO}  \\ \hline
+		23 & field & 0 or more &\todo{TODO} &\todo{TODO}  \\ \hline
+		24 & name & 1 only &\todo{TODO} &\todo{TODO}  \\ \hline
+		25 & type & 1 only &\todo{TODO} &\todo{TODO}  \\ \hline
+		26 & description & 1 only & Free text & Field description  \\ \hline
+		27 & description & 0 or 1 & Free text & \vs Description   \\ \hline
+		28, 29 & life-cycle pool-size & 1 only & & A performance parameter set maximum number of instances  \\ \hline
+		30 - 33 & addressing & & key/value pairs & Predicates describing sensor location  \\ \hline
+		34,35 & storage history-size & 1 only & output-specification & Number of stream elements held in database - does not affect stream processing  \\ \hline
+		36 & streams & 1 only &\ & Container for streams  \\ \hline
+		37 & stream & 0 or more & & Container for a single stream definition   \\ \hline
+		38 & name & 1 only & alhanumeric & Unique stream identifier  \\ \hline
+		39 & count & 0 or 1 & & deprecated ?\\ \hline
+		40 & rate & 1 only & numeric (ms) & performance tuning - minimum interval (ms.) between calls to this stream  \\ \hline
+		41 & source & 0 or more &  & Container for one source  \\ \hline
+		42 & alias & 1 only & alphanumeric & Unique source identifier  \\ \hline
+		43 & disconnect-buffer-size & 0 or 1 &\todo{TODO} &\todo{TODO}  \\ \hline
+		44 & storage-size & 0 or 1 &  & Size of sliding window (count or time based)  \\ \hline
+		45 & slide & 0 or 1 & & Slide interval (count or time based)  \\ \hline
+		46 & sampling-rate & 0 or 1 & float 0 - 1 & load shedding parameter  \\ \hline
+		47 & address & 0 or 1 &  & Container to contain wrappers  \\ \hline
+		48 & wrapper & 1 or more & alphanumeric & Wrapper name  \\ \hline
+		49 - 51 & predicate & 0 or more & & Predicates are specific to wrappers (Refer to section \ref{sec:quickref_wrappers})  \\ \hline
+		52 & query (source) & 1 only & Valid SQL & Selects data from source  \\ \hline
+		53 & query (stream) & 1 only& Valid SQL & Selects data from stream   \\ \hline
+	\end{tabulary}
+	}
+	\caption{\vsd DTD Quick Reference Card Description}
+	\label{table:vsd_dtd}
+\end{table*}

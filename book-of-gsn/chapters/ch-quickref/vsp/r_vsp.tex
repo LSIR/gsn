@@ -1,0 +1,46 @@
+\subsection{gsn.vsensor.RVirtualSensor \vsp}
+
+\begin{table*}[!htp]
+	\centering
+	{\normalfont\footnotesize
+	\begin{tabulary}{\textwidth}{|C|C|C|C|J|}%
+	\hline
+		\multicolumn{5}{|c|}{\textbf{Parameters for gsn.vsensor.RVirtualSensor \vsp}} \\
+	\hline
+	\hline
+		\textbf{Parameter Name} &
+		\textbf{Type} &
+		\textbf{Mandatory} &
+		\textbf{Default} &
+		\textbf{Description} \\
+	\hline
+	\hline
+		phone-number &
+		String &	
+		Yes &
+		None &
+		The mobile phone number to send the message \\
+	\hline
+		password &
+		String &
+		Yes &
+		None &
+		The password to login to the mobile operator or SMS gateway provider \\
+	\hline
+		sms-server &
+		String &
+		Yes &
+		None &
+		URL address of the mobile phone operator or SMS gatewat provider \\
+	\hline
+		message-format &
+		String &
+		Yes &
+		None &
+		The format of the SMS message in StringTemplate-syntax, e.g. Temperature: \$TEMP\$ where TEMP has some value given from the GSN StreamElement \\
+	\hline
+	\end{tabulary}
+	}
+	\caption{Parameters for gsn.vsensor.RVirtualSensor \vsp \label{table:parameters_r_vsp}}
+	
+\end{table*}
