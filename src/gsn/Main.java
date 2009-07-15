@@ -116,7 +116,13 @@ public final class Main {
 		VSensorLoader vsloader = new VSensorLoader ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
 
-		vsloader.addVSensorStateChangeListener(new SensorMapIntegration());
+		String msrIntegration = "gsn.msr.sensormap.SensorMapIntegration";
+		try {
+			vsloader.addVSensorStateChangeListener((VSensorStateChangeListener) Class.forName(msrIntegration).newInstance());	
+		}catch (Exception e) {
+			logger.warn("MSR Sensor Map integration is disabled.");
+		}
+		
 		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(PushDelivery.class));

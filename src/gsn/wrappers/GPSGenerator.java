@@ -46,7 +46,7 @@ public class GPSGenerator extends AbstractWrapper {
    public boolean initialize (  ) {
       setName( "GPSGenerator-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
-      if ( addressBean.getPredicateValue( "sampling-rate" ) != null ) {
+      if ( addressBean.getPredicateValue( "rate" ) != null ) {
          samplingRate = ParamParser.getInteger( addressBean.getPredicateValue( "rate" ) , DEFAULT_SAMPLING_RATE );
          if ( samplingRate <= 0 ) {
             logger.warn( "The specified >sampling-rate< parameter for the >MemoryMonitoringWrapper< should be a positive number.\nGSN uses the default rate (" + DEFAULT_SAMPLING_RATE + "ms )." );

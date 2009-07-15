@@ -61,7 +61,6 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
     if(maximumDelay > 0){
     	streamElementBuffer = SynchronizedBuffer.decorate(new UnboundedFifoBuffer());
     	delayPostingElements = true;
-    	setUsingRemoteTimestamp(true);
     	if(timer.getDelay() < maximumDelay)
     		logger.warn("Maximum delay is greater than element production interval. Running for a long time may lead to an OutOfMemoryException" );
     }
