@@ -5,13 +5,18 @@ import gsn.beans.VSensorConfig;
 import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
 import gsn.http.rest.RestDelivery;
-import gsn.msr.sensormap.SensorMapIntegration;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
 import gsn.vsensor.SQLValidatorIntegration;
 import gsn.wrappers.WrappersUtil;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.SplashScreen;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -75,8 +80,8 @@ public final class Main {
 
 	private static int gsnControllerPort;
 
-	private Main() throws Exception{
-		System.out.println("Global Sensor Networks (GSN) is Starting ...");
+	private Main() throws Exception {
+
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
@@ -84,22 +89,17 @@ public final class Main {
 		try {
 			controlSocket = new GSNController(null, gsnControllerPort);
 			containerConfig = loadContainerConfiguration();
+			updateSplashIfNeeded(new String[] {"GSN is starting at port:"+containerConfig.getContainerPort(),"All GSN logs are available at: logs/gsn.log"});
+			System.out.println("Global Sensor Networks (GSN) is Starting on port "+containerConfig.getContainerPort()+"...");
+			System.out.println("The logs of GSN server are available in logs/gsn.log file.");
+			System.out.println("To Stop GSN execute the gsn-stop script.");
 		} catch ( FileNotFoundException e ) {
 			logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
 			logger.error ( e.getMessage ( ) );
 			logger.error ( "Check the path of the configuration file and try again." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
-			return;
-		} catch (UnknownHostException e) {
-			logger.error ( e.getMessage ( ),e );
-			return;
-		} catch (IOException e) {
-			logger.error ( e.getMessage ( ),e );
-			return;
-		} catch (Exception e) {
-			logger.error ( e.getMessage ( ),e );
-			return;
-		}
+			throw new Exception(e);
+		} 
 		StorageManager.getInstance ( ).init ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) );
 		if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
 
@@ -109,9 +109,7 @@ public final class Main {
 			jettyServer.start ( );
 			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
 		} catch ( Exception e ) {
-			logger.error ( "Start of the HTTP server failed. The HTTP protocol is used in most of the communications." );
-			logger.error ( e.getMessage ( ) , e );
-			return;
+			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used in most of the communications: "+ e.getMessage(),e);
 		}
 		VSensorLoader vsloader = new VSensorLoader ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
@@ -122,16 +120,54 @@ public final class Main {
 		}catch (Exception e) {
 			logger.warn("MSR Sensor Map integration is disabled.");
 		}
-		
+
 		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(PushDelivery.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(RestDelivery.class));
-		
+
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
 		vsloader.startLoading();
+		
+
+	}
+
+	private static void closeSplashIfneeded() {
+		SplashScreen splash = SplashScreen.getSplashScreen();
+		//Check if we have specified any splash screen
+		if (splash == null) {
+			return;
+		}
+		if (splash.isVisible())
+			splash.close();
+	}
+
+	private static void updateSplashIfNeeded(String message[]) {
+			SplashScreen splash = SplashScreen.getSplashScreen();
+			//Check if we have specified any splash screen
+			for (int i=0;i<message.length;i++)
+				System.out.println(message[i]);
+			if (splash == null) 
+				return;
+			
+			if (splash.isVisible()) {
+				//Get a graphics overlay for the splash screen
+				Graphics2D g = splash.createGraphics();
+				//Do some drawing on the graphics object
+				//Now update to the splash screen
+
+				g.setComposite(AlphaComposite.Clear);
+				g.fillRect(0,0,400,70);
+				g.setPaintMode();
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g.setColor(Color.BLACK);
+				g.setFont(new Font("Arial",Font.BOLD,11));
+				for (int i=0;i<message.length;i++)
+					g.drawString(message[i], 13, 16*i+10);
+				splash.update();
+			}
 	}
 
 	public synchronized static Main getInstance() {
@@ -140,7 +176,7 @@ public final class Main {
 				singleton=new Main();
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);
-				System.exit(1);
+				throw new RuntimeException(e);
 			}
 			return singleton;
 	}
@@ -157,11 +193,20 @@ public final class Main {
 
 	public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
 
-
-
 	public static void main ( String [ ]  args)  {
 		Main.gsnControllerPort = Integer.parseInt(args[0]) ;
+		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
+		try {
 		Main.getInstance();
+		}catch (Exception e) {
+			updateSplashIfNeeded(new String[] {"Starting GSN failed! Look at logs/gsn.log for more information."});
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		}
+		closeSplashIfneeded();
 	}
 
 	/**
@@ -386,37 +431,37 @@ public final class Main {
 
 		handlers.setHandlers(new Handler[]{contexts,new DefaultHandler()});
 		server.setHandler(handlers);
-		
+
 		Properties usernames = new Properties();
-        usernames.load(new FileReader("conf/realm.properties"));
-        if (!usernames.isEmpty()){
+		usernames.load(new FileReader("conf/realm.properties"));
+		if (!usernames.isEmpty()){
 			HashLoginService loginService = new HashLoginService();
 			loginService.setName("GSNRealm");
 			loginService.setConfig("conf/realm.properties");
 			loginService.setRefreshInterval(10000); //re-reads the file every 10 seconds.
-	
+
 			Constraint constraint = new Constraint();
-	        constraint.setName("GSN User");
-	        constraint.setRoles(new String[]{"gsnuser"});
-	        constraint.setAuthenticate(true);
-	
-	        ConstraintMapping cm = new ConstraintMapping();
-	        cm.setConstraint(constraint);
-	        cm.setPathSpec("/*");
-	        cm.setMethod("GET");
-	        
-	        ConstraintMapping cm2 = new ConstraintMapping();
-	        cm2.setConstraint(constraint);
-	        cm2.setPathSpec("/*");
-	        cm2.setMethod("POST");
-	        
-	        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-	        securityHandler.setLoginService(loginService);
-	        securityHandler.setConstraintMappings(new ConstraintMapping[]{cm, cm2});
-	        securityHandler.setAuthenticator(new BasicAuthenticator());
-	        webAppContext.setSecurityHandler(securityHandler);
-        }
-		
+			constraint.setName("GSN User");
+			constraint.setRoles(new String[]{"gsnuser"});
+			constraint.setAuthenticate(true);
+
+			ConstraintMapping cm = new ConstraintMapping();
+			cm.setConstraint(constraint);
+			cm.setPathSpec("/*");
+			cm.setMethod("GET");
+
+			ConstraintMapping cm2 = new ConstraintMapping();
+			cm2.setConstraint(constraint);
+			cm2.setPathSpec("/*");
+			cm2.setMethod("POST");
+
+			ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+			securityHandler.setLoginService(loginService);
+			securityHandler.setConstraintMappings(new ConstraintMapping[]{cm, cm2});
+			securityHandler.setAuthenticator(new BasicAuthenticator());
+			webAppContext.setSecurityHandler(securityHandler);
+		}
+
 		server.setSendServerVersion(true);
 		server.setStopAtShutdown ( true );
 		server.setSendServerVersion ( false );

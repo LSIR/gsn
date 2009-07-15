@@ -1,23 +1,13 @@
 package gsn;
 
-import gsn.beans.Modifications;
-import gsn.beans.VSensorConfig;
 import gsn.utils.ValidityTools;
-import gsn.utils.graph.Graph;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
 import org.apache.log4j.Logger;
 
 public class GSNController extends Thread {
@@ -32,8 +22,6 @@ public class GSNController extends Thread {
 
 	public static final String GSN_CONTROL_LIST_LOADED_VSENSORS = "LIST LOADED VSENSORS";
 
-	private boolean running = true;
-
 	public static transient Logger logger = Logger.getLogger(GSNController.class);
 
 	private VSensorLoader vsLoader;
@@ -47,7 +35,7 @@ public class GSNController extends Thread {
 
 	public void run() {
 		logger.info("Started GSN Controller on port " + gsnControllerPort);
-		while (running) {
+		while (true) {
 			try {
 				Socket socket = mySocket.accept();
 				if (logger.isDebugEnabled())
@@ -64,8 +52,7 @@ public class GSNController extends Thread {
 					}
 					continue;
 				}
-
-				new ConnectionManager(socket).start();
+				new StopManager().start();
 			} catch (SocketTimeoutException e) {
 				if (logger.isDebugEnabled())
 					logger.debug("Connection timed out. Message was: " + e.getMessage());
@@ -85,51 +72,35 @@ public class GSNController extends Thread {
 			this.vsLoader = vsLoader;
 	}
 
-	private class ConnectionManager extends Thread {
-		private Socket incoming;
-		
-		private PrintWriter writer;
-		
-		private BufferedReader reader;
-
-		public ConnectionManager(Socket incoming) {
-			this.incoming = incoming;
-		}
+	private class StopManager extends Thread {
 
 		public void run() {
-			try {
-				reader = new BufferedReader(new InputStreamReader(incoming.getInputStream()));
-				writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(incoming.getOutputStream())), true);
-				ObjectOutputStream objos = null;
-				String message = reader.readLine();
-				while (message != null) {
-					message = message.trim();
-					if (logger.isDebugEnabled())
-						logger.debug("Received control message: " + message);
-					if (message.equalsIgnoreCase(GSN_CONTROL_SHUTDOWN)) { // We
-						// stop
-						// GSN
-						// here
-						logger.info("Shutting down GSN...");
-						running = false;
-						if (vsLoader != null) {
-							vsLoader.stopLoading();
-							logger.info("All virtual sensors have been stopped, shutting down virtual machine.");
-						} else {
-							logger
-									.warn("Could not shut down virtual sensors properly. We are probably exiting GSN before it has been completely initialized.");
-						}
-					} else if (GSN_CONTROL_LIST_LOADED_VSENSORS.equalsIgnoreCase(message)) {
-						Graph<VSensorConfig> dependencyGraph = Modifications.buildDependencyGraphFromIterator(Mappings
-								.getAllVSensorConfigs());
-						objos = new ObjectOutputStream(incoming.getOutputStream());
-						objos.writeObject(dependencyGraph);
-						objos.flush();
+
+			new Thread(new Runnable() {
+
+				public void run() {
+					try {
+						Thread.sleep(7000);
+					} catch (InterruptedException e) {
+
+					}finally {
+						logger.warn("Forced exit...");
+						System.exit(1);
 					}
-					message = reader.readLine();
+				}}).start();
+
+			try {
+				// We  stop  GSN  here
+				logger.info("Shutting down GSN...");
+				if (vsLoader != null) {
+					vsLoader.stopLoading();
+					logger.info("All virtual sensors have been stopped, shutting down virtual machine.");
+				} else {
+					logger.warn("Could not shut down virtual sensors properly. We are probably exiting GSN before it has been completely initialized.");
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				logger.warn("Error while reading from or writing to control connection: " + e.getMessage(), e);
+			}finally {
 			}
 		}
 	}
