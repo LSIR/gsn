@@ -364,7 +364,7 @@ public abstract class AbstractWrapper extends Thread {
 		isActive = false;
 		dispose();
 		if (logger.isInfoEnabled())
-			logger.info("disposed called");
+			logger.info("dispose called");
 		listeners.clear();
 		for (SlidingHandler slidingHandler : slidingHandlers.values()) {
 			slidingHandler.dispose();

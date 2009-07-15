@@ -17,8 +17,7 @@ import org.apache.log4j.Logger;
  * latter is for the sensors equipped with both temperature and light sensors.
  * 
  */
-public class MultiFormatWrapper extends AbstractWrapper
-{
+public class MultiFormatWrapper extends AbstractWrapper {
   private DataField[] collection = new DataField[] { new DataField("packet_type", "int", "packet type"),
       new DataField("temperature", "double", "Presents the temperature sensor."), new DataField("light", "double", "Presents the light sensor.") };
   private final transient Logger logger = Logger.getLogger(MultiFormatWrapper.class);
@@ -26,14 +25,12 @@ public class MultiFormatWrapper extends AbstractWrapper
   private AddressBean params;
   private long rate = 1000;
 
-  public boolean initialize()
-  {
+  public boolean initialize() {
     setName("MultiFormatWrapper" + counter++);
     
     params = getActiveAddressBean();
     
-    if ( params.getPredicateValue( "rate" ) != null )
-    {
+    if ( params.getPredicateValue( "rate" ) != null ) {
       rate = (long) Integer.parseInt( params.getPredicateValue( "rate"));
       
       logger.info("Sampling rate set to " + params.getPredicateValue( "rate") + " msec.");
@@ -42,19 +39,15 @@ public class MultiFormatWrapper extends AbstractWrapper
     return true;
   }
 
-  public void run()
-  {
+  public void run() {
     Double light = 0.0, temperature = 0.0;
     int packetType = 0;
     
-    while (isActive())
-    {
-      try
-      {
+    while (isActive()) {
+      try {
         // delay 
         Thread.sleep(rate);
-      } catch (InterruptedException e)
-      {
+      } catch (InterruptedException e) {
         logger.error(e.getMessage(), e);
       }
       
@@ -68,18 +61,15 @@ public class MultiFormatWrapper extends AbstractWrapper
     }
   }
 
-  public DataField[] getOutputFormat()
-  {
+  public DataField[] getOutputFormat() {
     return collection;
   }
 
-  public String getWrapperName()
-  {
+  public String getWrapperName() {
     return "MultiFormat Sample Wrapper";
   }  
 
-  public void dispose()
-  {
+  public void dispose() {
     counter--;
   }
 }

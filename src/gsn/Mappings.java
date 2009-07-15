@@ -54,7 +54,7 @@ public final class Mappings {
    }
    
    public static void removeFilename ( String fileName ) {
-	   if(fileNameToVSInstance.contains(fileName)){
+	   if(fileNameToVSInstance.containsKey(fileName)){
 		   VSensorConfig config = ( fileNameToVSInstance.get( fileName ) ).getConfig( );
 		   vsNameTOVSConfig.remove( config.getName( ) );
 		   fileNameToVSInstance.remove( fileName );

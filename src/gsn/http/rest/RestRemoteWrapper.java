@@ -73,6 +73,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
 		int tries = 0;
 		while(tries < 2){
 			tries++;
+			
 			response = httpclient.execute(httpget, localContext);
 			
 			int sc = response.getStatusLine().getStatusCode();
@@ -112,10 +113,8 @@ public class RestRemoteWrapper extends AbstractWrapper {
 
 	public void dispose() {
 		try {
-			//TODO: if the content has already been consumed, this call doesn't close the connection.
-			response.getEntity().consumeContent(); //can't close without consuming
-			response.getEntity().getContent().close();
-		} catch (IOException e) {
+			httpclient.getConnectionManager().shutdown(); //This closes the connection already in use by the response
+		} catch (Exception e) {
 			logger.debug(e.getMessage(),e);
 		}
 	}
@@ -133,8 +132,10 @@ public class RestRemoteWrapper extends AbstractWrapper {
 				logger.debug(e.getMessage(),e);
 				logger.warn("Connection to: "+params.getRemoteContactPoint()+" is lost, trying to reconnect in 3 seconds...");
 				try {
-					Thread.sleep(3000);
-					connectToRemote();
+					if(isActive()){
+						Thread.sleep(3000);
+						connectToRemote();
+					}
 				} catch (Exception err) {
 					logger.error(err.getMessage(),err);
 				}

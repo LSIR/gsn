@@ -236,7 +236,7 @@ public class VSensorLoader extends Thread {
 			inputStream.release();
 		}
 		// sm.renameTable(vsensorName,vsensorName+"Before"+System.currentTimeMillis());
-		logger.fatal("Total change Listeners:"+changeListeners.size());
+		logger.debug("Total change Listeners:"+changeListeners.size());
 		fireVSensorUnLoading(pool.getConfig());
 		//  this.sm.dropTable ( config.getName ( ) );
 	}
