@@ -161,7 +161,7 @@ public class DownloadReport extends AbstractDataRequest {
 	private static Integer getColumnId (ResultSetMetaData rsmd, String columnname) {
 		try {
 			for (int i = 1 ; i <= rsmd.getColumnCount() ; i++) {
-				if (rsmd.getColumnName(i).compareToIgnoreCase(columnname) == 0) return i;
+				if (rsmd.getColumnLabel(i).compareToIgnoreCase(columnname) == 0) return i;
 			}
 		}
 		catch (SQLException e) {

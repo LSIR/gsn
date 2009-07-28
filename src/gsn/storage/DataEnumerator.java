@@ -62,17 +62,19 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 	
 	public DataEnumerator ( PreparedStatement preparedStatement , boolean binaryLinked ,boolean manualClose) {
 		this.manualCloseConnection=manualClose;
+		if ( preparedStatement == null ) {
+			if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
+			hasNext = false;
+			return;
+		}
+		
 		try {
 			preparedStatement.setFetchSize(50);
 		} catch (SQLException e1) {
 			logger.warn(e1.getMessage(),e1);
 		}
 
-		if ( preparedStatement == null ) {
-			if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
-			hasNext = false;
-			return;
-		}
+		
 		this.linkBinaryData = binaryLinked;
 		Vector < String > fieldNames = new Vector < String >( );
 		Vector < Byte > fieldTypes = new Vector < Byte >( );
@@ -83,7 +85,7 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 			// Also setting the values for <code> hasTimedFieldInResultSet</code>
 			// if the timed field is present in the result set.
 			for ( int i = 1 ; i <= resultSet.getMetaData( ).getColumnCount( ) ; i++ ) {
-				String colName = resultSet.getMetaData( ).getColumnName( i );
+				String colName = resultSet.getMetaData( ).getColumnLabel( i );
 				int colTypeInJDBCFormat = resultSet.getMetaData( ).getColumnType( i );
 				int colScale=resultSet.getMetaData().getScale(i);
 				if ( colName.equalsIgnoreCase( "PK" ) ) {
@@ -152,7 +154,7 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 						break;
 					case DataTypes.BINARY :
 						if ( linkBinaryData )
-							output[ innerIndex ] = "/field?vs=" + resultSet.getMetaData( ).getTableName( actualColIndex ) + "&amp;field=" + resultSet.getMetaData( ).getColumnName( actualColIndex )
+							output[ innerIndex ] = "/field?vs=" + resultSet.getMetaData( ).getTableName( actualColIndex ) + "&amp;field=" + resultSet.getMetaData( ).getColumnLabel( actualColIndex )
 							+ "&amp;pk=" + pkValue;
 						else
 							output[ innerIndex ] = resultSet.getBytes( actualColIndex );

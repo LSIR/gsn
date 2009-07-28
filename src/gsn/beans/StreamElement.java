@@ -217,16 +217,16 @@ public final class StreamElement implements Serializable {
 	 * @return The value corresponding to the named tuple.
 	 */
 	public final Serializable getData ( final String fieldName ) {
-		if ( this.indexedFieldNames == null ) {
-			this.indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
+		if ( indexedFieldNames == null ) {
+			indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
 			for ( int i = 0 ; i < this.fieldNames.length ; i++ )
-				this.indexedFieldNames.put( this.fieldNames[ i ] , i );
+				this.indexedFieldNames.put( fieldNames[ i ] , i );
 			//    for (String k : this.indexedFieldNames.keySet())
 			//    System.out.println("Key : "+k + " VALUE = "+this.indexedFieldNames.get(k));
 		}
 		//  System.out.print(fieldName+" AT INDEX : "+ this.indexedFieldNames.get( fieldName ) );
 		//  System.out.println(" HAS VALUE : "+this.fieldValues[ this.indexedFieldNames.get( fieldName ) ]);
-		Integer index = this.indexedFieldNames.get( fieldName );
+		Integer index = indexedFieldNames.get( fieldName );
 		if (index == null) {
 			logger.info("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
 			return null;

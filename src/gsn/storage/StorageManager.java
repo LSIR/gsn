@@ -89,7 +89,7 @@ public class StorageManager {
 			ResultSetMetaData structure = rs.getMetaData();
 			ArrayList<DataField> toReturnArr = new ArrayList<DataField>();
 			for (int i=1;i<=structure.getColumnCount();i++) {
-				String colName = structure.getColumnName(i);
+				String colName = structure.getColumnLabel(i);
 				if (colName.equalsIgnoreCase("pk")) continue;
 				int colType = structure.getColumnType(i);
 				byte colTypeInGSN= getDatabaseForConnection(connection).convertLocalTypeToGSN(colType);
@@ -129,7 +129,7 @@ public class StorageManager {
 			if (fields != null && fields.length > 0)
 				nextField: for (DataField field : fields) {
 					for (int i = 1; i <= structure.getColumnCount(); i++) {
-						String colName = structure.getColumnName(i);
+						String colName = structure.getColumnLabel(i);
 						int colType = structure.getColumnType(i);
 						int colTypeScale = structure.getScale(i);
 						if (field.getName().equalsIgnoreCase(colName))
