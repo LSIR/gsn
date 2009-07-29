@@ -63,7 +63,7 @@ public class PushRemoteWrapper extends AbstractWrapper {
 			postParameters = new ArrayList <NameValuePair>();
 			postParameters.add(new BasicNameValuePair(PushDelivery.NOTIFICATION_ID_KEY, Double.toString(uid)));
 			postParameters.add(new BasicNameValuePair(PushDelivery.LOCAL_CONTACT_POINT, initParams.getLocalContactPoint()));
-			
+
 			lastReceivedTimestamp = initParams.getStartTime();
 			structure = registerAndGetStructure();
 		}catch (Exception e) {
@@ -87,17 +87,17 @@ public class PushRemoteWrapper extends AbstractWrapper {
 	public DataField[] registerAndGetStructure() throws ClientProtocolException, IOException, ClassNotFoundException {
 		HttpPost httpPost = new HttpPost(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
 		httpPost.setEntity(new UrlEncodedFormEntity(postParameters, HTTP.UTF_8));
-		
+
 		HttpContext localContext = new BasicHttpContext();
-		
+
 		NotificationRegistry.getInstance().addNotification(uid, this);
-		
+
 		int tries = 0;
 		while(tries < 2){
 			tries++;
 			HttpResponse response = httpclient.execute(httpPost, localContext);
 			HttpEntity entity = response.getEntity();
-			
+
 			int sc = response.getStatusLine().getStatusCode();
 			AuthState authState = null;
 			if (sc == HttpStatus.SC_UNAUTHORIZED) {
@@ -124,7 +124,7 @@ public class PushRemoteWrapper extends AbstractWrapper {
 				break;	
 			}
 		}
-		
+
 		if(structure == null)
 			throw new RuntimeException("Cannot connect to the remote host.");
 
@@ -141,16 +141,19 @@ public class PushRemoteWrapper extends AbstractWrapper {
 
 	public void run() {
 		HttpPost httpPost = new HttpPost(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
+		HttpResponse response = null; //This is acting as keep alive.
 		while(isActive()) {
 			try {
 				Thread.sleep(KEEP_ALIVE_PERIOD);
 				httpPost.setEntity(new UrlEncodedFormEntity(postParameters, HTTP.UTF_8));
-				HttpResponse response = httpclient.execute(httpPost); //This is acting as keep alive.
+
+				response = httpclient.execute(httpPost);
 				int status = response.getStatusLine().getStatusCode();
 				if (status != RestStreamHanlder.SUCCESS_200) {
 					logger.error("Cant register to the remote client, retrying in:"+ (KEEP_ALIVE_PERIOD/1000)+" seconds.");
 					structure = registerAndGetStructure();
 				}
+
 			} catch (InterruptedException e) {
 				logger.warn(e.getMessage(),e);
 			} catch (ClientProtocolException e) {
@@ -159,6 +162,15 @@ public class PushRemoteWrapper extends AbstractWrapper {
 				logger.warn(e.getMessage(),e);		
 			} catch (ClassNotFoundException e) {
 				logger.warn(e.getMessage(),e);
+			}finally {
+				if( response!=null)
+					try {
+						response.getEntity().getContent().close();
+					} catch (IllegalStateException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						logger.warn(e.getMessage(),e);
+					}
 			}
 		}
 	}
