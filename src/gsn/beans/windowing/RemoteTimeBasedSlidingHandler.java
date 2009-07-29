@@ -194,7 +194,17 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 			}
 			TreeMap<CharSequence, CharSequence> rewritingMapping = new TreeMap<CharSequence, CharSequence>(new CaseInsensitiveComparator());
 			rewritingMapping.put("wrapper", wrapperAlias);
-			StringBuilder toReturn = new StringBuilder(streamSource.getSqlQuery());
+			
+			String sqlQuery = streamSource.getSqlQuery();
+            StringBuilder toReturn = new StringBuilder();
+            
+            int fromIndex = sqlQuery.indexOf(" from ");
+            if(StorageManager.isH2() && fromIndex > -1){
+            	toReturn.append(sqlQuery.substring(0, fromIndex + 6)).append(" (select * from ").append(sqlQuery.substring(fromIndex + 6));
+            }else{
+            	toReturn.append(sqlQuery);
+            }
+			
 			if (streamSource.getSqlQuery().toLowerCase().indexOf(" where ") < 0) {
 				toReturn.append(" where ");
 			} else {
@@ -246,6 +256,10 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 					}
 				}
 			}
+			
+			if(StorageManager.isH2() && fromIndex > -1){
+            	toReturn.append(")");
+            }
 
 			toReturn = new StringBuilder(SQLUtils.newRewrite(toReturn, rewritingMapping));
 
