@@ -57,8 +57,7 @@ public class PushRemoteWrapper extends AbstractWrapper {
 
 		try {
 			initParams = new RemoteWrapperParamParser(getActiveAddressBean(),true);
-			if (initParams.isPushBased())
-				uid  = Math.random();
+			uid  = Math.random();
 
 			postParameters = new ArrayList <NameValuePair>();
 			postParameters.add(new BasicNameValuePair(PushDelivery.NOTIFICATION_ID_KEY, Double.toString(uid)));
