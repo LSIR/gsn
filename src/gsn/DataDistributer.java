@@ -127,6 +127,7 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 		}
 
 		StreamElement se = dataEnum.nextElement();
+		//		boolean success = true;
 		boolean success = listener.deliverStreamElement(se);
 		if (!success) {
 			logger.debug("FLushing an stream element failed, delivery failure [Listener: "+listener.toString()+"]");
@@ -232,9 +233,12 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 
 	public boolean contains(DeliverySystem delivery) {
 		synchronized (listeners) {
-			return listeners.contains(delivery);
+			for (DistributionRequest listener : listeners)
+				if (listener.getDeliverySystem().equals(delivery))
+					return true;
+			return false;
 		}
-		
+
 	}
 
 }

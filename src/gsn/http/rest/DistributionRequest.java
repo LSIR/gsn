@@ -16,5 +16,7 @@ public interface DistributionRequest {
 	public abstract void close();
 
 	public abstract boolean isClosed();
+	
+	public abstract DeliverySystem getDeliverySystem();
 
 }

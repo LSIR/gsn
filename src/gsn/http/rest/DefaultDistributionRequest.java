@@ -39,8 +39,9 @@ public class DefaultDistributionRequest implements DistributionRequest {
 		return sb.toString();
 	}
 
-	public boolean deliverStreamElement(StreamElement se)  {
+	public boolean deliverStreamElement(StreamElement se)  {		
 		boolean success = deliverySystem.writeStreamElement(se);
+//		boolean success = true;
 		if (success)
 			lastVisitedTime=se.getTimeStamp();
 		return success;
@@ -69,6 +70,10 @@ public class DefaultDistributionRequest implements DistributionRequest {
 	
 	public boolean isClosed() {
 		return deliverySystem.isClosed();
+	}
+
+	public DeliverySystem getDeliverySystem() {
+		return deliverySystem;
 	}
 }
 	

@@ -79,6 +79,7 @@ public class RestStreamHanlder extends HttpServlet {
 			if (isExist) {
 				logger.debug("Keep alive request received for the notification-id:"+notificationId);
 				response.setStatus(SUCCESS_200);
+				delivery.close();
 				return;
 			}
 

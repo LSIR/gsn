@@ -68,13 +68,13 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 			return;
 		}
 		
-		try {
-			preparedStatement.setFetchSize(50);
-		} catch (SQLException e1) {
-			logger.warn(e1.getMessage(),e1);
-		}
+//		try {
+//			preparedStatement.setFetchSize(50);
+//		} catch (SQLException e1) {
+//			logger.warn(e1.getMessage(),e1);
+//			return;
+//		}
 
-		
 		this.linkBinaryData = binaryLinked;
 		Vector < String > fieldNames = new Vector < String >( );
 		Vector < Byte > fieldTypes = new Vector < Byte >( );

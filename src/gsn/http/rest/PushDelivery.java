@@ -43,6 +43,7 @@ public class PushDelivery implements DeliverySystem {
 
 	public PushDelivery(String deliveryContactPoint,double notificaitonId, Writer writer) {
 		httpPut = new HttpPut(deliveryContactPoint);
+		
 		this.writer = writer;
 		this.notificationId = notificaitonId;
 	}
@@ -59,11 +60,13 @@ public class PushDelivery implements DeliverySystem {
 	public boolean writeStreamElement(StreamElement se) {
 		String xml = xstream.toXML(new StreamElement4Rest(se));
 		boolean success = sendData(xml);
+//		boolean success =true;
 		isClosed = !success;
 		return success;
 	}
 
 	public void close() {
+		httpclient.getConnectionManager().shutdown();
 		isClosed = true;
 	}
 
@@ -81,7 +84,9 @@ public class PushDelivery implements DeliverySystem {
 			
 			HttpResponse response = httpclient.execute(httpPut);
 			
-			if (response.getStatusLine().getStatusCode() != RestStreamHanlder.SUCCESS_200) {
+			int statusCode = response.getStatusLine().getStatusCode();
+			response.getEntity().getContent().close(); // releasing the connection to the http client's pool
+			if (statusCode != RestStreamHanlder.SUCCESS_200) {
 				return false;
 			}
 			return true;
