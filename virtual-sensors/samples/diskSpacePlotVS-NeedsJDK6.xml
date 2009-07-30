@@ -22,10 +22,10 @@
 	<streams>
 		<stream name="DATA" rate="100">
 			<source alias="source3" storage-size="1" sampling-rate="1">
-				<address wrapper="remote">
+				<address wrapper="remote-rest">
 					<predicate key="HOST">localhost</predicate>
 					<predicate key="PORT">22001</predicate>
-					<predicate key="NAME">FreeDiskSpace</predicate>
+					<predicate key="QUERY">select * from FreeDiskSpace</predicate>
 				</address>
 				<query>select FREE_SPACE,TIMED from wrapper</query>
 			</source>
