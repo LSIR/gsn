@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 
 public class SMACleaner extends AbstractVirtualSensor {
 	
-	
 	static int index = 0;
 	static double values[] ;
 	static private double error_threshold;
@@ -18,7 +17,6 @@ public class SMACleaner extends AbstractVirtualSensor {
 	private static final transient Logger logger = Logger.getLogger(SensorscopeVS.class);
 	
 	public void dataAvailable(String inputStreamName,StreamElement in) {
-		index++;
 		Double input = (Double) in.getData()[0];
 		
 		if (index>=values.length) {
@@ -29,10 +27,13 @@ public class SMACleaner extends AbstractVirtualSensor {
 			
 			StreamElement se ;
 			boolean isAcceptable =  (Math.abs(input - sma)/input <= error_threshold );
-			se= new StreamElement(new DataField[] {new DataField("raw_value","double" ), new DataField("acceptable","integer")},new Serializable[] {input,(isAcceptable == false ? 0 : 1)},in.getTimeStamp());
+			se= new StreamElement(
+					new DataField[] {new DataField("raw_value","double" ), new DataField("acceptable","integer")},
+					new Serializable[] {input,(isAcceptable == false ? 0 : 1)},
+					in.getTimeStamp());
 			dataProduced(se);
 		}
-		values[index%values.length]= input;
+		values[index++%values.length]= input;
 	}
 
 	public void dispose() {
