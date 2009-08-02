@@ -323,6 +323,7 @@ public class VSensorLoader extends Thread {
 	 * FIXME: COPIED_FOR_SAFE_STOAGE
 	 */
 	public AbstractWrapper findWrapper(AddressBean addressBean) throws InstantiationException, IllegalAccessException {
+		
 		AbstractWrapper wrapper = activeWrappers.get ( addressBean );
 		if ( wrapper == null ) {
 			if ( Main.getInstance().getWrapperClass ( addressBean.getWrapper ( ) ) == null ) {
