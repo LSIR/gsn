@@ -15,6 +15,7 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.SplashScreen;
 import java.io.File;
@@ -24,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -130,7 +130,7 @@ public final class Main {
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
 		vsloader.startLoading();
-		
+
 
 	}
 
@@ -145,13 +145,15 @@ public final class Main {
 	}
 
 	private static void updateSplashIfNeeded(String message[]) {
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+		boolean headless_check = ge.isHeadless();
+		for (int i=0;i<message.length;i++)
+			System.out.println(message[i]);
+
+		if (!headless_check) {
 			SplashScreen splash = SplashScreen.getSplashScreen();
-			//Check if we have specified any splash screen
-			for (int i=0;i<message.length;i++)
-				System.out.println(message[i]);
-			if (splash == null) 
+			if (splash == null)
 				return;
-			
 			if (splash.isVisible()) {
 				//Get a graphics overlay for the splash screen
 				Graphics2D g = splash.createGraphics();
@@ -168,6 +170,7 @@ public final class Main {
 					g.drawString(message[i], 13, 16*i+10);
 				splash.update();
 			}
+		}
 	}
 
 	public synchronized static Main getInstance() {
@@ -197,7 +200,7 @@ public final class Main {
 		Main.gsnControllerPort = Integer.parseInt(args[0]) ;
 		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
 		try {
-		Main.getInstance();
+			Main.getInstance();
 		}catch (Exception e) {
 			updateSplashIfNeeded(new String[] {"Starting GSN failed! Look at logs/gsn.log for more information."});
 			try {
