@@ -135,6 +135,8 @@ public final class Main {
 	}
 
 	private static void closeSplashIfneeded() {
+		if (isHeadless())
+			return;
 		SplashScreen splash = SplashScreen.getSplashScreen();
 		//Check if we have specified any splash screen
 		if (splash == null) {
@@ -143,10 +145,11 @@ public final class Main {
 		if (splash.isVisible())
 			splash.close();
 	}
+	
+	
 
 	private static void updateSplashIfNeeded(String message[]) {
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
-		boolean headless_check = ge.isHeadless();
+		boolean headless_check = isHeadless();
 		for (int i=0;i<message.length;i++)
 			System.out.println(message[i]);
 
@@ -171,6 +174,12 @@ public final class Main {
 				splash.update();
 			}
 		}
+	}
+
+	private static boolean isHeadless() {
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+		boolean headless_check = ge.isHeadless();
+		return headless_check;
 	}
 
 	public synchronized static Main getInstance() {
