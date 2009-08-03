@@ -5,6 +5,7 @@ import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,8 +119,11 @@ public class PushRemoteWrapper extends AbstractWrapper {
 				}
 			} else {
 				logger.debug ( new StringBuilder ( ).append ( "Wants to consume the strcture packet from " ).append(initParams.getRemoteContactPoint()));
-				structure = (DataField[]) XSTREAM.fromXML(entity.getContent());
+				InputStream content = entity.getContent();
+				structure = (DataField[]) XSTREAM.fromXML(content);
 				logger.debug("Connection established for: "+ initParams.getRemoteContactPoint());
+								
+				content.close();
 				break;	
 			}
 		}
@@ -166,7 +170,7 @@ public class PushRemoteWrapper extends AbstractWrapper {
 					try {
 						response.getEntity().getContent().close();
 					} catch (IllegalStateException e) {
-						e.printStackTrace();
+						logger.warn(e.getMessage(), e);
 					} catch (IOException e) {
 						logger.warn(e.getMessage(),e);
 					}

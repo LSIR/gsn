@@ -4,10 +4,10 @@ package gsn.wrappers.xBow;
  * This is wrapper is based on Lei Shu's xmlWrapper.
  * It works with a Crossbow eKo wireless sensor network.
  * The sensor boards contain:
- * •	a Sensirion SHT11 single chip humidity and temperature sensor;
- * •	an Intersema MS55ER barometric pressure and temperature sensor;
- * •	a TAOS Inc. TLS2550 digital light sensor and
- * •	an Analog Devices ADXL202 dual axis accelerometer.
+ * 	a Sensirion SHT11 single chip humidity and temperature sensor;
+ * 	an Intersema MS55ER barometric pressure and temperature sensor;
+ * 	a TAOS Inc. TLS2550 digital light sensor and
+ * 	an Analog Devices ADXL202 dual axis accelerometer.
  * @author bgpearn
  */
 

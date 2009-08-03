@@ -174,7 +174,7 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 			logger.error( e.getMessage( ) , e );
 			close();
 		}
-		return streamElement;
+		return streamElement; //BUG -> if a SQLException occurs, the last stream element will be returned.
 	}
 
 	public void close ( ) {
@@ -195,5 +195,6 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 		}
-	} 
+	}
+
 }
