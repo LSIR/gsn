@@ -6,7 +6,6 @@ import gsn.beans.StreamElement;
 
 import java.io.File;
 import java.io.Serializable;
-import java.lang.management.ManagementFactory;
 
 import org.apache.log4j.Logger;
 
@@ -27,8 +26,11 @@ public class DiskSpaceWrapper extends AbstractWrapper{
       
     public boolean initialize() {
         logger.info("Initializing DiskSpaceWrapper Class");
-        if(!ManagementFactory.getRuntimeMXBean().getVmVersion().startsWith("1.6"))
-            logger.error("Error in initializing DiskSpaceWrapper because of incompatible jdk version (should be 1.6.x)");
+        String javaVersion = System.getProperty("java.version");
+        if(!javaVersion.startsWith("1.6")){
+            logger.error("Error in initializing DiskSpaceWrapper because of incompatible jdk version: " + javaVersion + " (should be 1.6.x)");
+            return false;
+        }
         setName("DiskSpaceWrapper-Thread" + (++threadCounter));
         return true;
     }
