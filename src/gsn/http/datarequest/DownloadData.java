@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -142,11 +143,11 @@ public class DownloadData extends AbstractDataRequest {
 		}
 		if (wantTimed) {
 			if (se.getData().length != 0) respond.print(cvsDelimiter);
-			respond.print( qbuilder.getSdf() == null ? se.getTimeStamp() : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
+			respond.print( qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
 		}
 		respond.println();
 	}
-
+	
 	private void formatXMLElement (PrintWriter respond, StreamElement se, boolean wantTimed, boolean firstLine) {
 		if (firstLine) {
 			respond.println("\t\t<header>");
@@ -160,8 +161,14 @@ public class DownloadData extends AbstractDataRequest {
 		for (int i = 0 ; i < se.getData().length ; i++) {
 			respond.println("\t\t\t<field>" + se.getData()[i] + "</field>");
 		}
-		if (wantTimed) respond.println("\t\t\t<field>" + ( qbuilder.getSdf() == null ? se.getTimeStamp() : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
+		if (wantTimed) respond.println("\t\t\t<field>" + ( qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
 		respond.println("\t\t</tuple>");
+	}
+	
+	private long timestampInUTC(long timestamp){
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(timestamp);
+		return cal.getTimeInMillis() + cal.getTimeZone().getOffset(cal.getTimeInMillis());
 	}
 
 	public AllowedOutputType getOt() {

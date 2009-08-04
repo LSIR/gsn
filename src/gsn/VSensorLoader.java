@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jibx.runtime.JiBXException;
@@ -35,7 +36,7 @@ public class VSensorLoader extends Thread {
 	/**
 	 * Mapping between the AddressBean and DataSources
 	 */
-	private  final HashMap < AddressBean , AbstractWrapper > activeWrappers                   = new HashMap < AddressBean ,  AbstractWrapper >( );
+	private  final List < AbstractWrapper > activeWrappers                   = new ArrayList< AbstractWrapper >( );
 
 	private StorageManager                                         sm                      = StorageManager.getInstance ( );
 
@@ -252,7 +253,7 @@ public class VSensorLoader extends Thread {
 		}
 		if ( !wrapper.isActive()) {//This stream source is the only listener
 			logger.debug("The wrapper:"+wrapper.getName()+" is removed.");
-			activeWrappers.remove ( wrapper.getActiveAddressBean ( ) );
+			activeWrappers.remove ( wrapper );
 		}else {
 			logger.debug("The wrapper:"+wrapper.getName()+" is not released as it is still used by other virtual sensors.");
 		}
@@ -323,14 +324,11 @@ public class VSensorLoader extends Thread {
 	 * FIXME: COPIED_FOR_SAFE_STOAGE
 	 */
 	public AbstractWrapper findWrapper(AddressBean addressBean) throws InstantiationException, IllegalAccessException {
-		
-		AbstractWrapper wrapper = activeWrappers.get ( addressBean );
-		if ( wrapper == null ) {
 			if ( Main.getInstance().getWrapperClass ( addressBean.getWrapper ( ) ) == null ) {
 				logger.error ( "The wrapper >" + addressBean.getWrapper ( ) + "< is not defined in the >" + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE + "< file." );
 				return null;
 			}
-			wrapper = ( AbstractWrapper ) Main.getInstance().getWrapperClass ( addressBean.getWrapper ( ) ).newInstance ( );
+			AbstractWrapper wrapper = ( AbstractWrapper ) Main.getInstance().getWrapperClass ( addressBean.getWrapper ( ) ).newInstance ( );
 			wrapper.setActiveAddressBean ( addressBean );
 			boolean initializationResult = wrapper.initialize (  );
 			if ( initializationResult == false )
@@ -344,11 +342,9 @@ public class VSensorLoader extends Thread {
 				return null;
 			}
 			wrapper.start ( );
-			activeWrappers.put ( wrapper.getActiveAddressBean() , wrapper );
-		}else 
-			if (logger.isDebugEnabled())
-				logger.debug("Existing wrapper found and reused. [name :"+addressBean.getWrapper() );
-		return wrapper;
+			activeWrappers.add ( wrapper );
+
+			return wrapper;
 	}
 	public boolean prepareStreamSource ( VSensorConfig vsensorConfig,InputStream inputStream , StreamSource streamSource  ) throws InstantiationException, IllegalAccessException {
 		streamSource.setInputStream(inputStream);

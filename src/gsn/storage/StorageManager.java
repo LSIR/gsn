@@ -455,8 +455,7 @@ public class StorageManager {
 		StringBuilder statement = getStatementCreateView(viewName, selectQuery);
 		if (logger.isDebugEnabled())
 			logger.debug("Creating a view:" + statement);
-		final PreparedStatement prepareStatement = connection
-		.prepareStatement(statement.toString());
+		final PreparedStatement prepareStatement = connection.prepareStatement(statement.toString());
 		prepareStatement.execute();
 		close(prepareStatement);
 	}
