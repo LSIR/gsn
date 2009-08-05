@@ -1,0 +1,42 @@
+<virtual-sensor name="WAN1_Agg" >
+  <processing-class>
+    <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+    <unique-timestamps>true</unique-timestamps>
+    <init-params/>
+   <output-structure>
+				<field name='AVG_RELATIVE_HUMIDITY' type='double'/>
+				<field name='AVG_AIR_TEMPERATURE' type='double'/>
+	    </output-structure>
+  </processing-class>
+  
+  <description>Wannengrat weather station 1 in Davos, Switzerland. Copyright owner of the data is SLF.</description>
+  <life-cycle pool-size="10" />
+  <addressing>
+		<predicate key='geographical'>Davos, Switzerland.</predicate>
+	 	<predicate key='LATITUDE'>46.7952138889</predicate>
+		<predicate key='LONGITUDE'>9.77391388889</predicate>
+		<predicate key='ALTITUDE'>2455</predicate>
+		<predicate key='NAME'>WAN1</predicate>
+		<predicate key='GPS_Precision'>10</predicate>
+		<predicate key='SLOPE'>0</predicate>
+		<predicate key='exposition'>NULL</predicate>
+		<predicate key='metadata'>http://www.swiss-experiment.ch/index.php/Wannengrat:Wan1</predicate>
+	</addressing>
+  <storage />
+  
+  <streams>
+    <stream name="data" >
+      <source alias="source" storage-size="30m" sampling-rate="1" slide="3" >
+        <address wrapper="local">
+            <predicate key="name">WAN1_Clone</predicate>
+			<predicate key="start-time">2006-01-01T00:00:00.000+02:00</predicate>
+	    </address>
+ 	    <query>select avg(RELATIVE_HUMIDITY) as AVG_RELATIVE_HUMIDITY, avg(AIR_TEMPERATURE) as AVG_AIR_TEMPERATURE , MAX(TIMED) as TIMED from wrapper</query> 
+<!--  	    <query>select RELATIVE_HUMIDITY as AVG_RELATIVE_HUMIDITY, AIR_TEMPERATURE as AVG_AIR_TEMPERATURE,TIMED as TIMED from wrapper</query>  --> 
+	    </source>
+	    <query>select * from source</query>
+	  </stream>
+  </streams>
+
+</virtual-sensor> 
+

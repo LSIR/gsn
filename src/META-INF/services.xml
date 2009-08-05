@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file was auto-generated from WSDL -->
+<!-- by the Apache Axis2 version: 1.3  Built on : Aug 10, 2007 (04:45:47 LKT) -->
+<serviceGroup>
+    <service name="Service">
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="gsn.msr.sensormap.datahub.ServiceMessageReceiverInOut"/>
+        </messageReceivers>
+        <parameter name="ServiceClass">gsn.msr.sensormap.datahub.ServiceSoap12Impl</parameter>
+        <parameter name="useOriginalwsdl">true</parameter>
+        <parameter name="modifyUserWSDLPortAddress">true</parameter>
+        <operation name="GetPassCode" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/GetPassCode</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/GetPassCodeResponse</outputActionMapping>
+        </operation>
+        <operation name="DebugUserManager" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/DebugUserManager</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/DebugUserManagerResponse</outputActionMapping>
+        </operation>
+        <operation name="CreateSensorType" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/CreateSensorType</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/CreateSensorTypeResponse</outputActionMapping>
+        </operation>
+        <operation name="CreateVectorSensorType" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/CreateVectorSensorType</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/CreateVectorSensorTypeResponse</outputActionMapping>
+        </operation>
+        <operation name="InsertSensor" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/InsertSensor</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/InsertSensorResponse</outputActionMapping>
+        </operation>
+        <operation name="InsertVectorSensor" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/InsertVectorSensor</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/InsertVectorSensorResponse</outputActionMapping>
+        </operation>
+        <operation name="DeleteSensor" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/DeleteSensor</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/DeleteSensorResponse</outputActionMapping>
+        </operation>
+        <operation name="DeleteVectorSensor" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/DeleteVectorSensor</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/DeleteVectorSensorResponse</outputActionMapping>
+        </operation>
+        <operation name="GetSensorDescriptionByName" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/GetSensorDescriptionByName</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/GetSensorDescriptionByNameResponse</outputActionMapping>
+        </operation>
+        <operation name="GetSensorsByPublisher" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/GetSensorsByPublisher</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/GetSensorsByPublisherResponse</outputActionMapping>
+        </operation>
+        <operation name="UpdateSensorLocation" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/UpdateSensorLocation</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/UpdateSensorLocationResponse</outputActionMapping>
+        </operation>
+        <operation name="SensorsInsidePolygon" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/SensorsInsidePolygon</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/SensorsInsidePolygonResponse</outputActionMapping>
+        </operation>
+        <operation name="DebugVectorSensorManager" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/DebugVectorSensorManager</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/DebugVectorSensorManagerResponse</outputActionMapping>
+        </operation>
+        <operation name="DebugSensorManager" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/DebugSensorManager</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/DebugSensorManagerResponse</outputActionMapping>
+        </operation>
+        <operation name="StoreScalarData" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/StoreScalarData</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/StoreScalarDataResponse</outputActionMapping>
+        </operation>
+        <operation name="StoreScalarDataBatch" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/StoreScalarDataBatch</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/StoreScalarDataBatchResponse</outputActionMapping>
+        </operation>
+        <operation name="GetLatestScalarData" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/GetLatestScalarData</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/GetLatestScalarDataResponse</outputActionMapping>
+        </operation>
+        <operation name="GetScalarData" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/GetScalarData</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/GetScalarDataResponse</outputActionMapping>
+        </operation>
+        <operation name="GetLatestScalarDataBatch" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/GetLatestScalarDataBatch</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/GetLatestScalarDataBatchResponse</outputActionMapping>
+        </operation>
+        <operation name="StoreVectorData" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/StoreVectorData</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/StoreVectorDataResponse</outputActionMapping>
+        </operation>
+        <operation name="StoreVectorComponentData" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/StoreVectorComponentData</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/StoreVectorComponentDataResponse</outputActionMapping>
+        </operation>
+        <operation name="GetVectorData" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/GetVectorData</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/GetVectorDataResponse</outputActionMapping>
+        </operation>
+        <operation name="GetVectorComponentData" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/GetVectorComponentData</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/GetVectorComponentDataResponse</outputActionMapping>
+        </operation>
+        <operation name="StoreBinaryData" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/StoreBinaryData</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/StoreBinaryDataResponse</outputActionMapping>
+        </operation>
+        <operation name="GetLatestBinarySensorData" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/GetLatestBinarySensorData</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/GetLatestBinarySensorDataResponse</outputActionMapping>
+        </operation>
+        <operation name="DebugScalarDataManager" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/DebugScalarDataManager</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/DebugScalarDataManagerResponse</outputActionMapping>
+        </operation>
+        <operation name="DebugBinaryDataManager" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/DebugBinaryDataManager</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/DebugBinaryDataManagerResponse</outputActionMapping>
+        </operation>
+        <operation name="DebugVectorDataManager" mep="http://www.w3.org/ns/wsdl/in-out">
+            <actionMapping>http://tempuri.org/DebugVectorDataManager</actionMapping>
+            <outputActionMapping>http://tempuri.org/ServiceSoap/DebugVectorDataManagerResponse</outputActionMapping>
+        </operation>
+    </service>
+</serviceGroup>

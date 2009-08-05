@@ -1,0 +1,44 @@
+<virtual-sensor name="WAN1_Cleaned" >
+  <processing-class>
+    <class-name>gsn.vsensor.SMACleaner</class-name>
+    <unique-timestamps>true</unique-timestamps>
+    <init-params>
+    	<param name='size'>5</param>
+		<param name='error-threshold'>0.15</param>
+    </init-params>
+   <output-structure>
+				<field name='raw_value' type='double'/>
+				<field name='acceptable' type='double'/>
+	    </output-structure>
+  </processing-class>
+  
+  <description>Wannengrat weather station 1 in Davos, Switzerland. Copyright owner of the data is SLF.</description>
+  <life-cycle pool-size="1" />
+  <addressing>
+		<predicate key='geographical'>Davos, Switzerland.</predicate>
+	 	<predicate key='LATITUDE'>46.7952138889</predicate>
+		<predicate key='LONGITUDE'>9.77391388889</predicate>
+		<predicate key='ALTITUDE'>2455</predicate>
+		<predicate key='NAME'>WAN1</predicate>
+		<predicate key='GPS_Precision'>10</predicate>
+		<predicate key='SLOPE'>0</predicate>
+		<predicate key='exposition'>NULL</predicate>
+		<predicate key='metadata'>http://www.swiss-experiment.ch/index.php/Wannengrat:Wan1</predicate>
+	</addressing>
+  <storage />
+  
+  <streams>
+    <stream name="data" >
+      <source alias="source" storage-size="1" sampling-rate="1" slide="1" >
+        <address wrapper="local">
+            <predicate key="name">WAN1_Clone</predicate>
+			<predicate key="start-time">2006-01-01T00:00:00.000+02:00</predicate>
+	    </address>
+ 	    <query>select RELATIVE_HUMIDITY , TIMED from wrapper</query> 
+	    </source>
+	    <query>select * from source</query>
+	  </stream>
+  </streams>
+
+</virtual-sensor> 
+

@@ -1,0 +1,67 @@
+<virtual-sensor name="WAN1" >
+  <processing-class>
+    <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+    <unique-timestamps>true</unique-timestamps>
+    <init-params/>
+   <output-structure>
+				<field name='record' type='double'/>
+				<field name='RELATIVE_HUMIDITY' type='double'/>
+				<field name='AIR_TEMPERATURE' type='double'/>
+				<field name='WIND_SPEED_SCALAR_AV' type='double'/>
+				<field name='WIND_SPEED_VECTOR_AV' type='double'/>
+				<field name='WIND_DIRECTION' type='double'/>
+				<field name='WIND_DIRECTION_STDEV' type='double'/>
+				<field name='WIND_SPEED_MAX' type='double'/>
+				<field name='WIND_SPEED_NORTHERLY_COMPONENT' type='double'/>
+				<field name='WIND_SPEED_WESTERLY_COMPONENT' type='double'/>
+				<field name='WIND_SPEED_VERTICAL_COMPONENT' type='double'/>
+				<field name='INCOMING_SHORTWAVE_RADIATION' type='double'/>
+				<field name='OUTGOING_SHORTWAVE_RADIATION' type='double'/>
+				<field name='INCOMING_LONGWAVE_RADIATION' type='double'/>
+				<field name='OUTGOING_LONGWAVE_RADIATION' type='double'/>
+	    </output-structure>
+  </processing-class>
+  
+  <description>Wannengrat weather station 1 in Davos, Switzerland. Copyright owner of the data is SLF.</description>
+  <life-cycle pool-size="10" />
+  <addressing>
+		<predicate key='geographical'>Davos, Switzerland.</predicate>
+	 	<predicate key='LATITUDE'>46.7952138889</predicate>
+		<predicate key='LONGITUDE'>9.77391388889</predicate>
+		<predicate key='ALTITUDE'>2455</predicate>
+		<predicate key='NAME'>WAN1</predicate>
+		<predicate key='GPS_Precision'>10</predicate>
+		<predicate key='SLOPE'>0</predicate>
+		<predicate key='exposition'>NULL</predicate>
+		<predicate key='metadata'>http://www.swiss-experiment.ch/index.php/Wannengrat:Wan1</predicate>
+	</addressing>
+  <storage />
+  
+  <streams>
+<!--    <stream name="data" >
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="csv">
+          <predicate key="file">Wan_1.met</predicate>
+	        <predicate key="fields">timed,record,rh,ta,vw_wvc_1,vw_wvc_2,vw_wvc_3,vw_wvc_4,vw_max,vw_u,vw_v,vw_w,sw_in,sw_out,lw_in,lw_out</predicate>
+	        <predicate key="formats">timestamp(y-M-d H:m:s),numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric</predicate>
+	        <predicate key="bad-values">NaN,6999,-6999, 7999,-7999, NULL</predicate>
+	        <predicate key="timezone">Etc/GMT-1</predicate>
+	        <predicate key="sampling">60000</predicate> 
+	        <predicate key="skip-first-lines">4</predicate>
+	        <predicate key="check-point-directory">csv-check-points</predicate>
+	      </address>
+	      <query>select TIMED, record, RH AS RELATIVE_HUMIDITY, TA
+			AS AIR_TEMPERATURE, VW_WVc_1 AS WIND_SPEED_SCALAR_AV, VW_WVc_2
+	            AS WIND_SPEED_VECTOR_AV,
+			VW_WVc_3 AS WIND_DIRECTION, VW_WVc_4 AS
+	            WIND_DIRECTION_STDEV, VW_Max AS WIND_SPEED_MAX, SW_in AS
+			INCOMING_SHORTWAVE_RADIATION,
+	            SW_out AS OUTGOING_SHORTWAVE_RADIATION, LW_in AS
+			INCOMING_LONGWAVE_RADIATION, LW_out AS
+	            OUTGOING_LONGWAVE_RADIATION from wrapper</query>
+	    </source>
+	    <query>select * from source</query>
+	  </stream> -->
+  </streams>
+
+</virtual-sensor> 

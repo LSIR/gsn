@@ -1,0 +1,55 @@
+<virtual-sensor name="WAN1_Clone" >
+  <processing-class>
+    <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+    <unique-timestamps>true</unique-timestamps>
+    <init-params/>
+   <output-structure>
+				<field name='record' type='double'/>
+				<field name='RELATIVE_HUMIDITY' type='double'/>
+				<field name='AIR_TEMPERATURE' type='double'/>
+				<field name='WIND_SPEED_SCALAR_AV' type='double'/>
+				<field name='WIND_SPEED_VECTOR_AV' type='double'/>
+				<field name='WIND_DIRECTION' type='double'/>
+				<field name='WIND_DIRECTION_STDEV' type='double'/>
+				<field name='WIND_SPEED_MAX' type='double'/>
+				<field name='WIND_SPEED_NORTHERLY_COMPONENT' type='double'/>
+				<field name='WIND_SPEED_WESTERLY_COMPONENT' type='double'/>
+				<field name='WIND_SPEED_VERTICAL_COMPONENT' type='double'/>
+				<field name='INCOMING_SHORTWAVE_RADIATION' type='double'/>
+				<field name='OUTGOING_SHORTWAVE_RADIATION' type='double'/>
+				<field name='INCOMING_LONGWAVE_RADIATION' type='double'/>
+				<field name='OUTGOING_LONGWAVE_RADIATION' type='double'/>
+	    </output-structure>
+  </processing-class>
+  
+  <description>Wannengrat weather station 1 in Davos, Switzerland. Copyright owner of the data is SLF.</description>
+  <life-cycle pool-size="10" />
+  <addressing>
+		<predicate key='geographical'>Davos, Switzerland.</predicate>
+	 	<predicate key='LATITUDE'>46.7952138889</predicate>
+		<predicate key='LONGITUDE'>9.77391388889</predicate>
+		<predicate key='ALTITUDE'>2455</predicate>
+		<predicate key='NAME'>WAN1</predicate>
+		<predicate key='GPS_Precision'>10</predicate>
+		<predicate key='SLOPE'>0</predicate>
+		<predicate key='exposition'>NULL</predicate>
+		<predicate key='metadata'>http://www.swiss-experiment.ch/index.php/Wannengrat:Wan1</predicate>
+	</addressing>
+  <storage />
+  
+  <streams>
+<!--      <stream name="data" >
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="remote">
+             <predicate key="query">select * from WAN1</predicate>
+			<predicate key="remote-contact-point">http://192.168.51.67:22001/streaming/</predicate>
+			<predicate key="local-contact-point">http://192.168.51.26:22001/streaming/</predicate>
+			<predicate key="start-time">2006-01-01T00:00:00.000+02:00</predicate>
+	      </address>
+	      <query>select * from wrapper</query>
+	    </source>
+	    <query>select * from source</query>
+	  </stream>   -->
+  </streams>
+
+</virtual-sensor> 
