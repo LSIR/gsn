@@ -1,9 +1,6 @@
 package gsn.operators;
 
-import gsn.beans.DataTypes;
-import gsn.beans.Operator;
-import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
+import gsn.beans.*;
 import gsn.channels.DataChannel;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
@@ -30,7 +27,11 @@ public class GPSNMEAVS  implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 	private static final transient Logger logger = Logger.getLogger( GPSNMEAVS.class );
@@ -68,13 +69,13 @@ public class GPSNMEAVS  implements Operator {
 	}
 
 	public void process ( String inputStreamName , StreamElement data) {
-		if ( logger.isDebugEnabled( ) ) logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getData(SerialWrapper.RAW_PACKET)));
+		if ( logger.isDebugEnabled( ) ) logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getValue(SerialWrapper.RAW_PACKET)));
 
 		//needed? ######
 //		Wrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
 
 		//raw data from serial
-		String s = new String( ( byte [ ] ) data.getData( SerialWrapper.RAW_PACKET ) );
+		String s = new String( ( byte [ ] ) data.getValue( SerialWrapper.RAW_PACKET ) );
 		String [ ] line = s.split( "\n" );
 		//iterate on every line
 		for ( int i = 0 ; i < line.length ; i++ ) {
@@ -104,7 +105,9 @@ public class GPSNMEAVS  implements Operator {
 				//send back the data
 				outputData[ 0 ] = lat;
 				outputData[ 1 ] = lon;
-				StreamElement output = new StreamElement( fieldNames , fieldTypes , outputData , System.currentTimeMillis( ) );
+        StreamElement output = StreamElement.from(this).setTime(System.currentTimeMillis());
+        for (int j=0;j<fieldNames.length;j++)
+          output.set(fieldNames[j],outputData[j]);
 				outputChannel.write( output );
 				break;//one $GPRMC line is enough
 			}

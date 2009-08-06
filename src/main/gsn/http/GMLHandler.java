@@ -2,7 +2,6 @@ package gsn.http;
 
 import gsn.Main;
 import gsn.Mappings;
-import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSFile;
 import gsn.storage.DataEnumerator;
@@ -17,8 +16,6 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.KeyValue;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 public class GMLHandler implements RequestHandler {

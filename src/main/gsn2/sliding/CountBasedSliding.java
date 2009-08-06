@@ -16,7 +16,7 @@ public class CountBasedSliding implements SlidingHandler{
 		tempCounter++;
 		if (tempCounter % size == 0) 
 			for (SlidingListener listener:listeners)
-				listener.slide(se.getTimeStamp());
+				listener.slide(se.getTimed());
 	}
 
 	public void reset() {

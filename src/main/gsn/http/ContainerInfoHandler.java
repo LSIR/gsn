@@ -1,27 +1,18 @@
 package gsn.http;
 
 import gsn.Main;
-import gsn.Mappings;
-import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
-import gsn.beans.WebInput;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.KeyValue;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 public class ContainerInfoHandler implements RequestHandler {
@@ -78,7 +69,7 @@ public class ContainerInfoHandler implements RequestHandler {
 //                sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
 //            sb.append("</field>\n");
 //          }
-//          sb.append("\t<field name=\"timed\" type=\"string\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
+//          sb.append("\t<field name=\"timed\" type=\"string\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : sdf.format(new Date(se.getTimed( ))) ).append( "</field>\n" );
 //          for ( KeyValue df : sensorConfig.getAddressing( )){
 //            sb.append("\t<field");
 //            sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");

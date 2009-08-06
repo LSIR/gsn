@@ -30,7 +30,7 @@ public class TimeBasedWindow implements WindowHandler {
         List<StreamElement> toReturn = checkNextWindow(timestamp);
 
         for (ListIterator<StreamElement> iter = items.listIterator(); iter.hasNext();) {
-            if (iter.next().getTimeStamp() <= timestamp - size) {
+            if (iter.next().getTimed() <= timestamp - size) {
                 iter.remove();
             }
         }
@@ -41,7 +41,7 @@ public class TimeBasedWindow implements WindowHandler {
     public List<StreamElement> checkNextWindow(long timestamp) {
         LinkedList<StreamElement> toReturn = new LinkedList<StreamElement>();
         for (StreamElement se : items) {
-            if (se.getTimeStamp() <= timestamp && se.getTimeStamp() > timestamp - size) {
+            if (se.getTimed() <= timestamp && se.getTimed() > timestamp - size) {
                 toReturn.add(se);
             }
         }

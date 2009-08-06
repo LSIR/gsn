@@ -8,8 +8,6 @@ public final class DataField implements Serializable {
   
    private static final long serialVersionUID = -8841539191525018987L;
    
-   private String            description      = "Not Provided";
-   
    private String            name;
    
    private byte               dataTypeID       = -1;
@@ -18,28 +16,18 @@ public final class DataField implements Serializable {
    
    private DataField ( ) {}
    
-   public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {
+   public DataField ( final String fieldName , final String type ) throws GSNRuntimeException {
       this.name = fieldName;
       this.type = type;
       this.dataTypeID = DataTypes.convertTypeNameToGSNTypeID( type );
-      this.description = description;
    }
    
-   public DataField ( final String name , final String type ) {
-      this.name = name;
-      this.type = type;
-      this.dataTypeID = DataTypes.convertTypeNameToGSNTypeID( type );
-   }
- 
    public DataField(String colName,byte dataTypeID) {
      this.name=colName;
      this.dataTypeID = dataTypeID;
      this.type = DataTypes.TYPE_NAMES[this.dataTypeID];
   }
 
-  public String getDescription ( ) {
-      return this.description;
-   }
    transient boolean fieldNameConvertedToLowerCase = false;
    public String getName ( ) {
       if (fieldNameConvertedToLowerCase==false) {
@@ -73,7 +61,7 @@ public final class DataField implements Serializable {
    public String toString ( ) {
       final StringBuilder result = new StringBuilder( );
       result.append( "[Field-Name:" ).append( this.name ).append( ", Type:" ).append( DataTypes.TYPE_NAMES[ this.getDataTypeID( ) ] ).append( "[" + this.type + "]" ).append( ", Decription:" )
-            .append( this.description ).append( "]" );
+            .append( "]" );
       return result.toString( );
    }
    

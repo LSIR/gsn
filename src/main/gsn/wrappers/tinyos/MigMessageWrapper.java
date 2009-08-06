@@ -198,7 +198,7 @@ public class MigMessageWrapper implements Wrapper , net.tinyos.message.MessageLi
 		while(it.hasNext()) {
 			String curName = it.next();
 			String curType = outputFields.get(curName);
-			fieldsAL.add(new DataField(curName.toUpperCase(), types.get(curType), curName));
+			fieldsAL.add(new DataField(curName.toUpperCase(), types.get(curType)));
 		}
 		return fieldsAL.toArray(new DataField[] {} );
 	}
@@ -263,7 +263,14 @@ public class MigMessageWrapper implements Wrapper , net.tinyos.message.MessageLi
 				}
 			}
 		}
-		dataChannel.write( new StreamElement(getOutputFormat(),new Serializable[] {retvals.toArray(new Serializable[] {})},System.currentTimeMillis() ));
+
+    Serializable[] readings = retvals.toArray(new Serializable[]{});
+    StreamElement streamEle = StreamElement.from(this);
+                for (int i=0;i<getOutputFormat().length;i++)
+                  streamEle.set(getOutputFormat()[i].getName(),readings[i]);
+    streamEle.setTime(System.currentTimeMillis());
+
+    dataChannel.write( streamEle);
 	}
 
 	private boolean checkArray(String fieldName) {

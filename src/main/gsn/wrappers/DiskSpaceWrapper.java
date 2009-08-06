@@ -1,13 +1,11 @@
 package gsn.wrappers;
 
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.WrapperConfig;
 import gsn.channels.DataChannel;
 
 import java.io.File;
-import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
@@ -19,7 +17,7 @@ public class DiskSpaceWrapper implements Wrapper {
 
 	private final transient Logger      logger                      = Logger.getLogger(DiskSpaceWrapper.class);
 
-	private transient DataField[]       outputStructureCache        = new DataField[]{new DataField("FREE_SPACE", "bigint", "Free Disk Space")};
+	private transient DataField[]       outputStructureCache        = new DataField[]{new DataField("FREE_SPACE", "bigint")};
 
 	private File[] roots;
 
@@ -62,8 +60,7 @@ public class DiskSpaceWrapper implements Wrapper {
 
 			//convert to MB
 			totalFreeSpace = totalFreeSpace / (1024 * 1024);
-			StreamElement streamElement = new StreamElement(new String[]{"FREE_SPACE"}, new Byte[]{DataTypes.BIGINT}, new Serializable[] {totalFreeSpace
-			},System.currentTimeMillis());
+			StreamElement streamElement = StreamElement.from(this).set("FREE_SPACE",totalFreeSpace).setTime(System.currentTimeMillis());
 			dataChannel.write(streamElement);
 		}
 	}

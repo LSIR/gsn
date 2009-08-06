@@ -41,372 +41,372 @@ import org.xml.sax.SAXException;
 //TODO: This wrapper does not reconnect to a remote xServe if communication is lost.
 
 public class xBowWrapper implements Wrapper {
-	
 
-	private final WrapperConfig conf;
 
-	private final DataChannel dataChannel;
+  private final WrapperConfig conf;
 
-	private int                      DEFAULT_RATE       = 5000;
+  private final DataChannel dataChannel;
 
-	private final transient Logger     logger                 = Logger.getLogger ( xBowWrapper.class );
+  private int                      DEFAULT_RATE       = 5000;
 
-	private static final String [ ]  FIELD_NAMES           = new String [ ] {
-		"amType", "nodeid" , "voltage" , 
-		"humid" , "humtemp" , "prtemp" ,"press",
-		"taosch0", "taosch1", "taoch0"};
+  private final transient Logger     logger                 = Logger.getLogger ( xBowWrapper.class );
 
-	private static final Byte [ ]    FIELD_TYPES           = new Byte [ ] {
-		DataTypes.INTEGER ,DataTypes.INTEGER , DataTypes.INTEGER ,  
-		DataTypes.INTEGER ,DataTypes.INTEGER , DataTypes.DOUBLE , DataTypes.DOUBLE,
-		DataTypes.INTEGER, DataTypes.INTEGER,DataTypes.DOUBLE};
+  private static final String [ ]  FIELD_NAMES           = new String [ ] {
+          "amType", "nodeid" , "voltage" ,
+          "humid" , "humtemp" , "prtemp" ,"press",
+          "taosch0", "taosch1", "taoch0"};
 
-	private static final String [ ]  FIELD_DESCRIPTION     = new String [ ] { 
-		"amType" ,"Node ID" , "Voltage of This Node" ,
-		"Humidity" , "Temperature" , "PrTemp", "Pressure", 
-		"taosch0", "taosch1", "taoch0"};
+  private static final Byte [ ]    FIELD_TYPES           = new Byte [ ] {
+          DataTypes.INTEGER ,DataTypes.INTEGER , DataTypes.INTEGER ,
+          DataTypes.INTEGER ,DataTypes.INTEGER , DataTypes.DOUBLE , DataTypes.DOUBLE,
+          DataTypes.INTEGER, DataTypes.INTEGER,DataTypes.DOUBLE};
 
-	private static final String [ ]  FIELD_TYPES_STRING    = new String [ ] { 
-		"int" , "int" , "int" , 
-		"int" , "int" , "double", "double",
-		"int" , "int" , "double"};
+  private static final String [ ]  FIELD_DESCRIPTION     = new String [ ] {
+          "amType" ,"Node ID" , "Voltage of This Node" ,
+          "Humidity" , "Temperature" , "PrTemp", "Pressure",
+          "taosch0", "taosch1", "taoch0"};
 
-	private DataField[]                outputStructure      ;
+  private static final String [ ]  FIELD_TYPES_STRING    = new String [ ] {
+          "int" , "int" , "int" ,
+          "int" , "int" , "double", "double",
+          "int" , "int" , "double"};
 
-	private String                     host                ;
+  private DataField[]                outputStructure      ;
 
-	private int                        port                ;
+  private String                     host                ;
 
-	private int                        rate                ;
+  private int                        port                ;
 
-	// fields of sensor node
+  private int                        rate                ;
 
-	private int						amType ;
-	private int                        nodeid              ;
+  // fields of sensor node
 
-	private int                        parent              ;
+  private int						amType ;
+  private int                        nodeid              ;
 
-	private int                        group               ;
+  private int                        parent              ;
 
-	private int                        voltage             ;
+  private int                        group               ;
 
-	private int                        humid               ;
+  private int                        voltage             ;
 
-	private int                        humtemp             ;
-	private int						  taosch0;
-	private int						  taosch1;
-	private double						  taoch0;
+  private int                        humid               ;
 
+  private int                        humtemp             ;
+  private int						  taosch0;
+  private int						  taosch1;
+  private double						  taoch0;
 
-	private double                     prtemp               ;
-	private double                     press               ;
 
-	private double                     accel_x             ;
+  private double                     prtemp               ;
+  private double                     press               ;
 
-	private double                     accel_y             ;
+  private double                     accel_x             ;
 
-	// declare the socket object for client side   
-	private Socket                     xmlSocket = null    ;
+  private double                     accel_y             ;
 
-	private BufferedReader             rd                  ;
+  // declare the socket object for client side
+  private Socket                     xmlSocket = null    ;
 
-	private StreamElement              streamEle           ;
+  private BufferedReader             rd                  ;
 
-	private  boolean                   add = false         ;
+  private StreamElement              streamEle           ;
 
-	private String                     s  = ""             ; // xml packet
+  private  boolean                   add = false         ;
 
-	private String                     xmls                ; 
+  private String                     s  = ""             ; // xml packet
 
-	private DocumentBuilderFactory     domfac              ;
+  private String                     xmls                ;
 
-	private DocumentBuilder            dombuilder          ;
+  private DocumentBuilderFactory     domfac              ;
 
-	private InputSource                ins                 ;
+  private DocumentBuilder            dombuilder          ;
 
-	private Document                   doc                 ;
+  private InputSource                ins                 ;
 
-	private boolean                    notEnd = true       ; 
+  private Document                   doc                 ;
 
-	private int                        k                   ;
+  private boolean                    notEnd = true       ;
 
-	private String                     bs                  ;
+  private int                        k                   ;
 
-	private int                        indexS              ;
+  private String                     bs                  ;
 
-	private int                        indexE              ;
+  private int                        indexS              ;
 
-	private boolean                    getxml              ;
+  private int                        indexE              ;
 
-	public xBowWrapper(WrapperConfig conf, DataChannel channel) {
-		this.conf = conf;
-		this.dataChannel= channel;
+  private boolean                    getxml              ;
 
-		/**
-		 * check the host and port parameters.
-		 */
+  public xBowWrapper(WrapperConfig conf, DataChannel channel) {
+    this.conf = conf;
+    this.dataChannel= channel;
 
-		 host = conf.getParameters().getPredicateValueWithException( "host" );
-		 port = conf.getParameters().getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
-		 if ( port > 65000 || port <= 0 ) 
-			 throw new RuntimeException("Remote wrapper initialization failed, bad port number:"+port);
+    /**
+     * check the host and port parameters.
+     */
 
-		 rate = conf.getParameters().getPredicateValueAsInt( "rate" , DEFAULT_RATE);
-		 
-		 ArrayList<DataField > output = new ArrayList < DataField >();
-		 for ( int i = 0 ; i < FIELD_NAMES.length ; i++ )
-			 output.add( new DataField( FIELD_NAMES[ i ] , FIELD_TYPES_STRING[ i ] , FIELD_DESCRIPTION[ i ] ) );
-		 outputStructure = output.toArray( new DataField[] {} );
+    host = conf.getParameters().getPredicateValueWithException( "host" );
+    port = conf.getParameters().getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
+    if ( port > 65000 || port <= 0 )
+      throw new RuntimeException("Remote wrapper initialization failed, bad port number:"+port);
 
-	}
+    rate = conf.getParameters().getPredicateValueAsInt( "rate" , DEFAULT_RATE);
 
-	public void start(){
+    ArrayList<DataField > output = new ArrayList < DataField >();
+    for ( int i = 0 ; i < FIELD_NAMES.length ; i++ )
+      output.add( new DataField( FIELD_NAMES[ i ] , FIELD_TYPES_STRING[ i ]  ) );
+    outputStructure = output.toArray( new DataField[] {} );
 
-		//		   int n=0;
+  }
 
-		try {
+  public void start(){
 
-			// setup the socket connection
-			xmlSocket = new Socket(host, port);
+    //		   int n=0;
 
-			rd = new BufferedReader(new InputStreamReader(xmlSocket.getInputStream()));
+    try {
 
-		} catch (IOException e){
-			logger.warn(" The xml socket connection is not set up.");
-			logger.warn(" Cannot read from xmlSocket. ");
-		}
+      // setup the socket connection
+      xmlSocket = new Socket(host, port);
 
-		while ( isActive ) {
+      rd = new BufferedReader(new InputStreamReader(xmlSocket.getInputStream()));
 
-			getxml = false;
+    } catch (IOException e){
+      logger.warn(" The xml socket connection is not set up.");
+      logger.warn(" Cannot read from xmlSocket. ");
+    }
 
-			try {
-				Thread.sleep(rate);
-			} catch (InterruptedException e) {
-				logger.error(e.getMessage(),e);
-			}
+    while ( isActive ) {
 
-			try { // try
+      getxml = false;
 
-			s = "";
+      try {
+        Thread.sleep(rate);
+      } catch (InterruptedException e) {
+        logger.error(e.getMessage(),e);
+      }
 
-			char[] c = new char[3000];
+      try { // try
 
-			// initialize this char[]
-			for (int j = 0; j < c.length; j++){
-				c[j] = 0;
-			} 
+        s = "";
 
-			rd.read(c);
+        char[] c = new char[3000];
 
-			for (int j = 0; j < c.length; j++){
-				s = s + c[j];
-			} 
+        // initialize this char[]
+        for (int j = 0; j < c.length; j++){
+          c[j] = 0;
+        }
 
-			s = s.trim();
+        rd.read(c);
 
-			if (s != ""){
+        for (int j = 0; j < c.length; j++){
+          s = s + c[j];
+        }
 
-				try{
-					indexS = s.indexOf("<?xml");
-					indexE = s.indexOf("</MotePacket>");
-				}catch (Exception e){
-					logger.error( e.getMessage( ) , e );
-				}
+        s = s.trim();
 
-				if (indexS < indexE) {
-					if (indexS >= 0){
-						bs = s.substring(indexS,(indexE+13) );
-						if (bs.length() > 2000) {
-							xmls = bs;
-							getxml = true;    
-						}
-						if (bs.length() < 2000) {
-							try{	 
-								indexS = s.indexOf("<?xml", indexE);
-								indexE = s.indexOf("</MotePacket>", indexS);
-							} catch (Exception e){
-								logger.error( e.getMessage( ) , e );
-							} 
-							if (indexS < indexE) {
-								if (indexS >= 0){
-									bs = s.substring(indexS,(indexE+13) );
-									if (bs.length() > 2000) {
-										xmls = bs;
-										getxml = true;    
-									}	         
-								}
-							}
+        if (s != ""){
 
-						}
+          try{
+            indexS = s.indexOf("<?xml");
+            indexE = s.indexOf("</MotePacket>");
+          }catch (Exception e){
+            logger.error( e.getMessage( ) , e );
+          }
 
-					}
+          if (indexS < indexE) {
+            if (indexS >= 0){
+              bs = s.substring(indexS,(indexE+13) );
+              if (bs.length() > 2000) {
+                xmls = bs;
+                getxml = true;
+              }
+              if (bs.length() < 2000) {
+                try{
+                  indexS = s.indexOf("<?xml", indexE);
+                  indexE = s.indexOf("</MotePacket>", indexS);
+                } catch (Exception e){
+                  logger.error( e.getMessage( ) , e );
+                }
+                if (indexS < indexE) {
+                  if (indexS >= 0){
+                    bs = s.substring(indexS,(indexE+13) );
+                    if (bs.length() > 2000) {
+                      xmls = bs;
+                      getxml = true;
+                    }
+                  }
+                }
 
+              }
 
-				}
+            }
 
-			}
 
+          }
 
-			try { // try 4
+        }
 
-				if (getxml){ // if 1
 
-					// Create instance of DocumentBuilderFactory
-					domfac = DocumentBuilderFactory.newInstance();
+        try { // try 4
 
-					try { // try 3
-						// Get the DocumentBuilder
-						dombuilder = domfac.newDocumentBuilder();
-					} catch (ParserConfigurationException e){ // try 3
-						logger.info(e.getMessage( ) , e );
-					}
+          if (getxml){ // if 1
 
-					try { // try 2
-						// Create instance of input source
-						ins = new InputSource();
+            // Create instance of DocumentBuilderFactory
+            domfac = DocumentBuilderFactory.newInstance();
 
-						// Initialize this input source as xmls
-						ins.setCharacterStream(new StringReader(xmls));
+            try { // try 3
+              // Get the DocumentBuilder
+              dombuilder = domfac.newDocumentBuilder();
+            } catch (ParserConfigurationException e){ // try 3
+              logger.info(e.getMessage( ) , e );
+            }
 
-						//logger.info(ins);
+            try { // try 2
+              // Create instance of input source
+              ins = new InputSource();
 
-						// Pass xmls stream to XML Parser
-						doc = dombuilder.parse(ins);
-					} catch (SAXException e){ // try 2
-						logger.info(e.getMessage( ) , e );
-					} catch (NullPointerException e){
-						logger.info(e.getMessage( ) , e );
-					}
+              // Initialize this input source as xmls
+              ins.setCharacterStream(new StringReader(xmls));
 
+              //logger.info(ins);
 
-					// Get the root element of XML packet
-					Element root = doc.getDocumentElement();
+              // Pass xmls stream to XML Parser
+              doc = dombuilder.parse(ins);
+            } catch (SAXException e){ // try 2
+              logger.info(e.getMessage( ) , e );
+            } catch (NullPointerException e){
+              logger.info(e.getMessage( ) , e );
+            }
 
-					// Get the first level Node list
-					NodeList fields = root.getChildNodes();
 
-					// Get all fields' name
-					// start of second layer for 3
-					for(int i=0;i<fields.getLength();i++){
+            // Get the root element of XML packet
+            Element root = doc.getDocumentElement();
 
-						Element field = (Element)fields.item(i);		        		
+            // Get the first level Node list
+            NodeList fields = root.getChildNodes();
 
-						String name;
+            // Get all fields' name
+            // start of second layer for 3
+            for(int i=0;i<fields.getLength();i++){
 
-						Element nameEle=(Element)field.getElementsByTagName("Name").item(0);
+              Element field = (Element)fields.item(i);
 
-						name = nameEle.getTextContent();
+              String name;
 
-						String value;
+              Element nameEle=(Element)field.getElementsByTagName("Name").item(0);
 
-						Element valueEle=(Element)field.getElementsByTagName("ConvertedValue").item(0);
+              name = nameEle.getTextContent();
 
-						value = valueEle.getTextContent();
+              String value;
 
-						if (name.equals("amtype")){
-							amType = Integer.parseInt(value);
-						}
+              Element valueEle=(Element)field.getElementsByTagName("ConvertedValue").item(0);
 
-						if (name.equals("nodeid")){
-							nodeid = Integer.parseInt(value);
-						}
+              value = valueEle.getTextContent();
 
-						if (name.equals("parent")){
-							parent = Integer.parseInt(value);
-						}
+              if (name.equals("amtype")){
+                amType = Integer.parseInt(value);
+              }
 
-						if (name.equals("group")){
-							group = Integer.parseInt(value);
-						}
+              if (name.equals("nodeid")){
+                nodeid = Integer.parseInt(value);
+              }
 
-						if (name.equals("voltage")){
-							voltage = Integer.parseInt(value);
-						}
+              if (name.equals("parent")){
+                parent = Integer.parseInt(value);
+              }
 
-						if (name.equals("humid")){
-							humid = Integer.parseInt(value);
-						}
+              if (name.equals("group")){
+                group = Integer.parseInt(value);
+              }
 
-						if (name.equals("humtemp")){
-							humtemp = Integer.parseInt(value);
-						}
+              if (name.equals("voltage")){
+                voltage = Integer.parseInt(value);
+              }
 
-						if (name.equals("taosch0")){
-							taosch0 = Integer.parseInt(value);
-						}
+              if (name.equals("humid")){
+                humid = Integer.parseInt(value);
+              }
 
-						if (name.equals("taosch1")){
-							taosch1 = Integer.parseInt(value);
-						}
+              if (name.equals("humtemp")){
+                humtemp = Integer.parseInt(value);
+              }
 
-						if (name.equals("taoch0")){
-							if (Double.isNaN(taoch0 = Double.parseDouble(value))){
-								taoch0 = 0 ;
-							}
-						}
-						if (name.equals("prtemp")){
-							prtemp = Double.parseDouble(value);
-						}
+              if (name.equals("taosch0")){
+                taosch0 = Integer.parseInt(value);
+              }
 
-						if (name.equals("press")){
-							press = Double.parseDouble(value);
-						}
+              if (name.equals("taosch1")){
+                taosch1 = Integer.parseInt(value);
+              }
 
-						if (name.equals("accel_x")){
-							accel_x = Double.parseDouble(value);
-						}
+              if (name.equals("taoch0")){
+                if (Double.isNaN(taoch0 = Double.parseDouble(value))){
+                  taoch0 = 0 ;
+                }
+              }
+              if (name.equals("prtemp")){
+                prtemp = Double.parseDouble(value);
+              }
 
-						if (name.equals("accel_y")){
+              if (name.equals("press")){
+                press = Double.parseDouble(value);
+              }
 
-							accel_y = Double.parseDouble(value);
-						}
+              if (name.equals("accel_x")){
+                accel_x = Double.parseDouble(value);
+              }
 
-					} // end of second layer for 3
+              if (name.equals("accel_y")){
 
-					if (amType == 11) {		        	
-						try { // try 1
+                accel_y = Double.parseDouble(value);
+              }
 
+            } // end of second layer for 3
 
-							streamEle = new StreamElement( FIELD_NAMES , FIELD_TYPES , 
-									new Serializable [ ] { 
-									amType, nodeid , voltage , 
-									humid , humtemp , prtemp, 
-									press, taosch0, taosch1, taoch0 } );	
+            if (amType == 11) {
+              try { // try 1
+                Serializable[] values = new Serializable[]{
+                        amType, nodeid, voltage,
+                        humid, humtemp, prtemp,
+                        press, taosch0, taosch1, taoch0};
+                streamEle = StreamElement.from(this);
+                for (int i=0;i<values.length;i++)
+                  streamEle.set(FIELD_NAMES[i],values[i]);
 
-							dataChannel.write(streamEle);
+                dataChannel.write(streamEle);
 
-						}catch (Exception e){ // try 1
-							logger.info(e.getMessage( ) , e );
-						}
+              }catch (Exception e){ // try 1
+                logger.info(e.getMessage( ) , e );
+              }
 
-					} 
-				}; // end of if
+            }
+          }; // end of if
 
-			}catch (Exception e) { // try 4
-				logger.error( e.getMessage( ) , e );
-			}
+        }catch (Exception e) { // try 4
+          logger.error( e.getMessage( ) , e );
+        }
 
-			} catch (Exception e) { // try
-				logger.error( e.getMessage( ) , e );
-			}
+      } catch (Exception e) { // try
+        logger.error( e.getMessage( ) , e );
+      }
 
-		}   // while
+    }   // while
 
-	}  // run
+  }  // run
 
-	private boolean isActive=true;
+  private boolean isActive=true;
 
-	public void dispose ( ) {
-	}
+  public void dispose ( ) {
+  }
 
-	public  DataField[] getOutputFormat ( ) {
-		return outputStructure;
-	}
+  public  DataField[] getOutputFormat ( ) {
+    return outputStructure;
+  }
 
-	public void stop() {
-		isActive = false;
+  public void stop() {
+    isActive = false;
 
-	}
+  }
 
 }

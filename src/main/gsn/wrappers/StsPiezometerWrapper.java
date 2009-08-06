@@ -74,9 +74,9 @@ public class StsPiezometerWrapper implements Wrapper {
 
 	private final transient Logger   logger             = Logger.getLogger( StsPiezometerWrapper.class );
 	private DataField[] structure = {
-			new DataField( "pressure" , "double" , "pressure"),
-			new DataField( "temperature" , "double" , "water temperatured"),
-			new DataField( "conductivity" , "double" , "electric conductivity") };
+			new DataField( "pressure" , "double" ),
+			new DataField( "temperature" , "double" ),
+			new DataField( "conductivity" , "double") };
 	private SimpleDateFormat dateTimeFormat ;
 	private SimpleDateFormat svnDateTimeFormat ;
 	private long lastModified= 0;
@@ -177,10 +177,13 @@ public class StsPiezometerWrapper implements Wrapper {
 
 	public  StreamElement rowToSE(String[] data) {
 		Date date;
-		StreamElement se = null;
+		StreamElement se = StreamElement.from(this);
 		try {
 			date = dateTimeFormat.parse(data[0]+" "+data[1]);
-			se = new StreamElement(structure,removeTimestampFromRow(data),date.getTime());
+      se.setTime(date.getTime());
+      Double[] values = removeTimestampFromRow(data);
+      for (int i=0;i<getOutputFormat().length;i++)
+        se.set(getOutputFormat()[i].getName(),values[i]);
 		} catch (ParseException e) {
 			logger.error("invalide date format! "+data[0]+" "+data[1]);
 			logger.error(e.getMessage(),e);
@@ -340,10 +343,10 @@ public class StsPiezometerWrapper implements Wrapper {
 								//								continue;
 								//								}
 								StreamElement streamElement = rowToSE(data);
-								if (streamElement.getTimeStamp()>this.lastEnteredStreamelement){
+								if (streamElement.getTimed()>this.lastEnteredStreamelement){
 									logger.warn("posting data");
 									dataChannel.write(streamElement);
-									this.lastEnteredStreamelement = streamElement.getTimeStamp();
+									this.lastEnteredStreamelement = streamElement.getTimed();
 								}
 							}
 							this.lastModified = modified.longValue();
@@ -379,10 +382,10 @@ public class StsPiezometerWrapper implements Wrapper {
 								//								continue;
 								//								}
 								StreamElement streamElement = rowToSE(data);
-								if (streamElement.getTimeStamp()>this.lastEnteredStreamelement){
+								if (streamElement.getTimed()>this.lastEnteredStreamelement){
 									logger.warn("posting data");
 									dataChannel.write(streamElement);
-									this.lastEnteredStreamelement = streamElement.getTimeStamp();
+									this.lastEnteredStreamelement = streamElement.getTimed();
 								}
 							}
 							this.lastModified = modified.longValue();

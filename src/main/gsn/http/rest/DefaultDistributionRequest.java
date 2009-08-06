@@ -43,7 +43,7 @@ public class DefaultDistributionRequest implements DistributionRequest {
 		boolean success = deliverySystem.writeStreamElement(se);
 //		boolean success = true;
 		if (success)
-			lastVisitedTime=se.getTimeStamp();
+			lastVisitedTime=se.getTimed();
 		return success;
 	}
 

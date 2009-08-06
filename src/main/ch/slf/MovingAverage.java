@@ -54,9 +54,12 @@ public class MovingAverage extends WindowAwareVS {
 		dataOut[0] = avg;
 		
 		//
-		StreamElement se = new StreamElement (outputStructure, dataOut, middleTimeStamp);
-		logger.debug("FFT StreamElement produced: " + se);
-		outputChannel.write( se );
+//		StreamElement se = new StreamElement (outputStructure, dataOut, middleTimeStamp);
+//		logger.debug("FFT StreamElement produced: " + se);
+//		outputChannel.write( se );
 	}
 
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
 }

@@ -68,8 +68,8 @@ public abstract class WindowAwareVS implements Operator {
 				Object[] elts = circularBuffer.toArray();
 				for (int i = 0 ; i < elts.length ; i++) {
 					elt = (StreamElement) elts[i];
-					values[i] = ((Number)elt.getData()[0]).doubleValue() ; //
-					timestamps[i] = new Long(elt.getTimeStamp());
+					values[i] = ((Number)elt.getValue(elt.getFieldNames()[0])).doubleValue() ; //
+					timestamps[i] = new Long(elt.getTimed());
 				}
 
 				// Remove stepsize elements from the beginning of the buffer

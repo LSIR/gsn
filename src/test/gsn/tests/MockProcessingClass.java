@@ -2,6 +2,7 @@ package gsn.tests;
 
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
@@ -29,7 +30,11 @@ public class MockProcessingClass implements Operator {
 		
 	}
 
-	public void start() {
+  public DataField[] getStructure() {
+    return new DataField[0];  
+  }
+
+  public void start() {
 		
 	}
 

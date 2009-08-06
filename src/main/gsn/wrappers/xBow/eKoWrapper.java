@@ -66,12 +66,12 @@ public class eKoWrapper implements Wrapper {
 		DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE,
 		DataTypes.VARCHAR };
 
-	private static final String [ ]  FIELD_DESCRIPTION     = new String [ ] { "amType", "Node ID", "Packet Type", 
-		"Battery Volts", "Solar Volts", "Internal Temp",
-		"Soil Moisture", "Soil Temperature",
-		"Ambient Temperature", "Ambient Humidity", "Ambient Dewpoint",
-		"Delectric Permittivity", "Water Content VWC (%)", "Electrical Conductivity (accurate to 7 dS/m)", "Temperature (degC)",
-	"Sensor Table" };
+//	private static final String [ ]  FIELD_DESCRIPTION     = new String [ ] { "amType", "Node ID", "Packet Type",
+//		"Battery Volts", "Solar Volts", "Internal Temp",
+//		"Soil Moisture", "Soil Temperature",
+//		"Ambient Temperature", "Ambient Humidity", "Ambient Dewpoint",
+//		"Delectric Permittivity", "Water Content VWC (%)", "Electrical Conductivity (accurate to 7 dS/m)", "Temperature (degC)",
+//	"Sensor Table" };
 
 	private static final String [ ]  FIELD_TYPES_STRING    = new String [ ] { "int", "int", "varchar(50)", 
 		"double", "double", "double", 
@@ -148,7 +148,7 @@ public class eKoWrapper implements Wrapper {
 
 		ArrayList<DataField > output = new ArrayList < DataField >();
 		for ( int i = 0 ; i < FIELD_NAMES.length ; i++ ) {
-			output.add( new DataField( FIELD_NAMES[ i ] , FIELD_TYPES_STRING[ i ] , FIELD_DESCRIPTION[ i ] ) );
+			output.add( new DataField( FIELD_NAMES[ i ] , FIELD_TYPES_STRING[ i ] ) );
 		}
 		outputStructure = output.toArray( new DataField[] {} ); // ISSUE BUG ! How does the output work .
 
@@ -404,13 +404,15 @@ public class eKoWrapper implements Wrapper {
 			logger.info("amType: " +amType +" Node ID: " + nodeid + " Packet Name  " + packetName );
 
 			try { // try 1
-
-				streamEle = new StreamElement( FIELD_NAMES , FIELD_TYPES , new Serializable [ ] { amType, nodeid, packetName,
-						batteryV, solarV, enTemp,
-						soilMoisture, soilTemp,
-						es1201Temp, es1201Humidity, es1201Dp,
-						EtDp, EtVWC, EtEc, EtTemp,
-						sensorTable } );	
+        Serializable[] values = new Serializable[]{amType, nodeid, packetName,
+                batteryV, solarV, enTemp,
+                soilMoisture, soilTemp,
+                es1201Temp, es1201Humidity, es1201Dp,
+                EtDp, EtVWC, EtEc, EtTemp,
+                sensorTable};
+				streamEle = StreamElement.from(this);
+        for (int i=0;i<values.length;i++)
+          streamEle.set(FIELD_NAMES[i],values[i]);
 
 				dataChannel.write(streamEle);
 

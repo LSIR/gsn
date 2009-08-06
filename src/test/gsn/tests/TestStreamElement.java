@@ -1,9 +1,19 @@
 package gsn.tests;
 
-
-import static org.testng.Assert.*;
+import org.testng.annotations.Test;
+import gsn.beans.StreamElement;
+import gsn.beans.WrapperConfig;
 
 public class TestStreamElement {
+
+
+    @Test
+    public void testCreatingStreamElementFromWrapper(){
+        WrapperConfig conf = new WrapperConfig("test-wrapper");
+
+        MockWrapper wrapper = new MockWrapper(conf,null);
+        StreamElement se = StreamElement.from(wrapper);
+    }
 
 //  @Test
 //  This method has to be modified to be adapted to httpclient/httpcore library version 4.0
@@ -61,7 +71,7 @@ public class TestStreamElement {
 //    assertEquals(201,status);
 //    assertEquals(1, wrapper.getStreamElements().size());
 //    StreamElement consumedSe = wrapper.getStreamElements().get(0);
-//    assertEquals(se.getTimeStamp() ,consumedSe.getTimeStamp() );
+//    assertEquals(se.getTimed() ,consumedSe.getTimed() );
 //    for (int i=0;i<structure.length;i++) {
 //      assertEquals(se.getFieldNames()[i] ,consumedSe.getFieldNames()[i] );
 //      assertEquals(se.getFieldTypes()[i] ,consumedSe.getFieldTypes()[i] );

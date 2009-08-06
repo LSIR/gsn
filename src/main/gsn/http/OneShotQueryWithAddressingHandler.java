@@ -2,7 +2,6 @@ package gsn.http;
 
 import gsn.Main;
 import gsn.Mappings;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSFile;
 import gsn.storage.DataEnumerator;
@@ -55,12 +54,12 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
       while ( result.hasMoreElements( ) ) {
          StreamElement se = result.nextElement( );
          sb.append( "<stream-element>\n" );
-         for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ )
-            if ( se.getFieldTypes( )[ i ] == DataTypes.BINARY )
-               sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( se.getData( )[ i ].toString( ) ).append( "</field>\n" );
-            else
-               sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) ).append( "</field>\n" );
-         sb.append( "<field name=\"timed\" >" ).append( sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
+         for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ );
+//            if ( se.getFieldTypes( )[ i ] == DataTypes.BINARY )
+//               sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( se.getData( )[ i ].toString( ) ).append( "</field>\n" );
+//            else
+//               sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) ).append( "</field>\n" );
+         sb.append( "<field name=\"timed\" >" ).append( sdf.format(new Date(se.getTimed( ))) ).append( "</field>\n" );
          VSFile sensorConfig = Mappings.getVSensorConfig( vsName );
          if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( vsName ).append( "* received." ).toString( ) );
          //StringBuilder statement = new StringBuilder( "<virtual-sensor name=\"" ).append( vsName ).append( "\" last-modified=\"" ).append( new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\">\n" );

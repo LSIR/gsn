@@ -3,6 +3,7 @@ package gsn.operators;
 import gsn.beans.DataTypes;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
@@ -12,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -29,7 +29,11 @@ public class DemoVSensor  implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 
@@ -57,11 +61,11 @@ public class DemoVSensor  implements Operator {
 
 	public void process ( String inputStreamName , StreamElement data ) {
 		if ( inputStreamName.equalsIgnoreCase( "SSTREAM" ) ) {
-			String action = ( String ) data.getData( "STATUS" );
+			String action = ( String ) data.getValue( "STATUS" );
 			/**
 			 * 
 			 */
-			String moteId = ( String ) data.getData( "ID" );
+			String moteId = ( String ) data.getValue( "ID" );
 			if ( moteId.toLowerCase( ).indexOf( "mica" ) < 0 ) return;
 			if ( action.toLowerCase( ).indexOf( "add" ) >= 0 ) counter++;
 			if ( action.toLowerCase( ).indexOf( "remove" ) >= 0 ) counter--;
@@ -70,7 +74,7 @@ public class DemoVSensor  implements Operator {
 
 			BufferedImage bufferedImage = null;
 			outputStream.reset( );
-			byte [ ] rawData = ( byte [ ] ) data.getData( "IMAGE" );
+			byte [ ] rawData = ( byte [ ] ) data.getValue( "IMAGE" );
 			input = new ByteArrayInputStream( rawData );
 			try {
 				bufferedImage = ImageIO.read( input );
@@ -107,7 +111,7 @@ public class DemoVSensor  implements Operator {
 				logger.error(e.getMessage(),e);
 			}
 
-			StreamElement outputSE = new StreamElement( OUTPUT_FIELDS , OUTPUT_TYPES , new Serializable [ ] { outputStream.toByteArray( ) } , data.getTimeStamp( ) );
+			StreamElement outputSE = StreamElement.from(this).set(IMAGE_OUTPUT_FIELD,outputStream.toByteArray( )).setTime(data.getTimed( ) );
 			outputChannel.write( outputSE );
 		}
 		if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );

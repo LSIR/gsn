@@ -107,7 +107,7 @@ public class SystemTime implements Wrapper , ActionListener {
 	}
 
 	public void actionPerformed ( ActionEvent actionEvent ) {
-		StreamElement streamElement = new StreamElement( EMPTY_FIELD_LIST , EMPTY_FIELD_TYPES , EMPTY_DATA_PART , actionEvent.getWhen( ) );
+		StreamElement streamElement = StreamElement.from(this).setTime( actionEvent.getWhen( ) );
 		if(delayPostingElements){
 			streamElementBuffer.add(streamElement);
 			synchronized(objectLock){

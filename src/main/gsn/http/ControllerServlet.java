@@ -90,10 +90,6 @@ public class ControllerServlet extends HttpServlet {
             handler = new OutputStructureHandler ( );
             if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
             break;
-         case REQUEST_ADDRESSING :
-            handler = new AddressingReqHandler ( );
-            if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
-            break;
          default :
             response.sendError ( UNSUPPORTED_REQUEST_ERROR , "The requested operation is not supported." );
             break;

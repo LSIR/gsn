@@ -1,7 +1,6 @@
 package gsn.wrappers.general;
 
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.WrapperConfig;
 import gsn.channels.DataChannel;
@@ -9,7 +8,6 @@ import gsn.wrappers.Wrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -57,8 +55,7 @@ public class UDPWrapper implements Wrapper {
 				socket.receive( receivedPacket );
 				String dataRead = new String( receivedPacket.getData( ) );
 				if ( logger.isDebugEnabled( ) ) logger.debug( "UDPWrapper received a packet : " + dataRead );
-				StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { receivedPacket.getData( ) } , System
-						.currentTimeMillis( ) );
+				StreamElement streamElement = StreamElement.from(this).set(RAW_PACKET,receivedPacket.getData( )).setTime(System.currentTimeMillis( ) );
 				dataChannel.write( streamElement );
 			} catch ( IOException e ) {
 				logger.warn( "Error while receiving data on UDP socket : " + e.getMessage( ) );
@@ -67,7 +64,7 @@ public class UDPWrapper implements Wrapper {
 	}
 
 	public  DataField [] getOutputFormat ( ) {
-		return new DataField[] {new DataField( RAW_PACKET , "BINARY" , "The packet contains raw data received as a UDP packet." ) };
+		return new DataField[] {new DataField( RAW_PACKET , "BINARY" ) };
 
 	}
 

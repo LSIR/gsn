@@ -129,21 +129,21 @@ public class DownloadData extends AbstractDataRequest {
 	private void formatCSVElement (PrintWriter respond, StreamElement se, boolean wantTimed, String cvsDelimiter, boolean firstLine) {
 		if (firstLine) {
 			respond.print("#");
-			for (int i = 0 ; i < se.getData().length ; i++) {
+			for (int i = 0 ; i < se.getFieldNames().length ; i++) {
 				respond.print(se.getFieldNames()[i]);
-				if (i != se.getData().length - 1) respond.print(cvsDelimiter);
+				if (i != se.getFieldNames().length - 1) respond.print(cvsDelimiter);
 			}
-			if (wantTimed && se.getData().length != 0) respond.print(cvsDelimiter);
+			if (wantTimed && se.getFieldNames().length != 0) respond.print(cvsDelimiter);
 			if (wantTimed) respond.print("timed");
 			respond.println();
 		}
-		for (int i = 0 ; i < se.getData().length ; i++) {
-			respond.print(se.getData()[i]);
-			if (i != se.getData().length - 1) respond.print(cvsDelimiter); 
+		for (int i = 0 ; i < se.getFieldNames().length ; i++) {
+			respond.print(se.getValue(se.getFieldNames()[i]));
+			if (i != se.getFieldNames().length - 1) respond.print(cvsDelimiter);
 		}
 		if (wantTimed) {
-			if (se.getData().length != 0) respond.print(cvsDelimiter);
-			respond.print( qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
+			if (se.getFieldNames().length != 0) respond.print(cvsDelimiter);
+			respond.print( qbuilder.getSdf() == null ? timestampInUTC(se.getTimed()) : qbuilder.getSdf().format(new Date(se.getTimed())));
 		}
 		respond.println();
 	}
@@ -151,17 +151,17 @@ public class DownloadData extends AbstractDataRequest {
 	private void formatXMLElement (PrintWriter respond, StreamElement se, boolean wantTimed, boolean firstLine) {
 		if (firstLine) {
 			respond.println("\t\t<header>");
-			for (int i = 0 ; i < se.getData().length ; i++) {
+			for (int i = 0 ; i < se.getFieldNames().length ; i++) {
 				respond.println("\t\t\t<field>" + se.getFieldNames()[i] + "</field>");
 			}
 			if (wantTimed) respond.println("\t\t\t<field>timed</field>");
 			respond.println("\t\t</header>");
 		}
 		respond.println("\t\t<tuple>");
-		for (int i = 0 ; i < se.getData().length ; i++) {
-			respond.println("\t\t\t<field>" + se.getData()[i] + "</field>");
+		for (int i = 0 ; i < se.getFieldNames().length ; i++) {
+			respond.println("\t\t\t<field>" +se.getValue(se.getFieldNames()[i]) + "</field>");
 		}
-		if (wantTimed) respond.println("\t\t\t<field>" + ( qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
+		if (wantTimed) respond.println("\t\t\t<field>" + ( qbuilder.getSdf() == null ? timestampInUTC(se.getTimed()) : qbuilder.getSdf().format(new Date(se.getTimed()))) + "</field>");
 		respond.println("\t\t</tuple>");
 	}
 	

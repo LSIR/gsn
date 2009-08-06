@@ -25,7 +25,11 @@ public class StreamExporterVirtualSensor implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 

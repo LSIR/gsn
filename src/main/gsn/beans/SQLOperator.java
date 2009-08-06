@@ -34,8 +34,12 @@ public class SQLOperator implements Serializable,Operator{
 		// write the list into the channel.
 		// perform manual sliding.
 	}
-	
-	public SQLOperatorConfig getConfig() {
+
+  public DataField[] getStructure() {
+    return new DataField[0];  
+  }
+
+  public SQLOperatorConfig getConfig() {
 		return config;
 	}
 

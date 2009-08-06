@@ -2,6 +2,7 @@ package gsn.operators;
 
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
@@ -16,7 +17,11 @@ public class MyFilter  implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 

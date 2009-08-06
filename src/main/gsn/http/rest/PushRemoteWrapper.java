@@ -141,7 +141,7 @@ public class PushRemoteWrapper implements Wrapper {
 		logger.debug ( new StringBuilder ( ).append ( "Received Stream Element at the push wrapper."));
 		StreamElement4Rest se = (StreamElement4Rest) XSTREAM.fromXML(Xstream4Rest);
 		StreamElement streamElement = se.toStreamElement();
-		lastReceivedTimestamp = streamElement.getTimeStamp();
+		lastReceivedTimestamp = streamElement.getTimed();
 		dataChannel.write(streamElement);
 	}
 

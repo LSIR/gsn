@@ -2,6 +2,7 @@ package gsn.operators;
 
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
@@ -25,7 +26,11 @@ public class ClockedBridgeVirtualSensor  implements ActionListener , Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 
@@ -95,7 +100,7 @@ public class ClockedBridgeVirtualSensor  implements ActionListener , Operator {
 			DataEnumerator data = StorageManager.getInstance().executeQuery(query,true);
 			while (data.hasMoreElements()){
 				StreamElement se = data.nextElement();
-				last_updated = se.getTimeStamp();
+				last_updated = se.getTimed();
 				// TODO: BAD CALL, SHOULD BECOME A WRAPPER ! 
 				//dataProduced(se);
 			}

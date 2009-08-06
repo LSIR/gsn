@@ -25,8 +25,8 @@ public class MultiFormatWrapper implements Wrapper {
 
 	private final DataChannel dataChannel;
 
-	private DataField[] collection = new DataField[] { new DataField("packet_type", "int", "packet type"),
-			new DataField("temperature", "double", "Presents the temperature sensor."), new DataField("light", "double", "Presents the light sensor.") };
+	private DataField[] collection = new DataField[] { new DataField("packet_type", "int"),
+			new DataField("temperature", "double"), new DataField("light", "double") };
 	private final transient Logger logger = Logger.getLogger(MultiFormatWrapper.class);
 
 	private long rate = 1000;
@@ -55,7 +55,12 @@ public class MultiFormatWrapper implements Wrapper {
 			packetType = 2;
 
 			// post the data to GSN
-			dataChannel.write(new StreamElement(getOutputFormat(),new Serializable[] { packetType, temperature, light },System.currentTimeMillis()));       
+      StreamElement se = StreamElement.from(this).setTime(System.currentTimeMillis());
+      Serializable[] values = {packetType, temperature, light};
+      for (int i=0;i<getOutputFormat().length;i++)
+        se.set(getOutputFormat()[i].getName(),values[i]);
+      
+      dataChannel.write(se);
 		}
 	}
 

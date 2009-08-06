@@ -19,9 +19,6 @@ import java.util.Date;
 import java.util.Vector;
 
 import static org.testng.Assert.*;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.AfterTest;
 
 public class TestStreamExporterVirtualSensor {
 
@@ -95,14 +92,16 @@ public class TestStreamExporterVirtualSensor {
 		Object [ ] data = null;
 
 		for ( String type : DataTypes.TYPE_NAMES )
-			fieldTypes.add( new DataField( type , type , type ) );
+			fieldTypes.add( new DataField( type , type  ) );
 		int i = 0;
 		for ( Object value : DataTypes.TYPE_SAMPLE_VALUES )
 			data[ i++ ] = value;
 
 		long timeStamp = new Date( ).getTime( );
-		StreamElement streamElement = new StreamElement( fieldTypes.toArray( new DataField[] {} ) , ( Serializable [ ] ) data , timeStamp );
-
+    StreamElement streamElement = StreamElement.from(vs).setTime(timeStamp);
+    for (i=0;i<data.length;i++){
+      streamElement.set(fieldTypes.get(i).getName(),(Serializable) data[i]);
+    }
 		// give datastream to vs
 		vs.process( streamName , streamElement );
 

@@ -1,10 +1,7 @@
 package gsn.operators;
 
 import gsn.ManualDataConsumer;
-import gsn.beans.DataTypes;
-import gsn.beans.Operator;
-import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
+import gsn.beans.*;
 import gsn.channels.DataChannel;
 import gsn.others.visualization.svg.SVGCircle;
 import gsn.others.visualization.svg.SVGEdge;
@@ -28,7 +25,11 @@ public class WebInteractiveVirtualSensor implements ManualDataConsumer, Operator
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 
@@ -66,16 +67,16 @@ public class WebInteractiveVirtualSensor implements ManualDataConsumer, Operator
 
 	public void process ( String inputStreamName , StreamElement streamElement ) {
 		if ( inputStreamName.equalsIgnoreCase( INPUT_STREAM_NAME ) ) {
-			int node_id = ( Integer ) streamElement.getData( "NODE_ID" );
-			int parent_id = ( Integer ) streamElement.getData( "PARENT_ID" );
+			int node_id = ( Integer ) streamElement.getValue( "NODE_ID" );
+			int parent_id = ( Integer ) streamElement.getValue( "PARENT_ID" );
 			float tempreature = 0f;
 			SVGCircle simpleNodeObject = new SVGCircle( new SimpleNodeObject( node_id , parent_id , SimpleNodeObject.REQUEST_TYPE_DATA , tempreature ) , Color.blue );
 			lazyTimedHashMap.put( node_id , simpleNodeObject );
 		}
 		ArrayList < SVGCircle > arrayList = lazyTimedHashMap.getValues( );
 		byte [ ] visualizedResults = visualaize( 400 , 400 , arrayList ).getBytes( );
-		StreamElement out = new StreamElement( new String [ ] { OUTPUT_FIELD_NAME } , new Byte[ ] { DataTypes.BINARY } , new Serializable [ ] { visualizedResults } , System.currentTimeMillis( ) );
-		outputChannel.write(out );
+
+		outputChannel.write(streamElement.from(this).set(OUTPUT_FIELD_NAME,visualizedResults).setTime(System.currentTimeMillis()) );
 
 	}
 

@@ -248,12 +248,12 @@ public class DataDownload extends HttpServlet {
 						//line += delimiter+se.getData( )[ i ].toString( );
 
 						if ( !commonReq && ((i >= fields.length) || (fields[i].contains("timed")))) {
-							line += separator+sdf.format(se.getData( )[i]);
+							line += separator+sdf.format(se.getValue(se.getFieldNames()[i]));
 						} else {
-							line += separator+se.getData( )[ i ].toString( );
+							line += separator+se.getValue(se.getFieldNames()[i]).toString( );
 						}
 					if (wantTimeStamp) {
-						Date d = new Date (se.getTimeStamp());
+						Date d = new Date (se.getTimed());
 						line += separator + sdf.format(d);
 					}
 					respond.println(line.substring(separator.length()));
@@ -292,16 +292,16 @@ public class DataDownload extends HttpServlet {
 
 						//if ( !commonReq && expression.contains("timed")) {
 						if ( !commonReq && ((i >= fields.length) || (fields[i].contains("timed")))) {
-							respond.println("\t\t<field>"+sdf.format(se.getData( )[i])+"</field>");
+							respond.println("\t\t<field>"+sdf.format(se.getValue(se.getFieldNames()[i]))+"</field>");
 						} else {
-							if (se.getData()[i]==null)
+							if (se.getValue(se.getFieldNames()[i])==null)
 								respond.println("\t\t<field>Null</field>");
 							else
-								respond.println("\t\t<field>"+se.getData( )[ i ].toString( )+"</field>");
+								respond.println("\t\t<field>"+se.getValue(se.getFieldNames()[i])+"</field>");
 						}
 					}
 					if (wantTimeStamp) {
-						Date d = new Date (se.getTimeStamp());
+						Date d = new Date (se.getTimed());
 						respond.println("\t\t<field>"+sdf.format(d)+"</field>");
 					}
 					respond.println("\t</line>");

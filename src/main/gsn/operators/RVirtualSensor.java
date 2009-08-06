@@ -1,9 +1,9 @@
 package gsn.operators;
 
-import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
@@ -26,7 +26,11 @@ public class RVirtualSensor implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 
@@ -113,8 +117,8 @@ public class RVirtualSensor implements Operator {
 						Object[] elts = circularBuffer.toArray();
 						for (int i = 0; i < elts.length; i++) {
 							elt = (StreamElement) elts[i];
-							values[i] = ((Number) elt.getData()[n])
-									.doubleValue(); //
+//							values[i] = ((Number) elt.getValue()[n])
+//									.doubleValue(); //
 						}
 
 						// assign vectors as R variables
@@ -153,7 +157,7 @@ public class RVirtualSensor implements Operator {
 					Serializable[] outputData = null;
 					StreamElement se = null;
 
-					Byte[] fieldType = streamElement.getFieldTypes();
+//					Byte[] fieldType = streamElement.getFieldTypes();
 
 					// check if we have defined more attributes in the output
 					// structure
@@ -163,25 +167,25 @@ public class RVirtualSensor implements Operator {
 //						outputData = new Serializable[fieldname.length];
 //					}
 
-					for (int n = 0; n < fieldname.length; n++) {
+//					for (int n = 0; n < fieldname.length; n++) {
 						// evaluate/get attribute data from R server
-						xp = rc.parseAndEval(fieldname[n].toLowerCase());
+//						xp = rc.parseAndEval(fieldname[n].toLowerCase());
 
-						if (fieldType[n] == DataTypes.DOUBLE) {
-							double[] b1 = xp.asDoubles();
-							outputData[n] = b1[b1.length - 1];
-						}
-
-						if (fieldType[n] == DataTypes.INTEGER) {
-							int[] b1 = xp.asIntegers();
-							outputData[n] = b1[b1.length - 1];
-						}
-
-						if (fieldType[n] == DataTypes.BIGINT) {
-							int[] b1 = xp.asIntegers();
-							outputData[n] = (long) b1[b1.length - 1];
-						}
-					}
+//						if (fieldType[n] == DataTypes.DOUBLE) {
+//							double[] b1 = xp.asDoubles();
+//							outputData[n] = b1[b1.length - 1];
+//						}
+//
+//						if (fieldType[n] == DataTypes.INTEGER) {
+//							int[] b1 = xp.asIntegers();
+//							outputData[n] = b1[b1.length - 1];
+//						}
+//
+//						if (fieldType[n] == DataTypes.BIGINT) {
+//							int[] b1 = xp.asIntegers();
+//							outputData[n] = (long) b1[b1.length - 1];
+//						}
+//					}
 
 //					int len1 = outStructure.length;
 //					int len2 = fieldname.length;

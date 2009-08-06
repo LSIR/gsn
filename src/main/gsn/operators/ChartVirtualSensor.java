@@ -3,6 +3,7 @@ package gsn.operators;
 import gsn.beans.DataTypes;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
@@ -44,7 +45,11 @@ public class ChartVirtualSensor implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 
@@ -151,12 +156,14 @@ public class ChartVirtualSensor implements Operator {
 			ChartInfo chart = input_stream_name_to_ChartInfo_map.get( fieldNames[ i ] );
 			charts[ i ] = chart.writePlot( ).toByteArray( );
 		}
-		StreamElement output = new StreamElement( fieldNames , fieldTypes , charts , System.currentTimeMillis( ) );
+		StreamElement se = StreamElement.from(this).setTime(System.currentTimeMillis());
+    for (int i=0;i<fieldNames.length;i++)
+      se.set(fieldNames[i],charts[i]);
 
 		/**
 		 * Informing container about existance of a stream element.
 		 */
-		outputChannel.write( output );
+		outputChannel.write( se );
 		/**
 		 * For debugging purposes.
 		 */
@@ -270,7 +277,7 @@ class ChartInfo {
 				dataCollectionForTheChart.addSeries( timeSeries );
 			}
 			try {
-				timeSeries.addOrUpdate( new FixedMillisecond( new Date( streamElement.getTimeStamp( ) ) ) , Double.parseDouble( streamElement.getData( )[ i ].toString( ) ) );
+				timeSeries.addOrUpdate( new FixedMillisecond( new Date( streamElement.getTimed( ) ) ) , Double.parseDouble( streamElement.getValue(streamElement.getFieldNames( )[i] ).toString( ) ) );
 			} catch ( SeriesException e ) {
 				logger.warn( e.getMessage( ) , e );
 			}

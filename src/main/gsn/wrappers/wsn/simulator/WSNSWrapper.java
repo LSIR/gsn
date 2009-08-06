@@ -80,8 +80,15 @@ public class WSNSWrapper implements Wrapper , DataListener {
 				synchronized ( dataBuffer ) {
 					dataPacket = dataBuffer.remove( 0 );
 				}
-				StreamElement streamElement = new StreamElement( new String [ ] { "NODE_ID" , "PARENT_ID" , "TEMPREATURE" } , new Byte [ ] { DataTypes.INTEGER , DataTypes.INTEGER ,
-						DataTypes.INTEGER } , new Serializable [ ] { dataPacket.getIdentifier( ) , dataPacket.getParent( ) , dataPacket.getValue( ) } , System.currentTimeMillis( ) );
+
+        String[] fields = {"NODE_ID", "PARENT_ID", "TEMPREATURE"};
+        Serializable[] values = {dataPacket.getIdentifier(), dataPacket.getParent(), dataPacket.getValue()};
+        long timestamp = System.currentTimeMillis();
+        StreamElement streamElement = StreamElement.from(this);
+        for (int i=0;i<fields.length;i++)
+          streamElement.set(fields[i],values[i]);
+        streamElement.setTime(timestamp);
+        
 				dataChannel.write( streamElement );
 				if ( dataBuffer.size( ) > 0 ) continue;
 
@@ -98,9 +105,9 @@ public class WSNSWrapper implements Wrapper , DataListener {
 			node.stopNode( );
 	}
 
-	private static  final DataField[] dataField  = new DataField[] {new DataField( "NODE_ID" , DataTypes.INTEGER_NAME , "Node's identification." ) ,
-		new DataField( "PARENT_ID" , DataTypes.INTEGER_NAME , "Parent Node's identification." ) ,
-		new DataField( "TEMPREATURE" , DataTypes.INTEGER_NAME , "incremental int" )};
+	private static  final DataField[] dataField  = new DataField[] {new DataField( "NODE_ID" , DataTypes.INTEGER_NAME  ) ,
+		new DataField( "PARENT_ID" , DataTypes.INTEGER_NAME  ) ,
+		new DataField( "TEMPREATURE" , DataTypes.INTEGER_NAME)};
 
 	public DataField [] getOutputFormat ( ) {
 		return dataField;

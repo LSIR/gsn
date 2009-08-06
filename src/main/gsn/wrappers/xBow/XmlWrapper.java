@@ -175,7 +175,7 @@ public class XmlWrapper implements Wrapper {
 	
 		ArrayList<DataField > output = new ArrayList < DataField >();
 		for ( int i = 0 ; i < FIELD_NAMES.length ; i++ )
-			output.add( new DataField( FIELD_NAMES[ i ] , FIELD_TYPES_STRING[ i ] , FIELD_DESCRIPTION[ i ] ) );
+			output.add( new DataField( FIELD_NAMES[ i ] , FIELD_TYPES_STRING[ i ]  ) );
 		outputStructure = output.toArray( new DataField[] {} );
 	}
 
@@ -400,9 +400,12 @@ public class XmlWrapper implements Wrapper {
 
 						try { // try 1
 
-
-							streamEle = new StreamElement( FIELD_NAMES , FIELD_TYPES , new Serializable [ ] { nodeid , voltage , humid , humtemp , press } );	
-
+              Serializable[] values = new Serializable[]{nodeid, voltage, humid, humtemp, press};
+              
+              streamEle = StreamElement.from(this);
+              for (int i=0;i<values.length;i++)
+                  streamEle.set(FIELD_NAMES[i],values[i]);
+              
 							dataChannel.write(streamEle);
 
 						}catch (Exception e){ // try 1

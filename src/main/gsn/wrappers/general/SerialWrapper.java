@@ -198,7 +198,7 @@ public class SerialWrapper implements Wrapper , SerialPortEventListener ,ManualD
 		}
 
 		inputBuffer = new byte [ MAXBUFFERSIZE ];
-		dataField = new DataField[] { new DataField( RAW_PACKET , (output_format==0?"binary":"varchar")+"("+packet_length+")" , "The packet contains raw data from a sensor network." ) };
+		dataField = new DataField[] { new DataField( RAW_PACKET , (output_format==0?"binary":"varchar")+"("+packet_length+")") };
 
 	}
 
@@ -440,10 +440,10 @@ public class SerialWrapper implements Wrapper , SerialPortEventListener ,ManualD
 	private void post_item (String val){
 		switch (output_format){
 		case 0: // for binary data
-			dataChannel.write(  new StreamElement( getOutputFormat(),new Serializable[] {val.length()>packet_length?val.substring(0,packet_length).getBytes():val.getBytes() },System.currentTimeMillis()));
+			dataChannel.write( StreamElement.from(this).set(RAW_PACKET,val.length()>packet_length?val.substring(0,packet_length).getBytes():val.getBytes() ).setTime(System.currentTimeMillis()));
 			break;
 		case 1: // for strings
-			dataChannel.write(  new StreamElement( getOutputFormat(),new Serializable[] {val.length()>packet_length ? val.substring(0,packet_length):val},System.currentTimeMillis()) );
+			dataChannel.write( StreamElement.from(this).set(RAW_PACKET,val.length()>packet_length ? val.substring(0,packet_length):val).setTime(System.currentTimeMillis()) );
 			break;
 		}
 	}

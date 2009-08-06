@@ -2,12 +2,12 @@ package gsn.operators;
 
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -28,7 +28,11 @@ public class SensorInternetVS  implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 	private static final String SI_URL = "si-url";
@@ -83,7 +87,7 @@ public class SensorInternetVS  implements Operator {
 
 			// Build and send the parameters
 			PrintWriter out = new PrintWriter(siConnection.getOutputStream());
-			String postParams = buildParameters(streamElement.getFieldNames(), streamElement.getData(), streamElement.getTimeStamp()) ;
+			String postParams = buildParameters(streamElement) ;
 			logger.debug("POST parameters: " + postParams) ;
 			out.print(postParams);
 			out.flush();
@@ -105,21 +109,21 @@ public class SensorInternetVS  implements Operator {
 
 	}
 
-	private String buildParameters (String[] fieldsNames, Serializable[] data, long timestamp) {
+	private String buildParameters (StreamElement se) {
 
 		StringBuilder sb = new StringBuilder () ;
 		//
-		for (int i = 0 ; i < fieldsNames.length ; i++) {
+		for (int i = 0 ; i < se.getFieldNames().length ; i++) {
 			if (i < siStreamMapping.length) {
 				if (i != 0) sb.append("&");
-				sb.append(createPostParameter ("time[" + i + "]=", dateFormat.format(new Date (timestamp))));
+				sb.append(createPostParameter ("time[" + i + "]=", dateFormat.format(new Date (se.getTimed()))));
 				sb.append("&");
-				sb.append(createPostParameter ("data[" + i + "]=", data[i].toString()));
+				sb.append(createPostParameter ("data[" + i + "]=", se.getValue(se.getFieldNames()[i]).toString()));
 				sb.append("&");
 				sb.append(createPostParameter ("key[" + i + "]=", Integer.toString(siStreamMapping[i])));
 			}
 			else {
-				logger.warn("The field >" + fieldsNames[i] + "< is not mapped in your configuration file.");
+				logger.warn("The field >" + se.getFieldNames()[i] + "< is not mapped in your configuration file.");
 			}
 		}
 		return sb.toString();

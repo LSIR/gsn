@@ -90,7 +90,7 @@ public class WanWrapper implements Wrapper {
 			StringBuilder description = new StringBuilder(header[2][i]);
 			if (header[3][i].length()>2)
 				description.append(" - ").append(header[3][i]);
-			output[i-1]= new DataField(convertHeaderName(header[1][i]),"double", description.toString());
+			output[i-1]= new DataField(convertHeaderName(header[1][i]),"double");
 		}
 		return output;
 	}
@@ -103,7 +103,10 @@ public class WanWrapper implements Wrapper {
 		StreamElement se = null;
 		try {
 			date = dateTimeFormat.parse(data[0]);
-			se = new StreamElement(structure,removeTimestampFromRow(structure,data),date.getTime());
+      Double[] values = removeTimestampFromRow(structure, data);
+			se = StreamElement.from(this).setTime(date.getTime());
+      for (int i=0;i<values.length;i++)
+           se.set(getOutputFormat()[i].getName(),values[i]);
 		} catch (ParseException e) {
 			logger.error("invalide date format! "+data[0]);
 			logger.error(e.getMessage(),e);

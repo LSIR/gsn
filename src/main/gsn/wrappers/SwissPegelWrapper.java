@@ -74,10 +74,10 @@ public class SwissPegelWrapper implements Wrapper {
 
 	private final transient Logger   logger             = Logger.getLogger( SwissPegelWrapper.class );
 	private DataField[] structure = {
-			new DataField( "pegel" , "double" , "pegel"),
-			new DataField( "minterval" , "double" , "measurement interval"),
-			new DataField( "quality" , "double" , "measurement quality"),
-			new DataField( "measurementType", "double", "measurement type") };
+			new DataField( "pegel" , "double" ),
+			new DataField( "minterval" , "double" ),
+			new DataField( "quality" , "double" ),
+			new DataField( "measurementType", "double") };
 	private int threadCounter=0;
 	private SimpleDateFormat dateTimeFormat ;
 	private SimpleDateFormat svnDateTimeFormat ;
@@ -192,7 +192,10 @@ public class SwissPegelWrapper implements Wrapper {
 		StreamElement se = null;
 		try {
 			date = dateTimeFormat.parse(data[1]+" "+data[0]);
-			se = new StreamElement(structure,removeTimestampFromRow(data),date.getTime());
+      se = StreamElement.from(this).setTime(date.getTime());
+    Double[] values = removeTimestampFromRow(data);
+      for (int i=0;i<values.length;i++)
+        se.set(getOutputFormat()[i].getName(),values[i]);
 		} catch (ParseException e) {
 			logger.error("invalide date format! "+data[1]+" "+data[0]);
 			logger.error(e.getMessage(),e);
@@ -249,10 +252,10 @@ public class SwissPegelWrapper implements Wrapper {
 								//								continue;
 								//								}
 								StreamElement streamElement = rowToSE(data);
-								if (streamElement.getTimeStamp()>this.lastEnteredStreamelement){
+								if (streamElement.getTimed()>this.lastEnteredStreamelement){
 									logger.warn("posting data");
 									dataChannel.write(streamElement);
-									this.lastEnteredStreamelement = streamElement.getTimeStamp();
+									this.lastEnteredStreamelement = streamElement.getTimed();
 								}
 							}
 							this.lastModified = modified.longValue();
@@ -288,10 +291,10 @@ public class SwissPegelWrapper implements Wrapper {
 								//								continue;
 								//								}
 								StreamElement streamElement = rowToSE(data);
-								if (streamElement.getTimeStamp()>this.lastEnteredStreamelement){
+								if (streamElement.getTimed()>this.lastEnteredStreamelement){
 									logger.warn("posting data");
 									dataChannel.write(streamElement);
-									this.lastEnteredStreamelement = streamElement.getTimeStamp();
+									this.lastEnteredStreamelement = streamElement.getTimed();
 								}
 							}
 							this.lastModified = modified.longValue();

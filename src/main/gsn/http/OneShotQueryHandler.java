@@ -2,7 +2,6 @@ package gsn.http;
 
 import gsn.Main;
 import gsn.Mappings;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSFile;
 import gsn.storage.DataEnumerator;
@@ -16,7 +15,6 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 public class OneShotQueryHandler implements RequestHandler{
@@ -56,14 +54,14 @@ public class OneShotQueryHandler implements RequestHandler{
            sb.append( "<stream-element>\n" );
            for ( int i = 0 ; i < se.getFieldNames( ).length ; i++ ) {
                sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\" >" );
-               if (se.getData()[i] != null)
-                   if ( se.getFieldTypes( )[ i ] == DataTypes.BINARY )
-                       sb.append( se.getData( )[ i ].toString( ) );
-                   else
-                       sb.append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) );
-               sb.append( "</field>\n");
+//               if (se.getData()[i] != null)
+//                   if ( se.getFieldTypes( )[ i ] == DataTypes.BINARY )
+//                       sb.append( se.getData( )[ i ].toString( ) );
+//                   else
+//                       sb.append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) );
+//               sb.append( "</field>\n");
            }
-           sb.append( "<field name=\"timed\" >" ).append( sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
+           sb.append( "<field name=\"timed\" >" ).append( sdf.format(new Date(se.getTimed( ))) ).append( "</field>\n" );
            sb.append( "</stream-element>\n" );
        }
       result.close();

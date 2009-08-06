@@ -3,6 +3,7 @@ package gsn.operators;
 import gsn.beans.DataTypes;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 import gsn2.conf.Parameters;
@@ -25,7 +26,11 @@ public class SensorscopeVS  implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 
@@ -191,7 +196,7 @@ public class SensorscopeVS  implements Operator {
      */
 
     public void process(String inputStreamName, StreamElement data) {
-        Serializable[] dataFields = data.getData();
+        Serializable[] dataFields =null;// data.getData();
         short ntwSenderId = NO_VALUE;
         short ntwDistToBts = NO_VALUE;
         short tspHopCount = NO_VALUE;
@@ -385,15 +390,15 @@ public class SensorscopeVS  implements Operator {
             i++;
         }
 
-        long t = data.isTimestampSet() ? data.getTimeStamp() : System.currentTimeMillis();
+        long t = data.isTimestampSet() ? data.getTimed() : System.currentTimeMillis();
 
 
-        StreamElement out = new StreamElement(
-                fieldNames.toArray(new String[]{}),
-                dataTypes.toArray(new Byte[]{}),
-                datas.toArray(new Serializable[]{}),
-                t);
-        outputChannel.write(out);//flexibile output.
+//        StreamElement out = new StreamElement(
+//                fieldNames.toArray(new String[]{}),
+//                dataTypes.toArray(new Byte[]{}),
+//                datas.toArray(new Serializable[]{}),
+//                t);
+//        outputChannel.write(out);//flexibile output.
     }
 
     public double getSoilTemperature(short rawValue) {

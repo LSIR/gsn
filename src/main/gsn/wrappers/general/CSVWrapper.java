@@ -88,10 +88,14 @@ public class CSVWrapper implements Wrapper {
 
 					reader = new FileReader(handler.getDataFile());
 					output = handler.run(reader, checkPointDir);
-					for (TreeMap<String, Serializable> se : output) {
-						StreamElement streamElement = new StreamElement(se,getOutputFormat());
-						dataChannel.write(streamElement);
-						handler.updateCheckPointFile(streamElement.getTimeStamp());
+          for (TreeMap<String, Serializable> data : output) {
+            StreamElement se = StreamElement.from(this);
+            se.setTime(System.currentTimeMillis());
+            for (String key:data.keySet())
+              se.set(key,data.get(key));
+
+						dataChannel.write(se);
+						handler.updateCheckPointFile(se.getTimed());
 					}
 				}
 				if (output==null || output.size()==0) //More intelligent sleeping, being more proactive once the wrapper receives huge files.

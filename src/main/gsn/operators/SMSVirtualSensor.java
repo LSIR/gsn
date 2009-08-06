@@ -2,7 +2,6 @@ package gsn.operators;
 
 import gsn.ManualDataConsumer;
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.channels.DataChannel;
@@ -33,7 +32,11 @@ public class SMSVirtualSensor implements Operator,ManualDataConsumer{
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return outputStructure;
+  }
+
+  public void start() {}
 	public void stop() {}
 
 
@@ -58,9 +61,9 @@ public class SMSVirtualSensor implements Operator,ManualDataConsumer{
 		MESSAGE_FIELD_NAME, PHONENUMBER_FIELD_NAME, RECEIVER_FIELD_NAME };
 
 	private transient final DataField [] outputStructure = new  DataField [] { 
-			new DataField( "message" , "varchar(255)" , "SMS-message to be sent." ),
-			new DataField( "phonenumber" , "varchar(255)" , "Phone number of the recipient" ),
-			new DataField( "receiver" , "varchar(255)" , "Receiver-field of the email" ),
+			new DataField( "message" , "string"  ),
+			new DataField( "phonenumber" , "string" ),
+			new DataField( "receiver" , "string"  ),
 	};   
 
 	private String					password;
@@ -104,9 +107,7 @@ public class SMSVirtualSensor implements Operator,ManualDataConsumer{
 			String number = it.next();
 			String receiverEmail = formatReceiverEmail(number, password, smsServer);
 			String message = prepareMessage(data, messageFormat);
-			StreamElement out = new StreamElement( FIELD_NAMES , 
-					new Byte[ ] { DataTypes.VARCHAR, DataTypes.VARCHAR, DataTypes.VARCHAR } , 
-					new Serializable [ ] { message, number, receiverEmail } , time );
+			StreamElement out = StreamElement.from(this).set("message",message).set("phonenumber",number).set("receiver",receiverEmail).setTime(time);
 			outputChannel.write( out );
 		}
 
@@ -128,7 +129,7 @@ public class SMSVirtualSensor implements Operator,ManualDataConsumer{
 		 */
 		String [ ] fieldNames = streamElement.getFieldNames( );
 		for ( int i = 0 ; i < fieldNames.length ; i++ ) {
-			template.setAttribute( streamElement.getFieldNames( )[ i ] , streamElement.getData( )[ i ] );
+			template.setAttribute( fieldNames[i], streamElement.getValue(fieldNames[i]) );
 		}
 		String resultMessage = template.toString( );
 		return resultMessage;

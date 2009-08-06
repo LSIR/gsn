@@ -12,7 +12,6 @@ package gsn.wrappers.cameras.usb;
 // http://www.geocities.com/marcoschmidt.geo/java-image-coding.html
 
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.WrapperConfig;
 import gsn.channels.DataChannel;
@@ -22,7 +21,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -103,7 +101,7 @@ public class WebCamWrapper implements Wrapper , ControllerListener {
 
 	public static final String            DEFAULT_GSN_LOG4J_PROPERTIES = "conf/log4j.properties";
 
-	private transient final static  DataField [] dataField = new DataField[] {new DataField( PICTURE_KEY , "binary:image/jpeg" , "The pictures observerd from the webcam." )};
+	private transient final static  DataField [] dataField = new DataField[] {new DataField( PICTURE_KEY , "binary:image/jpeg" )};
 	// -----------------------------------START----------------------------------------
 	// DEVICE NAME FOR LINUX CAM: "v4l:OV518 USB Camera:0"
 	private boolean isLiveViewEnabled = false;
@@ -282,7 +280,7 @@ public class WebCamWrapper implements Wrapper , ControllerListener {
 			baos.reset( );
 			if ( reading != null ) {
 				codec.encode( reading.getBufferedImage( ) );
-				streamElement = new StreamElement( new String [ ] { PICTURE_KEY } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { baos.toByteArray( ) } , System.currentTimeMillis( ) );
+				streamElement = StreamElement.from(this).set( PICTURE_KEY ,baos.toByteArray( )).setTime(System.currentTimeMillis( ) );
 			}
 		} catch ( Exception e ) {
 			logger.error( e.getMessage( ) , e );

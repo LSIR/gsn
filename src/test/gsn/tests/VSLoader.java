@@ -1,4 +1,4 @@
-package gsn;
+package gsn.tests;
 
 import static org.picocontainer.behaviors.Behaviors.caching;
 import static org.picocontainer.behaviors.Behaviors.synchronizing;
@@ -13,6 +13,8 @@ import gsn.tests.MockWrapper;
 import gsn.tests.MockWrapper2;
 import gsn.utils.TableFinder;
 import gsn.wrappers.Wrapper;
+import gsn.ConfigurationVisitorAdapter;
+import gsn.DBVisitor;
 import gsn2.conf.ChannelConfig;
 import gsn2.conf.OperatorConfig;
 import gsn2.conf.SQLOperatorConfig;

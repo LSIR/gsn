@@ -3,6 +3,7 @@ package gsn.operators;
 import gsn.beans.DataTypes;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn.channels.GSNChannel;
 import gsn.utils.MatlabEngine;
@@ -21,7 +22,11 @@ public class MatlabVS implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 
@@ -39,32 +44,32 @@ public class MatlabVS implements Operator {
 	private DataChannel outputChannel;
 	 
 	public void process(String inputStreamName,StreamElement streamElement) {
-		if(streamElement.getFieldTypes().length == nbArgs+1)
-			for(int i = 0; i < nbArgs; i++)
-				parameters[i] = (Double) streamElement.getData()[i];
-		Double answer;
-		try {
-			String matlabCommand = functionName + "(" ;
-			for(int i = 0; i < nbArgs; i++) {
-				matlabCommand = matlabCommand + parameters[i].toString();
-				if(i != nbArgs-1)
-					matlabCommand = matlabCommand +",";
-			}
-			if(nbArgs > 0)
-				matlabCommand = matlabCommand + ")";
-			if(logger.isDebugEnabled())
-				logger.debug("Calling matlab engine with command: " + matlabCommand);
-			engine.evalString(matlabCommand);
-			String matlabAnswer = engine.getOutputString(100);
-			if(logger.isDebugEnabled())
-				logger.debug("Received output from matlab: " + matlabAnswer +". Trying to interpret this"
-						+ " answer as a Java Float object.");
-			answer = Double.parseDouble(matlabAnswer);
-			StreamElement result = new StreamElement(fieldNames, fieldTypes , new Serializable[] {answer});
-			outputChannel.write(result);
-		} catch (IOException e) {
-			logger.warn(e);
-		}
+//		if(streamElement.getFieldTypes().length == nbArgs+1)
+//			for(int i = 0; i < nbArgs; i++)
+//				parameters[i] = (Double) streamElement.getData()[i];
+//		Double answer;
+//		try {
+//			String matlabCommand = functionName + "(" ;
+//			for(int i = 0; i < nbArgs; i++) {
+//				matlabCommand = matlabCommand + parameters[i].toString();
+//				if(i != nbArgs-1)
+//					matlabCommand = matlabCommand +",";
+//			}
+//			if(nbArgs > 0)
+//				matlabCommand = matlabCommand + ")";
+//			if(logger.isDebugEnabled())
+//				logger.debug("Calling matlab engine with command: " + matlabCommand);
+//			engine.evalString(matlabCommand);
+//			String matlabAnswer = engine.getOutputString(100);
+//			if(logger.isDebugEnabled())
+//				logger.debug("Received output from matlab: " + matlabAnswer +". Trying to interpret this"
+//						+ " answer as a Java Float object.");
+//			answer = Double.parseDouble(matlabAnswer);
+//			StreamElement result = new StreamElement(fieldNames, fieldTypes , new Serializable[] {answer});
+//			outputChannel.write(result);
+//		} catch (IOException e) {
+//			logger.warn(e);
+//		}
 
 
 	}

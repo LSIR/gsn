@@ -3,6 +3,7 @@ package gsn.operators;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.beans.VSFile;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
@@ -21,7 +22,11 @@ public class EPuckVS  implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
    
@@ -52,10 +57,10 @@ private DataChannel outputChannel;
    }
    
    boolean actionA = false;
-   
+
    public void process ( String inputStreamName , StreamElement data ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "I just received some data from the robot" );
-      System.out.println( new String( ( byte [ ] ) data.getData( SerialWrapper.RAW_PACKET ) ) );
+      System.out.println( new String( ( byte [ ] ) data.getValue( SerialWrapper.RAW_PACKET ) ) );
 //      Wrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
       if ( actionA == false ) {
          actionA = true;

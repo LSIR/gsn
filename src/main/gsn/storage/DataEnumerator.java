@@ -165,7 +165,7 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 					innerIndex++;
 				}
 			}
-			streamElement = new StreamElement( dataFieldNames , dataFieldTypes , output , indexOfTimedField == -1 ? System.currentTimeMillis( ) : timestamp );
+//			streamElement = new StreamElement( dataFieldNames , dataFieldTypes , output , indexOfTimedField == -1 ? System.currentTimeMillis( ) : timestamp ); // TODO: have to be adopted to the new call.
 			if ( indexofPK != -1 ) streamElement.setInternalPrimayKey( pkValue );
 			hasNext = resultSet.next( );
 			if ( hasNext == false )

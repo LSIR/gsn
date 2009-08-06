@@ -44,7 +44,7 @@ public class GSNChannel implements DataChannel{
 			logger.error( e.getMessage( ) , e );
 			return;
 		}
-		if ( !streamElement.isTimestampSet( ) ) streamElement.setTimeStamp( System.currentTimeMillis( ) );
+		if ( !streamElement.isTimestampSet( ) ) streamElement.setTime( System.currentTimeMillis( ) );
 
 		try {
 			ContainerImpl.getInstance().publishData( this ,streamElement);
@@ -83,7 +83,7 @@ public class GSNChannel implements DataChannel{
 		}
 		int i =-1;
 		for (DataField field: outputStructure) {
-			Serializable value = se.getData(field.getName());
+			Serializable value = se.getValue(field.getName());
 			i++;
 			if (value==null)
 				continue;

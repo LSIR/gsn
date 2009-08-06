@@ -541,7 +541,7 @@ public class StorageManager {
 			for (DataField dataField : fields) {
 				if (dataField.getName().equalsIgnoreCase("timed"))
 					continue;
-				Serializable value = streamElement.getData(dataField.getName());
+				Serializable value = streamElement.getValue(dataField.getName());
 				
 				switch (dataField.getDataTypeID()) {
 				case DataTypes.VARCHAR:
@@ -595,11 +595,11 @@ public class StorageManager {
 				default:
 					logger.error("The type conversion is not supported for : "
 							+ streamElement.getFieldNames()[counter - 1] + "("
-							+ streamElement.getFieldTypes()[counter - 1] + ")");
+							+ streamElement.getType(streamElement.getFieldNames()[counter - 1] ) + ")");
 				}
 				counter++;
 			}
-			ps.setLong(counter, streamElement.getTimeStamp());
+			ps.setLong(counter, streamElement.getTimed());
 			ps.execute();
 		} catch (GSNRuntimeException e) {
 			if (e.getType() == GSNRuntimeException.UNEXPECTED_VIRTUAL_SENSOR_REMOVAL) {

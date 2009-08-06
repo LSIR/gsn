@@ -20,7 +20,7 @@ public class EmptyWrapper implements Wrapper {
 	public EmptyWrapper(WrapperConfig conf, DataChannel channel) {
 		this.conf = conf;
 		this.dataChannel= channel;
-		dataField = new DataField[] { new DataField( "DATA" , "int" , "incremental int" ) };
+		dataField = new DataField[] { new DataField( "DATA" , "int" ) };
 	}
 
 	public void start(){

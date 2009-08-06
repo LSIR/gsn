@@ -2,6 +2,7 @@ package gsn.operators;
 
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
@@ -19,7 +20,11 @@ public class StreamRRDExporterVirtualSensor implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 	public static final String            PARAM_RRDFILE    = "rrdfile" ;
@@ -109,14 +114,15 @@ public class StreamRRDExporterVirtualSensor implements Operator {
 		if(logger.isDebugEnabled())
 			logger.debug( "Trying to add new data items to the rrdfile:" + this.rrdfile );
 		String command ="rrdtool update "+rrdfile+" N";
-		Serializable[] stream = streamElement.getData();
-		String field;
-		for(int i=0;i<stream.length;i++){
-			field = stream[i].toString();
+			String field;
+
+		for(int i=0;i<streamElement.getFieldNames().length;i++){
+			field = streamElement.getValue(streamElement.getFieldNames()[i]).toString();
 			// if the field is empty we have to add an U for unknown to the rrdfile
 			if(field==null || field.equals("")) field = "U";
 			command = command+":"+field;
 		}
+
 		Runtime runtime = Runtime.getRuntime();
 		try {
 			if(logger.isDebugEnabled())

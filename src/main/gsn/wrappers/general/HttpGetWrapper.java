@@ -8,7 +8,6 @@ import gsn.wrappers.Wrapper;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,7 +30,7 @@ public class HttpGetWrapper implements Wrapper {
 
 	private int                      rate;
 
-	private transient final DataField [] outputStructure = new  DataField [] { new DataField( "data" , "binary:image/jpeg" , "JPEG image from the remote networked camera." ) };
+	private transient final DataField [] outputStructure = new  DataField [] { new DataField( "data" , "binary:image/jpeg" ) };
 
 
 	/**
@@ -67,7 +66,7 @@ public class HttpGetWrapper implements Wrapper {
 				int readIndex = -1;
 				while ( (readIndex= content.read(buffer))!=-1)
 					arrayOutputStream.write(buffer, 0, readIndex);
-				dataChannel.write(new StreamElement(getOutputFormat(),new Serializable[] { arrayOutputStream.toByteArray()},System.currentTimeMillis()));
+				dataChannel.write(StreamElement.from(this).set(getOutputFormat()[0].getName(), arrayOutputStream.toByteArray()).setTime(System.currentTimeMillis()));
 			} catch ( InterruptedException e ) {
 				logger.error( e.getMessage( ) , e );
 			}catch (IOException e) {

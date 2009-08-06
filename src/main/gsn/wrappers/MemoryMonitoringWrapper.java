@@ -1,7 +1,6 @@
 package gsn.wrappers;
 
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.WrapperConfig;
 import gsn.channels.DataChannel;
@@ -24,8 +23,8 @@ public class MemoryMonitoringWrapper implements Wrapper {
 
 	private final transient Logger    logger                                = Logger.getLogger( MemoryMonitoringWrapper.class );
 
-	private transient DataField [ ]   outputStructureCache                  = new DataField [ ] { new DataField( FIELD_NAME_HEAP , "bigint" , "Heap memory usage." ) ,
-			new DataField( FIELD_NAME_NON_HEAP , "bigint" , "Nonheap memory usage." ) , new DataField( FIELD_NAME_PENDING_FINALIZATION_COUNT , "int" , "The number of objects with pending finalization." ) };
+	private transient DataField [ ]   outputStructureCache                  = new DataField [ ] { new DataField( FIELD_NAME_HEAP , "bigint" ) ,
+			new DataField( FIELD_NAME_NON_HEAP , "bigint" ) , new DataField( FIELD_NAME_PENDING_FINALIZATION_COUNT , "int" ) };
 
 	private static final String       FIELD_NAME_HEAP                       = "HEAP";
 
@@ -54,9 +53,13 @@ public class MemoryMonitoringWrapper implements Wrapper {
 			long nonHeapMemoryUsage = mbean.getNonHeapMemoryUsage( ).getUsed( );
 			int pendingFinalizationCount = mbean.getObjectPendingFinalizationCount( );
 
-			StreamElement streamElement = new StreamElement( FIELD_NAMES , new Byte [ ] { DataTypes.BIGINT , DataTypes.BIGINT , DataTypes.INTEGER } , new Serializable [ ] { heapMemoryUsage ,
-					nonHeapMemoryUsage , pendingFinalizationCount } , System.currentTimeMillis( ) );
-			dataChannel.write( streamElement );
+      Serializable[] values = {heapMemoryUsage ,nonHeapMemoryUsage , pendingFinalizationCount};
+      StreamElement se = StreamElement.from(this).setTime(System.currentTimeMillis());
+      for (int i=0;i<values.length;i++)
+        se.set(FIELD_NAMES[i],values[i]);
+
+      dataChannel.write( se );
+
 		}
 	}
 

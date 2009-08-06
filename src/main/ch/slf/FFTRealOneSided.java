@@ -61,7 +61,7 @@ public class FFTRealOneSided extends WindowAwareVS {
 	 * @param values A two dimensional array that contains in first dimension (values[])
 	 *        the differents steps, and in the second dimension (value[step][]) the different
 	 *        measures for this step.
-	 * @param timestamps An array that contains the timestamps in milli seconds at every
+	 * @param timestampsInMSec An array that contains the timestamps in milli seconds at every
 	 *        step.
 	 * @return
 	 */
@@ -114,9 +114,9 @@ public class FFTRealOneSided extends WindowAwareVS {
 			dataOut[1] = sb.toString().getBytes();
 
 			//
-			StreamElement se = new StreamElement (outputStructure, dataOut, middleTimeStamp);
-			logger.debug("FFT StreamElement produced: " + se);
-			outputChannel.write( se );
+//			StreamElement se = new StreamElement (outputStructure, dataOut, middleTimeStamp);
+//			logger.debug("FFT StreamElement produced: " + se);
+//			outputChannel.write( se );
 
 		} catch (IllegalArgumentException e) {
 			logger.error("Unable to compute the FFT: " + e.getMessage());
@@ -124,5 +124,8 @@ public class FFTRealOneSided extends WindowAwareVS {
 			logger.error("Unable to compute the FFT: " + e.getMessage());
 		}
 	}
-	
+
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
 }

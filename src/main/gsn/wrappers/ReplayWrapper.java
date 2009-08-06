@@ -110,7 +110,7 @@ class DelayedDataEnumerator implements Enumeration<ScheduledStreamElement>{
 		StreamElement currentSe = data.nextElement();
 		long delay = 500;// First time execution is delayed for 500ms.
 		if (previousElement!=null) 
-			delay =  (currentSe.getTimeStamp()-previousElement.getTimeStamp())/speed;
+			delay =  (currentSe.getTimed()-previousElement.getTimed())/speed;
 		previousElement = currentSe;
 		return new ScheduledStreamElement(currentSe,delay);
 	}

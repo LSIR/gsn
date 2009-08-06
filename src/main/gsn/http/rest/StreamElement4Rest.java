@@ -10,14 +10,17 @@ import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * This has to merged with StreamElement
+ */
 public class StreamElement4Rest {
 	
 	private List<Field4Rest> fields = new ArrayList<Field4Rest>();
 
 	public StreamElement4Rest(StreamElement se) {
-		this.timestamp=new Date(se.getTimeStamp());
+		this.timestamp=new Date(se.getTimed());
 		for (int i =0;i<se.getFieldNames().length;i++) {
-			fields.add( new Field4Rest(se.getFieldNames()[i],se.getFieldTypes()[i],se.getData()[i]));
+			fields.add( new Field4Rest(se.getFieldNames()[i],se.getType(se.getFieldNames()[i]),se.getValue(se.getFieldNames()[i])));
 		}
 	}
 	
@@ -44,8 +47,9 @@ public class StreamElement4Rest {
 			types[idx] = field.getType();
 			idx++;
 		}
-		
-		return new StreamElement(names,types,values,timestamp.getTime());
+
+    return null;
+//		return new StreamElement(names,types,values,timestamp.getTime());
 
 	}
 	

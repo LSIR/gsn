@@ -6,7 +6,6 @@ import gsn.beans.StreamElement;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -18,7 +17,11 @@ public class SMACleaner  implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 	
@@ -30,7 +33,7 @@ public class SMACleaner  implements Operator {
 	private DataChannel outputChannel;
 	
 	public void process(String inputStreamName,StreamElement in) {
-		Double input = (Double) in.getData()[0];
+		Double input = (Double) in.getValue(in.getFieldNames()[0]);
 		
 		if (index>=values.length) {
 			double sum = 0;
@@ -38,12 +41,9 @@ public class SMACleaner  implements Operator {
 				sum+=v;
 			double sma = sum/values.length;
 			
-			StreamElement se ;
 			boolean isAcceptable =  (Math.abs(input - sma)/input <= error_threshold );
-			se= new StreamElement(
-					new DataField[] {new DataField("raw_value","double" ), new DataField("acceptable","integer")},
-					new Serializable[] {input,(isAcceptable == false ? 0 : 1)},
-					in.getTimeStamp());
+			
+      StreamElement se = StreamElement.from(this).setTime(in.getTimed()).set("raw_value",input).set("acceptable",(isAcceptable == false ? 0 : 1));
 			outputChannel.write(se);
 		}
 		values[index++%values.length]= input;

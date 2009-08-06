@@ -2,6 +2,7 @@ package gsn.operators;
 
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
@@ -27,7 +28,11 @@ public class EmailVirtualSensor implements Operator {
 			process(inputStreamName, se);
 	}
 
-	public void start() {}
+  public DataField[] getStructure() {
+    return new DataField[0];  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  public void start() {}
 	public void stop() {}
 
 
@@ -74,9 +79,9 @@ public class EmailVirtualSensor implements Operator {
 		for(int i=0; i < fieldNames.length; i++) {
 			String fn = fieldNames[i];
 			if(fn.equals(RECEIVER_FIELD_NAME)) {
-				receiverEmail = (String) data.getData()[i];
+				receiverEmail = (String) data.getValue(fn);
 			} else if(fn.equals(MESSAGE_FIELD_NAME)) {
-				message = (String) data.getData()[i];
+				message = (String) data.getValue(fn);
 			}
 		}
 

@@ -131,7 +131,7 @@ public class RestRemoteWrapper implements Wrapper {
 				while(isActive && (se = (StreamElement4Rest)inputStream.readObject())!=null) { 
 					StreamElement streamElement = se.toStreamElement();
 					dataChannel.write(streamElement);
-					lastReceivedTimestamp = streamElement.getTimeStamp();
+					lastReceivedTimestamp = streamElement.getTimed();
 				}
 			} catch (Exception e) {
 				logger.debug(e.getMessage(),e);
@@ -149,7 +149,7 @@ public class RestRemoteWrapper implements Wrapper {
 	}
 
 	public void manualDataInsertion(StreamElement se) {
-		lastReceivedTimestamp = se.getTimeStamp();
+		lastReceivedTimestamp = se.getTimed();
 		dataChannel.write(se);
 	}
 
