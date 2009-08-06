@@ -1,6 +1,5 @@
 package gsn.operators;
 
-import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
@@ -14,7 +13,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -36,8 +34,6 @@ public class DemoVSensor  implements Operator {
 
 
 	private static final transient Logger logger                  = Logger.getLogger( DemoVSensor.class );
-
-	private ArrayList < String >          fields                  = new ArrayList < String >( );
 
 	private ByteArrayOutputStream         outputStream            = new ByteArrayOutputStream( 24 * 1024 );
 
@@ -119,10 +115,7 @@ public class DemoVSensor  implements Operator {
 
 	public DemoVSensor(OperatorConfig config,DataChannel outputChannel ) {
 		this.outputChannel = outputChannel;
-		for ( DataField field : config.getOutputFormat())
-			fields.add( field.getName( ) );
 	}
-
 	public void dispose ( ) {
 
 	}

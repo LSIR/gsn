@@ -21,12 +21,12 @@ public class SQLValidatorIntegration implements VSensorStateChangeListener{
 	private static final transient Logger logger = Logger.getLogger(SQLValidatorIntegration.class);
 
 	public boolean vsLoading(VSFile config) {
-		try {
-			String ddl = StorageManager.getStatementCreateTable(config.getName(), config.getProcessingClassConfig().getOutputFormat(), validator.getSampleConnection()).toString();
-			validator.executeDDL(ddl);
-		}catch (Exception e) {
-			logger.error(e.getMessage(),e);
-		}
+//		try {
+//			String ddl = StorageManager.getStatementCreateTable(config.getName(), config.getProcessingClassConfig().getOutputFormat(), validator.getSampleConnection()).toString();
+//			validator.executeDDL(ddl);
+//		}catch (Exception e) {
+//			logger.error(e.getMessage(),e);
+//		}
 		return true;
 	}
 

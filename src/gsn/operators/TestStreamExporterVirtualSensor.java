@@ -4,7 +4,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSFile;
-import gsn.utils.KeyValueImp;
+import gsn.utils.Parameter;
 import gsn2.conf.OperatorConfig;
 import gsn2.conf.Parameters;
 
@@ -61,13 +61,13 @@ public class TestStreamExporterVirtualSensor extends TestCase {
 	 * class comments for more info. Should succeed.
 	 */
 	public void testConnectToExistingMySQLDB ( ) throws ClassNotFoundException, SQLException {
-		ArrayList < KeyValue > params = new ArrayList < KeyValue >( );
-		params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_URL , url ) );
-		params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_USER , user ) );
-		params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_PASSWD , passwd )); 
+		ArrayList < Parameter > params = new ArrayList < Parameter >( );
+		params.add( new Parameter( StreamExporterVirtualSensor.PARAM_URL , url ) );
+		params.add( new Parameter( StreamExporterVirtualSensor.PARAM_USER , user ) );
+		params.add( new Parameter( StreamExporterVirtualSensor.PARAM_PASSWD , passwd )); 
 
 		OperatorConfig pcConfig = new OperatorConfig();
-		pcConfig.setParameters(new Parameters(params.toArray(new KeyValue[]{})));
+		pcConfig.setParameters(new Parameters(params.toArray(new Parameter[]{})));
 		
 		StreamExporterVirtualSensor vs = new StreamExporterVirtualSensor( pcConfig,null);
 		
@@ -78,13 +78,13 @@ public class TestStreamExporterVirtualSensor extends TestCase {
 	 * each possible data type.
 	 */
 	public void testLogStatementIntoMySQLDB ( ) throws ClassNotFoundException, SQLException {
-		ArrayList < KeyValue > params = new ArrayList < KeyValue >( );
-		params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_URL , url ) );
-		params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_USER , user ) );
-		params.add( new KeyValueImp( StreamExporterVirtualSensor.PARAM_PASSWD , passwd )); 
+		ArrayList < Parameter> params = new ArrayList < Parameter >( );
+		params.add( new Parameter( StreamExporterVirtualSensor.PARAM_URL , url ) );
+		params.add( new Parameter( StreamExporterVirtualSensor.PARAM_USER , user ) );
+		params.add( new Parameter( StreamExporterVirtualSensor.PARAM_PASSWD , passwd )); 
 
 		OperatorConfig pcConfig = new OperatorConfig();
-		pcConfig.setParameters(new Parameters(params.toArray(new KeyValue[]{})));
+		pcConfig.setParameters(new Parameters(params.toArray(new Parameter[]{})));
 		
 		StreamExporterVirtualSensor vs = new StreamExporterVirtualSensor( pcConfig,null);
 		

@@ -1,6 +1,6 @@
 package gsn.beans;
 
-import gsn.utils.KeyValueImp;
+import gsn.utils.Parameter;
 import gsn.utils.ValidityTools;
 
 import java.io.FileInputStream;
@@ -478,15 +478,15 @@ public class ContainerConfig {
 	/**
 	 * MSR MAP PART.
 	 */
-	private ArrayList<KeyValueImp> msrMap ;
+	private ArrayList<Parameter> msrMap ;
 	private HashMap<String, String> msrMapCached ;
 	public HashMap<String, String> getMsrMap() {
 		if (msrMapCached==null) {
 			msrMapCached = new HashMap<String, String>();
 			if (msrMap==null)
 				return msrMapCached;
-			for (KeyValueImp kv : msrMap)
-				msrMapCached.put(kv.getKey().toLowerCase().trim(), kv.getValue());
+			for (Parameter kv : msrMap)
+				msrMapCached.put(kv.getName().toLowerCase().trim(), kv.getValue());
 		}
 		return msrMapCached;
 	}

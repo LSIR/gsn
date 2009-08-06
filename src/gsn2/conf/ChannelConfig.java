@@ -1,11 +1,16 @@
 package gsn2.conf;
 
-public class ChannelConfig {
+import gsn.beans.WrapperConfig;
+
+import java.io.Serializable;
+
+public class ChannelConfig implements Serializable {
 	
 	private String windowValue;
 	private String slidingValue;
 	private String name;
-
+	private WrapperConfig sourceConfig;
+	
 	public ChannelConfig(String name,String slidingValue,String windowValue) {
 		this.slidingValue = slidingValue;
 		this.windowValue = windowValue;

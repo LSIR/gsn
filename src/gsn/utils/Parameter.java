@@ -10,40 +10,41 @@ import org.apache.log4j.Logger;
  * Two predicates are the same if they have the same name and value. This class
  * is used for Abstract Addressing and Options.
  */
-public class KeyValueImp implements KeyValue , Serializable {
+public class Parameter implements Serializable {
    
 	private static final long serialVersionUID = 5739537343169906104L;
 
-	private transient final Logger logger = Logger.getLogger( KeyValueImp.class );
+	private transient final Logger logger = Logger.getLogger( Parameter.class );
    
-   private String                 key;
+   private String                 name;
    
    private String                 value;
    
-   public KeyValueImp ( ) {
+   public Parameter ( ) {
 
    }
    
-   public KeyValueImp ( String key , String value ) {
-      this.key = key;
+   public Parameter ( String key , String value ) {
+      this.name = key;
       this.value = value;
    }
    
-   public void setKey ( String key ) {
-      this.key = key;
-   }
-   
+  
    public void setValue ( String value ) {
       this.value = value;
    }
    
-   public boolean equals ( Object obj ) {
-      if ( obj == null || !( obj instanceof KeyValueImp ) ) { return false; }
-      KeyValueImp input = ( KeyValueImp ) obj;
-      return input.getKey( ).equalsIgnoreCase( getKey( ) ) && input.getValue( ).equalsIgnoreCase( getValue( ) );
-   }
    
-   /**
+   
+   public String getName() {
+	return name;
+}
+
+public void setName(String name) {
+	this.name = name;
+}
+
+/**
     * Converts the value inside the predicate object to boolean or returns
     * false.
     * 
@@ -76,18 +77,10 @@ public class KeyValueImp implements KeyValue , Serializable {
       return result;
    }
    
-   public int hashCode ( ) {
-      return toString( ).hashCode( );
-   }
-   
    public String toString ( ) {
       StringBuffer result = new StringBuffer( );
-      result.append( "Predicate ( Key = " ).append( key ).append( ", Value = " ).append( value ).append( " )\n" );
+      result.append( "Predicate ( Key = " ).append( name ).append( ", Value = " ).append( value ).append( " )\n" );
       return result.toString( );
-   }
-   
-   public String getKey ( ) {
-      return this.key;
    }
    
    public String getValue ( ) {

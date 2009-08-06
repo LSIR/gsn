@@ -51,7 +51,7 @@ public class RVirtualSensor implements Operator {
 
 	public TreeMap<String, String> params = null;
 	
-	private DataField[] outStructure;
+//	private DataField[] outStructure;
 	private DataChannel outputChannel;
 
 	public RVirtualSensor(OperatorConfig config,DataChannel outputChannel ) {
@@ -66,7 +66,7 @@ public class RVirtualSensor implements Operator {
 		
 		if (windowSize < stepSize) 
 			throw new RuntimeException("The parameter " + WINDOW_SIZE + " must be greater or equal to the parameter " + STEP_SIZE);
-		outStructure = config.getOutputFormat();
+//		outStructure = config.getOutputFormat();
 	}
 
 	public void process(String inputStreamName,StreamElement streamElement) {
@@ -142,13 +142,13 @@ public class RVirtualSensor implements Operator {
 
 					// collect vector values after computation
 				
-					String[] plotFieldName = new String[outStructure.length];
-					Byte[] plotFieldType = new Byte[outStructure.length];
-
-					for (int w = 0; w < outStructure.length; w++) {
-						plotFieldName[w] = outStructure[w].getName();
-						plotFieldType[w] = outStructure[w].getDataTypeID();
-					}
+//					String[] plotFieldName = new String[outStructure.length];
+//					Byte[] plotFieldType = new Byte[outStructure.length];
+//
+//					for (int w = 0; w < outStructure.length; w++) {
+//						plotFieldName[w] = outStructure[w].getName();
+//						plotFieldType[w] = outStructure[w].getDataTypeID();
+//					}
 
 					Serializable[] outputData = null;
 					StreamElement se = null;
@@ -157,11 +157,11 @@ public class RVirtualSensor implements Operator {
 
 					// check if we have defined more attributes in the output
 					// structure
-					if (outStructure.length > fieldname.length) {
-						outputData = new Serializable[outStructure.length];
-					} else {
-						outputData = new Serializable[fieldname.length];
-					}
+//					if (outStructure.length > fieldname.length) {
+//						outputData = new Serializable[outStructure.length];
+//					} else {
+//						outputData = new Serializable[fieldname.length];
+//					}
 
 					for (int n = 0; n < fieldname.length; n++) {
 						// evaluate/get attribute data from R server
@@ -183,32 +183,32 @@ public class RVirtualSensor implements Operator {
 						}
 					}
 
-					int len1 = outStructure.length;
-					int len2 = fieldname.length;
-
-					// check if we have defined more attributes in the output
-					// structure
-					if (len1 > len2) {
-						if (stype.equals("plot")) {
-							xp = rc.parseAndEval("gsn_plot");
-							outputData[len2] = xp.asBytes();
-
-							se = new StreamElement(plotFieldName,
-									plotFieldType, outputData);
-						}
-					} else {
-						se = new StreamElement(fieldname, fieldType, outputData);
-					}
-
-					logger.info("Computation finished.");
-
-					outputChannel.write(se);
-					logger.debug("Stream published: "
-							+ se.toString().toLowerCase());
-
-					// Close connection to R server
-					rc.close();
-					logger.info("Connection to R server closed.");
+//					int len1 = outStructure.length;
+//					int len2 = fieldname.length;
+//
+//					// check if we have defined more attributes in the output
+//					// structure
+//					if (len1 > len2) {
+//						if (stype.equals("plot")) {
+//							xp = rc.parseAndEval("gsn_plot");
+//							outputData[len2] = xp.asBytes();
+//
+////							se = new StreamElement(plotFieldName,
+////									plotFieldType, outputData);
+//						}
+//					} else {
+//						se = new StreamElement(fieldname, fieldType, outputData);
+//					}
+//
+//					logger.info("Computation finished.");
+//
+//					outputChannel.write(se);
+//					logger.debug("Stream published: "
+//							+ se.toString().toLowerCase());
+//
+//					// Close connection to R server
+//					rc.close();
+//					logger.info("Connection to R server closed.");
 
 				} catch (Exception e) {
 					logger.warn(e);

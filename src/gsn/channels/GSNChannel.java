@@ -16,21 +16,17 @@ public class GSNChannel implements DataChannel{
 
 	private static final transient Logger logger           = Logger.getLogger( GSNChannel.class );
 
-	private long                          lastVisitiedTime = 0;
-
 	private void validateStreamElement ( StreamElement streamElement ,boolean adjust) {
-		if ( !compatibleStructure( streamElement, getVirtualSensorConfiguration( ).getProcessingClassConfig().getOutputFormat(),adjust ) ) {
-			StringBuilder exceptionMessage = new StringBuilder( ).append( "The streamElement produced by :" ).append( getVirtualSensorConfiguration( ).getName( ) ).append(
-			" Virtual Sensor is not compatible with the defined streamElement.\n" );
-			exceptionMessage.append( "The expected stream element structure (specified in " ).append( getVirtualSensorConfiguration( ).getFileName( ) ).append( " is [" );
-			for ( DataField df : getVirtualSensorConfiguration( ).getProcessingClassConfig().getOutputFormat() ) 
-				exceptionMessage.append( df.getName( ) ).append( " (" ).append( DataTypes.TYPE_NAMES[ df.getDataTypeID( ) ] ).append( ") , " );
-			exceptionMessage.append( "] but the actual stream element received from the " + getVirtualSensorConfiguration( ).getName( ) ).append( " has the [" );
-			for ( int i = 0 ; i < streamElement.getFieldNames( ).length ; i++ )
-				exceptionMessage.append( streamElement.getFieldNames( )[ i ] ).append( "(" ).append( DataTypes.TYPE_NAMES[ streamElement.getFieldTypes( )[ i ] ] ).append( ")," );
-			exceptionMessage.append(" ] thus the stream element dropped !!!" );
-			throw new RuntimeException( exceptionMessage.toString( ) );
-		}
+//		if ( !compatibleStructure( streamElement, getVirtualSensorConfiguration( ).getProcessingClassConfig().getOutputFormat(),adjust ) ) {
+//			StringBuilder exceptionMessage = new StringBuilder( ).append( "The streamElement produced by :" ).append( getVirtualSensorConfiguration( ).getName( ) ).append(
+//			" Virtual Sensor is not compatible with the defined streamElement.\n" );
+//			exceptionMessage.append( "The expected stream element structure (specified in " ).append( getVirtualSensorConfiguration( ).getFileName( ) ).append( " is [" );
+//			exceptionMessage.append( "] but the actual stream element received from the " + getVirtualSensorConfiguration( ).getName( ) ).append( " has the [" );
+//			for ( int i = 0 ; i < streamElement.getFieldNames( ).length ; i++ )
+//				exceptionMessage.append( streamElement.getFieldNames( )[ i ] ).append( "(" ).append( DataTypes.TYPE_NAMES[ streamElement.getFieldTypes( )[ i ] ] ).append( ")," );
+//			exceptionMessage.append(" ] thus the stream element dropped !!!" );
+//			throw new RuntimeException( exceptionMessage.toString( ) );
+//		}
 	}
 	/**
 	 * if Adjust is true then system checks the output structure of the virtual sensor and
@@ -49,14 +45,6 @@ public class GSNChannel implements DataChannel{
 			return;
 		}
 		if ( !streamElement.isTimestampSet( ) ) streamElement.setTimeStamp( System.currentTimeMillis( ) );
-
-		final int outputStreamRate = getVirtualSensorConfiguration( ).getOutputStreamRate( );
-		final long currentTime = System.currentTimeMillis( );
-		if ( ( currentTime - lastVisitiedTime ) < outputStreamRate ) {
-			if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
-			return;
-		}
-		lastVisitiedTime = currentTime;
 
 		try {
 			ContainerImpl.getInstance().publishData( this ,streamElement);
@@ -152,7 +140,6 @@ public class GSNChannel implements DataChannel{
 	    
 	    retValue = "GSNChannel ( "
 	        + super.toString() + TAB
-	        + "lastVisitiedTime = " + this.lastVisitiedTime + TAB
 	        + "virtualSensorConfiguration = " + this.virtualSensorConfiguration + TAB
 	        + "config = " + this.config + TAB
 	        + " )";

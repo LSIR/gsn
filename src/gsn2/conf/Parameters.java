@@ -1,26 +1,28 @@
 package gsn2.conf;
 
+import gsn.utils.Parameter;
+
+import java.io.Serializable;
 import java.util.Vector;
 
-import org.apache.commons.collections.KeyValue;
-
-public class Parameters {
+public class Parameters implements Serializable {
 
 	public static final Parameters EMPTY_PARAMETERS = new Parameters(null);
 
-	private KeyValue[] predicates;
+	private Parameter[] parameters;
 
-	public Parameters(KeyValue...newPredicates) {
+	public Parameters() {this(null);}
+	public Parameters(Parameter...newPredicates) {
 		if (newPredicates==null)
-			this.predicates=new  KeyValue[0];
+			this.parameters=new  Parameter[0];
 		else
-			this.predicates = newPredicates;
+			this.parameters = newPredicates;
 	}
 
 	public String getPredicateValueWithException ( String key ) {
 		key = key.trim( );
-		for (  KeyValue predicate : this.predicates ) {
-			if ( predicate.getKey( ).toString( ).trim( ).equalsIgnoreCase( key ) ) {
+		for (  Parameter predicate : this.parameters ) {
+			if ( predicate.getName( ).toString( ).trim( ).equalsIgnoreCase( key ) ) {
 				final String value = ( String ) predicate.getValue( );
 				if (value.trim().length()>0)
 					return ( value);
@@ -39,9 +41,9 @@ public class Parameters {
 
 	public String getPredicateValue ( String key ) {
 		key = key.trim( );
-		for (  KeyValue predicate : this.predicates ) {
-			//    logger.fatal(predicate.getKey()+" --- " +predicate.getValue());
-			if ( predicate.getKey( ).toString( ).trim( ).equalsIgnoreCase( key ) ) return ( ( String ) predicate.getValue( ));
+		for (  Parameter predicate : this.parameters ) {
+			//    logger.fatal(predicate.getName()+" --- " +predicate.getValue());
+			if ( predicate.getName( ).toString( ).trim( ).equalsIgnoreCase( key ) ) return ( ( String ) predicate.getValue( ));
 		}
 		return null;
 	}
@@ -101,14 +103,14 @@ public class Parameters {
 		}
 	}
 
-	public KeyValue[] getPredicates() {
-		return predicates;
+	public Parameter[] getPredicates() {
+		return parameters;
 	}
 
 	public String[] getPredicateValues(String key) {
 		Vector<String> toReturn = new Vector<String>();
-		for (  KeyValue predicate : this.predicates ) {
-			if ( predicate.getKey( ).toString( ).trim( ).equalsIgnoreCase( key ) )
+		for (  Parameter predicate : this.parameters ) {
+			if ( predicate.getName( ).toString( ).trim( ).equalsIgnoreCase( key ) )
 				toReturn.add((String) predicate.getValue( ));
 		}
 		return toReturn.toArray(new String[] {});
@@ -132,8 +134,8 @@ public class Parameters {
 			+ super.toString() + TAB
 			+ "predicates = " ;
 
-		for (  KeyValue predicate : this.predicates ) 
-			retValue+= predicate.getKey().toString()+"="+predicate.getValue()+" , ";
+		for (  Parameter predicate : this.parameters ) 
+			retValue+= predicate.getName().toString()+"="+predicate.getValue()+" , ";
 
 		retValue= TAB + " )";
 

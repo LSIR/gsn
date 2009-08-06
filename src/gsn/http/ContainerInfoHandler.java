@@ -41,71 +41,71 @@ public class ContainerInfoHandler implements RequestHandler {
 	  
 	  
     StringBuilder sb = new StringBuilder( "<gsn " );
-    sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
-    sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
-    sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
-    sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
-    
-    Iterator < VSFile > vsIterator = Mappings.getAllVSensorConfigs( );
-    
-    
-    while ( vsIterator.hasNext( ) ) {
-      VSFile sensorConfig = vsIterator.next( );
-      if ( reqName != null && !sensorConfig.getName().equals(reqName) ) continue;
-      sb.append("<virtual-sensor");
-      sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
-      sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
-      if (sensorConfig.getDescription() != null) {
-        sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
-      }
-      sb.append( ">\n" );
-      
-      ArrayList<StreamElement> ses = getMostRecentValueFor(sensorConfig.getName());
-      int counter = 1;
-      if (ses!=null ) {
-        for (StreamElement se:ses){
-          for ( DataField df : sensorConfig.getProcessingClassConfig().getOutputFormat() ) {
-            sb.append("\t<field");
-            sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
-            sb.append(" type=\"").append(df.getType()).append("\"");
-            if (df.getDescription() != null && df.getDescription().trim().length() != 0)
-              sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
-            sb.append(">");
-            if (se!= null ) 
-              if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
-                sb.append( se.getData( df.getName( ) ) );
-              else
-                sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
-            sb.append("</field>\n");
-          }
-          sb.append("\t<field name=\"timed\" type=\"string\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
-          for ( KeyValue df : sensorConfig.getAddressing( )){
-            sb.append("\t<field");
-            sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
-            sb.append(" category=\"predicate\">");
-            sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
-            sb.append("</field>\n" );
-          }
-          if (sensorConfig.getProcessingClassConfig().getWebInputs()!=null){
-            for ( WebInput wi : sensorConfig.getProcessingClassConfig().getWebInputs() ) {
-              for ( DataField df : wi.getParameters ( ) ) {
-                sb.append( "\t<field");
-                sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
-                sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
-                sb.append(" category=\"input\"");
-                sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
-                if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
-                  sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
-                sb.append( "></field>\n" );
-              }
-            }
-          }
-          counter++;
-        }
-      }
-      sb.append( "</virtual-sensor>\n" );
-    }
-    sb.append( "</gsn>\n" );
+//    sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
+//    sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
+//    sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
+//    sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
+//    
+//    Iterator < VSFile > vsIterator = Mappings.getAllVSensorConfigs( );
+//    
+//    
+//    while ( vsIterator.hasNext( ) ) {
+//      VSFile sensorConfig = vsIterator.next( );
+//      if ( reqName != null && !sensorConfig.getName().equals(reqName) ) continue;
+//      sb.append("<virtual-sensor");
+//      sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
+//      sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
+//      if (sensorConfig.getDescription() != null) {
+//        sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
+//      }
+//      sb.append( ">\n" );
+//      
+//      ArrayList<StreamElement> ses = getMostRecentValueFor(sensorConfig.getName());
+//      int counter = 1;
+//      if (ses!=null ) {
+//        for (StreamElement se:ses){
+//          for ( DataField df : sensorConfig.getProcessingClassConfig().getOutputFormat() ) {
+//            sb.append("\t<field");
+//            sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
+//            sb.append(" type=\"").append(df.getType()).append("\"");
+//            if (df.getDescription() != null && df.getDescription().trim().length() != 0)
+//              sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
+//            sb.append(">");
+//            if (se!= null ) 
+//              if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
+//                sb.append( se.getData( df.getName( ) ) );
+//              else
+//                sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
+//            sb.append("</field>\n");
+//          }
+//          sb.append("\t<field name=\"timed\" type=\"string\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
+//          for ( KeyValue df : sensorConfig.getAddressing( )){
+//            sb.append("\t<field");
+//            sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
+//            sb.append(" category=\"predicate\">");
+//            sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
+//            sb.append("</field>\n" );
+//          }
+//          if (sensorConfig.getProcessingClassConfig().getWebInputs()!=null){
+//            for ( WebInput wi : sensorConfig.getProcessingClassConfig().getWebInputs() ) {
+//              for ( DataField df : wi.getParameters ( ) ) {
+//                sb.append( "\t<field");
+//                sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
+//                sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
+//                sb.append(" category=\"input\"");
+//                sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
+//                if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
+//                  sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
+//                sb.append( "></field>\n" );
+//              }
+//            }
+//          }
+//          counter++;
+//        }
+//      }
+//      sb.append( "</virtual-sensor>\n" );
+//    }
+//    sb.append( "</gsn>\n" );
     return sb.toString();
   }
   

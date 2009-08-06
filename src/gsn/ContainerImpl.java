@@ -43,7 +43,7 @@ public class ContainerImpl  {
 		String name = sensor.getVirtualSensorConfiguration( ).getName( ).toLowerCase();
 		StorageManager storageMan = StorageManager.getInstance( );
 		synchronized ( psLock ) {
-			storageMan.executeInsert( name ,sensor.getVirtualSensorConfiguration().getProcessingClassConfig().getOutputFormat(), data );
+//			storageMan.executeInsert( name ,sensor.getVirtualSensorConfiguration().getProcessingClassConfig().getOutputFormat(), data );
 		}
 		
 		for (VirtualSensorDataListener listener : dataListeners) {

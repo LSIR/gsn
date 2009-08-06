@@ -1,0 +1,9 @@
+<binding>
+	<mapping name="sensor-server" class="gsn.beans.ContainerConfig">
+		<value name="port" field="containerPort" />
+		<value name="time-format" field="timeFormat" usage="optional" default="dd/MM/yyyy HH:mm:ss Z"/>
+		<value name="ssl-port" field="sslPort" usage="optional"/>
+        <value name="ssl-key-store-password" field="sslKeyStorePassword" usage="optional"/>
+        <value name="ssl-key-password" field="sslKeyPassword" usage="optional"/>
+	</mapping>
+</binding>

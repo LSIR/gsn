@@ -11,6 +11,8 @@ public final class WrapperConfig implements Serializable{
 	
 	private Parameters parameters;
 
+	public WrapperConfig () {/* Required by Jibx */ }
+	
 	public WrapperConfig (  String wrapperName , Parameters parameters) {
 		this.parameters = parameters;
 		this.wrapperName = wrapperName;

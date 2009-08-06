@@ -22,8 +22,8 @@ public final class Mappings {
    public static void addVSensorInstance ( VirtualSensorPool sensorPool ) {
       TreeMap < String , Boolean > vsNameToOutputStructureFields = new TreeMap < String , Boolean >( );
       vsNamesToOutputStructureFields.put( sensorPool.getConfig( ).getName( ) , vsNameToOutputStructureFields );
-      for ( DataField fields : sensorPool.getConfig( ).getProcessingClassConfig().getOutputFormat() )
-         vsNameToOutputStructureFields.put( fields.getName( ) , Boolean.TRUE );
+//      for ( DataField fields : sensorPool.getConfig( ).getProcessingClassConfig().getOutputFormat() )
+//         vsNameToOutputStructureFields.put( fields.getName( ) , Boolean.TRUE );
       vsNameToOutputStructureFields.put( "timed" , Boolean.TRUE );
       vsNameTOVSConfig.put( sensorPool.getConfig( ).getName( ) , sensorPool.getConfig( ) );
       fileNameToVSInstance.put( sensorPool.getConfig( ).getFileName( ) , sensorPool );

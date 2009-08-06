@@ -1,14 +1,11 @@
 <project name="gsn" default="build" basedir=".">
-   <property name="safe-storage-port" value="25000"/>
-   <property name="safe-storage-controller-port" value="25012"/>
-	<property name="gsn-controller-port" value="22232"/>
+   <property name="gsn-controller-port" value="22232"/>
    <target name="init" description="initializes properties and initialization tasks">
       <tstamp>
          <format property="TODAY" pattern="yyyy-MMMM-d-'at'-hh-mm-aa" locale="en"/>
       </tstamp>
+   	
       <property environment="env"/>
-      <property name="env.GEM_PATH" value="${basedir}/ruby_gems" />
-
       <property name="conf.dir" value="${basedir}/conf"/>
       <property name="build.dir" value="build/classes"/>
       <property name="src.dir" value="src"/>
@@ -59,7 +56,6 @@
 	  <copydir  dest="${build.dir}/gsn/gui/templates" src="${src.dir}/gsn/gui/templates"/>
    	<copydir  dest="${build.dir}/META-INF" src="${src.dir}/META-INF"/>
    </target>
- 
      
     <target name="build" depends="setup">
     	<javac debug="true" srcdir="${src.dir}" optimize="off"
@@ -72,8 +68,8 @@
        <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
    	            failonerror="true">
    	         <classpath refid="classpath"/>
-   	         <arg value="conf/containerJIBX.xml"/>
-   	         <arg value="conf/VirtualSensorDescription.xml"/>            
+   	         <arg value="conf/configurationJIBX.xml"/>
+   	         <arg value="conf/OperatorDescription.xml"/>            
    	      </java>
    </target>
    
@@ -87,7 +83,7 @@
       </java>
    </target>
    
-   <target name="gsn" depends="bind,cleandb">
+   <target name="gsn" depends="bind">
       <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
          <classpath refid="classpath"/>
          <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
@@ -100,15 +96,7 @@
    </target>
 	
   <target name="restart" depends="stop,gsn"/>
- 
-	<target name="gui" depends="bind">
-	    <java classname="gsn.gui.GSNConfiguratorFrame"  fork="true" dir="${basedir}">
-	         <classpath refid="classpath"/>
-	      	 <jvmarg value="-splash:icons/GSNLogo.png" />
-	    	<arg id="gsnc-port" value="${gsn-controller-port}" />  
-	    </java>
-	</target>	
- 
+  
    <!-- ================================= 
           target: stop              
          ================================= -->
@@ -176,20 +164,6 @@
 	      	      <exclude name="**/TestContainerImpl.java"/> -->
    	   	      <exclude name="**/RFIDTest.java"/>
          	 	<exclude name="**/TestDataPropogation.java"/>
-         	 	<exclude name="**/TestVSensorLoader.java"/>
-         	 	<exclude name="**/TestStreamSource.java"/>
-         	 	<exclude name="**/TestWindowing1.java"/>
-         	 	<exclude name="**/TestWindowing2.java"/>
-         	 	<exclude name="**/TestPublicToMSR.java"/>
-         	 	<exclude name="**/TestService.java"/>
-         	 	<exclude name="**/TestDataPacket.java"/>
-         	 	<exclude name="**/TestSQLUtils.java"/>
-         	 	<exclude name="**/TestStreamElement.java"/>
-         	 	<exclude name="**/TestValidityTools.java"/>
-         	 	<exclude name="**/TestGraph.java"/>
-         	 	<exclude name="**/TestContainerImpl.java"/>
-         	 	<exclude name="**/TestStreamExporterVirtualSensor.java"/>
-         	 	<exclude name="**/TestStorageManager.java"/>
          	 	<exclude name="**/TestAbstractWrapper.java"/>
          	 </fileset>
 <!--         	<fileset dir="${build.dir}" includes="**/TestStreamSource.*,**/TestAbstractWrapper.*,**/TestVSensorLoader.*" />-->
@@ -222,7 +196,7 @@
       </documentdoclet>
       
    </target>
-   <target name="jar" depends="clean,bind">
+   <target name="jar" depends="clean,build,bind">
       <mkdir dir="${jars}"/>
       <jar destfile="${jars}/${jar.file}" basedir="${build.dir}" >
          <manifest>
@@ -231,13 +205,7 @@
          </manifest>
       </jar>
    </target>
-   <target name="installer" depends="clean,bind,jar">
-      <izpack input="${basedir}/installer/izpack-installer.xml"
-              output="${basedir}/${jars}/gsn-installer.jar"
-              basedir="${basedir}/installer"
-              izPackdir="${basedir}/izpack"/>
-   </target>
-	
+  
 	<target name="compile-reports" depends="init">
 			<taskdef name="jrc" classname="net.sf.jasperreports.ant.JRAntCompileTask"> 
 				<classpath refid="classpath"/>
@@ -252,142 +220,5 @@
 			</jrc> 
 		</target>
 	
-	<target name="cleandb" depends="bind">
-		 <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" classpathref="classpath"/>
-	</target>
-	
-	<target name="start-acquisition"  depends="bind">
-		<java classname="gsn.acquisition2.server.SafeStorageServer"  fork="true" dir="${basedir}" classpathref="classpath">
-			<arg id="ss-port" value="${safe-storage-port}"/>
-			<arg id="ssc-port" value="${safe-storage-controller-port}" />
-			<arg id="ss-mode" value="1" />
-		</java>
-	</target>
-	
-	<target name="clean-acquisition" depends="bind">
-		<java classname="gsn.acquisition2.server.SafeStorageServer"  fork="true" dir="${basedir}" classpathref="classpath">
-			<arg id="ss-port" value="${safe-storage-port}"/>
-			<arg id="ssc-port" value="${safe-storage-controller-port}" />
-			<arg id="ss-mode" value="100" />
-		</java>
-	</target>
-	
-		<target name="generate-msr" depends="bind">
-			<java classname="org.apache.axis2.wsdl.WSDL2Java"  fork="false" dir="${basedir}" classpathref="classpath">
-				<arg value="-o"/>
-				<arg value="generated" />
-				<arg value="-p" />
-				<arg value="gsn.msr.sensormap.datahub" />
-				<arg value="-s" />
-				<arg value="-ss" />
-				<arg value="-sd" />
-				<arg value="-uri" />
-				<arg value="service.asmx.xml" />
-			</java>
-		</target>
-
-
-	
-	<target name="start-acquisition-nofork"  depends="bind">
-			<java classname="gsn.acquisition2.server.SafeStorageServer"  fork="false" dir="${basedir}" classpathref="classpath">
-				<arg id="ss-port" value="${safe-storage-port}"/>
-				<arg id="ssc-port" value="${safe-storage-controller-port}" />
-				<arg id="ss-mode" value="1" />
-			</java>
-		</target>
-	
-	<target name="stop-acquisition" depends="bind">
-		<java classname="gsn.SafeStorageStop"  fork="true" dir="${basedir}" classpathref="classpath">
-			<arg id="ssc-port" value="${safe-storage-controller-port}" />
-		</java>
-	</target>
-	
-	<target name="rails" depends="bind">
-		<java classname="gsn.RailsRunner"  fork="true" dir="${basedir}" classpathref="classpath" >
-			<sysproperty key="jruby.lib" value="${basedir}/ruby_gems/lib" />
-			<sysproperty key="jruby.base" value="${basedir}/ruby_gems" />
-			<sysproperty key="jruby.home" value="${basedir}/ruby_gems" />
-			<jvmarg value="-Djruby.fork.enabled=true" /> <!-- For Running JUnit Tests.-->
-		</java>
-		
-	</target>
-	
-	<target name="prepare-install">
-		<java classname="org.jruby.Main"  fork="true" dir="${basedir}" classpathref="classpath">
-    		<arg value="-S" />
-    		<arg value="gem" />
-    		<arg value="sources" />
-    		<arg value="-a" />
-    		<arg value="http://gems.github.com" />
-    	</java>  
-	</target>
-	
-    <target name="install" depends="bind,prepare-install">
-    	 <delete includeEmptyDirs="yes" failonerror="no">
-    	         <fileset dir="ruby_gems" includes="**/**"/>
-    	</delete>
-    	<mkdir dir="ruby_gems"/>
-    	<java classname="org.jruby.Main"  fork="true" dir="${basedir}" classpathref="classpath">
-    		<arg value="-S" />
-    		<arg value="gem" />
-    		<arg value="install" />
-    		<arg value="gem_plugin" />
-    		<arg value="activesupport" />
-    		<arg value="activerecord" />
-    		<arg value="actionpack" />
-    		<arg value="actionmailer" />
-    		<arg value="activeresource" />
-    		<arg value="rails" />
-    		<arg value="mongrel" />
-    		<arg value="jruby-openssl" />
-    		<arg value="roxml" />
-    		<arg value="mislav-will_paginate" />
-    		<arg value="jdbc-wrapper" />
-    		<arg value="activerecord-jdbc-adapter" />
-    		<arg value="jdbc-h2" />
-    		<arg value="jdbc-mysql" />
-    		<arg value="activerecord-jdbch2-adapter" />
-    		<arg value="activerecord-jdbcmysql-adapter" />
-    		<arg value="--install-dir" />
-    		<arg value="ruby_gems" />
-    		<arg value="--no-ri" />
-    	 	<arg value="--no-rdoc" />
-    	</java>  
-	</target>
-	
-	
-	<target name="migrate" depends="setup">
-	    	<java classname="org.jruby.Main"  fork="true" dir="${basedir}\web_app" classpathref="classpath">
-	    		<arg value="-r" />
-	    		<arg value="env_setup.rb" />
-	    		<arg value="-S" />
-	    		<arg value="rake" />
-	    		<arg value="db:migrate" />
-		   		<jvmarg value="-Djruby.lib=${basedir}/ruby_gems/lib" />
-		   	    <jvmarg value="-Djruby.home=${basedir}/ruby_gems" />
-		   	    <jvmarg value="-Djruby.base=${basedir}/ruby_gems" />
-	    	</java>  
-	</target>
-		 
-
-
-    <target name="rails2" depends="bind">
-        <java classname="org.jruby.Main"  fork="true" dir="${basedir}/web_app" classpathref="classpath">
-		 <sysproperty key="jruby.lib" value="${basedir}/ruby_gems/lib" />
-         <sysproperty key="jruby.base" value="${basedir}/ruby_gems" />
-         <sysproperty key="jruby.home" value="${basedir}/ruby_gems" />
-	     <jvmarg value="-Djruby.lib=${basedir}/ruby_gems/lib" />
-	     <jvmarg value="-Djruby.home=${basedir}/ruby_gems" />
-	     <jvmarg value="-Djruby.base=${basedir}/ruby_gems" />
-	     <jvmarg value="-Djruby.fork.enabled=true" />
-	     <arg value="-S" />
-         <arg value="script/server" />
-    </java>
-        </target>
-
-
-	
-	<target name="start-all" depends="start-acquisition-nofork,gsn"/>
-	<target name="stop-all" depends="stop-acquisition,stop"/>
 </project>
 

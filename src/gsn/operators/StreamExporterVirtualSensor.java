@@ -50,21 +50,21 @@ public class StreamExporterVirtualSensor implements Operator {
 	private DataChannel outputChannel;
 
 	public StreamExporterVirtualSensor (OperatorConfig config,DataChannel outputChannel ) throws ClassNotFoundException, SQLException {
-		this.outputChannel = outputChannel;
-		output_structure = config.getOutputFormat();
-		table_name = config.getParameters().getPredicateValueWithException(  TABLE_NAME );
-		user = config.getParameters().getPredicateValueWithException( PARAM_USER);
-		password = config.getParameters().getPredicateValueWithException( PARAM_PASSWD);
-		url =config.getParameters().getPredicateValueWithException( PARAM_URL);
-		try {
-			Class.forName(config.getParameters().getPredicateValueWithException(PARAM_DRIVER));
-			connection = getConnection();
-			logger.debug( "jdbc connection established." );
-			if (!StorageManager.tableExists(table_name,output_structure , connection))
-				StorageManager.executeCreateTable(table_name, output_structure, false,connection);
-		}catch (GSNRuntimeException e) {
-			throw new RuntimeException("Initialization failed. There is a table called " + TABLE_NAME+ " Inside the database but the structure is not compatible with what GSN expects.");
-		}
+//		this.outputChannel = outputChannel;
+//		output_structure = config.getOutputFormat();
+//		table_name = config.getParameters().getPredicateValueWithException(  TABLE_NAME );
+//		user = config.getParameters().getPredicateValueWithException( PARAM_USER);
+//		password = config.getParameters().getPredicateValueWithException( PARAM_PASSWD);
+//		url =config.getParameters().getPredicateValueWithException( PARAM_URL);
+//		try {
+//			Class.forName(config.getParameters().getPredicateValueWithException(PARAM_DRIVER));
+//			connection = getConnection();
+//			logger.debug( "jdbc connection established." );
+//			if (!StorageManager.tableExists(table_name,output_structure , connection))
+//				StorageManager.executeCreateTable(table_name, output_structure, false,connection);
+//		}catch (GSNRuntimeException e) {
+//			throw new RuntimeException("Initialization failed. There is a table called " + TABLE_NAME+ " Inside the database but the structure is not compatible with what GSN expects.");
+//		}
 	}
 
 	public void process ( String inputStreamName , StreamElement streamElement) {

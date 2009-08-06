@@ -70,11 +70,11 @@ public class VSensorLoader extends Thread {
 			VirtualSensorPool pool = new VirtualSensorPool ( vs );
 			
 			try {
-				if (!StorageManager.getInstance().tableExists( vs.getName ( ) , vs.getProcessingClassConfig().getOutputFormat() ))
-					StorageManager.getInstance().executeCreateTable ( vs.getName ( ) , vs.getProcessingClassConfig().getOutputFormat(),pool.getConfig().getIsTimeStampUnique() );
-				else
-					logger.info("Reusing the existing "+vs.getName()+" table.");
-			} catch ( SQLException e ) {
+//				if (!StorageManager.getInstance().tableExists( vs.getName ( ) , vs.getProcessingClassConfig().getOutputFormat() ))
+//					StorageManager.getInstance().executeCreateTable ( vs.getName ( ) , vs.getProcessingClassConfig().getOutputFormat(),pool.getConfig().getIsTimeStampUnique() );
+//				else
+//					logger.info("Reusing the existing "+vs.getName()+" table.");
+			} catch ( Exception e ) {
 				if ( e.getMessage ( ).toLowerCase ( ).contains ( "table already exists" ) ) {
 					logger.error ( e.getMessage ( ) );
 					if ( logger.isInfoEnabled ( ) ) logger.info ( e.getMessage ( ) , e );

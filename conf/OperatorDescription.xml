@@ -1,0 +1,34 @@
+<binding xmlns:tns="http://gsn2.conf" name="binding">
+  <namespace uri="http://gsn2.conf" default="elements"/>
+  <mapping abstract="true" type-name="tns:operatorConfig" class="gsn2.conf.OperatorConfig">
+    <value name="name" field="identifier"  style="attribute" />
+    <value style="element" name="processor" field="className" />
+    <value style="element" name="unique-timestamp" field="uniqueTimestamp"  usage="optional" default="true" />
+
+    <structure map-as="tns:parameters" field="parameters" usage="optional" name="parameters"/>
+    
+    <collection name="sources" field="channels" usage="optional">
+      <structure type="gsn2.conf.ChannelConfig" name="source">
+        <value style="attribute" name="window-size" field="windowValue" usage="optional"  default="1" />
+        <value style="attribute" name="sliding-value" field="slidingValue" usage="optional"  default="1" />
+        <value style="attribute" name="name" field="name" />
+        <structure field="sourceConfig" name="wrapper">
+          <value style="attribute" name="wrapper" field="wrapperName" />
+          <structure map-as="tns:parameters" field="parameters" usage="optional" name="parameters"/>
+        </structure>
+      </structure>
+    </collection>
+    
+  </mapping>
+  <mapping class="gsn2.conf.OperatorConfig" name="operator">
+    <structure map-as="tns:operatorConfig"/>
+  </mapping>
+  <mapping abstract="true" type-name="tns:parameters" class="gsn2.conf.Parameters">
+    <collection field="parameters" usage="optional">
+      <structure type="gsn.utils.Parameter" name="parameter">
+        <value style="attribute" name="name" field="name" />
+        <value style="text" field="value" usage="optional"/>
+      </structure>
+    </collection>
+  </mapping>
+</binding>

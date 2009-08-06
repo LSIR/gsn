@@ -315,15 +315,15 @@ public class MultiDataDownload extends HttpServlet {
 		Iterator<VSFile> iter = Mappings.getAllVSensorConfigs();
 		VSFile vsc ;
 		ArrayList<String> allFields;
-		while (iter.hasNext()) {
-			vsc = (VSFile) iter.next();
-			allFields = new ArrayList<String> () ;
-			DataField[] dfs = vsc.getProcessingClassConfig().getOutputFormat();
-			for (int i = 0 ; i < dfs.length ; i++) {
-				allFields.add(dfs[i].getName());
-			}	
-			allVsAndFieldsMapping.put(vsc.getName(), allFields);
-		}
+//		while (iter.hasNext()) {
+//			vsc = (VSFile) iter.next();
+//			allFields = new ArrayList<String> () ;
+//			DataField[] dfs = vsc.getProcessingClassConfig().getOutputFormat();
+//			for (int i = 0 ; i < dfs.length ; i++) {
+//				allFields.add(dfs[i].getName());
+//			}	
+//			allVsAndFieldsMapping.put(vsc.getName(), allFields);
+//		}
 		return allVsAndFieldsMapping;
 	}
 

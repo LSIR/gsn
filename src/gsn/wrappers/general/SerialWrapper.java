@@ -12,7 +12,7 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.WrapperConfig;
 import gsn.channels.DataChannel;
-import gsn.utils.KeyValueImp;
+import gsn.utils.Parameter;
 import gsn.wrappers.Wrapper;
 import gsn2.conf.Parameters;
 
@@ -458,17 +458,17 @@ public class SerialWrapper implements Wrapper , SerialPortEventListener ,ManualD
 		Logger logger = Logger.getLogger( SerialWrapper.class );
 		logger.info( "SerialWrapper Test Started" );
 		
-		ArrayList < KeyValueImp > predicates = new ArrayList < KeyValueImp >( );
-		predicates.add( new KeyValueImp( "serialport" , "/dev/ttyUSB0" ) );
-		predicates.add( new KeyValueImp( "inputseparator" , "(\n|\r|\f)" ) );
-		predicates.add( new KeyValueImp( "baudrate" , "57600" ) );
-		predicates.add( new KeyValueImp( "flowcontrolmode" , "FLOWCONTROL_NONE" ) );
-		predicates.add( new KeyValueImp( "databits" , "8" ) );
-		predicates.add( new KeyValueImp( "stopbits" , "1" ) );
-		predicates.add( new KeyValueImp( "parity" , "PARITY_NONE" ) );
-		predicates.add( new KeyValueImp( "host" , "localhost" ) );
-		predicates.add( new KeyValueImp( "port" , "22001" ) );
-		SerialWrapper serialWrapper = new SerialWrapper( new WrapperConfig( "SerialWrapper" , new Parameters(predicates.toArray(new KeyValueImp[] {}) ) ),null);
+		ArrayList < Parameter > predicates = new ArrayList < Parameter >( );
+		predicates.add( new Parameter( "serialport" , "/dev/ttyUSB0" ) );
+		predicates.add( new Parameter( "inputseparator" , "(\n|\r|\f)" ) );
+		predicates.add( new Parameter( "baudrate" , "57600" ) );
+		predicates.add( new Parameter( "flowcontrolmode" , "FLOWCONTROL_NONE" ) );
+		predicates.add( new Parameter( "databits" , "8" ) );
+		predicates.add( new Parameter( "stopbits" , "1" ) );
+		predicates.add( new Parameter( "parity" , "PARITY_NONE" ) );
+		predicates.add( new Parameter( "host" , "localhost" ) );
+		predicates.add( new Parameter( "port" , "22001" ) );
+		SerialWrapper serialWrapper = new SerialWrapper( new WrapperConfig( "SerialWrapper" , new Parameters(predicates.toArray(new Parameter[] {}) ) ),null);
 		serialWrapper.start();
 	}
 
