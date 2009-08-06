@@ -1,6 +1,8 @@
 package gsn.tests;
 
 
+import static org.testng.Assert.*;
+
 public class TestStreamElement {
 
 //  @Test

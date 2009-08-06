@@ -1,20 +1,18 @@
 package gsn.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
 import gsn.beans.WrapperConfig;
 import gsn.utils.Parameter;
 import gsn2.conf.Parameters;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
+import org.testng.annotations.BeforeClass;
 
 public class TestAdressBean {
 	private WrapperConfig addressBean1;
 	private WrapperConfig addressBean2;
 	
-	@BeforeClass 
+	@BeforeClass
 	public static void init(){
 		
 	}

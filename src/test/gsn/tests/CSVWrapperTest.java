@@ -1,8 +1,6 @@
-package gsn.wrappers.general;
+package gsn.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -15,29 +13,34 @@ import java.util.TreeMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.testng.Assert.*;
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterTest;
 
+import gsn.wrappers.general.CSVHandler;
+
+
+@Test(enabled=false)
 public class CSVWrapperTest {
 	private final String CSV_FILE_NAME =  "test.csv.csv"; 
 	private final String CHECK_POINT_DIR = "csv-check-points.csv";
 
 	
-	@Before
+	@BeforeTest
 	public void setUp() throws Exception {
 		BasicConfigurator.configure();
 //		wrapper.initialize(fields,formats);
 	}
 
-	@After
+	@AfterTest
 	public void tearDown() throws Exception {
 	
 	}
 
 	@Test
 	public void testIsNull() {
-		assertEquals(true,CSVHandler.isNull(new String[] {"NaN","4343"}, null));
+		assertEquals(true, CSVHandler.isNull(new String[] {"NaN","4343"}, null));
 		assertEquals(true,CSVHandler.isNull(new String[] {"NaN","4343"}, "nan"));
 		assertEquals(true,CSVHandler.isNull(new String[] {"NaN","4343"}, "4343"));
 		assertFalse(CSVHandler.isNull(new String[] {"NaN","4343"}, "43434"));

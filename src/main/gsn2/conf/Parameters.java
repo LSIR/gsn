@@ -4,6 +4,7 @@ import gsn.utils.Parameter;
 
 import java.io.Serializable;
 import java.util.Vector;
+import java.util.Arrays;
 
 public class Parameters implements Serializable {
 
@@ -142,8 +143,19 @@ public class Parameters implements Serializable {
 		return retValue;
 	}
 
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        Parameters that = (Parameters) o;
 
+        if (!Arrays.equals(parameters, that.parameters)) return false;
 
-	// TODO: Implementing the equals and hashchode methods.
+        return true;
+    }
+
+    public int hashCode() {
+        return parameters != null ? Arrays.hashCode(parameters) : 0;
+    }
+
 }

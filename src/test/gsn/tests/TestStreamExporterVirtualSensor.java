@@ -1,10 +1,11 @@
-package gsn.operators;
+package gsn.tests;
 
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSFile;
 import gsn.utils.Parameter;
+import gsn.operators.StreamExporterVirtualSensor;
 import gsn2.conf.OperatorConfig;
 import gsn2.conf.Parameters;
 
@@ -17,11 +18,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 
-import junit.framework.TestCase;
+import static org.testng.Assert.*;
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterTest;
 
-import org.apache.commons.collections.KeyValue;
-
-public class TestStreamExporterVirtualSensor extends TestCase {
+public class TestStreamExporterVirtualSensor {
 
 	private final String  user = "sa" , passwd = "" , db = "." , url = "jdbc:hsqldb:mem:." , streamName = "aJUnitTestStream";
 
