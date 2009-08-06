@@ -10,7 +10,8 @@ public class MockWrapper implements Wrapper {
 	private final WrapperConfig conf;
 
 	private final DataChannel dataChannel;
-	
+
+  private DataField[] fields = new DataField[0];
 	public MockWrapper(WrapperConfig config, DataChannel channel) {
 		this.conf = config;
 		this.dataChannel= channel;
@@ -29,11 +30,16 @@ public class MockWrapper implements Wrapper {
 		System.out.println("Wrapper1 Disposed");
 	}
 
+
 	public DataField[] getOutputFormat() {
-		return new DataField[] {};
+		return fields;
 	}
 
-	/**
+  public void setFields(DataField[] fields) {
+    this.fields = fields;
+  }
+
+  /**
 	 * Constructs a <code>String</code> with all attributes
 	 * in name = value format.
 	 *

@@ -121,6 +121,8 @@ public class StreamElement implements Serializable {
   }
 
   public Serializable getValue(String name)	{
+    if (name.toLowerCase().equals("timed"))
+      return getTimed();
     Serializable toReturn = fieldNameToValueMapping.get(name.toLowerCase());
     if(toReturn ==null)
       logger.info("There is a request for field "+name+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
