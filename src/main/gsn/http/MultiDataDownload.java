@@ -1,8 +1,5 @@
 package gsn.http;
 
-import gsn.Mappings;
-import gsn.beans.DataField;
-import gsn.beans.VSFile;
 import gsn.http.datarequest.DataRequestException;
 import gsn.http.datarequest.DownloadReport;
 
@@ -312,8 +309,8 @@ public class MultiDataDownload extends HttpServlet {
 	private Hashtable<String, ArrayList<String>> buildAllVirtualSensorsAndFieldsMapping () {
 		//
 		Hashtable<String, ArrayList<String>> allVsAndFieldsMapping = new Hashtable<String, ArrayList<String>>();
-		Iterator<VSFile> iter = Mappings.getAllVSensorConfigs();
-		VSFile vsc ;
+//		Iterator<VSFile> iter = Mappings.getAllVSensorConfigs();
+//		VSFile vsc ;
 		ArrayList<String> allFields;
 //		while (iter.hasNext()) {
 //			vsc = (VSFile) iter.next();

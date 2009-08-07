@@ -3,17 +3,11 @@ package gsn;
 import static org.picocontainer.behaviors.Behaviors.caching;
 import static org.picocontainer.behaviors.Behaviors.synchronizing;
 import gsn.beans.Operator;
-import gsn.beans.VSFile;
-import gsn.storage.StorageManager;
-
-import java.io.File;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
+import gsn2.conf.OperatorConfig;
 
 public class VirtualSensorPool {
 
@@ -23,22 +17,20 @@ public class VirtualSensorPool {
 
 	private String                                processingClassName;
 
-	private long                                  lastModified    = -1;
-
 	private MutablePicoContainer picoVS;
 
-	private VSFile config;
+	private OperatorConfig config;
 
-	public VirtualSensorPool ( VSFile config ) {
+	public VirtualSensorPool ( OperatorConfig config ) {
 		if ( logger.isInfoEnabled( ) )
-			logger.info( ( new StringBuilder( "Preparing the pool for: " ) ).append( config.getName( ) ).toString( ) );
+			logger.info( ( new StringBuilder( "Preparing the pool for: " ) ).append( config.getIdentifier()).toString( ) );
 
 		picoVS = new PicoBuilder().withBehaviors(synchronizing(), caching()).withLifecycle().build();
-		picoVS.addComponent(Operator.class, config.getProcessingClassConfig().getClassName());
-		picoVS.addComponent(config.getProcessingClassConfig());
-		picoVS.setName("VS-Pico:"+config.getName());
+		picoVS.addComponent(Operator.class, config.getClassName());
+		picoVS.addComponent(config.getParameters());
+		picoVS.setName("VS-Pico:"+config.getIdentifier());
 		this.config= config;
-		this.lastModified = new File( config.getFileName( ) ).lastModified( );
+
 	}
 
 	public synchronized Operator borrowVS ( ) throws VirtualSensorInitializationFailedException {
@@ -51,12 +43,8 @@ public class VirtualSensorPool {
 		if ( logger.isDebugEnabled() ) logger.debug( new StringBuilder( ).append( "The VSPool Of: " ).append(picoVS.toString()).toString( ) );
 	}
 
-	public VSFile getConfig ( ) {
+	public OperatorConfig getConfig ( ) {
 		return config;
-	}
-
-	public long getLastModified ( ) {
-		return lastModified;
 	}
 
 	public void DoUselessDataRemoval ( ) {
@@ -73,11 +61,8 @@ public class VirtualSensorPool {
 //			logger.debug( new StringBuilder( ).append( effected ).append( " old rows dropped from " ).append( config.getName( ) ).toString( ) );
 	}
 
-	/**
-	 * @return
-	 */
 	public StringBuilder uselessDataRemovalQuery() {
-		String virtualSensorName = config.getName( );
+		String virtualSensorName = config.getIdentifier();
 		StringBuilder query = null;
 //		if ( config.isStorageCountBased( ) ){
 //			if ( StorageManager.isH2( ) ) {

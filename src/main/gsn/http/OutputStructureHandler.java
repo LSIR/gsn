@@ -1,16 +1,12 @@
 package gsn.http;
 
-import gsn.Mappings;
-import gsn.beans.DataField;
-import gsn.beans.VSFile;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import gsn2.conf.OperatorConfig;
 
 public class OutputStructureHandler implements RequestHandler{
    private static transient Logger                                      logger                             = Logger.getLogger( OutputStructureHandler.class );
@@ -18,7 +14,7 @@ public class OutputStructureHandler implements RequestHandler{
    public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
       response.setStatus( HttpServletResponse.SC_OK );
       String vsName = request.getParameter( "name" );
-      VSFile sensorConfig = Mappings.getVSensorConfig( vsName );
+      OperatorConfig sensorConfig = null;//Mappings.getVSensorConfig( vsName );
       if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( vsName ).append( "* received." ).toString( ) );
       StringBuilder sb = new StringBuilder("<virtual-sensor name=\"" ).append( vsName ).append( "\">\n" );
 //      for ( DataField df : sensorConfig.getProcessingClassConfig().getOutputFormat() )
@@ -35,7 +31,7 @@ public class OutputStructureHandler implements RequestHandler{
          response.sendError( WebConstants.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
          return false;
       }
-      VSFile sensorConfig = Mappings.getVSensorConfig( vsName );
+      OperatorConfig sensorConfig = null;//Mappings.getVSensorConfig( vsName );
       if ( sensorConfig == null ) {
          response.sendError( WebConstants.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist." );
          return false;

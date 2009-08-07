@@ -10,9 +10,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-public class BridgeVirtualSensor  implements Operator {
-	
-	public void process ( String inputStreamName , List<StreamElement> data ) {
+public class MirrorOperator implements Operator {
+
+  public void process ( String inputStreamName , List<StreamElement> data ) {
 		for (StreamElement se: data)
 			process(inputStreamName, se);
 	}
@@ -26,10 +26,10 @@ public class BridgeVirtualSensor  implements Operator {
 	public void stop() {}
 
 
-	private static final transient Logger logger = Logger.getLogger( BridgeVirtualSensor.class );
+	private static final transient Logger logger = Logger.getLogger( MirrorOperator.class );
 	private DataChannel outputChannel;
 
-	public BridgeVirtualSensor(OperatorConfig config,DataChannel outputChannel) {
+	public MirrorOperator(OperatorConfig config,DataChannel outputChannel) {
 		this.outputChannel = outputChannel;
 	}
 

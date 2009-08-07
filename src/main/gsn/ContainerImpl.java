@@ -40,7 +40,7 @@ public class ContainerImpl  {
 
 
 	public void publishData ( GSNChannel sensor ,StreamElement data) throws SQLException {
-		String name = sensor.getVirtualSensorConfiguration( ).getName( ).toLowerCase();
+		String name = sensor.getVirtualSensorConfiguration( ).getIdentifier().toLowerCase();
 		StorageManager storageMan = StorageManager.getInstance( );
 		synchronized ( psLock ) {
 //			storageMan.executeInsert( name ,sensor.getVirtualSensorConfiguration().getProcessingClassConfig().getOutputFormat(), data );

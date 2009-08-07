@@ -1,9 +1,7 @@
 package gsn.http;
 
 import gsn.Main;
-import gsn.Mappings;
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 
@@ -18,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import gsn2.conf.OperatorConfig;
 
 public class OneShotQueryWithAddressingHandler implements RequestHandler{
 
@@ -60,12 +59,12 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
 //            else
 //               sb.append( "<field name=\"" ).append( se.getFieldNames( )[ i ] ).append( "\">" ).append( StringEscapeUtils.escapeXml( se.getData( )[ i ].toString( ) ) ).append( "</field>\n" );
          sb.append( "<field name=\"timed\" >" ).append( sdf.format(new Date(se.getTimed( ))) ).append( "</field>\n" );
-         VSFile sensorConfig = Mappings.getVSensorConfig( vsName );
+         OperatorConfig sensorConfig = null;//Mappings.getVSensorConfig( vsName );
          if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Structure request for *" ).append( vsName ).append( "* received." ).toString( ) );
          //StringBuilder statement = new StringBuilder( "<virtual-sensor name=\"" ).append( vsName ).append( "\" last-modified=\"" ).append( new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\">\n" );
-         for ( KeyValue df : sensorConfig.getAddressing( ) )
-            sb.append( "<field name=\"" ).append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ) ) ).append( "\">" ).append( StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) )
-                  .append( "</field>\n" );
+//         for ( KeyValue df : sensorConfig.getAddressing( ) )
+//            sb.append( "<field name=\"" ).append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ) ) ).append( "\">" ).append( StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) )
+//                  .append( "</field>\n" );
          sb.append( "</stream-element>\n" );
       }
       result.close();
@@ -79,7 +78,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler{
          response.sendError( WebConstants.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
          return false;
       }
-      VSFile sensorConfig = Mappings.getVSensorConfig( vsName );
+      OperatorConfig sensorConfig =null;// Mappings.getVSensorConfig( vsName );
       if ( sensorConfig == null ) {
          response.sendError( WebConstants.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist." );
          return false;

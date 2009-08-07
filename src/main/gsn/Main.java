@@ -1,15 +1,13 @@
 package gsn;
 
 import gsn.beans.ContainerConfig;
-import gsn.beans.VSFile;
 import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
 import gsn.http.rest.RestDelivery;
-import gsn.operators.SQLValidatorIntegration;
-import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
 import gsn.wrappers.WrappersUtil;
+import gsn.core.OpLoader;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -42,7 +40,6 @@ import java.security.cert.CertificateFactory;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
 
@@ -111,20 +108,13 @@ public final class Main {
 		} catch ( Exception e ) {
 			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used in most of the communications: "+ e.getMessage(),e);
 		}
-		VSensorLoader vsloader = new VSensorLoader ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+		OpLoader vsloader = new OpLoader(  );
 		controlSocket.setLoader(vsloader);
 
-		String msrIntegration = "gsn.msr.sensormap.SensorMapIntegration";
-		try {
-			vsloader.addVSensorStateChangeListener((VSensorStateChangeListener) Class.forName(msrIntegration).newInstance());	
-		}catch (Exception e) {
-			logger.warn("MSR Sensor Map integration is disabled.");
-		}
-
-		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));
-		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
-		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(PushDelivery.class));
-		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(RestDelivery.class));
+//		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));
+//		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
+//		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(PushDelivery.class));
+//		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(RestDelivery.class));
 
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
@@ -228,8 +218,6 @@ public final class Main {
 	private static  Properties wrappers ;
 
 	private  ContainerConfig                       containerConfig;
-
-	private  HashMap < String , VSFile >    virtualSensors;
 
 	public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
 		ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
@@ -349,17 +337,6 @@ public final class Main {
 		return null;
 	}
 
-	public final HashMap < String , VSFile > getVirtualSensors ( ) {
-		return virtualSensors;
-	}
-
-	public  boolean justConsumes ( ) {
-		Iterator < VSFile > vsconfigs = virtualSensors.values ( ).iterator ( );
-		while ( vsconfigs.hasNext ( ) )
-			if ( !vsconfigs.next ( ).needsStorage ( ) ) return false;
-		return true;
-	}
-
 	/**
 	 * Get's the GSN configuration without starting GSN.
 	 * @return
@@ -389,20 +366,7 @@ public final class Main {
 	public static int tableNameGenerator ( ) {
 		return randomTableNameGenerator ( 15 ).hashCode ( );
 	}
-	/**
-	 * This method is used ONLY for ORACLE DB.
-	 * ADDS the postfix at the end of the tableName. If the table name ends with " then
-	 * updates it properly.   
-	 * @param tableName
-	 * @return
-	 */
-	public static String tableNamePostFixAppender(CharSequence table_name,String postFix) {
-		String tableName = table_name.toString();
-		if (tableName.endsWith("\""))
-			return (tableName.substring(0, tableName.length()-2))+postFix+"\"";
-		else
-			return tableName+postFix;
-	}
+
 
 	public static StringBuilder tableNameGeneratorInString (CharSequence tableName) {
 		if (tableName.charAt(0)=='_' && StorageManager.isOracle())

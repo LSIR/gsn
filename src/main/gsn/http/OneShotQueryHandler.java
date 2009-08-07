@@ -1,9 +1,7 @@
 package gsn.http;
 
 import gsn.Main;
-import gsn.Mappings;
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 
@@ -16,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import gsn2.conf.OperatorConfig;
 
 public class OneShotQueryHandler implements RequestHandler{
 
@@ -75,7 +74,7 @@ public class OneShotQueryHandler implements RequestHandler{
          response.sendError( WebConstants.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
          return false;
       }
-      VSFile sensorConfig = Mappings.getVSensorConfig( vsName );
+      OperatorConfig sensorConfig = null;//= Mappings.getVSensorConfig( vsName );
       if ( sensorConfig == null ) {
          response.sendError( WebConstants.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist." );
          return false;

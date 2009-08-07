@@ -1,12 +1,12 @@
 package gsn;
 
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
 import gsn.http.rest.DeliverySystem;
 import gsn.http.rest.DistributionRequest;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
+import gsn.core.VSensorStateChangeListener;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,8 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
+import gsn2.conf.OperatorConfig;
 
-public class DataDistributer implements VirtualSensorDataListener,VSensorStateChangeListener,Runnable {
+public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener,Runnable {
 
 	private static transient Logger       logger     = Logger.getLogger ( DataDistributer.class );
 
@@ -154,11 +155,11 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 		}
 	}
 
-	public void consume(StreamElement se, VSFile config) {
+	public void consume(StreamElement se, OperatorConfig config) {
 		synchronized (listeners) {
 			for (DistributionRequest listener : listeners )
 				if (listener.getVSensorConfig()==config) {
-					logger.debug("sending stream element " +se.toString()+" produced by " +config.getName() + " to listener =>"+listener.toString());
+					logger.debug("sending stream element " +se.toString()+" produced by " +config.getIdentifier() + " to listener =>"+listener.toString());
 					if (!candidateListeners.contains(listener)) {
 						addListenerToCandidates(listener);
 					}else {
@@ -193,11 +194,11 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 		}
 	}
 
-	public boolean vsLoading(VSFile config) {
+	public boolean vsLoading(OperatorConfig config) {
 		return true;
 	}
 
-	public boolean vsUnLoading(VSFile config) {
+	public boolean vsUnLoading(OperatorConfig config) {
 		synchronized (listeners) {
 			logger.debug("Distributer unloading: "+listeners.size());
 			for(DistributionRequest listener : listeners) {
@@ -224,7 +225,7 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 		return dataEnum;
 	}
 
-	public void release() {
+	public void dispose() {
 		synchronized (listeners) {
 			while (!listeners.isEmpty())
 				removeListener(listeners.get(0));

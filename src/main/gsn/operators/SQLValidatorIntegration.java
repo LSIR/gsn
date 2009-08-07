@@ -1,13 +1,13 @@
 package gsn.operators;
 
-import gsn.VSensorStateChangeListener;
-import gsn.beans.VSFile;
+import gsn.core.VSensorStateChangeListener;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+import gsn2.conf.OperatorConfig;
 
 public class SQLValidatorIntegration implements VSensorStateChangeListener{
 	
@@ -20,7 +20,7 @@ public class SQLValidatorIntegration implements VSensorStateChangeListener{
 
 	private static final transient Logger logger = Logger.getLogger(SQLValidatorIntegration.class);
 
-	public boolean vsLoading(VSFile config) {
+	public boolean vsLoading(OperatorConfig config) {
 //		try {
 //			String ddl = StorageManager.getStatementCreateTable(config.getName(), config.getProcessingClassConfig().getOutputFormat(), validator.getSampleConnection()).toString();
 //			validator.executeDDL(ddl);
@@ -30,9 +30,9 @@ public class SQLValidatorIntegration implements VSensorStateChangeListener{
 		return true;
 	}
 
-	public boolean vsUnLoading(VSFile config) {
+	public boolean vsUnLoading(OperatorConfig config) {
 		try {
-			String ddl = StorageManager.getStatementDropTable(config.getName(), validator.getSampleConnection()).toString();
+			String ddl = StorageManager.getStatementDropTable(config.getIdentifier(), validator.getSampleConnection()).toString();
 			validator.executeDDL(ddl);
 		}catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -41,8 +41,7 @@ public class SQLValidatorIntegration implements VSensorStateChangeListener{
 		return true;
 	}
 
-	public void release() throws Exception {
-		validator.release();
-		
+	public void dispose()  {
+		validator.dispose();
 	}
 }

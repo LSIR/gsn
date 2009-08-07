@@ -25,7 +25,7 @@ public class MyFilter  implements Operator {
 	public void stop() {}
 
 
-	private static final transient Logger logger = Logger.getLogger( BridgeVirtualSensor.class );
+	private static final transient Logger logger = Logger.getLogger( MirrorOperator.class );
 	private DataChannel outputChannel;
 
 	public MyFilter(OperatorConfig config,DataChannel outputChannel ) {

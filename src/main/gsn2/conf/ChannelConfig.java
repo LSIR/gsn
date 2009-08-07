@@ -10,7 +10,10 @@ public class ChannelConfig implements Serializable {
 	private String slidingValue;
 	private String name;
 	private WrapperConfig sourceConfig;
-	
+
+  public ChannelConfig(String name) {
+    this(name,"1","1");
+  }
 	public ChannelConfig(String name,String slidingValue,String windowValue) {
 		this.slidingValue = slidingValue;
 		this.windowValue = windowValue;

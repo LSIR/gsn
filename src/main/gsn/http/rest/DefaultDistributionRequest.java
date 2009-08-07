@@ -1,13 +1,13 @@
 package gsn.http.rest;
 
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
 import gsn.storage.SQLValidator;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+import gsn2.conf.OperatorConfig;
 
 public class DefaultDistributionRequest implements DistributionRequest {
 
@@ -19,9 +19,9 @@ public class DefaultDistributionRequest implements DistributionRequest {
 
 	private DeliverySystem deliverySystem;
 
-	private VSFile vSensorConfig;
+	private OperatorConfig vSensorConfig;
 
-	private DefaultDistributionRequest(DeliverySystem deliverySystem, VSFile sensorConfig, String query, long lastVisitedTime) throws IOException, SQLException {
+	private DefaultDistributionRequest(DeliverySystem deliverySystem, OperatorConfig sensorConfig, String query, long lastVisitedTime) throws IOException, SQLException {
 		this.deliverySystem = deliverySystem;
 		vSensorConfig = sensorConfig;
 		this.query = query;
@@ -29,13 +29,13 @@ public class DefaultDistributionRequest implements DistributionRequest {
 		deliverySystem.writeStructure(SQLValidator.getInstance().extractSelectColumns(query));
 	}
 
-	public static DefaultDistributionRequest create(DeliverySystem deliverySystem, VSFile sensorConfig,String query, long lastVisitedTime) throws IOException, SQLException {
+	public static DefaultDistributionRequest create(DeliverySystem deliverySystem, OperatorConfig sensorConfig,String query, long lastVisitedTime) throws IOException, SQLException {
 		DefaultDistributionRequest toReturn = new DefaultDistributionRequest(deliverySystem,sensorConfig,query,lastVisitedTime);
 		return toReturn;
 	}
 
 	public String toString() {
-		StringBuilder sb = new StringBuilder("DefaultDistributionRequest Request[[ Delivery System: ").append(deliverySystem.getClass().getName()).append("],[Query:").append(query).append("],[StartTime:").append(lastVisitedTime).append("],[VirtualSensorName:").append(vSensorConfig.getName()).append("]]");
+		StringBuilder sb = new StringBuilder("DefaultDistributionRequest Request[[ Delivery System: ").append(deliverySystem.getClass().getName()).append("],[Query:").append(query).append("],[StartTime:").append(lastVisitedTime).append("],[VirtualSensorName:").append(vSensorConfig.getIdentifier()).append("]]");
 		return sb.toString();
 	}
 
@@ -58,7 +58,7 @@ public class DefaultDistributionRequest implements DistributionRequest {
 	}
 
 	
-	public VSFile getVSensorConfig() {
+	public OperatorConfig getVSensorConfig() {
 		return vSensorConfig;
 	}
 

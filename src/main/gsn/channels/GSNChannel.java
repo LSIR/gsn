@@ -4,7 +4,6 @@ import gsn.ContainerImpl;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
 import gsn2.conf.OperatorConfig;
 
 import java.io.Serializable;
@@ -103,12 +102,12 @@ public class GSNChannel implements DataChannel{
 		return true;
 	}
 
-	private VSFile                 virtualSensorConfiguration;
+	private OperatorConfig                 virtualSensorConfiguration;
 	
 	/**
 	 * @return the virtualSensorConfiguration
 	 */
-	public VSFile getVirtualSensorConfiguration ( ) {
+	public OperatorConfig getVirtualSensorConfiguration ( ) {
 		if ( virtualSensorConfiguration == null ) { throw new RuntimeException( "The VirtualSensorParameter is not set !!!" ); }
 		return virtualSensorConfiguration;
 	}
@@ -116,7 +115,7 @@ public class GSNChannel implements DataChannel{
 	/**
 	 * @param virtualSensorConfiguration the virtualSensorConfiguration to set
 	 */
-	public void setVirtualSensorConfiguration ( VSFile virtualSensorConfiguration ) {
+	public void setVirtualSensorConfiguration ( OperatorConfig virtualSensorConfiguration ) {
 		this.virtualSensorConfiguration = virtualSensorConfiguration;
 	}
 	

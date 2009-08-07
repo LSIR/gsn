@@ -2,7 +2,6 @@ package gsn.operators;
 
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
 import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn.utils.protocols.ProtocolManager;
@@ -36,7 +35,7 @@ public class EPuckVS  implements Operator {
    
    private Wrapper                       wrapper;
    
-   private VSFile                 vsensor;
+   private OperatorConfig                 vsensor;
 
 private DataChannel outputChannel;
    

@@ -163,7 +163,7 @@
             </cobertura-instrument>
         </target>
 
-    <target name="test" depends="init-reports, bind" description="Runs TestNG tests">
+    <target name="test" depends="bind,init-reports" description="Runs TestNG tests">
             <testng failureproperty="tests.failed" outputdir="${reports}/testng" parallel="false" haltonfailure="false">
                 <!--Note: the classpath order is important. -->
                 <classpath location="${instrumented.dir}"/>

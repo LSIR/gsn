@@ -86,23 +86,23 @@ public class ReportManager {
 		
 		// Streams
 		Collection<Stream> fields_v1 = new ArrayList<Stream> ();
-		fields_v1.add(new Stream("Temperature [°C]", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Humidity [%]", lastUpdate.toString(), dat2));
-		fields_v1.add(new Stream("Temp", lastUpdate.toString(), dat3));
-		fields_v1.add(new Stream("Solar", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Altitude", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Length 1", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Length 2", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Length 3", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Length 4", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Length 5", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Length 6", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Length 7", lastUpdate.toString(), dat1));
-		fields_v1.add(new Stream("Length 8", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Temperature [°C]", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Humidity [%]", lastUpdate.toString(), dat2));
+//		fields_v1.add(new Stream("Temp", lastUpdate.toString(), dat3));
+//		fields_v1.add(new Stream("Solar", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Altitude", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Length 1", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Length 2", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Length 3", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Length 4", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Length 5", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Length 6", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Length 7", lastUpdate.toString(), dat1));
+//		fields_v1.add(new Stream("Length 8", lastUpdate.toString(), dat1));
 		
 		Collection<Stream> fields_v2 = new ArrayList<Stream> ();
-		fields_v2.add(new Stream("Stream 1", lastUpdate.toString(), dat2));
-		fields_v2.add(new Stream("Stream 2", lastUpdate.toString(), dat1));
+//		fields_v2.add(new Stream("Stream 1", lastUpdate.toString(), dat2));
+//		fields_v2.add(new Stream("Stream 2", lastUpdate.toString(), dat1));
 		
 		// Virtual Sensors
 		Collection<VirtualSensor> virtualSensors = new ArrayList<VirtualSensor> ();

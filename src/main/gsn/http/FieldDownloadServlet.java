@@ -1,16 +1,6 @@
 package gsn.http;
 
-import gsn.Mappings;
-import gsn.beans.DataField;
-import gsn.beans.DataTypes;
-import gsn.beans.VSFile;
-import gsn.storage.StorageManager;
-
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

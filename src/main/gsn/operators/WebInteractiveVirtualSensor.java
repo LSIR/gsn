@@ -55,7 +55,7 @@ public class WebInteractiveVirtualSensor implements ManualDataConsumer, Operator
 
 	private final String                  OUTPUT_FIELD_NAME = "PLOT";
 
-	private VSFile                 vsensor;
+	private OperatorConfig                 vsensor;
 
 	private DataChannel outputChannel;
 

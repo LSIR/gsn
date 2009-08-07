@@ -1,8 +1,6 @@
 package gsn.http.rest;
 
 import gsn.DataDistributer;
-import gsn.Mappings;
-import gsn.beans.VSFile;
 import gsn.storage.SQLUtils;
 import gsn.storage.SQLValidator;
 import gsn.utils.Helpers;
@@ -20,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
+import gsn2.conf.OperatorConfig;
 
 public class RestStreamHanlder extends HttpServlet {
 
@@ -114,7 +113,7 @@ public class RestStreamHanlder extends HttpServlet {
 	class URLParser{
 		private String query,tableName;
 		private long startTime;
-		private VSFile config;
+		private OperatorConfig config;
 		public URLParser(HttpServletRequest request) throws UnsupportedEncodingException, Exception {
 			String requestURI = request.getRequestURI().substring(request.getRequestURI().toLowerCase().indexOf(STREAMING)+STREAMING.length());
 			StringTokenizer tokens = new StringTokenizer(requestURI,"/");
@@ -131,9 +130,9 @@ public class RestStreamHanlder extends HttpServlet {
 			tableName=tableName.trim();
 			query = SQLUtils.newRewrite(query, tableName, tableName.toLowerCase()).toString();
 			tableName=tableName.toLowerCase();
-			config = Mappings.getConfig(tableName);
+			config = null; //Mappings.getConfig(tableName);
 		}
-		public VSFile getVSensorConfig() {
+		public OperatorConfig getVSensorConfig() {
 			return config;
 		}
 		public String getQuery() {

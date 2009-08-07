@@ -7,6 +7,7 @@ import gsn.beans.WrapperConfig;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 
+
 public class TestStreamElement {
 
 

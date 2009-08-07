@@ -3,7 +3,6 @@ package gsn.tests;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
 import gsn.utils.Parameter;
 import gsn.operators.StreamExporterVirtualSensor;
 import gsn2.conf.OperatorConfig;
@@ -24,7 +23,7 @@ public class TestStreamExporterVirtualSensor {
 
 	private final String  user = "sa" , passwd = "" , db = "." , url = "jdbc:hsqldb:mem:." , streamName = "aJUnitTestStream";
 
-	private VSFile config;
+	private OperatorConfig config;
 
 	/*
 	 * To run some of these tests, a mysql server must be running on localhost
@@ -37,9 +36,9 @@ public class TestStreamExporterVirtualSensor {
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	public void setUp ( ) {
-		config = new VSFile( );
-		config.setName( "JUnitTestStreamExporterVS" );
-		config.setFileName( "PlaceholderfileNameForJUNitTesting" );
+		config = new OperatorConfig( );
+//		config.setName( "JUnitTestStreamExporterVS" );
+//		config.setFileName( "PlaceholderfileNameForJUNitTesting" );
 
 	}
 

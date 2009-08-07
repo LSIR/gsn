@@ -1,7 +1,7 @@
 package gsn.http.rest;
 
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
+import gsn2.conf.OperatorConfig;
 
 public interface DistributionRequest {
 
@@ -11,7 +11,7 @@ public interface DistributionRequest {
 
 	public abstract String getQuery();
 
-	public abstract VSFile getVSensorConfig();
+	public abstract OperatorConfig getVSensorConfig();
 
 	public abstract void close();
 

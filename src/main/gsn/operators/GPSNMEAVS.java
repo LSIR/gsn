@@ -42,7 +42,7 @@ public class GPSNMEAVS  implements Operator {
 
 	private Wrapper                       wrapper;
 
-	private VSFile                 vsensor;
+	private OperatorConfig                 vsensor;
 
 	private static final String [ ] fieldNames = new String [ ] { "latitude" , "longitude" };
 

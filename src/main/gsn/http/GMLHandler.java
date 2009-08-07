@@ -1,9 +1,7 @@
 package gsn.http;
 
 import gsn.Main;
-import gsn.Mappings;
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 
@@ -17,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import gsn2.conf.OperatorConfig;
 
 public class GMLHandler implements RequestHandler {
 
@@ -35,12 +34,12 @@ public class GMLHandler implements RequestHandler {
 
 		StringBuilder outsb = new StringBuilder( "<gsn:FeatureCollection xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"./gsn.xsd\" xmlns:gsn=\"http://gsn.ch/\" xmlns:gml=\"http://www.opengis.net/gml\"> \n" );
 
-		Iterator < VSFile > vsIterator = Mappings.getAllVSensorConfigs( );
+		Iterator <OperatorConfig> vsIterator = null;// Mappings.getAllVSensorConfigs( );
 
 
 		while ( vsIterator.hasNext( ) ) {
-			VSFile sensorConfig = vsIterator.next( );
-			if ( reqName != null && !sensorConfig.getName().equals(reqName) ) continue;
+			OperatorConfig sensorConfig = vsIterator.next( );
+			if ( reqName != null && !sensorConfig.getIdentifier().equals(reqName) ) continue;
 			StringBuilder sb = new StringBuilder();
 			//      sb.append("<gml:featureMember>\n");
 			//      sb.append("<gsn:sensors");

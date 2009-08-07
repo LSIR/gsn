@@ -324,10 +324,6 @@ public class StorageManager {
 				logger.debug("Dropping table structure: " + tableName+ " With query: "+stmt);
 			prepareStatement= connection.prepareStatement(stmt);
 			prepareStatement.execute();
-			if (isOracle()) {
-				executeCommand("drop sequence "+Main.tableNamePostFixAppender(tableName,"_SEQ"),connection);
-				executeCommand("drop trigger "+Main.tableNamePostFixAppender(tableName,"_TRIG"),connection);
-			}
 		}catch (SQLException e) {
 			logger.info(e.getMessage(),e);
 		}
@@ -378,16 +374,6 @@ public class StorageManager {
 		PreparedStatement prepareStatement = connection.prepareStatement(sql.toString());
 		prepareStatement.execute();
 		prepareStatement.close();
-
-		if (isOracle()) { // need to make a sequence and trigger.
-			String oracleSeq = "create sequence "+Main.tableNamePostFixAppender(tableName,"_SEQ");
-			String oracleTrigger = "create or replace trigger "+Main.tableNamePostFixAppender(tableName, "_TRIG")+" before insert on "+tableName+" for each row begin select "+Main.tableNamePostFixAppender(tableName,"_SEQ")+".nextval into :NEW.pk from dual; end;";
-			logger.debug(oracleSeq);
-			logger.debug(oracleTrigger);
-			executeCommand(oracleSeq,connection);
-			executeCommand(oracleTrigger, connection);
-
-		}
 
 		sql = getStatementCreateIndexOnTimed(tableName,unique);
 		if (logger.isDebugEnabled())
@@ -688,12 +674,11 @@ public class StorageManager {
 				viewName));
 	}
 
-	public static StringBuilder getStatementCreateIndexOnTimed(
-			CharSequence tableName,boolean unique) throws SQLException {
+	public static StringBuilder getStatementCreateIndexOnTimed(CharSequence tableName,boolean unique) throws SQLException {
 		StringBuilder toReturn = new StringBuilder("CREATE ");
 		if (unique)
 			toReturn.append(" UNIQUE ");
-		toReturn.append(" INDEX ").append(Main.tableNamePostFixAppender(tableName, "_INDEX")).append(" ON ").append(tableName).append(" (timed DESC)");
+		toReturn.append(" INDEX ").append(tableName+ "_INDEX").append(" ON ").append(tableName).append(" (timed DESC)");
 		return toReturn;
 	}
 

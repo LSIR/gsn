@@ -1,6 +1,5 @@
 package gsn.http.datarequest;
 
-import gsn.Mappings;
 import gsn.reports.ReportManager;
 import gsn.reports.beans.Data;
 import gsn.reports.beans.Report;
@@ -89,9 +88,6 @@ public class DownloadReport extends AbstractDataRequest {
 		
 		try {
 			// Get the last update for this Virtual Sensor (In GSN, all the Virtual Sensor streams are inserted in the same record)
-			String configFileName = Mappings.getVSensorConfig(vsname).getFileName();
-			long last = Mappings.getLastModifiedTime(configFileName);
-			String lastModified = (qbuilder.getSdf() == null ? "UNIX: " + last : qbuilder.getSdf().format(new Date(last)));
 
 			// Create the streams
 			connection = StorageManager.getInstance().getConnection();
@@ -102,7 +98,7 @@ public class DownloadReport extends AbstractDataRequest {
 			FieldsCollection streamNames = qbuilder.getVsnamesAndStreams().get(vsname);
 			for (int i = 0 ; i < streamNames.getFields().length ; i++) {
 				if (streamNames.getFields()[i].compareToIgnoreCase("timed") != 0 || streamNames.isWantTimed()) {
-					dataStreams.put(streamNames.getFields()[i], new Stream (vsstream[i], lastModified, new ArrayList<Data> ()));
+					dataStreams.put(streamNames.getFields()[i], new Stream (vsstream[i], new ArrayList<Data> ()));
 				}
 			}
 
@@ -137,13 +133,9 @@ public class DownloadReport extends AbstractDataRequest {
 		}finally{
 			StorageManager.close(connection);
 		}
-		//
-		boolean mappedVirtualSensor = (Mappings.getVSensorConfig(vsname) != null);
-
 		String latitude = "NA";
-		if (mappedVirtualSensor && Mappings.getVSensorConfig(vsname).getLatitude() != null) latitude =  Mappings.getVSensorConfig(vsname).getLatitude().toString();
-		String longitude = "NA";
-		if (mappedVirtualSensor && Mappings.getVSensorConfig(vsname).getLongitude() != null) longitude = Mappings.getVSensorConfig(vsname).getLongitude().toString(); 		
+    String longitude = "NA";
+
 		return new VirtualSensor (
 				vsname,
 				latitude,

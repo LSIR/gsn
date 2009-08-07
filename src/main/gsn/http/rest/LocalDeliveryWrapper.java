@@ -2,10 +2,8 @@ package gsn.http.rest;
 
 import gsn.DataDistributer;
 import gsn.ManualDataConsumer;
-import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.VSFile;
 import gsn.beans.WrapperConfig;
 import gsn.channels.DataChannel;
 import gsn.storage.SQLUtils;
@@ -20,6 +18,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
+import gsn2.conf.OperatorConfig;
 
 public class LocalDeliveryWrapper implements Wrapper , DeliverySystem,ManualDataConsumer{
 
@@ -31,9 +30,9 @@ public class LocalDeliveryWrapper implements Wrapper , DeliverySystem,ManualData
 
 	private static transient Logger                  logger           = Logger.getLogger( LocalDeliveryWrapper.class );
 
-	private VSFile vSensorConfig;
+	private OperatorConfig vSensorConfig;
 
-	public VSFile getVSensorConfig() {
+	public OperatorConfig getVSensorConfig() {
 		return vSensorConfig;
 	}
 
@@ -77,7 +76,7 @@ public class LocalDeliveryWrapper implements Wrapper , DeliverySystem,ManualData
 		query = SQLUtils.newRewrite(query, vsName, vsName.toLowerCase()).toString();
 		logger.debug("Local wrapper request received for: "+vsName);
 
-			vSensorConfig = Mappings.getConfig(vsName);
+			vSensorConfig = null;//Mappings.getConfig(vsName);
 			distributionRequest = DefaultDistributionRequest.create(this, vSensorConfig, query, lastVisited);
 			// This call MUST be executed before adding this listener to the data-distributer because distributer checks the isClose method before flushing.
 	}
