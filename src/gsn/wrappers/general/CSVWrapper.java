@@ -90,7 +90,7 @@ public class CSVWrapper extends AbstractWrapper {
 				if (preivousError==null || (preivousError!=null && (lastModified != previousModTime || lastModifiedCheckPoint!=previousCheckModTime))){
 
 					reader = new FileReader(handler.getDataFile());
-					output = handler.run(reader, checkPointDir);
+					output = handler.work(reader, checkPointDir);
 					for (TreeMap<String, Serializable> se : output) {
 						StreamElement streamElement = new StreamElement(se,getOutputFormat());
 						boolean insertionSuccess = postStreamElement(streamElement);

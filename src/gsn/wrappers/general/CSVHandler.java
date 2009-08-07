@@ -134,7 +134,7 @@ public class CSVHandler {
 		return toReturn;
 	}
 
-	public ArrayList<TreeMap<String, Serializable>> run(Reader dataFile,String checkpointDir) throws IOException {
+	public ArrayList<TreeMap<String, Serializable>> work(Reader dataFile,String checkpointDir) throws IOException {
 		ArrayList<TreeMap<String, Serializable>> items = null;
 			setupCheckPointFileIfNeeded();
 			String val = FileUtils.readFileToString(new File(checkPointFile),"UTF-8");
@@ -228,6 +228,7 @@ public class CSVHandler {
 			}catch (IllegalArgumentException e) {
 				logger.error("Parsing error: TimeFormat="+timeFormat+" , TimeValue="+timeValue);
 				logger.error(e.getMessage(),e);
+        throw e;
 			}
 		}
 		
@@ -311,5 +312,5 @@ public class CSVHandler {
 	public String getCheckPointFile() {
 		return checkPointFile;
 	}
-		
+
 }
