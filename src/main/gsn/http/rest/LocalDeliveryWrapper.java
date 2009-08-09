@@ -50,10 +50,10 @@ public class LocalDeliveryWrapper implements Wrapper , DeliverySystem,ManualData
 		this.conf = conf;
 		this.dataChannel= channel;
 
-		String query = conf.getParameters().getPredicateValue("query");
+		String query = conf.getParameters().getValue("query");
 
-		String vsName = conf.getParameters().getPredicateValue( "name" );
-		String startTime = conf.getParameters().getPredicateValueWithDefault("start-time",CURRENT_TIME );
+		String vsName = conf.getParameters().getValue( "name" );
+		String startTime = conf.getParameters().getValueWithDefault("start-time",CURRENT_TIME );
 
 		if (query==null && vsName == null) 
 			throw new RuntimeException("For using local-wrapper, either >query< or >name< parameters should be specified"); 

@@ -1,40 +1,49 @@
 package gsn.tests;
 
-import gsn.beans.DataField;
-import gsn.beans.WrapperConfig;
 import gsn.beans.Operator;
+import gsn.beans.StreamElement;
+import gsn.beans.DataField;
 import gsn.channels.DataChannel;
-import gsn.wrappers.Wrapper;
 import gsn.operators.OperatorInitializationException;
+import gsn2.conf.OperatorConfig;
 import static org.easymock.EasyMock.*;
 
-public class MockWrapper implements Wrapper {
+import java.util.List;
 
-    private static  Wrapper mock ;
-
-    private final WrapperConfig conf;
-
-    private final DataChannel dataChannel;
-
-    private DataField[] outputStructure = new DataField[0];
-
+public class MockOperator implements Operator {
+    private OperatorConfig conf;
+    private DataChannel outputChannel;
+    private static Operator mock ;
     private String canStart;
     private String canStop;
     private String canDispose;
     private String constructor;
 
-
-    public MockWrapper(WrapperConfig config, DataChannel channel) {
-        this.conf = config;
-        this.dataChannel= channel;
-        mock= createMock(Wrapper.class);
+    public MockOperator(OperatorConfig conf,DataChannel outputChannel ) {
+        this.outputChannel = outputChannel;
+        this.conf = conf;
         canStart = conf.getParameters().getValue("start");
         canStop = conf.getParameters().getValue("stop");
         canDispose = conf.getParameters().getValue("dispose");
         constructor = conf.getParameters().getValue("constructor");
-        mock = (Wrapper) createMock(Wrapper.class);
+        mock = (Operator) createMock(Operator.class);
         if (constructor!=null)
             throw new OperatorInitializationException("constructor-fail");
+        
+    }
+
+    public void dispose() {
+        mock.dispose();
+        if (canDispose!=null)
+            throw new RuntimeException("Fail-Dispose");
+    }
+
+    public void process(String name, List<StreamElement> window) {
+        mock.process(name,window);
+    }
+
+    public DataField[] getStructure() {
+        return mock.getStructure();
     }
 
     public void start() {
@@ -49,33 +58,16 @@ public class MockWrapper implements Wrapper {
             throw new RuntimeException("Fail-Stop");
     }
 
-
-    public void dispose() {
-        mock.dispose();
-        if (canDispose!=null)
-            throw new RuntimeException("Fail-Dispose");
-    }
-
-
-
-    public DataField[] getOutputFormat() {
-        return outputStructure;
-    }
-
-    public static Wrapper getMock() {
+    public static Operator getMock() {
         return mock;
     }
 
-    public WrapperConfig getConf() {
+    public OperatorConfig getConf() {
         return conf;
     }
 
-    public DataChannel getDataChannel() {
-        return dataChannel;
-    }
-
-    public void setOutputStructure(DataField[] outputStructure) {
-        this.outputStructure = outputStructure;
+    public DataChannel getOutputChannel() {
+        return outputChannel;
     }
 
     /**
@@ -91,10 +83,10 @@ public class MockWrapper implements Wrapper {
 
         String retValue = "";
 
-        retValue = "MockWrapper ( "
+        retValue = "MockOperator ( "
                 + super.toString() + TAB
                 + "conf = " + this.conf + TAB
-                + "dataChannel = " + this.dataChannel + TAB
+                + "outputChannel = " + this.outputChannel + TAB
                 + " )";
 
         return retValue;

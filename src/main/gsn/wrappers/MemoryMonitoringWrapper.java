@@ -39,7 +39,7 @@ public class MemoryMonitoringWrapper implements Wrapper {
 	public MemoryMonitoringWrapper(WrapperConfig conf, DataChannel channel) {
 		this.conf = conf;
 		this.dataChannel= channel;
-		samplingRate = conf.getParameters().getPredicateValueAsInt("sampling-rate",DEFAULT_SAMPLING_RATE );
+		samplingRate = conf.getParameters().getValueAsInt("sampling-rate",DEFAULT_SAMPLING_RATE );
 	}
 
 	public void start(){

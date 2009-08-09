@@ -25,24 +25,24 @@ public class RemoteWrapperParamParser {
 	public RemoteWrapperParamParser(WrapperConfig addressBean, boolean isPushBased) {
 
 		Parameters params = addressBean.getParameters();
-		query = params.getPredicateValueWithException("query" );
+		query = params.getValueWithException("query" );
 		
 		logger.debug("Remote wrapper parameter [keep-alive: "+isPushBased+"], Query=> "+query);
 
 		if (isPushBased ) 
-			deliveryContactPoint = params.getPredicateValueWithException(PushDelivery.LOCAL_CONTACT_POINT);
+			deliveryContactPoint = params.getValueWithException(PushDelivery.LOCAL_CONTACT_POINT);
 
-		username = params.getPredicateValue( "username" );
-		password = params.getPredicateValue( "password" );
+		username = params.getValue( "username" );
+		password = params.getValue( "password" );
 		/**
 		 * First looks for URL parameter, if it is there it will be used otherwise
 		 * looks for host and port parameters.
 		 */
-		if ( (remoteContactPoint =params.getPredicateValue ( "remote-contact-point" ))==null) {
-			String host = params.getPredicateValue ( "host" );
+		if ( (remoteContactPoint =params.getValue( "remote-contact-point" ))==null) {
+			String host = params.getValue( "host" );
 			if ( host == null || host.trim ( ).length ( ) == 0 ) 
 				throw new RuntimeException( "The >host< parameter is missing from the RemoteWrapper wrapper." );
-			int port = params.getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
+			int port = params.getValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
 			if ( port > 65000 || port <= 0 ) 
 				throw new RuntimeException("Remote wrapper initialization failed, bad port number:"+port);
 
@@ -53,7 +53,7 @@ public class RemoteWrapperParamParser {
 			remoteContactPoint+="/";
 
 		try {
-			startTime = Helpers.convertTimeFromIsoToLong(params.getPredicateValueWithDefault("start-time",CURRENT_TIME ));
+			startTime = Helpers.convertTimeFromIsoToLong(params.getValueWithDefault("start-time",CURRENT_TIME ));
 		}catch (Exception e) {
 			logger.error("Failed to parse the start-time parameter of the remote wrapper, a sample time could be:"+(CURRENT_TIME));
 			throw new RuntimeException(e);

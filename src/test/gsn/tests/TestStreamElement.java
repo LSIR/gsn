@@ -6,6 +6,8 @@ import gsn.beans.StreamElement;
 import gsn.beans.WrapperConfig;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
+import gsn.utils.Parameter;
+import gsn2.conf.Parameters;
 
 
 public class TestStreamElement {
@@ -13,9 +15,10 @@ public class TestStreamElement {
 
     @Test
     public void testCreatingStreamElementForEmptyWrapper(){
-        WrapperConfig conf = new WrapperConfig("test-wrapper");
+        WrapperConfig conf = new WrapperConfig("test-wrapper",new Parameters(new Parameter("name","id")));
         MockWrapper wrapper = new MockWrapper(conf,null);
-        wrapper.setFields(new DataField[]{});
+
+        wrapper.setOutputStructure(new DataField[]{});
         StreamElement se = StreamElement.from(wrapper);
         assertEquals(se.getFieldNames().length,0);
         assertEquals(se.getTimed(),null);
@@ -28,9 +31,9 @@ public class TestStreamElement {
 
     @Test
     public void testCreatingStreamElementFromWrapper(){
-        WrapperConfig conf = new WrapperConfig("test-wrapper");
+        WrapperConfig conf = new WrapperConfig("test-wrapper",new Parameters(new Parameter("name","id")));
         MockWrapper wrapper = new MockWrapper(conf,null);
-        wrapper.setFields(new DataField[]{new DataField("field1","string")});
+        wrapper.setOutputStructure(new DataField[]{new DataField("field1","string")});
         StreamElement se = StreamElement.from(wrapper).setTime(System.currentTimeMillis());
         assertEquals(se.getFieldNames().length,1);
         assertEquals(se.getValue("field1"),null);

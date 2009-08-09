@@ -12,7 +12,7 @@
                     <value style="attribute" name="sliding-value" field="slidingValue" usage="optional"  default="1" />
                     <value style="attribute" name="name" field="name" />
                     <structure field="sourceConfig" name="wrapper">
-                        <value style="attribute" name="wrapper" field="wrapperName" />
+                        <value style="attribute" name="wrapper" field="className" />
                         <structure map-as="parameters" field="parameters" usage="optional" name="parameters"/>
                     </structure>
                 </structure>

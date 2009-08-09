@@ -228,6 +228,7 @@ public class CSVHandler {
 			}catch (IllegalArgumentException e) {
 				logger.error("Parsing error: TimeFormat="+timeFormat+" , TimeValue="+timeValue);
 				logger.error(e.getMessage(),e);
+        throw e;
 			}
 		}
 		

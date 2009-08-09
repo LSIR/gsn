@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import gsn.ConfigurationVisitor;
 import gsn.Visitable;
+import gsn.utils.Parameter;
 
 public class OperatorConfig implements Visitable,Serializable{
 	private String className="";
@@ -62,6 +63,10 @@ public class OperatorConfig implements Visitable,Serializable{
 		this.parameters = parameters;
 	}
 
+    public void setParameters(Parameter... parameters) {
+		this.parameters = new Parameters(parameters);
+	}
+
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
@@ -87,14 +92,15 @@ public class OperatorConfig implements Visitable,Serializable{
   }
 
   public ChannelConfig[] getChannels() {
-    return channels;
+    if (this.channels==null)
+     return new ChannelConfig[0];
+		return channels;
   }
 
-  public void setChannels(ChannelConfig[] channels) {
+  public void setChannels(ChannelConfig... channels) {
     this.channels = channels;
   }
 
-  @Override
   public String toString() {
     return "OperatorConfig{" +
             "className='" + className + '\'' +

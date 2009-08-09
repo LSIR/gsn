@@ -58,9 +58,9 @@ public class WSNSWrapper implements Wrapper , DataListener {
 		 * Reading the initialization paramteters from the XML Configurations
 		 * provided.
 		 */
-		node_count = conf.getParameters().getPredicateValueAsInt( NODE_COUNT_KEY,NODE_COUNT_DEFAULT_VALUE ) ;
-		step_counter = conf.getParameters().getPredicateValueAsInt( STEP_COUNTER,STEP_COUNTER_DEFAULT_VALUE ) ;
-		rate = conf.getParameters().getPredicateValueAsInt( RATE_KEY,RATE_DEFAULT_VALUE ) ;
+		node_count = conf.getParameters().getValueAsInt( NODE_COUNT_KEY,NODE_COUNT_DEFAULT_VALUE ) ;
+		step_counter = conf.getParameters().getValueAsInt( STEP_COUNTER,STEP_COUNTER_DEFAULT_VALUE ) ;
+		rate = conf.getParameters().getValueAsInt( RATE_KEY,RATE_DEFAULT_VALUE ) ;
 
 		if ( step_counter <= 0 ) 
 			throw new RuntimeException( "The specified >step_counter< parameter for the >WSNWrapper< shouldn't be a negative number.\nGSN disables the step_counter (-1)." );

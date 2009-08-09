@@ -42,7 +42,7 @@ public class UDPWrapper implements Wrapper {
 	public UDPWrapper (WrapperConfig conf, DataChannel channel) throws SocketException {
 		this.conf = conf;
 		this.dataChannel= channel;
-		port = conf.getParameters().getPredicateValueAsIntWithException( "port" ) ;
+		port = conf.getParameters().getValueAsIntWithException( "port" ) ;
 		socket = new DatagramSocket( port );
 	}
 

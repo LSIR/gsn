@@ -1,7 +1,7 @@
 package gsn.beans;
 
 import gsn.channels.DataChannel;
-import gsn2.conf.SQLOperatorConfig;
+import gsn2.conf.OperatorConfig;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,11 +12,11 @@ public class SQLOperator implements Serializable,Operator{
 	
 	private transient static final Logger               logger                = Logger.getLogger( SQLOperator.class );
 	
-	private SQLOperatorConfig config;
+	private OperatorConfig config;
 
 	private DataChannel channel;
 
-	public SQLOperator(SQLOperatorConfig config, DataChannel channel) {
+	public SQLOperator(OperatorConfig config, DataChannel channel) {
 		this.config = config;
 		this.channel = channel;
 		// parsing the query and getting the table names.
@@ -39,7 +39,7 @@ public class SQLOperator implements Serializable,Operator{
     return new DataField[0];  
   }
 
-  public SQLOperatorConfig getConfig() {
+  public OperatorConfig getConfig() {
 		return config;
 	}
 

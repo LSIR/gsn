@@ -34,7 +34,7 @@ public class MultiFormatWrapper implements Wrapper {
 	public MultiFormatWrapper(WrapperConfig conf, DataChannel channel) {
 		this.conf = conf;
 		this.dataChannel= channel;
-		rate = conf.getParameters().getPredicateValueAsInt("rate", 1000);
+		rate = conf.getParameters().getValueAsInt("rate", 1000);
 	}
 
 	public void start() {

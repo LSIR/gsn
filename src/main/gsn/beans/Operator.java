@@ -1,11 +1,11 @@
 package gsn.beans;
 
 import java.util.List;
-
-import org.picocontainer.Disposable;
 import org.picocontainer.Startable;
+import org.picocontainer.Disposable;
 
-public interface Operator extends Disposable,Startable {
+
+public interface Operator extends Startable, Disposable {
 
 	public abstract void process(String name, List<StreamElement> window);
 

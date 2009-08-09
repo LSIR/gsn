@@ -1,6 +1,7 @@
 package gsn2.conf;
 
 import gsn.utils.Parameter;
+import gsn.operators.MandatoryParameterMissingException;
 
 import java.io.Serializable;
 import java.util.Vector;
@@ -20,7 +21,7 @@ public class Parameters implements Serializable {
 			this.parameters = newPredicates;
 	}
 
-	public String getPredicateValueWithException ( String key ) {
+	public String getValueWithException( String key ) {
 		key = key.trim( );
 		for (  Parameter predicate : this.parameters ) {
 			if ( predicate.getName( ).toString( ).trim( ).equalsIgnoreCase( key ) ) {
@@ -29,7 +30,7 @@ public class Parameters implements Serializable {
 					return ( value);
 			}
 		}
-		throw new RuntimeException("The required parameter: >"+key+"<+ is missing.from the virtual sensor configuration file.");
+		throw new MandatoryParameterMissingException(key);
 	}
 
 
@@ -40,10 +41,9 @@ public class Parameters implements Serializable {
 	 * @return
 	 */
 
-	public String getPredicateValue ( String key ) {
+	public String getValue( String key ) {
 		key = key.trim( );
 		for (  Parameter predicate : this.parameters ) {
-			//    logger.fatal(predicate.getName()+" --- " +predicate.getValue());
 			if ( predicate.getName( ).toString( ).trim( ).equalsIgnoreCase( key ) ) return ( ( String ) predicate.getValue( ));
 		}
 		return null;
@@ -56,8 +56,8 @@ public class Parameters implements Serializable {
 	 * @param defaultValue Will be return if the key is not present or its an empty string.
 	 * @return
 	 */
-	public String getPredicateValueWithDefault(String key, String defaultValue) {
-		String value = getPredicateValue(key);
+	public String getValueWithDefault(String key, String defaultValue) {
+		String value = getValue(key);
 		if (value==null|| value.trim().length()==0)
 			return defaultValue;
 		else
@@ -71,8 +71,8 @@ public class Parameters implements Serializable {
 	 * @param defaultValue Will be return if the key is not present or its value is not a valid integer.
 	 * @return
 	 */
-	public int getPredicateValueAsInt(String key, int defaultValue) {
-		String value = getPredicateValue(key);
+	public int getValueAsInt(String key, int defaultValue) {
+		String value = getValue(key);
 		if (value==null|| value.trim().length()==0)
 			return defaultValue;
 		try { 
@@ -82,10 +82,8 @@ public class Parameters implements Serializable {
 		}
 	}
 
-	public int getPredicateValueAsIntWithException ( String key ) {
-		String value = getPredicateValue(key);
-		if (value==null|| value.trim().length()==0)
-			throw new RuntimeException("The required parameter: >"+key+"<+ is missing.");
+	public int getValueAsIntWithException( String key ) {
+		String value = getValueWithException(key);
 		try { 
 			return Integer.parseInt(value);
 		}catch (Exception e) {
@@ -93,22 +91,20 @@ public class Parameters implements Serializable {
 		}
 	}
 
-	public double getPredicateValueAsDoubleWithException(String key) {
-		String value = getPredicateValue(key);
-		if (value==null|| value.trim().length()==0)
-			throw new RuntimeException("The required parameter: >"+key+"<+ is missing.");
-		try { 
+	public double getValueAsDoubleWithException(String key) {
+		String value = getValueWithException(key);
+		try {
 			return Double.parseDouble(value);
 		}catch (Exception e) {
 			throw new RuntimeException("The required parameter: >"+key+"<+ is bad formatted.",e);
 		}
 	}
 
-	public Parameter[] getPredicates() {
+	public Parameter[] getParameters() {
 		return parameters;
 	}
 
-	public String[] getPredicateValues(String key) {
+	public String[] getValues(String key) {
 		Vector<String> toReturn = new Vector<String>();
 		for (  Parameter predicate : this.parameters ) {
 			if ( predicate.getName( ).toString( ).trim( ).equalsIgnoreCase( key ) )

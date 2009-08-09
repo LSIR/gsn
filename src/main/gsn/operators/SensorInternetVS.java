@@ -57,11 +57,11 @@ public class SensorInternetVS  implements Operator {
 	public  SensorInternetVS(OperatorConfig config,DataChannel outputChannel ) throws MalformedURLException {
 		this.outputChannel = outputChannel;
 		
-		siUrl = new URL ( config.getParameters().getPredicateValueWithException(SI_URL)) ;
-		siUsername =config.getParameters().getPredicateValueWithException(SI_USERNAME);
-		siPassword =config.getParameters().getPredicateValueWithException(SI_PASSWORD);
+		siUrl = new URL ( config.getParameters().getValueWithException(SI_URL)) ;
+		siUsername =config.getParameters().getValueWithException(SI_USERNAME);
+		siPassword =config.getParameters().getValueWithException(SI_PASSWORD);
 		
-		String param = config.getParameters().getPredicateValueWithException(SI_STREAM_MAPPING) ;
+		String param = config.getParameters().getValueWithException(SI_STREAM_MAPPING) ;
 		siStreamMapping = initStreamMapping(param) ;
 		if (siStreamMapping == null) 
 			throw new RuntimeException("Failed to parse the required parameter: >" + SI_STREAM_MAPPING + "< (" + param + ")");

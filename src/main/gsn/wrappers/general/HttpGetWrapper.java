@@ -45,9 +45,9 @@ public class HttpGetWrapper implements Wrapper {
 	public HttpGetWrapper(WrapperConfig conf, DataChannel channel) throws MalformedURLException {
 		this.conf = conf;
 		this.dataChannel= channel;
-		url = new URL( conf.getParameters().getPredicateValue( "url" ));
+		url = new URL( conf.getParameters().getValue( "url" ));
 
-		rate = conf.getParameters().getPredicateValueAsInt( "rate",DEFAULT_RATE );
+		rate = conf.getParameters().getValueAsInt( "rate",DEFAULT_RATE );
 		logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
 	}
 

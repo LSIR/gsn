@@ -47,8 +47,8 @@ public class ReplayWrapper  implements Wrapper{
 	public ReplayWrapper(WrapperConfig conf, DataChannel channel) throws SQLException {
 		this.conf = conf;
 		this.dataChannel= channel;
-		dbname = conf.getParameters().getPredicateValueWithException("dbname");
-		speed= conf.getParameters().getPredicateValueAsInt("speed", 1);
+		dbname = conf.getParameters().getValueWithException("dbname");
+		speed= conf.getParameters().getValueAsInt("speed", 1);
 
 		logger.info("Initializing the ReplayWrapper with : "+dbname +". Loading the table structure ...");
 		connection = StorageManager.getInstance().getConnection();

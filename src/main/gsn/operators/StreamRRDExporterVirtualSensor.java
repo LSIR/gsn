@@ -8,7 +8,6 @@ import gsn2.conf.OperatorConfig;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -41,11 +40,11 @@ public class StreamRRDExporterVirtualSensor implements Operator {
 	
 	public StreamRRDExporterVirtualSensor (OperatorConfig config,DataChannel outputChannel ) {
 		this.outputChannel = outputChannel;
-		rrdfile = config.getParameters().getPredicateValueWithException(PARAM_RRDFILE);
+		rrdfile = config.getParameters().getValueWithException(PARAM_RRDFILE);
 		logger.debug( "rrdfile=" + this.rrdfile);
 		if (!ensureFileExistence(rrdfile)) 
 			createRRDFile();
-		this.fields = config.getParameters().getPredicateValues(PARAM_FIELD);
+		this.fields = config.getParameters().getValues(PARAM_FIELD);
 	}
 
 	private boolean createRRDFile() {

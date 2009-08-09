@@ -6,7 +6,7 @@ import gsn.http.rest.DistributionRequest;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
-import gsn.core.VSensorStateChangeListener;
+import gsn.core.OpStateChangeListener;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,9 +18,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.MutablePicoContainer;
 import gsn2.conf.OperatorConfig;
 
-public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener,Runnable {
+public class DataDistributer implements VirtualSensorDataListener, OpStateChangeListener,Runnable {
 
 	private static transient Logger       logger     = Logger.getLogger ( DataDistributer.class );
 
@@ -194,11 +195,11 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 		}
 	}
 
-	public boolean vsLoading(OperatorConfig config) {
-		return true;
+	public void opLoading(MutablePicoContainer config) {
+
 	}
 
-	public boolean vsUnLoading(OperatorConfig config) {
+	public void opUnLoading(MutablePicoContainer config) {
 		synchronized (listeners) {
 			logger.debug("Distributer unloading: "+listeners.size());
 			for(DistributionRequest listener : listeners) {
@@ -211,7 +212,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 				}
 			}
 		}
-		return true;
+
 	}
 	private DataEnumerator makeDataEnum(DistributionRequest listener)  {
 		PreparedStatement ps = preparedStatements.get(listener);

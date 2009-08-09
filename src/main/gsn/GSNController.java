@@ -1,7 +1,7 @@
 package gsn;
 
 import gsn.utils.ValidityTools;
-import gsn.core.OpLoader;
+import gsn.core.ContainerManager;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -26,9 +26,9 @@ public class GSNController extends Thread {
 
 	public static transient Logger logger = Logger.getLogger(GSNController.class);
 
-	private OpLoader vsLoader;
+	private ContainerManager vsLoader;
 
-	public GSNController(OpLoader vsLoader, int gsnControllerPort) throws UnknownHostException, IOException {
+	public GSNController(ContainerManager vsLoader, int gsnControllerPort) throws UnknownHostException, IOException {
 		this.vsLoader = vsLoader;
 		this.gsnControllerPort = gsnControllerPort ;
 		mySocket = new ServerSocket(gsnControllerPort, 0, InetAddress.getByName("localhost"));
@@ -69,7 +69,7 @@ public class GSNController extends Thread {
 	 * allows GSNController to shut down properly all the virtual sensors in
 	 * use.
 	 */
-	public void setLoader(OpLoader vsLoader) {
+	public void setLoader(ContainerManager vsLoader) {
 		if (this.vsLoader == null) // override protection
 			this.vsLoader = vsLoader;
 	}

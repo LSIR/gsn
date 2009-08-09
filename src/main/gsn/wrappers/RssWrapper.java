@@ -48,8 +48,8 @@ public class RssWrapper implements Wrapper {
   public RssWrapper(WrapperConfig conf, DataChannel channel) throws MalformedURLException {
     this.conf = conf;
     this.dataChannel= channel;
-    url = new URL(conf.getParameters().getPredicateValueWithException("url"));
-    rate = conf.getParameters().getPredicateValueAsInt( "rate" ,SAMPLING_RATE_IN_MSEC);
+    url = new URL(conf.getParameters().getValueWithException("url"));
+    rate = conf.getParameters().getValueAsInt( "rate" ,SAMPLING_RATE_IN_MSEC);
     logger.debug( "RssWrapper is now running @" + rate + " Rate." );
   }
 

@@ -95,17 +95,17 @@ public class StsPiezometerWrapper implements Wrapper {
 
 		dateTimeFormat = new SimpleDateFormat( DateFormat );
 		svnDateTimeFormat = new SimpleDateFormat( SvnDateFormat );
-		sampling = conf.getParameters().getPredicateValueAsInt(SAMPLING, SAMPLING_DEFAULT);
-		directory = conf.getParameters().getPredicateValueWithException(DIRECTORY);
-		datadirectory = conf.getParameters().getPredicateValueWithException("data_directory");
-		svnurl = conf.getParameters().getPredicateValueWithException(SVNURL);
-		svnlogin = conf.getParameters().getPredicateValueWithException(SVNLOGIN);
-		svnpasswd = conf.getParameters().getPredicateValueWithException(SVNPASSWD);
+		sampling = conf.getParameters().getValueAsInt(SAMPLING, SAMPLING_DEFAULT);
+		directory = conf.getParameters().getValueWithException(DIRECTORY);
+		datadirectory = conf.getParameters().getValueWithException("data_directory");
+		svnurl = conf.getParameters().getValueWithException(SVNURL);
+		svnlogin = conf.getParameters().getValueWithException(SVNLOGIN);
+		svnpasswd = conf.getParameters().getValueWithException(SVNPASSWD);
 
-		skip_lines = conf.getParameters().getPredicateValueAsInt(SKIP_LINES, 4);
-		String seperator_text =conf.getParameters().getPredicateValue(SEPERATOR);
+		skip_lines = conf.getParameters().getValueAsInt(SKIP_LINES, 4);
+		String seperator_text =conf.getParameters().getValue(SEPERATOR);
 
-		String not_a_number_constant_val = conf.getParameters().getPredicateValue(NOT_A_NUMBER);
+		String not_a_number_constant_val = conf.getParameters().getValue(NOT_A_NUMBER);
 
 		if (not_a_number_constant_val != null && not_a_number_constant_val.trim().length()>0) {
 			StringTokenizer st = new StringTokenizer(not_a_number_constant_val,",");

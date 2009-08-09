@@ -60,8 +60,8 @@ public class SystemTime implements Wrapper , ActionListener {
 		this.dataChannel= channel;
 		
 		//  TODO: negative values?
-		timer = new Timer(  conf.getParameters().getPredicateValueAsInt( CLOCK_PERIOD_KEY ,DEFAULT_CLOCK_PERIODS) , this );
-		maximumDelay = conf.getParameters().getPredicateValueAsInt(MAX_DELAY_KEY, DEFAULT_MAX_DELAY);
+		timer = new Timer(  conf.getParameters().getValueAsInt( CLOCK_PERIOD_KEY ,DEFAULT_CLOCK_PERIODS) , this );
+		maximumDelay = conf.getParameters().getValueAsInt(MAX_DELAY_KEY, DEFAULT_MAX_DELAY);
 		
 		if(maximumDelay > 0){
 			streamElementBuffer = SynchronizedBuffer.decorate(new UnboundedFifoBuffer());

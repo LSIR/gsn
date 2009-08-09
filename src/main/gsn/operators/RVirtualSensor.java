@@ -1,6 +1,5 @@
 package gsn.operators;
 
-import gsn.beans.DataTypes;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.beans.DataField;
@@ -64,9 +63,9 @@ public class RVirtualSensor implements Operator {
 		circularBuffers = new Hashtable<String, ArrayBlockingQueue<StreamElement>>();
 		// Get the parameters from the XML configuration file
 
-		windowSize  = config.getParameters().getPredicateValueAsIntWithException(WINDOW_SIZE);
-		stype = config.getParameters().getPredicateValueWithDefault("script_type", "computation");
-		stepSize =  config.getParameters().getPredicateValueAsIntWithException(STEP_SIZE);
+		windowSize  = config.getParameters().getValueAsIntWithException(WINDOW_SIZE);
+		stype = config.getParameters().getValueWithDefault("script_type", "computation");
+		stepSize =  config.getParameters().getValueAsIntWithException(STEP_SIZE);
 		
 		if (windowSize < stepSize) 
 			throw new RuntimeException("The parameter " + WINDOW_SIZE + " must be greater or equal to the parameter " + STEP_SIZE);

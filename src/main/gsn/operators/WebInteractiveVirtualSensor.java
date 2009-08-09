@@ -61,7 +61,7 @@ public class WebInteractiveVirtualSensor implements ManualDataConsumer, Operator
 
 	public WebInteractiveVirtualSensor (OperatorConfig config ,DataChannel outputChannel ) {
 		this.outputChannel = outputChannel;
-		int memorySizeInSeconds = config.getParameters().getPredicateValueAsIntWithException( "memory-size-in-seconds"  );
+		int memorySizeInSeconds = config.getParameters().getValueAsIntWithException( "memory-size-in-seconds"  );
 		lazyTimedHashMap = new LazyTimedHashMap( memorySizeInSeconds * 1000 );
 	}
 

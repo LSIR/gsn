@@ -147,13 +147,13 @@ public class VoipVirtualSensor  implements Operator {
 
 	public VoipVirtualSensor(OperatorConfig config,DataChannel outputChannel ) {
 		this.outputChannel = outputChannel;
-		String message = config.getParameters().getPredicateValueWithException("message");
+		String message = config.getParameters().getValueWithException("message");
 		
-		String host = config.getParameters().getPredicateValueWithException("host");
-		String username = config.getParameters().getPredicateValueWithException("username");
-		String password = config.getParameters().getPredicateValueWithException("password");
-		phone_no = config.getParameters().getPredicateValueWithException("number");
-		dialPlan = config.getParameters().getPredicateValueWithException("dial-plan");
+		String host = config.getParameters().getValueWithException("host");
+		String username = config.getParameters().getValueWithException("username");
+		String password = config.getParameters().getValueWithException("password");
+		phone_no = config.getParameters().getValueWithException("number");
+		dialPlan = config.getParameters().getValueWithException("dial-plan");
 		
 		ManagerConnectionFactory factory = new ManagerConnectionFactory(host,username,password);
 

@@ -73,10 +73,10 @@ public class MigMessageWrapper implements Wrapper , net.tinyos.message.MessageLi
 		this.conf = conf;
 		this.dataChannel= channel;
 
-		source =  conf.getParameters().getPredicateValueWithException(INITPARAM_SOURCE);
-		packetName =  conf.getParameters().getPredicateValueWithException(INITPARAM_PACKETNAME);
-		path =  conf.getParameters().getPredicateValueWithException(INITPARAM_PATH);
-		classPackage =  conf.getParameters().getPredicateValueWithDefault(INITPARAM_CLASS_PACKAGE,"gsn");
+		source =  conf.getParameters().getValueWithException(INITPARAM_SOURCE);
+		packetName =  conf.getParameters().getValueWithException(INITPARAM_PACKETNAME);
+		path =  conf.getParameters().getValueWithException(INITPARAM_PATH);
+		classPackage =  conf.getParameters().getValueWithDefault(INITPARAM_CLASS_PACKAGE,"gsn");
 
 		logger.debug("Connecting to " + source);
 		moteIF = new MoteIF(BuildSource.makePhoenix(source, PrintStreamMessenger.err));

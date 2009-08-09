@@ -61,10 +61,10 @@ public class EmailVirtualSensor implements Operator {
 
 	public  EmailVirtualSensor (OperatorConfig config,DataChannel outputChannel ) throws EmailException {
 		this.outputChannel = outputChannel;
-		subject = config.getParameters().getPredicateValueWithDefault(INITPARAM_SUBJECT,DEFAULT_SUBJECT);
-		receiverEmail = config.getParameters().getPredicateValueWithDefault(INITPARAM_RECEIVER,"");
-		senderEmail =config.getParameters().getPredicateValueWithException(INITPARAM_SENDER);
-		mailServer =config.getParameters().getPredicateValueWithException(INITPARAM_SERVER);
+		subject = config.getParameters().getValueWithDefault(INITPARAM_SUBJECT,DEFAULT_SUBJECT);
+		receiverEmail = config.getParameters().getValueWithDefault(INITPARAM_RECEIVER,"");
+		senderEmail =config.getParameters().getValueWithException(INITPARAM_SENDER);
+		mailServer =config.getParameters().getValueWithException(INITPARAM_SERVER);
 
 		email = new SimpleEmail();
 		email.setHostName(mailServer);

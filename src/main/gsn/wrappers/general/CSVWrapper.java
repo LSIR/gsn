@@ -40,16 +40,16 @@ public class CSVWrapper implements Wrapper {
 		this.conf = conf;
 		this.dataChannel= channel;
 
-		dataFile = conf.getParameters().getPredicateValueWithException("file");
-		String csvFields = conf.getParameters().getPredicateValueWithException("fields");
-		String csvFormats = conf.getParameters().getPredicateValueWithException("formats");
-		String csvSeparator = conf.getParameters().getPredicateValueWithDefault("separator",",");
-		checkPointDir = conf.getParameters().getPredicateValueWithDefault("check-point-directory", "./csv-check-points");
-		String csvStringQuote = conf.getParameters().getPredicateValueWithDefault("quote","\"");
-		int skipFirstXLine = conf.getParameters().getPredicateValueAsInt("skip-first-lines", 0);
-		String timezone = conf.getParameters().getPredicateValueWithDefault("timezone", handler.LOCAL_TIMEZONE_ID);
-		String nullValues = conf.getParameters().getPredicateValueWithDefault("bad-values", "");
-		samplingPeriodInMsc = conf.getParameters().getPredicateValueAsInt("sampling", 10000);
+		dataFile = conf.getParameters().getValueWithException("file");
+		String csvFields = conf.getParameters().getValueWithException("fields");
+		String csvFormats = conf.getParameters().getValueWithException("formats");
+		String csvSeparator = conf.getParameters().getValueWithDefault("separator",",");
+		checkPointDir = conf.getParameters().getValueWithDefault("check-point-directory", "./csv-check-points");
+		String csvStringQuote = conf.getParameters().getValueWithDefault("quote","\"");
+		int skipFirstXLine = conf.getParameters().getValueAsInt("skip-first-lines", 0);
+		String timezone = conf.getParameters().getValueWithDefault("timezone", handler.LOCAL_TIMEZONE_ID);
+		String nullValues = conf.getParameters().getValueWithDefault("bad-values", "");
+		samplingPeriodInMsc = conf.getParameters().getValueAsInt("sampling", 10000);
 
 		if (csvSeparator!= null && csvSeparator.length()!=1) {
 			logger.warn("The provided CSV separator:>"+csvSeparator+"< should only have  1 character, thus ignored and instead \",\" is used.");

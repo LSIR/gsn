@@ -55,8 +55,8 @@ public class SMACleaner  implements Operator {
 
 	public  SMACleaner(OperatorConfig config,DataChannel outputChannel ) {
 		this.outputChannel = outputChannel;
-		int size = config.getParameters().getPredicateValueAsIntWithException("size");
-		error_threshold = config.getParameters().getPredicateValueAsDoubleWithException("error-threshold");
+		int size = config.getParameters().getValueAsIntWithException("size");
+		error_threshold = config.getParameters().getValueAsDoubleWithException("error-threshold");
 		values = new double[size];
 	}
 

@@ -2,7 +2,6 @@ package ch.slf;
 
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
-import gsn.beans.StreamElement;
 import gsn.channels.DataChannel;
 import gsn2.conf.OperatorConfig;
 
@@ -51,7 +50,7 @@ public class FFTRealOneSided extends WindowAwareVS {
 
 	public FFTRealOneSided(OperatorConfig config,DataChannel outputChannel ) {
 		this.outputChannel = outputChannel;
-		fft_size = config.getParameters().getPredicateValueAsIntWithException("window-size");
+		fft_size = config.getParameters().getValueAsIntWithException("window-size");
 		fft = new FastFourierTransformer () ;
 		if (! FastFourierTransformer.isPowerOf2(fft_size)) 
 			throw new RuntimeException("The window size >" + fft_size + "< is not a power of 2.");

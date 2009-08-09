@@ -7,19 +7,19 @@ import java.io.Serializable;
 
 public final class WrapperConfig implements Serializable{
 
-	private String                 wrapperName;
+	private String className;
 	
 	private Parameters parameters;
 
-	public WrapperConfig () {/* Required by Jibx */ }
+    public WrapperConfig () {/* Required by Jibx */ }
 	
-	public WrapperConfig (  String wrapperName , Parameters parameters) {
+	public WrapperConfig (  String className , Parameters parameters) {
 		this.parameters = parameters;
-		this.wrapperName = wrapperName;
+		this.className = className;
 	}
 
 	public WrapperConfig ( final String wrapper  ) {
-		this.wrapperName = wrapper;
+		this.className = wrapper;
 		parameters = Parameters.EMPTY_PARAMETERS;
 	}
 	
@@ -31,8 +31,8 @@ public final class WrapperConfig implements Serializable{
 		return parameters;
 	}
 
-	public String getWrapperName ( ) {
-		return this.wrapperName;
+	public String getClassName( ) {
+		return this.className;
 	}
 	
 	public void accept(ConfigurationVisitor v) {
@@ -40,7 +40,7 @@ public final class WrapperConfig implements Serializable{
 	}
 
 	public String toString ( ) {
-		final StringBuffer result = new StringBuffer( "[" ).append( this.getWrapperName( ) );
+		final StringBuffer result = new StringBuffer( "[" ).append( this.getClassName( ) );
 		result.append(parameters.toString());
 		result.append( "]" );
 		return result.toString( );
@@ -52,7 +52,7 @@ public final class WrapperConfig implements Serializable{
 		result = prime * result
 				+ ((parameters == null) ? 0 : parameters.hashCode());
 		result = prime * result
-				+ ((wrapperName == null) ? 0 : wrapperName.hashCode());
+				+ ((className == null) ? 0 : className.hashCode());
 		return result;
 	}
 
@@ -69,15 +69,13 @@ public final class WrapperConfig implements Serializable{
 				return false;
 		} else if (!parameters.equals(other.parameters))
 			return false;
-		if (wrapperName == null) {
-			if (other.wrapperName != null)
+		if (className == null) {
+			if (other.className != null)
 				return false;
-		} else if (!wrapperName.equals(other.wrapperName))
+		} else if (!className.equals(other.className))
 			return false;
 		return true;
 	}
 
-
-	
 
 }

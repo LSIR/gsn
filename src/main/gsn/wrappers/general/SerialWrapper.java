@@ -103,14 +103,14 @@ public class SerialWrapper implements Wrapper , SerialPortEventListener ,ManualD
 		this.conf = conf;
 		this.dataChannel= channel;
 
-		serialPort = conf.getParameters().getPredicateValueWithException( "serialport" );
-		inputSeparator = conf.getParameters().getPredicateValue( "inputseparator" );
+		serialPort = conf.getParameters().getValueWithException( "serialport" );
+		inputSeparator = conf.getParameters().getValue( "inputseparator" );
 		if ( inputSeparator == null ) 
 			useInputSeparator = false;
 		else 
 			useInputSeparator = true;
 
-		String representation = conf.getParameters().getPredicateValue( "representation" );
+		String representation = conf.getParameters().getValue( "representation" );
 
 		if ( representation == null || representation.equalsIgnoreCase("binary") ){ 
 			output_format=0;
@@ -119,15 +119,15 @@ public class SerialWrapper implements Wrapper , SerialPortEventListener ,ManualD
 		else 
 			throw new RuntimeException("The provided representation >"+representation+"< is not valid, possible values are binary , string");
 
-		packet_length= conf.getParameters().getPredicateValueAsInt("packet-length",100);
+		packet_length= conf.getParameters().getValueAsInt("packet-length",100);
 
-		String newBaudRate = conf.getParameters().getPredicateValue( "baudrate" );
+		String newBaudRate = conf.getParameters().getValue( "baudrate" );
 		if ( newBaudRate != null && newBaudRate.trim( ).length( ) > 0 ) {
 			baudRate = Integer.parseInt( newBaudRate ); // TODO: check validity of
 			// baudrate?
 		}
 
-		String newDataBits = conf.getParameters().getPredicateValue( "databits" );
+		String newDataBits = conf.getParameters().getValue( "databits" );
 		if ( newDataBits != null && newDataBits.trim( ).length( ) > 0 ) {
 			switch ( Integer.parseInt( newDataBits ) ) {
 			case 5 :
@@ -145,7 +145,7 @@ public class SerialWrapper implements Wrapper , SerialPortEventListener ,ManualD
 			}
 		}
 
-		String newStopBits = conf.getParameters().getPredicateValue( "stopbits" );
+		String newStopBits = conf.getParameters().getValue( "stopbits" );
 		if ( newStopBits != null && newStopBits.trim( ).length( ) > 0 ) {
 			float newstopbits = Float.parseFloat( newStopBits );
 
@@ -154,7 +154,7 @@ public class SerialWrapper implements Wrapper , SerialPortEventListener ,ManualD
 			if ( newstopbits == 1.5 ) stopBits = SerialPort.STOPBITS_1_5;
 		}
 
-		String newParity = conf.getParameters().getPredicateValue( "parity" );
+		String newParity = conf.getParameters().getValue( "parity" );
 		if ( newParity != null && newParity.trim( ).length( ) > 0 ) {
 			if ( newParity.equals( "PARITY_EVEN" ) ) parity = SerialPort.PARITY_EVEN;
 			if ( newParity.equals( "PARITY_MARK" ) ) parity = SerialPort.PARITY_MARK;
@@ -163,7 +163,7 @@ public class SerialWrapper implements Wrapper , SerialPortEventListener ,ManualD
 			if ( newParity.equals( "PARITY_SPACE" ) ) parity = SerialPort.PARITY_SPACE;
 		}
 
-		String newflowControlMode = conf.getParameters().getPredicateValue( "flowcontrolmode" );
+		String newflowControlMode = conf.getParameters().getValue( "flowcontrolmode" );
 		if ( newflowControlMode != null && newflowControlMode.trim( ).length( ) > 0 ) {
 			flowControlMode = 0;
 

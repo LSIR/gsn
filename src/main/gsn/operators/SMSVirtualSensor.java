@@ -76,10 +76,10 @@ public class SMSVirtualSensor implements Operator,ManualDataConsumer{
 
 	public SMSVirtualSensor (OperatorConfig config,DataChannel outputChannel ) {
 		this.outputChannel = outputChannel;
-		phoneNumbers = new ConcurrentLinkedQueue<String>(Arrays.asList(config.getParameters().getPredicateValues(INITPARAM_PHONE_NUMBER)));
-		password =  config.getParameters().getPredicateValueWithException(INITPARAM_PASSWORD);
-		smsServer = config.getParameters().getPredicateValueWithException(INITPARAM_SMS_SERVER);
-		messageFormat =  config.getParameters().getPredicateValueWithException(INITPARAM_MESSAGE_FORMAT);
+		phoneNumbers = new ConcurrentLinkedQueue<String>(Arrays.asList(config.getParameters().getValues(INITPARAM_PHONE_NUMBER)));
+		password =  config.getParameters().getValueWithException(INITPARAM_PASSWORD);
+		smsServer = config.getParameters().getValueWithException(INITPARAM_SMS_SERVER);
+		messageFormat =  config.getParameters().getValueWithException(INITPARAM_MESSAGE_FORMAT);
 	}
 
 	/**

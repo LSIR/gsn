@@ -48,9 +48,9 @@ public class WanWrapper implements Wrapper {
 		this.conf = conf;
 		this.dataChannel= channel;
 		dateTimeFormat = new SimpleDateFormat( DateFormat );
-		sampling = conf.getParameters().getPredicateValueAsInt(SAMPLING, SAMPLING_DEFAULT);
-		filename = conf.getParameters().getPredicateValueWithException(FILE);
-		String not_a_number_constant_val =conf.getParameters().getPredicateValue(NOT_A_NUMBER);
+		sampling = conf.getParameters().getValueAsInt(SAMPLING, SAMPLING_DEFAULT);
+		filename = conf.getParameters().getValueWithException(FILE);
+		String not_a_number_constant_val =conf.getParameters().getValue(NOT_A_NUMBER);
 
 		if (not_a_number_constant_val != null && not_a_number_constant_val.trim().length()>0) {
 			StringTokenizer st = new StringTokenizer(not_a_number_constant_val,",");

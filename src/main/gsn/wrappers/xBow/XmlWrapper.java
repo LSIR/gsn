@@ -165,13 +165,13 @@ public class XmlWrapper implements Wrapper {
 		 */
 
 
-		host = conf.getParameters().getPredicateValueWithException( "host" );
-		port = conf.getParameters().getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
+		host = conf.getParameters().getValueWithException( "host" );
+		port = conf.getParameters().getValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
 		if ( port > 65000 || port <= 0 ) 
 			throw new RuntimeException("Remote wrapper initialization failed, bad port number:"+port);
 		
 
-		rate = conf.getParameters().getPredicateValueAsInt( "rate" , DEFAULT_RATE);
+		rate = conf.getParameters().getValueAsInt( "rate" , DEFAULT_RATE);
 	
 		ArrayList<DataField > output = new ArrayList < DataField >();
 		for ( int i = 0 ; i < FIELD_NAMES.length ; i++ )

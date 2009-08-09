@@ -100,88 +100,88 @@ public class SensorscopeVS  implements Operator {
     public SensorscopeVS(OperatorConfig config,DataChannel outputChannel ) {
 		this.outputChannel = outputChannel;
         Parameters params = config.getParameters();
-        samplingTime = params.getPredicateValueAsInt("sampling",samplingTime);
+        samplingTime = params.getValueAsInt("sampling",samplingTime);
 
         logger.warn("Sampling time : > " + samplingTime + " <");
 
         //initialize field names from virtual sensor file
 
-        NTW_SENDER_ID_NAME = params.getPredicateValueWithDefault(NTW_SENDER_ID_Key.toLowerCase(), NTW_SENDER_ID_Key );
-        NTW_DISTANCE_TO_BTS = params.getPredicateValueWithDefault(DEFAULT_NTW_DISTANCE_TO_BTS.toLowerCase(),DEFAULT_NTW_DISTANCE_TO_BTS.toLowerCase());
+        NTW_SENDER_ID_NAME = params.getValueWithDefault(NTW_SENDER_ID_Key.toLowerCase(), NTW_SENDER_ID_Key );
+        NTW_DISTANCE_TO_BTS = params.getValueWithDefault(DEFAULT_NTW_DISTANCE_TO_BTS.toLowerCase(),DEFAULT_NTW_DISTANCE_TO_BTS.toLowerCase());
         
         logger.warn("NTW_SENDER_ID : > "+ NTW_SENDER_ID_NAME + " <");
         logger.warn("NTW_DISTANCE_TO_BTS : > "+ NTW_DISTANCE_TO_BTS + " <");
         
-        TSP_HOP_COUNT = params.getPredicateValueWithDefault(DEFAULT_TSP_HOP_COUNT.toLowerCase(),DEFAULT_TSP_HOP_COUNT.toLowerCase());
+        TSP_HOP_COUNT = params.getValueWithDefault(DEFAULT_TSP_HOP_COUNT.toLowerCase(),DEFAULT_TSP_HOP_COUNT.toLowerCase());
         logger.warn("TSP_HOP_COUNT : > "+ TSP_HOP_COUNT + " <");
 
-        TSP_PACKET_SN = params.getPredicateValueWithDefault(DEFAULT_TSP_PACKET_SN.toLowerCase(),DEFAULT_TSP_PACKET_SN.toLowerCase());
+        TSP_PACKET_SN = params.getValueWithDefault(DEFAULT_TSP_PACKET_SN.toLowerCase(),DEFAULT_TSP_PACKET_SN.toLowerCase());
         logger.warn("TSP_PACKET_SN : > "+ TSP_PACKET_SN + " <");
 
-        REPORTER_ID = params.getPredicateValueWithDefault(DEFAULT_REPORTER_ID.toLowerCase(),DEFAULT_REPORTER_ID.toLowerCase());
+        REPORTER_ID = params.getValueWithDefault(DEFAULT_REPORTER_ID.toLowerCase(),DEFAULT_REPORTER_ID.toLowerCase());
         logger.warn("REPORTER_ID : > "+REPORTER_ID + " <");
 
-        TIMESTAMP = params.getPredicateValueWithDefault(DEFAULT_TIMESTAMP.toLowerCase(),DEFAULT_TIMESTAMP.toLowerCase());
+        TIMESTAMP = params.getValueWithDefault(DEFAULT_TIMESTAMP.toLowerCase(),DEFAULT_TIMESTAMP.toLowerCase());
         logger.warn("TIMESTAMP : > "+TIMESTAMP + " <");
 
-        RAIN_METER = params.getPredicateValueWithDefault(DEFAULT_RAIN_METER.toLowerCase(),DEFAULT_RAIN_METER.toLowerCase());
+        RAIN_METER = params.getValueWithDefault(DEFAULT_RAIN_METER.toLowerCase(),DEFAULT_RAIN_METER.toLowerCase());
         logger.warn("RAIN_METER : > "+ RAIN_METER + " <");
 
-        WIND_SPEED = params.getPredicateValueWithDefault(DEFAULT_WIND_SPEED.toLowerCase(),DEFAULT_WIND_SPEED.toLowerCase());
+        WIND_SPEED = params.getValueWithDefault(DEFAULT_WIND_SPEED.toLowerCase(),DEFAULT_WIND_SPEED.toLowerCase());
         logger.warn("WIND_SPEED : > "+ WIND_SPEED + " <");
 
-        WATERMARK = params.getPredicateValueWithDefault(DEFAULT_WATERMARK.toLowerCase(),DEFAULT_WATERMARK.toLowerCase());
+        WATERMARK = params.getValueWithDefault(DEFAULT_WATERMARK.toLowerCase(),DEFAULT_WATERMARK.toLowerCase());
         logger.warn("WATERMARK : > "+ WATERMARK + " <");
 
-        SOLAR_RADIATION = params.getPredicateValueWithDefault(DEFAULT_SOLAR_RADIATION.toLowerCase(),DEFAULT_SOLAR_RADIATION.toLowerCase());
+        SOLAR_RADIATION = params.getValueWithDefault(DEFAULT_SOLAR_RADIATION.toLowerCase(),DEFAULT_SOLAR_RADIATION.toLowerCase());
         logger.warn("SOLAR_RADIATION : > "+ SOLAR_RADIATION + " <");
 
-        AIR_TEMPERATURE = params.getPredicateValueWithDefault(DEFAULT_AIR_TEMPERATURE.toLowerCase(),DEFAULT_AIR_TEMPERATURE.toLowerCase());
+        AIR_TEMPERATURE = params.getValueWithDefault(DEFAULT_AIR_TEMPERATURE.toLowerCase(),DEFAULT_AIR_TEMPERATURE.toLowerCase());
         logger.warn("AIR_TEMPERATURE : > "+ AIR_TEMPERATURE + " <");
 
-        AIR_HUMIDITY = params.getPredicateValueWithDefault(DEFAULT_AIR_HUMIDITY.toLowerCase(),DEFAULT_AIR_HUMIDITY.toLowerCase());
+        AIR_HUMIDITY = params.getValueWithDefault(DEFAULT_AIR_HUMIDITY.toLowerCase(),DEFAULT_AIR_HUMIDITY.toLowerCase());
         logger.warn("AIR_HUMIDITY : > "+ AIR_HUMIDITY + " <");
 
-        SKIN_TEMPERATURE = params.getPredicateValueWithDefault(DEFAULT_SKIN_TEMPERATURE.toLowerCase(),DEFAULT_SKIN_TEMPERATURE.toLowerCase());
+        SKIN_TEMPERATURE = params.getValueWithDefault(DEFAULT_SKIN_TEMPERATURE.toLowerCase(),DEFAULT_SKIN_TEMPERATURE.toLowerCase());
         logger.warn("SKIN_TEMPERATURE : > "+ SKIN_TEMPERATURE + " <");
 
-        SOIL_MOISTURE = params.getPredicateValueWithDefault(DEFAULT_SOIL_MOISTURE.toLowerCase(),DEFAULT_SOIL_MOISTURE.toLowerCase());
+        SOIL_MOISTURE = params.getValueWithDefault(DEFAULT_SOIL_MOISTURE.toLowerCase(),DEFAULT_SOIL_MOISTURE.toLowerCase());
         logger.warn("SOIL_MOISTURE : > "+ SOIL_MOISTURE + " <");
 
-        WIND_DIRECTION = params.getPredicateValueWithDefault(DEFAULT_WIND_DIRECTION.toLowerCase(),DEFAULT_WIND_DIRECTION.toLowerCase());
+        WIND_DIRECTION = params.getValueWithDefault(DEFAULT_WIND_DIRECTION.toLowerCase(),DEFAULT_WIND_DIRECTION.toLowerCase());
         logger.warn("WIND_DIRECTION : > "+ WIND_DIRECTION + " <");
 
-        WIND_DIRECTION2 = params.getPredicateValueWithDefault(DEFAULT_WIND_DIRECTION2.toLowerCase(),DEFAULT_WIND_DIRECTION2.toLowerCase());
+        WIND_DIRECTION2 = params.getValueWithDefault(DEFAULT_WIND_DIRECTION2.toLowerCase(),DEFAULT_WIND_DIRECTION2.toLowerCase());
         logger.warn("WIND_DIRECTION2 : > "+ WIND_DIRECTION2 + " <");
 
-        SOIL_CONDUCTIVITY_1 = params.getPredicateValueWithDefault(DEFAULT_SOIL_CONDUCTIVITY_1.toLowerCase(),DEFAULT_SOIL_CONDUCTIVITY_1.toLowerCase());
+        SOIL_CONDUCTIVITY_1 = params.getValueWithDefault(DEFAULT_SOIL_CONDUCTIVITY_1.toLowerCase(),DEFAULT_SOIL_CONDUCTIVITY_1.toLowerCase());
         logger.warn("SOIL_CONDUCTIVITY_1 : > "+ SOIL_CONDUCTIVITY_1 + " <");
 
-        SOIL_CONDUCTIVITY_2 = params.getPredicateValueWithDefault(DEFAULT_SOIL_CONDUCTIVITY_2.toLowerCase(),DEFAULT_SOIL_CONDUCTIVITY_2.toLowerCase());
+        SOIL_CONDUCTIVITY_2 = params.getValueWithDefault(DEFAULT_SOIL_CONDUCTIVITY_2.toLowerCase(),DEFAULT_SOIL_CONDUCTIVITY_2.toLowerCase());
         logger.warn("SOIL_CONDUCTIVITY_2 : > "+ SOIL_CONDUCTIVITY_2 + " <");
 
-        SOIL_CONDUCTIVITY_3 = params.getPredicateValueWithDefault(DEFAULT_SOIL_CONDUCTIVITY_3.toLowerCase(),DEFAULT_SOIL_CONDUCTIVITY_3.toLowerCase());
+        SOIL_CONDUCTIVITY_3 = params.getValueWithDefault(DEFAULT_SOIL_CONDUCTIVITY_3.toLowerCase(),DEFAULT_SOIL_CONDUCTIVITY_3.toLowerCase());
         logger.warn("SOIL_CONDUCTIVITY_3 : > "+ SOIL_CONDUCTIVITY_3 + " <");
 
-        SOIL_MOISTURE_1 = params.getPredicateValueWithDefault(DEFAULT_SOIL_MOISTURE_1.toLowerCase(),DEFAULT_SOIL_MOISTURE_1.toLowerCase());
+        SOIL_MOISTURE_1 = params.getValueWithDefault(DEFAULT_SOIL_MOISTURE_1.toLowerCase(),DEFAULT_SOIL_MOISTURE_1.toLowerCase());
         logger.warn("SOIL_MOISTURE_1 : > "+ SOIL_MOISTURE_1 + " <");
 
-        SOIL_MOISTURE_2 = params.getPredicateValueWithDefault(DEFAULT_SOIL_MOISTURE_2.toLowerCase(),DEFAULT_SOIL_MOISTURE_2.toLowerCase());
+        SOIL_MOISTURE_2 = params.getValueWithDefault(DEFAULT_SOIL_MOISTURE_2.toLowerCase(),DEFAULT_SOIL_MOISTURE_2.toLowerCase());
         logger.warn("SOIL_MOISTURE_2 : > "+ SOIL_MOISTURE_2 + " <");
 
-        SOIL_MOISTURE_3 = params.getPredicateValueWithDefault(DEFAULT_SOIL_MOISTURE_3.toLowerCase(),DEFAULT_SOIL_MOISTURE_3.toLowerCase());
+        SOIL_MOISTURE_3 = params.getValueWithDefault(DEFAULT_SOIL_MOISTURE_3.toLowerCase(),DEFAULT_SOIL_MOISTURE_3.toLowerCase());
         logger.warn("SOIL_MOISTURE_3 : > "+ SOIL_MOISTURE_3 + " <");
 
-        SOIL_TEMPERATURE_1 = params.getPredicateValueWithDefault(DEFAULT_SOIL_TEMPERATURE_1.toLowerCase(),DEFAULT_SOIL_TEMPERATURE_1.toLowerCase());
+        SOIL_TEMPERATURE_1 = params.getValueWithDefault(DEFAULT_SOIL_TEMPERATURE_1.toLowerCase(),DEFAULT_SOIL_TEMPERATURE_1.toLowerCase());
         logger.warn("SOIL_TEMPERATURE_1 : > "+ SOIL_TEMPERATURE_1 + " <");
 
-        SOIL_TEMPERATURE_2 = params.getPredicateValueWithDefault(DEFAULT_SOIL_TEMPERATURE_2.toLowerCase(),DEFAULT_SOIL_TEMPERATURE_2.toLowerCase());
+        SOIL_TEMPERATURE_2 = params.getValueWithDefault(DEFAULT_SOIL_TEMPERATURE_2.toLowerCase(),DEFAULT_SOIL_TEMPERATURE_2.toLowerCase());
         logger.warn("SOIL_TEMPERATURE_2 : > "+ SOIL_TEMPERATURE_2 + " <");
 
-        SOIL_TEMPERATURE_3 = params.getPredicateValueWithDefault(DEFAULT_SOIL_TEMPERATURE_3.toLowerCase(),DEFAULT_SOIL_TEMPERATURE_3.toLowerCase());
+        SOIL_TEMPERATURE_3 = params.getValueWithDefault(DEFAULT_SOIL_TEMPERATURE_3.toLowerCase(),DEFAULT_SOIL_TEMPERATURE_3.toLowerCase());
         logger.warn("SOIL_TEMPERATURE_3 : > "+ SOIL_TEMPERATURE_3 + " <");
 
-        FOO = params.getPredicateValueWithDefault(DEFAULT_FOO.toLowerCase(),DEFAULT_FOO.toLowerCase());
+        FOO = params.getValueWithDefault(DEFAULT_FOO.toLowerCase(),DEFAULT_FOO.toLowerCase());
         logger.warn("FOO : > "+ FOO + " <");
     
     }

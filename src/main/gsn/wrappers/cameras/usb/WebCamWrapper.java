@@ -109,8 +109,8 @@ public class WebCamWrapper implements Wrapper , ControllerListener {
 	public WebCamWrapper(WrapperConfig conf, DataChannel channel) {
 		this.conf = conf;
 		this.dataChannel= channel;
-		String liveView = conf.getParameters().getPredicateValueWithException( "live-view" );
-		String deviceName=conf.getParameters().getPredicateValueWithException("device");
+		String liveView = conf.getParameters().getValueWithException( "live-view" );
+		String deviceName=conf.getParameters().getValueWithException("device");
 		try {
 			isLiveViewEnabled = Boolean.parseBoolean( liveView );
 		} catch ( Exception e ) {

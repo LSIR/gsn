@@ -79,13 +79,13 @@ public class ChartVirtualSensor implements Operator {
 		 * This can now plot only for one input stream value.
 		 */
 		ChartInfo chartInfo = new ChartInfo( );
-		chartInfo.setInputStreamName( config.getParameters().getPredicateValueWithException( "input-stream" ) );
-		chartInfo.setPlotTitle( config.getParameters().getPredicateValueWithException("title" ) );
-		chartInfo.setType( config.getParameters().getPredicateValueWithException( "type" ) );
-		chartInfo.setHeight( config.getParameters().getPredicateValueAsInt("height"  , 480 ) );
-		chartInfo.setWidth( config.getParameters().getPredicateValueAsInt( "width"  , 640 ) );
-		chartInfo.setVerticalAxisTitle(config.getParameters().getPredicateValueWithException( "vertical-axis" ) );
-		chartInfo.setHistorySize( config.getParameters().getPredicateValueAsInt("history-size"  , 10 ) );
+		chartInfo.setInputStreamName( config.getParameters().getValueWithException( "input-stream" ) );
+		chartInfo.setPlotTitle( config.getParameters().getValueWithException("title" ) );
+		chartInfo.setType( config.getParameters().getValueWithException( "type" ) );
+		chartInfo.setHeight( config.getParameters().getValueAsInt("height"  , 480 ) );
+		chartInfo.setWidth( config.getParameters().getValueAsInt( "width"  , 640 ) );
+		chartInfo.setVerticalAxisTitle(config.getParameters().getValueWithException( "vertical-axis" ) );
+		chartInfo.setHistorySize( config.getParameters().getValueAsInt("history-size"  , 10 ) );
 		
 		input_stream_name_to_ChartInfo_map.put( chartInfo.getInputStreamName( ) , chartInfo );
 		chartInfo.initialize( );

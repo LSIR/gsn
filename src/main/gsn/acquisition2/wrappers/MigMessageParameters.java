@@ -65,9 +65,9 @@ public class MigMessageParameters {
 
 		// Mandatory parameters (may thow RuntimeException)
 
-		tinyosSource = infos.getParameters().getPredicateValueWithException(TINYOS_SOURCE) ;
+		tinyosSource = infos.getParameters().getValueWithException(TINYOS_SOURCE) ;
 
-		tinyosMessageName = infos.getParameters().getPredicateValueWithException(TINYOS_MESSAGE_NAME) ;
+		tinyosMessageName = infos.getParameters().getValueWithException(TINYOS_MESSAGE_NAME) ;
 
 		// Define TinyOS version from the superclasses
 
@@ -80,9 +80,9 @@ public class MigMessageParameters {
 
 		// Optional parameters
 
-		tinyosGetterPrefix = infos.getParameters().getPredicateValueWithDefault(TINYOS_GETTER_PREFIX, TINYOS_GETTER_PREFIX_DEFAULT);
+		tinyosGetterPrefix = infos.getParameters().getValueWithDefault(TINYOS_GETTER_PREFIX, TINYOS_GETTER_PREFIX_DEFAULT);
 
-		tinyOSMessageLength = Integer.parseInt(infos.getParameters().getPredicateValueWithDefault(TINYOS_MESSAGE_LENGTH, "-1")) ;
+		tinyOSMessageLength = Integer.parseInt(infos.getParameters().getValueWithDefault(TINYOS_MESSAGE_LENGTH, "-1")) ;
 
 	}
 

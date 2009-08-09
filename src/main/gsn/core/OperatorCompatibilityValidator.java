@@ -5,7 +5,9 @@ import gsn2.conf.OperatorConfig;
 
 import java.util.ArrayList;
 
-public class OperatorCompatibilityValidator extends ChainOfReponsibility<OperatorConfig> implements VSensorStateChangeListener{
+import org.picocontainer.MutablePicoContainer;
+
+public class OperatorCompatibilityValidator extends ChainOfReponsibility<OperatorConfig> implements OpStateChangeListener {
 
   private ArrayList<String> existingNames = new ArrayList<String>();
 
@@ -15,14 +17,12 @@ public class OperatorCompatibilityValidator extends ChainOfReponsibility<Operato
     return true;
   }
 
-  public boolean vsLoading(OperatorConfig config) {
-    existingNames.add(config.getIdentifier().toLowerCase());
-    return true;
+  public void opLoading(MutablePicoContainer config) {
+    existingNames.add(config.getComponent(OperatorConfig.class).getIdentifier().toLowerCase());
   }
 
-  public boolean vsUnLoading(OperatorConfig config) {
-    existingNames.remove(config.getIdentifier().toLowerCase());
-    return true;
+  public void opUnLoading(MutablePicoContainer config) {
+    existingNames.remove(config.getComponent(OperatorConfig.class).getIdentifier().toLowerCase());
   }
 
   public void dispose() {

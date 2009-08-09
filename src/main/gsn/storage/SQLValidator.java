@@ -1,6 +1,6 @@
 package gsn.storage;
 
-import gsn.core.VSensorStateChangeListener;
+import gsn.core.OpStateChangeListener;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 
@@ -19,9 +19,10 @@ import org.h2.engine.ConnectionInfo;
 import org.h2.engine.Session;
 import org.h2.engine.SessionFactoryEmbedded;
 import org.h2.value.DataType;
+import org.picocontainer.MutablePicoContainer;
 import gsn2.conf.OperatorConfig;
 
-public class SQLValidator implements VSensorStateChangeListener {
+public class SQLValidator implements OpStateChangeListener {
 
 	private static final transient Logger logger             = Logger.getLogger( SQLValidator.class );
 
@@ -112,14 +113,10 @@ public class SQLValidator implements VSensorStateChangeListener {
 		return connection;
 	}
 
-	public boolean vsLoading(OperatorConfig config) {
-
-		return false;
+	public void opLoading(MutablePicoContainer config) {
 	}
 
-	public boolean vsUnLoading(OperatorConfig config) {
-
-		return false;
+	public void opUnLoading(MutablePicoContainer config) {
 	}
 
 	private DataField[] getFields(Select select) {

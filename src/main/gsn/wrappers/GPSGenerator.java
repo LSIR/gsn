@@ -47,8 +47,8 @@ public class GPSGenerator implements Wrapper {
   public GPSGenerator(WrapperConfig conf, DataChannel channel) throws IOException {
     this.conf = conf;
     this.dataChannel= channel;
-    samplingRate = conf.getParameters().getPredicateValueAsInt("rate", DEFAULT_SAMPLING_RATE);
-    String picture = conf.getParameters().getPredicateValueWithException("picture");
+    samplingRate = conf.getParameters().getValueAsInt("rate", DEFAULT_SAMPLING_RATE);
+    String picture = conf.getParameters().getValueWithException("picture");
 
     File pictureF = new File( picture );
     if ( !pictureF.isFile( ) || !pictureF.canRead( ) )

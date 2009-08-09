@@ -50,9 +50,9 @@ public class ClockedBridgeVirtualSensor  implements ActionListener , Operator {
 	public ClockedBridgeVirtualSensor (OperatorConfig config ,DataChannel outputChannel ) throws SQLException {
 		this.outputChannel = outputChannel;
 
-		clock_rate = config.getParameters().getPredicateValueAsIntWithException(RATE_PARAM);
-		table_name = config.getParameters().getPredicateValueWithException(TABLE_NAME_PARAM);
-		output_table_name = config.getParameters().getPredicateValueWithException(OUTPUT_TABLE_NAME_PARAM);
+		clock_rate = config.getParameters().getValueAsIntWithException(RATE_PARAM);
+		table_name = config.getParameters().getValueWithException(TABLE_NAME_PARAM);
+		output_table_name = config.getParameters().getValueWithException(OUTPUT_TABLE_NAME_PARAM);
 		 
 		timer = new Timer( clock_rate , this );
 

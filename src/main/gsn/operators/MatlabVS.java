@@ -10,7 +10,6 @@ import gsn.utils.MatlabEngine;
 import gsn2.conf.OperatorConfig;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -86,9 +85,9 @@ public class MatlabVS implements Operator {
 
 	public MatlabVS(OperatorConfig config,DataChannel outputChannel ) throws IOException {
 		this.outputChannel = outputChannel;
-		String functionName = config.getParameters().getPredicateValueWithDefault("function",defaultFunctionName);
+		String functionName = config.getParameters().getValueWithDefault("function",defaultFunctionName);
 		
-		nbArgs = config.getParameters().getPredicateValueAsInt("arguments",0);
+		nbArgs = config.getParameters().getValueAsInt("arguments",0);
 		parameters = new Double[nbArgs];
 		
 		

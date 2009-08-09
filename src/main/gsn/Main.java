@@ -7,7 +7,7 @@ import gsn.http.rest.RestDelivery;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
 import gsn.wrappers.WrappersUtil;
-import gsn.core.OpLoader;
+import gsn.core.ContainerManager;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -108,7 +108,7 @@ public final class Main {
 		} catch ( Exception e ) {
 			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used in most of the communications: "+ e.getMessage(),e);
 		}
-		OpLoader vsloader = new OpLoader(  );
+		ContainerManager vsloader = new ContainerManager(  );
 		controlSocket.setLoader(vsloader);
 
 //		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));

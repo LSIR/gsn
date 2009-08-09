@@ -39,8 +39,8 @@ public abstract class WindowAwareVS implements Operator {
 
 	public void initialize(OperatorConfig config) {	
 		circularBuffers = new Hashtable<String, ArrayBlockingQueue<StreamElement>> () ;
-		windowSize = config.getParameters().getPredicateValueAsIntWithException(WINDOW_SIZE);
-		stepSize= config.getParameters().getPredicateValueAsIntWithException(STEP_SIZE);
+		windowSize = config.getParameters().getValueAsIntWithException(WINDOW_SIZE);
+		stepSize= config.getParameters().getValueAsIntWithException(STEP_SIZE);
 		
 		if (windowSize < stepSize) 
 			throw new RuntimeException("The parameter " + WINDOW_SIZE + " must be greater or equal to the parameter " + STEP_SIZE);

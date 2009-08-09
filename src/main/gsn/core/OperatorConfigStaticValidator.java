@@ -23,11 +23,14 @@ public class OperatorConfigStaticValidator extends ChainOfReponsibility<Operator
       logger.error("The operator name can't be empty.");
       return false;
     }
-
+    String className = null;
     try {
-      Class.forName(operatorConfig.getClassName());
+      className=operatorConfig.getClassName();
+      Class.forName(className);
+      for (ChannelConfig cConfig : operatorConfig.getChannels())
+          Class.forName(className=cConfig.getSourceConfig().getClassName());
     } catch (Exception e) {
-      logger.error("Problem in loading the operator class: "+operatorConfig.getClassName(),e);
+      logger.error("Problem in loading the class: "+className,e);
       return false;
     }
 
