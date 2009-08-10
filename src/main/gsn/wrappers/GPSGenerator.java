@@ -3,7 +3,7 @@ package gsn.wrappers;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
 
 import java.io.BufferedInputStream;
@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import gsn2.wrappers.Wrapper;
 
 public class GPSGenerator implements Wrapper {
 
@@ -26,7 +27,7 @@ public class GPSGenerator implements Wrapper {
 
   private static final String [ ]  FIELD_NAMES           = new String [ ] { "latitude" , "longitude" , "temperature" , "light" , "camera" };
 
-  private static final Byte [ ] FIELD_TYPES           = new Byte [ ] { DataTypes.DOUBLE , DataTypes.DOUBLE , DataTypes.DOUBLE , DataTypes.INTEGER , DataTypes.BINARY };
+  private static final Byte [ ] FIELD_TYPES           = new Byte [ ] { DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.NUMERIC , DataTypes.BINARY };
 
   private static final String [ ]  FIELD_DESCRIPTION     = new String [ ] { "Latitude Reading" , "Longitude Reading" , "Temperature Sensor" , "Light Sensor" , "Camera Picture" };
 

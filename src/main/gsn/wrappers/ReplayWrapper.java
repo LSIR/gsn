@@ -1,7 +1,7 @@
 package gsn.wrappers;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
@@ -13,12 +13,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import gsn2.wrappers.Wrapper;
 
 /**
  * This wrapper enables one to reply the existing stream from a database.
  * parameters: (dbname,speed [integer >=1, default is 1], for instance speed=2 means play 2 times faster).
  */
-public class ReplayWrapper  implements Wrapper{
+public class ReplayWrapper  implements Wrapper {
 	private final WrapperConfig conf;
 
 	private final DataChannel dataChannel;
@@ -110,7 +111,7 @@ class DelayedDataEnumerator implements Enumeration<ScheduledStreamElement>{
 		StreamElement currentSe = data.nextElement();
 		long delay = 500;// First time execution is delayed for 500ms.
 		if (previousElement!=null) 
-			delay =  (currentSe.getTimed()-previousElement.getTimed())/speed;
+			delay =  (currentSe.getTimeInMillis()-previousElement.getTimeInMillis())/speed;
 		previousElement = currentSe;
 		return new ScheduledStreamElement(currentSe,delay);
 	}

@@ -4,7 +4,7 @@ import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.beans.DataField;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.io.File;
 import java.io.Serializable;
@@ -170,17 +170,17 @@ public class RVirtualSensor implements Operator {
 						// evaluate/get attribute data from R server
 //						xp = rc.parseAndEval(fieldname[n].toLowerCase());
 
-//						if (fieldType[n] == DataTypes.DOUBLE) {
+//						if (fieldType[n] == DataTypes.NUMERIC) {
 //							double[] b1 = xp.asDoubles();
 //							outputData[n] = b1[b1.length - 1];
 //						}
 //
-//						if (fieldType[n] == DataTypes.INTEGER) {
+//						if (fieldType[n] == DataTypes.NUMERIC) {
 //							int[] b1 = xp.asIntegers();
 //							outputData[n] = b1[b1.length - 1];
 //						}
 //
-//						if (fieldType[n] == DataTypes.BIGINT) {
+//						if (fieldType[n] == DataTypes.TIME) {
 //							int[] b1 = xp.asIntegers();
 //							outputData[n] = (long) b1[b1.length - 1];
 //						}

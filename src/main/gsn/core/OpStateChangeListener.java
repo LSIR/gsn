@@ -2,7 +2,6 @@ package gsn.core;
 
 import org.picocontainer.Disposable;
 import org.picocontainer.MutablePicoContainer;
-import gsn2.conf.OperatorConfig;
 
 public interface OpStateChangeListener extends Disposable{
 

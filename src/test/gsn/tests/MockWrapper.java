@@ -1,10 +1,9 @@
 package gsn.tests;
 
 import gsn.beans.DataField;
-import gsn.beans.WrapperConfig;
-import gsn.beans.Operator;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 import gsn.operators.OperatorInitializationException;
 import static org.easymock.EasyMock.*;
 

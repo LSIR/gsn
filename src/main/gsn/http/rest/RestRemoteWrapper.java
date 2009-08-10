@@ -2,9 +2,9 @@ package gsn.http.rest;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -131,7 +131,7 @@ public class RestRemoteWrapper implements Wrapper {
 				while(isActive && (se = (StreamElement4Rest)inputStream.readObject())!=null) { 
 					StreamElement streamElement = se.toStreamElement();
 					dataChannel.write(streamElement);
-					lastReceivedTimestamp = streamElement.getTimed();
+					lastReceivedTimestamp = streamElement.getTimeInMillis();
 				}
 			} catch (Exception e) {
 				logger.debug(e.getMessage(),e);
@@ -149,7 +149,7 @@ public class RestRemoteWrapper implements Wrapper {
 	}
 
 	public void manualDataInsertion(StreamElement se) {
-		lastReceivedTimestamp = se.getTimed();
+		lastReceivedTimestamp = se.getTimeInMillis();
 		dataChannel.write(se);
 	}
 

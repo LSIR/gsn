@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 import gsn.utils.ChainOfReponsibility;
 
 public class OperatorParser implements FilePresenceListener{

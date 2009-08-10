@@ -5,22 +5,16 @@ import static org.easymock.classextension.EasyMock.*;
 import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.verify;
 import static org.testng.Assert.*;
-import org.jibx.runtime.JiBXException;
-import org.apache.commons.io.FileUtils;
 import org.picocontainer.MutablePicoContainer;
-import gsn.core.OperatorParser;
 import gsn.core.ContainerManager;
 import gsn.core.OpStateChangeListener;
-import gsn.utils.ChainOfReponsibility;
 import gsn.utils.Parameter;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.beans.Operator;
-import gsn.wrappers.Wrapper;
-import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn2.wrappers.Wrapper;
+import gsn.core.OperatorConfig;
+import gsn.channels.ChannelConfig;
 import gsn2.conf.Parameters;
-import gsn2.conf.ChannelConfig;
-import net.sf.jasperreports.engine.export.JExcelApiExporter;
 
 public class TestContainerManager {
     @Test

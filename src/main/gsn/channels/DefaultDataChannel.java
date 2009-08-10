@@ -2,7 +2,7 @@ package gsn.channels;
 
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
-import gsn2.conf.ChannelConfig;
+import gsn.channels.ChannelConfig;
 import gsn2.sliding.SlidingHandler;
 import gsn2.sliding.SlidingListener;
 import gsn2.window.SlidingWindowFactory;

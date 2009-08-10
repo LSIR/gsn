@@ -1,6 +1,6 @@
 package gsn.utils.protocols;
 
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 
 import java.util.Collection;
 import java.util.Date;

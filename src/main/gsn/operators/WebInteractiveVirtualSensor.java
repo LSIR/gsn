@@ -1,6 +1,7 @@
 package gsn.operators;
 
 import gsn.ManualDataConsumer;
+import gsn.core.OperatorConfig;
 import gsn.beans.*;
 import gsn.channels.DataChannel;
 import gsn.others.visualization.svg.SVGCircle;
@@ -9,7 +10,6 @@ import gsn.others.visualization.svg.SVGLayer;
 import gsn.others.visualization.svg.SVGPage;
 import gsn.others.visualization.svg.SVGUtils;
 import gsn.utils.LazyTimedHashMap;
-import gsn2.conf.OperatorConfig;
 
 import java.awt.Color;
 import java.io.Serializable;
@@ -55,7 +55,7 @@ public class WebInteractiveVirtualSensor implements ManualDataConsumer, Operator
 
 	private final String                  OUTPUT_FIELD_NAME = "PLOT";
 
-	private OperatorConfig                 vsensor;
+	private OperatorConfig vsensor;
 
 	private DataChannel outputChannel;
 

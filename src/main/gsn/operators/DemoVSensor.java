@@ -5,7 +5,7 @@ import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.beans.DataField;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -111,7 +111,7 @@ public class DemoVSensor  implements Operator {
 				logger.error(e.getMessage(),e);
 			}
 
-			StreamElement outputSE = StreamElement.from(this).set(IMAGE_OUTPUT_FIELD,outputStream.toByteArray( )).setTime(data.getTimed( ) );
+			StreamElement outputSE = StreamElement.from(this).set(IMAGE_OUTPUT_FIELD,outputStream.toByteArray( )).setTime(data.getTime( ) );
 			outputChannel.write( outputSE );
 		}
 		if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );

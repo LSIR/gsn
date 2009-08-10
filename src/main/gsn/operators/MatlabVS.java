@@ -7,7 +7,7 @@ import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn.channels.GSNChannel;
 import gsn.utils.MatlabEngine;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,7 +34,7 @@ public class MatlabVS implements Operator {
 
 
 	private String[] fieldNames = {"Matlab_Result"};
-	private Byte[] fieldTypes = {DataTypes.DOUBLE};
+	private Byte[] fieldTypes = {DataTypes.NUMERIC};
 
 	private String functionName;
 	private final String defaultFunctionName = "myGSNMatlabFunction";

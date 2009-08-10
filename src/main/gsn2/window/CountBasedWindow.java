@@ -31,7 +31,7 @@ public class CountBasedWindow implements WindowHandler {
 		List<StreamElement> toReturn = checkNextWindow(timestamp);
 
 		for (ListIterator<StreamElement> iter = items.listIterator(); iter.hasNext();) {
-			if (iter.next().getTimed() < minimumRequiredTimestamp) {
+			if (iter.next().getTimeInMillis() < minimumRequiredTimestamp) {
 				iter.remove();
 			}
 		}
@@ -43,9 +43,9 @@ public class CountBasedWindow implements WindowHandler {
 
 		for (int i = 0; i < items.size(); i++) {
 			StreamElement se = items.get(i);
-			if (se.getTimed() <= timestamp) {
+			if (se.getTimeInMillis() <= timestamp) {
 				toReturn.add(se);
-				minimumRequiredTimestamp = se.getTimed();
+				minimumRequiredTimestamp = se.getTimeInMillis();
 			}
 			if (toReturn.size() == size) break;
 		}

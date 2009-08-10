@@ -2,7 +2,7 @@ package ch.slf;
 
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -37,7 +37,7 @@ public abstract class WindowAwareVS implements Operator {
 
 	private int stepSize = -1;
 
-	public void initialize(OperatorConfig config) {	
+	public void initialize(OperatorConfig config) {
 		circularBuffers = new Hashtable<String, ArrayBlockingQueue<StreamElement>> () ;
 		windowSize = config.getParameters().getValueAsIntWithException(WINDOW_SIZE);
 		stepSize= config.getParameters().getValueAsIntWithException(STEP_SIZE);
@@ -69,7 +69,7 @@ public abstract class WindowAwareVS implements Operator {
 				for (int i = 0 ; i < elts.length ; i++) {
 					elt = (StreamElement) elts[i];
 					values[i] = ((Number)elt.getValue(elt.getFieldNames()[0])).doubleValue() ; //
-					timestamps[i] = new Long(elt.getTimed());
+					timestamps[i] = new Long(elt.getTimeInMillis());
 				}
 
 				// Remove stepsize elements from the beginning of the buffer

@@ -4,7 +4,7 @@ import gsn.beans.DataField;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class SMACleaner  implements Operator {
 			
 			boolean isAcceptable =  (Math.abs(input - sma)/input <= error_threshold );
 			
-      StreamElement se = StreamElement.from(this).setTime(in.getTimed()).set("raw_value",input).set("acceptable",(isAcceptable == false ? 0 : 1));
+      StreamElement se = StreamElement.from(this).setTime(in.getTimeInMillis()).set("raw_value",input).set("acceptable",(isAcceptable == false ? 0 : 1));
 			outputChannel.write(se);
 		}
 		values[index++%values.length]= input;

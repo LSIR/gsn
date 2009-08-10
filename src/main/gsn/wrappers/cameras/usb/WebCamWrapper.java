@@ -13,9 +13,9 @@ package gsn.wrappers.cameras.usb;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -56,7 +56,7 @@ import org.apache.log4j.PropertyConfigurator;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
-public class WebCamWrapper implements Wrapper , ControllerListener {
+public class WebCamWrapper implements Wrapper, ControllerListener {
 
 	private final WrapperConfig conf;
 

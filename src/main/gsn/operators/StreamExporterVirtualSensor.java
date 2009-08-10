@@ -5,8 +5,7 @@ import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.channels.DataChannel;
 import gsn.storage.StorageManager;
-import gsn.utils.GSNRuntimeException;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

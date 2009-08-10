@@ -18,9 +18,9 @@ import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -59,12 +59,12 @@ public class eKoWrapper implements Wrapper {
 		"EtDp", "EtVWC", "EtEc", "EtTemp",
 	"sensorTable"};
 
-	private static final Byte [ ]    FIELD_TYPES           = new Byte [ ] { DataTypes.INTEGER, DataTypes.INTEGER, DataTypes.VARCHAR, 
-		DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE,
-		DataTypes.DOUBLE, DataTypes.DOUBLE, 
-		DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE,
-		DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE,
-		DataTypes.VARCHAR };
+	private static final Byte [ ]    FIELD_TYPES           = new Byte [ ] { DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.STRING,
+		DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.NUMERIC,
+		DataTypes.NUMERIC, DataTypes.NUMERIC,
+		DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.NUMERIC,
+		DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.NUMERIC, DataTypes.NUMERIC,
+		DataTypes.STRING };
 
 //	private static final String [ ]  FIELD_DESCRIPTION     = new String [ ] { "amType", "Node ID", "Packet Type",
 //		"Battery Volts", "Solar Volts", "Internal Temp",

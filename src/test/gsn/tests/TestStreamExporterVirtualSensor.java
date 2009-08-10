@@ -5,7 +5,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.Parameter;
 import gsn.operators.StreamExporterVirtualSensor;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 import gsn2.conf.Parameters;
 
 import java.io.Serializable;
@@ -26,7 +26,7 @@ public class TestStreamExporterVirtualSensor {
 	private OperatorConfig config;
 
 	/*
-	 * To run some of these tests, a mysql server must be running on localhost
+	 * To process some of these tests, a mysql server must be running on localhost
 	 * with the following configuration: a database 'gsntest' must exist. a user
 	 * 'gsntest' with password 'gsntest' must exist and have all privileges on
 	 * the 'gsntest' database. You can do it with the following: mysql -u -p root

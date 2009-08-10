@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 public class RestStreamHanlder extends HttpServlet {
 

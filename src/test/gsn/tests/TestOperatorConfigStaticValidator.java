@@ -1,15 +1,11 @@
 package gsn.tests;
 
 import org.testng.annotations.Test;
-import org.testng.annotations.Test;
-import static org.easymock.classextension.EasyMock.*;
 import static org.testng.Assert.*;
 import gsn.core.OperatorConfigStaticValidator;
-import gsn.channels.DataChannel;
-import gsn.channels.GSNChannel;
-import gsn.beans.WrapperConfig;
-import gsn2.conf.OperatorConfig;
-import gsn2.conf.ChannelConfig;
+import gsn2.wrappers.WrapperConfig;
+import gsn.core.OperatorConfig;
+import gsn.channels.ChannelConfig;
 
 public class TestOperatorConfigStaticValidator {
 

@@ -6,8 +6,8 @@ import static org.testng.Assert.*;
 import org.jibx.runtime.JiBXException;
 import org.apache.commons.io.FileUtils;
 import gsn.core.OperatorParser;
+import gsn.core.OperatorConfig;
 import gsn.utils.ChainOfReponsibility;
-import gsn2.conf.OperatorConfig;
 
 import java.io.File;
 import java.io.IOException;

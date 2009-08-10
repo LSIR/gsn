@@ -1,7 +1,7 @@
 package gsn.http.rest;
 
 import gsn.beans.ContainerConfig;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.utils.Helpers;
 import gsn2.conf.Parameters;
 

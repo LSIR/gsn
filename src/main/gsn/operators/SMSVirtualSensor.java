@@ -5,7 +5,7 @@ import gsn.beans.DataField;
 import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.io.Serializable;
 import java.util.Arrays;

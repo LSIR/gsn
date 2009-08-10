@@ -5,7 +5,7 @@ import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.beans.DataField;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -277,7 +277,7 @@ class ChartInfo {
 				dataCollectionForTheChart.addSeries( timeSeries );
 			}
 			try {
-				timeSeries.addOrUpdate( new FixedMillisecond( new Date( streamElement.getTimed( ) ) ) , Double.parseDouble( streamElement.getValue(streamElement.getFieldNames( )[i] ).toString( ) ) );
+				timeSeries.addOrUpdate( new FixedMillisecond( new Date( streamElement.getTimeInMillis() ) ) , Double.parseDouble( streamElement.getValue(streamElement.getFieldNames( )[i] ).toString( ) ) );
 			} catch ( SeriesException e ) {
 				logger.warn( e.getMessage( ) , e );
 			}

@@ -3,7 +3,7 @@ package gsn.wrappers;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
 
 import java.io.BufferedReader;
@@ -33,6 +33,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import au.com.bytecode.opencsv.CSVReader;
+import gsn2.wrappers.Wrapper;
 
 public class SwissPegelWrapper implements Wrapper {
 
@@ -252,10 +253,10 @@ public class SwissPegelWrapper implements Wrapper {
 								//								continue;
 								//								}
 								StreamElement streamElement = rowToSE(data);
-								if (streamElement.getTimed()>this.lastEnteredStreamelement){
+								if (streamElement.getTimeInMillis()>this.lastEnteredStreamelement){
 									logger.warn("posting data");
 									dataChannel.write(streamElement);
-									this.lastEnteredStreamelement = streamElement.getTimed();
+									this.lastEnteredStreamelement = streamElement.getTimeInMillis();
 								}
 							}
 							this.lastModified = modified.longValue();
@@ -291,10 +292,10 @@ public class SwissPegelWrapper implements Wrapper {
 								//								continue;
 								//								}
 								StreamElement streamElement = rowToSE(data);
-								if (streamElement.getTimed()>this.lastEnteredStreamelement){
+								if (streamElement.getTimeInMillis()>this.lastEnteredStreamelement){
 									logger.warn("posting data");
 									dataChannel.write(streamElement);
-									this.lastEnteredStreamelement = streamElement.getTimed();
+									this.lastEnteredStreamelement = streamElement.getTimeInMillis();
 								}
 							}
 							this.lastModified = modified.longValue();

@@ -2,7 +2,7 @@ package gsn.wrappers;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
 
 import java.io.File;
@@ -18,6 +18,7 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
+import gsn2.wrappers.Wrapper;
 
 public class WanWrapper implements Wrapper {
 

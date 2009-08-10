@@ -1,7 +1,7 @@
 package gsn.acquisition2.wrappers;
 
 import gsn.beans.DataField;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -173,14 +173,14 @@ public class MigMessageParameters {
 		typesMapping.put(short.class, "SMALLINT") ;
 		typesMapping.put(int.class, "INTEGER") ;
 		typesMapping.put(long.class, "BIGINT") ;
-		typesMapping.put(float.class, "DOUBLE");
-		typesMapping.put(double.class, "DOUBLE");
+		typesMapping.put(float.class, "NUMERIC");
+		typesMapping.put(double.class, "NUMERIC");
 		typesMapping.put(byte[].class, "TINYINT") ;
 		typesMapping.put(short[].class, "SMALLINT") ;
 		typesMapping.put(int[].class, "INTEGER") ;
 		typesMapping.put(long[].class, "BIGINT") ;
-		typesMapping.put(float[].class, "DOUBLE");
-		typesMapping.put(double[].class, "DOUBLE");
+		typesMapping.put(float[].class, "NUMERIC");
+		typesMapping.put(double[].class, "NUMERIC");
 	}
 
 	private void findTinyOSVersionFromClassHierarchy (Class<?> messageClass) {

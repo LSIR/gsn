@@ -2,9 +2,9 @@ package gsn.http.rest;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -141,7 +141,7 @@ public class PushRemoteWrapper implements Wrapper {
 		logger.debug ( new StringBuilder ( ).append ( "Received Stream Element at the push wrapper."));
 		StreamElement4Rest se = (StreamElement4Rest) XSTREAM.fromXML(Xstream4Rest);
 		StreamElement streamElement = se.toStreamElement();
-		lastReceivedTimestamp = streamElement.getTimed();
+		lastReceivedTimestamp = streamElement.getTimeInMillis();
 		dataChannel.write(streamElement);
 	}
 

@@ -2,7 +2,7 @@ package ch.epfl.sensorscope.wrappers;
 
 import gsn.acquisition2.wrappers.MigMessageParameters;
 import gsn.acquisition2.wrappers.MigMessageWrapper2;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
 
 import java.io.IOException;

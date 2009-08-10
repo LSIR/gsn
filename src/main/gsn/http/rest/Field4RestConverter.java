@@ -25,17 +25,13 @@ public class Field4RestConverter implements Converter {
 		String value = null;
 
 		switch (input.getType()) {
-		case DataTypes.BIGINT:
-		case DataTypes.SMALLINT:
-		case DataTypes.INTEGER:
-		case DataTypes.DOUBLE:
-		case DataTypes.TINYINT:
+		case DataTypes.TIME:
+		case DataTypes.NUMERIC:
 			type="numeric";
 			if (input.getValue() !=null)
 				value = Double.toString(((Number)input.getValue()).doubleValue());
 			break;
-		case DataTypes.CHAR:
-		case DataTypes.VARCHAR:
+		case DataTypes.STRING:
 			type="string";
 			if (input.getValue() !=null)
 				value = (String)input.getValue();
@@ -57,9 +53,9 @@ public class Field4RestConverter implements Converter {
 		String type = reader.getAttribute("type");
 		Byte typeId;
 		if (type.equalsIgnoreCase("numeric"))
-			typeId = DataTypes.DOUBLE;
+			typeId = DataTypes.NUMERIC;
 		else if (type.equalsIgnoreCase("string"))
-			typeId = DataTypes.VARCHAR;
+			typeId = DataTypes.STRING;
 		else 
 			typeId = DataTypes.BINARY;
 		

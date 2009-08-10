@@ -1,7 +1,7 @@
 package gsn.core;
 
 import gsn.utils.ChainOfReponsibility;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.util.ArrayList;
 

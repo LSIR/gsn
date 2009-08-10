@@ -18,7 +18,7 @@ public class StreamElement4Rest {
 	private List<Field4Rest> fields = new ArrayList<Field4Rest>();
 
 	public StreamElement4Rest(StreamElement se) {
-		this.timestamp=new Date(se.getTimed());
+		this.timestamp=new Date(se.getTimeInMillis());
 		for (int i =0;i<se.getFieldNames().length;i++) {
 			fields.add( new Field4Rest(se.getFieldNames()[i],se.getType(se.getFieldNames()[i]),se.getValue(se.getFieldNames()[i])));
 		}

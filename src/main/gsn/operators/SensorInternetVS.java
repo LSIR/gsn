@@ -4,7 +4,7 @@ import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.beans.DataField;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -116,7 +116,7 @@ public class SensorInternetVS  implements Operator {
 		for (int i = 0 ; i < se.getFieldNames().length ; i++) {
 			if (i < siStreamMapping.length) {
 				if (i != 0) sb.append("&");
-				sb.append(createPostParameter ("time[" + i + "]=", dateFormat.format(new Date (se.getTimed()))));
+				sb.append(createPostParameter ("time[" + i + "]=", dateFormat.format(new Date (se.getTimeInMillis()))));
 				sb.append("&");
 				sb.append(createPostParameter ("data[" + i + "]=", se.getValue(se.getFieldNames()[i]).toString()));
 				sb.append("&");

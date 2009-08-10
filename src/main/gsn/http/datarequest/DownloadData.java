@@ -143,7 +143,7 @@ public class DownloadData extends AbstractDataRequest {
 		}
 		if (wantTimed) {
 			if (se.getFieldNames().length != 0) respond.print(cvsDelimiter);
-			respond.print( qbuilder.getSdf() == null ? timestampInUTC(se.getTimed()) : qbuilder.getSdf().format(new Date(se.getTimed())));
+			respond.print( qbuilder.getSdf() == null ? timestampInUTC(se.getTimeInMillis()) : qbuilder.getSdf().format(new Date(se.getTimeInMillis())));
 		}
 		respond.println();
 	}
@@ -161,7 +161,7 @@ public class DownloadData extends AbstractDataRequest {
 		for (int i = 0 ; i < se.getFieldNames().length ; i++) {
 			respond.println("\t\t\t<field>" +se.getValue(se.getFieldNames()[i]) + "</field>");
 		}
-		if (wantTimed) respond.println("\t\t\t<field>" + ( qbuilder.getSdf() == null ? timestampInUTC(se.getTimed()) : qbuilder.getSdf().format(new Date(se.getTimed()))) + "</field>");
+		if (wantTimed) respond.println("\t\t\t<field>" + ( qbuilder.getSdf() == null ? timestampInUTC(se.getTimeInMillis()) : qbuilder.getSdf().format(new Date(se.getTimeInMillis()))) + "</field>");
 		respond.println("\t\t</tuple>");
 	}
 	

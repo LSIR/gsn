@@ -19,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.picocontainer.MutablePicoContainer;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 public class DataDistributer implements VirtualSensorDataListener, OpStateChangeListener,Runnable {
 

@@ -1,7 +1,7 @@
 package gsn.acquisition2.wrappers;
 
 import gsn.beans.DataField;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;

@@ -6,7 +6,6 @@ import gsn.http.rest.PushDelivery;
 import gsn.http.rest.RestDelivery;
 import gsn.storage.StorageManager;
 import gsn.utils.ValidityTools;
-import gsn.wrappers.WrappersUtil;
 import gsn.core.ContainerManager;
 
 import java.awt.AlphaComposite;
@@ -79,7 +78,7 @@ public final class Main {
 
 	private Main() throws Exception {
 
-		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
+		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES ,  DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 		//  initializeConfiguration();
@@ -215,20 +214,16 @@ public final class Main {
 	 * Mapping between the wrapper name (used in addressing of stream source)
 	 * into the class implementing DataSource.
 	 */
-	private static  Properties wrappers ;
 
 	private  ContainerConfig                       containerConfig;
 
 	public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
-		ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
+		ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES ,  Main.DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 		ContainerConfig toReturn = null;
 		try {
 			toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FILE );
-			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
-			if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Loading wrappers.properties at : " ).append ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE ).toString ( ) );
-			if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
 		} catch ( JiBXException e ) {
 			logger.error ( e.getMessage ( ) );
 			logger.error ( new StringBuilder ( ).append ( "Can't parse the GSN configuration file : conf/gsn.xml" ).toString ( ) );
@@ -265,13 +260,6 @@ public final class Main {
 		Class.forName(conf.getJdbcDriver());
 		conf.setContainerConfigurationFileName (  gsnXMLpath );
 		return conf;
-	}
-
-	//FIXME: COPIED_FOR_SAFE_STOAGE
-	public static Properties getWrappers()  {
-		if (singleton==null )
-			return WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
-		return singleton.wrappers;
 	}
 
 	private static final String PUBLIC_KEY_FILE=".public_key";
@@ -320,21 +308,6 @@ public final class Main {
 		PKCS8EncodedKeySpec pubKeySpec = new PKCS8EncodedKeySpec (encKey);
 		KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
 		return keyFactory.generatePublic (pubKeySpec);
-	}
-	//FIXME: COPIED_FOR_SAFE_STOAGE
-	public  static Class < ? > getWrapperClass ( String id ) {
-		try {
-			String className =  getWrappers().getProperty(id);
-			if (className ==null) { 
-				logger.error("The requested wrapper: "+id+" doesn't exist in the wrappers.properties file.");
-				return null;
-			}
-
-			return Class.forName(className);  
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage(),e);
-		}
-		return null;
 	}
 
 	/**

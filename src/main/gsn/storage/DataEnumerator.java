@@ -133,23 +133,13 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 					continue;
 				else {
 					switch ( dataFieldTypes[ innerIndex ] ) {
-					case DataTypes.VARCHAR :
-					case DataTypes.CHAR :
+					case DataTypes.STRING:
 						output[ innerIndex ] = resultSet.getString( actualColIndex );
 						break;
-					case DataTypes.INTEGER :
-						output[ innerIndex ] = resultSet.getInt( actualColIndex );
-						break;
-					case DataTypes.TINYINT :
-						output[ innerIndex ] = resultSet.getByte( actualColIndex );
-						break;
-					case DataTypes.SMALLINT :
-						output[ innerIndex ] = resultSet.getShort( actualColIndex );
-						break;
-					case DataTypes.DOUBLE :
+					case DataTypes.NUMERIC:
 						output[ innerIndex ] = resultSet.getDouble( actualColIndex );
 						break;
-					case DataTypes.BIGINT :
+					case DataTypes.TIME :
 						output[ innerIndex ] = resultSet.getLong( actualColIndex );
 						break;
 					case DataTypes.BINARY :

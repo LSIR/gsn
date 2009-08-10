@@ -5,7 +5,7 @@ import gsn.beans.StreamElement;
 import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn.operators.OperatorInitializationException;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 import static org.easymock.EasyMock.*;
 
 import java.util.List;

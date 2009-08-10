@@ -6,9 +6,9 @@ import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
-import gsn.wrappers.Wrapper;
-import gsn.wrappers.general.SerialWrapper;
-import gsn2.conf.OperatorConfig;
+import gsn2.wrappers.Wrapper;
+import gsn.wrappers.StsPiezometerWrapper;
+import gsn.core.OperatorConfig;
 
 import java.util.List;
 
@@ -33,9 +33,9 @@ public class EPuckVS  implements Operator {
    
    private ProtocolManager               protocolManager;
    
-   private Wrapper                       wrapper;
+   private Wrapper wrapper;
    
-   private OperatorConfig                 vsensor;
+   private OperatorConfig vsensor;
 
 private DataChannel outputChannel;
    
@@ -59,7 +59,7 @@ private DataChannel outputChannel;
 
    public void process ( String inputStreamName , StreamElement data ) {
       if ( logger.isDebugEnabled( ) ) logger.debug( "I just received some data from the robot" );
-      System.out.println( new String( ( byte [ ] ) data.getValue( SerialWrapper.RAW_PACKET ) ) );
+      System.out.println( new String( ( byte [ ] ) data.getValue( StsPiezometerWrapper.SerialWrapper.RAW_PACKET ) ) );
 //      Wrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
       if ( actionA == false ) {
          actionA = true;

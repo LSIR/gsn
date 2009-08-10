@@ -1,7 +1,7 @@
 package gsn.http.rest;
 
 import gsn.beans.StreamElement;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 public interface DistributionRequest {
 

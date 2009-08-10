@@ -2,14 +2,15 @@ package gsn.http.rest;
 
 import gsn.DataDistributer;
 import gsn.ManualDataConsumer;
+import gsn.core.OperatorConfig;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
 import gsn.storage.SQLUtils;
 import gsn.storage.SQLValidator;
 import gsn.utils.Helpers;
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -18,9 +19,8 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
-import gsn2.conf.OperatorConfig;
 
-public class LocalDeliveryWrapper implements Wrapper , DeliverySystem,ManualDataConsumer{
+public class LocalDeliveryWrapper implements Wrapper, DeliverySystem,ManualDataConsumer{
 
 	private final WrapperConfig conf;
 

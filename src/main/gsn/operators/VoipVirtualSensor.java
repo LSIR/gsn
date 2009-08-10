@@ -42,7 +42,7 @@ import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.beans.DataField;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.io.IOException;
 import java.util.List;

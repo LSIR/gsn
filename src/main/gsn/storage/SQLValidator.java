@@ -20,7 +20,6 @@ import org.h2.engine.Session;
 import org.h2.engine.SessionFactoryEmbedded;
 import org.h2.value.DataType;
 import org.picocontainer.MutablePicoContainer;
-import gsn2.conf.OperatorConfig;
 
 public class SQLValidator implements OpStateChangeListener {
 

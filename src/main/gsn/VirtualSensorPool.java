@@ -3,11 +3,11 @@ package gsn;
 import static org.picocontainer.behaviors.Behaviors.caching;
 import static org.picocontainer.behaviors.Behaviors.synchronizing;
 import gsn.beans.Operator;
+import gsn.core.OperatorConfig;
 
 import org.apache.log4j.Logger;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
-import gsn2.conf.OperatorConfig;
 
 public class VirtualSensorPool {
 

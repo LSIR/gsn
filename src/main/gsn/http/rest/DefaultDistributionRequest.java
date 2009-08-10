@@ -2,12 +2,12 @@ package gsn.http.rest;
 
 import gsn.beans.StreamElement;
 import gsn.storage.SQLValidator;
+import gsn.core.OperatorConfig;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import gsn2.conf.OperatorConfig;
 
 public class DefaultDistributionRequest implements DistributionRequest {
 
@@ -43,7 +43,7 @@ public class DefaultDistributionRequest implements DistributionRequest {
 		boolean success = deliverySystem.writeStreamElement(se);
 //		boolean success = true;
 		if (success)
-			lastVisitedTime=se.getTimed();
+			lastVisitedTime=se.getTimeInMillis();
 		return success;
 	}
 

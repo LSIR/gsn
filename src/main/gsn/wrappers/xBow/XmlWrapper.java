@@ -4,9 +4,9 @@ import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -84,13 +84,13 @@ public class XmlWrapper implements Wrapper {
 
 	private final transient Logger     logger                 = Logger.getLogger ( XmlWrapper.class );
 
-	//private static  DataField [] outputStructure     = new DataField[] { new DataField( "nodeid" , "INTEGER", "Node ID" ) , new DataField( "parent" , "INTEGER", "Parent Node ID" ) , new DataField( "group" , "INTEGER" , "Group ID" ) , new DataField( "voltage" , "INTEGER" , "Voltage of This Node" ) , new DataField( "humid" , "INTEGER" , "Humidity" ) , new DataField( "humtemp" , "INTEGER" , "Temperature" ) , new DataField( "press" , "DOUBLE" , "Press" ) , new DataField( "accel_x" , "DOUBLE" , "accel_x" ) ,new DataField( "accel_y" ,"DOUBLE" , "accel_y" )};
+	//private static  DataField [] outputStructure     = new DataField[] { new DataField( "nodeid" , "INTEGER", "Node ID" ) , new DataField( "parent" , "INTEGER", "Parent Node ID" ) , new DataField( "group" , "INTEGER" , "Group ID" ) , new DataField( "voltage" , "INTEGER" , "Voltage of This Node" ) , new DataField( "humid" , "INTEGER" , "Humidity" ) , new DataField( "humtemp" , "INTEGER" , "Temperature" ) , new DataField( "press" , "NUMERIC" , "Press" ) , new DataField( "accel_x" , "NUMERIC" , "accel_x" ) ,new DataField( "accel_y" ,"NUMERIC" , "accel_y" )};
 	//private static  DataField [] outputStructure     = new DataField[] { new DataField( "nodeid" , "INTEGER", "Node ID" ) , new DataField( "humtemp" , "INTEGER", "Parent Node ID" )};
-	//private static  DataField [] outputStructure     = new DataField[] { new DataField( "nodeid" , DataTypes.INTEGER_NAME, "Node ID" ) , new DataField( "parent" , DataTypes.INTEGER_NAME, "Parent Node ID" ) , new DataField( "group" , DataTypes.INTEGER_NAME , "Group ID" )};
+	//private static  DataField [] outputStructure     = new DataField[] { new DataField( "nodeid" , DataTypes.NUMERIC_NAME, "Node ID" ) , new DataField( "parent" , DataTypes.NUMERIC_NAME, "Parent Node ID" ) , new DataField( "group" , DataTypes.NUMERIC_NAME , "Group ID" )};
 
 	private static final String [ ]  FIELD_NAMES           = new String [ ] { "nodeid" , "voltage" , "humid" , "humtemp" , "press" };
 
-	private static final Byte [ ]    FIELD_TYPES           = new Byte [ ] { DataTypes.INTEGER , DataTypes.INTEGER , DataTypes.INTEGER , DataTypes.INTEGER , DataTypes.DOUBLE };
+	private static final Byte [ ]    FIELD_TYPES           = new Byte [ ] { DataTypes.NUMERIC , DataTypes.NUMERIC , DataTypes.NUMERIC , DataTypes.NUMERIC , DataTypes.NUMERIC};
 
 	private static final String [ ]  FIELD_DESCRIPTION     = new String [ ] { "Node ID" , "Voltage of This Node" , "Humidity" , "Temperature" , "Press" };
 
@@ -429,7 +429,7 @@ public class XmlWrapper implements Wrapper {
 
 		}   // while
 
-	}  // run
+	}  // process
 
 	private boolean isActive=true;
 

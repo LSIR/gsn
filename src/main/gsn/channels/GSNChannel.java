@@ -1,10 +1,10 @@
 package gsn.channels;
 
 import gsn.ContainerImpl;
+import gsn.core.OperatorConfig;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn2.conf.OperatorConfig;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -86,13 +86,10 @@ public class GSNChannel implements DataChannel{
 			i++;
 			if (value==null)
 				continue;
-			if ( ( (  field.getDataTypeID() == DataTypes.BIGINT ||
-					field.getDataTypeID() == DataTypes.DOUBLE ||
-					field.getDataTypeID() == DataTypes.INTEGER||
-					field.getDataTypeID() == DataTypes.SMALLINT||
-					field.getDataTypeID() == DataTypes.TINYINT ) &&!(value instanceof Number)) 
+			if ( ( (  field.getDataTypeID() == DataTypes.TIME ||
+					field.getDataTypeID() == DataTypes.NUMERIC  ) &&!(value instanceof Number))
 					||
-					( (field.getDataTypeID() == DataTypes.VARCHAR || field.getDataTypeID() == DataTypes.CHAR) && !(value instanceof String)) ||
+					( (field.getDataTypeID() == DataTypes.STRING) && !(value instanceof String)) ||
 					( (field.getDataTypeID() == DataTypes.BINARY) && !(value instanceof byte[])) 
 			){ 
 				logger.warn( "Validation problem for output field >" + field.getName( ) + ", The field type declared as >" + field.getType()+"< while in VSD it is defined as >"+DataTypes.TYPE_NAMES[outputStructure[ i ].getDataTypeID( )]);

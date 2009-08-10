@@ -1,7 +1,7 @@
 package gsn;
 
-import gsn.beans.WrapperConfig;
-import gsn2.conf.OperatorConfig;
+import gsn2.wrappers.WrapperConfig;
+import gsn.core.OperatorConfig;
 
 public class DBVisitor implements ConfigurationVisitor{
 

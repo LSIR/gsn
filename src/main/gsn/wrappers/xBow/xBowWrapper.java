@@ -4,9 +4,9 @@ import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,9 +57,9 @@ public class xBowWrapper implements Wrapper {
           "taosch0", "taosch1", "taoch0"};
 
   private static final Byte [ ]    FIELD_TYPES           = new Byte [ ] {
-          DataTypes.INTEGER ,DataTypes.INTEGER , DataTypes.INTEGER ,
-          DataTypes.INTEGER ,DataTypes.INTEGER , DataTypes.DOUBLE , DataTypes.DOUBLE,
-          DataTypes.INTEGER, DataTypes.INTEGER,DataTypes.DOUBLE};
+          DataTypes.NUMERIC ,DataTypes.NUMERIC , DataTypes.NUMERIC ,
+          DataTypes.NUMERIC ,DataTypes.NUMERIC , DataTypes.NUMERIC, DataTypes.NUMERIC,
+          DataTypes.NUMERIC, DataTypes.NUMERIC,DataTypes.NUMERIC};
 
   private static final String [ ]  FIELD_DESCRIPTION     = new String [ ] {
           "amType" ,"Node ID" , "Voltage of This Node" ,
@@ -393,7 +393,7 @@ public class xBowWrapper implements Wrapper {
 
     }   // while
 
-  }  // run
+  }  // process
 
   private boolean isActive=true;
 

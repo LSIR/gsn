@@ -2,9 +2,8 @@ package ch.slf;
 
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
-import gsn.beans.StreamElement;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.io.Serializable;
 
@@ -15,7 +14,7 @@ public class MovingAverage extends WindowAwareVS {
 	private static final String VALUES = "AVERAGE";
 
 	private static final DataField [] outputStructure = new DataField[] { 
-		new DataField(VALUES, DataTypes.DOUBLE_NAME)
+		new DataField(VALUES, DataTypes.NUMERIC_NAME)
 	};
 	
 	private static transient Logger logger  = Logger.getLogger ( MovingAverage.class );

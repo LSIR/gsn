@@ -2,9 +2,9 @@ package gsn.wrappers.tinyos;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
-import gsn.wrappers.Wrapper;
+import gsn2.wrappers.Wrapper;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  * uses the compiled class-file to read the appropriate data.
  */
 
-public class MigMessageWrapper implements Wrapper , net.tinyos.message.MessageListener {
+public class MigMessageWrapper implements Wrapper, net.tinyos.message.MessageListener {
 
 	private final WrapperConfig conf;
 

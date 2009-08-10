@@ -1,5 +1,5 @@
 <binding  name="binding">
-    <mapping name="operator" class="gsn2.conf.OperatorConfig">
+    <mapping name="operator" class="gsn.core.OperatorConfig">
             <value name="name" field="identifier"  style="attribute" />
             <value style="element" name="processor" field="className" />
             <value style="element" name="unique-timestamp" field="uniqueTimestamp"  usage="optional" default="true" />
@@ -7,7 +7,7 @@
             <structure map-as="parameters" field="parameters" usage="optional" name="parameters"/>
 
             <collection name="sources" field="channels" usage="optional">
-                <structure type="gsn2.conf.ChannelConfig" name="source">
+                <structure type="gsn.channels.ChannelConfig" name="source">
                     <value style="attribute" name="window-size" field="windowValue" usage="optional"  default="1" />
                     <value style="attribute" name="sliding-value" field="slidingValue" usage="optional"  default="1" />
                     <value style="attribute" name="name" field="name" />

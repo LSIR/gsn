@@ -1,15 +1,11 @@
 package gsn.core;
 
 import gsn.utils.ChainOfReponsibility;
-import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
-import gsn2.conf.ChannelConfig;
+import gsn.core.OperatorConfig;
+import gsn.channels.ChannelConfig;
 
-import java.util.HashMap;
 import java.util.ArrayList;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.ClassUtils;
 import org.apache.log4j.Logger;
 
 public class OperatorConfigStaticValidator extends ChainOfReponsibility<OperatorConfig>{

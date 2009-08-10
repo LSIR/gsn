@@ -73,23 +73,7 @@ public class ControllerServlet extends HttpServlet {
       case 0 : //default case pointing to the /gsn
           handler = new ContainerInfoHandler ( );
           if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
-          break;
-      case REQUEST_GML : //case pointing to gml (v2) output
-          handler = new GMLHandler ( );
-          if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
-          break;
-      case REQUEST_ONE_SHOT_QUERY :
-            handler = new OneShotQueryHandler ( );
-            if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
-            break;
-         case REQUEST_ONE_SHOT_QUERY_WITH_ADDRESSING :
-            handler = new OneShotQueryWithAddressingHandler ( );
-            if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
-            break;
-         case REQUEST_OUTPUT_FORMAT :
-            handler = new OutputStructureHandler ( );
-            if ( handler.isValid ( request , response ) ) handler.handle ( request , response );
-            break;
+          break; 
          default :
             response.sendError ( UNSUPPORTED_REQUEST_ERROR , "The requested operation is not supported." );
             break;

@@ -5,7 +5,7 @@ import gsn.beans.Operator;
 import gsn.beans.StreamElement;
 import gsn.beans.DataField;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 import gsn2.conf.Parameters;
 
 import java.io.Serializable;
@@ -252,137 +252,137 @@ public class SensorscopeVS  implements Operator {
             if (fieldName.equals(SOIL_CONDUCTIVITY_1)) {
                 soilConductivity1 = getSoilConductivity((Short) dataFields[i]);
                 fieldNames.add(SOIL_CONDUCTIVITY_1);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilConductivity1);
             } else if (fieldName.equals(SOIL_CONDUCTIVITY_2)) {
                 soilConductivity2 = getSoilConductivity((Short) dataFields[i]);
                 fieldNames.add(SOIL_CONDUCTIVITY_2);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilConductivity2);
             } else if (fieldName.equals(SOIL_CONDUCTIVITY_3)) {
                 soilConductivity3 = getSoilConductivity((Short) dataFields[i]);
                 fieldNames.add(SOIL_CONDUCTIVITY_3);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilConductivity3);
             }
             //
             else if (fieldName.equals(SOIL_MOISTURE_1)) {
                 soilMoisture1 = (Short) dataFields[i];
                 fieldNames.add(SOIL_MOISTURE_1);
-                dataTypes.add(DataTypes.SMALLINT);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilMoisture1);
             } else if (fieldName.equals(SOIL_MOISTURE_2)) {
                 soilMoisture2 = (Short) dataFields[i];
                 fieldNames.add(SOIL_MOISTURE_2);
-                dataTypes.add(DataTypes.SMALLINT);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilMoisture2);
             } else if (fieldName.equals(SOIL_MOISTURE_3)) {
                 soilMoisture3 = (Short) dataFields[i];
                 fieldNames.add(SOIL_MOISTURE_3);
-                dataTypes.add(DataTypes.SMALLINT);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilMoisture3);
             }
             //
             else if (fieldName.equals(SOIL_TEMPERATURE_1)) {
                 soilTemperature1 = getSoilTemperature((Short) dataFields[i]);
                 fieldNames.add(SOIL_TEMPERATURE_1);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilTemperature1);
             } else if (fieldName.equals(SOIL_TEMPERATURE_2)) {
                 soilTemperature2 = getSoilTemperature((Short) dataFields[i]);
                 fieldNames.add(SOIL_TEMPERATURE_2);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilTemperature2);
             } else if (fieldName.equals(SOIL_TEMPERATURE_3)) {
                 soilTemperature3 = getSoilTemperature((Short) dataFields[i]);
                 fieldNames.add(SOIL_TEMPERATURE_3);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilTemperature3);
             }
             //
             else if (fieldName.equals(NTW_SENDER_ID_NAME)) {
                 ntwSenderId = (Short) dataFields[i];
                 fieldNames.add(NTW_SENDER_ID_NAME);
-                dataTypes.add(DataTypes.SMALLINT);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(ntwSenderId);
             } else if (fieldName.equals(NTW_DISTANCE_TO_BTS)) {
                 ntwDistToBts = (Short) dataFields[i];
                 fieldNames.add(NTW_DISTANCE_TO_BTS);
-                dataTypes.add(DataTypes.SMALLINT);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(ntwDistToBts);
             } else if (fieldName.equals(TSP_HOP_COUNT)) {
                 tspHopCount = (Short) dataFields[i];
                 fieldNames.add(TSP_HOP_COUNT);
-                dataTypes.add(DataTypes.SMALLINT);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(tspHopCount);
             } else if (fieldName.equals(TSP_PACKET_SN)) {
                 tspPacketSn = (Short) dataFields[i];
                 fieldNames.add(TSP_PACKET_SN);
-                dataTypes.add(DataTypes.SMALLINT);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(tspPacketSn);
             } else if (fieldName.equals(REPORTER_ID)) {
                 reporterId = (Short) dataFields[i];
                 fieldNames.add(REPORTER_ID);
-                dataTypes.add(DataTypes.SMALLINT);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(reporterId);
             } else if (fieldName.equals(TIMESTAMP)) {
                 timestamp = (Long) dataFields[i];
                 fieldNames.add(TIMESTAMP);
-                dataTypes.add(DataTypes.BIGINT);
+                dataTypes.add(DataTypes.TIME);
                 datas.add(timestamp);
             } else if (fieldName.equals(RAIN_METER)) {
                 rainMeter = getRainMeter((Short) dataFields[i]);
                 fieldNames.add(RAIN_METER);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(rainMeter);
             } else if (fieldName.equals(WIND_SPEED)) {
                 windSpeed = getWindSpeed((Integer) dataFields[i]);
                 fieldNames.add(WIND_SPEED);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(windSpeed);
             } else if (fieldName.equals(WATERMARK)) {
                 watermark = getWatermark((Integer) dataFields[i], airTemperature);
                 fieldNames.add(WATERMARK);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(watermark);
             } else if (fieldName.equals(SOLAR_RADIATION)) {
                 solarRadiation = getSolarRadiation((Integer) dataFields[i]);
                 fieldNames.add(SOLAR_RADIATION);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(solarRadiation);
             } else if (fieldName.equals(AIR_TEMPERATURE)) {
                 fieldNames.add(AIR_TEMPERATURE);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(airTemperature);
             } else if (fieldName.equals(AIR_HUMIDITY)) {
                 airHumidity = getHumidity((Integer) ((Number) dataFields[i]).intValue(), airTemperature);
                 fieldNames.add(AIR_HUMIDITY);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(airHumidity);
             } else if (fieldName.equals(SKIN_TEMPERATURE)) {
                 skinTemperature = getSkinTemperature((Integer) ((Number) dataFields[i]).intValue());
                 fieldNames.add(SKIN_TEMPERATURE);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(skinTemperature);
             } else if (fieldName.equals(SOIL_MOISTURE)) {
                 soilMoisture = getSoilMoisture((Integer) ((Number) dataFields[i]).intValue());
                 fieldNames.add(SOIL_MOISTURE);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(soilMoisture);
             } else if (fieldName.equals(WIND_DIRECTION)) {
                 windDirection = getWindDirection((Integer) ((Number) dataFields[i]).intValue());
                 fieldNames.add(WIND_DIRECTION);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(windDirection);
             } else if (fieldName.equals(WIND_DIRECTION2)) {
                 windDirection2 = getWindDirection2((Integer) ((Number) dataFields[i]).intValue());
                 fieldNames.add(WIND_DIRECTION2);
-                dataTypes.add(DataTypes.DOUBLE);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(windDirection2);
             } else if (fieldName.equals(FOO)) {
                 foo = (Short) dataFields[i];
                 fieldNames.add(FOO);
-                dataTypes.add(DataTypes.SMALLINT);
+                dataTypes.add(DataTypes.NUMERIC);
                 datas.add(foo);
             } else {
                 logger.error("FIELD NOT FOUND IN THE LIST >" + fieldName + "<");
@@ -390,7 +390,7 @@ public class SensorscopeVS  implements Operator {
             i++;
         }
 
-        long t = data.isTimestampSet() ? data.getTimed() : System.currentTimeMillis();
+        long t = data.isTimestampSet() ? data.getTimeInMillis() : System.currentTimeMillis();
 
 
 //        StreamElement out = new StreamElement(

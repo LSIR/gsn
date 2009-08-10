@@ -4,9 +4,9 @@ import gsn.beans.*;
 import gsn.channels.DataChannel;
 import gsn.utils.protocols.ProtocolManager;
 import gsn.utils.protocols.EPuck.SerComProtocol;
-import gsn.wrappers.Wrapper;
-import gsn.wrappers.general.SerialWrapper;
-import gsn2.conf.OperatorConfig;
+import gsn2.wrappers.Wrapper;
+import gsn.wrappers.StsPiezometerWrapper;
+import gsn.core.OperatorConfig;
 
 import java.io.Serializable;
 import java.util.List;
@@ -40,13 +40,13 @@ public class GPSNMEAVS  implements Operator {
 
 	private ProtocolManager               protocolManager;
 
-	private Wrapper                       wrapper;
+	private Wrapper wrapper;
 
-	private OperatorConfig                 vsensor;
+	private OperatorConfig vsensor;
 
 	private static final String [ ] fieldNames = new String [ ] { "latitude" , "longitude" };
 
-	private static final Byte [ ] fieldTypes = new Byte [ ] { DataTypes.DOUBLE, DataTypes.DOUBLE};
+	private static final Byte [ ] fieldTypes = new Byte [ ] { DataTypes.NUMERIC, DataTypes.NUMERIC};
 
 	private Serializable [ ] outputData = new Serializable [ fieldNames.length ];
 
@@ -69,13 +69,13 @@ public class GPSNMEAVS  implements Operator {
 	}
 
 	public void process ( String inputStreamName , StreamElement data) {
-		if ( logger.isDebugEnabled( ) ) logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getValue(SerialWrapper.RAW_PACKET)));
+		if ( logger.isDebugEnabled( ) ) logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getValue(StsPiezometerWrapper.SerialWrapper.RAW_PACKET)));
 
 		//needed? ######
 //		Wrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
 
 		//raw data from serial
-		String s = new String( ( byte [ ] ) data.getValue( SerialWrapper.RAW_PACKET ) );
+		String s = new String( ( byte [ ] ) data.getValue( StsPiezometerWrapper.SerialWrapper.RAW_PACKET ) );
 		String [ ] line = s.split( "\n" );
 		//iterate on every line
 		for ( int i = 0 ; i < line.length ; i++ ) {

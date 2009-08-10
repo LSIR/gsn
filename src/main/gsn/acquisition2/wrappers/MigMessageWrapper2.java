@@ -1,6 +1,6 @@
 package gsn.acquisition2.wrappers;
 
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
 
 import java.io.IOException;

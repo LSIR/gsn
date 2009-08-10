@@ -3,7 +3,7 @@ package ch.slf;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.channels.DataChannel;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.io.Serializable;
 
@@ -35,7 +35,7 @@ public class FFTRealOneSided extends WindowAwareVS {
 	private static final String VALUES = "VALS";
 
 	private static final DataField [] outputStructure = new DataField[] { 
-		new DataField(DF, DataTypes.DOUBLE_NAME), 
+		new DataField(DF, DataTypes.NUMERIC_NAME),
 		new DataField(VALUES, "BINARY:text/plain")
 	};
 

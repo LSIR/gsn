@@ -152,7 +152,7 @@ public class AntRunner {
 	if (project == null)
 	    throw new Exception(
 		    "No target can be launched because the project has not been initialized. Please call the 'init' method first !");
-	// If no target is specified, run the default one.
+	// If no target is specified, process the default one.
 	if (_target == null)
 	    _target = project.getDefaultTarget();
 	// Run the target

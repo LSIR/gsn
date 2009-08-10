@@ -1,7 +1,7 @@
 package gsn.tests;
 
 
-import gsn.beans.WrapperConfig;
+import gsn2.wrappers.WrapperConfig;
 import gsn.utils.Parameter;
 import gsn2.conf.Parameters;
 import org.testng.annotations.Test;

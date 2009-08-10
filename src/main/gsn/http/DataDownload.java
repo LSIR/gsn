@@ -253,7 +253,7 @@ public class DataDownload extends HttpServlet {
 							line += separator+se.getValue(se.getFieldNames()[i]).toString( );
 						}
 					if (wantTimeStamp) {
-						Date d = new Date (se.getTimed());
+						Date d = new Date (se.getTimeInMillis());
 						line += separator + sdf.format(d);
 					}
 					respond.println(line.substring(separator.length()));
@@ -301,7 +301,7 @@ public class DataDownload extends HttpServlet {
 						}
 					}
 					if (wantTimeStamp) {
-						Date d = new Date (se.getTimed());
+						Date d = new Date (se.getTimeInMillis());
 						respond.println("\t\t<field>"+sdf.format(d)+"</field>");
 					}
 					respond.println("\t</line>");

@@ -6,7 +6,7 @@ import gsn.beans.DataField;
 import gsn.channels.DataChannel;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -100,7 +100,7 @@ public class ClockedBridgeVirtualSensor  implements ActionListener , Operator {
 			DataEnumerator data = StorageManager.getInstance().executeQuery(query,true);
 			while (data.hasMoreElements()){
 				StreamElement se = data.nextElement();
-				last_updated = se.getTimed();
+				last_updated = se.getTimeInMillis();
 				// TODO: BAD CALL, SHOULD BECOME A WRAPPER ! 
 				//dataProduced(se);
 			}

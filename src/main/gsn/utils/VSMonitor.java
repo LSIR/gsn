@@ -41,7 +41,7 @@ import org.xml.sax.InputSource;
 * VSMonitor
 * Monitors a series of Virtual Sensors (last update time)
 * and creates a report shown on standard output and sent by e-mail
-* You can put this program in a Cron job and run it regularely to check status.
+* You can put this program in a Cron job and process it regularely to check status.
 * Syntax for calling:
 * java -jar VSMonitor.jar <config_file> <list_of_mails>
 *  e.g.  java -jar VSMonitor.jar conf/monitoring.cfg user@gmail.com admin@gmail.com

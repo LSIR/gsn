@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.picocontainer.MutablePicoContainer;
-import gsn2.conf.OperatorConfig;
+import gsn.core.OperatorConfig;
 
 public class SQLValidatorIntegration implements OpStateChangeListener {
 	
