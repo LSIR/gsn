@@ -1,6 +1,6 @@
 package gsn.core;
 
-import gsn.utils.ChainOfReponsibility;
+import gsn.utils.ChainedReponsibility;
 import gsn.core.OperatorConfig;
 import gsn.channels.ChannelConfig;
 
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-public class OperatorConfigStaticValidator extends ChainOfReponsibility<OperatorConfig>{
+public class OperatorConfigStaticValidator extends ChainedReponsibility<OperatorConfig> {
   
   private static transient Logger logger                              = Logger.getLogger ( OperatorConfigStaticValidator.class );
 
@@ -22,7 +22,6 @@ public class OperatorConfigStaticValidator extends ChainOfReponsibility<Operator
     String className = null;
     try {
       className=operatorConfig.getClassName();
-      Class.forName(className);
       for (ChannelConfig cConfig : operatorConfig.getChannels())
           Class.forName(className=cConfig.getSourceConfig().getClassName());
     } catch (Exception e) {
@@ -38,7 +37,6 @@ public class OperatorConfigStaticValidator extends ChainOfReponsibility<Operator
           logger.error("Channel names must be unique for each operator, channel-name: "+cName);
           return false;
         }
-        names.add(cName);
       }
     }
     return true;

@@ -8,7 +8,7 @@ import java.io.StringReader;
 import java.io.File;
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.TreeMap;
+
 import static org.easymock.classextension.EasyMock.*;
 import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.verify;
@@ -23,7 +23,7 @@ import gsn2.wrappers.CSVWrapper;
 import gsn2.wrappers.WrapperConfig;
 import gsn2.conf.Parameters;
 import gsn.beans.StreamElement;
-import gsn.utils.Parameter;
+import gsn.utils.Param;
 import gsn.channels.DataChannel;
 
 @Test(sequential = true)
@@ -181,9 +181,9 @@ public class TestCSVWrapper {
                 "01.01.2009,2,10:15,11,\"Ali Salehi\"\n";
 
         WrapperConfig config = new WrapperConfig("gsn2.wrappers.CSVWrapper",new Parameters(
-                new Parameter("file",CSV_DATA_FILE),new Parameter("fields",fields),new Parameter("timestamp-field","timed"),
-                new Parameter("formats",formats),new Parameter("check-point-path",CSV_CHK_POINT_FILE),new Parameter("bad-values","NaN,-1234,4321"),
-                new Parameter("sampling","1"),new Parameter("quote","''"),new Parameter("separator",",,")
+                new Param("file",CSV_DATA_FILE),new Param("fields",fields),new Param("timestamp-field","timed"),
+                new Param("formats",formats),new Param("check-point-path",CSV_CHK_POINT_FILE),new Param("bad-values","NaN,-1234,4321"),
+                new Param("sampling","1"),new Param("quote","''"),new Param("separator",",,")
         ));
 
         DataChannel mock = createMock(DataChannel.class);
@@ -210,9 +210,9 @@ public class TestCSVWrapper {
                 "01.01.2009,2,10:15,11,\"Ali Salehi\"\n";
 
         WrapperConfig config = new WrapperConfig("gsn2.wrappers.CSVWrapper",new Parameters(
-                new Parameter("file",CSV_DATA_FILE),new Parameter("fields",fields),new Parameter("timestamp-field","timed"),
-                new Parameter("formats",formats),new Parameter("check-point-path",CSV_CHK_POINT_FILE),new Parameter("bad-values","NaN,-1234,4321"),
-                new Parameter("sampling","1")
+                new Param("file",CSV_DATA_FILE),new Param("fields",fields),new Param("timestamp-field","timed"),
+                new Param("formats",formats),new Param("check-point-path",CSV_CHK_POINT_FILE),new Param("bad-values","NaN,-1234,4321"),
+                new Param("sampling","1")
         ));
 
         DataChannel mock = createMock(DataChannel.class);
@@ -237,9 +237,9 @@ public class TestCSVWrapper {
                 "01.01.2009,10:11,1\n";
 
         WrapperConfig config = new WrapperConfig("gsn2.wrappers.CSVWrapper",new Parameters(
-                new Parameter("file",CSV_DATA_FILE),new Parameter("fields",fields),new Parameter("timestamp-field","timed"),
-                new Parameter("formats",formats),new Parameter("check-point-path",CSV_CHK_POINT_FILE),new Parameter("bad-values","NaN,-1234,4321"),
-                new Parameter("sampling","1")
+                new Param("file",CSV_DATA_FILE),new Param("fields",fields),new Param("timestamp-field","timed"),
+                new Param("formats",formats),new Param("check-point-path",CSV_CHK_POINT_FILE),new Param("bad-values","NaN,-1234,4321"),
+                new Param("sampling","1")
         ));
 
         DataChannel mock = createMock(DataChannel.class);

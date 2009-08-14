@@ -6,7 +6,7 @@ import gsn.beans.StreamElement;
 import gsn2.wrappers.WrapperConfig;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
-import gsn.utils.Parameter;
+import gsn.utils.Param;
 import gsn2.conf.Parameters;
 
 
@@ -15,7 +15,7 @@ public class TestStreamElement {
 
     @Test
     public void testCreatingStreamElementForEmptyWrapper(){
-        WrapperConfig conf = new WrapperConfig("test-wrapper",new Parameters(new Parameter("name","id")));
+        WrapperConfig conf = new WrapperConfig("test-wrapper",new Parameters(new Param("name","id")));
         MockWrapper wrapper = new MockWrapper(conf,null);
 
         wrapper.setOutputStructure(new DataField[]{});
@@ -31,7 +31,7 @@ public class TestStreamElement {
 
     @Test
     public void testCreatingStreamElementFromWrapper(){
-        WrapperConfig conf = new WrapperConfig("test-wrapper",new Parameters(new Parameter("name","id")));
+        WrapperConfig conf = new WrapperConfig("test-wrapper",new Parameters(new Param("name","id")));
         MockWrapper wrapper = new MockWrapper(conf,null);
         wrapper.setOutputStructure(new DataField[]{new DataField("field1","string")});
         StreamElement se = StreamElement.from(wrapper).setTime(System.currentTimeMillis());
@@ -47,7 +47,7 @@ public class TestStreamElement {
 
     @Test
     public void testStreamElementIsEmpty(){
-        WrapperConfig conf = new WrapperConfig("test-wrapper",new Parameters(new Parameter("name","id")));
+        WrapperConfig conf = new WrapperConfig("test-wrapper",new Parameters(new Param("name","id")));
         MockWrapper wrapper = new MockWrapper(conf,null);
         wrapper.setOutputStructure(new DataField[]{new DataField("field1","string")});
         StreamElement se = StreamElement.from(wrapper).setTime(System.currentTimeMillis());

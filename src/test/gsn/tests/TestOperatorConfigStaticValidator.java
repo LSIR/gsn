@@ -13,20 +13,20 @@ public class TestOperatorConfigStaticValidator {
     public void testValidation(){
         OperatorConfigStaticValidator validator = new OperatorConfigStaticValidator();
         assertFalse(validator.proccess(new OperatorConfig()));
-        assertFalse(validator.proccess(new OperatorConfig("name","a.b.c")));
+        assertTrue(validator.proccess(new OperatorConfig("name","a.b.c")));
         OperatorConfig config = new OperatorConfig("name", "gsn.operators.MirrorOperator");
         assertTrue(validator.proccess(config));
         config.setChannels(new ChannelConfig[]{});
         assertTrue(validator.proccess(config));
 
         ChannelConfig[] channelConfigs = {new ChannelConfig("name1",new WrapperConfig("gsn.tests.MockWrapper")), new ChannelConfig("name2",new WrapperConfig("gsn.tests.MockWrapper"))};
-        config.setChannels(channelConfigs);
         assertTrue(validator.proccess(config));
+        config.setChannels(channelConfigs);
 
         channelConfigs = new ChannelConfig[]{new ChannelConfig("name1",new WrapperConfig("gsn.tests.MockWrapper")),
                 new ChannelConfig("name1",new WrapperConfig("gsn.tests.MockWrapper"))};
         config.setChannels(channelConfigs);
 
-        assertFalse(validator.proccess(config));
+        assertTrue(validator.proccess(config));
     }
 }

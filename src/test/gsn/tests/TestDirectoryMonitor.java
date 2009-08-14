@@ -26,7 +26,6 @@ public class TestDirectoryMonitor {
     mockListener.fileAddition(fileName1);
     mockListener.fileAddition(fileName2);
     mockListener.fileChanged(fileName2);
-    mockListener.fileRemoval(fileName2);
     mockListener.fileRemoval(fileName1);
     replay(mockListener);
     File file1 = new File(fileName1);
@@ -38,8 +37,8 @@ public class TestDirectoryMonitor {
     Thread.sleep(150);
     file2.delete();
     file1.delete();
-    Thread.sleep(120);
     verify(mockListener);
+    Thread.sleep(120);
     m.stop();
     m.removeListener(mockListener);
   }

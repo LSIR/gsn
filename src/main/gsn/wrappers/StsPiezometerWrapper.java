@@ -6,7 +6,7 @@ import gsn.beans.StreamElement;
 import gsn2.wrappers.WrapperConfig;
 import gsn.channels.DataChannel;
 import gsn.ManualDataConsumer;
-import gsn.utils.Parameter;
+import gsn.utils.Param;
 
 import java.io.*;
 import java.text.ParseException;
@@ -918,17 +918,17 @@ public class StsPiezometerWrapper implements Wrapper {
             Logger logger = Logger.getLogger( SerialWrapper.class );
             logger.info( "SerialWrapper Test Started" );
 
-            ArrayList <Parameter> predicates = new ArrayList < Parameter >( );
-            predicates.add( new Parameter( "serialport" , "/dev/ttyUSB0" ) );
-            predicates.add( new Parameter( "inputseparator" , "(\n|\r|\f)" ) );
-            predicates.add( new Parameter( "baudrate" , "57600" ) );
-            predicates.add( new Parameter( "flowcontrolmode" , "FLOWCONTROL_NONE" ) );
-            predicates.add( new Parameter( "databits" , "8" ) );
-            predicates.add( new Parameter( "stopbits" , "1" ) );
-            predicates.add( new Parameter( "parity" , "PARITY_NONE" ) );
-            predicates.add( new Parameter( "host" , "localhost" ) );
-            predicates.add( new Parameter( "port" , "22001" ) );
-            SerialWrapper serialWrapper = new SerialWrapper( new WrapperConfig( "SerialWrapper" , new Parameters(predicates.toArray(new Parameter[] {}) ) ),null);
+            ArrayList <Param> predicates = new ArrayList <Param>( );
+            predicates.add( new Param( "serialport" , "/dev/ttyUSB0" ) );
+            predicates.add( new Param( "inputseparator" , "(\n|\r|\f)" ) );
+            predicates.add( new Param( "baudrate" , "57600" ) );
+            predicates.add( new Param( "flowcontrolmode" , "FLOWCONTROL_NONE" ) );
+            predicates.add( new Param( "databits" , "8" ) );
+            predicates.add( new Param( "stopbits" , "1" ) );
+            predicates.add( new Param( "parity" , "PARITY_NONE" ) );
+            predicates.add( new Param( "host" , "localhost" ) );
+            predicates.add( new Param( "port" , "22001" ) );
+            SerialWrapper serialWrapper = new SerialWrapper( new WrapperConfig( "SerialWrapper" , new Parameters(predicates.toArray(new Param[] {}) ) ),null);
             serialWrapper.start();
         }
 

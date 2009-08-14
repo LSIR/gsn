@@ -17,12 +17,12 @@ public class TestOperatorCompatibilityValidator {
 
         MutablePicoContainer pico = new DefaultClassLoadingPicoContainer();
         pico.addComponent(config);
-        assertTrue(validator.proccess(config));
-        validator.opLoading(pico);
         assertFalse(validator.proccess(config2));
+        assertTrue(validator.proccess(config));
 
         pico = new DefaultClassLoadingPicoContainer();
         pico.addComponent(config2);
+        validator.opLoading(pico);
         validator.opUnLoading(pico);
         assertTrue(validator.proccess(config2));
     }

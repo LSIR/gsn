@@ -1,6 +1,6 @@
 package gsn2.conf;
 
-import gsn.utils.Parameter;
+import gsn.utils.Param;
 import gsn.operators.MandatoryParameterMissingException;
 
 import java.io.Serializable;
@@ -11,19 +11,19 @@ public class Parameters implements Serializable {
 
 	public static final Parameters EMPTY_PARAMETERS = new Parameters(null);
 
-	private Parameter[] parameters;
+	private Param[] params;
 
-	public Parameters() {this(null);}
-	public Parameters(Parameter...newPredicates) {
+    public Parameters() {this(null);}
+	public Parameters(Param...newPredicates) {
 		if (newPredicates==null)
-			this.parameters=new  Parameter[0];
+			this.params =new Param[0];
 		else
-			this.parameters = newPredicates;
+			this.params = newPredicates;
 	}
 
 	public String getValueWithException( String key ) {
 		key = key.trim( );
-		for (  Parameter predicate : this.parameters ) {
+		for (  Param predicate : this.params) {
 			if ( predicate.getName( ).toString( ).trim( ).equalsIgnoreCase( key ) ) {
 				final String value = ( String ) predicate.getValue( );
 				if (value.trim().length()>0)
@@ -43,7 +43,7 @@ public class Parameters implements Serializable {
 
 	public String getValue( String key ) {
 		key = key.trim( );
-		for (  Parameter predicate : this.parameters ) {
+		for (  Param predicate : this.params) {
 			if ( predicate.getName( ).toString( ).trim( ).equalsIgnoreCase( key ) ) return ( ( String ) predicate.getValue( ));
 		}
 		return null;
@@ -100,13 +100,13 @@ public class Parameters implements Serializable {
 		}
 	}
 
-	public Parameter[] getParameters() {
-		return parameters;
+	public Param[] getParameters() {
+		return params;
 	}
 
 	public String[] getValues(String key) {
 		Vector<String> toReturn = new Vector<String>();
-		for (  Parameter predicate : this.parameters ) {
+		for (  Param predicate : this.params) {
 			if ( predicate.getName( ).toString( ).trim( ).equalsIgnoreCase( key ) )
 				toReturn.add((String) predicate.getValue( ));
 		}
@@ -131,7 +131,7 @@ public class Parameters implements Serializable {
 			+ super.toString() + TAB
 			+ "predicates = " ;
 
-		for (  Parameter predicate : this.parameters ) 
+		for (  Param predicate : this.params)
 			retValue+= predicate.getName().toString()+"="+predicate.getValue()+" , ";
 
 		retValue= TAB + " )";
@@ -145,13 +145,13 @@ public class Parameters implements Serializable {
 
         Parameters that = (Parameters) o;
 
-        if (!Arrays.equals(parameters, that.parameters)) return false;
+        if (!Arrays.equals(params, that.params)) return false;
 
         return true;
     }
 
     public int hashCode() {
-        return parameters != null ? Arrays.hashCode(parameters) : 0;
+        return params != null ? Arrays.hashCode(params) : 0;
     }
 
 }

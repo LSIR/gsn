@@ -21,7 +21,6 @@ public class DefaultDataChannel implements DataChannel, SlidingListener {
 	public DefaultDataChannel(Operator operator,ChannelConfig config) {
 		sliding = SlidingWindowFactory.getSliding(config.getSlidingValue());
 		window = SlidingWindowFactory.getWindow(config.getWindowValue());
-		sliding.addListener(this);
 		this.name = config.getName();
 	}
 

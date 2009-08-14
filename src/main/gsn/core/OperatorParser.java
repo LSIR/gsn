@@ -11,7 +11,7 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 import gsn.core.OperatorConfig;
-import gsn.utils.ChainOfReponsibility;
+import gsn.utils.ChainedReponsibility;
 
 public class OperatorParser implements FilePresenceListener{
 
@@ -19,13 +19,10 @@ public class OperatorParser implements FilePresenceListener{
 
   private HashMap<String, OperatorConfig> knownConfigs = new HashMap<String, OperatorConfig>();
 
-  private IUnmarshallingContext uctx;
+  private ChainedReponsibility<OperatorConfig> additionChain;
+  private ChainedReponsibility<OperatorConfig> removalChain;
 
-  private ChainOfReponsibility<OperatorConfig> additionChain;
-  private ChainOfReponsibility<OperatorConfig> removalChain;
-
-  public OperatorParser(ChainOfReponsibility<OperatorConfig> additionChain,ChainOfReponsibility<OperatorConfig> removalChain) throws JiBXException {
-    uctx = BindingDirectory.getFactory ( OperatorConfig.class).createUnmarshallingContext ( );
+  public OperatorParser(ChainedReponsibility<OperatorConfig> additionChain, ChainedReponsibility<OperatorConfig> removalChain) throws JiBXException {
     this.additionChain = additionChain;
     this.removalChain = removalChain;
   }
@@ -47,13 +44,6 @@ public class OperatorParser implements FilePresenceListener{
   }
 
   public void fileChanged(String filePath) {
-    OperatorConfig currentConfig = knownConfigs.get(filePath);
-    OperatorConfig newConfig = createOperatorConfig(filePath);
-    if (currentConfig == null )
-      return;
-
-    if (currentConfig.equals(newConfig))
-      return;
     fileRemoval(filePath);
     fileAddition(filePath);
   }
@@ -63,10 +53,7 @@ public class OperatorParser implements FilePresenceListener{
     OperatorConfig conf = null;
     try {
       inputStream = new FileInputStream(new File(file));
-      conf = ( OperatorConfig ) uctx.unmarshalDocument (inputStream, null );
     } catch (FileNotFoundException e) {
-      logger.error(e.getMessage(),e);
-    } catch (JiBXException e) {
       logger.error(e.getMessage(),e);
     } finally {
       if (inputStream!=null)

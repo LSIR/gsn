@@ -1,7 +1,7 @@
 package gsn2.wrappers;
 
 import gsn.ConfigurationVisitor;
-import gsn.utils.Parameter;
+import gsn.utils.Param;
 import gsn2.conf.Parameters;
 
 import java.io.Serializable;
@@ -20,8 +20,8 @@ public final class WrapperConfig implements Serializable{
 	}
 
 
-	public WrapperConfig (  String className , Parameter... parameters) {
-		this.parameters = new Parameters(parameters);
+	public WrapperConfig (  String className , Param... params) {
+		this.parameters = new Parameters(params);
 		this.className = className;
 	}
 

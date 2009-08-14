@@ -153,9 +153,7 @@ public class CSVHandler {
             }catch (Exception e){
                 logger.error(e.getMessage(),e);
             }
-            if (se==null && !toReturn.isEmpty())
-              break;
-           
+
             if (se.isEmpty() || se.getTimeInMillis()<= previousCheckPoint)
                 continue;
 
@@ -193,6 +191,8 @@ public class CSVHandler {
                 String value = "";
                 String format = "";
                 if (timeStampValues.get(fields[i])!=null ) {
+                    value+=separator;
+                    format+=separator;
                     value = timeStampValues.get(fields[i]);
                     format = timeStampFormats.get(fields[i]);
                     value+=separator;

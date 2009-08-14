@@ -6,7 +6,7 @@ import java.util.Arrays;
 import gsn.ConfigurationVisitor;
 import gsn.Visitable;
 import gsn.channels.ChannelConfig;
-import gsn.utils.Parameter;
+import gsn.utils.Param;
 import gsn2.conf.Parameters;
 
 public class OperatorConfig implements Visitable,Serializable{
@@ -17,8 +17,6 @@ public class OperatorConfig implements Visitable,Serializable{
 	private ChannelConfig[] channels ;
 	
 	public String getClassName() {
-		if ( this.className == null ) 
-			this.className = "gsn.vsensor.MirrorOperator";
 		return this.className;
 	}
 	
@@ -44,9 +42,7 @@ public class OperatorConfig implements Visitable,Serializable{
 	}
 
 	public Parameters getParameters() {
-    if (this.parameters==null)
-     return Parameters.EMPTY_PARAMETERS;
-		return parameters;
+    	return parameters;
 	}
 
 	public void setClassName(String className) {
@@ -65,37 +61,11 @@ public class OperatorConfig implements Visitable,Serializable{
 		this.parameters = parameters;
 	}
 
-    public void setParameters(Parameter... parameters) {
-		this.parameters = new Parameters(parameters);
+    public void setParameters(Param... params) {
+		this.parameters = new Parameters(params);
 	}
 
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    OperatorConfig that = (OperatorConfig) o;
-
-    if (uniqueTimestamp != that.uniqueTimestamp) return false;
-    if (!Arrays.equals(channels, that.channels)) return false;
-    if (className != null ? !className.equals(that.className) : that.className != null) return false;
-    if (identifier != null ? !identifier.equals(that.identifier) : that.identifier != null) return false;
-    if (parameters != null ? !parameters.equals(that.parameters) : that.parameters != null) return false;
-
-    return true;
-  }
-
-  public int hashCode() {
-    int result = className != null ? className.hashCode() : 0;
-    result = 31 * result + (identifier != null ? identifier.hashCode() : 0);
-    result = 31 * result + (uniqueTimestamp ? 1 : 0);
-    result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
-    result = 31 * result + (channels != null ? Arrays.hashCode(channels) : 0);
-    return result;
-  }
-
   public ChannelConfig[] getChannels() {
-    if (this.channels==null)
-     return new ChannelConfig[0];
 		return channels;
   }
 

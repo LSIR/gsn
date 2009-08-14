@@ -28,7 +28,6 @@ public class MockWrapper implements Wrapper {
         this.dataChannel= channel;
         mock= createMock(Wrapper.class);
         canStart = conf.getParameters().getValue("start");
-        canStop = conf.getParameters().getValue("stop");
         canDispose = conf.getParameters().getValue("dispose");
         constructor = conf.getParameters().getValue("constructor");
         mock = (Wrapper) createMock(Wrapper.class);

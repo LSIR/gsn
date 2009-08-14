@@ -7,7 +7,7 @@ import org.jibx.runtime.JiBXException;
 import org.apache.commons.io.FileUtils;
 import gsn.core.OperatorParser;
 import gsn.core.OperatorConfig;
-import gsn.utils.ChainOfReponsibility;
+import gsn.utils.ChainedReponsibility;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class TestOperatorParser {
 
   @Test
   public void testBadOp() throws JiBXException, IOException {
-    ChainOfReponsibility<OperatorConfig> mockAddition = createMock(ChainOfReponsibility.class);
+    ChainedReponsibility<OperatorConfig> mockAddition = createMock(ChainedReponsibility.class);
 
     replay(mockAddition);
 
@@ -36,7 +36,7 @@ public class TestOperatorParser {
 
   @Test
   public void testMissingFile() throws JiBXException, IOException {
-    ChainOfReponsibility<OperatorConfig> mockAddition = createMock(ChainOfReponsibility.class);
+    ChainedReponsibility<OperatorConfig> mockAddition = createMock(ChainedReponsibility.class);
     replay(mockAddition);
     OperatorParser parser = new OperatorParser(mockAddition,mockAddition);
     File op1 = new File(tempDir + "/" + "op123.xml");
@@ -47,8 +47,8 @@ public class TestOperatorParser {
 
   @Test
   public void testGoodOp() throws JiBXException, IOException {
-    ChainOfReponsibility<OperatorConfig> mockAddition = createMock(ChainOfReponsibility.class);
-    ChainOfReponsibility<OperatorConfig> mockRemoval = createMock(ChainOfReponsibility.class);
+    ChainedReponsibility<OperatorConfig> mockAddition = createMock(ChainedReponsibility.class);
+    ChainedReponsibility<OperatorConfig> mockRemoval = createMock(ChainedReponsibility.class);
     OperatorParser parser = new OperatorParser(mockAddition,mockRemoval);
 
     OperatorConfig expectedOperator = new OperatorConfig("test1", "org.com");
@@ -90,8 +90,8 @@ public class TestOperatorParser {
 
   @Test
   public void testFileChange() throws Exception{
-    ChainOfReponsibility<OperatorConfig> mockAddition = createMock(ChainOfReponsibility.class);
-    ChainOfReponsibility<OperatorConfig> mockRemoval = createMock(ChainOfReponsibility.class);
+    ChainedReponsibility<OperatorConfig> mockAddition = createMock(ChainedReponsibility.class);
+    ChainedReponsibility<OperatorConfig> mockRemoval = createMock(ChainedReponsibility.class);
     OperatorParser parser = new OperatorParser(mockAddition,mockRemoval);
 
     OperatorConfig expectedOperator1 = new OperatorConfig("test1", "org.com");

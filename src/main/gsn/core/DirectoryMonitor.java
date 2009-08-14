@@ -13,7 +13,7 @@ import java.io.FileFilter;
 public class DirectoryMonitor extends TimerTask{
   private String path;
   private int monitoringInterval = 5000; //5 seconds.
-  private ArrayList<FilePresenceListener> listeners = new ArrayList();
+  private ArrayList<FilePresenceListener> listeners;
   private Timer timer;
   private HashMap<String,Long> changes = new HashMap<String,Long>();
 
@@ -25,11 +25,9 @@ public class DirectoryMonitor extends TimerTask{
     dir = new File(path);
     if(! dir.isDirectory())
       throw new RuntimeException("The specified directory:"+path+" doesn't exist.");
-    timer = new Timer(this.getClass().getName());
   }
 
   public void addListener(FilePresenceListener listener){
-    if (!listeners.contains(listener))
       listeners.add(listener);
   }
 
@@ -38,7 +36,7 @@ public class DirectoryMonitor extends TimerTask{
   }
 
   public void start() {
-    timer.schedule(this,0,monitoringInterval);
+
   }
 
   public void stop(){
@@ -58,10 +56,6 @@ public class DirectoryMonitor extends TimerTask{
     for (String removedFile:removal)
       for (FilePresenceListener listener: listeners)
         listener.fileRemoval(removedFile);
-
-    for (String addedFile:addition)
-      for (FilePresenceListener listener: listeners)
-        listener.fileAddition(addedFile);
 
     Collection intersection = CollectionUtils.intersection(localChanges.keySet(), changes.keySet());
     for (Object sameName: intersection)  {

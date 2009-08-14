@@ -8,7 +8,7 @@ import static org.testng.Assert.*;
 import org.picocontainer.MutablePicoContainer;
 import gsn.core.ContainerManager;
 import gsn.core.OpStateChangeListener;
-import gsn.utils.Parameter;
+import gsn.utils.Param;
 import gsn2.wrappers.WrapperConfig;
 import gsn.beans.Operator;
 import gsn2.wrappers.Wrapper;
@@ -45,7 +45,7 @@ public class TestContainerManager {
     @Test
     public void testNotLoadingBadOp1(){
         OperatorConfig badConf = new OperatorConfig("id1","gsn.tests.MockOperator");
-        badConf.setParameters(new Parameter("constructor","fail"));
+        badConf.setParameters(new Param("constructor","fail"));
         OpStateChangeListener changeListener = createMock(OpStateChangeListener.class);
         replay(changeListener);
         ContainerManager cm = new ContainerManager();
@@ -72,7 +72,7 @@ public class TestContainerManager {
     public void testNotLoadingDueToExceptionInStartOfOperator(){
         OpStateChangeListener changeListener = createMock(OpStateChangeListener.class);
         OperatorConfig okConf = new OperatorConfig("id","gsn.tests.MockOperator");
-        okConf.setParameters(new Parameter("start","fail"));
+        okConf.setParameters(new Param("start","fail"));
 
         changeListener.opLoading((MutablePicoContainer) anyObject());
         changeListener.opUnLoading((MutablePicoContainer) anyObject())  ;
@@ -96,7 +96,7 @@ public class TestContainerManager {
     public void testNotProperlyUnLoadingDueToExceptionInStopOfOperator(){
         OpStateChangeListener changeListener = createMock(OpStateChangeListener.class);
         OperatorConfig okConf = new OperatorConfig("id","gsn.tests.MockOperator");
-        okConf.setParameters(new Parameter("stop","fail"));
+        okConf.setParameters(new Param("stop","fail"));
         changeListener.opLoading((MutablePicoContainer) anyObject());
         changeListener.opUnLoading((MutablePicoContainer) anyObject())  ;
 
@@ -122,7 +122,7 @@ public class TestContainerManager {
     public void testNotLoadingDueToExceptionInConstructorOfWrapper(){
         OpStateChangeListener changeListener = createMock(OpStateChangeListener.class);
         OperatorConfig okConf = new OperatorConfig("id","gsn.tests.MockOperator");
-        okConf.setChannels(new ChannelConfig("c1",new WrapperConfig("gsn.tests.MockWrapper",new Parameters(new Parameter("constructor","fail")))));
+        okConf.setChannels(new ChannelConfig("c1",new WrapperConfig("gsn.tests.MockWrapper",new Parameters(new Param("constructor","fail")))));
       
         replay(changeListener);
         ContainerManager cm = new ContainerManager();
@@ -144,7 +144,7 @@ public class TestContainerManager {
     public void testNotLoadingDueToExceptionInStartOfWrapper(){
         OpStateChangeListener changeListener = createMock(OpStateChangeListener.class);
         OperatorConfig okConf = new OperatorConfig("id","gsn.tests.MockOperator");
-        okConf.setChannels(new ChannelConfig("c1",new WrapperConfig("gsn.tests.MockWrapper",new Parameters(new Parameter("start","fail")))));
+        okConf.setChannels(new ChannelConfig("c1",new WrapperConfig("gsn.tests.MockWrapper",new Parameters(new Param("start","fail")))));
         changeListener.opLoading((MutablePicoContainer) anyObject());
         changeListener.opUnLoading((MutablePicoContainer) anyObject())  ;
 
@@ -173,7 +173,7 @@ public class TestContainerManager {
     public void testNotLoadingDueToExceptionInDisposeOfWrapper(){
         //todo
         OperatorConfig okConf = new OperatorConfig("id","gsn.tests.MockOperator");
-        okConf.setChannels(new ChannelConfig("c1",new WrapperConfig("gsn.tests.MockWrapper",new Parameters(new Parameter("dispose","fail")))));
+        okConf.setChannels(new ChannelConfig("c1",new WrapperConfig("gsn.tests.MockWrapper",new Parameters(new Param("dispose","fail")))));
         theNormalShutdown(okConf);
     }
 
@@ -206,7 +206,7 @@ public class TestContainerManager {
     @Test
     public void testNotLoadingDueToExceptionInStopOfWrapper(){
         OperatorConfig okConf = new OperatorConfig("id","gsn.tests.MockOperator");
-        okConf.setChannels(new ChannelConfig("c1",new WrapperConfig("gsn.tests.MockWrapper",new Parameters(new Parameter("stop","fail")))));
+        okConf.setChannels(new ChannelConfig("c1",new WrapperConfig("gsn.tests.MockWrapper",new Parameters(new Param("stop","fail")))));
         theNormalShutdown(okConf);
     }
 

@@ -62,7 +62,7 @@ public class HttpRequestUtils {
       } else if ( ( value.equalsIgnoreCase( "false" ) ) || ( value.equalsIgnoreCase( "off" ) ) || ( value.equalsIgnoreCase( "no" ) ) ) {
          return false;
       } else {
-         throw new NumberFormatException( "Parameter " + name + " value " + value + " is not a boolean" );
+         throw new NumberFormatException( "Param " + name + " value " + value + " is not a boolean" );
       }
    }
    
