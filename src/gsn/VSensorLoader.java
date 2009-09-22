@@ -341,7 +341,7 @@ public class VSensorLoader extends Thread {
 				logger.error ( e.getMessage ( ) , e );
 				return null;
 			}
-			wrapper.start ( );
+//			wrapper.start ( ); //moved to the VSensorPool
 			activeWrappers.add ( wrapper );
 
 			return wrapper;

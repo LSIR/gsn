@@ -53,8 +53,8 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 
 	private LinkedBlockingQueue<DistributionRequest> locker= new LinkedBlockingQueue<DistributionRequest>();
 
-	private ConcurrentHashMap<DistributionRequest,Boolean> candidatesForNextRound  = new ConcurrentHashMap<DistributionRequest,Boolean>(); 
-
+	private ConcurrentHashMap<DistributionRequest,Boolean> candidatesForNextRound  = new ConcurrentHashMap<DistributionRequest,Boolean>();
+	
 	public void addListener(DistributionRequest listener)  {
 		synchronized (listeners) {
 			if (!listeners.contains(listener)) {
@@ -159,7 +159,7 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 			for (DistributionRequest listener : listeners )
 				if (listener.getVSensorConfig()==config) {
 					logger.debug("sending stream element " +se.toString()+" produced by " +config.getName() + " to listener =>"+listener.toString());
-					if (!candidateListeners.contains(listener)) {
+					if (!candidateListeners.containsKey(listener)) {
 						addListenerToCandidates(listener);
 					}else {
 						candidatesForNextRound.put(listener,Boolean.TRUE);
@@ -213,14 +213,16 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 		return true;
 	}
 	private DataEnumerator makeDataEnum(DistributionRequest listener)  {
-		PreparedStatement ps = preparedStatements.get(listener);
+
+		PreparedStatement prepareStatement = preparedStatements.get(listener);
 		try {
-			ps.setLong(1, listener.getLastVisitedTime());
+			prepareStatement.setLong(1, listener.getLastVisitedTime());
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 			return new DataEnumerator();
 		}
-		DataEnumerator dataEnum = new DataEnumerator(ps,false,true);
+
+		DataEnumerator dataEnum = new DataEnumerator(prepareStatement,false,true);
 		return dataEnum;
 	}
 

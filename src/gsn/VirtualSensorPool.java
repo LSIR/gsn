@@ -1,5 +1,7 @@
 package gsn;
 
+import gsn.beans.InputStream;
+import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
@@ -91,6 +93,11 @@ public class VirtualSensorPool {
 	}
 
 	public void start ( ) throws PoolIsFullException , VirtualSensorInitializationFailedException {
+		for(InputStream inputStream : config.getInputStreams()){
+			for(StreamSource streamSource : inputStream.getSources()){
+				streamSource.getWrapper().start();
+			}
+		}
 		returnVS( borrowVS( ) ); // To initialize the first VS.
 	}
 
