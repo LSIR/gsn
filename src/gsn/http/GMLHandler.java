@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,16 +36,18 @@ public class GMLHandler implements RequestHandler {
 
   //return only the requested sensor if specified (otherwise use null)
   public String buildOutput (String reqName) {
-	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
-
+	SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
     StringBuilder outsb = new StringBuilder( "<gsn:FeatureCollection xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"./gsn.xsd\" xmlns:gsn=\"http://gsn.ch/\" xmlns:gml=\"http://www.opengis.net/gml\"> \n" );
-
     Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
+    HashSet<String> sensorsSet = new HashSet<String> ();
+    if ( reqName != null && reqName.contains(","))
+    	sensorsSet = new HashSet<String>(Arrays.asList(reqName.split(",")));
+    else sensorsSet.add(reqName);
 
 
     while ( vsIterator.hasNext( ) ) {
       VSensorConfig sensorConfig = vsIterator.next( );
-      if ( reqName != null && !sensorConfig.getName().equals(reqName) ) continue;
+      if ( reqName != null && !sensorsSet.contains(sensorConfig.getName()) ) continue;
   	  StringBuilder sb = new StringBuilder();
       sb.append("<gml:featureMember>\n");
       sb.append("<gsn:sensors");
