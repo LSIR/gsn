@@ -1,13 +1,10 @@
 package gsn.wrappers.xBow;
 
-import gsn.Main;
-import gsn.Mappings;
 import gsn.beans.AddressBean;
 import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.beans.StreamSource;
 import gsn.wrappers.AbstractWrapper;
 import org.apache.log4j.Logger;
 
@@ -15,7 +12,6 @@ import java.util.ArrayList;
 
 import java.lang.Thread;
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
 
 import javax.xml.parsers.DocumentBuilder;

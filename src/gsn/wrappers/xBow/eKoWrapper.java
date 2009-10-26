@@ -3,25 +3,23 @@ package gsn.wrappers.xBow;
 /**
  * This is wrapper is based on Lei Shu's xmlWrapper.
  * It works with a Crossbow eKo wireless sensor network.
- * The sensor boards contain:
- * 	a Sensirion SHT11 single chip humidity and temperature sensor;
- * 	an Intersema MS55ER barometric pressure and temperature sensor;
- * 	a TAOS Inc. TLS2550 digital light sensor and
- * 	an Analog Devices ADXL202 dual axis accelerometer.
+ * Currently handles packets from the following eKo Sensor packages:
+ * 	eN2100 Internal Sensors;
+ * 	eS1101 Soil Moisture and Temperature Sensor v2;
+ * 	eS1201 Ambient Temperature and Humidity Sensor;
+ * 	ET159 Decagon 5ET Soil Moisture Sensor
+=======
  * @author bgpearn
  */
 
 //TODO: This wrapper does not reconnect to a remote xServe if communication is lost.
 
 
-import gsn.Main;
-//import gsn.Mappings;
 import gsn.beans.AddressBean;
 import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-//import gsn.beans.StreamSource;
 import gsn.wrappers.AbstractWrapper;
 import org.apache.log4j.Logger;
 
@@ -66,7 +64,7 @@ public class eKoWrapper extends AbstractWrapper {
 			"Battery Volts", "Solar Volts", "Internal Temp",
 			"Soil Moisture", "Soil Temperature",
 			"Ambient Temperature", "Ambient Humidity", "Ambient Dewpoint",
-			"Delectric Permittivity", "Water Content VWC (%)", "Electrical Conductivity (accurate to 7 dS/m)", "Temperature (degC)",
+			"Dielectric Permittivity", "Water Content VWC (%)", "Electrical Conductivity (accurate to 7 dS/m)", "Temperature (degC)",
 			"Sensor Table" };
 
 	private static final String [ ]  FIELD_TYPES_STRING    = new String [ ] { "int", "int", "varchar(50)", 
