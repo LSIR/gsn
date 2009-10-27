@@ -1,8 +1,8 @@
 <sensor-server>
-   <name>GSN Server</name>
-   <author>GSN Development Team.</author>
-   <email>my email address</email>
-   <description>Not Provided</description>
+   <name>PermaSense</name>
+   <author>Mustafa Yuecel</author>
+   <email>yuecel@tik.ee.ethz.ch</email>
+   <description>Database Middleware for PermaSense</description>
    <port>22001</port>
 <!-- OTHER DATABASE OPTIONS -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />   -->
