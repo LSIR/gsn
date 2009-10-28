@@ -11,11 +11,7 @@ public class DozerDigitalDCXMsg extends DozerAbstractMsg
     public static final int AM_TYPE = 0x86;
     
     private Integer sampleno = null;
-    private Integer battery = null;
-    private Double Pdiff = null; // P1-P2
-    private Double P2 = null;
-    private Double TOB1 = null;
-    private Double TOB2 = null;
+    private Short battery = null;
     
     public DozerDigitalDCXMsg() {
         super(DEFAULT_MESSAGE_SIZE);
@@ -57,7 +53,7 @@ public class DozerDigitalDCXMsg extends DozerAbstractMsg
         amTypeSet(AM_TYPE);
     }
 
-    public int getSampleNo()
+    public int get_payload_sampleNo()
     {
     	if (sampleno == null)
     	{
@@ -67,11 +63,11 @@ public class DozerDigitalDCXMsg extends DozerAbstractMsg
     	return sampleno;
     }
     
-    public int getBattery()
+    public short get_payload_batteryStatus()
     {
     	if (battery == null)
     	{
-    		battery = new Integer((int) getUIntElement(9 * 8, 8));
+    		battery = new Short((short) getUIntElement(9 * 8, 8));
     	}
     	
     	return battery;
@@ -98,47 +94,64 @@ public class DozerDigitalDCXMsg extends DozerAbstractMsg
     	
     	return tmp;
     }
+
+
+    public double[] get_payload_dcxData_floatArray() {
+        double[] tmp = new double[4];
+
+        for( int i=0; i<4; i++) {
+        	tmp[i] = floatAt(i*5 + 10);
+        }
         
-    public double getPdiff()
-    {
-    	if (Pdiff == null)
-    	{
-    		Pdiff = floatAt(10);
-    	}
-    	return Pdiff;
+        return tmp;
     }
     
-    public double getP2()
-    {
-    	if (P2 == null)
-    	{
-    		P2 = floatAt(15);
-    	}
-    	return P2;
+    public static int numElements_payload_dcxData_floatArray() {
+        return 4;
     }
     
-    public double getTOB1()
-    {
-    	if (TOB1 == null)
-    	{
-    		TOB1 = floatAt(20);
-    	}
-    	return TOB1;
+    public short[] get_payload_dcxData_status() {
+        short[] tmp = new short[4];
+        
+        for(int i=0; i<4; i++)
+        	tmp[i] = new Short((short) ((getUIntElement(i*5+14 * 8, 8))));
+        
+        return tmp;
     }
     
-    public double getTOB2()
-    {
-    	if (TOB2 == null)
-    	{
-    		TOB2 = floatAt(25);
-    	}
-    	return TOB2;
+    public static int numElements_payload_dcxData_status() {
+        return 4;
     }
 
-    public String toString()
-    {
-    	    	
-    	return "\t" + super.toString() + "\n\t\t" +
-    		" sampleno:" + getSampleNo() + " battery:"+getBattery()+"% P1-P2:"+getPdiff()+ " P2:" +getP2() + " TOB1:" +getTOB1()+ " TOB2:" +getTOB2()+"\n";
+    public String toString() {
+      String s = "Message <DataDigitalDCXMsg> \n";
+      try {
+        s += "  [header.seqNr=0x"+Long.toHexString(get_header_seqNr())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [header.originatorID=0x"+Long.toHexString(get_header_originatorID())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [header.aTime.low=0x"+Long.toHexString(get_header_aTime_low())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [header.aTime.high=0x"+Long.toHexString(get_header_aTime_high())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.sampleNo=0x"+Long.toHexString(get_payload_sampleNo())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.batteryStatus=0x"+Long.toHexString(get_payload_batteryStatus())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.dcxData.status=";
+        for (int i = 0; i < 4; i++) {
+          s += "0x"+floatAt(i)+" ";
+        }
+        s += "]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      return s;
     }
 }

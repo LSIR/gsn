@@ -11,21 +11,17 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     public static final int AM_TYPE = 0x88;
 
     private Integer sampleno = null;
-    private Integer uptime = null;
-    private Long boottime = null;
-    private String boottime_date = null;
+    private Short uptime_high = null;
+    private Integer uptime_low = null;
     private Integer temperature = null;
-    private Double realtemperature_C = null;
     private Integer moisture = null;
-    private Double approxmoisture_rel = null;
-    private Double realmoisture_rel = null;
     private Integer mspvoltage = null;
     private Integer msptemperature = null;
-    private Integer queuesize = null;
+    private Short queuesize = null;
     private Integer packetssent = null;
     private Integer packetsreceived = null;
-    private Integer childcount = null;
-    private Integer rssi = null;
+    private Short childcount = null;
+    private Short rssi = null;
         
     public DozerBaseStatusMsg() {
         super(DEFAULT_MESSAGE_SIZE);
@@ -67,7 +63,7 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
         amTypeSet(AM_TYPE);
     }
 
-    public int getSampleNo()
+    public int get_payload_sampleNo()
     {
     	if (sampleno == null)
     	{
@@ -76,38 +72,26 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     	
     	return sampleno;
     }
-    
-    public int getUptime()
-    {
-    	if (uptime == null)
+
+    public short get_payload_uptime_high() {
+    	if (uptime_high == null)
     	{
-    		uptime = new Integer((int) ((getUIntElement(11 * 8, 8) << 16) + (getUIntElement(9 * 8, 8) << 8) + getUIntElement(10 * 8, 8)));
+    		uptime_high = new Short((short) (getUIntElement(11 * 8, 8)));
     	}
     	
-    	return uptime;
+    	return uptime_high;
     }
-    
-    public long getBootTime()
-    {
-    	if (boottime == null)
+
+    public int get_payload_uptime_low() {
+    	if (uptime_low == null)
     	{
-    		boottime = new Long(getTimeStamp() - ((getUptime() + getATime()) * 1000L));
+    		uptime_low = new Integer((int) ((getUIntElement(9 * 8, 8) << 8) + getUIntElement(10 * 8, 8)));
     	}
     	
-    	return boottime;
+    	return uptime_low;
     }
     
-    public String getBootTime_date()
-    {
-    	if (boottime_date == null)
-    	{
-    		boottime_date = MsgFormatter.DF.format(getBootTime());
-    	}
-    	
-    	return boottime_date;
-    }
-    
-    public int getTemperature()
+    public int get_payload_temperature()
     {
     	if (temperature == null)
     	{
@@ -117,19 +101,7 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     	return temperature;
     }
     
-    public double getRealTemperature_C() throws NumberFormatException
-    {
-    	if (getTemperature() == 0xffff)
-    		throw new NumberFormatException();
-
-    	if (realtemperature_C == null)
-    	{
-    		realtemperature_C = new Double(-39.63d + (0.01d * getTemperature()));
-    	}
-    	return realtemperature_C;
-    }
-    
-    public int getMoisture()
+    public int get_payload_humidity()
     {
     	if (moisture == null)
     	{
@@ -139,51 +111,7 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     	return moisture;
     }
 
-    public double getApproxMoisture_rel() throws NumberFormatException
-    {
-    	if (getMoisture() == 0xffff)
-    		throw new NumberFormatException();
-
-    	if (approxmoisture_rel == null)
-    	{
-    		approxmoisture_rel = new Double(-4 + (0.0405d * getMoisture()) - 0.0000028d * Math.pow(getMoisture(), 2));
-    		
-    		if (approxmoisture_rel > 99d)
-    		{
-    			approxmoisture_rel = new Double(100d);
-    		}
-    		else if (approxmoisture_rel < 0d)
-    		{
-    			approxmoisture_rel = new Double(0d);
-    		}
-    	}
-    	
-		return approxmoisture_rel;
-    }
-    
-    public double getRealMoisture_rel() throws NumberFormatException
-    {
-    	if (getMoisture() == 0xffff)
-    		throw new NumberFormatException();
-
-    	if (realmoisture_rel == null)
-    	{
-    		realmoisture_rel = new Double(((getRealTemperature_C() - 25) * (0.01d + (0.00008d * getMoisture()))) + getApproxMoisture_rel());
-
-    		if (realmoisture_rel > 99d)
-    		{
-    			realmoisture_rel = new Double(100d);
-    		}
-    		else if (realmoisture_rel < 0d)
-    		{
-    			realmoisture_rel = new Double(0d);
-    		}
-    	}
-    	
-    	return realmoisture_rel;
-    }
-
-    public int getMspVoltage()
+    public int get_payload_mspvoltage()
     {
     	if (mspvoltage == null)
     	{
@@ -193,7 +121,7 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     	return mspvoltage;
     }
 
-    public int getMspTemperature()
+    public int get_payload_msptemperature()
     {
     	if (msptemperature == null)
     	{
@@ -203,17 +131,17 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     	return msptemperature;
     }
 
-    public int getQueueSize()
+    public short get_payload_queueSize()
     {
     	if (queuesize == null)
     	{
-    		queuesize = new Integer((int) getUIntElement(20 * 8, 8));
+    		queuesize = new Short((short) getUIntElement(20 * 8, 8));
     	}
     		
     	return queuesize;
     }
     
-    public int getPacketsSent()
+    public int get_payload_packetsSent()
     {
     	if (packetssent == null)
     	{
@@ -223,7 +151,7 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     	return packetssent;
     }
 
-    public int getPacketsReceived()
+    public int get_payload_packetsReceived()
     {
     	if (packetsreceived == null)
     	{
@@ -233,46 +161,76 @@ public class DozerBaseStatusMsg extends DozerAbstractMsg
     	return packetsreceived;
     }
     
-    public int getchildcount()
+    public short get_payload_childcount()
     {
     	if (childcount == null)
     	{
-    		childcount = new Integer((int) getUIntElement(25 * 8, 8));
+    		childcount = new Short((short) getUIntElement(25 * 8, 8));
     	}
     	
     	return childcount;
     }
     
-    public int getrssi()
+    public short get_payload_rssi()
     {
     	if (rssi == null)
     	{
-    		rssi = new Integer((int) getUIntElement(26 * 8, 8));
+    		rssi = new Short((short) getUIntElement(26 * 8, 8));
     	}
     	
     	return rssi;
     }
-    
-    public String toString()
-    {
-    	String temp = "invalid";
-    	try
-    	{
-    		temp = MsgFormatter.DECIMAL_1FRAC.format(getRealTemperature_C()) + "°C";
-    	}
-    	catch (NumberFormatException e) { }
-    	
-    	String hum = "invalid";
-    	try
-    	{
-    	    hum = MsgFormatter.DECIMAL_1FRAC.format(getRealMoisture_rel()) + "%";
-    	}
-    	catch (NumberFormatException e) { }
 
-    	return "\t" + super.toString() + "\n\t\t sampleno:" + getSampleNo() + 
-    		" uptime:" + getUptime() + "(" + getBootTime_date() + ")" +	
-    		" temperature:" + getTemperature() + "(" + temp + ") moisture:" + getMoisture() + "(" + hum + ")" +
-    		" mspvoltage:" + getMspVoltage() + " msptemperature:" + getMspTemperature() + " queuesize:" + getQueueSize() +
-    		" packetssent:" + getPacketsSent() + " packetsreceived:" + getPacketsReceived() + " childcount:" + getchildcount()+ " rssi:" + getrssi()+ "\n";
+    public String toString() {
+      String s = "Message <DozerBaseStatusMsg> \n";
+      try {
+        s += "  [header.seqNr=0x"+Long.toHexString(get_header_seqNr())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [header.originatorID=0x"+Long.toHexString(get_header_originatorID())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [header.aTime.low=0x"+Long.toHexString(get_header_aTime_low())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [header.aTime.high=0x"+Long.toHexString(get_header_aTime_high())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.sampleNo=0x"+Long.toHexString(get_payload_sampleNo())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.uptime.low=0x"+Long.toHexString(get_payload_uptime_low())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.uptime.high=0x"+Long.toHexString(get_payload_uptime_high())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.temperature=0x"+Long.toHexString(get_payload_temperature())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.humidity=0x"+Long.toHexString(get_payload_humidity())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.mspvoltage=0x"+Long.toHexString(get_payload_mspvoltage())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.msptemperature=0x"+Long.toHexString(get_payload_msptemperature())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.queueSize=0x"+Long.toHexString(get_payload_queueSize())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.packetsSent=0x"+Long.toHexString(get_payload_packetsSent())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.packetsReceived=0x"+Long.toHexString(get_payload_packetsReceived())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.childcount=0x"+Long.toHexString(get_payload_childcount())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.rssi=0x"+Long.toHexString(get_payload_rssi())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      return s;
     }
 }

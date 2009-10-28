@@ -11,25 +11,18 @@ public class DozerHealthMsg extends DozerAbstractMsg
     public static final int AM_TYPE = 0x80;
 
     private Integer sampleno = null;
-    private Integer uptime = null;
-    private Long boottime = null;
-    private String boottime_date = null;
+    private Integer uptime_low = null;
+    private Short uptime_high = null;
     private Integer sysvoltage = null;
-    private Double realsysvoltage_V = null;
     private Integer sdivoltage = null;
-    private Double realsdivoltage_V = null;
     private Integer temperature = null;
-    private Double realtemperature_C = null;
     private Integer moisture = null;
-    private Double approxmoisture_rel = null;
-    private Double realmoisture_rel = null;
     private Integer mspvoltage = null;
     private Integer msptemperature = null;
     private Integer flashstatus = null;
-    private Integer queuesize = null;
+    private Short queuesize = null;
     private Integer parentid = null;
-    private Integer hopcount = null;
-    private Integer childcount = null;
+    private Short hopchildcount = null;
     
     public DozerHealthMsg() {
         super(DEFAULT_MESSAGE_SIZE);
@@ -71,7 +64,7 @@ public class DozerHealthMsg extends DozerAbstractMsg
         amTypeSet(AM_TYPE);
     }
 
-    public int getSampleNo()
+    public int get_payload_sampleNo()
     {
     	if (sampleno == null)
     	{
@@ -80,38 +73,26 @@ public class DozerHealthMsg extends DozerAbstractMsg
     		
     	return sampleno;
     }
-    
-    public int getUptime()
-    {
-    	if (uptime == null)
+
+    public short get_payload_uptime_high() {
+    	if (uptime_high == null)
     	{
-    		uptime = new Integer((int) ((getUIntElement(11 * 8, 8) << 16) + (getUIntElement(9 * 8, 8) << 8) + getUIntElement(10 * 8, 8)));
+    		uptime_high = new Short((short) (getUIntElement(11 * 8, 8)));
     	}
-    		
-    	return uptime;
+    	
+    	return uptime_high;
     }
 
-    public long getBootTime()
-    {
-    	if (boottime == null)
+    public int get_payload_uptime_low() {
+    	if (uptime_low == null)
     	{
-    		boottime = new Long(getTimeStamp() - ((getUptime() + getATime()) * 1000L));
+    		uptime_low = new Integer((int) ((getUIntElement(9 * 8, 8) << 8) + getUIntElement(10 * 8, 8)));
     	}
     	
-    	return boottime;
+    	return uptime_low;
     }
     
-    public String getBootTime_date()
-    {
-    	if (boottime_date == null)
-    	{
-    		boottime_date = MsgFormatter.DF.format(getBootTime());
-    	}
-    	
-    	return boottime_date;
-    }
-    
-    public int getSysVoltage()
+    public int get_payload_sysvoltage()
     {
     	if (sysvoltage == null)
     	{
@@ -120,21 +101,8 @@ public class DozerHealthMsg extends DozerAbstractMsg
     		
     	return sysvoltage;
     }
-
-    public double getRealSysVoltage_V() throws NumberFormatException
-    {
-    	if (getSysVoltage() == 0xffff)
-    		throw new NumberFormatException();
-
-    	if (realsysvoltage_V == null)
-    	{
-    		realsysvoltage_V = new Double(getSysVoltage() * (2.56d/65536d) * (39d/24d));
-    	}
-    	
-    	return realsysvoltage_V; 
-    }
     
-    public int getSdiVoltage()
+    public int get_payload_sdivoltage()
     {
     	if (sdivoltage == null)
     	{
@@ -144,20 +112,7 @@ public class DozerHealthMsg extends DozerAbstractMsg
     	return sdivoltage;
     }
     
-    public double getRealSdiVoltage_V() throws NumberFormatException
-    {
-    	if (getSdiVoltage() == 0xffff)
-    		throw new NumberFormatException();
-
-    	if (realsdivoltage_V == null)
-    	{
-    		realsdivoltage_V = new Double(getSdiVoltage() * (2.56d/65536d) * (204d/24d));
-    	}
-    	
-    	return realsdivoltage_V; 
-    }
-    
-    public int getTemperature()
+    public int get_payload_temperature()
     {
     	if (temperature == null)
     	{
@@ -167,19 +122,7 @@ public class DozerHealthMsg extends DozerAbstractMsg
     	return temperature;
     }
     
-    public double getRealTemperature_C() throws NumberFormatException
-    {
-    	if (getTemperature() == 0xffff)
-    		throw new NumberFormatException();
-
-    	if (realtemperature_C == null)
-    	{
-    		realtemperature_C = new Double(-39.63d + (0.01d * getTemperature()));
-    	}
-    	return realtemperature_C;
-    }
-    
-    public int getMoisture()
+    public int get_payload_humidity()
     {
     	if (moisture == null)
     	{
@@ -189,51 +132,7 @@ public class DozerHealthMsg extends DozerAbstractMsg
     	return moisture;
     }
     
-    public double getApproxMoisture_rel() throws NumberFormatException
-    {
-    	if (getMoisture() == 0xffff)
-    		throw new NumberFormatException();
-
-    	if (approxmoisture_rel == null)
-    	{
-    		approxmoisture_rel = new Double(-4 + (0.0405d * getMoisture()) - 0.0000028d * Math.pow(getMoisture(), 2));
-    		
-    		if (approxmoisture_rel > 99d)
-    		{
-    			approxmoisture_rel = new Double(100d);
-    		}
-    		else if (approxmoisture_rel < 0d)
-    		{
-    			approxmoisture_rel = new Double(0d);
-    		}
-    	}
-    	
-		return approxmoisture_rel;
-    }
-    
-    public double getRealMoisture_rel() throws NumberFormatException
-    {
-    	if (getMoisture() == 0xffff)
-    		throw new NumberFormatException();
-
-    	if (realmoisture_rel == null)
-    	{
-    		realmoisture_rel = new Double(((getRealTemperature_C() - 25) * (0.01d + (0.00008d * getMoisture()))) + getApproxMoisture_rel());
-
-    		if (realmoisture_rel > 99d)
-    		{
-    			realmoisture_rel = new Double(100d);
-    		}
-    		else if (realmoisture_rel < 0d)
-    		{
-    			realmoisture_rel = new Double(0d);
-    		}
-    	}
-    	
-    	return realmoisture_rel;
-    }
-    
-    public int getMspVoltage()
+    public int get_payload_mspvoltage()
     {
     	if (mspvoltage == null)
     	{
@@ -243,7 +142,7 @@ public class DozerHealthMsg extends DozerAbstractMsg
     	return mspvoltage;
     }
 
-    public int getMspTemperature()
+    public int get_payload_msptemperature()
     {
     	if (msptemperature == null)
     	{
@@ -253,7 +152,7 @@ public class DozerHealthMsg extends DozerAbstractMsg
     	return msptemperature;
     }
 
-    public int getFlashStatus()
+    public int get_payload_flashStatus()
     {
     	if (flashstatus == null)
     	{
@@ -263,17 +162,17 @@ public class DozerHealthMsg extends DozerAbstractMsg
     	return flashstatus;
     }
 
-    public int getQueueSize()
+    public short get_payload_queueSize()
     {
     	if (queuesize == null)
     	{
-    		queuesize = new Integer((int) getUIntElement(26 * 8, 8));
+    		queuesize = new Short((short) getUIntElement(26 * 8, 8));
     	}
     		
     	return queuesize;
     }
 
-    public int getParentId()
+    public int get_payload_parentId()
     {
     	if (parentid == null)
     	{
@@ -283,62 +182,69 @@ public class DozerHealthMsg extends DozerAbstractMsg
     	return parentid;
     }
 
-    public int getHopCount()
+    public short get_payload_hopCountChildCount()
     {
-    	if (hopcount == null)
+    	if (hopchildcount == null)
     	{
-    		hopcount = new Integer((int) getUIntElement((29 * 8) + 4, 4));
+    		hopchildcount = new Short((short) getUIntElement(29 * 8, 8));
     	}
     		
-    	return hopcount;
+    	return hopchildcount;
     }
-
-    public int getChildCount()
-    {
-    	if (childcount == null)
-    	{
-    		childcount = new Integer((int) getUIntElement(29 * 8, 4));
-    	}
-    		
-    	return childcount;
-    }
-
-    public String toString()
-    {
-    	String sys = "invalid";
-    	try
-    	{
-    		sys = MsgFormatter.DECIMAL_2FRAC.format(getRealSysVoltage_V()) + "V";
-    	}
-    	catch (NumberFormatException e) { }
-    	
-    	String sdi = "invalid";
-    	try
-    	{
-    		sdi = MsgFormatter.DECIMAL_2FRAC.format(getRealSdiVoltage_V()) + "V";
-    	}
-    	catch (NumberFormatException e) { }
-    	
-    	String temp = "invalid";
-    	try
-    	{
-    		temp = MsgFormatter.DECIMAL_1FRAC.format(getRealTemperature_C()) + "°C";
-    	}
-    	catch (NumberFormatException e) { }
-    	
-    	String hum = "invalid";
-    	try
-    	{
-    	    hum = MsgFormatter.DECIMAL_1FRAC.format(getRealMoisture_rel()) + "%";
-    	}
-    	catch (NumberFormatException e) { }
-    	
-    	return "\t" + super.toString() + "\n\t\t" +
-    		" sampleno:" + getSampleNo() + " uptime:"  + getUptime() + "(" + getBootTime_date() + ")" + 
-    		" sysvoltage:" + getSysVoltage() + "(" + sys + ")" + " sdivoltage:" + getSdiVoltage() + "(" + sdi + ")" + 
-    		" temperature:" + getTemperature() + "(" + temp + ")" +	" moisture:" + getMoisture() + "(" + hum + ")" + 
-    		" mspvoltage:"+getMspVoltage() + " msptemperature:" + getMspTemperature() + " flashstatus:" + getFlashStatus() + 
-    		" queuesize:" + getQueueSize() + " parentid:" + getParentId() + " hopcount:" + getHopCount() +
-    		" childcount:" + getChildCount() + "\n";
-    }
+    
+    public String toString() {
+        String s = "Message <DataNodeHealthMsg> \n";
+        try {
+          s += "  [header.seqNr=0x"+Long.toHexString(get_header_seqNr())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [header.originatorID=0x"+Long.toHexString(get_header_originatorID())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [header.aTime.low=0x"+Long.toHexString(get_header_aTime_low())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [header.aTime.high=0x"+Long.toHexString(get_header_aTime_high())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.sampleNo=0x"+Long.toHexString(get_payload_sampleNo())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.uptime.low=0x"+Long.toHexString(get_payload_uptime_low())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.uptime.high=0x"+Long.toHexString(get_payload_uptime_high())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.sysvoltage=0x"+Long.toHexString(get_payload_sysvoltage())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.sdivoltage=0x"+Long.toHexString(get_payload_sdivoltage())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.temperature=0x"+Long.toHexString(get_payload_temperature())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.humidity=0x"+Long.toHexString(get_payload_humidity())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.mspvoltage=0x"+Long.toHexString(get_payload_mspvoltage())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.msptemperature=0x"+Long.toHexString(get_payload_msptemperature())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.flashStatus=0x"+Long.toHexString(get_payload_flashStatus())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.queueSize=0x"+Long.toHexString(get_payload_queueSize())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.parentId=0x"+Long.toHexString(get_payload_parentId())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.hopCountChildCount=0x"+Long.toHexString(get_payload_hopCountChildCount())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        return s;
+      }
 }

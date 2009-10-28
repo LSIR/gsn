@@ -54,7 +54,7 @@ public class DozerAdcComDiffMsg extends DozerAbstractMsg
         amTypeSet(AM_TYPE);
     }
 
-    public int getSampleNo()
+    public int get_payload_sampleNo()
     {
     	if (sampleno == null)
     	{
@@ -75,67 +75,67 @@ public class DozerAdcComDiffMsg extends DozerAbstractMsg
         }
     }
     
-    public int getSibAdcDiff0()
-    {
+    public int[] get_payload_sibADCDiff() {
+        int[] tmp = new int[4];
     	if (sibAdcDiff == null)
     		readSibAdc();
-    	return sibAdcDiff[0];
+    	
+    	for(int i=0; i<4; i++)
+    		tmp[i] = sibAdcDiff[i];
+    	
+        return tmp;
+    }
+
+    public static int numElements_payload_sibADCDiff() {
+        return 4;
     }
     
-    public int getSibAdcDiff1()
-    {
-    	if (sibAdcDiff == null)
-    		readSibAdc();
-    	return sibAdcDiff[1];
-    }
-
-    public int getSibAdcDiff2()
-    {
-    	if (sibAdcDiff == null)
-    		readSibAdc();
-    	return sibAdcDiff[2];
-    }
-
-    public int getSibAdcDiff3()
-    {
-    	if (sibAdcDiff == null)
-    		readSibAdc();
-    	return sibAdcDiff[3];
-    }
-
-    public int getSibAdcCom0()
-    {
+    public int[] get_payload_sibADCCom() {
+        int[] tmp = new int[3];
     	if (sibAdcCom == null)
     		readSibAdc();
-    	return sibAdcCom[0];
-    }
-
-    public int getSibAdcCom1()
-    {
-    	if (sibAdcCom == null)
-    		readSibAdc();
-    	return sibAdcCom[1];
-    }
-
-    public int getSibAdcCom2()
-    {
-    	if (sibAdcCom == null)
-    		readSibAdc();
-    	return sibAdcCom[2];
-    }
-
-    public String toString()
-    {
-    	StringBuffer AdcDiffString = new StringBuffer();
-    	StringBuffer AdcComString = new StringBuffer();
-    	if (sibAdcDiff == null)
-    		readSibAdc();
-    	for (int i=0;i<sibAdcDiff.length;i++)
-    		AdcDiffString.append(sibAdcDiff[i].toString()+" ");
-    	for (int i=0;i<sibAdcCom.length;i++)
-    		AdcComString.append(sibAdcCom[i].toString()+" ");
     	
-    	return "\t" + super.toString() + "\n\t\t" +
-    		" sampleno:" + getSampleNo() + " ADCDiff: "+AdcDiffString + "ADCCom: "+AdcComString + "\n";
+    	for(int i=0; i<3; i++)
+    		tmp[i] = sibAdcCom[i];
+    	
+        return tmp;
     }
+    
+    public static int numElements_payload_sibADCCom() {
+        return 3;
+    }
+    
+    public String toString() {
+        String s = "Message <DataAdcDiffMsg> \n";
+        try {
+          s += "  [header.seqNr=0x"+Long.toHexString(get_header_seqNr())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [header.originatorID=0x"+Long.toHexString(get_header_originatorID())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [header.aTime.low=0x"+Long.toHexString(get_header_aTime_low())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [header.aTime.high=0x"+Long.toHexString(get_header_aTime_high())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.sampleNo=0x"+Long.toHexString(get_payload_sampleNo())+"]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.sibADCDiff=";
+          for (int i = 0; i < 4; i++) {
+            s += "0x"+Long.toHexString(sibAdcDiff[i] & 0xffff)+" ";
+          }
+          s += "]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        try {
+          s += "  [payload.sibADCCom=";
+          for (int i = 0; i < 3; i++) {
+            s += "0x"+Long.toHexString(sibAdcCom[i] & 0xffff)+" ";
+          }
+          s += "]\n";
+        } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+        return s;
+      }
 }
