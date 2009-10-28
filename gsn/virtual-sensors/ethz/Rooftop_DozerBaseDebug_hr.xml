@@ -1,0 +1,37 @@
+<virtual-sensor name="Rooftop_DozerBaseDebug_hr_3933" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>true</unique-timestamps>
+        <output-structure>
+                <field name="generation_time" type="VARCHAR(20)" />
+                <field name="sequence_number" type="INTEGER" />
+                <field name="node_id" type="INTEGER" />
+                <field name="ra_state" type="SMALLINT" />
+                <field name="queue" type="INTEGER" />
+                <field name="radio_sleep" type="BIGINT" />
+                <field name="radio_up" type="BIGINT" />
+       </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerBaseDebugMsg) from ETZ rooftop deployment in human readable form</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Rooftop_DozerBaseDebug_3933</predicate>
+        </address>
+        <query> select 	TIMED,
+        				timestr(GEN_TIME)			as generation_time,
+        				HEADER_SEQNR 				as sequence_number,
+        				HEADER_ORIGINATORID 		as node_id,
+		                PAYLOAD_RASTATE				as ra_state,
+		                PAYLOAD_QUEUE				as queue,
+		                PAYLOAD_RADIOSLEEP			as radio_sleep,
+		                PAYLOAD_RADIOUP				as radio_up from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>

@@ -1,0 +1,43 @@
+<virtual-sensor name="Jungfraujoch_DozerDigitalDCX_3933" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+                <field name="GEN_TIME" type="BIGINT"/>
+                <field name="HEADER_ATIME_HIGH" type="SMALLINT" />
+                <field name="HEADER_ATIME_LOW" type="INTEGER" />
+                <field name="HEADER_ORIGINATORID" type="INTEGER" />
+                <field name="HEADER_SEQNR" type="INTEGER" />
+                <field name="PAYLOAD_BATTERYSTATUS" type="SMALLINT" />
+                <field name="PAYLOAD_DCXDATA_STATUS0" type="SMALLINT" />
+                <field name="PAYLOAD_DCXDATA_STATUS1" type="SMALLINT" />
+                <field name="PAYLOAD_DCXDATA_STATUS2" type="SMALLINT" />
+                <field name="PAYLOAD_DCXDATA_STATUS3" type="SMALLINT" />
+                <field name="PAYLOAD_SAMPLENO" type="INTEGER" />
+                <field name="PAYLOAD_DCXDATA_FLOATARRAY0" type="DOUBLE" />
+                <field name="PAYLOAD_DCXDATA_FLOATARRAY1" type="DOUBLE" />
+                <field name="PAYLOAD_DCXDATA_FLOATARRAY2" type="DOUBLE" />
+                <field name="PAYLOAD_DCXDATA_FLOATARRAY3" type="DOUBLE" />
+       </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerDigitalDCXMsg) from Jungfraujoch deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="ps-backlog">
+          <predicate key="deployment">permasense-jj-bs01.ethz.ch:9002</predicate>
+          <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+          <predicate key="message-classname">ch.ethz.permafrozer.DozerDigitalDCXMsg</predicate>
+          <predicate key="tinyos1x-groupId">-1</predicate>
+          <predicate key="tinyos1x-platformName">tinynode</predicate>
+          <predicate key="local-sf-port">9005</predicate>
+        </address>
+        <query> select * from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>

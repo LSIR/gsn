@@ -1,0 +1,33 @@
+<virtual-sensor name="Rooftop_DozerReset_3933" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+                <field name="GEN_TIME" type="BIGINT"/> 
+                <field name="HEADER_SEQNR" type="INTEGER" />
+                <field name="HEADER_ORIGINATORID" type="INTEGER" />
+                <field name="HEADER_ATIME_HIGH" type="SMALLINT" />
+                <field name="HEADER_ATIME_LOW" type="INTEGER" />
+                <field name="PAYLOAD_CAUSE" type="SMALLINT" />
+                <field name="PAYLOAD_COUNT" type="INTEGER" />
+       </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerResetMsg) from ETZ rooftop deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="ps-backlog">
+          <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9002</predicate>
+          <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+          <predicate key="message-classname">ch.ethz.permafrozer.messages.DozerResetMsg</predicate>
+          <predicate key="local-sf-port">9003</predicate>
+        </address>
+        <query> select * from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>

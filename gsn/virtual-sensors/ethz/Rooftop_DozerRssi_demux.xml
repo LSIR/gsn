@@ -1,0 +1,112 @@
+<virtual-sensor name="Rooftop_DozerRssi_4355_demux" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+                <field name="GEN_TIME" type="BIGINT" />
+                <field name="sequence_number" type="INTEGER" />
+                <field name="node_id" type="INTEGER" />
+                <field name="rssi_node_id" type="INTEGER" />
+                <field name="rssi" type="SMALLINT" />
+       </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerRssiMsg) from Rooftop deployment in usable form</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    <stream name="data0">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Rooftop_DozerRssi_4355</predicate>
+        </address>
+        <query> select TIMED, GEN_TIME,
+        HEADER_SEQNR as sequence_number,
+        HEADER_ORIGINATORID as node_id,
+        PAYLOAD_RSSI_ID0 as rssi_node_id,
+        PAYLOAD_RSSI_RSSI0 as rssi from wrapper </query>
+      </source>
+      <query> select * from source where rssi_node_id &lt; 65535</query>
+    </stream>
+    <stream name="data1">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Rooftop_DozerRssi_4355</predicate>
+        </address>
+        <query> select TIMED, GEN_TIME,
+        HEADER_SEQNR as sequence_number,
+        HEADER_ORIGINATORID as node_id,
+        PAYLOAD_RSSI_ID1 as rssi_node_id,
+        PAYLOAD_RSSI_RSSI1 as rssi from wrapper </query>
+      </source>
+      <query> select * from source where rssi_node_id &lt; 65535</query>
+    </stream>
+    <stream name="data2">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Rooftop_DozerRssi_4355</predicate>
+        </address>
+        <query> select TIMED, GEN_TIME,
+        HEADER_SEQNR as sequence_number,
+        HEADER_ORIGINATORID as node_id,
+        PAYLOAD_RSSI_ID2 as rssi_node_id,
+        PAYLOAD_RSSI_RSSI2 as rssi from wrapper </query>
+      </source>
+      <query> select * from source where rssi_node_id &lt; 65535</query>
+    </stream>
+    <stream name="data3">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Rooftop_DozerRssi_4355</predicate>
+        </address>
+        <query> select TIMED, GEN_TIME,
+        HEADER_SEQNR as sequence_number,
+        HEADER_ORIGINATORID as node_id,
+        PAYLOAD_RSSI_ID3 as rssi_node_id,
+        PAYLOAD_RSSI_RSSI3 as rssi from wrapper </query>
+      </source>
+      <query> select * from source where rssi_node_id &lt; 65535</query>
+    </stream>
+    <stream name="data4">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Rooftop_DozerRssi_4355</predicate>
+        </address>
+        <query> select TIMED, GEN_TIME,
+        HEADER_SEQNR as sequence_number,
+        HEADER_ORIGINATORID as node_id,
+        PAYLOAD_RSSI_ID4 as rssi_node_id,
+        PAYLOAD_RSSI_RSSI4 as rssi from wrapper </query>
+      </source>
+      <query> select * from source where rssi_node_id &lt; 65535</query>
+    </stream>
+    <stream name="data5">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Rooftop_DozerRssi_4355</predicate>
+        </address>
+        <query> select TIMED, GEN_TIME,
+        HEADER_SEQNR as sequence_number,
+        HEADER_ORIGINATORID as node_id,
+        PAYLOAD_RSSI_ID5 as rssi_node_id,
+        PAYLOAD_RSSI_RSSI5 as rssi from wrapper </query>
+      </source>
+      <query> select * from source where rssi_node_id &lt; 65535</query>
+    </stream>
+    <stream name="data6">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Rooftop_DozerRssi_4355</predicate>
+        </address>
+        <query> select TIMED, GEN_TIME,
+        HEADER_SEQNR as sequence_number,
+        HEADER_ORIGINATORID as node_id,
+        PAYLOAD_RSSI_ID6 as rssi_node_id,
+        PAYLOAD_RSSI_RSSI6 as rssi from wrapper </query>
+      </source>
+      <query> select * from source where rssi_node_id &lt; 65535</query>
+    </stream>
+
+
+  </streams>
+</virtual-sensor>

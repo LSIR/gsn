@@ -1,0 +1,45 @@
+<virtual-sensor name="Matterhorn_BasestationStatus_hr_4252" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>false</unique-timestamps>
+       <output-structure>
+		<field name="timestamp" type="VARCHAR(20)" />
+                <field name="v_pv" type="VARCHAR(10)" />
+                <field name="i_pv" type="VARCHAR(10)" />   
+                <field name="v_12bat" type="VARCHAR(10)" />
+                <field name="i_v12dc_ext" type="VARCHAR(10)" />
+                <field name="v12dc_in" type="VARCHAR(10)" /> 
+                <field name="i_v12dc_in" type="VARCHAR(10)" />
+                <field name="vcc_5_0" type="VARCHAR(10)" /> 
+                <field name="vcc_node" type="VARCHAR(10)" />  
+                <field name="i_vcc_node" type="VARCHAR(10)" />
+                <field name="vcc_4_2" type="VARCHAR(10)" />
+       </output-structure>
+    </processing-class>
+    <description>show status information of the Basestation from the Matterhorn deployment in human readable form</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Matterhorn_BasestationStatus_4252</predicate>
+        </address>
+        <query> select
+			timestr(TIMESTAMP)	as timestamp,
+			mv_to_v(V_PV_MV)	as v_pv, 
+			ua_to_ma(I_PV_UA)	as i_pv, 
+			mv_to_v(V_12BAT_MV)	as v_12bat, 
+			ua_to_a(I_V12DC_EXT_UA)	as i_v12dc_ext,
+			mv_to_v(V12DC_IN_MV)	as v12dc_in, 
+			ua_to_ma(I_V12DC_IN_UA)	as i_v12dc_in,
+			mv_to_v(VCC_5_0_MV)	as vcc_5_0, 
+			mv_to_v(VCC_NODE_MV)	as vcc_node,
+			ua_to_ma(I_VCC_NODE_UA)	as i_vcc_node,
+			mv_to_v(VCC_4_2_MV)	as vcc_4_2 from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>

@@ -1,0 +1,51 @@
+<virtual-sensor name="Jungfraujoch_DozerDigitalDCX_hr_3933" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>true</unique-timestamps>
+        <output-structure>
+                <field name="generation_time" type="VARCHAR(20)" />
+                <field name="sequence_number" type="INTEGER" />
+                <field name="node_id" type="INTEGER" />
+                <field name="valid" type="TINYINT" />
+                <field name="sample_number" type="SMALLINT" />
+                <field name="battery_status" type="SMALLINT" />
+                <field name="dcx_data_status_0" type="SMALLINT" />
+                <field name="dcx_data_status_1" type="SMALLINT" />
+                <field name="dcx_data_status_2" type="SMALLINT" />
+                <field name="dcx_data_status_3" type="SMALLINT" />
+                <field name="dcx_data_0" type="DOUBLE" />
+                <field name="dcx_data_1" type="DOUBLE" />
+                <field name="dcx_data_2" type="DOUBLE" />
+                <field name="dcx_data_3" type="DOUBLE" />
+       </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerDigitalDCXMsg) from Jungfraujoch deployment in human readable form</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Jungfraujoch_DozerDigitalDCX_3933</predicate>
+        </address>
+        <query> select 	TIMED,
+        				timestr(GEN_TIME)							as generation_time,
+        				HEADER_SEQNR 								as sequence_number,
+        				HEADER_ORIGINATORID 						as node_id,
+        				to_tinyint(PAYLOAD_SAMPLENO &gt;&gt; 15)	as valid,
+        				to_smallint(PAYLOAD_SAMPLENO &amp; 32767)	as sample_number,
+		                PAYLOAD_BATTERYSTATUS						as battery_status,
+		                PAYLOAD_DCXDATA_STATUS0						as dcx_data_status_0,
+		                PAYLOAD_DCXDATA_STATUS1						as dcx_data_status_1,
+		                PAYLOAD_DCXDATA_STATUS2						as dcx_data_status_2,
+		                PAYLOAD_DCXDATA_STATUS3						as dcx_data_status_3,
+		                PAYLOAD_DCXDATA_FLOATARRAY0					as dcx_data_0,
+		                PAYLOAD_DCXDATA_FLOATARRAY1					as dcx_data_1,
+		                PAYLOAD_DCXDATA_FLOATARRAY2					as dcx_data_2,
+		                PAYLOAD_DCXDATA_FLOATARRAY3					as dcx_data_3 from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>

@@ -1,0 +1,47 @@
+<virtual-sensor name="Matterhorn_DozerAdcComDiff_hr_3933" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>true</unique-timestamps>
+        <output-structure>  
+                <field name="generation_time" type="VARCHAR(20)" />
+                <field name="sequence_number" type="INTEGER" />
+                <field name="node_id" type="INTEGER" />
+                <field name="valid" type="TINYINT" />
+                <field name="sample_number" type="SMALLINT" />
+                <field name="sib_adc_com_0" type="INTEGER" />
+                <field name="sib_adc_com_1" type="INTEGER" />
+                <field name="sib_adc_com_2" type="INTEGER" />
+                <field name="sib_adc_diff_0" type="INTEGER" />
+                <field name="sib_adc_diff_1" type="INTEGER" />
+                <field name="sib_adc_diff_2" type="INTEGER" />
+                <field name="sib_adc_diff_3" type="INTEGER" />
+       </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerAdcComDiffMsg) from Matterhorn deployment in human readable form</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Matterhorn_DozerAdcComDiff_3933</predicate>
+        </address>
+        <query> select 	TIMED,
+        				timestr(GEN_TIME)										as generation_time,
+        				HEADER_SEQNR 											as sequence_number,
+        				HEADER_ORIGINATORID 									as node_id,
+        				to_tinyint(PAYLOAD_SAMPLENO &gt;&gt; 15)				as valid,
+        				to_smallint(PAYLOAD_SAMPLENO &amp; 32767)				as sample_number,
+		                PAYLOAD_SIBADCCOM0										as sib_adc_com_0,
+		                PAYLOAD_SIBADCCOM1										as sib_adc_com_1,
+		                PAYLOAD_SIBADCCOM2										as sib_adc_com_2,
+		                PAYLOAD_SIBADCDIFF0										as sib_adc_diff_0,
+		                PAYLOAD_SIBADCDIFF1										as sib_adc_diff_1,
+		                PAYLOAD_SIBADCDIFF2										as sib_adc_diff_2,
+		                PAYLOAD_SIBADCDIFF3										as sib_adc_diff_3 from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>

@@ -1,0 +1,42 @@
+<virtual-sensor name="Jungfraujoch_BackLogStatus_4252" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensorBothDirections</class-name>
+       <unique-timestamps>false</unique-timestamps>
+       <web-input password="test">
+         	<command name="backlog">
+          		<field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
+          		<field name="backup_data" type="radio:yes|no" >backup incoming data at the deployment. This will only work if BackLogMain.py has been started with the --backup_db option!</field>
+        	</command>
+   		</web-input>
+       <output-structure>
+		<field name="TIMESTAMP" type="BIGINT" />
+                <field name="CONNECTED" type="SMALLINT" />
+                <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
+                <field name="BACKLOG_DB_SIZE_KB" type="INTEGER" />
+                <field name="BACKUP_DB_ENTRIES" type="INTEGER" />
+                <field name="BACKUP_DB_SIZE_KB" type="INTEGER" />
+                <field name="ERROR_NUMBER" type="INTEGER" />
+                <field name="COMMANDS_SENT" type="INTEGER" />
+       </output-structure>
+    </processing-class>
+    <description>show status information of PSBackLog and send commands to the Jungfraujoch deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+      <predicate key="type">PermaSense Jungfraujoch deployment</predicate>
+      <predicate key="LATITUDE">46.547438</predicate>
+      <predicate key="LONGITUDE">7.982088</predicate>
+    </addressing>
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="ps-backlog">
+          <predicate key="deployment">permasense-jj-bs01.ethz.ch:9002</predicate>
+          <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+        </address>
+        <query> select * from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>

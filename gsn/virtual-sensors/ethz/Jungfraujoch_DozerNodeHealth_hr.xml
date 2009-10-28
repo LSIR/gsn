@@ -1,0 +1,61 @@
+<virtual-sensor name="Jungfraujoch_DozerNodeHealth_hr_3933" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>true</unique-timestamps>
+        <output-structure>
+                <field name="generation_time" type="VARCHAR(20)" />
+                <field name="up_time" type="VARCHAR(20)" />
+                <field name="sequence_number" type="INTEGER" />
+                <field name="node_id" type="INTEGER" />
+                <field name="boottime" type="VARCHAR(20)" />
+                <field name="temperature" type="DOUBLE" />
+                <field name="msp_temperature" type="DOUBLE" />
+                <field name="msp_voltage" type="DOUBLE" />
+                <field name="valid" type="TINYINT" />
+                <field name="sample_number" type="SMALLINT" />
+                <field name="queue_size" type="SMALLINT" />
+                <field name="humidity" type="DOUBLE" />
+                <field name="flash_status" type="INTEGER" />
+                <field name="sdi_voltage" type="DOUBLE" />
+                <field name="sys_voltage" type="DOUBLE" />
+                <field name="parent_id" type="INTEGER" />
+                <field name="child_count" type="TINYINT" />
+                <field name="hop_count" type="TINYINT" />
+       </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerNodeHealthMsg) from Jungfraujoch deployment in human readable form</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="name">Jungfraujoch_DozerNodeHealth_3933</predicate>
+        </address>
+        <query>	select 	TIMED,
+        				timestr(GEN_TIME)										as generation_time,
+        				uptime(PAYLOAD_UPTIME_LOW, PAYLOAD_UPTIME_HIGH)			as up_time,
+        				HEADER_SEQNR 											as sequence_number,
+        				HEADER_ORIGINATORID 									as node_id,
+        				boottime(TIMED, HEADER_ATIME_LOW, HEADER_ATIME_HIGH,
+        					PAYLOAD_UPTIME_LOW, PAYLOAD_UPTIME_HIGH)			as boottime,
+        				real_temperature(PAYLOAD_TEMPERATURE)					as temperature,
+        				real_sdi_voltage(PAYLOAD_SDIVOLTAGE)					as sdi_voltage,
+        				real_sys_voltage(PAYLOAD_SYSVOLTAGE)					as sys_voltage,
+        				PAYLOAD_FLASHSTATUS										as flash_status,
+        				real_msp_temperature(PAYLOAD_MSPTEMPERATURE)			as msp_temperature,
+        				real_msp_voltage(PAYLOAD_MSPVOLTAGE)					as msp_voltage,
+        				to_tinyint(PAYLOAD_SAMPLENO &gt;&gt; 15)				as valid,
+        				to_smallint(PAYLOAD_SAMPLENO &amp; 32767)				as sample_number,
+        				PAYLOAD_QUEUESIZE 										as queue_size,
+        				real_humidity(PAYLOAD_HUMIDITY,
+        					real_temperature(PAYLOAD_TEMPERATURE))				as humidity,
+        				PAYLOAD_PARENTID										as parent_id,
+        				to_tinyint(PAYLOAD_HOPCOUNTCHILDCOUNT &gt;&gt; 4)		as hop_count,
+        				to_tinyint(PAYLOAD_HOPCOUNTCHILDCOUNT &amp; 15)			as child_count from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>
