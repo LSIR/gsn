@@ -62,6 +62,11 @@ import org.apache.log4j.Logger;
 			logger.error("Initialization failed. There is a table called " + TABLE_NAME+ " Inside the database but the structure is not compatible with what GSN expects.");
 			return false;
 		}
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			logger.error(e.getMessage(),e);
+		}
 		super.initialize();   		//get the timer settings
 
 		TimerTask timerTask = new MyTimerTask();
@@ -81,8 +86,11 @@ import org.apache.log4j.Logger;
 			StringBuilder query = StorageManager.getStatementInsert(table_name, getVirtualSensorConfiguration().getOutputStructure());
 			
 			try {
+				connection = getConnection();
+
 				StorageManager.executeInsert(table_name ,getVirtualSensorConfiguration().getOutputStructure(),dataItem,getConnection() );
 				logger.warn(getVirtualSensorConfiguration().getName() + " Wrote to database ");
+				connection.close();
 			} catch (SQLException e) {
 				logger.error(e.getMessage(),e);
 				logger.error("Insertion failed! ("+ query+")");
@@ -109,6 +117,12 @@ import org.apache.log4j.Logger;
 
 	public void dispose() {
 		timer0.cancel();
+		try {
+			this.connection.close();
+		} catch (SQLException e) {
+			logger.error(e.getMessage(),e);
+		}
+
 		//<TODO> should we close the database connection here?
 	}
 
