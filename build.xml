@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project basedir="." default="build-gsn" name="gsn">
+        <!-- UPDATE-ME: The name of your installer comes below in the gsn.name property -->
+	<property name="gsn.name" value="gsn-beta2-r1279" />
+	<!-- UPDATE-ME: The path to your GSN code for which you want to make an installer from -->
+	<property name="gsn.trunk"  value="/home/ali/workspace/gsn-trunk" />
+ 	<!-- UPDATE-ME: The path of your IzPack installation, for windows you should write something like c:/Program Files/IzPack -->
+	<property name="iz-pack" value="/home/ali/IzPack" /> 
+	<property name="dist"  location="dist" />
+	<target name="build-gsn" >
+		<property name="build.dir" value="temp/build"/>
+    <property name="src.dir" value="${gsn.trunk}/src"/>
+     <path id="classpath">
+         <pathelement location="${build.dir}/"/>
+         <fileset dir="${gsn.trunk}/lib">
+            <include name="**/*.jar"/>
+<!--            <exclude name="**/axis-2/**"/>  -->
+         </fileset>
+    </path>
+    <delete includeEmptyDirs="yes" failonerror="no">
+         <fileset dir="temp" />
+         <fileset dir="${dist}" />
+   </delete>
+   <mkdir dir="${dist}/lib"/>
+   <mkdir dir="${dist}/conf"/>
+   <mkdir dir="${dist}/logs"/>
+   <mkdir dir="${dist}/virtual-sensors"/>
+   <mkdir dir="${build.dir}"/>
+   <javac debug="true" srcdir="${src.dir}" optimize="off" destdir="${build.dir}" failonerror="true"  classpathref="classpath" >
+	 <exclude name="**/msr/**" /> 
+	 <exclude name="**/microsoft/**"/> 
+	 <exclude name="**/tempuri/**"/>
+	 <exclude name="**/epfl/**"/>
+	 <exclude name="**/ethz/**"/>
+	 <exclude name="**/slf/**"/>
+	 <exclude name="**/acquisition2/**"/>
+	 <exclude name="**/ieee1451/**"/>
+	 <exclude name="**/svn/**"/>
+	 <exclude name="**/WebCamWrapper.java"/>
+	 <exclude name="**/DemoVSensor.java"/>
+  	</javac>
+  	 <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"  failonerror="true">
+   	         <classpath refid="classpath"/>
+   	         <arg value="${gsn.trunk}/conf/containerJIBX.xml"/>
+   	         <arg value="${gsn.trunk}/conf/VirtualSensorDescription.xml"/>            
+    </java>
+    
+    <jar destfile="dist/lib/${gsn.name}.jar" basedir="${build.dir}" >
+				 <exclude name="**/msr/**" /> 
+				 <exclude name="**/acquisition2/**"/>
+         <manifest>
+            <!-- UPDATE-ME: write the name of the person wrote the installer -->
+            <attribute name="Built-By" value="ALI.SALEHI-at-EPFL.ch"/>
+            <attribute name="Main-Class" value="gsn.Main"/>
+            <attribute name="SplashScreen-Image" value="logo.png" /> <!-- We rather that you don't change the logo, of course minor modifications are fine. -->
+         </manifest>
+    </jar>
+
+	<copy file="${gsn.trunk}/virtual-sensors/samples/memoryDataVS.xml" todir="dist/virtual-sensors/"/>
+	<copy file="${gsn.trunk}/conf/wrappers.properties" todir="dist/conf/"/>
+	<copy file="${gsn.trunk}/conf/realm.properties" todir="dist/conf/"/>
+  	<copy file="log4j.properties" todir="dist/conf/"/>
+  	<copy file="gsn.xml" todir="dist/conf/"/>
+  	<copy file="logo.png" todir="dist/lib/"/>
+  	
+  	<copy file="gsn-start.bat" todir="dist/"/>
+  	<copy file="gsn-start.sh" todir="dist/"/>
+	<copy file="gsn-stop.sh" todir="dist/"/>
+	<copy file="gsn-stop.bat" todir="dist/"/>
+	<copy file="license.txt" todir="dist/"/>
+		
+    <copy  todir="dist/lib" flatten="yes" includeEmptyDirs="false">
+			<fileset dir="${gsn.trunk}/lib/">
+  		  <include name="**/**"/>
+   		  <exclude name="**/axis-2/**"/>
+  		  <exclude name="**/.svn/**"/>
+ 		  </fileset>
+		</copy>
+    <copy  todir="dist/webapp">
+	 <fileset dir="${gsn.trunk}/webapp/">
+  		  <exclude name="**/.svn/**"/>
+  		  <exclude name="**/axis2.xml"/>
+  		  <exclude name="**/*.aar"/>
+ 	  </fileset>
+	</copy>
+		
+	<path id="classpath">
+			<fileset dir="${iz-pack}/lib">
+				<include name="**/*.jar"/>
+			</fileset>
+		</path>
+	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpathref="classpath"/>
+	<izpack input="izpack.xml" output="${basedir}/${gsn.name}.jar" basedir="${basedir}" izPackdir="${iz-pack}"/>
+	
+	</target>
+	
+	<target name="clean">
+		<delete dir="build/classes"/>
+		<delete dir="${dist}" />
+	</target>
+
+	
+	<target name="exe" ><!-- For this you need launch4j application which is only available for windows. -->
+		<!-- This task works only on windows -->
+		<taskdef name="launch4j" classpath="c:/Program Files/Launch4j/launch4j.jar" classname="net.sf.launch4j.ant.Launch4jTask" />
+		<launch4j>
+			<config
+	        	outfile="${exe.name}"
+	          icon="images/nextick.ico"
+	          headertype="gui"
+	          jarpath="nextick-v2rc.jar"
+	          customProcName="true"
+	          stayAlive="false">
+				<jre minVersion="1.6.0" />
+				<splash file="images/nextick.bmp" />
+			</config>
+		</launch4j>
+	</target>
+</project>

@@ -1,0 +1,20 @@
+  <shortcuts>
+  <skipIfNotSupported/>
+  <programGroup defaultName="NexTick"
+                location="applications"/>
+  <shortcut
+    name="NexTick"
+    target="$INSTALL_PATH\nextick.bat"
+    commandLine=""
+    workingDirectory="$INSTALL_PATH"
+    description="Start NexTick (Version 2.0)"
+    iconFile="$INSTALL_PATH\images\nextick.ico"
+    iconIndex="0"
+    initialState="minimized"
+    programGroup="no"
+    desktop="yes"
+    applications="yes"
+    startMenu="no"
+    startup="no" >
+  </shortcut>
+  </shortcuts>

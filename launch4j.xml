@@ -1,0 +1,32 @@
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Users\ali\Documents\workspace\gsn-installer\gsn-beta1-rc0.jar</jar>
+  <outfile>gsn-v1beta1.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>http://gsn.sf.net</supportUrl>
+  <customProcName>true</customProcName>
+  <stayAlive>false</stayAlive>
+  <manifest></manifest>
+  <icon></icon>
+  <classPath>
+    <mainClass>com.izforge.izpack.installer.Installer</mainClass>
+  </classPath>
+  <jre>
+    <path></path>
+    <minVersion>1.6.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+  </jre>
+  <messages>
+    <startupErr>GSN can&apos;t install !</startupErr>
+    <bundledJreErr>Java Runtime Environment can&apos;t be installed.</bundledJreErr>
+    <jreVersionErr>Your Java version doesn&apos;t match what nextick needs.</jreVersionErr>
+    <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
+    <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>
