@@ -40,21 +40,14 @@ input[type=button],input[type=submit]
 {
 	color: black;
 	text-align: center;
-	border: 1px solid #5290CD;
 	cursor: pointer;
 	
 	margin:1px;
+
+	border: 1px solid #5290CD;
 	border-left: 10px solid #5290CD;
 	background-color: #b8caf7;
 }
-
-
-iframe
-{
-	width:100%;
-	border:none;
-}
-
 
 input[type=button]:active,input[type=button]:hover,input[type=submit]:active,input[type=submit]:hover
 {
