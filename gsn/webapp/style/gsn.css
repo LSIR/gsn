@@ -33,7 +33,6 @@ a img
 p 
 {
 	margin: 0.5em 0;
-	border-color: #5290CD;
 }
 
 input[type=button],input[type=submit]
@@ -60,7 +59,7 @@ body, html
 {
 	margin:0;
 	padding:0;
-	background: #F5F5F5;
+	background:#F5F5F5;
 	color:#333;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-size:12px;
@@ -101,7 +100,7 @@ body
 {
 	padding:95px 60px;
 	margin:0;
-	color: white;
+	color:white;
 }
 
 #headerfm h1 
@@ -109,7 +108,7 @@ body
 	margin:0;
 	padding:32px 0 32px 90px;
 	font-size:1.7em;
-	color: white;
+	color:white;
 }
 #header a,#headerfm a 
 {
@@ -122,7 +121,7 @@ body
 	line-height:2.2em;
 	margin:0;
 	padding:0;
-	background: #5ca1e7;
+	background:#5ca1e7;
 	color:#9e9e9e;
 }
 
@@ -176,7 +175,7 @@ body
 {
 	/*background:#80b0da;*/
 	/*color:#ffffff;*/
-	background: #b8caf7; /*#ff6f00;*/
+	background:#b8caf7; /*#ff6f00;*/
 	color:#000000;
 	text-decoration:none;
 }
@@ -218,7 +217,7 @@ body
 }
 #seeLink{
 	text-align:left;
-	margin-left:5%	;
+	margin-left:5%;
 	width:90%;
 	background-color:#b8caf7;
 	border: 1px solid #5290CD;
@@ -902,50 +901,50 @@ div.full-page {
 }
 
 /* dialog - zomming - plotting */
-.ui-dialog-titlebar-close{
+.ui-dialog-titlebar-close {
     display: none; /* removing the close btn*/
 }
-.ui-dialog-container{
+.ui-dialog-container {
     width:300px; /* For some reasons the actual size can't be specified through percentage !''*/
     height:400px;
 }
-.dlg_selector .overview{
+.dlg_selector .overview {
     width: 150px;
     height: 100px;
 }
 
-.ui-dialog-content{
+.ui-dialog-content {
     padding:0px;
 }
-.gsn_chart{
+.gsn_chart {
     width:750px;
     height:400px;
     /* position:absolute !important; */
 }
-.gsn_chart canvas{
+.gsn_chart canvas {
     position: absolute !important;
     left: 0px !important;
     top: 0px !important;
 }
 .miniature {
     float: right;
-    /*margin-left: 30px ;*/
+    /*margin-left: 30px;*/
     margin-right:15px;
     max-width:200px;
 }
-.overviewLegend{
+.overviewLegend {
     padding-left:30px;
 }
-.overview{
+.overview {
     margin: auto;
 }
-.miniature .legendColorBox{
+.miniature .legendColorBox {
     padding-left:30px;
-    background-image: url(eye.png) ;
+    background-image: url(eye.png);
     background-position: left center;
     background-repeat: no-repeat;
 }
-.miniature .no-img{
+.miniature .no-img {
     background-image: none;
 }
 
@@ -953,7 +952,7 @@ div.full-page {
     width:auto;
     height:auto;
 }
-.clear-both{
+.clear-both {
     clear:both;
 }
 
