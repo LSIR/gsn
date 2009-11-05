@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<title>PermaSense :: GSN</title>
+	
+	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
+	<script type="text/javascript" src="js/jquery-dom.js"></script>
+	<script type="text/javascript" src="js/jquery.history.js"></script>
+	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
+		
+	<script type="text/javascript" src="js/constants.js"></script>
+	<script type="text/javascript" src="js/functions.js"></script>
+	
+	<script type="text/javascript" src="js/gsn.js"></script>
+<script type="text/javascript">
+<!--//<![CDATA[
+
+var initialUpdateVal = 600;
+var nextUpdateVal = initialUpdateVal;
+
+function updateTopology()
+{
+	window.location.reload();
+	/*
+	var time = new Date();
+	$("#healthdiv img").each(function(){
+		var src = $(this).attr("src");
+		$(this).attr("src",src+"?time="+time.valueOf());
+		
+	});*/
+}
+
+function nextUpdate()
+{
+	
+	if(nextUpdateVal==0) nextUpdateVal=initialUpdateVal+1;
+	
+	nextUpdateVal--;
+	
+	$("#nextUpdate").text(nextUpdateVal);
+	
+	if(nextUpdateVal==0) 
+	{
+		updateTopology();
+	}
+	setTimeout("nextUpdate()",1000);
+}
+
+$(document).ready(function() {
+	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+	
+	//load the requested page
+	$.historyInit(GSN.load);
+		
+	$("#nextUpdate").text(nextUpdateVal);
+	setTimeout("nextUpdate()",1000);
+	
+});	
+//]]>-->
+</script>
+</head>
+<body>
+
+<div id="container">
+	<div id="header">
+		<h1><a href="." id="gsn-name">PermaSense :: GSN</a></h1>
+	</div>
+	<div id="navigation">
+		<ul id="menu">
+			<li><a href="index.html#home">home</a></li>
+			<li><a href="data.html#data">data browser</a></li>
+			<li><a href="topology.html#topology">network topology</a></li>
+			<li><a href="nodehealth.html#nodehealth">node health</a></li>
+            <li><a href="basehealth.html#basehealth">base health</a></li>
+			<li class="selected"><a href="weather.html#weather">on-site weather</a></li>
+			<li><a href="map.html#map">map</a></li>
+			<!-- <li><a href="fullmap.html#fullmap">fullmap</a></li> -->
+		</ul>
+		<ul id="linkWebsite"><li><a href="http://www.permasense.ch" target="_blank">PermaSense Home</a></li></ul>
+	</div>
+	
+	<div id="separator">
+		<div id="starttext">
+			<p>
+				A collection of weather information related to the PermaSense Deployments.
+			</p>
+		</div>
+	</div>
+	
+	
+	<div id="maindiv">
+	
+		<p id="updatetext">next update in <span id="nextUpdate">??</span> seconds</p>
+		<br/>
+		<table width="100%">
+			<tr>
+			<td>
+				<b>Live Webcam:</b><br/><br/>
+				
+				<table><tr><td><img src="http://www.zermatt.ch/html/bergbahnen/webcams/matterhorn2.jpg"/></td></tr></table>
+			</td>
+			<td valign="top">
+				<b>Weather-Info </b><br/>
+				
+				<table><tr><td>Kleines Matterhorn</td><td>Solvay</td></tr>
+				       <tr><td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067470.png"/></td>
+					   <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069730.png"/></td>
+					</tr>
+				</table>
+				<img src="http://people.ee.ethz.ch/~perma/webcam.php?id=0" width="250" height="300">
+			</td>
+			</tr>
+			<tr>
+			<td>
+				<table><tr><td><img src="http://www.swisspanorama.com/assets/images/jungfraujoch.jpg"/>
+                                               <img src="http://www.swisspanorama.com/assets/images/maennlichen.jpg"/></td></tr></table>
+			</td>
+			<td>
+				<table>
+					<tr><td>Jungfraujoch</td><td>Konkordiahuette</td></tr>
+					<tr>
+						<td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067300.png"/></td>
+						<td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069710.png"/></td>
+					</tr>
+				</table>
+			</td>
+			</tr>
+	
+		</table>
+
+		
+		<p style="margin-top:30px;">
+			<b>Measured values from Zermatt Weatherstation (&copy; MeteoSchweiz)</b><br/><br/>
+		
+			<table width="100%">
+		
+				<tr>
+					<td><b>Temperature (mean):</b></td>
+					<td><b>Minutes of Sunshine:</b></td>
+				</tr>
+				<tr>
+					<td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.temp.ZER.gif"/></td>
+					<td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.son.ZER.gif"/></td>
+					
+				</tr>
+				<tr><td>&nbsp;</td></tr>
+				<tr>
+					<td><b>Precipitation:</b></td>
+					<td><b>Windspeed (peak and mean) [km/h]:</b></td>
+				</tr>
+				<tr>
+					<td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.reg.ZER.gif"/></td>
+					<td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.win.ZER.gif"/></td>
+					
+				</tr>
+	
+			</table>
+		
+		</p>
+		
+		<p style="text-align:center;margin-top:30px;">
+			<b>Precipitation Radar:</b><br/><br/>
+			<img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter/radarbild.Par.0004.Image.gif"/>
+			<!-- img src="http://www.meteoschweiz.admin.ch/web/de/wetter/modelle/vorhersagen.Par.0002.DownloadFile.ext.tmp/gross.gif"/ -->
+		</p>
+		
+		<p style="text-align:center;margin-top:30px;">
+			<b>4-Days Forecast</b><br/><br/>
+			<img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067470.png"/>
+		</p>
+
+		<p style="text-align:center;margin-top:30px;">
+			<img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067300.png"/>
+		</p>
+		
+
+	</div>
+	<div class="separator">
+		<div id="footer">
+		      <table width="100%">
+				<tr>
+					<td style="width:50%;color:#444444;"><b>A Project of <a href="http://www.ethz.ch" target="_blank">ETH Zurich</a>, <a href="http://www.unibas.ch" target="_blank">Uni Basel</a> and <a href="http://www.uzh.ch" target="_blank">Uni Zurich</a></b></td>
+					<td style="text-align:right;width:50%;font-size:9px;">Powered by <a href="http://gsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-5632004-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+</body>
+</html>

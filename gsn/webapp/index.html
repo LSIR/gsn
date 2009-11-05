@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-	<title>GSN</title>
+	<title>PermaSense :: GSN</title>
 	
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
 	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
@@ -43,23 +43,34 @@ $(document).ready(function() {
 
 <div id="container">
 	<div id="header">
-		<h1><a href="." id="gsn-name">GSN</a></h1>
+		<h1><a href="." id="gsn-name">PermaSense :: GSN</a></h1>
 	</div>
 	<div id="navigation">
 		<ul id="menu">
 			<li class="selected"><a href="index.html#home">home</a></li>
-			<li><a href="data.html#data">data</a></li>
+			<li><a href="data.html#data">data browser</a></li>
+			<li><a href="topology.html#topology">network topology</a></li>
+			<li><a href="nodehealth.html#nodehealth">node health</a></li>
+			<li><a href="basehealth.html#basehealth">base health</a></li>
+			<li><a href="weather.html#weather">on-site weather</a></li>
 			<li><a href="map.html#map">map</a></li>
-			<li><a href="fullmap.html#fullmap">fullmap</a></li>
+			<!-- <li><a href="fullmap.html#fullmap">fullmap</a></li> -->
 		</ul>
-		<ul id="linkWebsite"><li><a href="http://sourceforge.net/apps/trac/gsn/">GSN Home</a></li></ul>
+		<ul id="linkWebsite"><li><a href="http://www.permasense.ch" target="_blank">PermaSense Home</a></li></ul>
+	</div>
+	<div id="separator">
+		<div id="starttext">
+			<p>Welcome to the PermaSense Data Frontend.</p>
+			<p>PermaSense observes physical parameters related to permafrost in steep high-alpine terrain over a period of multiple years. Live sensor network data is transmitted from the Matterhorn and Jungfraujoch field sites at 3500 m a.s.l. every 2 minutes.</p>
+			<p>See the data live on the real-time tabs below or as plots in the <a href="data.html">data browser</a>.</p>
+		</div>
 	</div>
 	<div id="main">
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
 		
 		<div id="control">
 		  <iframe name="webupload" style="border:0;height:0;width:0;"></iframe>
-		  <div id="msg">Welcome to Global Sensor Networks. The first ten sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
+		  <!-- <div id="msg">Welcome to Global Sensor Networks. The first ten sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div> -->
 		  <p>Auto-refresh every : 
 			<select id="refreshall_timeout" >
 			<option value="3600000">1hour</option>
@@ -84,23 +95,35 @@ $(document).ready(function() {
 
 	</div>
 	<div id="sidebar">
-		<h3>Description</h3>
+		<!-- <h3>Description</h3>
 		<p id="gsn-desc">none</p>
 		<h3>Author</h3>
-		<p id="gsn-author">none</p>
+		<p id="gsn-author">none</p> -->
 		<h3>Virtual sensors</h3>
         <ul id="vsmenu">
          <li><a href="#">not loaded</a></li>
         </ul>
         <p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
 	</div>
-	<div id="footer">
-		<p>Powered by <a href="http://globalsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</p>
-		<p>
-		    <a href="http://validator.w3.org/check?uri=referer"><img src="./img/html_valid.bmp"/></a>
-		    <a href="http://jigsaw.w3.org/css-validator/check?uri=referer"><img src="./img/css_valid.bmp"/></a>
-	  </p>
+	<div class="separator">
+		<div id="footer">
+			<table width="100%">
+				<tr>
+					<td style="width:50%;color:#444444;"><b>A Project of <a href="http://www.ethz.ch" target="_blank">ETH Zurich</a>, <a href="http://www.unibas.ch" target="_blank">Uni Basel</a> and <a href="http://www.uzh.ch" target="_blank">Uni Zurich</a></b></td>
+					<td style="text-align:right;width:50%;font-size:9px;">Powered by <a href="http://gsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>
+				</tr>
+			</table>
+		</div>
 	</div>
 </div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-5632004-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
 </body>
 </html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<title>PermaSense :: GSN</title>
+	
+	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
+	<script type="text/javascript" src="js/jquery-dom.js"></script>
+	<script type="text/javascript" src="js/jquery.history.js"></script>
+	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
+		
+	<script type="text/javascript" src="js/constants.js"></script>
+	<script type="text/javascript" src="js/functions.js"></script>
+	
+	<script type="text/javascript" src="js/gsn.js"></script>
+<script type="text/javascript">
+<!--//<![CDATA[
+
+var initialUpdateVal = 30;
+var nextUpdateVal = initialUpdateVal;
+
+function updateTopology()
+{
+	window.location.reload();
+}
+
+function nextUpdate()
+{
+	if(nextUpdateVal==0) nextUpdateVal=initialUpdateVal+1;
+	
+	nextUpdateVal--;
+	
+	$("#nextUpdate").text(nextUpdateVal);
+	
+	if(nextUpdateVal==0) 
+	{
+		updateTopology();
+	}
+	setTimeout("nextUpdate()",1000);
+}
+
+$(document).ready(function() {
+	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+	
+	//load the requested page
+	$.historyInit(GSN.load);
+		
+	$("#nextUpdate").text(nextUpdateVal);
+	setTimeout("nextUpdate()",1000);
+	
+});	
+//]]>-->
+</script>
+</head>
+<body>
+
+<div id="container">
+	<div id="header">
+		<h1><a href="." id="gsn-name">PermaSense :: GSN</a></h1>
+	</div>
+	<div id="navigation">
+		<ul id="menu">
+			<li><a href="index.html#home">home</a></li>
+			<li><a href="data.html#data">data browser</a></li>
+			<li class="selected"><a href="topology.html#topology">network topology</a></li>
+			<li><a href="nodehealth.html#nodehealth">node health</a></li>
+            <li><a href="basehealth.html#basehealth">base health</a></li>
+			<li><a href="weather.html#weather">on-site weather</a></li>
+			<li><a href="map.html#map">map</a></li>
+            <!-- <li><a href="fullmap.html#fullmap">fullmap</a></li> -->
+		</ul>
+		<ul id="linkWebsite"><li><a href="http://www.permasense.ch" target="_blank">PermaSense Home</a></li></ul>
+	</div>
+	
+	<div id="separator">
+		<div id="starttext">
+			<p>
+				The current sensor network topology and status data. Sensor nodes have IDs above 2000, access nodes below.
+			</p>
+		</div>
+	</div>
+	
+	<div id="maindiv">
+	
+		<p id="updatetext">next update in <span id="nextUpdate">??</span> seconds</p>
+
+		<p>&nbsp;</p>
+
+		<p>Matterhorn
+			
+		<a href="http://people.ee.ethz.ch/~perma/topology.php?host=permafrozer" target="_blank"><img id="topology_img_matterhorn" src="http://people.ee.ethz.ch/~perma/topology.php?host=permafrozer" style="width:955px;border:none;"/></a>
+
+		</p>
+		<p>&nbsp;</p>
+
+		<p>Jungfraujoch
+			
+		<a href="http://people.ee.ethz.ch/~perma/topology.php?host=almer" target="_blank"><img id="topology_img_almer" src="http://people.ee.ethz.ch/~perma/topology.php?host=almer" style="width:955px;border:none;"/></a>
+
+		</p>
+		<p>&nbsp;</p>
+
+		<p>ETZ Rooftop
+			
+		<a href="http://people.ee.ethz.ch/~perma/topology.php?host=rooftop" target="_blank"><img id="topology_img_etzroof" src="http://people.ee.ethz.ch/~perma/topology.php?host=rooftop" style="width:955px;border:none;"/></a>
+
+		</p>
+
+	</div>
+	<div class="separator">
+		<div id="footer">
+		      <table width="100%">
+				<tr>
+					<td style="width:50%;color:#444444;"><b>A Project of <a href="http://www.ethz.ch" target="_blank">ETH Zurich</a>, <a href="http://www.unibas.ch" target="_blank">Uni Basel</a> and <a href="http://www.uzh.ch" target="_blank">Uni Zurich</a></b></td>
+					<td style="text-align:right;width:50%;font-size:9px;">Powered by <a href="http://gsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-5632004-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+</body>
+</html>

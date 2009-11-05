@@ -210,8 +210,8 @@ var GSN = {
 		
         //Test example
         //GSN.vsName.push("genepi_meteo_10_replay", "genepi_meteo_11_replay","genepi_meteo_12_replay","genepi_meteo_13_replay","genepi_meteo_15_replay","genepi_meteo_16_replay","genepi_meteo_18_replay","genepi_meteo_2_replay","genepi_meteo_3_replay","genepi_meteo_4_replay","genepi_meteo_6_replay","genepi_meteo_7_replay");
-        GSN.vsName = GSN.util.regroupByRubricSensorName(GSN.vsName);
-		
+        //GSN.vsName = GSN.util.regroupByRubricSensorName(GSN.vsName);
+        GSN.vsName = GSN.util.regroupByUnderscore(GSN.vsName);		
 		
         // Creation of the sidebar menu with categories
         var vsName = GSN.vsName;
@@ -2103,6 +2103,28 @@ var GSN = {
             }
 			
             return vsNameRubric;
+        }
+
+        /**
+                * Take an array return a sorted array with grouping to the first underscore
+                */                    
+        ,
+        regroupByUnderscore: function(vsName){
+            var name, index;
+
+            vsName.sort();
+            vsNameUnderscore = new Array(vsName.length);
+            for(var i=0;i<vsName.length;++i)
+            {
+                name = vsName[i];
+                vsNameUnderscore[i] = new Array(2);
+                index = name.indexOf("_");
+                vsNameUnderscore[i][0] = name;
+                if(index>=1) vsNameUnderscore[i][1] = name.substr(0,index);
+                else vsNameUnderscore[i][1] = "others";
+            }
+
+            return vsNameUnderscore;
         }
 		
         ,
