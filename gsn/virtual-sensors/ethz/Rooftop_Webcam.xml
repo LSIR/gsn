@@ -14,7 +14,7 @@
     <streams>
     <stream name="data">
       <source alias="source" storage-size="1" sampling-rate="1">
-        <address wrapper="ps-backlog">
+        <address wrapper="backlog">
           <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9002</predicate>
           <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryBridgePlugin</predicate>
           <predicate key="listener-id">1</predicate>
