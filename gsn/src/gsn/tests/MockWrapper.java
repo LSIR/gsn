@@ -60,14 +60,16 @@ public class MockWrapper extends AbstractWrapper{
   }
 
 
-  protected void postStreamElement(long timestamp, Serializable[] values) {
+  protected boolean postStreamElement(long timestamp, Serializable[] values) {
     StreamElement se = new StreamElement(getOutputFormat(),values,timestamp);
-    streamElements.add(se); 
+    streamElements.add(se);
+    return true;
   }
 
-  protected void postStreamElement(Serializable... values) {
+  protected boolean postStreamElement(Serializable... values) {
     StreamElement se = new StreamElement(getOutputFormat(),values,System.currentTimeMillis());
-    streamElements.add(se); 
+    streamElements.add(se);
+    return true;
   }
 
   protected Boolean postStreamElement(StreamElement se) {

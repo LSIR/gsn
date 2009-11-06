@@ -180,16 +180,16 @@ public abstract class AbstractWrapper extends Thread {
 		return isActive;
 	}
 
-	protected void postStreamElement(Serializable... values) {
+	protected boolean postStreamElement(Serializable... values) {
 		StreamElement se = new StreamElement(getOutputFormat(), values, System
 				.currentTimeMillis());
-		postStreamElement(se);
+		return postStreamElement(se);
 	}
 
-	protected void postStreamElement(long timestamp, Serializable[] values) {
+	protected boolean postStreamElement(long timestamp, Serializable[] values) {
 		StreamElement se = new StreamElement(getOutputFormat(), values,
 				timestamp);
-		postStreamElement(se);
+		return postStreamElement(se);
 	}
 
 	/**
