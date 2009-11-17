@@ -68,6 +68,8 @@ public class RestRemoteWrapper extends AbstractWrapper {
 					ResultSet rs = StorageManager.executeQueryWithResultSet(query, conn);
 					if (rs.next()) {
 						lastReceivedTimestamp = rs.getLong(1);
+					} else {
+						lastReceivedTimestamp = 0;
 					}
 				} catch (SQLException e) {
 					logger.error(e.getMessage(), e);

@@ -72,6 +72,8 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 				ResultSet rs = StorageManager.executeQueryWithResultSet(dbquery, conn);
 				if (rs.next()) {
 					lastVisited = rs.getLong(1);
+				} else {
+					lastVisited = 0;
 				}
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
