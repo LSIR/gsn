@@ -10,12 +10,15 @@ import gsn.beans.VSensorConfig;
 import gsn.storage.PoolIsFullException;
 import gsn.storage.SQLUtils;
 import gsn.storage.SQLValidator;
+import gsn.storage.StorageManager;
 import gsn.utils.Helpers;
 import gsn.vsensor.AbstractVirtualSensor;
 import gsn.wrappers.AbstractWrapper;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -24,7 +27,7 @@ import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
 
-public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySystem{
+public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySystem {
 
 	private  final String CURRENT_TIME = ISODateTimeFormat.dateTime().print(System.currentTimeMillis());
 	
@@ -46,10 +49,8 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 
 	public boolean initialize() {
 		AddressBean params = getActiveAddressBean( );
-		String query = params.getPredicateValue("query");
-		
+		String query = params.getPredicateValue("query");		
 		String vsName = params.getPredicateValue( "name" );
-		String startTime = params.getPredicateValueWithDefault("start-time",CURRENT_TIME );
 
 		if (query==null && vsName == null) {
 			logger.error("For using local-wrapper, either >query< or >name< parameters should be specified"); 
@@ -59,14 +60,36 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		if (query == null) 
 			query = "select * from "+vsName;
 
-		long lastVisited;
-		try {
-			lastVisited = Helpers.convertTimeFromIsoToLong(startTime);
-		}catch (Exception e) {
-			logger.error("Problem in parsing the start-time parameter, the provided value is:"+startTime+" while a valid input is:"+CURRENT_TIME);
-			logger.error(e.getMessage(),e);
-			return false;
+		long lastVisited = -1;
+		String startTime = params.getPredicateValueWithDefault("start-time", CURRENT_TIME);
+		if (startTime.equals("auto")) {
+			Connection conn = null;
+			try {
+				conn = StorageManager.getInstance().getConnection();
+				StringBuilder dbquery = new StringBuilder();
+				dbquery.append("select max(timed) from ").append(getDBAliasInStr());
+				
+				ResultSet rs = StorageManager.executeQueryWithResultSet(dbquery, conn);
+				if (rs.next()) {
+					lastVisited = rs.getLong(1);
+				}
+			} catch (SQLException e) {
+				logger.error(e.getMessage(), e);
+			} finally {
+				StorageManager.close(conn);
+			}
 		}
+		if (lastVisited == -1) {
+			try {
+				lastVisited = Helpers.convertTimeFromIsoToLong(startTime);
+			} catch (Exception e) {
+				logger.error("Problem in parsing the start-time parameter, the provided value is:"+startTime+" while a valid input is:"+CURRENT_TIME);
+				logger.error(e.getMessage(),e);
+				return false;
+			}
+		}
+		logger.info("lastVisited=" + String.valueOf(lastVisited));
+		
 		try {
 			vsName = SQLValidator.getInstance().validateQuery(query);
 			if(vsName==null) //while the other instance is not loaded.

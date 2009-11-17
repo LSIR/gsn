@@ -2,10 +2,14 @@ package gsn.http.rest;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -53,10 +57,31 @@ public class RestRemoteWrapper extends AbstractWrapper {
 	public boolean initialize() {
 		try {
 			params = new RemoteWrapperParamParser(getActiveAddressBean(),false);
-			lastReceivedTimestamp = params.getStartTime();
+			String startTime = getActiveAddressBean().getPredicateValue("start-time");
+			if (startTime != null && startTime.equals("auto")) {
+				Connection conn = null;
+				try {
+					conn = StorageManager.getInstance().getConnection();
+					StringBuilder query = new StringBuilder();
+					query.append("select max(timed) from ").append(getDBAliasInStr());
+					
+					ResultSet rs = StorageManager.executeQueryWithResultSet(query, conn);
+					if (rs.next()) {
+						lastReceivedTimestamp = rs.getLong(1);
+					}
+				} catch (SQLException e) {
+					logger.error(e.getMessage(), e);
+				} finally {
+					StorageManager.close(conn);
+				}
+			}
+			if (lastReceivedTimestamp == -1) {
+				lastReceivedTimestamp = params.getStartTime();
+			}
+			logger.info("lastReceivedTimestamp=" + String.valueOf(lastReceivedTimestamp));
 			structure = connectToRemote();
-		}catch (Exception e) {
-			logger.error(e.getMessage(),e);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 		return true;
