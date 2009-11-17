@@ -17,30 +17,31 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
 
     private transient Logger logger = Logger.getLogger(this.getClass());
 
-    private static final int THREAD_RATE = 1000; //default THREAD_RATE, every 1 second.
+    private static final int DEFAULT_SAMPLING_RATE_IN_MSEC = 1000; //default thread_rate, every 1 second.
+    private int thread_rate = DEFAULT_SAMPLING_RATE_IN_MSEC;
     private int selected_station_id;
 
     private static final String INITPARAM_SOURCE = "source";
     private static final String INITPARAM_STATION_ID = "station_id";
 
-    private static final int MAX_DUPN = 4; // maximum id for extended sensors supported (max number = max_dpun++1)
+    private static final int MAX_DUPN = 4; // maximum number of extended sensors supported
 
-    private static final int INDEX_AIR_TEMP = (MAX_DUPN+1)*5;
-    private static final int INDEX_AIR_HUMID = (MAX_DUPN+1)*2;
-    private static final int INDEX_SOLAR_RAD = (MAX_DUPN+1)*3;
-    private static final int INDEX_RAIN_METER = (MAX_DUPN+1)*4;
-    private static final int INDEX_GROUND_TEMP_TNX = (MAX_DUPN+1);
-    private static final int INDEX_AIR_TEMP_TNX = (MAX_DUPN+1)*6;
-    private static final int INDEX_SOIL_TEMP_ECTM = (MAX_DUPN+1)*7;
-    private static final int INDEX_SOIL_MOISTURE_ECTM = (MAX_DUPN+1)*8;
-    private static final int INDEX_SOIL_WATER_POTENTIAL = (MAX_DUPN+1)*9;
-    private static final int INDEX_SOIL_TEMP_DECAGON = (MAX_DUPN+1)*10;
-    private static final int INDEX_SOIL_MOISTURE_DECAGON = (MAX_DUPN+1)*11;
-    private static final int INDEX_SOIL_CONDUCT_DECAGON = (MAX_DUPN+1)*12;
-    private static final int INDEX_WIND_DIRECTION = (MAX_DUPN+1)*13;
-    private static final int INDEX_WIND_SPEED = (MAX_DUPN+1)*14;
+    private static final int OFFSET_AIR_TEMP = (MAX_DUPN + 1) * 1;
+    private static final int OFFSET_AIR_HUMID = (MAX_DUPN + 1) * 2;
+    private static final int OFFSET_SOLAR_RAD = (MAX_DUPN + 1) * 3;
+    private static final int OFFSET_RAIN_METER = (MAX_DUPN + 1) * 4;
+    private static final int OFFSET_GROUND_TEMP_TNX = (MAX_DUPN + 1)*5;
+    private static final int OFFSET_AIR_TEMP_TNX = (MAX_DUPN + 1) * 6;
+    private static final int OFFSET_SOIL_TEMP_ECTM = (MAX_DUPN + 1) * 7;
+    private static final int OFFSET_SOIL_MOISTURE_ECTM = (MAX_DUPN + 1) * 8;
+    private static final int OFFSET_SOIL_WATER_POTENTIAL = (MAX_DUPN + 1) * 9;
+    private static final int OFFSET_SOIL_TEMP_DECAGON = (MAX_DUPN + 1) * 10;
+    private static final int OFFSET_SOIL_MOISTURE_DECAGON = (MAX_DUPN + 1) * 11;
+    private static final int OFFSET_SOIL_CONDUCT_DECAGON = (MAX_DUPN + 1) * 12;
+    private static final int OFFSET_WIND_DIRECTION = (MAX_DUPN + 1) * 13;
+    private static final int OFFSET_WIND_SPEED = (MAX_DUPN + 1) * 14;
 
-    private int threadCounter = 0;
+    private static int threadCounter = 0;
 
     private String source;
 
@@ -213,7 +214,7 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
         while (isActive()) {
             try {
                 // delay
-                Thread.sleep(THREAD_RATE);
+                Thread.sleep(thread_rate);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -244,13 +245,6 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
 
                 if (type == 1) { //if (type != 1) continue; // ignore packets other than sensing data
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("\nPacket (" + packet.length + ")");
-                        logger.debug(list_array(packet));
-                    }
-
-                    if (logger.isDebugEnabled())
-                        logger.debug("dst:" + destination + " src:" + source + " len:" + length + " grp:" + group + " typ:" + type);
 
                     /// TinyOS header
 
@@ -260,11 +254,18 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                     int stationID = packet[9] * 256 + packet[10];
                     int dataPayLoadSize = length - 3;
 
-                    if (logger.isDebugEnabled())
-                        logger.debug("hopCount:" + hopCount + " stationID:" + stationID + " dataPayLoad.size:" + dataPayLoadSize);
-
-
                     if (stationID == selected_station_id) {
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Packet (" + packet.length + ")");
+                            logger.debug(list_array(packet));
+                        }
+
+                        if (logger.isDebugEnabled())
+                            logger.debug("dst:" + destination + " src:" + source + " len:" + length + " grp:" + group + " typ:" + type);
+
+                        if (logger.isDebugEnabled())
+                            logger.debug("hopCount:" + hopCount + " stationID:" + stationID + " dataPayLoad.size:" + dataPayLoadSize);
 
                         /// preambule
 
@@ -438,9 +439,9 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                 buffer[0] = new Integer(stationID);
                                 buf[0] = stationID;
 
-                                for (int i = 1; i <= OUTPUT_STRUCTURE_SIZE-2; i++)
+                                for (int i = 1; i <= OUTPUT_STRUCTURE_SIZE - 2; i++)
                                     buffer[i] = null;
-                                buffer[OUTPUT_STRUCTURE_SIZE-1] = new Long(last_timestamp);
+                                buffer[OUTPUT_STRUCTURE_SIZE - 1] = new Long(last_timestamp);
                                 doPostStreamElement = true;
 
                                 // extended sensors (when other sensors share the same bus)
@@ -487,30 +488,30 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                             sid2_air_humid = (raw_airhumidity * 1.0 * 0.0405) - 4 - (raw_airhumidity * raw_airhumidity * 0.0000028) + ((raw_airhumidity * 0.00008) + 0.01) * (sid2_air_temp - 25);
                                             logger.info("sid2_air_temp: " + measure.format(sid2_air_temp) +
                                                     " sid2_air_humid: " + measure.format(sid2_air_humid));
-                                            buffer[INDEX_AIR_TEMP + dupn] = new Double(sid2_air_temp);
-                                            buf[INDEX_AIR_TEMP + dupn] = sid2_air_temp;
-                                            count[INDEX_AIR_TEMP + dupn]++;
-                                            buffer[INDEX_AIR_HUMID + dupn] = new Double(sid2_air_humid);
-                                            buf[INDEX_AIR_HUMID + dupn] = sid2_air_humid;
-                                            count[INDEX_AIR_HUMID + dupn]++;
+                                            buffer[OFFSET_AIR_TEMP + dupn] = new Double(sid2_air_temp);
+                                            buf[OFFSET_AIR_TEMP + dupn] = sid2_air_temp;
+                                            count[OFFSET_AIR_TEMP + dupn]++;
+                                            buffer[OFFSET_AIR_HUMID + dupn] = new Double(sid2_air_humid);
+                                            buf[OFFSET_AIR_HUMID + dupn] = sid2_air_humid;
+                                            count[OFFSET_AIR_HUMID + dupn]++;
                                             break;
 
                                         case 4:
                                             long raw_solar_rad = reading[0] * 256 + reading[1];
                                             sid4_solar_rad = raw_solar_rad * 2.5 * 1000 * 6 / (4095 * 1.67 * 5);
                                             logger.info("sid4_solar_rad: " + measure.format(sid4_solar_rad));
-                                            buffer[INDEX_SOLAR_RAD + dupn] = new Double(sid4_solar_rad);
-                                            buf[INDEX_SOLAR_RAD + dupn] = sid4_solar_rad;
-                                            count[INDEX_SOLAR_RAD + dupn]++;
+                                            buffer[OFFSET_SOLAR_RAD + dupn] = new Double(sid4_solar_rad);
+                                            buf[OFFSET_SOLAR_RAD + dupn] = sid4_solar_rad;
+                                            count[OFFSET_SOLAR_RAD + dupn]++;
                                             break;
 
                                         case 5:
                                             long raw_rain_meter = reading[0] * 256 + reading[1];
                                             sid5_rain_meter = raw_rain_meter * 0.254;
                                             logger.info("sid5_rain_meter: " + measure.format(sid5_rain_meter));
-                                            buffer[INDEX_RAIN_METER + dupn] = new Double(sid5_rain_meter);
-                                            buf[INDEX_RAIN_METER + dupn] = sid5_rain_meter;
-                                            count[INDEX_RAIN_METER + dupn]++;
+                                            buffer[OFFSET_RAIN_METER + dupn] = new Double(sid5_rain_meter);
+                                            buf[OFFSET_RAIN_METER + dupn] = sid5_rain_meter;
+                                            count[OFFSET_RAIN_METER + dupn]++;
                                             break;
 
                                         case 6:
@@ -518,12 +519,12 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                             long raw_air_temp = reading[2] * 256 + reading[3];
                                             sid6_ground_temp = raw_ground_temp / 16.0 - 273.15;
                                             sid6_air_temp = raw_air_temp / 16.0 - 273.15;
-                                            buffer[INDEX_GROUND_TEMP_TNX + dupn] = new Double(sid6_ground_temp);
-                                            buf[INDEX_GROUND_TEMP_TNX + dupn] = sid6_ground_temp;
-                                            count[INDEX_GROUND_TEMP_TNX + dupn]++;
-                                            buffer[INDEX_AIR_TEMP_TNX + dupn] = new Double(sid6_air_temp);
-                                            buf[INDEX_AIR_TEMP_TNX + dupn] = sid6_air_temp;
-                                            count[INDEX_AIR_TEMP_TNX + dupn]++;
+                                            buffer[OFFSET_GROUND_TEMP_TNX + dupn] = new Double(sid6_ground_temp);
+                                            buf[OFFSET_GROUND_TEMP_TNX + dupn] = sid6_ground_temp;
+                                            count[OFFSET_GROUND_TEMP_TNX + dupn]++;
+                                            buffer[OFFSET_AIR_TEMP_TNX + dupn] = new Double(sid6_air_temp);
+                                            buf[OFFSET_AIR_TEMP_TNX + dupn] = sid6_air_temp;
+                                            count[OFFSET_AIR_TEMP_TNX + dupn]++;
                                             logger.info("sid6_ground_temp: " + measure.format(sid6_ground_temp) +
                                                     " sid6_air_temp: " + measure.format(sid6_air_temp));
                                             break;
@@ -533,12 +534,12 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                             long raw_soil_moisture = reading[2] * 256 + reading[3];
                                             sid7_soil_temp = (raw_soil_temp - 400.0) / 10.0;
                                             sid7_soil_moisture = (raw_soil_moisture * 0.00104 - 0.5) * 100;
-                                            buffer[INDEX_SOIL_TEMP_ECTM + dupn] = new Double(sid7_soil_temp);
-                                            buf[INDEX_SOIL_TEMP_ECTM + dupn] = sid7_soil_temp;
-                                            count[INDEX_SOIL_TEMP_ECTM + dupn]++;
-                                            buffer[INDEX_SOIL_MOISTURE_ECTM + dupn] = new Double(sid7_soil_moisture);
-                                            buf[INDEX_SOIL_MOISTURE_ECTM + dupn] = sid7_soil_moisture;
-                                            count[INDEX_SOIL_MOISTURE_ECTM + dupn]++;
+                                            buffer[OFFSET_SOIL_TEMP_ECTM + dupn] = new Double(sid7_soil_temp);
+                                            buf[OFFSET_SOIL_TEMP_ECTM + dupn] = sid7_soil_temp;
+                                            count[OFFSET_SOIL_TEMP_ECTM + dupn]++;
+                                            buffer[OFFSET_SOIL_MOISTURE_ECTM + dupn] = new Double(sid7_soil_moisture);
+                                            buf[OFFSET_SOIL_MOISTURE_ECTM + dupn] = sid7_soil_moisture;
+                                            count[OFFSET_SOIL_MOISTURE_ECTM + dupn]++;
                                             logger.info("sid7_soil_temp: " + measure.format(sid7_soil_temp) +
                                                     " sid7_soil_moisture: " + measure.format(sid7_soil_moisture));
                                             break;
@@ -546,9 +547,9 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                         case 8:
                                             long raw_soil_water_potential = reading[0] * 256 + reading[1];
                                             sid8_soil_water_potential = raw_soil_water_potential;
-                                            buffer[INDEX_SOIL_WATER_POTENTIAL + dupn] = new Double(sid8_soil_water_potential);
-                                            buf[INDEX_SOIL_WATER_POTENTIAL + dupn] = sid8_soil_water_potential;
-                                            count[INDEX_SOIL_WATER_POTENTIAL + dupn]++;
+                                            buffer[OFFSET_SOIL_WATER_POTENTIAL + dupn] = new Double(sid8_soil_water_potential);
+                                            buf[OFFSET_SOIL_WATER_POTENTIAL + dupn] = sid8_soil_water_potential;
+                                            count[OFFSET_SOIL_WATER_POTENTIAL + dupn]++;
                                             logger.info("sid8_soil_water_potential:" + measure.format(sid8_soil_water_potential));
                                             break;
 
@@ -565,15 +566,15 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                                 sid9_soil_conduct = raw_sid9_soil_conduct / 100.0;
                                             else
                                                 sid9_soil_conduct = (700 + 5.0 * (raw_sid9_soil_conduct - 700)) / 100.0;
-                                            buffer[INDEX_SOIL_TEMP_DECAGON + dupn] = new Double(sid9_soil_temp);
-                                            buf[INDEX_SOIL_TEMP_DECAGON + dupn] = sid9_soil_temp;
-                                            count[INDEX_SOIL_TEMP_DECAGON + dupn]++;
-                                            buffer[INDEX_SOIL_MOISTURE_DECAGON + dupn] = new Double(sid9_soil_moisture);
-                                            buf[INDEX_SOIL_MOISTURE_DECAGON + dupn] = sid9_soil_moisture;
-                                            count[INDEX_SOIL_MOISTURE_DECAGON + dupn]++;
-                                            buffer[INDEX_SOIL_CONDUCT_DECAGON + dupn] = new Double(sid9_soil_conduct);
-                                            buf[INDEX_SOIL_CONDUCT_DECAGON + dupn] = sid9_soil_conduct;
-                                            count[INDEX_SOIL_CONDUCT_DECAGON + dupn]++;
+                                            buffer[OFFSET_SOIL_TEMP_DECAGON + dupn] = new Double(sid9_soil_temp);
+                                            buf[OFFSET_SOIL_TEMP_DECAGON + dupn] = sid9_soil_temp;
+                                            count[OFFSET_SOIL_TEMP_DECAGON + dupn]++;
+                                            buffer[OFFSET_SOIL_MOISTURE_DECAGON + dupn] = new Double(sid9_soil_moisture);
+                                            buf[OFFSET_SOIL_MOISTURE_DECAGON + dupn] = sid9_soil_moisture;
+                                            count[OFFSET_SOIL_MOISTURE_DECAGON + dupn]++;
+                                            buffer[OFFSET_SOIL_CONDUCT_DECAGON + dupn] = new Double(sid9_soil_conduct);
+                                            buf[OFFSET_SOIL_CONDUCT_DECAGON + dupn] = sid9_soil_conduct;
+                                            count[OFFSET_SOIL_CONDUCT_DECAGON + dupn]++;
                                             logger.info("sid9_soil_temp: " + measure.format(sid9_soil_temp) +
                                                     " sid9_soil_moisture: " + measure.format(sid9_soil_moisture) +
                                                     " sid9_soil_conduct: " + measure.format(sid9_soil_conduct));
@@ -588,12 +589,12 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                             else
                                                 sid10_wind_direction = 360 - java.lang.Math.acos((raw_sid10_wind_direction * 2.0) / 4095.0 - 1) * 360.0 / (2 * java.lang.Math.PI);
                                             sid10_wind_speed = raw_sid10_wind_speed * 3600.0 * 1.6093 / (600 * 1600 * 3.6);
-                                            buffer[INDEX_WIND_DIRECTION + dupn] = new Double(sid10_wind_direction);
-                                            buf[INDEX_WIND_DIRECTION + dupn] = sid10_wind_direction;
-                                            count[INDEX_WIND_DIRECTION + dupn]++;
-                                            buffer[INDEX_WIND_SPEED + dupn] = new Double(sid10_wind_speed);
-                                            buf[INDEX_WIND_SPEED + dupn] = sid10_wind_speed;
-                                            count[INDEX_WIND_SPEED + dupn]++;
+                                            buffer[OFFSET_WIND_DIRECTION + dupn] = new Double(sid10_wind_direction);
+                                            buf[OFFSET_WIND_DIRECTION + dupn] = sid10_wind_direction;
+                                            count[OFFSET_WIND_DIRECTION + dupn]++;
+                                            buffer[OFFSET_WIND_SPEED + dupn] = new Double(sid10_wind_speed);
+                                            buf[OFFSET_WIND_SPEED + dupn] = sid10_wind_speed;
+                                            count[OFFSET_WIND_SPEED + dupn]++;
                                             logger.info("sid10_wind_direction: " + measure.format(sid10_wind_direction) +
                                                     " sid10_wind_speed: " + measure.format(sid10_wind_speed));
                                             break;
@@ -618,13 +619,13 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                             sb2.append("......\t");
                                         else
                                             sb2.append(nf2.format(buf[i2])).append("\t");
-                                    logger.debug("-- " + last_timestamp + " " + sb2.toString());
+                                   logger.debug("-- " + last_timestamp + " " + sb2.toString());
                                     */
                                     if (last_timestamp != previous_timestamp) {
 
                                         //logger.debug("");
 
-                                        for (int i = 1; i < OUTPUT_STRUCTURE_SIZE-1; i++) {// accumulated values
+                                        for (int i = 1; i < OUTPUT_STRUCTURE_SIZE - 1; i++) {// accumulated values
                                             if (count[i] > 0)
                                                 buffer[i] = new Double(buf[i]);
                                         }
@@ -685,7 +686,7 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                 logger.warn("Error on " + reader.getName() + ": " + e);
             }
             catch (IndexOutOfBoundsException e) {
-                logger.warn("Error while parsing SensorScope packet ("+selected_station_id+"):" + list_array(packet));
+                logger.warn("Error while parsing SensorScope packet:" + list_array(packet));
                 logger.warn(e);
             }
 
