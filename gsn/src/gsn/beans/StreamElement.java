@@ -171,8 +171,19 @@ public final class StreamElement implements Serializable {
 		return this.fieldValues;
 	}
 
-	public void setData (int index,Serializable data ) {
-		this.fieldValues[index]=data;
+	public void setData ( int index, Serializable data ) {
+		this.fieldValues[index] = data;
+	}
+
+	public void setData ( String fieldName, Serializable data ) {
+		this.fieldValues[indexedFieldNames.get( fieldName )] = data;
+	}
+
+	public void setData ( String fieldName, Serializable data, Byte type )  throws IllegalArgumentException {
+		this.verifyTypesCompatibility(new Byte[]{ type }, new Serializable[]{ data });
+		int index = indexedFieldNames.get( fieldName );
+		this.fieldValues[index] = data;
+		this.fieldTypes[index] = type;
 	}
 
 	public long getTimeStamp ( ) {
