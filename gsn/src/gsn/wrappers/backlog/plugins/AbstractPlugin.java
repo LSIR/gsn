@@ -239,4 +239,34 @@ public abstract class AbstractPlugin {
 	public boolean isTimeStampUnique() {
 	  return activeBackLogWrapper.isTimeStampUnique();
 	}
+	
+	public static int arr2int (byte[] arr, int start) {
+		int i = 0;
+		int len = 4;
+		int cnt = 0;
+		byte[] tmp = new byte[len];
+		for (i = start; i < (start + len); i++) {
+			tmp[cnt] = arr[i];
+			cnt++;
+		}
+		int accum = 0;
+		i = 0;
+		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
+			accum |= ( (int)( tmp[i] & 0xff ) ) << shiftBy;
+			i++;
+		}
+		return accum;
+	}
+		
+	public static byte[] int2arr (int l) {
+		int len = 4;
+		byte[] arr = new byte[len];
+
+		int i = 0;
+		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
+			arr[i] = (byte)( l >> shiftBy);
+			i++;
+		}
+		return arr;
+	}
 }

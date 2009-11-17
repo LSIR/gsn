@@ -62,24 +62,4 @@ public class BasestationStatusPlugin extends AbstractPlugin {
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 		return PACKET_PROCESSED;
 	}
-	
-	
-	private static int arr2int (byte[] arr, int start) {
-		int i = 0;
-		int len = 4;
-		int cnt = 0;
-		byte[] tmp = new byte[len];
-		for (i = start; i < (start + len); i++) {
-			tmp[cnt] = arr[i];
-			cnt++;
-		}
-		int accum = 0;
-		i = 0;
-		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
-			accum |= ( (int)( tmp[i] & 0xff ) ) << shiftBy;
-			i++;
-		}
-		return accum;
-	}
-
 }

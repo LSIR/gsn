@@ -1,5 +1,7 @@
 package gsn.wrappers.backlog;
 
+import gsn.wrappers.backlog.plugins.AbstractPlugin;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -400,7 +402,7 @@ public class DeploymentClient extends Thread {
 				return null;
 			}
 			// read the message
-			int len = arr2int(length_buf, 0);
+			int len = AbstractPlugin.arr2int(length_buf, 0);
 			if( len <= 0 ) {
 				logger.error("The incoming message length (" + len + ") is not a positiv integer. Skip this message!");
 				return null;
@@ -450,7 +452,7 @@ public class DeploymentClient extends Thread {
 				return false;
 		}
     	try {
-    		remoteOutputStream.write(int2arr(message.length));
+    		remoteOutputStream.write(AbstractPlugin.int2arr(message.length));
 			remoteOutputStream.write(message);
 		} catch (IOException e) {
 			remoteOutputStreamSemaphore.release();
@@ -553,37 +555,5 @@ public class DeploymentClient extends Thread {
 			remoteOutputStream.close();
 		if ( remoteSocket != null )
 			remoteSocket.close();
-	}
-	
-	
-	private static int arr2int (byte[] arr, int start) {
-		int i = 0;
-		int len = 4;
-		int cnt = 0;
-		byte[] tmp = new byte[len];
-		for (i = start; i < (start + len); i++) {
-			tmp[cnt] = arr[i];
-			cnt++;
-		}
-		int accum = 0;
-		i = 0;
-		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
-			accum |= ( (int)( tmp[i] & 0xff ) ) << shiftBy;
-			i++;
-		}
-		return accum;
-	}
-	
-	
-	private static byte[] int2arr (int l) {
-		int len = 4;
-		byte[] arr = new byte[len];
-
-		int i = 0;
-		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
-			arr[i] = (byte)( l >> shiftBy);
-			i++;
-		}
-		return arr;
 	}
 }
