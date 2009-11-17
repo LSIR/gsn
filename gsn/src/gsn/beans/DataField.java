@@ -54,7 +54,7 @@ public final class DataField implements Serializable {
       if ( !( o instanceof DataField ) ) return false;
       
       final DataField dataField = ( DataField ) o;
-      if ( this.name != null ? !this.name.equals( dataField.name ) : dataField.name != null ) return false;
+      if ( this.name != null ? !this.name.equals( dataField.name ) || (this.dataTypeID != dataField.dataTypeID) : dataField.name != null ) return false;
       return true;
    }
    
