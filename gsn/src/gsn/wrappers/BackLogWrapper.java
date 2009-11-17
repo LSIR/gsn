@@ -2,8 +2,8 @@ package gsn.wrappers;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
@@ -20,6 +20,7 @@ import gsn.wrappers.backlog.sf.SFListen;
 import gsn.wrappers.backlog.sf.SFv1Listen;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
+import gsn.Main;
 
 
 /**
@@ -64,9 +65,6 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	private static final String SF_LOCAL_PORT = "local-sf-port";
 	private static final String TINYOS1X_PLATFORM_NAME = "tinyos1x-platformName";
 	
-	
-	
-	private static int blWrapperthreadCounter = 0;
 	private AbstractPlugin pluginObject = null;
 	private AddressBean addressBean = null;
 	private static Map<String,DeploymentClient> deploymentClientList = new HashMap<String,DeploymentClient> ();
@@ -121,60 +119,6 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 			return false;
 	    }
 		
-		// create SQL functions which are used to unpack some MIG messages
-		try {
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_tinyint"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION to_tinyint(number bigint) RETURNS tinyint BEGIN return number; END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_smallint"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION to_smallint(number bigint) RETURNS smallint BEGIN return number; END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_integer"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION to_integer(number bigint) RETURNS integer BEGIN return number; END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS real_humidity"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION real_humidity(humidity integer, real_temp double) RETURNS double BEGIN DECLARE rel_humidity double; SET rel_humidity = ((real_temp - 25) * (0.01 + (0.00008 * humidity))) + (-4 + (0.0405 * humidity) - 0.0000028 * POW(humidity,2)); SET rel_humidity = if(rel_humidity > 99, 100, rel_humidity); SET rel_humidity = if(rel_humidity < 0, 0, rel_humidity); return rel_humidity; END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS real_temperature"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION real_temperature(temp integer) RETURNS double BEGIN return temp * 0.01 - 39.63; END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS real_sys_voltage"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION real_sys_voltage(sys_voltage integer) RETURNS double BEGIN return sys_voltage  * (2.56/65536) * (39/24); END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS real_sdi_voltage"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION real_sdi_voltage(sdi_voltage integer) RETURNS double BEGIN return sdi_voltage  * (2.56/65536) * (204/24); END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS real_msp_temperature"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION real_msp_temperature(msp_temperature integer) RETURNS double BEGIN return (msp_temperature  * (1.5/4095) - 0.986) / 0.00355; END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS real_msp_voltage"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION real_msp_voltage(msp_voltage integer) RETURNS double BEGIN return msp_voltage  * (1.5/4095) * 2; END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS real_sib_current"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION real_sib_current(sib_current integer) RETURNS double BEGIN return sib_current  * (2.56/65536) * (10/0.15); END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS boottime"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION boottime(ptime bigint, atime_low integer, atime_high smallint, uptime_low integer, uptime_high smallint) RETURNS varchar(20) BEGIN return FROM_UNIXTIME((ptime - ((atime_low | atime_high << 16) + (uptime_low | uptime_high << 16)) * 1000)/1000, '%d/%m/%Y %T'); END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS uptime"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION uptime(uptime_low integer, uptime_high smallint) RETURNS varchar(20) BEGIN DECLARE uptime_total INTEGER; DECLARE days INTEGER; SET uptime_total = (uptime_low | uptime_high << 16); SET days = FLOOR(uptime_total/86400); return if(days > 0, concat(cast(days as CHAR), 'd ',SEC_TO_TIME(uptime_total-(days*86400))), SEC_TO_TIME(uptime_total)); END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS timestr"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION timestr(time_sec bigint) RETURNS varchar(20) BEGIN return FROM_UNIXTIME(time_sec/1000, '%d/%m/%Y %T'); END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS mv_to_v"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION mv_to_v(mv integer) RETURNS varchar(10) BEGIN return CONCAT(ROUND(mv/1000, 3), ' V'); END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS ua_to_ma"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION ua_to_ma(ua integer) RETURNS varchar(10) BEGIN return CONCAT(ROUND(ua/1000, 3), ' mA'); END"));
-
-			getStorageManager().executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS ua_to_a"));
-			getStorageManager().executeUpdate(new StringBuilder("CREATE FUNCTION ua_to_a(ua integer) RETURNS varchar(10) BEGIN return CONCAT(ROUND(ua/1000000, 3), ' A'); END"));
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		}
-		
 		// instantiating the plugin class specified in the XML file
 		logger.info("Loading BackLog plugin: >" + addressBean.getPredicateValue( BACKLOG_PLUGIN ) + "<");
 		try {
@@ -183,22 +127,7 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 		} catch (ClassNotFoundException e) {
 			logger.error("The BackLog plugin class >" + addressBean.getPredicateValue( BACKLOG_PLUGIN ) + "< could not be found");
 			return false;
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (SecurityException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (InstantiationException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (IllegalAccessException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (InvocationTargetException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		} catch (NoSuchMethodException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
@@ -220,9 +149,6 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 				deploymentSemaphore = new Semaphore(1);
 				deploymentSemaphoreList.put(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ), deploymentSemaphore);
 			}
-
-	        // set the thread name
-			setName( "BackLogWrapper-Thread:" + ( ++blWrapperthreadCounter ) );
 		}
 
 		
@@ -237,8 +163,8 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 				try {
 					logger.info("Loading DeploymentClient for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
 					deploymentClient = new DeploymentClient(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-					deploymentClient.start();					
 					deploymentClient.registerListener(pluginObject.getMessageType(), this);
+					deploymentClient.start();					
 				} catch (Exception e) {
 					logger.error("Could not load DeploymentClient for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
 					return false;
@@ -335,9 +261,7 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	 */
 	public boolean dataProcessed(long timestamp, Serializable... data) {
 		logger.debug("dataProcessed timestamp: " + timestamp);
-		//TODO: change the following line as soon as GSN has fixed the unordered timestamp bug!!!
-		// return postStreamElement(timestamp, data);
-		return postStreamElement(data);
+		return postStreamElement(timestamp, data);
 	}
 
 
@@ -361,7 +285,7 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	 */
 	public boolean sendRemote(byte[] data) {
 		try {
-			return deploymentClient.sendMessage(new BackLogMessage(pluginObject.getMessageType(), 0, data));
+			return deploymentClient.sendMessage(new BackLogMessage(pluginObject.getMessageType(), System.currentTimeMillis(), data));
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			return false;
@@ -432,7 +356,7 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	 */
 	@Override
 	public String getWrapperName() {
-		return "BackLog wrapper";
+		return "BackLogWrapper";
 	}
 
 
@@ -492,20 +416,19 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	@Override
 	public boolean messageReceived(BackLogMessage message) {
 		int packetcode = pluginObject.packetReceived(message.getTimestamp(), message.getPayload());
-		if(packetcode == pluginObject.PACKET_ERROR)
-			logger.warn("Message with timestamp >" + message.getTimestamp() + "< and type >" + message.getType() + "< could not be processed! Skip message.");
 		if (packetcode == pluginObject.PACKET_PROCESSED)
 			return true;
 		else
+			logger.warn("Message with timestamp >" + message.getTimestamp() + "< and type >" + message.getType() + "< could not be processed! Skip message.");
 			return false;
 	}
 
-
+	
 
 	/**
-	 * Finalizes this BackLogWrapper. This function is called by GSN.
+	 * Disposes this BackLogWrapper. This function is called by GSN.
 	 * <p>
-	 * Finalizes the used plugin and deregisters itself from the 
+	 * Disposes the used plugin and deregisters itself from the 
 	 * DeploymentClient.
 	 *
 	 * If this is the last BackLogWrapper for the used deployment,
@@ -526,19 +449,19 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 		
 		deploymentClient.deregisterListener(pluginObject.getMessageType(), this);
 
-		if( 1 == n ) {
+		if( n == 1 ) {
 			// if this is the last listener close the serial forwarder
 			if( sfListen != null ) {
-				sfListen.finalize();
+				sfListen.interrupt();
 				sfListenList.remove(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
 			}
 			if( sfv1Listen != null ) {
-				sfv1Listen.finalize();
+				sfv1Listen.interrupt();
 				sfv1ListenList.remove(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
 			}
 			// and the client
 			deploymentClientList.remove(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-			deploymentClient.finalize();
+			deploymentClient.interrupt();
 			
 			// remove this deployment from the counter
 			activePluginsCounterList.remove(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
@@ -547,9 +470,8 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 		}
 
 		// tell the plugin to stop
-		pluginObject.finalize();
+		pluginObject.stop();
 		
-		blWrapperthreadCounter--;
 		deploymentSemaphore.release();
 	}
    

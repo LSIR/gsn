@@ -38,11 +38,8 @@ import org.apache.log4j.Logger;
  * 
  * @author Tonio Gsell
  */
-public class MigMessagePlugin extends AbstractPlugin {
-	// mandatory
-	private static final String ATIME_LOW_NAME = "HEADER_ATIME_LOW";
-	private static final String ATIME_HIGH_NAME = "HEADER_ATIME_HIGH";
-	
+public class MigMessagePlugin extends AbstractPlugin
+{
 	// only mandatory for TinyOS1.x messages
 	private static final String TINYOS1X_PLATFORM_NAME = "tinyos1x-platformName";
 	// optional for TinyOS1.x messages
@@ -326,10 +323,6 @@ public class MigMessagePlugin extends AbstractPlugin {
 		}
     }
 	
-	@Override
-	public void finalize() {
-	}
-
 
 	private boolean messageToBeProcessed(long timestamp, byte[] rmsg) {
 		Method getter = null;
@@ -384,41 +377,11 @@ public class MigMessagePlugin extends AbstractPlugin {
 			return false;
 		}
 
-		if( isTimeStampUnique() ) {
-			// TODO: remove the following line as soon as GSN has fixed the unordered timestamp bug!!!
-			output.add(0, timestamp);
-			if(dataProcessed(timestamp, output.toArray(new Serializable[] {})))
-				ackMessage(timestamp);
-			else
-				logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
-		}
-		else {
-			// use atime_high and atime_low to calculate the generation time of the message and
-			// use it as timestamp for GSN
-			// TODO: remove the following line  as soon as GSN has fixed the unordered timestamp bug!!!
-			output.add(0, timestamp);
-			Serializable[] data = output.toArray(new Serializable[] {});
-			StreamElement strm = new StreamElement(getOutputFormat(),data);
-			Integer atime_low = (Integer) strm.getData(ATIME_LOW_NAME);
-			Short atime_high = (Short) strm.getData(ATIME_HIGH_NAME);
-			if( atime_low == null || atime_high == null) {
-				logger.error("Using the basestation timestamp in GSN as no atime_high/low getters are available in the message class >" + parameters.getTinyosMessageName() + "<.");
-				if(dataProcessed(timestamp, data))
-					ackMessage(timestamp);
-				else
-					logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
-			}
-			else {
-				int atime_total = ((int)atime_high) << 16;
-				atime_total += atime_low;
-				// TODO: remove the following line as soon as GSN has fixed the unordered timestamp bug!!!
-				data[0] = timestamp - (atime_total * 1000);
-				if(dataProcessed(timestamp - (atime_total * 1000), data))
-					ackMessage(timestamp);
-				else
-					logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
-			}
-		}
+		if (dataProcessed(timestamp, output.toArray(new Serializable[] {})))
+			ackMessage(timestamp);
+		else
+			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+
 		return true;
 	}
 

@@ -243,22 +243,15 @@ public class DeploymentClient extends Thread {
 	 * @return true if this client is connected otherwise false
 	 */
 	public boolean isConnected() {
-		try {
-			connStatSemaphore.acquire();
-		} catch (InterruptedException e) {
-			logger.error(e.getMessage(), e);
-		}
-		boolean conn = remoteConnected;
-		connStatSemaphore.release();
-		return conn;
+		return remoteConnected;
 	}
 
 	
 	/**
-	 * Finalize this client: stop the reading thread, cancel
+	 * Stopping this client: stop the reading thread, cancel
 	 * all timers and close the socket.
 	 */
-	public void finalize() {
+	public void interrupt() {
 		tRun = false;
 		try {
 			this.join(0);

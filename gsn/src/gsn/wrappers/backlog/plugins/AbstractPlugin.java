@@ -45,10 +45,9 @@ public abstract class AbstractPlugin {
 
 
 	/**
-	 * Finalize the plugin.
+	 * Stop the plugin.
 	 */
-	public void finalize() {
-	}
+	public void stop() { }
 
 
 	/**

@@ -19,22 +19,11 @@ import gsn.wrappers.BackLogWrapper;
  */
 public class BinaryBridgePlugin extends AbstractPlugin {
 
-	// mandatory
-	private static final String BINARY_LISTENER_ID = "listener-id";
-	
-
 	private final transient Logger logger = Logger.getLogger( BinaryBridgePlugin.class );
-	private final DataField[] dataField = {new DataField("TIMESTAMP", "BIGINT"), new DataField( "DATA" , "binary" )};
 	
-	@Override
-	public boolean initialize ( BackLogWrapper backLogWrapper ) {
-		super.initialize(backLogWrapper);
-		if ( getActiveAddressBean().getPredicateValue( BINARY_LISTENER_ID ) == null ) {
-			logger.error("Loading the PSBackLog wrapper failed due to missing *" + BINARY_LISTENER_ID + "* parameter.");
-			return false;
-	    }
-		return true;
-	}
+	private final DataField[] dataField = new DataField[] {new DataField("TIMESTAMP", "BIGINT"),
+										  				   new DataField("FILEPATH", "VARCHAR(255)"),
+										  				   new DataField("DATA", "binary")};
 
 	@Override
 	public byte getMessageType() {
@@ -48,32 +37,20 @@ public class BinaryBridgePlugin extends AbstractPlugin {
 
 	@Override
 	public int packetReceived(long timestamp, byte[] packet) {
-		if( arr2int(packet, 0) == getActiveAddressBean().getPredicateValueAsInt( BINARY_LISTENER_ID , 0) ) {
-			Serializable[] data = {timestamp, java.util.Arrays.copyOfRange(packet, 4, packet.length)};
-			if(dataProcessed(System.currentTimeMillis(), data))
-				ackMessage(timestamp);
-			else
-				logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+		StringBuffer sb = new StringBuffer();
+		int i;
+		for (i = 0; i < packet.length; i++) {
+			if (packet[i] == 0) break;
+			sb.append((char) packet[i]);
 		}
-		return PACKET_PROCESSED;
-	}
-	
-	
-	private static int arr2int (byte[] arr, int start) {
-		int i = 0;
-		int len = 4;
-		int cnt = 0;
-		byte[] tmp = new byte[len];
-		for (i = start; i < (start + len); i++) {
-			tmp[cnt] = arr[i];
-			cnt++;
+		// find index of first null byte
+		Serializable[] data = {timestamp, sb.toString(), java.util.Arrays.copyOfRange(packet, i+1, packet.length)};
+		if(dataProcessed(System.currentTimeMillis(), data)) {
+			ackMessage(timestamp);
+			return PACKET_PROCESSED;
+		} else {
+			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+			return PACKET_SKIPPED;
 		}
-		int accum = 0;
-		i = 0;
-		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
-			accum |= ( (int)( tmp[i] & 0xff ) ) << shiftBy;
-			i++;
-		}
-		return accum;
 	}
 }

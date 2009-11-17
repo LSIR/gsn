@@ -99,7 +99,7 @@ public class SFv1Listen extends Thread {
         clients.remove(clientS);
     }
 
-    public void finalize() {
+    public void interrupt() {
     	try {
     	    if (serverSocket != null) {
     	    	serverSocket.close();

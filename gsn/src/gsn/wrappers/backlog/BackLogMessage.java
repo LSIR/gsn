@@ -65,23 +65,24 @@ public class BackLogMessage {
 	 *  send/receive backlog command messages by the
 	 *  {@link gsn.wrappers.backlog.plugins.BackLogStatusPlugin BackLogStatusPlugin}. */
 	public static final byte BACKLOG_STATUS_MESSAGE_TYPE = 10;
-	
-	/** The TOS message type. This message type is used to
-	 *  send/receive TOS messages by the
-	 *  {@link gsn.wrappers.backlog.plugins.MigMessagePlugin MigMessagePlugin}. */
-	public static final byte TOS_MESSAGE_TYPE = 11;
 
 	/** The basestation status message type. This message type is used to
      *  receive basestation status messages by the
 	 *  {@link gsn.wrappers.backlog.plugins.BasestationStatusPlugin BasestationStatusPlugin}. */
-	public static final byte BASESTATION_STATUS_MESSAGE_TYPE = 12;
+	public static final byte BASESTATION_STATUS_MESSAGE_TYPE = 11;
+
+	/** The TOS message type. This message type is used to
+	 *  send/receive TOS messages by the
+	 *  {@link gsn.wrappers.backlog.plugins.MigMessagePlugin MigMessagePlugin}. */
+	public static final byte TOS_MESSAGE_TYPE = 20;
+	public static final byte TOS1x_MESSAGE_TYPE = 21;
 
 	/** The binary message type. This message type is used to
      *  receive any binary data by the
 	 *  {@link gsn.wrappers.backlog.plugins.BinaryBridgePlugin BinaryBridgePlugin}. */
-	public static final byte BINARY_MESSAGE_TYPE = 20;
+	public static final byte BINARY_MESSAGE_TYPE = 30;
 
-	public static final byte VAISALA_WXT520_MESSAGE_TYPE = 30;
+	public static final byte VAISALA_WXT520_MESSAGE_TYPE = 40;
 	
 	/* #                                                            #
 	 * #                                                            #
