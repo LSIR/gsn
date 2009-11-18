@@ -51,7 +51,7 @@ public final class StreamElement implements Serializable {
 			this.fieldNames[ i ] = outputStructure[ i ].getName( ).toLowerCase( );
 			this.fieldTypes[ i ] = outputStructure[ i ].getDataTypeID( );
 		}
-		if ( this.fieldNames.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
+		if ( outputStructure.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
 		this.verifyTypesCompatibility( this.fieldTypes , data );
 		this.fieldValues = data;
 	}
