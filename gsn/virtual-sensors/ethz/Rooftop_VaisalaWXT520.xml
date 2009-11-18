@@ -1,6 +1,6 @@
 <virtual-sensor name="Rooftop_VaisalaWXT520_4252" priority="10" >
     <processing-class>
-       <class-name>gsn.vsensor.BridgeVirtualSensorBothDirections</class-name>
+       <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
        <unique-timestamps>false</unique-timestamps>
        <output-structure>
 		<field name="TIMESTAMP" type="BIGINT" />

@@ -3,7 +3,7 @@
        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
        <unique-timestamps>false</unique-timestamps>
         <output-structure>
-                <field name="GEN_TIME" type="BIGINT"/> 
+                <field name="TIMESTAMP" type="BIGINT"/> 
                 <field name="HEADER_SEQNR" type="INTEGER" />
                 <field name="HEADER_ORIGINATORID" type="INTEGER" />
                 <field name="HEADER_ATIME_HIGH" type="SMALLINT" />

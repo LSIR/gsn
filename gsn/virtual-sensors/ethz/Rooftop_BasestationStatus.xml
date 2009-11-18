@@ -1,8 +1,9 @@
 <virtual-sensor name="Rooftop_BasestationStatus_3933" priority="10" >
     <processing-class>
-       <class-name>gsn.vsensor.BridgeVirtualSensorBothDirections</class-name>
+       <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
        <unique-timestamps>false</unique-timestamps>
        <output-structure>
+                <field name="TIMESTAMP" type="BIGINT" />
                 <field name="V_PV_MV" type="INTEGER" />
                 <field name="I_PV_UA" type="INTEGER" />
                 <field name="V_12BAT_MV" type="INTEGER" />

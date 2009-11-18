@@ -1,6 +1,6 @@
 <virtual-sensor name="Rooftop_BackLogStatus_3933" priority="10" >
     <processing-class>
-       <class-name>gsn.vsensor.BridgeVirtualSensorBothDirections</class-name>
+       <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
        <unique-timestamps>false</unique-timestamps>
        <web-input password="test">
          	<command name="backlog">
@@ -9,13 +9,14 @@
         	</command>
    		</web-input>
        <output-structure>
-                <field name="CONNECTED" type="SMALLINT" />
+                <field name="TIMESTAMP" type="BIGINT" />
+                <field name="ERROR_COUNTER" type="INTEGER" />
+                <field name="EXCEPTION_COUNTER" type="INTEGER" />
                 <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
                 <field name="BACKLOG_DB_SIZE_KB" type="INTEGER" />
-                <field name="BACKUP_DB_ENTRIES" type="INTEGER" />
-                <field name="BACKUP_DB_SIZE_KB" type="INTEGER" />
-                <field name="ERROR_NUMBER" type="INTEGER" />
-                <field name="COMMANDS_SENT" type="INTEGER" />
+                <field name="IN_COUNTER" type="INTEGER" />
+                <field name="OUT_COUNTER" type="INTEGER" />
+                <field name="BACKLOG_COUNTER" type="INTEGER" />
        </output-structure>
     </processing-class>
     <description>show status information of PSBackLog and send commands to the ETZ rooftop deployment</description>
