@@ -190,12 +190,10 @@ public class MigMessagePlugin extends AbstractPlugin
 	@Override
 	public DataField[] getOutputFormat() {
 		DataField[] tmp = new DataField[ parameters.getOutputStructure().length+1];
-		tmp[0] = new DataField("GEN_TIME", "BIGINT");
+		tmp[0] = new DataField("TIMESTAMP", "BIGINT");
 		for(int i=0; i<parameters.getOutputStructure().length; i++)
 			tmp[i+1] = parameters.getOutputStructure()[i];
 		return tmp;
-		// TODO: replace everything with the following line as soon  as GSN has fixed the unordered timestamp bug!!!
-		// return parameters.getOutputStructure();
 	}
 
 	
@@ -377,7 +375,8 @@ public class MigMessagePlugin extends AbstractPlugin
 			return false;
 		}
 
-		if (dataProcessed(timestamp, output.toArray(new Serializable[] {})))
+		output.add(0, timestamp);
+		if (dataProcessed(System.currentTimeMillis(), output.toArray(new Serializable[] {})))
 			ackMessage(timestamp);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
