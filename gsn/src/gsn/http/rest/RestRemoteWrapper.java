@@ -58,7 +58,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
 		try {
 			params = new RemoteWrapperParamParser(getActiveAddressBean(),false);
 			String startTime = getActiveAddressBean().getPredicateValue("start-time");
-			if (startTime != null && startTime.equals("auto")) {
+			if (startTime != null && startTime.equals("continue")) {
 				Connection conn = null;
 				try {
 					conn = StorageManager.getInstance().getConnection();
@@ -68,16 +68,13 @@ public class RestRemoteWrapper extends AbstractWrapper {
 					ResultSet rs = StorageManager.executeQueryWithResultSet(query, conn);
 					if (rs.next()) {
 						lastReceivedTimestamp = rs.getLong(1);
-					} else {
-						lastReceivedTimestamp = 0;
 					}
 				} catch (SQLException e) {
 					logger.error(e.getMessage(), e);
 				} finally {
 					StorageManager.close(conn);
 				}
-			}
-			if (lastReceivedTimestamp == -1) {
+			} else {
 				lastReceivedTimestamp = params.getStartTime();
 			}
 			logger.info("lastReceivedTimestamp=" + String.valueOf(lastReceivedTimestamp));

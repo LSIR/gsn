@@ -62,7 +62,7 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 
 		long lastVisited = -1;
 		String startTime = params.getPredicateValueWithDefault("start-time", CURRENT_TIME);
-		if (startTime.equals("auto")) {
+		if (startTime.equals("continue")) {
 			Connection conn = null;
 			try {
 				conn = StorageManager.getInstance().getConnection();
@@ -72,16 +72,13 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 				ResultSet rs = StorageManager.executeQueryWithResultSet(dbquery, conn);
 				if (rs.next()) {
 					lastVisited = rs.getLong(1);
-				} else {
-					lastVisited = 0;
 				}
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
 				StorageManager.close(conn);
 			}
-		}
-		if (lastVisited == -1) {
+		} else {
 			try {
 				lastVisited = Helpers.convertTimeFromIsoToLong(startTime);
 			} catch (Exception e) {
