@@ -30,10 +30,10 @@
     <stream name="data">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="backlog">
-          <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9002</predicate>
+          <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9003</predicate>
           <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
           <predicate key="message-classname">ch.ethz.permafrozer.messages.DozerBaseStatusMsg</predicate>
-          <predicate key="local-sf-port">9003</predicate>
+          <predicate key="local-sf-port">9006</predicate>
         </address>
         <query> select * from wrapper </query>
       </source>
