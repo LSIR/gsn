@@ -2,6 +2,7 @@ package gsn.wrappers.backlog;
 
 import gsn.wrappers.backlog.plugins.AbstractPlugin;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -452,8 +453,11 @@ public class DeploymentClient extends Thread {
 				return false;
 		}
     	try {
-    		remoteOutputStream.write(AbstractPlugin.int2arr(message.length));
-			remoteOutputStream.write(message);
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream(message.length + 4);
+    		baos.write(AbstractPlugin.int2arr(message.length));
+    		baos.write(message);
+    		remoteOutputStream.write(baos.toByteArray());
+			//remoteOutputStream.write(message);
 		} catch (IOException e) {
 			remoteOutputStreamSemaphore.release();
 			connectionLost();
