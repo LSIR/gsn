@@ -1,9 +1,10 @@
-<virtual-sensor name="Rooftop_DozerAdcMux1_3933" priority="10" >
+<virtual-sensor name="Rooftop_DozerAdcMux1_1355" priority="10" >
     <processing-class>
        <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
        <unique-timestamps>false</unique-timestamps>
         <output-structure>
                 <field name="TIMESTAMP" type="BIGINT"/>
+		<field name="GENTIME" type="BIGINT"/>
                 <field name="HEADER_ATIME_HIGH" type="SMALLINT" />
                 <field name="HEADER_ATIME_LOW" type="INTEGER" />
                 <field name="HEADER_ORIGINATORID" type="INTEGER" />

@@ -1,41 +1,41 @@
-<virtual-sensor name="Rooftop_BackLogStatus_3933" priority="10" >
+<virtual-sensor name="Rooftop_BackLogStatus_1355" priority="10" >
     <processing-class>
-       <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
-       <unique-timestamps>false</unique-timestamps>
-       <web-input password="test">
-         	<command name="backlog">
-          		<field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
-        	</command>
-   		</web-input>
-       <output-structure>
-                <field name="TIMESTAMP" type="BIGINT" />
-                <field name="ERROR_COUNTER" type="INTEGER" />
-                <field name="EXCEPTION_COUNTER" type="INTEGER" />
-                <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
-                <field name="BACKLOG_DB_SIZE_KB" type="INTEGER" />
-                <field name="IN_COUNTER" type="INTEGER" />
-                <field name="OUT_COUNTER" type="INTEGER" />
-                <field name="BACKLOG_COUNTER" type="INTEGER" />
-       </output-structure>
+        <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <web-input password="test">
+            <command name="backlog">
+                <field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
+            </command>
+        </web-input>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="ERROR_COUNTER" type="INTEGER" />
+            <field name="EXCEPTION_COUNTER" type="INTEGER" />
+            <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
+            <field name="BACKLOG_DB_SIZE_KB" type="INTEGER" />
+            <field name="IN_COUNTER" type="INTEGER" />
+            <field name="OUT_COUNTER" type="INTEGER" />
+            <field name="BACKLOG_COUNTER" type="INTEGER" />
+        </output-structure>
     </processing-class>
     <description>show status information of PSBackLog and send commands to the ETZ rooftop deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
-      <predicate key="type">PermaSense rooftop deployment at ETH Zurich</predicate>
-      <predicate key="LATITUDE">47.377322</predicate>
-      <predicate key="LONGITUDE">8.552935</predicate>
+        <predicate key="type">PermaSense rooftop deployment at ETH Zurich</predicate>
+        <predicate key="LATITUDE">47.377322</predicate>
+        <predicate key="LONGITUDE">8.552935</predicate>
     </addressing>
     <storage />
     <streams>
-    <stream name="data">
-      <source alias="source" storage-size="1" sampling-rate="1">
-        <address wrapper="backlog">
-          <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9003</predicate>
-          <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
-        </address>
-        <query> select * from wrapper </query>
-      </source>
-      <query> select * from source</query>
-    </stream>
-  </streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source</query>
+        </stream>
+    </streams>
 </virtual-sensor>
