@@ -5,7 +5,6 @@
        <web-input password="test">
          	<command name="backlog">
           		<field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
-          		<field name="backup_data" type="radio:yes|no" >backup incoming data at the deployment. This will only work if BackLogMain.py has been started with the --backup_db option!</field>
         	</command>
    		</web-input>
        <output-structure>
