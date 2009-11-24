@@ -1,48 +1,48 @@
 <virtual-sensor name="Rooftop_VaisalaWXT520_1355" priority="10" >
     <processing-class>
-       <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
-       <unique-timestamps>false</unique-timestamps>
-       <output-structure>
-		<field name="TIMESTAMP" type="BIGINT" />
-		<field name="Sn" type="VARCHAR(30)" />
-		<field name="Wu_Dn" type="VARCHAR(10)" />
-		<field name="Wu_Dm" type="VARCHAR(10)" />
-		<field name="Wu_Dx" type="VARCHAR(10)" />
-		<field name="Wu_Sn" type="VARCHAR(10)" />
-		<field name="Wu_Sm" type="VARCHAR(10)" />
-		<field name="Wu_Sx" type="VARCHAR(10)" />
-		<field name="Tu_Ta" type="VARCHAR(10)" />
-		<field name="Tu_Tp" type="VARCHAR(10)" />
-		<field name="Tu_Ua" type="VARCHAR(10)" />
-		<field name="Tu_Pa" type="VARCHAR(10)" />
-		<field name="Ru_Rc" type="VARCHAR(10)" />
-		<field name="Ru_Rd" type="VARCHAR(10)" />
-		<field name="Ru_Ri" type="VARCHAR(10)" />
-		<field name="Ru_Hc" type="VARCHAR(10)" />
-		<field name="Ru_Hd" type="VARCHAR(10)" />
-		<field name="Ru_Hi" type="VARCHAR(10)" />
-		<field name="Ru_Rp" type="VARCHAR(10)" />
-		<field name="Ru_Hp" type="VARCHAR(10)" />
-		<field name="Su_Th" type="VARCHAR(10)" />
-		<field name="Su_Vh" type="VARCHAR(10)" />
-		<field name="Su_Vs" type="VARCHAR(10)" />
-		<field name="Su_Vr" type="VARCHAR(10)" />
-       </output-structure>
+        <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="Sn" type="VARCHAR(30)" />
+            <field name="Wu_Dn" type="VARCHAR(10)" />
+            <field name="Wu_Dm" type="VARCHAR(10)" />
+            <field name="Wu_Dx" type="VARCHAR(10)" />
+            <field name="Wu_Sn" type="VARCHAR(10)" />
+            <field name="Wu_Sm" type="VARCHAR(10)" />
+            <field name="Wu_Sx" type="VARCHAR(10)" />
+            <field name="Tu_Ta" type="VARCHAR(10)" />
+            <field name="Tu_Tp" type="VARCHAR(10)" />
+            <field name="Tu_Ua" type="VARCHAR(10)" />
+            <field name="Tu_Pa" type="VARCHAR(10)" />
+            <field name="Ru_Rc" type="VARCHAR(10)" />
+            <field name="Ru_Rd" type="VARCHAR(10)" />
+            <field name="Ru_Ri" type="VARCHAR(10)" />
+            <field name="Ru_Hc" type="VARCHAR(10)" />
+            <field name="Ru_Hd" type="VARCHAR(10)" />
+            <field name="Ru_Hi" type="VARCHAR(10)" />
+            <field name="Ru_Rp" type="VARCHAR(10)" />
+            <field name="Ru_Hp" type="VARCHAR(10)" />
+            <field name="Su_Th" type="VARCHAR(10)" />
+            <field name="Su_Vh" type="VARCHAR(10)" />
+            <field name="Su_Vs" type="VARCHAR(10)" />
+            <field name="Su_Vr" type="VARCHAR(10)" />
+        </output-structure>
     </processing-class>
     <description>show weather sensor values of Vaisala WXT520 on Basestation from the rooftop deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
     <streams>
-    <stream name="data">
-      <source alias="source" storage-size="1" sampling-rate="1">
-        <address wrapper="backlog">
-          <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9003</predicate>
-          <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.VaisalaWXT520Plugin</predicate>
-        </address>
-        <query> select * from wrapper </query>
-      </source>
-      <query> select * from source</query>
-    </stream>
-  </streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.VaisalaWXT520Plugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source</query>
+        </stream>
+    </streams>
 </virtual-sensor>
