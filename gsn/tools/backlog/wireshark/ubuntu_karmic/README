@@ -1,0 +1,3 @@
+copy both files (backlog.la and backlog.so) to /usr/lib/wireshark/plugins/
+
+to make the new filter/dissector available: backlog
