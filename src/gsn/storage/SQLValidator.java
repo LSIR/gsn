@@ -97,11 +97,12 @@ public class SQLValidator implements VSensorStateChangeListener {
 		return select.getTables().iterator().next().getName();
 	}
 
-	public  DataField[] extractSelectColumns(String query) {
+	public  DataField[] extractSelectColumns(String query, VSensorConfig vSensorConfig) {
 		Select select = queryToSelect(query);
 		if (select ==null)
 			return new DataField[0];
-		return getFields(select);
+		
+		return getFields(select,vSensorConfig.getOutputStructure());
 	}
 
 	public Session getSession() {
@@ -122,15 +123,21 @@ public class SQLValidator implements VSensorStateChangeListener {
 		return false;
 	}
 
-	private DataField[] getFields(Select select) {
+	private DataField[] getFields(Select select, DataField[] fields) {
 		ArrayList<DataField> toReturn = new ArrayList<DataField>();
 		try {
 			for (int i=0;i<select.getColumnCount();i++) {
 				String name = select.queryMeta().getColumnName(i);
 				if (name.equalsIgnoreCase("timed") || name.equalsIgnoreCase("pk") )
 					continue;
-				byte gsnType = DataTypes.SQLTypeToGSNTypeSimplified(DataType.convertTypeToSQLType(select.queryMeta().getColumnType(i)));
-				toReturn.add( new DataField(name,gsnType));
+				String gsnType = null;
+				for (int j=0;j<fields.length;j++) {
+					if (fields[j].getName().equalsIgnoreCase(name)) {	
+						gsnType=fields[j].getType();
+						toReturn.add( new DataField(name,gsnType));
+						break;
+					}
+				}				
 			}
 			return toReturn.toArray(new DataField[] {});
 		}catch (Exception e) {
