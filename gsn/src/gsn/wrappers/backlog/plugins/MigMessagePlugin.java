@@ -41,9 +41,6 @@ import org.apache.log4j.Logger;
  */
 public class MigMessagePlugin extends AbstractPlugin
 {
-	// only mandatory for TinyOS1.x messages
-	private static final String TINYOS1X_PLATFORM = "tinyos1x-platform";
-
 	private MigMessageParameters parameters = null;
 
 	private int messageType = -1;
@@ -60,8 +57,8 @@ public class MigMessagePlugin extends AbstractPlugin
 	private TOSMsg template ;	
 
 	@Override
-	public boolean initialize(BackLogWrapper backLogWrapper) {
-		super.initialize(backLogWrapper);
+	public boolean initialize(BackLogWrapper backlogwrapper) {
+		super.initialize(backlogwrapper);
 		try {
 			// get the Mig message class for the specified TOS packet
 			parameters = new MigMessageParameters();
@@ -72,13 +69,7 @@ public class MigMessagePlugin extends AbstractPlugin
 			
 			// if it is a TinyOS1.x message class we need the platform name
 			if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
-				try {
-					tinyos1x_platform = getActiveAddressBean().getPredicateValueWithException(TINYOS1X_PLATFORM);
-				}
-				catch (Exception e) {
-					logger.error(e.getMessage());
-					return false;
-				}
+				tinyos1x_platform = backlogwrapper.getTinyos1xPlatform();
 				messageType = ((net.tinyos1x.message.Message) messageConstructor.newInstance(new byte [1])).amType();
 
 				// a template message for this platform has to be instantiated to be able to get the data offset

@@ -27,9 +27,6 @@ import gsn.wrappers.BackLogWrapper;
  */
 public class MigUploadPlugin extends AbstractPlugin {
 	
-	// only mandatory for TinyOS1.x messages
-	private static final String TINYOS1X_PLATFORM = "tinyos1x-platform";
-
 	private int commands_sent = 0;
 	
 	private final static int tinyos1x_groupId = -1;
@@ -41,9 +38,9 @@ public class MigUploadPlugin extends AbstractPlugin {
 
 
 	@Override
-	public boolean initialize(BackLogWrapper backLogWrapper) {
-		super.initialize(backLogWrapper);
-		tinyos1x_platform = getActiveAddressBean().getPredicateValue(TINYOS1X_PLATFORM);
+	public boolean initialize(BackLogWrapper backlogwrapper) {
+		super.initialize(backlogwrapper);
+		tinyos1x_platform = backlogwrapper.getTinyos1xPlatform();
 
 		// a template message for this platform has to be instantiated to be able to get the data offset
 		// if a message has to be sent to the deployment
