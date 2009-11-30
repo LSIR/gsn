@@ -120,7 +120,7 @@ public class DataTypes {
     * @return
     */
    public static byte SQLTypeToGSNTypeSimplified(int sqlType) {
-	   if (sqlType == Types.BIGINT || sqlType == Types.SMALLINT || sqlType == Types.DOUBLE || sqlType==Types.INTEGER || sqlType == Types.DECIMAL||sqlType == Types.REAL || sqlType == Types.FLOAT|| sqlType == Types.NUMERIC )
+	   if (sqlType == Types.BIGINT || sqlType == Types.SMALLINT || sqlType == Types.TINYINT || sqlType == Types.DOUBLE || sqlType==Types.INTEGER || sqlType == Types.DECIMAL||sqlType == Types.REAL || sqlType == Types.FLOAT|| sqlType == Types.NUMERIC )
 			return  DataTypes.DOUBLE;
 		else if (sqlType == Types.VARCHAR || sqlType == Types.CHAR|| sqlType == Types.LONGNVARCHAR || sqlType == Types.LONGVARCHAR || sqlType== Types.NCHAR )
 			return  DataTypes.VARCHAR;
