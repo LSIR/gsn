@@ -24,22 +24,22 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
     private static final String INITPARAM_SOURCE = "source";
     private static final String INITPARAM_STATION_ID = "station_id";
 
-    private static final int MAX_DUPN = 4; // maximum number of extended sensors supported
+    private static final int MAX_DUPN = 15; // maximum DUPN value = maximum number of extended sensors supported -1
 
-    private static final int OFFSET_AIR_TEMP = (MAX_DUPN + 1) * 1;
-    private static final int OFFSET_AIR_HUMID = (MAX_DUPN + 1) * 2;
-    private static final int OFFSET_SOLAR_RAD = (MAX_DUPN + 1) * 3;
-    private static final int OFFSET_RAIN_METER = (MAX_DUPN + 1) * 4;
-    private static final int OFFSET_GROUND_TEMP_TNX = (MAX_DUPN + 1)*5;
-    private static final int OFFSET_AIR_TEMP_TNX = (MAX_DUPN + 1) * 6;
-    private static final int OFFSET_SOIL_TEMP_ECTM = (MAX_DUPN + 1) * 7;
-    private static final int OFFSET_SOIL_MOISTURE_ECTM = (MAX_DUPN + 1) * 8;
-    private static final int OFFSET_SOIL_WATER_POTENTIAL = (MAX_DUPN + 1) * 9;
-    private static final int OFFSET_SOIL_TEMP_DECAGON = (MAX_DUPN + 1) * 10;
-    private static final int OFFSET_SOIL_MOISTURE_DECAGON = (MAX_DUPN + 1) * 11;
-    private static final int OFFSET_SOIL_CONDUCT_DECAGON = (MAX_DUPN + 1) * 12;
-    private static final int OFFSET_WIND_DIRECTION = (MAX_DUPN + 1) * 13;
-    private static final int OFFSET_WIND_SPEED = (MAX_DUPN + 1) * 14;
+    private static final int OFFSET_AIR_TEMP = 5 + (MAX_DUPN + 1) * 0;
+    private static final int OFFSET_AIR_HUMID = 5 + (MAX_DUPN + 1) * 1;
+    private static final int OFFSET_SOLAR_RAD = 5 + (MAX_DUPN + 1) * 2;
+    private static final int OFFSET_RAIN_METER = 5 + (MAX_DUPN + 1) * 3;
+    private static final int OFFSET_GROUND_TEMP_TNX = 5 + (MAX_DUPN + 1) * 4;
+    private static final int OFFSET_AIR_TEMP_TNX = 5 + (MAX_DUPN + 1) * 5;
+    private static final int OFFSET_SOIL_TEMP_ECTM = 5 + (MAX_DUPN + 1) * 6;
+    private static final int OFFSET_SOIL_MOISTURE_ECTM = 5 + (MAX_DUPN + 1) * 7;
+    private static final int OFFSET_SOIL_WATER_POTENTIAL = 5 + (MAX_DUPN + 1) * 8;
+    private static final int OFFSET_SOIL_TEMP_DECAGON = 5 + (MAX_DUPN + 1) * 9;
+    private static final int OFFSET_SOIL_MOISTURE_DECAGON = 5 + (MAX_DUPN + 1) * 10;
+    private static final int OFFSET_SOIL_CONDUCT_DECAGON = 5 + (MAX_DUPN + 1) * 11;
+    private static final int OFFSET_WIND_DIRECTION = 5 + (MAX_DUPN + 1) * 12;
+    private static final int OFFSET_WIND_SPEED = 5 + (MAX_DUPN + 1) * 13;
 
     private static int threadCounter = 0;
 
@@ -60,89 +60,243 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
             new DataField("air_temp_3", "double", "SHT75 Temperature (3)"),
             new DataField("air_temp_4", "double", "SHT75 Temperature (4)"),
             new DataField("air_temp_5", "double", "SHT75 Temperature (5)"),
+            new DataField("air_temp_6", "double", "SHT75 Temperature (6)"),
+            new DataField("air_temp_7", "double", "SHT75 Temperature (7)"),
+            new DataField("air_temp_8", "double", "SHT75 Temperature (8)"),
+            new DataField("air_temp_9", "double", "SHT75 Temperature (9)"),
+            new DataField("air_temp_10", "double", "SHT75 Temperature (10)"),
+            new DataField("air_temp_11", "double", "SHT75 Temperature (11)"),
+            new DataField("air_temp_12", "double", "SHT75 Temperature (12)"),
+            new DataField("air_temp_13", "double", "SHT75 Temperature (13)"),
+            new DataField("air_temp_14", "double", "SHT75 Temperature (14)"),
+            new DataField("air_temp_15", "double", "SHT75 Temperature (15)"),
+            new DataField("air_temp_16", "double", "SHT75 Temperature (16)"),
 
             new DataField("air_humid", "double", "SHT75 Humidity"),
             new DataField("air_humid_2", "double", "SHT75 Humidity (2)"),
             new DataField("air_humid_3", "double", "SHT75 Humidity (3)"),
             new DataField("air_humid_4", "double", "SHT75 Humidity (4)"),
             new DataField("air_humid_5", "double", "SHT75 Humidity (5)"),
+            new DataField("air_humid_6", "double", "SHT75 Humidity (6)"),
+            new DataField("air_humid_7", "double", "SHT75 Humidity (7)"),
+            new DataField("air_humid_8", "double", "SHT75 Humidity (8)"),
+            new DataField("air_humid_9", "double", "SHT75 Humidity (9)"),
+            new DataField("air_humid_10", "double", "SHT75 Humidity (10)"),
+            new DataField("air_humid_11", "double", "SHT75 Humidity (11)"),
+            new DataField("air_humid_12", "double", "SHT75 Humidity (12)"),
+            new DataField("air_humid_13", "double", "SHT75 Humidity (13)"),
+            new DataField("air_humid_14", "double", "SHT75 Humidity (14)"),
+            new DataField("air_humid_15", "double", "SHT75 Humidity (15)"),
+            new DataField("air_humid_16", "double", "SHT75 Humidity (16)"),
 
             new DataField("solar_rad", "double", "Davis Solar radiation"),
             new DataField("solar_rad_2", "double", "Davis Solar radiation (2)"),
             new DataField("solar_rad_3", "double", "Davis Solar radiation (3)"),
             new DataField("solar_rad_4", "double", "Davis Solar radiation (4)"),
             new DataField("solar_rad_5", "double", "Davis Solar radiation (5)"),
+            new DataField("solar_rad_6", "double", "Davis Solar radiation (6)"),
+            new DataField("solar_rad_7", "double", "Davis Solar radiation (7)"),
+            new DataField("solar_rad_8", "double", "Davis Solar radiation (8)"),
+            new DataField("solar_rad_9", "double", "Davis Solar radiation (9)"),
+            new DataField("solar_rad_10", "double", "Davis Solar radiation (10)"),
+            new DataField("solar_rad_11", "double", "Davis Solar radiation (11)"),
+            new DataField("solar_rad_12", "double", "Davis Solar radiation (12)"),
+            new DataField("solar_rad_13", "double", "Davis Solar radiation (13)"),
+            new DataField("solar_rad_14", "double", "Davis Solar radiation (14)"),
+            new DataField("solar_rad_15", "double", "Davis Solar radiation (15)"),
+            new DataField("solar_rad_16", "double", "Davis Solar radiation (16)"),
 
             new DataField("rain_meter", "double", "Davis Rain Meter"),
             new DataField("rain_meter_2", "double", "Davis Rain Meter (2)"),
             new DataField("rain_meter_3", "double", "Davis Rain Meter (3)"),
             new DataField("rain_meter_4", "double", "Davis Rain Meter (4)"),
             new DataField("rain_meter_5", "double", "Davis Rain Meter (5)"),
+            new DataField("rain_meter_6", "double", "Davis Rain Meter (6)"),
+            new DataField("rain_meter_7", "double", "Davis Rain Meter (7)"),
+            new DataField("rain_meter_8", "double", "Davis Rain Meter (8)"),
+            new DataField("rain_meter_9", "double", "Davis Rain Meter (9)"),
+            new DataField("rain_meter_10", "double", "Davis Rain Meter (10)"),
+            new DataField("rain_meter_11", "double", "Davis Rain Meter (11)"),
+            new DataField("rain_meter_12", "double", "Davis Rain Meter (12)"),
+            new DataField("rain_meter_13", "double", "Davis Rain Meter (13)"),
+            new DataField("rain_meter_14", "double", "Davis Rain Meter (14)"),
+            new DataField("rain_meter_15", "double", "Davis Rain Meter (15)"),
+            new DataField("rain_meter_16", "double", "Davis Rain Meter (16)"),
 
             new DataField("ground_temp_tnx", "double", "TNX Ground Temperature"),
             new DataField("ground_temp_tnx_2", "double", "TNX Ground Temperature (2)"),
             new DataField("ground_temp_tnx_3", "double", "TNX Ground Temperature (3)"),
             new DataField("ground_temp_tnx_4", "double", "TNX Ground Temperature (4)"),
             new DataField("ground_temp_tnx_5", "double", "TNX Ground Temperature (5)"),
+            new DataField("ground_temp_tnx_6", "double", "TNX Ground Temperature (6)"),
+            new DataField("ground_temp_tnx_7", "double", "TNX Ground Temperature (7)"),
+            new DataField("ground_temp_tnx_8", "double", "TNX Ground Temperature (8)"),
+            new DataField("ground_temp_tnx_9", "double", "TNX Ground Temperature (9)"),
+            new DataField("ground_temp_tnx_10", "double", "TNX Ground Temperature (10)"),
+            new DataField("ground_temp_tnx_11", "double", "TNX Ground Temperature (11)"),
+            new DataField("ground_temp_tnx_12", "double", "TNX Ground Temperature (12)"),
+            new DataField("ground_temp_tnx_13", "double", "TNX Ground Temperature (13)"),
+            new DataField("ground_temp_tnx_14", "double", "TNX Ground Temperature (14)"),
+            new DataField("ground_temp_tnx_15", "double", "TNX Ground Temperature (15)"),
+            new DataField("ground_temp_tnx_16", "double", "TNX Ground Temperature (16)"),
 
             new DataField("air_temp_tnx", "double", "TNX Air Temperature"),
             new DataField("air_temp_tnx_2", "double", "TNX Air Temperature (2)"),
             new DataField("air_temp_tnx_3", "double", "TNX Air Temperature (3)"),
             new DataField("air_temp_tnx_4", "double", "TNX Air Temperature (4)"),
             new DataField("air_temp_tnx_5", "double", "TNX Air Temperature (5)"),
+            new DataField("air_temp_tnx_6", "double", "TNX Air Temperature (6)"),
+            new DataField("air_temp_tnx_7", "double", "TNX Air Temperature (7)"),
+            new DataField("air_temp_tnx_8", "double", "TNX Air Temperature (8)"),
+            new DataField("air_temp_tnx_9", "double", "TNX Air Temperature (9)"),
+            new DataField("air_temp_tnx_10", "double", "TNX Air Temperature (10)"),
+            new DataField("air_temp_tnx_11", "double", "TNX Air Temperature (11)"),
+            new DataField("air_temp_tnx_12", "double", "TNX Air Temperature (12)"),
+            new DataField("air_temp_tnx_13", "double", "TNX Air Temperature (13)"),
+            new DataField("air_temp_tnx_14", "double", "TNX Air Temperature (14)"),
+            new DataField("air_temp_tnx_15", "double", "TNX Air Temperature (15)"),
+            new DataField("air_temp_tnx_16", "double", "TNX Air Temperature (16)"),
 
             new DataField("soil_temp_ectm", "double", "EC-TM Temperature"),
             new DataField("soil_temp_ectm_2", "double", "EC-TM Temperature (2)"),
             new DataField("soil_temp_ectm_3", "double", "EC-TM Temperature (3)"),
             new DataField("soil_temp_ectm_4", "double", "EC-TM Temperature (4)"),
             new DataField("soil_temp_ectm_5", "double", "EC-TM Temperature (5)"),
+            new DataField("soil_temp_ectm_6", "double", "EC-TM Temperature (6)"),
+            new DataField("soil_temp_ectm_7", "double", "EC-TM Temperature (7)"),
+            new DataField("soil_temp_ectm_8", "double", "EC-TM Temperature (8)"),
+            new DataField("soil_temp_ectm_9", "double", "EC-TM Temperature (9)"),
+            new DataField("soil_temp_ectm_10", "double", "EC-TM Temperature (10)"),
+            new DataField("soil_temp_ectm_11", "double", "EC-TM Temperature (11)"),
+            new DataField("soil_temp_ectm_12", "double", "EC-TM Temperature (12)"),
+            new DataField("soil_temp_ectm_13", "double", "EC-TM Temperature (13)"),
+            new DataField("soil_temp_ectm_14", "double", "EC-TM Temperature (14)"),
+            new DataField("soil_temp_ectm_15", "double", "EC-TM Temperature (15)"),
+            new DataField("soil_temp_ectm_16", "double", "EC-TM Temperature (16)"),
 
             new DataField("soil_moisture_ectm", "double", "EC-TM Moisture"),
             new DataField("soil_moisture_ectm_2", "double", "EC-TM Moisture (2)"),
             new DataField("soil_moisture_ectm_3", "double", "EC-TM Moisture (3)"),
             new DataField("soil_moisture_ectm_4", "double", "EC-TM Moisture (4)"),
             new DataField("soil_moisture_ectm_5", "double", "EC-TM Moisture (5)"),
+            new DataField("soil_moisture_ectm_6", "double", "EC-TM Moisture (6)"),
+            new DataField("soil_moisture_ectm_7", "double", "EC-TM Moisture (7)"),
+            new DataField("soil_moisture_ectm_8", "double", "EC-TM Moisture (8)"),
+            new DataField("soil_moisture_ectm_9", "double", "EC-TM Moisture (9)"),
+            new DataField("soil_moisture_ectm_10", "double", "EC-TM Moisture (10)"),
+            new DataField("soil_moisture_ectm_11", "double", "EC-TM Moisture (11)"),
+            new DataField("soil_moisture_ectm_12", "double", "EC-TM Moisture (12)"),
+            new DataField("soil_moisture_ectm_13", "double", "EC-TM Moisture (13)"),
+            new DataField("soil_moisture_ectm_14", "double", "EC-TM Moisture (14)"),
+            new DataField("soil_moisture_ectm_15", "double", "EC-TM Moisture (15)"),
+            new DataField("soil_moisture_ectm_16", "double", "EC-TM Moisture (16)"),
 
             new DataField("soil_water_potential", "double", "Decagon MPS-1 Potential"),
             new DataField("soil_water_potential_2", "double", "Decagon MPS-1 Potential (2)"),
             new DataField("soil_water_potential_3", "double", "Decagon MPS-1 Potential (3)"),
             new DataField("soil_water_potential_4", "double", "Decagon MPS-1 Potential (4)"),
             new DataField("soil_water_potential_5", "double", "Decagon MPS-1 Potential (5)"),
+            new DataField("soil_water_potential_6", "double", "Decagon MPS-1 Potential (6)"),
+            new DataField("soil_water_potential_7", "double", "Decagon MPS-1 Potential (7)"),
+            new DataField("soil_water_potential_8", "double", "Decagon MPS-1 Potential (8)"),
+            new DataField("soil_water_potential_9", "double", "Decagon MPS-1 Potential (9)"),
+            new DataField("soil_water_potential_10", "double", "Decagon MPS-1 Potential (10)"),
+            new DataField("soil_water_potential_11", "double", "Decagon MPS-1 Potential (11)"),
+            new DataField("soil_water_potential_12", "double", "Decagon MPS-1 Potential (12)"),
+            new DataField("soil_water_potential_13", "double", "Decagon MPS-1 Potential (13)"),
+            new DataField("soil_water_potential_14", "double", "Decagon MPS-1 Potential (14)"),
+            new DataField("soil_water_potential_15", "double", "Decagon MPS-1 Potential (15)"),
+            new DataField("soil_water_potential_16", "double", "Decagon MPS-1 Potential (16)"),
 
             new DataField("soil_temp_decagon", "double", "Decagon Temperature"),
             new DataField("soil_temp_decagon_2", "double", "Decagon Temperature (2)"),
             new DataField("soil_temp_decagon_3", "double", "Decagon Temperature (3)"),
             new DataField("soil_temp_decagon_4", "double", "Decagon Temperature (4)"),
             new DataField("soil_temp_decagon_5", "double", "Decagon Temperature (5)"),
+            new DataField("soil_temp_decagon_6", "double", "Decagon Temperature (6)"),
+            new DataField("soil_temp_decagon_7", "double", "Decagon Temperature (7)"),
+            new DataField("soil_temp_decagon_8", "double", "Decagon Temperature (8)"),
+            new DataField("soil_temp_decagon_9", "double", "Decagon Temperature (9)"),
+            new DataField("soil_temp_decagon_10", "double", "Decagon Temperature (10)"),
+            new DataField("soil_temp_decagon_11", "double", "Decagon Temperature (11)"),
+            new DataField("soil_temp_decagon_12", "double", "Decagon Temperature (12)"),
+            new DataField("soil_temp_decagon_13", "double", "Decagon Temperature (13)"),
+            new DataField("soil_temp_decagon_14", "double", "Decagon Temperature (14)"),
+            new DataField("soil_temp_decagon_15", "double", "Decagon Temperature (15)"),
+            new DataField("soil_temp_decagon_16", "double", "Decagon Temperature (16)"),
 
             new DataField("soil_moisture_decagon", "double", "Decagon Moisture"),
             new DataField("soil_moisture_decagon_2", "double", "Decagon Moisture (2)"),
             new DataField("soil_moisture_decagon_3", "double", "Decagon Moisture (3)"),
             new DataField("soil_moisture_decagon_4", "double", "Decagon Moisture (4)"),
             new DataField("soil_moisture_decagon_5", "double", "Decagon Moisture (5)"),
+            new DataField("soil_moisture_decagon_6", "double", "Decagon Moisture (6)"),
+            new DataField("soil_moisture_decagon_7", "double", "Decagon Moisture (7)"),
+            new DataField("soil_moisture_decagon_8", "double", "Decagon Moisture (8)"),
+            new DataField("soil_moisture_decagon_9", "double", "Decagon Moisture (9)"),
+            new DataField("soil_moisture_decagon_10", "double", "Decagon Moisture (10)"),
+            new DataField("soil_moisture_decagon_11", "double", "Decagon Moisture (11)"),
+            new DataField("soil_moisture_decagon_12", "double", "Decagon Moisture (12)"),
+            new DataField("soil_moisture_decagon_13", "double", "Decagon Moisture (13)"),
+            new DataField("soil_moisture_decagon_14", "double", "Decagon Moisture (14)"),
+            new DataField("soil_moisture_decagon_15", "double", "Decagon Moisture (15)"),
+            new DataField("soil_moisture_decagon_16", "double", "Decagon Moisture (16)"),
 
             new DataField("soil_conduct_decagon", "double", "Decagon Conductivity"),
             new DataField("soil_conduct_decagon_2", "double", "Decagon Conductivity (2)"),
             new DataField("soil_conduct_decagon_3", "double", "Decagon Conductivity (3)"),
             new DataField("soil_conduct_decagon_4", "double", "Decagon Conductivity (4)"),
             new DataField("soil_conduct_decagon_5", "double", "Decagon Conductivity (5)"),
+            new DataField("soil_conduct_decagon_6", "double", "Decagon Conductivity (6)"),
+            new DataField("soil_conduct_decagon_7", "double", "Decagon Conductivity (7)"),
+            new DataField("soil_conduct_decagon_8", "double", "Decagon Conductivity (8)"),
+            new DataField("soil_conduct_decagon_9", "double", "Decagon Conductivity (9)"),
+            new DataField("soil_conduct_decagon_10", "double", "Decagon Conductivity (10)"),
+            new DataField("soil_conduct_decagon_11", "double", "Decagon Conductivity (11)"),
+            new DataField("soil_conduct_decagon_12", "double", "Decagon Conductivity (12)"),
+            new DataField("soil_conduct_decagon_13", "double", "Decagon Conductivity (13)"),
+            new DataField("soil_conduct_decagon_14", "double", "Decagon Conductivity (14)"),
+            new DataField("soil_conduct_decagon_15", "double", "Decagon Conductivity (15)"),
+            new DataField("soil_conduct_decagon_16", "double", "Decagon Conductivity (16)"),
 
             new DataField("wind_direction", "double", "Davis Anemometer Direction"),
-            new DataField("wind_direction_2", "double", "Davis Anemometer Direction_2"),
-            new DataField("wind_direction_3", "double", "Davis Anemometer Direction_3"),
-            new DataField("wind_direction_4", "double", "Davis Anemometer Direction_4"),
-            new DataField("wind_direction_5", "double", "Davis Anemometer Direction_5"),
+            new DataField("wind_direction_2", "double", "Davis Anemometer Direction (2)"),
+            new DataField("wind_direction_3", "double", "Davis Anemometer Direction (3)"),
+            new DataField("wind_direction_4", "double", "Davis Anemometer Direction (4)"),
+            new DataField("wind_direction_5", "double", "Davis Anemometer Direction (5)"),
+            new DataField("wind_direction_6", "double", "Davis Anemometer Direction (6)"),
+            new DataField("wind_direction_7", "double", "Davis Anemometer Direction (7)"),
+            new DataField("wind_direction_8", "double", "Davis Anemometer Direction (8)"),
+            new DataField("wind_direction_9", "double", "Davis Anemometer Direction (9)"),
+            new DataField("wind_direction_10", "double", "Davis Anemometer Direction (10)"),
+            new DataField("wind_direction_11", "double", "Davis Anemometer Direction (11)"),
+            new DataField("wind_direction_12", "double", "Davis Anemometer Direction (12)"),
+            new DataField("wind_direction_13", "double", "Davis Anemometer Direction (13)"),
+            new DataField("wind_direction_14", "double", "Davis Anemometer Direction (14)"),
+            new DataField("wind_direction_15", "double", "Davis Anemometer Direction (15)"),
+            new DataField("wind_direction_16", "double", "Davis Anemometer Direction (16)"),
 
             new DataField("wind_speed", "double", "Davis Anemometer Speed"),
             new DataField("wind_speed_2", "double", "Davis Anemometer Speed (2)"),
             new DataField("wind_speed_3", "double", "Davis Anemometer Speed (3)"),
             new DataField("wind_speed_4", "double", "Davis Anemometer Speed (4)"),
             new DataField("wind_speed_5", "double", "Davis Anemometer Speed (5)"),
+            new DataField("wind_speed_6", "double", "Davis Anemometer Speed (6)"),
+            new DataField("wind_speed_7", "double", "Davis Anemometer Speed (7)"),
+            new DataField("wind_speed_8", "double", "Davis Anemometer Speed (8)"),
+            new DataField("wind_speed_9", "double", "Davis Anemometer Speed (9)"),
+            new DataField("wind_speed_10", "double", "Davis Anemometer Speed (10)"),
+            new DataField("wind_speed_11", "double", "Davis Anemometer Speed (11)"),
+            new DataField("wind_speed_12", "double", "Davis Anemometer Speed (12)"),
+            new DataField("wind_speed_13", "double", "Davis Anemometer Speed (13)"),
+            new DataField("wind_speed_14", "double", "Davis Anemometer Speed (14)"),
+            new DataField("wind_speed_15", "double", "Davis Anemometer Speed (15)"),
+            new DataField("wind_speed_16", "double", "Davis Anemometer Speed (16)"),
 
             new DataField("timestamp", "bigint", "Timestamp")
     };
 
-    private final int OUTPUT_STRUCTURE_SIZE = 76;
+    private final int OUTPUT_STRUCTURE_SIZE = outputStructureCache.length;
 
     private Serializable[] buffer = new Serializable[OUTPUT_STRUCTURE_SIZE];
 
