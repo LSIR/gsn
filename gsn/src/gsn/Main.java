@@ -90,9 +90,9 @@ public final class Main {
 			controlSocket = new GSNController(null, gsnControllerPort);
 			containerConfig = loadContainerConfiguration();
 			updateSplashIfNeeded(new String[] {"GSN is starting at port:"+containerConfig.getContainerPort(),"All GSN logs are available at: logs/gsn.log"});
-			System.out.println("Global Sensor Networks (GSN) is Starting on port "+containerConfig.getContainerPort()+"...");
-			System.out.println("The logs of GSN server are available in logs/gsn.log file.");
-			System.out.println("To Stop GSN execute the gsn-stop script.");
+			//System.out.println("Global Sensor Networks (GSN) is Starting on port "+containerConfig.getContainerPort()+"...");
+			//System.out.println("The logs of GSN server are available in logs/gsn.log file.");
+			//System.out.println("To Stop GSN execute the gsn-stop script.");
 		} catch ( FileNotFoundException e ) {
 			logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
 			logger.error ( e.getMessage ( ) );
