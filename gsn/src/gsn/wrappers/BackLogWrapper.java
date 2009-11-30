@@ -63,7 +63,7 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	public static final String BACKLOG_DEPLOYMENT = "deployment";
 	private static final String BACKLOG_PLUGIN = "plugin-classname";
 	private static final String SF_LOCAL_PORT = "local-sf-port";
-	private static final String TINYOS1X_PLATFORM_NAME = "tinyos1x-platformName";
+	private static final String TINYOS1X_PLATFORM = "tinyos1x-platform";
 	
 	private AbstractPlugin pluginObject = null;
 	private AddressBean addressBean = null;
@@ -186,7 +186,7 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 		
 		// start optional local serial forwarder or check its port compliance if needed
 		// do we need a serial forwarder for TinyOS-2.x
-		if (addressBean.getPredicateValue(TINYOS1X_PLATFORM_NAME) == null) {
+		if (addressBean.getPredicateValue(TINYOS1X_PLATFORM) == null) {
 			synchronized (sfListenList) {
 				if (sfListenList.containsKey(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ))) {
 					sfListen = sfListenList.get(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
@@ -223,8 +223,8 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 					try {
 						port = addressBean.getPredicateValueAsInt( SF_LOCAL_PORT, -1 );
 						if( port > 0 ) {
-							sfv1Listen = new SFv1Listen(port, deploymentClient, addressBean.getPredicateValue( TINYOS1X_PLATFORM_NAME ));
-							logger.info("starting local serial forwarder v1.x on port " + port + " for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "< using '" + addressBean.getPredicateValue( TINYOS1X_PLATFORM_NAME ) + "' platform");
+							sfv1Listen = new SFv1Listen(port, deploymentClient, addressBean.getPredicateValue( TINYOS1X_PLATFORM ));
+							logger.info("starting local serial forwarder v1.x on port " + port + " for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "< using '" + addressBean.getPredicateValue( TINYOS1X_PLATFORM ) + "' platform");
 							sfv1Listen.start();
 							sfv1ListenList.put(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ), sfv1Listen);
 						}
