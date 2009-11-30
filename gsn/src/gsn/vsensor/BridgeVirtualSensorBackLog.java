@@ -10,11 +10,20 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.lang.Double;
@@ -29,6 +38,7 @@ import gsn.utils.ParamParser;
 import gsn.wrappers.AbstractWrapper;
 
 import org.apache.log4j.Logger;
+import org.h2.tools.Server;
 
 /**
  * This virtual sensor takes the input field called as specified in the
@@ -53,6 +63,12 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 	
 	private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensorBackLog.class);
 
+	private static HashSet<String> deployments = new HashSet<String>();
+	
+	private String deployment;
+	private Connection conn = null;
+	private PreparedStatement query = null;
+	private Server web;
 	private int width;
 	private String stream_name = null;
 	private String stream_source = null;
@@ -65,6 +81,16 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 		int i;
 		VSensorConfig vsensor = getVirtualSensorConfiguration();
 		TreeMap<String,String> params = vsensor.getMainClassInitialParams();
+		
+		deployment = params.get("deployment");
+		if (deployment == null) {
+			logger.info("init-param 'deployment' must be defined");
+			return false;
+		}
+		
+		deployment = deployment.toLowerCase();
+
+		logger.debug(deployment);
 		
 		width = ParamParser.getInteger(params.get("width"), DEFAULT_WIDTH);
 		stream_name = params.get("stream-name");
@@ -103,12 +129,67 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 				jpeg_scaled.add(s);
 		}
 
+		if (outputstructure.contains(new DataField("location_id", DataTypes.INTEGER))) {
+			synchronized (deployments) {
+				if (deployments.isEmpty()) {
+					try {
+						Class.forName("org.h2.Driver");
+					} catch (ClassNotFoundException e) {
+						logger.error(e.getMessage(), e);
+						return false;
+					}
+					if (logger.isDebugEnabled()) {
+						try {
+							String [] args = {"-webPort 8082"};
+							web = Server.createWebServer(args);
+							web.start();
+						} catch (SQLException e) {
+							logger.warn(e.getMessage(), e);
+						}
+					}
+				}
+
+				try {
+					conn = DriverManager.getConnection("jdbc:h2:mem:locationmapping-" + deployment + ";DB_CLOSE_DELAY=-1", "sa", "");
+					conn.setAutoCommit(true);
+					logger.info("connected to jdbc:h2:mem:locationmapping-" + deployment + "...");
+
+					logger.debug(deployments);
+					
+					// check if table is already created
+					if (!deployments.contains(deployment)) {
+						Statement stat = conn.createStatement();
+						stat.execute("CREATE TABLE mapping(node_id SMALLINT UNSIGNED NOT NULL, begin SMALLDATETIME(23,0) NOT NULL, end SMALLDATETIME(23,0) NOT NULL, location_id INTEGER NOT NULL, PRIMARY KEY(node_id, begin, end))");
+						stat.execute("INSERT INTO mapping SELECT * FROM CSVREAD('conf/backlog/locationmapping-" + deployment + ".csv')");
+						logger.info("create mapping table for " + deployment + " deployment");
+						deployments.add(deployment);
+					}
+
+					logger.debug(deployments);
+					
+					query = conn.prepareStatement("SELECT location_id FROM mapping WHERE node_id = ? AND ? BETWEEN begin AND end LIMIT 1");
+					
+				} catch (SQLException e) {
+					logger.error(e.getMessage(), e);
+					return false;
+				}
+			}
+		}
+		
 		return true;
 	}
 	
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		String s;
+		if (conn != null) {
+			if (data.getData("HEADER_ORIGINATORID") != null && data.getData("GENERATION_TIME") != null) {
+				data.setData("location_id", getLocationId(
+						((Double) data.getData("HEADER_ORIGINATORID")).intValue(),
+						((Double) data.getData("GENERATION_TIME")).longValue()));
+			}
+		}
 		for (Enumeration<String> elem = timestamp_string.elements() ; elem.hasMoreElements() ; ) {
+			// convert timestamps to human readable form
 			s = elem.nextElement();
 			if (data.getData(s) != null) {
 				try {
@@ -119,6 +200,7 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 			}
 		}
 		for (Enumeration<String> elem = jpeg_scaled.elements() ; elem.hasMoreElements() ; ) {
+			// scale image to given width
 			s = elem.nextElement();
 		    if (data.getData(s) != null) {
 		    	try {
@@ -162,5 +244,34 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 			}
 		}
 		return false;
+	}
+
+	private Integer getLocationId(int originatorid, long gentime) {
+		Integer res = null;
+		long start = 0;
+		if (logger.isDebugEnabled())
+			start = System.nanoTime();
+		try {
+			query.setInt(1, originatorid);
+			query.setTimestamp(2, new Timestamp(gentime));
+			ResultSet rs = query.executeQuery();
+			if (rs.next())
+				res = rs.getInt(1);
+		} catch (SQLException e) {
+			logger.warn(e.getMessage(), e);
+		}
+		logger.debug("getLocationId: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		return res;
+	}
+	
+	public void dispose() {
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (SQLException e) { /* ignore */	}
+		}
+		if (web != null) {
+			web.shutdown();
+		}
 	}
 }
