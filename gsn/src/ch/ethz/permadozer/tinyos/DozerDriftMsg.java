@@ -4,9 +4,9 @@
  * message type.
  */
 
-package ch.ethz.permafrozer.messages;
+package ch.ethz.permadozer.tinyos;
 
-public class DozerDriftMsg extends ch.ethz.permafrozer.messages.DataHeaderMsg {
+public class DozerDriftMsg extends ch.ethz.permadozer.tinyos.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
     public static final int DEFAULT_MESSAGE_SIZE = 25;

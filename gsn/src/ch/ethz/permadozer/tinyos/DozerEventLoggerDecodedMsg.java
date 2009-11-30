@@ -1,4 +1,4 @@
-package ch.ethz.permafrozer.messages;
+package ch.ethz.permadozer.tinyos;
 
 import java.util.Vector;
 

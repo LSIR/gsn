@@ -4,9 +4,9 @@
  * message type.
  */
 
-package ch.ethz.permafrozer.messages;
+package ch.ethz.permadozer.tinyos;
 
-public class DozerDigitalDCXMsg extends ch.ethz.permafrozer.messages.DataHeaderMsg {
+public class DozerDigitalDCXMsg extends ch.ethz.permadozer.tinyos.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
     public static final int DEFAULT_MESSAGE_SIZE = 30;
@@ -99,12 +99,20 @@ public class DozerDigitalDCXMsg extends ch.ethz.permafrozer.messages.DataHeaderM
         s += "  [header.aTime.high=0x"+Long.toHexString(get_header_aTime_high())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.sampleNo=0x"+Long.toHexString(get_payload_sampleNo())+"]\n";
+        s += "  [payload.sample.valid=0x"+Long.toHexString(get_payload_sample_valid())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.sample.no=0x"+Long.toHexString(get_payload_sample_no())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.batteryStatus=0x"+Long.toHexString(get_payload_batteryStatus())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
+        s += "  [payload.dcxData.floatvalue=";
+        for (int i = 0; i < 4; i++) {
+          s += Float.toString(getElement_payload_dcxData_floatvalue(i))+" ";
+        }
+        s += "]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.dcxData.status=";
@@ -371,66 +379,132 @@ public class DozerDigitalDCXMsg extends ch.ethz.permafrozer.messages.DataHeaderM
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.sampleNo
-    //   Field type: int
+    // Accessor methods for field: payload.sample.valid
+    //   Field type: byte
     //   Offset (bits): 56
-    //   Size (bits): 16
+    //   Size (bits): 1
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.sampleNo' is signed (false).
+     * Return whether the field 'payload.sample.valid' is signed (false).
      */
-    public static boolean isSigned_payload_sampleNo() {
+    public static boolean isSigned_payload_sample_valid() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.sampleNo' is an array (false).
+     * Return whether the field 'payload.sample.valid' is an array (false).
      */
-    public static boolean isArray_payload_sampleNo() {
+    public static boolean isArray_payload_sample_valid() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.sampleNo'
+     * Return the offset (in bytes) of the field 'payload.sample.valid'
      */
-    public static int offset_payload_sampleNo() {
+    public static int offset_payload_sample_valid() {
         return (56 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.sampleNo'
+     * Return the offset (in bits) of the field 'payload.sample.valid'
      */
-    public static int offsetBits_payload_sampleNo() {
+    public static int offsetBits_payload_sample_valid() {
         return 56;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.sampleNo'
+     * Return the value (as a byte) of the field 'payload.sample.valid'
      */
-    public int get_payload_sampleNo() {
-        return (int)getUIntBEElement(offsetBits_payload_sampleNo(), 16);
+    public byte get_payload_sample_valid() {
+        return (byte)getUIntBEElement(offsetBits_payload_sample_valid(), 1);
     }
 
     /**
-     * Set the value of the field 'payload.sampleNo'
+     * Set the value of the field 'payload.sample.valid'
      */
-    public void set_payload_sampleNo(int value) {
-        setUIntBEElement(offsetBits_payload_sampleNo(), 16, value);
+    public void set_payload_sample_valid(byte value) {
+        setUIntBEElement(offsetBits_payload_sample_valid(), 1, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.sampleNo'
+     * Return the size, in bytes, of the field 'payload.sample.valid'
+     * WARNING: This field is not an even-sized number of bytes (1 bits).
      */
-    public static int size_payload_sampleNo() {
-        return (16 / 8);
+    public static int size_payload_sample_valid() {
+        return (1 / 8) + 1;
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.sampleNo'
+     * Return the size, in bits, of the field 'payload.sample.valid'
      */
-    public static int sizeBits_payload_sampleNo() {
-        return 16;
+    public static int sizeBits_payload_sample_valid() {
+        return 1;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.sample.no
+    //   Field type: short
+    //   Offset (bits): 57
+    //   Size (bits): 15
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.sample.no' is signed (false).
+     */
+    public static boolean isSigned_payload_sample_no() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.sample.no' is an array (false).
+     */
+    public static boolean isArray_payload_sample_no() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.sample.no'
+     * WARNING: This field is not byte-aligned (bit offset 57).
+     */
+    public static int offset_payload_sample_no() {
+        return (57 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.sample.no'
+     */
+    public static int offsetBits_payload_sample_no() {
+        return 57;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.sample.no'
+     */
+    public short get_payload_sample_no() {
+        return (short)getUIntBEElement(offsetBits_payload_sample_no(), 15);
+    }
+
+    /**
+     * Set the value of the field 'payload.sample.no'
+     */
+    public void set_payload_sample_no(short value) {
+        setUIntBEElement(offsetBits_payload_sample_no(), 15, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.sample.no'
+     * WARNING: This field is not an even-sized number of bytes (15 bits).
+     */
+    public static int size_payload_sample_no() {
+        return (15 / 8) + 1;
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.sample.no'
+     */
+    public static int sizeBits_payload_sample_no() {
+        return 15;
     }
 
     /////////////////////////////////////////////////////////
@@ -497,130 +571,129 @@ public class DozerDigitalDCXMsg extends ch.ethz.permafrozer.messages.DataHeaderM
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.dcxData.floatbyte
-    //   Field type: short[][]
+    // Accessor methods for field: payload.dcxData.floatvalue
+    //   Field type: float[]
     //   Offset (bits): 0
-    //   Size of each element (bits): 8
+    //   Size of each element (bits): 32
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.dcxData.floatbyte' is signed (false).
+     * Return whether the field 'payload.dcxData.floatvalue' is signed (false).
      */
-    public static boolean isSigned_payload_dcxData_floatbyte() {
+    public static boolean isSigned_payload_dcxData_floatvalue() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.dcxData.floatbyte' is an array (true).
+     * Return whether the field 'payload.dcxData.floatvalue' is an array (true).
      */
-    public static boolean isArray_payload_dcxData_floatbyte() {
+    public static boolean isArray_payload_dcxData_floatvalue() {
         return true;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.dcxData.floatbyte'
+     * Return the offset (in bytes) of the field 'payload.dcxData.floatvalue'
      */
-    public static int offset_payload_dcxData_floatbyte(int index1, int index2) {
+    public static int offset_payload_dcxData_floatvalue(int index1) {
         int offset = 0;
         if (index1 < 0 || index1 >= 4) throw new ArrayIndexOutOfBoundsException();
         offset += 80 + index1 * 40;
-        if (index2 < 0 || index2 >= 4) throw new ArrayIndexOutOfBoundsException();
-        offset += 0 + index2 * 8;
         return (offset / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.dcxData.floatbyte'
+     * Return the offset (in bits) of the field 'payload.dcxData.floatvalue'
      */
-    public static int offsetBits_payload_dcxData_floatbyte(int index1, int index2) {
+    public static int offsetBits_payload_dcxData_floatvalue(int index1) {
         int offset = 0;
         if (index1 < 0 || index1 >= 4) throw new ArrayIndexOutOfBoundsException();
         offset += 80 + index1 * 40;
-        if (index2 < 0 || index2 >= 4) throw new ArrayIndexOutOfBoundsException();
-        offset += 0 + index2 * 8;
         return offset;
     }
 
     /**
-     * Return the entire array 'payload.dcxData.floatbyte' as a short[][]
+     * Return the entire array 'payload.dcxData.floatvalue' as a float[]
      */
-    public short[][] get_payload_dcxData_floatbyte() {
-        short[][] tmp = new short[4][4];
-        for (int index0 = 0; index0 < numElements_payload_dcxData_floatbyte(0); index0++) {
-          for (int index1 = 0; index1 < numElements_payload_dcxData_floatbyte(1); index1++) {
-              tmp[index0][index1] = getElement_payload_dcxData_floatbyte(index0,index1);
-          }
+    public float[] get_payload_dcxData_floatvalue() {
+        float[] tmp = new float[4];
+        for (int index0 = 0; index0 < numElements_payload_dcxData_floatvalue(0); index0++) {
+            tmp[index0] = getElement_payload_dcxData_floatvalue(index0);
         }
         return tmp;
     }
 
     /**
-     * Set the contents of the array 'payload.dcxData.floatbyte' from the given short[][]
+     * Set the contents of the array 'payload.dcxData.floatvalue' from the given float[]
      */
-    public void set_payload_dcxData_floatbyte(short[][] value) {
+    public void set_payload_dcxData_floatvalue(float[] value) {
         for (int index0 = 0; index0 < value.length; index0++) {
-          for (int index1 = 0; index1 < value[index0].length; index1++) {
-              setElement_payload_dcxData_floatbyte(index0,index1, value[index0][index1]);
-          }
+            setElement_payload_dcxData_floatvalue(index0, value[index0]);
         }
     }
 
     /**
-     * Return an element (as a short) of the array 'payload.dcxData.floatbyte'
+     * Return an element (as a float) of the array 'payload.dcxData.floatvalue'
      */
-    public short getElement_payload_dcxData_floatbyte(int index1, int index2) {
-        return (short)getUIntBEElement(offsetBits_payload_dcxData_floatbyte(index1, index2), 8);
+    public float getElement_payload_dcxData_floatvalue(int index1) {
+        return (float)getFloatElement(offsetBits_payload_dcxData_floatvalue(index1), 32);
     }
 
     /**
-     * Set an element of the array 'payload.dcxData.floatbyte'
+     * Set an element of the array 'payload.dcxData.floatvalue'
      */
-    public void setElement_payload_dcxData_floatbyte(int index1, int index2, short value) {
-        setUIntBEElement(offsetBits_payload_dcxData_floatbyte(index1, index2), 8, value);
+    public void setElement_payload_dcxData_floatvalue(int index1, float value) {
+        setFloatElement(offsetBits_payload_dcxData_floatvalue(index1), 32, value);
     }
 
     /**
-     * Return the total size, in bytes, of the array 'payload.dcxData.floatbyte'
+     * Return the total size, in bytes, of the array 'payload.dcxData.floatvalue'
      */
-    public static int totalSize_payload_dcxData_floatbyte() {
+    public static int totalSize_payload_dcxData_floatvalue() {
         return (160 / 8);
     }
 
     /**
-     * Return the total size, in bits, of the array 'payload.dcxData.floatbyte'
+     * Return the total size, in bits, of the array 'payload.dcxData.floatvalue'
      */
-    public static int totalSizeBits_payload_dcxData_floatbyte() {
+    public static int totalSizeBits_payload_dcxData_floatvalue() {
         return 160;
     }
 
     /**
-     * Return the size, in bytes, of each element of the array 'payload.dcxData.floatbyte'
+     * Return the size, in bytes, of each element of the array 'payload.dcxData.floatvalue'
      */
-    public static int elementSize_payload_dcxData_floatbyte() {
-        return (8 / 8);
+    public static int elementSize_payload_dcxData_floatvalue() {
+        return (32 / 8);
     }
 
     /**
-     * Return the size, in bits, of each element of the array 'payload.dcxData.floatbyte'
+     * Return the size, in bits, of each element of the array 'payload.dcxData.floatvalue'
      */
-    public static int elementSizeBits_payload_dcxData_floatbyte() {
-        return 8;
+    public static int elementSizeBits_payload_dcxData_floatvalue() {
+        return 32;
     }
 
     /**
-     * Return the number of dimensions in the array 'payload.dcxData.floatbyte'
+     * Return the number of dimensions in the array 'payload.dcxData.floatvalue'
      */
-    public static int numDimensions_payload_dcxData_floatbyte() {
-        return 2;
+    public static int numDimensions_payload_dcxData_floatvalue() {
+        return 1;
     }
 
     /**
-     * Return the number of elements in the array 'payload.dcxData.floatbyte'
+     * Return the number of elements in the array 'payload.dcxData.floatvalue'
+     */
+    public static int numElements_payload_dcxData_floatvalue() {
+        return 4;
+    }
+
+    /**
+     * Return the number of elements in the array 'payload.dcxData.floatvalue'
      * for the given dimension.
      */
-    public static int numElements_payload_dcxData_floatbyte(int dimension) {
-      int array_dims[] = { 4, 4,  };
-        if (dimension < 0 || dimension >= 2) throw new ArrayIndexOutOfBoundsException();
+    public static int numElements_payload_dcxData_floatvalue(int dimension) {
+      int array_dims[] = { 4,  };
+        if (dimension < 0 || dimension >= 1) throw new ArrayIndexOutOfBoundsException();
         if (array_dims[dimension] == 0) throw new IllegalArgumentException("Array dimension "+dimension+" has unknown size");
         return array_dims[dimension];
     }

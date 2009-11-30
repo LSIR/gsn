@@ -4,9 +4,9 @@
  * message type.
  */
 
-package ch.ethz.permafrozer.messages;
+package ch.ethz.permadozer.tinyos;
 
-public class DozerHealthMsg extends ch.ethz.permafrozer.messages.DataHeaderMsg {
+public class DozerHealthMsg extends ch.ethz.permadozer.tinyos.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
     public static final int DEFAULT_MESSAGE_SIZE = 30;
@@ -99,7 +99,10 @@ public class DozerHealthMsg extends ch.ethz.permafrozer.messages.DataHeaderMsg {
         s += "  [header.aTime.high=0x"+Long.toHexString(get_header_aTime_high())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.sampleNo=0x"+Long.toHexString(get_payload_sampleNo())+"]\n";
+        s += "  [payload.sample.valid=0x"+Long.toHexString(get_payload_sample_valid())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.sample.no=0x"+Long.toHexString(get_payload_sample_no())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.uptime.low=0x"+Long.toHexString(get_payload_uptime_low())+"]\n";
@@ -135,7 +138,10 @@ public class DozerHealthMsg extends ch.ethz.permafrozer.messages.DataHeaderMsg {
         s += "  [payload.parentId=0x"+Long.toHexString(get_payload_parentId())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.hopCountChildCount=0x"+Long.toHexString(get_payload_hopCountChildCount())+"]\n";
+        s += "  [payload.hopCount=0x"+Long.toHexString(get_payload_hopCount())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.childCount=0x"+Long.toHexString(get_payload_childCount())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -395,66 +401,132 @@ public class DozerHealthMsg extends ch.ethz.permafrozer.messages.DataHeaderMsg {
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.sampleNo
-    //   Field type: int
+    // Accessor methods for field: payload.sample.valid
+    //   Field type: byte
     //   Offset (bits): 56
-    //   Size (bits): 16
+    //   Size (bits): 1
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.sampleNo' is signed (false).
+     * Return whether the field 'payload.sample.valid' is signed (false).
      */
-    public static boolean isSigned_payload_sampleNo() {
+    public static boolean isSigned_payload_sample_valid() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.sampleNo' is an array (false).
+     * Return whether the field 'payload.sample.valid' is an array (false).
      */
-    public static boolean isArray_payload_sampleNo() {
+    public static boolean isArray_payload_sample_valid() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.sampleNo'
+     * Return the offset (in bytes) of the field 'payload.sample.valid'
      */
-    public static int offset_payload_sampleNo() {
+    public static int offset_payload_sample_valid() {
         return (56 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.sampleNo'
+     * Return the offset (in bits) of the field 'payload.sample.valid'
      */
-    public static int offsetBits_payload_sampleNo() {
+    public static int offsetBits_payload_sample_valid() {
         return 56;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.sampleNo'
+     * Return the value (as a byte) of the field 'payload.sample.valid'
      */
-    public int get_payload_sampleNo() {
-        return (int)getUIntBEElement(offsetBits_payload_sampleNo(), 16);
+    public byte get_payload_sample_valid() {
+        return (byte)getUIntBEElement(offsetBits_payload_sample_valid(), 1);
     }
 
     /**
-     * Set the value of the field 'payload.sampleNo'
+     * Set the value of the field 'payload.sample.valid'
      */
-    public void set_payload_sampleNo(int value) {
-        setUIntBEElement(offsetBits_payload_sampleNo(), 16, value);
+    public void set_payload_sample_valid(byte value) {
+        setUIntBEElement(offsetBits_payload_sample_valid(), 1, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.sampleNo'
+     * Return the size, in bytes, of the field 'payload.sample.valid'
+     * WARNING: This field is not an even-sized number of bytes (1 bits).
      */
-    public static int size_payload_sampleNo() {
-        return (16 / 8);
+    public static int size_payload_sample_valid() {
+        return (1 / 8) + 1;
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.sampleNo'
+     * Return the size, in bits, of the field 'payload.sample.valid'
      */
-    public static int sizeBits_payload_sampleNo() {
-        return 16;
+    public static int sizeBits_payload_sample_valid() {
+        return 1;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.sample.no
+    //   Field type: short
+    //   Offset (bits): 57
+    //   Size (bits): 15
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.sample.no' is signed (false).
+     */
+    public static boolean isSigned_payload_sample_no() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.sample.no' is an array (false).
+     */
+    public static boolean isArray_payload_sample_no() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.sample.no'
+     * WARNING: This field is not byte-aligned (bit offset 57).
+     */
+    public static int offset_payload_sample_no() {
+        return (57 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.sample.no'
+     */
+    public static int offsetBits_payload_sample_no() {
+        return 57;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.sample.no'
+     */
+    public short get_payload_sample_no() {
+        return (short)getUIntBEElement(offsetBits_payload_sample_no(), 15);
+    }
+
+    /**
+     * Set the value of the field 'payload.sample.no'
+     */
+    public void set_payload_sample_no(short value) {
+        setUIntBEElement(offsetBits_payload_sample_no(), 15, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.sample.no'
+     * WARNING: This field is not an even-sized number of bytes (15 bits).
+     */
+    public static int size_payload_sample_no() {
+        return (15 / 8) + 1;
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.sample.no'
+     */
+    public static int sizeBits_payload_sample_no() {
+        return 15;
     }
 
     /////////////////////////////////////////////////////////
@@ -1151,66 +1223,132 @@ public class DozerHealthMsg extends ch.ethz.permafrozer.messages.DataHeaderMsg {
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.hopCountChildCount
-    //   Field type: short
+    // Accessor methods for field: payload.hopCount
+    //   Field type: byte
     //   Offset (bits): 232
-    //   Size (bits): 8
+    //   Size (bits): 4
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.hopCountChildCount' is signed (false).
+     * Return whether the field 'payload.hopCount' is signed (false).
      */
-    public static boolean isSigned_payload_hopCountChildCount() {
+    public static boolean isSigned_payload_hopCount() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.hopCountChildCount' is an array (false).
+     * Return whether the field 'payload.hopCount' is an array (false).
      */
-    public static boolean isArray_payload_hopCountChildCount() {
+    public static boolean isArray_payload_hopCount() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.hopCountChildCount'
+     * Return the offset (in bytes) of the field 'payload.hopCount'
      */
-    public static int offset_payload_hopCountChildCount() {
+    public static int offset_payload_hopCount() {
         return (232 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.hopCountChildCount'
+     * Return the offset (in bits) of the field 'payload.hopCount'
      */
-    public static int offsetBits_payload_hopCountChildCount() {
+    public static int offsetBits_payload_hopCount() {
         return 232;
     }
 
     /**
-     * Return the value (as a short) of the field 'payload.hopCountChildCount'
+     * Return the value (as a byte) of the field 'payload.hopCount'
      */
-    public short get_payload_hopCountChildCount() {
-        return (short)getUIntBEElement(offsetBits_payload_hopCountChildCount(), 8);
+    public byte get_payload_hopCount() {
+        return (byte)getUIntBEElement(offsetBits_payload_hopCount(), 4);
     }
 
     /**
-     * Set the value of the field 'payload.hopCountChildCount'
+     * Set the value of the field 'payload.hopCount'
      */
-    public void set_payload_hopCountChildCount(short value) {
-        setUIntBEElement(offsetBits_payload_hopCountChildCount(), 8, value);
+    public void set_payload_hopCount(byte value) {
+        setUIntBEElement(offsetBits_payload_hopCount(), 4, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.hopCountChildCount'
+     * Return the size, in bytes, of the field 'payload.hopCount'
+     * WARNING: This field is not an even-sized number of bytes (4 bits).
      */
-    public static int size_payload_hopCountChildCount() {
-        return (8 / 8);
+    public static int size_payload_hopCount() {
+        return (4 / 8) + 1;
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.hopCountChildCount'
+     * Return the size, in bits, of the field 'payload.hopCount'
      */
-    public static int sizeBits_payload_hopCountChildCount() {
-        return 8;
+    public static int sizeBits_payload_hopCount() {
+        return 4;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.childCount
+    //   Field type: byte
+    //   Offset (bits): 236
+    //   Size (bits): 4
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.childCount' is signed (false).
+     */
+    public static boolean isSigned_payload_childCount() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.childCount' is an array (false).
+     */
+    public static boolean isArray_payload_childCount() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.childCount'
+     * WARNING: This field is not byte-aligned (bit offset 236).
+     */
+    public static int offset_payload_childCount() {
+        return (236 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.childCount'
+     */
+    public static int offsetBits_payload_childCount() {
+        return 236;
+    }
+
+    /**
+     * Return the value (as a byte) of the field 'payload.childCount'
+     */
+    public byte get_payload_childCount() {
+        return (byte)getUIntBEElement(offsetBits_payload_childCount(), 4);
+    }
+
+    /**
+     * Set the value of the field 'payload.childCount'
+     */
+    public void set_payload_childCount(byte value) {
+        setUIntBEElement(offsetBits_payload_childCount(), 4, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.childCount'
+     * WARNING: This field is not an even-sized number of bytes (4 bits).
+     */
+    public static int size_payload_childCount() {
+        return (4 / 8) + 1;
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.childCount'
+     */
+    public static int sizeBits_payload_childCount() {
+        return 4;
     }
 
 }
