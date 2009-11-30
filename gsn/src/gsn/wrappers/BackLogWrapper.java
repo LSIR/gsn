@@ -1,12 +1,11 @@
 package gsn.wrappers;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
+import java.util.Properties;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -20,7 +19,6 @@ import gsn.wrappers.backlog.sf.SFListen;
 import gsn.wrappers.backlog.sf.SFv1Listen;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
-import gsn.Main;
 
 
 /**
@@ -60,22 +58,23 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	/**
 	 * The field name for the deployment as used in the virtual sensor's XML file.
 	 */
-	public static final String BACKLOG_DEPLOYMENT = "deployment";
 	private static final String BACKLOG_PLUGIN = "plugin-classname";
 	private static final String SF_LOCAL_PORT = "local-sf-port";
 	private static final String TINYOS1X_PLATFORM = "tinyos1x-platform";
 	
+	private String deployment = null;
+	private static Map<String,Properties> propertyList = new HashMap<String,Properties>();
+	private String plugin = null;
 	private AbstractPlugin pluginObject = null;
 	private AddressBean addressBean = null;
-	private static Map<String,DeploymentClient> deploymentClientList = new HashMap<String,DeploymentClient> ();
+	private static Map<String,DeploymentClient> deploymentClientList = new HashMap<String,DeploymentClient>();
 	private DeploymentClient deploymentClient = null;
-	private static Map<String,SFListen> sfListenList = new HashMap<String,SFListen> ();
-	private static Map<String,SFv1Listen> sfv1ListenList = new HashMap<String,SFv1Listen> ();
+	private static Map<String,SFListen> sfListenList = new HashMap<String,SFListen>();
+	private static Map<String,SFv1Listen> sfv1ListenList = new HashMap<String,SFv1Listen>();
 	private SFListen sfListen = null;
 	private SFv1Listen sfv1Listen = null;
-	private static Map<String,Integer> activePluginsCounterList = new HashMap<String,Integer> ();
-	private static Map<String,Semaphore> deploymentSemaphoreList = new HashMap<String,Semaphore> ();
-	private Semaphore deploymentSemaphore = null;
+	private static Map<String,Integer> activePluginsCounterList = new HashMap<String,Integer>();
+	private String tinyos1x_platform = null;
 	
 	private final transient Logger logger = Logger.getLogger( BackLogWrapper.class );
 
@@ -104,28 +103,51 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	 */
 	@Override
 	public boolean initialize() {
-		logger.info("BackLog wrapper initialize started...");
+		Properties props;
+		
+		logger.debug("BackLog wrapper initialize started...");
+		
+	    addressBean = getActiveAddressBean();
 
-	    addressBean = getActiveAddressBean( );
-
-	    // check the XML file for the basestation entry
-		if ( addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) == null ) {
-			logger.error("Loading the PSBackLog wrapper failed due to missing *" + BACKLOG_DEPLOYMENT + "* parameter.");
+		deployment = addressBean.getVirtualSensorName().split("_")[0].toLowerCase();
+		
+		synchronized (propertyList) {
+			if (propertyList.containsKey(deployment)) {
+				props = propertyList.get(deployment);
+			} else {
+				String propertyfile = "conf/backlog/" + deployment + ".properties";
+				try {
+					props = new Properties();
+					props.load(new FileInputStream(propertyfile));
+					propertyList.put(deployment, props);
+				} catch (Exception e) {
+					logger.error("Could not load property file: " + propertyfile, e);
+					return false;
+				}
+			}
+		}
+		
+		String address = props.getProperty("address");
+		if (address == null) {
+			logger.error("Could not get property 'address' from property file");
 			return false;
-	    }
+		}
+		
+		plugin = addressBean.getPredicateValue(BACKLOG_PLUGIN);
+		
 	    // check the XML file for the plugin entry
-		if ( addressBean.getPredicateValue( BACKLOG_PLUGIN ) == null ) {
-			logger.error("Loading the PSBackLog wrapper failed due to missing *" + BACKLOG_PLUGIN + "* parameter.");
+		if (plugin == null) {
+			logger.error("Loading the PSBackLog wrapper failed due to missing >" + BACKLOG_PLUGIN + "< predicate.");
 			return false;
 	    }
 		
 		// instantiating the plugin class specified in the XML file
-		logger.info("Loading BackLog plugin: >" + addressBean.getPredicateValue( BACKLOG_PLUGIN ) + "<");
+		logger.debug("Loading BackLog plugin: >" + plugin + "<");
 		try {
-			Class<?> cl = Class.forName(addressBean.getPredicateValue( BACKLOG_PLUGIN ));
+			Class<?> cl = Class.forName(plugin);
 			pluginObject = (AbstractPlugin) cl.getConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
-			logger.error("The BackLog plugin class >" + addressBean.getPredicateValue( BACKLOG_PLUGIN ) + "< could not be found");
+			logger.error("The plugin class >" + plugin + "< could not be found");
 			return false;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -135,102 +157,83 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 		
 		// initializing the plugin
         if( !pluginObject.initialize(this) ) {
-    		logger.error("Could not load BackLog plugin: >" + addressBean.getPredicateValue( BACKLOG_PLUGIN ) + "<");
+    		logger.error("Could not load BackLog plugin: >" + plugin + "<");
         	return false;
         }
-
-		
-		// create or reuse a semaphore for this deployment
-		synchronized (deploymentSemaphoreList) {
-			if (deploymentSemaphoreList.containsKey(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ))) {
-				deploymentSemaphore = deploymentSemaphoreList.get(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-			}
-			else {
-				deploymentSemaphore = new Semaphore(1);
-				deploymentSemaphoreList.put(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ), deploymentSemaphore);
-			}
-		}
-
 		
 		// start or reuse a deployment client
 		synchronized (deploymentClientList) {
-			if (deploymentClientList.containsKey(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ))) {
-				logger.info("Reusing existing DeploymentClient for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
-				deploymentClient = deploymentClientList.get(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
+			if (deploymentClientList.containsKey(deployment)) {
+				logger.info("Reusing existing DeploymentClient for deployment: >" + deployment + "<");
+				deploymentClient = deploymentClientList.get(deployment);
 				deploymentClient.registerListener(pluginObject.getMessageType(), this);
 			}
 			else {
 				try {
-					logger.info("Loading DeploymentClient for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
-					deploymentClient = new DeploymentClient(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
+					logger.info("Loading DeploymentClient for deployment: >" + deployment + "<");
+					deploymentClient = new DeploymentClient(address);
 					deploymentClient.registerListener(pluginObject.getMessageType(), this);
 					deploymentClient.start();					
+					deploymentClientList.put(deployment, deploymentClient);
 				} catch (Exception e) {
-					logger.error("Could not load DeploymentClient for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
+					logger.error("Could not load DeploymentClient for deployment: >" + deployment + "<");
 					return false;
 				}
-				deploymentClientList.put(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ), deploymentClient);
 			}
 		}
 		
 		// count active plugins per deployment
 		synchronized (activePluginsCounterList) {
-			if (activePluginsCounterList.containsKey(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ))) {
-				int n = activePluginsCounterList.get(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-				activePluginsCounterList.put(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ), n+1);
+			if (activePluginsCounterList.containsKey(deployment)) {
+				int n = activePluginsCounterList.get(deployment);
+				activePluginsCounterList.put(deployment, n+1);
 			}
 			else {
-				activePluginsCounterList.put(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ), 1);
+				activePluginsCounterList.put(deployment, 1);
 			}
 		}
 		
-		// start optional local serial forwarder or check its port compliance if needed
-		// do we need a serial forwarder for TinyOS-2.x
-		if (addressBean.getPredicateValue(TINYOS1X_PLATFORM) == null) {
+		tinyos1x_platform = props.getProperty(TINYOS1X_PLATFORM);
+		String sflocalport = props.getProperty(SF_LOCAL_PORT);
+		
+		// start optional local serial forwarder
+		if (tinyos1x_platform == null) {
 			synchronized (sfListenList) {
-				if (sfListenList.containsKey(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ))) {
-					sfListen = sfListenList.get(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-					if( addressBean.getPredicateValueAsInt( SF_LOCAL_PORT, -1 ) != sfListen.getLocalPort())
-						logger.warn("serial forwarder port does not match: reusing port " + sfListen.getLocalPort());
+				if (sfListenList.containsKey(deployment)) {
+					sfListen = sfListenList.get(deployment);
 				}
 				else {
-					int port = -1;
-					try {
-						port = addressBean.getPredicateValueAsInt( SF_LOCAL_PORT, -1 );
-						if( port > 0 ) {
+					if (sflocalport != null) {
+						int port = -1;
+						try {
+							port = Integer.parseInt(sflocalport);
 							sfListen = new SFListen(port, deploymentClient);
-							logger.info("starting local serial forwarder on port " + port + " for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
+							logger.info("starting local serial forwarder on port " + port + " for deployment: >" + deployment + "<");
 							sfListen.start();
-							sfListenList.put(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ), sfListen);
+							sfListenList.put(deployment, sfListen);
+						} catch (Exception e) {
+							logger.error("Could not start serial forwarder on port " + port + " for deployment: >" + deployment + "<");							
 						}
-					} catch (Exception e) {
-						logger.error("Could not start serial forwarder v2.x on port " + port + " for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
-						return false;
 					}
 				}
 			}
-		}
-		// or do we need one for TinyOS-1.x
-		else {
+		} else {
 			synchronized (sfv1ListenList) {
-				if (sfv1ListenList.containsKey(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ))) {
-					sfv1Listen = sfv1ListenList.get(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-					if( addressBean.getPredicateValueAsInt( SF_LOCAL_PORT, -1 ) != sfv1Listen.getLocalPort())
-						logger.warn("serial forwarder port does not match: reusing port " + sfv1Listen.getLocalPort());
+				if (sfv1ListenList.containsKey(deployment)) {
+					sfv1Listen = sfv1ListenList.get(deployment);
 				}
 				else {
-					int port = -1;
-					try {
-						port = addressBean.getPredicateValueAsInt( SF_LOCAL_PORT, -1 );
-						if( port > 0 ) {
-							sfv1Listen = new SFv1Listen(port, deploymentClient, addressBean.getPredicateValue( TINYOS1X_PLATFORM ));
-							logger.info("starting local serial forwarder v1.x on port " + port + " for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "< using '" + addressBean.getPredicateValue( TINYOS1X_PLATFORM ) + "' platform");
+					if (sflocalport != null) {
+						int port = -1;
+						try {
+							port = Integer.parseInt(sflocalport);
+							sfv1Listen = new SFv1Listen(port, deploymentClient, tinyos1x_platform);
+							logger.info("starting local serial forwarder 1.x on port " + port + " for deployment: >" + deployment + "<");
 							sfv1Listen.start();
-							sfv1ListenList.put(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ), sfv1Listen);
+							sfv1ListenList.put(deployment, sfv1Listen);
+						} catch (Exception e) {
+							logger.error("Could not start serial forwarder 1.x on port " + port + " for deployment: >" + deployment + "<");							
 						}
-					} catch (Exception e) {
-						logger.error("Could not start serial forwarder on port " + port + " for deployment: >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
-						return false;
 					}
 				}
 			}
@@ -437,44 +440,43 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	 */
 	@Override
 	public void dispose() {
-		logger.info("Deregister this BackLogWrapper from the deployment >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
-		
-		try {
-			deploymentSemaphore.acquire();
-		} catch (InterruptedException e) {
-			logger.error(e.getMessage(), e);
-		}
-		int n = activePluginsCounterList.get(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-		activePluginsCounterList.put(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ), n-1);
-		
+		logger.info("Deregister this BackLogWrapper from the deployment >" + deployment + "<");
+
 		deploymentClient.deregisterListener(pluginObject.getMessageType(), this);
 
-		if( n == 1 ) {
-			// if this is the last listener close the serial forwarder
-			if( sfListen != null ) {
-				sfListen.interrupt();
-				sfListenList.remove(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-			}
-			if( sfv1Listen != null ) {
-				sfv1Listen.interrupt();
-				sfv1ListenList.remove(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-			}
-			// and the client
-			deploymentClientList.remove(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-			deploymentClient.interrupt();
-			
-			// remove this deployment from the counter
-			activePluginsCounterList.remove(addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ));
-			
-			logger.info("Final shutdown of the deployment >" + addressBean.getPredicateValue( BACKLOG_DEPLOYMENT ) + "<");
-		}
+		synchronized (activePluginsCounterList) {
+			int n = activePluginsCounterList.get(deployment);
+			activePluginsCounterList.put(deployment, n-1);
 
+			if (n == 1) {
+				// if this is the last listener close the serial forwarder
+				if (sfListen != null) {
+					sfListenList.remove(deployment);
+					sfListen.interrupt();
+				}
+				if (sfv1Listen != null) {
+					sfv1ListenList.remove(deployment);
+					sfv1Listen.interrupt();
+				}
+				// and the client
+				deploymentClientList.remove(deployment);
+				deploymentClient.interrupt();
+
+				// remove this deployment from the counter
+				activePluginsCounterList.remove(deployment);
+
+				logger.info("Final shutdown of the deployment >" + deployment + "<");
+			}
+		}
+		
 		// tell the plugin to stop
 		pluginObject.stop();
-		
-		deploymentSemaphore.release();
 	}
    
+	public String getTinyos1xPlatform() {
+		return tinyos1x_platform;
+	}
+	
 	@Override
    	public boolean isTimeStampUnique() {
    		return false;
