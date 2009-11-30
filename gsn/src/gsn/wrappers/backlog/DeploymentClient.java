@@ -43,11 +43,11 @@ public class DeploymentClient extends Thread {
 	    to the deployment in case of a connection loss. */
 	public static final int RECONNECT_TIMEOUT_SEC = 30;
 	/** Ping request interval in seconds. */
-	public static final int PING_INTERVAL_SEC = 60;
+	public static final int PING_INTERVAL_SEC = 10;
 	/** Time in seconds in which at least one ping acknowledge
 	    message should have been received. If no acknowledge has
 	    been received, the connection is considered broken. */
-	public static final int PING_ACK_CHECK_INTERVAL_SEC = 300;
+	public static final int PING_ACK_CHECK_INTERVAL_SEC = 60;
 	
 	
 	
