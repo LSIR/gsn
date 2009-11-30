@@ -1,7 +1,7 @@
 package gsn.wrappers.backlog.plugins;
 
 import gsn.beans.DataField;
-import gsn.beans.StreamElement;
+import gsn.beans.DataTypes;
 import gsn.wrappers.BackLogWrapper;
 import gsn.wrappers.backlog.plugins.MigMessageParameters;
 
@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 
 import net.tinyos.message.SerialPacket;
@@ -41,14 +42,7 @@ import org.apache.log4j.Logger;
 public class MigMessagePlugin extends AbstractPlugin
 {
 	// only mandatory for TinyOS1.x messages
-	private static final String TINYOS1X_PLATFORM_NAME = "tinyos1x-platformName";
-	// optional for TinyOS1.x messages
-	private static final String TINYOS1X_GROUP_ID = "tinyos1x-groupId";
-	
-	// has to be the same as in net.tinyos1x.message.MoteIF
-	private static final int ANY_GROUP_ID = -1;
-	
-	
+	private static final String TINYOS1X_PLATFORM = "tinyos1x-platform";
 
 	private MigMessageParameters parameters = null;
 
@@ -57,11 +51,13 @@ public class MigMessagePlugin extends AbstractPlugin
 
 	private final transient Logger logger = Logger.getLogger( MigMessagePlugin.class );
 	
-	private int tinos1x_groupId;
-	private String tinos1x_platformName = null;
-
-	private TOSMsg template ;
+	private DataField[] outputstructure = null;
+	private String[] outputstructurenames;
 	
+	private final static int tinyos1x_groupId = -1;
+	private String tinyos1x_platform = null;
+
+	private TOSMsg template ;	
 
 	@Override
 	public boolean initialize(BackLogWrapper backLogWrapper) {
@@ -76,9 +72,8 @@ public class MigMessagePlugin extends AbstractPlugin
 			
 			// if it is a TinyOS1.x message class we need the platform name
 			if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
-				tinos1x_groupId = getActiveAddressBean().getPredicateValueAsInt(TINYOS1X_GROUP_ID, -1);
 				try {
-					tinos1x_platformName = getActiveAddressBean().getPredicateValueWithException(TINYOS1X_PLATFORM_NAME);
+					tinyos1x_platform = getActiveAddressBean().getPredicateValueWithException(TINYOS1X_PLATFORM);
 				}
 				catch (Exception e) {
 					logger.error(e.getMessage());
@@ -88,7 +83,7 @@ public class MigMessagePlugin extends AbstractPlugin
 
 				// a template message for this platform has to be instantiated to be able to get the data offset
 				// if a message has to be sent to the deployment
-			   	Class<?> msgCls = Class.forName ( "net.tinyos1x.message." + tinos1x_platformName + ".TOSMsg" ) ;
+			   	Class<?> msgCls = Class.forName ( "net.tinyos1x.message." + tinyos1x_platform + ".TOSMsg" ) ;
 			   	Constructor<?> c = msgCls.getConstructor () ;
 				template = (TOSMsg) c.newInstance () ;
 			}
@@ -114,41 +109,34 @@ public class MigMessagePlugin extends AbstractPlugin
 			// create a TOS message (TinyOS1.x)
 			final TOSMsg msg = createTOSMsg ( packet ) ;
 
-			// are we interested in this group id?
-			if ( tinos1x_groupId == ANY_GROUP_ID || msg.get_group () == tinos1x_groupId ) {
-				Integer type = new Integer ( msg.get_type () );
+			Integer type = new Integer ( msg.get_type () );
 
-				// are we also interested in this message type
-				if( type == messageType ) {
-					net.tinyos1x.message.Message received ;
-					int length = msg.get_length () ;
-					
-					try {
-						// clone the message for further processing
-						received = msg.clone( length ) ;
-						received.dataSet ( msg.dataGet () , msg.offset_data ( 0 ) , 0 , length ) ;
-					}
-					catch ( ArrayIndexOutOfBoundsException e ) {
-						/*
-					    * Note: this will not catch messages whose length is incorrect,
-					    * but less than DATA_LENGTH (see AM.h) + 2
-					    */
-						logger.error( "invalid length message received (too long)" ) ;
-				    	return PACKET_ERROR;
-					}
-					catch ( Exception e ) {
-						logger.error( "couldn't clone message!, TinyOS 1x" ) ;
-						return PACKET_ERROR;
-					}
-					
-					// process the message
-					messageToBeProcessed(timestamp, received.dataGet());					
-					return PACKET_PROCESSED;
+			// are we also interested in this message type
+			if( type == messageType ) {
+				net.tinyos1x.message.Message received ;
+				int length = msg.get_length () ;
+
+				try {
+					// clone the message for further processing
+					received = msg.clone( length ) ;
+					received.dataSet ( msg.dataGet () , msg.offset_data ( 0 ) , 0 , length ) ;
+				}
+				catch ( ArrayIndexOutOfBoundsException e ) {
+					/*
+					 * Note: this will not catch messages whose length is incorrect,
+					 * but less than DATA_LENGTH (see AM.h) + 2
+					 */
+					logger.error( "invalid length message received (too long)" ) ;
+					return PACKET_ERROR;
+				}
+				catch ( Exception e ) {
+					logger.error( "couldn't clone message!, TinyOS 1x" ) ;
+					return PACKET_ERROR;
 				}
 
-			} else {
-		    	  logger.error("Dropping packet with bad group ID");
-		    	  return PACKET_ERROR;
+				// process the message
+				messageToBeProcessed(timestamp, received.dataGet());					
+				return PACKET_PROCESSED;
 			}
 		}
 		else {
@@ -189,11 +177,32 @@ public class MigMessagePlugin extends AbstractPlugin
 	
 	@Override
 	public DataField[] getOutputFormat() {
-		DataField[] tmp = new DataField[ parameters.getOutputStructure().length+1];
-		tmp[0] = new DataField("TIMESTAMP", "BIGINT");
-		for(int i=0; i<parameters.getOutputStructure().length; i++)
-			tmp[i+1] = parameters.getOutputStructure()[i];
-		return tmp;
+		if (outputstructure == null) {
+			String s;
+			LinkedHashMap<String, DataField> outputstructuremap = 
+				new LinkedHashMap<String, DataField>(2 + parameters.getOutputStructure().length);
+			outputstructuremap.put("timestamp", new DataField("timestamp", DataTypes.BIGINT));
+			outputstructuremap.put("generation_time", new DataField("generation_time", DataTypes.BIGINT));
+			for(int i=0; i<parameters.getOutputStructure().length; i++) {
+				outputstructuremap.put(parameters.getOutputStructure()[i].getName(), 
+						parameters.getOutputStructure()[i]);
+			}
+
+			// special merge of "*_low" and "*_high" fields
+			outputstructurenames = outputstructuremap.keySet().toArray(new String[] {});
+			for (int i=0; i < outputstructurenames.length; i++) {
+				s = outputstructurenames[i];
+				if (s.endsWith("_low") || s.endsWith("_high")) {
+					s = s.substring(0, s.lastIndexOf('_')).toLowerCase();
+					if (!outputstructuremap.containsKey(s))
+						outputstructuremap.put(s, new DataField(s, DataTypes.INTEGER));
+				}					
+			}
+
+			outputstructurenames = outputstructuremap.keySet().toArray(new String[] {});
+			outputstructure = outputstructuremap.values().toArray(new DataField[] {});
+		}
+		return outputstructure;
 	}
 
 	
@@ -295,7 +304,7 @@ public class MigMessagePlugin extends AbstractPlugin
 
 			// message header: destination, group id, and message type
 			packet.set_addr ( moteId ) ;
-			packet.set_group ( (short) tinos1x_groupId ) ;
+			packet.set_group ( (short) tinyos1x_groupId ) ;
 			packet.set_type ( ( short ) amType ) ;
 			packet.set_length ( ( short ) data.length ) ;
 		      
@@ -322,61 +331,61 @@ public class MigMessagePlugin extends AbstractPlugin
     }
 	
 
-	private boolean messageToBeProcessed(long timestamp, byte[] rmsg) {
+	private boolean messageToBeProcessed(long timestamp, byte[] rawmsg) {
 		Method getter = null;
 		Object res = null;
-		Serializable resarray = null;
-			
-		if (logger.isDebugEnabled()) {
-			StringBuilder rawmsgoutput = new StringBuilder ();
-			for (int i = 0 ; i < rmsg.length ; i++) {
-				rawmsgoutput.append(rmsg[i]);
-				rawmsgoutput.append(" ");
-			}
-			logger.debug("new message to be processed: " + rawmsgoutput.toString());
-		}
 
-		ArrayList<Serializable> output = new ArrayList<Serializable> () ;
+		LinkedHashMap<String, Serializable> outputvaluesmap = 
+			new LinkedHashMap<String, Serializable>(outputstructure.length);
+		
+		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[0], timestamp);
+		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[1], null);
+		
 		try {
-			Object msg = (Object) messageConstructor.newInstance(rmsg);
+			Object msg = (Object) messageConstructor.newInstance(rawmsg);
 
 			Iterator<Method> iter = parameters.getGetters().iterator();
 			while (iter.hasNext()) {
-				getter = (Method) iter.next();
+				getter = iter.next();
 				getter.setAccessible(true);
 				res = getter.invoke(msg);
 				if (getter.getReturnType().isArray()) {
-					for(int i = 0 ; i < Array.getLength(res) ; i++) {
-						resarray = (Serializable) Array.get(res, i);
-						output.add(resarray);
-						logger.debug("> " + getter.getName() + ": " + resarray);
+					String name = getter.getName().toLowerCase();
+					for (int i=0; i < Array.getLength(res); i++) {
+						//outputvaluesmap.put(name + "[" + i + "]", (Serializable) Array.get(res, i));
+						addValue(outputvaluesmap, name + "[" + i + "]", (Serializable) Array.get(res, i));
 					}
 				}
 				else {
-					output.add((Serializable)res);
-					logger.debug("> " + getter.getName() + ": " + res);
+					//outputvaluesmap.put(getter.getName().toLowerCase(), (Serializable) res);
+					addValue(outputvaluesmap, getter.getName().toLowerCase(), (Serializable) res);
 				}
 			}
-			
-		} catch (InstantiationException e) {
-			logger.error("Unable to instanciate the message");
-			return false;
-		} catch (IllegalAccessException e) {
-			logger.error("Illegal Access to >" + getter + "<");
-			return false;
-		} catch (IllegalArgumentException e) {
-			logger.error("Illegal argument to >" + getter + "<");
-			return false;
-		} catch (InvocationTargetException e) {
-			logger.error("Invocation Target Exception " + e.getMessage(), e);
-			return false;
-		} catch (SecurityException e) {
-			logger.error("Security Exception " + e.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return false;
 		}
-
-		output.add(0, timestamp);
-		if (dataProcessed(System.currentTimeMillis(), output.toArray(new Serializable[] {})))
+		
+		// special merge of "*_low" and "*_high" fields
+		for (int i=outputvaluesmap.size(); i < outputstructure.length; i++) {
+			String key = parameters.getTinyosGetterPrefix() + outputstructurenames[i];
+			int merged = 0;
+			if (outputvaluesmap.containsKey(key + "_low"))
+				merged += ((Integer) outputvaluesmap.get(key + "_low")).intValue();
+			if (outputvaluesmap.containsKey(key + "_high"))
+				merged += ((Short) outputvaluesmap.get(key + "_high")).intValue() << 16;
+			outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[i], merged);
+		}
+		
+		if (outputvaluesmap.containsKey(parameters.getTinyosGetterPrefix() + "header_atime")) {
+			long atime = ((Integer) outputvaluesmap.get(parameters.getTinyosGetterPrefix() + "header_atime")).longValue();
+			outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[1], timestamp - (atime * 1000));
+		} else {
+			// should never happen
+			logger.warn("invalid gentime field");
+		}
+		
+		if (dataProcessed(System.currentTimeMillis(), outputvaluesmap.values().toArray(new Serializable[] {})))
 			ackMessage(timestamp);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
@@ -384,6 +393,18 @@ public class MigMessagePlugin extends AbstractPlugin
 		return true;
 	}
 
+	private void addValue(LinkedHashMap<String, Serializable> map, String name, Serializable obj) {
+		// convert Float/Double NaN to null
+		if (obj.getClass().isAssignableFrom(Float.class)) {
+			if (((Float) obj).isNaN())
+				obj = null;
+		} else if (obj.getClass().isAssignableFrom(Double.class)) {
+			if (((Double) obj).isNaN())
+				obj = null;
+		}
+		map.put(name, obj);
+	}
+	
 //	
 // following functions are only used for TinyOS1.x messages	
 //
@@ -392,7 +413,7 @@ public class MigMessagePlugin extends AbstractPlugin
 	   	try {
 		   	Class<?> msgCls ;
          
-		   	msgCls = Class.forName ( "net.tinyos1x.message." + tinos1x_platformName + ".TOSMsg" ) ;
+		   	msgCls = Class.forName ( "net.tinyos1x.message." + tinyos1x_platform + ".TOSMsg" ) ;
          
 		   	Constructor<?> c = msgCls.getConstructor ( cArgs ) ;
 		   	return (TOSMsg) c.newInstance ( args ) ;
@@ -403,7 +424,7 @@ public class MigMessagePlugin extends AbstractPlugin
 		   	e.printStackTrace () ;
 	   	}
 	   	catch ( NoSuchMethodException e ) {
-		   	System.err.println ( "Could not locate the appropriate constructor; check the class " + "net.tinyos1x.message." + tinos1x_platformName
+		   	System.err.println ( "Could not locate the appropriate constructor; check the class " + "net.tinyos1x.message." + tinyos1x_platform
                               + ".TOSMsg" ) ;
 		   	e.printStackTrace () ;
 	   	}
@@ -439,5 +460,4 @@ public class MigMessagePlugin extends AbstractPlugin
     	
     	return instantiateTOSMsg ( cArgs , initArgs ) ;
     }
-
 }
