@@ -81,15 +81,7 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 		VSensorConfig vsensor = getVirtualSensorConfiguration();
 		TreeMap<String,String> params = vsensor.getMainClassInitialParams();
 		
-		deployment = params.get("deployment");
-		if (deployment == null) {
-			logger.info("init-param 'deployment' must be defined");
-			return false;
-		}
-		
-		deployment = deployment.toLowerCase();
-
-		logger.debug(deployment);
+		deployment = vsensor.getName().split("_")[0].toLowerCase();
 		
 		width = ParamParser.getInteger(params.get("width"), DEFAULT_WIDTH);
 		stream_name = params.get("stream-name");
@@ -153,8 +145,6 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 					conn.setAutoCommit(true);
 					logger.info("connected to jdbc:h2:mem:locationmapping-" + deployment + "...");
 
-					logger.debug(deployments);
-					
 					// check if table is already created
 					if (!deployments.contains(deployment)) {
 						Statement stat = conn.createStatement();
@@ -163,8 +153,6 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 						logger.info("create mapping table for " + deployment + " deployment");
 						deployments.add(deployment);
 					}
-
-					logger.debug(deployments);
 					
 					query = conn.prepareStatement("SELECT location_id FROM mapping WHERE node_id = ? AND ? BETWEEN begin AND end LIMIT 1");
 					
@@ -259,7 +247,8 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 		} catch (SQLException e) {
 			logger.warn(e.getMessage(), e);
 		}
-		logger.debug("getLocationId: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		if (logger.isDebugEnabled())
+			logger.debug("getLocationId: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
 		return res;
 	}
 	
