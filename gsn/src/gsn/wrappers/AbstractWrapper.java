@@ -231,8 +231,7 @@ public abstract class AbstractWrapper extends Thread {
 			return toReturn;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			logger
-					.error("Produced data item from the wrapper couldn't be propagated inside the system.");
+			logger.error("Produced data item from the wrapper couldn't be propagated inside the system.");
 			return false;
 		}
 	}
