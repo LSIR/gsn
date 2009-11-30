@@ -2,6 +2,9 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="deployment">rooftop</param>
+        </init-params>
         <web-input password="test">
             <command name="backlog">
                 <field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>

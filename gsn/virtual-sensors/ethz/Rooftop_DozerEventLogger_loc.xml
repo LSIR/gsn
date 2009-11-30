@@ -1,4 +1,4 @@
-<virtual-sensor name="Rooftop_DozerEventLogger_1376" priority="10" >
+<virtual-sensor name="Rooftop_DozerEventLogger_loc_1376" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -8,6 +8,7 @@
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
             <field name="GENERATION_TIME" type="BIGINT"/>
+            <field name="LOCATION_ID" type="INTEGER" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
@@ -41,20 +42,17 @@
             <field name="PAYLOAD_EVENTLOG_VALUE6" type="INTEGER" />
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerEventLogMsg) from ETZ rooftop deployment</description>
+    <description>Dozer messages (DozerEventLogMsg) from ETZ rooftop deployment with location id</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permadozer.tinyos.DozerEventLoggerDecodedMsg</predicate>
-                    <predicate key="local-sf-port">9006</predicate>
+                <address wrapper="local">
+                    <predicate key="query"> select * from Rooftop_DozerEventLogger_1376 </predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select *, null as LOCATION_ID from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

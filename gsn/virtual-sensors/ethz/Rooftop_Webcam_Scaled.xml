@@ -3,6 +3,7 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
+            <param name="deployment">rooftop</param>
             <param name="jpeg_scaled">jpeg_scaled</param>
         </init-params>
         <output-structure>
