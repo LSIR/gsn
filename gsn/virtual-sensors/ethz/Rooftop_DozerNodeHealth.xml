@@ -2,9 +2,6 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="deployment">rooftop</param>
-        </init-params>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
             <field name="GENERATION_TIME" type="BIGINT"/>
@@ -35,10 +32,8 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permadozer.tinyos.DozerHealthMsg</predicate>
-                    <predicate key="local-sf-port">9006</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

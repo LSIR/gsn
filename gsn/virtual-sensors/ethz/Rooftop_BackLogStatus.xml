@@ -2,9 +2,6 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="deployment">rooftop</param>
-        </init-params>
         <web-input password="test">
             <command name="backlog">
                 <field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
@@ -33,7 +30,6 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="deployment">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>

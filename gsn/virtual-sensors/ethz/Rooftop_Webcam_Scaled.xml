@@ -3,7 +3,6 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
-            <param name="deployment">rooftop</param>
             <param name="jpeg_scaled">jpeg_scaled</param>
         </init-params>
         <output-structure>
@@ -27,7 +26,7 @@
                 </address>
                 <query> select TIMESTAMP as TIMESTAMP_STRING, DATA as JPEG_SCALED from wrapper</query>
             </source>
-            <query> select * from source</query>
+            <query> select * from source </query>
         </stream>
     </streams>
 </virtual-sensor>
