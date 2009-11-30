@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import net.tinyos.message.SerialPacket;
 import net.tinyos.packet.Serial;
@@ -30,50 +28,28 @@ import gsn.wrappers.BackLogWrapper;
 public class MigUploadPlugin extends AbstractPlugin {
 	
 	// only mandatory for TinyOS1.x messages
-	private static final String TINYOS1X_PLATFORM_NAME = "tinyos1x-platformName";
-	// optional for TinyOS1.x messages
-	private static final String TINYOS1X_GROUP_ID = "tinyos1x-groupId";
-	
-	
+	private static final String TINYOS1X_PLATFORM = "tinyos1x-platform";
 
 	private int commands_sent = 0;
-	private Timer checkConnection = null;
 	
-	private int tinos1x_groupId;
-	private String tinos1x_platformName = null;
+	private final static int tinyos1x_groupId = -1;
+	private String tinyos1x_platform = null;
 
 	private TOSMsg template ;
 
 	private final transient Logger logger = Logger.getLogger( MigUploadPlugin.class );
 
 
-
-	/**
-	 * Check if the connection to the deployment still exists.
-	 * 
-	 * @author Tonio Gsell
-	 */
-	class CheckConnection extends TimerTask {
-		public void run() {
-			short connected = 0;
-			if( isConnected() )
-				connected = 1;
-			Serializable[] data = {connected, commands_sent};
-			dataProcessed(System.currentTimeMillis(), data);
-		}
-	}
-
 	@Override
 	public boolean initialize(BackLogWrapper backLogWrapper) {
 		super.initialize(backLogWrapper);
-		tinos1x_platformName = getActiveAddressBean().getPredicateValue(TINYOS1X_PLATFORM_NAME);
-		tinos1x_groupId = getActiveAddressBean().getPredicateValueAsInt(TINYOS1X_GROUP_ID, -1);
+		tinyos1x_platform = getActiveAddressBean().getPredicateValue(TINYOS1X_PLATFORM);
 
 		// a template message for this platform has to be instantiated to be able to get the data offset
 		// if a message has to be sent to the deployment
 	   	Class<?> msgCls;
 		try {
-			msgCls = Class.forName ( "net.tinyos1x.message." + tinos1x_platformName + ".TOSMsg" );
+			msgCls = Class.forName ( "net.tinyos1x.message." + tinyos1x_platform + ".TOSMsg" );
 		   	Constructor<?> c = msgCls.getConstructor () ;
 			template = (TOSMsg) c.newInstance () ;
 		} catch (Exception e) {
@@ -81,9 +57,6 @@ public class MigUploadPlugin extends AbstractPlugin {
 			return false;
 		}
 		
-		checkConnection = new Timer("BackLogCommandTimer");
-		checkConnection.schedule( new CheckConnection(), 2000, 30000 );
-        
 		return true;
 	}
 
@@ -189,7 +162,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 		}
 	
 		// which TinyOS messages version are we generating?
-		if (tinos1x_platformName != null) {
+		if (tinyos1x_platform != null) {
 			// the following functionality has been extracted from net.tinyos1x.message.Sender
 			// from the send function
 			TOSMsg packet ;
@@ -202,7 +175,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 
 			// message header: destination, group id, and message type
 			packet.set_addr ( moteId ) ;
-			packet.set_group ( (short) tinos1x_groupId ) ;
+			packet.set_group ( (short) tinyos1x_groupId ) ;
 			packet.set_type ( ( short ) amType ) ;
 			packet.set_length ( ( short ) data.length ) ;
 		      
@@ -236,7 +209,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 	   	try {
 		   	Class<?> msgCls ;
          
-		   	msgCls = Class.forName ( "net.tinyos1x.message." + tinos1x_platformName + ".TOSMsg" ) ;
+		   	msgCls = Class.forName ( "net.tinyos1x.message." + tinyos1x_platform + ".TOSMsg" ) ;
          
 		   	Constructor<?> c = msgCls.getConstructor ( cArgs ) ;
 		   	return (TOSMsg) c.newInstance ( args ) ;
@@ -247,7 +220,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 		   	e.printStackTrace () ;
 	   	}
 	   	catch ( NoSuchMethodException e ) {
-		   	System.err.println ( "Could not locate the appropriate constructor; check the class " + "net.tinyos1x.message." + tinos1x_platformName
+		   	System.err.println ( "Could not locate the appropriate constructor; check the class " + "net.tinyos1x.message." + tinyos1x_platform
                               + ".TOSMsg" ) ;
 		   	e.printStackTrace () ;
 	   	}
