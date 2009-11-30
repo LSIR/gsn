@@ -5,7 +5,7 @@
 		<value name="email" field="webEmail" usage="optional" />
 		<value name="description" field="webDescription" usage="optional" />
 		<value name="port" field="containerPort" />
-		<value name="time-format" field="timeFormat" usage="optional" default="dd/MM/yyyy HH:mm:ss z"/>
+		<value name="time-format" field="timeFormat" usage="optional" default="dd/MM/yyyy HH:mm:ss.SSS z"/>
 		<value name="ssl-port" field="sslPort" usage="optional"/>
         <value name="ssl-key-store-password" field="sslKeyStorePassword" usage="optional"/>
         <value name="ssl-key-password" field="sslKeyPassword" usage="optional"/>
