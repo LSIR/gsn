@@ -1,11 +1,13 @@
 package gsn.http.rest;
 
+import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.SQLValidator;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
@@ -26,7 +28,8 @@ public class DefaultDistributionRequest implements DistributionRequest {
 		vSensorConfig = sensorConfig;
 		this.query = query;
 		this.lastVisitedTime = lastVisitedTime;
-		deliverySystem.writeStructure(SQLValidator.getInstance().extractSelectColumns(query));
+		DataField[] selectedColmnNames = SQLValidator.getInstance().extractSelectColumns(query,vSensorConfig);
+		deliverySystem.writeStructure(selectedColmnNames);
 	}
 
 	public static DefaultDistributionRequest create(DeliverySystem deliverySystem, VSensorConfig sensorConfig,String query, long lastVisitedTime) throws IOException, SQLException {
