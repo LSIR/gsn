@@ -1,13 +1,18 @@
-<virtual-sensor name="Rooftop_DozerAdcMux1_mapped_1385" priority="10" >
+<virtual-sensor name="Rooftop_DozerAdcMux1_mapped_1390" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+            <param name="sensortype_mapping" />
+        </init-params>        
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
             <field name="GENERATION_TIME" type="BIGINT"/>
             <field name="POSITION" type="INTEGER" />
             <field name="SENSORTYPE" type="VARCHAR(30)" />
             <field name="SENSORTYPE_ARGS" type="VARCHAR(255)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
@@ -35,7 +40,7 @@
                 <address wrapper="local">
                     <predicate key="query"> select * from Rooftop_DozerAdcMux1_1376 </predicate>
                 </address>
-                <query> select *, -1 as POSITION, "" as SENSORTYPE, "" as SENSORTYPE_ARGS from wrapper </query>
+                <query> select *, -1 as POSITION, "" as SENSORTYPE, "" as SENSORTYPE_ARGS, -1 as SENSORTYPE_SERIALID from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

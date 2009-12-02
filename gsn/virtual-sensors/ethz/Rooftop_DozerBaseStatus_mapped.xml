@@ -2,6 +2,9 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+        </init-params>        
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
             <field name="GENERATION_TIME" type="BIGINT"/>

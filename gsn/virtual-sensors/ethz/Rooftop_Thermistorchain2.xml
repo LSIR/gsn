@@ -1,11 +1,7 @@
-<virtual-sensor name="Rooftop_DozerAdcComDiff_mapped_1390" priority="10" >
+<virtual-sensor name="Rooftop_Thermistorchain2_1390" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="position_mapping" />
-            <param name="sensortype_mapping" />
-        </init-params>        
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
             <field name="GENERATION_TIME" type="BIGINT"/>
@@ -16,18 +12,14 @@
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
-            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="PAYLOAD_SIBADCCOM0" type="INTEGER" />
-            <field name="PAYLOAD_SIBADCCOM1" type="INTEGER" />
-            <field name="PAYLOAD_SIBADCCOM2" type="INTEGER" />
-            <field name="PAYLOAD_SIBADCDIFF0" type="INTEGER" />
-            <field name="PAYLOAD_SIBADCDIFF1" type="INTEGER" />
-            <field name="PAYLOAD_SIBADCDIFF2" type="INTEGER" />
-            <field name="PAYLOAD_SIBADCDIFF3" type="INTEGER" />
+            <field name="TC_T6" type="INTEGER" />
+            <field name="TC_T7" type="INTEGER" />
+            <field name="TC_T8" type="INTEGER" />
+            <field name="TC_REF6" type="INTEGER" />
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerAdcComDiffMsg) from ETZ rooftop deployment</description>
+    <description>Thermistorchain/TC data (part 2) from ETZ rooftop deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -35,9 +27,15 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Rooftop_DozerAdcComDiff_1376 </predicate>
+                    <predicate key="query"> select * from Rooftop_DozerAdcMux2_mapped_1390 where PAYLOAD_SAMPLE_VALID != 0 and SENSORTYPE is not null and locate("TC", SENSORTYPE) != 0 </predicate>
                 </address>
-                <query> select *, -1 as POSITION, "" as SENSORTYPE, "" as SENSORTYPE_ARGS, -1 as SENSORTYPE_SERIALID from wrapper </query>
+                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_ARGS, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_NO,
+                        PAYLOAD_SIBADC00 as TC_T6,
+                        PAYLOAD_SIBADC01 as TC_T7,
+                        PAYLOAD_SIBADC02 as TC_T8, 
+                        PAYLOAD_SIBADC09 as TC_REF6 
+                        from wrapper
+                </query>
             </source>
             <query> select * from source </query>
         </stream>
