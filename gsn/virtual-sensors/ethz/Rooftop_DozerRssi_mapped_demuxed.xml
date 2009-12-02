@@ -1,10 +1,11 @@
-<virtual-sensor name="Rooftop_DozerRssi_loc_demux_1376" priority="10" >
+<virtual-sensor name="Rooftop_DozerRssi_mapped_demuxed_1385" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="GENERATION_TIME" type="BIGINT" />
-            <field name="LOCATION_ID" type="INTEGER" />
+            <field name="POSITION" type="INTEGER" />
+            <field name="SENSORTYPE" type="VARCHAR(30)" />
             <field name="SEQUENCE_NUMBER" type="INTEGER" />
             <field name="NODE_ID" type="INTEGER" />
             <field name="RSSI_NODE_ID" type="INTEGER" />
@@ -20,12 +21,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
-                        PAYLOAD_RSSI_ID0, PAYLOAD_RSSI_RSSI0 from Rooftop_DozerRssi_loc_1376 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        PAYLOAD_RSSI_ID0, PAYLOAD_RSSI_RSSI0 from Rooftop_DozerRssi_mapped_1385 
                         where PAYLOAD_RSSI_RSSI0 != 65535
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID,
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
                     PAYLOAD_RSSI_ID0 as RSSI_NODE_ID,
@@ -38,12 +39,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
-                        PAYLOAD_RSSI_ID1, PAYLOAD_RSSI_RSSI1 from Rooftop_DozerRssi_loc_1376 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        PAYLOAD_RSSI_ID1, PAYLOAD_RSSI_RSSI1 from Rooftop_DozerRssi_mapped_1385 
                         where PAYLOAD_RSSI_RSSI1 != 65535
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID,
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
                     PAYLOAD_RSSI_ID1 as RSSI_NODE_ID,
@@ -56,12 +57,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
-                        PAYLOAD_RSSI_ID2, PAYLOAD_RSSI_RSSI2 from Rooftop_DozerRssi_loc_1376 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        PAYLOAD_RSSI_ID2, PAYLOAD_RSSI_RSSI2 from Rooftop_DozerRssi_mapped_1385 
                         where PAYLOAD_RSSI_RSSI2 != 65535
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID,
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
                     PAYLOAD_RSSI_ID2 as RSSI_NODE_ID,
@@ -74,12 +75,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
-                        PAYLOAD_RSSI_ID3, PAYLOAD_RSSI_RSSI3 from Rooftop_DozerRssi_loc_1376 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        PAYLOAD_RSSI_ID3, PAYLOAD_RSSI_RSSI3 from Rooftop_DozerRssi_mapped_1385 
                         where PAYLOAD_RSSI_RSSI3 != 65535
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID,
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
                     PAYLOAD_RSSI_ID3 as RSSI_NODE_ID,
@@ -92,12 +93,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
-                        PAYLOAD_RSSI_ID4, PAYLOAD_RSSI_RSSI4 from Rooftop_DozerRssi_loc_1376 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        PAYLOAD_RSSI_ID4, PAYLOAD_RSSI_RSSI4 from Rooftop_DozerRssi_mapped_1385 
                         where PAYLOAD_RSSI_RSSI4 != 65535
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID,
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
                     PAYLOAD_RSSI_ID4 as RSSI_NODE_ID,
@@ -110,12 +111,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
-                        PAYLOAD_RSSI_ID5, PAYLOAD_RSSI_RSSI5 from Rooftop_DozerRssi_loc_1376 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        PAYLOAD_RSSI_ID5, PAYLOAD_RSSI_RSSI5 from Rooftop_DozerRssi_mapped_1385 
                         where PAYLOAD_RSSI_RSSI5 != 65535
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID,
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
                     PAYLOAD_RSSI_ID5 as RSSI_NODE_ID,
@@ -128,12 +129,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
-                        PAYLOAD_RSSI_ID6, PAYLOAD_RSSI_RSSI6 from Rooftop_DozerRssi_loc_1376 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        PAYLOAD_RSSI_ID6, PAYLOAD_RSSI_RSSI6 from Rooftop_DozerRssi_mapped_1385 
                         where PAYLOAD_RSSI_RSSI6 != 65535
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID,
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
                     PAYLOAD_RSSI_ID6 as RSSI_NODE_ID,

@@ -1,10 +1,11 @@
-<virtual-sensor name="Rooftop_DozerEventLogger_loc_demux_1376" priority="10" >
+<virtual-sensor name="Rooftop_DozerEventLogger_mapped_demuxed_1385" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="GENERATION_TIME" type="BIGINT"/>
-            <field name="LOCATION_ID" type="INTEGER" />
+            <field name="POSITION" type="INTEGER" />
+            <field name="SENSORTYPE" type="VARCHAR(30)" />
             <field name="EVENT_TIMESTAMP" type="BIGINT" />
             <field name="SEQUENCE_NUMBER" type="INTEGER" />
             <field name="NODE_ID" type="INTEGER" />
@@ -22,12 +23,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
                         PAYLOAD_EVENTLOG_TIME0, PAYLOAD_EVENTLOG_ID0, PAYLOAD_EVENTLOG_TYPE0, PAYLOAD_EVENTLOG_VALUE0
-                        from Rooftop_DozerEventLogger_loc_1376 where PAYLOAD_EVENTLOG_ID0 != -1
+                        from Rooftop_DozerEventLogger_mapped_1385 where PAYLOAD_EVENTLOG_ID0 != -1
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID, 
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE,  
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME0 * 1000)) as EVENT_TIMESTAMP,
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
@@ -42,12 +43,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
                         PAYLOAD_EVENTLOG_TIME1, PAYLOAD_EVENTLOG_ID1, PAYLOAD_EVENTLOG_TYPE1, PAYLOAD_EVENTLOG_VALUE1
-                        from Rooftop_DozerEventLogger_loc_1376 where PAYLOAD_EVENTLOG_ID1 != -1
+                        from Rooftop_DozerEventLogger_mapped_1385 where PAYLOAD_EVENTLOG_ID1 != -1
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID, 
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME1 * 1000)) as EVENT_TIMESTAMP,
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
@@ -62,12 +63,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
                         PAYLOAD_EVENTLOG_TIME2, PAYLOAD_EVENTLOG_ID2, PAYLOAD_EVENTLOG_TYPE2, PAYLOAD_EVENTLOG_VALUE2
-                        from Rooftop_DozerEventLogger_loc_1376 where PAYLOAD_EVENTLOG_ID2 != -1
+                        from Rooftop_DozerEventLogger_mapped_1385 where PAYLOAD_EVENTLOG_ID2 != -1
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID, 
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME2 * 1000)) as EVENT_TIMESTAMP,
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
@@ -82,12 +83,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
                         PAYLOAD_EVENTLOG_TIME3, PAYLOAD_EVENTLOG_ID3, PAYLOAD_EVENTLOG_TYPE3, PAYLOAD_EVENTLOG_VALUE3
-                        from Rooftop_DozerEventLogger_loc_1376 where PAYLOAD_EVENTLOG_ID3 != -1
+                        from Rooftop_DozerEventLogger_mapped_1385 where PAYLOAD_EVENTLOG_ID3 != -1
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID, 
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME3 * 1000)) as EVENT_TIMESTAMP,
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
@@ -102,12 +103,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
                         PAYLOAD_EVENTLOG_TIME4, PAYLOAD_EVENTLOG_ID4, PAYLOAD_EVENTLOG_TYPE4, PAYLOAD_EVENTLOG_VALUE4
-                        from Rooftop_DozerEventLogger_loc_1376 where PAYLOAD_EVENTLOG_ID4 != -1
+                        from Rooftop_DozerEventLogger_mapped_1385 where PAYLOAD_EVENTLOG_ID4 != -1
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID, 
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME4 * 1000)) as EVENT_TIMESTAMP,
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
@@ -122,12 +123,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
                         PAYLOAD_EVENTLOG_TIME5, PAYLOAD_EVENTLOG_ID5, PAYLOAD_EVENTLOG_TYPE5, PAYLOAD_EVENTLOG_VALUE5
-                        from Rooftop_DozerEventLogger_loc_1376 where PAYLOAD_EVENTLOG_ID5 != -1
+                        from Rooftop_DozerEventLogger_mapped_1385 where PAYLOAD_EVENTLOG_ID5 != -1
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID, 
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME5 * 1000)) as EVENT_TIMESTAMP,
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,
@@ -142,12 +143,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select GENERATION_TIME, LOCATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, 
+                        select GENERATION_TIME, POSITION, SENSORTYPE, HEADER_SEQNR, HEADER_ORIGINATORID, 
                         PAYLOAD_EVENTLOG_TIME6, PAYLOAD_EVENTLOG_ID6, PAYLOAD_EVENTLOG_TYPE6, PAYLOAD_EVENTLOG_VALUE6
-                        from Rooftop_DozerEventLogger_loc_1376 where PAYLOAD_EVENTLOG_ID6 != -1
+                        from Rooftop_DozerEventLogger_mapped_1385 where PAYLOAD_EVENTLOG_ID6 != -1
                     </predicate>
                 </address>
-                <query> select GENERATION_TIME, LOCATION_ID, 
+                <query> select GENERATION_TIME, POSITION, SENSORTYPE, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME6 * 1000)) as EVENT_TIMESTAMP,
                     HEADER_SEQNR as SEQUENCE_NUMBER,
                     HEADER_ORIGINATORID as NODE_ID,

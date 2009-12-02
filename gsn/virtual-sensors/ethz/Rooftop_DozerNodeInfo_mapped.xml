@@ -1,11 +1,12 @@
-<virtual-sensor name="Rooftop_DozerNodeInfo_loc_1376" priority="10" >
+<virtual-sensor name="Rooftop_DozerNodeInfo_mapped_1385" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
             <field name="GENERATION_TIME" type="BIGINT"/>
-            <field name="LOCATION_ID" type="INTEGER" />
+            <field name="POSITION" type="INTEGER" />
+            <field name="SENSORTYPE" type="VARCHAR(30)" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
@@ -14,7 +15,7 @@
             <field name="PAYLOAD_XE1205FREQUENCY" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerNodeInfoMsg) from ETZ rooftop deployment with location id</description>
+    <description>Dozer messages (DozerNodeInfoMsg) from ETZ rooftop deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -24,7 +25,7 @@
                 <address wrapper="local">
                     <predicate key="query"> select * from Rooftop_DozerNodeInfo_1376 </predicate>
                 </address>
-                <query> select *, null as LOCATION_ID from wrapper </query>
+                <query> select *, -1 as POSITION, "" as SENSORTYPE from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
