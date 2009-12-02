@@ -66,7 +66,8 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 	
 	private String deployment;
 	private Connection conn = null;
-	private PreparedStatement query = null;
+	private PreparedStatement position_query = null;
+	private PreparedStatement sensortype_query = null;
 	private Server web;
 	private int width;
 	private String stream_name = null;
@@ -120,7 +121,7 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 				jpeg_scaled.add(s);
 		}
 
-		if (outputstructure.contains(new DataField("location_id", DataTypes.INTEGER))) {
+		if (outputstructure.contains(new DataField("position", DataTypes.INTEGER))) {
 			synchronized (deployments) {
 				if (deployments.isEmpty()) {
 					try {
@@ -131,7 +132,7 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 					}
 					if (logger.isDebugEnabled()) {
 						try {
-							String [] args = {"-webPort 8082"};
+							String [] args = {"-webPort", "8082", "-webAllowOthers", "true"};
 							web = Server.createWebServer(args);
 							web.start();
 						} catch (SQLException e) {
@@ -141,20 +142,32 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 				}
 
 				try {
-					conn = DriverManager.getConnection("jdbc:h2:mem:locationmapping-" + deployment + ";DB_CLOSE_DELAY=-1", "sa", "");
+					conn = DriverManager.getConnection("jdbc:h2:mem:" + deployment + ";DB_CLOSE_DELAY=-1", "sa", "");
 					conn.setAutoCommit(true);
-					logger.info("connected to jdbc:h2:mem:locationmapping-" + deployment + "...");
+					logger.info("connected to jdbc:h2:mem:" + deployment + "...");
 
 					// check if table is already created
 					if (!deployments.contains(deployment)) {
 						Statement stat = conn.createStatement();
-						stat.execute("CREATE TABLE mapping(node_id SMALLINT UNSIGNED NOT NULL, begin SMALLDATETIME(23,0) NOT NULL, end SMALLDATETIME(23,0) NOT NULL, location_id INTEGER NOT NULL, PRIMARY KEY(node_id, begin, end))");
-						stat.execute("INSERT INTO mapping SELECT * FROM CSVREAD('conf/backlog/locationmapping-" + deployment + ".csv')");
-						logger.info("create mapping table for " + deployment + " deployment");
+						stat.execute("CREATE TABLE positionmapping(node_id INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, position INT NOT NULL, PRIMARY KEY(node_id, begin, end))");
+						logger.info("create positionmapping table for " + deployment + " deployment");
+						try {
+							stat.execute("INSERT INTO positionmapping SELECT * FROM CSVREAD('conf/backlog/positionmapping-" + deployment + ".csv')");
+						} catch (SQLException e) {
+							logger.error("could not fill out locationmapping table", e);
+						}
+						stat.execute("CREATE TABLE sensortypemapping(position INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, sensortype VARCHAR(30) NOT NULL, sensortype_args VARCHAR(255) NOT NULL, PRIMARY KEY(position, begin, end))");
+						logger.info("create sensortypemapping table for " + deployment + " deployment");
+						try {
+							stat.execute("INSERT INTO sensortypemapping SELECT * FROM CSVREAD('conf/backlog/sensortypemapping-" + deployment + ".csv')");
+						} catch (SQLException e) {
+							logger.error("could not fill out sensortypemapping table", e);
+						}						
 						deployments.add(deployment);
 					}
 					
-					query = conn.prepareStatement("SELECT location_id FROM mapping WHERE node_id = ? AND ? BETWEEN begin AND end LIMIT 1");
+					position_query = conn.prepareStatement("SELECT position FROM positionmapping WHERE node_id = ? AND ? BETWEEN begin AND end LIMIT 1");
+					sensortype_query = conn.prepareStatement("SELECT sensortype, sensortype_args FROM sensortypemapping WHERE position = ? AND ? BETWEEN begin AND end LIMIT 1");
 					
 				} catch (SQLException e) {
 					logger.error(e.getMessage(), e);
@@ -169,10 +182,20 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		String s;
 		if (conn != null) {
-			if (data.getData("HEADER_ORIGINATORID") != null && data.getData("GENERATION_TIME") != null) {
-				data.setData("location_id", getLocationId(
-						((Double) data.getData("HEADER_ORIGINATORID")).intValue(),
-						((Double) data.getData("GENERATION_TIME")).longValue()));
+			if (data.getData("position") != null &&
+					data.getData("HEADER_ORIGINATORID") != null && 
+					data.getData("GENERATION_TIME") != null) {
+				long generation_time = ((Long) data.getData("GENERATION_TIME")).longValue();
+				int position = getPosition(
+						((Integer) data.getData("HEADER_ORIGINATORID")).intValue(),	generation_time);
+				data.setData("position", position);
+				if (data.getData("sensortype") != null) {
+					String[] sensortype = getSensorType(position, generation_time);
+					data.setData("sensortype", sensortype[0]);
+					if (data.getData("sensortype_args") != null) {
+						data.setData("sensortype_args", sensortype[1]);
+					}
+				}
 			}
 		}
 		for (Enumeration<String> elem = timestamp_string.elements() ; elem.hasMoreElements() ; ) {
@@ -180,7 +203,7 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 			s = elem.nextElement();
 			if (data.getData(s) != null) {
 				try {
-					data.setData(s, datetimefm.format(new Date(((Double) data.getData(s)).longValue())), DataTypes.VARCHAR);
+					data.setData(s, datetimefm.format(new Date(((Long) data.getData(s)).longValue())), DataTypes.VARCHAR);
 				} catch (IllegalArgumentException e) {
 					logger.error(e.getMessage(), e);
 				}
@@ -233,22 +256,41 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 		return false;
 	}
 
-	private Integer getLocationId(int originatorid, long gentime) {
+	private Integer getPosition(int node_id, long generation_time) {
 		Integer res = null;
 		long start = 0;
 		if (logger.isDebugEnabled())
 			start = System.nanoTime();
 		try {
-			query.setInt(1, originatorid);
-			query.setTimestamp(2, new Timestamp(gentime));
-			ResultSet rs = query.executeQuery();
+			position_query.setInt(1, node_id);
+			position_query.setTimestamp(2, new Timestamp(generation_time));
+			ResultSet rs = position_query.executeQuery();
 			if (rs.next())
 				res = rs.getInt(1);
 		} catch (SQLException e) {
 			logger.warn(e.getMessage(), e);
 		}
 		if (logger.isDebugEnabled())
-			logger.debug("getLocationId: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+			logger.debug("getPosition: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		return res;
+	}
+
+	private String[] getSensorType(int position, long generation_time) {
+		String[] res = new String[]{null, null};
+		long start = 0;
+		if (logger.isDebugEnabled())
+			start = System.nanoTime();
+		try {
+			sensortype_query.setInt(1, position);
+			sensortype_query.setTimestamp(2, new Timestamp(generation_time));
+			ResultSet rs = sensortype_query.executeQuery();
+			if (rs.next())
+				res = new String[]{rs.getString(1), rs.getString(2)};
+		} catch (SQLException e) {
+			logger.warn(e.getMessage(), e);
+		}
+		if (logger.isDebugEnabled())
+			logger.debug("getSensortype: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
 		return res;
 	}
 	
