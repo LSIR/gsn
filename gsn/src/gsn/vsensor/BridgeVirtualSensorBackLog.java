@@ -17,15 +17,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.lang.Double;
 
 import javax.imageio.ImageIO;
 
@@ -68,7 +69,6 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 	private Connection conn = null;
 	private PreparedStatement position_query = null;
 	private PreparedStatement sensortype_query = null;
-	private PreparedStatement serialid_query = null;
 	private Server web;
 	private int width;
 	private String stream_name = null;
@@ -78,6 +78,12 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 	private Vector<String> jpeg_scaled;
 	private boolean position_mapping = false;
 	private boolean sensortype_mapping = false;
+	private boolean tc1_conversion = false;
+	private boolean tc2_conversion = false;
+	private DecimalFormat tc_format = new DecimalFormat("0.00");
+	private boolean crt_conversion = false;
+	private DecimalFormat crt_format = new DecimalFormat("0.000");	
+	private String conversion = null;
 	
 	public boolean initialize() {
 		String s;
@@ -129,6 +135,19 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 		
 		if (params.get("sensortype_mapping") != null)
 			sensortype_mapping = true;
+
+		if (params.get("tc1_conversion") != null) {
+			tc1_conversion = true;
+			conversion = "TC";
+		}
+		if (params.get("tc2_conversion") != null) {
+			tc2_conversion = true;
+			conversion = "TC";			
+		}
+		if (params.get("crt_conversion") != null) {
+			crt_conversion = true;
+			conversion = "CRT";
+		}
 
 		if (position_mapping || sensortype_mapping) {
 			synchronized (deployments) {
@@ -195,7 +214,7 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 				}
 			}
 		}
-		
+
 		return true;
 	}
 	
@@ -220,6 +239,74 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 				if (data.getData("sensortype_serialid") != null) {
 					data.setData("sensortype_serialid", sensortype[2]);
 				}
+			}
+		}
+		if (conversion != null && data.getData("sensortype") != null && data.getData("sensortype_args") != null) {
+			List<String> sensortype = Arrays.asList(((String) data.getData("sensortype")).split("\\+", -1));
+			String[] sensortype_args = ((String) data.getData("sensortype_args")).split("\\+", -1);
+			if (sensortype.size() == sensortype_args.length) {
+				int index = sensortype.indexOf(conversion);
+				if (index != -1) {
+					String[] args = sensortype_args[index].split(",", -1);
+					if (tc1_conversion) {
+						if (args.length == 14) {
+							if (data.getData("tc_ref1") != null && data.getData("tc_ref2") != null &&
+								data.getData("tc_t1") != null && data.getData("tc_t2") != null &&
+								data.getData("tc_t3") != null && data.getData("tc_t4") != null &&
+								data.getData("tc_ref3") != null && data.getData("tc_ref4") != null &&
+								data.getData("tc_ref5") != null && data.getData("tc_t5") != null)
+							{
+								thermistorConversion(data, "tc_ref1", Double.parseDouble(args[0]));
+								thermistorConversion(data, "tc_ref2", Double.parseDouble(args[1]));
+								thermistorConversion(data, "tc_t1", Double.parseDouble(args[2]));
+								thermistorConversion(data, "tc_t2", Double.parseDouble(args[3]));
+								thermistorConversion(data, "tc_t3", Double.parseDouble(args[4]));
+								thermistorConversion(data, "tc_t4", Double.parseDouble(args[5]));
+								thermistorConversion(data, "tc_ref3", Double.parseDouble(args[6]));
+								thermistorConversion(data, "tc_ref4", Double.parseDouble(args[7]));
+								thermistorConversion(data, "tc_ref5", Double.parseDouble(args[8]));
+								thermistorConversion(data, "tc_t5", Double.parseDouble(args[9]));
+							} else {
+								logger.warn("cannot find the tc* fields for tc1_conversion");
+							}
+						} else {
+							logger.warn("tc1_conversion needs 14 arguments");
+						}
+					} else if (tc2_conversion) {
+						if (args.length == 14) {
+							if (data.getData("tc_t6") != null && data.getData("tc_t7") != null &&
+								data.getData("tc_t8") != null && data.getData("tc_ref6") != null)
+							{
+								thermistorConversion(data, "tc_t6", Double.parseDouble(args[10]));
+								thermistorConversion(data, "tc_t7", Double.parseDouble(args[11]));
+								thermistorConversion(data, "tc_t8", Double.parseDouble(args[12]));
+								thermistorConversion(data, "tc_ref6", Double.parseDouble(args[13]));
+							} else {
+								logger.warn("cannot find the tc* fields for tc2_conversion");
+							}
+						} else {
+							logger.warn("tc2_conversion needs 14 arguments");
+						}
+					} else if (crt_conversion) {
+						if (args.length == 3) {
+							if (data.getData("cr1_dx") != null && data.getData("cr1_t") != null &&
+								data.getData("cr_temp") != null)
+							{
+								dilatationConversion(data, "cr1_dx", Double.parseDouble(args[0]));
+								thermistorConversion(data, "cr1_t", Double.parseDouble(args[1]));
+								thermistorConversion(data, "cr_temp", Double.parseDouble(args[2]));
+							} else {
+								logger.warn("cannot find the cr* fields for crt_conversion");
+							}
+						} else {
+							logger.warn("crt_conversion needs 3 arguments");
+						}						
+					}
+				} else {
+					logger.warn("cannot find >" + conversion + "< in sensortype field");
+				}
+			} else {
+				logger.warn("sensortype and sensortype_args have different format");
 			}
 		}
 		for (Enumeration<String> elem = timestamp_string.elements() ; elem.hasMoreElements() ; ) {
@@ -280,11 +367,37 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 		return false;
 	}
 
+	private void thermistorConversion(StreamElement data, String label, double cal) {
+		String result = null;
+		long start = System.nanoTime();
+		int value = ((Integer) data.getData(label)).intValue();
+		if (value <= 64000) {
+			double ln_res = Math.log(27000.0 * ((64000.0 / value) - 1.0));
+			//Math.pow(val, 3.0) needs more CPU instructions than (val * val * val)
+			//double steinhart_eq = 0.00103348 + 0.000238465 * ln_res + 0.000000158948 * Math.pow(ln_res, 3);
+			double steinhart_eq = 0.00103348 + (0.000238465 * ln_res) + (0.000000158948 * (ln_res * ln_res * ln_res));
+			result = tc_format.format((1.0 / steinhart_eq) - 273.15 - cal);
+		}
+		data.setData(label, result, DataTypes.VARCHAR);
+		if (logger.isDebugEnabled())
+			logger.debug("thermistorConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");				
+	}
+
+	private void dilatationConversion(StreamElement data, String label, double dx) {
+		String result = null;
+		long start = System.nanoTime();
+		int value = ((Integer) data.getData(label)).intValue();
+		if (value <= 64000) {
+			result = crt_format.format((value / 64000.0) * dx);
+		}
+		data.setData(label, result, DataTypes.VARCHAR);
+		if (logger.isDebugEnabled())
+			logger.debug("dilatationConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");				
+	}
+	
 	private Integer getPosition(int node_id, long generation_time) {
 		Integer res = null;
-		long start = 0;
-		if (logger.isDebugEnabled())
-			start = System.nanoTime();
+		long start = System.nanoTime();
 		try {
 			position_query.setInt(1, node_id);
 			position_query.setTimestamp(2, new Timestamp(generation_time));
@@ -301,9 +414,7 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 
 	private Serializable[] getSensorType(int position, long generation_time) {
 		Serializable[] res = new Serializable[]{null, null, null};
-		long start = 0;
-		if (logger.isDebugEnabled())
-			start = System.nanoTime();
+		long start = System.nanoTime();
 		try {
 			sensortype_query.setInt(1, position);
 			sensortype_query.setTimestamp(2, new Timestamp(generation_time));
@@ -322,7 +433,7 @@ public class BridgeVirtualSensorBackLog extends BridgeVirtualSensor
 		if (conn != null) {
 			try {
 				conn.close();
-			} catch (SQLException e) { /* ignore */	}
+			} catch (Exception e) { /* ignore */ }
 		}
 		if (web != null) {
 			web.shutdown();

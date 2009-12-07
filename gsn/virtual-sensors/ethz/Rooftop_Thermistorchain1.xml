@@ -1,7 +1,10 @@
-<virtual-sensor name="Rooftop_Thermistorchain1_1390" priority="10" >
+<virtual-sensor name="Rooftop_Thermistorchain1_1391" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="tc1_conversion" />
+        </init-params>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
             <field name="GENERATION_TIME" type="BIGINT"/>
@@ -13,16 +16,16 @@
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TC_REF1" type="INTEGER" />
-            <field name="TC_REF2" type="INTEGER" />
-            <field name="TC_T1" type="INTEGER" />
-            <field name="TC_T2" type="INTEGER" />
-            <field name="TC_T3" type="INTEGER" />
-            <field name="TC_T4" type="INTEGER" />
-            <field name="TC_REF3" type="INTEGER" />
-            <field name="TC_REF4" type="INTEGER" />
-            <field name="TC_REF5" type="INTEGER" />
-            <field name="TC_T5" type="INTEGER" />
+            <field name="TC_REF1" type="VARCHAR(10)" />
+            <field name="TC_REF2" type="VARCHAR(10)" />
+            <field name="TC_T1" type="VARCHAR(10)" />
+            <field name="TC_T2" type="VARCHAR(10)" />
+            <field name="TC_T3" type="VARCHAR(10)" />
+            <field name="TC_T4" type="VARCHAR(10)" />
+            <field name="TC_REF3" type="VARCHAR(10)" />
+            <field name="TC_REF4" type="VARCHAR(10)" />
+            <field name="TC_REF5" type="VARCHAR(10)" />
+            <field name="TC_T5" type="VARCHAR(10)" />
         </output-structure>
     </processing-class>
     <description>Thermistorchain/TC data (part 1) from ETZ rooftop deployment</description>
