@@ -5,7 +5,7 @@
     <display-name>GSN Server</display-name>
 <!-- 
      *******************************************************************************     
-      WEB SERVICES CALL [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] ; there is
+      WEB SERVICES CALL [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP / HYDROSYS ] ; there is
       another part down in this file which has to be uncommented to have the axis working.
      ******************************************************************************* -->
 <!-- 
@@ -83,7 +83,7 @@
 	
 	<!-- 
      *******************************************************************************     
-      WEB SERVICES CALL MAPPING [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] 
+      WEB SERVICES CALL MAPPING [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP / HYDROSYS ] 
      ******************************************************************************* -->
 <!--     <servlet-mapping>
         <servlet-name>AxisServlet</servlet-name>

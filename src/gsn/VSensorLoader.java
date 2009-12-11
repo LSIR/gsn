@@ -11,11 +11,13 @@ import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.WrappersUtil;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,6 +47,8 @@ public class VSensorLoader extends Thread {
 	private boolean                                                isActive                              = true;
 
 	private static int                                             VSENSOR_LOADER_THREAD_COUNTER       = 0;
+	
+	private static VSensorLoader singleton = null;
 
 	private ArrayList<VSensorStateChangeListener> changeListeners = new ArrayList<VSensorStateChangeListener>();
 
@@ -77,8 +81,13 @@ public class VSensorLoader extends Thread {
 	public VSensorLoader() {
 
 	}
-	public VSensorLoader ( String pluginsPath ) {
+	private VSensorLoader ( String pluginsPath ) {
 		this.pluginsDir = pluginsPath;
+	}
+	public static VSensorLoader getInstance(String path) {
+		if (singleton == null)
+			singleton = new VSensorLoader(path);
+		return singleton;
 	}
 	
 	public void startLoading() {
@@ -94,27 +103,54 @@ public class VSensorLoader extends Thread {
 		}
 		while ( isActive ) {
 			try {
+				try {
+					Thread.sleep ( 3000 );
+				} catch ( InterruptedException e ) {
+					logger.error ( e.getMessage ( ) , e );
+				}finally {
+					if ( this.isActive == false ) return;
+				}
 				loadPlugin ( );
 			} catch ( Exception e ) {
 				logger.error ( e.getMessage ( ) , e );
 			}
 		}
 	}
+	
+	public synchronized void loadVirtualSensor (String vsConfigurationFileContent, String fileName) throws Exception {
+		String filePath = getVSConfigurationFilePath(fileName);
+		File file = new File(filePath);
+		if ( ! file.exists() ) {
+			try {
+				// Create the VS configuration file
+				Writer fw = new BufferedWriter(new FileWriter(filePath, true));
+				fw.write(vsConfigurationFileContent);
+				fw.flush();
+				// Try to load it
+				loadPlugin();
+			}
+			catch (Exception e) {
+				file.delete();
+				throw e;
+			}
+		}
+		else {
+			throw new Exception("The configuration file:" + filePath + " already exist." );
+		}
+	}
+	
+	public static String getVSConfigurationFilePath(String fileName) {
+		return Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY + File.separator + fileName + ".xml";
+	}
 
-	public void loadPlugin ( ) throws SQLException , JiBXException {
+	public synchronized void loadPlugin ( ) throws SQLException , JiBXException {
 		Modifications modifications = getUpdateStatus ( pluginsDir );
 		ArrayList < VSensorConfig > removeIt = modifications.getRemove ( );
 		ArrayList<VSensorConfig> addIt = modifications.getAdd();
 		for ( VSensorConfig configFile : removeIt ) {
 			removeVirtualSensor(configFile);
 		}
-		try {
-			Thread.sleep ( 3000 );
-		} catch ( InterruptedException e ) {
-			logger.error ( e.getMessage ( ) , e );
-		}finally {
-			if ( this.isActive == false ) return;
-		}
+		
 
 		for ( VSensorConfig vs : addIt ) {
 			if (!isVirtualSensorValid(vs))

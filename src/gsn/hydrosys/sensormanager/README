@@ -1,0 +1,49 @@
+ACTIVATE THE WEB SERVICE
+
+In the webapp/WEB-INF/web.xml, uncomment the parts for webservice
+	
+
+DEV
+
+* GENERATE THE JAVA CODE FROM WSDL FILE
+	ant generate-hydrosys
+	copy files from generated/src to gsn's src
+	edit
+	copy back to generated/src (gsn/hydrosys and gsn/beans/xsd)
+	in generated directory:
+		ant jar.client
+		ant jar.server
+	
+	copy the SensorManager.aar to webapp/WEB-INF/services/
+	
+ACCESS THE SERVICE
+	http://localhost:22001/services/SensorManager?wsdl
+
+* GENERATE THE WSDL FROM THE SensorManager INTERFACE
+	1. Compile the java Interface
+	2. java2wsdl.sh -o sensormanager -l http://localhost:22001/hydrosys/SensorManager -cn gsn.hydrosys.sensormanager.SensorManager
+	3. Edit sensormanager/SensorManager.wsdl file
+	
+EXAMPLE OF REQUEST
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sen="http://sensormanager.hydrosys.gsn" xmlns:xsd="http://beans.gsn/xsd">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sen:registerQuery>
+         <sen:queryName>test</sen:queryName>
+         <!--Zero or more repetitions:-->
+         <sen:outputStructure>
+            <xsd:name>HEAP</xsd:name>
+            <xsd:type>BIGINT</xsd:type>
+         </sen:outputStructure>
+         <sen:outputStructure>
+            <xsd:name>NON_HEAP2</xsd:name>
+            <xsd:type>BIGINT</xsd:type>
+         </sen:outputStructure>
+         <!--Zero or more repetitions:-->
+         <sen:vsnames>memoryusage1</sen:vsnames>
+         <sen:vsnames>memoryusage2</sen:vsnames> 
+	 <sen:query>select memoryusage1.HEAP AS HEAP, memoryusage2.NON_HEAP AS NON_HEAP2 from memoryusage1,memoryusage2</sen:query>
+      </sen:registerQuery>
+   </soapenv:Body>
+</soapenv:Envelope>
