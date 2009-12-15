@@ -659,11 +659,11 @@ var GSN = {
             $.LI({},$.A({
                 "href":"javascript:GSN.vsbox.toggle('"+vsName+"','upload');",
                 "class":"tabupload"
-            },"Upload")),
-            $.LI({},$.A({
-                "href":"./data.html",
-                "class":"tabdata"
-            },"Download"))
+            },"Upload"))
+//            $.LI({},$.A({
+//                "href":"./data.html",
+//                "class":"tabdata"
+//            },"Download"))
             ),
             $.DL({
                 "class":"dynamic"
