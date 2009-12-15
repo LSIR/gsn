@@ -173,7 +173,7 @@ public class MigMessagePlugin extends AbstractPlugin
 			LinkedHashMap<String, DataField> outputstructuremap = 
 				new LinkedHashMap<String, DataField>(2 + parameters.getOutputStructure().length);
 			outputstructuremap.put("timestamp", new DataField("timestamp", DataTypes.BIGINT));
-			outputstructuremap.put("generation_time", new DataField("generation_time", DataTypes.BIGINT));
+			outputstructuremap.put("generationtime", new DataField("generationtime", DataTypes.BIGINT));
 			for(int i=0; i<parameters.getOutputStructure().length; i++) {
 				outputstructuremap.put(parameters.getOutputStructure()[i].getName(), 
 						parameters.getOutputStructure()[i]);

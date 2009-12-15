@@ -1,25 +1,24 @@
-<virtual-sensor name="Rooftop_Thermistorchain2_1391" priority="10" >
+<virtual-sensor name="Rooftop_Thermistorchain2_1396" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
-            <param name="tc2_conversion" />
+            <param name="sensorvalue_conversion" />
         </init-params>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
-            <field name="GENERATION_TIME" type="BIGINT"/>
+            <field name="GENERATIONTIME" type="BIGINT"/>
             <field name="POSITION" type="INTEGER" />
             <field name="SENSORTYPE" type="VARCHAR(30)" />
-            <field name="SENSORTYPE_ARGS" type="VARCHAR(255)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TC_T6" type="VARCHAR(10)" />
-            <field name="TC_T7" type="VARCHAR(10)" />
-            <field name="TC_T8" type="VARCHAR(10)" />
-            <field name="TC_REF6" type="VARCHAR(10)" />
+            <field name="TC_T6" type="VARCHAR(30)" />
+            <field name="TC_T7" type="VARCHAR(30)" />
+            <field name="TC_T8" type="VARCHAR(30)" />
+            <field name="TC_REF6" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>
     <description>Thermistorchain/TC data (part 2) from ETZ rooftop deployment</description>
@@ -30,15 +29,9 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Rooftop_DozerAdcMux2_mapped_1390 where PAYLOAD_SAMPLE_VALID != 0 and SENSORTYPE is not null and locate("TC", SENSORTYPE) != 0 </predicate>
+                    <predicate key="query"> select * from Rooftop_DozerAdcMux2_mapped_1396 where PAYLOAD_SAMPLE_VALID != 0 and SENSORTYPE is not null and locate("tc", SENSORTYPE) != 0 </predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_ARGS, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_NO,
-                        PAYLOAD_SIBADC00 as TC_T6,
-                        PAYLOAD_SIBADC01 as TC_T7,
-                        PAYLOAD_SIBADC02 as TC_T8, 
-                        PAYLOAD_SIBADC09 as TC_REF6 
-                        from wrapper
-                </query>
+                <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

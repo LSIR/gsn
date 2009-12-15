@@ -1,31 +1,30 @@
-<virtual-sensor name="Rooftop_Thermistorchain1_1391" priority="10" >
+<virtual-sensor name="Rooftop_Thermistorchain1_1396" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
-            <param name="tc1_conversion" />
+            <param name="sensorvalue_conversion" />
         </init-params>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
-            <field name="GENERATION_TIME" type="BIGINT"/>
+            <field name="GENERATIONTIME" type="BIGINT"/>
             <field name="POSITION" type="INTEGER" />
             <field name="SENSORTYPE" type="VARCHAR(30)" />
-            <field name="SENSORTYPE_ARGS" type="VARCHAR(255)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TC_REF1" type="VARCHAR(10)" />
-            <field name="TC_REF2" type="VARCHAR(10)" />
-            <field name="TC_T1" type="VARCHAR(10)" />
-            <field name="TC_T2" type="VARCHAR(10)" />
-            <field name="TC_T3" type="VARCHAR(10)" />
-            <field name="TC_T4" type="VARCHAR(10)" />
-            <field name="TC_REF3" type="VARCHAR(10)" />
-            <field name="TC_REF4" type="VARCHAR(10)" />
-            <field name="TC_REF5" type="VARCHAR(10)" />
-            <field name="TC_T5" type="VARCHAR(10)" />
+            <field name="TC_REF1" type="VARCHAR(30)" />
+            <field name="TC_REF2" type="VARCHAR(30)" />
+            <field name="TC_T1" type="VARCHAR(30)" />
+            <field name="TC_T2" type="VARCHAR(30)" />
+            <field name="TC_T3" type="VARCHAR(30)" />
+            <field name="TC_T4" type="VARCHAR(30)" />
+            <field name="TC_REF3" type="VARCHAR(30)" />
+            <field name="TC_REF4" type="VARCHAR(30)" />
+            <field name="TC_REF5" type="VARCHAR(30)" />
+            <field name="TC_T5" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>
     <description>Thermistorchain/TC data (part 1) from ETZ rooftop deployment</description>
@@ -36,21 +35,9 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Rooftop_DozerAdcMux1_mapped_1390 where PAYLOAD_SAMPLE_VALID != 0 and SENSORTYPE is not null and locate("TC", SENSORTYPE) != 0 </predicate>
+                    <predicate key="query"> select * from Rooftop_DozerAdcMux1_mapped_1396 where PAYLOAD_SAMPLE_VALID != 0 and SENSORTYPE is not null and locate("tc", SENSORTYPE) != 0 </predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_ARGS, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_NO,
-                        PAYLOAD_SIBADC00 as TC_REF1,
-                        PAYLOAD_SIBADC01 as TC_REF2,
-                        PAYLOAD_SIBADC02 as TC_T1, 
-                        PAYLOAD_SIBADC03 as TC_T2, 
-                        PAYLOAD_SIBADC04 as TC_T3, 
-                        PAYLOAD_SIBADC05 as TC_T4, 
-                        PAYLOAD_SIBADC06 as TC_REF3, 
-                        PAYLOAD_SIBADC07 as TC_REF4, 
-                        PAYLOAD_SIBADC08 as TC_REF5, 
-                        PAYLOAD_SIBADC09 as TC_T5
-			            from wrapper
-			    </query>
+                <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

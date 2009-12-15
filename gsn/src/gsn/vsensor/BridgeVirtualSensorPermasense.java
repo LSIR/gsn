@@ -1,0 +1,462 @@
+package gsn.vsensor;
+
+import gsn.Main;
+
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.ListIterator;
+import java.util.TreeMap;
+import java.util.Vector;
+
+import javax.imageio.ImageIO;
+
+import gsn.beans.DataTypes;
+import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
+import gsn.utils.ParamParser;
+import gsn.wrappers.AbstractWrapper;
+
+import org.apache.log4j.Logger;
+import org.h2.tools.Server;
+
+/**
+ * This virtual sensor takes the input field called as specified in the
+ * IMAGE_INPUT_FIELD variable from the input stream,
+ * interprets it as a jpeg and resizes it to the image width specified in
+ * the virtual sensors XML file's SCALED_IMAGE_WIDTH_NAME field. Finally,
+ * it forwards the result in a new stream with a field named as specified
+ * in the IMAGE_OUTPUT_FIELD variable.
+ *
+ * @author Tonio Gsell
+ * @author Mustafa Yuecel
+ */
+public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
+{
+	private static final int DEFAULT_WIDTH = 610;
+	private static final String DEFAULT_STREAM_NAME = "data";
+	private static final String DEFAULT_STREAM_SOURCE = "source";
+	
+	private static final SimpleDateFormat datetimefm = new SimpleDateFormat(Main.getContainerConfig().getTimeFormat());
+	private static final DecimalFormat decimal4 = new DecimalFormat("0.0000");
+	private static final DecimalFormat decimal1 = new DecimalFormat("0.0");
+	private static final MyFilenameFilter filter = new MyFilenameFilter();
+	
+	private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensorPermasense.class);
+
+	private static HashSet<String> deployments = new HashSet<String>();
+	
+	private String deployment;
+	private Connection conn = null;
+	private PreparedStatement position_query = null;
+	private PreparedStatement sensortype_query = null;
+	private PreparedStatement serialid_query = null;
+	private PreparedStatement conversion_query = null;
+	private Server web;
+	private int width;
+	private String stream_name = null;
+	private String stream_source = null;
+	private AbstractWrapper backlog = null;
+	private Vector<String> timestamp_to_string;
+	private Vector<String> jpeg_scaled;
+	private boolean position_mapping = false;
+	private boolean sensortype_mapping = false;
+	private boolean sensorvalue_conversion = false;
+	
+	public boolean initialize() {
+		String s;
+		int i;
+		VSensorConfig vsensor = getVirtualSensorConfiguration();
+		TreeMap<String,String> params = vsensor.getMainClassInitialParams();
+		
+		deployment = vsensor.getName().split("_")[0].toLowerCase();
+		
+		width = ParamParser.getInteger(params.get("width"), DEFAULT_WIDTH);
+		stream_name = params.get("stream-name");
+		if (stream_name == null) stream_name = DEFAULT_STREAM_NAME;
+		stream_source = params.get("stream-source");
+		if (stream_source == null) stream_source = DEFAULT_STREAM_SOURCE;
+		try {
+			backlog = vsensor.getInputStream(stream_name).getSource(stream_source).getWrapper();
+		} catch (Exception e) {
+			logger.info("backlog wrapper instance not found in " + vsensor.getName() + "->" + stream_source);
+		}
+
+		String[] timestamp = null;
+		s = params.get("timestamp_to_string");
+		if (s != null)
+			timestamp = s.split(",");
+		if (timestamp == null) timestamp = new String[]{ };
+		timestamp_to_string = new Vector<String>(timestamp.length);
+		for (i = 0; i < timestamp.length; i++) {
+			timestamp_to_string.addElement(timestamp[i].trim().toLowerCase());
+		}
+		
+		String[] jpeg = null;
+		s = params.get("jpeg_scaled");
+		if (s != null)
+			jpeg = s.split(",");
+		if (jpeg == null) jpeg = new String[]{ };
+		jpeg_scaled = new Vector<String>(jpeg.length);
+		for (i = 0; i < jpeg.length; i++) {
+			jpeg_scaled.addElement(jpeg[i].trim().toLowerCase());
+		}
+
+		if (params.get("position_mapping") != null)
+			position_mapping = true;
+
+		if (params.get("sensortype_mapping") != null)
+			sensortype_mapping = true;
+
+		if (params.get("sensorvalue_conversion") != null)
+			sensorvalue_conversion = true;
+
+		if (position_mapping || sensortype_mapping || sensorvalue_conversion) {
+			synchronized (deployments) {
+				if (deployments.isEmpty()) {
+					try {
+						Class.forName("org.h2.Driver");
+					} catch (ClassNotFoundException e) {
+						logger.error(e.getMessage(), e);
+						return false;
+					}
+					if (logger.isDebugEnabled()) {
+						try {
+							String [] args = {"-webPort", "8082", "-webAllowOthers", "true"};
+							web = Server.createWebServer(args);
+							web.start();
+						} catch (SQLException e) {
+							logger.warn(e.getMessage(), e);
+						}
+					}
+				}
+
+				try {
+					conn = DriverManager.getConnection("jdbc:h2:mem:" + deployment + ";DB_CLOSE_DELAY=-1", "sa", "");
+					conn.setAutoCommit(true);
+					logger.info("connected to jdbc:h2:mem:" + deployment + "...");
+					
+					// check if table is already created
+					if (!deployments.contains(deployment)) {
+						Statement stat = conn.createStatement();
+						stat.execute("CREATE TABLE positionmapping(node_id INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, position INT NOT NULL, comment CLOB, PRIMARY KEY(node_id, begin, end))");
+						logger.info("create positionmapping table for " + deployment + " deployment");
+						s = "conf/permasense/" + deployment + "-positionmapping.csv";
+						if (new File(s).exists()) {
+							stat.execute("INSERT INTO positionmapping SELECT * FROM CSVREAD('" + s + "')");
+						} else {
+							logger.warn("positionmapping not available");
+						}
+
+						stat.execute("CREATE TABLE sensormapping(position INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, sensortype VARCHAR(30) NOT NULL, sensortype_args BIGINT, comment CLOB, PRIMARY KEY(position, begin, end, sensortype))");
+						logger.info("create sensormapping table for " + deployment + " deployment");
+						s = "conf/permasense/" + deployment + "-sensormapping.csv";
+						if (new File(s).exists()) {
+							stat.execute("INSERT INTO sensormapping SELECT * FROM CSVREAD('" + s + "')");
+						} else {
+							logger.warn("sensormapping not available");
+						}
+						
+						// TODO: sensortype dont depends on deployment...
+						stat.execute("CREATE TABLE sensortype(sensortype VARCHAR(30) NOT NULL, signal_name VARCHAR(30) NOT NULL, physical_signal VARCHAR(30) NOT NULL, conversion VARCHAR(30), input VARCHAR(30), PRIMARY KEY(sensortype, signal_name, physical_signal))");
+						logger.info("create sensortype table for " + deployment + " deployment");
+						String[] files = new File("conf/permasense/sensortype_templates").list(filter);
+						ListIterator<String> filenames = Arrays.asList(files).listIterator();
+						while (filenames.hasNext()) {
+							s = filenames.next();
+							stat.execute("INSERT INTO sensortype SELECT '" + s.substring(0, s.lastIndexOf('.')) + 
+									"' AS sensortype, * FROM CSVREAD('conf/permasense/sensortype_templates/" + s + "')");
+						}
+
+						stat.execute("CREATE TABLE sensortype_args(sensortype_args BIGINT NOT NULL, physical_signal VARCHAR(30) NOT NULL, value VARCHAR(255) NOT NULL, comment CLOB, PRIMARY KEY(sensortype_args, physical_signal))");
+						logger.info("create sensortype_args table for " + deployment + " deployment");
+						s = "conf/permasense/" + deployment + "-sensortype_args.csv";
+						if (new File(s).exists()) {
+							stat.execute("INSERT INTO sensortype_args SELECT * FROM CSVREAD('" + s + "')");
+						} else {
+							logger.info("sensortype_args not available");
+						}
+						
+						deployments.add(deployment);
+					}
+					
+					if (position_mapping) {
+						position_query = conn.prepareStatement("SELECT position FROM positionmapping WHERE node_id = ? AND ? BETWEEN begin AND end LIMIT 1");
+					}
+					if (sensortype_mapping) {
+						sensortype_query = conn.prepareStatement("SELECT sensortype, sensortype_args FROM sensormapping WHERE position = ? AND ? BETWEEN begin AND end AND sensortype != 'serialid'");
+						serialid_query = conn.prepareStatement("SELECT sensortype_args AS sensortype_serialid FROM sensormapping WHERE position = ? AND ? BETWEEN begin AND end AND sensortype = 'serialid' LIMIT 1");
+					}
+					if (sensorvalue_conversion) {
+						conversion_query = conn.prepareStatement("SELECT st.physical_signal AS physical_signal, st.conversion AS conversion, st.input as input, CASEWHEN(st.input IS NULL,NULL,sta.value) as value " +
+								"FROM sensormapping AS sm, sensortype AS st, sensortype_args AS sta WHERE sm.position = ? AND ? BETWEEN sm.begin AND sm.end AND sm.sensortype = st.sensortype " +
+								"AND st.signal_name = ? AND CASEWHEN(st.input IS NULL,TRUE,sm.sensortype_args = sta.sensortype_args AND sta.physical_signal = st.physical_signal) LIMIT 1");
+					}	
+				} catch (SQLException e) {
+					logger.error(e.getMessage(), e);
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+	
+	public void dataAvailable(String inputStreamName, StreamElement data) {
+		String s;
+		if (conn != null) {
+			if (position_mapping && 
+					data.getData("header_originatorid") != null && data.getData("generationtime") != null) {
+				Integer position = getPosition(((Integer) data.getData("header_originatorid")).intValue(),
+						new Timestamp(((Long) data.getData("generationtime")).longValue()));
+				data = new StreamElement(data, 
+						new String[]{"position"}, 
+						new Byte[]{DataTypes.INTEGER}, 
+						new Serializable[]{position});
+			}
+			if (sensortype_mapping && 
+					data.getData("position") != null &&	data.getData("generationtime") != null) {
+				Serializable[] sensortype = getSensorType(((Integer) data.getData("position")).intValue(), 
+						new Timestamp(((Long) data.getData("generationtime")).longValue()));
+				data = new StreamElement(data, 
+						new String[]{"sensortype", "sensortype_serialid"}, 
+						new Byte[]{DataTypes.VARCHAR, DataTypes.BIGINT},
+						sensortype);
+			}
+			if (sensorvalue_conversion &&
+					data.getData("position") != null &&	data.getData("generationtime") != null) {
+				String physical, conversion, input, value;
+				HashMap<String, Serializable> map = new HashMap<String, Serializable>();
+				long start = System.nanoTime();
+				ListIterator<String> list = Arrays.asList(data.getFieldNames()).listIterator();
+				try {
+					conversion_query.setInt(1, ((Integer) data.getData("position")).intValue());
+					conversion_query.setTimestamp(2, new Timestamp(((Long) data.getData("generationtime")).longValue()));
+					while (list.hasNext()) {
+						s = list.next().toLowerCase();
+						if (s.startsWith("payload_") && !s.startsWith("payload_sample_") && data.getData(s) != null) {
+							conversion_query.setString(3, s.substring("payload_".length()));
+							ResultSet rs = conversion_query.executeQuery();
+							if (rs.next()) {
+								physical = rs.getString(1);
+								conversion = rs.getString(2);
+								input = rs.getString(3);
+								value = rs.getString(4);
+								// physical_signal, conversion, input, value
+								logger.debug("physical_signal:" + physical + " conversion:" + conversion +
+										" input:" + input + " value:" + value);
+								if (conversion.equals("thermistor")) {
+									// TODO: check sanity of conversion table during init
+									assert input.equals("cal");
+									map.put(physical, thermistorConversion(data.getData(s), value));
+								} else if (conversion.equals("dilatation")) {
+									// TODO: check sanity of conversion table during init
+									assert input.equals("dx");
+									map.put(physical, dilatationConversion(data.getData(s), value));
+								} else {
+									logger.warn("unimplemented conversion: " + conversion);
+								}
+							} else {
+								logger.debug("no conversion found for >" + s + "< (" + s.substring("payload_".length()) + ")");
+							}
+						} else {
+							logger.debug("ignoring >" + s + "<");
+						}
+					}
+					if (!map.isEmpty()) {
+						Byte[] types = new Byte[map.size()];
+						Arrays.fill(types, DataTypes.VARCHAR);
+						data = new StreamElement(data, map.keySet().toArray(new String[]{}), 
+								types, map.values().toArray(new Serializable[]{}));
+					}
+				} catch (SQLException e) {
+					logger.warn(e.getMessage(), e);
+				}
+				if (logger.isDebugEnabled())
+					logger.debug("conversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");				
+			}
+		}
+		for (Enumeration<String> elem = timestamp_to_string.elements() ; elem.hasMoreElements() ; ) {
+			// convert timestamps to human readable form
+			s = elem.nextElement();
+			if (data.getData(s) != null) {
+				try {
+					data = new StreamElement(data, new String[]{ s+"_string", }, new Byte[]{ DataTypes.VARCHAR, }, new Serializable[]{ datetimefm.format(new Date(((Long) data.getData(s)).longValue())), });
+				} catch (IllegalArgumentException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+		}
+		for (Enumeration<String> elem = jpeg_scaled.elements() ; elem.hasMoreElements() ; ) {
+			// scale image to given width
+			s = elem.nextElement();
+		    if (data.getData(s) != null) {
+		    	try {
+		    		BufferedImage image;
+		    		try {
+		    			image = ImageIO.read(new ByteArrayInputStream((byte[]) data.getData(s)));
+		    		} catch ( IOException e ) {
+		    			logger.error("Could not read image: skip image!", e);
+		    			return;
+		    		}
+
+		    		// use Graphics2D for scaling -> make usage of GPU
+		    		double factor = (float) width / image.getWidth();
+		    		BufferedImage scaled = new BufferedImage(width, (int) (image.getHeight() * factor), BufferedImage.TYPE_INT_RGB);
+		    		Graphics2D g = scaled.createGraphics();
+		    		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		    		AffineTransform at = AffineTransform.getScaleInstance(factor, factor);
+		    		g.drawRenderedImage(image,at);
+		    		g.dispose();
+
+		    		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		    		ImageIO.write(scaled, "jpeg", os);
+
+		    		data.setData(s, os.toByteArray());
+		    	} catch (Exception e) {
+		    		logger.error(e.getMessage(), e);
+		    	}
+		    }
+		}
+
+		super.dataAvailable(inputStreamName, data);
+	}
+	
+	@Override
+	public boolean dataFromWeb(String command, String[] paramNames, Serializable[] paramValues) {
+		if (backlog != null) {
+			try {
+				return backlog.sendToWrapper(command, paramNames, paramValues);
+			} catch (Exception e) {
+				logger.warn(e.getMessage());
+			}
+		}
+		return false;
+	}
+
+	private String thermistorConversion(Serializable input, String cal) {
+		String result = null;
+		long start = System.nanoTime();
+		int v = ((Integer) input).intValue();
+		if (v <= 64000) {
+			double ln_res = Math.log(27000.0 * ((64000.0 / v) - 1.0));
+			//Math.pow(v, 3.0) needs more CPU instructions than (v * v * v)
+			//double steinhart_eq = 0.00103348 + 0.000238465 * ln_res + 0.000000158948 * Math.pow(ln_res, 3);
+			double steinhart_eq = 0.00103348 + (0.000238465 * ln_res) + (0.000000158948 * (ln_res * ln_res * ln_res));
+			result = decimal4.format((1.0 / steinhart_eq) - 273.15 - Double.parseDouble(cal));
+		}
+		if (logger.isDebugEnabled())
+			logger.debug("thermistorConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");				
+		return result;
+	}
+
+	private String dilatationConversion(Serializable input, String dx) {
+		String result = null;
+		long start = System.nanoTime();
+		int v = ((Integer) input).intValue();
+		if (v <= 64000) {
+			result = decimal4.format((v / 64000.0) * Double.parseDouble(dx));
+		}
+		if (logger.isDebugEnabled())
+			logger.debug("dilatationConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		return result;
+	}
+	
+	private Integer getPosition(int node_id, Timestamp generationtime) {
+		Integer res = null;
+		long start = System.nanoTime();
+		try {
+			position_query.setInt(1, node_id);
+			position_query.setTimestamp(2, generationtime);
+			ResultSet rs = position_query.executeQuery();
+			if (rs.next()) {
+				res = rs.getInt(1);
+				if (rs.wasNull())
+					res = null;
+			}
+		} catch (SQLException e) {
+			logger.warn(e.getMessage(), e);
+		}
+		if (logger.isDebugEnabled())
+			logger.debug("getPosition: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		return res;
+	}
+
+	private Serializable[] getSensorType(int position, Timestamp generationtime) {
+		Long serialid = null;
+		String s = null;
+		ResultSet rs;
+		StringBuffer sb = new StringBuffer();
+		Serializable[] res = new Serializable[]{null, null, null};
+		long start = System.nanoTime();
+		try {
+			sensortype_query.setInt(1, position);
+			sensortype_query.setTimestamp(2, generationtime);			
+			rs = sensortype_query.executeQuery();
+			if (rs.first()) {
+				do {
+					s = rs.getString(1);
+					sb.append(s.substring(s.indexOf('_') + 1) + ":" + rs.getString(2) + " ");
+				} while (rs.next());
+				s = sb.toString();
+			}
+			
+			serialid_query.setInt(1, position);
+			serialid_query.setTimestamp(2, generationtime);
+			rs = serialid_query.executeQuery();
+			if (rs.next()) {
+				serialid = rs.getLong(1);
+				if (rs.wasNull())
+					serialid = null;
+			}
+			res = new Serializable[]{s, serialid};
+		} catch (SQLException e) {
+			logger.warn(e.getMessage(), e);
+		}
+		if (logger.isDebugEnabled())
+			logger.debug("getSensortype: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		return res;
+	}
+	
+	public synchronized void dispose() {
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (Exception e) {
+			} finally {
+				conn = null;
+			}
+		}
+		if (web != null) {
+			web.shutdown();
+			web = null;
+		}
+	}
+}
+
+class MyFilenameFilter implements FilenameFilter {
+	public boolean accept(File dir, String name) {
+		return name.endsWith(".csv");
+	}
+}

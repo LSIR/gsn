@@ -1,6 +1,6 @@
-<virtual-sensor name="Rooftop_DozerAdcMux1_mapped_1390" priority="10" >
+<virtual-sensor name="Rooftop_DozerAdcMux1_mapped_1396" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="position_mapping" />
@@ -8,26 +8,25 @@
         </init-params>        
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
-            <field name="GENERATION_TIME" type="BIGINT"/>
+            <field name="GENERATIONTIME" type="BIGINT"/>
             <field name="POSITION" type="INTEGER" />
             <field name="SENSORTYPE" type="VARCHAR(30)" />
-            <field name="SENSORTYPE_ARGS" type="VARCHAR(255)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="PAYLOAD_SIBADC00" type="INTEGER" />
-            <field name="PAYLOAD_SIBADC01" type="INTEGER" />
-            <field name="PAYLOAD_SIBADC02" type="INTEGER" />
-            <field name="PAYLOAD_SIBADC03" type="INTEGER" />
-            <field name="PAYLOAD_SIBADC04" type="INTEGER" />
-            <field name="PAYLOAD_SIBADC05" type="INTEGER" />
-            <field name="PAYLOAD_SIBADC06" type="INTEGER" />
-            <field name="PAYLOAD_SIBADC07" type="INTEGER" />
-            <field name="PAYLOAD_SIBADC08" type="INTEGER" />
-            <field name="PAYLOAD_SIBADC09" type="INTEGER" />
+            <field name="PAYLOAD_A0_1" type="INTEGER" />
+            <field name="PAYLOAD_A0_2" type="INTEGER" />
+            <field name="PAYLOAD_A0_3" type="INTEGER" />
+            <field name="PAYLOAD_A0_4" type="INTEGER" />
+            <field name="PAYLOAD_A0_5" type="INTEGER" />
+            <field name="PAYLOAD_A0_6" type="INTEGER" />
+            <field name="PAYLOAD_A0_7" type="INTEGER" />
+            <field name="PAYLOAD_A0_8" type="INTEGER" />
+            <field name="PAYLOAD_A0_9" type="INTEGER" />
+            <field name="PAYLOAD_A0_10" type="INTEGER" />
         </output-structure>
     </processing-class>
     <description>dozer messages (DozerAdcMux1Msg) from ETZ rooftop deployment</description>
@@ -38,9 +37,9 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Rooftop_DozerAdcMux1_1376 </predicate>
+                    <predicate key="query"> select * from Rooftop_DozerAdcMux1_1396 </predicate>
                 </address>
-                <query> select *, -1 as POSITION, "" as SENSORTYPE, "" as SENSORTYPE_ARGS, -1 as SENSORTYPE_SERIALID from wrapper </query>
+                <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

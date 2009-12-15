@@ -1,6 +1,6 @@
 <virtual-sensor name="Rooftop_Webcam_1355" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT" />

@@ -1,0 +1,46 @@
+<virtual-sensor name="Rooftop_CrackmeterTemperature_last_1396" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="timestamp_to_string">TIMESTAMP,GENERATIONTIME</param>
+        </init-params>
+        <output-structure>
+            <field name="TIMESTAMP_STRING" type="VARCHAR(30)"/>
+            <field name="GENERATIONTIME_STRING" type="VARCHAR(30)"/>
+            <field name="POSITION" type="INTEGER" />
+            <field name="SENSORTYPE" type="VARCHAR(30)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="SEQUENCE_NUMBER" type="INTEGER" />
+            <field name="NODE_ID" type="INTEGER" />
+            <field name="SAMPLE_NUMBER" type="SMALLINT" />
+            <field name="CRT_DX1" type="VARCHAR(30)" />
+            <field name="CRT_T1" type="VARCHAR(30)" />
+            <field name="CRT_T2" type="VARCHAR(30)" />
+        </output-structure>
+    </processing-class>
+    <description>CrackmeterTemperature/CRT data from ETZ rooftop deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Rooftop_CrackmeterTemperature_1396 </predicate>
+                </address>
+                <query> 
+                    select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, 
+                    HEADER_SEQNR AS SEQUENCE_NUMBER, 
+                    HEADER_ORIGINATORID as NODE_ID,
+                    PAYLOAD_SAMPLE_NO as SAMPLE_NUMBER,
+                    CONCAT(CRT_DX1,CHAR(32,91,109,109,93)) as CRT_DX1, 
+                    CONCAT(CRT_T1,CHAR(32,91,176,67,93)) as CRT_T1, 
+                    CONCAT(CRT_T2,CHAR(32,91,176,67,93)) as CRT_T2
+                    from wrapper 
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

@@ -1,13 +1,13 @@
-<virtual-sensor name="Rooftop_DozerBaseStatus_mapped_1385" priority="10" >
+<virtual-sensor name="Rooftop_DozerBaseStatus_mapped_1396" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorBackLog</class-name>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="position_mapping" />
         </init-params>        
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
-            <field name="GENERATION_TIME" type="BIGINT"/>
+            <field name="GENERATIONTIME" type="BIGINT"/>
             <field name="POSITION" type="INTEGER" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
@@ -34,9 +34,9 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Rooftop_DozerBaseStatus_1376 </predicate>
+                    <predicate key="query"> select * from Rooftop_DozerBaseStatus_1396 </predicate>
                 </address>
-                <query> select *, -1 as POSITION from wrapper </query>
+                <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

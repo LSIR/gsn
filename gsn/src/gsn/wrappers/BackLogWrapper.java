@@ -115,7 +115,7 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 			if (propertyList.containsKey(deployment)) {
 				props = propertyList.get(deployment);
 			} else {
-				String propertyfile = "conf/backlog/" + deployment + ".properties";
+				String propertyfile = "conf/permasense/" + deployment + ".properties";
 				try {
 					props = new Properties();
 					props.load(new FileInputStream(propertyfile));
