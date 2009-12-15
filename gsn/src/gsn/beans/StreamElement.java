@@ -31,18 +31,42 @@ public final class StreamElement implements Serializable {
 	private static final String NULL_ENCODING = "NULL"; // null encoding for transmission over xml-rpc
 
 	public StreamElement (StreamElement other) {
-		this.fieldNames=new String[other.fieldNames.length];
+		int len = other.fieldNames.length;
+		this.fieldNames=new String[len];
+		this.fieldValues=new Serializable[len];
+		this.fieldTypes=new Byte[len]; 
 		for (int i=0;i<other.fieldNames.length;i++) {
-			fieldNames[i]=other.fieldNames[i];
-			fieldValues[i]=other.fieldValues[i];
-			fieldTypes[i]=other.fieldTypes[i];
+			this.fieldNames[i]=other.fieldNames[i];
+			this.fieldValues[i]=other.fieldValues[i];
+			this.fieldTypes[i]=other.fieldTypes[i];
 		}
 		this.timeStamp=other.timeStamp;
 		this.internalPrimayKey = other.internalPrimayKey;
 	}
+	
+	public StreamElement (StreamElement other, final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data) {
+		int len = other.fieldNames.length + dataFieldNames.length;
+		this.fieldNames=new String[len];
+		this.fieldValues=new Serializable[len];
+		this.fieldTypes=new Byte[len]; 
+		for (int i=0;i<other.fieldNames.length;i++) {
+			this.fieldNames[i]=other.fieldNames[i];
+			this.fieldValues[i]=other.fieldValues[i];
+			this.fieldTypes[i]=other.fieldTypes[i];
+		}
+		for (int i=0;i<dataFieldNames.length;i++) {
+			this.fieldNames[other.fieldNames.length+i]=dataFieldNames[i];
+			this.fieldValues[other.fieldNames.length+i]=data[i];
+			this.fieldTypes[other.fieldNames.length+i]=dataFieldTypes[i];			
+		}
+		this.timeStamp=other.timeStamp;
+		this.internalPrimayKey = other.internalPrimayKey;
+	}	
+	
 	public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data  ) {
 		this(outputStructure,data,System.currentTimeMillis());
 	}
+	
 	public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data , final long timeStamp ) {
 		this.fieldNames = new String [ outputStructure.length ];
 		this.fieldTypes = new Byte [ outputStructure.length ];
@@ -177,13 +201,6 @@ public final class StreamElement implements Serializable {
 
 	public void setData ( String fieldName, Serializable data ) {
 		this.fieldValues[indexedFieldNames.get( fieldName )] = data;
-	}
-
-	public void setData ( String fieldName, Serializable data, Byte type )  throws IllegalArgumentException {
-		this.verifyTypesCompatibility(new Byte[]{ type }, new Serializable[]{ data });
-		int index = indexedFieldNames.get( fieldName );
-		this.fieldValues[index] = data;
-		this.fieldTypes[index] = type;
 	}
 
 	public long getTimeStamp ( ) {
