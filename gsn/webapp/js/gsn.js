@@ -544,17 +544,6 @@ var GSN = {
                 //initalisation of gsn info, vsmenu
                 if (!GSN.loaded) GSN.init(data);
 			
-                //create vsbox on the first load
-                if (firstload && GSN.context == "home") {
-                    for (var i = 0; i < 10; ++i){
-                        var n = $($("virtual-sensor",data).get(i)).attr("name");
-                        if (n!=null) GSN.vsbox.add(n);
-                    }
-                } else if (firstload && GSN.context == "fullmap") {
-                    $("virtual-sensor",data).each(function(){
-                        GSN.vsbox.add($(this).attr("name"));
-                    });
-                }
 			
                 //update vsbox
                 $("virtual-sensor",data).each(function(){
