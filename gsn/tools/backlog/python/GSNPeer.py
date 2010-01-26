@@ -116,7 +116,7 @@ class GSNPeerClass(Thread):
             try:
                 self._logger.info('got connection from ' + str(self._clientaddr))
     
-                self.clientsocket.settimeout(10.0)
+                self.clientsocket.settimeout(None)
     
                 self._pingtimer.resume()
                 self._pingwatchdog.resume()
