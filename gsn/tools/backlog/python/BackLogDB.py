@@ -118,7 +118,7 @@ class BackLogDBClass(Thread):
             self._con.commit()
             self._dbNumberOfEntries += 1
             self._lock.release()
-            self._logger.debug('store (%d, %d, %d): %f s' % (msgType, timestamp, len(data), (time.time() - t)))
+            self._logger.debug('store (%d,%d,%d): %f s' % (msgType, timestamp, len(data), (time.time() - t)))
             return True
         except sqlite3.Error, e:
             self._lock.release()
@@ -204,7 +204,7 @@ class BackLogDBClass(Thread):
                 # should be blocking until queue is free and ready to send
                 self._logger.debug('rsnd...')
                 if self._parent.gsnpeer.processResendMsg(msgType, timestamp, message):
-                    self._logger.debug('rsnd (%d, %d, %d)' % (msgType, timestamp, len(message)))
+                    self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
                 else:
                     self._logger.info('resend interrupted')
                     break
