@@ -84,8 +84,8 @@ class TOSPluginClass(AbstractPluginClass):
                 payload = array.array('B', [0] + packet.payload()).tostring()
             else:
                 #self.debug('tos1')
-                length = len(packet)
-                payload = array.array('B', packet).tostring()
+                length = len(packet.payload())
+                payload = array.array('B', packet.payload()).tostring()
 
             self.debug('rcv (%d,%d,%d)' % (self.getMsgType(), timestamp, length))
 
