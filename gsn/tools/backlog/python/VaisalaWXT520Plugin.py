@@ -67,46 +67,47 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
             self.debug('died')
             return
 
-        ser = serial.Serial('/dev/ttyUSB0', 1200, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_TWO, timeout=1)
+        ser = serial.Serial('/dev/ttyUSB0', 1200, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=1)
         ser.open()
-        ser.write('?!')
+        ser.write('?\r\n')
         ser.flushOutput()
         time.sleep(0.1)
         id = str(str(ser.read(ser.inWaiting())).strip().decode('ascii'))
-        ser.write(id + 'XZM!')
+        ser.write(id + 'XZM\r\n')
         ser.readline()
-        ser.write(id + 'XZ!')
+        ser.write(id + 'XZ\r\n')
         ser.flushOutput()
-        time.sleep(0.1)
 
-        ser.write(id + 'XXU!')
+        ser.readline()
+
+        ser.write(id + 'XU\r\n')
         self.info(ser.readline().strip())
 
-        ser.write(id + 'XWU,R=1111110011111100,I=60!')
+        ser.write(id + 'WU,R=1111110000000000,I=60\r\n')
         ser.readline()
-        ser.write(id + 'XWU,A=60,G=3,U=M,D=0,N=W,F=2!')
+        ser.write(id + 'WU,A=60,G=3,U=M,D=0,N=W,F=2\r\n')
         ser.readline()
-        ser.write(id + 'XWU!')
+        ser.write(id + 'WU\r\n')
         self.info(ser.readline().strip())
-        ser.write(id + 'XTU,R=1111000011110000,I=60!')
+        ser.write(id + 'TU,R=1111000000000000,I=60\r\n')
         ser.readline()
-        ser.write(id + 'XTU,P=H,T=C!')
+        ser.write(id + 'TU,P=H,T=C\r\n')
         ser.readline()
-        ser.write(id + 'XTU!')
+        ser.write(id + 'TU\r\n')
         self.info(ser.readline().strip())
-        ser.write(id + 'XRU,R=1111111111111111,I=60!')
+        ser.write(id + 'RU,R=1111111100000000,I=60\r\n')
         ser.readline()
-        ser.write(id + 'XRU,U=M,S=M,Z=M!')
+        ser.write(id + 'RU,U=M,S=M,Z=M\r\n')
         ser.readline()
-        ser.write(id + 'XRU,X=65535,Y=65535!')
+        ser.write(id + 'RU,X=65535,Y=65535\r\n')
         ser.readline()
-        ser.write(id + 'XRU!')   
+        ser.write(id + 'RU\r\n')
         self.info(ser.readline().strip())
-        ser.write(id + 'XSU,R=1111000011110000,I=60!')
+        ser.write(id + 'SU,R=1111000000000000,I=60\r\n')
         ser.readline()
-        ser.write(id + 'XSU,S=Y,H=N!')
+        ser.write(id + 'SU,S=N,H=Y\r\n')
         ser.readline()
-        ser.write(id + 'XSU!')   
+        ser.write(id + 'SU\r\n')
         self.info(ser.readline().strip())
         
         while not self._stopped:
@@ -114,124 +115,31 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
             if self._sleeper.isSet():
                 continue
 
-            line = ''
             try:
-                ser.write(id + 'I!')
-                Sn = ser.readline().strip()
-                packet = self.packString(Sn)
+                ser.write(id + 'R1\r\n')
+                line = ser.readline().strip()
+                self.debug(line)
+                packet = self.packString(line)
                 
-                ser.write(id + 'M1!')
-                line = ser.readline()
-                count = int(line[4])
-                self._sleeper.wait(int(line[1:4]))
-                if self._sleeper.isSet():
-                    continue
-                ser.readline()
-                i = 0
-                params = []
-                while count > len(params):
-                    ser.write(id + 'D' + str(i) + '!')
-                    line = ser.readline().strip()
-                    params += re.findall('[+-]{1}[0-9\.]+', line)
-                    i += 1
-                Wu_Dn = params[0]
-                packet += self.packString(Wu_Dn)
-                Wu_Dm = params[1]
-                packet += self.packString(Wu_Dm)
-                Wu_Dx = params[2]
-                packet += self.packString(Wu_Dx)
-                Wu_Sn = params[3]
-                packet += self.packString(Wu_Sn)
-                Wu_Sm = params[4]
-                packet += self.packString(Wu_Sm)
-                Wu_Sx = params[5]
-                packet += self.packString(Wu_Sx)
+                ser.write(id + 'R2\r\n')
+                line = ser.readline().strip()
+                self.debug(line)
+                packet += self.packString(line)
                 
-                ser.write(id + 'M2!')
-                line = ser.readline()
-                count = int(line[4])
-                self._sleeper.wait(int(line[1:4]))
-                if self._sleeper.isSet():
-                    continue
-                ser.readline()
-                i = 0
-                params = []
-                while count > len(params):
-                    ser.write(id + 'D' + str(i) + '!')
-                    line = ser.readline().strip()
-                    params += re.findall('[+-]{1}[0-9\.]+', line)
-                    i += 1
-                Tu_Ta = params[0]
-                packet += self.packString(Tu_Ta)
-                Tu_Tp = params[1]
-                packet += self.packString(Tu_Tp)
-                Tu_Ua = params[2]
-                packet += self.packString(Tu_Ua)
-                Tu_Pa = params[3]
-                packet += self.packString(Tu_Pa)
+                ser.write(id + 'R3\r\n')
+                line = ser.readline().strip()
+                self.debug(line)
+                packet += self.packString(line)
                 
-                ser.write(id + 'M3!')
-                line = ser.readline()
-                count = int(line[4])
-                i = 0
-                params = []
-                while count > len(params):
-                    ser.write(id + 'D' + str(i) + '!')
-                    line = ser.readline().strip()
-                    params += re.findall('[+-]{1}[0-9\.]+', line)
-                    i += 1
-                Ru_Rc = params[0]
-                packet += self.packString(Ru_Rc)
-                Ru_Rd = params[1]
-                packet += self.packString(Ru_Rd)
-                Ru_Ri = params[2]
-                packet += self.packString(Ru_Ri)
-                Ru_Hc = params[3]
-                packet += self.packString(Ru_Hc)
-                Ru_Hd = params[4]
-                packet += self.packString(Ru_Hd)
-                Ru_Hi = params[5]
-                packet += self.packString(Ru_Hi)
-                Ru_Rp = params[6]
-                packet += self.packString(Ru_Rp)
-                Ru_Hp = params[7]
-                packet += self.packString(Ru_Hp)
-                
-                ser.write(id + 'M5!')
-                line = ser.readline()
-                count = int(line[4])
-                self._sleeper.wait(int(line[1:4]))
-                if self._sleeper.isSet():
-                    continue
-                ser.readline()
-                i = 0
-                params = []
-                while count > len(params):
-                     ser.write(id + 'D' + str(i) + '!')
-                     line = ser.readline().strip()
-                     params += re.findall('[+-]{1}[0-9\.]+', line)
-                     i += 1
-                Su_Th = params[0]
-                packet += self.packString(Su_Th)
-                Su_Vh = params[1]
-                packet += self.packString(Su_Vh)
-                Su_Vs = params[2]
-                packet += self.packString(Su_Vs)
-                Su_Vr = params[3]
-                packet += self.packString(Su_Vr)
+                ser.write(id + 'R5\r\n')
+                line = ser.readline().strip()
+                self.debug(line)
+                packet += self.packString(line)
                 
                 self.processMsg(self.getTimeStamp(), packet, self._backlog)
-            except IndexError, e:
-                self.warning(e.__str__())
-                self.warning('last line was <' + line + '>')
-                ser.close()
-                ser.open()
-                ser.write('?!')
-                ser.flushOutput()
-                time.sleep(0.1)
             except Exception, e:
                 self.error(e.__str__())
-                break
+                continue
 
         ser.close()         
         self.info('died')
@@ -239,6 +147,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
 
     def packString(self, s):
         return struct.pack(str(len(s)) + 'sx', s)
+
 
     def stop(self):
         self._stopped = True
