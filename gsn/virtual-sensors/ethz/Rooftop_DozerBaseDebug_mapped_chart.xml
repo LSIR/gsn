@@ -8,7 +8,7 @@
             <param name="width">610</param>
             <param name="vertical-axis">%</param>
             <param name="history-size">1000</param>
-            <param name="time-stream-name">generationtime</param>
+            <param name="time-stream-name">GENERATIONTIME</param>
         </init-params>
         <output-structure>
             <field name="data" type="binary:image/jpeg"/>
@@ -22,10 +22,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select generationtime, payload_radiosleep, payload_radioup from Rooftop_DozerBaseDebug_mapped_1396 </predicate>
+                    <predicate key="query"> select GENERATIONTIME, PAYLOAD_RADIOSLEEP, PAYLOAD_RADIOUP from Rooftop_DozerBaseDebug_mapped_1396 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select generationtime, (100 * payload_radioup / (payload_radiosleep + payload_radioup)) as radiodutycycle from wrapper </query>
+                <query> select GENERATIONTIME, (100 * PAYLOAD_RADIOUP / (PAYLOAD_RADIOSLEEP + PAYLOAD_RADIOUP)) as RADIO_DUTYCYCLE from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

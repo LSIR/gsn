@@ -75,7 +75,7 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
       chartInfo.setWidth( ParamParser.getInteger( params.get( "width" ) , 640 ) );
       chartInfo.setVerticalAxisTitle( params.get( "vertical-axis" ) );
       chartInfo.setHistorySize( ParamParser.getInteger( params.get( "history-size" ) , 10 ) );
-      chartInfo.setTimeStreamName( params.get( "time-stream-name" ) );
+      chartInfo.setTimeStreamName( params.get( "time-stream-name" ).toLowerCase() );
       input_stream_name_to_ChartInfo_map.put( chartInfo.getInputStreamName( ) , chartInfo );
       chartInfo.initialize( );
       timer = new Timer();
