@@ -1,42 +1,40 @@
-<virtual-sensor name="Matterhorn_BackLogStatus_4252" priority="10" >
+<virtual-sensor name="Matterhorn_BackLogStatus_1355" priority="10" >
     <processing-class>
-       <class-name>gsn.vsensor.BridgeVirtualSensorBothDirections</class-name>
-       <unique-timestamps>false</unique-timestamps>
-       <web-input password="test">
-         	<command name="backlog">
-          		<field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
-          		<field name="backup_data" type="radio:yes|no" >backup incoming data at the deployment. This will only work if BackLogMain.py has been started with the --backup_db option!</field>
-        	</command>
-   		</web-input>
-       <output-structure>
-		<field name="TIMESTAMP" type="BIGINT" />
-                <field name="CONNECTED" type="SMALLINT" />
-                <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
-                <field name="BACKLOG_DB_SIZE_KB" type="INTEGER" />
-                <field name="BACKUP_DB_ENTRIES" type="INTEGER" />
-                <field name="BACKUP_DB_SIZE_KB" type="INTEGER" />
-                <field name="ERROR_NUMBER" type="INTEGER" />
-                <field name="COMMANDS_SENT" type="INTEGER" />
-       </output-structure>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <web-input password="test">
+            <command name="backlog">
+                <field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
+            </command>
+        </web-input>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="ERROR_COUNTER" type="INTEGER" />
+            <field name="EXCEPTION_COUNTER" type="INTEGER" />
+            <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
+            <field name="BACKLOG_DB_SIZE_KB" type="INTEGER" />
+            <field name="IN_COUNTER" type="INTEGER" />
+            <field name="OUT_COUNTER" type="INTEGER" />
+            <field name="BACKLOG_COUNTER" type="INTEGER" />
+        </output-structure>
     </processing-class>
     <description>show status information of PSBackLog and send commands to the Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
-      <predicate key="type">PermaSense Matterhorn deployment</predicate>
-      <predicate key="LATITUDE">45.983817</predicate>
-      <predicate key="LONGITUDE">7.682508</predicate>
+        <predicate key="type">PermaSense Matterhorn deployment</predicate>
+        <predicate key="LATITUDE">45.983817</predicate>
+        <predicate key="LONGITUDE">7.682508</predicate>
     </addressing>
     <storage />
     <streams>
-    <stream name="data">
-      <source alias="source" storage-size="1" sampling-rate="1">
-        <address wrapper="backlog">
-          <predicate key="deployment">permasense-mh-bs01.ethz.ch:9002</predicate>
-          <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
-        </address>
-        <query> select * from wrapper </query>
-      </source>
-      <query> select * from source</query>
-    </stream>
-  </streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source</query>
+        </stream>
+    </streams>
 </virtual-sensor>

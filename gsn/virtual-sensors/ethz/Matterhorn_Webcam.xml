@@ -1,27 +1,26 @@
-<virtual-sensor name="Matterhorn_Webcam_4252" priority="10" >
+<virtual-sensor name="Matterhorn_Webcam_1355" priority="10" >
     <processing-class>
-       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
-       <unique-timestamps>false</unique-timestamps>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
         <output-structure>
-		<field name="TIMESTAMP" type="BIGINT" />
-  	    	<field name="DATA" type="binary" />
-       </output-structure>
+            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="FILEPATH" type="VARCHAR(255)" />
+            <field name="DATA" type="binary" />
+        </output-structure>
     </processing-class>
     <description>webcam picture from Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
     <streams>
-    <stream name="data">
-      <source alias="source" storage-size="1" sampling-rate="1">
-        <address wrapper="backlog">
-          <predicate key="deployment">permasense-mh-bs01.ethz.ch:9002</predicate>
-          <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryBridgePlugin</predicate>
-          <predicate key="listener-id">1</predicate>
-        </address>
-        <query> select * from wrapper </query>
-      </source>
-      <query> select * from source</query>
-    </stream>
-  </streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryBridgePlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
 </virtual-sensor>
