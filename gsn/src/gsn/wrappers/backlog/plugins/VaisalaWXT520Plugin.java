@@ -20,29 +20,10 @@ import gsn.wrappers.BackLogWrapper;
 public class VaisalaWXT520Plugin extends AbstractPlugin {
 
 	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"), 
-						new DataField("Sn", "VARCHAR(30)"),
-						new DataField("Wu_Dn", "VARCHAR(10)"),
-						new DataField("Wu_Dm", "VARCHAR(10)"),
-						new DataField("Wu_Dx", "VARCHAR(10)"),
-						new DataField("Wu_Sn", "VARCHAR(10)"),
-						new DataField("Wu_Sm", "VARCHAR(10)"),
-						new DataField("Wu_Sx", "VARCHAR(10)"),
-						new DataField("Tu_Ta", "VARCHAR(10)"),
-						new DataField("Tu_Tp", "VARCHAR(10)"),
-						new DataField("Tu_Ua", "VARCHAR(10)"),
-						new DataField("Tu_Pa", "VARCHAR(10)"),
-						new DataField("Ru_Rc", "VARCHAR(10)"),
-						new DataField("Ru_Rd", "VARCHAR(10)"),
-						new DataField("Ru_Ri", "VARCHAR(10)"),
-						new DataField("Ru_Hc", "VARCHAR(10)"),
-						new DataField("Ru_Hd", "VARCHAR(10)"),
-						new DataField("Ru_Hi", "VARCHAR(10)"),
-						new DataField("Ru_Rp", "VARCHAR(10)"),
-						new DataField("Ru_Hp", "VARCHAR(10)"),
-						new DataField("Su_Th", "VARCHAR(10)"),
-						new DataField("Su_Vh", "VARCHAR(10)"),
-						new DataField("Su_Vs", "VARCHAR(10)"),
-						new DataField("Su_Vr", "VARCHAR(10)")};
+						new DataField("Wu", "VARCHAR(100)"),
+						new DataField("Tu", "VARCHAR(100)"),
+						new DataField("Ru", "VARCHAR(100)"),
+						new DataField("Su", "VARCHAR(100)")};
 
 	private final transient Logger logger = Logger.getLogger( VaisalaWXT520Plugin.class );
 	
