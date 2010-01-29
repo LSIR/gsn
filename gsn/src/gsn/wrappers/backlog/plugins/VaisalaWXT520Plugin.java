@@ -58,7 +58,7 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 			}
 			if (packet[i] == 0) {
 				len = i - start_index;
-				if ((len == 0) || (count == 0 && len > 30) || (count != 0 && len > 10)) break;
+				if ((len == 0) || (len > 100)) break;
 				count++;
 				data[count] = new String(packet, start_index, len);
 				start_index = i+1;
