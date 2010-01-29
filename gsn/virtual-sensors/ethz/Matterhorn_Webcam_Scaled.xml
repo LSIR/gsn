@@ -23,7 +23,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select TIMESTAMP, DATA from Matterhorn_Webcam_1355 where FILEPATH='/tmp/webcam.jpg'</predicate>
+                    <predicate key="query">select TIMESTAMP, DATA from Matterhorn_Binary_1355 where FILEPATH='/tmp/webcam.jpg'</predicate>
                 </address>
                 <query> select TIMESTAMP, DATA as JPEG_SCALED from wrapper</query>
             </source>
