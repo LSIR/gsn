@@ -132,6 +132,9 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 			logger.error("Could not get property 'address' from property file");
 			return false;
 		}
+
+		tinyos1x_platform = props.getProperty(TINYOS1X_PLATFORM);
+		String sflocalport = props.getProperty(SF_LOCAL_PORT);
 		
 		plugin = addressBean.getPredicateValue(BACKLOG_PLUGIN);
 		
@@ -192,9 +195,6 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 				activePluginsCounterList.put(deployment, 1);
 			}
 		}
-		
-		tinyos1x_platform = props.getProperty(TINYOS1X_PLATFORM);
-		String sflocalport = props.getProperty(SF_LOCAL_PORT);
 		
 		// start optional local serial forwarder
 		if (tinyos1x_platform == null) {
