@@ -1,4 +1,4 @@
-<virtual-sensor name="Rooftop_Webcam_Scaled_1355" priority="10" >
+<virtual-sensor name="Rooftop_Webcam_scaled_1355" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
