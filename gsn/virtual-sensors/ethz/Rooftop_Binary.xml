@@ -1,4 +1,4 @@
-<virtual-sensor name="Rooftop_Webcam_1355" priority="10" >
+<virtual-sensor name="Rooftop_Binary_1355" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -8,7 +8,7 @@
             <field name="DATA" type="binary" />
         </output-structure>
     </processing-class>
-    <description>webcam picture from ETZ rooftop deployment</description>
+    <description>binaries from ETZ rooftop deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -18,7 +18,7 @@
                 <address wrapper="backlog">
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryBridgePlugin</predicate>
                 </address>
-                <query> select * from wrapper</query>
+                <query> select * from wrapper </query>
             </source>
             <query> select * from source</query>
         </stream>
