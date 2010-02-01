@@ -23,7 +23,6 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query"> select GENERATIONTIME, PAYLOAD_RADIOSLEEP, PAYLOAD_RADIOUP from Rooftop_DozerBaseDebug_mapped_1396 </predicate>
-                    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select GENERATIONTIME, (100 * PAYLOAD_RADIOUP / (PAYLOAD_RADIOSLEEP + PAYLOAD_RADIOUP)) as RADIO_DUTYCYCLE from wrapper </query>
             </source>

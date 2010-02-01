@@ -23,7 +23,6 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query"> select GENERATIONTIME, CRT_DX1 from Rooftop_CrackmeterTemperature_1396 where POSITION = 8 </predicate>
-                    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
