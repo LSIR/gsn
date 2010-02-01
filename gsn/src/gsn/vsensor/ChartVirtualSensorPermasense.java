@@ -266,11 +266,11 @@ class ChartInfoBackLog {
     */
    public synchronized void addData ( StreamElement streamElement ) {
 	   for ( int i = 0 ; i < streamElement.getFieldNames( ).length ; i++ ) {
-		   if (timeStreamName != null && timeStreamName.equals(streamElement.getFieldNames( )[ i ])) continue;
+		   if (timeStreamName != null && timeStreamName.equalsIgnoreCase(streamElement.getFieldNames( )[ i ])) continue;
 		   if (streamElement.getData()[i] == null) continue;
-		   TimeSeries timeSeries = dataForTheChart.get( streamElement.getFieldNames( )[ i ] );
+		   TimeSeries timeSeries = dataForTheChart.get( streamElement.getFieldNames( )[ i ].toLowerCase() );
 		   if ( timeSeries == null ) {
-			   dataForTheChart.put( streamElement.getFieldNames( )[ i ] , timeSeries = new TimeSeries( streamElement.getFieldNames( )[ i ] , org.jfree.data.time.FixedMillisecond.class ) );
+			   dataForTheChart.put( streamElement.getFieldNames( )[ i ].toLowerCase() , timeSeries = new TimeSeries( streamElement.getFieldNames( )[ i ].toLowerCase() , org.jfree.data.time.FixedMillisecond.class ) );
 			   timeSeries.setMaximumItemCount( historySize );
 			   dataCollectionForTheChart.addSeries( timeSeries );
 		   }
