@@ -53,13 +53,12 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 		int count = 0;
 		int start_index = 0;
 		for (int i = 0; i<packet.length; i++) {
-			if (count >= dataField.length) {
-				break;
-			}
 			if (packet[i] == 0) {
 				len = i - start_index;
 				if ((len == 0) || (len > 100)) break;
 				count++;
+				if (count >= dataField.length)
+					break;
 				data[count] = new String(packet, start_index, len);
 				start_index = i+1;
 			}
