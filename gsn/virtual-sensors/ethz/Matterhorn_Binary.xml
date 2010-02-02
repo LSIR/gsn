@@ -8,7 +8,7 @@
             <field name="DATA" type="binary" />
         </output-structure>
     </processing-class>
-    <description>binaries from Matterhorn deployment</description>
+    <description>binaries from the Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />

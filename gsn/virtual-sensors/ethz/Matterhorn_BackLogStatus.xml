@@ -22,8 +22,8 @@
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Matterhorn deployment</predicate>
-        <predicate key="LATITUDE">45.983817</predicate>
-        <predicate key="LONGITUDE">7.682508</predicate>
+        <predicate key="LATITUDE">45.981007</predicate>
+        <predicate key="LONGITUDE">7.671047</predicate>
     </addressing>
     <storage />
     <streams>

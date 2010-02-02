@@ -28,7 +28,7 @@
                 </address>
                 <query> select * from wrapper </query>
             </source>
-            <query> select * from source</query>
+            <query> select * from source </query>
         </stream>
     </streams>
 </virtual-sensor>
