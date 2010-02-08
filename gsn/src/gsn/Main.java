@@ -69,6 +69,7 @@ import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
+import org.kjkoster.zapcat.zabbix.ZabbixAgent;
 
 /**
  * Web Service URL : http://localhost:22001/services/Service?wsdl
@@ -81,7 +82,6 @@ public final class Main {
 	private static int gsnControllerPort;
 
 	private Main() throws Exception {
-
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
@@ -130,8 +130,6 @@ public final class Main {
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
 		vsloader.startLoading();
-
-
 	}
 
 	private static void closeSplashIfneeded() {
@@ -209,6 +207,7 @@ public final class Main {
 		Main.gsnControllerPort = Integer.parseInt(args[0]) ;
 		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
 		try {
+			new ZabbixAgent();
 			Main.getInstance();
 		}catch (Exception e) {
 			updateSplashIfNeeded(new String[] {"Starting GSN failed! Look at logs/gsn.log for more information."});

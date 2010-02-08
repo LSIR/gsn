@@ -108,7 +108,7 @@
          <jvmarg value="-Dorg.mortbay.log.LogFactory.noDiscovery=false"/>
       	 <arg id="gsnc-port" value="${gsn-controller-port}" />
          <!-- <jvmarg value="-server"/> Sometimes on windows compaines about a missing dll.-->
-         <!-- For profiling using JConsole <jvmarg value="-Dcom.sun.management.jmxremote"/> -->
+         <jvmarg value="-Dcom.sun.management.jmxremote"/>
          <!-- For JDK5 profiling <jvmarg value="-Xrunhprof:heap=sites,depth=15,force=n"/> -->
       </java>
    </target>
