@@ -42,12 +42,6 @@ import org.apache.log4j.Logger;
 import org.h2.tools.Server;
 
 /**
- * This virtual sensor takes the input field called as specified in the
- * IMAGE_INPUT_FIELD variable from the input stream,
- * interprets it as a jpeg and resizes it to the image width specified in
- * the virtual sensors XML file's SCALED_IMAGE_WIDTH_NAME field. Finally,
- * it forwards the result in a new stream with a field named as specified
- * in the IMAGE_OUTPUT_FIELD variable.
  *
  * @author Tonio Gsell
  * @author Mustafa Yuecel
