@@ -4,7 +4,6 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
 
-import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.Serializable;
@@ -43,20 +42,7 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
    
    private  final transient Logger               logger                             = Logger.getLogger( this.getClass() );
    
-   /**
-    * The <code>GENERATE_COUNT</code> represents after how many inputs, the
-    * virtual sensor should generate data. By default it set to 1 meaning that
-    * for each stream element received, the virtual sensor plots a new diagram.
-    * If you want to make the virtual sensor plot after receiving each K stream
-    * elements, set <code>GENERATE_COUNT</code> to K.
-    */
-   private final int                                   GENERATE_COUNT                     = 4;
-   
-   private long                                        counter                            = 0;
-   
    private final HashMap < String , ChartInfoBackLog > input_stream_name_to_ChartInfo_map = new HashMap < String , ChartInfoBackLog >( );
-   
-   private int                                         counter_pref                       = 0;
    
    private Timer timer;
    private boolean triggered = false;
