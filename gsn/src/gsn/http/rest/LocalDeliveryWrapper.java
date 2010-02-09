@@ -67,7 +67,7 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			try {
 				conn = StorageManager.getInstance().getConnection();
 				StringBuilder dbquery = new StringBuilder();
-				dbquery.append("select max(timed) from ").append(getDBAliasInStr());
+				dbquery.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
 				
 				ResultSet rs = StorageManager.executeQueryWithResultSet(dbquery, conn);
 				if (rs.next()) {
