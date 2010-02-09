@@ -19,7 +19,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -27,6 +26,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -36,6 +36,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.ParamParser;
+import gsn.vsensor.permasense.Converter;
 import gsn.wrappers.AbstractWrapper;
 
 import org.apache.log4j.Logger;
@@ -53,8 +54,6 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 	private static final String DEFAULT_STREAM_SOURCE = "source";
 	
 	private static final SimpleDateFormat datetimefm = new SimpleDateFormat(Main.getContainerConfig().getTimeFormat());
-	private static final DecimalFormat decimal4 = new DecimalFormat("0.0000");
-	private static final DecimalFormat decimal1 = new DecimalFormat("0.0");
 	private static final MyFilenameFilter filter = new MyFilenameFilter();
 	
 	private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensorPermasense.class);
@@ -77,6 +76,8 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 	private boolean position_mapping = false;
 	private boolean sensortype_mapping = false;
 	private boolean sensorvalue_conversion = false;
+
+	private static Map<String,Converter> converterList = new TreeMap<String,Converter>();
 	
 	public boolean initialize() {
 		String s;
@@ -207,7 +208,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 								"FROM sensormapping AS sm, sensortype AS st, sensortype_args AS sta WHERE sm.position = ? AND ? BETWEEN sm.begin AND sm.end AND sm.sensortype = st.sensortype " +
 								"AND st.signal_name = ? AND CASEWHEN(st.input IS NULL,TRUE,sm.sensortype_args = sta.sensortype_args AND sta.physical_signal = st.physical_signal) LIMIT 1");
 					}	
-				} catch (SQLException e) {
+				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 					return false;
 				}
@@ -241,6 +242,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 			if (sensorvalue_conversion &&
 					data.getData("position") != null &&	data.getData("generationtime") != null) {
 				String physical, conversion, input, value;
+				Converter converter;
 				HashMap<String, Serializable> map = new HashMap<String, Serializable>();
 				long start = System.nanoTime();
 				ListIterator<String> list = Arrays.asList(data.getFieldNames()).listIterator();
@@ -260,16 +262,20 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 								// physical_signal, conversion, input, value
 								logger.debug("physical_signal:" + physical + " conversion:" + conversion +
 										" input:" + input + " value:" + value);
-								if (conversion.equals("thermistor")) {
-									// TODO: check sanity of conversion table during init
-									assert input.equals("cal");
-									map.put(physical, thermistorConversion(data.getData(s), value));
-								} else if (conversion.equals("dilatation")) {
-									// TODO: check sanity of conversion table during init
-									assert input.equals("dx");
-									map.put(physical, dilatationConversion(data.getData(s), value));
-								} else {
-									logger.warn("unimplemented conversion: " + conversion);
+								
+								try {
+									synchronized (converterList) {
+										if (!converterList.containsKey(conversion)) {
+											String className = "gsn.vsensor.converters." + conversion.substring(0,1).toUpperCase() + conversion.substring(1);
+											logger.info("Instantiating converter '" + className);
+											Class<?> classTemplate = Class.forName(className);
+											converterList.put(conversion, (Converter)classTemplate.getConstructor().newInstance());
+										}
+										converter = converterList.get(conversion);
+									}	
+									map.put(physical, converter.convert(data.getData(s), value));
+								} catch (Exception e) {
+									logger.error(e.getMessage(), e);
 								}
 							} else {
 								logger.debug("no conversion found for >" + s + "< (" + s.substring("payload_".length()) + ")");
@@ -347,34 +353,6 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 			}
 		}
 		return false;
-	}
-
-	private String thermistorConversion(Serializable input, String cal) {
-		String result = null;
-		long start = System.nanoTime();
-		int v = ((Integer) input).intValue();
-		if (v <= 64000) {
-			double ln_res = Math.log(27000.0 * ((64000.0 / v) - 1.0));
-			//Math.pow(v, 3.0) needs more CPU instructions than (v * v * v)
-			//double steinhart_eq = 0.00103348 + 0.000238465 * ln_res + 0.000000158948 * Math.pow(ln_res, 3);
-			double steinhart_eq = 0.00103348 + (0.000238465 * ln_res) + (0.000000158948 * (ln_res * ln_res * ln_res));
-			result = decimal4.format((1.0 / steinhart_eq) - 273.15 - Double.parseDouble(cal));
-		}
-		if (logger.isDebugEnabled())
-			logger.debug("thermistorConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");				
-		return result;
-	}
-
-	private String dilatationConversion(Serializable input, String dx) {
-		String result = null;
-		long start = System.nanoTime();
-		int v = ((Integer) input).intValue();
-		if (v <= 64000) {
-			result = decimal4.format((v / 64000.0) * Double.parseDouble(dx));
-		}
-		if (logger.isDebugEnabled())
-			logger.debug("dilatationConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
-		return result;
 	}
 	
 	private Integer getPosition(int node_id, Timestamp generationtime) {
