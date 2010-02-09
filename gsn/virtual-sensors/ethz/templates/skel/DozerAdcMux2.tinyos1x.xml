@@ -1,0 +1,54 @@
+<virtual-sensor name="@deployment@_DozerAdcMux2_@rev_dozeradcmux2_tinyos1x@" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT"/>
+            <field name="GENERATIONTIME" type="BIGINT"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" />
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="PAYLOAD_A0_11" type="INTEGER" />
+            <field name="PAYLOAD_A0_12" type="INTEGER" />
+            <field name="PAYLOAD_A0_13" type="INTEGER" />
+            <field name="PAYLOAD_A0_14" type="INTEGER" />
+            <field name="PAYLOAD_A0_15" type="INTEGER" />
+            <field name="PAYLOAD_A0_16" type="INTEGER" />
+            <field name="PAYLOAD_A0_17" type="INTEGER" />
+            <field name="PAYLOAD_A0_18" type="INTEGER" />
+            <field name="PAYLOAD_A0_19" type="INTEGER" />
+            <field name="PAYLOAD_A0_20" type="INTEGER" />
+        </output-structure>
+    </processing-class>
+    <description>dozer messages (DozerAdcMux1Msg) from @deployment@ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos1x.messages.DozerAdcMux2Msg</predicate>
+                </address>
+                <query> select TIMESTAMP, GENERATIONTIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                    to_tinyint(PAYLOAD_SAMPLENO &gt;&gt; 15) as PAYLOAD_SAMPLE_VALID, 
+                    to_smallint(PAYLOAD_SAMPLENO &amp; 32767) as PAYLOAD_SAMPLE_NO, 
+                    PAYLOAD_SIBADC00 as PAYLOAD_A0_11, 
+                    PAYLOAD_SIBADC01 as PAYLOAD_A0_12, 
+                    PAYLOAD_SIBADC02 as PAYLOAD_A0_13, 
+                    PAYLOAD_SIBADC03 as PAYLOAD_A0_14, 
+                    PAYLOAD_SIBADC04 as PAYLOAD_A0_15, 
+                    PAYLOAD_SIBADC05 as PAYLOAD_A0_16, 
+                    PAYLOAD_SIBADC06 as PAYLOAD_A0_17, 
+                    PAYLOAD_SIBADC07 as PAYLOAD_A0_18, 
+                    PAYLOAD_SIBADC08 as PAYLOAD_A0_19, 
+                    PAYLOAD_SIBADC09 as PAYLOAD_A0_20 from wrapper
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
