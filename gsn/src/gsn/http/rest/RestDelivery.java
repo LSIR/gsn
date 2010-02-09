@@ -46,7 +46,8 @@ public class RestDelivery implements DeliverySystem {
 			}
 			return true;
 		} catch (Exception e) {
-			logger.debug(e.getMessage(),e);
+			logger.error(e.getMessage());
+			logger.debug(e);
 			return false;
 		}
 

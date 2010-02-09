@@ -55,22 +55,28 @@ public class RestRemoteWrapper extends AbstractWrapper {
 	}
 
 	public boolean initialize() {
-		try {
 			params = new RemoteWrapperParamParser(getActiveAddressBean(),false);
 			String startTime = getActiveAddressBean().getPredicateValue("start-time");
 			if (startTime != null && startTime.equals("continue")) {
 				Connection conn = null;
 				try {
 					conn = StorageManager.getInstance().getConnection();
-					StringBuilder query = new StringBuilder();
-					query.append("select max(timed) from ").append(getDBAliasInStr());
-					
-					ResultSet rs = StorageManager.executeQueryWithResultSet(query, conn);
+
+					// check if table already exists
+					ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), null);
 					if (rs.next()) {
-						lastReceivedTimestamp = rs.getLong(1);
+						StringBuilder query = new StringBuilder();
+						query.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
+						rs = StorageManager.executeQueryWithResultSet(query, conn);
+						if (rs.next()) {
+							lastReceivedTimestamp = rs.getLong(1);
+						}
 					}
+					else
+						logger.info("Table '" + getActiveAddressBean().getVirtualSensorName() + "' doesn't exist => using all data from the remote database");
 				} catch (SQLException e) {
 					logger.error(e.getMessage(), e);
+					return false;
 				} finally {
 					StorageManager.close(conn);
 				}
@@ -78,16 +84,18 @@ public class RestRemoteWrapper extends AbstractWrapper {
 				lastReceivedTimestamp = params.getStartTime();
 			}
 			logger.info("lastReceivedTimestamp=" + String.valueOf(lastReceivedTimestamp));
-			structure = connectToRemote();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		}
+			
+			try {
+				structure = connectToRemote();
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				return false;
+			}
 		return true;
 	}
 
 	
-	public DataField[] connectToRemote() throws ClientProtocolException, IOException, ClassNotFoundException {
+	private DataField[] connectToRemote() throws ClientProtocolException, IOException, ClassNotFoundException {
 		HttpGet httpget = new HttpGet(params.getRemoteContactPointEncoded(lastReceivedTimestamp));
 		HttpContext localContext = new BasicHttpContext();
 		
@@ -134,6 +142,20 @@ public class RestRemoteWrapper extends AbstractWrapper {
 		return structure;
 		
 	}
+	
+	private void reconnectToRemote() {
+		logger.info("trying to reconnect every 3 seconds... ");
+		while(isActive()) {
+			try {
+				Thread.sleep(3000);
+				if(isActive())
+					connectToRemote();
+				return;
+			} catch (Exception err) {
+				logger.warn(err.getMessage());
+			}
+		}
+	}
 
 	public void dispose() {
 		try {
@@ -153,15 +175,9 @@ public class RestRemoteWrapper extends AbstractWrapper {
 					lastReceivedTimestamp = streamElement.getTimeStamp();
 				}
 			} catch (Exception e) {
-				logger.debug(e.getMessage(),e);
-				logger.warn("Connection to: "+params.getRemoteContactPoint()+" is lost, trying to reconnect in 3 seconds...");
-				try {
-					if(isActive()){
-						Thread.sleep(3000);
-						connectToRemote();
-					}
-				} catch (Exception err) {
-					logger.error(err.getMessage(),err);
+				if(isActive()) {
+					logger.warn("Connection to: "+params.getRemoteContactPoint()+" is lost (Exception: " + e.getMessage() + ")");
+					reconnectToRemote();
 				}
 			}
 		}
