@@ -154,8 +154,6 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
 
 class ChartInfoBackLog {
    
-   private static final String             SYNTAX          = "INPUT_STREAM_VAR_NAME:CHART_NAME:VERTICAL_AXIS_TITLE [TYPE@SIZE] {WIDTH;HEIGHT}";
-   
    private  final transient Logger   logger          = Logger.getLogger( this.getClass() );
    
    private String                          plotTitle;
@@ -292,7 +290,7 @@ class ChartInfoBackLog {
    }
    
    public boolean equals ( Object obj ) {
-      if ( obj == null && !( obj instanceof ChartInfo ) ) return false;
+      if ( obj == null && !( obj instanceof ChartInfoBackLog ) ) return false;
       return ( obj.hashCode( ) == hashCode( ) );
    }
    
