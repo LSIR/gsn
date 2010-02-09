@@ -63,7 +63,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
 					conn = StorageManager.getInstance().getConnection();
 
 					// check if table already exists
-					ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), null);
+					ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
 					if (rs.next()) {
 						StringBuilder query = new StringBuilder();
 						query.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
