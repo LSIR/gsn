@@ -1197,6 +1197,8 @@ public class StorageManager {
 	        pool.setUsername(username);
 	        pool.setPassword(password);
 	        pool.setUrl(databaseURL);
+			pool.setMaxActive(-1);
+			pool.setMaxWait(30000);
 		try {
 		
 			con = getConnection();
