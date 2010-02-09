@@ -66,12 +66,16 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			Connection conn = null;
 			try {
 				conn = StorageManager.getInstance().getConnection();
-				StringBuilder dbquery = new StringBuilder();
-				dbquery.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
 				
-				ResultSet rs = StorageManager.executeQueryWithResultSet(dbquery, conn);
+				ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
 				if (rs.next()) {
-					lastVisited = rs.getLong(1);
+					StringBuilder dbquery = new StringBuilder();
+					dbquery.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
+
+					rs = StorageManager.executeQueryWithResultSet(dbquery, conn);
+					if (rs.next()) {
+						lastVisited = rs.getLong(1);
+					}
 				}
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
