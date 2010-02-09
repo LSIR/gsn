@@ -1,13 +1,10 @@
 package gsn.wrappers.backlog.plugins;
 
 import java.io.Serializable;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
-import gsn.wrappers.BackLogWrapper;
 
 
 /**
