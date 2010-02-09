@@ -8,15 +8,6 @@ import gsn.beans.DataField;
 import gsn.wrappers.BackLogWrapper;
 
 
-/**
- * This plugin offers the functionality to send commands to the Backlog Python program
- * on the deployment side. It also listens for incoming BackLogStatus messages.
- * <p>
- * Any new command pointed directly to the Backlog Python program should be implemented
- * in this class.
- * 
- * @author Tonio Gsell
- */
 public class VaisalaWXT520Plugin extends AbstractPlugin {
 
 	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"), 
