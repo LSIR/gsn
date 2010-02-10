@@ -266,7 +266,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 								try {
 									synchronized (converterList) {
 										if (!converterList.containsKey(conversion)) {
-											String className = "gsn.vsensor.converters." + conversion.substring(0,1).toUpperCase() + conversion.substring(1);
+											String className = "gsn.vsensor.permasense." + conversion.substring(0,1).toUpperCase() + conversion.substring(1);
 											logger.info("Instantiating converter '" + className);
 											Class<?> classTemplate = Class.forName(className);
 											converterList.put(conversion, (Converter)classTemplate.getConstructor().newInstance());
