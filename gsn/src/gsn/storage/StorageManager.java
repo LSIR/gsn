@@ -767,7 +767,7 @@ public class StorageManager {
 						convertedType = field.getType();
 					break;
 				case DataTypes.BINARY:
-					convertedType = "BLOB";
+					convertedType = "LONGBLOB";
 					break;
 				case DataTypes.DOUBLE:
 					convertedType = "double precision";
