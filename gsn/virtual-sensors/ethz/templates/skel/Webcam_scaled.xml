@@ -24,6 +24,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="@local_or_remote@">
                     <predicate key="query">select TIMESTAMP, DATA from @deployment@_Binary_@rev_binary@ where FILEPATH='/tmp/webcam.jpg'</predicate>
+                    <predicate key="remote-contact-point">@remote_contact_point@</predicate>
                 </address>
                 <query> select TIMESTAMP, DATA as JPEG_SCALED from wrapper </query>
             </source>

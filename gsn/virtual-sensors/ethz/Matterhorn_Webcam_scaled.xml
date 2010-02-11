@@ -22,10 +22,11 @@
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="local">
+                <address wrapper="remote-rest">
                     <predicate key="query">select TIMESTAMP, DATA from Matterhorn_Binary_1355 where FILEPATH='/tmp/webcam.jpg'</predicate>
+                    <predicate key="remote-contact-point">http://yosemite.ee.ethz.ch:22001/streaming/</predicate>
                 </address>
-                <query> select TIMESTAMP, DATA as JPEG_SCALED from wrapper</query>
+                <query> select TIMESTAMP, DATA as JPEG_SCALED from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
