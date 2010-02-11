@@ -14,13 +14,13 @@ public class Dilatation implements Converter {
 	
 	public String convert(Serializable input, String value) {
 		String result = null;
-		long start = System.nanoTime();
+		//long start = System.nanoTime();
 		int v = ((Integer) input).intValue();
 		if (v <= 64000) {
 			result = decimal4.format((v / 64000.0) * Double.parseDouble(value));
 		}
-		if (logger.isDebugEnabled())
-			logger.debug("dilatationConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		//if (logger.isDebugEnabled())
+		//	logger.debug("dilatationConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
 		return result;
 	}
 	
