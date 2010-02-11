@@ -17,7 +17,7 @@ public class Pressure implements Converter {
 		//long start = System.nanoTime();
 		int v = ((Integer) input).intValue();
 		if (v <= 64000) {
-			result = decimal1.format((v / 64000.0) * 2.5 * 2.0 * 1000.0);
+			result = decimal1.format((v / 64000.0) * 5000.0);
 		}
 		//if (logger.isDebugEnabled())
 		//	logger.debug("pressureConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
