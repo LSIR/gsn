@@ -61,7 +61,7 @@ class TOSPluginClass(AbstractPluginClass):
         self._serialsource.start()
 
         # open accessnode queue, just in case if we closed it before...
-        if isinstance(self._serialsource, tos1x.AM):
+        if not isinstance(self._serialsource, tos.AM):
             self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x01, 0x80]).tolist(), 0x00, None, True)
         
         while not self._stopped:
@@ -124,7 +124,7 @@ class TOSPluginClass(AbstractPluginClass):
         self._stopped = True
         
         # send close queue cmd to access node
-        if isinstance(self._serialsource, tos1x.AM):
+        if not isinstance(self._serialsource, tos.AM):
             self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x00, 0x80]).tolist(), 0x00, None, True)
             time.sleep(35)
         
