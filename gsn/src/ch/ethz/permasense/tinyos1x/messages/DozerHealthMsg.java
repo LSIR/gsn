@@ -17,7 +17,7 @@ public class DozerHealthMsg extends DozerAbstractMsg
     private Integer sdivoltage = null;
     private Integer temperature = null;
     private Integer moisture = null;
-    private Integer mspvoltage = null;
+    private Integer sibcurrent = null;
     private Integer msptemperature = null;
     private Integer flashstatus = null;
     private Short queuesize = null;
@@ -132,14 +132,14 @@ public class DozerHealthMsg extends DozerAbstractMsg
     	return moisture;
     }
     
-    public int get_payload_mspvoltage()
+    public int get_payload_sibcurrent()
     {
-    	if (mspvoltage == null)
+    	if (sibcurrent == null)
     	{
-    		mspvoltage = new Integer((int) ((getUIntElement(20 * 8, 8) << 8) + getUIntElement(21 * 8, 8)));
+    		sibcurrent = new Integer((int) ((getUIntElement(20 * 8, 8) << 8) + getUIntElement(21 * 8, 8)));
     	}
     		
-    	return mspvoltage;
+    	return sibcurrent;
     }
 
     public int get_payload_msptemperature()
@@ -228,7 +228,7 @@ public class DozerHealthMsg extends DozerAbstractMsg
           s += "  [payload.humidity=0x"+Long.toHexString(get_payload_humidity())+"]\n";
         } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
         try {
-          s += "  [payload.mspvoltage=0x"+Long.toHexString(get_payload_mspvoltage())+"]\n";
+          s += "  [payload.sibcurrent=0x"+Long.toHexString(get_payload_sibcurrent())+"]\n";
         } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
         try {
           s += "  [payload.msptemperature=0x"+Long.toHexString(get_payload_msptemperature())+"]\n";

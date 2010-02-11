@@ -15,7 +15,7 @@
             <field name="PAYLOAD_SDIVOLTAGE" type="INTEGER" />
             <field name="PAYLOAD_TEMPERATURE" type="INTEGER" />
             <field name="PAYLOAD_HUMIDITY" type="INTEGER" />
-            <field name="PAYLOAD_MSPVOLTAGE" type="INTEGER" />
+            <field name="PAYLOAD_SIBCURRENT" type="INTEGER" />
             <field name="PAYLOAD_MSPTEMPERATURE" type="INTEGER" />
             <field name="PAYLOAD_FLASHSTATUS" type="INTEGER" />
             <field name="PAYLOAD_QUEUESIZE" type="SMALLINT" />
@@ -39,7 +39,7 @@
                     to_tinyint(PAYLOAD_SAMPLENO &gt;&gt; 15) as PAYLOAD_SAMPLE_VALID, 
                     to_smallint(PAYLOAD_SAMPLENO &amp; 32767) as PAYLOAD_SAMPLE_NO, 
                     PAYLOAD_UPTIME, PAYLOAD_SYSVOLTAGE, PAYLOAD_SDIVOLTAGE, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY, 
-                    PAYLOAD_MSPVOLTAGE, PAYLOAD_MSPTEMPERATURE, PAYLOAD_FLASHSTATUS, PAYLOAD_QUEUESIZE, PAYLOAD_PARENTID, 
+                    PAYLOAD_SIBCURRENT, PAYLOAD_MSPTEMPERATURE, PAYLOAD_FLASHSTATUS, PAYLOAD_QUEUESIZE, PAYLOAD_PARENTID, 
                     to_tinyint(PAYLOAD_HOPCOUNTCHILDCOUNT &gt;&gt; 4) as PAYLOAD_HOPCOUNT, 
                     to_tinyint(PAYLOAD_HOPCOUNTCHILDCOUNT &amp; 15) as PAYLOAD_CHILDCOUNT from wrapper
                 </query>
