@@ -11,6 +11,7 @@ Jungfraujoch_DozerEventLogger.xml
 Jungfraujoch_DozerNodeHealth.xml
 Jungfraujoch_DozerNodeInfo.xml
 Jungfraujoch_DozerRssi.xml
+Jungfraujoch_DozerStateCounter.xml
 Matterhorn_BackLogStatus.xml
 Matterhorn_BasestationStatus.xml
 Matterhorn_Binary.xml
