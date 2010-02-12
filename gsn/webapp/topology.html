@@ -18,12 +18,16 @@
 <script type="text/javascript">
 <!--//<![CDATA[
 
-var initialUpdateVal = 30;
+var initialUpdateVal = 12;
 var nextUpdateVal = initialUpdateVal;
+var deployments = new Array("Matterhorn", "Jungfraujoch", "Rooftop");
 
 function updateTopology()
 {
-	window.location.reload();
+	var d = new Date();
+	for (var i in deployments) {
+	    $("#topology_"+deployments[i]).find("img").attr('src',"http://people.ee.ethz.ch/~perma/topology.php?host="+deployments[i]+"&date="+ d.getSeconds());
+	}
 }
 
 function nextUpdate()
@@ -42,6 +46,7 @@ function nextUpdate()
 }
 
 $(document).ready(function() {
+
 	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 	
 	//load the requested page
@@ -49,10 +54,102 @@ $(document).ready(function() {
 		
 	$("#nextUpdate").text(nextUpdateVal);
 	setTimeout("nextUpdate()",1000);
+
+	// deployments
+	for (var i in deployments) {
+	    // add tab
+	    $("#deployment_menu").append($.LI({}, $.A({
+		"id":"topology_menu_"+deployments[i],
+		"href":"javascript:showTopology("+i+")"
+	    },deployments[i])));
+	    // add div
+	    $("#topologycontainer").append(
+		$.DIV({
+		    "id":"topology_"+deployments[i]
+		      },
+		$.IMG({
+		    "id":"topology_img_"+deployments[i],
+		    "src":"http://people.ee.ethz.ch/~perma/topology.php?host="+deployments[i]
+		})));
+	    if (i>0)
+		$("#topology_"+deployments[i]).hide();
+	    else
+		$("#topology_menu_"+deployments[i]).addClass("selected");
+
+	}
 	
-});	
+});
+
+function showTopology(id) {
+  for (var i in deployments) {
+      $("#topology_"+deployments[i]).hide();
+      $("#topology_menu_"+deployments[i]).removeClass("selected");
+  }
+  $("#topology_"+deployments[id]).show();
+  $("#topology_menu_"+deployments[id]).addClass("selected");
+}
 //]]>-->
 </script>
+<style type="text/css">
+<!--
+#deployment_navigation #deployment_menu li {
+border-right:1px solid #FFFFFF;
+float:left;
+list-style-type:none;
+white-space:nowrap;
+}
+
+#deployment_navigation {
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background:#5CA1E7 none repeat scroll 0 0;
+color:#9E9E9E;
+height:2.2em;
+line-height:2.2em;
+margin:0;
+padding:0;
+border-top-width:0.1em;
+border-bottom-width:0.1em;
+border-left-width:0.1;
+border-right-width:0;
+border-style:solid;
+border-color:#5CA1E7;
+}
+
+#deployment_navigation #deployment_menu{
+margin:0;
+padding:0;
+}
+
+#deployment_navigation li a {
+background-color:inherit;
+color:#000000;
+display:block;
+font-size:0.8em;
+font-weight:bolder;
+padding:0 8px;
+text-decoration:none;
+text-transform:uppercase;
+}
+
+#deployment_navigation .selected {
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background:#FFFFFF none repeat scroll 0 0;
+color:#000000;
+text-decoration:none;
+}
+
+#deployment_navigation a:hover
+{
+	background:#b8caf7; /*#ff6f00;*/
+	color:#000000;
+	text-decoration:none;
+}
+-->
+</style>
 </head>
 <body>
 
@@ -77,37 +174,20 @@ $(document).ready(function() {
 	<div id="separator">
 		<div id="starttext">
 			<p>
-				The current sensor network topology and status data. Sensor nodes have IDs above 2000, access nodes below.
+				The current sensor network topology and status data. Sensor nodes have IDs above 1024, access nodes below.
 			</p>
 		</div>
 	</div>
 	
 	<div id="maindiv">
+		<div id="deployment_navigation">
+		<ul id="deployment_menu">
+		</ul>
+		</div>	
 	
 		<p id="updatetext">next update in <span id="nextUpdate">??</span> seconds</p>
 
-		<p>&nbsp;</p>
-
-		<p>Matterhorn
-			
-		<a href="http://people.ee.ethz.ch/~perma/topology.php?host=permafrozer" target="_blank"><img id="topology_img_matterhorn" src="http://people.ee.ethz.ch/~perma/topology.php?host=permafrozer" style="width:955px;border:none;"/></a>
-
-		</p>
-		<p>&nbsp;</p>
-
-		<p>Jungfraujoch
-			
-		<a href="http://people.ee.ethz.ch/~perma/topology.php?host=almer" target="_blank"><img id="topology_img_almer" src="http://people.ee.ethz.ch/~perma/topology.php?host=almer" style="width:955px;border:none;"/></a>
-
-		</p>
-		<p>&nbsp;</p>
-
-		<p>ETZ Rooftop
-			
-		<a href="http://people.ee.ethz.ch/~perma/topology.php?host=rooftop" target="_blank"><img id="topology_img_etzroof" src="http://people.ee.ethz.ch/~perma/topology.php?host=rooftop" style="width:955px;border:none;"/></a>
-
-		</p>
-
+		<div id="topologycontainer"></div>
 	</div>
 	<div class="separator">
 		<div id="footer">
