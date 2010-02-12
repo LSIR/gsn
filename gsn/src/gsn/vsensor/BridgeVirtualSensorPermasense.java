@@ -138,7 +138,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 					}
 					if (logger.isDebugEnabled()) {
 						try {
-							String [] args = {"-webPort", "8082", "-webAllowOthers", "true"};
+							String [] args = {"-webPort", "8082", "-webAllowOthers", "false"};
 							web = Server.createWebServer(args);
 							web.start();
 						} catch (SQLException e) {
