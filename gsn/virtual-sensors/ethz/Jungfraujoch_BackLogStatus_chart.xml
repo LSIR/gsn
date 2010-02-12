@@ -1,0 +1,33 @@
+<virtual-sensor name="Jungfraujoch_BackLogStatus_chart_1355" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Backlog queue size</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">#</param>
+            <param name="history-size">1440</param>
+            <param name="time-stream-name">TIMESTAMP</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>backlog health status from Jungfraujoch deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select TIMESTAMP, BACKLOG_DB_ENTRIES from Jungfraujoch_BackLogStatus_1355 </predicate>
+                    <predicate key="remote-contact-point">http://yosemite.ee.ethz.ch:22001/streaming/</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
