@@ -234,7 +234,8 @@ class ChartInfoBackLog {
          chart = ChartFactory.createTimeSeriesChart( plotTitle , "Time" , verticalAxisTitle , dataCollectionForTheChart , true , true , false );
          chart.setBorderVisible( true );
          XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) chart.getXYPlot().getRenderer();
-       	 renderer.setSeriesShape(0, new Rectangle2D.Double(-1.0, -1.0, 2.0, 2.0));
+         for (int i=0; i<10; i++)
+       	     renderer.setSeriesShape(i, new Rectangle2D.Double(-1.0, -1.0, 2.0, 2.0));
        	 renderer.setBaseShapesVisible(true);
        	 renderer.setBaseShapesFilled(true);
          ready = true;
