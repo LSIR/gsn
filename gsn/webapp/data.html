@@ -163,7 +163,13 @@
                     if (all){
                         to_return+='<option value="All" >' + all + '</option>';
                     }
-                    for (var item in items){
+                    var sorteditems = [];
+                    var i=0;
+                    for (var item in items)
+                        sorteditems[i++]=item;
+                    sorteditems.sort();
+                    for (var i=0;i<sorteditems.length;i++) {
+                        var item = sorteditems[i];
                         to_return+='<option value="' + item+'" >'+item+'</option>';
                     }
                     to_return+='</select>'
