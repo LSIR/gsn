@@ -17,7 +17,7 @@
       <property name="libdir" value="lib"/>
    	  <property name="reports" value="reports"/>
       <property name="temp" value="temp"/>
-      <property name="maxMemoryUsage" value="128m"/>
+      <property name="maxMemoryUsage" value="1024m"/>
       <property name="jar.file" value="gsn-core.jar"/>
       <!--  Enable the following line when you want to use Java Media Framework.
  You should unarchive the complete archive provide by sun and fix the
