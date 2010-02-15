@@ -4,7 +4,6 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.ParamParser;
 
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -17,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.jfree.data.general.SeriesException;
 import org.jfree.data.time.FixedMillisecond;
 import org.jfree.data.time.TimeSeries;
@@ -40,18 +39,15 @@ import org.jfree.data.time.TimeSeriesCollection;
  */
 public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
    
-   private  final transient Logger               logger                             = Logger.getLogger( this.getClass() );
+   private final transient Logger logger = Logger.getLogger( this.getClass() );
    
-   private final HashMap < String , ChartInfoBackLog > input_stream_name_to_ChartInfo_map = new HashMap < String , ChartInfoBackLog >( );
+   private final HashMap < String , ChartInfoBackLog > input_stream_name_to_ChartInfo_map = 
+	   new HashMap < String , ChartInfoBackLog >( );
    
    private Timer timer;
    private boolean triggered = false;
    
    public boolean initialize ( ) {
-      /**
-       * TODO : Checking if the user provides the arguements currectly. TODO :
-       * This can now plot only for one input stream value.
-       */
       TreeMap <  String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
       ChartInfoBackLog chartInfo = new ChartInfoBackLog( );
       chartInfo.setInputStreamName( params.get( "input-stream" ) );
@@ -107,9 +103,6 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
 			 * Informing container about existance of a stream element.
 			 */
 			dataProduced( output );
-			/**
-			 * For debugging purposes.
-			 */
 		}
 	}
 
@@ -233,11 +226,10 @@ class ChartInfoBackLog {
       if ( !ready ) {
          chart = ChartFactory.createTimeSeriesChart( plotTitle , "Time" , verticalAxisTitle , dataCollectionForTheChart , true , true , false );
          chart.setBorderVisible( true );
-         XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) chart.getXYPlot().getRenderer();
-         for (int i=0; i<10; i++)
-       	     renderer.setSeriesShape(i, new Rectangle2D.Double(-1.0, -1.0, 2.0, 2.0));
-       	 renderer.setBaseShapesVisible(true);
-       	 renderer.setBaseShapesFilled(true);
+         XYDotRenderer renderer = new XYDotRenderer();
+         renderer.setDotHeight(2);
+         renderer.setDotWidth(2);
+         chart.getXYPlot().setRenderer(renderer);
          ready = true;
          if ( logger.isDebugEnabled( ) ) logger.debug( "The Chart Virtual Sensor is ready." );
       }
