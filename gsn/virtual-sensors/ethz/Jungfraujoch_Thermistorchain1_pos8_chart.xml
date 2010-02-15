@@ -1,0 +1,33 @@
+<virtual-sensor name="Jungfraujoch_Thermistorchain1_pos8_chart_1396" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Thermistorchain temperatures (Position 8)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">°C</param>
+            <param name="history-size">3600</param>
+            <param name="time-stream-name">GENERATIONTIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>Thermistorchain/TC data (part 1) from Jungfraujoch deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select GENERATIONTIME, TC_T1, TC_T2, TC_T3, TC_T4, TC_T5 from Jungfraujoch_Thermistorchain1_1396 where POSITION = 8 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
