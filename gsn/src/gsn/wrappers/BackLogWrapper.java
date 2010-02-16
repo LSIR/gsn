@@ -3,6 +3,7 @@ package gsn.wrappers;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -11,6 +12,7 @@ import javax.naming.OperationNotSupportedException;
 
 import org.apache.log4j.Logger;
 
+import gsn.storage.StorageManager;
 import gsn.wrappers.backlog.BackLogMessage;
 import gsn.wrappers.backlog.DeploymentClient;
 import gsn.wrappers.backlog.BackLogMessageListener;
@@ -75,6 +77,7 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 	private SFv1Listen sfv1Listen = null;
 	private static Map<String,Integer> activePluginsCounterList = new HashMap<String,Integer>();
 	private String tinyos1x_platform = null;
+	private static StorageManager storage = null;
 	
 	private final transient Logger logger = Logger.getLogger( BackLogWrapper.class );
 
@@ -122,6 +125,22 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 					propertyList.put(deployment, props);
 				} catch (Exception e) {
 					logger.error("Could not load property file: " + propertyfile, e);
+					return false;
+				}
+			}
+
+			if (storage == null) {
+				try {
+					StorageManager sm = getStorageManager();
+					sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_tinyint"));
+					sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_tinyint(number bigint) RETURNS tinyint BEGIN return number; END"));
+					sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_smallint"));
+					sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_smallint(number bigint) RETURNS smallint BEGIN return number; END"));
+					sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_integer"));
+					sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_integer(number bigint) RETURNS integer BEGIN return number; END"));
+					storage = sm;
+				} catch (SQLException e) {
+					logger.error("Could not add SQL cast functions", e);
 					return false;
 				}
 			}
