@@ -24,7 +24,6 @@
             <field name="TC_T4" type="VARCHAR(30)" />
             <field name="TC_REF3" type="VARCHAR(30)" />
             <field name="TC_REF4" type="VARCHAR(30)" />
-            <field name="TC_REF5" type="VARCHAR(30)" />
             <field name="TC_T5" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>

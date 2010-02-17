@@ -19,7 +19,6 @@
             <field name="TC_T6" type="VARCHAR(30)" />
             <field name="TC_T7" type="VARCHAR(30)" />
             <field name="TC_T8" type="VARCHAR(30)" />
-            <field name="TC_REF6" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>
     <description>Thermistorchain/TC data (part 2) from Jungfraujoch deployment</description>
