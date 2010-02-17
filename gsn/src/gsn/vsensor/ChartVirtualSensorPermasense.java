@@ -45,7 +45,8 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
 	   new HashMap < String , ChartInfoBackLog >( );
    
    private Timer timer;
-   private boolean triggered = false;
+   private Boolean triggered = false;
+   private Boolean running = false;
    
    public boolean initialize ( ) {
       TreeMap <  String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
@@ -67,8 +68,14 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
    
 	class ChartGenerator extends TimerTask {
 		public void run() {
-			if (!triggered) return;
-			triggered = false;
+			synchronized (running) {
+				if (running) return;
+				synchronized (triggered) {
+					if (!triggered) return;
+					running = true;
+				}
+			}
+			
 			String [ ] fieldNames = input_stream_name_to_ChartInfo_map.keySet( ).toArray( new String [ ] {} );
 			Byte [ ] fieldTypes = new Byte [ fieldNames.length ];
 			Serializable [ ] charts = new Serializable [ fieldNames.length ];
@@ -103,6 +110,10 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
 			 * Informing container about existance of a stream element.
 			 */
 			dataProduced( output );
+			
+			synchronized (running) {
+				running = false;
+			}
 		}
 	}
 
@@ -130,7 +141,9 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
        */
       chartInfo.addData( streamElement );
       
-      triggered = true;
+      synchronized (triggered) {
+    	  triggered = true;
+      }
    }
    
    public void dispose ( ) {
