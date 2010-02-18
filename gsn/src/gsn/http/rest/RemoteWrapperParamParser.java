@@ -50,9 +50,10 @@ public class RemoteWrapperParamParser {
 		if (!remoteContactPoint.trim().endsWith("/"))
 			remoteContactPoint+="/";
 
+		String str = addressBean.getPredicateValueWithDefault("start-time",CURRENT_TIME);
 		try {
-			if (!addressBean.getPredicateValueWithDefault("start-time",CURRENT_TIME).equals("continue") || !addressBean.getPredicateValueWithDefault("start-time",CURRENT_TIME).startsWith("-"))
-				startTime = Helpers.convertTimeFromIsoToLong(addressBean.getPredicateValueWithDefault("start-time",CURRENT_TIME ));
+			if (!str.equals("continue") && !str.startsWith("-"))
+				startTime = Helpers.convertTimeFromIsoToLong(str);
 		}catch (Exception e) {
 			logger.error("Failed to parse the start-time parameter of the remote wrapper, a sample time could be:"+(CURRENT_TIME));
 			throw new RuntimeException(e);
