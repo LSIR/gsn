@@ -16,6 +16,8 @@ import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.LogarithmicAxis;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.jfree.data.general.SeriesException;
 import org.jfree.data.time.FixedMillisecond;
@@ -59,6 +61,7 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
       chartInfo.setVerticalAxisTitle( params.get( "vertical-axis" ) );
       chartInfo.setHistorySize( ParamParser.getInteger( params.get( "history-size" ) , 10 ) );
       chartInfo.setTimeStreamName( params.get( "time-stream-name" ).toLowerCase() );
+      chartInfo.setLogVerticalAxis( params.get( "log-vertical-axis" ) == null ? false : true );
       input_stream_name_to_ChartInfo_map.put( chartInfo.getInputStreamName( ) , chartInfo );
       chartInfo.initialize( );
       timer = new Timer();
@@ -192,6 +195,8 @@ class ChartInfoBackLog {
    
    private String                          verticalAxisTitle;
    
+   private boolean                         logVerticalAxis = false;
+   
    public ChartInfoBackLog ( ) {
       byteArrayOutputStream = new ByteArrayOutputStream( 64 * 1024 ); // Grows
       // as
@@ -235,14 +240,22 @@ class ChartInfoBackLog {
 	      if ( !ready ) this.timeStreamName = timeStreamName;
    }   
    
+   public void setLogVerticalAxis(boolean b) {
+	   if ( !ready ) this.logVerticalAxis = b; 
+   }
+   
    public void initialize ( ) {
       if ( !ready ) {
          chart = ChartFactory.createTimeSeriesChart( plotTitle , "Time" , verticalAxisTitle , dataCollectionForTheChart , true , true , false );
          chart.setBorderVisible( true );
+         XYPlot plot = chart.getXYPlot();
          XYDotRenderer renderer = new XYDotRenderer();
-         renderer.setDotHeight(2);
-         renderer.setDotWidth(2);
-         chart.getXYPlot().setRenderer(renderer);
+         renderer.setDotHeight(1);
+         renderer.setDotWidth(1);
+         if (logVerticalAxis) {
+        	 plot.setRangeAxis(new LogarithmicAxis(verticalAxisTitle));
+         }
+         plot.setRenderer(renderer);
          ready = true;
          if ( logger.isDebugEnabled( ) ) logger.debug( "The Chart Virtual Sensor is ready." );
       }
