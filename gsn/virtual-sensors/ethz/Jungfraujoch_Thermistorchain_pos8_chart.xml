@@ -3,11 +3,11 @@
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Thermistorchain temperatures (Position 8)</param>
+            <param name="title">Thermistorchain temperatures (Position 8, 3d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
-            <param name="vertical-axis">°C</param>
-            <param name="history-size">3600</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">4320</param>
             <param name="time-stream-name">GENERATIONTIME</param>
         </init-params>
         <output-structure>
