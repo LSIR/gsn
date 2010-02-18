@@ -24,6 +24,7 @@
                 <address wrapper="remote-rest">
                     <predicate key="query"> select TIMESTAMP, I_V12DC_EXT_UA, I_V12DC_IN_UA from Matterhorn_BasestationStatus_1355 </predicate>
                     <predicate key="remote-contact-point">http://yosemite.ee.ethz.ch:22001/streaming/</predicate>
+                    <predicate key="start-time">-259200000</predicate>
                 </address>
                 <query> select TIMESTAMP, I_V12DC_EXT_UA/1000 as 12V_EXT_CURRENT, I_V12DC_IN_UA/1000 as 12V_IN_CURRENT from wrapper </query>
             </source>

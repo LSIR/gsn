@@ -23,7 +23,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query"> select GENERATIONTIME, SR_T1, SR_T2, SR_T3, SR_T4 from Jungfraujoch_Sensorrod_1396 where POSITION = 5 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
-                    <predicate key="start-time">continue</predicate>
+                    <predicate key="start-time">-518400000</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

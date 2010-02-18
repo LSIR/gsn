@@ -23,7 +23,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query"> select GENERATIONTIME, TC_T1, TC_T2, TC_T3, TC_T4, TC_T5, TC_T6, TC_T7, TC_T8 from Jungfraujoch_Thermistorchain_1396 where POSITION = 10 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
-                    <predicate key="start-time">continue</predicate>
+                    <predicate key="start-time">-518400000</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
