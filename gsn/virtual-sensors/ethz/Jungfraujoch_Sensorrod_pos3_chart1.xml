@@ -1,29 +1,29 @@
-<virtual-sensor name="Jungfraujoch_BackLogStatus_chart_1355" priority="10" >
+<virtual-sensor name="Jungfraujoch_Sensorrod_pos3_chart1_1396" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Backlog queue size (3d)</param>
+            <param name="title">Sensorrod temperatures (Position 3)</param>
             <param name="height">400</param>
             <param name="width">610</param>
-            <param name="vertical-axis">#</param>
-            <param name="history-size">4320</param>
-            <param name="time-stream-name">TIMESTAMP</param>
+            <param name="vertical-axis">°C</param>
+            <param name="history-size">3600</param>
+            <param name="time-stream-name">GENERATIONTIME</param>
         </init-params>
         <output-structure>
             <field name="data" type="binary:image/jpeg"/>
         </output-structure>
     </processing-class>
-    <description>backlog health status from Jungfraujoch deployment</description>
+    <description>Thermistorchain/TC data (merged) from Jungfraujoch deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage history-size="1" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
-                    <predicate key="query"> select TIMESTAMP, BACKLOG_DB_ENTRIES from Jungfraujoch_BackLogStatus_1355 </predicate>
-                    <predicate key="remote-contact-point">http://yosemite.ee.ethz.ch:22001/streaming/</predicate>
+                <address wrapper="local">
+                    <predicate key="query"> select GENERATIONTIME, SR_T1, SR_T2, SR_T3, SR_T4 from Jungfraujoch_Sensorrod_1396 where POSITION = 3 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
