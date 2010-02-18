@@ -80,6 +80,14 @@ public class RestRemoteWrapper extends AbstractWrapper {
 				} finally {
 					StorageManager.close(conn);
 				}
+			} else if (startTime != null && startTime.startsWith("-")) {
+				try {
+					lastReceivedTimestamp = System.currentTimeMillis() - Long.parseLong(startTime.substring(1));
+				} catch (NumberFormatException e) {
+					logger.error("Problem in parsing the start-time parameter, the provided value is: " + startTime);
+					logger.error(e.getMessage(), e);
+					return false;
+				}
 			} else {
 				lastReceivedTimestamp = params.getStartTime();
 			}

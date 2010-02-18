@@ -82,6 +82,14 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			} finally {
 				StorageManager.close(conn);
 			}
+		} else if (startTime.startsWith("-")) {
+			try {
+				lastVisited = System.currentTimeMillis() - Long.parseLong(startTime.substring(1));
+			} catch (NumberFormatException e) {
+				logger.error("Problem in parsing the start-time parameter, the provided value is: " + startTime);
+				logger.error(e.getMessage(), e);
+				return false;				
+			}
 		} else {
 			try {
 				lastVisited = Helpers.convertTimeFromIsoToLong(startTime);
