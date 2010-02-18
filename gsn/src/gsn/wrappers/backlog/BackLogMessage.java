@@ -81,6 +81,7 @@ public class BackLogMessage {
      *  receive any binary data by the
 	 *  {@link gsn.wrappers.backlog.plugins.BinaryBridgePlugin BinaryBridgePlugin}. */
 	public static final byte BINARY_MESSAGE_TYPE = 30;
+	public static final byte BIG_BINARY_MESSAGE_TYPE = 31;
 
 	/** The Vaisala WXT520 message type. This message type is used to
      *  receive Vaisala WXT520 weather station data.
