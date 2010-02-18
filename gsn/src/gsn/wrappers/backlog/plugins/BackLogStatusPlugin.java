@@ -39,6 +39,12 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 		return dataField;
 	}
 
+
+	@Override
+	public String getPluginName() {
+		return "BackLogStatusPlugin";
+	}
+
 	@Override
 	public int packetReceived(long timestamp, byte[] packet) {
 		Integer error_counter = null;

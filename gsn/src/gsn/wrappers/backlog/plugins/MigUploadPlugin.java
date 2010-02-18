@@ -62,6 +62,12 @@ public class MigUploadPlugin extends AbstractPlugin {
 		return gsn.wrappers.backlog.BackLogMessage.TOS_MESSAGE_TYPE;
 	}
 
+
+	@Override
+	public String getPluginName() {
+		return "MigUploadPlugin";
+	}
+
 	@Override
 	public DataField[] getOutputFormat() {
 		DataField[] dataField = {new DataField("CONNECTED", "SMALLINT"), new DataField("COMMANDS_SENT", "INTEGER")};

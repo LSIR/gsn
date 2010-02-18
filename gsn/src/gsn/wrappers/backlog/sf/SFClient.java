@@ -118,4 +118,12 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 
 	public void message(String s) {
 	}
+
+	@Override
+	public void remoteConnEstablished() {
+	}
+
+	@Override
+	public void remoteConnLost() {
+	}
 }

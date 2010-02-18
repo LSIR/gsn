@@ -16,13 +16,15 @@ import gsn.wrappers.BackLogWrapper;
  * 
  * @author Tonio Gsell
  */
-public abstract class AbstractPlugin {
+public abstract class AbstractPlugin extends Thread {
 	
 	public final int PACKET_PROCESSED = 0;
 	public final int PACKET_SKIPPED = 1;
 	public final int PACKET_ERROR = 2;
 	
 	private BackLogWrapper activeBackLogWrapper = null;
+	private volatile Thread pluginThread;
+
 
 	/**
 	 * Initialize the plugin.
@@ -43,11 +45,18 @@ public abstract class AbstractPlugin {
 		return true;
 	}
 
-
-	/**
-	 * Stop the plugin.
-	 */
-	public void stop() { }
+	
+	public void start() {
+        pluginThread = new Thread(this);
+        pluginThread.setName(getPluginName());
+        pluginThread.start();
+    }
+	
+	
+	public void run() { }
+	
+	
+	public void dispose() { }
 
 
 	/**
@@ -65,6 +74,23 @@ public abstract class AbstractPlugin {
 	 *			PACKET_ERROR	 if there was an error
 	 */
 	public abstract int packetReceived ( long timestamp, byte[] packet );
+	
+	
+	public abstract String getPluginName();
+
+
+	/**
+	 * This function is called if the remote connection to the deployment has
+	 * been established.
+	 */
+	public void remoteConnEstablished() { }
+
+
+	/**
+	 * This function is called if the remote connection to the deployment has
+	 * been lost.
+	 */
+	public void remoteConnLost() { }
 
 
 	/**
@@ -239,6 +265,36 @@ public abstract class AbstractPlugin {
 	public boolean isTimeStampUnique() {
 	  return activeBackLogWrapper.isTimeStampUnique();
 	}
+		
+	public static byte[] uint2arr (long l) {
+		int len = 4;
+		byte[] arr = new byte[len];
+
+		int i = 0;
+		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
+			arr[i] = (byte)( l >> shiftBy);
+			i++;
+		}
+		return arr;
+	}
+	
+	public static long arr2uint (byte[] arr, int start) {
+		int i = 0;
+		int len = 4;
+		int cnt = 0;
+		byte[] tmp = new byte[len];
+		for (i = start; i < (start + len); i++) {
+			tmp[cnt] = arr[i];
+			cnt++;
+		}
+		long accum = 0;
+		i = 0;
+		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
+			accum |= ( (long)( tmp[i] & 0xff ) ) << shiftBy;
+			i++;
+		}
+		return accum;
+	}
 	
 	public static int arr2int (byte[] arr, int start) {
 		int i = 0;
@@ -264,6 +320,38 @@ public abstract class AbstractPlugin {
 
 		int i = 0;
 		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
+			arr[i] = (byte)( l >> shiftBy);
+			i++;
+		}
+		return arr;
+	}
+
+	
+	public static long arr2long (byte[] arr, int start) {
+		int i = 0;
+		int len = 8;
+		int cnt = 0;
+		byte[] tmp = new byte[len];
+		for (i = start; i < (start + len); i++) {
+			tmp[cnt] = arr[i];
+			cnt++;
+		}
+		long accum = 0;
+		i = 0;
+		for ( int shiftBy = 0; shiftBy < 64; shiftBy += 8 ) {
+			accum |= ( (long)( tmp[i] & 0xff ) ) << shiftBy;
+			i++;
+		}
+		return accum;
+	}
+
+	
+	public static byte[] long2arr (long l) {
+		int len = 8;
+		byte[] arr = new byte[len];
+
+		int i = 0;
+		for ( int shiftBy = 0; shiftBy < 64; shiftBy += 8 ) {
 			arr[i] = (byte)( l >> shiftBy);
 			i++;
 		}

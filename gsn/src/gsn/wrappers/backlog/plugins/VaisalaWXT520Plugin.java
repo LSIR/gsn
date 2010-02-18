@@ -29,6 +29,12 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 		return gsn.wrappers.backlog.BackLogMessage.VAISALA_WXT520_MESSAGE_TYPE;
 	}
 
+
+	@Override
+	public String getPluginName() {
+		return "VaisalaWXT520Plugin";
+	}
+
 	@Override
 	public DataField[] getOutputFormat() {
 		return dataField;

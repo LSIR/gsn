@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -41,7 +42,7 @@ public class DeploymentClient extends Thread {
 
 	/** Timeout in seconds to pass until trying to reconnect
 	    to the deployment in case of a connection loss. */
-	public static final int RECONNECT_TIMEOUT_SEC = 30;
+	public static final int RECONNECT_TIMEOUT_SEC = 3;
 	/** Ping request interval in seconds. */
 	public static final int PING_INTERVAL_SEC = 10;
 	/** Time in seconds in which at least one ping acknowledge
@@ -513,7 +514,17 @@ public class DeploymentClient extends Thread {
     	// start ping checker timer
         pingCheckerTimer = new Timer("BasestationClient-Thread:" + pingThreadNumber + ":PingCheckerTimer");
         pingCheckerTimer.schedule( new PingChecker(), PING_ACK_CHECK_INTERVAL_SEC * 1000, PING_ACK_CHECK_INTERVAL_SEC * 1000 );
-        
+
+
+		Iterator<Vector<BackLogMessageListener>> iter = msgTypeListener.values().iterator();
+		while (iter.hasNext()) {
+			Enumeration<BackLogMessageListener> en = iter.next().elements();
+			// send the message to all listeners
+			while (en.hasMoreElements()) {
+				en.nextElement().remoteConnEstablished();
+			}
+		}
+		
         firstReconnect = true;
         return true;
 	}
@@ -537,6 +548,15 @@ public class DeploymentClient extends Thread {
         pingCheckerTimer.cancel();
         
 		pingACKreceived = false;
+
+		Iterator<Vector<BackLogMessageListener>> iter = msgTypeListener.values().iterator();
+		while (iter.hasNext()) {
+			Enumeration<BackLogMessageListener> en = iter.next().elements();
+			// send the message to all listeners
+			while (en.hasMoreElements()) {
+				en.nextElement().remoteConnLost();
+			}
+		}
 
         // close the socket
 		try {

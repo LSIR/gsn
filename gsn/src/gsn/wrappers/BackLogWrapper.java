@@ -260,6 +260,14 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 		
 		return true;
 	}
+	
+	
+	
+	@Override
+	public void run() {
+		logger.debug("Starting BackLog plugin: >" + plugin + "<");
+		pluginObject.start();
+	}
 
 
 
@@ -489,7 +497,12 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 		}
 		
 		// tell the plugin to stop
-		pluginObject.stop();
+		pluginObject.dispose();
+		try {
+			pluginObject.join();
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
+		}
 	}
    
 	public String getTinyos1xPlatform() {
@@ -500,5 +513,21 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
    	public boolean isTimeStampUnique() {
    		return false;
    	}
+
+
+
+
+	@Override
+	public void remoteConnEstablished() {
+		pluginObject.remoteConnEstablished();
+	}
+
+
+
+
+	@Override
+	public void remoteConnLost() {
+		pluginObject.remoteConnLost();
+	}
 
 }

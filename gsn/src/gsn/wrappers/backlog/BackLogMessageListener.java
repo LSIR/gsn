@@ -20,4 +20,18 @@ public interface BackLogMessageListener extends java.util.EventListener {
      * @return true, if the listener did acknowledge the message
      */
     public boolean messageReceived(BackLogMessage message);
+
+    /**
+     * This method is called to signal remote connection lost. It must be
+     * implemented by any listener which likes to register itself at
+     * a {@link DeploymentClient}.
+     */
+    public void remoteConnLost();
+
+    /**
+     * This method is called to signal remote connection establishment. It must be
+     * implemented by any listener which likes to register itself at
+     * a {@link DeploymentClient}.
+     */
+    public void remoteConnEstablished();
 }

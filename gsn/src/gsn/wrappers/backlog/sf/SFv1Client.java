@@ -122,4 +122,12 @@ public class SFv1Client extends SFProtocol implements Runnable, BackLogMessageLi
 
 	public void message(String s) {
 	}
+
+	@Override
+	public void remoteConnEstablished() {
+	}
+
+	@Override
+	public void remoteConnLost() {
+	}
 }

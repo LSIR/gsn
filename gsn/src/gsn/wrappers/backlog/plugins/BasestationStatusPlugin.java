@@ -41,6 +41,12 @@ public class BasestationStatusPlugin extends AbstractPlugin {
 		return dataField;
 	}
 
+
+	@Override
+	public String getPluginName() {
+		return "BasestationStatusPlugin";
+	}
+
 	@Override
 	public int packetReceived(long timestamp, byte[] packet) {
 		Serializable[] data = new Serializable[dataField.length];

@@ -89,6 +89,12 @@ public class MigMessagePlugin extends AbstractPlugin
 		return true;
 	}
 
+
+	@Override
+	public String getPluginName() {
+		return "MigMessagePlugin";
+	}
+
 	
 	@Override
 	public int packetReceived(long timestamp, byte[] packet) {

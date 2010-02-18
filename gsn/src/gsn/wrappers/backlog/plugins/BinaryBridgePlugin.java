@@ -34,6 +34,12 @@ public class BinaryBridgePlugin extends AbstractPlugin {
 		return dataField;
 	}
 
+
+	@Override
+	public String getPluginName() {
+		return "BinaryBridgePlugin";
+	}
+
 	@Override
 	public int packetReceived(long timestamp, byte[] packet) {
 		StringBuffer sb = new StringBuffer();
