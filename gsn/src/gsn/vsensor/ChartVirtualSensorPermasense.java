@@ -65,7 +65,7 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
       input_stream_name_to_ChartInfo_map.put( chartInfo.getInputStreamName( ) , chartInfo );
       chartInfo.initialize( );
       timer = new Timer();
-      timer.scheduleAtFixedRate(new ChartGenerator(), 5000, 5000);
+      timer.scheduleAtFixedRate(new ChartGenerator(), 30000, 30000);
       return true;
    }
    
