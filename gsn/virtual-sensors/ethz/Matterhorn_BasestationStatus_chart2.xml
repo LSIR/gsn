@@ -3,11 +3,11 @@
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Basestation current health (3d)</param>
+            <param name="title">Basestation current health (7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
             <param name="vertical-axis">mA</param>
-            <param name="history-size">4320</param>
+            <param name="history-size">10080</param>
             <param name="time-stream-name">TIMESTAMP</param>
         </init-params>
         <output-structure>
@@ -21,10 +21,9 @@
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
-                    <predicate key="query"> select TIMESTAMP, I_V12DC_EXT_UA, I_V12DC_IN_UA from Matterhorn_BasestationStatus_1355 </predicate>
-                    <predicate key="remote-contact-point">http://yosemite.ee.ethz.ch:22001/streaming/</predicate>
-                    <predicate key="start-time">-259200000</predicate>
+                <address wrapper="local">
+                    <predicate key="query"> select TIMESTAMP, I_V12DC_EXT_UA, I_V12DC_IN_UA from Matterhorn_BasestationStatus_mapped_1355 </predicate>
+                    <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select TIMESTAMP, I_V12DC_EXT_UA/1000 as 12V_EXT_CURRENT, I_V12DC_IN_UA/1000 as 12V_IN_CURRENT from wrapper </query>
             </source>
