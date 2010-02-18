@@ -91,6 +91,16 @@ class AbstractPluginClass(Thread):
         @param message: The message to be processed by the plugin in string format
         '''
         self.warning('msgReceived triggered but nothing implemented')
+        
+        
+    def ackReceived(self, timestamp):
+        '''
+        This function is called if an acknowledge message has been received from GSN.
+        If a plugin needs to receive acknowledge information it can use this function.
+        
+        @param timestamp: The timestamp of the acknowledge message as integer
+        '''
+        pass
     
     
     def processMsg(self, timestamp, payload, backlogging=False):

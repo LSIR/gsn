@@ -174,7 +174,18 @@ class BackLogMainClass(Thread):
         
     
     def resend(self):
-        self.backlog.resend()     
+        self.backlog.resend()
+        
+    def ackReceived(self, timestamp):
+        # tell the plugins to have received an acknowledge message
+        for plugin_entry in self.plugins:
+            module_name = plugin_entry[0]
+            plugin = plugin_entry[1]
+            plugin.ackReceived(timestamp)
+            
+        # remove the message from the backlog database using its timestamp
+        self.backlog.removeMsg(timestamp)
+            
 
 
     def incrementExceptionCounter(self):

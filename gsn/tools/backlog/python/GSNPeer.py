@@ -162,8 +162,8 @@ class GSNPeerClass(Thread):
                         # answer with a ping ack
                         self.pingAck(msg.getTimestamp())
                     elif msgType == BackLogMessage.ACK_MESSAGE_TYPE:
-                        # if it is an acknowledge, remove the message from the backlog database using its timestamp
-                        self._parent.backlog.removeMsg(msg.getTimestamp())
+                        # if it is an acknowledge, tell BackLogMain to have received one
+                        self._parent.ackReceived(msg.getTimestamp())
                     else:
                         # send the packet to all plugins which 'use' this message type
                         msgTypeValid = False
@@ -197,6 +197,10 @@ class GSNPeerClass(Thread):
 
     def getStatus(self):
         return (self._inCounter, self._outCounter, self._backlogCounter)
+            
+            
+    def isConnected(self):
+        return self.connected
 
 
     def sendToGSN(self, msg, resend=False):
