@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.CRC32;
@@ -30,17 +31,23 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	private static final String PROPERTY_FILE = "property-file";
 	private static final String STORAGE = "storage";
 	private static final String STORAGE_DIRECTORY = "storage-directory";
+	private static final String FOLDER_DATE_TIME_FM = "folder-date-time-fm";
 	
 	private static final String PROPERTY_REMOTE_FILE = "remote_file";
 	private static final String PROPERTY_DOWNLOADED_SIZE = "downloaded_size";
 	private static final String PROPERTY_FILE_TIMESTAMP = "timestamp";
 	private static final String PROPERTY_FILE_SIZE = "file_size";
-	protected static final String PROPERTY_CHUNK_NUMBER = "chunck_number";
+	protected static final String PROPERTY_CHUNK_NUMBER = "chunk_number";
+	
+	private static final String TEMP_FILE_NAME = "binaryplugin_download.part";
+	private static final String DEFAULT_FOLDER_DATE_TIME_FM = "yyyy-MM-dd";
 
 	private static final byte INIT_PACKET = 0;
 	private static final byte RESEND_PACKET = 1;
 	private static final byte CHUNK_PACKET = 2;
 	private static final byte CRC_PACKET = 3;
+	
+	private SimpleDateFormat folderdatetimefm;
 
 	private String localFileDir;
 
@@ -80,6 +87,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			return false;
 		}
 		
+		folderdatetimefm = new SimpleDateFormat(addressBean.getPredicateValueWithDefault(FOLDER_DATE_TIME_FM, DEFAULT_FOLDER_DATE_TIME_FM));
+		
 		logger.debug("property file name: " + propertyFileName);
 		logger.debug("storage type: " + storage);
 		logger.debug("local file directory: " + localFileDir);
@@ -107,6 +116,11 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		File f = new File(localFileDir);
 		if (!f.isDirectory()) {
 			logger.error(localFileDir + " is not a directory");
+			return false;
+		}
+		
+		if (!f.canWrite()) {
+			logger.error(localFileDir + " is not writable");
 			return false;
 		}
 		
@@ -179,14 +193,32 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				logger.debug("   binary length: " + binaryLength);
     	
     			    File f = new File(remoteBinaryName);
-    				localBinaryName = localFileDir + f.getName();
+    			    
+    			    if (storeInDatabase) {
+    			    	localBinaryName = localFileDir + TEMP_FILE_NAME;
+    			    }
+    			    else {
+	    			    String datedir = localFileDir + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
+	    			    String filename = f.getName();
+	    			    f = new File(datedir);
+	    			    if (!f.exists()) {
+	    			    	if (!f.mkdir()) {
+	    			    		logger.error("could not mkdir >" + datedir + "<  -> drop remote file " + remoteBinaryName);
+	    			    		getNewFile();
+	    			    		continue;
+	    			    	}
+	    			    }
+	    			    localBinaryName = datedir + filename;
+    			    }
     	
     				filelen = 0;
     				
     				// delete the file if it already exists
     				f = new File(localBinaryName);
-    			    if (f.exists())
+    			    if (f.exists()) {
+    			    	logger.debug("overwrite already existing file >" + localBinaryName + "<");
     			    	f.delete();
+    			    }
     	
     			    // write the new file info to the property file
     				configFile.setProperty(PROPERTY_REMOTE_FILE, remoteBinaryName);
@@ -272,7 +304,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
     							file.delete();
     						}
     						else {
-    							Serializable[] data = {binaryTimestamp, remoteBinaryName, localBinaryName};
+    							String relLocalName = "./" + localBinaryName.replaceAll(localFileDir, "");
+    							Serializable[] data = {binaryTimestamp, remoteBinaryName, relLocalName};
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
     							}
@@ -338,12 +371,21 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				getNewFile();
 			}
 			remoteBinaryName = configFile.getProperty(PROPERTY_REMOTE_FILE);
-		    File f = new File(remoteBinaryName);
-			localBinaryName = localFileDir + f.getName();
 			downloadedSize = Long.valueOf(configFile.getProperty(PROPERTY_DOWNLOADED_SIZE)).longValue();
 			binaryTimestamp = Long.valueOf(configFile.getProperty(PROPERTY_FILE_TIMESTAMP)).longValue();
 			binaryLength = Long.valueOf(configFile.getProperty(PROPERTY_FILE_SIZE)).longValue();
-			
+
+		    if (storeInDatabase) {
+		    	localBinaryName = localFileDir + TEMP_FILE_NAME;
+		    }
+		    else {
+			    File f = new File(remoteBinaryName);
+			    String datedir = localFileDir + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
+			    String filename = f.getName();
+			    f = new File(datedir);
+			    localBinaryName = datedir + filename;
+		    }
+		    
 			calcChecksumThread.newChecksum(localBinaryName);
 		}
 		else
@@ -446,8 +488,9 @@ class CalculateChecksum extends Thread {
 		            cis = new CheckedInputStream(
 		                    new FileInputStream(file), new CRC32());
 		        } catch (FileNotFoundException e) {
-		            System.err.println("File not found.");
-		            System.exit(1);
+		            parent.logger.error("file >" + file + "< not found -> request a new file from the deployment");
+		            parent.getNewFile();
+		            continue;
 		        }
 
 		        byte[] buf = new byte[4096];
