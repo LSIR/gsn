@@ -27,8 +27,6 @@ import gsn.wrappers.BackLogWrapper;
  * TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
  */
 public class BigBinaryPlugin extends AbstractPlugin {
-
-	private static final String PROPERTY_FILE = "property-file";
 	private static final String STORAGE = "storage";
 	private static final String STORAGE_DIRECTORY = "storage-directory";
 	private static final String FOLDER_DATE_TIME_FM = "folder-date-time-fm";
@@ -41,6 +39,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	
 	private static final String TEMP_FILE_NAME = "binaryplugin_download.part";
 	private static final String DEFAULT_FOLDER_DATE_TIME_FM = "yyyy-MM-dd";
+	private static final String PROPERTY_FILE_NAME = ".gsnBinaryStat";
 
 	private static final byte INIT_PACKET = 0;
 	private static final byte RESEND_PACKET = 1;
@@ -79,7 +78,6 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		
 		String storage;
 		try {
-			propertyFileName = addressBean.getPredicateValueWithException(PROPERTY_FILE);
 			storage = addressBean.getPredicateValueWithException(STORAGE);
 			localFileDir = addressBean.getPredicateValueWithException(STORAGE_DIRECTORY);
 		} catch (Exception e) {
@@ -89,19 +87,15 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		
 		folderdatetimefm = new SimpleDateFormat(addressBean.getPredicateValueWithDefault(FOLDER_DATE_TIME_FM, DEFAULT_FOLDER_DATE_TIME_FM));
 		
-		logger.debug("property file name: " + propertyFileName);
-		logger.debug("storage type: " + storage);
-		logger.debug("local file directory: " + localFileDir);
-		
 		if (storage.equalsIgnoreCase("database")) {
 			storeInDatabase = true;
-			dataField = new DataField[] {new DataField("TIMESTAMP", "BIGINT"),
+			dataField = new DataField[] {new DataField("MODIFICATIONTIME", "BIGINT"),
 	  				   new DataField("REMOTEFILE", "VARCHAR(255)"),
 	  				   new DataField("DATA", "binary")};
 		}
 		else if (storage.equalsIgnoreCase("filesystem")) {
 			storeInDatabase = false;
-			dataField = new DataField[] {new DataField("TIMESTAMP", "BIGINT"),
+			dataField = new DataField[] {new DataField("MODIFICATIONTIME", "BIGINT"),
 					   new DataField("REMOTEFILE", "VARCHAR(255)"),
 					   new DataField("LOCALFILE", "VARCHAR(255)")};
 		}
@@ -123,6 +117,12 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			logger.error(localFileDir + " is not writable");
 			return false;
 		}
+		
+		propertyFileName = localFileDir + PROPERTY_FILE_NAME;
+		
+		logger.debug("property file name: " + propertyFileName);
+		logger.debug("storage type: " + storage);
+		logger.debug("local file directory: " + localFileDir);
 		
 		return true;
 	}
@@ -272,65 +272,70 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				
     				logger.debug("crc packet with crc32 >" + crc + "< received");
     				
-    				// do we really have the whole file?
-    				if ((new File(localBinaryName)).length() == binaryLength) {
-    					// check crc
-    					if (calculatedCRC.getValue() == crc) {
-    						logger.debug("crc is correct");
-    						if (storeInDatabase) {
-    							byte[] tmp = null;
-    							File file = new File(localBinaryName);
-    							FileInputStream fin;
-    							
-    							try {
-    								fin = new FileInputStream(file);
-    								// find index of first null byte
-    								tmp = new byte[(int)file.length()];
-    								fin.read(tmp);
-    								fin.close();
-    							} catch (FileNotFoundException e) {
-    								logger.error(e.getMessage(), e);
-    							} catch (IOException e) {
-    								logger.error(e.getMessage(), e);
-    							}
-    							
-    							Serializable[] data = {binaryTimestamp, remoteBinaryName, tmp};
-    							if(!dataProcessed(System.currentTimeMillis(), data)) {
-    								logger.warn("The binary data  (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") could not be stored in the database.");
-    							}
-    							else
-    								logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored in database");
-    							
-    							file.delete();
-    						}
-    						else {
-    							String relLocalName = "./" + localBinaryName.replaceAll(localFileDir, "");
-    							Serializable[] data = {binaryTimestamp, remoteBinaryName, relLocalName};
-    							if(!dataProcessed(System.currentTimeMillis(), data)) {
-    								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
-    							}
-    							logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored on disk");
-    						}
-    					
-    						File stat = new File(propertyFileName);
-    						stat.delete();
-    						
-    						localBinaryName = null;
-    						lastChunkNumber = -1;
-    					}
-    					else {
-    						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request file retransmission");
-    						calculatedCRC.reset();
-    						getSpecificFile(remoteBinaryName, 0, 0);
-    						continue;
-    					}
+    				if (lastChunkNumber == -1) {
+    					logger.debug("crc packet already received -> drop it");
     				}
     				else {
-    					// we should never reach this point as well...
-    					logger.error("binary length does not match (actual length=" + (new File(localBinaryName)).length() + "/should be=" + binaryLength + ") -> drop this file (should never happen!)");
-    					getNewFile();
-    					continue;
-    				}
+	    				// do we really have the whole file?
+	    				if ((new File(localBinaryName)).length() == binaryLength) {
+	    					// check crc
+	    					if (calculatedCRC.getValue() == crc) {
+	    						logger.debug("crc is correct");
+	    						if (storeInDatabase) {
+	    							byte[] tmp = null;
+	    							File file = new File(localBinaryName);
+	    							FileInputStream fin;
+	    							
+	    							try {
+	    								fin = new FileInputStream(file);
+	    								// find index of first null byte
+	    								tmp = new byte[(int)file.length()];
+	    								fin.read(tmp);
+	    								fin.close();
+	    							} catch (FileNotFoundException e) {
+	    								logger.error(e.getMessage(), e);
+	    							} catch (IOException e) {
+	    								logger.error(e.getMessage(), e);
+	    							}
+	    							
+	    							Serializable[] data = {binaryTimestamp, remoteBinaryName, tmp};
+	    							if(!dataProcessed(System.currentTimeMillis(), data)) {
+	    								logger.warn("The binary data  (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") could not be stored in the database.");
+	    							}
+	    							else
+	    								logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored in database");
+	    							
+	    							file.delete();
+	    						}
+	    						else {
+	    							String relLocalName = "./" + localBinaryName.replaceAll(localFileDir, "");
+	    							Serializable[] data = {binaryTimestamp, remoteBinaryName, relLocalName};
+	    							if(!dataProcessed(System.currentTimeMillis(), data)) {
+	    								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
+	    							}
+	    							logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored on disk");
+	    						}
+	    					
+	    						File stat = new File(propertyFileName);
+	    						stat.delete();
+	    						
+	    						localBinaryName = null;
+	    						lastChunkNumber = -1;
+	    					}
+	    					else {
+	    						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request file retransmission");
+	    						calculatedCRC.reset();
+	    						getSpecificFile(remoteBinaryName, 0, 0);
+	    						continue;
+	    					}
+	    				}
+	    				else {
+	    					// we should never reach this point as well...
+	    					logger.error("binary length does not match (actual length=" + (new File(localBinaryName)).length() + "/should be=" + binaryLength + ") -> drop this file (should never happen!)");
+	    					getNewFile();
+	    					continue;
+	    				}
+	    			}
     			}
     		} catch (Exception e) {
     			// something is very wrong -> get the next file
