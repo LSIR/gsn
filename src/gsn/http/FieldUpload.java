@@ -3,7 +3,6 @@ package gsn.http;
 import gsn.Mappings;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.StreamElement;
-import gsn.storage.PoolIsFullException;
 import gsn.vsensor.AbstractVirtualSensor;
 
 import java.io.IOException;
@@ -108,8 +107,6 @@ public class FieldUpload extends HttpServlet {
 			    try {
 			    	vs = Mappings.getVSensorInstanceByVSName( vsname ).borrowVS( );
 			    	vs.dataFromWeb( cmd , paramNames.toArray(new String[]{}) , paramValues.toArray(new Serializable[]{}) );
-			    } catch ( PoolIsFullException e ) {
-			      logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
 			    } catch ( VirtualSensorInitializationFailedException e ) {
 			      logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
 			    } finally {
