@@ -52,14 +52,19 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
    
 	class ChartGenerator extends Thread
 	{
-		private boolean stopped = false;		
-		private Object event = new Object();
+		private boolean stopped = false;
+		private Boolean event = new Boolean(false);
 		
 		public void run() {
 			while (!stopped) {
 				try {
-					event.wait();
-					Thread.sleep(5000);
+					synchronized (event) {
+						while (!event) {
+							event.wait();
+						}
+						event = false;
+					}
+					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 					break;
 				}			
@@ -103,6 +108,7 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
 		
 		public void trigger() {
 			synchronized (event) {
+				event = true;
 				event.notify();
 			}
 		}
