@@ -29,6 +29,7 @@ public class VSensorConfig implements Serializable {
 
 	private String                                 description;
 
+    @Deprecated
 	private int                                    lifeCyclePoolSize                         = DEFAULT_POOL_SIZE;
 
 	private int                                    outputStreamRate;
@@ -107,6 +108,7 @@ public class VSensorConfig implements Serializable {
 	}
 
 	/**
+     * @Deprecated
 	 * @return Returns the lifeCyclePoolSize.
 	 */
 	public int getLifeCyclePoolSize ( ) {
@@ -182,6 +184,7 @@ public class VSensorConfig implements Serializable {
 	}
 
 	/**
+     * @Deprecated
 	 * @param lifeCyclePoolSize The lifeCyclePoolSize to set.
 	 */
 	public void setLifeCyclePoolSize ( final int lifeCyclePoolSize ) {
@@ -376,7 +379,7 @@ public class VSensorConfig implements Serializable {
 		}
 		builder.append( "]" );
 		return "VSensorConfig{" + "name='" + this.name + '\'' + ", priority=" + this.priority + ", mainClass='" + this.mainClass + '\'' 
-		+ ", description='" + this.description + '\'' + ", lifeCyclePoolSize=" + this.lifeCyclePoolSize + ", outputStreamRate=" + this.outputStreamRate
+		+ ", description='" + this.description + '\'' + ", outputStreamRate=" + this.outputStreamRate
 		+ ", addressing=" + this.addressing + ", outputStructure=" + this.outputStructure + ", storageHistorySize='" + this.storageHistorySize + '\'' + builder.toString( )
 		+ ", mainClassInitialParams=" + this.mainClassInitialParams + ", lastModified=" + this.lastModified + ", fileName='" + this.fileName + '\'' + ", logger=" + this.logger + ", nameInitialized="
 		+ this.nameInitialized + ", isStorageCountBased=" + this.isStorageCountBased + ", parsedStorageSize=" + this.parsedStorageSize + '}';

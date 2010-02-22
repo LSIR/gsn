@@ -25,6 +25,7 @@
        <collection name="output-structure"   field="outputStructure"  item-type="gsn.beans.DataField" />
        </structure>
        <value name="description" field="description"  usage="optional"/>
+       <!-- life-cycle and its content is deprecated -->
        <structure name="life-cycle"  usage="optional">  
           <value name="pool-size"  field="lifeCyclePoolSize" style="attribute" />
        </structure>
