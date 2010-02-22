@@ -268,7 +268,7 @@ class ChartInfoBackLog {
     * 
     * @param streamElement
     */
-   public synchronized void addData ( StreamElement streamElement ) {
+   public void addData ( StreamElement streamElement ) {
 	   for ( int i = 0 ; i < streamElement.getFieldNames( ).length ; i++ ) {
 		   if (timeStreamName != null && timeStreamName.equalsIgnoreCase(streamElement.getFieldNames( )[ i ])) continue;
 		   if (streamElement.getData()[i] == null) continue;
@@ -297,7 +297,7 @@ class ChartInfoBackLog {
     * 
     * @return Returns the byteArrayOutputStream.
     */
-   public synchronized ByteArrayOutputStream writePlot ( ) {
+   public ByteArrayOutputStream writePlot ( ) {
       if ( !changed ) return byteArrayOutputStream;
       byteArrayOutputStream.reset( );
       try {
