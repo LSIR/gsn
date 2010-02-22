@@ -73,7 +73,7 @@ public class TestVSensorLoader {
 		File someFile = File.createTempFile("bla", ".xml");
 		sensorConfig.setMainClass("gsn.vsensor.BridgeVirtualSensor");
 		sensorConfig.setFileName(someFile.getAbsolutePath());
-		VirtualSensorPool pool = new VirtualSensorPool(sensorConfig);
+		VirtualSensor pool = new VirtualSensor(sensorConfig);
 		InputStream is = new InputStream();
 		is.setInputStreamName("t1");
 		is.setQuery("select * from my-stream1");

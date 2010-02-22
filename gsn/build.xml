@@ -57,18 +57,11 @@
       <condition property="java6">
         <equals arg1="${ant.java.version}" arg2="1.6"/> 
       </condition>
-      <copy todir="${build.dir}/org/apache">
-         <fileset dir="${src.dir}/org/apache"/>
-      </copy>
-      <copy todir="${build.dir}/gsn/gui/templates">
-         <fileset dir="${src.dir}/gsn/gui/templates"/>
-      </copy>
-      <copy todir="${build.dir}/META-INF">
-         <fileset dir="${src.dir}/META-INF"/>
-      </copy>
-      <copy todir="${build.dir}/gsn/gui/resources">
-         <fileset dir="${src.dir}/gsn/gui/resources"/>
-      </copy>
+      <copydir  dest="${build.dir}/org/apache" src="${src.dir}/org/apache"/>
+      <copydir  dest="${build.dir}/org/apache" src="${src.dir}/org/apache"/>
+	<!-- <copydir  dest="${build.dir}/gsn/gui/templates" src="${src.dir}/gsn/gui/templates"/> -->
+   	<copydir  dest="${build.dir}/META-INF" src="${src.dir}/META-INF"/>
+        <!-- <copydir dest="${build.dir}/gsn/gui/resources" src="${src.dir}/gsn/gui/resources"/> -->
    </target>
  
      

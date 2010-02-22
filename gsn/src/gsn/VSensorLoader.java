@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -119,7 +118,7 @@ public class VSensorLoader extends Thread {
 			if (!isVirtualSensorValid(vs))
 				continue ;
 
-			VirtualSensorPool pool = new VirtualSensorPool ( vs );
+			VirtualSensor pool = new VirtualSensor( vs );
 			try {
 				if ( createInputStreams (  pool ) == false ) {
 					logger.error ( "loading the >" + vs.getName() + "< virtual sensor is stoped due to error(s) in preparing the input streams." );
@@ -172,7 +171,7 @@ public class VSensorLoader extends Thread {
 
 	private void removeVirtualSensor(VSensorConfig configFile) {
 		logger.warn ( new StringBuilder ( ).append ( "removing : " ).append ( configFile.getName ( ) ).toString ( ) );
-		VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile.getFileName ( ) );
+		VirtualSensor sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile.getFileName ( ) );
 		Mappings.removeFilename ( configFile.getFileName ( ) );
 		removeAllVSResources ( sensorInstance );
 	}
@@ -222,7 +221,7 @@ public class VSensorLoader extends Thread {
 		return valid;
 	}
 
-	public void removeAllVSResources ( VirtualSensorPool pool ) {
+	public void removeAllVSResources ( VirtualSensor pool ) {
 		VSensorConfig config = pool.getConfig ( );
 		pool.closePool ( );
 		final String vsensorName = config.getName ( );
@@ -297,7 +296,7 @@ public class VSensorLoader extends Thread {
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public boolean createInputStreams ( VirtualSensorPool pool ) throws InstantiationException, IllegalAccessException {
+	public boolean createInputStreams ( VirtualSensor pool ) throws InstantiationException, IllegalAccessException {
 		if ( logger.isDebugEnabled ( ) ) logger.debug ( new StringBuilder ( ).append ( "Preparing input streams for: " ).append ( pool.getConfig().getName ( ) ).toString ( ) );
 		if ( pool.getConfig().getInputStreams ( ).size ( ) == 0 ) logger.warn ( new StringBuilder ( "There is no input streams defined for *" ).append ( pool.getConfig().getName ( ) ).append ( "*" ).toString ( ) );
 		for ( Iterator < InputStream > inputStreamIterator = pool.getConfig().getInputStreams ( ).iterator ( ) ; inputStreamIterator.hasNext ( ) ; ) {
@@ -377,7 +376,7 @@ public class VSensorLoader extends Thread {
 		this.isActive = false;
 		this.interrupt ( );
 		for ( String configFile : Mappings.getAllKnownFileName ( ) ) {
-			VirtualSensorPool sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile );
+			VirtualSensor sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile );
 			removeAllVSResources ( sensorInstance );
 			logger.warn ( "Removing the resources associated with : " + sensorInstance.getConfig ( ).getFileName ( ) + " [done]." );
 		}
