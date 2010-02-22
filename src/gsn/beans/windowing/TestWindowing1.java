@@ -4,8 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import gsn.VirtualSensor;
 import gsn.VirtualSensorInitializationFailedException;
-import gsn.VirtualSensorPool;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.InputStream;
@@ -195,7 +196,7 @@ public class TestWindowing1 {
 		config.setFileName("dummy-vs-file");
 		assertTrue(config.validate());
 
-		VirtualSensorPool pool = new VirtualSensorPool(config);
+		VirtualSensor pool = new VirtualSensor(config);
 		is.setPool(pool);
 		if (sm.tableExists(config.getName()))
 			sm.executeDropTable(config.getName());
@@ -273,7 +274,7 @@ public class TestWindowing1 {
 		config.setFileName("dummy-vs-file");
 		assertTrue(config.validate());
 
-		VirtualSensorPool pool = new VirtualSensorPool(config);
+		VirtualSensor pool = new VirtualSensor(config);
 		is.setPool(pool);
 		if (sm.tableExists(config.getName()))
 			sm.executeDropTable(config.getName());
@@ -386,7 +387,7 @@ public class TestWindowing1 {
 		config.setFileName("dummy-vs-file");
 		assertTrue(config.validate());
 
-		VirtualSensorPool pool = new VirtualSensorPool(config);
+		VirtualSensor pool = new VirtualSensor(config);
 		is.setPool(pool);
 		if (sm.tableExists(config.getName()))
 			sm.executeDropTable(config.getName());
@@ -482,7 +483,7 @@ public class TestWindowing1 {
 		config.setFileName("dummy-vs-file");
 		assertTrue(config.validate());
 
-		VirtualSensorPool pool = new VirtualSensorPool(config);
+		VirtualSensor pool = new VirtualSensor(config);
 		is.setPool(pool);
 		if (sm.tableExists(config.getName()))
 			sm.executeDropTable(config.getName());
@@ -561,7 +562,7 @@ public class TestWindowing1 {
 		config.setFileName("dummy-vs-file");
 		assertTrue(config.validate());
 
-		VirtualSensorPool pool = new VirtualSensorPool(config);
+		VirtualSensor pool = new VirtualSensor(config);
 		is.setPool(pool);
 		if (sm.tableExists(config.getName()))
 			sm.executeDropTable(config.getName());
@@ -658,7 +659,7 @@ public class TestWindowing1 {
 		config.setFileName("dummy-vs-file");
 		assertTrue(config.validate());
 
-		VirtualSensorPool pool = new VirtualSensorPool(config);
+		VirtualSensor pool = new VirtualSensor(config);
 		is.setPool(pool);
 		if (sm.tableExists(config.getName()))
 			sm.executeDropTable(config.getName());
