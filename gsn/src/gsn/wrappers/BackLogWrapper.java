@@ -130,15 +130,22 @@ public class BackLogWrapper extends AbstractWrapper implements BackLogMessageLis
 			}
 
 			if (storage == null) {
+				
 				try {
 					StorageManager sm = getStorageManager();
-					sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_tinyint"));
-					sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_tinyint(number bigint) RETURNS tinyint BEGIN return number; END"));
-					sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_smallint"));
-					sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_smallint(number bigint) RETURNS smallint BEGIN return number; END"));
-					sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_integer"));
-					sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_integer(number bigint) RETURNS integer BEGIN return number; END"));
-					storage = sm;
+					if (StorageManager.getDatabaseForConnection(sm.getConnection()) == StorageManager.DATABASE.MYSQL) {
+						sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_tinyint"));
+						sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_tinyint(number bigint) RETURNS tinyint BEGIN return number; END"));
+						sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_smallint"));
+						sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_smallint(number bigint) RETURNS smallint BEGIN return number; END"));
+						sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_integer"));
+						sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_integer(number bigint) RETURNS integer BEGIN return number; END"));
+						storage = sm;
+					}
+					else {
+						logger.error("Currently only MySQL supported!");
+						return false;
+					}
 				} catch (SQLException e) {
 					logger.error("Could not add SQL cast functions", e);
 					return false;
