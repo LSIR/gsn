@@ -26,7 +26,7 @@ function updateTopology()
 {
 	var d = new Date();
 	for (var i in deployments) {
-	    $("#topology_"+deployments[i]).find("img").attr('src',"http://people.ee.ethz.ch/~perma/topology.php?host="+deployments[i]+"&date="+ d.getSeconds());
+	    $("#topology_"+deployments[i]).find("img").attr('src',"http://people.ee.ethz.ch/~perma/topology.php?host="+deployments[i]+"&date="+ d.getTime());
 	}
 }
 
@@ -68,15 +68,14 @@ $(document).ready(function() {
 		    "id":"topology_"+deployments[i]
 		      },
 		$.IMG({
-		    "id":"topology_img_"+deployments[i],
-		    "src":"http://people.ee.ethz.ch/~perma/topology.php?host="+deployments[i]
+		    "id":"topology_img_"+deployments[i]
 		})));
 	    if (i>0)
 		$("#topology_"+deployments[i]).hide();
 	    else
 		$("#topology_menu_"+deployments[i]).addClass("selected");
-
 	}
+	updateTopology();
 	
 });
 
