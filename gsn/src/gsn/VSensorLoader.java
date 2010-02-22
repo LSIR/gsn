@@ -6,7 +6,6 @@ import gsn.beans.InputStream;
 import gsn.beans.Modifications;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
-import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.WrappersUtil;
@@ -23,7 +22,7 @@ import org.apache.log4j.Logger;
 import org.jibx.runtime.JiBXException;
 
 public class VSensorLoader extends Thread {
-
+ 
 
 	public static final String                                     VSENSOR_POOL                        = "VSENSOR-POOL";
 
@@ -161,9 +160,6 @@ public class VSensorLoader extends Thread {
 				try {
 					fireVSensorLoading(pool.getConfig());
 					pool.start ( );
-				} catch ( PoolIsFullException e1 ) {
-					logger.error ( "Creating the virtual sensor >" + vs.getName ( ) + "< failed." , e1 );
-					continue;
 				} catch ( VirtualSensorInitializationFailedException e1 ) {
 					logger.error ( "Creating the virtual sensor >" + vs.getName ( ) + "< failed." , e1 );
 					removeVirtualSensor(vs);

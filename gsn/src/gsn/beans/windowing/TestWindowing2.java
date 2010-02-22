@@ -12,7 +12,6 @@ import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
-import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.vsensor.BridgeVirtualSensor;
 import gsn.wrappers.AbstractWrapper;
@@ -100,7 +99,7 @@ public class TestWindowing2 {
 	 * Testing time-based slide on each tuple (remote time-based)
 	 */
 	@Test
-	public void testTimeBasedWindow1() throws SQLException, PoolIsFullException, VirtualSensorInitializationFailedException {
+	public void testTimeBasedWindow1() throws SQLException, VirtualSensorInitializationFailedException {
 		InputStream is = new InputStream();
 		is.setQuery("select * from mystream");
 		StreamSource ss = new StreamSource().setAlias("mystream").setAddressing(addressing).setSqlQuery("select * from wrapper")
@@ -174,7 +173,7 @@ public class TestWindowing2 {
 	 * Testing time-based window-slide (remote time-based)
 	 */
 	@Test
-	public void testTimeBasedWindow2() throws SQLException, PoolIsFullException, VirtualSensorInitializationFailedException {
+	public void testTimeBasedWindow2() throws SQLException, VirtualSensorInitializationFailedException {
 		InputStream is = new InputStream();
 		is.setQuery("select * from mystream");
 		StreamSource ss = new StreamSource().setAlias("mystream").setAddressing(addressing).setSqlQuery("select * from wrapper")
@@ -274,7 +273,7 @@ public class TestWindowing2 {
 	 * Testing tuple-based-win-time-based-slide
 	 */
 	@Test
-	public void testTimeBasedWindow3() throws SQLException, PoolIsFullException, VirtualSensorInitializationFailedException {
+	public void testTimeBasedWindow3() throws SQLException, VirtualSensorInitializationFailedException {
 		InputStream is = new InputStream();
 		is.setQuery("select * from mystream");
 		StreamSource ss = new StreamSource().setAlias("mystream").setAddressing(addressing).setSqlQuery("select * from wrapper")

@@ -7,7 +7,6 @@ import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
-import gsn.storage.PoolIsFullException;
 import gsn.storage.SQLUtils;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
@@ -124,9 +123,6 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		AbstractVirtualSensor vs;
 		try {
 			vs = Mappings.getVSensorInstanceByVSName( vSensorConfig.getName( ) ).borrowVS( );
-		} catch ( PoolIsFullException e ) {
-			logger.warn( "Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
-			return false;
 		} catch ( VirtualSensorInitializationFailedException e ) {
 			logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
 			return false;
