@@ -1,6 +1,7 @@
 package gsn.wrappers.backlog.plugins;
 
 import org.apache.log4j.Logger;
+import org.h2.tools.Server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -17,6 +19,7 @@ import java.util.zip.CheckedInputStream;
 
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
+import gsn.storage.StorageManager;
 import gsn.wrappers.BackLogWrapper;
 
 
@@ -52,7 +55,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 
 	protected final transient Logger logger = Logger.getLogger( BigBinaryPlugin.class );
 	
-	private DataField[] dataField = null;
+	private DataField[] dataField = new DataField[] {new DataField("MODIFICATIONTIME", "BIGINT"),
+			   							new DataField("RELATIVEFILE", "VARCHAR(255)"),
+			   							new DataField("STORAGEDIRECTORY", "VARCHAR(255)"),
+			   							new DataField("DATA", "binary")};
 	
 	private LinkedBlockingQueue<Message> msgQueue = new LinkedBlockingQueue<Message>();
 	private String propertyFileName = null;
@@ -65,6 +71,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	protected String localBinaryName = null;
 	protected long downloadedSize = -1;
 	private long lastChunkNumber = -1;
+
+	private Server web;
 	
 	private CalculateChecksum calcChecksumThread;
 
@@ -75,6 +83,20 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		calcChecksumThread = new CalculateChecksum(this);
 
 		AddressBean addressBean = getActiveAddressBean();
+
+		try {
+			if (logger.isDebugEnabled() && StorageManager.getDatabaseForConnection(StorageManager.getInstance().getConnection()) == StorageManager.DATABASE.H2) {
+				try {
+					String [] args = {"-webPort", "8082", "-webAllowOthers", "false"};
+					web = Server.createWebServer(args);
+					web.start();
+				} catch (SQLException e) {
+					logger.warn(e.getMessage(), e);
+				}
+			}
+		} catch (SQLException e) {
+			logger.warn(e.getMessage(), e);
+		}
 		
 		String storage;
 		try {
@@ -87,18 +109,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		
 		folderdatetimefm = new SimpleDateFormat(addressBean.getPredicateValueWithDefault(FOLDER_DATE_TIME_FM, DEFAULT_FOLDER_DATE_TIME_FM));
 		
-		if (storage.equalsIgnoreCase("database")) {
+		if (storage.equalsIgnoreCase("database"))
 			storeInDatabase = true;
-			dataField = new DataField[] {new DataField("MODIFICATIONTIME", "BIGINT"),
-	  				   new DataField("REMOTEFILE", "VARCHAR(255)"),
-	  				   new DataField("DATA", "binary")};
-		}
-		else if (storage.equalsIgnoreCase("filesystem")) {
+		else if (storage.equalsIgnoreCase("filesystem"))
 			storeInDatabase = false;
-			dataField = new DataField[] {new DataField("MODIFICATIONTIME", "BIGINT"),
-					   new DataField("REMOTEFILE", "VARCHAR(255)"),
-					   new DataField("LOCALFILE", "VARCHAR(255)")};
-		}
 		else {
 			logger.error("the 'storage' predicate in the virtual sensor's configuration file has to be 'database' or 'filesystem'");
 			return false;
@@ -153,6 +167,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
+		if (web != null) {
+			web.shutdown();
+			web = null;
+		}
 		dispose = true;
 		msgQueue.add(new Message());
 	}
@@ -198,11 +216,19 @@ public class BigBinaryPlugin extends AbstractPlugin {
     			    	localBinaryName = localFileDir + TEMP_FILE_NAME;
     			    }
     			    else {
-	    			    String datedir = localFileDir + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
+    			    	String subpath = f.getParent();
+    			    	if (subpath == null	)
+    			    		subpath = "./";
+    			    	logger.debug("subpath: " + subpath);
+    					
+    					if(!subpath.endsWith("/"))
+    						subpath += "/";
+    			    	
+	    			    String datedir = localFileDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
 	    			    String filename = f.getName();
 	    			    f = new File(datedir);
 	    			    if (!f.exists()) {
-	    			    	if (!f.mkdir()) {
+	    			    	if (!f.mkdirs()) {
 	    			    		logger.error("could not mkdir >" + datedir + "<  -> drop remote file " + remoteBinaryName);
 	    			    		getNewFile();
 	    			    		continue;
@@ -297,8 +323,11 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    							} catch (IOException e) {
 	    								logger.error(e.getMessage(), e);
 	    							}
-	    							
-	    							Serializable[] data = {binaryTimestamp, remoteBinaryName, tmp};
+
+	    							String relDir = remoteBinaryName;
+	    							if (!relDir.startsWith("./"))
+	    								relDir = "./" + relDir;
+	    							Serializable[] data = {binaryTimestamp, relDir, null, tmp};
 	    							if(!dataProcessed(System.currentTimeMillis(), data)) {
 	    								logger.warn("The binary data  (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") could not be stored in the database.");
 	    							}
@@ -308,8 +337,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    							file.delete();
 	    						}
 	    						else {
-	    							String relLocalName = "./" + localBinaryName.replaceAll(localFileDir, "");
-	    							Serializable[] data = {binaryTimestamp, remoteBinaryName, relLocalName};
+	    							String relLocalName = localBinaryName.replaceAll(localFileDir, "");
+	    							if (!relLocalName.startsWith("./"))
+	    								relLocalName = "./" + relLocalName;
+	    							Serializable[] data = {binaryTimestamp, relLocalName, localFileDir, null};
 	    							if(!dataProcessed(System.currentTimeMillis(), data)) {
 	    								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
 	    							}
@@ -385,7 +416,15 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		    }
 		    else {
 			    File f = new File(remoteBinaryName);
-			    String datedir = localFileDir + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
+		    	String subpath = f.getParent();
+		    	if (subpath == null	)
+		    		subpath = "./";
+		    	logger.debug("subpath: " + subpath);
+				
+				if(!subpath.endsWith("/"))
+					subpath += "/";
+		    	
+			    String datedir = localFileDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
 			    String filename = f.getName();
 			    f = new File(datedir);
 			    localBinaryName = datedir + filename;
@@ -423,6 +462,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(remoteLocation.length() + 5);
 		baos.write(RESEND_PACKET);
 		baos.write(uint2arr(sizeAlreadyDownloaded));
+		baos.write(uint2arr(chunkNr));
 		baos.write(remoteLocation.getBytes());
 		byte [] pkt = baos.toByteArray();
 		lastChunkNumber = chunkNr;

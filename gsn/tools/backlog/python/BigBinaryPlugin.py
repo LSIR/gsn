@@ -15,6 +15,7 @@ from pyinotify import WatchManager, ThreadedNotifier, EventsCodes, ProcessEvent
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
+from string import join
 
 CHUNK_ACK_CHECK_SEC = 5
 
@@ -40,6 +41,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _lasttimestamp
     _work
     _crcAccepted
+    _prefix
     
     TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
     '''
@@ -48,10 +50,21 @@ class BigBinaryPluginClass(AbstractPluginClass):
         AbstractPluginClass.__init__(self, parent, options)
         self._parent = parent
         
-        paths = self.getOptionValues('path')
+        self._prefix = self.getOptionValue('prefix')
+        
+        directories = self.getOptionValues('directory')
 
-        if paths is None:
-            raise TypeError('no paths specified to watch')
+        if self._prefix is None:
+            raise TypeError('no prefix specified')
+        
+        if not self._prefix.endswith('/'):
+            self._prefix += '/'
+        
+        if not os.path.isdir(self._prefix):
+            raise TypeError('prefix >' + self._prefix + '< is not a directory')
+
+        if not directories:
+            directories.append('.')
 
         wm = WatchManager()
         self._notifier = ThreadedNotifier(wm, BinaryChangedProcessing(self))
@@ -60,21 +73,25 @@ class BigBinaryPluginClass(AbstractPluginClass):
         self._filedeque = deque()
         self._msgdeque = deque()
         
-        for pathname in paths:
-            if os.path.isdir(pathname):
-                # tell the watch manager which folders to watch for newly written files
-                wm.add_watch(pathname, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_CLOSE_WRITE'])
-                self.info('enable close-after-write notification for path ' + pathname)
+        filetime = []
+        for dir in directories:
+            pathname = os.path.join(self._prefix, dir)
+            pathname = os.path.normpath(pathname)
+            if not os.path.isdir(pathname):
+                os.makedirs(pathname)
                 
-                # check the paths for existing files which have to be sent
-                filetime = []
-                for root, dirs, files in os.walk(pathname):
-                    for filename in files:
-                        f = os.path.join(root, filename)
-                        time = os.stat(f).st_mtime
-                        filetime.append((time, f))
-            else:
-                self.warning(pathname + ' is not a path')
+            # tell the watch manager which folders to watch for newly written files
+            wm.add_watch(pathname, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_CLOSE_WRITE'])
+            self.info('enable close-after-write notification for path ' + pathname)
+            
+            files = os.listdir(pathname)
+            
+            # check the path for existing files which have to be sent
+            for filename in files:
+                f = os.path.join(pathname, filename)
+                if os.path.isfile(f):
+                    time = os.stat(f).st_mtime
+                    filetime.append((time, f))
         
         # sort the existing files by time
         filetime.sort()
@@ -141,10 +158,11 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     # what chunk number are we at
                     chunkNumber = int(struct.unpack('<I', message[5:9])[0])
                     # what is the name of the file to resend
-                    filename = struct.unpack(str(len(message)-9) + 's', message[9:len(message)])[0]
+                    filenamenoprefix = struct.unpack(str(len(message)-9) + 's', message[9:len(message)])[0]
+                    filename = os.path.join(self._prefix, filenamenoprefix)
                     self.debug('downloaded size: ' + str(downloaded))
                     self.debug('chunk number: ' + str(chunkNumber))
-                    self.debug('path: ' + filename)
+                    self.debug('file: ' + filename)
                     self.crcAccepted = False
                     
                     try:
@@ -201,13 +219,15 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         os.remove(filename)
                         continue
                     
-                    filenamelen = len(filename)
+                    filenamenoprefix = filename.replace(self._prefix, '')
+                    self.debug('filename without prefix: ' + filenamenoprefix)
+                    filenamelen = len(filenamenoprefix)
                     if filenamelen > 255:
                         filenamelen = 255
                     
                     chunkNumber = 0
-                    packet = struct.pack('<BqI', INIT_PACKET, os.stat(filename).st_mtime, filelen) 
-                    packet += struct.pack(str(filenamelen) + 'sx', filename)
+                    packet = struct.pack('<BqI', INIT_PACKET, os.stat(filename).st_mtime, filelen)
+                    packet += struct.pack(str(filenamelen) + 'sx', filenamenoprefix)
                     
                     self.debug('sending initial binary packet for ' + filedescriptor.name)
                 
@@ -215,7 +235,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 # or are we already sending chunks of a file?
                 else:
                     # read the next chunk out of the opened file
-                    chunk = filedescriptor.read(self._parent.gsnpeer.getMTU()-14)
+                    chunk = filedescriptor.read(self._parent.gsnpeer.getMTU()-20)
                     
                     if crc:
                         crc = zlib.crc32(chunk, crc)
