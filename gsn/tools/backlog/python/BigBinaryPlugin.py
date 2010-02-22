@@ -16,8 +16,6 @@ from pyinotify import WatchManager, ThreadedNotifier, EventsCodes, ProcessEvent
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
-CHUNK_SIZE_BYTES = 1000
-
 CHUNK_ACK_CHECK_SEC = 5
 
 INIT_PACKET = 0
@@ -35,6 +33,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
 
     '''
     data/instance attributes:
+    _parent
     _notifier
     _stopped
     _filedeque
@@ -47,6 +46,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
     
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options)
+        self._parent = parent
         
         paths = self.getOptionValues('path')
 
@@ -138,9 +138,12 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 elif type == RESEND_PACKET:
                     # how much of the file has already been downloaded
                     downloaded = int(struct.unpack('<I', message[1:5])[0])
+                    # what chunk number are we at
+                    chunkNumber = int(struct.unpack('<I', message[5:9])[0])
                     # what is the name of the file to resend
-                    filename = struct.unpack(str(len(message)-5) + 's', message[5:len(message)])[0]
+                    filename = struct.unpack(str(len(message)-9) + 's', message[9:len(message)])[0]
                     self.debug('downloaded size: ' + str(downloaded))
+                    self.debug('chunk number: ' + str(chunkNumber))
                     self.debug('path: ' + filename)
                     self.crcAccepted = False
                     
@@ -165,9 +168,6 @@ class BigBinaryPluginClass(AbstractPluginClass):
                                     crc = zlib.crc32(part)
                                 sizecalculated += len(part)
         
-                            # calculate chunk number
-                            chunkNumber = downloaded / CHUNK_SIZE_BYTES
-                            self.debug('calculated chunk number: ' + str(chunkNumber))
                             self.debug('recalculated crc: ' + str(crc))
                         else:
                             crc = None
@@ -215,7 +215,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 # or are we already sending chunks of a file?
                 else:
                     # read the next chunk out of the opened file
-                    chunk = filedescriptor.read(CHUNK_SIZE_BYTES)
+                    chunk = filedescriptor.read(self._parent.gsnpeer.getMTU()-14)
                     
                     if crc:
                         crc = zlib.crc32(chunk, crc)

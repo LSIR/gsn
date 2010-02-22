@@ -24,6 +24,9 @@ PING_ACK_CHECK_INTERVAL_SEC = 60.0
 
 SEND_QUEUE_SIZE = 25
 
+SOL_IP = 0
+IP_MTU = 14
+
 class GSNPeerClass(Thread):
     '''
     Offers the server functionality for GSN.
@@ -45,6 +48,7 @@ class GSNPeerClass(Thread):
     _backlogCounter
     _lock
     _stopped
+    _mtu
     '''
 
     def __init__(self, parent, port):
@@ -106,6 +110,8 @@ class GSNPeerClass(Thread):
             self._logger.info('listening on port ' + str(self._port))
             try:
                 (self.clientsocket, self._clientaddr) = self._serversocket.accept()
+                self._mtu = self.clientsocket.getsockopt(SOL_IP, IP_MTU)
+                self._logger.debug('MTU of client socket is ' + str(self._mtu))
                 self.connected = True
             except socket.error, e:
                 if not self._stopped:
@@ -201,6 +207,13 @@ class GSNPeerClass(Thread):
             
     def isConnected(self):
         return self.connected
+    
+    
+    def getMTU(self):
+        if self.connected:
+            return self._mtu
+        else:
+            return None
 
 
     def sendToGSN(self, msg, resend=False):
