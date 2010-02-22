@@ -7,8 +7,6 @@ import gsn.utils.ParamParser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeMap;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -24,21 +22,6 @@ import org.jfree.data.time.FixedMillisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 
-/**
- * The plot should be introduced in the init-param part of the configuration
- * file in which this virtual sensor is used. The paramter name is PLOT and the
- * value should have the following syntax
- * INPUT_STREAM_VAR_NAME:CHART_NAME[TYPE@SIZE]{WIDTH;HEIGHT} The typcal values
- * for width and height are 640 and 480. The Size means how many values the
- * system should use for plotting the diagram. <br>
- * VERY IMPORTANT : THIS A GENERAL PLOT DRAWING VIRTUAL SENSOR AND NOT
- * MEMORY/CPU FRIENDLY. ONE CAN USE THIS VIRTUAL SENSOR AS A STARTING POINT FOR
- * WRITING MORE ADVANCED AND OPTIMIZED CHART DRAWING PACKAGES. <br>
- * VERY IMPORTANT : IN THIS IMPLEMENTATION, THE LARGER THE SIZE OF THE HISTORY
- * USED FOR DRAWING, THE BIGGER THE OUTPUT PLOT SIZE (IN KILOBYTES) AND THE
- * HIGHER PROCESSING TIME.
- * 
- */
 public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
    
    private final transient Logger logger = Logger.getLogger( this.getClass() );
@@ -46,15 +29,12 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
    private final HashMap < String , ChartInfoBackLog > input_stream_name_to_ChartInfo_map = 
 	   new HashMap < String , ChartInfoBackLog >( );
    
-   private Timer timer;
-   private Boolean triggered = false;
-   private Boolean running = false;
+   private ChartGenerator generator;
    
    public boolean initialize ( ) {
       TreeMap <  String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
       ChartInfoBackLog chartInfo = new ChartInfoBackLog( );
-      chartInfo.setInputStreamName( params.get( "input-stream" ) );
-      
+      chartInfo.setInputStreamName( params.get( "input-stream" ) );      
       chartInfo.setPlotTitle( params.get( "title" ) );
       chartInfo.setHeight( ParamParser.getInteger( params.get( "height" ) , 480 ) );
       chartInfo.setWidth( ParamParser.getInteger( params.get( "width" ) , 640 ) );
@@ -64,59 +44,72 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
       chartInfo.setLogVerticalAxis( params.get( "log-vertical-axis" ) == null ? false : true );
       input_stream_name_to_ChartInfo_map.put( chartInfo.getInputStreamName( ) , chartInfo );
       chartInfo.initialize( );
-      timer = new Timer();
-      timer.scheduleAtFixedRate(new ChartGenerator(), 30000, 30000);
+      generator = new ChartGenerator();
+      generator.setPriority(Thread.MIN_PRIORITY);
+      generator.start();
       return true;
    }
    
-	class ChartGenerator extends TimerTask {
+	class ChartGenerator extends Thread
+	{
+		private boolean stopped = false;		
+		private Object event = new Object();
+		
 		public void run() {
-			synchronized (running) {
-				if (running) return;
-				synchronized (triggered) {
-					if (!triggered) return;
-					running = true;
+			while (!stopped) {
+				try {
+					event.wait();
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					break;
+				}			
+				
+				String [ ] fieldNames = input_stream_name_to_ChartInfo_map.keySet( ).toArray( new String [ ] {} );
+				Byte [ ] fieldTypes = new Byte [ fieldNames.length ];
+				Serializable [ ] charts = new Serializable [ fieldNames.length ];
+				for ( int i = 0 ; i < fieldTypes.length ; i++ ) {
+					/**
+					 * We set the type of the output stream element to Types.Binary because
+					 * we are producing images.
+					 */
+					fieldTypes[ i ] = DataTypes.BINARY;
 				}
-			}
-			
-			String [ ] fieldNames = input_stream_name_to_ChartInfo_map.keySet( ).toArray( new String [ ] {} );
-			Byte [ ] fieldTypes = new Byte [ fieldNames.length ];
-			Serializable [ ] charts = new Serializable [ fieldNames.length ];
-			for ( int i = 0 ; i < fieldTypes.length ; i++ ) {
 				/**
-				 * We set the type of the output stream element to Types.Binary because
-				 * we are producing images.
+				 * Creating an stream element with the specified fieldnames, fieldtypes
+				 * and using the current time as the timestamp of the stream element.
 				 */
-				fieldTypes[ i ] = DataTypes.BINARY;
-			}
-			/**
-			 * Creating an stream element with the specified fieldnames, fieldtypes
-			 * and using the current time as the timestamp of the stream element.
-			 */
 
-			/**
-			 * In here our stream element's relation contains just one row of data and
-			 * it's filled using the binary data which contains the plots. Note that
-			 * this virtual sensor plots one diagram for each InputStreamName. Also
-			 * Note that, each InputStreamName can have one or more variables inside
-			 * it's stream elements's relation thus having one plot for several
-			 * variables.
-			 */
+				/**
+				 * In here our stream element's relation contains just one row of data and
+				 * it's filled using the binary data which contains the plots. Note that
+				 * this virtual sensor plots one diagram for each InputStreamName. Also
+				 * Note that, each InputStreamName can have one or more variables inside
+				 * it's stream elements's relation thus having one plot for several
+				 * variables.
+				 */
 
-			for ( int i = 0 ; i < fieldNames.length ; i++ ) {
-				ChartInfoBackLog chart = input_stream_name_to_ChartInfo_map.get( fieldNames[ i ] );
-				charts[ i ] = chart.writePlot( ).toByteArray( );
-			}
-			StreamElement output = new StreamElement( fieldNames , fieldTypes , charts , System.currentTimeMillis( ) );
+				for ( int i = 0 ; i < fieldNames.length ; i++ ) {
+					ChartInfoBackLog chart = input_stream_name_to_ChartInfo_map.get( fieldNames[ i ] );
+					charts[ i ] = chart.writePlot( ).toByteArray( );
+				}
+				StreamElement output = new StreamElement( fieldNames , fieldTypes , charts , System.currentTimeMillis( ) );
 
-			/**
-			 * Informing container about existance of a stream element.
-			 */
-			dataProduced( output );
-			
-			synchronized (running) {
-				running = false;
+				/**
+				 * Informing container about existance of a stream element.
+				 */
+				dataProduced( output );
 			}
+		}
+		
+		public void trigger() {
+			synchronized (event) {
+				event.notify();
+			}
+		}
+		
+		public void interrupt() {
+			stopped = true;
+			super.interrupt();
 		}
 	}
 
@@ -144,13 +137,14 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
        */
       chartInfo.addData( streamElement );
       
-      synchronized (triggered) {
-    	  triggered = true;
-      }
+      generator.trigger();
    }
    
    public void dispose ( ) {
-	   timer.cancel();
+	   generator.interrupt();
+	   try {
+		   generator.join();
+	   } catch (InterruptedException e) { /* ignore */ }
    }
    
 }
@@ -281,7 +275,7 @@ class ChartInfoBackLog {
 			   if (timeStreamName != null)
 				   timeSeries.addOrUpdate( new FixedMillisecond( ((Long) streamElement.getData(timeStreamName)).longValue() ) , Double.parseDouble( streamElement.getData( )[ i ].toString( ) ) );
 			   else
-				   timeSeries.addOrUpdate( new FixedMillisecond( streamElement.getTimeStamp( ) ) , Double.parseDouble( streamElement.getData( )[ i ].toString( ) ) );        		 
+				   timeSeries.addOrUpdate( new FixedMillisecond( streamElement.getTimeStamp( ) ) , Double.parseDouble( streamElement.getData( )[ i ].toString( ) ) );
 		   } catch ( SeriesException e ) {
 			   logger.warn( e.getMessage( ) , e );
 		   }
