@@ -38,6 +38,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query"> select * from Rooftop_DozerAdcMux1_1396 </predicate>
+                    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

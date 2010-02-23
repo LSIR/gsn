@@ -2,10 +2,6 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="position_mapping" />
-            <param name="sensortype_mapping" />
-        </init-params>        
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT"/>
             <field name="GENERATIONTIME" type="BIGINT"/>
@@ -15,47 +11,147 @@
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME0" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME1" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME2" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME3" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME4" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME5" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME6" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_ID0" type="SMALLINT" />
-            <field name="PAYLOAD_EVENTLOG_ID1" type="SMALLINT" />
-            <field name="PAYLOAD_EVENTLOG_ID2" type="SMALLINT" />
-            <field name="PAYLOAD_EVENTLOG_ID3" type="SMALLINT" />
-            <field name="PAYLOAD_EVENTLOG_ID4" type="SMALLINT" />
-            <field name="PAYLOAD_EVENTLOG_ID5" type="SMALLINT" />
-            <field name="PAYLOAD_EVENTLOG_ID6" type="SMALLINT" />
-            <field name="PAYLOAD_EVENTLOG_TYPE0" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TYPE1" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TYPE2" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TYPE3" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TYPE4" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TYPE5" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TYPE6" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_VALUE0" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_VALUE1" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_VALUE2" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_VALUE3" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_VALUE4" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_VALUE5" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_VALUE6" type="INTEGER" />
+            <field name="EVENT_TIMESTAMP" type="BIGINT" />
+            <field name="EVENT_ID" type="SMALLINT" />
+            <field name="EVENT_TYPE" type="INTEGER" />
+            <field name="EVENT_VALUE" type="INTEGER" />
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerEventLogMsg) from ETZ rooftop deployment</description>
+    <description>Dozer messages (DozerEventLoggerMsg) from ETZ rooftop deployment in usable form</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Rooftop_DozerEventLogger_1396 </predicate>
+                    <predicate key="query">
+                        select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        PAYLOAD_EVENTLOG_TIME0, PAYLOAD_EVENTLOG_ID0, PAYLOAD_EVENTLOG_TYPE0, PAYLOAD_EVENTLOG_VALUE0
+                        from Rooftop_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID0 != -1
+                    </predicate>
+                    <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                    (GENERATIONTIME - (PAYLOAD_EVENTLOG_TIME0 * 1000)) as EVENT_TIMESTAMP,
+                    PAYLOAD_EVENTLOG_ID0 as EVENT_ID,
+                    PAYLOAD_EVENTLOG_TYPE0 as EVENT_TYPE,
+                    IF(PAYLOAD_EVENTLOG_TYPE0=0,NULL,PAYLOAD_EVENTLOG_VALUE0) as EVENT_VALUE from wrapper 
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">
+                        select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        PAYLOAD_EVENTLOG_TIME1, PAYLOAD_EVENTLOG_ID1, PAYLOAD_EVENTLOG_TYPE1, PAYLOAD_EVENTLOG_VALUE1
+                        from Rooftop_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID1 != -1
+                    </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                    (GENERATIONTIME - (PAYLOAD_EVENTLOG_TIME1 * 1000)) as EVENT_TIMESTAMP,
+                    PAYLOAD_EVENTLOG_ID1 as EVENT_ID,
+                    PAYLOAD_EVENTLOG_TYPE1 as EVENT_TYPE,
+                    IF(PAYLOAD_EVENTLOG_TYPE1=0,NULL,PAYLOAD_EVENTLOG_VALUE1) as EVENT_VALUE from wrapper 
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">
+                        select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        PAYLOAD_EVENTLOG_TIME2, PAYLOAD_EVENTLOG_ID2, PAYLOAD_EVENTLOG_TYPE2, PAYLOAD_EVENTLOG_VALUE2
+                        from Rooftop_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID2 != -1
+                    </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                    (GENERATIONTIME - (PAYLOAD_EVENTLOG_TIME2 * 1000)) as EVENT_TIMESTAMP,
+                    PAYLOAD_EVENTLOG_ID2 as EVENT_ID,
+                    PAYLOAD_EVENTLOG_TYPE2 as EVENT_TYPE,
+                    IF(PAYLOAD_EVENTLOG_TYPE2=0,NULL,PAYLOAD_EVENTLOG_VALUE2) as EVENT_VALUE from wrapper 
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data3">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">
+                        select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        PAYLOAD_EVENTLOG_TIME3, PAYLOAD_EVENTLOG_ID3, PAYLOAD_EVENTLOG_TYPE3, PAYLOAD_EVENTLOG_VALUE3
+                        from Rooftop_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID3 != -1
+                    </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                    (GENERATIONTIME - (PAYLOAD_EVENTLOG_TIME3 * 1000)) as EVENT_TIMESTAMP,
+                    PAYLOAD_EVENTLOG_ID3 as EVENT_ID,
+                    PAYLOAD_EVENTLOG_TYPE3 as EVENT_TYPE,
+                    IF(PAYLOAD_EVENTLOG_TYPE3=0,NULL,PAYLOAD_EVENTLOG_VALUE3) as EVENT_VALUE from wrapper 
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data4">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">
+                        select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        PAYLOAD_EVENTLOG_TIME4, PAYLOAD_EVENTLOG_ID4, PAYLOAD_EVENTLOG_TYPE4, PAYLOAD_EVENTLOG_VALUE4
+                        from Rooftop_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID4 != -1
+                    </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                    (GENERATIONTIME - (PAYLOAD_EVENTLOG_TIME4 * 1000)) as EVENT_TIMESTAMP,
+                    PAYLOAD_EVENTLOG_ID4 as EVENT_ID,
+                    PAYLOAD_EVENTLOG_TYPE4 as EVENT_TYPE,
+                    IF(PAYLOAD_EVENTLOG_TYPE4=0,NULL,PAYLOAD_EVENTLOG_VALUE4) as EVENT_VALUE from wrapper 
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data5">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">
+                        select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        PAYLOAD_EVENTLOG_TIME5, PAYLOAD_EVENTLOG_ID5, PAYLOAD_EVENTLOG_TYPE5, PAYLOAD_EVENTLOG_VALUE5
+                        from Rooftop_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID5 != -1
+                    </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                    (GENERATIONTIME - (PAYLOAD_EVENTLOG_TIME5 * 1000)) as EVENT_TIMESTAMP,
+                    PAYLOAD_EVENTLOG_ID5 as EVENT_ID,
+                    PAYLOAD_EVENTLOG_TYPE5 as EVENT_TYPE,
+                    IF(PAYLOAD_EVENTLOG_TYPE5=0,NULL,PAYLOAD_EVENTLOG_VALUE5) as EVENT_VALUE from wrapper 
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data6">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">
+                        select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        PAYLOAD_EVENTLOG_TIME6, PAYLOAD_EVENTLOG_ID6, PAYLOAD_EVENTLOG_TYPE6, PAYLOAD_EVENTLOG_VALUE6
+                        from Rooftop_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID6 != -1
+                    </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                    (GENERATIONTIME - (PAYLOAD_EVENTLOG_TIME6 * 1000)) as EVENT_TIMESTAMP,
+                    PAYLOAD_EVENTLOG_ID6 as EVENT_ID,
+                    PAYLOAD_EVENTLOG_TYPE6 as EVENT_TYPE,
+                    IF(PAYLOAD_EVENTLOG_TYPE6=0,NULL,PAYLOAD_EVENTLOG_VALUE6) as EVENT_VALUE from wrapper 
+                </query>
             </source>
             <query> select * from source </query>
         </stream>

@@ -29,7 +29,7 @@
             <field name="PAYLOAD_A0_20" type="INTEGER" />
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerAdcMux2Msg) from ETZ rooftop deployment</description>
+    <description>dozer messages (DozerAdcMux2Msg) from ETZ rooftop deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -38,6 +38,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query"> select * from Rooftop_DozerAdcMux2_1396 </predicate>
+                    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
