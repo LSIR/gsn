@@ -48,7 +48,6 @@ public abstract class AbstractPlugin extends Thread {
 	
 	public void start() {
         pluginThread = new Thread(this);
-        pluginThread.setName(getPluginName());
         pluginThread.start();
     }
 	
