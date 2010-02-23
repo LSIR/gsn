@@ -25,10 +25,34 @@ import gsn.storage.StorageManager;
 import gsn.wrappers.BackLogWrapper;
 
 
+
 /**
+ * This plugin offers the functionality to download binaries from a deployment
+ * in the size of up to 4GB. The binaries will be sent in chunks. Thus, no significant
+ * interrupts of other plugin traffic is guaranteed. In case of a connection loss,
+ * the download of the actual binary will be resumed as soon
+ * as GSN reconnects to the deployment. The downloaded binaries
+ * can be stored on disk or in the database. The first happens if 'storage=filesystem'
+ * (defined in the virtual sensor's XML file) is set. The second, if
+ * 'storage=database' is set (only use the second option if the binaries are not too big,
+ * or install a lot of RAM).
+ * <p>
+ * The 'storage-directory' predicate (defined in the virtual sensor's XML file) has
+ * to be used to specify the storage location. If the binaries are stored in the
+ * database the directory is only used to store the partly downloaded binary. If
+ * the binaries are stored on disk, it defines the root directory in which the
+ * binaries will be stored.
+ * <p>
+ * If the binaries should be stored on disk the same folder structure as on side of
+ * the deployment is used. In addition to that the binaries are separated into subfolders
+ * named and sorted after the binaries modification time. The needed resolution of separation
+ * can be specified in the virtual sensor's XML file using the 'folder-date-time-fm'
+ * predicate. It defines the format (and with it the separation of the binaries based
+ * on their modification time) of the folder naming. For formatting issues please
+ * refer to {@link SimpleDateFormat}.
  * 
  * @author Tonio Gsell
- * 
+ * <p>
  * TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
  */
 public class BigBinaryPlugin extends AbstractPlugin {
@@ -36,13 +60,13 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	private static final String STORAGE_DIRECTORY = "storage-directory";
 	private static final String FOLDER_DATE_TIME_FM = "folder-date-time-fm";
 	
-	private static final String PROPERTY_REMOTE_FILE = "remote_file";
+	private static final String PROPERTY_REMOTE_BINARY = "remote_binary";
 	private static final String PROPERTY_DOWNLOADED_SIZE = "downloaded_size";
-	private static final String PROPERTY_FILE_TIMESTAMP = "timestamp";
-	private static final String PROPERTY_FILE_SIZE = "file_size";
+	private static final String PROPERTY_BINARY_TIMESTAMP = "timestamp";
+	private static final String PROPERTY_BINARY_SIZE = "file_size";
 	protected static final String PROPERTY_CHUNK_NUMBER = "chunk_number";
 	
-	private static final String TEMP_FILE_NAME = "binaryplugin_download.part";
+	private static final String TEMP_BINARY_NAME = "binaryplugin_download.part";
 	private static final String DEFAULT_FOLDER_DATE_TIME_FM = "yyyy-MM-dd";
 	private static final String PROPERTY_FILE_NAME = ".gsnBinaryStat";
 
@@ -53,7 +77,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	
 	private SimpleDateFormat folderdatetimefm;
 
-	private String localFileDir;
+	private String localBinaryDir;
 
 	protected final transient Logger logger = Logger.getLogger( BigBinaryPlugin.class );
 	
@@ -81,6 +105,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	private CalculateChecksum calcChecksumThread;
 
 	private boolean dispose = false;
+	
 	
 	public boolean initialize ( BackLogWrapper backLogWrapper ) {
 		super.initialize(backLogWrapper);
@@ -116,7 +141,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		String storage;
 		try {
 			storage = addressBean.getPredicateValueWithException(STORAGE);
-			localFileDir = addressBean.getPredicateValueWithException(STORAGE_DIRECTORY);
+			localBinaryDir = addressBean.getPredicateValueWithException(STORAGE_DIRECTORY);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return false;
@@ -133,25 +158,25 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			return false;
 		}
 			
-		if(!localFileDir.endsWith("/"))
-			localFileDir += "/";
+		if(!localBinaryDir.endsWith("/"))
+			localBinaryDir += "/";
 		
-		File f = new File(localFileDir);
+		File f = new File(localBinaryDir);
 		if (!f.isDirectory()) {
-			logger.error(localFileDir + " is not a directory");
+			logger.error(localBinaryDir + " is not a directory");
 			return false;
 		}
 		
 		if (!f.canWrite()) {
-			logger.error(localFileDir + " is not writable");
+			logger.error(localBinaryDir + " is not writable");
 			return false;
 		}
 		
-		propertyFileName = localFileDir + PROPERTY_FILE_NAME;
+		propertyFileName = localBinaryDir + PROPERTY_FILE_NAME;
 		
 		logger.debug("property file name: " + propertyFileName);
 		logger.debug("storage type: " + storage);
-		logger.debug("local file directory: " + localFileDir);
+		logger.debug("local binary directory: " + localBinaryDir);
 
         setName(getPluginName() + "-Thread" + (++threadCounter));
 		
@@ -224,7 +249,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				}
     				remoteBinaryName = name.toString();
     	
-    				logger.debug("new incoming binary file:");
+    				logger.debug("new incoming binary:");
     				logger.debug("   remote binary name: " + remoteBinaryName);
     				logger.debug("   timestamp of the binary: " + binaryTimestamp);
     				logger.debug("   binary length: " + binaryLength);
@@ -232,7 +257,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     			    File f = new File(remoteBinaryName);
     			    
     			    if (storeInDatabase) {
-    			    	localBinaryName = localFileDir + TEMP_FILE_NAME;
+    			    	localBinaryName = localBinaryDir + TEMP_BINARY_NAME;
     			    }
     			    else {
     			    	String subpath = f.getParent();
@@ -243,13 +268,13 @@ public class BigBinaryPlugin extends AbstractPlugin {
     					if(!subpath.endsWith("/"))
     						subpath += "/";
     			    	
-	    			    String datedir = localFileDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
+	    			    String datedir = localBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
 	    			    String filename = f.getName();
 	    			    f = new File(datedir);
 	    			    if (!f.exists()) {
 	    			    	if (!f.mkdirs()) {
-	    			    		logger.error("could not mkdir >" + datedir + "<  -> drop remote file " + remoteBinaryName);
-	    			    		getNewFile();
+	    			    		logger.error("could not mkdir >" + datedir + "<  -> drop remote binary " + remoteBinaryName);
+	    			    		getNewBinary();
 	    			    		continue;
 	    			    	}
 	    			    }
@@ -261,15 +286,15 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				// delete the file if it already exists
     				f = new File(localBinaryName);
     			    if (f.exists()) {
-    			    	logger.debug("overwrite already existing file >" + localBinaryName + "<");
+    			    	logger.debug("overwrite already existing binary >" + localBinaryName + "<");
     			    	f.delete();
     			    }
     	
-    			    // write the new file info to the property file
-    				configFile.setProperty(PROPERTY_REMOTE_FILE, remoteBinaryName);
+    			    // write the new binary info to the property file
+    				configFile.setProperty(PROPERTY_REMOTE_BINARY, remoteBinaryName);
     				configFile.setProperty(PROPERTY_DOWNLOADED_SIZE, Long.toString(0));
-    				configFile.setProperty(PROPERTY_FILE_TIMESTAMP, Long.toString(binaryTimestamp));
-    				configFile.setProperty(PROPERTY_FILE_SIZE, Long.toString(binaryLength));
+    				configFile.setProperty(PROPERTY_BINARY_TIMESTAMP, Long.toString(binaryTimestamp));
+    				configFile.setProperty(PROPERTY_BINARY_SIZE, Long.toString(binaryLength));
     				configFile.setProperty(PROPERTY_CHUNK_NUMBER, Long.toString(0));
     				
     				configFile.store(new FileOutputStream(propertyFileName), null);
@@ -295,7 +320,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     					fos.write(chunk);
     					fos.close();
     					filelen = file.length();
-    					// write the actual file length and chunk number to the property file
+    					// write the actual binary length and chunk number to the property file
     					// to be able to recover in case of a GSN failure
     					configFile.setProperty(PROPERTY_DOWNLOADED_SIZE, Long.toString(filelen));
     					configFile.setProperty(PROPERTY_CHUNK_NUMBER, Long.toString(chunknum));
@@ -303,8 +328,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				}
     				else {
     					// we should never reach this point...
-    					logger.error("received chunk number (received nr=" + chunknum + "/last nr=" + lastChunkNumber + ") out of order -> drop this file (should never happen!)");
-    					getNewFile();
+    					logger.error("received chunk number (received nr=" + chunknum + "/last nr=" + lastChunkNumber + ") out of order -> drop this binary (should never happen!)");
+    					getNewBinary();
     					continue;
     				}
     				
@@ -321,7 +346,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     					logger.debug("crc packet already received -> drop it");
     				}
     				else {
-	    				// do we really have the whole file?
+	    				// do we really have the whole binary?
 	    				if ((new File(localBinaryName)).length() == binaryLength) {
 	    					// check crc
 	    					if (calculatedCRC.getValue() == crc) {
@@ -356,10 +381,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    							file.delete();
 	    						}
 	    						else {
-	    							String relLocalName = localBinaryName.replaceAll(localFileDir, "");
+	    							String relLocalName = localBinaryName.replaceAll(localBinaryDir, "");
 	    							if (!relLocalName.startsWith("./"))
 	    								relLocalName = "./" + relLocalName;
-	    							Serializable[] data = {binaryTimestamp, relLocalName, localFileDir, null};
+	    							Serializable[] data = {binaryTimestamp, relLocalName, localBinaryDir, null};
 	    							if(!dataProcessed(System.currentTimeMillis(), data)) {
 	    								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
 	    							}
@@ -373,24 +398,24 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    						lastChunkNumber = -1;
 	    					}
 	    					else {
-	    						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request file retransmission");
+	    						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request binary retransmission");
 	    						calculatedCRC.reset();
-	    						getSpecificFile(remoteBinaryName, 0, 0);
+	    						getSpecificBinary(remoteBinaryName, 0, 0);
 	    						continue;
 	    					}
 	    				}
 	    				else {
 	    					// we should never reach this point as well...
-	    					logger.error("binary length does not match (actual length=" + (new File(localBinaryName)).length() + "/should be=" + binaryLength + ") -> drop this file (should never happen!)");
-	    					getNewFile();
+	    					logger.error("binary length does not match (actual length=" + (new File(localBinaryName)).length() + "/should be=" + binaryLength + ") -> drop this binary (should never happen!)");
+	    					getNewBinary();
 	    					continue;
 	    				}
 	    			}
     			}
     		} catch (Exception e) {
-    			// something is very wrong -> get the next file
+    			// something is very wrong -> get the next binary
     			logger.error(e.getMessage(), e);
-    			getNewFile();
+    			getNewBinary();
     			continue;
     		}
     		
@@ -423,15 +448,15 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				configFile.load(new FileInputStream(propertyFileName));
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
-				getNewFile();
+				getNewBinary();
 			}
-			remoteBinaryName = configFile.getProperty(PROPERTY_REMOTE_FILE);
+			remoteBinaryName = configFile.getProperty(PROPERTY_REMOTE_BINARY);
 			downloadedSize = Long.valueOf(configFile.getProperty(PROPERTY_DOWNLOADED_SIZE)).longValue();
-			binaryTimestamp = Long.valueOf(configFile.getProperty(PROPERTY_FILE_TIMESTAMP)).longValue();
-			binaryLength = Long.valueOf(configFile.getProperty(PROPERTY_FILE_SIZE)).longValue();
+			binaryTimestamp = Long.valueOf(configFile.getProperty(PROPERTY_BINARY_TIMESTAMP)).longValue();
+			binaryLength = Long.valueOf(configFile.getProperty(PROPERTY_BINARY_SIZE)).longValue();
 
 		    if (storeInDatabase) {
-		    	localBinaryName = localFileDir + TEMP_FILE_NAME;
+		    	localBinaryName = localBinaryDir + TEMP_BINARY_NAME;
 		    }
 		    else {
 			    File f = new File(remoteBinaryName);
@@ -443,7 +468,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				if(!subpath.endsWith("/"))
 					subpath += "/";
 		    	
-			    String datedir = localFileDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
+			    String datedir = localBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
 			    String filename = f.getName();
 			    f = new File(datedir);
 			    localBinaryName = datedir + filename;
@@ -452,7 +477,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			calcChecksumThread.newChecksum(localBinaryName);
 		}
 		else
-			getNewFile();
+			getNewBinary();
 	}
 
 
@@ -460,9 +485,13 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	public void remoteConnLost() {
 		logger.debug("Connection lost");
 	}
-	
-	
-	protected void getNewFile() {
+
+
+
+	/**
+	 * Get a new binary from the deployment.
+	 */
+	protected void getNewBinary() {
 		byte [] pkt = new byte [1];
 		pkt[0] = INIT_PACKET;
 		
@@ -475,9 +504,21 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			}
 		}
 	}
-	
-	protected void getSpecificFile(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr) throws Exception {
-		// ask the deployment to resend the specified file from the specified position
+
+
+
+	/**
+	 * Get a specific binary from the deployment (resume the download of a partly
+	 * downloaded binary).
+	 * 
+	 * @param remoteLocation the relative location of the remote binary
+	 * @param sizeAlreadyDownloaded the size of the binary which has already been downloaded
+	 * @param chunkNr the number of the last chunk which has already been downloaded
+	 * 
+	 * @throws Exception if an I/O error occurs.
+	 */
+	protected void getSpecificBinary(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr) throws Exception {
+		// ask the deployment to resend the specified binary from the specified position
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(remoteLocation.length() + 5);
 		baos.write(RESEND_PACKET);
 		baos.write(uint2arr(sizeAlreadyDownloaded));
@@ -495,6 +536,13 @@ public class BigBinaryPlugin extends AbstractPlugin {
 
 
 
+
+
+/**
+ * A message to be put into the message queue.
+ * 
+ * @author Tonio Gsell
+ */
 class Message {
 	protected long timestamp;
 	protected byte[] packet;
@@ -516,7 +564,13 @@ class Message {
 }
 
 
-
+/**
+ * Offers the functionality to calculate the checksum of a partly downloaded
+ * binary. After the checksum has been calculated the deployment is asked to
+ * resume the download.
+ * 
+ * @author Tonio Gsell
+ */
 class CalculateChecksum extends Thread {
 	private boolean dispose = false;
     private CheckedInputStream cis = null;
@@ -543,17 +597,17 @@ class CalculateChecksum extends Thread {
 			if (this.dispose)
 				break;
 			
-			// if the property file exists we have already downloaded a part of a file -> resume
+			// if the property file exists we have already downloaded a part of a binary -> resume
 			try {
-				// calculate crc from already downloaded file
-				parent.logger.debug("calculating cheksum for already downloaded part of file >" + parent.localBinaryName + "<");
+				// calculate crc from already downloaded binary
+				parent.logger.debug("calculating cheksum for already downloaded part of binary >" + parent.localBinaryName + "<");
 		        try {
 		            // Computer CRC32 checksum
 		            cis = new CheckedInputStream(
 		                    new FileInputStream(file), new CRC32());
 		        } catch (FileNotFoundException e) {
-		            parent.logger.error("file >" + file + "< not found -> request a new file from the deployment");
-		            parent.getNewFile();
+		            parent.logger.error("binary >" + file + "< not found -> request a new binary from the deployment");
+		            parent.getNewBinary();
 		            continue;
 		        }
 
@@ -568,11 +622,11 @@ class CalculateChecksum extends Thread {
 				
 		        parent.logger.debug("recalculated crc (" + parent.calculatedCRC.getValue() + ") from " + parent.localBinaryName);
 				
-				parent.getSpecificFile(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue());
+				parent.getSpecificBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue());
 			} catch (Exception e) {
-				// no good... -> ask for a new file
+				// no good... -> ask for a new binary
 				parent.logger.error(e.getMessage(), e);
-				parent.getNewFile();
+				parent.getNewBinary();
 			}
 		}
         
@@ -580,8 +634,16 @@ class CalculateChecksum extends Thread {
 	}
 	
 	
-	public void newChecksum(String file) {
-		fileQueue.add(file);
+
+
+
+	/**
+	 * Calculate the checksum of the partly downloaded binary.
+	 * 
+	 * @param binary the partly downloaded binary which should be resumed
+	 */
+	public void newChecksum(String binary) {
+		fileQueue.add(binary);
 	}
 	
 	public void dispose() {

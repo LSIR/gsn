@@ -1,5 +1,5 @@
 '''
-Created on Jul 15, 2009
+Created on Feb 01, 2010
 
 @author: Tonio Gsell
 @author: Mustafa Yuecel
@@ -26,13 +26,36 @@ CRC_PACKET = 3
 
 class BigBinaryPluginClass(AbstractPluginClass):
     '''
-    Reads a file from disk and sends it to GSN.
+    This plugin offers the functionality to send binaries to GSN
+    in the size of up to 4GB. You can specify different folders to be watched for
+    binaries to be modified. On each modification event (modify binary/create binary)
+    the modified binary will be sent to GSN and afterwards deleted. The binaries
+    will be sent in chunks. Thus, no significant interrupts of other plugin traffic
+    is guaranteed. In case of a connection loss, the download of the actual binary
+    will be resumed as soon as GSN reconnects.
     
     The following values have to specified in the plugin configuration file:
-        file:        the location of the file
-    '''
+        prefix:        the root folder in which the binaries are located
+        
+        directory#:    the relative directory based on the prefix. The different
+                       directory options have to be followed by an incrementing number
+                       (e.g. directory1 = ..., directory2 = ..., etc.)
+                       If no directory is specified, the root directory (specified in
+                       prefix) will be watched for binary modifications (this is the same
+                       as setting 'directory1 = .').
 
-    '''
+    For example:
+        prefix = /media/
+        directory1 = webcam1
+        directory2 = webcam2
+        directory3 = camera
+        
+        In this example the three folders '/media/webcam1', '/media/webcam2' and
+        '/media/camera' will be watched for any new binary modifications. New pictures
+        will be sent to GSN.
+
+
+
     data/instance attributes:
     _parent
     _notifier
@@ -40,7 +63,6 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _filedeque
     _lasttimestamp
     _work
-    _crcAccepted
     _prefix
     
     TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
