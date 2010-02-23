@@ -153,7 +153,8 @@ public class MigUploadPlugin extends AbstractPlugin {
 		if( isConnected() )
 			connected = 1;
 		Serializable[] output = {connected, commands_sent++};
-		dataProcessed(System.currentTimeMillis(), output);
+		if (!dataProcessed(System.currentTimeMillis(), output))
+			logger.warn("command could not be stored in the database");
 		
 		return ret;
 	}
