@@ -36,7 +36,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Jungfraujoch_DozerAdcMux2_mapped_1396 where SENSORTYPE is not null and locate("sr", SENSORTYPE) != 0 </predicate>
+                    <predicate key="query"> select * from Jungfraujoch_DozerAdcMux2_mapped_1396 where SENSORTYPE is not null and locate("sr:", SENSORTYPE) != 0 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
