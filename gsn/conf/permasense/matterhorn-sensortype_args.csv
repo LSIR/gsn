@@ -1,0 +1,20 @@
+"SENSORTYPE_ARGS","PHYSICAL_SIGNAL","VALUE","COMMENT"
+
+# adccomdiff_nctt
+"1","nctt_dx1","50",
+"1","nctt_t1","0.0",
+"1","nctt_t2","0.0",
+"2","nctt_dx1","150",
+"2","nctt_t1","0.0",
+"2","nctt_t2","0.0",
+
+# adccomdiff_tctc
+"1","tctc_t2","0.0",
+"1","tctc_dx1","100",
+"1","tctc_t1","0.0",
+"1","tctc_dx2","200",
+
+# adccomdiff_nctc
+"1","nctc_dx1","100",
+"1","nctc_t1","0.0",
+"1","nctc_dx2","150",
