@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
@@ -71,6 +73,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	protected String localBinaryName = null;
 	protected long downloadedSize = -1;
 	private long lastChunkNumber = -1;
+	private static Set<String> deploymentList = new HashSet<String>();
+    private static int threadCounter = 0;
 
 	private Server web;
 	
@@ -80,9 +84,20 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	
 	public boolean initialize ( BackLogWrapper backLogWrapper ) {
 		super.initialize(backLogWrapper);
-		calcChecksumThread = new CalculateChecksum(this);
 
 		AddressBean addressBean = getActiveAddressBean();
+
+		String deployment = addressBean.getVirtualSensorName().split("_")[0].toLowerCase();
+		
+		// check if this plugin has already be used for this deployment
+		synchronized (deploymentList) {
+			if (!deploymentList.add(deployment)) {
+				logger.error("This plugin can only be used once per deployment!");
+				return false;
+			}
+		}
+		
+		calcChecksumThread = new CalculateChecksum(this);
 
 		try {
 			if (logger.isDebugEnabled() && StorageManager.getDatabaseForConnection(StorageManager.getInstance().getConnection()) == StorageManager.DATABASE.H2) {
@@ -137,6 +152,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		logger.debug("property file name: " + propertyFileName);
 		logger.debug("storage type: " + storage);
 		logger.debug("local file directory: " + localFileDir);
+
+        setName(getPluginName() + "-Thread" + (++threadCounter));
 		
 		return true;
 	}
@@ -144,7 +161,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 
 	@Override
 	public String getPluginName() {
-		return "BinaryPlugin";
+		return "BigBinaryPlugin";
 	}
 	
 
@@ -173,6 +190,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		}
 		dispose = true;
 		msgQueue.add(new Message());
+		
+        threadCounter--;
 	}
 	
 	@Override
