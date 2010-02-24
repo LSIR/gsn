@@ -204,9 +204,9 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 						serialid_query = conn.prepareStatement("SELECT sensortype_args AS sensortype_serialid FROM sensormapping WHERE position = ? AND ? BETWEEN begin AND end AND sensortype = 'serialid' LIMIT 1");
 					}
 					if (sensorvalue_conversion) {
-						conversion_query = conn.prepareStatement("SELECT st.physical_signal AS physical_signal, st.conversion AS conversion, st.input as input, CASEWHEN(st.input IS NULL,NULL,sta.value) as value " +
+						conversion_query = conn.prepareStatement("SELECT st.physical_signal AS physical_signal, st.conversion AS conversion, st.input as input, CASEWHEN(st.input IS NULL OR sm.sensortype_args IS NULL,NULL,sta.value) as value " +
 								"FROM sensormapping AS sm, sensortype AS st, sensortype_args AS sta WHERE sm.position = ? AND ? BETWEEN sm.begin AND sm.end AND sm.sensortype = st.sensortype " +
-								"AND st.signal_name = ? AND CASEWHEN(st.input IS NULL,TRUE,sm.sensortype_args = sta.sensortype_args AND sta.physical_signal = st.physical_signal) LIMIT 1");
+								"AND st.signal_name = ? AND CASEWHEN(st.input IS NULL OR sm.sensortype_args IS NULL,TRUE,sm.sensortype_args = sta.sensortype_args AND sta.physical_signal = st.physical_signal) LIMIT 1");
 					}	
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
