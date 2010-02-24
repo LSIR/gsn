@@ -32,10 +32,8 @@ import gsn.wrappers.BackLogWrapper;
  * interrupts of other plugin traffic is guaranteed. In case of a connection loss,
  * the download of the actual binary will be resumed as soon
  * as GSN reconnects to the deployment. The downloaded binaries
- * can be stored on disk or in the database. The first happens if 'storage=filesystem'
- * (defined in the virtual sensor's XML file) is set. The second, if
- * 'storage=database' is set (only use the second option if the binaries are not too big,
- * or install a lot of RAM).
+ * can be stored on disk or in the database. This will be configured on side of the
+ * deployment.
  * <p>
  * The 'storage-directory' predicate (defined in the virtual sensor's XML file) has
  * to be used to specify the storage location. If the binaries are stored in the
@@ -46,28 +44,24 @@ import gsn.wrappers.BackLogWrapper;
  * If the binaries should be stored on disk the same folder structure as on side of
  * the deployment is used. In addition to that the binaries are separated into subfolders
  * named and sorted after the binaries modification time. The needed resolution of separation
- * can be specified in the virtual sensor's XML file using the 'folder-date-time-fm'
- * predicate. It defines the format (and with it the separation of the binaries based
- * on their modification time) of the folder naming. For formatting issues please
- * refer to {@link SimpleDateFormat}.
+ * can be specified on side of the deployment.
  * 
  * @author Tonio Gsell
  * <p>
  * TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
  */
 public class BigBinaryPlugin extends AbstractPlugin {
-	private static final String STORAGE = "storage";
 	private static final String STORAGE_DIRECTORY = "storage-directory";
-	private static final String FOLDER_DATE_TIME_FM = "folder-date-time-fm";
 	
 	private static final String PROPERTY_REMOTE_BINARY = "remote_binary";
 	private static final String PROPERTY_DOWNLOADED_SIZE = "downloaded_size";
 	private static final String PROPERTY_BINARY_TIMESTAMP = "timestamp";
 	private static final String PROPERTY_BINARY_SIZE = "file_size";
 	protected static final String PROPERTY_CHUNK_NUMBER = "chunk_number";
+	protected static final String PROPERTY_STORAGE_TYPE = "storage_type";
+	protected static final String PROPERTY_TIME_DATE_FORMAT = "time_date_format";
 	
 	private static final String TEMP_BINARY_NAME = "binaryplugin_download.part";
-	private static final String DEFAULT_FOLDER_DATE_TIME_FM = "yyyy-MM-dd";
 	private static final String PROPERTY_FILE_NAME = ".gsnBinaryStat";
 
 	private static final byte ACK_PACKET = 0;
@@ -139,26 +133,13 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			logger.warn(e.getMessage(), e);
 		}
 		
-		String storage;
 		try {
-			storage = addressBean.getPredicateValueWithException(STORAGE);
 			localBinaryDir = addressBean.getPredicateValueWithException(STORAGE_DIRECTORY);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return false;
 		}
 		
-		folderdatetimefm = new SimpleDateFormat(addressBean.getPredicateValueWithDefault(FOLDER_DATE_TIME_FM, DEFAULT_FOLDER_DATE_TIME_FM));
-		
-		if (storage.equalsIgnoreCase("database"))
-			storeInDatabase = true;
-		else if (storage.equalsIgnoreCase("filesystem"))
-			storeInDatabase = false;
-		else {
-			logger.error("the 'storage' predicate in the virtual sensor's configuration file has to be 'database' or 'filesystem'");
-			return false;
-		}
-			
 		if(!localBinaryDir.endsWith("/"))
 			localBinaryDir += "/";
 		
@@ -176,7 +157,6 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		propertyFileName = localBinaryDir + PROPERTY_FILE_NAME;
 		
 		logger.debug("property file name: " + propertyFileName);
-		logger.debug("storage type: " + storage);
 		logger.debug("local binary directory: " + localBinaryDir);
 
         setName(getPluginName() + "-Thread" + (++threadCounter));
@@ -244,16 +224,42 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				// get file info
     				binaryTimestamp = arr2long(msg.getPacket(), 1);
     				binaryLength = arr2uint(msg.getPacket(), 9);
-    				for (int i = 13; i < msg.getPacket().length; i++) {
+    				byte storage = msg.getPacket()[13];
+    				int i = 14;
+    				for (; i < msg.getPacket().length; i++) {
     					if (msg.getPacket()[i] == 0) break;
     					name.append((char) msg.getPacket()[i]);
     				}
     				remoteBinaryName = name.toString();
+    				name = new StringBuffer();
+    				i++;
+    				for (; i < msg.getPacket().length; i++) {
+    					if (msg.getPacket()[i] == 0) break;
+    					name.append((char) msg.getPacket()[i]);
+    				}
+    				String datetimefm = name.toString();
+    				try {
+    					folderdatetimefm = new SimpleDateFormat(datetimefm);
+    				} catch (IllegalArgumentException e) {
+    					logger.error("the received init packet does contain a mallformed date time format >" + datetimefm + "<! Please check your backlog configuration on the deployment -> drop this binary");
+    					getNewBinary();
+    					continue;
+    				}
+    				
+    				if (storage == 1)
+    					storeInDatabase = true;
+    				else
+    					storeInDatabase = false;
     	
     				logger.debug("new incoming binary:");
     				logger.debug("   remote binary name: " + remoteBinaryName);
     				logger.debug("   timestamp of the binary: " + binaryTimestamp);
     				logger.debug("   binary length: " + binaryLength);
+    				if (storeInDatabase)
+    					logger.debug("   store in database");
+    				else
+    					logger.debug("   store on disk");
+    				logger.debug("   folder date time format: " + datetimefm);
     	
     			    File f = new File(remoteBinaryName);
     			    
@@ -297,6 +303,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				configFile.setProperty(PROPERTY_BINARY_TIMESTAMP, Long.toString(binaryTimestamp));
     				configFile.setProperty(PROPERTY_BINARY_SIZE, Long.toString(binaryLength));
     				configFile.setProperty(PROPERTY_CHUNK_NUMBER, Long.toString(0));
+    				configFile.setProperty(PROPERTY_STORAGE_TYPE, Boolean.toString(storeInDatabase));
+    				configFile.setProperty(PROPERTY_TIME_DATE_FORMAT, datetimefm);
     				
     				configFile.store(new FileOutputStream(propertyFileName), null);
     				
@@ -326,15 +334,15 @@ public class BigBinaryPlugin extends AbstractPlugin {
     					configFile.setProperty(PROPERTY_DOWNLOADED_SIZE, Long.toString(filelen));
     					configFile.setProperty(PROPERTY_CHUNK_NUMBER, Long.toString(chunknum));
     					configFile.store(new FileOutputStream(propertyFileName), null);
+        				
+        				logger.debug("actual length of concatenated binary is " + filelen + " bytes");
     				}
     				else {
     					// we should never reach this point...
-    					logger.error("received chunk number (received nr=" + chunknum + "/last nr=" + lastChunkNumber + ") out of order -> drop this binary (should never happen!)");
-    					getNewBinary();
+    					logger.error("received chunk number (received nr=" + chunknum + "/last nr=" + lastChunkNumber + ") out of order -> request binary retransmission");
+    					getSpecificBinary(remoteBinaryName, 0, 1);
     					continue;
     				}
-    				
-    				logger.debug("actual length of concatenated binary is " + filelen + " bytes");
 
     				lastChunkNumber = chunknum;
     			}
@@ -403,7 +411,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    					else {
 	    						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request binary retransmission");
 	    						calculatedCRC.reset();
-	    						getSpecificBinary(remoteBinaryName, 0, 0);
+	    						getSpecificBinary(remoteBinaryName, 0, 1);
 	    						continue;
 	    					}
 	    				}
@@ -466,6 +474,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			downloadedSize = Long.valueOf(configFile.getProperty(PROPERTY_DOWNLOADED_SIZE)).longValue();
 			binaryTimestamp = Long.valueOf(configFile.getProperty(PROPERTY_BINARY_TIMESTAMP)).longValue();
 			binaryLength = Long.valueOf(configFile.getProperty(PROPERTY_BINARY_SIZE)).longValue();
+			storeInDatabase = Boolean.valueOf(configFile.getProperty(PROPERTY_STORAGE_TYPE)).booleanValue();
+			folderdatetimefm = new SimpleDateFormat(configFile.getProperty(PROPERTY_TIME_DATE_FORMAT));
 
 		    if (storeInDatabase) {
 		    	localBinaryName = localBinaryDir + TEMP_BINARY_NAME;

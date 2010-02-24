@@ -17,6 +17,8 @@ import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 from string import join
 
+DEFAULT_DATE_TIME_FORMATE = 'yyyy-MM-dd'
+
 CHUNK_ACK_CHECK_SEC = 5
 
 ACK_PACKET = 0
@@ -36,24 +38,32 @@ class BigBinaryPluginClass(AbstractPluginClass):
     will be resumed as soon as GSN reconnects.
     
     The following values have to specified in the plugin configuration file:
-        prefix:        the root folder in which the binaries are located
+        rootdir:        The root folder in which the binaries are located
         
-        directory#:    the relative directory based on the prefix. The different
-                       directory options have to be followed by an incrementing number
-                       (e.g. directory1 = ..., directory2 = ..., etc.)
-                       If no directory is specified, the root directory (specified in
-                       prefix) will be watched for binary modifications (this is the same
-                       as setting 'directory1 = .').
+        watch#:         The relative directory based on the root directory to be watched.
+                        The second part (after the comma) specifies where it has to be
+                        stored on side of GSN. In the database or in the filesystem.
+                        If filesystem is chosen, the third part can optionally be set
+                        to format the subfolders based on the modification time. Please
+                        refer to Java SimpleDateFormat Class for possible formatting information.
+                        The different watch options have to be followed by an incrementing number
+                        (e.g. watch1 = ..., watch2 = ..., etc.)
+                        If no watch is specified, the root directory will be watched for
+                        binary modifications (this is the same as setting 'watch1 = ./,filesystem').
 
     For example:
-        prefix = /media/
-        directory1 = webcam1
-        directory2 = webcam2
-        directory3 = camera
+        rootdir = /media/
+        watch1 = webcam1,database
+        watch2 = webcam2,filesystem
+        watch3 = camera,filesystem,yyyy-MM
         
         In this example the three folders '/media/webcam1', '/media/webcam2' and
-        '/media/camera' will be watched for any new binary modifications. New pictures
-        will be sent to GSN.
+        '/media/camera' will be watched for any new binary modifications. Changing binaries
+        in '/media/webcam1' will be stored in the database in GSN. Whereas changed ones in the
+        folders '/media/webcam2' and '/media/camera' will be stored on disk on side of GSN.
+        Binaries from '/media/webcam2' will be separated into standardly named subfolders
+        corresponding to the default set by DEFAULT_DATE_TIME_FORMATE. While binaries from
+        '/media/camera' will be sorted into monthly based subfolders.
 
 
 
@@ -64,7 +74,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _filedeque
     _work
     _waitforack
-    _prefix
+    _rootdir
+    _watches
     
     TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
     '''
@@ -73,21 +84,21 @@ class BigBinaryPluginClass(AbstractPluginClass):
         AbstractPluginClass.__init__(self, parent, options)
         self._parent = parent
         
-        self._prefix = self.getOptionValue('prefix')
+        self._rootdir = self.getOptionValue('rootdir')
         
-        directories = self.getOptionValues('directory')
+        watches = self.getOptionValues('watch')
 
-        if self._prefix is None:
-            raise TypeError('no prefix specified')
+        if self._rootdir is None:
+            raise TypeError('no rootdir specified')
         
-        if not self._prefix.endswith('/'):
-            self._prefix += '/'
+        if not self._rootdir.endswith('/'):
+            self._rootdir += '/'
         
-        if not os.path.isdir(self._prefix):
-            raise TypeError('prefix >' + self._prefix + '< is not a directory')
+        if not os.path.isdir(self._rootdir):
+            raise TypeError('rootdir >' + self._rootdir + '< is not a directory')
 
-        if not directories:
-            directories.append('.')
+        if not watches:
+            watches.append('.,filesystem')
 
         wm = WatchManager()
         self._notifier = ThreadedNotifier(wm, BinaryChangedProcessing(self))
@@ -96,9 +107,36 @@ class BigBinaryPluginClass(AbstractPluginClass):
         self._filedeque = deque()
         self._msgdeque = deque()
         
+        self._watches = []
         filetime = []
-        for dir in directories:
-            pathname = os.path.join(self._prefix, dir)
+        for watch in watches:
+            w = watch.split(',')
+        
+            if not w[0].endswith('/'):
+                w[0] += '/'
+                
+            if len(w) == 1:
+                raise TypeError('watch >' + watch + '< in the configuration file is not well formatted')
+            elif len(w) == 2 or len(w) == 3:
+                w[1] = w[1].lower()
+                if w[1] == 'database':
+                    w[1] = 1
+                    if len(w) == 2:
+                        w.append('')
+                elif w[1] == 'filesystem':
+                    w[1] = 0
+                    if len(w) == 2:
+                        w.append(DEFAULT_DATE_TIME_FORMATE)
+                    elif len(w) == 3:
+                        if len(w[2]) > 255:
+                            raise TypeError('the date time format in watch >' + watch + '< is longer than 255 characters')
+                else:
+                    raise TypeError('the second part of watch >' + watch + '< in the configuration file has to be database or filesystem')
+            else:
+                raise TypeError('watch >' + watch + '< in the configuration file has too many commas')
+            
+            dir = w[0]
+            pathname = os.path.join(self._rootdir, dir)
             pathname = os.path.normpath(pathname)
             if not os.path.isdir(pathname):
                 os.makedirs(pathname)
@@ -109,12 +147,17 @@ class BigBinaryPluginClass(AbstractPluginClass):
             
             files = os.listdir(pathname)
             
+            self._watches.append(w)
+            
             # check the path for existing files which have to be sent
             for filename in files:
                 f = os.path.join(pathname, filename)
                 if os.path.isfile(f):
                     time = os.stat(f).st_mtime
                     filetime.append((time, f))
+                    
+        for watch in self._watches:
+            self.debug('watch: ' + watch[0] + '  -  ' + str(watch[1]) + '  -  ' + watch[2])
         
         # sort the existing files by time
         filetime.sort()
@@ -190,7 +233,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     chunkNumber = int(struct.unpack('<I', message[5:9])[0])
                     # what is the name of the file to resend
                     filenamenoprefix = struct.unpack(str(len(message)-9) + 's', message[9:len(message)])[0]
-                    filename = os.path.join(self._prefix, filenamenoprefix)
+                    filename = os.path.join(self._rootdir, filenamenoprefix)
                     self.debug('downloaded size: ' + str(downloaded))
                     self.debug('chunk number: ' + str(chunkNumber))
                     self.debug('file: ' + filename)
@@ -253,17 +296,31 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         os.remove(filename)
                         continue
                     
-                    filenamenoprefix = filename.replace(self._prefix, '')
+                    filenamenoprefix = filename.replace(self._rootdir, '')
                     self.debug('filename without prefix: ' + filenamenoprefix)
                     filenamelen = len(filenamenoprefix)
                     if filenamelen > 255:
                         filenamelen = 255
                     
+                    # check witch watch this file belongs to
+                    l = -1
+                    watch = None
+                    for w in self._watches:
+                        if (filename.count(w[0]) > 0 or w[0] == './') and len(w[0]) > l:
+                            watch = w
+                            l = len(w[0])
+                    if not watch:
+                        self.error('no watch specified for ' + filename + ' (this is very strange!!!) -> close file')
+                        os.chmod(filename, 0744)
+                        filedescriptor.close()
+                        continue
+                        
                     chunkNumber = 1
-                    packet = struct.pack('<BqI', INIT_PACKET, os.stat(filename).st_mtime * 1000, filelen)
+                    packet = struct.pack('<BqIB', INIT_PACKET, os.stat(filename).st_mtime * 1000, filelen, watch[1])
                     packet += struct.pack(str(filenamelen) + 'sx', filenamenoprefix)
+                    packet += struct.pack(str(len(watch[2])) + 'sx', watch[2])
                     
-                    self.debug('sending initial binary packet for ' + filedescriptor.name)
+                    self.debug('sending initial binary packet for ' + filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '< and time date format >' + watch[2] + '<')
                 
                     crc = None
                 # or are we already sending chunks of a file?
@@ -320,6 +377,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 self._work.clear()
             except Exception, e:
                 self._waitforack = False
+                os.chmod(filename, 0744)
+                filedescriptor.close()
                 self.error(e.__str__())
             
 
