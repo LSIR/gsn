@@ -36,6 +36,7 @@ public class RestDelivery implements DeliverySystem {
 
 	public boolean writeStreamElement(StreamElement se) {
 		try {
+			Thread.sleep(1);
 			objectStream.writeObject(new StreamElement4Rest(se));
 			objectStream.flush();
 			continuation.getServletResponse().flushBuffer();
