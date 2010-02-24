@@ -19,10 +19,11 @@ from string import join
 
 CHUNK_ACK_CHECK_SEC = 5
 
-INIT_PACKET = 0
-RESEND_PACKET = 1
-CHUNK_PACKET = 2
-CRC_PACKET = 3
+ACK_PACKET = 0
+INIT_PACKET = 1
+RESEND_PACKET = 2
+CHUNK_PACKET = 3
+CRC_PACKET = 4
 
 class BigBinaryPluginClass(AbstractPluginClass):
     '''
@@ -61,8 +62,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _notifier
     _stopped
     _filedeque
-    _lasttimestamp
     _work
+    _waitforack
     _prefix
     
     TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
@@ -122,17 +123,12 @@ class BigBinaryPluginClass(AbstractPluginClass):
             self._filedeque.appendleft(file[1])
             self.debug('putting existing file into FIFO: ' + file[1])
 
-        self._lasttimestamp = -1
+        self._waitforack = False
         self._stopped = False
 
 
     def getMsgType(self):
         return BackLogMessage.BIG_BINARY_MESSAGE_TYPE
-    
-    
-    def ackReceived(self, timestamp):
-       if timestamp == self._lasttimestamp:
-           self._work.set()
     
     
     def msgReceived(self, msg):
@@ -152,6 +148,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 self.exception(e)
                 
         filedescriptor = None
+        chunkNumber = -1
                 
         while not self._stopped:
             # wait for the next file event to happen
@@ -161,12 +158,24 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 
             try:
                 message = self._msgdeque.pop()
+                self._waitforack = False
                 # the first byte of the message defines its type
                 type = struct.unpack('B', message[0])[0]
                 self.debug('type: ' + str(type))
                 
+                if type == ACK_PACKET:
+                    chkNr = int(struct.unpack('<I', message[1:5])[0])
+                    self.debug('acknowledge packet received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber) + '<')
+                    if not chunkNumber == chkNr:
+                        self.warning('received chunk number >' + str(chkNr) + '< is not the one we expected >' + str(chunkNumber) + '<')
+                        continue
+                    elif chkNr == 0:
+                        # crc has been accepted by GSN
+                        self.debug('crc has been accepted for ' + filename)
+                        # remove it from disk
+                        os.remove(filename)
                 # if the type is INIT_PACKET we have to send a new file
-                if type == INIT_PACKET:
+                elif type == INIT_PACKET:
                     if filedescriptor and not filedescriptor.closed:
                         filename = filedescriptor.name
                         self.warning('new file request, but actual file (' + filename + ') not yet closed -> remove it!')
@@ -185,7 +194,6 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     self.debug('downloaded size: ' + str(downloaded))
                     self.debug('chunk number: ' + str(chunkNumber))
                     self.debug('file: ' + filename)
-                    self.crcAccepted = False
                     
                     try:
                         # open the specified file
@@ -207,11 +215,15 @@ class BigBinaryPluginClass(AbstractPluginClass):
                                 else:
                                     crc = zlib.crc32(part)
                                 sizecalculated += len(part)
+                                    
+                                if part == '':
+                                    self.warning('end of file reached while calculating CRC')
+                                    break
         
                             self.debug('recalculated crc: ' + str(crc))
                         else:
                             crc = None
-                            chunkNumber = 0
+                            chunkNumber = -1
                     except IOError, e:
                         self.warning(e)
             except  IndexError:
@@ -247,8 +259,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     if filenamelen > 255:
                         filenamelen = 255
                     
-                    chunkNumber = 0
-                    packet = struct.pack('<BqI', INIT_PACKET, os.stat(filename).st_mtime, filelen)
+                    chunkNumber = 1
+                    packet = struct.pack('<BqI', INIT_PACKET, os.stat(filename).st_mtime * 1000, filelen)
                     packet += struct.pack(str(filenamelen) + 'sx', filenamenoprefix)
                     
                     self.debug('sending initial binary packet for ' + filedescriptor.name)
@@ -271,51 +283,34 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         # create the crc packet [type, crc]
                         packet = struct.pack('<Bi', CRC_PACKET, crc)
                         packet += chunk
-                        self._work.clear()
                         
                         filename = filedescriptor.name
                         os.chmod(filename, 0744)
                         filedescriptor.close()
                         
                         # send it
-                        self.crcAccepted = True
                         self.debug('sending crc: ' + str(crc))
                         timestamp = self.getTimeStamp()
                         self._lasttimestamp = timestamp
                         first = True
-                        while not self._work.isSet() and self.isGSNConnected() and not self._msgdeque:
-                            if not first:
-                                self.info('resend crc message')
-                            self.processMsg(timestamp, packet, self._backlog)
-                            self.debug('wait for crc acknowledge')
-                            # and resend it if no ack has been received
-                            self._work.wait(CHUNK_ACK_CHECK_SEC)
-                            first = False
-                        if self.crcAccepted and self.isGSNConnected():
-                            # crc has been accepted by GSN
-                            self.debug('crc has been accepted for ' + filename)
-                            # remove it from disk
-                            os.remove(filename)
-                        continue
-                    
-                    # increase the chunk number
-                    chunkNumber = chunkNumber + 1
-                    # create the packet [type, chunk number (4bytes)]
-                    packet = struct.pack('<BI', CHUNK_PACKET, chunkNumber)
-                    packet += chunk
-                    
-                    self.debug('sending binary chunk number ' + str(chunkNumber) + ' for ' + filedescriptor.name)
+                        chunkNumber = 0
+                    else:
+                        # increase the chunk number
+                        chunkNumber = chunkNumber + 1
+                        # create the packet [type, chunk number (4bytes)]
+                        packet = struct.pack('<BI', CHUNK_PACKET, chunkNumber)
+                        packet += chunk
+                        
+                        self.debug('sending binary chunk number ' + str(chunkNumber) + ' for ' + filedescriptor.name)
                 
-                # tell PSBackLogMain to send the chunk to GSN
-                timestamp = self.getTimeStamp()
-                self._lasttimestamp = timestamp
-                # send the chunk
+                # tell BackLogMain to send the packet to GSN
                 self._work.clear()
                 first = True
-                while not self._work.isSet() and self.isGSNConnected() and not self._msgdeque:
+                while not self._work.isSet() and self.isGSNConnected():
                     if not first:
                         self.info('resend message')
-                    self.processMsg(timestamp, packet, self._backlog)
+                    self._waitforack = True
+                    self.processMsg(self.getTimeStamp(), packet, self._backlog)
                     # and resend it if no ack has been received
                     self._work.wait(CHUNK_ACK_CHECK_SEC)
                     first = False
@@ -324,6 +319,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 self.debug('file FIFO is empty waiting for next file to arrive')
                 self._work.clear()
             except Exception, e:
+                self._waitforack = False
                 self.error(e.__str__())
             
 
@@ -356,5 +352,5 @@ class BinaryChangedProcessing(ProcessEvent):
         self._logger.debug(event.pathname + ' changed')
         
         self._parent._filedeque.appendleft(event.pathname)
-        if self._parent.isGSNConnected():
+        if self._parent.isGSNConnected() and not self._parent._waitforack:
             self._parent._work.set()

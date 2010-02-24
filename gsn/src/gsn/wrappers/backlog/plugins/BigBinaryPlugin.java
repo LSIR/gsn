@@ -70,10 +70,11 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	private static final String DEFAULT_FOLDER_DATE_TIME_FM = "yyyy-MM-dd";
 	private static final String PROPERTY_FILE_NAME = ".gsnBinaryStat";
 
-	private static final byte INIT_PACKET = 0;
-	private static final byte RESEND_PACKET = 1;
-	private static final byte CHUNK_PACKET = 2;
-	private static final byte CRC_PACKET = 3;
+	private static final byte ACK_PACKET = 0;
+	private static final byte INIT_PACKET = 1;
+	private static final byte RESEND_PACKET = 2;
+	private static final byte CHUNK_PACKET = 3;
+	private static final byte CRC_PACKET = 4;
 	
 	private SimpleDateFormat folderdatetimefm;
 
@@ -268,7 +269,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     					if(!subpath.endsWith("/"))
     						subpath += "/";
     			    	
-	    			    String datedir = localBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
+	    			    String datedir = localBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
 	    			    String filename = f.getName();
 	    			    f = new File(datedir);
 	    			    if (!f.exists()) {
@@ -300,7 +301,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				configFile.store(new FileOutputStream(propertyFileName), null);
     				
     				calculatedCRC.reset();
-    				lastChunkNumber = 0;
+    				lastChunkNumber = 1;
     			}
     			else if (type == CHUNK_PACKET) {
     				// get number of this chunk
@@ -342,7 +343,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				
     				logger.debug("crc packet with crc32 >" + crc + "< received");
     				
-    				if (lastChunkNumber == -1) {
+    				if (lastChunkNumber == 0) {
     					logger.debug("crc packet already received -> drop it");
     				}
     				else {
@@ -388,6 +389,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    							if(!dataProcessed(System.currentTimeMillis(), data)) {
 	    								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
 	    							}
+	    							if (!(new File(localBinaryName)).setLastModified(binaryTimestamp))
+	    								logger.warn("could not set modification time for " + localBinaryName);
 	    							logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored on disk");
 	    						}
 	    					
@@ -395,7 +398,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    						stat.delete();
 	    						
 	    						localBinaryName = null;
-	    						lastChunkNumber = -1;
+	    						lastChunkNumber = 0;
 	    					}
 	    					else {
 	    						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request binary retransmission");
@@ -419,7 +422,16 @@ public class BigBinaryPlugin extends AbstractPlugin {
     			continue;
     		}
     		
-    		ackMessage(msg.getTimestamp());
+    		try {
+        		ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
+        		baos.write(ACK_PACKET);
+				baos.write(uint2arr(lastChunkNumber));
+	    		sendRemote(baos.toByteArray());
+			} catch (IOException e) {
+    			logger.error(e.getMessage(), e);
+    			getNewBinary();
+    			continue;
+			}
     	}
         
         logger.debug("thread stopped");
@@ -468,7 +480,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				if(!subpath.endsWith("/"))
 					subpath += "/";
 		    	
-			    String datedir = localBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp * 1000)) + "/";
+			    String datedir = localBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
 			    String filename = f.getName();
 			    f = new File(datedir);
 			    localBinaryName = datedir + filename;
