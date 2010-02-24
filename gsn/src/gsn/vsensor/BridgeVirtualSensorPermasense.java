@@ -389,7 +389,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 			if (rs.first()) {
 				do {
 					s = rs.getString(1);
-					sb.append(s.substring(s.indexOf('_') + 1) + ":" + rs.getString(2) + " ");
+					sb.append(" " + s.substring(s.indexOf('_') + 1) + ":" + rs.getString(2));
 				} while (rs.next());
 				s = sb.toString();
 			}
