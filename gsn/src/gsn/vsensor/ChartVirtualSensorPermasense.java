@@ -57,6 +57,13 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
 		private Object event = new Object();
 		
 		public void run() {
+			
+			try { 
+				Thread.sleep(60000); 
+			} catch (InterruptedException e) { 
+				return;
+			}
+
 			while (!stopped) {
 				try {
 					synchronized (event) {
