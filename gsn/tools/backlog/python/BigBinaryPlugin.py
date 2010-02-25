@@ -21,6 +21,8 @@ DEFAULT_DATE_TIME_FORMATE = 'yyyy-MM-dd'
 
 CHUNK_ACK_CHECK_SEC = 5
 
+CHUNK_SIZE = 64000
+
 ACK_PACKET = 0
 INIT_PACKET = 1
 RESEND_PACKET = 2
@@ -298,7 +300,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 pass
         
             try:
-                if (not filedescriptor or filedescriptor.closed):
+                if not filedescriptor or filedescriptor.closed:
                     # get the next file to send out of the fifo
                     filename = self._filedeque.pop()
                     
@@ -351,7 +353,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 # or are we already sending chunks of a file?
                 else:
                     # read the next chunk out of the opened file
-                    chunk = filedescriptor.read(self._parent.gsnpeer.getMTU()-20)
+                    chunk = filedescriptor.read(CHUNK_SIZE)
                     
                     if crc:
                         crc = zlib.crc32(chunk, crc)
@@ -417,7 +419,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
         self._notifier.stop()
         self._work.set()
         self._filedeque.clear()
-        if not filedescriptor.closed:
+        if filedescriptor and not filedescriptor.closed:
             os.chmod(filename, 0744)
             filedescriptor.close()
         self.info('stopped')
