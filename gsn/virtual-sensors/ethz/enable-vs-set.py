@@ -35,6 +35,8 @@ if abort:
 # read list (given by argument)
 fd = open(filepath, 'r')
 for line in fd:
+  if line.startswith('#'):
+    continue
   link = line.rstrip()
   source = 'ethz/' + link 
   if os.path.exists(source):

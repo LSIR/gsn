@@ -15,7 +15,7 @@
             <field name="data" type="binary:image/jpeg"/>
         </output-structure>
     </processing-class>
-    <description>Thermistorchain/TC data (merged) from Jungfraujoch deployment</description>
+    <description>Sensorrod/SR data (merged) from Jungfraujoch deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage history-size="1" />

@@ -1,0 +1,34 @@
+<virtual-sensor name="Matterhorn_Thermistorchain_pos1_chart1_1396" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Thermistorchain temperatures (Position 1, 7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">5020</param>
+            <param name="time-stream-name">GENERATIONTIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>Thermistorchain/TC data (merged) from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <!-- all fields jumps temporarly up and down, TC_T5 - TC_T8 jumps down to -87°C -->
+                    <predicate key="query"> select GENERATIONTIME, TC_T1, TC_T2, TC_T3, TC_T4 from Matterhorn_Thermistorchain_1396 where POSITION = 1 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

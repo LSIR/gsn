@@ -14,7 +14,7 @@
             <field name="data" type="binary:image/jpeg"/>
         </output-structure>
     </processing-class>
-    <description>Thermistorchain/TC data (merged) from Jungfraujoch deployment</description>
+    <description>Sensorrod/SR data (merged) from Jungfraujoch deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage history-size="1" />
@@ -22,6 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
+                    <!-- SR_T1 shows constant value around 38.6°C -->
                     <predicate key="query"> select GENERATIONTIME, SR_T2, SR_T3, SR_T4 from Jungfraujoch_Sensorrod_1396 where POSITION = 9 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
