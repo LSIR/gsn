@@ -262,7 +262,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     					folderdatetimefm = new SimpleDateFormat(datetimefm);
     				} catch (IllegalArgumentException e) {
     					logger.error("the received init packet does contain a mallformed date time format >" + datetimefm + "<! Please check your backlog configuration on the deployment -> drop this binary");
-    					bigBinarySender.requestNewFile();
+    					bigBinarySender.requestNewBinary();
     					continue;
     				}
     				
@@ -301,7 +301,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    			    if (!f.exists()) {
 	    			    	if (!f.mkdirs()) {
 	    			    		logger.error("could not mkdir >" + datedir + "<  -> drop remote binary " + remoteBinaryName);
-	    			    		bigBinarySender.requestNewFile();
+	    			    		bigBinarySender.requestNewBinary();
 	    			    		continue;
 	    			    	}
 	    			    }
@@ -360,7 +360,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				else {
     					// we should never reach this point...
     					logger.error("received chunk number (received nr=" + chunknum + "/last nr=" + lastChunkNumber + ") out of order -> request binary retransmission");
-    					bigBinarySender.requestSpecificFile(remoteBinaryName, 0, 1);
+    					bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
     					continue;
     				}
 
@@ -431,14 +431,14 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    					else {
 	    						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request binary retransmission");
 	    						calculatedCRC.reset();
-	    						bigBinarySender.requestSpecificFile(remoteBinaryName, 0, 1);
+	    						bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
 	    						continue;
 	    					}
 	    				}
 	    				else {
 	    					// we should never reach this point as well...
-	    					logger.error("binary length does not match (actual length=" + (new File(localBinaryName)).length() + "/should be=" + binaryLength + ") -> drop this binary (should never happen!)");
-	    					bigBinarySender.requestNewFile();
+	    					logger.error("binary length does not match (actual length=" + (new File(localBinaryName)).length() + "/should be=" + binaryLength + ") -> request binary retransmission (should never happen!)");
+    						bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
 	    					continue;
 	    				}
 	    			}
@@ -446,7 +446,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     		} catch (Exception e) {
     			// something is very wrong -> get the next binary
     			logger.error(e.getMessage(), e);
-    			bigBinarySender.requestNewFile();
+    			bigBinarySender.requestNewBinary();
     			continue;
     		}
 
@@ -479,7 +479,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				configFile.load(new FileInputStream(propertyFileName));
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
-				bigBinarySender.requestNewFile();
+				bigBinarySender.requestNewBinary();
 				return;
 			}
 			remoteBinaryName = configFile.getProperty(PROPERTY_REMOTE_BINARY);
@@ -510,7 +510,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		    
 			calcChecksumThread.newChecksum(localBinaryName);
 		} else {
-			bigBinarySender.requestNewFile();
+			bigBinarySender.requestNewBinary();
 		}
 	}
 
@@ -594,7 +594,7 @@ class CalculateChecksum extends Thread {
 		                    new FileInputStream(file), new CRC32());
 		        } catch (FileNotFoundException e) {
 		            parent.logger.error("binary >" + file + "< not found -> request a new binary from the deployment");
-		            parent.bigBinarySender.requestNewFile();
+		            parent.bigBinarySender.requestNewBinary();
 		            continue;
 		        }
 
@@ -609,11 +609,11 @@ class CalculateChecksum extends Thread {
 				
 		        parent.logger.debug("recalculated crc (" + parent.calculatedCRC.getValue() + ") from " + parent.localBinaryName);
 				
-				parent.bigBinarySender.requestSpecificFile(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue());
+				parent.bigBinarySender.resumeBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue());
 			} catch (Exception e) {
 				// no good... -> ask for a new binary
 				parent.logger.error(e.getMessage(), e);
-				parent.bigBinarySender.requestNewFile();
+				parent.bigBinarySender.requestNewBinary();
 			}
 		}
         
@@ -707,7 +707,7 @@ class BigBinarySender extends Thread
 				trigger();
 			} catch (IOException e) {
     			parent.logger.error(e.getMessage(), e);
-    			requestNewFile();
+    			requestNewBinary();
 			}
 		}
 	}
@@ -717,7 +717,7 @@ class BigBinarySender extends Thread
 	/**
 	 * Get a new binary from the deployment.
 	 */
-	public void requestNewFile() {
+	public void requestNewBinary() {
 		if (triggered)
 			parent.logger.error("already sending a message");
 		else {
@@ -730,8 +730,15 @@ class BigBinarySender extends Thread
 
 
 	/**
-	 * Get a specific binary from the deployment (resume the download of a partly
-	 * downloaded binary).
+	 * Retransmit the specified binary from the deployment.
+	 */
+	public void requestRetransmissionOfBinary(String remoteLocation) throws IOException {
+		requestSpecificBinary(remoteLocation, 0, 1);
+	}
+
+
+	/**
+	 * Resume the specified binary from the deployment
 	 * 
 	 * @param remoteLocation the relative location of the remote binary
 	 * @param sizeAlreadyDownloaded the size of the binary which has already been downloaded
@@ -739,7 +746,12 @@ class BigBinarySender extends Thread
 	 * 
 	 * @throws Exception if an I/O error occurs.
 	 */
-	public void requestSpecificFile(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr) throws IOException {
+	public void resumeBinary(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr) throws IOException {
+		requestSpecificBinary(remoteLocation, sizeAlreadyDownloaded, chunkNr);
+	}
+	
+	
+	private void requestSpecificBinary(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr) throws IOException {
 		if (triggered)
 			parent.logger.error("already sending a message");
 		else {
