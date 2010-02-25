@@ -64,11 +64,11 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	private static final String TEMP_BINARY_NAME = "binaryplugin_download.part";
 	private static final String PROPERTY_FILE_NAME = ".gsnBinaryStat";
 
-	private static final byte ACK_PACKET = 0;
-	private static final byte INIT_PACKET = 1;
-	private static final byte RESEND_PACKET = 2;
-	private static final byte CHUNK_PACKET = 3;
-	private static final byte CRC_PACKET = 4;
+	protected static final byte ACK_PACKET = 0;
+	protected static final byte INIT_PACKET = 1;
+	protected static final byte RESEND_PACKET = 2;
+	protected static final byte CHUNK_PACKET = 3;
+	protected static final byte CRC_PACKET = 4;
 	
 	private SimpleDateFormat folderdatetimefm;
 
@@ -91,13 +91,14 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	protected String remoteBinaryName = null;
 	protected String localBinaryName = null;
 	protected long downloadedSize = -1;
-	private long lastChunkNumber = -1;
+	protected long lastChunkNumber = -1;
 	private static Set<String> deploymentList = new HashSet<String>();
     private static int threadCounter = 0;
 
 	private Server web;
 	
 	private CalculateChecksum calcChecksumThread;
+	protected BigBinarySender bigBinarySender;
 
 	private boolean dispose = false;
 	
@@ -118,6 +119,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		}
 		
 		calcChecksumThread = new CalculateChecksum(this);
+		bigBinarySender = new BigBinarySender(this);
 
 		try {
 			if (logger.isDebugEnabled() && StorageManager.getDatabaseForConnection(StorageManager.getInstance().getConnection()) == StorageManager.DATABASE.H2) {
@@ -190,6 +192,12 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
+		bigBinarySender.dispose();
+		try {
+			bigBinarySender.join();
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
+		}
 		if (web != null) {
 			web.shutdown();
 			web = null;
@@ -202,7 +210,9 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	
 	@Override
 	public void run() {
+		bigBinarySender.start();
 		calcChecksumThread.start();
+		
     	while (!dispose) {
         	Message msg;
 			try {
@@ -213,12 +223,17 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			}
 			if (dispose)
 				break;
+			
+			bigBinarySender.stopSending();
         	
     		long filelen = -1;
     		// get packet type
     		byte type = msg.getPacket()[0];
     		try {
-    			if (type == INIT_PACKET) {
+    			if (type == ACK_PACKET) {
+    				continue;
+    			}
+    			else if (type == INIT_PACKET) {
     				StringBuffer name = new StringBuffer();
     				
     				// get file info
@@ -242,7 +257,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     					folderdatetimefm = new SimpleDateFormat(datetimefm);
     				} catch (IllegalArgumentException e) {
     					logger.error("the received init packet does contain a mallformed date time format >" + datetimefm + "<! Please check your backlog configuration on the deployment -> drop this binary");
-    					getNewBinary();
+    					bigBinarySender.requestNewFile();
     					continue;
     				}
     				
@@ -281,7 +296,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    			    if (!f.exists()) {
 	    			    	if (!f.mkdirs()) {
 	    			    		logger.error("could not mkdir >" + datedir + "<  -> drop remote binary " + remoteBinaryName);
-	    			    		getNewBinary();
+	    			    		bigBinarySender.requestNewFile();
 	    			    		continue;
 	    			    	}
 	    			    }
@@ -340,7 +355,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				else {
     					// we should never reach this point...
     					logger.error("received chunk number (received nr=" + chunknum + "/last nr=" + lastChunkNumber + ") out of order -> request binary retransmission");
-    					getSpecificBinary(remoteBinaryName, 0, 1);
+    					bigBinarySender.requestSpecificFile(remoteBinaryName, 0, 1);
     					continue;
     				}
 
@@ -411,14 +426,14 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    					else {
 	    						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request binary retransmission");
 	    						calculatedCRC.reset();
-	    						getSpecificBinary(remoteBinaryName, 0, 1);
+	    						bigBinarySender.requestSpecificFile(remoteBinaryName, 0, 1);
 	    						continue;
 	    					}
 	    				}
 	    				else {
 	    					// we should never reach this point as well...
 	    					logger.error("binary length does not match (actual length=" + (new File(localBinaryName)).length() + "/should be=" + binaryLength + ") -> drop this binary (should never happen!)");
-	    					getNewBinary();
+	    					bigBinarySender.requestNewFile();
 	    					continue;
 	    				}
 	    			}
@@ -426,20 +441,11 @@ public class BigBinaryPlugin extends AbstractPlugin {
     		} catch (Exception e) {
     			// something is very wrong -> get the next binary
     			logger.error(e.getMessage(), e);
-    			getNewBinary();
+    			bigBinarySender.requestNewFile();
     			continue;
     		}
-    		
-    		try {
-        		ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
-        		baos.write(ACK_PACKET);
-				baos.write(uint2arr(lastChunkNumber));
-	    		sendRemote(baos.toByteArray());
-			} catch (IOException e) {
-    			logger.error(e.getMessage(), e);
-    			getNewBinary();
-    			continue;
-			}
+
+    		bigBinarySender.sendAck(lastChunkNumber);
     	}
         
         logger.debug("thread stopped");
@@ -452,7 +458,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			msgQueue.add(new Message(timestamp, packet));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return PACKET_SKIPPED;
+			return PACKET_ERROR;
 		}
 		return PACKET_PROCESSED;
 	}
@@ -468,7 +474,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				configFile.load(new FileInputStream(propertyFileName));
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
-				getNewBinary();
+				bigBinarySender.requestNewFile();
+				return;
 			}
 			remoteBinaryName = configFile.getProperty(PROPERTY_REMOTE_BINARY);
 			downloadedSize = Long.valueOf(configFile.getProperty(PROPERTY_DOWNLOADED_SIZE)).longValue();
@@ -497,62 +504,15 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		    }
 		    
 			calcChecksumThread.newChecksum(localBinaryName);
+		} else {
+			bigBinarySender.requestNewFile();
 		}
-		else
-			getNewBinary();
 	}
 
 
 	@Override
 	public void remoteConnLost() {
 		logger.debug("Connection lost");
-	}
-
-
-
-	/**
-	 * Get a new binary from the deployment.
-	 */
-	protected void getNewBinary() {
-		byte [] pkt = new byte [1];
-		pkt[0] = INIT_PACKET;
-		
-		while(!sendRemote(pkt)) {
-			logger.info("could not send the message -> retry in 3 seconds");
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-	}
-
-
-
-	/**
-	 * Get a specific binary from the deployment (resume the download of a partly
-	 * downloaded binary).
-	 * 
-	 * @param remoteLocation the relative location of the remote binary
-	 * @param sizeAlreadyDownloaded the size of the binary which has already been downloaded
-	 * @param chunkNr the number of the last chunk which has already been downloaded
-	 * 
-	 * @throws Exception if an I/O error occurs.
-	 */
-	protected void getSpecificBinary(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr) throws Exception {
-		// ask the deployment to resend the specified binary from the specified position
-		ByteArrayOutputStream baos = new ByteArrayOutputStream(remoteLocation.length() + 5);
-		baos.write(RESEND_PACKET);
-		baos.write(uint2arr(sizeAlreadyDownloaded));
-		baos.write(uint2arr(chunkNr));
-		baos.write(remoteLocation.getBytes());
-		byte [] pkt = baos.toByteArray();
-		lastChunkNumber = chunkNr;
-		
-		while(!sendRemote(pkt)) {
-			logger.info("could not send the message -> retry in 3 seconds");
-			Thread.sleep(3000);
-		}
 	}
 }
 
@@ -629,7 +589,7 @@ class CalculateChecksum extends Thread {
 		                    new FileInputStream(file), new CRC32());
 		        } catch (FileNotFoundException e) {
 		            parent.logger.error("binary >" + file + "< not found -> request a new binary from the deployment");
-		            parent.getNewBinary();
+		            parent.bigBinarySender.requestNewFile();
 		            continue;
 		        }
 
@@ -644,11 +604,11 @@ class CalculateChecksum extends Thread {
 				
 		        parent.logger.debug("recalculated crc (" + parent.calculatedCRC.getValue() + ") from " + parent.localBinaryName);
 				
-				parent.getSpecificBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue());
+				parent.bigBinarySender.requestSpecificFile(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue());
 			} catch (Exception e) {
 				// no good... -> ask for a new binary
 				parent.logger.error(e.getMessage(), e);
-				parent.getNewBinary();
+				parent.bigBinarySender.requestNewFile();
 			}
 		}
         
@@ -671,5 +631,124 @@ class CalculateChecksum extends Thread {
 	public void dispose() {
 		this.dispose = true;
 		fileQueue.add("");
+	}
+}
+
+class BigBinarySender extends Thread
+{
+    private BigBinaryPlugin parent = null;
+	private boolean stopped = false;
+	private boolean triggered = false;
+	private Object event = new Object();
+	private byte [] packet = null;
+	
+	private static final int RESEND_INTERVAL = 3000;
+	
+	BigBinarySender(BigBinaryPlugin plug) {
+		this.setName("BigBinarySenderThread");
+		parent = plug;
+	}
+	
+	public void run() {
+		while (!stopped) {
+			try {
+				synchronized (event) {
+					if (!triggered)
+						event.wait();
+					else
+						event.wait(RESEND_INTERVAL);
+				}
+			} catch (InterruptedException e) {
+				break;
+			}
+			
+			if(triggered)
+				if(!parent.sendRemote(packet))
+					stopSending();
+		}
+	}
+	
+	
+	private void trigger() {
+		synchronized (event) {
+			triggered = true;
+			event.notify();
+		}
+	}
+	
+	public void stopSending() {
+		synchronized (event) {
+			triggered = false;
+			packet = null;
+			event.notify();
+		}
+	}
+	
+	public void dispose() {
+		stopped = true;
+		super.interrupt();
+	}
+	
+	
+	public void sendAck(long ackNr) {
+		if (triggered)
+			parent.logger.error("already sending a message");
+		else {
+    		try {
+        		ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
+        		baos.write(BigBinaryPlugin.ACK_PACKET);
+				baos.write(BigBinaryPlugin.uint2arr(ackNr));
+	    		packet = baos.toByteArray();
+				trigger();
+			} catch (IOException e) {
+    			parent.logger.error(e.getMessage(), e);
+    			requestNewFile();
+			}
+		}
+	}
+
+
+
+	/**
+	 * Get a new binary from the deployment.
+	 */
+	public void requestNewFile() {
+		if (triggered)
+			parent.logger.error("already sending a message");
+		else {
+			packet = new byte [1];
+			packet[0] = BigBinaryPlugin.INIT_PACKET;
+			trigger();
+		}
+	}
+
+
+
+	/**
+	 * Get a specific binary from the deployment (resume the download of a partly
+	 * downloaded binary).
+	 * 
+	 * @param remoteLocation the relative location of the remote binary
+	 * @param sizeAlreadyDownloaded the size of the binary which has already been downloaded
+	 * @param chunkNr the number of the last chunk which has already been downloaded
+	 * 
+	 * @throws Exception if an I/O error occurs.
+	 */
+	public void requestSpecificFile(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr) throws IOException {
+		if (triggered)
+			parent.logger.error("already sending a message");
+		else {
+			// ask the deployment to resend the specified binary from the specified position
+			ByteArrayOutputStream baos = new ByteArrayOutputStream(remoteLocation.length() + 5);
+			baos.write(BigBinaryPlugin.RESEND_PACKET);
+			baos.write(BigBinaryPlugin.uint2arr(sizeAlreadyDownloaded));
+			baos.write(BigBinaryPlugin.uint2arr(chunkNr));
+			baos.write(remoteLocation.getBytes());
+			packet = baos.toByteArray();
+			
+			parent.lastChunkNumber = chunkNr;
+			
+			trigger();
+		}
 	}
 }

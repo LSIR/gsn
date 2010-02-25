@@ -166,6 +166,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
             self._filedeque.appendleft(file[1])
             self.debug('putting existing file into FIFO: ' + file[1])
 
+        self._lastRecvPacketType = None
         self._waitforack = False
         self._stopped = False
 
@@ -207,26 +208,49 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 self.debug('type: ' + str(type))
                 
                 if type == ACK_PACKET:
+                    setCRC = False
                     chkNr = int(struct.unpack('<I', message[1:5])[0])
                     self.debug('acknowledge packet received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber) + '<')
-                    if not chunkNumber == chkNr:
-                        self.warning('received chunk number >' + str(chkNr) + '< is not the one we expected >' + str(chunkNumber) + '<')
+                    
+                    if self._lastRecvPacketType == ACK_PACKET:
+                        if chunkNumber-1 == chkNr:
+                            self.debug('acknowledge packet for chunk number >' + str(chkNr) + '< already received')
+                            continue
+                        elif not chunkNumber == chkNr:
+                            self.warning('received chunk number >' + str(chkNr) + '< is not the one we expected >' + str(chunkNumber) + '< (should not happen)')
+                            continue
+                        elif chkNr == 0:
+                            # crc has been accepted by GSN
+                            self.debug('crc has been accepted for ' + filename)
+                            # remove it from disk
+                            os.remove(filename)
+                            setCRC = True
+                    elif self._lastRecvPacketType == CRC_PACKET and chkNr == 0:
+                        self.debug('CRC packet already received')
                         continue
-                    elif chkNr == 0:
-                        # crc has been accepted by GSN
-                        self.debug('crc has been accepted for ' + filename)
-                        # remove it from disk
-                        os.remove(filename)
+                
+                    if setCRC:
+                        self._lastRecvPacketType = CRC_PACKET
+                    else:
+                        self._lastRecvPacketType = ACK_PACKET
                 # if the type is INIT_PACKET we have to send a new file
                 elif type == INIT_PACKET:
+                    if self._lastRecvPacketType == INIT_PACKET:
+                        self.debug('init packet already received')
+                        continue
+                    self.debug('new binary request received')
                     if filedescriptor and not filedescriptor.closed:
                         filename = filedescriptor.name
                         self.warning('new file request, but actual file (' + filename + ') not yet closed -> remove it!')
                         os.chmod(filename, 0744)
                         filedescriptor.close()
                         os.remove(filename)
+                    
+                    self._lastRecvPacketType = INIT_PACKET
                 # if the type is RESEND_PACKET we have to resend a part of a file...
                 elif type == RESEND_PACKET:
+                    self.debug('binary retransmission request received')
+                    
                     # how much of the file has already been downloaded
                     downloaded = int(struct.unpack('<I', message[1:5])[0])
                     # what chunk number are we at
@@ -266,9 +290,10 @@ class BigBinaryPluginClass(AbstractPluginClass):
                             self.debug('recalculated crc: ' + str(crc))
                         else:
                             crc = None
-                            chunkNumber = -1
                     except IOError, e:
                         self.warning(e)
+                    
+                    self._lastRecvPacketType = RESEND_PACKET
             except  IndexError:
                 pass
         
@@ -374,6 +399,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
             except IndexError:
                 # fifo is empty
                 self.debug('file FIFO is empty waiting for next file to arrive')
+                packet = struct.pack('<B', ACK_PACKET)
+                self.processMsg(self.getTimeStamp(), packet, self._backlog)
                 self._work.clear()
             except Exception, e:
                 self._waitforack = False
