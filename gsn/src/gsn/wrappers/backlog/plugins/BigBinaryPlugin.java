@@ -96,6 +96,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     private static int threadCounter = 0;
 
 	private Server web;
+	private String deployment = null;
 	
 	private CalculateChecksum calcChecksumThread;
 	protected BigBinarySender bigBinarySender;
@@ -108,7 +109,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 
 		AddressBean addressBean = getActiveAddressBean();
 
-		String deployment = addressBean.getVirtualSensorName().split("_")[0].toLowerCase();
+		deployment = addressBean.getVirtualSensorName().split("_")[0].toLowerCase();
 		
 		// check if this plugin has already be used for this deployment
 		synchronized (deploymentList) {
@@ -204,6 +205,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		}
 		dispose = true;
 		msgQueue.add(new Message());
+		
+		synchronized (deploymentList) {
+			deploymentList.remove(deployment);
+		}
 		
         threadCounter--;
 	}
