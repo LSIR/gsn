@@ -18,9 +18,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BigBinaryPlugin</predicate>
-                    <predicate key="storage">filesystem</predicate>
-                    <predicate key="storage-directory">~/gsn-test-binaries</predicate>
-                    <!-- <predicate key="folder-date-time-fm">yyyy-MM</predicate> -->
+                    <predicate key="storage-directory">/home/perma/gsn-test-binaries</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
