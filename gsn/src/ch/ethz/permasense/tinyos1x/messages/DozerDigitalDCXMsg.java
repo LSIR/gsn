@@ -114,7 +114,7 @@ public class DozerDigitalDCXMsg extends DozerAbstractMsg
         short[] tmp = new short[4];
         
         for(int i=0; i<4; i++)
-        	tmp[i] = new Short((short) ((getUIntElement(i*5+14 * 8, 8))));
+        	tmp[i] = new Short((short) ((getUIntElement((i*5+14) * 8, 8))));
         
         return tmp;
     }
