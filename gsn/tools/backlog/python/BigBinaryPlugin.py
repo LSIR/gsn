@@ -417,6 +417,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
         self._notifier.stop()
         self._work.set()
         self._filedeque.clear()
+        if not filedescriptor.closed:
+            os.chmod(filename, 0744)
+            filedescriptor.close()
         self.info('stopped')
 
 
