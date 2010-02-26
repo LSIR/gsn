@@ -76,7 +76,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _filedeque
     _work
     _waitforack
+    _lastRecvPacketType
     _rootdir
+    _filedescriptor
     _watches
     
     TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
@@ -168,6 +170,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
             self._filedeque.appendleft(file[1])
             self.debug('putting existing file into FIFO: ' + file[1])
 
+                
+        self._filedescriptor = None
         self._lastRecvPacketType = None
         self._waitforack = False
         self._stopped = False
@@ -192,8 +196,6 @@ class BigBinaryPluginClass(AbstractPluginClass):
         except Exception, e:
             if not self._stopped:
                 self.exception(e)
-                
-        filedescriptor = None
         chunkNumber = -1
                 
         while not self._stopped:
@@ -241,11 +243,11 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         self.debug('init packet already received')
                         continue
                     self.debug('new binary request received')
-                    if filedescriptor and not filedescriptor.closed:
-                        filename = filedescriptor.name
+                    if self._filedescriptor and not self._filedescriptor.closed:
+                        filename = self._filedescriptor.name
                         self.warning('new file request, but actual file (' + filename + ') not yet closed -> remove it!')
                         os.chmod(filename, 0744)
-                        filedescriptor.close()
+                        self._filedescriptor.close()
                         os.remove(filename)
                     
                     self._lastRecvPacketType = INIT_PACKET
@@ -266,7 +268,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     
                     try:
                         # open the specified file
-                        filedescriptor = open(filename, 'rb')
+                        self._filedescriptor = open(filename, 'rb')
                         os.chmod(filename, 0444)
                         
                         if downloaded > 0:
@@ -275,9 +277,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
                             crc = None
                             while sizecalculated != downloaded:
                                 if downloaded - sizecalculated > 4096:
-                                    part = filedescriptor.read(4096)
+                                    part = self._filedescriptor.read(4096)
                                 else:
-                                    part = filedescriptor.read(downloaded - sizecalculated)
+                                    part = self._filedescriptor.read(downloaded - sizecalculated)
                                     
                                 if crc:
                                     crc = zlib.crc32(part, crc)
@@ -300,13 +302,13 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 pass
         
             try:
-                if not filedescriptor or filedescriptor.closed:
+                if not self._filedescriptor or self._filedescriptor.closed:
                     # get the next file to send out of the fifo
                     filename = self._filedeque.pop()
                     
                     if os.path.isfile(filename):
                         # open the file
-                        filedescriptor = open(filename, 'rb')
+                        self._filedescriptor = open(filename, 'rb')
                         os.chmod(filename, 0444)
                     else:
                         # if the file does not exist we are continuing in the fifo
@@ -319,7 +321,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         # if the file is empty we ignore it and continue in the fifo
                         self.debug('ignore empty file: ' + filename)
                         os.chmod(filename, 0744)
-                        filedescriptor.close()
+                        self._filedescriptor.close()
                         os.remove(filename)
                         continue
                     
@@ -339,7 +341,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     if not watch:
                         self.error('no watch specified for ' + filename + ' (this is very strange!!!) -> close file')
                         os.chmod(filename, 0744)
-                        filedescriptor.close()
+                        self._filedescriptor.close()
                         continue
                         
                     chunkNumber = 1
@@ -347,13 +349,13 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     packet += struct.pack(str(filenamelen) + 'sx', filenamenoprefix)
                     packet += struct.pack(str(len(watch[2])) + 'sx', watch[2])
                     
-                    self.debug('sending initial binary packet for ' + filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '< and time date format >' + watch[2] + '<')
+                    self.debug('sending initial binary packet for ' + self._filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '< and time date format >' + watch[2] + '<')
                 
                     crc = None
                 # or are we already sending chunks of a file?
                 else:
                     # read the next chunk out of the opened file
-                    chunk = filedescriptor.read(CHUNK_SIZE)
+                    chunk = self._filedescriptor.read(CHUNK_SIZE)
                     
                     if crc:
                         crc = zlib.crc32(chunk, crc)
@@ -368,9 +370,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         packet = struct.pack('<Bi', CRC_PACKET, crc)
                         packet += chunk
                         
-                        filename = filedescriptor.name
+                        filename = self._filedescriptor.name
                         os.chmod(filename, 0744)
-                        filedescriptor.close()
+                        self._filedescriptor.close()
                         
                         # send it
                         self.debug('sending crc: ' + str(crc))
@@ -385,7 +387,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         packet = struct.pack('<BI', CHUNK_PACKET, chunkNumber)
                         packet += chunk
                         
-                        self.debug('sending binary chunk number ' + str(chunkNumber) + ' for ' + filedescriptor.name)
+                        self.debug('sending binary chunk number ' + str(chunkNumber) + ' for ' + self._filedescriptor.name)
                 
                 # tell BackLogMain to send the packet to GSN
                 self._work.clear()
@@ -407,7 +409,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
             except Exception, e:
                 self._waitforack = False
                 os.chmod(filename, 0744)
-                filedescriptor.close()
+                self._filedescriptor.close()
                 self.error(e.__str__())
             
 
@@ -419,9 +421,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
         self._notifier.stop()
         self._work.set()
         self._filedeque.clear()
-        if filedescriptor and not filedescriptor.closed:
+        if self._filedescriptor and not self._filedescriptor.closed:
             os.chmod(filename, 0744)
-            filedescriptor.close()
+            self._filedescriptor.close()
         self.info('stopped')
 
 
