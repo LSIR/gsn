@@ -8,8 +8,8 @@
 "a0_7","tm_ref3","thermistor44006","cal"
 "a0_8","tm_ref4","thermistor44006","cal"
 "a0_9","tm_ref5","thermistor44006","cal"
-"a0_10","tm_m1","moisture",
-"a0_11","tm_m2","moisture",
-"a0_12","tm_m3","moisture",
-"a0_13","tm_m4","moisture",
+"a0_10","tm_m1","resistivity",
+"a0_11","tm_m2","resistivity",
+"a0_12","tm_m3","resistivity",
+"a0_13","tm_m4","resistivity",
 "a0_20","tm_ref6","thermistor44006","cal"
