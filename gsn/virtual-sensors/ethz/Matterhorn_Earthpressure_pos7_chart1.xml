@@ -1,4 +1,4 @@
-<virtual-sensor name="Matterhorn_Earthpressure_pos7_chart1_1396" priority="10" >
+<virtual-sensor name="Matterhorn_Earthpressure_pos7_chart1" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
@@ -6,7 +6,7 @@
             <param name="title">Earthpressure pressure (Position 7, 7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
-            <param name="vertical-axis">bar</param>
+            <param name="vertical-axis">mbar</param>
             <param name="history-size">5020</param>
             <param name="time-stream-name">GENERATIONTIME</param>
         </init-params>

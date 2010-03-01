@@ -1,9 +1,9 @@
-<virtual-sensor name="Matterhorn_Earthpressure_pos5_chart2_1396" priority="10" >
+<virtual-sensor name="Matterhorn_Earthpressure_pos5_chart2" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Earthpressure temperature (Position 1, 7d)</param>
+            <param name="title">Earthpressure temperature (Position 5, 7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
             <param name="vertical-axis">℃</param>

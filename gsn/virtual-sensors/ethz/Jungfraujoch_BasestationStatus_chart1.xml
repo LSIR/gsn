@@ -1,4 +1,4 @@
-<virtual-sensor name="Jungfraujoch_BasestationStatus_chart1_1355" priority="10" >
+<virtual-sensor name="Jungfraujoch_BasestationStatus_chart1" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>

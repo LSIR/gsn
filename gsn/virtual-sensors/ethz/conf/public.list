@@ -1,4 +1,4 @@
-Jungfraujoch_BackLogStatus_chart.xml
+Jungfraujoch_BackLogStatus_chart1.xml
 Jungfraujoch_BackLogStatus_mapped.xml
 Jungfraujoch_BasestationStatus_chart1.xml
 Jungfraujoch_BasestationStatus_chart2.xml
@@ -41,7 +41,7 @@ Jungfraujoch_Thermistorchain_pos10_chart2.xml
 Jungfraujoch_Thermistorchain_pos8_chart1.xml
 Jungfraujoch_Thermistorchain_pos8_chart2.xml
 Jungfraujoch_Thermistorchain.xml
-Matterhorn_BackLogStatus_chart.xml
+Matterhorn_BackLogStatus_chart1.xml
 Matterhorn_BackLogStatus_mapped.xml
 Matterhorn_BasestationStatus_chart1.xml
 Matterhorn_BasestationStatus_chart2.xml
@@ -72,6 +72,17 @@ Matterhorn_Earthpressure_pos5_chart1.xml
 Matterhorn_Earthpressure_pos5_chart2.xml
 Matterhorn_Earthpressure_pos7_chart1.xml
 Matterhorn_Earthpressure_pos7_chart2.xml
+Matterhorn_Moisturechain1.xml
+Matterhorn_Moisturechain2.xml
+Matterhorn_Moisturechain_pos5_chart1.xml
+Matterhorn_Moisturechain_pos5_chart2.xml
+Matterhorn_Moisturechain_pos5_chart3.xml
+Matterhorn_Moisturechain_pos7_chart1.xml
+Matterhorn_Moisturechain_pos7_chart2.xml
+Matterhorn_Moisturechain_pos7_chart3.xml
+Matterhorn_Moisturechain.xml
+Matterhorn_Selfpotential_pos13_chart1.xml
+Matterhorn_Selfpotential.xml
 Matterhorn_Sensorrod1.xml
 Matterhorn_Sensorrod2.xml
 Matterhorn_Sensorrod_pos10_chart1.xml
@@ -95,4 +106,9 @@ Matterhorn_Thermistorchain_pos3_chart2.xml
 Matterhorn_Thermistorchain_pos4_chart1.xml
 Matterhorn_Thermistorchain_pos4_chart2.xml
 Matterhorn_Thermistorchain.xml
+Matterhorn_Waterpressure_pos5_chart1.xml
+Matterhorn_Waterpressure_pos5_chart2.xml
+Matterhorn_Waterpressure_pos7_chart1.xml
+Matterhorn_Waterpressure_pos7_chart2.xml
+Matterhorn_Waterpressure.xml
 Matterhorn_Webcam_scaled.xml

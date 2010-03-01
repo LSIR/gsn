@@ -1,20 +1,20 @@
-<virtual-sensor name="Matterhorn_BackLogStatus_chart_1355" priority="10" >
+<virtual-sensor name="Matterhorn_Waterpressure_pos5_chart2" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Backlog queue size (7d)</param>
+            <param name="title">Waterpressure temperatures (Position 5, 7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
-            <param name="vertical-axis">#</param>
-            <param name="history-size">10080</param>
-            <param name="time-stream-name">TIMESTAMP</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">5020</param>
+            <param name="time-stream-name">GENERATIONTIME</param>
         </init-params>
         <output-structure>
             <field name="data" type="binary:image/jpeg"/>
         </output-structure>
     </processing-class>
-    <description>backlog health status from Matterhorn deployment</description>
+    <description>Waterpressure/PS data from Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage history-size="1" />
@@ -22,7 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select TIMESTAMP, BACKLOG_DB_ENTRIES from Matterhorn_BackLogStatus_mapped_1355 </predicate>
+                    <predicate key="query"> select GENERATIONTIME, DCX_TOB1, DCX_TOB2 from Matterhorn_Waterpressure_1396 where POSITION = 5 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select * from wrapper </query>
