@@ -14,10 +14,10 @@ public class Thermistor44005 implements Converter {
 	
 	public String convert(Serializable input, String value) {
 		String result = null;
-		double cal = 0.0;
 		//long start = System.nanoTime();
 		int v = ((Integer) input).intValue();
 		if (v < 64000 && v != 0) {
+			double cal = 0.0;
 			if (value != null)
 				cal = Double.parseDouble(value);
 			double ln_res = Math.log(10000.0 / ((64000.0 / v) - 1.0));
