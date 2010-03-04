@@ -138,7 +138,6 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		
 		// check if this plugin has already be used for this deployment
 		synchronized (deploymentList) {
-			logger.debug("deployment: " + deployment);
 			if (!deploymentList.add(deployment)) {
 				logger.error("This plugin can only be used once per deployment!");
 				return false;

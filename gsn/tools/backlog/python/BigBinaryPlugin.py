@@ -19,7 +19,7 @@ from string import join
 
 DEFAULT_DATE_TIME_FORMATE = 'yyyy-MM-dd'
 
-CHUNK_ACK_CHECK_SEC = 5
+RESEND_INTERVAL_SEC = 10
 
 CHUNK_SIZE = 64000
 
@@ -217,7 +217,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     self.debug('acknowledge packet received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber) + '<')
                     
                     if self._lastRecvPacketType == ACK_PACKET:
-                        if chunkNumber-1 == chkNr:
+                        if chunkNumber-1 == chkNr or (chkNr != 0 and chunkNumber == 0):
                             self.debug('acknowledge packet for chunk number >' + str(chkNr) + '< already received')
                             continue
                         elif not chunkNumber == chkNr:
@@ -378,7 +378,6 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         self.debug('sending crc: ' + str(crc))
                         timestamp = self.getTimeStamp()
                         self._lasttimestamp = timestamp
-                        first = True
                         chunkNumber = 0
                     else:
                         # increase the chunk number
@@ -398,7 +397,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     self._waitforack = True
                     self.processMsg(self.getTimeStamp(), packet, self._backlog)
                     # and resend it if no ack has been received
-                    self._work.wait(CHUNK_ACK_CHECK_SEC)
+                    self._work.wait(RESEND_INTERVAL_SEC)
                     first = False
             except IndexError:
                 # fifo is empty
@@ -422,7 +421,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
         self._work.set()
         self._filedeque.clear()
         if self._filedescriptor and not self._filedescriptor.closed:
-            os.chmod(filename, 0744)
+            os.chmod(self._filedescriptor.name, 0744)
             self._filedescriptor.close()
         self.info('stopped')
 
