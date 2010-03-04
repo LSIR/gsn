@@ -20,7 +20,7 @@ public class Thermistor44005 implements Converter {
 			double cal = 0.0;
 			if (value != null)
 				cal = Double.parseDouble(value);
-			double ln_res = Math.log(10000.0 * ((64000.0 / v) - 1.0));
+			double ln_res = Math.log(10000.0 / ((64000.0 / v) - 1.0));
 			//Math.pow(v, 3.0) needs more CPU instructions than (v * v * v)
 			//double steinhart_eq = 0.0014051 + 0.0002369 * ln_res + 0.0000001019 * Math.pow(ln_res, 3);
 			double tmp = 0.0014051 + (0.0002369 * ln_res) + (0.0000001019 * (ln_res * ln_res * ln_res));
