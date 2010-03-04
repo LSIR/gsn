@@ -11,6 +11,10 @@ import os
 import logging
 from threading import Thread, Lock, Event
 
+
+SLEEP_BEFORE_RESEND_ON_RECONNECT = 30
+
+
 class BackLogDBClass(Thread):
     '''
     Offers the backlog functionality.
@@ -31,6 +35,7 @@ class BackLogDBClass(Thread):
     _cur
     _dbNumberOfEntries
     _lock
+    _sleep
     _resend
     _stopped
     '''
@@ -94,6 +99,7 @@ class BackLogDBClass(Thread):
         self._resend = Event()
     
         self._stopped = False
+        self._sleep = False
         
         self._logger.debug('database ' + self._dbname + ' ready to use')
         
@@ -165,10 +171,11 @@ class BackLogDBClass(Thread):
         return (self._dbNumberOfEntries, os.path.getsize(self._dbname)/1024)            
             
                 
-    def resend(self):
+    def resend(self, sleep=False):
         '''
         Resend all messages which are in the backlog database to GSN.
         '''
+        self._sleep = sleep
         self._resend.set()
 
 
@@ -176,6 +183,10 @@ class BackLogDBClass(Thread):
         self._logger.info('started')
         while not self._stopped:
             self._resend.wait()
+            if self._stopped:
+                break
+            if self._sleep:
+                time.sleep(SLEEP_BEFORE_RESEND_ON_RECONNECT)
             if self._stopped:
                 break
 

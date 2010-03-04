@@ -129,7 +129,7 @@ class GSNPeerClass(Thread):
                 self._gsnwriter.resume()
     
                 # let BackLogMain know that GSN successfully connected
-                self._parent.backlog.resend()
+                self._parent.backlog.resend(True)
 
                 while not self._stopped:
                     self._logger.debug('rcv...');
