@@ -87,6 +87,9 @@
             <fileset dir="${basedir}/lib/">
                 <include name="**/**"/>
                 <exclude name="**/axis-2/**"/>
+                <exclude name="**/safe-storage/**"/>
+                <exclude name="**/junit-jars/**"/>
+                <exclude name="**/compiling/**"/>
                 <exclude name="**/.svn/**"/>
             </fileset>
         </copy>
