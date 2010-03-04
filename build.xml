@@ -113,14 +113,6 @@
 
     <target name="restart" depends="stop,gsn" description="Restart GSN Server in non graphical mode."/>
 
-    <target name="gui" depends="bind" description="Run GSN server in graphical mode.">
-        <java classname="gsn.gui.GSNConfiguratorFrame" fork="true" dir="${basedir}">
-            <classpath refid="classpath"/>
-            <jvmarg value="-splash:icons/GSNLogo.png"/>
-            <arg id="gsnc-port" value="${gsn-controller-port}"/>
-        </java>
-    </target>
-
     <target name="stop" depends="build" description="Stop the running GSN server (if any).">
         <java classname="gsn.GSNStop" maxmemory="${maxMemoryUsage}" fork="false" dir="${basedir}"
               classpathref="classpath">
@@ -298,7 +290,7 @@
         -->
     </target>
         
-    <target name="jar" depends="clean,bind">
+    <target name="jar" depends="clean,bind" description="Create a jar file containing the GSN classes.">
         <jar destfile="${jars}/${jar.file}" basedir="${build.dir}">
             <manifest>
                 <attribute name="Built-By" value="GSN Development Team."/>
