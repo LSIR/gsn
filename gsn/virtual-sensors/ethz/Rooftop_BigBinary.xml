@@ -18,7 +18,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BigBinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/rooftop/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
