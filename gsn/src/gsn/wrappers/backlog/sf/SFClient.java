@@ -58,7 +58,7 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 
     private void init() throws IOException {
     	open(this);
-		listenServer.source.registerListener(BackLogMessage.TOS_MESSAGE_TYPE, this);
+		listenServer.source.registerListener(BackLogMessage.TOS_MESSAGE_TYPE, this, false);
     }
 
     public void shutdown() {
@@ -84,7 +84,7 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 		}
 		catch (IOException e) { }
 		finally {
-		    listenServer.source.deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this);
+		    listenServer.source.deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this, false);
 		    listenServer.removeSFClient(this);
 		    shutdown();
 		}
@@ -93,22 +93,27 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
     private void readPackets() throws IOException {
 		for (;;) {
 			byte[] packet = readPacket();
-		    BackLogMessage msg = new BackLogMessage(BackLogMessage.TOS_MESSAGE_TYPE, 0, packet);
-		    
-		    if (!listenServer.source.sendMessage(msg))
-		    	logger.error("write failed");
-		    else
-				logger.debug("Message from SF with address >" + socket.getInetAddress().getHostName() + "< received and forwarded");
+		    BackLogMessage msg;
+			try {
+				msg = new BackLogMessage(BackLogMessage.TOS_MESSAGE_TYPE, 0, packet);
+			    
+			    if (!listenServer.source.sendMessage(msg))
+			    	logger.error("write failed");
+			    else
+					logger.debug("Message from SF with address >" + socket.getInetAddress().getHostName() + "< received and forwarded");
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
         }
     }
 
 	@Override
-	public boolean messageReceived(BackLogMessage m) {
+	public boolean messageReceived(long timestamp, byte[] payload) {
 		try {
-		    if(writeSourcePacket(m.getPayload()))
-		    	logger.debug("Message with timestamp " + m.getTimestamp() + " successfully written to sf client " + socket.getLocalAddress().getHostAddress());
+		    if(writeSourcePacket(payload))
+		    	logger.debug("Message with timestamp " + timestamp + " successfully written to sf client " + socket.getLocalAddress().getHostAddress());
 		    else
-		    	logger.error("Message with timestamp " + m.getTimestamp() + " could not be written to sf client " + socket.getLocalAddress().getHostAddress());
+		    	logger.error("Message with timestamp " + timestamp + " could not be written to sf client " + socket.getLocalAddress().getHostAddress());
 		}
 		catch (IOException e) {
 		    shutdown();

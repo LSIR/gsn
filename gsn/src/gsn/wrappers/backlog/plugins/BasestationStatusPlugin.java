@@ -48,7 +48,7 @@ public class BasestationStatusPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public int packetReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(long timestamp, byte[] packet) {
 		Serializable[] data = new Serializable[dataField.length];
 		data[0] = timestamp;
 		if(packet.length == 40) {
@@ -66,6 +66,6 @@ public class BasestationStatusPlugin extends AbstractPlugin {
 			ackMessage(timestamp);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
-		return PACKET_PROCESSED;
+		return true;
 	}
 }

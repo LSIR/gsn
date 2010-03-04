@@ -1,6 +1,6 @@
 package gsn.wrappers.backlog.sf;
 
-import gsn.wrappers.backlog.DeploymentClient;
+import gsn.wrappers.backlog.BackLogMessageMultiplexer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
  * @author	Tonio Gsell
  */
 public class SFListen extends Thread {
-    DeploymentClient source;
+    BackLogMessageMultiplexer source;
     private ServerSocket serverSocket;
     private Vector<SFClient> clients  = new Vector<SFClient>();
     private static int sfListenThreadCounter = 1;
@@ -29,7 +29,7 @@ public class SFListen extends Thread {
 	
 	private int serverPort = -1;
 	
-	public SFListen(int localPort, DeploymentClient bc) throws IOException {
+	public SFListen(int localPort, BackLogMessageMultiplexer bc) throws IOException {
 		serverPort = localPort;
 		source = bc;
 		
@@ -40,6 +40,7 @@ public class SFListen extends Thread {
 	}
 
     public void run() {
+    	logger.debug("start thread");
 	
 	    // open up our server socket
 	    try {
@@ -65,6 +66,8 @@ public class SFListen extends Thread {
 	        finally {
 		    cleanup();
         }
+	    
+	    logger.debug("stop thread");
     }
 
     private void cleanup() {

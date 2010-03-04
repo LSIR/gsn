@@ -155,7 +155,9 @@ public class BackLogMessage {
 	 * 
 	 * @throws IOException if the payload length exceeds MAX_PAYLOAD_SIZE
 	 */
-	public BackLogMessage(byte type, long timestamp, byte[] payload) throws IOException {
+	public BackLogMessage(byte type, long timestamp, byte[] payload) throws Exception {
+		if( payload == null )
+			throw new NullPointerException("The payload should not be null");
 		if( payload.length > MAX_PAYLOAD_SIZE )
 			throw new IOException("The payload exceeds the maximum size of " + MAX_PAYLOAD_SIZE + "bits.");
 		this.type = type;

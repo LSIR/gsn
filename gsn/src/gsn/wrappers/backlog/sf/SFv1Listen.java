@@ -1,6 +1,6 @@
 package gsn.wrappers.backlog.sf;
 
-import gsn.wrappers.backlog.DeploymentClient;
+import gsn.wrappers.backlog.BackLogMessageMultiplexer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
  * @author	Tonio Gsell
  */
 public class SFv1Listen extends Thread {
-    DeploymentClient source;
+	BackLogMessageMultiplexer source;
     private ServerSocket serverSocket;
     private Vector<SFv1Client> clients  = new Vector<SFv1Client>();
     private static int sfListenThreadCounter = 1;
@@ -30,7 +30,7 @@ public class SFv1Listen extends Thread {
 	
 	private int serverPort = -1;
 	
-	public SFv1Listen(int localPort, DeploymentClient bc, String platform) throws IOException {
+	public SFv1Listen(int localPort, BackLogMessageMultiplexer bc, String platform) throws IOException {
 		this.platform = platform;
 		serverPort = localPort;
 		source = bc;
@@ -42,6 +42,7 @@ public class SFv1Listen extends Thread {
 	}
 
     public void run() {
+    	logger.debug("start thread");
 	
 	    // open up our server socket
 	    try {
@@ -67,6 +68,8 @@ public class SFv1Listen extends Thread {
 	        finally {
 		    cleanup();
         }
+
+	    logger.debug("stop thread");
     }
 
     private void cleanup() {

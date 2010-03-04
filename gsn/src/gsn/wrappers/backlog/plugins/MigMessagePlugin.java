@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.Properties;
 
 import net.tinyos.message.SerialPacket;
 import net.tinyos.packet.Serial;
@@ -43,7 +44,6 @@ public class MigMessagePlugin extends AbstractPlugin
 {
 	private MigMessageParameters parameters = null;
 
-	private int messageType = -1;
 	private Constructor<?> messageConstructor = null;
 
 	private final transient Logger logger = Logger.getLogger( MigMessagePlugin.class );
@@ -53,13 +53,18 @@ public class MigMessagePlugin extends AbstractPlugin
 	
 	private final static int tinyos1x_groupId = -1;
 	private String tinyos1x_platform = null;
+	private MigMessageMultiplexer migMsgMultiplexer = null;
 
-	private TOSMsg template ;	
+	private TOSMsg template;
+	
+	private int msgType;
 
 	@Override
-	public boolean initialize(BackLogWrapper backlogwrapper) {
-		super.initialize(backlogwrapper);
+	public boolean initialize(BackLogWrapper backlogwrapper, String deployment, Properties props) {
+		super.activeBackLogWrapper = backlogwrapper;
 		try {
+			migMsgMultiplexer = MigMessageMultiplexer.getInstance(deployment, props, backlogwrapper.getBLMessageMultiplexer());
+			
 			// get the Mig message class for the specified TOS packet
 			parameters = new MigMessageParameters();
 			parameters.initParameters(getActiveAddressBean());
@@ -69,8 +74,8 @@ public class MigMessagePlugin extends AbstractPlugin
 			
 			// if it is a TinyOS1.x message class we need the platform name
 			if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
-				tinyos1x_platform = backlogwrapper.getTinyos1xPlatform();
-				messageType = ((net.tinyos1x.message.Message) messageConstructor.newInstance(new byte [1])).amType();
+				tinyos1x_platform = props.getProperty(MigMessageMultiplexer.TINYOS1X_PLATFORM);
+				msgType = ((net.tinyos1x.message.Message) messageConstructor.newInstance(new byte [1])).amType();
 
 				// a template message for this platform has to be instantiated to be able to get the data offset
 				// if a message has to be sent to the deployment
@@ -79,8 +84,10 @@ public class MigMessagePlugin extends AbstractPlugin
 				template = (TOSMsg) c.newInstance () ;
 			}
 			else {
-				messageType = ((net.tinyos.message.Message) messageConstructor.newInstance(new byte [1])).amType();
+				msgType = ((net.tinyos.message.Message) messageConstructor.newInstance(new byte [1])).amType();
 			}
+			
+			migMsgMultiplexer.registerListener(msgType, this);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return false;
@@ -97,238 +104,7 @@ public class MigMessagePlugin extends AbstractPlugin
 
 	
 	@Override
-	public int packetReceived(long timestamp, byte[] packet) {
-		// which TinyOS messages are we looking for?
-		if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
-			// the following functionality has been extracted from net.tinyos1x.message.Receiver
-			// from the packetReceived function
-			
-			// create a TOS message (TinyOS1.x)
-			final TOSMsg msg = createTOSMsg ( packet ) ;
-
-			Integer type = new Integer ( msg.get_type () );
-
-			// are we also interested in this message type
-			if( type == messageType ) {
-				net.tinyos1x.message.Message received ;
-				int length = msg.get_length () ;
-
-				try {
-					// clone the message for further processing
-					received = msg.clone( length ) ;
-					received.dataSet ( msg.dataGet () , msg.offset_data ( 0 ) , 0 , length ) ;
-				}
-				catch ( ArrayIndexOutOfBoundsException e ) {
-					/*
-					 * Note: this will not catch messages whose length is incorrect,
-					 * but less than DATA_LENGTH (see AM.h) + 2
-					 */
-					logger.error( "invalid length message received (too long)" ) ;
-					return PACKET_ERROR;
-				}
-				catch ( Exception e ) {
-					logger.error( "couldn't clone message!, TinyOS 1x" ) ;
-					return PACKET_ERROR;
-				}
-
-				// process the message
-				messageToBeProcessed(timestamp, received.dataGet());					
-				return PACKET_PROCESSED;
-			}
-		}
-		else {
-			// the following functionality has been extracted from net.tinyos.message.Receiver
-			// from the packetReceived function
-			
-			if (packet[0] != Serial.TOS_SERIAL_ACTIVE_MESSAGE_ID)
-				return PACKET_SKIPPED; // not for us.
-	
-			// create a SerialPacket message
-			SerialPacket msg = new SerialPacket(packet, 1);
-			int type = msg.get_header_type();
-
-			// are we interested in this message type
-			if( type == messageType ) {
-			    int length = msg.get_header_length();
-			    net.tinyos.message.Message received;
-			    try {
-					// clone the message for further processing
-				    received = msg.clone(length);
-				    received.dataSet(msg.dataGet(), SerialPacket.offset_data(0) + msg.baseOffset(), 0, length);
-			    } catch (ArrayIndexOutOfBoundsException e) {
-			    	logger.error("invalid length message received (too long)");
-			    	return PACKET_ERROR;
-			    } catch (Exception e) {
-			    	logger.error("couldn't clone message!");
-			    	return PACKET_ERROR;
-			    }
-			    
-				// process the message
-				messageToBeProcessed(timestamp, received.dataGet());
-				return PACKET_PROCESSED;
-			}
-		}
-		return PACKET_SKIPPED;
-	}
-
-	
-	@Override
-	public DataField[] getOutputFormat() {
-		if (outputstructure == null) {
-			String s;
-			LinkedHashMap<String, DataField> outputstructuremap = 
-				new LinkedHashMap<String, DataField>(2 + parameters.getOutputStructure().length);
-			outputstructuremap.put("timestamp", new DataField("timestamp", DataTypes.BIGINT));
-			outputstructuremap.put("generationtime", new DataField("generationtime", DataTypes.BIGINT));
-			for(int i=0; i<parameters.getOutputStructure().length; i++) {
-				outputstructuremap.put(parameters.getOutputStructure()[i].getName(), 
-						parameters.getOutputStructure()[i]);
-			}
-
-			// special merge of "*_low" and "*_high" fields
-			outputstructurenames = outputstructuremap.keySet().toArray(new String[] {});
-			for (int i=0; i < outputstructurenames.length; i++) {
-				s = outputstructurenames[i];
-				if (s.endsWith("_low") || s.endsWith("_high")) {
-					s = s.substring(0, s.lastIndexOf('_')).toLowerCase();
-					if (!outputstructuremap.containsKey(s))
-						outputstructuremap.put(s, new DataField(s, DataTypes.INTEGER));
-				}					
-			}
-
-			outputstructurenames = outputstructuremap.keySet().toArray(new String[] {});
-			outputstructure = outputstructuremap.values().toArray(new DataField[] {});
-		}
-		return outputstructure;
-	}
-
-	
-	@Override
-	public byte getMessageType() {
-		// this plugin operates on the TOS_MESSAGE_TYPE
-		return gsn.wrappers.backlog.BackLogMessage.TOS_MESSAGE_TYPE;
-	}
-
-
-
-	@Override
-	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
-		boolean ret = false;
-		logger.debug("action: " + action);
-		if( action.compareToIgnoreCase("payload") == 0 ) {
-			int moteId = -257;
-			int amType = -257;
-			byte[] data = null;
-			
-			if( paramNames.length != 3 ) {
-				logger.error("upload action must have three parameter names: 'moteid', 'amtype' and 'data'");
-				return false;
-			}
-			if( paramValues.length != 3 ) {
-				logger.error("upload action must have three parameter values");
-				return false;
-			}
-			
-			for( int i=0; i<3; i++ ) {
-				try {
-					String tmp = paramNames[i];
-					if( tmp.compareToIgnoreCase("mote id") == 0 )
-						moteId = Integer.parseInt((String) paramValues[i]);
-					else if( tmp.compareToIgnoreCase("am type") == 0 )
-						amType = Integer.parseInt((String) paramValues[i]);
-					else if( tmp.compareToIgnoreCase("payload") == 0 )
-						data = ((String) paramValues[i]).getBytes();
-				} catch(Exception e) {
-					logger.error("Could not interprete upload arguments: " + e.getMessage());
-					return false;
-				}
-			}
-			
-			if( moteId < -256 | amType < -256 | data == null ) {
-				logger.error("upload action must contain all three parameter names: 'mote id', 'am type' and 'payload'");
-				return false;
-			}
-			
-			if(data.length == 0) {
-				logger.warn("Upload message's payload is empty");
-			}
-			
-			try {
-				ret = sendRemote(createTOSpacket(moteId, amType, data));
-				logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
-			} catch (IOException e) {
-				logger.error(e.getMessage());
-			}
-		}
-		else if( action.compareToIgnoreCase("binary_packet") == 0 ) {
-			if(((String)paramNames[0]).compareToIgnoreCase("binary packet") == 0) {
-				byte [] packet = ((String) paramValues[0]).getBytes();
-				if(packet.length > 0) {
-					ret = sendRemote(packet);
-					logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
-				}
-				else {
-					logger.error("Upload failed due to empty 'binary packet' field");
-				}
-			}
-			else {
-				logger.error("binary_packet upload action needs a 'binary packet' field.");
-			}
-		}
-		else
-			logger.error("Unknown action");
-		
-		return ret;
-	}
-
-	
-    private byte[] createTOSpacket(int moteId, int amType, byte[] data) throws IOException {
-		if (amType < 0) {
-		    throw new IOException("unknown AM type for message");
-		}
-	
-		// which TinyOS messages version are we generating?
-		if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
-			// the following functionality has been extracted from net.tinyos1x.message.Sender
-			// from the send function
-			TOSMsg packet ;
-		      
-			// normal case, a PhoenixSource
-			// hack: we don't leave any space for the crc, so
-			// numElements_data() will be wrong. But we access the
-			// data area via dataSet/dataGet, so we're ok.
-			packet = createTOSMsg ( template.offset_data ( 0 ) + data.length ) ;
-
-			// message header: destination, group id, and message type
-			packet.set_addr ( moteId ) ;
-			packet.set_group ( (short) tinyos1x_groupId ) ;
-			packet.set_type ( ( short ) amType ) ;
-			packet.set_length ( ( short ) data.length ) ;
-		      
-			packet.dataSet ( data , 0 , packet.offset_data ( 0 ) , data.length ) ;
-
-			return packet.dataGet();
-		}
-		else {
-			// the following functionality has been extracted from net.tinyos.message.Sender
-			// from the send function
-			SerialPacket packet =
-			    new SerialPacket(SerialPacket.offset_data(0) + data.length);
-			packet.set_header_dest(moteId);
-			packet.set_header_type((short)amType);
-			packet.set_header_length((short)data.length);
-			packet.dataSet(data, 0, SerialPacket.offset_data(0), data.length);
-		
-			byte[] packetData = packet.dataGet();
-			byte[] fullPacket = new byte[packetData.length + 1];
-			fullPacket[0] = Serial.TOS_SERIAL_ACTIVE_MESSAGE_ID;
-			System.arraycopy(packetData, 0, fullPacket, 1, packetData.length);
-			return fullPacket;
-		}
-    }
-	
-
-	private boolean messageToBeProcessed(long timestamp, byte[] rawmsg) {
+	public boolean messageReceived(long timestamp, byte[] packet) {
 		Method getter = null;
 		Object res = null;
 
@@ -339,7 +115,7 @@ public class MigMessagePlugin extends AbstractPlugin
 		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[1], null);
 		
 		try {
-			Object msg = (Object) messageConstructor.newInstance(rawmsg);
+			Object msg = (Object) messageConstructor.newInstance(packet);
 
 			Iterator<Method> iter = parameters.getGetters().iterator();
 			while (iter.hasNext()) {
@@ -390,17 +166,171 @@ public class MigMessagePlugin extends AbstractPlugin
 		return true;
 	}
 
-	private void addValue(LinkedHashMap<String, Serializable> map, String name, Serializable obj) {
-		// convert Float/Double NaN to null
-		if (obj.getClass().isAssignableFrom(Float.class)) {
-			if (((Float) obj).isNaN())
-				obj = null;
-		} else if (obj.getClass().isAssignableFrom(Double.class)) {
-			if (((Double) obj).isNaN())
-				obj = null;
+	
+	@Override
+	public DataField[] getOutputFormat() {
+		if (outputstructure == null) {
+			String s;
+			LinkedHashMap<String, DataField> outputstructuremap = 
+				new LinkedHashMap<String, DataField>(2 + parameters.getOutputStructure().length);
+			outputstructuremap.put("timestamp", new DataField("timestamp", DataTypes.BIGINT));
+			outputstructuremap.put("generationtime", new DataField("generationtime", DataTypes.BIGINT));
+			for(int i=0; i<parameters.getOutputStructure().length; i++) {
+				outputstructuremap.put(parameters.getOutputStructure()[i].getName(), 
+						parameters.getOutputStructure()[i]);
+			}
+
+			// special merge of "*_low" and "*_high" fields
+			outputstructurenames = outputstructuremap.keySet().toArray(new String[] {});
+			for (int i=0; i < outputstructurenames.length; i++) {
+				s = outputstructurenames[i];
+				if (s.endsWith("_low") || s.endsWith("_high")) {
+					s = s.substring(0, s.lastIndexOf('_')).toLowerCase();
+					if (!outputstructuremap.containsKey(s))
+						outputstructuremap.put(s, new DataField(s, DataTypes.INTEGER));
+				}					
+			}
+
+			outputstructurenames = outputstructuremap.keySet().toArray(new String[] {});
+			outputstructure = outputstructuremap.values().toArray(new DataField[] {});
 		}
-		map.put(name, obj);
+		return outputstructure;
 	}
+
+	
+	@Override
+	public byte getMessageType() {
+		// this plugin operates on the TOS_MESSAGE_TYPE
+		return gsn.wrappers.backlog.BackLogMessage.TOS_MESSAGE_TYPE;
+	}
+	
+	
+	@Override
+	public void dispose() {
+		migMsgMultiplexer.deregisterListener(msgType, this);
+	}
+
+
+
+	@Override
+	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+		boolean ret = false;
+		logger.debug("action: " + action);
+		if( action.compareToIgnoreCase("payload") == 0 ) {
+			int moteId = -257;
+			int amType = -257;
+			byte[] data = null;
+			
+			if( paramNames.length != 3 ) {
+				logger.error("upload action must have three parameter names: 'moteid', 'amtype' and 'data'");
+				return false;
+			}
+			if( paramValues.length != 3 ) {
+				logger.error("upload action must have three parameter values");
+				return false;
+			}
+			
+			for( int i=0; i<3; i++ ) {
+				try {
+					String tmp = paramNames[i];
+					if( tmp.compareToIgnoreCase("mote id") == 0 )
+						moteId = Integer.parseInt((String) paramValues[i]);
+					else if( tmp.compareToIgnoreCase("am type") == 0 )
+						amType = Integer.parseInt((String) paramValues[i]);
+					else if( tmp.compareToIgnoreCase("payload") == 0 )
+						data = ((String) paramValues[i]).getBytes();
+				} catch(Exception e) {
+					logger.error("Could not interprete upload arguments: " + e.getMessage());
+					return false;
+				}
+			}
+			
+			if( moteId < -256 | amType < -256 | data == null ) {
+				logger.error("upload action must contain all three parameter names: 'mote id', 'am type' and 'payload'");
+				return false;
+			}
+			
+			if(data.length == 0) {
+				logger.warn("Upload message's payload is empty");
+			}
+			
+			try {
+				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data));
+				logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+		}
+		else if( action.compareToIgnoreCase("binary_packet") == 0 ) {
+			if(((String)paramNames[0]).compareToIgnoreCase("binary packet") == 0) {
+				byte [] packet = ((String) paramValues[0]).getBytes();
+				if(packet.length > 0) {
+					try {
+						ret = sendRemote(System.currentTimeMillis(), packet);
+						logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
+					}
+				}
+				else {
+					logger.error("Upload failed due to empty 'binary packet' field");
+				}
+			}
+			else {
+				logger.error("binary_packet upload action needs a 'binary packet' field.");
+			}
+		}
+		else
+			logger.error("Unknown action");
+		
+		return ret;
+	}
+
+	
+    private byte[] createTOSpacket(int moteId, int amType, byte[] data) throws IOException {
+		if (amType < 0) {
+		    throw new IOException("unknown AM type for message");
+		}
+	
+		// which TinyOS messages version are we generating?
+		if (tinyos1x_platform != null) {
+			// the following functionality has been extracted from net.tinyos1x.message.Sender
+			// from the send function
+			TOSMsg packet ;
+		      
+			// normal case, a PhoenixSource
+			// hack: we don't leave any space for the crc, so
+			// numElements_data() will be wrong. But we access the
+			// data area via dataSet/dataGet, so we're ok.
+			packet = createTOSMsg ( template.offset_data ( 0 ) + data.length ) ;
+
+			// message header: destination, group id, and message type
+			packet.set_addr ( moteId ) ;
+			packet.set_group ( (short) tinyos1x_groupId ) ;
+			packet.set_type ( ( short ) amType ) ;
+			packet.set_length ( ( short ) data.length ) ;
+		      
+			packet.dataSet ( data , 0 , packet.offset_data ( 0 ) , data.length ) ;
+
+			return packet.dataGet();
+		}
+		else {
+			// the following functionality has been extracted from net.tinyos.message.Sender
+			// from the send function
+			SerialPacket packet =
+			    new SerialPacket(SerialPacket.offset_data(0) + data.length);
+			packet.set_header_dest(moteId);
+			packet.set_header_type((short)amType);
+			packet.set_header_length((short)data.length);
+			packet.dataSet(data, 0, SerialPacket.offset_data(0), data.length);
+		
+			byte[] packetData = packet.dataGet();
+			byte[] fullPacket = new byte[packetData.length + 1];
+			fullPacket[0] = Serial.TOS_SERIAL_ACTIVE_MESSAGE_ID;
+			System.arraycopy(packetData, 0, fullPacket, 1, packetData.length);
+			return fullPacket;
+		}
+    }
 	
 //	
 // following functions are only used for TinyOS1.x messages	
@@ -440,15 +370,6 @@ public class MigMessagePlugin extends AbstractPlugin
       	return null ;
    	}
 
-   	public TOSMsg createTOSMsg ( byte data[] ) {
-   		Object initArgs[] = new Object [ 1 ] ;
-   		Class<?> cArgs[] = new Class [ 1 ] ;
-   		cArgs [ 0 ] = data.getClass () ;
-   		initArgs [ 0 ] = data ;
-
-   		return instantiateTOSMsg ( cArgs , initArgs ) ;
-   	}
-
     public TOSMsg createTOSMsg ( int data_length ) {
     	Object [] initArgs = new Object [ 1 ] ;
     	Class<?> [] cArgs = new Class [ 1 ] ;
@@ -457,4 +378,18 @@ public class MigMessagePlugin extends AbstractPlugin
     	
     	return instantiateTOSMsg ( cArgs , initArgs ) ;
     }
+
+	
+	
+	private void addValue(LinkedHashMap<String, Serializable> map, String name, Serializable obj) {
+		// convert Float/Double NaN to null
+		if (obj.getClass().isAssignableFrom(Float.class)) {
+			if (((Float) obj).isNaN())
+				obj = null;
+		} else if (obj.getClass().isAssignableFrom(Double.class)) {
+			if (((Double) obj).isNaN())
+				obj = null;
+		}
+		map.put(name, obj);
+	}
 }

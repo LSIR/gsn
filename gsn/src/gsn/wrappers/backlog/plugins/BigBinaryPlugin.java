@@ -51,6 +51,9 @@ import gsn.wrappers.BackLogWrapper;
  * TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
  */
 public class BigBinaryPlugin extends AbstractPlugin {
+	
+	protected static final int RESEND_INTERVAL_SEC = 10;
+	
 	private static final String STORAGE_DIRECTORY = "storage-directory";
 	
 	private static final String PROPERTY_REMOTE_BINARY = "remote_binary";
@@ -104,37 +107,13 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	private boolean dispose = false;
 	
 	
-	public boolean initialize ( BackLogWrapper backLogWrapper ) {
-		super.initialize(backLogWrapper);
+	public boolean initialize ( BackLogWrapper backlogwrapper, String deployment, Properties props) {
+		activeBackLogWrapper = backlogwrapper;
 
 		AddressBean addressBean = getActiveAddressBean();
-
-		deployment = addressBean.getVirtualSensorName().split("_")[0].toLowerCase();
-		
-		// check if this plugin has already be used for this deployment
-		synchronized (deploymentList) {
-			if (!deploymentList.add(deployment)) {
-				logger.error("This plugin can only be used once per deployment!");
-				return false;
-			}
-		}
 		
 		calcChecksumThread = new CalculateChecksum(this);
 		bigBinarySender = new BigBinarySender(this);
-
-		try {
-			if (logger.isDebugEnabled() && StorageManager.getDatabaseForConnection(StorageManager.getInstance().getConnection()) == StorageManager.DATABASE.H2) {
-				try {
-					String [] args = {"-webPort", "8082", "-webAllowOthers", "false"};
-					web = Server.createWebServer(args);
-					web.start();
-				} catch (SQLException e) {
-					logger.warn(e.getMessage(), e);
-				}
-			}
-		} catch (SQLException e) {
-			logger.warn(e.getMessage(), e);
-		}
 		
 		try {
 			localBinaryDir = addressBean.getPredicateValueWithException(STORAGE_DIRECTORY);
@@ -157,12 +136,37 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			return false;
 		}
 		
+		// check if this plugin has already be used for this deployment
+		synchronized (deploymentList) {
+			logger.debug("deployment: " + deployment);
+			if (!deploymentList.add(deployment)) {
+				logger.error("This plugin can only be used once per deployment!");
+				return false;
+			}
+		}
+
+		try {
+			if (logger.isDebugEnabled() && StorageManager.getDatabaseForConnection(StorageManager.getInstance().getConnection()) == StorageManager.DATABASE.H2) {
+				try {
+					String [] args = {"-webPort", "8082", "-webAllowOthers", "false"};
+					web = Server.createWebServer(args);
+					web.start();
+				} catch (SQLException e) {
+					logger.warn(e.getMessage(), e);
+				}
+			}
+		} catch (SQLException e) {
+			logger.warn(e.getMessage(), e);
+		}
+		
 		propertyFileName = localBinaryDir + PROPERTY_FILE_NAME;
 		
 		logger.debug("property file name: " + propertyFileName);
 		logger.debug("local binary directory: " + localBinaryDir);
 
         setName(getPluginName() + "-Thread" + (++threadCounter));
+        
+        registerListener();
 		
 		return true;
 	}
@@ -458,14 +462,14 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	
 
 	@Override
-	public int packetReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(long timestamp, byte[] packet) {
 		try {
 			msgQueue.add(new Message(timestamp, packet));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return PACKET_ERROR;
+			return false;
 		}
-		return PACKET_PROCESSED;
+		return true;
 	}
 
 
@@ -647,30 +651,41 @@ class BigBinarySender extends Thread
 	private Object event = new Object();
 	private byte [] packet = null;
 	
-	private static final int RESEND_INTERVAL = 3000;
-	
 	BigBinarySender(BigBinaryPlugin plug) {
 		this.setName("BigBinarySenderThread");
 		parent = plug;
 	}
 	
 	public void run() {
+		parent.logger.debug("start thread");
 		while (!stopped) {
 			try {
 				synchronized (event) {
 					if (!triggered)
 						event.wait();
-					else
-						event.wait(RESEND_INTERVAL);
+					else {
+						event.wait(BigBinaryPlugin.RESEND_INTERVAL_SEC*1000);
+						if (triggered)
+							parent.logger.debug("resend message");
+						else
+							continue;
+					}
 				}
 			} catch (InterruptedException e) {
 				break;
 			}
 			
-			if(triggered)
-				if(!parent.sendRemote(packet))
-					stopSending();
+			if(triggered) {
+				parent.logger.debug("send acknowledge packet for chunk number " + parent.lastChunkNumber);
+				try {
+					if(!parent.sendRemote(System.currentTimeMillis(), packet))
+						stopSending();
+				} catch (Exception e) {
+					parent.logger.error(e.getMessage(), e);
+				}
+			}
 		}
+		parent.logger.debug("stop thread");
 	}
 	
 	
@@ -732,7 +747,13 @@ class BigBinarySender extends Thread
 	/**
 	 * Retransmit the specified binary from the deployment.
 	 */
-	public void requestRetransmissionOfBinary(String remoteLocation) throws IOException {
+	public void requestRetransmissionOfBinary(String remoteLocation) throws IOException {	
+		// delete the file if it already exists
+		File f = new File(parent.localBinaryName);
+	    if (f.exists()) {
+	    	parent.logger.debug("overwrite already existing binary >" + parent.localBinaryName + "<");
+	    	f.delete();
+	    }
 		requestSpecificBinary(remoteLocation, 0, 1);
 	}
 

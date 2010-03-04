@@ -46,7 +46,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public int packetReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(long timestamp, byte[] packet) {
 		Integer error_counter = null;
 		Integer exception_counter = null;
 		Integer backlog_db_entries = null;
@@ -76,7 +76,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 			ackMessage(timestamp);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
-		return PACKET_PROCESSED;
+		return true;
 	}
 
 	
@@ -98,12 +98,16 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 					command[0] = 1;
 				}
 			}
-			if( sendRemote(command) ) {
-				logger.debug("Upload command sent (resend data " + command[0] + " / backup data " + command[1] + ")");
-			}
-			else {
-				logger.warn("Upload command (resend data " + command[0] + " / backup data " + command[1] + ") has not been sent!");
-				return false;
+			try {
+				if( sendRemote(System.currentTimeMillis(), command) ) {
+					logger.debug("Upload command sent (resend data " + command[0] + " / backup data " + command[1] + ")");
+				}
+				else {
+					logger.warn("Upload command (resend data " + command[0] + " / backup data " + command[1] + ") has not been sent!");
+					return false;
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 			}
 		}
 		

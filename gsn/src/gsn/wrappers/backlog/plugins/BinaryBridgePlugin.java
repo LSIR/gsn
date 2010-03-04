@@ -41,7 +41,7 @@ public class BinaryBridgePlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public int packetReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(long timestamp, byte[] packet) {
 		StringBuffer sb = new StringBuffer();
 		int i;
 		for (i = 0; i < packet.length; i++) {
@@ -52,10 +52,10 @@ public class BinaryBridgePlugin extends AbstractPlugin {
 		Serializable[] data = {timestamp, sb.toString(), java.util.Arrays.copyOfRange(packet, i+1, packet.length)};
 		if(dataProcessed(System.currentTimeMillis(), data)) {
 			ackMessage(timestamp);
-			return PACKET_PROCESSED;
+			return true;
 		} else {
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
-			return PACKET_SKIPPED;
+			return false;
 		}
 	}
 }

@@ -1,13 +1,17 @@
 package gsn.wrappers.backlog.plugins;
 
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Properties;
 
 import javax.naming.OperationNotSupportedException;
 
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.wrappers.BackLogWrapper;
+import gsn.wrappers.backlog.BackLogMessage;
+import gsn.wrappers.backlog.BackLogMessageListener;
 
 
 /**
@@ -16,13 +20,9 @@ import gsn.wrappers.BackLogWrapper;
  * 
  * @author Tonio Gsell
  */
-public abstract class AbstractPlugin extends Thread {
+public abstract class AbstractPlugin extends Thread implements BackLogMessageListener {
 	
-	public final int PACKET_PROCESSED = 0;
-	public final int PACKET_SKIPPED = 1;
-	public final int PACKET_ERROR = 2;
-	
-	private BackLogWrapper activeBackLogWrapper = null;
+	protected BackLogWrapper activeBackLogWrapper = null;
 	private volatile Thread pluginThread;
 
 
@@ -30,8 +30,10 @@ public abstract class AbstractPlugin extends Thread {
 	 * Initialize the plugin.
 	 * <p>
 	 * This function will be called once at the initialization time
-	 * of GSN by the {@link BackLogWrapper}. It has to be called by
-	 * the plugins initialize function!
+	 * of GSN by the {@link BackLogWrapper}. If it is overwritten by the
+	 * plugin, 'activeBackLogWrapper' has to be set by the plugins initialize
+	 * function and a listener has to be registered if messages should be
+	 * received.
 	 * 
 	 * @param backLogWrapper points to the calling
 	 * 			BackLogWrapper. It can be used
@@ -40,8 +42,9 @@ public abstract class AbstractPlugin extends Thread {
 	 * @return true if the initialization was successful otherwise
 	 * 			 false
 	 */
-	public boolean initialize ( BackLogWrapper backLogWrapper ) {
+	public boolean initialize ( BackLogWrapper backLogWrapper, String deployment, Properties props ) {
 		activeBackLogWrapper = backLogWrapper;
+		registerListener();
 		return true;
 	}
 
@@ -52,27 +55,20 @@ public abstract class AbstractPlugin extends Thread {
     }
 	
 	
+	public void registerListener(BackLogMessageListener listener) {
+		activeBackLogWrapper.getBLMessageMultiplexer().registerListener(getMessageType(), listener, true);
+	}
+	
+	
+	public void registerListener() {
+		activeBackLogWrapper.getBLMessageMultiplexer().registerListener(getMessageType(), this, true);
+	}
+	
+	
 	public void run() { }
 	
 	
 	public void dispose() { }
-
-
-	/**
-	 * This function is called if a packet has been received this
-	 * plugin is interested in.
-	 * 
-	 * @param timestamp when this packet has been generated.
-	 *			It should be used to acknowledge this packet if
-	 *			needed (use {@code gsn.wrappers.BackLogWrapper.ackMessage(long)}).
-	 *
-	 * @param packet as byte array
-	 * 
-	 * @return  PACKET_PROCESSED if successfully processed
-     *			PACKET_SKIPPED 	 if no action was taken
-	 *			PACKET_ERROR	 if there was an error
-	 */
-	public abstract int packetReceived ( long timestamp, byte[] packet );
 	
 	
 	public abstract String getPluginName();
@@ -215,11 +211,12 @@ public abstract class AbstractPlugin extends Thread {
 	 * 			The data to be processed. Its format must correspond
 	 * 			to the one specified by the plugin's getOutputFormat()
 	 * 			function.
-	 * @return if the message has been sent successfully true will be returned
-	 * 			 else false (no working connection)
+	 * @return false if not connected to the deployment
+	 * 
+	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
-	public boolean sendRemote(byte[] data) {
-		return activeBackLogWrapper.sendRemote(data);
+	public boolean sendRemote(long timestamp, byte[] data) throws Exception {
+		return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data));
 	}
 
 
@@ -242,18 +239,18 @@ public abstract class AbstractPlugin extends Thread {
 	 * 			message we want to acknowledge.
 	 */
 	public void ackMessage(long timestamp) {
-		activeBackLogWrapper.ackMessage(timestamp);
+		activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp);
 	}
 	
 	
-	/**
-	 * Retruns true if the deploymentClient is connected to the deployment.
-	 * 
-	 * @return true if the client is connected otherwise false
-	 */
-	public boolean isConnected() {
-		return activeBackLogWrapper.isConnected();
-	}
+//	/**
+//	 * Retruns true if the deploymentClient is connected to the deployment.
+//	 * 
+//	 * @return true if the client is connected otherwise false
+//	 */
+//	public boolean isConnected() {
+//		return activeBackLogWrapper.getBLMessageMultiplexer().isConnected();
+//	}
 	
 	
 	public final AddressBean getActiveAddressBean ( ) {

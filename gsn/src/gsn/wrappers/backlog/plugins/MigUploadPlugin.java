@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Properties;
 
 import net.tinyos.message.SerialPacket;
 import net.tinyos.packet.Serial;
@@ -38,9 +39,9 @@ public class MigUploadPlugin extends AbstractPlugin {
 
 
 	@Override
-	public boolean initialize(BackLogWrapper backlogwrapper) {
-		super.initialize(backlogwrapper);
-		tinyos1x_platform = backlogwrapper.getTinyos1xPlatform();
+	public boolean initialize(BackLogWrapper backlogwrapper, String deployment, Properties props) {
+		activeBackLogWrapper = backlogwrapper;
+		tinyos1x_platform = props.getProperty(MigMessageMultiplexer.TINYOS1X_PLATFORM);
 
 		// a template message for this platform has to be instantiated to be able to get the data offset
 		// if a message has to be sent to the deployment
@@ -53,6 +54,8 @@ public class MigUploadPlugin extends AbstractPlugin {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
+		
+		registerListener();
 		
 		return true;
 	}
@@ -70,13 +73,13 @@ public class MigUploadPlugin extends AbstractPlugin {
 
 	@Override
 	public DataField[] getOutputFormat() {
-		DataField[] dataField = {new DataField("CONNECTED", "SMALLINT"), new DataField("COMMANDS_SENT", "INTEGER")};
+		DataField[] dataField = {new DataField("COMMANDS_SENT", "INTEGER")};
 		return dataField;
 	}
 
 	@Override
-	public int packetReceived(long timestamp, byte[] packet) {
-		return PACKET_PROCESSED;
+	public boolean messageReceived(long timestamp, byte[] packet) {
+		return true;
 	}
 
 	@Override
@@ -122,9 +125,9 @@ public class MigUploadPlugin extends AbstractPlugin {
 			}
 			
 			try {
-				ret = sendRemote(createTOSpacket(moteId, amType, data));
+				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data));
 				logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				logger.error(e.getMessage());
 				return false;
 			}
@@ -133,7 +136,12 @@ public class MigUploadPlugin extends AbstractPlugin {
 			if(((String)paramNames[0]).compareToIgnoreCase("binary packet") == 0) {
 				byte [] packet = ((String) paramValues[0]).getBytes();
 				if(packet.length > 0) {
-					ret = sendRemote(packet);
+					try {
+						ret = sendRemote(System.currentTimeMillis(), packet);
+					} catch (Exception e) {
+						logger.error(e.getMessage());
+						return false;
+					}
 					logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
 				}
 				else {
@@ -149,10 +157,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 		else
 			logger.error("Unknown action");
 
-		short connected = 0;
-		if( isConnected() )
-			connected = 1;
-		Serializable[] output = {connected, commands_sent++};
+		Serializable[] output = {commands_sent++};
 		if (!dataProcessed(System.currentTimeMillis(), output))
 			logger.warn("command could not be stored in the database");
 		

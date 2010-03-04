@@ -5,7 +5,6 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
-import gsn.wrappers.BackLogWrapper;
 
 
 public class VaisalaWXT520Plugin extends AbstractPlugin {
@@ -17,12 +16,6 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 						new DataField("Su", "VARCHAR(100)")};
 
 	private final transient Logger logger = Logger.getLogger( VaisalaWXT520Plugin.class );
-	
-	@Override
-	public boolean initialize(BackLogWrapper backLogWrapper) {
-		super.initialize(backLogWrapper);
-		return true;
-	}
 
 	@Override
 	public byte getMessageType() {
@@ -41,7 +34,7 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 	}
 
 	@Override
-	public int packetReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(long timestamp, byte[] packet) {
 		Serializable[] data = new Serializable[dataField.length];
 
 		data[0] = timestamp;
@@ -63,7 +56,7 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 
 		if (count != (dataField.length - 1)) {
 			logger.warn("The message with timestamp >" + timestamp + "< seems unparsable.");
-			return PACKET_PROCESSED;
+			return true;
 		}
 		
 		if( dataProcessed(System.currentTimeMillis(), data) )
@@ -71,6 +64,6 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 
-		return PACKET_PROCESSED;
+		return true;
 	}
 }
