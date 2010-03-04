@@ -1,0 +1,35 @@
+<virtual-sensor name="ETZG_BasestationStatus_mapped_1355" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="V_PV_MV" type="INTEGER" />
+            <field name="I_PV_UA" type="INTEGER" />
+            <field name="V_12BAT_MV" type="INTEGER" />
+            <field name="I_V12DC_EXT_UA" type="INTEGER" />
+            <field name="V12DC_IN_MV" type="INTEGER" />
+            <field name="I_V12DC_IN_UA" type="INTEGER" />
+            <field name="VCC_5_0_MV" type="INTEGER" />
+            <field name="VCC_NODE_MV" type="INTEGER" />
+            <field name="I_VCC_NODE_UA" type="INTEGER" />
+            <field name="VCC_4_2_MV" type="INTEGER" />
+        </output-structure>
+    </processing-class>
+    <description>basestation status from ETZG deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZG_BasestationStatus_1355 </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

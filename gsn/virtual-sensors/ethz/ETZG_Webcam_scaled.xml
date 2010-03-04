@@ -1,0 +1,29 @@
+<virtual-sensor name="ETZG_Webcam_scaled_1355" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="timestamp_to_string">TIMESTAMP</param>
+            <param name="jpeg_scaled">JPEG_SCALED</param>
+        </init-params>
+        <output-structure>
+            <field name="TIMESTAMP_STRING" type="VARCHAR(30)" />
+            <field name="JPEG_SCALED" type="binary:image/jpeg" />
+        </output-structure>
+    </processing-class>
+    <description>webcam picture from ETZG deployment as thumbnail</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1"/>
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select TIMESTAMP, DATA from ETZG_Binary_1355 where FILEPATH='/tmp/webcam.jpg'</predicate>
+                </address>
+                <query> select TIMESTAMP, DATA as JPEG_SCALED from wrapper</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
