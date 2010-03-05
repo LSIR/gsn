@@ -47,12 +47,9 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 			logger.error(file.getAbsolutePath() + " does not exist");
 			return;
 		}
-		logger.debug("file: " + file.getAbsolutePath());
-		logger.debug("file type: " + filetype);
 		file = file.getAbsoluteFile();
 		
 		if (filetype.equalsIgnoreCase("jpeg")  || filetype.equalsIgnoreCase("jpg")) {
-			logger.debug("yeah");
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 		    try {
 		    	BufferedImage image = ImageIO.read(file); // Read from an input stream
@@ -61,6 +58,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 				ImageIO.write(image, "jpeg", os);
 		    } catch (IOException e) {
 		    	logger.error(e.getMessage(), e);
+		    	return;
 		    }
 			
 			data = new StreamElement(data, 
@@ -69,7 +67,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 					new Serializable[]{os.toByteArray()});
 		}
 		else if (filetype == "nef") {
-			
+			//TODO: extract jpeg from nef
 		}
 
 		super.dataAvailable(inputStreamName, data);
