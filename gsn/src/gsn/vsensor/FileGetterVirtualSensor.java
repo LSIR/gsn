@@ -35,7 +35,6 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 			logger.error("file_type has to be defined in the virtual sensors xml file");
 			return false;
 		}
-		filetype.toLowerCase();
 		
 		return super.initialize();
 	}
@@ -48,9 +47,12 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 			logger.error(file.getAbsolutePath() + " does not exist");
 			return;
 		}
+		logger.debug("file: " + file.getAbsolutePath());
+		logger.debug("file type: " + filetype);
 		file = file.getAbsoluteFile();
 		
-		if (filetype == "jpeg" || filetype == "jpg") {
+		if (filetype.equalsIgnoreCase("jpeg")  || filetype.equalsIgnoreCase("jpg")) {
+			logger.debug("yeah");
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 		    try {
 		    	BufferedImage image = ImageIO.read(file); // Read from an input stream
