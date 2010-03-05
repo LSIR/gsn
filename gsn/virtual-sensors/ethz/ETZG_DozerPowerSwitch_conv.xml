@@ -1,0 +1,45 @@
+<virtual-sensor name="ETZG_DozerPowerSwitch_conv_1396" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT"/>
+            <field name="GENERATIONTIME" type="BIGINT"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" />
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="V12EXT_V" type="DOUBLE" />
+            <field name="I12EXT_mA" type="DOUBLE" />
+            <field name="IPORT1_mA" type="DOUBLE" />
+            <field name="IPORT2_mA" type="DOUBLE" />
+            <field name="PAYLOAD_PORT1ON" type="TINYINT" />
+            <field name="PAYLOAD_PORT2ON" type="TINYINT" />
+            <field name="PAYLOAD_POWERSTATE" type="TINYINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerPowerSwitchMsg) from ETZG deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                   <predicate key="query">select GENERATIONTIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, PAYLOAD_V12EXT, PAYLOAD_I12EXT, PAYLOAD_IPORT1, PAYLOAD_IPORT2, PAYLOAD_PORT1ON, PAYLOAD_PORT2ON, PAYLOAD_POWERSTATE from ETZG_DozerPowerSwitch_1396</predicate>
+                   <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select 
+                  GENERATIONTIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                  (PAYLOAD_V12EXT * 18) / 4095 as V12EXT_V,
+                  ((PAYLOAD_I12EXT - 2048) * 3000) / 4095 as I12EXT_mA,
+                  (PAYLOAD_IPORT1 * 15000) / 4095 as IPORT1_mA,
+                  (PAYLOAD_IPORT2 * 15000) / 4095 as IPORT2_mA,
+                  PAYLOAD_PORT1ON, PAYLOAD_PORT2ON, PAYLOAD_POWERSTATE
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
