@@ -467,7 +467,7 @@ class SimpleAM(Thread):
         self._WriteLock.release()
         if not blocking:
             return True
-        ack = self.readAck(self._source.ackTimeout)
+        ack = self.readAck(timeout)
         #print 'SimpleAM:write: got an ack:', ack, ack.seqno == self.seqno
         return (ack != None and ack.seqno == self.seqno)
 
@@ -518,6 +518,8 @@ class AM(SimpleAM):
         return self.oobHook(super(AM, self).read(timeout))
 
     def write(self, packet, amId, timeout=None, blocking=True):
+        if not timeout:
+           timeout=self._source.ackTimeout
         r = super(AM, self).write(packet, amId, timeout, blocking)
         while not r:
             r = super(AM, self).write(packet, amId, timeout, blocking, inc=0)

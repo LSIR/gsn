@@ -58,4 +58,9 @@ class TOS1xPluginClass(TOSPluginClass, AbstractPluginClass):
         # TODO: use TOS1x_MESSAGE_TYPE after separation in GSN
         return BackLogMessage.TOS_MESSAGE_TYPE
         #return BackLogMessage.TOS1x_MESSAGE_TYPE
-    
+
+    def tos2backlog(self, packet):
+        return array.array('B', packet.payload()).tostring()
+
+    def backlog2tos(self, message):
+        return array.array('B', message).tolist()

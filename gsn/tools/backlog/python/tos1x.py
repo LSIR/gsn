@@ -458,10 +458,10 @@ class SimpleAM(Thread):
         return self.readData(timeout)
     
     def sendAck(self):
-        self._WriteLock.acquire()
         if self._ackSeqno:
+            self._WriteLock.acquire()
             self._hdlc.sendAck(self._ackSeqno)
-        self._WriteLock.release()
+            self._WriteLock.release()
 
     def write(self, packet, amId, timeout=5, blocking=True, inc=1):
         self.seqno = (self.seqno + inc) % 256
@@ -472,7 +472,7 @@ class SimpleAM(Thread):
         self._WriteLock.release()
         if not blocking:
             return True
-        ack = self.readAck(self._source.ackTimeout)
+        ack = self.readAck(timeout)
         #print 'SimpleAM:write: got an ack:', ack, ack.seqno == self.seqno
         return (ack != None and ack.seqno == self.seqno)
 
@@ -523,6 +523,8 @@ class AM(SimpleAM):
         super(AM, self).sendAck()
 
     def write(self, packet, amId, timeout=None, blocking=True):
+        if not timeout:
+           timeout=self._source.ackTimeout
         r = super(AM, self).write(packet, amId, timeout, blocking)
         while not r:
             r = super(AM, self).write(packet, amId, timeout, blocking, inc=0)

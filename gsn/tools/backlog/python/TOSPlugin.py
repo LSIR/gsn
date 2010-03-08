@@ -81,15 +81,8 @@ class TOSPluginClass(AbstractPluginClass):
         
             timestamp = self.getTimeStamp()
 
-            if isinstance(self._serialsource, tos.AM):
-                #self.debug('tos2')
-                length = len(packet.payload())
-                # TODO: append zero at start should not really happen here -> needs bugfix for tos.py
-                payload = array.array('B', [0] + packet.payload()).tostring()
-            else:
-                #self.debug('tos1')
-                length = len(packet.payload())
-                payload = array.array('B', packet.payload()).tostring()
+            length = len(packet.payload())
+            payload = self.tos2backlog(packet);
 
             self.debug('rcv (%d,%d,%d)' % (self.getMsgType(), timestamp, length))
 
@@ -107,13 +100,19 @@ class TOSPluginClass(AbstractPluginClass):
         
     def getMsgType(self):
         return BackLogMessage.TOS_MESSAGE_TYPE
-        
+
+    def tos2backlog(self, packet):
+        # TODO: append zero at start should not really happen here -> needs bugfix for tos.py
+        return array.array('B', [0] + packet.payload()).tostring()
+
+    def backlog2tos(self, message):
+        return array.array('B', message[1:]).tolist()
             
     def msgReceived(self, message):
-        packet = array.array('B', message).tolist()
+        packet = self.backlog2tos(message)
         #packet = [ byte for byte in struct.unpack(str(len(message)) + 'B', message) ]
         try:
-            self._serialsource.write(packet, 0x00, None, True)
+            self._serialsource.write(packet, 0x00, 0.2, True)
             self.debug('snd (%d,?,%d)' % (self.getMsgType(), len(message)))
         except Exception, e:
             if not self._stopped:
