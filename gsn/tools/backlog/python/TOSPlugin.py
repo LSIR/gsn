@@ -61,8 +61,7 @@ class TOSPluginClass(AbstractPluginClass):
         self._serialsource.start()
 
         # open accessnode queue, just in case if we closed it before...
-        if not isinstance(self._serialsource, tos.AM):
-            self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x01, 0x80]).tolist(), 0x00, None, True)
+        self.sendOpenQueueCommand()
         
         while not self._stopped:
             # read packet from serial port (this is blocking)
@@ -107,6 +106,13 @@ class TOSPluginClass(AbstractPluginClass):
 
     def backlog2tos(self, message):
         return array.array('B', message[1:]).tolist()
+
+    def sendCloseQueueCommand(self):
+        self._serialsource.write(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x00, 0x00]).tolist(), 0x00, 0.2, True)
+        time.sleep(35)
+
+    def sendOpenQueueCommand(self):
+        self._serialsource.write(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x01, 0x00]).tolist(), 0x00, 0.2, True)
             
     def msgReceived(self, message):
         packet = self.backlog2tos(message)
@@ -123,9 +129,7 @@ class TOSPluginClass(AbstractPluginClass):
         self._stopped = True
         
         # send close queue cmd to access node
-        if not isinstance(self._serialsource, tos.AM):
-            self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x00, 0x80]).tolist(), 0x00, None, True)
-            time.sleep(35)
+        self.sendCloseQueueCommand()
         
         self._serialsource.stop()
         self.info('stopped')
