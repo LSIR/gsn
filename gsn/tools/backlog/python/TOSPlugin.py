@@ -7,9 +7,9 @@ Created on Jul 15, 2009
 
 #import struct
 import array
-
-import BackLogMessage
+import time
 import tos
+import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_BACKLOG = True

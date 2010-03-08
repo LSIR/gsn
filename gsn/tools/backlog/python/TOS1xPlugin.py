@@ -5,6 +5,8 @@ Created on Jul 15, 2009
 @author: Mustafa Yuecel
 '''
 
+import array
+import time
 import tos1x
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
