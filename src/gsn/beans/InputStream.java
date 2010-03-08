@@ -1,8 +1,7 @@
 package gsn.beans;
 
+import gsn.VirtualSensor;
 import gsn.VirtualSensorInitializationFailedException;
-import gsn.VirtualSensorPool;
-import gsn.storage.PoolIsFullException;
 import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
@@ -39,7 +38,7 @@ public class InputStream implements Serializable{
 
 	private HashMap < CharSequence , StreamSource >           streamSourceAliasNameToStreamSourceName =  new HashMap < CharSequence , StreamSource >( );
 
-	private transient VirtualSensorPool                 pool;
+	private transient VirtualSensor pool;
 
 	private final transient TreeMap< CharSequence , CharSequence > rewritingData         = new TreeMap < CharSequence , CharSequence >( new CaseInsensitiveComparator());
 
@@ -221,14 +220,14 @@ public class InputStream implements Serializable{
 	/**
 	 * @return the pool
 	 */
-	public VirtualSensorPool getPool ( ) {
+	public VirtualSensor getPool ( ) {
 		return pool;
 	}
 
 	/**
 	 * @param pool the pool to set
 	 */
-	public void setPool ( VirtualSensorPool pool ) {
+	public void setPool ( VirtualSensor pool ) {
 		this.pool = pool;
 	}
 
@@ -276,9 +275,6 @@ public class InputStream implements Serializable{
 					StreamElement element= resultOfTheQuery.nextElement( );
 					sensor.dataAvailable( this.getInputStreamName( ) , element );
 				}
-			} catch ( final PoolIsFullException e ) {
-				logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
-				logger.warn( e.getMessage( ) , e );
 			} catch ( final UnsupportedOperationException e ) {
 				logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
 				logger.warn( e.getMessage( ) , e );

@@ -13,13 +13,13 @@ public final class Mappings {
    
    private static final ConcurrentHashMap<String,VSensorConfig>              vsNameTOVSConfig               = new ConcurrentHashMap<String,VSensorConfig>( );
    
-   private static final ConcurrentHashMap < String , VirtualSensorPool >             fileNameToVSInstance           = new ConcurrentHashMap < String , VirtualSensorPool >(  );
+   private static final ConcurrentHashMap < String , VirtualSensor>             fileNameToVSInstance           = new ConcurrentHashMap < String , VirtualSensor>(  );
    
    private static final ConcurrentHashMap < String , TreeMap < String , Boolean >> vsNamesToOutputStructureFields = new ConcurrentHashMap < String , TreeMap < String , Boolean >>( );
    
    private static final transient Logger                                 logger                         = Logger.getLogger( Mappings.class );
    
-   public static boolean addVSensorInstance ( VirtualSensorPool sensorPool ) {
+   public static boolean addVSensorInstance ( VirtualSensor sensorPool ) {
       try {
          if ( logger.isInfoEnabled( ) ) logger.info( ( new StringBuilder( "Testing the pool for :" ) ).append( sensorPool.getConfig( ).getName( ) ).toString( ) );
          sensorPool.returnVS( sensorPool.borrowVS( ) );
@@ -40,7 +40,7 @@ public final class Mappings {
       return true;
    }
    
-   public static VirtualSensorPool getVSensorInstanceByFileName ( String fileName ) {
+   public static VirtualSensor getVSensorInstanceByFileName ( String fileName ) {
       return fileNameToVSInstance.get( fileName );
    }
    
@@ -78,7 +78,7 @@ public final class Mappings {
       return vsNameTOVSConfig.values( ).iterator( );
    }
    
-   public static VirtualSensorPool getVSensorInstanceByVSName ( String vsensorName ) {
+   public static VirtualSensor getVSensorInstanceByVSName ( String vsensorName ) {
       if ( vsensorName == null ) return null;
       VSensorConfig vSensorConfig = vsNameTOVSConfig.get( vsensorName );
       if ( vSensorConfig == null ) return null;
