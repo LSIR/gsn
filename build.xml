@@ -138,6 +138,44 @@
         </java>
     </target>
 
+    <target name="generate-hydrosys" depends="bind" description="Generate the Hydrosys Web Service.">
+        <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="false" dir="${basedir}" classpathref="classpath">
+            <arg value="-o"/>
+            <arg value="generated"/>
+            <arg value="-p"/>
+            <arg value="gsn.hydrosys.sensormanager"/>
+            <arg value="-s"/>
+            <arg value="-ss"/>
+            <arg value="-sd"/>
+            <arg value="-uri"/>
+            <arg value="${build.dir}/META-INF/SensorManager.wsdl"/>
+        </java>
+    </target>
+
+    <!-- parameters at: http://ws.apache.org/axis/java/reference.html#Java2WSDLReference -->
+    <target name="generate-hydrosys-wsdl" depends="bind">
+        <exec executable="java2wsdl.sh" dir="${basedir}/build/classes/">
+            <arg value="-o"/>
+            <arg value="${basedir}/sensormanager"/>
+            <arg value="-cp"/>
+            <arg value="${basedir}/lib/core/commons-collections-3.2.jar"/>
+            <arg value="-l"/>
+            <arg value="http://localhost:22001/hydrosys/SensorManager"/>
+            <arg value="-cn"/>
+            <arg value="gsn.hydrosys.sensormanager.SensorManager"/>
+        </exec>
+        <!--<java classname="org.apache.ws.java2wsdl.Java2WSDL" fork="false" dir="${basedir}" classpathref="classpath">-->
+            <!--<arg value="-o"/>-->
+            <!--<arg value="sensormanager"/>-->
+            <!--<arg value="-cp"/>-->
+            <!--<arg value="${basedir}/lib/core/commons-collections-3.2.jar"/>-->
+            <!--<arg value="-l"/>-->
+            <!--<arg value="http://localhost:22001/hydrosys/SensorManager"/>-->
+            <!--<arg value="-cn"/>-->
+            <!--<arg value="gsn.hydrosys.sensormanager.SensorManager"/>-->
+        <!--</java>-->
+    </target>
+
     <target name="compile-reports" depends="init" description="Compile the Jasper Reports Layout files (.jrxml).">
         <taskdef name="jrc" classname="net.sf.jasperreports.ant.JRAntCompileTask">
             <classpath refid="classpath"/>
@@ -160,7 +198,7 @@
             <fileset dir="${jars}" includes="**/*"/>
         </delete>
     </target>
-    
+
 
     <!-- Tests -->
 
@@ -290,7 +328,7 @@
         </documentdoclet>
         -->
     </target>
-        
+
     <target name="jar" depends="clean,bind" description="Create a jar file containing the GSN classes.">
         <jar destfile="${jars}/${jar.file}" basedir="${build.dir}">
             <manifest>

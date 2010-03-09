@@ -1,30 +1,31 @@
 
 /**
- * DataField.java
+ * DeleteVirtualSensor.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
  */
             
-                package gsn.beans.xsd;
+                package gsn.hydrosys.sensormanager;
             
 
             /**
-            *  DataField bean class
+            *  DeleteVirtualSensor bean class
             */
         
-        public  class DataField
+        public  class DeleteVirtualSensor
         implements org.apache.axis2.databinding.ADBBean{
-        /* This type was generated from the piece of schema that had
-                name = DataField
-                Namespace URI = http://beans.gsn/xsd
-                Namespace Prefix = ns1
-                */
+        
+                public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
+                "http://sensormanager.hydrosys.gsn",
+                "deleteVirtualSensor",
+                "ns2");
+
             
 
         private static java.lang.String generatePrefix(java.lang.String namespace) {
-            if(namespace.equals("http://beans.gsn/xsd")){
-                return "ns1";
+            if(namespace.equals("http://sensormanager.hydrosys.gsn")){
+                return "ns2";
             }
             return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
         }
@@ -32,60 +33,30 @@
         
 
                         /**
-                        * field for Name
+                        * field for Vsname
                         */
 
                         
-                                    protected java.lang.String localName ;
+                                    protected java.lang.String localVsname ;
                                 
 
                            /**
                            * Auto generated getter method
                            * @return java.lang.String
                            */
-                           public  java.lang.String getName(){
-                               return localName;
+                           public  java.lang.String getVsname(){
+                               return localVsname;
                            }
 
                            
                         
                             /**
                                * Auto generated setter method
-                               * @param param Name
+                               * @param param Vsname
                                */
-                               public void setName(java.lang.String param){
+                               public void setVsname(java.lang.String param){
                             
-                                            this.localName=param;
-                                    
-
-                               }
-                            
-
-                        /**
-                        * field for Type
-                        */
-
-                        
-                                    protected java.lang.String localType ;
-                                
-
-                           /**
-                           * Auto generated getter method
-                           * @return java.lang.String
-                           */
-                           public  java.lang.String getType(){
-                               return localType;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param Type
-                               */
-                               public void setType(java.lang.String param){
-                            
-                                            this.localType=param;
+                                            this.localVsname=param;
                                     
 
                                }
@@ -119,15 +90,15 @@
 
 
         
-               org.apache.axiom.om.OMDataSource dataSource =
-                       new org.apache.axis2.databinding.ADBDataSource(this,parentQName){
+                org.apache.axiom.om.OMDataSource dataSource =
+                       new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       DataField.this.serialize(parentQName,factory,xmlWriter);
+                       DeleteVirtualSensor.this.serialize(MY_QNAME,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
-               parentQName,factory,dataSource);
+               MY_QNAME,factory,dataSource);
             
        }
 
@@ -174,83 +145,49 @@
                   if (serializeType){
                
 
-                   java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://beans.gsn/xsd");
+                   java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://sensormanager.hydrosys.gsn");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":DataField",
+                           namespacePrefix+":deleteVirtualSensor",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "DataField",
+                           "deleteVirtualSensor",
                            xmlWriter);
                    }
 
                
                    }
                
-                                    namespace = "http://beans.gsn/xsd";
+                                    namespace = "http://sensormanager.hydrosys.gsn";
                                     if (! namespace.equals("")) {
                                         prefix = xmlWriter.getPrefix(namespace);
 
                                         if (prefix == null) {
                                             prefix = generatePrefix(namespace);
 
-                                            xmlWriter.writeStartElement(prefix,"name", namespace);
+                                            xmlWriter.writeStartElement(prefix,"vsname", namespace);
                                             xmlWriter.writeNamespace(prefix, namespace);
                                             xmlWriter.setPrefix(prefix, namespace);
 
                                         } else {
-                                            xmlWriter.writeStartElement(namespace,"name");
+                                            xmlWriter.writeStartElement(namespace,"vsname");
                                         }
 
                                     } else {
-                                        xmlWriter.writeStartElement("name");
+                                        xmlWriter.writeStartElement("vsname");
                                     }
                                 
 
-                                          if (localName==null){
+                                          if (localVsname==null){
                                               // write the nil attribute
                                               
-                                                     throw new org.apache.axis2.databinding.ADBException("name cannot be null!!");
+                                                     throw new org.apache.axis2.databinding.ADBException("vsname cannot be null!!");
                                                   
                                           }else{
 
                                         
-                                                   xmlWriter.writeCharacters(localName);
-                                            
-                                          }
-                                    
-                                   xmlWriter.writeEndElement();
-                             
-                                    namespace = "http://beans.gsn/xsd";
-                                    if (! namespace.equals("")) {
-                                        prefix = xmlWriter.getPrefix(namespace);
-
-                                        if (prefix == null) {
-                                            prefix = generatePrefix(namespace);
-
-                                            xmlWriter.writeStartElement(prefix,"type", namespace);
-                                            xmlWriter.writeNamespace(prefix, namespace);
-                                            xmlWriter.setPrefix(prefix, namespace);
-
-                                        } else {
-                                            xmlWriter.writeStartElement(namespace,"type");
-                                        }
-
-                                    } else {
-                                        xmlWriter.writeStartElement("type");
-                                    }
-                                
-
-                                          if (localType==null){
-                                              // write the nil attribute
-                                              
-                                                     throw new org.apache.axis2.databinding.ADBException("type cannot be null!!");
-                                                  
-                                          }else{
-
-                                        
-                                                   xmlWriter.writeCharacters(localType);
+                                                   xmlWriter.writeCharacters(localVsname);
                                             
                                           }
                                     
@@ -418,22 +355,13 @@
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
                 
-                                      elementList.add(new javax.xml.namespace.QName("http://beans.gsn/xsd",
-                                                                      "name"));
+                                      elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
+                                                                      "vsname"));
                                  
-                                        if (localName != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localName));
+                                        if (localVsname != null){
+                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localVsname));
                                         } else {
-                                           throw new org.apache.axis2.databinding.ADBException("name cannot be null!!");
-                                        }
-                                    
-                                      elementList.add(new javax.xml.namespace.QName("http://beans.gsn/xsd",
-                                                                      "type"));
-                                 
-                                        if (localType != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localType));
-                                        } else {
-                                           throw new org.apache.axis2.databinding.ADBException("type cannot be null!!");
+                                           throw new org.apache.axis2.databinding.ADBException("vsname cannot be null!!");
                                         }
                                     
 
@@ -460,9 +388,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static DataField parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            DataField object =
-                new DataField();
+        public static DeleteVirtualSensor parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            DeleteVirtualSensor object =
+                new DeleteVirtualSensor();
 
             int event;
             java.lang.String nillableValue = null;
@@ -486,10 +414,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"DataField".equals(type)){
+                            if (!"deleteVirtualSensor".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (DataField)gsn.hydrosys.sensormanager.ExtensionMapper.getTypeObject(
+                                return (DeleteVirtualSensor)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -514,30 +442,11 @@
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://beans.gsn/xsd","name").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","vsname").equals(reader.getName())){
                                 
                                     java.lang.String content = reader.getElementText();
                                     
-                                              object.setName(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-                                              
-                                        reader.next();
-                                    
-                              }  // End of if for expected property start element
-                                
-                                else{
-                                    // A start element we are not expecting indicates an invalid parameter was passed
-                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
-                                }
-                            
-                                    
-                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
-                                
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://beans.gsn/xsd","type").equals(reader.getName())){
-                                
-                                    java.lang.String content = reader.getElementText();
-                                    
-                                              object.setType(
+                                              object.setVsname(
                                                     org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
                                               
                                         reader.next();

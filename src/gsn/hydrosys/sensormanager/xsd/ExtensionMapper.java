@@ -6,7 +6,7 @@
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
  */
 
-            package gsn.hydrosys.sensormanager;
+            package gsn.hydrosys.sensormanager.xsd;
             /**
             *  ExtensionMapper class
             */
@@ -19,10 +19,20 @@
 
               
                   if (
-                  "http://beans.gsn/xsd".equals(namespaceURI) &&
+                  "http://sensormanager.hydrosys.gsn/xsd".equals(namespaceURI) &&
                   "DataField".equals(typeName)){
                    
-                            return  gsn.beans.xsd.DataField.Factory.parse(reader);
+                            return  gsn.hydrosys.sensormanager.xsd.DataField.Factory.parse(reader);
+                        
+
+                  }
+
+              
+                  if (
+                  "http://sensormanager.hydrosys.gsn/xsd".equals(namespaceURI) &&
+                  "Status".equals(typeName)){
+                   
+                            return  gsn.hydrosys.sensormanager.xsd.Status.Factory.parse(reader);
                         
 
                   }

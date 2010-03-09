@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://sensormanager.hydrosys.gsn" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax21="http://beans.gsn/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://sensormanager.hydrosys.gsn">
-    
-    
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://sensormanager.hydrosys.gsn" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax21="http://sensormanager.hydrosys.gsn/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://sensormanager.hydrosys.gsn">
     <wsdl:types>
-        <xs:schema xmlns:ax22="http://beans.gsn/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://sensormanager.hydrosys.gsn">
-            <xs:import namespace="http://beans.gsn/xsd"/>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://sensormanager.hydrosys.gsn/xsd">
+            <xs:complexType name="Status">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="message" nillable="false" type="xs:string"/>
+                    <xs:element minOccurs="1" maxOccurs="1" name="status" type="xs:byte"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="DataField">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="name" nillable="false" type="xs:string"/>
+                    <xs:element minOccurs="1" maxOccurs="1" name="type" nillable="false" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax22="http://sensormanager.hydrosys.gsn/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://sensormanager.hydrosys.gsn">
+            <xs:import namespace="http://sensormanager.hydrosys.gsn/xsd"/>
             <xs:element name="unregisterQuery">
                 <xs:complexType>
                     <xs:sequence>
@@ -12,14 +24,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="unregisterQueryResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="1" maxOccurs="1" name="message" nillable="false" type="xs:string"/>
-                        <xs:element minOccurs="1" maxOccurs="1" name="status" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="unregisterQueryResponse" type="ax22:Status"/>
             <xs:element name="registerQuery">
                 <xs:complexType>
                     <xs:sequence>
@@ -30,33 +35,80 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="registerQueryResponse">
+            <xs:element name="registerQueryResponse" type="ax22:Status"/>
+            <xs:element name="listVirtualSensorsResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="1" maxOccurs="1" name="message" nillable="false" type="xs:string"/>
-                        <xs:element minOccurs="1" maxOccurs="1" name="status" type="xs:boolean"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="vsname" nillable="false" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listEnabledWrappersResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="wrappername" nillable="false" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listAvailableWrappersResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="wrappername" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteVirtualSensor">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="1" maxOccurs="1" name="vsname" nillable="false" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteVirtualSensorResponse" type="ax22:Status"/>
+            <xs:element name="createVirtualSensor">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="1" maxOccurs="1" name="vsname" nillable="false" type="xs:string"/>
+                        <xs:element minOccurs="1" maxOccurs="1" name="descriptionFileContent" nillable="false" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="createVirtualSensorResponse" type="ax22:Status"/>
+            <xs:element name="getOutputStructure">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="1" maxOccurs="1" name="vsname" nillable="false" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getOutputStructureResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputstructure" nillable="false" type="ax22:DataField"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
         </xs:schema>
-        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://beans.gsn/xsd">
-            <xs:complexType name="DataField">
-                <xs:sequence>
-                    <xs:element minOccurs="1" maxOccurs="1" name="name" nillable="false" type="xs:string"/>
-                    <xs:element minOccurs="1" maxOccurs="1" name="type" nillable="false" type="xs:string"/>
-                </xs:sequence>
-            </xs:complexType>
-        </xs:schema>
     </wsdl:types>
-    
-    
-    
-    
+    <wsdl:message name="getOutputStructureRequest">
+        <wsdl:part name="parameters" element="ns:getOutputStructure"/>
+    </wsdl:message>
+    <wsdl:message name="getOutputStructureResponse">
+        <wsdl:part name="parameters" element="ns:getOutputStructureResponse"/>
+    </wsdl:message>
+    <wsdl:message name="listVirtualSensorsRequest"/>
+    <wsdl:message name="listVirtualSensorsResponse">
+        <wsdl:part name="parameters" element="ns:listVirtualSensorsResponse"/>
+    </wsdl:message>
     <wsdl:message name="registerQueryRequest">
         <wsdl:part name="parameters" element="ns:registerQuery"/>
     </wsdl:message>
     <wsdl:message name="registerQueryResponse">
         <wsdl:part name="parameters" element="ns:registerQueryResponse"/>
+    </wsdl:message>
+    <wsdl:message name="listAvailableWrappersRequest"/>
+    <wsdl:message name="listAvailableWrappersResponse">
+        <wsdl:part name="parameters" element="ns:listAvailableWrappersResponse"/>
     </wsdl:message>
     <wsdl:message name="unregisterQueryRequest">
         <wsdl:part name="parameters" element="ns:unregisterQuery"/>
@@ -64,28 +116,87 @@
     <wsdl:message name="unregisterQueryResponse">
         <wsdl:part name="parameters" element="ns:unregisterQueryResponse"/>
     </wsdl:message>
-    
-    
-    
-    
+    <wsdl:message name="deleteVirtualSensorRequest">
+        <wsdl:part name="parameters" element="ns:deleteVirtualSensor"/>
+    </wsdl:message>
+    <wsdl:message name="deleteVirtualSensorResponse">
+        <wsdl:part name="parameters" element="ns:deleteVirtualSensorResponse"/>
+    </wsdl:message>
+    <wsdl:message name="listEnabledWrappersRequest"/>
+    <wsdl:message name="listEnabledWrappersResponse">
+        <wsdl:part name="parameters" element="ns:listEnabledWrappersResponse"/>
+    </wsdl:message>
+    <wsdl:message name="createVirtualSensorRequest">
+        <wsdl:part name="parameters" element="ns:createVirtualSensor"/>
+    </wsdl:message>
+    <wsdl:message name="createVirtualSensorResponse">
+        <wsdl:part name="parameters" element="ns:createVirtualSensorResponse"/>
+    </wsdl:message>
     <wsdl:portType name="SensorManagerPortType">
+        <wsdl:operation name="getOutputStructure">
+            <wsdl:input message="ns:getOutputStructureRequest" wsaw:Action="urn:getOutputStructure"/>
+            <wsdl:output message="ns:getOutputStructureResponse" wsaw:Action="urn:getOutputStructureResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="listVirtualSensors">
+            <wsdl:input message="ns:listVirtualSensorsRequest" wsaw:Action="urn:listVirtualSensors"/>
+            <wsdl:output message="ns:listVirtualSensorsResponse" wsaw:Action="urn:listVirtualSensorsResponse"/>
+        </wsdl:operation>
         <wsdl:operation name="registerQuery">
             <wsdl:input message="ns:registerQueryRequest" wsaw:Action="urn:registerQuery"/>
             <wsdl:output message="ns:registerQueryResponse" wsaw:Action="urn:registerQueryResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="listAvailableWrappers">
+            <wsdl:input message="ns:listAvailableWrappersRequest" wsaw:Action="urn:listAvailableWrappers"/>
+            <wsdl:output message="ns:listAvailableWrappersResponse" wsaw:Action="urn:listAvailableWrappersResponse"/>
         </wsdl:operation>
         <wsdl:operation name="unregisterQuery">
             <wsdl:input message="ns:unregisterQueryRequest" wsaw:Action="urn:unregisterQuery"/>
             <wsdl:output message="ns:unregisterQueryResponse" wsaw:Action="urn:unregisterQueryResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="deleteVirtualSensor">
+            <wsdl:input message="ns:deleteVirtualSensorRequest" wsaw:Action="urn:deleteVirtualSensor"/>
+            <wsdl:output message="ns:deleteVirtualSensorResponse" wsaw:Action="urn:deleteVirtualSensorResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="listEnabledWrappers">
+            <wsdl:input message="ns:listEnabledWrappersRequest" wsaw:Action="urn:listEnabledWrappers"/>
+            <wsdl:output message="ns:listEnabledWrappersResponse" wsaw:Action="urn:listEnabledWrappersResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="createVirtualSensor">
+            <wsdl:input message="ns:createVirtualSensorRequest" wsaw:Action="urn:createVirtualSensor"/>
+            <wsdl:output message="ns:createVirtualSensorResponse" wsaw:Action="urn:createVirtualSensorResponse"/>
+        </wsdl:operation>
     </wsdl:portType>
-    
-    
-    
-    
     <wsdl:binding name="SensorManagerSoap11Binding" type="ns:SensorManagerPortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getOutputStructure">
+            <soap:operation soapAction="urn:getOutputStructure" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listVirtualSensors">
+            <soap:operation soapAction="urn:listVirtualSensors" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="registerQuery">
             <soap:operation soapAction="urn:registerQuery" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listAvailableWrappers">
+            <soap:operation soapAction="urn:listAvailableWrappers" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -102,13 +213,65 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="deleteVirtualSensor">
+            <soap:operation soapAction="urn:deleteVirtualSensor" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listEnabledWrappers">
+            <soap:operation soapAction="urn:listEnabledWrappers" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="createVirtualSensor">
+            <soap:operation soapAction="urn:createVirtualSensor" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
-    
-    
     <wsdl:binding name="SensorManagerSoap12Binding" type="ns:SensorManagerPortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getOutputStructure">
+            <soap12:operation soapAction="urn:getOutputStructure" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listVirtualSensors">
+            <soap12:operation soapAction="urn:listVirtualSensors" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="registerQuery">
             <soap12:operation soapAction="urn:registerQuery" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listAvailableWrappers">
+            <soap12:operation soapAction="urn:listAvailableWrappers" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -125,11 +288,54 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="deleteVirtualSensor">
+            <soap12:operation soapAction="urn:deleteVirtualSensor" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listEnabledWrappers">
+            <soap12:operation soapAction="urn:listEnabledWrappers" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="createVirtualSensor">
+            <soap12:operation soapAction="urn:createVirtualSensor" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
-    
-    
     <wsdl:binding name="SensorManagerHttpBinding" type="ns:SensorManagerPortType">
         <http:binding verb="POST"/>
+        <wsdl:operation name="getOutputStructure">
+            <http:operation location="SensorManager/getOutputStructure"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getOutputStructure"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getOutputStructure"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listVirtualSensors">
+            <http:operation location="SensorManager/listVirtualSensors"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="listVirtualSensors"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="listVirtualSensors"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="registerQuery">
             <http:operation location="SensorManager/registerQuery"/>
             <wsdl:input>
@@ -137,6 +343,15 @@
             </wsdl:input>
             <wsdl:output>
                 <mime:content type="text/xml" part="registerQuery"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listAvailableWrappers">
+            <http:operation location="SensorManager/listAvailableWrappers"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="listAvailableWrappers"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="listAvailableWrappers"/>
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="unregisterQuery">
@@ -148,12 +363,34 @@
                 <mime:content type="text/xml" part="unregisterQuery"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="deleteVirtualSensor">
+            <http:operation location="SensorManager/deleteVirtualSensor"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="deleteVirtualSensor"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="deleteVirtualSensor"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listEnabledWrappers">
+            <http:operation location="SensorManager/listEnabledWrappers"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="listEnabledWrappers"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="listEnabledWrappers"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="createVirtualSensor">
+            <http:operation location="SensorManager/createVirtualSensor"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="createVirtualSensor"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="createVirtualSensor"/>
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
-    
-    
-    
-    
-    
     <wsdl:service name="SensorManager">
         <wsdl:port name="SensorManagerHttpSoap11Endpoint" binding="ns:SensorManagerSoap11Binding">
             <soap:address location="http://localhost:22001/hydrosys/SensorManager"/>

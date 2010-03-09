@@ -1,6 +1,6 @@
 
 /**
- * UnregisterQuery.java
+ * CreateVirtualSensor.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
@@ -10,15 +10,15 @@
             
 
             /**
-            *  UnregisterQuery bean class
+            *  CreateVirtualSensor bean class
             */
         
-        public  class UnregisterQuery
+        public  class CreateVirtualSensor
         implements org.apache.axis2.databinding.ADBBean{
         
                 public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
                 "http://sensormanager.hydrosys.gsn",
-                "unregisterQuery",
+                "createVirtualSensor",
                 "ns2");
 
             
@@ -33,30 +33,60 @@
         
 
                         /**
-                        * field for QueryName
+                        * field for Vsname
                         */
 
                         
-                                    protected java.lang.String localQueryName ;
+                                    protected java.lang.String localVsname ;
                                 
 
                            /**
                            * Auto generated getter method
                            * @return java.lang.String
                            */
-                           public  java.lang.String getQueryName(){
-                               return localQueryName;
+                           public  java.lang.String getVsname(){
+                               return localVsname;
                            }
 
                            
                         
                             /**
                                * Auto generated setter method
-                               * @param param QueryName
+                               * @param param Vsname
                                */
-                               public void setQueryName(java.lang.String param){
+                               public void setVsname(java.lang.String param){
                             
-                                            this.localQueryName=param;
+                                            this.localVsname=param;
+                                    
+
+                               }
+                            
+
+                        /**
+                        * field for DescriptionFileContent
+                        */
+
+                        
+                                    protected java.lang.String localDescriptionFileContent ;
+                                
+
+                           /**
+                           * Auto generated getter method
+                           * @return java.lang.String
+                           */
+                           public  java.lang.String getDescriptionFileContent(){
+                               return localDescriptionFileContent;
+                           }
+
+                           
+                        
+                            /**
+                               * Auto generated setter method
+                               * @param param DescriptionFileContent
+                               */
+                               public void setDescriptionFileContent(java.lang.String param){
+                            
+                                            this.localDescriptionFileContent=param;
                                     
 
                                }
@@ -94,7 +124,7 @@
                        new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       UnregisterQuery.this.serialize(MY_QNAME,factory,xmlWriter);
+                       CreateVirtualSensor.this.serialize(MY_QNAME,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
@@ -148,11 +178,11 @@
                    java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://sensormanager.hydrosys.gsn");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":unregisterQuery",
+                           namespacePrefix+":createVirtualSensor",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "unregisterQuery",
+                           "createVirtualSensor",
                            xmlWriter);
                    }
 
@@ -166,28 +196,62 @@
                                         if (prefix == null) {
                                             prefix = generatePrefix(namespace);
 
-                                            xmlWriter.writeStartElement(prefix,"queryName", namespace);
+                                            xmlWriter.writeStartElement(prefix,"vsname", namespace);
                                             xmlWriter.writeNamespace(prefix, namespace);
                                             xmlWriter.setPrefix(prefix, namespace);
 
                                         } else {
-                                            xmlWriter.writeStartElement(namespace,"queryName");
+                                            xmlWriter.writeStartElement(namespace,"vsname");
                                         }
 
                                     } else {
-                                        xmlWriter.writeStartElement("queryName");
+                                        xmlWriter.writeStartElement("vsname");
                                     }
                                 
 
-                                          if (localQueryName==null){
+                                          if (localVsname==null){
                                               // write the nil attribute
                                               
-                                                     throw new org.apache.axis2.databinding.ADBException("queryName cannot be null!!");
+                                                     throw new org.apache.axis2.databinding.ADBException("vsname cannot be null!!");
                                                   
                                           }else{
 
                                         
-                                                   xmlWriter.writeCharacters(localQueryName);
+                                                   xmlWriter.writeCharacters(localVsname);
+                                            
+                                          }
+                                    
+                                   xmlWriter.writeEndElement();
+                             
+                                    namespace = "http://sensormanager.hydrosys.gsn";
+                                    if (! namespace.equals("")) {
+                                        prefix = xmlWriter.getPrefix(namespace);
+
+                                        if (prefix == null) {
+                                            prefix = generatePrefix(namespace);
+
+                                            xmlWriter.writeStartElement(prefix,"descriptionFileContent", namespace);
+                                            xmlWriter.writeNamespace(prefix, namespace);
+                                            xmlWriter.setPrefix(prefix, namespace);
+
+                                        } else {
+                                            xmlWriter.writeStartElement(namespace,"descriptionFileContent");
+                                        }
+
+                                    } else {
+                                        xmlWriter.writeStartElement("descriptionFileContent");
+                                    }
+                                
+
+                                          if (localDescriptionFileContent==null){
+                                              // write the nil attribute
+                                              
+                                                     throw new org.apache.axis2.databinding.ADBException("descriptionFileContent cannot be null!!");
+                                                  
+                                          }else{
+
+                                        
+                                                   xmlWriter.writeCharacters(localDescriptionFileContent);
                                             
                                           }
                                     
@@ -356,12 +420,21 @@
 
                 
                                       elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
-                                                                      "queryName"));
+                                                                      "vsname"));
                                  
-                                        if (localQueryName != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localQueryName));
+                                        if (localVsname != null){
+                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localVsname));
                                         } else {
-                                           throw new org.apache.axis2.databinding.ADBException("queryName cannot be null!!");
+                                           throw new org.apache.axis2.databinding.ADBException("vsname cannot be null!!");
+                                        }
+                                    
+                                      elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
+                                                                      "descriptionFileContent"));
+                                 
+                                        if (localDescriptionFileContent != null){
+                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localDescriptionFileContent));
+                                        } else {
+                                           throw new org.apache.axis2.databinding.ADBException("descriptionFileContent cannot be null!!");
                                         }
                                     
 
@@ -388,9 +461,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static UnregisterQuery parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            UnregisterQuery object =
-                new UnregisterQuery();
+        public static CreateVirtualSensor parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            CreateVirtualSensor object =
+                new CreateVirtualSensor();
 
             int event;
             java.lang.String nillableValue = null;
@@ -414,10 +487,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"unregisterQuery".equals(type)){
+                            if (!"createVirtualSensor".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (UnregisterQuery)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
+                                return (CreateVirtualSensor)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -442,11 +515,30 @@
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","queryName").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","vsname").equals(reader.getName())){
                                 
                                     java.lang.String content = reader.getElementText();
                                     
-                                              object.setQueryName(
+                                              object.setVsname(
+                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
+                                              
+                                        reader.next();
+                                    
+                              }  // End of if for expected property start element
+                                
+                                else{
+                                    // A start element we are not expecting indicates an invalid parameter was passed
+                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                }
+                            
+                                    
+                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","descriptionFileContent").equals(reader.getName())){
+                                
+                                    java.lang.String content = reader.getElementText();
+                                    
+                                              object.setDescriptionFileContent(
                                                     org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
                                               
                                         reader.next();

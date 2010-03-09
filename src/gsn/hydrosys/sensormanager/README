@@ -1,49 +1,301 @@
+ACCESS THE WEBSERVICE
+Initial WSDL: http://<GSN-IP>:<GSN-PORT>/services/SensorManager?wsdl
+          ex: http://localhost:22001/services/SensorManager?wsdl
+
 ACTIVATE THE WEB SERVICE
+If the webservice is not already activated, uncomment configuration in webapp/WEB-INF/web.xml
 
-In the webapp/WEB-INF/web.xml, uncomment the parts for webservice
-	
 
-DEV
+METHODS
 
-* GENERATE THE JAVA CODE FROM WSDL FILE
-	ant generate-hydrosys
-	copy files from generated/src to gsn's src
-	edit
-	copy back to generated/src (gsn/hydrosys and gsn/beans/xsd)
-	in generated directory:
-		ant jar.client
-		ant jar.server
-	
-	copy the SensorManager.aar to webapp/WEB-INF/services/
-	
-ACCESS THE SERVICE
-	http://localhost:22001/services/SensorManager?wsdl
+1. CREATE VIRTUAL SENSOR
+------------------------
 
-* GENERATE THE WSDL FROM THE SensorManager INTERFACE
-	1. Compile the java Interface
-	2. java2wsdl.sh -o sensormanager -l http://localhost:22001/hydrosys/SensorManager -cn gsn.hydrosys.sensormanager.SensorManager
-	3. Edit sensormanager/SensorManager.wsdl file
-	
-EXAMPLE OF REQUEST
+> REQUEST
 
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sen="http://sensormanager.hydrosys.gsn" xmlns:xsd="http://beans.gsn/xsd">
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sen="http://sensormanager.hydrosys.gsn">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sen:createVirtualSensor>
+         <sen:vsname>memoryusage3</sen:vsname>
+         <sen:descriptionFileContent>
+         <![CDATA[
+<virtual-sensor name="memoryusage3" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <init-params/>
+    <output-structure>
+        <field name="HEAP" type="bigint"/>
+    </output-structure>
+    </processing-class>
+    <description>this VS reports the memory usage at the local machine every 1100 ms</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+          </addressing>
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="mem" storage-size="1" sampling-rate="1">
+                <address wrapper="memory-usage">
+                    <predicate key="HOST">localhost</predicate>
+                    <predicate key="PORT">22001</predicate>
+                    <predicate key="sampling-rate">1100</predicate>
+                </address>
+                <query>select HEAP from wrapper</query>
+            </source>
+        <query>select * from mem</query>
+        </stream>
+    </streams>
+</virtual-sensor>         
+         ]]>
+         </sen:descriptionFileContent>
+      </sen:createVirtualSensor>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+> RESPONSE
+
+Status:
+    1 if the Virtual Sensor has been created and enabled successfully.
+    2 if the Virtual Sensor failed to be created.
+
+
+
+2. REGISTER QUERY
+-----------------
+
+> REQUEST
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sen="http://sensormanager.hydrosys.gsn" xmlns:xsd="http://sensormanager.hydrosys.gsn/xsd">
    <soapenv:Header/>
    <soapenv:Body>
       <sen:registerQuery>
          <sen:queryName>test</sen:queryName>
-         <!--Zero or more repetitions:-->
          <sen:outputStructure>
             <xsd:name>HEAP</xsd:name>
             <xsd:type>BIGINT</xsd:type>
          </sen:outputStructure>
-         <sen:outputStructure>
+	 <sen:outputStructure>
             <xsd:name>NON_HEAP2</xsd:name>
             <xsd:type>BIGINT</xsd:type>
          </sen:outputStructure>
-         <!--Zero or more repetitions:-->
          <sen:vsnames>memoryusage1</sen:vsnames>
-         <sen:vsnames>memoryusage2</sen:vsnames> 
-	 <sen:query>select memoryusage1.HEAP AS HEAP, memoryusage2.NON_HEAP AS NON_HEAP2 from memoryusage1,memoryusage2</sen:query>
+	 <sen:vsnames>memoryusage2</sen:vsnames>
+         <sen:query>select memoryusage1.HEAP AS HEAP, memoryusage2.NON_HEAP AS NON_HEAP2 from memoryusage1,memoryusage2</sen:query>
       </sen:registerQuery>
    </soapenv:Body>
 </soapenv:Envelope>
+
+
+> RESPONSE
+
+Status:
+    1 if the QUERY has been created and enabled successfully.
+    2 if the QUERY failed to be registered.
+
+3. DELETE VIRTUAL SENSOR
+------------------------
+
+> REQUEST
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sen="http://sensormanager.hydrosys.gsn">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sen:deleteVirtualSensor>
+         <sen:vsname>test</sen:vsname>
+      </sen:deleteVirtualSensor>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+> RESPONSE
+
+Status:
+    1 if the Virtual Sensor has been deleted successfully.
+    2 if the Virtual Sensor failed to be deleted.
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Body>
+      <ns2:deleteVirtualSensorResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns1:message xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">Deleted the following Virtual Sensor: test</ns1:message>
+         <ns1:status xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">1</ns1:status>
+      </ns2:deleteVirtualSensorResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+4. UNREGISTER QUERY
+-------------------
+
+> REQUEST
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sen="http://sensormanager.hydrosys.gsn">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sen:unregisterQuery>
+         <sen:queryName>test</sen:queryName>
+      </sen:unregisterQuery>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+> RESPONSE
+
+Status:
+    1 if the Virtual Sensor has been unregistered successfully.
+    2 if the Virtual Sensor failed to be unregistered.
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Body>
+      <ns2:unregisterQueryResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns1:message xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">Unregistered the following Query: test</ns1:message>
+         <ns1:status xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">1</ns1:status>
+      </ns2:unregisterQueryResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+
+5. LIST AVAILABLE WRAPPERS
+--------------------------
+
+> QUERY
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Header/>
+   <soapenv:Body/>
+</soapenv:Envelope>
+
+
+> RESPONSE
+
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Body>
+      <ns2:listAvailableWrappersResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns2:wrappername>sensorscope2</ns2:wrappername>
+         <ns2:wrappername>teds-mote</ns2:wrappername>
+         ...
+         <ns2:wrappername>teds-cam</ns2:wrappername>
+         <ns2:wrappername>memory-usage</ns2:wrappername>
+      </ns2:listAvailableWrappersResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+
+6. LIST ENABLED WRAPPERS
+------------------------
+
+> QUERY
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Header/>
+   <soapenv:Body/>
+</soapenv:Envelope>
+
+> RESPONSE
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Body>
+      <ns2:listEnabledWrappersResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns2:wrappername>local</ns2:wrappername>
+         <ns2:wrappername>memory-usage</ns2:wrappername>
+      </ns2:listEnabledWrappersResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+7. LIST VIRTUAL SENSORS
+-----------------------
+
+> QUERY
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Header/>
+   <soapenv:Body/>
+</soapenv:Envelope>
+
+> RESPONSE
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Body>
+      <ns2:listVirtualSensorsResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns2:vsname>mytest2</ns2:vsname>
+         <ns2:vsname>memoryusage2</ns2:vsname>
+         <ns2:vsname>memoryusage1</ns2:vsname>
+      </ns2:listVirtualSensorsResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+8. GET OUTPUT STRUCTURE
+-----------------------
+
+> QUERY
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sen="http://sensormanager.hydrosys.gsn">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sen:getOutputStructure>
+         <sen:vsname>memoryusage1</sen:vsname>
+      </sen:getOutputStructure>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+> RESPONSE
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Body>
+      <ns2:getOutputStructureResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns2:outputstructure>
+            <ns1:name xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">heap</ns1:name>
+            <ns1:type xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">bigint</ns1:type>
+         </ns2:outputstructure>
+         <ns2:outputstructure>
+            <ns1:name xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">non_heap</ns1:name>
+            <ns1:type xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">bigint</ns1:type>
+         </ns2:outputstructure>
+         <ns2:outputstructure>
+            <ns1:name xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">pending_finalization_count</ns1:name>
+            <ns1:type xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">integer</ns1:type>
+         </ns2:outputstructure>
+      </ns2:getOutputStructureResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+DEVELOPMENT
+
+* GENERATE THE JAVA CODE FROM WSDL FILE
+
+	ant generate-hydrosys
+
+    in generated directory:
+    		ant jar.client
+    		ant jar.server
+
+    copy the SensorManager.aar to webapp/WEB-INF/services/
+	
+
+	copy files from generated/src to gsn's src
+
+	edit
+	
+* GENERATE THE WSDL FROM THE SensorManager INTERFACE
+	1. Compile the java Interface
+	2. java2wsdl.sh -o sensormanager -l http://localhost:22001/hydrosys/SensorManager -cn gsn.hydrosys.sensormanager.SensorManager
+	3. Edit sensormanager/SensorManager.wsdl file
+
+	or
+
+	ant generate-hydrosys-wsdl

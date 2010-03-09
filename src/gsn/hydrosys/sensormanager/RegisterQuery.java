@@ -68,7 +68,7 @@
                         */
 
                         
-                                    protected gsn.beans.xsd.DataField[] localOutputStructure ;
+                                    protected gsn.hydrosys.sensormanager.xsd.DataField[] localOutputStructure ;
                                 
                            /*  This tracker boolean wil be used to detect whether the user called the set method
                           *   for this attribute. It will be used to determine whether to include this field
@@ -79,9 +79,9 @@
 
                            /**
                            * Auto generated getter method
-                           * @return gsn.beans.xsd.DataField[]
+                           * @return gsn.hydrosys.sensormanager.xsd.DataField[]
                            */
-                           public  gsn.beans.xsd.DataField[] getOutputStructure(){
+                           public  gsn.hydrosys.sensormanager.xsd.DataField[] getOutputStructure(){
                                return localOutputStructure;
                            }
 
@@ -93,7 +93,7 @@
                               /**
                                * validate the array for OutputStructure
                                */
-                              protected void validateOutputStructure(gsn.beans.xsd.DataField[] param){
+                              protected void validateOutputStructure(gsn.hydrosys.sensormanager.xsd.DataField[] param){
                              
                               }
 
@@ -102,7 +102,7 @@
                               * Auto generated setter method
                               * @param param OutputStructure
                               */
-                              public void setOutputStructure(gsn.beans.xsd.DataField[] param){
+                              public void setOutputStructure(gsn.hydrosys.sensormanager.xsd.DataField[] param){
                               
                                    validateOutputStructure(param);
 
@@ -122,11 +122,11 @@
                              
                              /**
                              * Auto generated add method for the array for convenience
-                             * @param param gsn.beans.xsd.DataField
+                             * @param param gsn.hydrosys.sensormanager.xsd.DataField
                              */
-                             public void addOutputStructure(gsn.beans.xsd.DataField param){
+                             public void addOutputStructure(gsn.hydrosys.sensormanager.xsd.DataField param){
                                    if (localOutputStructure == null){
-                                   localOutputStructure = new gsn.beans.xsd.DataField[]{};
+                                   localOutputStructure = new gsn.hydrosys.sensormanager.xsd.DataField[]{};
                                    }
 
                             
@@ -138,8 +138,8 @@
                             org.apache.axis2.databinding.utils.ConverterUtil.toList(localOutputStructure);
                                list.add(param);
                                this.localOutputStructure =
-                             (gsn.beans.xsd.DataField[])list.toArray(
-                            new gsn.beans.xsd.DataField[list.size()]);
+                             (gsn.hydrosys.sensormanager.xsd.DataField[])list.toArray(
+                            new gsn.hydrosys.sensormanager.xsd.DataField[list.size()]);
 
                              }
                              
@@ -759,7 +759,7 @@
                             if (!"registerQuery".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (RegisterQuery)gsn.hydrosys.sensormanager.ExtensionMapper.getTypeObject(
+                                return (RegisterQuery)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -812,7 +812,7 @@
                                     
                                     
                                     // Process the array and step past its final element's end.
-                                    list2.add(gsn.beans.xsd.DataField.Factory.parse(reader));
+                                    list2.add(gsn.hydrosys.sensormanager.xsd.DataField.Factory.parse(reader));
                                                                 
                                                         //loop until we find a start element that is not part of this array
                                                         boolean loopDone2 = false;
@@ -830,7 +830,7 @@
                                                                 loopDone2 = true;
                                                             } else {
                                                                 if (new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","outputStructure").equals(reader.getName())){
-                                                                    list2.add(gsn.beans.xsd.DataField.Factory.parse(reader));
+                                                                    list2.add(gsn.hydrosys.sensormanager.xsd.DataField.Factory.parse(reader));
                                                                         
                                                                 }else{
                                                                     loopDone2 = true;
@@ -839,9 +839,9 @@
                                                         }
                                                         // call the converter utility  to convert and set the array
                                                         
-                                                        object.setOutputStructure((gsn.beans.xsd.DataField[])
+                                                        object.setOutputStructure((gsn.hydrosys.sensormanager.xsd.DataField[])
                                                             org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
-                                                                gsn.beans.xsd.DataField.class,
+                                                                gsn.hydrosys.sensormanager.xsd.DataField.class,
                                                                 list2));
                                                             
                               }  // End of if for expected property start element

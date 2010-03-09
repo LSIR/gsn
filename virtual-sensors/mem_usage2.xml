@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<virtual-sensor name="memoryusage2" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <init-params/>
+    <output-structure>
+        <field name="HEAP" type="bigint"/>
+        <field name="NON_HEAP" type="bigint"/>
+        <field name="PENDING_FINALIZATION_COUNT" type="integer"/>
+    </output-structure>
+
+    </processing-class>
+    <description>this VS reports the memory usage at the local machine every 1100 ms</description>
+    <addressing>
+	  </addressing>
+    <storage />
+    <streams>
+		<stream name="data">
+			<source alias="mem" storage-size="1" sampling-rate="1">
+				<address wrapper="memory-usage">
+                    			<predicate key="HOST">localhost</predicate>
+                    			<predicate key="PORT">22001</predicate>
+					<predicate key="sampling-rate">1100</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from mem</query>
+		</stream>
+	</streams>
+</virtual-sensor> 
+
+ 	  	 

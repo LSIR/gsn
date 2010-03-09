@@ -1,6 +1,6 @@
 
 /**
- * UnregisterQuery.java
+ * ListAvailableWrappersResponse.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
@@ -10,15 +10,15 @@
             
 
             /**
-            *  UnregisterQuery bean class
+            *  ListAvailableWrappersResponse bean class
             */
         
-        public  class UnregisterQuery
+        public  class ListAvailableWrappersResponse
         implements org.apache.axis2.databinding.ADBBean{
         
                 public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
                 "http://sensormanager.hydrosys.gsn",
-                "unregisterQuery",
+                "listAvailableWrappersResponse",
                 "ns2");
 
             
@@ -33,34 +33,86 @@
         
 
                         /**
-                        * field for QueryName
+                        * field for Wrappername
+                        * This was an Array!
                         */
 
                         
-                                    protected java.lang.String localQueryName ;
+                                    protected java.lang.String[] localWrappername ;
                                 
+                           /*  This tracker boolean wil be used to detect whether the user called the set method
+                          *   for this attribute. It will be used to determine whether to include this field
+                           *   in the serialized XML
+                           */
+                           protected boolean localWrappernameTracker = false ;
+                           
 
                            /**
                            * Auto generated getter method
-                           * @return java.lang.String
+                           * @return java.lang.String[]
                            */
-                           public  java.lang.String getQueryName(){
-                               return localQueryName;
+                           public  java.lang.String[] getWrappername(){
+                               return localWrappername;
                            }
 
                            
                         
-                            /**
-                               * Auto generated setter method
-                               * @param param QueryName
-                               */
-                               public void setQueryName(java.lang.String param){
-                            
-                                            this.localQueryName=param;
-                                    
 
-                               }
+
+                               
+                              /**
+                               * validate the array for Wrappername
+                               */
+                              protected void validateWrappername(java.lang.String[] param){
+                             
+                              }
+
+
+                             /**
+                              * Auto generated setter method
+                              * @param param Wrappername
+                              */
+                              public void setWrappername(java.lang.String[] param){
+                              
+                                   validateWrappername(param);
+
+                               
+                                          if (param != null){
+                                             //update the setting tracker
+                                             localWrappernameTracker = true;
+                                          } else {
+                                             localWrappernameTracker = true;
+                                                 
+                                          }
+                                      
+                                      this.localWrappername=param;
+                              }
+
+                               
+                             
+                             /**
+                             * Auto generated add method for the array for convenience
+                             * @param param java.lang.String
+                             */
+                             public void addWrappername(java.lang.String param){
+                                   if (localWrappername == null){
+                                   localWrappername = new java.lang.String[]{};
+                                   }
+
                             
+                                 //update the setting tracker
+                                localWrappernameTracker = true;
+                            
+
+                               java.util.List list =
+                            org.apache.axis2.databinding.utils.ConverterUtil.toList(localWrappername);
+                               list.add(param);
+                               this.localWrappername =
+                             (java.lang.String[])list.toArray(
+                            new java.lang.String[list.size()]);
+
+                             }
+                             
 
      /**
      * isReaderMTOMAware
@@ -94,7 +146,7 @@
                        new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       UnregisterQuery.this.serialize(MY_QNAME,factory,xmlWriter);
+                       ListAvailableWrappersResponse.this.serialize(MY_QNAME,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
@@ -148,51 +200,103 @@
                    java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://sensormanager.hydrosys.gsn");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":unregisterQuery",
+                           namespacePrefix+":listAvailableWrappersResponse",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "unregisterQuery",
+                           "listAvailableWrappersResponse",
                            xmlWriter);
                    }
 
                
                    }
-               
-                                    namespace = "http://sensormanager.hydrosys.gsn";
-                                    if (! namespace.equals("")) {
-                                        prefix = xmlWriter.getPrefix(namespace);
-
-                                        if (prefix == null) {
-                                            prefix = generatePrefix(namespace);
-
-                                            xmlWriter.writeStartElement(prefix,"queryName", namespace);
-                                            xmlWriter.writeNamespace(prefix, namespace);
-                                            xmlWriter.setPrefix(prefix, namespace);
-
-                                        } else {
-                                            xmlWriter.writeStartElement(namespace,"queryName");
-                                        }
-
-                                    } else {
-                                        xmlWriter.writeStartElement("queryName");
-                                    }
-                                
-
-                                          if (localQueryName==null){
-                                              // write the nil attribute
-                                              
-                                                     throw new org.apache.axis2.databinding.ADBException("queryName cannot be null!!");
-                                                  
-                                          }else{
-
+                if (localWrappernameTracker){
+                             if (localWrappername!=null) {
+                                   namespace = "http://sensormanager.hydrosys.gsn";
+                                   boolean emptyNamespace = namespace == null || namespace.length() == 0;
+                                   prefix =  emptyNamespace ? null : xmlWriter.getPrefix(namespace);
+                                   for (int i = 0;i < localWrappername.length;i++){
                                         
-                                                   xmlWriter.writeCharacters(localQueryName);
+                                            if (localWrappername[i] != null){
+                                        
+                                                if (!emptyNamespace) {
+                                                    if (prefix == null) {
+                                                        java.lang.String prefix2 = generatePrefix(namespace);
+
+                                                        xmlWriter.writeStartElement(prefix2,"wrappername", namespace);
+                                                        xmlWriter.writeNamespace(prefix2, namespace);
+                                                        xmlWriter.setPrefix(prefix2, namespace);
+
+                                                    } else {
+                                                        xmlWriter.writeStartElement(namespace,"wrappername");
+                                                    }
+
+                                                } else {
+                                                    xmlWriter.writeStartElement("wrappername");
+                                                }
+
                                             
-                                          }
+                                                        xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localWrappername[i]));
+                                                    
+                                                xmlWriter.writeEndElement();
+                                              
+                                                } else {
+                                                   
+                                                           // write null attribute
+                                                            namespace = "http://sensormanager.hydrosys.gsn";
+                                                            if (! namespace.equals("")) {
+                                                                prefix = xmlWriter.getPrefix(namespace);
+
+                                                                if (prefix == null) {
+                                                                    prefix = generatePrefix(namespace);
+
+                                                                    xmlWriter.writeStartElement(prefix,"wrappername", namespace);
+                                                                    xmlWriter.writeNamespace(prefix, namespace);
+                                                                    xmlWriter.setPrefix(prefix, namespace);
+
+                                                                } else {
+                                                                    xmlWriter.writeStartElement(namespace,"wrappername");
+                                                                }
+
+                                                            } else {
+                                                                xmlWriter.writeStartElement("wrappername");
+                                                            }
+                                                            writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","nil","1",xmlWriter);
+                                                            xmlWriter.writeEndElement();
+                                                       
+                                                }
+
+                                   }
+                             } else {
+                                 
+                                         // write the null attribute
+                                        // write null attribute
+                                            java.lang.String namespace2 = "http://sensormanager.hydrosys.gsn";
+                                            if (! namespace2.equals("")) {
+                                                java.lang.String prefix2 = xmlWriter.getPrefix(namespace2);
+
+                                                if (prefix2 == null) {
+                                                    prefix2 = generatePrefix(namespace2);
+
+                                                    xmlWriter.writeStartElement(prefix2,"wrappername", namespace2);
+                                                    xmlWriter.writeNamespace(prefix2, namespace2);
+                                                    xmlWriter.setPrefix(prefix2, namespace2);
+
+                                                } else {
+                                                    xmlWriter.writeStartElement(namespace2,"wrappername");
+                                                }
+
+                                            } else {
+                                                xmlWriter.writeStartElement("wrappername");
+                                            }
+
+                                           // write the nil attribute
+                                           writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","nil","1",xmlWriter);
+                                           xmlWriter.writeEndElement();
                                     
-                                   xmlWriter.writeEndElement();
-                             
+                             }
+
+                        }
                     xmlWriter.writeEndElement();
                
 
@@ -354,16 +458,34 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                
-                                      elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
-                                                                      "queryName"));
-                                 
-                                        if (localQueryName != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localQueryName));
-                                        } else {
-                                           throw new org.apache.axis2.databinding.ADBException("queryName cannot be null!!");
-                                        }
-                                    
+                 if (localWrappernameTracker){
+                            if (localWrappername!=null){
+                                  for (int i = 0;i < localWrappername.length;i++){
+                                      
+                                         if (localWrappername[i] != null){
+                                          elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
+                                                                              "wrappername"));
+                                          elementList.add(
+                                          org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localWrappername[i]));
+                                          } else {
+                                             
+                                                    elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
+                                                                              "wrappername"));
+                                                    elementList.add(null);
+                                                
+                                          }
+                                      
+
+                                  }
+                            } else {
+                              
+                                    elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
+                                                                              "wrappername"));
+                                    elementList.add(null);
+                                
+                            }
+
+                        }
 
                 return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
             
@@ -388,9 +510,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static UnregisterQuery parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            UnregisterQuery object =
-                new UnregisterQuery();
+        public static ListAvailableWrappersResponse parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            ListAvailableWrappersResponse object =
+                new ListAvailableWrappersResponse();
 
             int event;
             java.lang.String nillableValue = null;
@@ -414,10 +536,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"unregisterQuery".equals(type)){
+                            if (!"listAvailableWrappersResponse".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (UnregisterQuery)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
+                                return (ListAvailableWrappersResponse)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -439,25 +561,67 @@
                     
                     reader.next();
                 
+                        java.util.ArrayList list1 = new java.util.ArrayList();
+                    
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","queryName").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","wrappername").equals(reader.getName())){
                                 
-                                    java.lang.String content = reader.getElementText();
                                     
-                                              object.setQueryName(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-                                              
-                                        reader.next();
                                     
+                                    // Process the array and step past its final element's end.
+                                    
+                                              nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance","nil");
+                                              if ("true".equals(nillableValue) || "1".equals(nillableValue)){
+                                                  list1.add(null);
+                                                       
+                                                  reader.next();
+                                              } else {
+                                            list1.add(reader.getElementText());
+                                            }
+                                            //loop until we find a start element that is not part of this array
+                                            boolean loopDone1 = false;
+                                            while(!loopDone1){
+                                                // Ensure we are at the EndElement
+                                                while (!reader.isEndElement()){
+                                                    reader.next();
+                                                }
+                                                // Step out of this element
+                                                reader.next();
+                                                // Step to next element event.
+                                                while (!reader.isStartElement() && !reader.isEndElement())
+                                                    reader.next();
+                                                if (reader.isEndElement()){
+                                                    //two continuous end elements means we are exiting the xml structure
+                                                    loopDone1 = true;
+                                                } else {
+                                                    if (new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","wrappername").equals(reader.getName())){
+                                                         
+                                                          nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance","nil");
+                                                          if ("true".equals(nillableValue) || "1".equals(nillableValue)){
+                                                              list1.add(null);
+                                                                   
+                                                              reader.next();
+                                                          } else {
+                                                        list1.add(reader.getElementText());
+                                                        }
+                                                    }else{
+                                                        loopDone1 = true;
+                                                    }
+                                                }
+                                            }
+                                            // call the converter utility  to convert and set the array
+                                            
+                                                    object.setWrappername((java.lang.String[])
+                                                        list1.toArray(new java.lang.String[list1.size()]));
+                                                
                               }  // End of if for expected property start element
                                 
-                                else{
-                                    // A start element we are not expecting indicates an invalid parameter was passed
-                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
-                                }
-                              
+                                    else {
+                                        
+                                    }
+                                  
                             while (!reader.isStartElement() && !reader.isEndElement())
                                 reader.next();
                             
