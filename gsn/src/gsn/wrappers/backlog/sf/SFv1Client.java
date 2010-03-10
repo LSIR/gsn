@@ -62,7 +62,7 @@ public class SFv1Client extends SFProtocol implements Runnable, BackLogMessageLi
 
     private void init() throws IOException {
     	open(this);
-		listenServer.source.registerListener(BackLogMessage.TOS_MESSAGE_TYPE, this, false);
+		listenServer.source.registerListener(BackLogMessage.TOS1x_MESSAGE_TYPE, this, false);
     }
 
     public void shutdown() {
@@ -88,7 +88,7 @@ public class SFv1Client extends SFProtocol implements Runnable, BackLogMessageLi
 		}
 		catch (IOException e) { }
 		finally {
-		    listenServer.source.deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this, false);
+		    listenServer.source.deregisterListener(BackLogMessage.TOS1x_MESSAGE_TYPE, this, false);
 		    listenServer.removeSFClient(this);
 		    shutdown();
 		}
@@ -99,7 +99,7 @@ public class SFv1Client extends SFProtocol implements Runnable, BackLogMessageLi
 			byte[] packet = readPacket();
 		    BackLogMessage msg;
 			try {
-				msg = new BackLogMessage(BackLogMessage.TOS_MESSAGE_TYPE, 0, packet);
+				msg = new BackLogMessage(BackLogMessage.TOS1x_MESSAGE_TYPE, 0, packet);
 			    
 			    if (!listenServer.source.sendMessage(msg))
 			    	logger.error("write failed");
