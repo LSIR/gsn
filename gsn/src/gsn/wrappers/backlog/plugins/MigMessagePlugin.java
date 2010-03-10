@@ -200,8 +200,10 @@ public class MigMessagePlugin extends AbstractPlugin
 	
 	@Override
 	public byte getMessageType() {
-		// this plugin operates on the TOS_MESSAGE_TYPE
-		return gsn.wrappers.backlog.BackLogMessage.TOS_MESSAGE_TYPE;
+		if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1)
+			return gsn.wrappers.backlog.BackLogMessage.TOS1x_MESSAGE_TYPE;
+		else
+			return gsn.wrappers.backlog.BackLogMessage.TOS_MESSAGE_TYPE;
 	}
 	
 	
