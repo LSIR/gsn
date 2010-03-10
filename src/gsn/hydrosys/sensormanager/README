@@ -59,6 +59,15 @@ Status:
     1 if the Virtual Sensor has been created and enabled successfully.
     2 if the Virtual Sensor failed to be created.
 
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Body>
+      <ns2:createVirtualSensorResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns1:message xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">Created the configuration file (virtual-sensors/memoryusage3.xml)</ns1:message>
+         <ns1:status xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">1</ns1:status>
+      </ns2:createVirtualSensorResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
+
 
 
 2. REGISTER QUERY
@@ -92,6 +101,17 @@ Status:
 Status:
     1 if the QUERY has been created and enabled successfully.
     2 if the QUERY failed to be registered.
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Body>
+      <ns2:registerQueryResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns1:message xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">Query: select memoryusage1.HEAP AS HEAP, memoryusage2.NON_HEAP AS NON_HEAP2 from memoryusage1,memoryusage2
+Created the configuration file (virtual-sensors/test.xml)</ns1:message>
+         <ns1:status xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">1</ns1:status>
+      </ns2:registerQueryResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
+
 
 3. DELETE VIRTUAL SENSOR
 ------------------------
@@ -154,8 +174,8 @@ Status:
 
 
 
-5. LIST AVAILABLE WRAPPERS
---------------------------
+5. LIST WRAPPERS
+----------------
 
 > QUERY
 
@@ -170,41 +190,17 @@ Status:
 
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
    <soapenv:Body>
-      <ns2:listAvailableWrappersResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
-         <ns2:wrappername>sensorscope2</ns2:wrappername>
-         <ns2:wrappername>teds-mote</ns2:wrappername>
-         ...
-         <ns2:wrappername>teds-cam</ns2:wrappername>
-         <ns2:wrappername>memory-usage</ns2:wrappername>
-      </ns2:listAvailableWrappersResponse>
+      <ns2:listWrappersResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns2:wrapperaddress>memoryusage3/data/mem/memory-usage</ns2:wrapperaddress>
+         <ns2:wrapperaddress>memoryusage2/data/mem/memory-usage</ns2:wrapperaddress>
+         <ns2:wrapperaddress>memoryusage1/data/mem/memory-usage</ns2:wrapperaddress>
+      </ns2:listWrappersResponse>
    </soapenv:Body>
 </soapenv:Envelope>
 
 
 
-6. LIST ENABLED WRAPPERS
-------------------------
-
-> QUERY
-
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-   <soapenv:Header/>
-   <soapenv:Body/>
-</soapenv:Envelope>
-
-> RESPONSE
-
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-   <soapenv:Body>
-      <ns2:listEnabledWrappersResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
-         <ns2:wrappername>local</ns2:wrappername>
-         <ns2:wrappername>memory-usage</ns2:wrappername>
-      </ns2:listEnabledWrappersResponse>
-   </soapenv:Body>
-</soapenv:Envelope>
-
-
-7. LIST VIRTUAL SENSORS
+6. LIST VIRTUAL SENSORS
 -----------------------
 
 > QUERY
@@ -219,7 +215,7 @@ Status:
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
    <soapenv:Body>
       <ns2:listVirtualSensorsResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
-         <ns2:vsname>mytest2</ns2:vsname>
+         <ns2:vsname>memoryusage3</ns2:vsname>
          <ns2:vsname>memoryusage2</ns2:vsname>
          <ns2:vsname>memoryusage1</ns2:vsname>
       </ns2:listVirtualSensorsResponse>
@@ -227,17 +223,17 @@ Status:
 </soapenv:Envelope>
 
 
-8. GET OUTPUT STRUCTURE
------------------------
+7. GET VIRTUAL SENSOR OUTPUT STRUCTURE
+--------------------------------------
 
 > QUERY
 
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sen="http://sensormanager.hydrosys.gsn">
    <soapenv:Header/>
    <soapenv:Body>
-      <sen:getOutputStructure>
+      <sen:getVirtualSensorOutputStructure>
          <sen:vsname>memoryusage1</sen:vsname>
-      </sen:getOutputStructure>
+      </sen:getVirtualSensorOutputStructure>
    </soapenv:Body>
 </soapenv:Envelope>
 
@@ -245,7 +241,7 @@ Status:
 
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
    <soapenv:Body>
-      <ns2:getOutputStructureResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+      <ns2:getVirtualSensorOutputStructureResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
          <ns2:outputstructure>
             <ns1:name xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">heap</ns1:name>
             <ns1:type xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">bigint</ns1:type>
@@ -258,11 +254,46 @@ Status:
             <ns1:name xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">pending_finalization_count</ns1:name>
             <ns1:type xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">integer</ns1:type>
          </ns2:outputstructure>
-      </ns2:getOutputStructureResponse>
+      </ns2:getVirtualSensorOutputStructureResponse>
    </soapenv:Body>
 </soapenv:Envelope>
 
 
+8. GET WRAPPER OUTPUT STRUCTURE
+-------------------------------
+
+> QUERY
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sen="http://sensormanager.hydrosys.gsn">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <sen:getWrapperOutputStructure>
+         <sen:wrapperaddress>memoryusage1/data/mem/memory-usage</sen:wrapperaddress>
+      </sen:getWrapperOutputStructure>
+   </soapenv:Body>
+</soapenv:Envelope>
+
+
+> RESPONSE
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Body>
+      <ns2:getWrapperOutputStructureResponse xmlns:ns2="http://sensormanager.hydrosys.gsn">
+         <ns2:outputstructure>
+            <ns1:name xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">heap</ns1:name>
+            <ns1:type xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">bigint</ns1:type>
+         </ns2:outputstructure>
+         <ns2:outputstructure>
+            <ns1:name xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">non_heap</ns1:name>
+            <ns1:type xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">bigint</ns1:type>
+         </ns2:outputstructure>
+         <ns2:outputstructure>
+            <ns1:name xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">pending_finalization_count</ns1:name>
+            <ns1:type xmlns:ns1="http://sensormanager.hydrosys.gsn/xsd">int</ns1:type>
+         </ns2:outputstructure>
+      </ns2:getWrapperOutputStructureResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
 
 
 

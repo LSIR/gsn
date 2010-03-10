@@ -6,9 +6,11 @@
  */
 package gsn.hydrosys.sensormanager;
 
+import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
 import gsn.hydrosys.sensormanager.xsd.Status;
+import gsn.wrappers.AbstractWrapper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -129,26 +131,26 @@ public class SensorManagerSkeleton {
      * Auto generated method signature
      */
 
-    public gsn.hydrosys.sensormanager.ListAvailableWrappersResponse listAvailableWrappers() {
-        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#listAvailableWrappers");
-        ListAvailableWrappersResponse response = new ListAvailableWrappersResponse();
-        ArrayList<String> wrappernames = new ArrayList<String>();
-        for (Map.Entry property : gsn.Main.getInstance().getWrappers().entrySet()) {
-            logger.debug("key: " + property.getKey() + " value: " + property.getValue());
-            wrappernames.add(property.getKey().toString());
-        }
-        response.setWrappername(wrappernames.toArray(new String[wrappernames.size()]));
-        return response;
-    }
+//    public gsn.hydrosys.sensormanager.ListAvailableWrappersResponse listAvailableWrappers() {
+//        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#listAvailableWrappers");
+//        ListAvailableWrappersResponse response = new ListAvailableWrappersResponse();
+//        ArrayList<String> wrappernames = new ArrayList<String>();
+//        for (Map.Entry property : gsn.Main.getInstance().getWrappers().entrySet()) {
+//            logger.debug("key: " + property.getKey() + " value: " + property.getValue());
+//            wrappernames.add(property.getKey().toString());
+//        }
+//        response.setWrappername(wrappernames.toArray(new String[wrappernames.size()]));
+//        return response;
+//    }
 
 
     /**
      * Auto generated method signature
      */
 
-    public gsn.hydrosys.sensormanager.ListEnabledWrappersResponse listEnabledWrappers() {
-        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#listEnabledWrappers");
-        ListEnabledWrappersResponse response = new ListEnabledWrappersResponse();
+    public gsn.hydrosys.sensormanager.ListWrappersResponse listWrappers() {
+        //throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#listWrappers");
+        ListWrappersResponse response = new ListWrappersResponse();
         Iterator<VSensorConfig> iter = Mappings.getAllVSensorConfigs();
         VSensorConfig config;
         ArrayList<String> wrappers = new ArrayList<String>();
@@ -156,12 +158,19 @@ public class SensorManagerSkeleton {
             config = iter.next();
             for (gsn.beans.InputStream is : config.getInputStreams()) {
                 for (gsn.beans.StreamSource source : is.getSources()) {
-                    if (!wrappers.contains(source.getActiveAddressBean().getWrapper()))
-                        wrappers.add(source.getActiveAddressBean().getWrapper());
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(config.getName());
+                    sb.append("/");
+                    sb.append(is.getInputStreamName());
+                    sb.append("/");
+                    sb.append(source.getAlias());
+                    sb.append("/");
+                    sb.append(source.getActiveAddressBean().getWrapper());
+                    wrappers.add(sb.toString());
                 }
             }
         }
-        response.setWrappername(wrappers.toArray(new String[wrappers.size()]));
+        response.setWrapperaddress(wrappers.toArray(new String[wrappers.size()]));
         return response;
     }
 
@@ -188,20 +197,56 @@ public class SensorManagerSkeleton {
     /**
      * Auto generated method signature
      *
-     * @param getOutputStructure
+     * @param getVirtualSensorOutputStructure
+     *
      */
 
-    public gsn.hydrosys.sensormanager.GetOutputStructureResponse getOutputStructure(gsn.hydrosys.sensormanager.GetOutputStructure getOutputStructure) {
-        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getOutputStructure");
-        GetOutputStructureResponse response = new GetOutputStructureResponse();
-        VSensorConfig config = Mappings.getConfig(getOutputStructure.getVsname());
+    public gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse getVirtualSensorOutputStructure(gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructure getVirtualSensorOutputStructure) {
+        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getVirtualSensorOutputStructure");
+        GetVirtualSensorOutputStructureResponse response = new GetVirtualSensorOutputStructureResponse();
+        VSensorConfig config = Mappings.getConfig(getVirtualSensorOutputStructure.getVsname());
         if (config != null) {
             gsn.beans.DataField[] fields = config.getOutputStructure();
-            for (int i = 0 ; i < fields.length ; i++) {
+            for (int i = 0; i < fields.length; i++) {
                 gsn.hydrosys.sensormanager.xsd.DataField field = new gsn.hydrosys.sensormanager.xsd.DataField();
                 field.setName(fields[i].getName());
                 field.setType(fields[i].getType());
                 response.addOutputstructure(field);
+            }
+        }
+        return response;
+    }
+
+    /**
+     * Auto generated method signature
+     *
+     * @param getWrapperOutputStructure
+     */
+
+    public gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse getWrapperOutputStructure(gsn.hydrosys.sensormanager.GetWrapperOutputStructure getWrapperOutputStructure) {
+        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getWrapperOutputStructure");
+        GetWrapperOutputStructureResponse response = new GetWrapperOutputStructureResponse();
+        String[] path = getWrapperOutputStructure.getWrapperaddress().split("/");
+        if (path != null && path.length == 4) { // <vs-name>/<stream-name>/<source-alias>/<wrapper-name> -> 4 path elements
+            VSensorConfig config = Mappings.getConfig(path[0]); // get VSConfig for <vs-name>
+            if (config != null) {
+                for (gsn.beans.InputStream is : config.getInputStreams()) {  // go through the input streams
+                    if (is.getInputStreamName().equals(path[1])) { // get InputStream <stream-name>
+                        for (gsn.beans.StreamSource source : is.getSources()) { // go thourgh the sources
+                            if (source.getAlias().equals(path[2])) {    // get the source <source-alias>
+                                if (source.getWrapper() != null && source.getWrapper().getActiveAddressBean().getWrapper().equals(path[3])) { // get the wrapper <wrapper-name>
+                                    gsn.beans.DataField[] fields = source.getWrapper().getOutputFormat();
+                                    for (int i = 0; i < fields.length; i++) {
+                                        gsn.hydrosys.sensormanager.xsd.DataField field = new gsn.hydrosys.sensormanager.xsd.DataField();
+                                        field.setName(fields[i].getName());
+                                        field.setType(fields[i].getType());
+                                        response.addOutputstructure(field);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         return response;
@@ -255,3 +300,4 @@ public class SensorManagerSkeleton {
     }
 
 }
+	

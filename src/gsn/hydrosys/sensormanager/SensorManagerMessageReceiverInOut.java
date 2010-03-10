@@ -36,127 +36,134 @@
 
         
 
-            if("getOutputStructure".equals(methodName)){
-                
-                gsn.hydrosys.sensormanager.GetOutputStructureResponse getOutputStructureResponse4 = null;
-	                        gsn.hydrosys.sensormanager.GetOutputStructure wrappedParam =
-                                                             (gsn.hydrosys.sensormanager.GetOutputStructure)fromOM(
-                                    msgContext.getEnvelope().getBody().getFirstElement(),
-                                    gsn.hydrosys.sensormanager.GetOutputStructure.class,
-                                    getEnvelopeNamespaces(msgContext.getEnvelope()));
-                                                
-                                               getOutputStructureResponse4 =
-                                                   
-                                                   
-                                                         skel.getOutputStructure(wrappedParam)
-                                                    ;
-                                            
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), getOutputStructureResponse4, false);
-                                    } else 
-
-            if("listEnabledWrappers".equals(methodName)){
-                
-                gsn.hydrosys.sensormanager.ListEnabledWrappersResponse listEnabledWrappersResponse6 = null;
-	                        listEnabledWrappersResponse6 =
-                                                     
-                                                 skel.listEnabledWrappers()
-                                                ;
-                                            
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), listEnabledWrappersResponse6, false);
-                                    } else 
-
             if("deleteVirtualSensor".equals(methodName)){
                 
-                gsn.hydrosys.sensormanager.DeleteVirtualSensorResponse deleteVirtualSensorResponse8 = null;
+                gsn.hydrosys.sensormanager.DeleteVirtualSensorResponse deleteVirtualSensorResponse3 = null;
 	                        gsn.hydrosys.sensormanager.DeleteVirtualSensor wrappedParam =
                                                              (gsn.hydrosys.sensormanager.DeleteVirtualSensor)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     gsn.hydrosys.sensormanager.DeleteVirtualSensor.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               deleteVirtualSensorResponse8 =
+                                               deleteVirtualSensorResponse3 =
                                                    
                                                    
                                                          skel.deleteVirtualSensor(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), deleteVirtualSensorResponse8, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), deleteVirtualSensorResponse3, false);
+                                    } else 
+
+            if("getVirtualSensorOutputStructure".equals(methodName)){
+                
+                gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse getVirtualSensorOutputStructureResponse5 = null;
+	                        gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructure wrappedParam =
+                                                             (gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructure)fromOM(
+                                    msgContext.getEnvelope().getBody().getFirstElement(),
+                                    gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructure.class,
+                                    getEnvelopeNamespaces(msgContext.getEnvelope()));
+                                                
+                                               getVirtualSensorOutputStructureResponse5 =
+                                                   
+                                                   
+                                                         skel.getVirtualSensorOutputStructure(wrappedParam)
+                                                    ;
+                                            
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), getVirtualSensorOutputStructureResponse5, false);
+                                    } else 
+
+            if("listWrappers".equals(methodName)){
+                
+                gsn.hydrosys.sensormanager.ListWrappersResponse listWrappersResponse7 = null;
+	                        listWrappersResponse7 =
+                                                     
+                                                 skel.listWrappers()
+                                                ;
+                                            
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), listWrappersResponse7, false);
+                                    } else 
+
+            if("getWrapperOutputStructure".equals(methodName)){
+                
+                gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse getWrapperOutputStructureResponse9 = null;
+	                        gsn.hydrosys.sensormanager.GetWrapperOutputStructure wrappedParam =
+                                                             (gsn.hydrosys.sensormanager.GetWrapperOutputStructure)fromOM(
+                                    msgContext.getEnvelope().getBody().getFirstElement(),
+                                    gsn.hydrosys.sensormanager.GetWrapperOutputStructure.class,
+                                    getEnvelopeNamespaces(msgContext.getEnvelope()));
+                                                
+                                               getWrapperOutputStructureResponse9 =
+                                                   
+                                                   
+                                                         skel.getWrapperOutputStructure(wrappedParam)
+                                                    ;
+                                            
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), getWrapperOutputStructureResponse9, false);
                                     } else 
 
             if("registerQuery".equals(methodName)){
                 
-                gsn.hydrosys.sensormanager.RegisterQueryResponse registerQueryResponse10 = null;
+                gsn.hydrosys.sensormanager.RegisterQueryResponse registerQueryResponse11 = null;
 	                        gsn.hydrosys.sensormanager.RegisterQuery wrappedParam =
                                                              (gsn.hydrosys.sensormanager.RegisterQuery)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     gsn.hydrosys.sensormanager.RegisterQuery.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               registerQueryResponse10 =
+                                               registerQueryResponse11 =
                                                    
                                                    
                                                          skel.registerQuery(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), registerQueryResponse10, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), registerQueryResponse11, false);
                                     } else 
 
             if("listVirtualSensors".equals(methodName)){
                 
-                gsn.hydrosys.sensormanager.ListVirtualSensorsResponse listVirtualSensorsResponse12 = null;
-	                        listVirtualSensorsResponse12 =
+                gsn.hydrosys.sensormanager.ListVirtualSensorsResponse listVirtualSensorsResponse13 = null;
+	                        listVirtualSensorsResponse13 =
                                                      
                                                  skel.listVirtualSensors()
                                                 ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), listVirtualSensorsResponse12, false);
-                                    } else 
-
-            if("listAvailableWrappers".equals(methodName)){
-                
-                gsn.hydrosys.sensormanager.ListAvailableWrappersResponse listAvailableWrappersResponse14 = null;
-	                        listAvailableWrappersResponse14 =
-                                                     
-                                                 skel.listAvailableWrappers()
-                                                ;
-                                            
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), listAvailableWrappersResponse14, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), listVirtualSensorsResponse13, false);
                                     } else 
 
             if("unregisterQuery".equals(methodName)){
                 
-                gsn.hydrosys.sensormanager.UnregisterQueryResponse unregisterQueryResponse16 = null;
+                gsn.hydrosys.sensormanager.UnregisterQueryResponse unregisterQueryResponse15 = null;
 	                        gsn.hydrosys.sensormanager.UnregisterQuery wrappedParam =
                                                              (gsn.hydrosys.sensormanager.UnregisterQuery)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     gsn.hydrosys.sensormanager.UnregisterQuery.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               unregisterQueryResponse16 =
+                                               unregisterQueryResponse15 =
                                                    
                                                    
                                                          skel.unregisterQuery(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), unregisterQueryResponse16, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), unregisterQueryResponse15, false);
                                     } else 
 
             if("createVirtualSensor".equals(methodName)){
                 
-                gsn.hydrosys.sensormanager.CreateVirtualSensorResponse createVirtualSensorResponse18 = null;
+                gsn.hydrosys.sensormanager.CreateVirtualSensorResponse createVirtualSensorResponse17 = null;
 	                        gsn.hydrosys.sensormanager.CreateVirtualSensor wrappedParam =
                                                              (gsn.hydrosys.sensormanager.CreateVirtualSensor)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     gsn.hydrosys.sensormanager.CreateVirtualSensor.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               createVirtualSensorResponse18 =
+                                               createVirtualSensorResponse17 =
                                                    
                                                    
                                                          skel.createVirtualSensor(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), createVirtualSensorResponse18, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), createVirtualSensorResponse17, false);
                                     
             } else {
               throw new java.lang.RuntimeException("method not found");
@@ -172,48 +179,6 @@
         }
         
         //
-            private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.GetOutputStructure param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
-
-            
-                        try{
-                             return param.getOMElement(gsn.hydrosys.sensormanager.GetOutputStructure.MY_QNAME,
-                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-                        } catch(org.apache.axis2.databinding.ADBException e){
-                            throw org.apache.axis2.AxisFault.makeFault(e);
-                        }
-                    
-
-            }
-        
-            private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.GetOutputStructureResponse param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
-
-            
-                        try{
-                             return param.getOMElement(gsn.hydrosys.sensormanager.GetOutputStructureResponse.MY_QNAME,
-                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-                        } catch(org.apache.axis2.databinding.ADBException e){
-                            throw org.apache.axis2.AxisFault.makeFault(e);
-                        }
-                    
-
-            }
-        
-            private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.ListEnabledWrappersResponse param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
-
-            
-                        try{
-                             return param.getOMElement(gsn.hydrosys.sensormanager.ListEnabledWrappersResponse.MY_QNAME,
-                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-                        } catch(org.apache.axis2.databinding.ADBException e){
-                            throw org.apache.axis2.AxisFault.makeFault(e);
-                        }
-                    
-
-            }
-        
             private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.DeleteVirtualSensor param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
 
@@ -234,6 +199,76 @@
             
                         try{
                              return param.getOMElement(gsn.hydrosys.sensormanager.DeleteVirtualSensorResponse.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructure param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructure.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.ListWrappersResponse param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(gsn.hydrosys.sensormanager.ListWrappersResponse.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.GetWrapperOutputStructure param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(gsn.hydrosys.sensormanager.GetWrapperOutputStructure.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse.MY_QNAME,
                                           org.apache.axiom.om.OMAbstractFactory.getOMFactory());
                         } catch(org.apache.axis2.databinding.ADBException e){
                             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -276,20 +311,6 @@
             
                         try{
                              return param.getOMElement(gsn.hydrosys.sensormanager.ListVirtualSensorsResponse.MY_QNAME,
-                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-                        } catch(org.apache.axis2.databinding.ADBException e){
-                            throw org.apache.axis2.AxisFault.makeFault(e);
-                        }
-                    
-
-            }
-        
-            private  org.apache.axiom.om.OMElement  toOM(gsn.hydrosys.sensormanager.ListAvailableWrappersResponse param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
-
-            
-                        try{
-                             return param.getOMElement(gsn.hydrosys.sensormanager.ListAvailableWrappersResponse.MY_QNAME,
                                           org.apache.axiom.om.OMAbstractFactory.getOMFactory());
                         } catch(org.apache.axis2.databinding.ADBException e){
                             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -354,44 +375,6 @@
 
             }
         
-                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.hydrosys.sensormanager.GetOutputStructureResponse param, boolean optimizeContent)
-                        throws org.apache.axis2.AxisFault{
-                      try{
-                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-                           
-                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.hydrosys.sensormanager.GetOutputStructureResponse.MY_QNAME,factory));
-                                
-
-                         return emptyEnvelope;
-                    } catch(org.apache.axis2.databinding.ADBException e){
-                        throw org.apache.axis2.AxisFault.makeFault(e);
-                    }
-                    }
-                    
-                         private gsn.hydrosys.sensormanager.GetOutputStructureResponse wrapgetOutputStructure(){
-                                gsn.hydrosys.sensormanager.GetOutputStructureResponse wrappedElement = new gsn.hydrosys.sensormanager.GetOutputStructureResponse();
-                                return wrappedElement;
-                         }
-                    
-                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.hydrosys.sensormanager.ListEnabledWrappersResponse param, boolean optimizeContent)
-                        throws org.apache.axis2.AxisFault{
-                      try{
-                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-                           
-                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.hydrosys.sensormanager.ListEnabledWrappersResponse.MY_QNAME,factory));
-                                
-
-                         return emptyEnvelope;
-                    } catch(org.apache.axis2.databinding.ADBException e){
-                        throw org.apache.axis2.AxisFault.makeFault(e);
-                    }
-                    }
-                    
-                         private gsn.hydrosys.sensormanager.ListEnabledWrappersResponse wraplistEnabledWrappers(){
-                                gsn.hydrosys.sensormanager.ListEnabledWrappersResponse wrappedElement = new gsn.hydrosys.sensormanager.ListEnabledWrappersResponse();
-                                return wrappedElement;
-                         }
-                    
                     private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.hydrosys.sensormanager.DeleteVirtualSensorResponse param, boolean optimizeContent)
                         throws org.apache.axis2.AxisFault{
                       try{
@@ -408,6 +391,63 @@
                     
                          private gsn.hydrosys.sensormanager.DeleteVirtualSensorResponse wrapdeleteVirtualSensor(){
                                 gsn.hydrosys.sensormanager.DeleteVirtualSensorResponse wrappedElement = new gsn.hydrosys.sensormanager.DeleteVirtualSensorResponse();
+                                return wrappedElement;
+                         }
+                    
+                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse param, boolean optimizeContent)
+                        throws org.apache.axis2.AxisFault{
+                      try{
+                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+                           
+                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse.MY_QNAME,factory));
+                                
+
+                         return emptyEnvelope;
+                    } catch(org.apache.axis2.databinding.ADBException e){
+                        throw org.apache.axis2.AxisFault.makeFault(e);
+                    }
+                    }
+                    
+                         private gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse wrapgetVirtualSensorOutputStructure(){
+                                gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse wrappedElement = new gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse();
+                                return wrappedElement;
+                         }
+                    
+                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.hydrosys.sensormanager.ListWrappersResponse param, boolean optimizeContent)
+                        throws org.apache.axis2.AxisFault{
+                      try{
+                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+                           
+                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.hydrosys.sensormanager.ListWrappersResponse.MY_QNAME,factory));
+                                
+
+                         return emptyEnvelope;
+                    } catch(org.apache.axis2.databinding.ADBException e){
+                        throw org.apache.axis2.AxisFault.makeFault(e);
+                    }
+                    }
+                    
+                         private gsn.hydrosys.sensormanager.ListWrappersResponse wraplistWrappers(){
+                                gsn.hydrosys.sensormanager.ListWrappersResponse wrappedElement = new gsn.hydrosys.sensormanager.ListWrappersResponse();
+                                return wrappedElement;
+                         }
+                    
+                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse param, boolean optimizeContent)
+                        throws org.apache.axis2.AxisFault{
+                      try{
+                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+                           
+                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse.MY_QNAME,factory));
+                                
+
+                         return emptyEnvelope;
+                    } catch(org.apache.axis2.databinding.ADBException e){
+                        throw org.apache.axis2.AxisFault.makeFault(e);
+                    }
+                    }
+                    
+                         private gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse wrapgetWrapperOutputStructure(){
+                                gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse wrappedElement = new gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse();
                                 return wrappedElement;
                          }
                     
@@ -446,25 +486,6 @@
                     
                          private gsn.hydrosys.sensormanager.ListVirtualSensorsResponse wraplistVirtualSensors(){
                                 gsn.hydrosys.sensormanager.ListVirtualSensorsResponse wrappedElement = new gsn.hydrosys.sensormanager.ListVirtualSensorsResponse();
-                                return wrappedElement;
-                         }
-                    
-                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.hydrosys.sensormanager.ListAvailableWrappersResponse param, boolean optimizeContent)
-                        throws org.apache.axis2.AxisFault{
-                      try{
-                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
-                           
-                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.hydrosys.sensormanager.ListAvailableWrappersResponse.MY_QNAME,factory));
-                                
-
-                         return emptyEnvelope;
-                    } catch(org.apache.axis2.databinding.ADBException e){
-                        throw org.apache.axis2.AxisFault.makeFault(e);
-                    }
-                    }
-                    
-                         private gsn.hydrosys.sensormanager.ListAvailableWrappersResponse wraplistAvailableWrappers(){
-                                gsn.hydrosys.sensormanager.ListAvailableWrappersResponse wrappedElement = new gsn.hydrosys.sensormanager.ListAvailableWrappersResponse();
                                 return wrappedElement;
                          }
                     
@@ -523,27 +544,6 @@
 
         try {
         
-                if (gsn.hydrosys.sensormanager.GetOutputStructure.class.equals(type)){
-                
-                           return gsn.hydrosys.sensormanager.GetOutputStructure.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-                    
-
-                }
-           
-                if (gsn.hydrosys.sensormanager.GetOutputStructureResponse.class.equals(type)){
-                
-                           return gsn.hydrosys.sensormanager.GetOutputStructureResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-                    
-
-                }
-           
-                if (gsn.hydrosys.sensormanager.ListEnabledWrappersResponse.class.equals(type)){
-                
-                           return gsn.hydrosys.sensormanager.ListEnabledWrappersResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-                    
-
-                }
-           
                 if (gsn.hydrosys.sensormanager.DeleteVirtualSensor.class.equals(type)){
                 
                            return gsn.hydrosys.sensormanager.DeleteVirtualSensor.Factory.parse(param.getXMLStreamReaderWithoutCaching());
@@ -554,6 +554,41 @@
                 if (gsn.hydrosys.sensormanager.DeleteVirtualSensorResponse.class.equals(type)){
                 
                            return gsn.hydrosys.sensormanager.DeleteVirtualSensorResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructure.class.equals(type)){
+                
+                           return gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructure.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse.class.equals(type)){
+                
+                           return gsn.hydrosys.sensormanager.GetVirtualSensorOutputStructureResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (gsn.hydrosys.sensormanager.ListWrappersResponse.class.equals(type)){
+                
+                           return gsn.hydrosys.sensormanager.ListWrappersResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (gsn.hydrosys.sensormanager.GetWrapperOutputStructure.class.equals(type)){
+                
+                           return gsn.hydrosys.sensormanager.GetWrapperOutputStructure.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse.class.equals(type)){
+                
+                           return gsn.hydrosys.sensormanager.GetWrapperOutputStructureResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                     
 
                 }
@@ -575,13 +610,6 @@
                 if (gsn.hydrosys.sensormanager.ListVirtualSensorsResponse.class.equals(type)){
                 
                            return gsn.hydrosys.sensormanager.ListVirtualSensorsResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-                    
-
-                }
-           
-                if (gsn.hydrosys.sensormanager.ListAvailableWrappersResponse.class.equals(type)){
-                
-                           return gsn.hydrosys.sensormanager.ListAvailableWrappersResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                     
 
                 }

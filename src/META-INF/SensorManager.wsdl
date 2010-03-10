@@ -43,17 +43,10 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="listEnabledWrappersResponse">
+            <xs:element name="listWrappersResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="wrappername" nillable="false" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="listAvailableWrappersResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="wrappername" nillable="true" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="wrapperaddress" nillable="false" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -74,14 +67,28 @@
                 </xs:complexType>
             </xs:element>
             <xs:element name="createVirtualSensorResponse" type="ax22:Status"/>
-            <xs:element name="getOutputStructure">
+            <xs:element name="getVirtualSensorOutputStructure">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="1" maxOccurs="1" name="vsname" nillable="false" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getOutputStructureResponse">
+            <xs:element name="getVirtualSensorOutputStructureResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="outputstructure" nillable="false" type="ax22:DataField"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getWrapperOutputStructure">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="1" maxOccurs="1" name="wrapperaddress" nillable="false" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getWrapperOutputStructureResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="outputstructure" nillable="false" type="ax22:DataField"/>
@@ -90,11 +97,17 @@
             </xs:element>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="getOutputStructureRequest">
-        <wsdl:part name="parameters" element="ns:getOutputStructure"/>
+    <wsdl:message name="getVirtualSensorOutputStructureRequest">
+        <wsdl:part name="parameters" element="ns:getVirtualSensorOutputStructure"/>
     </wsdl:message>
-    <wsdl:message name="getOutputStructureResponse">
-        <wsdl:part name="parameters" element="ns:getOutputStructureResponse"/>
+    <wsdl:message name="getVirtualSensorOutputStructureResponse">
+        <wsdl:part name="parameters" element="ns:getVirtualSensorOutputStructureResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getWrapperOutputStructureRequest">
+        <wsdl:part name="parameters" element="ns:getWrapperOutputStructure"/>
+    </wsdl:message>
+    <wsdl:message name="getWrapperOutputStructureResponse">
+        <wsdl:part name="parameters" element="ns:getWrapperOutputStructureResponse"/>
     </wsdl:message>
     <wsdl:message name="listVirtualSensorsRequest"/>
     <wsdl:message name="listVirtualSensorsResponse">
@@ -105,10 +118,6 @@
     </wsdl:message>
     <wsdl:message name="registerQueryResponse">
         <wsdl:part name="parameters" element="ns:registerQueryResponse"/>
-    </wsdl:message>
-    <wsdl:message name="listAvailableWrappersRequest"/>
-    <wsdl:message name="listAvailableWrappersResponse">
-        <wsdl:part name="parameters" element="ns:listAvailableWrappersResponse"/>
     </wsdl:message>
     <wsdl:message name="unregisterQueryRequest">
         <wsdl:part name="parameters" element="ns:unregisterQuery"/>
@@ -122,9 +131,9 @@
     <wsdl:message name="deleteVirtualSensorResponse">
         <wsdl:part name="parameters" element="ns:deleteVirtualSensorResponse"/>
     </wsdl:message>
-    <wsdl:message name="listEnabledWrappersRequest"/>
-    <wsdl:message name="listEnabledWrappersResponse">
-        <wsdl:part name="parameters" element="ns:listEnabledWrappersResponse"/>
+    <wsdl:message name="listWrappersRequest"/>
+    <wsdl:message name="listWrappersResponse">
+        <wsdl:part name="parameters" element="ns:listWrappersResponse"/>
     </wsdl:message>
     <wsdl:message name="createVirtualSensorRequest">
         <wsdl:part name="parameters" element="ns:createVirtualSensor"/>
@@ -133,9 +142,13 @@
         <wsdl:part name="parameters" element="ns:createVirtualSensorResponse"/>
     </wsdl:message>
     <wsdl:portType name="SensorManagerPortType">
-        <wsdl:operation name="getOutputStructure">
-            <wsdl:input message="ns:getOutputStructureRequest" wsaw:Action="urn:getOutputStructure"/>
-            <wsdl:output message="ns:getOutputStructureResponse" wsaw:Action="urn:getOutputStructureResponse"/>
+        <wsdl:operation name="getVirtualSensorOutputStructure">
+            <wsdl:input message="ns:getVirtualSensorOutputStructureRequest" wsaw:Action="urn:getVirtualSensorOutputStructure"/>
+            <wsdl:output message="ns:getVirtualSensorOutputStructureResponse" wsaw:Action="urn:getVirtualSensorOutputStructureResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getWrapperOutputStructure">
+            <wsdl:input message="ns:getWrapperOutputStructureRequest" wsaw:Action="urn:getWrapperOutputStructure"/>
+            <wsdl:output message="ns:getWrapperOutputStructureResponse" wsaw:Action="urn:getWrapperOutputStructureResponse"/>
         </wsdl:operation>
         <wsdl:operation name="listVirtualSensors">
             <wsdl:input message="ns:listVirtualSensorsRequest" wsaw:Action="urn:listVirtualSensors"/>
@@ -145,10 +158,6 @@
             <wsdl:input message="ns:registerQueryRequest" wsaw:Action="urn:registerQuery"/>
             <wsdl:output message="ns:registerQueryResponse" wsaw:Action="urn:registerQueryResponse"/>
         </wsdl:operation>
-        <wsdl:operation name="listAvailableWrappers">
-            <wsdl:input message="ns:listAvailableWrappersRequest" wsaw:Action="urn:listAvailableWrappers"/>
-            <wsdl:output message="ns:listAvailableWrappersResponse" wsaw:Action="urn:listAvailableWrappersResponse"/>
-        </wsdl:operation>
         <wsdl:operation name="unregisterQuery">
             <wsdl:input message="ns:unregisterQueryRequest" wsaw:Action="urn:unregisterQuery"/>
             <wsdl:output message="ns:unregisterQueryResponse" wsaw:Action="urn:unregisterQueryResponse"/>
@@ -157,9 +166,9 @@
             <wsdl:input message="ns:deleteVirtualSensorRequest" wsaw:Action="urn:deleteVirtualSensor"/>
             <wsdl:output message="ns:deleteVirtualSensorResponse" wsaw:Action="urn:deleteVirtualSensorResponse"/>
         </wsdl:operation>
-        <wsdl:operation name="listEnabledWrappers">
-            <wsdl:input message="ns:listEnabledWrappersRequest" wsaw:Action="urn:listEnabledWrappers"/>
-            <wsdl:output message="ns:listEnabledWrappersResponse" wsaw:Action="urn:listEnabledWrappersResponse"/>
+        <wsdl:operation name="listWrappers">
+            <wsdl:input message="ns:listWrappersRequest" wsaw:Action="urn:listWrappers"/>
+            <wsdl:output message="ns:listWrappersResponse" wsaw:Action="urn:listWrappersResponse"/>
         </wsdl:operation>
         <wsdl:operation name="createVirtualSensor">
             <wsdl:input message="ns:createVirtualSensorRequest" wsaw:Action="urn:createVirtualSensor"/>
@@ -168,8 +177,17 @@
     </wsdl:portType>
     <wsdl:binding name="SensorManagerSoap11Binding" type="ns:SensorManagerPortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="getOutputStructure">
-            <soap:operation soapAction="urn:getOutputStructure" style="document"/>
+        <wsdl:operation name="getVirtualSensorOutputStructure">
+            <soap:operation soapAction="urn:getVirtualSensorOutputStructure" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getWrapperOutputStructure">
+            <soap:operation soapAction="urn:getWrapperOutputStructure" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -195,15 +213,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="listAvailableWrappers">
-            <soap:operation soapAction="urn:listAvailableWrappers" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
         <wsdl:operation name="unregisterQuery">
             <soap:operation soapAction="urn:unregisterQuery" style="document"/>
             <wsdl:input>
@@ -222,8 +231,8 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="listEnabledWrappers">
-            <soap:operation soapAction="urn:listEnabledWrappers" style="document"/>
+        <wsdl:operation name="listWrappers">
+            <soap:operation soapAction="urn:listWrappers" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -243,8 +252,17 @@
     </wsdl:binding>
     <wsdl:binding name="SensorManagerSoap12Binding" type="ns:SensorManagerPortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="getOutputStructure">
-            <soap12:operation soapAction="urn:getOutputStructure" style="document"/>
+        <wsdl:operation name="getVirtualSensorOutputStructure">
+            <soap12:operation soapAction="urn:getVirtualSensorOutputStructure" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getWrapperOutputStructure">
+            <soap12:operation soapAction="urn:getWrapperOutputStructure" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -270,15 +288,6 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="listAvailableWrappers">
-            <soap12:operation soapAction="urn:listAvailableWrappers" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
         <wsdl:operation name="unregisterQuery">
             <soap12:operation soapAction="urn:unregisterQuery" style="document"/>
             <wsdl:input>
@@ -297,8 +306,8 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="listEnabledWrappers">
-            <soap12:operation soapAction="urn:listEnabledWrappers" style="document"/>
+        <wsdl:operation name="listWrappers">
+            <soap12:operation soapAction="urn:listWrappers" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -318,13 +327,22 @@
     </wsdl:binding>
     <wsdl:binding name="SensorManagerHttpBinding" type="ns:SensorManagerPortType">
         <http:binding verb="POST"/>
-        <wsdl:operation name="getOutputStructure">
-            <http:operation location="SensorManager/getOutputStructure"/>
+        <wsdl:operation name="getVirtualSensorOutputStructure">
+            <http:operation location="SensorManager/getVirtualSensorOutputStructure"/>
             <wsdl:input>
-                <mime:content type="text/xml" part="getOutputStructure"/>
+                <mime:content type="text/xml" part="getVirtualSensorOutputStructure"/>
             </wsdl:input>
             <wsdl:output>
-                <mime:content type="text/xml" part="getOutputStructure"/>
+                <mime:content type="text/xml" part="getVirtualSensorOutputStructure"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getWrapperOutputStructure">
+            <http:operation location="SensorManager/getWrapperOutputStructure"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getWrapperOutputStructure"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getWrapperOutputStructure"/>
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="listVirtualSensors">
@@ -345,15 +363,6 @@
                 <mime:content type="text/xml" part="registerQuery"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="listAvailableWrappers">
-            <http:operation location="SensorManager/listAvailableWrappers"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="listAvailableWrappers"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="listAvailableWrappers"/>
-            </wsdl:output>
-        </wsdl:operation>
         <wsdl:operation name="unregisterQuery">
             <http:operation location="SensorManager/unregisterQuery"/>
             <wsdl:input>
@@ -372,13 +381,13 @@
                 <mime:content type="text/xml" part="deleteVirtualSensor"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="listEnabledWrappers">
-            <http:operation location="SensorManager/listEnabledWrappers"/>
+        <wsdl:operation name="listWrappers">
+            <http:operation location="SensorManager/listWrappers"/>
             <wsdl:input>
-                <mime:content type="text/xml" part="listEnabledWrappers"/>
+                <mime:content type="text/xml" part="listWrappers"/>
             </wsdl:input>
             <wsdl:output>
-                <mime:content type="text/xml" part="listEnabledWrappers"/>
+                <mime:content type="text/xml" part="listWrappers"/>
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="createVirtualSensor">

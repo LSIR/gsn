@@ -1,6 +1,6 @@
 
 /**
- * GetOutputStructureResponse.java
+ * ListWrappersResponse.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
@@ -10,15 +10,15 @@
             
 
             /**
-            *  GetOutputStructureResponse bean class
+            *  ListWrappersResponse bean class
             */
         
-        public  class GetOutputStructureResponse
+        public  class ListWrappersResponse
         implements org.apache.axis2.databinding.ADBBean{
         
                 public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
                 "http://sensormanager.hydrosys.gsn",
-                "getOutputStructureResponse",
+                "listWrappersResponse",
                 "ns2");
 
             
@@ -33,26 +33,26 @@
         
 
                         /**
-                        * field for Outputstructure
+                        * field for Wrapperaddress
                         * This was an Array!
                         */
 
                         
-                                    protected gsn.hydrosys.sensormanager.xsd.DataField[] localOutputstructure ;
+                                    protected java.lang.String[] localWrapperaddress ;
                                 
                            /*  This tracker boolean wil be used to detect whether the user called the set method
                           *   for this attribute. It will be used to determine whether to include this field
                            *   in the serialized XML
                            */
-                           protected boolean localOutputstructureTracker = false ;
+                           protected boolean localWrapperaddressTracker = false ;
                            
 
                            /**
                            * Auto generated getter method
-                           * @return gsn.hydrosys.sensormanager.xsd.DataField[]
+                           * @return java.lang.String[]
                            */
-                           public  gsn.hydrosys.sensormanager.xsd.DataField[] getOutputstructure(){
-                               return localOutputstructure;
+                           public  java.lang.String[] getWrapperaddress(){
+                               return localWrapperaddress;
                            }
 
                            
@@ -61,55 +61,55 @@
 
                                
                               /**
-                               * validate the array for Outputstructure
+                               * validate the array for Wrapperaddress
                                */
-                              protected void validateOutputstructure(gsn.hydrosys.sensormanager.xsd.DataField[] param){
+                              protected void validateWrapperaddress(java.lang.String[] param){
                              
                               }
 
 
                              /**
                               * Auto generated setter method
-                              * @param param Outputstructure
+                              * @param param Wrapperaddress
                               */
-                              public void setOutputstructure(gsn.hydrosys.sensormanager.xsd.DataField[] param){
+                              public void setWrapperaddress(java.lang.String[] param){
                               
-                                   validateOutputstructure(param);
+                                   validateWrapperaddress(param);
 
                                
                                           if (param != null){
                                              //update the setting tracker
-                                             localOutputstructureTracker = true;
+                                             localWrapperaddressTracker = true;
                                           } else {
-                                             localOutputstructureTracker = false;
+                                             localWrapperaddressTracker = false;
                                                  
                                           }
                                       
-                                      this.localOutputstructure=param;
+                                      this.localWrapperaddress=param;
                               }
 
                                
                              
                              /**
                              * Auto generated add method for the array for convenience
-                             * @param param gsn.hydrosys.sensormanager.xsd.DataField
+                             * @param param java.lang.String
                              */
-                             public void addOutputstructure(gsn.hydrosys.sensormanager.xsd.DataField param){
-                                   if (localOutputstructure == null){
-                                   localOutputstructure = new gsn.hydrosys.sensormanager.xsd.DataField[]{};
+                             public void addWrapperaddress(java.lang.String param){
+                                   if (localWrapperaddress == null){
+                                   localWrapperaddress = new java.lang.String[]{};
                                    }
 
                             
                                  //update the setting tracker
-                                localOutputstructureTracker = true;
+                                localWrapperaddressTracker = true;
                             
 
                                java.util.List list =
-                            org.apache.axis2.databinding.utils.ConverterUtil.toList(localOutputstructure);
+                            org.apache.axis2.databinding.utils.ConverterUtil.toList(localWrapperaddress);
                                list.add(param);
-                               this.localOutputstructure =
-                             (gsn.hydrosys.sensormanager.xsd.DataField[])list.toArray(
-                            new gsn.hydrosys.sensormanager.xsd.DataField[list.size()]);
+                               this.localWrapperaddress =
+                             (java.lang.String[])list.toArray(
+                            new java.lang.String[list.size()]);
 
                              }
                              
@@ -146,7 +146,7 @@
                        new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       GetOutputStructureResponse.this.serialize(MY_QNAME,factory,xmlWriter);
+                       ListWrappersResponse.this.serialize(MY_QNAME,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
@@ -200,35 +200,60 @@
                    java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://sensormanager.hydrosys.gsn");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":getOutputStructureResponse",
+                           namespacePrefix+":listWrappersResponse",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "getOutputStructureResponse",
+                           "listWrappersResponse",
                            xmlWriter);
                    }
 
                
                    }
-                if (localOutputstructureTracker){
-                                       if (localOutputstructure!=null){
-                                            for (int i = 0;i < localOutputstructure.length;i++){
-                                                if (localOutputstructure[i] != null){
-                                                 localOutputstructure[i].serialize(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","outputstructure"),
-                                                           factory,xmlWriter);
+                if (localWrapperaddressTracker){
+                             if (localWrapperaddress!=null) {
+                                   namespace = "http://sensormanager.hydrosys.gsn";
+                                   boolean emptyNamespace = namespace == null || namespace.length() == 0;
+                                   prefix =  emptyNamespace ? null : xmlWriter.getPrefix(namespace);
+                                   for (int i = 0;i < localWrapperaddress.length;i++){
+                                        
+                                            if (localWrapperaddress[i] != null){
+                                        
+                                                if (!emptyNamespace) {
+                                                    if (prefix == null) {
+                                                        java.lang.String prefix2 = generatePrefix(namespace);
+
+                                                        xmlWriter.writeStartElement(prefix2,"wrapperaddress", namespace);
+                                                        xmlWriter.writeNamespace(prefix2, namespace);
+                                                        xmlWriter.setPrefix(prefix2, namespace);
+
+                                                    } else {
+                                                        xmlWriter.writeStartElement(namespace,"wrapperaddress");
+                                                    }
+
                                                 } else {
-                                                   
-                                                        // we don't have to do any thing since minOccures is zero
-                                                    
+                                                    xmlWriter.writeStartElement("wrapperaddress");
                                                 }
 
-                                            }
-                                     } else {
-                                        
-                                               throw new org.apache.axis2.databinding.ADBException("outputstructure cannot be null!!");
-                                        
-                                    }
-                                 }
+                                            
+                                                        xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localWrapperaddress[i]));
+                                                    
+                                                xmlWriter.writeEndElement();
+                                              
+                                                } else {
+                                                   
+                                                           // we have to do nothing since minOccurs is zero
+                                                       
+                                                }
+
+                                   }
+                             } else {
+                                 
+                                         throw new org.apache.axis2.databinding.ADBException("wrapperaddress cannot be null!!");
+                                    
+                             }
+
+                        }
                     xmlWriter.writeEndElement();
                
 
@@ -390,26 +415,28 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                 if (localOutputstructureTracker){
-                             if (localOutputstructure!=null) {
-                                 for (int i = 0;i < localOutputstructure.length;i++){
+                 if (localWrapperaddressTracker){
+                            if (localWrapperaddress!=null){
+                                  for (int i = 0;i < localWrapperaddress.length;i++){
+                                      
+                                         if (localWrapperaddress[i] != null){
+                                          elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
+                                                                              "wrapperaddress"));
+                                          elementList.add(
+                                          org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localWrapperaddress[i]));
+                                          } else {
+                                             
+                                                    // have to do nothing
+                                                
+                                          }
+                                      
 
-                                    if (localOutputstructure[i] != null){
-                                         elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
-                                                                          "outputstructure"));
-                                         elementList.add(localOutputstructure[i]);
-                                    } else {
-                                        
-                                                // nothing to do
-                                            
-                                    }
-
-                                 }
-                             } else {
-                                 
-                                        throw new org.apache.axis2.databinding.ADBException("outputstructure cannot be null!!");
-                                    
-                             }
+                                  }
+                            } else {
+                              
+                                    throw new org.apache.axis2.databinding.ADBException("wrapperaddress cannot be null!!");
+                                
+                            }
 
                         }
 
@@ -436,9 +463,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static GetOutputStructureResponse parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            GetOutputStructureResponse object =
-                new GetOutputStructureResponse();
+        public static ListWrappersResponse parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            ListWrappersResponse object =
+                new ListWrappersResponse();
 
             int event;
             java.lang.String nillableValue = null;
@@ -462,10 +489,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"getOutputStructureResponse".equals(type)){
+                            if (!"listWrappersResponse".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (GetOutputStructureResponse)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
+                                return (ListWrappersResponse)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -492,43 +519,42 @@
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","outputstructure").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","wrapperaddress").equals(reader.getName())){
                                 
                                     
                                     
                                     // Process the array and step past its final element's end.
-                                    list1.add(gsn.hydrosys.sensormanager.xsd.DataField.Factory.parse(reader));
-                                                                
-                                                        //loop until we find a start element that is not part of this array
-                                                        boolean loopDone1 = false;
-                                                        while(!loopDone1){
-                                                            // We should be at the end element, but make sure
-                                                            while (!reader.isEndElement())
-                                                                reader.next();
-                                                            // Step out of this element
-                                                            reader.next();
-                                                            // Step to next element event.
-                                                            while (!reader.isStartElement() && !reader.isEndElement())
-                                                                reader.next();
-                                                            if (reader.isEndElement()){
-                                                                //two continuous end elements means we are exiting the xml structure
-                                                                loopDone1 = true;
-                                                            } else {
-                                                                if (new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","outputstructure").equals(reader.getName())){
-                                                                    list1.add(gsn.hydrosys.sensormanager.xsd.DataField.Factory.parse(reader));
-                                                                        
-                                                                }else{
-                                                                    loopDone1 = true;
-                                                                }
-                                                            }
-                                                        }
-                                                        // call the converter utility  to convert and set the array
+                                    list1.add(reader.getElementText());
+                                            
+                                            //loop until we find a start element that is not part of this array
+                                            boolean loopDone1 = false;
+                                            while(!loopDone1){
+                                                // Ensure we are at the EndElement
+                                                while (!reader.isEndElement()){
+                                                    reader.next();
+                                                }
+                                                // Step out of this element
+                                                reader.next();
+                                                // Step to next element event.
+                                                while (!reader.isStartElement() && !reader.isEndElement())
+                                                    reader.next();
+                                                if (reader.isEndElement()){
+                                                    //two continuous end elements means we are exiting the xml structure
+                                                    loopDone1 = true;
+                                                } else {
+                                                    if (new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","wrapperaddress").equals(reader.getName())){
+                                                         list1.add(reader.getElementText());
                                                         
-                                                        object.setOutputstructure((gsn.hydrosys.sensormanager.xsd.DataField[])
-                                                            org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
-                                                                gsn.hydrosys.sensormanager.xsd.DataField.class,
-                                                                list1));
-                                                            
+                                                    }else{
+                                                        loopDone1 = true;
+                                                    }
+                                                }
+                                            }
+                                            // call the converter utility  to convert and set the array
+                                            
+                                                    object.setWrapperaddress((java.lang.String[])
+                                                        list1.toArray(new java.lang.String[list1.size()]));
+                                                
                               }  // End of if for expected property start element
                                 
                                     else {

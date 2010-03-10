@@ -1,6 +1,6 @@
 
 /**
- * GetOutputStructure.java
+ * GetWrapperOutputStructure.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
@@ -10,15 +10,15 @@
             
 
             /**
-            *  GetOutputStructure bean class
+            *  GetWrapperOutputStructure bean class
             */
         
-        public  class GetOutputStructure
+        public  class GetWrapperOutputStructure
         implements org.apache.axis2.databinding.ADBBean{
         
                 public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
                 "http://sensormanager.hydrosys.gsn",
-                "getOutputStructure",
+                "getWrapperOutputStructure",
                 "ns2");
 
             
@@ -33,30 +33,30 @@
         
 
                         /**
-                        * field for Vsname
+                        * field for Wrapperaddress
                         */
 
                         
-                                    protected java.lang.String localVsname ;
+                                    protected java.lang.String localWrapperaddress ;
                                 
 
                            /**
                            * Auto generated getter method
                            * @return java.lang.String
                            */
-                           public  java.lang.String getVsname(){
-                               return localVsname;
+                           public  java.lang.String getWrapperaddress(){
+                               return localWrapperaddress;
                            }
 
                            
                         
                             /**
                                * Auto generated setter method
-                               * @param param Vsname
+                               * @param param Wrapperaddress
                                */
-                               public void setVsname(java.lang.String param){
+                               public void setWrapperaddress(java.lang.String param){
                             
-                                            this.localVsname=param;
+                                            this.localWrapperaddress=param;
                                     
 
                                }
@@ -94,7 +94,7 @@
                        new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       GetOutputStructure.this.serialize(MY_QNAME,factory,xmlWriter);
+                       GetWrapperOutputStructure.this.serialize(MY_QNAME,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
@@ -148,11 +148,11 @@
                    java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://sensormanager.hydrosys.gsn");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":getOutputStructure",
+                           namespacePrefix+":getWrapperOutputStructure",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "getOutputStructure",
+                           "getWrapperOutputStructure",
                            xmlWriter);
                    }
 
@@ -166,28 +166,28 @@
                                         if (prefix == null) {
                                             prefix = generatePrefix(namespace);
 
-                                            xmlWriter.writeStartElement(prefix,"vsname", namespace);
+                                            xmlWriter.writeStartElement(prefix,"wrapperaddress", namespace);
                                             xmlWriter.writeNamespace(prefix, namespace);
                                             xmlWriter.setPrefix(prefix, namespace);
 
                                         } else {
-                                            xmlWriter.writeStartElement(namespace,"vsname");
+                                            xmlWriter.writeStartElement(namespace,"wrapperaddress");
                                         }
 
                                     } else {
-                                        xmlWriter.writeStartElement("vsname");
+                                        xmlWriter.writeStartElement("wrapperaddress");
                                     }
                                 
 
-                                          if (localVsname==null){
+                                          if (localWrapperaddress==null){
                                               // write the nil attribute
                                               
-                                                     throw new org.apache.axis2.databinding.ADBException("vsname cannot be null!!");
+                                                     throw new org.apache.axis2.databinding.ADBException("wrapperaddress cannot be null!!");
                                                   
                                           }else{
 
                                         
-                                                   xmlWriter.writeCharacters(localVsname);
+                                                   xmlWriter.writeCharacters(localWrapperaddress);
                                             
                                           }
                                     
@@ -356,12 +356,12 @@
 
                 
                                       elementList.add(new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn",
-                                                                      "vsname"));
+                                                                      "wrapperaddress"));
                                  
-                                        if (localVsname != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localVsname));
+                                        if (localWrapperaddress != null){
+                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localWrapperaddress));
                                         } else {
-                                           throw new org.apache.axis2.databinding.ADBException("vsname cannot be null!!");
+                                           throw new org.apache.axis2.databinding.ADBException("wrapperaddress cannot be null!!");
                                         }
                                     
 
@@ -388,9 +388,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static GetOutputStructure parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            GetOutputStructure object =
-                new GetOutputStructure();
+        public static GetWrapperOutputStructure parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            GetWrapperOutputStructure object =
+                new GetWrapperOutputStructure();
 
             int event;
             java.lang.String nillableValue = null;
@@ -414,10 +414,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"getOutputStructure".equals(type)){
+                            if (!"getWrapperOutputStructure".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (GetOutputStructure)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
+                                return (GetWrapperOutputStructure)gsn.hydrosys.sensormanager.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -442,11 +442,11 @@
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","vsname").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://sensormanager.hydrosys.gsn","wrapperaddress").equals(reader.getName())){
                                 
                                     java.lang.String content = reader.getElementText();
                                     
-                                              object.setVsname(
+                                              object.setWrapperaddress(
                                                     org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
                                               
                                         reader.next();
