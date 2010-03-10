@@ -76,7 +76,6 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _filedeque
     _work
     _waitforack
-    _lastRecvPacketType
     _rootdir
     _filedescriptor
     _watches
@@ -172,7 +171,6 @@ class BigBinaryPluginClass(AbstractPluginClass):
 
                 
         self._filedescriptor = None
-        self._lastRecvPacketType = None
         self._waitforack = False
         self._stopped = False
 
@@ -196,7 +194,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
         except Exception, e:
             if not self._stopped:
                 self.exception(e)
-        chunkNumber = -1
+        chunkNumber = 0
+        lastRecvPacketType = None
+        lastSentPacketType = None
                 
         while not self._stopped:
             # wait for the next file event to happen
@@ -206,43 +206,46 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 
             try:
                 message = self._msgdeque.pop()
-                self._waitforack = False
                 # the first byte of the message defines its type
-                type = struct.unpack('B', message[0])[0]
-                self.debug('type: ' + str(type))
+                pktType = struct.unpack('B', message[0])[0]
+                self.debug('packet type: ' + str(pktType))
                 
-                if type == ACK_PACKET:
-                    setCRC = False
-                    chkNr = int(struct.unpack('<I', message[1:5])[0])
-                    self.debug('acknowledge packet received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber) + '<')
-                    
-                    if self._lastRecvPacketType == ACK_PACKET:
-                        if chunkNumber-1 == chkNr or (chkNr != 0 and chunkNumber == 0):
-                            self.debug('acknowledge packet for chunk number >' + str(chkNr) + '< already received')
+                if pktType == ACK_PACKET:
+                    self._waitforack = False
+                    ackType = int(struct.unpack('B', message[1])[0])
+                        
+                    if ackType == INIT_PACKET and lastSentPacketType == INIT_PACKET:
+                        self.debug('acknowledge packet received for init packet')
+                        chunkNumber = 0
+                    elif ackType == CHUNK_PACKET and lastSentPacketType == CHUNK_PACKET:
+                        chkNr = int(struct.unpack('<I', message[2:6])[0])
+                        if chkNr == chunkNumber-1:
+                            self.debug('acknowledge for chunk number >' + str(chkNr) + '< received')
+                        elif chkNr == chunkNumber-2:
+                            self.info('acknowledge for chunk number >' + str(chkNr) + '< already received')
+                            self._waitforack = True
                             continue
-                        elif not chunkNumber == chkNr:
-                            self.warning('received chunk number >' + str(chkNr) + '< is not the one we expected >' + str(chunkNumber) + '< (should not happen)')
+                        else:
+                            self.error('acknowledge packet received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
                             continue
-                        elif chkNr == 0:
-                            # crc has been accepted by GSN
-                            self.debug('crc has been accepted for ' + filename)
-                            # remove it from disk
-                            os.remove(filename)
-                            setCRC = True
-                    elif self._lastRecvPacketType == CRC_PACKET and chkNr == 0:
-                        self.debug('CRC packet already received')
-                        continue
-                
-                    if setCRC:
-                        self._lastRecvPacketType = CRC_PACKET
+                    elif ackType == CRC_PACKET and lastSentPacketType == CRC_PACKET:
+                        # crc has been accepted by GSN
+                        self.debug('crc has been accepted for ' + filename)
+                        # remove it from disk
+                        os.remove(filename)
                     else:
-                        self._lastRecvPacketType = ACK_PACKET
+                        self.error('received acknowledge type >' + str(ackType) + '< does not match the sent packet type >' + str(lastSentPacketType) + '<')
+                        continue
+                        
+                    lastRecvPacketType = ACK_PACKET
+                    
                 # if the type is INIT_PACKET we have to send a new file
-                elif type == INIT_PACKET:
-                    if self._lastRecvPacketType == INIT_PACKET:
+                elif pktType == INIT_PACKET:
+                    if lastRecvPacketType == INIT_PACKET:
                         self.debug('init packet already received')
                         continue
                     self.debug('new binary request received')
+                    
                     if self._filedescriptor and not self._filedescriptor.closed:
                         filename = self._filedescriptor.name
                         self.warning('new file request, but actual file (' + filename + ') not yet closed -> remove it!')
@@ -250,20 +253,25 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         self._filedescriptor.close()
                         os.remove(filename)
                     
-                    self._lastRecvPacketType = INIT_PACKET
+                    lastRecvPacketType = INIT_PACKET
+                    lastSentPacketType = ACK_PACKET
+                    self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._backlog)
                 # if the type is RESEND_PACKET we have to resend a part of a file...
-                elif type == RESEND_PACKET:
+                elif pktType == RESEND_PACKET:
+                    if lastRecvPacketType == RESEND_PACKET:
+                        self.debug('binary retransmission request already received')
+                        continue
                     self.debug('binary retransmission request received')
                     
                     # how much of the file has already been downloaded
                     downloaded = int(struct.unpack('<I', message[1:5])[0])
                     # what chunk number are we at
-                    chunkNumber = int(struct.unpack('<I', message[5:9])[0])
+                    chunkNumber = int(struct.unpack('<I', message[5:9])[0])+1
                     # what is the name of the file to resend
                     filenamenoprefix = struct.unpack(str(len(message)-9) + 's', message[9:len(message)])[0]
                     filename = os.path.join(self._rootdir, filenamenoprefix)
                     self.debug('downloaded size: ' + str(downloaded))
-                    self.debug('chunk number: ' + str(chunkNumber))
+                    self.debug('chunk number to send: ' + str(chunkNumber))
                     self.debug('file: ' + filename)
                     
                     try:
@@ -293,117 +301,128 @@ class BigBinaryPluginClass(AbstractPluginClass):
         
                             self.debug('recalculated crc: ' + str(crc))
                         else:
+                            # resend the whole binary
                             crc = None
+                            chunkNumber = 0
                     except IOError, e:
                         self.warning(e)
                     
-                    self._lastRecvPacketType = RESEND_PACKET
+                    lastRecvPacketType = RESEND_PACKET
+                    lastSentPacketType = ACK_PACKET
+                    self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._backlog)
             except  IndexError:
+                self.debug('message queue is empty')
+                self._work.clear()
                 pass
         
             try:
-                if not self._filedescriptor or self._filedescriptor.closed:
-                    # get the next file to send out of the fifo
-                    filename = self._filedeque.pop()
-                    
-                    if os.path.isfile(filename):
-                        # open the file
-                        self._filedescriptor = open(filename, 'rb')
-                        os.chmod(filename, 0444)
-                    else:
-                        # if the file does not exist we are continuing in the fifo
-                        continue
-                    
-                    # get the size of the file
-                    filelen = os.path.getsize(filename)
-                    
-                    if filelen == 0:
-                        # if the file is empty we ignore it and continue in the fifo
-                        self.debug('ignore empty file: ' + filename)
-                        os.chmod(filename, 0744)
-                        self._filedescriptor.close()
-                        os.remove(filename)
-                        continue
-                    
-                    filenamenoprefix = filename.replace(self._rootdir, '')
-                    self.debug('filename without prefix: ' + filenamenoprefix)
-                    filenamelen = len(filenamenoprefix)
-                    if filenamelen > 255:
-                        filenamelen = 255
-                    
-                    # check witch watch this file belongs to
-                    l = -1
-                    watch = None
-                    for w in self._watches:
-                        if (filename.count(w[0]) > 0 or w[0] == './') and len(w[0]) > l:
-                            watch = w
-                            l = len(w[0])
-                    if not watch:
-                        self.error('no watch specified for ' + filename + ' (this is very strange!!!) -> close file')
-                        os.chmod(filename, 0744)
-                        self._filedescriptor.close()
-                        continue
+                if not self._waitforack:
+                    if not self._filedescriptor or self._filedescriptor.closed:
+                        # get the next file to send out of the fifo
+                        filename = self._filedeque.pop()
                         
-                    chunkNumber = 1
-                    packet = struct.pack('<BqIB', INIT_PACKET, os.stat(filename).st_mtime * 1000, filelen, watch[1])
-                    packet += struct.pack(str(filenamelen) + 'sx', filenamenoprefix)
-                    packet += struct.pack(str(len(watch[2])) + 'sx', watch[2])
+                        if os.path.isfile(filename):
+                            # open the file
+                            self._filedescriptor = open(filename, 'rb')
+                            os.chmod(filename, 0444)
+                        else:
+                            # if the file does not exist we are continuing in the fifo
+                            self._work.set()
+                            continue
+                        
+                        # get the size of the file
+                        filelen = os.path.getsize(filename)
+                        
+                        if filelen == 0:
+                            # if the file is empty we ignore it and continue in the fifo
+                            self.debug('ignore empty file: ' + filename)
+                            os.chmod(filename, 0744)
+                            self._filedescriptor.close()
+                            os.remove(filename)
+                            self._work.set()
+                            continue
+                        
+                        filenamenoprefix = filename.replace(self._rootdir, '')
+                        self.debug('filename without prefix: ' + filenamenoprefix)
+                        filenamelen = len(filenamenoprefix)
+                        if filenamelen > 255:
+                            filenamelen = 255
+                        
+                        # check witch watch this file belongs to
+                        l = -1
+                        watch = None
+                        for w in self._watches:
+                            if (filename.count(w[0]) > 0 or w[0] == './') and len(w[0]) > l:
+                                watch = w
+                                l = len(w[0])
+                        if not watch:
+                            self.error('no watch specified for ' + filename + ' (this is very strange!!!) -> close file')
+                            os.chmod(filename, 0744)
+                            self._filedescriptor.close()
+                            self._work.set()
+                            continue
+                            
+                        packet = struct.pack('<BqIB', INIT_PACKET, os.stat(filename).st_mtime * 1000, filelen, watch[1])
+                        packet += struct.pack(str(filenamelen) + 'sx', filenamenoprefix)
+                        packet += struct.pack(str(len(watch[2])) + 'sx', watch[2])
+                        
+                        self.debug('sending initial binary packet for ' + self._filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '< and time date format >' + watch[2] + '<')
                     
-                    self.debug('sending initial binary packet for ' + self._filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '< and time date format >' + watch[2] + '<')
+                        crc = None
+                            
+                        lastSentPacketType = INIT_PACKET
+                    # or are we already sending chunks of a file?
+                    else:
+                        # read the next chunk out of the opened file
+                        chunk = self._filedescriptor.read(CHUNK_SIZE)
+                        
+                        if crc:
+                            crc = zlib.crc32(chunk, crc)
+                        else:
+                            crc = zlib.crc32(chunk)
+                        
+                        if chunk == "":
+                            # so we have reached the end of the file...
+                            self.debug('binary completely sent')
+                            
+                            # create the crc packet [type, crc]
+                            packet = struct.pack('<Bi', CRC_PACKET, crc)
+                            
+                            filename = self._filedescriptor.name
+                            os.chmod(filename, 0744)
+                            self._filedescriptor.close()
+                            
+                            # send it
+                            self.debug('sending crc: ' + str(crc))
+                            timestamp = self.getTimeStamp()
+                            self._lasttimestamp = timestamp
+                            
+                            lastSentPacketType = CRC_PACKET
+                        else:
+                            # create the packet [type, chunk number (4bytes)]
+                            packet = struct.pack('<BI', CHUNK_PACKET, chunkNumber)
+                            packet += chunk
+                            
+                            lastSentPacketType = CHUNK_PACKET
+                            self.debug('sending binary chunk number ' + str(chunkNumber) + ' for ' + self._filedescriptor.name)
+                            
+                            # increase the chunk number
+                            chunkNumber = chunkNumber + 1
                 
-                    crc = None
-                # or are we already sending chunks of a file?
-                else:
-                    # read the next chunk out of the opened file
-                    chunk = self._filedescriptor.read(CHUNK_SIZE)
-                    
-                    if crc:
-                        crc = zlib.crc32(chunk, crc)
-                    else:
-                        crc = zlib.crc32(chunk)
-                    
-                    if chunk == "":
-                        # so we have reached the end of the file...
-                        self.debug('binary completely sent')
-                        
-                        # create the crc packet [type, crc]
-                        packet = struct.pack('<Bi', CRC_PACKET, crc)
-                        packet += chunk
-                        
-                        filename = self._filedescriptor.name
-                        os.chmod(filename, 0744)
-                        self._filedescriptor.close()
-                        
-                        # send it
-                        self.debug('sending crc: ' + str(crc))
-                        timestamp = self.getTimeStamp()
-                        self._lasttimestamp = timestamp
-                        chunkNumber = 0
-                    else:
-                        # increase the chunk number
-                        chunkNumber = chunkNumber + 1
-                        # create the packet [type, chunk number (4bytes)]
-                        packet = struct.pack('<BI', CHUNK_PACKET, chunkNumber)
-                        packet += chunk
-                        
-                        self.debug('sending binary chunk number ' + str(chunkNumber) + ' for ' + self._filedescriptor.name)
-                
-                # tell BackLogMain to send the packet to GSN
-                self._work.clear()
-                first = True
-                while not self._work.isSet() and self.isGSNConnected():
-                    if not first:
-                        self.info('resend message')
-                    self._waitforack = True
-                    self.processMsg(self.getTimeStamp(), packet, self._backlog)
-                    # and resend it if no ack has been received
-                    self._work.wait(RESEND_INTERVAL_SEC)
-                    first = False
+                    # tell BackLogMain to send the packet to GSN
+                    first = True
+                    self._work.clear()
+                    while (not self._work.isSet() or first) and self.isGSNConnected():
+                        if not first:
+                            self.info('resend message')
+                        self._waitforack = True
+                        self.processMsg(self.getTimeStamp(), packet, self._backlog)
+                        # and resend it if no ack has been received
+                        self._work.wait(RESEND_INTERVAL_SEC)
+                        first = False
             except IndexError:
                 # fifo is empty
                 self.debug('file FIFO is empty waiting for next file to arrive')
-                packet = struct.pack('<B', ACK_PACKET)
-                self.processMsg(self.getTimeStamp(), packet, self._backlog)
                 self._work.clear()
             except Exception, e:
                 self._waitforack = False

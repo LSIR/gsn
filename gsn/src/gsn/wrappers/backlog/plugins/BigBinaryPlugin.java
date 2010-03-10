@@ -75,7 +75,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	
 	private SimpleDateFormat folderdatetimefm;
 
-	private String localBinaryDir;
+	private String rootBinaryDir;
 
 	protected final transient Logger logger = Logger.getLogger( BigBinaryPlugin.class );
 	
@@ -116,23 +116,23 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		bigBinarySender = new BigBinarySender(this);
 		
 		try {
-			localBinaryDir = addressBean.getPredicateValueWithException(STORAGE_DIRECTORY);
+			rootBinaryDir = addressBean.getPredicateValueWithException(STORAGE_DIRECTORY);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return false;
 		}
 		
-		if(!localBinaryDir.endsWith("/"))
-			localBinaryDir += "/";
+		if(!rootBinaryDir.endsWith("/"))
+			rootBinaryDir += "/";
 		
-		File f = new File(localBinaryDir);
+		File f = new File(rootBinaryDir);
 		if (!f.isDirectory()) {
-			logger.error(localBinaryDir + " is not a directory");
+			logger.error(rootBinaryDir + " is not a directory");
 			return false;
 		}
 		
 		if (!f.canWrite()) {
-			logger.error(localBinaryDir + " is not writable");
+			logger.error(rootBinaryDir + " is not writable");
 			return false;
 		}
 		
@@ -158,10 +158,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			logger.warn(e.getMessage(), e);
 		}
 		
-		propertyFileName = localBinaryDir + PROPERTY_FILE_NAME;
+		propertyFileName = rootBinaryDir + PROPERTY_FILE_NAME;
 		
 		logger.debug("property file name: " + propertyFileName);
-		logger.debug("local binary directory: " + localBinaryDir);
+		logger.debug("local binary directory: " + rootBinaryDir);
 
         setName(getPluginName() + "-Thread" + (++threadCounter));
         
@@ -220,9 +220,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	public void run() {
 		bigBinarySender.start();
 		calcChecksumThread.start();
-		
+		long lastRecvPacketType = -1;
+
+    	Message msg;
     	while (!dispose) {
-        	Message msg;
 			try {
 				msg = msgQueue.take();
 			} catch (InterruptedException e) {
@@ -236,111 +237,123 @@ public class BigBinaryPlugin extends AbstractPlugin {
         	
     		long filelen = -1;
     		// get packet type
-    		byte type = msg.getPacket()[0];
+    		byte pktType = msg.getPacket()[0];
     		try {
-    			if (type == ACK_PACKET) {
-    				continue;
+    			if (pktType == ACK_PACKET) {
+					byte ackType = msg.getPacket()[1];
+					logger.debug("acknowledge packet type >" + ackType + "< received");
+					
+    				lastRecvPacketType = ACK_PACKET;
     			}
-    			else if (type == INIT_PACKET) {
-    				StringBuffer name = new StringBuffer();
-    				
-    				// get file info
-    				binaryTimestamp = arr2long(msg.getPacket(), 1);
-    				binaryLength = arr2uint(msg.getPacket(), 9);
-    				byte storage = msg.getPacket()[13];
-    				int i = 14;
-    				for (; i < msg.getPacket().length; i++) {
-    					if (msg.getPacket()[i] == 0) break;
-    					name.append((char) msg.getPacket()[i]);
+    			else if (pktType == INIT_PACKET) {
+    				if (lastRecvPacketType == INIT_PACKET) {
+    					logger.debug("init packet already received");
+	    	    		bigBinarySender.sendInitAck();
     				}
-    				remoteBinaryName = name.toString();
-    				name = new StringBuffer();
-    				i++;
-    				for (; i < msg.getPacket().length; i++) {
-    					if (msg.getPacket()[i] == 0) break;
-    					name.append((char) msg.getPacket()[i]);
-    				}
-    				String datetimefm = name.toString();
-    				try {
-    					folderdatetimefm = new SimpleDateFormat(datetimefm);
-    				} catch (IllegalArgumentException e) {
-    					logger.error("the received init packet does contain a mallformed date time format >" + datetimefm + "<! Please check your backlog configuration on the deployment -> drop this binary");
-    					bigBinarySender.requestNewBinary();
-    					continue;
-    				}
-    				
-    				if (storage == 1)
-    					storeInDatabase = true;
-    				else
-    					storeInDatabase = false;
-    	
-    				logger.debug("new incoming binary:");
-    				logger.debug("   remote binary name: " + remoteBinaryName);
-    				logger.debug("   timestamp of the binary: " + binaryTimestamp);
-    				logger.debug("   binary length: " + binaryLength);
-    				if (storeInDatabase)
-    					logger.debug("   store in database");
-    				else
-    					logger.debug("   store on disk");
-    				logger.debug("   folder date time format: " + datetimefm);
-    	
-    			    File f = new File(remoteBinaryName);
-    			    
-    			    if (storeInDatabase) {
-    			    	localBinaryName = localBinaryDir + TEMP_BINARY_NAME;
-    			    }
-    			    else {
-    			    	String subpath = f.getParent();
-    			    	if (subpath == null	)
-    			    		subpath = "./";
-    			    	logger.debug("subpath: " + subpath);
-    					
-    					if(!subpath.endsWith("/"))
-    						subpath += "/";
-    			    	
-	    			    String datedir = localBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
-	    			    String filename = f.getName();
-	    			    f = new File(datedir);
-	    			    if (!f.exists()) {
-	    			    	if (!f.mkdirs()) {
-	    			    		logger.error("could not mkdir >" + datedir + "<  -> drop remote binary " + remoteBinaryName);
-	    			    		bigBinarySender.requestNewBinary();
-	    			    		continue;
-	    			    	}
+    				else {
+	    				StringBuffer name = new StringBuffer();
+	    				
+	    				// get file info
+	    				binaryTimestamp = arr2long(msg.getPacket(), 1);
+	    				binaryLength = arr2uint(msg.getPacket(), 9);
+	    				byte storage = msg.getPacket()[13];
+	    				int i = 14;
+	    				for (; i < msg.getPacket().length; i++) {
+	    					if (msg.getPacket()[i] == 0) break;
+	    					name.append((char) msg.getPacket()[i]);
+	    				}
+	    				remoteBinaryName = name.toString();
+	    				name = new StringBuffer();
+	    				i++;
+	    				for (; i < msg.getPacket().length; i++) {
+	    					if (msg.getPacket()[i] == 0) break;
+	    					name.append((char) msg.getPacket()[i]);
+	    				}
+	    				String datetimefm = name.toString();
+	    				try {
+	    					folderdatetimefm = new SimpleDateFormat(datetimefm);
+	    				} catch (IllegalArgumentException e) {
+	    					logger.error("the received init packet does contain a mallformed date time format >" + datetimefm + "<! Please check your backlog configuration on the deployment -> drop this binary");
+	    					bigBinarySender.requestNewBinary();
+	    					continue;
+	    				}
+	    				
+	    				if (storage == 1)
+	    					storeInDatabase = true;
+	    				else
+	    					storeInDatabase = false;
+	    	
+	    				logger.debug("new incoming binary:");
+	    				logger.debug("   remote binary name: " + remoteBinaryName);
+	    				logger.debug("   timestamp of the binary: " + binaryTimestamp);
+	    				logger.debug("   binary length: " + binaryLength);
+	    				if (storeInDatabase)
+	    					logger.debug("   store in database");
+	    				else
+	    					logger.debug("   store on disk");
+	    				logger.debug("   folder date time format: " + datetimefm);
+	    	
+	    			    File f = new File(remoteBinaryName);
+	    			    
+	    			    if (storeInDatabase) {
+	    			    	localBinaryName = rootBinaryDir + TEMP_BINARY_NAME;
 	    			    }
-	    			    localBinaryName = datedir + filename;
-    			    }
-    	
-    				filelen = 0;
-    				
-    				// delete the file if it already exists
-    				f = new File(localBinaryName);
-    			    if (f.exists()) {
-    			    	logger.debug("overwrite already existing binary >" + localBinaryName + "<");
-    			    	f.delete();
-    			    }
-    	
-    			    // write the new binary info to the property file
-    				configFile.setProperty(PROPERTY_REMOTE_BINARY, remoteBinaryName);
-    				configFile.setProperty(PROPERTY_DOWNLOADED_SIZE, Long.toString(0));
-    				configFile.setProperty(PROPERTY_BINARY_TIMESTAMP, Long.toString(binaryTimestamp));
-    				configFile.setProperty(PROPERTY_BINARY_SIZE, Long.toString(binaryLength));
-    				configFile.setProperty(PROPERTY_CHUNK_NUMBER, Long.toString(0));
-    				configFile.setProperty(PROPERTY_STORAGE_TYPE, Boolean.toString(storeInDatabase));
-    				configFile.setProperty(PROPERTY_TIME_DATE_FORMAT, datetimefm);
-    				
-    				configFile.store(new FileOutputStream(propertyFileName), null);
-    				
-    				calculatedCRC.reset();
-    				lastChunkNumber = 1;
+	    			    else {
+	    			    	String subpath = f.getParent();
+	    			    	if (subpath == null	)
+	    			    		subpath = "";
+	    			    	logger.debug("subpath: " + subpath);
+	    					
+	    					if(!subpath.endsWith("/"))
+	    						subpath += "/";
+	    			    	
+		    			    String datedir = rootBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
+		    			    String filename = f.getName();
+		    			    f = new File(datedir);
+		    			    if (!f.exists()) {
+		    			    	if (!f.mkdirs()) {
+		    			    		logger.error("could not mkdir >" + datedir + "<  -> drop remote binary " + remoteBinaryName);
+		    			    		bigBinarySender.requestNewBinary();
+		    			    		continue;
+		    			    	}
+		    			    }
+		    			    localBinaryName = datedir + filename;
+	    			    }
+	    	
+	    				filelen = 0;
+	    				
+	    				// delete the file if it already exists
+	    				f = new File(localBinaryName);
+	    			    if (f.exists()) {
+	    			    	logger.debug("overwrite already existing binary >" + localBinaryName + "<");
+	    			    	f.delete();
+	    			    }
+	    			    
+						lastChunkNumber = -1;
+	    	
+	    			    // write the new binary info to the property file
+	    				configFile.setProperty(PROPERTY_REMOTE_BINARY, remoteBinaryName);
+	    				configFile.setProperty(PROPERTY_DOWNLOADED_SIZE, Long.toString(0));
+	    				configFile.setProperty(PROPERTY_BINARY_TIMESTAMP, Long.toString(binaryTimestamp));
+	    				configFile.setProperty(PROPERTY_BINARY_SIZE, Long.toString(binaryLength));
+	    				configFile.setProperty(PROPERTY_CHUNK_NUMBER, Long.toString(lastChunkNumber));
+	    				configFile.setProperty(PROPERTY_STORAGE_TYPE, Boolean.toString(storeInDatabase));
+	    				configFile.setProperty(PROPERTY_TIME_DATE_FORMAT, datetimefm);
+	    				
+	    				configFile.store(new FileOutputStream(propertyFileName), null);
+	    				
+	    				calculatedCRC.reset();
+	
+	    	    		bigBinarySender.sendInitAck();
+    				}
     			}
-    			else if (type == CHUNK_PACKET) {
+    			else if (pktType == CHUNK_PACKET) {
     				// get number of this chunk
     				long chunknum = arr2uint(msg.getPacket(), 1);
     				logger.debug("Chunk for " + remoteBinaryName + " with number " + chunknum + " received");
     				
     				if (chunknum == lastChunkNumber) {
-    					logger.info("chunk already received -> drop it");
+    					logger.info("chunk already received");
     				}
     				else if (lastChunkNumber+1 == chunknum) {
     					// store the binary chunk to disk
@@ -368,14 +381,17 @@ public class BigBinaryPlugin extends AbstractPlugin {
     				}
 
     				lastChunkNumber = chunknum;
+
+    	    		bigBinarySender.sendChunkAck(lastChunkNumber);
     			}
-    			else if (type == CRC_PACKET) {
+    			else if (pktType == CRC_PACKET) {
     				long crc = arr2uint(msg.getPacket(), 1);
     				
     				logger.debug("crc packet with crc32 >" + crc + "< received");
     				
-    				if (lastChunkNumber == 0) {
+    				if (lastRecvPacketType == CRC_PACKET) {
     					logger.debug("crc packet already received -> drop it");
+			    		bigBinarySender.sendCRCAck();
     				}
     				else {
 	    				// do we really have the whole binary?
@@ -401,8 +417,6 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    							}
 
 	    							String relDir = remoteBinaryName;
-	    							if (!relDir.startsWith("./"))
-	    								relDir = "./" + relDir;
 	    							Serializable[] data = {binaryTimestamp, relDir, null, tmp};
 	    							if(!dataProcessed(System.currentTimeMillis(), data)) {
 	    								logger.warn("The binary data  (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") could not be stored in the database.");
@@ -413,10 +427,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    							file.delete();
 	    						}
 	    						else {
-	    							String relLocalName = localBinaryName.replaceAll(localBinaryDir, "");
-	    							if (!relLocalName.startsWith("./"))
-	    								relLocalName = "./" + relLocalName;
-	    							Serializable[] data = {binaryTimestamp, relLocalName, localBinaryDir, null};
+	    							String relLocalName = localBinaryName.replaceAll(rootBinaryDir, "");
+	    							Serializable[] data = {binaryTimestamp, relLocalName, rootBinaryDir, null};
 	    							if(!dataProcessed(System.currentTimeMillis(), data)) {
 	    								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
 	    							}
@@ -429,31 +441,28 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	    						stat.delete();
 	    						
 	    						localBinaryName = null;
-	    						lastChunkNumber = 0;
+
+	    			    		bigBinarySender.sendCRCAck();
 	    					}
 	    					else {
 	    						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request binary retransmission");
 	    						calculatedCRC.reset();
 	    						bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
-	    						continue;
 	    					}
 	    				}
 	    				else {
 	    					// we should never reach this point as well...
 	    					logger.error("binary length does not match (actual length=" + (new File(localBinaryName)).length() + "/should be=" + binaryLength + ") -> request binary retransmission (should never happen!)");
     						bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
-	    					continue;
 	    				}
 	    			}
     			}
+    			lastRecvPacketType = pktType;
     		} catch (Exception e) {
     			// something is very wrong -> get the next binary
     			logger.error(e.getMessage(), e);
     			bigBinarySender.requestNewBinary();
-    			continue;
     		}
-
-    		bigBinarySender.sendAck(lastChunkNumber);
     	}
         
         logger.debug("thread stopped");
@@ -463,6 +472,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	@Override
 	public boolean messageReceived(long timestamp, byte[] packet) {
 		try {
+			logger.debug("message received with timestamp " + timestamp);
 			msgQueue.add(new Message(timestamp, packet));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -475,6 +485,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	@Override
 	public void remoteConnEstablished() {
 		logger.debug("Connection established");
+		msgQueue.clear();
 		
 		File sf = new File(propertyFileName);
 		if (sf.exists()) {
@@ -493,21 +504,20 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			folderdatetimefm = new SimpleDateFormat(configFile.getProperty(PROPERTY_TIME_DATE_FORMAT));
 
 		    if (storeInDatabase) {
-		    	localBinaryName = localBinaryDir + TEMP_BINARY_NAME;
+		    	localBinaryName = rootBinaryDir + TEMP_BINARY_NAME;
 		    }
 		    else {
 			    File f = new File(remoteBinaryName);
 		    	String subpath = f.getParent();
 		    	if (subpath == null	)
-		    		subpath = "./";
-		    	logger.debug("subpath: " + subpath);
-				
-				if(!subpath.endsWith("/"))
+		    		subpath = "";
+		    	else if(!subpath.endsWith("/"))
 					subpath += "/";
+
+		    	logger.debug("subpath: " + subpath);
 		    	
-			    String datedir = localBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
+			    String datedir = rootBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
 			    String filename = f.getName();
-			    f = new File(datedir);
 			    localBinaryName = datedir + filename;
 		    }
 		    
@@ -521,6 +531,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	@Override
 	public void remoteConnLost() {
 		logger.debug("Connection lost");
+		
+		bigBinarySender.stopSending();
 	}
 }
 
@@ -595,25 +607,26 @@ class CalculateChecksum extends Thread {
 		            // Computer CRC32 checksum
 		            cis = new CheckedInputStream(
 		                    new FileInputStream(file), new CRC32());
-		        } catch (FileNotFoundException e) {
-		            parent.logger.error("binary >" + file + "< not found -> request a new binary from the deployment");
-		            parent.bigBinarySender.requestNewBinary();
-		            continue;
-		        }
 
-		        byte[] buf = new byte[4096];
-		        while(cis.read(buf) >= 0 && !this.dispose) {
-		        	yield();
-		        }
-		        if (this.dispose)
-		        	break;
+		            byte[] buf = new byte[4096];
+			        while(cis.read(buf) >= 0 && !this.dispose) {
+			        	yield();
+			        }
+			        if (this.dispose)
+			        	break;
+		        } catch (Exception e) {
+					// no good... -> ask for retransmission of the binary
+					parent.logger.error(e.getMessage(), e);
+					parent.bigBinarySender.requestRetransmissionOfBinary(parent.remoteBinaryName);
+					continue;
+				}
 		        
 		        parent.calculatedCRC = (CRC32) cis.getChecksum();
 				
 		        parent.logger.debug("recalculated crc (" + parent.calculatedCRC.getValue() + ") from " + parent.localBinaryName);
 				
 				parent.bigBinarySender.resumeBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue());
-			} catch (Exception e) {
+			} catch (IOException e) {
 				// no good... -> ask for a new binary
 				parent.logger.error(e.getMessage(), e);
 				parent.bigBinarySender.requestNewBinary();
@@ -656,7 +669,7 @@ class BigBinarySender extends Thread
 	}
 	
 	public void run() {
-		parent.logger.debug("start thread");
+		parent.logger.info("start thread");
 		while (!stopped) {
 			try {
 				synchronized (event) {
@@ -665,7 +678,7 @@ class BigBinarySender extends Thread
 					else {
 						event.wait(BigBinaryPlugin.RESEND_INTERVAL_SEC*1000);
 						if (triggered)
-							parent.logger.debug("resend message");
+							parent.logger.info("resend message");
 						else
 							continue;
 					}
@@ -675,7 +688,6 @@ class BigBinarySender extends Thread
 			}
 			
 			if(triggered) {
-				parent.logger.debug("send acknowledge packet for chunk number " + parent.lastChunkNumber);
 				try {
 					if(!parent.sendRemote(System.currentTimeMillis(), packet))
 						stopSending();
@@ -684,7 +696,7 @@ class BigBinarySender extends Thread
 				}
 			}
 		}
-		parent.logger.debug("stop thread");
+		parent.logger.info("stop thread");
 	}
 	
 	
@@ -709,20 +721,42 @@ class BigBinarySender extends Thread
 	}
 	
 	
-	public void sendAck(long ackNr) {
+	public void sendChunkAck(long ackNr) throws Exception {
 		if (triggered)
 			parent.logger.error("already sending a message");
 		else {
-    		try {
-        		ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
-        		baos.write(BigBinaryPlugin.ACK_PACKET);
-				baos.write(BigBinaryPlugin.uint2arr(ackNr));
-	    		packet = baos.toByteArray();
-				trigger();
-			} catch (IOException e) {
-    			parent.logger.error(e.getMessage(), e);
-    			requestNewBinary();
-			}
+			parent.logger.debug("acknowledge for chunk number >" + ackNr + "< sent");
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
+    		baos.write(BigBinaryPlugin.ACK_PACKET);
+    		baos.write(BigBinaryPlugin.CHUNK_PACKET);
+			baos.write(BigBinaryPlugin.uint2arr(ackNr));
+			parent.sendRemote(System.currentTimeMillis(), baos.toByteArray());
+		}
+	}
+	
+	
+	public void sendInitAck() throws Exception {
+		if (triggered)
+			parent.logger.error("already sending a message");
+		else {
+			parent.logger.debug("init acknowledge sent");
+			byte [] packet = new byte[2];
+			packet[0] = BigBinaryPlugin.ACK_PACKET;
+			packet[1] = BigBinaryPlugin.INIT_PACKET;
+			parent.sendRemote(System.currentTimeMillis(), packet);
+		}
+	}
+	
+	
+	public void sendCRCAck() throws Exception {
+		if (triggered)
+			parent.logger.error("already sending a message");
+		else {
+			parent.logger.debug("crc acknowledge sent");
+			byte [] packet = new byte[2];
+			packet[0] = BigBinaryPlugin.ACK_PACKET;
+			packet[1] = BigBinaryPlugin.CRC_PACKET;
+			parent.sendRemote(System.currentTimeMillis(), packet);
 		}
 	}
 
@@ -753,7 +787,7 @@ class BigBinarySender extends Thread
 	    	parent.logger.debug("overwrite already existing binary >" + parent.localBinaryName + "<");
 	    	f.delete();
 	    }
-		requestSpecificBinary(remoteLocation, 0, 1);
+		requestSpecificBinary(remoteLocation, 0, 0);
 	}
 
 
