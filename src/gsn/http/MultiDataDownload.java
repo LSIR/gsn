@@ -44,13 +44,18 @@ public class MultiDataDownload extends HttpServlet {
 		try {
 			logger.debug("Query string: " + req.getQueryString());
 
-			String downloadFormat = req.getParameter("download_format");
-			Map<String, String[]> parameterMap = parseParameters(req);
+            String downloadFormat = req.getParameter("download_format") == null ? "csv" : req.getParameter("download_format");
+			String downloadMode = req.getParameter("download_mode") == null ? "attachement" : req.getParameter("download_mode");
+            Map<String, String[]> parameterMap = parseParameters(req, downloadFormat);
 			if ("csv".compareTo(downloadFormat) == 0) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
 				dd.process();
-				res.setContentType("application/x-download");
-				res.setHeader("content-disposition","attachment; filename=data.csv");
+                if ("inline".compareTo(downloadMode) != 0) {
+				    res.setContentType("application/x-download");
+				    res.setHeader("content-disposition","attachment; filename=data.csv");
+                }
+                else
+                    res.setContentType("text");
 				dd.outputResult(res.getOutputStream());
 				//res.getOutputStream().flush();
 			}
@@ -58,7 +63,8 @@ public class MultiDataDownload extends HttpServlet {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
 				dd.process();
 				res.setContentType("text/xml");
-				res.setHeader("content-disposition","attachment; filename=data.xml");
+				if ("inline".compareTo(downloadMode) != 0) 
+                    res.setHeader("content-disposition","attachment; filename=data.xml");
 				dd.outputResult(res.getOutputStream());
 				//res.getOutputStream().flush();
 			}
@@ -80,7 +86,7 @@ public class MultiDataDownload extends HttpServlet {
 		}
 	}
 	
-	private Map<String, String[]> parseParameters (HttpServletRequest req) {
+	private Map<String, String[]> parseParameters (HttpServletRequest req, String downloadFormat) {
 		
 		Map<String, String[]> parameterMap = new Hashtable<String, String[]>();
 
@@ -113,13 +119,13 @@ public class MultiDataDownload extends HttpServlet {
 		}
 		
 		// Download format
-		String req_download_format = req.getParameter("download_format");
-		if (req_download_format != null) {
-			parameterMap.put("outputtype", new String[] { req_download_format });
-		}
-		else {
-			parameterMap.put("outputtype", new String[] { "csv" });
-		}
+		//String req_download_format = req.getParameter("download_format");
+		//if (req_download_format != null) {
+			parameterMap.put("outputtype", new String[] { downloadFormat });
+		//}
+		//else {
+		//	parameterMap.put("outputtype", new String[] { "csv" });
+		//}
 		
 		// CRITFIELDS
 		// TIME LIMITS
