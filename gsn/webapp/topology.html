@@ -20,7 +20,7 @@
 
 var initialUpdateVal = 12;
 var nextUpdateVal = initialUpdateVal;
-var deployments = new Array("Matterhorn", "Jungfraujoch", "Rooftop");
+var deployments = new Array();
 
 function updateTopology()
 {
@@ -56,27 +56,44 @@ $(document).ready(function() {
 	setTimeout("nextUpdate()",1000);
 
 	// deployments
-	for (var i in deployments) {
-	    // add tab
-	    $("#deployment_menu").append($.LI({}, $.A({
-		"id":"topology_menu_"+deployments[i],
-		"href":"javascript:showTopology("+i+")"
-	    },deployments[i])));
-	    // add div
-	    $("#topologycontainer").append(
-		$.DIV({
-		    "id":"topology_"+deployments[i]
-		      },
-		$.IMG({
-		    "id":"topology_img_"+deployments[i]
-		})));
-	    if (i>0)
-		$("#topology_"+deployments[i]).hide();
-	    else
-		$("#topology_menu_"+deployments[i]).addClass("selected");
-	}
-	updateTopology();
-	
+	// load deployments
+	$.ajax({
+	      type: "GET",
+	      url: "/gsn",
+	      success: function(data){
+		var arraySize = 0;
+		$("virtual-sensor",data).each(function(){
+		    var deploymentname = $(this).attr("name").split("_", 1)[0];
+		    if(deploymentname.length > 1) {
+			deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
+			if ($.inArray(deploymentname, deployments) < 0) {
+			    deployments.push(deploymentname);
+			}
+		    }
+		});
+		// display
+		for (var i in deployments) {
+		    // add tab
+		    $("#deployment_menu").append($.LI({}, $.A({
+			"id":"topology_menu_"+deployments[i],
+			"href":"javascript:showTopology("+i+")"
+		    },deployments[i])));
+		    // add div
+		    $("#topologycontainer").append(
+			$.DIV({
+			    "id":"topology_"+deployments[i]
+			      },
+			$.IMG({
+			    "id":"topology_img_"+deployments[i]
+			})));
+		    if (i>0)
+			$("#topology_"+deployments[i]).hide();
+		    else
+			$("#topology_menu_"+deployments[i]).addClass("selected");
+		}
+		updateTopology();
+	      }
+	});	
 });
 
 function showTopology(id) {
