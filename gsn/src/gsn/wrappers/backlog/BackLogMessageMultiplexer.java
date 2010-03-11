@@ -127,36 +127,41 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 				if (dispose)
 					break;
 				
-				
-				
-				if (newPacket) {
-					if (pkt.size() >= 4) {
-						packetLength = AbstractPlugin.arr2uint(pkt.toByteArray(), 0);
-						newPacket = false;
+				boolean hasMorePkt = true;
+				while(hasMorePkt) {
+					if (newPacket) {
+						if (pkt.size() >= 4) {
+							packetLength = AbstractPlugin.arr2uint(pkt.toByteArray(), 0);
+							newPacket = false;
+						}
+						else
+							hasMorePkt = false;
 					}
-				}
-
-				if (!newPacket && pkt.size() >= packetLength+4) {
-					byte[] tmp = pkt.toByteArray();
-					pkt = new ByteArrayOutputStream();
-					newPacket = true;
-					
-					if (tmp.length > packetLength+4)
-						pkt.write(java.util.Arrays.copyOfRange(tmp, (int) (packetLength+4), tmp.length));
-
-		    		BackLogMessage msg = null;
-					msg = new BackLogMessage(java.util.Arrays.copyOfRange(tmp, 4, (int) (packetLength+4)));
-		    		logger.debug("Message received: with timestamp " + msg.getTimestamp() + " and type " + msg.getType());
-		    		if( msg.getType() == BackLogMessage.PING_MESSAGE_TYPE ) {
-		    			sendPingAck(msg.getTimestamp());
-		    		}
-		    		else if( msg.getType() == BackLogMessage.PING_ACK_MESSAGE_TYPE ) {
-		    			synchronized (pingACKreceived) {
-		    				pingACKreceived = true;
-		    			}
-		    		}
-		    		else
-		    			multiplexMessage(msg);
+	
+					if (!newPacket && pkt.size() >= packetLength+4) {
+						byte[] tmp = pkt.toByteArray();
+						pkt = new ByteArrayOutputStream();
+						newPacket = true;
+						
+						if (tmp.length > packetLength+4)
+							pkt.write(java.util.Arrays.copyOfRange(tmp, (int) (packetLength+4), tmp.length));
+	
+			    		BackLogMessage msg = null;
+						msg = new BackLogMessage(java.util.Arrays.copyOfRange(tmp, 4, (int) (packetLength+4)));
+			    		logger.debug("Message received: with timestamp " + msg.getTimestamp() + " and type " + msg.getType());
+			    		if( msg.getType() == BackLogMessage.PING_MESSAGE_TYPE ) {
+			    			sendPingAck(msg.getTimestamp());
+			    		}
+			    		else if( msg.getType() == BackLogMessage.PING_ACK_MESSAGE_TYPE ) {
+			    			synchronized (pingACKreceived) {
+			    				pingACKreceived = true;
+			    			}
+			    		}
+			    		else
+			    			multiplexMessage(msg);
+					}
+					else
+						hasMorePkt = false;
 				}
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
