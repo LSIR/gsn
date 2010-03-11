@@ -20,7 +20,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select MODIFICATIONTIME, RELATIVEFILE, STORAGEDIRECTORY from ETZG_BigBinary_1515 where RELATIVEFILE like './camera1/%' and STORAGEDIRECTORY like '%etzg/'</predicate>
+                    <predicate key="query">select MODIFICATIONTIME, RELATIVEFILE, STORAGEDIRECTORY from ETZG_BigBinary_1515 where RELATIVEFILE like 'camera1/%' and STORAGEDIRECTORY like '%etzg/'</predicate>
                 </address>
                 <query> select MODIFICATIONTIME, concat(STORAGEDIRECTORY,RELATIVEFILE) as FILE from wrapper</query>
             </source>
