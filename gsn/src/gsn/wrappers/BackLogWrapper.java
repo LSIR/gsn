@@ -308,8 +308,6 @@ public class BackLogWrapper extends AbstractWrapper {
 	public void dispose() {
 		logger.info("dispose");
 		
-		blMsgMultiplexer.deregisterListener(pluginObject.getMessageType(), pluginObject, true);
-		
 		// tell the plugin to stop
 		pluginObject.dispose();
 		try {

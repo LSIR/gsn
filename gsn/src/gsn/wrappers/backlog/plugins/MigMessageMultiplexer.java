@@ -37,6 +37,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	private SFv1Listen sfv1Listen = null;
 	
 	private String deploymentName = null;
+	private BackLogMessageMultiplexer blMessageMultiplexer;
 	
 	
 	public MigMessageMultiplexer() throws Exception {
@@ -46,6 +47,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	
 	private MigMessageMultiplexer(String deployment, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
 		deploymentName = deployment;
+		blMessageMultiplexer = blMsgMulti;
 		tinyos1x_platform = props.getProperty(TINYOS1X_PLATFORM);
 		String sflocalport = props.getProperty(SF_LOCAL_PORT);
 		
@@ -169,7 +171,11 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				logger.error(e.getMessage(), e);
 			}
 		}
-		
+
+		if (tinyos1x_platform == null)
+			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS1x_MESSAGE_TYPE, this, true);
+		else
+			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this, true);
 		migMsgMultiplexerMap.remove(deploymentName);
 	}
 	

@@ -65,10 +65,22 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	}
 	
 	
+	public void deregisterListener() {
+		activeBackLogWrapper.getBLMessageMultiplexer().deregisterListener(getMessageType(), this, true);
+	}
+	
+	
+	public void deregisterListener(BackLogMessageListener listener) {
+		activeBackLogWrapper.getBLMessageMultiplexer().deregisterListener(getMessageType(), listener, true);
+	}
+	
+	
 	public void run() { }
 	
 	
-	public void dispose() { }
+	public void dispose() {
+		deregisterListener();
+	}
 	
 	
 	public abstract String getPluginName();
