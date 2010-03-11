@@ -119,6 +119,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 		while(!dispose) {
 			try {
 				try {
+					logger.debug("rcv...");
 					pkt.write(recvQueue.take());
 				} catch (InterruptedException e) {
 					logger.debug(e.getMessage());
@@ -148,7 +149,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	
 			    		BackLogMessage msg = null;
 						msg = new BackLogMessage(java.util.Arrays.copyOfRange(tmp, 4, (int) (packetLength+4)));
-			    		logger.debug("Message received: with timestamp " + msg.getTimestamp() + " and type " + msg.getType());
+			    		logger.debug("rcv (" + msg.getType() + "," + msg.getTimestamp() + "," + msg.getMessage().length + ")");
 			    		if( msg.getType() == BackLogMessage.PING_MESSAGE_TYPE ) {
 			    			sendPingAck(msg.getTimestamp());
 			    		}
@@ -204,6 +205,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	 * @throws IOException if the message is too long
 	 */
 	public boolean sendMessage(BackLogMessage message) throws IOException {
+		logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
 		return asyncDeploymentClient.send(this, message.getMessage());
 	}
 	
@@ -409,12 +411,14 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
  */
 class PingTimer extends TimerTask {
 	private BackLogMessageMultiplexer parent;
+	protected final transient Logger logger = Logger.getLogger( PingTimer.class );
 	
 	public PingTimer(BackLogMessageMultiplexer parent) {
 		this.parent = parent;
 	}
 	
 	public void run() {
+		logger.debug("ping");
 		parent.sendPing();
 	}
 }
@@ -428,19 +432,25 @@ class PingTimer extends TimerTask {
  */
 class PingWatchDog extends TimerTask {
 	private BackLogMessageMultiplexer parent;
+	protected final transient Logger logger = Logger.getLogger( PingWatchDog.class );
 	
 	public PingWatchDog(BackLogMessageMultiplexer parent) {
 		this.parent = parent;
 	}
 	
 	public void run() {
+		boolean noAck = true;
 		synchronized (parent.pingACKreceived) {
 			if(parent.pingACKreceived) {
+				logger.debug("reset");
 				parent.pingACKreceived = false;
+				noAck = false;
 			}
-			else {
-				parent.asyncDeploymentClient.reconnect(parent);
-			}
+		}
+		
+		if (noAck) {
+			logger.debug("connection lost");
+			parent.asyncDeploymentClient.reconnect(parent);
 		}
 	}
 }
