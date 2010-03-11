@@ -101,13 +101,18 @@ public class AsyncDeploymentClient extends Thread  {
 	    					logger.debug("Selector:reconnect");
 	    					if (change.socket.keyFor(selector).isValid())
 	    						closeConnection(change.socket.keyFor(selector), change.socket);
+	    					DeploymentListener listener;
 	    					synchronized (socketToListenerList) {
-	    						DeploymentListener listener = socketToListenerList.get(change.socket);
-	    						logger.debug("trying to reconnect to " + listener.getDeploymentName() + " deployment in " + RECONNECT_TIMEOUT_SEC + " seconds");
-	    						Timer timer = new Timer("Reconnect" + listener.getDeploymentName() + "Timer");
-	    						timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
-	    						listenerToSocketList.remove(socketToListenerList.get(change.socket));
+	    						listener = socketToListenerList.get(change.socket);
 	    						socketToListenerList.remove(change.socket);
+	    					}
+	    					if (listener != null) {
+	    						synchronized (listenerToSocketList) {
+			    					listenerToSocketList.remove(listener);
+								}
+		    					logger.debug("trying to reconnect to " + listener.getDeploymentName() + " deployment in " + RECONNECT_TIMEOUT_SEC + " seconds");
+		    					Timer timer = new Timer("Reconnect" + listener.getDeploymentName() + "Timer");
+		    					timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
 	    					}
 	    					break;
 	    				}
@@ -196,9 +201,11 @@ public class AsyncDeploymentClient extends Thread  {
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}
+			DeploymentListener listener;
 			synchronized (socketToListenerList) {
-				socketToListenerList.get(sc).connectionLost();
+				listener = socketToListenerList.get(sc);
 			}
+			listener.connectionLost();
     	}
     	writeBuffer.clear();
     	writeBuffer.flip();
@@ -267,9 +274,11 @@ public class AsyncDeploymentClient extends Thread  {
 			return;
 		}
 
+		DeploymentListener listener;
 		synchronized (socketToListenerList) {
-			socketToListenerList.get((SocketChannel)key.channel()).connectionEstablished();
+			listener = socketToListenerList.get((SocketChannel)key.channel());
 		}
+		listener.connectionEstablished();
 	  
 		// Register an interest in reading on this channel
 		key.interestOps(SelectionKey.OP_READ);
@@ -362,13 +371,18 @@ public class AsyncDeploymentClient extends Thread  {
 			this.selector.wakeup();
 			return true;
 		}
-		else
+		else {
+			logger.debug("not connected");
 			return false;
+		}
 	}
 	
 	
 	public void reconnect(DeploymentListener listener) {
+		writeBuffer.clear();
+    	writeBuffer.flip();
 		synchronized (changeRequests) {
+			logger.debug("add reconnect request");
 			// Indicate we want the interest ops set changed
 			changeRequests.add(new ChangeRequest(listenerToSocketList.get(listener), ChangeRequest.TYPE_RECONNECT, -1));
 		}
