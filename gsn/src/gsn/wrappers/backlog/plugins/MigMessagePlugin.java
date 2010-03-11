@@ -3,7 +3,6 @@ package gsn.wrappers.backlog.plugins;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.wrappers.BackLogWrapper;
-import gsn.wrappers.backlog.plugins.MigMessageParameters;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -12,8 +11,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Properties;
 
 import net.tinyos.message.SerialPacket;
@@ -21,7 +21,6 @@ import net.tinyos.packet.Serial;
 import net.tinyos1x.message.TOSMsg;
 
 import org.apache.log4j.Logger;
-
 
 /**
  * This plugin offers the functionality to read/send TinyOS messages by using
@@ -45,6 +44,7 @@ public class MigMessagePlugin extends AbstractPlugin
 	private MigMessageParameters parameters = null;
 
 	private Constructor<?> messageConstructor = null;
+	private Constructor<?> voidMessageConstructor = null;
 
 	private final transient Logger logger = Logger.getLogger( MigMessagePlugin.class );
 	
@@ -58,6 +58,8 @@ public class MigMessagePlugin extends AbstractPlugin
 	private TOSMsg template;
 	
 	private int msgType;
+	
+	private static Hashtable<Class<?>,Method> parseMapping = null;
 
 	@Override
 	public boolean initialize(BackLogWrapper backlogwrapper, String deployment, Properties props) {
@@ -69,8 +71,9 @@ public class MigMessagePlugin extends AbstractPlugin
 			parameters = new MigMessageParameters();
 			parameters.initParameters(getActiveAddressBean());
 			Class<?> classTemplate = Class.forName(parameters.getTinyosMessageName());
-			parameters.buildOutputStructure(classTemplate, new ArrayList<DataField>(), new ArrayList<Method>());
+			parameters.buildOutputStructure(classTemplate, new ArrayList<DataField>(), new ArrayList<Method>(),  new ArrayList<Method>());
 			messageConstructor = classTemplate.getConstructor(byte[].class) ;
+			voidMessageConstructor = classTemplate.getConstructor() ;
 			
 			// if it is a TinyOS1.x message class we need the platform name
 			if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
@@ -282,13 +285,77 @@ public class MigMessagePlugin extends AbstractPlugin
 				logger.error("binary_packet upload action needs a 'binary packet' field.");
 			}
 		}
+		else if( action.compareToIgnoreCase("tosmsg") == 0 ) {
+			// compose tos packet for sending
+			Method setter = null;
+			
+			if (parseMapping==null) {
+				try {
+					buildMappings();
+				}
+				catch (Exception e) {
+					logger.error(e);
+					return false;
+				}
+			}
+				
+			try {
+				Object msg = (Object) voidMessageConstructor.newInstance();
+
+				Iterator<Method> iter = parameters.getSetters().iterator();
+				while (iter.hasNext()) {
+					setter = iter.next();
+					setter.setAccessible(true);
+					for (int i=0; i<paramNames.length;i++) {
+						String name = setter.getName();
+						if (paramNames[i].compareToIgnoreCase(name.substring(parameters.getTinyosSetterPrefix().length()))==0) {
+							Class<?>[] setterparams = setter.getParameterTypes();
+							if (setterparams.length==1) {
+								Class<?> param = setterparams[0];
+								logger.debug("set field "+name+" to "+ (String)paramValues[i]);
+								Method parser = parseMapping.get(param);
+								setter.invoke(msg, parser.invoke(null, paramValues[i]));
+							}
+							else {
+								logger.warn("Unknown setter with "+ setterparams.length +" parameters");
+							}	
+							break;
+						}
+					}
+				}
+				logger.debug(msg);
+				// switch tos version
+				byte[] packet;
+				if (tinyos1x_platform != null) {
+					net.tinyos1x.message.Message tosmsg = (net.tinyos1x.message.Message)msg;
+					packet = createTOSpacket(0xffff, tosmsg.amType(), tosmsg.dataGet());
+				}
+				else {
+					net.tinyos.message.Message tosmsg = (net.tinyos.message.Message)msg;
+					packet = createTOSpacket(0xffff, tosmsg.amType(), tosmsg.dataGet());
+				}
+				ret = sendRemote(System.currentTimeMillis(), packet);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				return false;
+			}
+		}
 		else
 			logger.error("Unknown action");
 		
 		return ret;
 	}
 
-	
+	private static void buildMappings () throws SecurityException, NoSuchMethodException {
+		parseMapping = new Hashtable<Class<?>, Method> () ;
+		parseMapping.put(byte.class, Byte.class.getMethod("parseByte", String.class)) ;
+		parseMapping.put(short.class, Short.class.getMethod("parseShort", String.class)) ;
+		parseMapping.put(int.class, Integer.class.getMethod("parseInt", String.class)) ;
+		parseMapping.put(long.class, Long.class.getMethod("parseLong", String.class)) ;
+		parseMapping.put(float.class, Float.class.getMethod("parseFloat", String.class));
+		parseMapping.put(double.class, Double.class.getMethod("parseDouble", String.class));
+	}
+
     private byte[] createTOSpacket(int moteId, int amType, byte[] data) throws IOException {
 		if (amType < 0) {
 		    throw new IOException("unknown AM type for message");

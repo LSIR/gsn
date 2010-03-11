@@ -65,15 +65,32 @@ public class ContainerInfoHandler implements RequestHandler {
       if (ses!=null ) {
         for (StreamElement se:ses){
           for ( DataField df : sensorConfig.getOutputStructure( ) ) {
+        	boolean unixtime=false;
             sb.append("\t<field");
             sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
             sb.append(" type=\"").append(df.getType()).append("\"");
+            if (df.getUnit() != null && df.getUnit().trim().length() != 0) {
+            	if(df.getUnit().compareToIgnoreCase("unixtime")==0) {
+            		unixtime = true;
+            	}
+            	else
+                	sb.append(" unit=\"").append(StringEscapeUtils.escapeXml(df.getUnit())).append("\"");
+            }
             if (df.getDescription() != null && df.getDescription().trim().length() != 0)
               sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
             sb.append(">");
             if (se!= null ) 
               if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
                 sb.append( se.getData( df.getName( ) ) );
+              else if (unixtime) {
+            	  try {
+            		  sb.append(sdf.format(new Date((Long)se.getData(StringEscapeUtils.escapeXml( df.getName( ) )))));
+            	  }
+            	  catch (ClassCastException e) {
+            		  logger.warn("Stream element ["+se+"] could not be cast to date string");
+            		  sb.append("null");
+            	  }
+              }
               else
                 sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
             sb.append("</field>\n");
@@ -86,22 +103,24 @@ public class ContainerInfoHandler implements RequestHandler {
             sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
             sb.append("</field>\n" );
           }
-          if (sensorConfig.getWebinput( )!=null){
-            for ( WebInput wi : sensorConfig.getWebinput( ) ) {
-              for ( DataField df : wi.getParameters ( ) ) {
-                sb.append( "\t<field");
-                sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
-                sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
-                sb.append(" category=\"input\"");
-                sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
-                if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
-                  sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
-                sb.append( "></field>\n" );
-              }
-            }
-          }
           counter++;
         }
+      }
+      if (sensorConfig.getWebinput( )!=null){
+          for ( WebInput wi : sensorConfig.getWebinput( ) ) {
+            for ( DataField df : wi.getParameters ( ) ) {
+              sb.append( "\t<field");
+              sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
+              sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
+              sb.append(" category=\"input\"");
+              sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
+              if ( df.getDefaultValue() != null)
+                  sb.append( " defaultvalue=\"" ).append( StringEscapeUtils.escapeXml( df.getDefaultValue()) ).append( "\"" );                
+              if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
+                sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
+              sb.append( "></field>\n" );
+            }
+          }
       }
       sb.append( "</virtual-sensor>\n" );
     }

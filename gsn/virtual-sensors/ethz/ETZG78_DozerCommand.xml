@@ -1,0 +1,37 @@
+<virtual-sensor name="ETZG78_DozerCommand_1396" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <web-input>
+            <command name="tosmsg">
+                <field name="destination" type="*text" defaultvalue="65535">destination</field>
+                <field name="cmd" type="*select:|IDLE_CMD,0|DATA_CONTROL_CMD,1|OBJECT_TRANSFER,7|ACCESSNODE_QUEUE_CTRL_CMD,8|GUMSTIX_CTRL_CMD,14">cmd</field>
+                <field name="arg" type="*text">destination</field>
+                <field name="repetitioncnt" type="*text" defaultvalue="0">repetition count</field>
+            </command>
+        </web-input>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="DESTINATION" type="INTEGER"/>
+            <field name="CMD" type="TINYINT" />
+            <field name="ARG" type="SMALLINT" />
+            <field name="REPETITIONCNT" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerCommandMsg) from ETZG78 deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerCommandMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

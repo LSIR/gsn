@@ -14,7 +14,7 @@ public final class DataField implements Serializable {
    
    private byte               dataTypeID       = -1;
    
-   private String            type;
+   private String            type, unit, defaultvalue;
    
    private DataField ( ) {}
    
@@ -83,6 +83,22 @@ public final class DataField implements Serializable {
     */
    public String getType ( ) {
       return this.type;
+   }
+   
+   /**
+    * @return Returns the unit. This method is just used in the web interface
+    * for displaying data.
+    */
+   public String getUnit ( ) {
+      return this.unit;
+   }
+   
+   /**
+    * @return Returns the default value. This method is just used in the web interface
+    * for input fields.
+    */
+   public String getDefaultValue ( ) {
+      return this.defaultvalue;
    }
    
 }

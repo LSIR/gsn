@@ -72,6 +72,8 @@
    <mapping name="field" class="gsn.beans.DataField">
 	<value name="name"  field="name" style="attribute"/>
    	<value name="type" field="type" style="attribute"/>
+   	<value name="unit" field="unit" style="attribute" usage="optional"/>
+   	<value name="defaultvalue" field="defaultvalue" style="attribute" usage="optional"/>
    	<value field="description" style="text" usage="optional"/>
    </mapping>
    

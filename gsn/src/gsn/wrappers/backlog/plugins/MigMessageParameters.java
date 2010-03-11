@@ -24,6 +24,7 @@ public class MigMessageParameters {
 	private final transient Logger logger = Logger.getLogger( MigMessageParameters.class );
 
 	private ArrayList<Method> getters = null;
+	private ArrayList<Method> setters = null;
 
 	private DataField[] outputStructure = null;
 
@@ -49,6 +50,10 @@ public class MigMessageParameters {
 	private static final String TINYOS_GETTER_PREFIX = "getter-prefix";
 	private static final String TINYOS_GETTER_PREFIX_DEFAULT = "get_";
 	private String tinyosGetterPrefix = null;
+
+	private static final String TINYOS_SETTER_PREFIX = "setter-prefix";
+	private static final String TINYOS_SETTER_PREFIX_DEFAULT = "set_";
+	private String tinyosSetterPrefix = null;
 
 	private static final String TINYOS_MESSAGE_LENGTH = "message-length";
 	private int tinyOSMessageLength;
@@ -86,6 +91,7 @@ public class MigMessageParameters {
 		// Optional parameters
 
 		tinyosGetterPrefix = infos.getPredicateValueWithDefault(TINYOS_GETTER_PREFIX, TINYOS_GETTER_PREFIX_DEFAULT);
+		tinyosSetterPrefix = infos.getPredicateValueWithDefault(TINYOS_SETTER_PREFIX, TINYOS_SETTER_PREFIX_DEFAULT);
 
 		tinyOSMessageLength = Integer.parseInt(infos.getPredicateValueWithDefault(TINYOS_MESSAGE_LENGTH, "-1")) ;
 
@@ -111,7 +117,8 @@ public class MigMessageParameters {
 		// Optional parameters
 
 		tinyosGetterPrefix = infos.getPredicateValueWithDefault(TINYOS_GETTER_PREFIX, TINYOS_GETTER_PREFIX_DEFAULT);
-
+		tinyosSetterPrefix = infos.getPredicateValueWithDefault(TINYOS_SETTER_PREFIX, TINYOS_SETTER_PREFIX_DEFAULT);
+		
 		tinyOSMessageLength = Integer.parseInt(infos.getPredicateValueWithDefault(TINYOS_MESSAGE_LENGTH, "-1")) ;
 
 	}
@@ -128,8 +135,8 @@ public class MigMessageParameters {
 	 * @param tosmsgClass
 	 * @param fields
 	 */
-	public void buildOutputStructure (Class<?> tosmsgClass, ArrayList<DataField> fields, ArrayList<Method> getters) throws RuntimeException {
-		logger.debug("Building output structure for class: " + tosmsgClass.getCanonicalName() + " and prefix: " + tinyosGetterPrefix);
+	public void buildOutputStructure (Class<?> tosmsgClass, ArrayList<DataField> fields, ArrayList<Method> getters, ArrayList<Method> setters) throws RuntimeException {
+		logger.debug("Building output structure for class: " + tosmsgClass.getCanonicalName() + " and getter prefix: " + tinyosGetterPrefix+" and setter prefix: " + tinyosSetterPrefix);
 
 		if (typesMapping == null) buildMappings() ;
 
@@ -140,11 +147,13 @@ public class MigMessageParameters {
 		if (tinyosMessageClassNotFound) {
 			fields = null;
 			getters = null;
+			setters = null;
 			throw new RuntimeException ("Neither TinyOS1x (net.tinyos1x.message.Message) nor TinyOS2x (net.tinyos.message.Message) message class where found in the >" + tinyosMessageName + "< class hierarchy") ;
 		} 
 		else if (tinyos1xMessageClassReached || tinyos2xMessageClassReached) {
 			this.outputStructure = fields.toArray(new DataField[] {});
 			this.getters = getters;
+			this.setters = setters;
 		}
 		else {
 
@@ -208,8 +217,18 @@ public class MigMessageParameters {
 						}
 					}
 				}
+				// select setters
+				else if (method.getName().startsWith(tinyosSetterPrefix)) {
+					logger.debug("setter: " + method.getName());
+					if ( isInMethodList(setters, method) ) {
+						logger.warn("The method >" + method.getName() + "< is already defined in a subclass. This setter is skipped.");
+					}
+					else {
+						setters.add(method);
+					}
+				}
 			}
-			buildOutputStructure (tosmsgClass.getSuperclass(), fields, getters) ;
+			buildOutputStructure (tosmsgClass.getSuperclass(), fields, getters, setters) ;
 		}
 	}
 	
@@ -273,6 +292,10 @@ public class MigMessageParameters {
 	public ArrayList<Method> getGetters() {
 		return getters;
 	}
+	
+	public ArrayList<Method> getSetters() {
+		return setters;
+	}
 
 	public DataField[] getOutputStructure() {
 		return outputStructure;
@@ -280,6 +303,10 @@ public class MigMessageParameters {
 
 	public String getTinyosGetterPrefix() {
 		return tinyosGetterPrefix;
+	}
+
+	public String getTinyosSetterPrefix() {
+		return tinyosSetterPrefix;
 	}
 
 	public byte getTinyosVersion() {

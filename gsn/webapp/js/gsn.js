@@ -730,18 +730,25 @@ var GSN = {
             var input = $("dl.input",vsdl.get(4));
             dl = dynamic;
 			
-            var name,cat,type,value;
+            var name,cat,type,value,defaultvalue,unit;
             var last_cmd,cmd;
             var hiddenclass ="";
             //update the vsbox the first time, when it's empty
             if ($(dynamic).children().size()==0 && $(static_).children().size()==0){
                 var gotDynamic,gotStatic,gotInput = false;
+                var addInput = $(input).children().size() == 0;
                 $("field",vs).each(function(){
                     name = $(this).attr("name");
                     cat = $(this).attr("category");
                     cmd = $(this).attr("command");
                     type = $(this).attr("type");
                     value = $(this).text();
+                    defaultvalue = $(this).attr("defaultvalue");
+                    unit = $(this).attr("unit");
+                    if (unit==null)
+                        unit="";
+                    else
+                        unit=" "+unit;
 				
                     if (name=="timed") {
                         //if (value != "") value = GSN.util.printDate(value);
@@ -759,7 +766,7 @@ var GSN = {
                         dl = static_;
                         if (!gotStatic) {
                             $("a.tabstatic", vsd).show();
-                            if (!gotDynamic) {
+                            if (!gotDynamic && addInput) {
                                 $(vsd).find("a.tabstatic").addClass("active");
                                 $(vsd).find("> dl").hide();
                                 $(vsd).find("dl.static").show();
@@ -801,8 +808,10 @@ var GSN = {
                             });
                         } else if (type.indexOf("binary") != -1){
                             value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
+                        } else {
+                            value = value + unit;
                         }
-                    } else if (cat == "input") {
+                    } else if (cat == "input" && addInput) {
                         if (last_cmd != cmd) {
                             if (last_cmd != null) hiddenclass = ' hidden';
                             $("select.cmd", vsd).append($.OPTION({},cmd));
@@ -820,7 +829,10 @@ var GSN = {
                             var options = type.split(":")[1].split("|");
                             value = '<select name="'+cmd+";"+name+'">';
                             for (var i = 0; i < options.length;i++){
-                                value += '<option>'+options[i]+'</option>';
+                                if (options[i].split(",").length == 2)
+                                    value += '<option value="'+options[i].split(",")[1]+'">'+options[i].split(",")[0]+'</option>';
+                                else
+                                    value += '<option>'+options[i]+'</option>';
                             }
                             value += '</select>';
                         }  else if (type.split(":")[0].indexOf("radio") != -1 ||
@@ -831,20 +843,23 @@ var GSN = {
                                 value += '<input type="'+type.split(":")[0]+'" name="'+cmd+";"+name+'" value="'+options[i]+'">'+options[i]+'</input>';
                             }
                         } else {
-                            value = '<input type="text" name="'+cmd+";"+name+'"/>';
+                            if (defaultvalue == null)
+                               defaultvalue="";
+                            value = '<input type="text" name="'+cmd+";"+name+'" value="'+defaultvalue+'"/>';
                         }
                         if ($(this).attr("description")!=null)
                             value += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';
 					
                         name = comp+name;
                     }
-                    $(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
+		    if (!(cat == "input" && !addInput))
+		      $(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
                 });
 			  
                 if ($(vs).attr("description")!="") {
                     $("dl.description", vsd).empty().append($.DD({},$(vs).attr("description")));
                     $("a.tabdescription", vsd).show();
-                    if (!gotStatic) {
+                    if (!gotStatic && addInput) {
                         $(vsd).find("a.tabdescription", vsd).addClass("active");
                         $(vsd).find("> dl").hide();
                         $(vsd).find("dl.description").show();
@@ -856,11 +871,16 @@ var GSN = {
             } else {
                 //update the vsbox when the value already exists
                 var dds = $("dd",dl);
-                var dd,field;
+                var dd,field,unit;
                 for (var i = 0; i<dds.size();i++){
                     dd = dds.get(i);
                     field = $("field[@name="+$(dd).attr("class")+"]",vs);
                     type = $(field).attr("type");
+                    unit = $(field).attr("unit");
+                    if (unit==null)
+                        unit="";
+                    else
+                        unit=" "+unit;
                     value = $(field).text();
                     if (value!="") {
                         if (type.indexOf("svg") != -1){
@@ -880,7 +900,7 @@ var GSN = {
                         } else if (type.indexOf("binary") != -1){
                             $("a",dd).attr("href",value);
                         } else {
-                            $(dd).empty().append(value);
+                            $(dd).empty().append(value + unit);
                         }
                     }
                 }
