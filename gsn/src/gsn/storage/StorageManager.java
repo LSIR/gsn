@@ -211,9 +211,10 @@ public class StorageManager {
 	 */
 
 	public static ResultSet getBinaryFieldByQuery(StringBuilder query,
-			String colName, long pk, Connection connection) throws SQLException {
+			String colName, Long pk, Connection connection) throws SQLException {
 		PreparedStatement ps = connection.prepareStatement(query.toString());
-		ps.setLong(1, pk);
+		if (pk != null)
+			ps.setLong(1, pk);
 		return ps.executeQuery();
 	}
 

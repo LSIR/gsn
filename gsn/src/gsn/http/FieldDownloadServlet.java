@@ -31,6 +31,7 @@ public class FieldDownloadServlet extends HttpServlet {
 
 	public void doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 		String vsName = req.getParameter( "vs" );
+		Long pk = null;
 		if ( vsName == null || (vsName =vsName.trim( ).toLowerCase()).length( ) == 0 ) {
 			res.sendError( WebConstants.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
 			return;
@@ -49,12 +50,20 @@ public class FieldDownloadServlet extends HttpServlet {
 
 		primaryKey = primaryKey.trim( );
 		colName = colName.trim( );
+		StringBuilder query;
+		if (primaryKey.compareToIgnoreCase("latest")==0) {
+			query = new StringBuilder( ).append( prefix ).append( vsName ).append(" where timed = (select max(timed) from " ).append(vsName).append(")");
+		}
+		else {
+			pk = Long.parseLong(primaryKey);
+			query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
+		}
+
 		// TODO : Check to see if the requested column exists.
-		StringBuilder query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
 		Connection conn = null;
 		try {
 			conn = StorageManager.getInstance().getConnection();
-			ResultSet rs = StorageManager.getInstance( ).getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) ,conn);
+			ResultSet rs = StorageManager.getInstance( ).getBinaryFieldByQuery( query , colName , pk ,conn);
 			if ( !rs.next() ) {
 				res.sendError( res.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
 			}else {
