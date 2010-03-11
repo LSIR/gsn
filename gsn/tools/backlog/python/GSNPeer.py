@@ -240,8 +240,10 @@ class GSNPeerClass(Thread):
                 self._pingwatchdog.pause()
                 self._pingtimer.pause()
                 self.clientsocket.close()
-                self.connected = False
+        except Exception, e:
+            self._logger.exception(e.__str__())
         finally:
+            self.connected = False
             self._lock.release()
 
 
