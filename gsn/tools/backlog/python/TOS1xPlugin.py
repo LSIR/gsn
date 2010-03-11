@@ -57,7 +57,6 @@ class TOS1xPluginClass(TOSPluginClass, AbstractPluginClass):
         self._stopped = False
 
     def getMsgType(self):
-        # TODO: use TOS1x_MESSAGE_TYPE after separation in GSN
         return BackLogMessage.TOS1x_MESSAGE_TYPE
 
     def tos2backlog(self, packet):

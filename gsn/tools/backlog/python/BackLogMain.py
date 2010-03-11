@@ -185,6 +185,20 @@ class BackLogMainClass(Thread):
             
         # remove the message from the backlog database using its timestamp
         self.backlog.removeMsg(timestamp)
+        
+    def connectionToGSNestablished(self):
+        # tell the plugins that the connection to GSN has been established
+        for plugin_entry in self.plugins:
+            module_name = plugin_entry[0]
+            plugin = plugin_entry[1]
+            plugin.connectionToGSNestablished()
+        
+    def connectionToGSNlost(self):
+        # tell the plugins that the connection to GSN has been lost
+        for plugin_entry in self.plugins:
+            module_name = plugin_entry[0]
+            plugin = plugin_entry[1]
+            plugin.connectionToGSNlost()
             
 
 

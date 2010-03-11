@@ -113,6 +113,7 @@ class GSNPeerClass(Thread):
                 self._mtu = self.clientsocket.getsockopt(SOL_IP, IP_MTU)
                 self._logger.debug('MTU of client socket is ' + str(self._mtu))
                 self.connected = True
+                self._parent.connectionToGSNestablished()
             except socket.error, e:
                 if not self._stopped:
                     self._logger.error('exception while accepting connection: ' + e.__str__())
@@ -236,6 +237,7 @@ class GSNPeerClass(Thread):
         self._lock.acquire()
         try:
             if self.connected:
+                self._parent.connectionToGSNlost()
                 self._gsnwriter.pause()
                 self._pingwatchdog.pause()
                 self._pingtimer.pause()

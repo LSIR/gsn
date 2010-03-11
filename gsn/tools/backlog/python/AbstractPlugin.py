@@ -135,6 +135,20 @@ class AbstractPluginClass(Thread):
         This function have to stop the thread.
         '''
         pass
+        
+    
+    def connectionToGSNestablished(self):
+        '''
+        This function is called if a new connection to GSN has been established
+        '''
+        pass
+        
+    
+    def connectionToGSNlost(self):
+        '''
+        This function is called if a the connection to GSN has been lost
+        '''
+        pass
     
     
     def getTimeStamp(self):
