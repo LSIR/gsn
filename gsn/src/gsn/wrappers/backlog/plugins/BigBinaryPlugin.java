@@ -15,6 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
@@ -72,7 +74,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	protected static final byte RESEND_PACKET = 2;
 	protected static final byte CHUNK_PACKET = 3;
 	protected static final byte CRC_PACKET = 4;
-	
+
+	private Timer connectionTestTimer = null;
 	private SimpleDateFormat folderdatetimefm;
 
 	private String rootBinaryDir;
@@ -225,6 +228,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		bigBinarySender.start();
 		calcChecksumThread.start();
 		long lastRecvPacketType = -1;
+		
+    	// start connection check timer
+		connectionTestTimer = new Timer("ConnectionCheck");
+		connectionTestTimer.schedule( new ConnectionCheckTimer(this), 15000 );
 
     	Message msg;
     	while (!dispose) {
@@ -501,6 +508,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	@Override
 	public void remoteConnEstablished() {
 		logger.debug("Connection established");
+		connectionTestTimer.cancel();
 		
 		File sf = new File(propertyFileName);
 		if (sf.exists()) {
@@ -854,5 +862,23 @@ class BigBinarySender extends Thread
 			
 			trigger();
 		}
+	}
+}
+
+
+
+/**
+ * Pretends a connection establishment on fire.
+ */
+class ConnectionCheckTimer extends TimerTask {
+	private BigBinaryPlugin parent;
+	
+	public ConnectionCheckTimer(BigBinaryPlugin parent) {
+		this.parent = parent;
+	}
+	
+	public void run() {
+		parent.logger.debug("connection check timer fired");
+		parent.remoteConnEstablished();
 	}
 }
