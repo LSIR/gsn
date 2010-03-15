@@ -645,7 +645,7 @@ class CalculateChecksum extends Thread {
 			
 	        parent.logger.debug("recalculated crc (" + parent.calculatedCRC.getValue() + ") from " + parent.localBinaryName);
 			
-			parent.bigBinarySender.resumeBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue()+1);
+			parent.bigBinarySender.resumeBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue()+1, parent.calculatedCRC.getValue());
 		}
         
         parent.logger.info("thread stopped");
@@ -815,7 +815,7 @@ class BigBinarySender extends Thread
 	    	parent.logger.debug("overwrite already existing binary >" + parent.localBinaryName + "<");
 	    	f.delete();
 	    }
-		requestSpecificBinary(remoteLocation, 0, 0);
+		requestSpecificBinary(remoteLocation, 0, 0, 0);
 	}
 
 
@@ -828,12 +828,12 @@ class BigBinarySender extends Thread
 	 * 
 	 * @throws Exception if an I/O error occurs.
 	 */
-	public void resumeBinary(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr) {
-		requestSpecificBinary(remoteLocation, sizeAlreadyDownloaded, chunkNr);
+	public void resumeBinary(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr, long crc) {
+		requestSpecificBinary(remoteLocation, sizeAlreadyDownloaded, chunkNr, crc);
 	}
 	
 	
-	private void requestSpecificBinary(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr) {
+	private void requestSpecificBinary(String remoteLocation, long sizeAlreadyDownloaded, long chunkNr, long crc) {
 		if (triggered)
 			parent.logger.error("already sending a message");
 		else {
@@ -843,6 +843,7 @@ class BigBinarySender extends Thread
 			try {
 				baos.write(BigBinaryPlugin.uint2arr(sizeAlreadyDownloaded));
 				baos.write(BigBinaryPlugin.uint2arr(chunkNr));
+				baos.write(BigBinaryPlugin.uint2arr(crc));
 				baos.write(remoteLocation.getBytes());
 			} catch (IOException e) {
 				parent.logger.error(e.getMessage(), e);

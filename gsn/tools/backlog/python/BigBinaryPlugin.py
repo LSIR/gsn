@@ -301,11 +301,14 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         downloaded = int(struct.unpack('<I', message[1:5])[0])
                         # what chunk number are we at
                         chunkNumber = int(struct.unpack('<I', message[5:9])[0])
+                        # what crc do we have at GSN
+                        gsnCRC = int(struct.unpack('<I', message[9:13])[0])
                         # what is the name of the file to resend
-                        filenamenoprefix = struct.unpack(str(len(message)-9) + 's', message[9:len(message)])[0]
+                        filenamenoprefix = struct.unpack(str(len(message)-13) + 's', message[13:len(message)])[0]
                         filename = os.path.join(self._rootdir, filenamenoprefix)
                         self.debug('downloaded size: ' + str(downloaded))
                         self.debug('chunk number to send: ' + str(chunkNumber))
+                        self.debug('crc at GSN: ' + str(gsnCRC))
                         self.debug('file: ' + filename)
                         
                         try:
@@ -332,8 +335,13 @@ class BigBinaryPluginClass(AbstractPluginClass):
                                     if part == '':
                                         self.warning('end of file reached while calculating CRC')
                                         break
-            
-                                self.debug('recalculated crc: ' + str(crc))
+                                    
+                                if crc != gsnCRC:
+                                    self.warning('crc does not match -> resend complete binary')
+                                    os.chmod(filename, 0744)
+                                    self._filedescriptor.close()
+                                else:
+                                    self.debug('recalculated crc: ' + str(crc))
                             else:
                                 # resend the whole binary
                                 crc = None
