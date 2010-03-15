@@ -119,7 +119,6 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 		while(!dispose) {
 			try {
 				try {
-					logger.debug("rcv...");
 					pkt.write(recvQueue.take());
 				} catch (InterruptedException e) {
 					logger.debug(e.getMessage());
