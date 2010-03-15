@@ -220,6 +220,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	
 	@Override
 	public void run() {
+        logger.info("thread started");
+        
 		bigBinarySender.start();
 		calcChecksumThread.start();
 		long lastRecvPacketType = -1;
@@ -248,10 +250,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				lastRecvPacketType = ACK_PACKET;
 			}
 			else if (pktType == INIT_PACKET) {
-				if (lastRecvPacketType == INIT_PACKET) {
+				if (lastRecvPacketType == INIT_PACKET)
 					logger.debug("init packet already received");
-    	    		bigBinarySender.sendInitAck();
-				}
 				else {
     				StringBuffer name = new StringBuffer();
     				
@@ -350,18 +350,17 @@ public class BigBinaryPlugin extends AbstractPlugin {
 					}
     				
     				calculatedCRC.reset();
-
-    	    		bigBinarySender.sendInitAck();
 				}
+				
+	    		bigBinarySender.sendInitAck();
 			}
 			else if (pktType == CHUNK_PACKET) {
 				// get number of this chunk
 				long chunknum = arr2uint(msg.getPacket(), 1);
 				logger.debug("Chunk for " + remoteBinaryName + " with number " + chunknum + " received");
 				
-				if (chunknum == lastChunkNumber) {
+				if (chunknum == lastChunkNumber)
 					logger.info("chunk already received");
-				}
 				else if (lastChunkNumber+1 == chunknum) {
 					try {
 						// store the binary chunk to disk
@@ -407,13 +406,13 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			else if (pktType == CRC_PACKET) {
 				long crc = arr2uint(msg.getPacket(), 1);
 				
-				logger.debug("crc packet with crc32 >" + crc + "< received");
-				
 				if (lastRecvPacketType == CRC_PACKET) {
 					logger.debug("crc packet already received -> drop it");
 		    		bigBinarySender.sendCRCAck();
 				}
 				else {
+					logger.debug("crc packet with crc32 >" + crc + "< received");
+					
     				// do we really have the whole binary?
     				if ((new File(localBinaryName)).length() == binaryLength) {
     					// check crc
@@ -482,7 +481,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			lastRecvPacketType = pktType;
     	}
         
-        logger.debug("thread stopped");
+        logger.info("thread stopped");
     }
 	
 
@@ -609,7 +608,7 @@ class CalculateChecksum extends Thread {
 	public void run() {
 		String file;
         
-        parent.logger.debug("thread started");
+        parent.logger.info("thread started");
 		
 		while (!this.dispose) {
 			try {
@@ -649,7 +648,7 @@ class CalculateChecksum extends Thread {
 			parent.bigBinarySender.resumeBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BigBinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue()+1);
 		}
         
-        parent.logger.debug("thread stopped");
+        parent.logger.info("thread stopped");
 	}
 	
 	
@@ -685,7 +684,7 @@ class BigBinarySender extends Thread
 	}
 	
 	public void run() {
-		parent.logger.info("start thread");
+		parent.logger.info("thread started");
 		while (!stopped) {
 			try {
 				synchronized (event) {
@@ -712,7 +711,7 @@ class BigBinarySender extends Thread
 				}
 			}
 		}
-		parent.logger.info("stop thread");
+		parent.logger.info("thread stopped");
 	}
 	
 	

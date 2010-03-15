@@ -172,7 +172,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
 
                 
         self._filedescriptor = None
-        self._waitforack = False
+        self._waitforack = True
         self._stopped = False
 
 
@@ -188,6 +188,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
     
     def connectionToGSNestablished(self):
         self.debug('connection established')
+        self._parent._waitforack = False
         self._msgdeque.clear()
         
     
@@ -233,6 +234,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
                             self.debug('acknowledge for chunk number >' + str(chkNr) + '< received')
                         elif chkNr == chunkNumber-2:
                             self.info('acknowledge for chunk number >' + str(chkNr) + '< already received')
+                            if not self._msgdeque:
+                                self._work.clear()
                             continue
                         else:
                             self.error('acknowledge packet received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
@@ -252,66 +255,77 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 elif pktType == INIT_PACKET:
                     if lastRecvPacketType == INIT_PACKET:
                         self.debug('init packet already received')
+                        self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._backlog)
+                        if not self._msgdeque:
+                            self._work.clear()
                         continue
-                    self.debug('new binary request received')
-                    
-                    if self._filedescriptor and not self._filedescriptor.closed:
-                        filename = self._filedescriptor.name
-                        self.warning('new file request, but actual file (' + filename + ') not yet closed -> remove it!')
-                        os.chmod(filename, 0744)
-                        self._filedescriptor.close()
-                        os.remove(filename)
+                    else:
+                        self.debug('new binary request received')
+                        
+                        if self._filedescriptor and not self._filedescriptor.closed:
+                            filename = self._filedescriptor.name
+                            self.warning('new file request, but actual file (' + filename + ') not yet closed -> remove it!')
+                            os.chmod(filename, 0744)
+                            self._filedescriptor.close()
+                            os.remove(filename)
                     
                     lastRecvPacketType = INIT_PACKET
                     lastSentPacketType = ACK_PACKET
                     self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._backlog)
                 # if the type is RESEND_PACKET we have to resend a part of a file...
                 elif pktType == RESEND_PACKET:
-                    self.debug('binary retransmission request received')
-                    
-                    # how much of the file has already been downloaded
-                    downloaded = int(struct.unpack('<I', message[1:5])[0])
-                    # what chunk number are we at
-                    chunkNumber = int(struct.unpack('<I', message[5:9])[0])
-                    # what is the name of the file to resend
-                    filenamenoprefix = struct.unpack(str(len(message)-9) + 's', message[9:len(message)])[0]
-                    filename = os.path.join(self._rootdir, filenamenoprefix)
-                    self.debug('downloaded size: ' + str(downloaded))
-                    self.debug('chunk number to send: ' + str(chunkNumber))
-                    self.debug('file: ' + filename)
-                    
-                    try:
-                        # open the specified file
-                        self._filedescriptor = open(filename, 'rb')
-                        os.chmod(filename, 0444)
+                    if lastRecvPacketType == RESEND_PACKET:
+                        self.debug('binary retransmission request already received')
+                        self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._backlog)
+                        if not self._msgdeque:
+                            self._work.clear()
+                        continue
+                    else:
+                        self.debug('binary retransmission request received')
                         
-                        if downloaded > 0:
-                            # recalculate the crc
-                            sizecalculated = 0
-                            crc = None
-                            while sizecalculated != downloaded:
-                                if downloaded - sizecalculated > 4096:
-                                    part = self._filedescriptor.read(4096)
-                                else:
-                                    part = self._filedescriptor.read(downloaded - sizecalculated)
-                                    
-                                if crc:
-                                    crc = zlib.crc32(part, crc)
-                                else:
-                                    crc = zlib.crc32(part)
-                                sizecalculated += len(part)
-                                    
-                                if part == '':
-                                    self.warning('end of file reached while calculating CRC')
-                                    break
-        
-                            self.debug('recalculated crc: ' + str(crc))
-                        else:
-                            # resend the whole binary
-                            crc = None
-                            chunkNumber = 0
-                    except IOError, e:
-                        self.warning(e)
+                        # how much of the file has already been downloaded
+                        downloaded = int(struct.unpack('<I', message[1:5])[0])
+                        # what chunk number are we at
+                        chunkNumber = int(struct.unpack('<I', message[5:9])[0])
+                        # what is the name of the file to resend
+                        filenamenoprefix = struct.unpack(str(len(message)-9) + 's', message[9:len(message)])[0]
+                        filename = os.path.join(self._rootdir, filenamenoprefix)
+                        self.debug('downloaded size: ' + str(downloaded))
+                        self.debug('chunk number to send: ' + str(chunkNumber))
+                        self.debug('file: ' + filename)
+                        
+                        try:
+                            # open the specified file
+                            self._filedescriptor = open(filename, 'rb')
+                            os.chmod(filename, 0444)
+                            
+                            if downloaded > 0:
+                                # recalculate the crc
+                                sizecalculated = 0
+                                crc = None
+                                while sizecalculated != downloaded:
+                                    if downloaded - sizecalculated > 4096:
+                                        part = self._filedescriptor.read(4096)
+                                    else:
+                                        part = self._filedescriptor.read(downloaded - sizecalculated)
+                                        
+                                    if crc:
+                                        crc = zlib.crc32(part, crc)
+                                    else:
+                                        crc = zlib.crc32(part)
+                                    sizecalculated += len(part)
+                                        
+                                    if part == '':
+                                        self.warning('end of file reached while calculating CRC')
+                                        break
+            
+                                self.debug('recalculated crc: ' + str(crc))
+                            else:
+                                # resend the whole binary
+                                crc = None
+                                chunkNumber = 0
+                        except IOError, e:
+                            self.warning(e)
                     
                     lastRecvPacketType = RESEND_PACKET
                     lastSentPacketType = ACK_PACKET
