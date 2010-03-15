@@ -84,7 +84,6 @@ public class AsyncDeploymentClient extends Thread  {
 	    				ChangeRequest change = changes.next();
 	    				switch(change.type) {
 	    				case ChangeRequest.TYPE_CHANGEOPS:
-	    					logger.debug("Selector:changeops");
 	    					key = change.socket.keyFor(selector);
 	    					if (key == null || !key.isValid())
 	    						continue;
