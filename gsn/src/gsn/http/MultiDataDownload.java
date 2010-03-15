@@ -46,7 +46,7 @@ public class MultiDataDownload extends HttpServlet {
 
 			String downloadFormat = req.getParameter("download_format");
 			Map<String, String[]> parameterMap = parseParameters(req);
-			if (downloadFormat.compareTo("csv") == 0) {
+			if ("csv".compareTo(downloadFormat) == 0) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
 				dd.process();
 				res.setContentType("application/x-download");
@@ -54,7 +54,7 @@ public class MultiDataDownload extends HttpServlet {
 				dd.outputResult(res.getOutputStream());
 				//res.getOutputStream().flush();
 			}
-			else if (downloadFormat.compareTo("xml") == 0) {
+			else if ("xml".compareTo(downloadFormat) == 0) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
 				dd.process();
 				res.setContentType("text/xml");
@@ -62,7 +62,7 @@ public class MultiDataDownload extends HttpServlet {
 				dd.outputResult(res.getOutputStream());
 				//res.getOutputStream().flush();
 			}
-			else if (downloadFormat.compareTo("pdf") == 0) {
+			else if ("pdf".compareTo(downloadFormat) == 0) {
 				DownloadReport rpd = new DownloadReport (parameterMap) ;
 				rpd.process();
 				res.setContentType("application/pdf");
