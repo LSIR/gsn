@@ -253,6 +253,17 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	public void ackMessage(long timestamp) {
 		activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp);
 	}
+
+
+
+	/**
+	 * Returns true if the connection to the deployment is established.
+	 * 
+	 * @return true if the connection to the deployment is established
+	 */
+	public boolean isConnected() {
+		return activeBackLogWrapper.getBLMessageMultiplexer().isConnected();
+	}
 	
 	
 //	/**

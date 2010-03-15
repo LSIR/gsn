@@ -385,6 +385,11 @@ public class AsyncDeploymentClient extends Thread  {
 		}
 		selector.wakeup();
 	}
+	
+	
+	public boolean isConnected(DeploymentListener listener) {
+		return listenerToSocketList.get(listener).isConnected();
+	}
 }
 
 

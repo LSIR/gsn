@@ -879,6 +879,7 @@ class ConnectionCheckTimer extends TimerTask {
 	
 	public void run() {
 		parent.logger.debug("connection check timer fired");
-		parent.remoteConnEstablished();
+		if (parent.isConnected())
+			parent.remoteConnEstablished();
 	}
 }

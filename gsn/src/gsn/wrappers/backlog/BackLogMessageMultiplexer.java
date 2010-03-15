@@ -400,6 +400,11 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	public String getDeploymentName() {
 		return deploymentName;
 	}
+	
+	
+	public boolean isConnected() {
+		return asyncDeploymentClient.isConnected(this);
+	}
 }
 
 
