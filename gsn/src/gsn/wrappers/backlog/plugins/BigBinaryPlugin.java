@@ -519,37 +519,61 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				dispose();
 				return;
 			}
+			boolean badProp = false;
 			remoteBinaryName = configFile.getProperty(PROPERTY_REMOTE_BINARY);
-			downloadedSize = Long.valueOf(configFile.getProperty(PROPERTY_DOWNLOADED_SIZE)).longValue();
-			binaryTimestamp = Long.valueOf(configFile.getProperty(PROPERTY_BINARY_TIMESTAMP)).longValue();
-			binaryLength = Long.valueOf(configFile.getProperty(PROPERTY_BINARY_SIZE)).longValue();
-			storeInDatabase = Boolean.valueOf(configFile.getProperty(PROPERTY_STORAGE_TYPE)).booleanValue();
-			folderdatetimefm = new SimpleDateFormat(configFile.getProperty(PROPERTY_TIME_DATE_FORMAT));
+			if (remoteBinaryName == null)
+				badProp = true;
+			String prop = configFile.getProperty(PROPERTY_DOWNLOADED_SIZE);
+			if (prop == null)
+				badProp = true;
+			downloadedSize = Long.valueOf(prop).longValue();
+			prop = configFile.getProperty(PROPERTY_BINARY_TIMESTAMP);
+			if (prop == null)
+				badProp = true;
+			binaryTimestamp = Long.valueOf(prop).longValue();
+			prop = configFile.getProperty(PROPERTY_BINARY_SIZE);
+			if (prop == null)
+				badProp = true;
+			binaryLength = Long.valueOf(prop).longValue();
+			prop = configFile.getProperty(PROPERTY_STORAGE_TYPE);
+			if (prop == null)
+				badProp = true;
+			storeInDatabase = Boolean.valueOf(prop).booleanValue();
+			prop = configFile.getProperty(PROPERTY_TIME_DATE_FORMAT);
+			if (prop == null)
+				badProp = true;
+			folderdatetimefm = new SimpleDateFormat(prop);
 
-		    if (storeInDatabase) {
-		    	localBinaryName = rootBinaryDir + TEMP_BINARY_NAME;
-		    }
-		    else {
-			    File f = new File(remoteBinaryName);
-		    	String subpath = f.getParent();
-		    	if (subpath == null	)
-		    		subpath = "";
-		    	else if(!subpath.endsWith("/"))
-					subpath += "/";
-
-		    	logger.debug("subpath: " + subpath);
-		    	
-			    String datedir = rootBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
-			    String filename = f.getName();
-			    localBinaryName = datedir + filename;
-		    }
-		    
-		    if ((new File(localBinaryName)).exists())
-		    	calcChecksumThread.newChecksum(localBinaryName);
-		    else {
-		    	logger.error("binary >" + localBinaryName + "< does not exist -> request retransmission");
-		    	bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
-		    }
+			if (badProp) {
+		    	logger.error("something is wrong with the property file -> request new binary");
+				bigBinarySender.requestNewBinary();
+			}
+			else {
+			    if (storeInDatabase) {
+			    	localBinaryName = rootBinaryDir + TEMP_BINARY_NAME;
+			    }
+			    else {
+				    File f = new File(remoteBinaryName);
+			    	String subpath = f.getParent();
+			    	if (subpath == null	)
+			    		subpath = "";
+			    	else if(!subpath.endsWith("/"))
+						subpath += "/";
+	
+			    	logger.debug("subpath: " + subpath);
+			    	
+				    String datedir = rootBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
+				    String filename = f.getName();
+				    localBinaryName = datedir + filename;
+			    }
+			    
+			    if ((new File(localBinaryName)).exists())
+			    	calcChecksumThread.newChecksum(localBinaryName);
+			    else {
+			    	logger.error("binary >" + localBinaryName + "< does not exist -> request retransmission");
+			    	bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
+			    }
+			}
 		} else {
 			bigBinarySender.requestNewBinary();
 		}
