@@ -75,6 +75,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _stopped
     _filedeque
     _work
+    _lock
     _waitforack
     _rootdir
     _filedescriptor
@@ -106,6 +107,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
         wm = WatchManager()
         self._notifier = ThreadedNotifier(wm, BinaryChangedProcessing(self))
         
+        self._lock = Lock()
         self._work = Event()
         self._work.clear()
         self._filedeque = deque()
@@ -183,7 +185,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
     def msgReceived(self, msg):
         self.debug('message received')
         self._msgdeque.appendleft(msg)
+        self._lock.acquire()
         self._work.set()
+        self._lock.release()
         
     
     def connectionToGSNestablished(self):
@@ -235,7 +239,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         elif chkNr == chunkNumber-2:
                             self.info('acknowledge for chunk number >' + str(chkNr) + '< already received')
                             if not self._msgdeque:
+                                self._lock.acquire()
                                 self._work.clear()
+                                self._lock.release()
                             continue
                         else:
                             self.error('acknowledge packet received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
@@ -257,7 +263,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         self.debug('init packet already received')
                         self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._backlog)
                         if not self._msgdeque:
+                            self._lock.acquire()
                             self._work.clear()
+                            self._lock.release()
                         continue
                     else:
                         self.debug('new binary request received')
@@ -278,7 +286,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         self.debug('binary retransmission request already received')
                         self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._backlog)
                         if not self._msgdeque:
+                            self._lock.acquire()
                             self._work.clear()
+                            self._lock.release()
                         continue
                     else:
                         self.debug('binary retransmission request received')
@@ -425,7 +435,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
             
                 # tell BackLogMain to send the packet to GSN
                 first = True
+                self._lock.acquire()
                 self._work.clear()
+                self._lock.release()
                 while (not self._work.isSet() or first) and self.isGSNConnected():
                     if not first:
                         self.info('resend message')
@@ -437,7 +449,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
             except IndexError:
                 # fifo is empty
                 self.debug('file FIFO is empty waiting for next file to arrive')
+                self._lock.acquire()
                 self._work.clear()
+                self._lock.release()
             except Exception, e:
                 self._waitforack = False
                 os.chmod(filename, 0744)
@@ -451,7 +465,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
     def stop(self):
         self._stopped = True
         self._notifier.stop()
+        self._lock.acquire()
         self._work.set()
+        self._lock.release()
         self._filedeque.clear()
         if self._filedescriptor and not self._filedescriptor.closed:
             os.chmod(self._filedescriptor.name, 0744)
@@ -478,4 +494,6 @@ class BinaryChangedProcessing(ProcessEvent):
         
         self._parent._filedeque.appendleft(event.pathname)
         if self._parent.isGSNConnected() and not self._parent._waitforack:
+            self._lock.acquire()
             self._parent._work.set()
+            self._lock.release()
