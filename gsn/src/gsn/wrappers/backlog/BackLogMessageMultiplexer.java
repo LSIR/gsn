@@ -325,6 +325,8 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	@Override
 	public void connectionEstablished() {
 		logger.debug("connection established");
+		
+		recvQueue.clear();
 
     	// start ping timer
         pingTimer = new Timer("PingTimer-" + deploymentName);
