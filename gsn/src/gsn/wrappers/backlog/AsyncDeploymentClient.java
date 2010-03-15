@@ -388,7 +388,11 @@ public class AsyncDeploymentClient extends Thread  {
 	
 	
 	public boolean isConnected(DeploymentListener listener) {
-		return listenerToSocketList.get(listener).isConnected();
+		SocketChannel sc = listenerToSocketList.get(listener);
+		if (sc == null)
+			return false;
+		else
+			return sc.isConnected();
 	}
 }
 
