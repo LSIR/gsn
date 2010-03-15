@@ -133,25 +133,29 @@ class GSNPeerClass(Thread):
                 self._parent.backlog.resend(True)
 
                 while not self._stopped:
-                    self._logger.debug('rcv...');
+                    self._logger.debug('rcv...')
                     # read the length (4 bytes) of the incoming packet (this is blocking)
                     try:
                         pkt = self.clientsocket.recv(4, socket.MSG_WAITALL)
-                    except socket.error:
+                    
+                        if len(pkt) != 4:
+                            raise IOError('packet length does not match')
+                    except (IOError, socket.error), e:
                         if not self._stopped:
                             raise
                         break
-                    assert len(pkt) == 4
                     
                     pkt_len = int(struct.unpack('<I', pkt)[0])
 
                     try:
                         pkt = self.clientsocket.recv(pkt_len, socket.MSG_WAITALL)
-                    except socket.error:
+                    
+                        if len(pkt) != pkt_len:
+                            raise IOError('packet length does not match')
+                    except (IOError,socket.error), e:
                         if not self._stopped:
                             raise
                         break
-                    assert len(pkt) == pkt_len
 
                     self._inCounter += 1
 
