@@ -494,6 +494,6 @@ class BinaryChangedProcessing(ProcessEvent):
         
         self._parent._filedeque.appendleft(event.pathname)
         if self._parent.isGSNConnected() and not self._parent._waitforack:
-            self._lock.acquire()
+            self._parent._lock.acquire()
             self._parent._work.set()
-            self._lock.release()
+            self._parent._lock.release()
