@@ -519,36 +519,32 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				dispose();
 				return;
 			}
-			boolean badProp = false;
-			remoteBinaryName = configFile.getProperty(PROPERTY_REMOTE_BINARY);
-			if (remoteBinaryName == null)
-				badProp = true;
-			String prop = configFile.getProperty(PROPERTY_DOWNLOADED_SIZE);
-			if (prop == null)
-				badProp = true;
-			downloadedSize = Long.valueOf(prop).longValue();
-			prop = configFile.getProperty(PROPERTY_BINARY_TIMESTAMP);
-			if (prop == null)
-				badProp = true;
-			binaryTimestamp = Long.valueOf(prop).longValue();
-			prop = configFile.getProperty(PROPERTY_BINARY_SIZE);
-			if (prop == null)
-				badProp = true;
-			binaryLength = Long.valueOf(prop).longValue();
-			prop = configFile.getProperty(PROPERTY_STORAGE_TYPE);
-			if (prop == null)
-				badProp = true;
-			storeInDatabase = Boolean.valueOf(prop).booleanValue();
-			prop = configFile.getProperty(PROPERTY_TIME_DATE_FORMAT);
-			if (prop == null)
-				badProp = true;
-			folderdatetimefm = new SimpleDateFormat(prop);
-
-			if (badProp) {
-		    	logger.error("something is wrong with the property file -> request new binary");
-				bigBinarySender.requestNewBinary();
-			}
-			else {
+			
+			try {
+				remoteBinaryName = configFile.getProperty(PROPERTY_REMOTE_BINARY);
+				if (remoteBinaryName == null)
+					throw new Exception("property >" + PROPERTY_REMOTE_BINARY + "< not found in " + propertyFileName);
+				String prop = configFile.getProperty(PROPERTY_DOWNLOADED_SIZE);
+				if (prop == null)
+					throw new Exception("property >" + PROPERTY_DOWNLOADED_SIZE + "< not found in " + propertyFileName);
+				downloadedSize = Long.valueOf(prop).longValue();
+				prop = configFile.getProperty(PROPERTY_BINARY_TIMESTAMP);
+				if (prop == null)
+					throw new Exception("property >" + PROPERTY_BINARY_TIMESTAMP + "< not found in " + propertyFileName);
+				binaryTimestamp = Long.valueOf(prop).longValue();
+				prop = configFile.getProperty(PROPERTY_BINARY_SIZE);
+				if (prop == null)
+					throw new Exception("property >" + PROPERTY_BINARY_SIZE + "< not found in " + propertyFileName);
+				binaryLength = Long.valueOf(prop).longValue();
+				prop = configFile.getProperty(PROPERTY_STORAGE_TYPE);
+				if (prop == null)
+					throw new Exception("property >" + PROPERTY_STORAGE_TYPE + "< not found in " + propertyFileName);
+				storeInDatabase = Boolean.valueOf(prop).booleanValue();
+				prop = configFile.getProperty(PROPERTY_TIME_DATE_FORMAT);
+				if (prop == null)
+					throw new Exception("property >" + PROPERTY_TIME_DATE_FORMAT + "< not found in " + propertyFileName);
+				
+				folderdatetimefm = new SimpleDateFormat(prop);
 			    if (storeInDatabase) {
 			    	localBinaryName = rootBinaryDir + TEMP_BINARY_NAME;
 			    }
@@ -573,6 +569,9 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			    	logger.error("binary >" + localBinaryName + "< does not exist -> request retransmission");
 			    	bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
 			    }
+			} catch (Exception e) {
+		    	logger.error(e.getMessage() + " -> request new binary");
+				bigBinarySender.requestNewBinary();
 			}
 		} else {
 			bigBinarySender.requestNewBinary();
