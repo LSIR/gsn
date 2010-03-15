@@ -501,7 +501,6 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	@Override
 	public void remoteConnEstablished() {
 		logger.debug("Connection established");
-		msgQueue.clear();
 		
 		File sf = new File(propertyFileName);
 		if (sf.exists()) {
@@ -552,7 +551,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	@Override
 	public void remoteConnLost() {
 		logger.debug("Connection lost");
-		
+
+		msgQueue.clear();
 		bigBinarySender.stopSending();
 	}
 }

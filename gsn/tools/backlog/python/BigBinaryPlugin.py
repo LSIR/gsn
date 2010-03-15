@@ -80,6 +80,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _rootdir
     _filedescriptor
     _watches
+    _lastRecvPacketType
+    _lastSentPacketType
     
     TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
     '''
@@ -193,11 +195,13 @@ class BigBinaryPluginClass(AbstractPluginClass):
     def connectionToGSNestablished(self):
         self.debug('connection established')
         self._parent._waitforack = False
-        self._msgdeque.clear()
         
     
     def connectionToGSNlost(self):
         self.debug('connection lost')
+        self._lastRecvPacketType = None
+        self._lastSentPacketType = None
+        self._msgdeque.clear()
            
         
     def run(self):
@@ -210,8 +214,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
             if not self._stopped:
                 self.exception(e)
         chunkNumber = 0
-        lastRecvPacketType = None
-        lastSentPacketType = None
+        self._lastRecvPacketType = None
+        self._lastSentPacketType = None
                 
         while not self._stopped:
             # wait for the next file event to happen
@@ -229,10 +233,10 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 if pktType == ACK_PACKET:
                     ackType = int(struct.unpack('B', message[1])[0])
                         
-                    if ackType == INIT_PACKET and lastSentPacketType == INIT_PACKET:
+                    if ackType == INIT_PACKET and self._lastSentPacketType == INIT_PACKET:
                         self.debug('acknowledge packet received for init packet')
                         chunkNumber = 0
-                    elif ackType == CHUNK_PACKET and lastSentPacketType == CHUNK_PACKET:
+                    elif ackType == CHUNK_PACKET and self._lastSentPacketType == CHUNK_PACKET:
                         chkNr = int(struct.unpack('<I', message[2:6])[0])
                         if chkNr == chunkNumber-1:
                             self.debug('acknowledge for chunk number >' + str(chkNr) + '< received')
@@ -246,20 +250,20 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         else:
                             self.error('acknowledge packet received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
                             continue
-                    elif ackType == CRC_PACKET and lastSentPacketType == CRC_PACKET:
+                    elif ackType == CRC_PACKET and self._lastSentPacketType == CRC_PACKET:
                         # crc has been accepted by GSN
                         self.debug('crc has been accepted for ' + filename)
                         # remove it from disk
                         os.remove(filename)
                     else:
-                        self.error('received acknowledge type >' + str(ackType) + '< does not match the sent packet type >' + str(lastSentPacketType) + '<')
+                        self.error('received acknowledge type >' + str(ackType) + '< does not match the sent packet type >' + str(self._lastSentPacketType) + '<')
                         continue
                         
-                    lastRecvPacketType = ACK_PACKET
+                    self._lastRecvPacketType = ACK_PACKET
                     
                 # if the type is INIT_PACKET we have to send a new file
                 elif pktType == INIT_PACKET:
-                    if lastRecvPacketType == INIT_PACKET:
+                    if self._lastRecvPacketType == INIT_PACKET:
                         self.debug('init packet already received')
                         self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._backlog)
                         if not self._msgdeque:
@@ -277,12 +281,12 @@ class BigBinaryPluginClass(AbstractPluginClass):
                             self._filedescriptor.close()
                             os.remove(filename)
                     
-                    lastRecvPacketType = INIT_PACKET
-                    lastSentPacketType = ACK_PACKET
+                    self._lastRecvPacketType = INIT_PACKET
+                    self._lastSentPacketType = ACK_PACKET
                     self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._backlog)
                 # if the type is RESEND_PACKET we have to resend a part of a file...
                 elif pktType == RESEND_PACKET:
-                    if lastRecvPacketType == RESEND_PACKET:
+                    if self._lastRecvPacketType == RESEND_PACKET:
                         self.debug('binary retransmission request already received')
                         self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._backlog)
                         if not self._msgdeque:
@@ -337,8 +341,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         except IOError, e:
                             self.warning(e)
                     
-                    lastRecvPacketType = RESEND_PACKET
-                    lastSentPacketType = ACK_PACKET
+                    self._lastRecvPacketType = RESEND_PACKET
+                    self._lastSentPacketType = ACK_PACKET
                     self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._backlog)
             except  IndexError:
                 pass
@@ -394,7 +398,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 
                     crc = None
                         
-                    lastSentPacketType = INIT_PACKET
+                    self._lastSentPacketType = INIT_PACKET
                 # or are we already sending chunks of a file?
                 else:
                     # read the next chunk out of the opened file
@@ -421,13 +425,13 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         timestamp = self.getTimeStamp()
                         self._lasttimestamp = timestamp
                         
-                        lastSentPacketType = CRC_PACKET
+                        self._lastSentPacketType = CRC_PACKET
                     else:
                         # create the packet [type, chunk number (4bytes)]
                         packet = struct.pack('<BI', CHUNK_PACKET, chunkNumber)
                         packet += chunk
                         
-                        lastSentPacketType = CHUNK_PACKET
+                        self._lastSentPacketType = CHUNK_PACKET
                         self.debug('sending binary chunk number ' + str(chunkNumber) + ' for ' + self._filedescriptor.name)
                         
                         # increase the chunk number
