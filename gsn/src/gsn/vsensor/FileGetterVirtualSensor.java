@@ -1,12 +1,9 @@
 package gsn.vsensor;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.TreeMap;
 
@@ -19,6 +16,8 @@ import gsn.beans.VSensorConfig;
 import org.apache.log4j.Logger;
 
 public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
+	
+	private static final String DCRAW = "/home/perma/dcraw-x64/dcraw";
 
 	private static final transient Logger logger = Logger.getLogger(FileGetterVirtualSensor.class);
 	
@@ -48,13 +47,13 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 			return;
 		}
 		file = file.getAbsoluteFile();
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
 		if (filetype.equalsIgnoreCase("jpeg")  || filetype.equalsIgnoreCase("jpg")) {
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			logger.debug("getting jpeg: " + file.getAbsolutePath());
 		    try {
 		    	BufferedImage image = ImageIO.read(file); // Read from an input stream
-		    	InputStream is = new BufferedInputStream( new FileInputStream(file));
-		    	image = ImageIO.read(is);
 				ImageIO.write(image, "jpeg", os);
 		    } catch (IOException e) {
 		    	logger.error(e.getMessage(), e);
@@ -62,12 +61,25 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 		    }
 			
 			data = new StreamElement(data, 
-					new String[]{"jpeg_scaled"}, 
-					new Byte[]{DataTypes.BINARY}, 
+					new String[]{"jpeg_scaled"},
+					new Byte[]{DataTypes.BINARY},
 					new Serializable[]{os.toByteArray()});
 		}
-		else if (filetype == "nef") {
-			//TODO: extract jpeg from nef
+		else if (filetype.equalsIgnoreCase("nef")) {
+			logger.debug("exctracting jpeg from: " + file.getAbsolutePath());
+			try {
+				Process p = Runtime.getRuntime().exec(DCRAW + " -c -e " + file.getAbsolutePath());
+				BufferedImage image = ImageIO.read(p.getInputStream());
+				ImageIO.write(image, "jpeg", os);
+				
+				data = new StreamElement(data, 
+						new String[]{"jpeg_scaled"},
+						new Byte[]{DataTypes.BINARY},
+						new Serializable[]{os.toByteArray()});
+			} catch (IOException e) {
+		    	logger.error(e.getMessage(), e);
+		    	return;
+			}
 		}
 
 		super.dataAvailable(inputStreamName, data);
