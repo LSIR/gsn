@@ -5,7 +5,7 @@
         <init-params>
             <param name="timestamp_to_string">MODIFICATIONTIME</param>
             <param name="jpeg_scaled">JPEG_SCALED</param>
-            <param name="file_type">jpeg</param>
+            <param name="file_type">nef</param>
         </init-params>
         <output-structure>
             <field name="MODIFICATIONTIME_STRING" type="VARCHAR(30)" />
