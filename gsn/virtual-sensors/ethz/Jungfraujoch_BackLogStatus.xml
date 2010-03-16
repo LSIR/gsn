@@ -16,6 +16,7 @@
             <field name="IN_COUNTER" type="INTEGER" />
             <field name="OUT_COUNTER" type="INTEGER" />
             <field name="BACKLOG_COUNTER" type="INTEGER" />
+            <field name="CONNECTION_LOSSES" type="INTEGER" />
         </output-structure>
     </processing-class>
     <description>show status information of PSBackLog and send commands to the Jungfraujoch deployment</description>

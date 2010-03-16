@@ -230,8 +230,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		long lastRecvPacketType = -1;
 		
     	// start connection check timer
-		connectionTestTimer = new Timer("ConnectionCheck");
-		connectionTestTimer.schedule( new ConnectionCheckTimer(this), 15000 );
+		if (connectionTestTimer == null) {
+			connectionTestTimer = new Timer("ConnectionCheck");
+			connectionTestTimer.schedule( new ConnectionCheckTimer(this), 15000 );
+		}
 
     	Message msg;
     	while (!dispose) {
@@ -508,7 +510,10 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	@Override
 	public void remoteConnEstablished() {
 		logger.debug("Connection established");
-		connectionTestTimer.cancel();
+		if (connectionTestTimer != null)
+			connectionTestTimer.cancel();
+		else
+			connectionTestTimer = new Timer("ConnectionCheck");
 		
 		File sf = new File(propertyFileName);
 		if (sf.exists()) {

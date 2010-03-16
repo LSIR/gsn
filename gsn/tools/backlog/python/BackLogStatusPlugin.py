@@ -72,7 +72,8 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             incounter = gsnpeerstatus[0]
             outcounter = gsnpeerstatus[1]
             backlogcounter = gsnpeerstatus[2]
-            packet += struct.pack('<III', incounter, outcounter, backlogcounter)
+            connectionLosses = gsnpeerstatus[3]
+            packet += struct.pack('<IIII', incounter, outcounter, backlogcounter, connectionLosses)
             
             self.processMsg(self.getTimeStamp(), packet, self._backlog)
             

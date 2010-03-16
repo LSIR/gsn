@@ -42,9 +42,11 @@ class GSNPeerClass(Thread):
     _pingtimer
     _pingwatchdog
     clientsocket
+    connected
     _clientaddr
     _inCounter
     _outCounter
+    _connectionLosses
     _backlogCounter
     _lock
     _stopped
@@ -86,6 +88,7 @@ class GSNPeerClass(Thread):
 
         self._inCounter = 0
         self._outCounter = 0
+        self._connectionLosses = 0
         self._backlogCounter = 0
 
         self.connected = False
@@ -187,7 +190,7 @@ class GSNPeerClass(Thread):
                             self.error('unknown message type ' + str(msgType) + ' received')                       
             except Exception, e:
                 self.disconnect()
-                self.exception(e)
+                self._logger.exception(e.__str__())
                 continue
 
         self._logger.info('died') 
@@ -207,7 +210,7 @@ class GSNPeerClass(Thread):
 
 
     def getStatus(self):
-        return (self._inCounter, self._outCounter, self._backlogCounter)
+        return (self._inCounter, self._outCounter, self._backlogCounter, self._connectionLosses)
             
             
     def isConnected(self):
@@ -247,8 +250,10 @@ class GSNPeerClass(Thread):
                 self._pingtimer.pause()
                 self.clientsocket.close()
         except Exception, e:
-            self.exception(e)
+            self._parent.incrementExceptionCounter()
+            self._logger.exception(e.__str__())
         finally:
+            self._connectionLosses += 1
             self.connected = False
             self._lock.release()
 
@@ -302,11 +307,6 @@ class GSNPeerClass(Thread):
     def error(self, msg):
         self._parent.incrementErrorCounter()
         self._logger.error(msg)
-        
-        
-    def exception(self, e):
-        self._parent.incrementExceptionCounter()
-        self._logger.exception(e.__str__())
 
 
 
@@ -421,8 +421,7 @@ class GSNWriter(Thread):
                 except socket.error, e:
                     if not self._stopped:
                         self._parent.disconnect() # sets connected to false
-                        self._parent._parent.incrementExceptionCounter()
-                        self._logger.exception(e)                  
+                        self._logger.exception(e.__str__())                  
                 finally:
                     self._sendqueue.task_done()
  

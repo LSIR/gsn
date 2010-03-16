@@ -25,7 +25,8 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 						new DataField("BACKLOG_DB_SIZE_KB", "INTEGER"),
 						new DataField("IN_COUNTER", "INTEGER"),
 						new DataField("OUT_COUNTER", "INTEGER"),
-						new DataField("BACKLOG_COUNTER", "INTEGER")};
+						new DataField("BACKLOG_COUNTER", "INTEGER"),
+						new DataField("CONNECTION_LOSSES", "INTEGER")};
 
 	private final transient Logger logger = Logger.getLogger( BackLogStatusPlugin.class );
 
@@ -54,6 +55,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 		Integer in_counter = null;
 		Integer out_counter = null;
 		Integer backlog_counter = null;
+		Integer connection_losses = null;
 
 		if(packet.length >= 4)
 			error_counter = arr2int(packet, 0);
@@ -69,8 +71,10 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 			out_counter = arr2int(packet, 20);
 		if(packet.length >= 28)
 			backlog_counter = arr2int(packet, 24);
+		if(packet.length >= 32)
+			connection_losses = arr2int(packet, 28);
 		
-		Serializable[] data = {timestamp, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter};
+		Serializable[] data = {timestamp, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses};
 		
 		if (dataProcessed(System.currentTimeMillis(), data))
 			ackMessage(timestamp);
