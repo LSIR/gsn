@@ -244,6 +244,7 @@ class GSNPeerClass(Thread):
         self._lock.acquire()
         try:
             if self.connected:
+                self._connectionLosses += 1
                 self._parent.connectionToGSNlost()
                 self._gsnwriter.pause()
                 self._pingwatchdog.pause()
@@ -253,7 +254,6 @@ class GSNPeerClass(Thread):
             self._parent.incrementExceptionCounter()
             self._logger.exception(e.__str__())
         finally:
-            self._connectionLosses += 1
             self.connected = False
             self._lock.release()
 
