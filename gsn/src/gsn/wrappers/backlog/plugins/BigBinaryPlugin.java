@@ -240,7 +240,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 			try {
 				msg = msgQueue.take();
 			} catch (InterruptedException e) {
-				logger.debug(e.getMessage());
+				logger.error(e.getMessage());
 				break;
 			}
 			if (dispose)
@@ -262,6 +262,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 				if (lastRecvPacketType == INIT_PACKET)
 					logger.debug("init packet already received");
 				else {
+					logger.debug("init packet received");
     				StringBuffer name = new StringBuffer();
     				
     				// get file info
@@ -759,6 +760,7 @@ class BigBinarySender extends Thread
 	}
 	
 	public void stopSending() {
+		parent.logger.debug("stop sending");
 		synchronized (event) {
 			triggered = false;
 			packet = null;
