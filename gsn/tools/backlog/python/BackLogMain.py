@@ -108,6 +108,11 @@ class BackLogMainClass(Thread):
             config_plugins = DEFAULT_PLUGINS
             self._logger.warning('use default plugins: ' + config_plugins)
 
+        self._exceptionCounter = 0
+        self._exceptionCounterLock = Lock()
+        self._errorCounter = 0
+        self._errorCounterLock = Lock()
+
         # init each plugin
         self.plugins = []
         for plugin_entry in config_plugins:
@@ -126,12 +131,8 @@ class BackLogMainClass(Thread):
                 self._logger.info('loaded plugin ' + module_name)
             except Exception, e:
                 self._logger.error('could not load plugin ' + module_name + ': ' + e.__str__())
+                self.incrementErrorCounter()
                 continue
-
-        self._exceptionCounter = 0
-        self._exceptionCounterLock = Lock()
-        self._errorCounter = 0
-        self._errorCounterLock = Lock()
 
   
     def run(self):

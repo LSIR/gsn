@@ -116,7 +116,7 @@ class GSNPeerClass(Thread):
                 self._parent.connectionToGSNestablished()
             except socket.error, e:
                 if not self._stopped:
-                    self._logger.error('exception while accepting connection: ' + e.__str__())
+                    self.error('exception while accepting connection: ' + e.__str__())
                     time.sleep(1.0)
                 continue                
 
@@ -184,10 +184,10 @@ class GSNPeerClass(Thread):
                                 msgTypeValid = True
                                 break
                         if msgTypeValid == False:
-                            self._logger.error('unknown message type ' + str(msgType) + ' received')                       
+                            self.error('unknown message type ' + str(msgType) + ' received')                       
             except Exception, e:
                 self.disconnect()
-                self._logger.exception(e)
+                self.exception(e)
                 continue
 
         self._logger.info('died') 
@@ -247,7 +247,7 @@ class GSNPeerClass(Thread):
                 self._pingtimer.pause()
                 self.clientsocket.close()
         except Exception, e:
-            self._logger.exception(e.__str__())
+            self.exception(e)
         finally:
             self.connected = False
             self._lock.release()
@@ -298,6 +298,15 @@ class GSNPeerClass(Thread):
     def processResendMsg(self, msgType, timestamp, payload):
         return self.sendToGSN(BackLogMessage.BackLogMessageClass(msgType, timestamp, payload), True)
 
+
+    def error(self, msg):
+        self._parent.incrementErrorCounter()
+        self._logger.error(msg)
+        
+        
+    def exception(self, e):
+        self._parent.incrementExceptionCounter()
+        self._logger.exception(e.__str__())
 
 
 
@@ -412,6 +421,7 @@ class GSNWriter(Thread):
                 except socket.error, e:
                     if not self._stopped:
                         self._parent.disconnect() # sets connected to false
+                        self._parent._parent.incrementExceptionCounter()
                         self._logger.exception(e)                  
                 finally:
                     self._sendqueue.task_done()

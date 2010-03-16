@@ -129,7 +129,7 @@ class BackLogDBClass(Thread):
         except sqlite3.Error, e:
             self._lock.release()
             if not self._stopped:
-                self._logger.exception(e)
+                self.exception(e)
             return False
 
         
@@ -157,7 +157,7 @@ class BackLogDBClass(Thread):
         except sqlite3.Error, e:
             self._lock.release()
             if not self._stopped:
-                self._logger.exception(e) 
+                self.exception(e) 
             
             
     def getStatus(self):
@@ -202,7 +202,7 @@ class BackLogDBClass(Thread):
                     self._lock.release()
                 except sqlite3.Error, e:
                     self._lock.release()
-                    self._logger.exception(e)
+                    self.exception(e)
                     break
                     
                 if row is None:
@@ -234,4 +234,9 @@ class BackLogDBClass(Thread):
         self._stopped = True
         self._resend.set()
         self._logger.info('stopped')
+        
+        
+    def exception(self, e):
+        self._parent.incrementExceptionCounter()
+        self._logger.exception(e.__str__())
         
