@@ -201,6 +201,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
         self.debug('connection lost')
         self._lastRecvPacketType = None
         self._lastSentPacketType = None
+        self._filedescriptor.close()
         self._msgdeque.clear()
            
         
