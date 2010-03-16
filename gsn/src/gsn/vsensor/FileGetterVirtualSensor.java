@@ -1,13 +1,12 @@
 package gsn.vsensor;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.TreeMap;
-
-import javax.imageio.ImageIO;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
@@ -49,38 +48,42 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 		file = file.getAbsoluteFile();
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		InputStream is = null;
 		
 		if (filetype.equalsIgnoreCase("jpeg")  || filetype.equalsIgnoreCase("jpg")) {
 			logger.debug("getting jpeg: " + file.getAbsolutePath());
 		    try {
-		    	BufferedImage image = ImageIO.read(file); // Read from an input stream
-				ImageIO.write(image, "jpeg", os);
+		    	is = new FileInputStream(file);
 		    } catch (IOException e) {
 		    	logger.error(e.getMessage(), e);
 		    	return;
 		    }
-			
-			data = new StreamElement(data, 
-					new String[]{"jpeg_scaled"},
-					new Byte[]{DataTypes.BINARY},
-					new Serializable[]{os.toByteArray()});
 		}
 		else if (filetype.equalsIgnoreCase("nef")) {
 			logger.debug("exctracting jpeg from: " + file.getAbsolutePath());
 			try {
 				Process p = Runtime.getRuntime().exec(DCRAW + " -c -e " + file.getAbsolutePath());
-				BufferedImage image = ImageIO.read(p.getInputStream());
-				ImageIO.write(image, "jpeg", os);
-				
-				data = new StreamElement(data, 
-						new String[]{"jpeg_scaled"},
-						new Byte[]{DataTypes.BINARY},
-						new Serializable[]{os.toByteArray()});
+				is = p.getInputStream();
 			} catch (IOException e) {
 		    	logger.error(e.getMessage(), e);
 		    	return;
 			}
 		}
+		
+		byte[] b = new byte[1024];
+		int n;
+		try {
+			while ((n = is.read(b)) != -1)
+				os.write(b, 0, n);
+		} catch (IOException e) {
+	    	logger.error(e.getMessage(), e);
+	    	return;
+		}
+		
+		data = new StreamElement(data, 
+				new String[]{"jpeg_scaled"},
+				new Byte[]{DataTypes.BINARY},
+				new Serializable[]{os.toByteArray()});
 
 		super.dataAvailable(inputStreamName, data);
 	}
