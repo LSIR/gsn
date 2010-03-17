@@ -47,6 +47,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	private InetAddress hostAddress;
 	private int hostPort;
 	private String deploymentName;
+	private boolean reconnected;
 	
 	
 	public BackLogMessageMultiplexer() throws Exception {
@@ -126,6 +127,11 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 				}
 				if (dispose)
 					break;
+				if (reconnected) {
+					newPacket = true;
+					packetLength = -1;
+					reconnected = false;
+				}
 				
 				boolean hasMorePkt = true;
 				while(hasMorePkt) {
@@ -325,6 +331,8 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	@Override
 	public void connectionEstablished() {
 		logger.debug("connection established");
+		recvQueue.clear();
+		reconnected = true;
 
     	// start ping timer
         pingTimer = new Timer("PingTimer-" + deploymentName);
@@ -347,7 +355,6 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	@Override
 	public void connectionLost() {
 		logger.debug("connection lost");
-		recvQueue.clear();
 		
     	// stop ping timer
         pingTimer.cancel();

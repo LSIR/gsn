@@ -257,10 +257,16 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     elif ackType == CRC_PACKET and self._lastSentPacketType == CRC_PACKET:
                         # crc has been accepted by GSN
                         self.debug('crc has been accepted for ' + filename)
-                        # remove it from disk
-                        os.remove(filename)
+                    
+                        if os.path.isfile(filename):
+                            # remove it from disk
+                            os.remove(filename)
                     else:
                         self.error('received acknowledge type >' + str(ackType) + '< does not match the sent packet type >' + str(self._lastSentPacketType) + '<')
+                        if not self._msgdeque:
+                            self._lock.acquire()
+                            self._work.clear()
+                            self._lock.release()
                         continue
                         
                     self._lastRecvPacketType = ACK_PACKET

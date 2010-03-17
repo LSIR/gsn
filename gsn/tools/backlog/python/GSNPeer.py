@@ -343,6 +343,7 @@ class PingTimer(Thread):
                 self._timer.clear()
                 continue
             self._action()
+            self._logger.debug('action')
             
         self._logger.info('died')
     
