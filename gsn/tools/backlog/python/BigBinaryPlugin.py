@@ -194,15 +194,18 @@ class BigBinaryPluginClass(AbstractPluginClass):
     
     def connectionToGSNestablished(self):
         self.debug('connection established')
+        self._lock.acquire()
+        self._lastRecvPacketType = None
+        self._lastSentPacketType = None
+        if self._filedescriptor:
+            self._filedescriptor.close()
+        self._msgdeque.clear()
         self._parent._waitforack = False
+        self._lock.release()
         
     
     def connectionToGSNlost(self):
         self.debug('connection lost')
-        self._lastRecvPacketType = None
-        self._lastSentPacketType = None
-        self._filedescriptor.close()
-        self._msgdeque.clear()
            
         
     def run(self):
