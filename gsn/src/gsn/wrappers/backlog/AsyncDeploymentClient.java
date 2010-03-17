@@ -88,6 +88,7 @@ public class AsyncDeploymentClient extends Thread  {
 	    					if (key == null || !key.isValid())
 	    						continue;
 	    					if (!change.socket.isConnectionPending()) {
+		    					logger.debug("Selector:changeops");
 	    						key.interestOps(change.ops);
 	    						key.attach(change);
 	    					}
@@ -134,8 +135,10 @@ public class AsyncDeploymentClient extends Thread  {
 	    			if (key.channel() instanceof SocketChannel) {
 		    			try {
 		    				if (key.isReadable()) {
+		    					logger.debug("Selector:read");
 		    					this.read(key);
 		    				} else if (key.isWritable()) {
+		    					logger.debug("Selector:write");
 		    					this.write(key);
 		    				} else if (key.isConnectable()) {
 		    					logger.debug("Selector:connect");

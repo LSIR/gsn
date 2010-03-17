@@ -131,6 +131,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 				while(hasMorePkt) {
 					if (newPacket) {
 						if (pkt.size() >= 4) {
+							logger.debug("rcv...");
 							packetLength = AbstractPlugin.arr2uint(pkt.toByteArray(), 0);
 							newPacket = false;
 						}
