@@ -250,7 +250,7 @@ public class ContainerConfig {
 
 	public static final String [ ] LOGGING_LEVELS                     = { "DEBUG" , "INFO" , "WARN" , "ERROR" };
 
-	public static String [ ]       NETWORK_ADDRESSES;
+	//public static String [ ]       NETWORK_ADDRESSES;
 
 	public static final String [ ] JDBC_SYSTEMS                       = { "H2 in Memory" , "H2 in File" , "MySql", "SQL Server" };
 
@@ -327,12 +327,14 @@ public class ContainerConfig {
 		return this.gsnLogFileName;
 	}
 
+    /*
 	static {
 		int i = 0;
 		NETWORK_ADDRESSES = new String [ ValidityTools.NETWORK_LOCAL_ADDRESS.size( ) ];
 		for ( String address : ValidityTools.NETWORK_LOCAL_ADDRESS )
 			NETWORK_ADDRESSES[ i++ ] = address + ":" + DEFAULT_DIRECTORY_PORT;
 	}
+	*/
 
 	private static String extractLoggingLevel ( String property , String [ ] setOfPossibleValues , String defaultValue ) {
 		String toReturn = defaultValue;
