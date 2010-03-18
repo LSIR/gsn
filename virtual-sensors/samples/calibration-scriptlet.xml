@@ -10,7 +10,19 @@
                     // Demo scriptlet
                     //------------------------------
 
-                    // Get a logger
+                    // Example of accessing the list of bindings
+                    println 'binding: ' + binding.getVariables();
+
+                    // Example of usage of a stateful variable
+                    //
+                    def isdef(var) {
+                        (binding.getVariables().containsKey(var))
+                    }
+                    // Initialisation
+                    statefulCounter = isdef('statefulCounter') ? statefulCounter + 1 : 0;
+                    println 'Stateful Counter: ' + statefulCounter;
+
+                    // Example of getting a logger
                     def logger = org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class);
 
                     // Define a variable x
@@ -28,7 +40,7 @@
                     PENDING_FINALIZATION_COUNT += Math.random();
 
                     // The NON_HEAP value is not modified.
-                    
+
                 ]]>
             </param>
         </init-params>

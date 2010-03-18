@@ -38,12 +38,12 @@ public class VirtualSensor {
             try {
                 virtualSensor = (AbstractVirtualSensor) Class.forName(config.getProcessingClass()).newInstance();
                 virtualSensor.setVirtualSensorConfiguration(config);
-                if (virtualSensor.initialize() == false) {
-                    virtualSensor = null;
-                    throw new VirtualSensorInitializationFailedException();
-                }
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                throw new VirtualSensorInitializationFailedException(e.getMessage(), e);
+            }
+            if (virtualSensor.initialize() == false) {
+                virtualSensor = null;
+                throw new VirtualSensorInitializationFailedException();
             }
             if (logger.isDebugEnabled())
                 logger.debug(new StringBuilder().append("Created a new instance for VS ").append(config.getName()));
@@ -65,8 +65,10 @@ public class VirtualSensor {
     public synchronized void closePool() {
         if (virtualSensor != null) {
             virtualSensor.dispose();
-            if (logger.isDebugEnabled()) logger.debug(new StringBuilder().append("VS ").append(config.getName()).append(" is now released."));
-        } else if (logger.isDebugEnabled()) logger.debug(new StringBuilder().append("VS ").append(config.getName()).append(" was already released."));
+            if (logger.isDebugEnabled())
+                logger.debug(new StringBuilder().append("VS ").append(config.getName()).append(" is now released."));
+        } else if (logger.isDebugEnabled())
+            logger.debug(new StringBuilder().append("VS ").append(config.getName()).append(" was already released."));
     }
 
     public void start() throws VirtualSensorInitializationFailedException {
@@ -92,7 +94,8 @@ public class VirtualSensor {
         return lastModified;
     }
 
-    public void dispose() {}
+    public void dispose() {
+    }
 
     public void DoUselessDataRemoval() {
         if (config.getParsedStorageSize() == VSensorConfig.STORAGE_SIZE_NOT_SET) return;
@@ -147,7 +150,8 @@ public class VirtualSensor {
             query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed < ").append(timedToRemove);
             query.append(" - ").append(config.getParsedStorageSize());
         }
-        if (logger.isDebugEnabled()) this.logger.debug(new StringBuilder().append("Enforcing the limit size on the VS table by : ").append(query).toString());
+        if (logger.isDebugEnabled())
+            this.logger.debug(new StringBuilder().append("Enforcing the limit size on the VS table by : ").append(query).toString());
         return query;
     }
 }
