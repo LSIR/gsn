@@ -44,6 +44,7 @@ ETZG_BasestationStatus_mapped.xml
 ETZG_BasestationStatus_chart1.xml
 ETZG_BasestationStatus_chart2.xml
 ETZG_BasestationStatus_chart3.xml
+ETZG_Camera_from_BigBinary_scaled.xml
 ETZG_DozerAdcComDiff.xml
 ETZG_DozerAdcComDiff_mapped.xml
 ETZG_DozerAdcMux1.xml
@@ -54,6 +55,7 @@ ETZG_DozerBaseDebug.xml
 ETZG_DozerBaseDebug_mapped.xml
 ETZG_DozerBaseStatus.xml
 ETZG_DozerBaseStatus_mapped.xml
+ETZG_DozerCommand.xml
 ETZG_DozerDigitalDCX.xml
 ETZG_DozerDigitalDCX_mapped.xml
 ETZG_DozerDrift.xml
@@ -66,6 +68,8 @@ ETZG_DozerNodeHealth.xml
 ETZG_DozerNodeHealth_mapped.xml
 ETZG_DozerNodeInfo.xml
 ETZG_DozerNodeInfo_mapped.xml
+ETZG_DozerPowerSwitch_conv.xml
+ETZG_DozerPowerSwitch.xml
 ETZG_DozerRssi.xml
 ETZG_DozerRssi_mapped.xml
 ETZG_DozerRssi_muxed_mapped.xml
