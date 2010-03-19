@@ -38,19 +38,13 @@ class GSNPeerClass(Thread):
     _parent
     _port
     _serversocket
-    _gsnwriter
     _pingtimer
     _pingwatchdog
-    clientsocket
-    connected
-    _clientaddr
+    _connected
     _inCounter
     _outCounter
     _connectionLosses
     _backlogCounter
-    _lock
-    _stopped
-    _mtu
     '''
 
     def __init__(self, parent, port):
@@ -70,9 +64,14 @@ class GSNPeerClass(Thread):
         self._parent = parent
         self._port = port
 
+        self._inCounter = 0
+        self._outCounter = 0
+        self._connectionLosses = 0
+        self._backlogCounter = 0
+        self._connected = False
+
         self._pingtimer = PingTimer(PING_INTERVAL_SEC, self.ping)
         self._pingwatchdog = PingWatchDog(PING_ACK_CHECK_INTERVAL_SEC, self.disconnect)
-        self._gsnwriter = GSNWriter(self)
         
         # try to open a server socket to which GSN can connect to
         try:
@@ -81,129 +80,21 @@ class GSNPeerClass(Thread):
             self._serversocket.bind(('0.0.0.0', port))
             self._serversocket.listen(1)
         except Exception, e:
-            raise TypeError(e.__str__())
-
-        self.clientsocket = None
-        self._clientaddr = None
-
-        self._inCounter = 0
-        self._outCounter = 0
-        self._connectionLosses = 0
-        self._backlogCounter = 0
-
-        self.connected = False
-        self._lock = Lock()
-        self._stopped = False
-
-
+            raise TypeError(e.__str__()) 
+        
+        self._gsnlistener = GSNListener(self, port, self._serversocket)
+        
+        
     def run(self):
-        self._logger.info('started')
-        # threads are waiting for the first resume to continue
-        self._pingtimer.start()
+        self._gsnlistener.start()
         self._pingwatchdog.start()
-        self._gsnwriter.start()
-        
-        pkt_len = None
-        pkt = None
-        msgType = None
-        msgTypeValid = None
-        
-        while not self._stopped:
-            # listen for a connection request by a GSN instance (this is blocking)
-            self._logger.info('listening on port ' + str(self._port))
-            try:
-                (self.clientsocket, self._clientaddr) = self._serversocket.accept()
-                self._mtu = self.clientsocket.getsockopt(SOL_IP, IP_MTU)
-                self._logger.debug('MTU of client socket is ' + str(self._mtu))
-                self.connected = True
-                self._parent.connectionToGSNestablished()
-            except socket.error, e:
-                if not self._stopped:
-                    self.error('exception while accepting connection: ' + e.__str__())
-                    time.sleep(1.0)
-                continue                
-
-            try:
-                self._logger.info('got connection from ' + str(self._clientaddr))
-    
-                self.clientsocket.settimeout(None)
-    
-                self._pingtimer.resume()
-                self._pingwatchdog.resume()
-                self._gsnwriter.resume()
-    
-                # let BackLogMain know that GSN successfully connected
-                self._parent.backlog.resend(True)
-
-                while not self._stopped:
-                    self._logger.debug('rcv...')
-                    # read the length (4 bytes) of the incoming packet (this is blocking)
-                    try:
-                        pkt = self.clientsocket.recv(4, socket.MSG_WAITALL)
-                    
-                        if len(pkt) != 4:
-                            raise IOError('packet length does not match')
-                    except (IOError, socket.error), e:
-                        if not self._stopped:
-                            raise
-                        break
-                    
-                    pkt_len = int(struct.unpack('<I', pkt)[0])
-
-                    try:
-                        pkt = self.clientsocket.recv(pkt_len, socket.MSG_WAITALL)
-                    
-                        if len(pkt) != pkt_len:
-                            raise IOError('packet length does not match')
-                    except (IOError,socket.error), e:
-                        if not self._stopped:
-                            raise
-                        break
-
-                    self._inCounter += 1
-
-                    # convert the packet to a BackLogMessage
-                    msg = BackLogMessage.BackLogMessageClass()
-                    msg.setMessage(pkt)
-                    # get the message type
-                    msgType = msg.getType()
-                    self._logger.debug('rcv (%d,%d,%d)' % (msgType, msg.getTimestamp(), pkt_len))
-                    # is it an answer to a ping?
-                    if msgType == BackLogMessage.PING_ACK_MESSAGE_TYPE:
-                        self._pingwatchdog.reset()
-                    # or is it a ping request
-                    elif msgType == BackLogMessage.PING_MESSAGE_TYPE:
-                        # answer with a ping ack
-                        self.pingAck(msg.getTimestamp())
-                    elif msgType == BackLogMessage.ACK_MESSAGE_TYPE:
-                        # if it is an acknowledge, tell BackLogMain to have received one
-                        self._parent.ackReceived(msg.getTimestamp())
-                    else:
-                        # send the packet to all plugins which 'use' this message type
-                        msgTypeValid = False
-                        for plug in self._parent.plugins:
-                            if msgType == plug[1].getMsgType():
-                                plug[1].msgReceived(msg.getPayload())
-                                msgTypeValid = True
-                                break
-                        if msgTypeValid == False:
-                            self.error('unknown message type ' + str(msgType) + ' received')                       
-            except Exception, e:
-                self.disconnect()
-                self._logger.exception(e.__str__())
-                continue
-
-        self._logger.info('died') 
+        self._pingtimer.start()
 
 
     def stop(self):
-        self._stopped = True
-        self._gsnwriter.stop()
         self._pingwatchdog.stop()
         self._pingtimer.stop()
-        if self.connected:
-            self.clientsocket.close()
-            self.connected = False
+        self._gsnlistener.stop()
         self._serversocket.shutdown(socket.SHUT_RDWR)
         self._serversocket.close()
         self._logger.info('stopped')
@@ -214,14 +105,7 @@ class GSNPeerClass(Thread):
             
             
     def isConnected(self):
-        return self.connected
-    
-    
-    def getMTU(self):
-        if self.connected:
-            return self._mtu
-        else:
-            return None
+        return self._connected
 
 
     def sendToGSN(self, msg, resend=False):
@@ -234,28 +118,58 @@ class GSNPeerClass(Thread):
         '''        
         self._outCounter += 1
         if resend:
-            return self._gsnwriter.addResendMsg(msg)        
+            return self._gsnlistener._gsnwriter.addResendMsg(msg)        
         else:
-            return self._gsnwriter.addMsg(msg)
+            return self._gsnlistener._gsnwriter.addMsg(msg)
+        
+        
+    def pktReceived(self, pkt):
+        # convert the packet to a BackLogMessage
+        msg = BackLogMessage.BackLogMessageClass()
+        msg.setMessage(pkt)
+        # get the message type
+        msgType = msg.getType()
+        
+        self._logger.debug('rcv (%d,%d,%d)' % (msgType, msg.getTimestamp(), len(pkt)))
+        self._inCounter += 1
+        
+        # is it an answer to a ping?
+        if msgType == BackLogMessage.PING_ACK_MESSAGE_TYPE:
+            self._pingwatchdog.reset()
+        # or is it a ping request
+        elif msgType == BackLogMessage.PING_MESSAGE_TYPE:
+            # answer with a ping ack
+            self.pingAck(msg.getTimestamp())
+        elif msgType == BackLogMessage.ACK_MESSAGE_TYPE:
+            # if it is an acknowledge, tell BackLogMain to have received one
+            self._parent.ackReceived(msg.getTimestamp())
+        else:
+            # send the packet to all plugins which 'use' this message type
+            msgTypeValid = False
+            for plug in self._parent.plugins:
+                if msgType == plug[1].getMsgType():
+                    plug[1].msgReceived(msg.getPayload())
+                    msgTypeValid = True
+                    break
+            if msgTypeValid == False:
+                self.error('unknown message type ' + str(msgType) + ' received')  
 
 
     def disconnect(self):
-        # synchonized method, guarantee that pause and close is called only once
-        self._lock.acquire()
-        try:
-            if self.connected:
-                self._connectionLosses += 1
-                self._parent.connectionToGSNlost()
-                self._gsnwriter.pause()
-                self._pingwatchdog.pause()
-                self._pingtimer.pause()
-                self.clientsocket.close()
-        except Exception, e:
-            self._parent.incrementExceptionCounter()
-            self._logger.exception(e.__str__())
-        finally:
-            self.connected = False
-            self._lock.release()
+        self._connected = False
+        self._connectionLosses += 1
+        self._parent.connectionToGSNlost()
+        self._pingwatchdog.pause()
+        self._pingtimer.pause() 
+        
+        self._gsnlistener = GSNListener(self, self._port, self._serversocket)
+        self._gsnlistener.start()
+        
+    def connected(self):
+        self._connected = True
+        self._parent.connectionToGSNestablished()
+        self._pingtimer.resume()
+        self._pingwatchdog.resume()
 
 
     def ping(self):
@@ -306,6 +220,144 @@ class GSNPeerClass(Thread):
 
     def error(self, msg):
         self._parent.incrementErrorCounter()
+        self._logger.error(msg)
+    
+    
+    
+    
+class GSNListener(Thread):
+    '''
+    Offers the listener functionality for GSN.
+    '''
+    
+    '''
+    data/instance attributes:
+    _logger
+    _parent
+    _port
+    _serversocket
+    _gsnwriter
+    clientsocket
+    _connected
+    _clientaddr
+    _lock
+    _stopped
+    '''
+
+    def __init__(self, parent, port, serversocket):
+        '''
+        Inititalizes the GSN server.
+        
+        @param parent: the BackLogMain object
+        @param port: the local port the server should be listening on
+        
+        @raise Exception: if there is a problem opening the server socket
+        '''
+        Thread.__init__(self)
+        
+        self._logger = logging.getLogger(self.__class__.__name__)
+        
+        # initialize variables
+        self._parent = parent
+        self._port = port
+        self._serversocket = serversocket
+        
+        self._gsnwriter = GSNWriter(self)
+
+        self.clientsocket = None
+        self._clientaddr = None
+
+        self._connected = False
+        self._lock = Lock()
+        self._stopped = False
+
+
+    def run(self):
+        self._logger.info('started')
+        # thread is waiting for the first resume to continue
+        self._gsnwriter.start()
+        
+        pkt_len = None
+        pkt = None
+        msgType = None
+        msgTypeValid = None
+        
+        # listen for a connection request by a GSN instance (this is blocking)
+        self._logger.info('listening on port ' + str(self._port))
+        try:
+            (self.clientsocket, self._clientaddr) = self._serversocket.accept()
+            self._connected = True
+            self._parent.connected()
+        except socket.error, e:
+            if not self._stopped:
+                self.error('exception while accepting connection: ' + e.__str__())
+                self.disconnect()
+
+        try:
+            self._logger.info('got connection from ' + str(self._clientaddr))
+
+            self.clientsocket.settimeout(None)
+
+            # let BackLogMain know that GSN successfully connected
+            self._parent._parent.backlog.resend(True)
+
+            while not self._stopped:
+                self._logger.debug('rcv...')
+                # read the length (4 bytes) of the incoming packet (this is blocking)
+                try:
+                    pkt = self.clientsocket.recv(4, socket.MSG_WAITALL)
+                
+                    if len(pkt) != 4:
+                        raise IOError('packet length does not match')
+                except (IOError, socket.error), e:
+                    if not self._stopped:
+                        raise
+                    break
+                
+                pkt_len = int(struct.unpack('<I', pkt)[0])
+
+                try:
+                    pkt = self.clientsocket.recv(pkt_len, socket.MSG_WAITALL)
+                
+                    if len(pkt) != pkt_len:
+                        raise IOError('packet length does not match')
+                except (IOError,socket.error), e:
+                    if not self._stopped:
+                        raise
+                    break
+                
+                self._parent.pktReceived(pkt)
+        except Exception, e:
+            self.disconnect()
+            self._logger.exception(e.__str__())
+
+        self._logger.info('died') 
+
+
+    def stop(self):
+        self._stopped = True
+        self._gsnwriter.stop()
+        if self._connected:
+            try:
+                self.clientsocket.close()
+            except Exception, e:
+                self._parent._parent.incrementExceptionCounter()
+                self._logger.exception(e.__str__())
+            self._connected = False
+        self._logger.info('stopped')
+
+
+    def disconnect(self):
+        # synchonized method, guarantee that stop is called only once
+        self._lock.acquire()
+        if self._connected:
+            self.stop()
+            self._parent.disconnect()
+        self._lock.release()
+
+
+    def error(self, msg):
+        self._parent._parent.incrementErrorCounter()
         self._logger.error(msg)
 
 
@@ -374,6 +426,7 @@ class PingWatchDog(PingTimer):
         self._logger.debug('reset')
 
 
+
 class GSNWriter(Thread):
 
     '''
@@ -392,13 +445,10 @@ class GSNWriter(Thread):
         self._sendqueue = Queue.Queue(SEND_QUEUE_SIZE)
         self._work = Event()
         self._stopped = False
-        self._paused = True
 
 
     def run(self):
         self._logger.info('started')
-        # wait until first resume
-        self._work.wait()
         while not self._stopped:
             self._work.wait()
             if self._stopped:
@@ -406,7 +456,7 @@ class GSNWriter(Thread):
             self._work.clear()
             
             # is there something to do?
-            while self._parent.connected and not self._sendqueue.empty() and not self._paused and not self._stopped:
+            while self._parent._connected and not self._sendqueue.empty() and not self._stopped:
                 try:
                     msg = self._sendqueue.get_nowait()
                 except Queue.Empty:
@@ -436,18 +486,6 @@ class GSNWriter(Thread):
         self._logger.info('stopped')
 
 
-    def pause(self):
-        self._paused = True
-        self.emptyQueue() # to unblock addResendMsg
-        self._logger.info('paused')
-
-
-    def resume(self):
-        self._paused = False
-        self._work.set()
-        self._logger.info('resumed')
-
-
     def emptyQueue(self):
         while not self._sendqueue.empty():
             try:
@@ -459,7 +497,7 @@ class GSNWriter(Thread):
 
 
     def addMsg(self, msg):
-        if not self._paused and not self._stopped:
+        if self._parent._connected and not self._stopped:
             try:
                 self._sendqueue.put_nowait(msg)
             except Queue.Full:
@@ -473,7 +511,7 @@ class GSNWriter(Thread):
         # wait until send queue is empty
         self._sendqueue.join()
         assert self._sendqueue.not_empty != True
-        if not self._paused and not self._stopped:
+        if self._parent._connected and not self._stopped:
             try:
                 self._sendqueue.put_nowait(msg)
             except Queue.Full:
