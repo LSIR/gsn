@@ -31,6 +31,8 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
    
    private ChartGenerator generator;
    
+   private static Object mutex = new Object();
+   
    public boolean initialize ( ) {
       TreeMap <  String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
       ChartInfoBackLog chartInfo = new ChartInfoBackLog( );
@@ -76,41 +78,43 @@ public class ChartVirtualSensorPermasense extends AbstractVirtualSensor {
 				} catch (InterruptedException e) {
 					break;
 				}			
-				
-				String [ ] fieldNames = input_stream_name_to_ChartInfo_map.keySet( ).toArray( new String [ ] {} );
-				Byte [ ] fieldTypes = new Byte [ fieldNames.length ];
-				Serializable [ ] charts = new Serializable [ fieldNames.length ];
-				for ( int i = 0 ; i < fieldTypes.length ; i++ ) {
+
+				synchronized (mutex) {
+					String [ ] fieldNames = input_stream_name_to_ChartInfo_map.keySet( ).toArray( new String [ ] {} );
+					Byte [ ] fieldTypes = new Byte [ fieldNames.length ];
+					Serializable [ ] charts = new Serializable [ fieldNames.length ];
+					for ( int i = 0 ; i < fieldTypes.length ; i++ ) {
+						/**
+						 * We set the type of the output stream element to Types.Binary because
+						 * we are producing images.
+						 */
+						fieldTypes[ i ] = DataTypes.BINARY;
+					}
 					/**
-					 * We set the type of the output stream element to Types.Binary because
-					 * we are producing images.
+					 * Creating an stream element with the specified fieldnames, fieldtypes
+					 * and using the current time as the timestamp of the stream element.
 					 */
-					fieldTypes[ i ] = DataTypes.BINARY;
+
+					/**
+					 * In here our stream element's relation contains just one row of data and
+					 * it's filled using the binary data which contains the plots. Note that
+					 * this virtual sensor plots one diagram for each InputStreamName. Also
+					 * Note that, each InputStreamName can have one or more variables inside
+					 * it's stream elements's relation thus having one plot for several
+					 * variables.
+					 */
+
+					for ( int i = 0 ; i < fieldNames.length ; i++ ) {
+						ChartInfoBackLog chart = input_stream_name_to_ChartInfo_map.get( fieldNames[ i ] );
+						charts[ i ] = chart.writePlot( ).toByteArray( );
+					}
+					StreamElement output = new StreamElement( fieldNames , fieldTypes , charts , System.currentTimeMillis( ) );
+
+					/**
+					 * Informing container about existance of a stream element.
+					 */
+					dataProduced( output );
 				}
-				/**
-				 * Creating an stream element with the specified fieldnames, fieldtypes
-				 * and using the current time as the timestamp of the stream element.
-				 */
-
-				/**
-				 * In here our stream element's relation contains just one row of data and
-				 * it's filled using the binary data which contains the plots. Note that
-				 * this virtual sensor plots one diagram for each InputStreamName. Also
-				 * Note that, each InputStreamName can have one or more variables inside
-				 * it's stream elements's relation thus having one plot for several
-				 * variables.
-				 */
-
-				for ( int i = 0 ; i < fieldNames.length ; i++ ) {
-					ChartInfoBackLog chart = input_stream_name_to_ChartInfo_map.get( fieldNames[ i ] );
-					charts[ i ] = chart.writePlot( ).toByteArray( );
-				}
-				StreamElement output = new StreamElement( fieldNames , fieldTypes , charts , System.currentTimeMillis( ) );
-
-				/**
-				 * Informing container about existance of a stream element.
-				 */
-				dataProduced( output );
 			}
 		}
 		
