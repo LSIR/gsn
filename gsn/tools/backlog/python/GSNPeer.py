@@ -69,9 +69,6 @@ class GSNPeerClass(Thread):
         self._connectionLosses = 0
         self._backlogCounter = 0
         self._connected = False
-
-        self._pingtimer = PingTimer(PING_INTERVAL_SEC, self.ping)
-        self._pingwatchdog = PingWatchDog(PING_ACK_CHECK_INTERVAL_SEC, self.disconnect)
         
         # try to open a server socket to which GSN can connect to
         try:
@@ -83,6 +80,9 @@ class GSNPeerClass(Thread):
             raise TypeError(e.__str__()) 
         
         self._gsnlistener = GSNListener(self, port, self._serversocket)
+
+        self._pingtimer = PingTimer(PING_INTERVAL_SEC, self.ping)
+        self._pingwatchdog = PingWatchDog(PING_ACK_CHECK_INTERVAL_SEC, self._gsnlistener.disconnect)
         
         
     def run(self):
@@ -160,7 +160,7 @@ class GSNPeerClass(Thread):
         self._connectionLosses += 1
         self._parent.connectionToGSNlost()
         self._pingwatchdog.pause()
-        self._pingtimer.pause() 
+        self._pingtimer.pause()
         
         self._gsnlistener = GSNListener(self, self._port, self._serversocket)
         self._gsnlistener.start()
@@ -292,6 +292,7 @@ class GSNListener(Thread):
             if not self._stopped:
                 self.error('exception while accepting connection: ' + e.__str__())
                 self.disconnect()
+                return
 
         try:
             self._logger.info('got connection from ' + str(self._clientaddr))

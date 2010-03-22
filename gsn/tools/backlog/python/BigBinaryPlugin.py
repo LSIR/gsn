@@ -74,6 +74,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _notifier
     _stopped
     _filedeque
+    _msgdeque
     _work
     _lock
     _waitforack
@@ -238,8 +239,10 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     ackType = int(struct.unpack('B', message[1])[0])
                         
                     if ackType == INIT_PACKET and self._lastSentPacketType == INIT_PACKET:
-                        self.debug('acknowledge packet received for init packet')
+                        self.debug('acknowledge received for init packet')
                         chunkNumber = 0
+                    elif ackType == INIT_PACKET and self._lastSentPacketType == CHUNK_PACKET and chunkNumber == 0:
+                        self.info('acknowledge for init packet already received')
                     elif ackType == CHUNK_PACKET and self._lastSentPacketType == CHUNK_PACKET:
                         chkNr = int(struct.unpack('<I', message[2:6])[0])
                         if chkNr == chunkNumber-1:
@@ -252,7 +255,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                                 self._lock.release()
                             continue
                         else:
-                            self.error('acknowledge packet received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
+                            self.error('acknowledge received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
                             continue
                     elif ackType == CRC_PACKET and self._lastSentPacketType == CRC_PACKET:
                         # crc has been accepted by GSN
@@ -349,6 +352,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                                 if crc != gsnCRC:
                                     self.warning('crc does not match -> resend complete binary')
                                     os.chmod(filename, 0744)
+                                    self._filedeque.appendleft(filename)
                                     self._filedescriptor.close()
                                 else:
                                     self.debug('recalculated crc: ' + str(crc))
