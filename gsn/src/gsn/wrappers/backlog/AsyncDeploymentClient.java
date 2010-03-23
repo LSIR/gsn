@@ -338,6 +338,17 @@ public class AsyncDeploymentClient extends Thread  {
 			logger.error(e.getMessage(), e);
 		}
 	}
+	
+	
+	private byte[] pktStuffing(byte[] message) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		for (int i=0; i<message.length; i++) {
+			baos.write(message[i]);
+			if (message[i] == BackLogMessageMultiplexer.STUFFING_BYTE)
+				baos.write(message[i]);
+		}
+		return baos.toByteArray();
+	}
 
 
 	public boolean send(DeploymentListener listener, byte[] data) throws IOException {
@@ -363,7 +374,7 @@ public class AsyncDeploymentClient extends Thread  {
 	        		ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length + 4);
 	        		baos.write(AbstractPlugin.uint2arr(data.length));
 					baos.write(data);
-					queue.add(baos.toByteArray());
+					queue.add(pktStuffing(baos.toByteArray()));
 				}
 			}
 		    

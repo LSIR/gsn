@@ -28,6 +28,9 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	    message should have been received. If no acknowledge has
 	    been received, the connection is considered broken. */
 	public static final int PING_ACK_CHECK_INTERVAL_SEC = 60;
+	
+	public static final int STUFFING_BYTE = 0;
+	
 	protected final transient Logger logger = Logger.getLogger( BackLogMessageMultiplexer.class );
 	
 
@@ -47,7 +50,8 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	private InetAddress hostAddress;
 	private int hostPort;
 	private String deploymentName;
-	private boolean reconnected;
+	private boolean reconnecting;
+	boolean stuff = false;
 	
 	
 	public BackLogMessageMultiplexer() throws Exception {
@@ -119,18 +123,29 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 		long packetLength = -1;
 		while(!dispose) {
 			try {
+				byte [] in;
 				try {
-					pkt.write(recvQueue.take());
+					in = recvQueue.take();
 				} catch (InterruptedException e) {
 					logger.debug(e.getMessage());
 					break;
 				}
+				
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				if (!pktDestuffing(in, baos)) {
+					logger.debug("stuffing mark reached");
+					if (baos.size() == 0)
+						continue;
+				}
+
+				pkt.write(baos.toByteArray());
+				logger.debug("take packet...");
 				if (dispose)
 					break;
-				if (reconnected) {
+				if (reconnecting) {
 					newPacket = true;
 					packetLength = -1;
-					reconnected = false;
+					reconnecting = false;
 				}
 				
 				boolean hasMorePkt = true;
@@ -139,6 +154,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 						if (pkt.size() >= 4) {
 							logger.debug("rcv...");
 							packetLength = AbstractPlugin.arr2uint(pkt.toByteArray(), 0);
+							logger.debug("packet length: " + packetLength);
 							newPacket = false;
 						}
 						else
@@ -178,6 +194,36 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	}
 	
 	
+	private boolean pktDestuffing(byte[] in, ByteArrayOutputStream destuffed) {
+		for(int i=0; i<in.length; i++) {
+			if (in[i] == STUFFING_BYTE && !stuff)
+				stuff = true;
+			else if (stuff) {
+				if (in[i] == STUFFING_BYTE) {
+					destuffed.write(in[i]);
+					stuff = false;
+				}
+				else {
+					destuffed = new ByteArrayOutputStream();
+					if (in.length-i != 0) {
+						try {
+							destuffed.write(java.util.Arrays.copyOfRange(in, i, in.length));
+						} catch (IOException e) {
+							logger.error(e.getMessage(), e);
+						}
+					}
+					
+					stuff = false;
+					return false;
+				}
+			}
+			else
+				destuffed.write(in[i]);
+		}
+		return true;
+	}
+
+
 	private void dispose() {
     	// stop ping timer
         pingTimer.cancel();
@@ -214,8 +260,8 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 		logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
 		return asyncDeploymentClient.send(this, message.getMessage());
 	}
-	
-	
+
+
 	/**
 	 * Register a particular listener for a specific message type. More than one
 	 * listener can be registered for each message type.
@@ -331,8 +377,9 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	@Override
 	public void connectionEstablished() {
 		logger.debug("connection established");
+		logger.debug("recvQueue size: " + recvQueue.size());
 		recvQueue.clear();
-		reconnected = true;
+		reconnecting = true;
 
     	// start ping timer
         pingTimer = new Timer("PingTimer-" + deploymentName);

@@ -24,6 +24,8 @@ PING_ACK_CHECK_INTERVAL_SEC = 60.0
 
 SEND_QUEUE_SIZE = 25
 
+STUFFING_BYTE = 0
+
 SOL_IP = 0
 IP_MTU = 14
 
@@ -45,6 +47,9 @@ class GSNPeerClass(Thread):
     _outCounter
     _connectionLosses
     _backlogCounter
+    _work
+    _stopped
+    _stuff
     '''
 
     def __init__(self, parent, port):
@@ -69,6 +74,9 @@ class GSNPeerClass(Thread):
         self._connectionLosses = 0
         self._backlogCounter = 0
         self._connected = False
+        self._stopped = False
+        self._stuff = False
+        self._work = Event()
         
         # try to open a server socket to which GSN can connect to
         try:
@@ -77,24 +85,37 @@ class GSNPeerClass(Thread):
             self._serversocket.bind(('0.0.0.0', port))
             self._serversocket.listen(1)
         except Exception, e:
-            raise TypeError(e.__str__()) 
-        
-        self._gsnlistener = GSNListener(self, port, self._serversocket)
+            raise TypeError(e.__str__())
 
         self._pingtimer = PingTimer(PING_INTERVAL_SEC, self.ping)
-        self._pingwatchdog = PingWatchDog(PING_ACK_CHECK_INTERVAL_SEC, self._gsnlistener.disconnect)
+        self._pingwatchdog = PingWatchDog(PING_ACK_CHECK_INTERVAL_SEC, self.watchdogdisconnect)
         
         
     def run(self):
-        self._gsnlistener.start()
+        self._logger.info('started')
+        
         self._pingwatchdog.start()
         self._pingtimer.start()
+        self._work.set()
+            
+        while not self._stopped:
+            self._work.wait()
+            if self._stopped:
+                break
+            self._work.clear()
+        
+            self._gsnlistener = GSNListener(self, self._port, self._serversocket)
+            self._gsnlistener.start()
+ 
+        self._logger.info('died')
 
 
     def stop(self):
         self._pingwatchdog.stop()
         self._pingtimer.stop()
         self._gsnlistener.stop()
+        self._stopped = True
+        self._work.set()
         self._serversocket.shutdown(socket.SHUT_RDWR)
         self._serversocket.close()
         self._logger.info('stopped')
@@ -124,6 +145,7 @@ class GSNPeerClass(Thread):
         
         
     def pktReceived(self, pkt):
+        t = time.time()
         # convert the packet to a BackLogMessage
         msg = BackLogMessage.BackLogMessageClass()
         msg.setMessage(pkt)
@@ -152,18 +174,24 @@ class GSNPeerClass(Thread):
                     msgTypeValid = True
                     break
             if msgTypeValid == False:
-                self.error('unknown message type ' + str(msgType) + ' received')  
+                self.error('unknown message type ' + str(msgType) + ' received')
+                
+        self._logger.info('packet processing: %f s' % (time.time() - t))
 
 
     def disconnect(self):
+        self._logger.debug('disconnect')
         self._connected = False
         self._connectionLosses += 1
         self._parent.connectionToGSNlost()
         self._pingwatchdog.pause()
         self._pingtimer.pause()
+        self._work.set()
         
-        self._gsnlistener = GSNListener(self, self._port, self._serversocket)
-        self._gsnlistener.start()
+        
+    def watchdogdisconnect(self):
+        self._gsnlistener.disconnect()
+        
         
     def connected(self):
         self._connected = True
@@ -306,7 +334,9 @@ class GSNListener(Thread):
                 self._logger.debug('rcv...')
                 # read the length (4 bytes) of the incoming packet (this is blocking)
                 try:
-                    pkt = self.clientsocket.recv(4, socket.MSG_WAITALL)
+                    pkt = self.pktReadAndDestuff(4)
+                    if not pkt:
+                        continue
                 
                     if len(pkt) != 4:
                         raise IOError('packet length does not match')
@@ -318,7 +348,9 @@ class GSNListener(Thread):
                 pkt_len = int(struct.unpack('<I', pkt)[0])
 
                 try:
-                    pkt = self.clientsocket.recv(pkt_len, socket.MSG_WAITALL)
+                    pkt = self.pktReadAndDestuff(pkt_len)
+                    if not pkt:
+                        continue
                 
                     if len(pkt) != pkt_len:
                         raise IOError('packet length does not match')
@@ -332,12 +364,44 @@ class GSNListener(Thread):
             self.disconnect()
             self._logger.exception(e.__str__())
 
-        self._logger.info('died') 
+        self._logger.info('died')
+        
+        
+    def pktReadAndDestuff(self, length):
+        out = ''
+        index = 0
+        t = time.time()
+        while True:
+            c = self.clientsocket.recv(1)
+            if not c:
+                raise IOError('None returned from socket')
+            
+            if ord(c) == STUFFING_BYTE and not self._parent._stuff:
+                self._parent._stuff = True
+            elif self._parent._stuff:
+                if ord(c) == STUFFING_BYTE:
+                    out += c
+                    self._parent._stuff = False
+                else:
+                    self._logger.debug('stuffing mark reached')
+                    self._parent._stuff = False
+                    return None
+            else:
+                out += c
+                    
+                index += 1
+            
+            if len(out) == length:
+                break
+        
+        self._logger.info('read and destuff: %f s' % (time.time() - t))
+        return out
 
 
     def stop(self):
         self._stopped = True
         self._gsnwriter.stop()
+        self._gsnwriter.join()
         if self._connected:
             try:
                 self.clientsocket.close()
@@ -468,7 +532,7 @@ class GSNWriter(Thread):
                 msglen = len(message)
             
                 try:
-                    self._parent.clientsocket.sendall(struct.pack('<I', msglen) + message)
+                    self._parent.clientsocket.sendall(self.pktStuffing(struct.pack('<I', msglen) + message))
                     self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
                 except socket.error, e:
                     if not self._stopped:
@@ -478,6 +542,15 @@ class GSNWriter(Thread):
                     self._sendqueue.task_done()
  
         self._logger.info('died')
+        
+        
+    def pktStuffing(self, pkt):
+        out = ''
+        for c in pkt:
+            out += c
+            if ord(c) == STUFFING_BYTE:
+                out += c
+        return out
 
 
     def stop(self):
