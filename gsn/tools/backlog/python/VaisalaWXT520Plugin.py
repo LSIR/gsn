@@ -67,7 +67,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
             self.debug('died')
             return
 
-        ser = serial.Serial('/dev/ttyUSB0', 1200, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=1)
+        ser = serial.Serial('/dev/ttyUSB0', 19200, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=1)
         ser.open()
         ser.write('?\r\n')
         ser.flushOutput()
