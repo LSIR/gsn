@@ -47,6 +47,9 @@ BIG_BINARY_MESSAGE_TYPE = 31
 # The Vaisala weather sensor (WXT520) message type.
 VAISALA_WXT520_MESSAGE_TYPE = 40
 
+# The Schedule message type.
+SCHEDULE_MESSAGE_TYPE = 50
+
 # The maximum supported payload size (2^32-9bytes). This is due to
 # the sending mechanism. A sent message is defined by preceding
 # four bytes containing the message size. A message consists of

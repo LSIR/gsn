@@ -87,6 +87,11 @@ public class BackLogMessage {
      *  receive Vaisala WXT520 weather station data.
 	 *  {@link gsn.wrappers.backlog.plugins.BinaryBridgePlugin BinaryBridgePlugin}. */
 	public static final byte VAISALA_WXT520_MESSAGE_TYPE = 40;
+
+	/** The Schedule message type. This message type is used to
+     *  send/receive Schedule data.
+	 *  {@link gsn.wrappers.backlog.plugins.SchedulePlugin SchedulePlugin}. */
+	public static final byte SCHEDULE_MESSAGE_TYPE = 50;
 	
 	/* #                                                            #
 	 * #                                                            #

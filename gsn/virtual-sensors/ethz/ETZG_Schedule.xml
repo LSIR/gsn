@@ -1,0 +1,29 @@
+<virtual-sensor name="ETZG_Schedule_1646" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+       	<web-input password="test">
+         	<command name="schedule_command">
+			<field name="schedule" type="*binary:1mb">schedule</field>
+        	</command>
+   		</web-input>
+       	<output-structure>
+			<field name="SCHEDULE" type="BINARY" />
+       	</output-structure>
+    </processing-class>
+    <description>schedules for ETZG deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
