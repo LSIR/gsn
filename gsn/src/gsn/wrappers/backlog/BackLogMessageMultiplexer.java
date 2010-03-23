@@ -44,13 +44,11 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	private int activPluginCounter = 0;
 
 	private Timer pingTimer = null;
-	private Timer pingCheckerTimer = null;
-	protected Boolean pingACKreceived = new Boolean(false);
+	private Timer pingWatchDogTimer = null;
 
 	private InetAddress hostAddress;
 	private int hostPort;
 	private String deploymentName;
-	private boolean reconnecting;
 	boolean stuff = false;
 	
 	
@@ -133,20 +131,19 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 				
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				if (!pktDestuffing(in, baos)) {
-					logger.debug("stuffing mark reached");
+					logger.warn("stuffing mark reached");
+					recvQueue.clear();
+					newPacket = true;
+					packetLength = -1;
+					pkt = new ByteArrayOutputStream();
+					
 					if (baos.size() == 0)
 						continue;
 				}
 
 				pkt.write(baos.toByteArray());
-				logger.debug("take packet...");
 				if (dispose)
 					break;
-				if (reconnecting) {
-					newPacket = true;
-					packetLength = -1;
-					reconnecting = false;
-				}
 				
 				boolean hasMorePkt = true;
 				while(hasMorePkt) {
@@ -176,9 +173,11 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 			    			sendPingAck(msg.getTimestamp());
 			    		}
 			    		else if( msg.getType() == BackLogMessage.PING_ACK_MESSAGE_TYPE ) {
-			    			synchronized (pingACKreceived) {
-			    				pingACKreceived = true;
-			    			}
+		    		    	// restart ping checker timer
+			    			logger.debug("reset ping watchdog");
+		    				pingWatchDogTimer.cancel();
+		    		        pingWatchDogTimer = new Timer("PingWatchDog-" + deploymentName);
+		    		        pingWatchDogTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000 );
 			    		}
 			    		else
 			    			multiplexMessage(msg);
@@ -228,7 +227,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
     	// stop ping timer
         pingTimer.cancel();
     	// stop ping checker timer
-        pingCheckerTimer.cancel();
+        pingWatchDogTimer.cancel();
         
 		dispose = true;
 		try {
@@ -377,16 +376,19 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	@Override
 	public void connectionEstablished() {
 		logger.debug("connection established");
-		logger.debug("recvQueue size: " + recvQueue.size());
-		recvQueue.clear();
-		reconnecting = true;
 
+		try {
+			asyncDeploymentClient.sendStuffingByte(this);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+		
     	// start ping timer
         pingTimer = new Timer("PingTimer-" + deploymentName);
         pingTimer.schedule( new PingTimer(this), PING_INTERVAL_SEC * 1000, PING_INTERVAL_SEC * 1000 );
     	// start ping checker timer
-        pingCheckerTimer = new Timer("PingWatchDog-" + deploymentName);
-        pingCheckerTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000, PING_ACK_CHECK_INTERVAL_SEC * 1000 );
+        pingWatchDogTimer = new Timer("PingWatchDog-" + deploymentName);
+        pingWatchDogTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000 );
         
 		Iterator<Vector<BackLogMessageListener>> iter = msgTypeListener.values().iterator();
 		while (iter.hasNext()) {
@@ -406,7 +408,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
     	// stop ping timer
         pingTimer.cancel();
     	// stop ping checker timer
-        pingCheckerTimer.cancel();
+        pingWatchDogTimer.cancel();
 
 		Iterator<Vector<BackLogMessageListener>> iter = msgTypeListener.values().iterator();
 		while (iter.hasNext()) {
@@ -499,18 +501,7 @@ class PingWatchDog extends TimerTask {
 	}
 	
 	public void run() {
-		boolean noAck = true;
-		synchronized (parent.pingACKreceived) {
-			if(parent.pingACKreceived) {
-				logger.debug("reset");
-				parent.pingACKreceived = false;
-				noAck = false;
-			}
-		}
-		
-		if (noAck) {
-			logger.debug("connection lost");
-			parent.asyncDeploymentClient.reconnect(parent);
-		}
+		logger.debug("connection lost");
+		parent.asyncDeploymentClient.reconnect(parent);
 	}
 }

@@ -352,6 +352,11 @@ public class AsyncDeploymentClient extends Thread  {
 
 
 	public boolean send(DeploymentListener listener, byte[] data) throws IOException {
+		return send(listener, data, true);
+	}
+
+
+	private boolean send(DeploymentListener listener, byte[] data, boolean stuff) throws IOException {
 		if (data.length > BUFFER_SIZE-4) 
 			throw new IOException("data limited to " + (BUFFER_SIZE-4) + " bytes");
 		
@@ -371,10 +376,14 @@ public class AsyncDeploymentClient extends Thread  {
 						queue = new ArrayList<byte[]>();
 						this.pendingData.put(socketChannel, queue);
 					}
-	        		ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length + 4);
-	        		baos.write(AbstractPlugin.uint2arr(data.length));
-					baos.write(data);
-					queue.add(pktStuffing(baos.toByteArray()));
+					if (stuff) {
+		        		ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length + 4);
+		        		baos.write(AbstractPlugin.uint2arr(data.length));
+						baos.write(data);
+						queue.add(pktStuffing(baos.toByteArray()));
+					}
+					else
+						queue.add(data);
 				}
 			}
 		    
@@ -386,6 +395,14 @@ public class AsyncDeploymentClient extends Thread  {
 			logger.debug("not connected");
 			return false;
 		}
+	}
+
+
+	public boolean sendStuffingByte(DeploymentListener listener) throws IOException {
+		logger.debug("send stuffing byte");
+		byte[] data = {BackLogMessageMultiplexer.STUFFING_BYTE};
+		
+		return send(listener, data, false);
 	}
 	
 	

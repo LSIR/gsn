@@ -145,7 +145,6 @@ class GSNPeerClass(Thread):
         
         
     def pktReceived(self, pkt):
-        t = time.time()
         # convert the packet to a BackLogMessage
         msg = BackLogMessage.BackLogMessageClass()
         msg.setMessage(pkt)
@@ -175,8 +174,6 @@ class GSNPeerClass(Thread):
                     break
             if msgTypeValid == False:
                 self.error('unknown message type ' + str(msgType) + ' received')
-                
-        self._logger.info('packet processing: %f s' % (time.time() - t))
 
 
     def disconnect(self):
@@ -270,6 +267,7 @@ class GSNListener(Thread):
     _clientaddr
     _lock
     _stopped
+    _stuffread
     '''
 
     def __init__(self, parent, port, serversocket):
@@ -294,6 +292,7 @@ class GSNListener(Thread):
 
         self.clientsocket = None
         self._clientaddr = None
+        self._stuffread = ''
 
         self._connected = False
         self._lock = Lock()
@@ -314,13 +313,18 @@ class GSNListener(Thread):
         self._logger.info('listening on port ' + str(self._port))
         try:
             (self.clientsocket, self._clientaddr) = self._serversocket.accept()
+            if self._stopped:
+                self._logger.info('died')
+                return
             self._connected = True
+            self._gsnwriter.sendStuffingByte()
             self._parent.connected()
         except socket.error, e:
             if not self._stopped:
                 self.error('exception while accepting connection: ' + e.__str__())
                 self.disconnect()
-                return
+            self._logger.info('died')
+            return
 
         try:
             self._logger.info('got connection from ' + str(self._clientaddr))
@@ -368,9 +372,8 @@ class GSNListener(Thread):
         
         
     def pktReadAndDestuff(self, length):
-        out = ''
+        out = self._stuffread
         index = 0
-        t = time.time()
         while True:
             c = self.clientsocket.recv(1)
             if not c:
@@ -383,8 +386,9 @@ class GSNListener(Thread):
                     out += c
                     self._parent._stuff = False
                 else:
-                    self._logger.debug('stuffing mark reached')
+                    self._logger.warn('stuffing mark reached')
                     self._parent._stuff = False
+                    self._stuffread = c
                     return None
             else:
                 out += c
@@ -393,15 +397,14 @@ class GSNListener(Thread):
             
             if len(out) == length:
                 break
-        
-        self._logger.info('read and destuff: %f s' % (time.time() - t))
+
+        self._stuffread = ''
         return out
 
 
     def stop(self):
         self._stopped = True
         self._gsnwriter.stop()
-        self._gsnwriter.join()
         if self._connected:
             try:
                 self.clientsocket.close()
@@ -519,7 +522,6 @@ class GSNWriter(Thread):
             if self._stopped:
                 break
             self._work.clear()
-            
             # is there something to do?
             while self._parent._connected and not self._sendqueue.empty() and not self._stopped:
                 try:
@@ -528,12 +530,19 @@ class GSNWriter(Thread):
                     self._logger.warning('send queue is empty')
                     break
             
-                message = msg.getMessage()
-                msglen = len(message)
+                if msg.__class__.__name__ != BackLogMessage.__name__ + 'Class':
+                    pkt = msg
+                else:
+                    message = msg.getMessage()
+                    msglen = len(message)
+                    pkt = self.pktStuffing(struct.pack('<I', msglen) + message)
             
                 try:
-                    self._parent.clientsocket.sendall(self.pktStuffing(struct.pack('<I', msglen) + message))
-                    self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
+                    self._parent.clientsocket.sendall(pkt)
+                    if msg.__class__.__name__ != BackLogMessage.__name__ + 'Class':
+                        self._logger.debug('stuffing byte sent')
+                    else:
+                        self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
                 except socket.error, e:
                     if not self._stopped:
                         self._parent.disconnect() # sets connected to false
@@ -545,12 +554,12 @@ class GSNWriter(Thread):
         
         
     def pktStuffing(self, pkt):
-        out = ''
-        for c in pkt:
-            out += c
-            if ord(c) == STUFFING_BYTE:
-                out += c
-        return out
+        c = chr(STUFFING_BYTE)
+        return pkt.replace(c, c+c)
+    
+    
+    def sendStuffingByte(self):
+        self.addMsg(chr(STUFFING_BYTE))
 
 
     def stop(self):
