@@ -241,7 +241,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                     if ackType == INIT_PACKET and self._lastSentPacketType == INIT_PACKET:
                         self.debug('acknowledge received for init packet')
                         chunkNumber = 0
-                    elif ackType == INIT_PACKET and self._lastSentPacketType == CHUNK_PACKET and chunkNumber == 0:
+                    elif ackType == INIT_PACKET and self._lastSentPacketType == CHUNK_PACKET and chunkNumber-1 == 0:
                         self.info('acknowledge for init packet already received')
                     elif ackType == CHUNK_PACKET and self._lastSentPacketType == CHUNK_PACKET:
                         chkNr = int(struct.unpack('<I', message[2:6])[0])
