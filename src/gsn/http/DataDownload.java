@@ -5,6 +5,7 @@ import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -312,9 +313,7 @@ public class DataDownload extends HttpServlet {
                     respond.println("</data>");
                 }
             }
-            catch (Exception e) {
-                logger.warn(e.getMessage(), e);
-            } finally {
+            finally {
                 if (result != null) result.close();
             }
             //*/
