@@ -15,7 +15,8 @@ public interface BackLogMessageListener extends java.util.EventListener {
      * implemented by any listener which likes to register itself at
      * a {@link DeploymentClient}.
 	 *
-     * @param message the received {@link BackLogMessage}
+     * @param timestamp contained in the message {@link BackLogMessage}
+     * @param payload of the message
      * 
      * @return true, if the listener did acknowledge the message
      */

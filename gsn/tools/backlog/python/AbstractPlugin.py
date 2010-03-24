@@ -110,7 +110,6 @@ class AbstractPluginClass(Thread):
         
         This function should be used by the plugins to send any data to GSN.
         
-        @param msgType: the message type. The message type must be listed in BackLogMessage.
         @param timestamp: the timestamp this message has been generated
         @param payload: the raw data to be sent (no more than 4 Gb)
         @param backLog: True if this message should be backlogged in the database, otherwise False.
