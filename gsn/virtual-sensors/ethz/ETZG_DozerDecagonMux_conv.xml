@@ -1,0 +1,79 @@
+<virtual-sensor name="ETZG_DozerDecagonMux_conv_1396" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="GENERATIONTIME" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="CONDUCTIVITY0" type="DOUBLE" unit="dS/m"/>
+            <field name="DIELECTRIC0" type="DOUBLE"/>
+            <field name="TEMPERATURE0" type="DOUBLE" unit="°C"/>
+            <field name="PAYLOAD_MUX_VALID0" type="TINYINT" />
+            <field name="CONDUCTIVITY1" type="DOUBLE" unit="dS/m"/>
+            <field name="DIELECTRIC1" type="DOUBLE"/>
+            <field name="TEMPERATURE1" type="DOUBLE" unit="°C"/>
+            <field name="PAYLOAD_MUX_VALID1" type="TINYINT" />
+            <field name="CONDUCTIVITY2" type="DOUBLE" unit="dS/m"/>
+            <field name="DIELECTRIC2" type="DOUBLE"/>
+            <field name="TEMPERATURE2" type="DOUBLE" unit="°C"/>
+            <field name="PAYLOAD_MUX_VALID2" type="TINYINT" />
+            <field name="CONDUCTIVITY3" type="DOUBLE" unit="dS/m"/>
+            <field name="DIELECTRIC3" type="DOUBLE"/>
+            <field name="TEMPERATURE3" type="DOUBLE" unit="°C"/>
+            <field name="PAYLOAD_MUX_VALID3" type="TINYINT" />
+            <field name="CONDUCTIVITY4" type="DOUBLE" unit="dS/m"/>
+            <field name="DIELECTRIC4" type="DOUBLE"/>
+            <field name="TEMPERATURE4" type="DOUBLE" unit="°C"/>
+            <field name="PAYLOAD_MUX_VALID4" type="TINYINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerDecagonMuxMsg) from ETZG deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                   <predicate key="query">select TIMESTAMP, GENERATIONTIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
+                     PAYLOAD_DATA_CONDUCTIVITY0, PAYLOAD_DATA_DIELECTRIC0, PAYLOAD_DATA_TEMPERATURE0, PAYLOAD_MUX_VALID0,
+                     PAYLOAD_DATA_CONDUCTIVITY1, PAYLOAD_DATA_DIELECTRIC1, PAYLOAD_DATA_TEMPERATURE1, PAYLOAD_MUX_VALID1,
+                     PAYLOAD_DATA_CONDUCTIVITY2, PAYLOAD_DATA_DIELECTRIC2, PAYLOAD_DATA_TEMPERATURE2, PAYLOAD_MUX_VALID2,
+                     PAYLOAD_DATA_CONDUCTIVITY3, PAYLOAD_DATA_DIELECTRIC3, PAYLOAD_DATA_TEMPERATURE3, PAYLOAD_MUX_VALID3,
+                     PAYLOAD_DATA_CONDUCTIVITY4, PAYLOAD_DATA_DIELECTRIC4, PAYLOAD_DATA_TEMPERATURE4, PAYLOAD_MUX_VALID4
+                     from ETZG_DozerDecagonMux_1396</predicate>
+                   <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select 
+                  TIMESTAMP, GENERATIONTIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
+                  IF(PAYLOAD_DATA_CONDUCTIVITY0>700, (700 + 5*(PAYLOAD_DATA_CONDUCTIVITY0-700)) / 100, PAYLOAD_DATA_CONDUCTIVITY0/100) as CONDUCTIVITY0,
+                  PAYLOAD_DATA_DIELECTRIC0/50 as DIELECTRIC0,
+                  (PAYLOAD_DATA_TEMPERATURE0-400)/10 as TEMPERATURE0,
+                  PAYLOAD_MUX_VALID0,
+                  IF(PAYLOAD_DATA_CONDUCTIVITY1>700, (700 + 5*(PAYLOAD_DATA_CONDUCTIVITY1-700)) / 100, PAYLOAD_DATA_CONDUCTIVITY1/100) as CONDUCTIVITY1,
+                  PAYLOAD_DATA_DIELECTRIC1/50 as DIELECTRIC1,
+                  (PAYLOAD_DATA_TEMPERATURE1-400)/10 as TEMPERATURE1,
+                  PAYLOAD_MUX_VALID1,
+                  IF(PAYLOAD_DATA_CONDUCTIVITY2>700, (700 + 5*(PAYLOAD_DATA_CONDUCTIVITY2-700)) / 100, PAYLOAD_DATA_CONDUCTIVITY2/100) as CONDUCTIVITY2,
+                  PAYLOAD_DATA_DIELECTRIC2/50 as DIELECTRIC2,
+                  (PAYLOAD_DATA_TEMPERATURE2-400)/10 as TEMPERATURE2,
+                  PAYLOAD_MUX_VALID2,
+                  IF(PAYLOAD_DATA_CONDUCTIVITY3>700, (700 + 5*(PAYLOAD_DATA_CONDUCTIVITY3-700)) / 100, PAYLOAD_DATA_CONDUCTIVITY3/100) as CONDUCTIVITY3,
+                  PAYLOAD_DATA_DIELECTRIC3/50 as DIELECTRIC3,
+                  (PAYLOAD_DATA_TEMPERATURE3-400)/10 as TEMPERATURE3,
+                  PAYLOAD_MUX_VALID3,
+                  IF(PAYLOAD_DATA_CONDUCTIVITY4>700, (700 + 5*(PAYLOAD_DATA_CONDUCTIVITY4-700)) / 100, PAYLOAD_DATA_CONDUCTIVITY4/100) as CONDUCTIVITY4,
+                  PAYLOAD_DATA_DIELECTRIC4/50 as DIELECTRIC4,
+                  (PAYLOAD_DATA_TEMPERATURE4-400)/10 as TEMPERATURE4,
+                  PAYLOAD_MUX_VALID4
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

@@ -76,3 +76,6 @@ ETZG_DozerRssi_muxed_mapped.xml
 ETZG_DozerStateCounter.xml
 ETZG_DozerStateCounter_mapped.xml
 ETZG_Webcam_from_BigBinary_scaled.xml
+ETZG_DozerCommand.xml
+ETZG_DozerDecagonMux_conv.xml
+ETZG_DozerDecagonMux.xml
