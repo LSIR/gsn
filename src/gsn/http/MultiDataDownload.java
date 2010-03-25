@@ -250,6 +250,12 @@ public class MultiDataDownload extends HttpServlet {
 		if (req_reportclass != null) {
 			parameterMap.put("reportclass", new String[] { req_reportclass });
 		}
+
+        //Paginated
+        String paginated = req.getParameter("paginated");
+		if (paginated != null) {
+			parameterMap.put("paginated", new String[] { paginated });
+		}
 		
 		return parameterMap;
 	}

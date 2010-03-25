@@ -1280,6 +1280,7 @@ public class StorageManager {
 		//        return connection;
 		if (logger.isDebugEnabled())
 			logger.debug("Asking for connections to default DB=> busy: "+pool.getNumActive()+", max-size:"+pool.getMaxActive()+", idle:"+pool.getNumIdle());
+			logger.warn("Asking for connections to default DB=> busy: "+pool.getNumActive()+", max-size:"+pool.getMaxActive()+", idle:"+pool.getNumIdle());
 		// try{ // used for tracking the calls to this method.
 		//     throw new RuntimeException("Trackeeer");
 		// }   catch (Exception e){
