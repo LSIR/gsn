@@ -106,7 +106,6 @@ public final class Main {
 		try {
 			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" ...");
             int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
-			System.out.println(maxServlets);
             Server jettyServer = getJettyServer(Main.getContainerConfig().getContainerPort(), maxServlets);
 			jettyServer.start ( );
 			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
