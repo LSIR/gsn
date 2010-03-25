@@ -237,35 +237,38 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 
                 if pktType == ACK_PACKET:
                     ackType = int(struct.unpack('B', message[1])[0])
+                    alreadyReceived = False
                         
                     if ackType == INIT_PACKET and self._lastSentPacketType == INIT_PACKET:
                         self.debug('acknowledge received for init packet')
                         chunkNumber = 0
                     elif ackType == INIT_PACKET and self._lastSentPacketType == CHUNK_PACKET and chunkNumber-1 == 0:
                         self.info('acknowledge for init packet already received')
+                        alreadyReceived = True
                     elif ackType == CHUNK_PACKET and self._lastSentPacketType == CHUNK_PACKET:
                         chkNr = int(struct.unpack('<I', message[2:6])[0])
                         if chkNr == chunkNumber-1:
                             self.debug('acknowledge for chunk number >' + str(chkNr) + '< received')
                         elif chkNr == chunkNumber-2:
                             self.info('acknowledge for chunk number >' + str(chkNr) + '< already received')
-                            if not self._msgdeque:
-                                self._lock.acquire()
-                                self._work.clear()
-                                self._lock.release()
-                            continue
+                            alreadyReceived = True
                         else:
                             self.error('acknowledge received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
                             continue
                     elif ackType == CRC_PACKET and self._lastSentPacketType == CRC_PACKET:
-                        # crc has been accepted by GSN
-                        self.debug('crc has been accepted for ' + filename)
-                    
                         if os.path.isfile(filename):
+                            # crc has been accepted by GSN
+                            self.debug('crc has been accepted for ' + filename)
                             # remove it from disk
                             os.remove(filename)
+                        else:
+                            self.debug('crc acknowledge for ' + filename + ' already received')
+                            alreadyReceived = True
                     else:
                         self.error('received acknowledge type >' + str(ackType) + '< does not match the sent packet type >' + str(self._lastSentPacketType) + '<')
+                        alreadyReceived = True
+                        
+                    if alreadyReceived:
                         if not self._msgdeque:
                             self._lock.acquire()
                             self._work.clear()
