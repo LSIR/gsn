@@ -210,6 +210,7 @@ public class DataDownload extends HttpServlet {
             try {
                 try {
                     result = StorageManager.getInstance().executeQuery(new StringBuilder(generated_request_query), false);
+                    //result = StorageManager.getInstance().streamedExecuteQuery(new String(generated_request_query), false);
                 } catch (SQLException e) {
                     logger.error("ERROR IN EXECUTING, query: " + generated_request_query);
                     logger.error(e.getMessage(), e);
