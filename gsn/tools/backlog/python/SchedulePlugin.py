@@ -5,11 +5,11 @@ Created on Mar 23, 2010
 '''
 
 import time
-from datetime import datetime
 import struct
 import re
 import os
 import pickle
+from datetime import datetime
 from threading import Event
 
 import BackLogMessage
@@ -132,10 +132,11 @@ class SchedulePluginClass(AbstractPluginClass):
             return
         
         
-        # Find out the current time
-        now = time.strftime('%H:%M')
-        
-        self._schedule.getNextSchedules(datetime.utcnow())
+        t = time.time()
+        nextschedules = self._schedule.getNextSchedules(datetime.utcnow())
+        self.debug('next schedules: %f s' % (time.time() - t))
+        for schedule in nextschedules:
+            self.debug('\t(' + str(schedule[0]) + ',' + str(schedule[1]) + ',' + str(schedule[2]) + ')')
                 
         self.info('died')
     
@@ -164,9 +165,6 @@ class SchedulePluginClass(AbstractPluginClass):
                 creationtime = struct.unpack('<q', message[1:9])[0]
                 self.debug('creation time: ' + str(creationtime))
                 # Get the schedule
-                self.debug('schedule length: ' + str(len(message[9:])))
-                self.debug('schedule:\n' + message[9:])
-    
                 schedule = message[9:]
                 try:
                     self._schedule = ScheduleCron(fake_tab=schedule)
@@ -199,6 +197,8 @@ class SchedulePluginClass(AbstractPluginClass):
         # TODO: next wakeup and shutdown
         pass
             
+        
+        
             
 class ScheduleCron(CronTab):
     
@@ -209,14 +209,21 @@ class ScheduleCron(CronTab):
         
     
     def getNextSchedules(self, dt):
+        schedules = []
         count = 1
         for schedule in self.crons:
             wd = dt.isoweekday()
             if wd == 7:
                 wd = 0
             
-            
             nxt = self._getNextSchedule(dt, schedule)
+            if not schedules or nxt < schedules[0][0]:
+                schedules = []
+                schedules.append((nxt, count, schedule.command))
+            elif nxt == schedules[0][0]:
+                schedules.append((nxt, count, schedule.command))
+            count += 1
+        return schedules
     
     
     def _getNextSchedule(self, dt, schedule):
