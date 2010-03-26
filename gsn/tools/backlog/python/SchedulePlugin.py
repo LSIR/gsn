@@ -331,8 +331,7 @@ class ScheduleCron(CronTab):
         result = []
         for part in cronslice.parts:
             if str(part).find("/") > 0 or str(part).find("-") > 0 or str(part).find('*') > -1:
-                for t in range(part.value_from,part.value_to+1,int(part.seq)):
-                    result.append(t)
+                result += range(part.value_from,part.value_to+1,int(part.seq))
             else:
                 result.append(part)
         return result
