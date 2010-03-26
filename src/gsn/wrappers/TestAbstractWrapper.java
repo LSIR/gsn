@@ -3,6 +3,8 @@ package gsn.wrappers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.InputStream;
@@ -29,7 +31,7 @@ public class TestAbstractWrapper {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.h2.Driver( ) );
-		StorageManager.getInstance ( ).init ( "org.h2.Driver","sa","" ,"jdbc:h2:mem:gsn_mem_db" );
+		StorageManager.getInstance ( ).init ( "org.h2.Driver","sa","" ,"jdbc:h2:mem:gsn_mem_db", Main.DEFAULT_MAX_DB_CONNECTIONS);
 //		StorageManager.getInstance ( ).initialize ( "com.mysql.jdbc.Driver","root","" , "jdbc:mysql://localhost/gsn");
 	}
 

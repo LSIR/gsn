@@ -2,6 +2,8 @@ package gsn.utils;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.storage.StorageManager;
 
@@ -20,7 +22,7 @@ public class TestValidityTools {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.h2.Driver( ) );
-		sm.init ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:." );
+		sm.init ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
 	}
 
 	@AfterClass

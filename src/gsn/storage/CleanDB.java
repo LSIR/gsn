@@ -15,7 +15,7 @@ public class CleanDB {
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
     ContainerConfig cc =Main.getContainerConfig();
     Class.forName(cc.getJdbcDriver());
-    StorageManager.getInstance ( ).init ( cc.getJdbcDriver ( ) , cc.getJdbcUsername ( ) , cc.getJdbcPassword ( ) , cc.getJdbcURL ( ) );
+    StorageManager.getInstance ( ).init ( cc.getJdbcDriver ( ) , cc.getJdbcUsername ( ) , cc.getJdbcPassword ( ) , cc.getJdbcURL ( ), Main.DEFAULT_MAX_DB_CONNECTIONS);
     ArrayList<String> tables = StorageManager.getInstance().getInternalTables();
     for (String t : tables) 
       StorageManager.getInstance().executeDropTable(t);
