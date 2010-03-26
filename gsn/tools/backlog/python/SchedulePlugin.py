@@ -5,6 +5,7 @@ Created on Mar 23, 2010
 '''
 
 import time
+from datetime import datetime
 import struct
 import re
 import os
@@ -12,6 +13,7 @@ import pickle
 from threading import Event
 
 import BackLogMessage
+from crontab import CronTab
 from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_BACKLOG = False
@@ -132,43 +134,8 @@ class SchedulePluginClass(AbstractPluginClass):
         
         # Find out the current time
         now = time.strftime('%H:%M')
-      
-        for task_time in sorted(self._schedule.iterkeys(), None, None, True):
-            if(task_time <= now):
-                # Ok, we've found our Task!
-                if self._wakeup_reason == self.WAKEUP_TYPE_SCHEDULED:
-                    pluginParamDict = self._schedule[task_time]
-                    self.info('ReverseModePlugin: Our current time is %s, so we execute the task for time %s.' % (now, task_time))
-
-                    # Iterate through the plugins and initialize 'em
-                    module = __import__('plugins')
-                    for plugin, params in pluginParamDict.iteritems():
-                        try:
-                            self.info('ReverseModePlugin: loading plugin: %s' % plugin)
-                            # fetch the plugin object from the 'plugins' module
-                            classobj = getattr(module, plugin)
-                        except AttributeError:
-                            self.error('ReverseModePlugin: could not load plugin %s: %s class does not exist in plugins.py' % (plugin, plugin))
-                            continue
-
-                        if classobj is not None:
-                            try:
-                                # instantiate the plugin
-                                plug_obj = classobj()
-                                # initialize the plugin
-                                plug_obj.initialize(parent, params)
-                                # start the plugin
-                                plug_obj.start()
-                                # append the plugin to the list for further usage
-                                parent._plugins[plugin] = plug_obj
-                                self._plugins[plugin] = plug_obj
-                            except Exception, e:
-                                self.error('ReverseModePlugin: Could not start plugin %s: %s' % (plugin, e.__str__()))
-                        else:
-                            self.error('ReverseModePlugin: could not load plugin %s' % plugin)
-
-                # All Plugins are initialized, so we don't have to iterate further through the schedule
-                break
+        
+        self._schedule.getNextSchedules(datetime.utcnow())
                 
         self.info('died')
     
@@ -198,14 +165,15 @@ class SchedulePluginClass(AbstractPluginClass):
                 self.debug('creation time: ' + str(creationtime))
                 # Get the schedule
                 self.debug('schedule length: ' + str(len(message[9:])))
-                self.debug('schedule: ' + message[9:])
+                self.debug('schedule:\n' + message[9:])
     
                 schedule = message[9:]
-                self._schedule = self._parseSchedule(schedule)
-                self.info('updated internal schedule with the one received from GSN.')
-               
-                # Write schedule to disk (the plaintext one for debugging and the parsed one for better performance)
                 try:
+                    self._schedule = ScheduleCron(fake_tab=schedule)
+                    
+                    self.info('updated internal schedule with the one received from GSN.')
+                   
+                    # Write schedule to disk (the plaintext one for debugging and the parsed one for better performance)
                     schedule_file = open(self.getOptionValue('schedule_file'), 'w')
                     schedule_file.write(schedule)
                     schedule_file.close()
@@ -216,63 +184,148 @@ class SchedulePluginClass(AbstractPluginClass):
     
                     self.info('updated %s and %s with the current schedule' % (schedule_file.name, schedule_file.name+".parsed")) 
                 except Exception, e:
-                    self.warning(e)
+                    self.error('received schedule can not be used: ' + str(e))
+                    if self._schedule:
+                        self.info('using locally stored schedule file')
     
             self._schedulereceived = True
             self._work.set()
         else:
             self.info('schedule already received')
-            
-            
-            
+        
+
+
     def _shutdown(self):
         # TODO: next wakeup and shutdown
         pass
-
-
-
-    def _parseSchedule(self, schedule):
-        '''
-        Parses the schedule file consisting of lines formatted as
-            HH:MM Plugin1:param1=value1,param2=value2 Plugin2:param3=value3 Plugin4
-        or e.g.
-            13:45 GPSPlugin:samplerate=5,duration=3600
-        and returns a dictionary like
-            {'HH:MM' => {'Plugin1'=>{'param1'=>'value1', 'param2'=>'value2'}, 'Plugin2'=>{'param3'=>'value3'}, 'Plugin4'=>{}}} 
-        '''
-        time_expr = re.compile('(\d{2}:\d{2})')
-        plugin_expr = re.compile('\s+(\w+)')
-        param_expr = re.compile('[,:](\w+)=(\w+)')
-
-        tasks = {}
-
-        scheduleLines = schedule.splitlines()
-
-        for line in scheduleLines:
-
-            plugins = {}
-            # Match the time hh:mm
-            time_match = time_expr.match(line)
-            if time_match:
-                task_time = time_match.group(1)
-                endIndex = time_match.end()
-
-                # Match the Plugin-Name
-                plugin_match = plugin_expr.match(line[endIndex:])
-                while plugin_match:
-                    pluginName = plugin_match.group(1)
-                    plugins[pluginName] = {}
-                    endIndex += plugin_match.end(0)
-    
-                    # Match the Parameter Names
-                    param_match = param_expr.match(line[endIndex:])
-                    while param_match:
-                        plugins[pluginName][param_match.group(1)] = param_match.group(2)
-                        endIndex += param_match.end()
-                        param_match = param_expr.match(line[endIndex:])
-                        
-                    plugin_match = plugin_expr.match(line[endIndex:])
             
-            tasks[task_time] = plugins
-
-        return tasks
+            
+class ScheduleCron(CronTab):
+    
+    def __init__(self, user=None, fake_tab=None):
+        CronTab.__init__(self, user, fake_tab)
+        for schedule in self.crons:
+            self._scheduleSanityCheck(schedule)
+        
+    
+    def getNextSchedules(self, dt):
+        count = 1
+        for schedule in self.crons:
+            wd = dt.isoweekday()
+            if wd == 7:
+                wd = 0
+            
+            
+            nxt = self._getNextSchedule(dt, schedule)
+    
+    
+    def _getNextSchedule(self, dt, schedule):
+        second = 0
+        year = dt.year
+            
+        firsttimenottoday = True
+        stop = False
+        while not stop:
+            for month in self._getRange(schedule.month()):
+                for day in self._getRange(schedule.dom()):
+                    for weekday in self._getRange(schedule.dow()):
+                        try:
+                            nextdatetime = datetime(year, month, day)
+                        except ValueError:
+                            continue
+                        
+                        wd = weekday
+                        if wd == 0:
+                            wd = 7
+                        
+                        if nextdatetime < datetime(dt.year, dt.month, dt.day) or wd != nextdatetime.isoweekday():
+                            continue
+                        
+                        if nextdatetime < datetime(dt.year, dt.month, dt.day+1):
+                            for hour in self._getRange(schedule.hour()):
+                                for minute in self._getRange(schedule.minute()):
+                                    nextdatetime = datetime(year, month, day, hour, minute)
+                                    if nextdatetime < dt:
+                                        continue
+                                    stop = True
+                                    break
+                                if stop:
+                                    break
+                        elif firsttimenottoday:
+                            minute = self._getFirst(schedule.minute())
+                            hour = self._getFirst(schedule.hour())
+                            firsttimenottoday = False
+                            stop = True
+                        break
+                    if stop:
+                        break
+                if stop:
+                    break
+            if stop:
+                break
+            else:          
+                year += 1
+        
+        return datetime(year, month, day, hour, minute)
+    
+    
+    def _scheduleSanityCheck(self, schedule):
+        try:
+            self._scheduleSanityCheckHelper(schedule.minute(), 0, 59)
+            self._scheduleSanityCheckHelper(schedule.hour(), 0, 23)
+            self._scheduleSanityCheckHelper(schedule.dow(), 0, 7)
+            self._scheduleSanityCheckHelper(schedule.month(), 1, 12)
+            self._scheduleSanityCheckHelper(schedule.dom(), 1, 31)
+        except ValueError, e:
+            raise ValueError(str(e) + ' in >' + str(schedule) + '<')
+        
+        
+    def _scheduleSanityCheckHelper(self, cronslice, min, max):
+        for part in cronslice.parts:
+            if str(part).find("/") > 0 or str(part).find("-") > 0 or str(part).find('*') > -1:
+                if part.value_to > max or part.value_from < min:
+                    raise ValueError('Invalid value ' + str(part))
+            else:
+                if part > max or part < min:
+                    raise ValueError('Invalid value ' + str(part))
+        
+    
+    
+    def _getFirst(self, cronslice):
+        smallestPart = None
+        for part in cronslice.parts:
+            if str(part).find("/") > 0 or str(part).find("-") > 0 or str(part).find('*') > -1:
+                smallestPart = part.value_from
+            else:
+                if not smallestPart or part < smallestPart:
+                    smallestPart = part
+        return smallestPart
+        
+    
+    
+#    def _getNext(self, time, cronslice):
+#        closestPart = None
+#        for part in cronslice.parts:
+#            if str(part).find("/") > 0 or str(part).find("-") > 0 or str(part).find('*') > -1:
+#                for t in range(part.value_from,part.value_to+1,int(part.seq)):
+#                    if t >= time and (not closestPart or t < closestPart):
+#                        closestPart = t
+#            else:
+#                if part >= time and (not closestPart or part < closestPart):
+#                    closestPart = part
+#        
+#        if not closestPart:
+#            return (self._getFirst(cronslice), True)
+#        else:
+#            return (closestPart, False)
+    
+    
+    def _getRange(self, cronslice):
+        result = []
+        for part in cronslice.parts:
+            if str(part).find("/") > 0 or str(part).find("-") > 0 or str(part).find('*') > -1:
+                for t in range(part.value_from,part.value_to+1,int(part.seq)):
+                    result.append(t)
+            else:
+                result.append(part)
+        return result
