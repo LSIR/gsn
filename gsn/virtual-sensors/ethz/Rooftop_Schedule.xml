@@ -8,7 +8,9 @@
         	</command>
    		</web-input>
        	<output-structure>
-			<field name="SCHEDULE" type="BINARY" />
+			<field name="CREATION_TIME" type="BIGINT" />
+			<field name="TRANSMISSION_TIME" type="BIGINT" />
+			<field name="SCHEDULE" type="binary" />
        	</output-structure>
     </processing-class>
     <description>schedules for Rooftop deployment</description>
@@ -27,3 +29,4 @@
         </stream>
     </streams>
 </virtual-sensor>
+

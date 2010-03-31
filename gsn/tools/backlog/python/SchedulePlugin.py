@@ -8,6 +8,7 @@ import time
 import struct
 import re
 import os
+import signal
 import pickle
 import subprocess
 from datetime import datetime, timedelta
@@ -77,6 +78,7 @@ class SchedulePluginClass(AbstractPluginClass):
         self._gsnconnected = False
         self._schedulereceived = False
         self._schedule = None
+        self._newSchedule = False
         self._stopped = False
         
         address = self.getOptionValue('tos_source_addr')
@@ -139,6 +141,9 @@ class SchedulePluginClass(AbstractPluginClass):
         
     def run(self):
         self.info('started')
+        
+        if self._shutdown_mode:
+            self._serialsource.start()
 
         # wait some time for GSN to connect
         if self.isGSNConnected():
@@ -179,10 +184,14 @@ class SchedulePluginClass(AbstractPluginClass):
                 self.info('died')
                 return
             else:
+                self.info('no schedule available at yet -> waiting for a schedule')
                 self._scheduleEvent.wait()
         
         dtnow = None
-        firstloop = True
+        if self._shutdown_mode:
+            lookback = True
+        else:
+            lookback = False
         stop = False
         service_time = timedelta()
         while not stop and not self._stopped:
@@ -196,9 +205,9 @@ class SchedulePluginClass(AbstractPluginClass):
             if not self._shutdown_mode:
                 self._scheduleLock.acquire()
             t = time.time()
-            nextschedules = self._schedule.getNextSchedules(dtnow, firstloop)
+            nextschedules = self._schedule.getNextSchedules(dtnow, lookback)
             self.debug('next schedule: %f s' % (time.time() - t))
-            firstloop = False
+            lookback = False
             if not self._shutdown_mode:
                 self._scheduleLock.release()
             
@@ -228,7 +237,9 @@ class SchedulePluginClass(AbstractPluginClass):
                     else:
                         self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400) + ' seconds')
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400)
-                        if self._stopped:
+                        if self._stopped or self._newSchedule:
+                            self._newSchedule = False
+                            self._stopEvent.clear()
                             break
                 
                 try:
@@ -281,9 +292,10 @@ class SchedulePluginClass(AbstractPluginClass):
                 # Get the schedule
                 schedule = message[9:]
                 try:
+                    sc = ScheduleCron(fake_tab=schedule)
                     if not self._shutdown_mode:
                         self._scheduleLock.acquire()
-                    self._schedule = ScheduleCron(fake_tab=schedule)
+                        self._schedule = sc
                     if not self._shutdown_mode:
                         self._scheduleLock.release()
                     
@@ -304,8 +316,12 @@ class SchedulePluginClass(AbstractPluginClass):
                     if self._schedule:
                         self.info('using locally stored schedule file')
     
-            if not self._schedule and self._schedulereceived and not self._shutdown_mode:
-                return
+            if self._schedulereceived and not self._shutdown_mode:
+                if not self._schedule:
+                    return
+                else:
+                    self._newSchedule = True
+                    self._stopEvent.set()
             
             self._schedulereceived = True
             self._scheduleEvent.set()
@@ -328,6 +344,8 @@ class SchedulePluginClass(AbstractPluginClass):
         while not resp_packet:
             self._serialsource.write(packet, self.AM_CONTROL_CMD_MSG)
             resp_packet = self._serialsource.read(1)
+            if self._stopped:
+                return -1
 
         response = tos.Packet(self.TOS_CMD_STRUCTURE, resp_packet['data'])
         if response['command'] == cmd:
@@ -343,7 +361,6 @@ class SchedulePluginClass(AbstractPluginClass):
         next_service_wakeup = sc.getNextSchedules(now, True)[0][0]
         if next_service_wakeup < now + self._max_next_schedule_wait_delta:
             td = (next_service_wakeup + timedelta(minutes=int(self.getOptionValue('service_wakeup_minutes')))) - now
-        self.debug('rest of service time: ' + str(td.seconds/60.0 + td.days * 1440.0) + ' minutes')
         return td
         
 
@@ -359,13 +376,24 @@ class SchedulePluginClass(AbstractPluginClass):
         sc = ScheduleCron(fake_tab=(self.getOptionValue('service_wakeup_schedule')+' no_script'))
         time_delta = sc.getNextSchedules(now)[0][0] - datetime.utcnow()
         time_to_service = time_delta.seconds + time_delta.days * 86400
-        self.debug('next service window is in ' + str(time_to_service/60.0) + ' minutes')
+        self.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
         if self._getCmdResponse(self.CMD_SERVICE_WINDOW, time_to_service) == time_to_service:
             self.info('ReverseModePlugin: Successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' minutes)')
 
-        # Get Wakeup Type
-        self._wakeup_reason = self._getCmdResponse(self.CMD_WAKEUP_QUERY)
-        self.info("ReverseModePlugin: TinyNode woke me up for reason code "+str(self._wakeup_reason))
+        # Schedule next wakeup
+        if self._schedule:
+            time_delta = self._schedule.getNextSchedules(now)
+            time_to_wakeup = time_delta.seconds + time_delta.days * 86400
+            if self._getCmdResponse(self.CMD_NEXT_WAKEUP, time_to_wakeup) == time_to_wakeup:
+                self.info("ReverseModePlugin: Successfully scheduled the next duty wakeup for "+self._nextTaskTime+" (that\'s in "+str(time_to_wakeup)+" seconds)")
+
+        # Tell TinyNode to shut us down in X seconds
+#        shutdown_offset = int(self.getPluginOption('reverse_mode_shutdown_offset'))
+#        if(self._getCmdResponse(self.CMD_SHUTDOWN, shutdown_offset) == shutdown_offset):
+#            self.info('ReverseModePlugin: We\'re going to be shut down in '+str(shutdown_offset)+'sec...')
+
+        # Terminate PSBacklog by sending our own process a SIGINT
+        os.kill(os.getpid(), signal.SIGINT)
             
         
         
