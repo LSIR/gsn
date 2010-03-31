@@ -10,7 +10,8 @@
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
-		
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+
 	<script type="text/javascript" src="js/constants.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
 	
@@ -20,10 +21,16 @@
 
 var initialUpdateVal = 600;
 var nextUpdateVal = initialUpdateVal;
+var deployments = new Array();
 
-function updateTopology()
+function updateHealth()
 {
-	window.location.reload();
+	var d = new Date();
+	for (var i in deployments) {
+	    $("#health_"+deployments[i]).find("img").each(function() {
+	      $(this).attr('src',$(this).attr("src").split("?")[0]+"?date="+ d.getTime());
+	    });
+	}
 }
 
 function nextUpdate()
@@ -36,7 +43,7 @@ function nextUpdate()
 	
 	if(nextUpdateVal==0) 
 	{
-		updateTopology();
+		updateHealth();
 	}
 	setTimeout("nextUpdate()",1000);
 }
@@ -50,7 +57,71 @@ $(document).ready(function() {
 	$("#nextUpdate").text(nextUpdateVal);
 	setTimeout("nextUpdate()",1000);
 	
+	// deployments
+	// load deployments
+	$.ajax({
+	      type: "GET",
+	      url: "/gsn",
+	      success: function(data){
+		var arraySize = 0;
+		$("virtual-sensor",data).each(function(){
+		    var deploymentname = $(this).attr("name").split("_", 1)[0];
+		    if(deploymentname.length > 1) {
+			deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
+			if ($.inArray(deploymentname, deployments) < 0) {
+			    deployments.push(deploymentname);
+			}
+		    }
+		});
+		// display
+		var visible;
+		if ($.inArray($.cookie("deployment"), deployments)>-1)
+		  visible = $.cookie("deployment");
+		else
+		  visible = deployments[0];
+		for (var i in deployments) {
+		    // add tab
+		    $("#deployment_menu").append($.LI({}, $.A({
+			"id":"deployment_menu_item_"+deployments[i],
+			"href":"javascript:showHealth("+i+")"
+		    },deployments[i])));
+		    // add div
+		    $("#healthcontainer").append(
+			$.DIV({
+			    "id":"health_"+deployments[i]
+			      },
+			  $.P({},
+			  $.IMG({
+			    "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_V12DCIN.png"
+			  })),
+			  $.P({},
+			  $.IMG({
+			    "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_BasestationTemperature.png"
+			  })),
+			  $.P({},
+			  $.IMG({
+			    "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_BasestationHumidity.png"
+			  }))
+			));
+		    if (deployments[i]!=visible)
+			$("#health_"+deployments[i]).hide();
+		    else
+			$("#deployment_menu_item_"+deployments[i]).addClass("selected");
+		}
+		updateHealth();
+	      }
+	});	
 });	
+
+function showHealth(id) {
+  for (var i in deployments) {
+      $("#health_"+deployments[i]).hide();
+      $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
+  }
+  $("#health_"+deployments[id]).show();
+  $("#deployment_menu_item_"+deployments[id]).addClass("selected");
+  $.cookie("deployment" , deployments[id]);
+}	
 //]]>-->
 </script>
 </head>
@@ -84,17 +155,17 @@ $(document).ready(function() {
 	
 	
 	<div id="maindiv">
-	
+
+		<div id="deployment_navigation">
+		<ul id="deployment_menu">
+		</ul>
+		</div>	
+		
 		<p id="updatetext">next update in <span id="nextUpdate">??</span> seconds</p>
 
-		<p>&nbsp;</p>
-	
-		<p>Matterhorn Basestation</p>
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_V12DCIN.png"/></p>
-                <p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_BasestationTemperature.png"/></p>
-                <p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_BasestationHumidity.png"/></p>
-
-		<p>Matterhorn Weatherstation</p>
+		<div id="healthcontainer"></div>
+		
+		<!-- <p>Matterhorn Weatherstation</p>
 		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Voltages.png"/></p>
 	        <p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Humidity.png"/></p>
 	        <p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Temperature.png"/></p> 
@@ -103,7 +174,7 @@ $(document).ready(function() {
 		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Hail.png"/></p>
 		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Winddirection.png"/></p>
 		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Windspeed.png"/></p>
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/rose_matterhorn_Winddirection.png"/></p>
+		<p><img src="http://people.ee.ethz.ch/~perma/plots/rose_matterhorn_Winddirection.png"/></p> -->
 	</div>
 	<div class="separator">
 		<div id="footer">

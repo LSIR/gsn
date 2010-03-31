@@ -10,6 +10,7 @@
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>
 		
 	<script type="text/javascript" src="js/constants.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
@@ -72,10 +73,15 @@ $(document).ready(function() {
 		    }
 		});
 		// display
+		var visible;
+		if ($.inArray($.cookie("deployment"), deployments)>-1)
+		  visible = $.cookie("deployment");
+		else
+		  visible = deployments[0];
 		for (var i in deployments) {
 		    // add tab
 		    $("#deployment_menu").append($.LI({}, $.A({
-			"id":"topology_menu_"+deployments[i],
+			"id":"deployment_menu_item_"+deployments[i],
 			"href":"javascript:showTopology("+i+")"
 		    },deployments[i])));
 		    // add div
@@ -86,10 +92,10 @@ $(document).ready(function() {
 			$.IMG({
 			    "id":"topology_img_"+deployments[i]
 			})));
-		    if (i>0)
+		    if (deployments[i]!=visible)
 			$("#topology_"+deployments[i]).hide();
 		    else
-			$("#topology_menu_"+deployments[i]).addClass("selected");
+			$("#deployment_menu_item_"+deployments[i]).addClass("selected");
 		}
 		updateTopology();
 	      }
@@ -99,73 +105,14 @@ $(document).ready(function() {
 function showTopology(id) {
   for (var i in deployments) {
       $("#topology_"+deployments[i]).hide();
-      $("#topology_menu_"+deployments[i]).removeClass("selected");
+      $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
   }
   $("#topology_"+deployments[id]).show();
-  $("#topology_menu_"+deployments[id]).addClass("selected");
+  $("#deployment_menu_item_"+deployments[id]).addClass("selected");
+  $.cookie("deployment" , deployments[id]);
 }
 //]]>-->
 </script>
-<style type="text/css">
-<!--
-#deployment_navigation #deployment_menu li {
-border-right:1px solid #FFFFFF;
-float:left;
-list-style-type:none;
-white-space:nowrap;
-}
-
-#deployment_navigation {
--moz-background-clip:border;
--moz-background-inline-policy:continuous;
--moz-background-origin:padding;
-background:#5CA1E7 none repeat scroll 0 0;
-color:#9E9E9E;
-height:2.2em;
-line-height:2.2em;
-margin:0;
-padding:0;
-border-top-width:0.1em;
-border-bottom-width:0.1em;
-border-left-width:0.1;
-border-right-width:0;
-border-style:solid;
-border-color:#5CA1E7;
-}
-
-#deployment_navigation #deployment_menu{
-margin:0;
-padding:0;
-}
-
-#deployment_navigation li a {
-background-color:inherit;
-color:#000000;
-display:block;
-font-size:0.8em;
-font-weight:bolder;
-padding:0 8px;
-text-decoration:none;
-text-transform:uppercase;
-}
-
-#deployment_navigation .selected {
--moz-background-clip:border;
--moz-background-inline-policy:continuous;
--moz-background-origin:padding;
-background:#FFFFFF none repeat scroll 0 0;
-color:#000000;
-text-decoration:none;
-}
-
-#deployment_navigation a:hover
-{
-	background:#b8caf7; /*#ff6f00;*/
-	color:#000000;
-	text-decoration:none;
-}
--->
-</style>
 </head>
 <body>
 
