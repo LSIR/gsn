@@ -964,3 +964,61 @@ div.full-page {
     height: 1.4em;
     background: #e6e6e6 url(/img/datepicker/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x;
 }
+
+/* deployments */
+#deployment_navigation #deployment_menu li {
+border-right:1px solid #FFFFFF;
+float:left;
+list-style-type:none;
+white-space:nowrap;
+}
+
+#deployment_navigation {
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background:#5CA1E7 none repeat scroll 0 0;
+color:#9E9E9E;
+height:2.2em;
+line-height:2.2em;
+margin:0;
+padding:0;
+border-top-width:0.1em;
+border-bottom-width:0.1em;
+border-left-width:0.1;
+border-right-width:0;
+border-style:solid;
+border-color:#5CA1E7;
+}
+
+#deployment_navigation #deployment_menu{
+margin:0;
+padding:0;
+}
+
+#deployment_navigation li a {
+background-color:inherit;
+color:#000000;
+display:block;
+font-size:0.8em;
+font-weight:bolder;
+padding:0 8px;
+text-decoration:none;
+text-transform:uppercase;
+}
+
+#deployment_navigation .selected {
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background:#FFFFFF none repeat scroll 0 0;
+color:#000000;
+text-decoration:none;
+}
+
+#deployment_navigation a:hover
+{
+	background:#b8caf7; /*#ff6f00;*/
+	color:#000000;
+	text-decoration:none;
+}
