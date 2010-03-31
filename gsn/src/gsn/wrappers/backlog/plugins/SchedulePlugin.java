@@ -96,8 +96,26 @@ public class SchedulePlugin extends AbstractPlugin {
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("schedule") == 0) {
 					long time = System.currentTimeMillis();
-					Serializable[] data = {time, null, decode(((String)paramValues[i]).toCharArray())};
-					dataProcessed(time, data);
+					byte [] schedule = decode(((String)paramValues[i]).toCharArray());
+					
+					byte [] pkt = new byte [schedule.length + 9];
+					pkt[0] = TYPE_NEW_SCHEDULE;
+					System.arraycopy(long2arr(time), 0, pkt, 1, 8);
+					System.arraycopy(schedule, 0, pkt, 9, schedule.length);
+					boolean sent = false;
+					try {
+						sent = sendRemote(System.currentTimeMillis(), pkt);
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
+					}
+					if (sent) {
+						Serializable[] data = {time, time, schedule};
+						dataProcessed(time, data);
+					}
+					else {
+						Serializable[] data = {time, null, schedule};
+						dataProcessed(time, data);
+					}
 				}
 			}
 		}

@@ -9,13 +9,12 @@ import struct
 import re
 import os
 import pickle
-import shlex
 import subprocess
 from datetime import datetime, timedelta
-from threading import Event
+from threading import Event, Lock
 
 import BackLogMessage
-#import tos
+import tos
 from crontab import CronTab
 from AbstractPlugin import AbstractPluginClass
 
@@ -68,8 +67,11 @@ class SchedulePluginClass(AbstractPluginClass):
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
         
+        # TODO: sanity check for configuration options
+        
         self._connectionEvent = Event()
         self._scheduleEvent = Event()
+        self._scheduleLock = Lock()
         self._stopEvent = Event()
         
         self._gsnconnected = False
@@ -82,19 +84,34 @@ class SchedulePluginClass(AbstractPluginClass):
         if address is None:
             raise TypeError('tos_source_addr not specified in config file')
 
-        # Initialize the serial source to the TinyNode
-        
-        # split the address (it should have the form serial@port:baudrate)
-#        source = address.split('@')
-#        if source[0] == 'serial':
-#            try:
-#                # try to open a connection to the specified serial port
-#                serial = tos.getSource(address, debug)
-#                self._serialsource = tos.AM(serial)
-#            except Exception, e:
-#                raise TypeError('could not initialize serial source: ' + e.__str__())
-#        else:
-#            raise TypeError('address type must be serial')
+        debug = self.getOptionValue('debug')
+        if debug is not None and debug == '1':
+            debug = True
+        else:
+            debug = False
+            
+        shutdown_mode = self.getOptionValue('shutdown_mode')
+        if shutdown_mode is not None and shutdown_mode == '1':
+            self.info('running in shutdown mode')
+            self._shutdown_mode = True
+        else:
+            self.info('not running in shutdown mode')
+            self._shutdown_mode = False
+            
+        if self._shutdown_mode:
+            # Initialize the serial source to the TinyNode
+    
+            # split the address (it should have the form serial@port:baudrate)
+            source = address.split('@')
+            if source[0] == 'serial':
+                try:
+                    # try to open a connection to the specified serial port
+                    serial = tos.getSource(address, debug)
+                    self._serialsource = tos.AM(serial)
+                except Exception, e:
+                    raise TypeError('could not initialize serial source: ' + e.__str__())
+            else:
+                raise TypeError('address type must be serial')
         
         if os.path.isfile(self.getOptionValue('schedule_file')+'.parsed'):
             try:
@@ -127,7 +144,7 @@ class SchedulePluginClass(AbstractPluginClass):
         if self.isGSNConnected():
             self._gsnconnected = True
         else:
-            self.info('waiting for gsn to connect')
+            self.info('waiting for gsn to connect for a maximum of ' + self.getOptionValue('max_gsn_connect_wait_minutes') + ' minutes')
             self._connectionEvent.wait((int(self.getOptionValue('max_gsn_connect_wait_minutes')) * 60))
             self._connectionEvent.clear()
             if self._stopped:
@@ -137,6 +154,7 @@ class SchedulePluginClass(AbstractPluginClass):
         # if GSN is connected try to get a new schedule for a while
         if self._gsnconnected:
             timeout = 0
+            self.info('waiting for gsn to answer a schedule request for a maximum of ' + self.getOptionValue('max_gsn_get_schedule_wait_minutes') + ' minutes')
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
                 self.info('request schedule from gsn')
                 self.processMsg(self.getTimeStamp(), struct.pack('<B', self.GSN_TYPE_GET_SCHEDULE))
@@ -148,22 +166,26 @@ class SchedulePluginClass(AbstractPluginClass):
                     break
                 timeout += 3
             
-            if timeout >= int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')):
+            if timeout >= int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
                 self.warning('gsn has not answered on any schedule request')
         else:
             self.warning('gsn has not connected')
         
         # if there is no schedule at all shutdown again and wait for next service window  
         if not self._schedule:
-            self.warning('no schedule available at all -> shutdown')
-            self._shutdown()
-            self.info('died')
-            return
+            if self._shutdown_mode:
+                self.warning('no schedule available at all -> shutdown')
+                self._shutdown()
+                self.info('died')
+                return
+            else:
+                self._scheduleEvent.wait()
         
         dtnow = None
         firstloop = True
         stop = False
-        while not stop:
+        service_time = timedelta()
+        while not stop and not self._stopped:
             if dtnow and dtnow.second == datetime.utcnow().second:
                 dtnow = datetime.utcnow()
                 dtnow += timedelta(seconds=1)
@@ -171,30 +193,46 @@ class SchedulePluginClass(AbstractPluginClass):
                 dtnow = datetime.utcnow()
             
             # get the next schedule(s) in time
+            if not self._shutdown_mode:
+                self._scheduleLock.acquire()
             t = time.time()
             nextschedules = self._schedule.getNextSchedules(dtnow, firstloop)
             self.debug('next schedule: %f s' % (time.time() - t))
             firstloop = False
+            if not self._shutdown_mode:
+                self._scheduleLock.release()
             
             for schedule in nextschedules:
                 self.debug('(' + str(schedule[0]) + ',' + str(schedule[1]) + ')')
                 dtnow = datetime.utcnow()
                 timediff = schedule[0] - dtnow
-                args = shlex.split(schedule[1])
-                if schedule[0] <= dtnow:
-                    self.debug('start >' + schedule[1] + '< now')
-                elif timediff < self._max_next_schedule_wait_delta:
-                    self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400) + ' seconds')
-                    self._stopEvent.wait(timediff.seconds + timediff.days * 86400)
-                    if self._stopped:
+                if self._shutdown_mode:
+                    service_time = self._serviceTime()
+                    if schedule[0] <= dtnow:
+                        self.debug('start >' + schedule[1] + '< now')
+                    elif timediff < (self._max_next_schedule_wait_delta + service_time):
+                        self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400) + ' seconds')
+                        self._stopEvent.wait(timediff.seconds + timediff.days * 86400)
+                        if self._stopped:
+                            break
+                    else:
+                        if service_time <= self._max_next_schedule_wait_delta:
+                            self.debug('nothing more to do in the next ' + self.getOptionValue('max_next_schedule_wait_minutes') + ' minutes (max_next_schedule_wait_minutes)')
+                        else:
+                            self.debug('nothing more to do in the next ' + str(service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes'))) + ' minutes (rest of service time plus max_next_schedule_wait_minutes)')
+                        stop = True
                         break
                 else:
-                    self.debug('nothing more to do in the next ' + self.getOptionValue('max_next_schedule_wait_minutes') + ' minutes (max_next_schedule_wait_minutes)')
-                    stop = True
-                    break
+                    if schedule[0] <= datetime.utcnow():
+                        self.debug('start >' + schedule[1] + '< now')
+                    else:
+                        self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400) + ' seconds')
+                        self._stopEvent.wait(timediff.seconds + timediff.days * 86400)
+                        if self._stopped:
+                            break
                 
                 try:
-                    proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    proc = subprocess.Popen(schedule[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 except Exception, e:
                     self.error('error in schedule script >' + schedule[1] + '<:' + str(e))
                 else:
@@ -207,7 +245,8 @@ class SchedulePluginClass(AbstractPluginClass):
                     if ret != 0:
                         self.error('return code from schedule script >' + schedule[1] + '< is ' + str(ret))
                     
-        self._shutdown()
+        if self._shutdown_mode:
+            self._shutdown(service_time)
                 
         self.info('died')
     
@@ -217,7 +256,8 @@ class SchedulePluginClass(AbstractPluginClass):
         self._connectionEvent.set()
         self._scheduleEvent.set()
         self._stopEvent.set()
-        self._serialsource.stop()
+        if self._shutdown_mode:
+            self._serialsource.stop()
         self.info('stopped')
 
 
@@ -226,7 +266,7 @@ class SchedulePluginClass(AbstractPluginClass):
         Try to interpret a new received Config-Message from GSN
         '''
 
-        if not self._schedulereceived:
+        if not self._schedulereceived or not self._shutdown_mode:
             # Is the Message filled with content or is it just an emty response?
             pktType = struct.unpack('B', message[0])[0]
             if pktType == self.GSN_TYPE_NO_SCHEDULE_AVAILABLE:
@@ -241,7 +281,11 @@ class SchedulePluginClass(AbstractPluginClass):
                 # Get the schedule
                 schedule = message[9:]
                 try:
+                    if not self._shutdown_mode:
+                        self._scheduleLock.acquire()
                     self._schedule = ScheduleCron(fake_tab=schedule)
+                    if not self._shutdown_mode:
+                        self._scheduleLock.release()
                     
                     self.info('updated internal schedule with the one received from GSN.')
                    
@@ -260,6 +304,9 @@ class SchedulePluginClass(AbstractPluginClass):
                     if self._schedule:
                         self.info('using locally stored schedule file')
     
+            if not self._schedule and self._schedulereceived and not self._shutdown_mode:
+                return
+            
             self._schedulereceived = True
             self._scheduleEvent.set()
         else:
@@ -275,7 +322,7 @@ class SchedulePluginClass(AbstractPluginClass):
 
         @return the response's argument on success and -1 on fail
         '''
-        packet = tosPlugPacket.tos.Packet(self.TOS_CMD_STRUCTURE, [cmd, argument])
+        packet = tos.Packet(self.TOS_CMD_STRUCTURE, [cmd, argument])
 
         resp_packet = None
         while not resp_packet:
@@ -288,23 +335,29 @@ class SchedulePluginClass(AbstractPluginClass):
         else:
             return -1
         
-
-
-    def _shutdown(self):
+        
+    def _serviceTime(self):
+        td = timedelta()
         now = datetime.utcnow()
         sc = ScheduleCron(fake_tab=(self.getOptionValue('service_wakeup_schedule') + ' ' + self.BACKWARD_LOOK_NAME + '=' + self.getOptionValue('service_wakeup_minutes')))
         next_service_wakeup = sc.getNextSchedules(now, True)[0][0]
         if next_service_wakeup < now + self._max_next_schedule_wait_delta:
             td = (next_service_wakeup + timedelta(minutes=int(self.getOptionValue('service_wakeup_minutes')))) - now
-            waitfor = td.seconds + td.days * 86400 + 1
+        self.debug('rest of service time: ' + str(td.seconds/60.0 + td.days * 1440.0) + ' minutes')
+        return td
+        
+
+
+    def _shutdown(self, sleepdelta=timedelta()):
+        now = datetime.utcnow()
+        if now + sleepdelta > now:
+            waitfor = sleepdelta.seconds + sleepdelta.days * 86400 + 1
             self.info('waiting ' + str(waitfor/60.0) + ' minutes for service windows to finish')
             self._stopEvent.wait(waitfor)
-            now = datetime.utcnow()
-            next_service_wakeup = sc.getNextSchedules(now)[0]
-            #TODO: next schedule could be soon...
         
         # Syncronize Service Wakeup Time
-        time_delta = next_service_wakeup - now
+        sc = ScheduleCron(fake_tab=(self.getOptionValue('service_wakeup_schedule')+' no_script'))
+        time_delta = sc.getNextSchedules(now)[0][0] - datetime.utcnow()
         time_to_service = time_delta.seconds + time_delta.days * 86400
         self.debug('next service window is in ' + str(time_to_service/60.0) + ' minutes')
         if self._getCmdResponse(self.CMD_SERVICE_WINDOW, time_to_service) == time_to_service:
@@ -375,7 +428,14 @@ class ScheduleCron(CronTab):
                         if nextdatetime < datetime(date_time.year, date_time.month, date_time.day) or wd != nextdatetime.isoweekday():
                             continue
                         
-                        if nextdatetime < datetime(date_time.year, date_time.month, date_time.day+1):
+                        try:
+                            dt = datetime(date_time.year, date_time.month, date_time.day+1)
+                        except ValueError:
+                            try:
+                                dt = datetime(date_time.year, date_time.month+1, 1)
+                            except ValueError:
+                                dt = datetime(date_time.year+1, 1, 1)
+                        if nextdatetime < dt:
                             for hour in self._getRange(schedule.hour()):
                                 for minute in self._getRange(schedule.minute()):
                                     nextdatetime = datetime(year, month, day, hour, minute)
@@ -434,24 +494,6 @@ class ScheduleCron(CronTab):
                 if not smallestPart or part < smallestPart:
                     smallestPart = part
         return smallestPart
-        
-    
-    
-#    def _getNext(self, time, cronslice):
-#        closestPart = None
-#        for part in cronslice.parts:
-#            if str(part).find("/") > 0 or str(part).find("-") > 0 or str(part).find('*') > -1:
-#                for t in range(part.value_from,part.value_to+1,int(part.seq)):
-#                    if t >= time and (not closestPart or t < closestPart):
-#                        closestPart = t
-#            else:
-#                if part >= time and (not closestPart or part < closestPart):
-#                    closestPart = part
-#        
-#        if not closestPart:
-#            return (self._getFirst(cronslice), True)
-#        else:
-#            return (closestPart, False)
     
     
     def _getRange(self, cronslice):
