@@ -68,8 +68,8 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 				query+= " timed > ? order by timed asc ";
 				PreparedStatement prepareStatement = null;
 				try {
-					prepareStatement = db.prepareStatement(query);
-					prepareStatement.setFetchSize(1);
+					prepareStatement = db.prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
+					prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
 				}catch (Exception e) {
 					throw new RuntimeException(e);
 				}
