@@ -34,6 +34,7 @@ Rooftop_DozerRssi_mapped.xml
 Rooftop_DozerRssi_muxed_mapped.xml
 Rooftop_DozerStateCounter.xml
 Rooftop_DozerStateCounter_mapped.xml
+Rooftop_Schedule.xml
 Rooftop_Webcam_from_BigBinary_scaled.xml
 ETZG_BigBinary.xml
 ETZG_BackLogStatus.xml
@@ -75,6 +76,7 @@ ETZG_DozerRssi_mapped.xml
 ETZG_DozerRssi_muxed_mapped.xml
 ETZG_DozerStateCounter.xml
 ETZG_DozerStateCounter_mapped.xml
+ETZG_Schedule.xml
 ETZG_Webcam_from_BigBinary_scaled.xml
 ETZG_DozerCommand.xml
 ETZG_DozerDecagonMux_conv.xml
