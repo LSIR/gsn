@@ -255,6 +255,10 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         else:
                             self.error('acknowledge received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
                             continue
+                    elif ackType == CHUNK_PACKET and self._lastSentPacketType == CRC_PACKET:
+                        chkNr = int(struct.unpack('<I', message[2:6])[0])
+                        self.info('acknowledge for chunk number >' + str(chkNr) + '< already received')
+                        alreadyReceived = True
                     elif ackType == CRC_PACKET and self._lastSentPacketType == CRC_PACKET:
                         if os.path.isfile(filename):
                             # crc has been accepted by GSN
@@ -264,6 +268,9 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         else:
                             self.debug('crc acknowledge for ' + filename + ' already received')
                             alreadyReceived = True
+                    elif ackType == CRC_PACKET and self._lastSentPacketType == INIT_PACKET:
+                        self.info('acknowledge for crc packet already received')
+                        alreadyReceived = True
                     else:
                         self.error('received acknowledge type >' + str(ackType) + '< does not match the sent packet type >' + str(self._lastSentPacketType) + '<')
                         alreadyReceived = True
@@ -328,11 +335,11 @@ class BigBinaryPluginClass(AbstractPluginClass):
                         self.debug('file: ' + filename)
                         
                         try:
-                            # open the specified file
-                            self._filedescriptor = open(filename, 'rb')
-                            os.chmod(filename, 0444)
-                            
                             if downloaded > 0:
+                                # open the specified file
+                                self._filedescriptor = open(filename, 'rb')
+                                os.chmod(filename, 0444)
+                                
                                 # recalculate the crc
                                 sizecalculated = 0
                                 crc = None
@@ -355,14 +362,13 @@ class BigBinaryPluginClass(AbstractPluginClass):
                                 if crc != gsnCRC:
                                     self.warning('crc received from gsn >' + str(gsnCRC) + '< does not match local one >' + str(crc) + '< -> resend complete binary')
                                     os.chmod(filename, 0744)
-                                    self._filedeque.appendleft(filename)
+                                    self._filedeque.append(filename)
                                     self._filedescriptor.close()
                                 else:
                                     self.debug('crc received from gsn matches local one -> resend following part of binary')
                             else:
                                 # resend the whole binary
-                                crc = None
-                                chunkNumber = 0
+                                self._filedeque.append(filename)
                         except IOError, e:
                             self.warning(e)
                     
