@@ -46,6 +46,7 @@ class SchedulePluginClass(AbstractPluginClass):
     CMD_NEXT_WAKEUP = 3
     CMD_SHUTDOWN = 4
     CMD_NET_STATUS = 5
+    CMD_WATCHDOG = 6
 
     # The wakeup types
     WAKEUP_TYPE_SCHEDULED = 0
@@ -77,6 +78,7 @@ class SchedulePluginClass(AbstractPluginClass):
         self._scheduleLock = Lock()
         self._stopEvent = Event()
         self._allJobsFinishedEvent = Event()
+        self._allJobsFinishedEvent.set()
         
         self._jobsObserver = JobsObserver(self, int(self.getOptionValue('max_default_job_runtime_minutes')))
         self._gsnconnected = False
@@ -104,7 +106,7 @@ class SchedulePluginClass(AbstractPluginClass):
             self.info('not running in shutdown mode')
             self._shutdown_mode = False
             
-#        if self._shutdown_mode:
+        if self._shutdown_mode:
             # Initialize the serial source to the TinyNode
     
             # split the address (it should have the form serial@port:baudrate)
@@ -118,6 +120,10 @@ class SchedulePluginClass(AbstractPluginClass):
                     raise TypeError('could not initialize serial source: ' + e.__str__())
             else:
                 raise TypeError('address type must be serial')
+            
+        # TODO: PingThread argument
+        if self._shutdown_mode:
+            self._pingThread = PingThread(self)
         
         if os.path.isfile(self.getOptionValue('schedule_file')+'.parsed'):
             try:
@@ -147,6 +153,9 @@ class SchedulePluginClass(AbstractPluginClass):
         self.info('started')
         
         self._jobsObserver.start()
+        
+        if self._shutdown_mode:
+            self._pingThread.start()
         
         if self._shutdown_mode:
             self._serialsource.start()
@@ -193,7 +202,6 @@ class SchedulePluginClass(AbstractPluginClass):
                 self.info('no schedule available at yet -> waiting for a schedule')
                 self._scheduleEvent.wait()
         
-        dtnow = None
         if self._shutdown_mode:
             lookback = True
         else:
@@ -201,12 +209,7 @@ class SchedulePluginClass(AbstractPluginClass):
         stop = False
         service_time = timedelta()
         while not stop and not self._stopped:
-            if dtnow and dtnow.minute == datetime.utcnow().minute:
-                dtnow = datetime.utcnow()
-                dtnow += timedelta(minutes=1)
-            else:
-                dtnow = datetime.utcnow()
-            
+            dtnow = datetime.utcnow() 
             # get the next schedule(s) in time
             if not self._shutdown_mode:
                 self._scheduleLock.acquire()
@@ -219,15 +222,15 @@ class SchedulePluginClass(AbstractPluginClass):
             
             for schedule in nextschedules:
                 self.debug('(' + str(schedule[0]) + ',' + str(schedule[1]) + ')')
-                dtnow = datetime.utcnow()
+                dtnow = datetime.utcnow() 
                 timediff = schedule[0] - dtnow
                 if self._shutdown_mode:
                     service_time = self._serviceTime()
                     if schedule[0] <= dtnow:
                         self.debug('start >' + schedule[1] + '< now')
                     elif timediff < (self._max_next_schedule_wait_delta + service_time):
-                        self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400) + ' seconds')
-                        self._stopEvent.wait(timediff.seconds + timediff.days * 86400)
+                        self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                        self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if self._stopped:
                             break
                     else:
@@ -238,11 +241,11 @@ class SchedulePluginClass(AbstractPluginClass):
                         stop = True
                         break
                 else:
-                    if schedule[0] <= datetime.utcnow():
+                    if schedule[0] <= dtnow:
                         self.debug('start >' + schedule[1] + '< now')
                     else:
-                        self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400) + ' seconds')
-                        self._stopEvent.wait(timediff.seconds + timediff.days * 86400)
+                        self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                        self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if self._stopped or self._newSchedule:
                             self._newSchedule = False
                             self._stopEvent.clear()
@@ -269,6 +272,8 @@ class SchedulePluginClass(AbstractPluginClass):
         self._connectionEvent.set()
         self._scheduleEvent.set()
         self._stopEvent.set()
+        if self._shutdown_mode:
+            self._pingThread.stop()
         if self._shutdown_mode:
             self._serialsource.stop()
         self.info('stopped')
@@ -373,40 +378,74 @@ class SchedulePluginClass(AbstractPluginClass):
 
 
     def _shutdown(self, sleepdelta=timedelta()):
-        now = datetime.utcnow()
-        if now + sleepdelta > now:
-            waitfor = sleepdelta.seconds + sleepdelta.days * 86400 + 1
-            self.info('waiting ' + str(waitfor/60.0) + ' minutes for service windows to finish')
-            self._stopEvent.wait(waitfor)
-        
-        # Syncronize Service Wakeup Time
-        sc = ScheduleCron(fake_tab=(self.getOptionValue('service_wakeup_schedule')+' no_job'))
-        time_delta = sc.getNextSchedules(now)[0][0] - datetime.utcnow()
-        time_to_service = time_delta.seconds + time_delta.days * 86400
-        self.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
-        if self._getCmdResponse(self.CMD_SERVICE_WINDOW, time_to_service) == time_to_service:
-            self.info('ReverseModePlugin: Successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' minutes)')
-
-        # Schedule next wakeup
-        if self._schedule:
-            time_delta = self._schedule.getNextSchedules(now)
-            time_to_wakeup = time_delta.seconds + time_delta.days * 86400
-            if self._getCmdResponse(self.CMD_NEXT_WAKEUP, time_to_wakeup) == time_to_wakeup:
-                self.info("ReverseModePlugin: Successfully scheduled the next duty wakeup for "+self._nextTaskTime+" (that\'s in "+str(time_to_wakeup)+" seconds)")
+        if self._shutdown_mode:
+            now = datetime.utcnow()
+            if now + sleepdelta > now:
+                waitfor = sleepdelta.seconds + sleepdelta.days * 86400 + sleepdelta.microseconds/1000000.0
+                self.info('waiting ' + str(waitfor/60.0) + ' minutes for service windows to finish')
+                self._stopEvent.wait(waitfor)
+            
+            # Syncronize Service Wakeup Time
+            sc = ScheduleCron(fake_tab=(self.getOptionValue('service_wakeup_schedule')+' no_job'))
+            time_delta = sc.getNextSchedules(now)[0][0] - datetime.utcnow()
+            time_to_service = time_delta.seconds + time_delta.days * 86400
+            self.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
+            if self._getCmdResponse(self.CMD_SERVICE_WINDOW, time_to_service) == time_to_service:
+                self.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
+    
+            # Schedule next wakeup
+            if self._schedule:
+                time_delta = self._schedule.getNextSchedules(now)
+                time_to_wakeup = time_delta.seconds + time_delta.days * 86400
+                if self._getCmdResponse(self.CMD_NEXT_WAKEUP, time_to_wakeup) == time_to_wakeup:
+                    self.info('successfully scheduled the next duty wakeup for '+self._nextTaskTime+" (that\'s in "+str(time_to_wakeup)+' seconds)')
+                    
+            # wait for jobs to finish
+            if not self._allJobsFinishedEvent.isSet():
+                self.info('waiting for all active jobs to finish')
+                self._allJobsFinishedEvent.wait((1+int(self.getOptionValue('max_default_job_runtime_minutes')))*60)
+                if not self._allJobsFinishedEvent.isSet():
+                    self.error('not all jobs have been killed (should not happen)')
+    
+            # Tell TinyNode to shut us down in X seconds
+            shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
+            if(self._getCmdResponse(self.CMD_SHUTDOWN, shutdown_offset) == shutdown_offset):
+                self.info('we\'re going to do a hard shut down in '+str(shutdown_offset)+' seconds ...')
+    
+            parentpid = os.getpid()
+            
+            try:
+                pid = os.fork()
+            except OSError, e:
+                self.error('could not fork: ' + str(e))
+                #subprocess.Popen('shutdown -h now', shell=True)
+                subprocess.Popen('echo hello', shell=True)
                 
-        # wait for jobs to finish
-        if not self_allJobsFinishedEvent.isSet():
-            self.info('waiting for all active jobs to finish')
-            self._allJobsFinishedEvent.wait()
-
-        # Tell TinyNode to shut us down in X seconds
-        shutdown_offset = int(self.getPluginOption('reverse_mode_shutdown_offset'))
-        if(self._getCmdResponse(self.CMD_SHUTDOWN, shutdown_offset) == shutdown_offset):
-            self.info('ReverseModePlugin: We\'re going to be shut down in '+str(shutdown_offset)+'sec...')
-
-        # Terminate PSBacklog by sending our own process a SIGINT
-        os.kill(os.getpid(), signal.SIGINT)
+            if pid == 0:
+                self.info('waiting for parent (pid=' + str(parentpid) + ') to complete')
+                while not self.dead(parentpid):
+                    self.info('parent (pid=' + str(parentpid) + ') not yet dead')
+                    self._stopEvent.wait(3)
+                self.info('parent completed')
+                
+                subprocess.Popen('shutdown -h now', shell=True)
+            else:
+                self.info('sending myself SIGINT')
+                # Terminate PSBacklog by sending our own process a SIGINT
+                os.kill(parentpid, signal.SIGINT)
+        else:
+            self.warning('shutdown called even if we are not in shutdown mode')
         
+    def dead(self, pid):
+        from os import kill
+        try:
+            return os.kill(pid, 0)
+        except OSError, e:
+            #process is dead
+            if e.errno == 3: return True
+            #no permissions
+            elif e.errno == 1: return False
+            else: raise
         
         
 class JobsObserver(Thread):
@@ -424,7 +463,7 @@ class JobsObserver(Thread):
         
         
     def run(self):
-        self._parent.info('started')
+        self._parent.info('JobsObserver: started')
         while not self._stopped:
             self._work.wait()
             if self._stopped:
@@ -458,7 +497,7 @@ class JobsObserver(Thread):
                     self._parent.allJobsFinished()
                     break
  
-        self._parent.info('died')
+        self._parent.info('JobsObserver: died')
         
         
         
@@ -482,7 +521,34 @@ class JobsObserver(Thread):
         self._stopped = True
         self._work.set()
         self._wait.set()
-        self._parent.info('stopped')
+        self._parent.info('JobsObserver: stopped')
+        
+        
+        
+class PingThread(Thread):
+    
+    def __init__(self, parent, ping_timeout_seconds=30):
+        Thread.__init__(self)
+        self._ping_timeout_seconds = ping_timeout_seconds
+        self._parent = parent
+        self._work = Event()
+        self._stopped = False
+        
+        
+    def run(self):
+        self._parent.info('PingThread: started')
+        while not self._stopped:
+            # TODO: time not 300
+            if(self._parent._getCmdResponse(self._parent.CMD_WATCHDOG, 300) == 300):
+                self._parent.info('watchdog reset successful')
+            self._work.wait(self._ping_timeout_seconds)
+        self._parent.info('PingThread: died')
+
+
+    def stop(self):
+        self._stopped = True
+        self._work.set()
+        self._parent.info('PingThread: stopped')
         
         
         
