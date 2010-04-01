@@ -12,7 +12,7 @@ import signal
 import pickle
 import subprocess
 from datetime import datetime, timedelta
-from threading import Event, Lock
+from threading import Event, Lock, Thread
 
 import BackLogMessage
 import tos
@@ -20,6 +20,8 @@ from crontab import CronTab
 from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_BACKLOG = False
+
+JOB_PROCESS_CHECK_INTERVAL_SECONDS = 10
 
 
 class SchedulePluginClass(AbstractPluginClass):
@@ -74,7 +76,9 @@ class SchedulePluginClass(AbstractPluginClass):
         self._scheduleEvent = Event()
         self._scheduleLock = Lock()
         self._stopEvent = Event()
+        self._allJobsFinishedEvent = Event()
         
+        self._jobsObserver = JobsObserver(self, int(self.getOptionValue('max_default_job_runtime_minutes')))
         self._gsnconnected = False
         self._schedulereceived = False
         self._schedule = None
@@ -100,7 +104,7 @@ class SchedulePluginClass(AbstractPluginClass):
             self.info('not running in shutdown mode')
             self._shutdown_mode = False
             
-        if self._shutdown_mode:
+#        if self._shutdown_mode:
             # Initialize the serial source to the TinyNode
     
             # split the address (it should have the form serial@port:baudrate)
@@ -141,6 +145,8 @@ class SchedulePluginClass(AbstractPluginClass):
         
     def run(self):
         self.info('started')
+        
+        self._jobsObserver.start()
         
         if self._shutdown_mode:
             self._serialsource.start()
@@ -195,9 +201,9 @@ class SchedulePluginClass(AbstractPluginClass):
         stop = False
         service_time = timedelta()
         while not stop and not self._stopped:
-            if dtnow and dtnow.second == datetime.utcnow().second:
+            if dtnow and dtnow.minute == datetime.utcnow().minute:
                 dtnow = datetime.utcnow()
-                dtnow += timedelta(seconds=1)
+                dtnow += timedelta(minutes=1)
             else:
                 dtnow = datetime.utcnow()
             
@@ -245,16 +251,11 @@ class SchedulePluginClass(AbstractPluginClass):
                 try:
                     proc = subprocess.Popen(schedule[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 except Exception, e:
-                    self.error('error in schedule script >' + schedule[1] + '<:' + str(e))
+                    self.error('error in scheduled job >' + schedule[1] + '<:' + str(e))
                 else:
-                    out = proc.communicate()
-                    if out[0]:
-                        self.info(out[0])
-                    if out[1]:
-                        self.error(out[1])
-                    ret = proc.poll()
-                    if ret != 0:
-                        self.error('return code from schedule script >' + schedule[1] + '< is ' + str(ret))
+                    self._allJobsFinishedEvent.clear()
+                    # TODO: max runtime argument per process insertion
+                    self._jobsObserver.observeJob(proc, schedule[1])
                     
         if self._shutdown_mode:
             self._shutdown(service_time)
@@ -264,12 +265,18 @@ class SchedulePluginClass(AbstractPluginClass):
     
     def stop(self):
         self._stopped = True
+        self._jobsObserver.stop()
         self._connectionEvent.set()
         self._scheduleEvent.set()
         self._stopEvent.set()
         if self._shutdown_mode:
             self._serialsource.stop()
         self.info('stopped')
+        
+        
+    def allJobsFinished(self):
+        self.debug('all jobs finished')
+        self._allJobsFinishedEvent.set()
 
 
     def msgReceived(self, message):
@@ -373,7 +380,7 @@ class SchedulePluginClass(AbstractPluginClass):
             self._stopEvent.wait(waitfor)
         
         # Syncronize Service Wakeup Time
-        sc = ScheduleCron(fake_tab=(self.getOptionValue('service_wakeup_schedule')+' no_script'))
+        sc = ScheduleCron(fake_tab=(self.getOptionValue('service_wakeup_schedule')+' no_job'))
         time_delta = sc.getNextSchedules(now)[0][0] - datetime.utcnow()
         time_to_service = time_delta.seconds + time_delta.days * 86400
         self.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
@@ -386,15 +393,97 @@ class SchedulePluginClass(AbstractPluginClass):
             time_to_wakeup = time_delta.seconds + time_delta.days * 86400
             if self._getCmdResponse(self.CMD_NEXT_WAKEUP, time_to_wakeup) == time_to_wakeup:
                 self.info("ReverseModePlugin: Successfully scheduled the next duty wakeup for "+self._nextTaskTime+" (that\'s in "+str(time_to_wakeup)+" seconds)")
+                
+        # wait for jobs to finish
+        if not self_allJobsFinishedEvent.isSet():
+            self.info('waiting for all active jobs to finish')
+            self._allJobsFinishedEvent.wait()
 
         # Tell TinyNode to shut us down in X seconds
-#        shutdown_offset = int(self.getPluginOption('reverse_mode_shutdown_offset'))
-#        if(self._getCmdResponse(self.CMD_SHUTDOWN, shutdown_offset) == shutdown_offset):
-#            self.info('ReverseModePlugin: We\'re going to be shut down in '+str(shutdown_offset)+'sec...')
+        shutdown_offset = int(self.getPluginOption('reverse_mode_shutdown_offset'))
+        if(self._getCmdResponse(self.CMD_SHUTDOWN, shutdown_offset) == shutdown_offset):
+            self.info('ReverseModePlugin: We\'re going to be shut down in '+str(shutdown_offset)+'sec...')
 
         # Terminate PSBacklog by sending our own process a SIGINT
         os.kill(os.getpid(), signal.SIGINT)
+        
+        
+        
+class JobsObserver(Thread):
+    
+    def __init__(self, parent, default_max_runtime_minute):
+        Thread.__init__(self)
+        
+        self._parent = parent
+        self._default_max_runtime_seconds = default_max_runtime_minute * 60.0
+        self._lock = Lock()
+        self._process_list = []
+        self._work = Event()
+        self._wait = Event()
+        self._stopped = False
+        
+        
+    def run(self):
+        self._parent.info('started')
+        while not self._stopped:
+            self._work.wait()
+            if self._stopped:
+                break
+            self._work.clear()
             
+            while not self._stopped:
+                self._wait.wait(JOB_PROCESS_CHECK_INTERVAL_SECONDS)
+                if self._stopped:
+                    break
+                
+                new_list = []
+                for proc in self._process_list:
+                    ret = proc[0].poll()
+                    if ret == None:
+                        pid = proc[0].pid
+                        if proc[1] <= JOB_PROCESS_CHECK_INTERVAL_SECONDS:
+                            self._parent.error('job (' + proc[2] + ') with PID ' + str(pid) + ' has not finished in time -> kill it')
+                            # Terminate this process by sending a SIGINT
+                            os.kill(pid, signal.SIGINT)
+                        else:
+                            self._parent.debug('job (' + proc[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
+                            new_list.append((proc[0], proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS, proc[2]))
+                    else:
+                        self._parent.info('job (' + proc[2] + ') finished with return code ' + str(ret))
+                
+                self._lock.acquire()
+                self._process_list = new_list
+                self._lock.release()
+                if not self._process_list:
+                    self._parent.allJobsFinished()
+                    break
+ 
+        self._parent.info('died')
+        
+        
+        
+    def observeJob(self, process, job_name, max_runtime_seconds=None):
+        if not self._stopped:
+            if not max_runtime_seconds:
+                max_runtime_seconds = self._default_max_runtime_seconds
+                
+            self._lock.acquire()
+            self._process_list.append((process, max_runtime_seconds, job_name))
+            self._lock.release()
+            self._parent.info('new job (' + job_name + ') added')
+            
+            self._work.set()
+            return True
+        else:
+            return False
+
+
+    def stop(self):
+        self._stopped = True
+        self._work.set()
+        self._wait.set()
+        self._parent.info('stopped')
+        
         
         
             
