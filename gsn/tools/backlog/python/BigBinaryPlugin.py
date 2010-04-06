@@ -75,6 +75,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
     _stopped
     _filedeque
     _msgdeque
+    _isBusy
     _work
     _lock
     _waitforack
@@ -90,6 +91,8 @@ class BigBinaryPluginClass(AbstractPluginClass):
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options)
         self._parent = parent
+        
+        self._isBusy = True
         
         self._rootdir = self.getOptionValue('rootdir')
         
@@ -487,6 +490,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
                 self._lock.acquire()
                 self._work.clear()
                 self._lock.release()
+                self._isBusy = False
             except Exception, e:
                 self._waitforack = False
                 os.chmod(filename, 0744)
@@ -495,6 +499,10 @@ class BigBinaryPluginClass(AbstractPluginClass):
             
 
         self.info('died')
+        
+         
+    def isBusy(self):
+        return self._isBusy
     
     
     def stop(self):
@@ -529,6 +537,7 @@ class BinaryChangedProcessing(ProcessEvent):
         
         self._parent._filedeque.appendleft(event.pathname)
         if self._parent.isGSNConnected() and not self._parent._waitforack:
+            self._parent._isBusy = True
             self._parent._lock.acquire()
             self._parent._work.set()
             self._parent._lock.release()

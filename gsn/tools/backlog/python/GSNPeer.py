@@ -105,7 +105,8 @@ class GSNPeerClass(Thread):
             self._work.clear()
         
             self._gsnlistener = GSNListener(self, self._port, self._serversocket)
-            self._gsnlistener.start()
+            if not self._stopped:
+                self._gsnlistener.start()
  
         self._logger.info('died')
 

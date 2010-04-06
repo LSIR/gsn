@@ -173,6 +173,23 @@ class AbstractPluginClass(Thread):
 
     def getGSNPeerStatus(self):
         return self._parent.gsnpeer.getStatus()
+    
+        
+    def isBusy(self):
+        '''
+        This function should return True if the plugin has still things to do.
+        If nothing more has to be processed it should return False.
+        
+        This function will get polled by the SchedulePlugin on shutdown. It will
+        wait a given time for all plugins to return False before shutdown. Thus, this
+        function should only return True if it changes back to returning False again
+        after a given time.
+        
+        @return: True if this plugin has still work to do
+        
+        @raise NotImplementedError: if this function is not implemented by the plugin
+        '''
+        raise NotImplementedError('isBusy is not implemented')
 
 
     def isGSNConnected(self):

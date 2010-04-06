@@ -86,6 +86,8 @@ class SchedulePluginClass(AbstractPluginClass):
         self._schedule = None
         self._newSchedule = False
         self._stopped = False
+            
+        self._max_next_schedule_wait_delta = timedelta(minutes=int(self.getOptionValue('max_next_schedule_wait_minutes')))
         
         address = self.getOptionValue('tos_source_addr')
         
@@ -135,8 +137,6 @@ class SchedulePluginClass(AbstractPluginClass):
                 self.error(e.__str__())
         else:
             self.info('there is no local schedule file available')
-            
-        self._max_next_schedule_wait_delta = timedelta(minutes=int(self.getOptionValue('max_next_schedule_wait_minutes')))
     
     
     def getMsgType(self):
@@ -228,7 +228,7 @@ class SchedulePluginClass(AbstractPluginClass):
                     service_time = self._serviceTime()
                     if schedule[0] <= dtnow:
                         self.debug('start >' + schedule[1] + '< now')
-                    elif timediff < (self._max_next_schedule_wait_delta + service_time):
+                    elif timediff < self._max_next_schedule_wait_delta or timediff < service_time:
                         self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if self._stopped:
@@ -271,6 +271,7 @@ class SchedulePluginClass(AbstractPluginClass):
         self._jobsObserver.stop()
         self._connectionEvent.set()
         self._scheduleEvent.set()
+        self._allJobsFinishedEvent.set()
         self._stopEvent.set()
         if self._shutdown_mode:
             self._pingThread.stop()
@@ -282,6 +283,10 @@ class SchedulePluginClass(AbstractPluginClass):
     def allJobsFinished(self):
         self.debug('all jobs finished')
         self._allJobsFinishedEvent.set()
+        
+        
+    def isBusy(self):
+        return True
 
 
     def msgReceived(self, message):
@@ -306,8 +311,8 @@ class SchedulePluginClass(AbstractPluginClass):
                 try:
                     sc = ScheduleCron(fake_tab=schedule)
                     if not self._shutdown_mode:
-                        self._scheduleLock.acquire()
-                        self._schedule = sc
+                        self._scheduleLock.acquire()   
+                    self._schedule = sc
                     if not self._shutdown_mode:
                         self._scheduleLock.release()
                     
@@ -367,38 +372,51 @@ class SchedulePluginClass(AbstractPluginClass):
         
         
     def _serviceTime(self):
-        td = timedelta()
         now = datetime.utcnow()
-        sc = ScheduleCron(fake_tab=(self.getOptionValue('service_wakeup_schedule') + ' ' + self.BACKWARD_LOOK_NAME + '=' + self.getOptionValue('service_wakeup_minutes')))
-        next_service_wakeup = sc.getNextSchedules(now, True)[0][0]
-        if next_service_wakeup < now + self._max_next_schedule_wait_delta:
-            td = (next_service_wakeup + timedelta(minutes=int(self.getOptionValue('service_wakeup_minutes')))) - now
-        return td
+        start, end = self._getNextServiceWindowRange()
+        if start < (now + self._max_next_schedule_wait_delta):
+            return end - now
+        else:
+            return timedelta()
+    
+    
+    def _getNextServiceWindowRange(self):
+        wakeup_minutes = timedelta(minutes=int(self.getOptionValue('service_wakeup_minutes')))
+        hour, minute = self.getOptionValue('service_wakeup_schedule').split(':')
+        now = datetime.utcnow()
+        service_time = datetime(now.year, now.month, now.day, int(hour), int(minute))
+        if (service_time + wakeup_minutes) < now:
+            twentyfourhours = timedelta(hours=24)
+            return (service_time + twentyfourhours, service_time + twentyfourhours + wakeup_minutes)
+        else:
+            return (service_time, service_time + wakeup_minutes)
+            
         
 
 
     def _shutdown(self, sleepdelta=timedelta()):
         if self._shutdown_mode:
+            approximate_startup_seconds = int(self.getOptionValue('approximate_startup_seconds'))
             now = datetime.utcnow()
             if now + sleepdelta > now:
                 waitfor = sleepdelta.seconds + sleepdelta.days * 86400 + sleepdelta.microseconds/1000000.0
                 self.info('waiting ' + str(waitfor/60.0) + ' minutes for service windows to finish')
                 self._stopEvent.wait(waitfor)
             
-            # Syncronize Service Wakeup Time
-            sc = ScheduleCron(fake_tab=(self.getOptionValue('service_wakeup_schedule')+' no_job'))
-            time_delta = sc.getNextSchedules(now)[0][0] - datetime.utcnow()
-            time_to_service = time_delta.seconds + time_delta.days * 86400
+            # Synchronize Service Wakeup Time
+            time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
+            time_to_service = time_delta.seconds + time_delta.days * 86400 - approximate_startup_seconds
             self.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
             if self._getCmdResponse(self.CMD_SERVICE_WINDOW, time_to_service) == time_to_service:
                 self.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
     
             # Schedule next wakeup
             if self._schedule:
-                time_delta = self._schedule.getNextSchedules(now)
-                time_to_wakeup = time_delta.seconds + time_delta.days * 86400
+                next_schedule = self._schedule.getNextSchedules(now)[0]
+                time_delta = next_schedule[0] - datetime.utcnow()
+                time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - approximate_startup_seconds
                 if self._getCmdResponse(self.CMD_NEXT_WAKEUP, time_to_wakeup) == time_to_wakeup:
-                    self.info('successfully scheduled the next duty wakeup for '+self._nextTaskTime+" (that\'s in "+str(time_to_wakeup)+' seconds)')
+                    self.info('successfully scheduled the next duty wakeup for '+next_schedule[1]+' (that\'s in '+str(time_to_wakeup)+' seconds)')
                     
             # wait for jobs to finish
             if not self._allJobsFinishedEvent.isSet():
@@ -406,6 +424,16 @@ class SchedulePluginClass(AbstractPluginClass):
                 self._allJobsFinishedEvent.wait((1+int(self.getOptionValue('max_default_job_runtime_minutes')))*60)
                 if not self._allJobsFinishedEvent.isSet():
                     self.error('not all jobs have been killed (should not happen)')
+                    
+            # wait for all plugins to finish
+            max_plugins_finish_wait_minutes = int(self.getOptionValue('max_plugins_finish_wait_minutes'))*60
+            while not self._stopped and not max_plugins_finish_wait_minutes <= 0:
+                if not self._parent.pluginsBusy():
+                    break
+                else:
+                    self.debug('plugins are still busy')
+                    self._stopEvent.wait(3)
+                    max_plugins_finish_wait_minutes -= 3
     
             # Tell TinyNode to shut us down in X seconds
             shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
@@ -418,17 +446,28 @@ class SchedulePluginClass(AbstractPluginClass):
                 pid = os.fork()
             except OSError, e:
                 self.error('could not fork: ' + str(e))
-                #subprocess.Popen('shutdown -h now', shell=True)
-                subprocess.Popen('echo hello', shell=True)
+                subprocess.Popen('shutdown -h now', shell=True)
                 
             if pid == 0:
-                self.info('waiting for parent (pid=' + str(parentpid) + ') to complete')
-                while not self.dead(parentpid):
-                    self.info('parent (pid=' + str(parentpid) + ') not yet dead')
-                    self._stopEvent.wait(3)
-                self.info('parent completed')
-                
-                subprocess.Popen('shutdown -h now', shell=True)
+                os.setsid()
+            
+                try:
+                    pid = os.fork()
+                except OSError, e:
+                    os._exit(0)
+                    
+                if (pid == 0):
+                    os.chdir('/')
+
+                    print 'waiting for parent (pid=' + str(parentpid) + ') to complete'
+                    while not self._dead(parentpid):
+                        print 'parent (pid=' + str(parentpid) + ') not yet dead'
+                        time.sleep(3)
+                    print 'parent completed'
+                    
+                    subprocess.Popen('shutdown -h now', shell=True)
+                else:
+                    os._exit(0)
             else:
                 self.info('sending myself SIGINT')
                 # Terminate PSBacklog by sending our own process a SIGINT
@@ -436,8 +475,8 @@ class SchedulePluginClass(AbstractPluginClass):
         else:
             self.warning('shutdown called even if we are not in shutdown mode')
         
-    def dead(self, pid):
-        from os import kill
+        
+    def _dead(self, pid):
         try:
             return os.kill(pid, 0)
         except OSError, e:

@@ -56,6 +56,10 @@ class BasestationStatusPluginClass(AbstractPluginClass):
     
     def getMsgType(self):
         return BackLogMessage.BASESTATION_STATUS_MESSAGE_TYPE
+        
+        
+    def isBusy(self):
+        return True
             
 
     def run(self):

@@ -47,6 +47,10 @@ class BackLogStatusPluginClass(AbstractPluginClass):
     
     def getMsgType(self):
         return BackLogMessage.BACKLOG_STATUS_MESSAGE_TYPE
+        
+        
+    def isBusy(self):
+        return True
     
     
     def msgReceived(self, message):

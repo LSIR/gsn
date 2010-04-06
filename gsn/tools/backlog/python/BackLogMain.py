@@ -173,6 +173,17 @@ class BackLogMainClass(Thread):
         
         self._logger.info('stopped')
         
+        
+    def pluginsBusy(self):
+        for plugin_entry in self.plugins:
+            try:
+                if plugin_entry[1].isBusy():
+                    return True
+            except NotImplementedError, e:
+                self._logger.error(plugin_entry[0] + ': ' + e.__str__())
+                self.incrementErrorCounter()
+        return False
+        
     
     def resend(self):
         self.backlog.resend()
