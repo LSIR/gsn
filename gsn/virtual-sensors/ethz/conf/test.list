@@ -81,3 +81,15 @@ ETZG_Webcam_from_BigBinary_scaled.xml
 ETZG_DozerCommand.xml
 ETZG_DozerDecagonMux_conv.xml
 ETZG_DozerDecagonMux.xml
+ETZG2_BigBinary.xml
+ETZG2_BackLogStatus.xml
+ETZG2_BackLogStatus_mapped.xml
+ETZG2_BackLogStatus_chart.xml
+ETZG2_BasestationStatus.xml
+ETZG2_BasestationStatus_mapped.xml
+ETZG2_BasestationStatus_chart1.xml
+ETZG2_BasestationStatus_chart2.xml
+ETZG2_BasestationStatus_chart3.xml
+ETZG2_Camera_from_BigBinary_scaled.xml
+ETZG2_Schedule.xml
+ETZG2_Webcam_from_BigBinary_scaled.xml
