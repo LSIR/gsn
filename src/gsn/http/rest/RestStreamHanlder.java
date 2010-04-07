@@ -49,7 +49,8 @@ public class RestStreamHanlder extends HttpServlet {
                 DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);
 			}catch (Exception e) {
 				logger.warn(e.getMessage(),e);
-			}
+                continuation.complete();
+            }
 		}else {
             continuation.suspend();
             Semaphore lock = (Semaphore) continuation.getAttribute("lock");
