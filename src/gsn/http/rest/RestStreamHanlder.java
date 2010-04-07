@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.StringTokenizer;
+import java.util.concurrent.Semaphore;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -37,27 +38,22 @@ public class RestStreamHanlder extends HttpServlet {
 		Continuation continuation = ContinuationSupport.getContinuation(request);
 
 		if(is2ndPass == null) {
-			final DefaultDistributionRequest streamingReq;
-			try {
-				URLParser parser = new URLParser(request);
-				RestDelivery deliverySystem = new RestDelivery(continuation);
-				streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
-				logger.debug("Rest request received: "+streamingReq.toString());
-				DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);
-				logger.debug("Streaming request received and registered:"+streamingReq.toString());
-				continuation.suspend();
+            continuation.setAttribute("2ndPass", Boolean.TRUE);
+            continuation.setAttribute("lock", new Semaphore(0, true));
+            continuation.suspend();
+            final DefaultDistributionRequest streamingReq;
+            try {
+                URLParser parser = new URLParser(request);
+                RestDelivery deliverySystem = new RestDelivery(continuation);
+                streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
+                DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);
 			}catch (Exception e) {
 				logger.warn(e.getMessage(),e);
-				return ;
 			}
 		}else {
-			try {
-				if (!response.getWriter().checkError()) {
-					continuation.suspend();	
-				}
-			}catch (Exception e) {
-				e.printStackTrace();
-			}
+            continuation.suspend();
+            Semaphore lock = (Semaphore) continuation.getAttribute("lock");
+            lock.release();
 		}
 	}
 	/**
