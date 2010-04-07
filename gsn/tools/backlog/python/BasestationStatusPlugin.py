@@ -59,7 +59,7 @@ class BasestationStatusPluginClass(AbstractPluginClass):
         
         
     def isBusy(self):
-        return True
+        return False
             
 
     def run(self):

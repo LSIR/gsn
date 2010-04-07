@@ -53,12 +53,17 @@ class SchedulePluginClass(AbstractPluginClass):
     WAKEUP_TYPE_SERVICE = 1
     WAKEUP_TYPE_BEACON = 2
     WAKEUP_TYPE_NODE_REBOOT = 3
+    
+    # ping and watchdog timing
+    PING_INTERVAL_SEC = 30
+    WATCHDOG_TIMEOUT_SEC = 300
 
     # Command Structure
     TOS_CMD_STRUCTURE = [('command', 'int', 1), ('argument', 'int', 4)]
     
     # Backward looking time naming
-    BACKWARD_LOOK_NAME = 'backward_look'
+    BACKWARD_TOLERANCE_NAME = 'backward_tolerance_minutes'
+    MAX_RUNTIME_NAME = 'max_runtime_minutes'
     ############################################
     '''
     This plugin offers the functionality to 
@@ -123,9 +128,8 @@ class SchedulePluginClass(AbstractPluginClass):
             else:
                 raise TypeError('address type must be serial')
             
-        # TODO: PingThread argument
         if self._shutdown_mode:
-            self._pingThread = PingThread(self)
+            self._pingThread = PingThread(self, self.PING_INTERVAL_SEC, self.WATCHDOG_TIMEOUT_SEC)
         
         if os.path.isfile(self.getOptionValue('schedule_file')+'.parsed'):
             try:
@@ -137,6 +141,8 @@ class SchedulePluginClass(AbstractPluginClass):
                 self.error(e.__str__())
         else:
             self.info('there is no local schedule file available')
+            
+        
     
     
     def getMsgType(self):
@@ -147,7 +153,7 @@ class SchedulePluginClass(AbstractPluginClass):
         self.debug('connection established')
         self._gsnconnected = True
         self._connectionEvent.set()
-       
+        
         
     def run(self):
         self.info('started')
@@ -155,11 +161,24 @@ class SchedulePluginClass(AbstractPluginClass):
         self._jobsObserver.start()
         
         if self._shutdown_mode:
-            self._pingThread.start()
-        
-        if self._shutdown_mode:
             self._serialsource.start()
-
+            self._pingThread.start()
+          
+        if self._schedule and self._shutdown_mode:  
+            # Schedule duty wakeup after this session, for safety reasons.
+            # (The scheduled time here could be in this session if schedules are following
+            # each other in short intervals. In this case it could be possible, that
+            # we have to wait for the next service window in case of an unexpected shutdown.)
+            min = int(self.getOptionValue('max_gsn_connect_wait_minutes'))
+            min += int(self.getOptionValue('max_gsn_get_schedule_wait_minutes'))
+            min += int(self.getOptionValue('max_next_schedule_wait_minutes'))
+            min += int(self.getOptionValue('max_plugins_finish_wait_minutes'))
+            min += int(self.getOptionValue('max_default_job_runtime_minutes'))
+            min += int(self.getOptionValue('hard_shutdown_offset_minutes'))
+            td = timedelta(minutes=min)
+            safety_schedule = self._schedule.getNextSchedules(datetime.utcnow() + td)[0]
+            self._scheduleNextDutyWakeup(safety_schedule[0] - datetime.utcnow(), safety_schedule[1])
+            
         # wait some time for GSN to connect
         if self.isGSNConnected():
             self._gsnconnected = True
@@ -222,7 +241,7 @@ class SchedulePluginClass(AbstractPluginClass):
             
             for schedule in nextschedules:
                 self.debug('(' + str(schedule[0]) + ',' + str(schedule[1]) + ')')
-                dtnow = datetime.utcnow() 
+                dtnow = datetime.utcnow()
                 timediff = schedule[0] - dtnow
                 if self._shutdown_mode:
                     service_time = self._serviceTime()
@@ -258,7 +277,7 @@ class SchedulePluginClass(AbstractPluginClass):
                 else:
                     self._allJobsFinishedEvent.clear()
                     # TODO: max runtime argument per process insertion
-                    self._jobsObserver.observeJob(proc, schedule[1])
+                    self._jobsObserver.observeJob(proc, schedule[1], schedule[2])
                     
         if self._shutdown_mode:
             self._shutdown(service_time)
@@ -286,7 +305,7 @@ class SchedulePluginClass(AbstractPluginClass):
         
         
     def isBusy(self):
-        return True
+        return False
 
 
     def msgReceived(self, message):
@@ -390,13 +409,17 @@ class SchedulePluginClass(AbstractPluginClass):
             return (service_time + twentyfourhours, service_time + twentyfourhours + wakeup_minutes)
         else:
             return (service_time, service_time + wakeup_minutes)
-            
         
-
+        
+    def _scheduleNextDutyWakeup(self, time_delta, schedule_name):
+        if self._shutdown_mode:
+            time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
+            if self._getCmdResponse(self.CMD_NEXT_WAKEUP, time_to_wakeup) == time_to_wakeup:
+                self.info('successfully scheduled the next duty wakeup for '+schedule_name+' (that\'s in '+str(time_to_wakeup)+' seconds)')
+            
 
     def _shutdown(self, sleepdelta=timedelta()):
         if self._shutdown_mode:
-            approximate_startup_seconds = int(self.getOptionValue('approximate_startup_seconds'))
             now = datetime.utcnow()
             if now + sleepdelta > now:
                 waitfor = sleepdelta.seconds + sleepdelta.days * 86400 + sleepdelta.microseconds/1000000.0
@@ -405,28 +428,25 @@ class SchedulePluginClass(AbstractPluginClass):
             
             # Synchronize Service Wakeup Time
             time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
-            time_to_service = time_delta.seconds + time_delta.days * 86400 - approximate_startup_seconds
+            time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
             self.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
             if self._getCmdResponse(self.CMD_SERVICE_WINDOW, time_to_service) == time_to_service:
                 self.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
     
-            # Schedule next wakeup
-            if self._schedule:
-                next_schedule = self._schedule.getNextSchedules(now)[0]
-                time_delta = next_schedule[0] - datetime.utcnow()
-                time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - approximate_startup_seconds
-                if self._getCmdResponse(self.CMD_NEXT_WAKEUP, time_to_wakeup) == time_to_wakeup:
-                    self.info('successfully scheduled the next duty wakeup for '+next_schedule[1]+' (that\'s in '+str(time_to_wakeup)+' seconds)')
+            # Schedule next duty wakeup
+            next_schedule = self._schedule.getNextSchedules(datetime.utcnow())[0]
+            self._scheduleNextDutyWakeup(next_schedule[0] - datetime.utcnow(), next_schedule[1])
                     
             # wait for jobs to finish
             if not self._allJobsFinishedEvent.isSet():
-                self.info('waiting for all active jobs to finish')
+                self.info('waiting for all active jobs to finish for a maximum of ' + self.getOptionValue('max_default_job_runtime_minutes') + ' minutes')
                 self._allJobsFinishedEvent.wait((1+int(self.getOptionValue('max_default_job_runtime_minutes')))*60)
                 if not self._allJobsFinishedEvent.isSet():
                     self.error('not all jobs have been killed (should not happen)')
                     
             # wait for all plugins to finish
             max_plugins_finish_wait_minutes = int(self.getOptionValue('max_plugins_finish_wait_minutes'))*60
+            self.info('waiting for all active plugins to finish for a maximum of ' + self.getOptionValue('max_plugins_finish_wait_minutes') + ' minutes')
             while not self._stopped and not max_plugins_finish_wait_minutes <= 0:
                 if not self._parent.pluginsBusy():
                     break
@@ -540,15 +560,17 @@ class JobsObserver(Thread):
         
         
         
-    def observeJob(self, process, job_name, max_runtime_seconds=None):
+    def observeJob(self, process, job_name, max_runtime_minutes=None):
         if not self._stopped:
-            if not max_runtime_seconds:
+            if not max_runtime_minutes:
                 max_runtime_seconds = self._default_max_runtime_seconds
+            else:
+                max_runtime_seconds = max_runtime_minutes * 60
                 
             self._lock.acquire()
             self._process_list.append((process, max_runtime_seconds, job_name))
             self._lock.release()
-            self._parent.info('new job (' + job_name + ') added')
+            self._parent.info('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_seconds/60) + ' minutes')
             
             self._work.set()
             return True
@@ -566,9 +588,10 @@ class JobsObserver(Thread):
         
 class PingThread(Thread):
     
-    def __init__(self, parent, ping_timeout_seconds=30):
+    def __init__(self, parent, ping_interval_seconds=30, watchdog_timeout_seconds=300):
         Thread.__init__(self)
-        self._ping_timeout_seconds = ping_timeout_seconds
+        self._ping_interval_seconds = ping_interval_seconds
+        self._watchdog_timeout_seconds = watchdog_timeout_seconds
         self._parent = parent
         self._work = Event()
         self._stopped = False
@@ -577,10 +600,9 @@ class PingThread(Thread):
     def run(self):
         self._parent.info('PingThread: started')
         while not self._stopped:
-            # TODO: time not 300
-            if(self._parent._getCmdResponse(self._parent.CMD_WATCHDOG, 300) == 300):
-                self._parent.info('watchdog reset successful')
-            self._work.wait(self._ping_timeout_seconds)
+            if(self._parent._getCmdResponse(self._parent.CMD_WATCHDOG, self._watchdog_timeout_seconds) == self._watchdog_timeout_seconds):
+                self._parent.debug('watchdog reset successfully')
+            self._work.wait(self._ping_interval_seconds)
         self._parent.info('PingThread: died')
 
 
@@ -605,25 +627,52 @@ class ScheduleCron(CronTab):
         backward_schedules = []
         now = datetime.utcnow()
         for schedule in self.crons:
-            commandstring = str(schedule.command)
-            index = commandstring.lower().find(SchedulePluginClass.BACKWARD_LOOK_NAME)
+            runtimemin = None
+            commandstring = str(schedule.command).strip()
+            back_index = commandstring.lower().find(SchedulePluginClass.BACKWARD_TOLERANCE_NAME)
+            run_index = commandstring.lower().find(SchedulePluginClass.MAX_RUNTIME_NAME)
             td = timedelta()
-            if index != -1:
+            
+            if back_index != -1 and run_index != -1:
+                if back_index < run_index:
+                    runtimemin = int(commandstring[run_index:].strip().replace(SchedulePluginClass.MAX_RUNTIME_NAME+'=',''))
+                    if look_backward:
+                        backwardmin = int(commandstring[back_index:run_index].strip().replace(SchedulePluginClass.BACKWARD_TOLERANCE_NAME+'=',''))
+                        td = timedelta(minutes=backwardmin)
+                        nextdt = self._getNextSchedule(date_time - td, schedule)
+                        if nextdt < now:
+                            backward_schedules.append((nextdt, commandstring.strip(), runtimemin))
+                        
+                    commandstring = commandstring[:back_index].strip()
+                else:      
+                    runtimemin = int(commandstring[run_index:back_index].strip().replace(SchedulePluginClass.MAX_RUNTIME_NAME+'=',''))
+                    if look_backward:
+                        backwardmin = int(commandstring[back_index:].strip().replace(SchedulePluginClass.BACKWARD_TOLERANCE_NAME+'=',''))
+                        td = timedelta(minutes=backwardmin)
+                        nextdt = self._getNextSchedule(date_time - td, schedule)
+                        if nextdt < now:
+                            backward_schedules.append((nextdt, commandstring.strip(), runtimemin))
+                        
+                    commandstring = commandstring[:run_index].strip()
+            elif back_index != -1:
                 if look_backward:
-                    backwardmin = int(commandstring[index:].replace(SchedulePluginClass.BACKWARD_LOOK_NAME+'=',''))
+                    backwardmin = int(commandstring[back_index:].strip().replace(SchedulePluginClass.BACKWARD_TOLERANCE_NAME+'=',''))
                     td = timedelta(minutes=backwardmin)
                     nextdt = self._getNextSchedule(date_time - td, schedule)
                     if nextdt < now:
-                        backward_schedules.append((nextdt, commandstring))
+                        backward_schedules.append((nextdt, commandstring.strip(), runtimemin))
                     
-                commandstring = commandstring[:index]
+                commandstring = commandstring[:back_index].strip()
+            elif run_index != -1:
+                runtimemin = int(commandstring[run_index:].strip().replace(SchedulePluginClass.MAX_RUNTIME_NAME+'=',''))
+                commandstring = commandstring[:run_index].strip()
                 
             nextdt = self._getNextSchedule(date_time, schedule)
             if not future_schedules or nextdt < future_schedules[0][0]:
                 future_schedules = []
-                future_schedules.append((nextdt, commandstring))
+                future_schedules.append((nextdt, commandstring, runtimemin))
             elif nextdt == future_schedules[0][0]:
-                future_schedules.append((nextdt, commandstring))
+                future_schedules.append((nextdt, commandstring, runtimemin))
             
         return backward_schedules + future_schedules
     
