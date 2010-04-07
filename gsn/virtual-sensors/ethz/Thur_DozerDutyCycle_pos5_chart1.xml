@@ -1,9 +1,9 @@
-<virtual-sensor name="Jungfraujoch_DozerDutyCycle_pos6_chart1" priority="10" >
+<virtual-sensor name="Thur_DozerDutyCycle_pos5_chart1" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Dozer duty cycle (Position 6, 7d)</param>
+            <param name="title">Dozer duty cycle (Position 5, 7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
             <param name="vertical-axis">‰</param>
@@ -15,7 +15,7 @@
             <field name="data" type="binary:image/jpeg"/>
         </output-structure>
     </processing-class>
-    <description>Dozer duty cycle information from Jungfraujoch deployment</description>
+    <description>Dozer duty cycle information from Thur deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage history-size="1" />
@@ -23,7 +23,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATIONTIME, PAYLOAD_PERIOD, PAYLOAD_MCUACTIVE, PAYLOAD_RADIOTX, PAYLOAD_RADIORX from Jungfraujoch_DozerStateCounter_mapped_1396 where POSITION = 6 </predicate>
+                    <predicate key="query"> select GENERATIONTIME, PAYLOAD_PERIOD, PAYLOAD_MCUACTIVE, PAYLOAD_RADIOTX, PAYLOAD_RADIORX from Thur_DozerStateCounter_mapped_1396 where POSITION = 5 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select GENERATIONTIME, 

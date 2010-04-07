@@ -7,6 +7,7 @@
             <param name="height">400</param>
             <param name="width">610</param>
             <param name="vertical-axis">‰</param>
+            <param name="log-vertical-axis"/>
             <param name="history-size">5040</param>
             <param name="time-stream-name">GENERATIONTIME</param>
         </init-params>
@@ -26,9 +27,9 @@
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select GENERATIONTIME, 
-                    (PAYLOAD_MCUACTIVE * 1000 / PAYLOAD_PERIOD) as MCUACTIVE, 
-                    (PAYLOAD_RADIOTX * 1000 / PAYLOAD_PERIOD) as RADIOTX, 
-                    (PAYLOAD_RADIORX * 1000 / PAYLOAD_PERIOD) as RADIORX from wrapper
+                    if(PAYLOAD_MCUACTIVE = 0, NULL, PAYLOAD_MCUACTIVE * 1000 / PAYLOAD_PERIOD) as MCUACTIVE, 
+                    if(PAYLOAD_RADIOTX = 0, NULL, PAYLOAD_RADIOTX * 1000 / PAYLOAD_PERIOD) as RADIOTX, 
+                    if(PAYLOAD_RADIORX = 0, NULL, PAYLOAD_RADIORX * 1000 / PAYLOAD_PERIOD) as RADIORX from wrapper
                 </query>
             </source>
             <query> select * from source </query>

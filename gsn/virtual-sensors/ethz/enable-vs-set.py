@@ -2,6 +2,7 @@
 
 import os
 import sys
+import time
 
 abort = False
 
@@ -20,14 +21,14 @@ if not os.path.exists(filepath):
 os.chdir(sys.path[0] + '/..')
 
 # delete symlinks in virtual-sensors
-for path in os.listdir('.'):
-  if (os.path.isfile(path) and path.endswith('.xml')):
-    if (os.path.islink(path)):
-      print 'delete ' + path + '...'
-      os.unlink(path)
-    else:
-      print path + ' is not a symlink, aborting...'
-      abort = True
+#for path in os.listdir('.'):
+#  if (os.path.isfile(path) and path.endswith('.xml')):
+#    if (os.path.islink(path)):
+#      print 'delete ' + path + '...'
+#      os.unlink(path)
+#    else:
+#      print path + ' is not a symlink, aborting...'
+#      abort = True
 
 if abort:
   sys.exit(-1)
@@ -40,7 +41,10 @@ for line in fd:
   link = line.rstrip()
   source = 'ethz/' + link 
   if os.path.exists(source):
-    os.symlink(source, link)
+    if not os.path.exists(link):
+      print link + ' -> ' + source
+      os.symlink(source, link)
+      time.sleep(300)
   else:
     print 'cannot create symlink ' + link + '...'
 fd.close()

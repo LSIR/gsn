@@ -1,0 +1,39 @@
+<virtual-sensor name="Thur_DozerDecagonMux_pos4_chart2" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Electrical conductivity (Position 4, 7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">dS/m</param>
+            <param name="history-size">5040</param>
+            <param name="time-stream-name">GENERATIONTIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerDecagonMuxMsg) information from Thur deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select GENERATIONTIME, PAYLOAD_DATA_DIELECTRIC0, PAYLOAD_MUX_VALID0, PAYLOAD_DATA_DIELECTRIC1, PAYLOAD_MUX_VALID1, PAYLOAD_DATA_DIELECTRIC2, PAYLOAD_MUX_VALID2, PAYLOAD_DATA_DIELECTRIC3, PAYLOAD_MUX_VALID3, PAYLOAD_DATA_DIELECTRIC4, PAYLOAD_MUX_VALID4 from Thur_DozerDecagonMux_mapped_1396 where POSITION = 4 and PAYLOAD_SAMPLE_VALID = 1 </predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select GENERATIONTIME, 
+                    if(PAYLOAD_MUX_VALID0 = 0, NULL, if(PAYLOAD_DATA_DIELECTRIC0 between 0 and 700, PAYLOAD_DATA_DIELECTRIC0 / 100, (700 + 5 * (PAYLOAD_DATA_DIELECTRIC0 - 700)) / 100)) as D0, 
+                    if(PAYLOAD_MUX_VALID1 = 0, NULL, if(PAYLOAD_DATA_DIELECTRIC1 between 0 and 700, PAYLOAD_DATA_DIELECTRIC1 / 100, (700 + 5 * (PAYLOAD_DATA_DIELECTRIC1 - 700)) / 100)) as D1, 
+                    if(PAYLOAD_MUX_VALID2 = 0, NULL, if(PAYLOAD_DATA_DIELECTRIC2 between 0 and 700, PAYLOAD_DATA_DIELECTRIC2 / 100, (700 + 5 * (PAYLOAD_DATA_DIELECTRIC2 - 700)) / 100)) as D2, 
+                    if(PAYLOAD_MUX_VALID3 = 0, NULL, if(PAYLOAD_DATA_DIELECTRIC3 between 0 and 700, PAYLOAD_DATA_DIELECTRIC3 / 100, (700 + 5 * (PAYLOAD_DATA_DIELECTRIC3 - 700)) / 100)) as D3, 
+                    if(PAYLOAD_MUX_VALID4 = 0, NULL, if(PAYLOAD_DATA_DIELECTRIC4 between 0 and 700, PAYLOAD_DATA_DIELECTRIC4 / 100, (700 + 5 * (PAYLOAD_DATA_DIELECTRIC4 - 700)) / 100)) as D4 from wrapper
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

@@ -1,0 +1,39 @@
+<virtual-sensor name="Thur_DozerDecagonMux_pos4_chart3" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Temperature (Position 4, 7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">5040</param>
+            <param name="time-stream-name">GENERATIONTIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerDecagonMuxMsg) information from Thur deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select GENERATIONTIME, PAYLOAD_DATA_TEMPERATURE0, PAYLOAD_MUX_VALID0, PAYLOAD_DATA_TEMPERATURE1, PAYLOAD_MUX_VALID1, PAYLOAD_DATA_TEMPERATURE2, PAYLOAD_MUX_VALID2, PAYLOAD_DATA_TEMPERATURE3, PAYLOAD_MUX_VALID3, PAYLOAD_DATA_TEMPERATURE4, PAYLOAD_MUX_VALID4 from Thur_DozerDecagonMux_mapped_1396 where POSITION = 4 and PAYLOAD_SAMPLE_VALID = 1 </predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select GENERATIONTIME, 
+                    IF(PAYLOAD_MUX_VALID0 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE0 - 400) / 10) as T0, 
+                    IF(PAYLOAD_MUX_VALID1 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE1 - 400) / 10) as T1, 
+                    IF(PAYLOAD_MUX_VALID2 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE2 - 400) / 10) as T2, 
+                    IF(PAYLOAD_MUX_VALID3 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE3 - 400) / 10) as T3, 
+                    IF(PAYLOAD_MUX_VALID4 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE4 - 400) / 10) as T4 from wrapper
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
