@@ -90,8 +90,10 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 		 */
 		logger.debug("Adding the listener: "+listener.toString()+" to the candidates.");
 		DataEnumerator dataEnum = makeDataEnum(listener);
-		candidateListeners.put(listener, dataEnum);
-		locker.add(listener);
+        if (dataEnum.hasMoreElements()) {
+		    candidateListeners.put(listener, dataEnum);
+		    locker.add(listener);
+        }
 	}
 
 	private void removeListenerFromCandidates(DistributionRequest listener) {
@@ -158,7 +160,7 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 		synchronized (listeners) {
 			for (DistributionRequest listener : listeners )
 				if (listener.getVSensorConfig()==config) {
-					logger.debug("sending stream element " +se.toString()+" produced by " +config.getName() + " to listener =>"+listener.toString());
+					logger.debug("sending stream element " +(se == null ? "second-chance-se" : se.toString())+" produced by " +config.getName() + " to listener =>"+listener.toString());
 					if (!candidateListeners.containsKey(listener)) {
 						addListenerToCandidates(listener);
 					}else {
@@ -185,10 +187,14 @@ public class DataDistributer implements VirtualSensorDataListener,VSensorStateCh
 				boolean success= flushStreamElement(item.getValue(), item.getKey());
 				if (success==false)
 					removeListener(item.getKey());
-				else
+				else {
 					if (!item.getValue().hasMoreElements()) {
 						removeListenerFromCandidates(item.getKey());
+                        // As we are limiting the number of elements returned by the JDBC driver
+                        // we consume the eventual remaining items.
+                        consume(null, item.getKey().getVSensorConfig());
 					}
+                }
 			}
 		}
 	}
