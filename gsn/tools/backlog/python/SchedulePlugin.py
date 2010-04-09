@@ -6,11 +6,13 @@ Created on Mar 23, 2010
 
 import time
 import struct
+import array
 import re
 import os
 import signal
 import pickle
 import subprocess
+import Queue
 from datetime import datetime, timedelta
 from threading import Event, Lock, Thread
 
@@ -19,54 +21,53 @@ import tos
 from crontab import CronTab
 from AbstractPlugin import AbstractPluginClass
 
+############################################
+# Some Constants
 DEFAULT_BACKLOG = False
 
 JOB_PROCESS_CHECK_INTERVAL_SECONDS = 10
+
+SEND_QUEUE_SIZE = 25
+
+# The GSN packet types
+GSN_TYPE_NO_SCHEDULE_AVAILABLE = 0
+GSN_TYPE_SCHEDULE_SAME = 1
+GSN_TYPE_NEW_SCHEDULE = 2
+GSN_TYPE_GET_SCHEDULE = 3
+
+# The AM Msg Type
+AM_CONTROL_CMD_MSG = 0x21
+
+# The Commands to send
+CMD_WAKEUP_QUERY = 1
+CMD_SERVICE_WINDOW = 2
+CMD_NEXT_WAKEUP = 3
+CMD_SHUTDOWN = 4
+CMD_NET_STATUS = 5
+CMD_RESET_WATCHDOG = 6
+
+# The wakeup types
+WAKEUP_TYPE_SCHEDULED = 1
+WAKEUP_TYPE_SERVICE = 2
+WAKEUP_TYPE_BEACON = 4
+WAKEUP_TYPE_NODE_REBOOT = 8
+
+# ping and watchdog timing
+PING_INTERVAL_SEC = 30
+WATCHDOG_TIMEOUT_SEC = 300
+
+# Command Structure
+TOS_CMD_STRUCTURE = [('command', 'int', 1), ('argument', 'int', 4)]
+
+# Backward looking time naming
+BACKWARD_TOLERANCE_NAME = 'backward_tolerance_minutes'
+MAX_RUNTIME_NAME = 'max_runtime_minutes'
+############################################
 
 
 class SchedulePluginClass(AbstractPluginClass):
     '''
     This plugin handles the schedules.
-    '''
-    ############################################
-    # Some Constants
-    
-    # The GSN packet types
-    GSN_TYPE_NO_SCHEDULE_AVAILABLE = 0
-    GSN_TYPE_SCHEDULE_SAME = 1
-    GSN_TYPE_NEW_SCHEDULE = 2
-    GSN_TYPE_GET_SCHEDULE = 3
-    
-    # The AM Msg Type
-    AM_CONTROL_CMD_MSG = 0x21
-
-    # The Commands to send
-    CMD_WAKEUP_QUERY = 1
-    CMD_SERVICE_WINDOW = 2
-    CMD_NEXT_WAKEUP = 3
-    CMD_SHUTDOWN = 4
-    CMD_NET_STATUS = 5
-    CMD_RESET_WATCHDOG = 6
-
-    # The wakeup types
-    WAKEUP_TYPE_SCHEDULED = 1
-    WAKEUP_TYPE_SERVICE = 2
-    WAKEUP_TYPE_BEACON = 4
-    WAKEUP_TYPE_NODE_REBOOT = 8
-    
-    # ping and watchdog timing
-    PING_INTERVAL_SEC = 30
-    WATCHDOG_TIMEOUT_SEC = 300
-
-    # Command Structure
-    TOS_CMD_STRUCTURE = [('command', 'int', 1), ('argument', 'int', 4)]
-    
-    # Backward looking time naming
-    BACKWARD_TOLERANCE_NAME = 'backward_tolerance_minutes'
-    MAX_RUNTIME_NAME = 'max_runtime_minutes'
-    ############################################
-    '''
-    This plugin offers the functionality to 
     '''
 
     '''
@@ -81,7 +82,6 @@ class SchedulePluginClass(AbstractPluginClass):
         self._connectionEvent = Event()
         self._scheduleEvent = Event()
         self._scheduleLock = Lock()
-        self._serialLock = Lock()
         self._stopEvent = Event()
         self._allJobsFinishedEvent = Event()
         self._allJobsFinishedEvent.set()
@@ -90,7 +90,6 @@ class SchedulePluginClass(AbstractPluginClass):
         self._gsnconnected = False
         self._schedulereceived = False
         self._schedule = None
-        self._node_state = None
         self._newSchedule = False
         self._stopped = False
             
@@ -116,21 +115,9 @@ class SchedulePluginClass(AbstractPluginClass):
             self._shutdown_mode = False
             
         if self._shutdown_mode:
-            # Initialize the serial source to the TinyNode
-    
-            # split the address (it should have the form serial@port:baudrate)
-            source = address.split('@')
-            if source[0] == 'serial':
-                try:
-                    # try to open a connection to the specified serial port
-                    serial = tos.getSource(address, debug)
-                    self._serialsource = tos.AM(serial)
-                except Exception, e:
-                    raise TypeError('could not initialize serial source: ' + e.__str__())
-            else:
-                raise TypeError('address type must be serial')
+            self._serialHandler = SerialHandler(self, address, debug)
             
-            self._pingThread = PingThread(self, self.PING_INTERVAL_SEC, self.WATCHDOG_TIMEOUT_SEC)
+            self._pingThread = PingThread(self, PING_INTERVAL_SEC, WATCHDOG_TIMEOUT_SEC)
         
         if os.path.isfile(self.getOptionValue('schedule_file')+'.parsed'):
             try:
@@ -162,9 +149,13 @@ class SchedulePluginClass(AbstractPluginClass):
         self._jobsObserver.start()
         
         if self._shutdown_mode:
-            self._serialsource.start()
+            self._serialHandler.start()
             self._pingThread.start()
-            self._node_state = self._getNodeState()
+            self._serialHandler.write(CMD_WAKEUP_QUERY, blocking=True)
+            if self._stopped:
+                self.info('died')
+                return
+                
           
         if self._schedule and self._shutdown_mode:  
             # Schedule duty wakeup after this session, for safety reasons.
@@ -198,7 +189,7 @@ class SchedulePluginClass(AbstractPluginClass):
             self.info('waiting for gsn to answer a schedule request for a maximum of ' + self.getOptionValue('max_gsn_get_schedule_wait_minutes') + ' minutes')
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
                 self.info('request schedule from gsn')
-                self.processMsg(self.getTimeStamp(), struct.pack('<B', self.GSN_TYPE_GET_SCHEDULE))
+                self.processMsg(self.getTimeStamp(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE))
                 self._scheduleEvent.wait(3)
                 if self._stopped:
                     self.info('died')
@@ -246,7 +237,7 @@ class SchedulePluginClass(AbstractPluginClass):
                 self.debug('(' + str(schedule[0]) + ',' + str(schedule[1]) + ')')
                 dtnow = datetime.utcnow()
                 timediff = schedule[0] - dtnow
-                if self._shutdown_mode and not self._isBeaconState():
+                if self._shutdown_mode:
                     service_time = self._serviceTime()
                     if schedule[0] <= dtnow:
                         self.debug('start >' + schedule[1] + '< now')
@@ -261,8 +252,11 @@ class SchedulePluginClass(AbstractPluginClass):
                         else:
                             self.debug('nothing more to do in the next ' + str(service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes'))) + ' minutes (rest of service time plus max_next_schedule_wait_minutes)')
                         
-                        self._node_state = self._getNodeState()
-                        if not self._isBeaconState():
+                        self._serialHandler.write(CMD_WAKEUP_QUERY, blocking=True)
+                        if self._stopped:
+                            self.info('died')
+                            return
+                        if self._shutdown_mode:
                             stop = True
                             break
                 else:
@@ -286,7 +280,7 @@ class SchedulePluginClass(AbstractPluginClass):
                         self._max_job_runtime_sec = schedule[2]
                     self._jobsObserver.observeJob(proc, schedule[1], schedule[2])
                     
-        if self._shutdown_mode and not self._isBeaconState() and not self._stopped:
+        if self._shutdown_mode and not self._stopped:
             self._shutdown(service_time)
                 
         self.info('died')
@@ -302,7 +296,7 @@ class SchedulePluginClass(AbstractPluginClass):
         if self._shutdown_mode:
             self._pingThread.stop()
         if self._shutdown_mode:
-            self._serialsource.stop()
+            self._serialHandler.stop()
         self.info('stopped')
         
         
@@ -313,6 +307,10 @@ class SchedulePluginClass(AbstractPluginClass):
         
     def isBusy(self):
         return False
+    
+    
+    def beaconReceived(self):
+        self._shutdown_mode = False
 
 
     def msgReceived(self, message):
@@ -323,11 +321,11 @@ class SchedulePluginClass(AbstractPluginClass):
         if not self._schedulereceived or not self._shutdown_mode:
             # Is the Message filled with content or is it just an emty response?
             pktType = struct.unpack('B', message[0])[0]
-            if pktType == self.GSN_TYPE_NO_SCHEDULE_AVAILABLE:
+            if pktType == GSN_TYPE_NO_SCHEDULE_AVAILABLE:
                 self.info('GSN has no schedule available')
-            elif pktType == self.GSN_TYPE_SCHEDULE_SAME:
+            elif pktType == GSN_TYPE_SCHEDULE_SAME:
                 self.info('no new schedule from GSN')
-            elif pktType == self.GSN_TYPE_NEW_SCHEDULE:
+            elif pktType == GSN_TYPE_NEW_SCHEDULE:
                 self.info('new schedule from GSN received')
                 # Get the schedule creation time
                 creationtime = struct.unpack('<q', message[1:9])[0]
@@ -370,60 +368,6 @@ class SchedulePluginClass(AbstractPluginClass):
             self._scheduleEvent.set()
         else:
             self.info('schedule already received')
-
-
-    def _getCmdResponse(self, cmd, argument=0):
-        '''
-        Send a command to the TinyNode and return the response's argument
-        
-        @param cmd: the 1 Byte Command Code
-        @param argument: the 4 byte argument for the command
-
-        @return the response's argument on success and -1 on fail
-        '''
-        packet = tos.Packet(self.TOS_CMD_STRUCTURE, [cmd, argument])
-
-        resp_packet = None
-        self._serialLock.acquire()
-        while not resp_packet:
-            self._serialsource.write(packet, self.AM_CONTROL_CMD_MSG)
-            resp_packet = self._serialsource.read(1)
-            if self._stopped:
-                self._serialLock.release()
-                return -1
-        self._serialLock.release()
-
-        response = tos.Packet(self.TOS_CMD_STRUCTURE, resp_packet['data'])
-        if response['command'] == cmd:
-            return response['argument']
-        else:
-            return -1
-        
-        
-    def _isBeaconState(self):
-#        return (self._getNodeState() & self.WAKEUP_TYPE_BEACON) == self.WAKEUP_TYPE_BEACON
-        return False
-    
-    
-    def _getNodeState(self):
-        # Get active Wakeup Type
-        node_state = self._getCmdResponse(self.CMD_WAKEUP_QUERY)
-        if node_state != self._node_state:
-            str = 'TinyNode wakeup states are: '
-            if (node_state & self.WAKEUP_TYPE_SCHEDULED) == self.WAKEUP_TYPE_SCHEDULED:
-                str += 'SCHEDULE '
-            if (node_state & self.WAKEUP_TYPE_SERVICE) == self.WAKEUP_TYPE_SERVICE:
-                str += 'SERVICE '
-            if (node_state & self.WAKEUP_TYPE_BEACON) == self.WAKEUP_TYPE_BEACON:
-                str += 'BEACON '
-            if (node_state & self.WAKEUP_TYPE_NODE_REBOOT) == self.WAKEUP_TYPE_NODE_REBOOT:
-                str += 'NODE_REBOOT'
-            self.info(str)
-            self._node_state = node_state
-        if node_state == -1:
-            return 0
-        else:
-            return node_state
         
         
     def _serviceTime(self):
@@ -450,8 +394,8 @@ class SchedulePluginClass(AbstractPluginClass):
     def _scheduleNextDutyWakeup(self, time_delta, schedule_name):
         if self._shutdown_mode:
             time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
-            if self._getCmdResponse(self.CMD_NEXT_WAKEUP, time_to_wakeup) == time_to_wakeup:
-                self.info('successfully scheduled the next duty wakeup for '+schedule_name+' (that\'s in '+str(time_to_wakeup)+' seconds)')
+            self._serialHandler.write(CMD_NEXT_WAKEUP, argument=time_to_wakeup)
+            self.info('successfully scheduled the next duty wakeup for '+schedule_name+' (that\'s in '+str(time_to_wakeup)+' seconds)')
             
 
     def _shutdown(self, sleepdelta=timedelta()):
@@ -468,8 +412,8 @@ class SchedulePluginClass(AbstractPluginClass):
             time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
             time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
             self.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
-            if self._getCmdResponse(self.CMD_SERVICE_WINDOW, time_to_service) == time_to_service:
-                self.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
+            self._serialHandler.write(CMD_SERVICE_WINDOW, argument=time_to_service)
+            self.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
     
             # Schedule next duty wakeup
             next_schedule = self._schedule.getNextSchedules(datetime.utcnow())[0]
@@ -501,14 +445,14 @@ class SchedulePluginClass(AbstractPluginClass):
             # last possible moment to check if a beacon has been sent to the node
             # (if so, we do not want to shutdown)
             self.info('get node wakeup states')
-            self._node_state = self._getNodeState()
-            if self._stopped or self._isBeaconState():
+            self._serialHandler.write(CMD_WAKEUP_QUERY, blocking=True)
+            if self._stopped or not self._shutdown_mode:
                 return
 
             # Tell TinyNode to shut us down in X seconds
             shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
-            if(self._getCmdResponse(self.CMD_SHUTDOWN, shutdown_offset) == shutdown_offset):
-                self.info('we\'re going to do a hard shut down in '+str(shutdown_offset)+' seconds ...')
+            self._serialHandler.write(CMD_SHUTDOWN, argument=shutdown_offset)
+            self.info('we\'re going to do a hard shut down in '+str(shutdown_offset)+' seconds ...')
     
             parentpid = os.getpid()
             
@@ -555,6 +499,208 @@ class SchedulePluginClass(AbstractPluginClass):
             #no permissions
             elif e.errno == 1: return False
             else: raise
+        
+        
+        
+class SerialHandler(Thread):
+    
+    def __init__(self, schedulePlugin, address, debug):
+        Thread.__init__(self)
+        self._schedulePlugin = schedulePlugin
+        self._stopped = False
+        self._node_state = None
+        
+        # Initialize the serial source to the TinyNode
+
+        # split the address (it should have the form serial@port:baudrate)
+        source = address.split('@')
+        if source[0] == 'serial':
+            try:
+                # try to open a connection to the specified serial port
+                serial = tos.getSource(address, debug)
+                self._serialsource = tos.AM(serial)
+            except Exception, e:
+                raise TypeError('could not initialize serial source: ' + e.__str__())
+        else:
+            raise TypeError('address type must be serial')
+        
+        self._serialWriter = SerialWriter(self, self._serialsource)
+        
+        
+    def run(self):
+        self._schedulePlugin.info('SerialHandler: started')
+        
+        self._serialsource.start()
+        self._serialWriter.start()
+        
+        while not self._stopped:
+            # read packet from serial port (this is blocking)
+            try:
+                self._schedulePlugin.debug('rcv...')
+                packet = self._serialsource.read()
+            except Exception, e:
+                if not self._stopped:
+                    self._schedulePlugin.error('could not read from serial source: ' + e.__str__())
+                continuepacket
+            
+            # if the packet is None just continue
+            if not packet:
+                #self._schedulePlugin.debug('read packet None')
+                continue
+            
+            response = tos.Packet(TOS_CMD_STRUCTURE, packet['data'])
+            if response['command'] == CMD_WAKEUP_QUERY:
+                node_state = response['argument']
+                self._schedulePlugin.debug('CMD_WAKEUP_QUERY response received with argument: ' + str(node_state))
+                if node_state != self._node_state:
+                    s = 'TinyNode wakeup states are: '
+                    if (node_state & WAKEUP_TYPE_SCHEDULED) == WAKEUP_TYPE_SCHEDULED:
+                        s += 'SCHEDULE '
+                    if (node_state & WAKEUP_TYPE_SERVICE) == WAKEUP_TYPE_SERVICE:
+                        s += 'SERVICE '
+                    if (node_state & WAKEUP_TYPE_BEACON) == WAKEUP_TYPE_BEACON:
+                        self._schedulePlugin.beaconReceived()
+                        s += 'BEACON '
+                    if (node_state & WAKEUP_TYPE_NODE_REBOOT) == WAKEUP_TYPE_NODE_REBOOT:
+                        s += 'NODE_REBOOT'
+                    self._schedulePlugin.info(s)
+                    self._node_state = node_state
+            elif response['command'] == CMD_SERVICE_WINDOW:
+                self._schedulePlugin.info('CMD_SERVICE_WINDOW response received with argument: ' + str(response['argument']))
+            elif response['command'] == CMD_NEXT_WAKEUP:
+                self._schedulePlugin.info('CMD_NEXT_WAKEUP response received with argument: ' + str(response['argument']))
+            elif response['command'] == CMD_SHUTDOWN:
+                self._schedulePlugin.info('CMD_SHUTDOWN response received with argument: ' + str(response['argument']))
+            elif response['command'] == CMD_NET_STATUS:
+                self._schedulePlugin.info('CMD_NET_STATUS response received with argument: ' + str(response['argument']))
+            elif response['command'] == CMD_RESET_WATCHDOG:
+                self._schedulePlugin.info('CMD_RESET_WATCHDOG response received with argument: ' + str(response['argument']))
+            
+            try:
+                self._serialsource.sendAck()
+            except Exception, e:
+                if not self._stopped:
+                    self._schedulePlugin.error('could not send ack: ' + e.__str__())
+                  
+            if response['command'] == self._serialWriter.getSentCommandType():
+                self._serialWriter.packetAckReceived()
+
+        self._schedulePlugin.info('SerialHandler: died')
+        
+        
+    def write(self, cmd, argument=0, blocking=False):
+        self._serialWriter.write(cmd, argument, blocking)
+    
+    
+    def stop(self):
+        self._stopped = True
+        self._serialWriter.stop()
+        self._serialsource.stop()
+        self._schedulePlugin.info('SerialHandler: stopped')
+        
+    
+        
+class SerialWriter(Thread):
+    
+    def __init__(self, serialHandler, serialsource):
+        Thread.__init__(self)
+        self._serialsource = serialsource
+        self._serialHandler = serialHandler
+        self._sendqueue = Queue.Queue(SEND_QUEUE_SIZE)
+        
+        self._work = Event()
+        self._ackEvent = Event()
+        
+        self._sentCmd = None
+        self._stopped = False
+        
+        
+    def run(self):
+        self._serialHandler._schedulePlugin.info('SerialWriter: started')
+
+        # open accessnode queue, just in case if we closed it before...
+        self.sendOpenQueueCommand()
+        
+        while not self._stopped:
+            self._work.wait()
+            if self._stopped:
+                break
+            self._work.clear()
+            # is there something to do?
+            while not self._sendqueue.empty() and not self._stopped:
+                try:
+                    item = self._sendqueue.get_nowait()
+                except Queue.Empty:
+                    self._logger.warning('send queue is empty')
+                    break
+                
+                if item[1]:
+                    self._sentCmd = item[0]['command']
+
+                self._serialHandler._schedulePlugin.debug('snd...')
+                self._serialsource.write(item[0], AM_CONTROL_CMD_MSG)
+                
+                if item[1]:
+                    self._ackEvent.wait()
+                    if self._stopped:
+                        self._serialHandler._schedulePlugin.info('SerialWriter: died')
+                        return
+                    self._sentCmd = None
+                    self._ackEvent.clear()
+            
+                self._sendqueue.task_done()
+            
+        self._serialHandler._schedulePlugin.info('SerialWriter: died')
+        
+        
+    def write(self, cmd, argument=0, blocking=False):
+        '''
+        Send a command to the TinyNode
+        
+        @param cmd: the 1 Byte Command Code
+        @param argument: the 4 byte argument for the command
+        '''
+        if not self._stopped:
+            try:
+                self._sendqueue.put_nowait((tos.Packet(TOS_CMD_STRUCTURE, [cmd, argument]), blocking))
+            except Queue.Full:
+                self._serialHandler._schedulePlugin.error('send queue is full')
+                return False
+            self._work.set()
+            if blocking:
+                self._ackEvent.wait()
+            return True
+        return False
+    
+    
+    def packetAckReceived(self):
+        self._serialHandler._schedulePlugin.debug('packet acknowledge received')
+        self._ackEvent.set()
+        
+        
+    def getSentCommandType(self):
+        return self._sentCmd
+    
+    
+    def stop(self):
+        self._stopped = True
+        self._work.set()
+        self._ackEvent.set()
+        self.join()
+        
+        # send close queue cmd to access node
+        self.sendCloseQueueCommand()
+        self._serialHandler._schedulePlugin.info('SerialWriter: stopped')
+
+
+    def sendCloseQueueCommand(self):
+        self._serialsource.write(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x00, 0x00]).tolist(), 0x00, 0.2, True)
+        time.sleep(35)
+
+
+    def sendOpenQueueCommand(self):
+        self._serialsource.write(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x01, 0x00]).tolist(), 0x00, 0.2, True)
+         
         
         
 class JobsObserver(Thread):
@@ -632,7 +778,7 @@ class JobsObserver(Thread):
         self._stopped = True
         self._work.set()
         self._wait.set()
-        self._parent.info('JobsObserver: stopped')
+        self._parent.info('JobsObserver: stopped')   
         
         
         
@@ -650,8 +796,8 @@ class PingThread(Thread):
     def run(self):
         self._parent.info('PingThread: started')
         while not self._stopped:
-            if(self._parent._getCmdResponse(self._parent.CMD_RESET_WATCHDOG, self._watchdog_timeout_seconds) == self._watchdog_timeout_seconds):
-                self._parent.info('watchdog reset successfully')
+            self._parent._serialHandler.write(CMD_RESET_WATCHDOG, self._watchdog_timeout_seconds)
+            self._parent.info('watchdog reset successfully')
             self._work.wait(self._ping_interval_seconds)
         self._parent.info('PingThread: died')
 
@@ -679,15 +825,15 @@ class ScheduleCron(CronTab):
         for schedule in self.crons:
             runtimemin = None
             commandstring = str(schedule.command).strip()
-            back_index = commandstring.lower().find(SchedulePluginClass.BACKWARD_TOLERANCE_NAME)
-            run_index = commandstring.lower().find(SchedulePluginClass.MAX_RUNTIME_NAME)
+            back_index = commandstring.lower().find(BACKWARD_TOLERANCE_NAME)
+            run_index = commandstring.lower().find(MAX_RUNTIME_NAME)
             td = timedelta()
             
             if back_index != -1 and run_index != -1:
                 if back_index < run_index:
-                    runtimemin = int(commandstring[run_index:].strip().replace(SchedulePluginClass.MAX_RUNTIME_NAME+'=',''))
+                    runtimemin = int(commandstring[run_index:].strip().replace(MAX_RUNTIME_NAME+'=',''))
                     if look_backward:
-                        backwardmin = int(commandstring[back_index:run_index].strip().replace(SchedulePluginClass.BACKWARD_TOLERANCE_NAME+'=',''))
+                        backwardmin = int(commandstring[back_index:run_index].strip().replace(BACKWARD_TOLERANCE_NAME+'=',''))
                         td = timedelta(minutes=backwardmin)
                         nextdt = self._getNextSchedule(date_time - td, schedule)
                         if nextdt < now:
@@ -695,9 +841,9 @@ class ScheduleCron(CronTab):
                         
                     commandstring = commandstring[:back_index].strip()
                 else:      
-                    runtimemin = int(commandstring[run_index:back_index].strip().replace(SchedulePluginClass.MAX_RUNTIME_NAME+'=',''))
+                    runtimemin = int(commandstring[run_index:back_index].strip().replace(MAX_RUNTIME_NAME+'=',''))
                     if look_backward:
-                        backwardmin = int(commandstring[back_index:].strip().replace(SchedulePluginClass.BACKWARD_TOLERANCE_NAME+'=',''))
+                        backwardmin = int(commandstring[back_index:].strip().replace(BACKWARD_TOLERANCE_NAME+'=',''))
                         td = timedelta(minutes=backwardmin)
                         nextdt = self._getNextSchedule(date_time - td, schedule)
                         if nextdt < now:
@@ -706,7 +852,7 @@ class ScheduleCron(CronTab):
                     commandstring = commandstring[:run_index].strip()
             elif back_index != -1:
                 if look_backward:
-                    backwardmin = int(commandstring[back_index:].strip().replace(SchedulePluginClass.BACKWARD_TOLERANCE_NAME+'=',''))
+                    backwardmin = int(commandstring[back_index:].strip().replace(BACKWARD_TOLERANCE_NAME+'=',''))
                     td = timedelta(minutes=backwardmin)
                     nextdt = self._getNextSchedule(date_time - td, schedule)
                     if nextdt < now:
@@ -714,7 +860,7 @@ class ScheduleCron(CronTab):
                     
                 commandstring = commandstring[:back_index].strip()
             elif run_index != -1:
-                runtimemin = int(commandstring[run_index:].strip().replace(SchedulePluginClass.MAX_RUNTIME_NAME+'=',''))
+                runtimemin = int(commandstring[run_index:].strip().replace(MAX_RUNTIME_NAME+'=',''))
                 commandstring = commandstring[:run_index].strip()
                 
             nextdt = self._getNextSchedule(date_time, schedule)
