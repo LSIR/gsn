@@ -182,7 +182,7 @@ class BackLogMainClass(Thread):
             except NotImplementedError, e:
                 self._logger.error(plugin_entry[0] + ': ' + e.__str__())
                 self.incrementErrorCounter()
-        return False
+        return self.backlog.isBusy()
         
     
     def resend(self):

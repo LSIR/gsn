@@ -506,6 +506,7 @@ class BigBinaryPluginClass(AbstractPluginClass):
     
     
     def stop(self):
+        self._isBusy = False
         self._stopped = True
         self._notifier.stop()
         self._lock.acquire()

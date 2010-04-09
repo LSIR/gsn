@@ -521,7 +521,7 @@ class AM(SimpleAM):
         if not timeout:
            timeout=self._source.ackTimeout
         r = super(AM, self).write(packet, amId, timeout, blocking)
-        while not r:
+        while not r and not self._stopped:
             r = super(AM, self).write(packet, amId, timeout, blocking, inc=0)
         return True
 

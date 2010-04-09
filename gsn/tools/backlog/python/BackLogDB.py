@@ -75,7 +75,7 @@ class BackLogDBClass(Thread):
             self._cur.execute('PRAGMA integrity_check')
             if self._cur.fetchone()[0] != 'ok':
                 raise sqlite3.Error('failed database integrity check')
-                        
+            
             self._logger.info('vacuum database')
             
             self._con.execute('VACUUM')
@@ -88,6 +88,11 @@ class BackLogDBClass(Thread):
             self._dbNumberOfEntries = self._cur.fetchone()[0]
             self._logger.info(str(self._dbNumberOfEntries) + ' entries in database')
             
+            if self._dbNumberOfEntries > 0:
+                self._isBusy = True
+            else:
+                self._isBusy = False
+            
             self._con.commit()
         except sqlite3.Error, e:
             raise TypeError('sqlite3: ' + e.__str__())
@@ -97,6 +102,7 @@ class BackLogDBClass(Thread):
         # thread lock to coordinate access to the database
         self._lock = Lock()
         self._resend = Event()
+        self._sleepEvent = Event()
     
         self._stopped = False
         self._sleep = False
@@ -175,6 +181,7 @@ class BackLogDBClass(Thread):
         '''
         Resend all messages which are in the backlog database to GSN.
         '''
+        self._isBusy = True
         self._sleep = sleep
         self._resend.set()
 
@@ -186,7 +193,7 @@ class BackLogDBClass(Thread):
             if self._stopped:
                 break
             if self._sleep:
-                time.sleep(SLEEP_BEFORE_RESEND_ON_RECONNECT)
+                self._sleepEvent.wait(SLEEP_BEFORE_RESEND_ON_RECONNECT)
             if self._stopped:
                 break
 
@@ -207,6 +214,7 @@ class BackLogDBClass(Thread):
                     
                 if row is None:
                     self._logger.info('all packets are sent')
+                    self._isBusy = False
                     break
 
                 timestamp = row[0]
@@ -218,6 +226,7 @@ class BackLogDBClass(Thread):
                     self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
                 else:
                     self._logger.info('resend interrupted')
+                    self._isBusy = False
                     break
 
             self._resend.clear()
@@ -227,12 +236,18 @@ class BackLogDBClass(Thread):
 
     def __del__(self):
         self._cur.close()
-        self._con.close() 
+        self._con.close()
+        
+        
+    def isBusy(self):
+        return self._isBusy
         
 
     def stop(self):
+        self._isBusy = False
         self._stopped = True
         self._resend.set()
+        self._sleepEvent.set()
         self._logger.info('stopped')
         
         

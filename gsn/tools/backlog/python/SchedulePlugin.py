@@ -46,13 +46,13 @@ class SchedulePluginClass(AbstractPluginClass):
     CMD_NEXT_WAKEUP = 3
     CMD_SHUTDOWN = 4
     CMD_NET_STATUS = 5
-    CMD_WATCHDOG = 6
+    CMD_RESET_WATCHDOG = 6
 
     # The wakeup types
-    WAKEUP_TYPE_SCHEDULED = 0
-    WAKEUP_TYPE_SERVICE = 1
-    WAKEUP_TYPE_BEACON = 2
-    WAKEUP_TYPE_NODE_REBOOT = 3
+    WAKEUP_TYPE_SCHEDULED = 1
+    WAKEUP_TYPE_SERVICE = 2
+    WAKEUP_TYPE_BEACON = 4
+    WAKEUP_TYPE_NODE_REBOOT = 8
     
     # ping and watchdog timing
     PING_INTERVAL_SEC = 30
@@ -81,6 +81,7 @@ class SchedulePluginClass(AbstractPluginClass):
         self._connectionEvent = Event()
         self._scheduleEvent = Event()
         self._scheduleLock = Lock()
+        self._serialLock = Lock()
         self._stopEvent = Event()
         self._allJobsFinishedEvent = Event()
         self._allJobsFinishedEvent.set()
@@ -89,6 +90,7 @@ class SchedulePluginClass(AbstractPluginClass):
         self._gsnconnected = False
         self._schedulereceived = False
         self._schedule = None
+        self._node_state = None
         self._newSchedule = False
         self._stopped = False
             
@@ -128,7 +130,6 @@ class SchedulePluginClass(AbstractPluginClass):
             else:
                 raise TypeError('address type must be serial')
             
-        if self._shutdown_mode:
             self._pingThread = PingThread(self, self.PING_INTERVAL_SEC, self.WATCHDOG_TIMEOUT_SEC)
         
         if os.path.isfile(self.getOptionValue('schedule_file')+'.parsed'):
@@ -163,6 +164,7 @@ class SchedulePluginClass(AbstractPluginClass):
         if self._shutdown_mode:
             self._serialsource.start()
             self._pingThread.start()
+            self._node_state = self._getNodeState()
           
         if self._schedule and self._shutdown_mode:  
             # Schedule duty wakeup after this session, for safety reasons.
@@ -228,6 +230,7 @@ class SchedulePluginClass(AbstractPluginClass):
         stop = False
         service_time = timedelta()
         while not stop and not self._stopped:
+            self._max_job_runtime_sec = int(self.getOptionValue('max_default_job_runtime_minutes'))*60
             dtnow = datetime.utcnow() 
             # get the next schedule(s) in time
             if not self._shutdown_mode:
@@ -243,7 +246,7 @@ class SchedulePluginClass(AbstractPluginClass):
                 self.debug('(' + str(schedule[0]) + ',' + str(schedule[1]) + ')')
                 dtnow = datetime.utcnow()
                 timediff = schedule[0] - dtnow
-                if self._shutdown_mode:
+                if self._shutdown_mode and not self._isBeaconState():
                     service_time = self._serviceTime()
                     if schedule[0] <= dtnow:
                         self.debug('start >' + schedule[1] + '< now')
@@ -257,8 +260,11 @@ class SchedulePluginClass(AbstractPluginClass):
                             self.debug('nothing more to do in the next ' + self.getOptionValue('max_next_schedule_wait_minutes') + ' minutes (max_next_schedule_wait_minutes)')
                         else:
                             self.debug('nothing more to do in the next ' + str(service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes'))) + ' minutes (rest of service time plus max_next_schedule_wait_minutes)')
-                        stop = True
-                        break
+                        
+                        self._node_state = self._getNodeState()
+                        if not self._isBeaconState():
+                            stop = True
+                            break
                 else:
                     if schedule[0] <= dtnow:
                         self.debug('start >' + schedule[1] + '< now')
@@ -276,10 +282,11 @@ class SchedulePluginClass(AbstractPluginClass):
                     self.error('error in scheduled job >' + schedule[1] + '<:' + str(e))
                 else:
                     self._allJobsFinishedEvent.clear()
-                    # TODO: max runtime argument per process insertion
+                    if schedule[2] > self._max_job_runtime_sec:
+                        self._max_job_runtime_sec = schedule[2]
                     self._jobsObserver.observeJob(proc, schedule[1], schedule[2])
                     
-        if self._shutdown_mode:
+        if self._shutdown_mode and not self._isBeaconState() and not self._stopped:
             self._shutdown(service_time)
                 
         self.info('died')
@@ -377,17 +384,46 @@ class SchedulePluginClass(AbstractPluginClass):
         packet = tos.Packet(self.TOS_CMD_STRUCTURE, [cmd, argument])
 
         resp_packet = None
+        self._serialLock.acquire()
         while not resp_packet:
             self._serialsource.write(packet, self.AM_CONTROL_CMD_MSG)
             resp_packet = self._serialsource.read(1)
             if self._stopped:
+                self._serialLock.release()
                 return -1
+        self._serialLock.release()
 
         response = tos.Packet(self.TOS_CMD_STRUCTURE, resp_packet['data'])
         if response['command'] == cmd:
             return response['argument']
         else:
             return -1
+        
+        
+    def _isBeaconState(self):
+#        return (self._getNodeState() & self.WAKEUP_TYPE_BEACON) == self.WAKEUP_TYPE_BEACON
+        return False
+    
+    
+    def _getNodeState(self):
+        # Get active Wakeup Type
+        node_state = self._getCmdResponse(self.CMD_WAKEUP_QUERY)
+        if node_state != self._node_state:
+            str = 'TinyNode wakeup states are: '
+            if (node_state & self.WAKEUP_TYPE_SCHEDULED) == self.WAKEUP_TYPE_SCHEDULED:
+                str += 'SCHEDULE '
+            if (node_state & self.WAKEUP_TYPE_SERVICE) == self.WAKEUP_TYPE_SERVICE:
+                str += 'SERVICE '
+            if (node_state & self.WAKEUP_TYPE_BEACON) == self.WAKEUP_TYPE_BEACON:
+                str += 'BEACON '
+            if (node_state & self.WAKEUP_TYPE_NODE_REBOOT) == self.WAKEUP_TYPE_NODE_REBOOT:
+                str += 'NODE_REBOOT'
+            self.info(str)
+            self._node_state = node_state
+        if node_state == -1:
+            return 0
+        else:
+            return node_state
         
         
     def _serviceTime(self):
@@ -425,6 +461,8 @@ class SchedulePluginClass(AbstractPluginClass):
                 waitfor = sleepdelta.seconds + sleepdelta.days * 86400 + sleepdelta.microseconds/1000000.0
                 self.info('waiting ' + str(waitfor/60.0) + ' minutes for service windows to finish')
                 self._stopEvent.wait(waitfor)
+                if self._stopped:
+                    return
             
             # Synchronize Service Wakeup Time
             time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
@@ -435,26 +473,38 @@ class SchedulePluginClass(AbstractPluginClass):
     
             # Schedule next duty wakeup
             next_schedule = self._schedule.getNextSchedules(datetime.utcnow())[0]
+            self.info('schedule next duty wakeup')
             self._scheduleNextDutyWakeup(next_schedule[0] - datetime.utcnow(), next_schedule[1])
                     
             # wait for jobs to finish
             if not self._allJobsFinishedEvent.isSet():
-                self.info('waiting for all active jobs to finish for a maximum of ' + self.getOptionValue('max_default_job_runtime_minutes') + ' minutes')
-                self._allJobsFinishedEvent.wait((1+int(self.getOptionValue('max_default_job_runtime_minutes')))*60)
+                self.info('waiting for all active jobs to finish for a maximum of ' + str(self._max_job_runtime_sec/60.0) + ' minutes')
+                self._allJobsFinishedEvent.wait(1+self._max_job_runtime_sec)
+                if self._stopped:
+                    return
                 if not self._allJobsFinishedEvent.isSet():
                     self.error('not all jobs have been killed (should not happen)')
                     
             # wait for all plugins to finish
-            max_plugins_finish_wait_minutes = int(self.getOptionValue('max_plugins_finish_wait_minutes'))*60
+            max_plugins_finish_wait_seconds = int(self.getOptionValue('max_plugins_finish_wait_minutes'))*60
             self.info('waiting for all active plugins to finish for a maximum of ' + self.getOptionValue('max_plugins_finish_wait_minutes') + ' minutes')
-            while not self._stopped and not max_plugins_finish_wait_minutes <= 0:
+            while not max_plugins_finish_wait_seconds <= 0:
                 if not self._parent.pluginsBusy():
                     break
                 else:
                     self.debug('plugins are still busy')
                     self._stopEvent.wait(3)
-                    max_plugins_finish_wait_minutes -= 3
-    
+                    if self._stopped:
+                        return
+                    max_plugins_finish_wait_seconds -= 3
+                    
+            # last possible moment to check if a beacon has been sent to the node
+            # (if so, we do not want to shutdown)
+            self.info('get node wakeup states')
+            self._node_state = self._getNodeState()
+            if self._stopped or self._isBeaconState():
+                return
+
             # Tell TinyNode to shut us down in X seconds
             shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
             if(self._getCmdResponse(self.CMD_SHUTDOWN, shutdown_offset) == shutdown_offset):
@@ -600,8 +650,8 @@ class PingThread(Thread):
     def run(self):
         self._parent.info('PingThread: started')
         while not self._stopped:
-            if(self._parent._getCmdResponse(self._parent.CMD_WATCHDOG, self._watchdog_timeout_seconds) == self._watchdog_timeout_seconds):
-                self._parent.debug('watchdog reset successfully')
+            if(self._parent._getCmdResponse(self._parent.CMD_RESET_WATCHDOG, self._watchdog_timeout_seconds) == self._watchdog_timeout_seconds):
+                self._parent.info('watchdog reset successfully')
             self._work.wait(self._ping_interval_seconds)
         self._parent.info('PingThread: died')
 
