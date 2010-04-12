@@ -77,7 +77,45 @@ class SchedulePluginClass(AbstractPluginClass):
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
         
-        # TODO: sanity check for configuration options
+        shutdownmode = int(self.getOptionValue('shutdown_mode'))
+        if shutdownmode is None:
+            raise TypeError('shutdown_mode not specified in config file')
+        elif shutdownmode != 1 and shutdownmode != 0:
+            raise TypeError('shutdown_mode has to be set to 1 or 0 in config file')
+        
+        self._getNextServiceWindowRange(self.getOptionValue('service_wakeup_schedule'))
+        
+        service_wakeup_minutes = int(self.getOptionValue('service_wakeup_minutes'))
+        if service_wakeup_minutes is None:
+            raise TypeError('service_wakeup_minutes not specified in config file')
+        
+        max_gsn_connect_wait_minutes = int(self.getOptionValue('max_gsn_connect_wait_minutes'))
+        if servicewakeupminutes is None:
+            raise TypeError('max_gsn_connect_wait_minutes not specified in config file')
+        
+        max_gsn_get_schedule_wait_minutes = int(self.getOptionValue('max_gsn_get_schedule_wait_minutes'))
+        if max_gsn_get_schedule_wait_minutes is None:
+            raise TypeError('max_gsn_get_schedule_wait_minutes not specified in config file')
+        
+        max_next_schedule_wait_minutes = int(self.getOptionValue('max_next_schedule_wait_minutes'))
+        if max_next_schedule_wait_minutes is None:
+            raise TypeError('max_next_schedule_wait_minutes not specified in config file')
+        
+        max_plugins_finish_wait_minutes = int(self.getOptionValue('max_plugins_finish_wait_minutes'))
+        if max_plugins_finish_wait_minutes is None:
+            raise TypeError('max_plugins_finish_wait_minutes not specified in config file')
+        
+        max_default_job_runtime_minutes = int(self.getOptionValue('max_default_job_runtime_minutes'))
+        if max_default_job_runtime_minutes is None:
+            raise TypeError('max_default_job_runtime_minutes not specified in config file')
+        
+        hard_shutdown_offset_minutes = int(self.getOptionValue('hard_shutdown_offset_minutes'))
+        if hard_shutdown_offset_minutes is None:
+            raise TypeError('hard_shutdown_offset_minutes not specified in config file')
+        
+        approximate_startup_seconds = int(self.getOptionValue('approximate_startup_seconds'))
+        if approximate_startup_seconds is None:
+            raise TypeError('approximate_startup_seconds not specified in config file')
         
         self._connectionEvent = Event()
         self._scheduleEvent = Event()
@@ -86,14 +124,14 @@ class SchedulePluginClass(AbstractPluginClass):
         self._allJobsFinishedEvent = Event()
         self._allJobsFinishedEvent.set()
         
-        self._jobsObserver = JobsObserver(self, int(self.getOptionValue('max_default_job_runtime_minutes')))
+        self._jobsObserver = JobsObserver(self, max_default_job_runtime_minutes)
         self._gsnconnected = False
         self._schedulereceived = False
         self._schedule = None
         self._newSchedule = False
         self._stopped = False
             
-        self._max_next_schedule_wait_delta = timedelta(minutes=int(self.getOptionValue('max_next_schedule_wait_minutes')))
+        self._max_next_schedule_wait_delta = timedelta(minutes=max_next_schedule_wait_minutes)
         
         address = self.getOptionValue('tos_source_addr')
         
@@ -189,7 +227,10 @@ class SchedulePluginClass(AbstractPluginClass):
             self.info('waiting for gsn to answer a schedule request for a maximum of ' + self.getOptionValue('max_gsn_get_schedule_wait_minutes') + ' minutes')
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
                 self.info('request schedule from gsn')
-                self.processMsg(self.getTimeStamp(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE))
+                if self._schedule:
+                    self.processMsg(self._schedule.getCreationTime(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE))
+                else:
+                    self.processMsg(self.getTimeStamp(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE))
                 self._scheduleEvent.wait(3)
                 if self._stopped:
                     self.info('died')
@@ -333,7 +374,7 @@ class SchedulePluginClass(AbstractPluginClass):
                 # Get the schedule
                 schedule = message[9:]
                 try:
-                    sc = ScheduleCron(fake_tab=schedule)
+                    sc = ScheduleCron(creationtime, fake_tab=schedule)
                     if not self._shutdown_mode:
                         self._scheduleLock.acquire()   
                     self._schedule = sc
@@ -797,7 +838,7 @@ class PingThread(Thread):
         self._parent.info('PingThread: started')
         while not self._stopped:
             self._parent._serialHandler.write(CMD_RESET_WATCHDOG, self._watchdog_timeout_seconds)
-            self._parent.info('watchdog reset successfully')
+            self._parent.debug('reset watchdog')
             self._work.wait(self._ping_interval_seconds)
         self._parent.info('PingThread: died')
 
@@ -812,10 +853,15 @@ class PingThread(Thread):
             
 class ScheduleCron(CronTab):
     
-    def __init__(self, user=None, fake_tab=None):
+    def __init__(self, creation_time, user=None, fake_tab=None):
         CronTab.__init__(self, user, fake_tab)
+        self._creation_time = creation_time
         for schedule in self.crons:
             self._scheduleSanityCheck(schedule)
+            
+            
+    def getCreationTime(self):
+        return self._creation_time
         
     
     def getNextSchedules(self, date_time, look_backward=False):
