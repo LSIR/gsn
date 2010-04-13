@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 public class AsyncDeploymentClient extends Thread  {
 	/** Timeout in seconds to pass until trying to reconnect
     to the deployment in case of a connection loss. */
-	public static final int RECONNECT_TIMEOUT_SEC = 3;
+	public static final int RECONNECT_TIMEOUT_SEC = 30;
 
 	private static final int BUFFER_SIZE = 65536;
 	
