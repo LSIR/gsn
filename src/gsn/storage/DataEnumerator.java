@@ -183,8 +183,13 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 			return;
 		try {
 			if (!manualCloseConnection && resultSet.getStatement() != null) {
-				StorageManager.close(resultSet.getStatement().getConnection());
-			}else {
+                java.sql.Statement s = resultSet.getStatement();
+                java.sql.Connection c = s.getConnection();
+                StorageManager.close(resultSet);
+                StorageManager.closeStatement(s);
+                StorageManager.close(c);
+                resultSet = null;
+            }else {
 				try {
 					resultSet.close();
 				}catch (SQLException e) {

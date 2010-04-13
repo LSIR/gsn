@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -230,7 +231,7 @@ public class StorageManager {
 	public static void close(ResultSet resultSet) {
 		try {
 			if (resultSet != null){
-				resultSet.getStatement().close();
+				resultSet.close();
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
