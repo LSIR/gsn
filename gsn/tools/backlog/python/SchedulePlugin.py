@@ -67,11 +67,43 @@ MAX_RUNTIME_NAME = 'max_runtime_minutes'
 
 class SchedulePluginClass(AbstractPluginClass):
     '''
-    This plugin handles the schedules.
-    '''
+    The SchedulePlugin offers the functionality to schedule different
+    jobs (bash scripts, programs, etc.) on the deployment system in a
+    well defined interval. The schedule is formated in a crontab-like
+    manner and can be defined and altered on side of GSN as needed using
+    the virtual sensors web input. A new schedule will be directly
+    transmitted to the deployment if a connection exists or will be
+    requested as soon as a connection opens.
+    
+    This plugin can be run in shutdown mode or not. If the shutdown mode
+    is enabled the plugin controls the duty-cycling of the deployment system.
+    Scheduled jobs in a configurable time interval will be executed in a
+    controlled environment. After their execution the system will be shutdown
+    and taken from the power supply. A TinyNode running BBv2PowerControl
+    offers the functionality (timers, startup/shutdown commands, etc.) to
+    manage the power supply of the deployment system. Thus, job scheduling
+    combined with duty-cycling can be used to minimize the energy consumption
+    of the system. If the shutdown mode is disabled the SchedulePlugin only
+    schedules jobs without offering any duty-cycling functionality.
 
-    '''
+
     data/instance attributes:
+    _connectionEvent
+    _scheduleEvent
+    _scheduleLock
+    _stopEvent
+    _allJobsFinishedEvent
+    _jobsObserver
+    _gsnconnected
+    _schedulereceived
+    _schedule
+    _newSchedule
+    _shutdown_mode
+    _max_next_schedule_wait_delta
+    _max_job_runtime_sec
+    _serialHandler
+    _pingThread
+    _stopped
     '''
     
     def __init__(self, parent, options):

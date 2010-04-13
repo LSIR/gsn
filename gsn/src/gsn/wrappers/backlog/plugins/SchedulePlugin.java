@@ -9,9 +9,29 @@ import org.apache.log4j.Logger;
 import gsn.beans.DataField;
 import gsn.storage.StorageManager;
 
+
+
+/**
+ * The SchedulePlugin offers the functionality to schedule different
+ * jobs (bash scripts, programs, etc.) on the deployment system in a
+ * well defined interval. The schedule is formated in a crontab-like
+ * manner and can be defined and altered on side of GSN as needed using
+ * the virtual sensors web input. A new schedule will be directly
+ * transmitted to the deployment if a connection exists or will be
+ * requested as soon as a connection opens.
+ * 
+ * This plugin accepts a schedule file from the web input and stores it
+ * in the SQL database. It tries to send it directly to the deployment.
+ * It answers on a 'get schedule request' from the deployment with a
+ * new schedule if one exists, with a 'no schedule available' message
+ * if no schedule is available or with a 'same schedule' message if
+ * the newest message available has already been transmitted to the
+ * deployment.
+ * 
+ * @author Tonio Gsell
+ */
 public class SchedulePlugin extends AbstractPlugin {
 	
-
 	private static final byte TYPE_NO_SCHEDULE_AVAILABLE = 0;
 	private static final byte TYPE_SCHEDULE_SAME = 1;
 	private static final byte TYPE_NEW_SCHEDULE = 2;
@@ -43,20 +63,26 @@ public class SchedulePlugin extends AbstractPlugin {
 		if (payload[0] == GSN_TYPE_GET_SCHEDULE) {
 			Connection conn = null;
 			try {
+				// get the newest schedule from the SQL database
 				conn = StorageManager.getInstance().getConnection();
 				StringBuilder query = new StringBuilder();
 				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" order by timed desc limit 1");
 				ResultSet rs = StorageManager.executeQueryWithResultSet(query, conn);
 				
 				if (rs.next()) {
+					// get the creation time of the newest schedule
 					long creationtime = rs.getLong("creation_time");
 					logger.debug("creation time: " + creationtime);
 					if (timestamp ==  creationtime) {
+						// if the schedule on the deployment has the same creation
+						// time as the newest one in the database, we do not have
+						// to resend it
 						logger.debug("no new schedule available");
 						byte [] pkt = {TYPE_SCHEDULE_SAME};
 						sendRemote(System.currentTimeMillis(), pkt);
 					}
 					else {
+						// send the new schedule to the deployment
 						byte[] schedule = rs.getBytes("schedule");
 						logger.debug("send new schedule (" + new String(schedule) + ")");
 	
@@ -73,6 +99,7 @@ public class SchedulePlugin extends AbstractPlugin {
 						}
 					}
 				} else {
+					// we do not have any schedule available in the database
 					byte [] pkt = {TYPE_NO_SCHEDULE_AVAILABLE};
 					sendRemote(System.currentTimeMillis(), pkt);
 					logger.warn("schedule request received but no schedule available in database");
@@ -95,6 +122,7 @@ public class SchedulePlugin extends AbstractPlugin {
 		if( action.compareToIgnoreCase("schedule_command") == 0 ) {
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("schedule") == 0) {
+					// store the schedule received from the web input in the database
 					long time = System.currentTimeMillis();
 					byte [] schedule = decode(((String)paramValues[i]).toCharArray());
 					
@@ -103,6 +131,7 @@ public class SchedulePlugin extends AbstractPlugin {
 					System.arraycopy(long2arr(time), 0, pkt, 1, 8);
 					System.arraycopy(schedule, 0, pkt, 9, schedule.length);
 					boolean sent = false;
+					// and try to send it to the deployment
 					try {
 						sent = sendRemote(System.currentTimeMillis(), pkt);
 					} catch (Exception e) {
