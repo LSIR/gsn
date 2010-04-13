@@ -115,14 +115,14 @@ class SchedulePluginClass(AbstractPluginClass):
         elif shutdownmode != 1 and shutdownmode != 0:
             raise TypeError('shutdown_mode has to be set to 1 or 0 in config file')
         
-        self._getNextServiceWindowRange(self.getOptionValue('service_wakeup_schedule'))
+        self._getNextServiceWindowRange()
         
         service_wakeup_minutes = int(self.getOptionValue('service_wakeup_minutes'))
         if service_wakeup_minutes is None:
             raise TypeError('service_wakeup_minutes not specified in config file')
         
         max_gsn_connect_wait_minutes = int(self.getOptionValue('max_gsn_connect_wait_minutes'))
-        if servicewakeupminutes is None:
+        if max_gsn_connect_wait_minutes is None:
             raise TypeError('max_gsn_connect_wait_minutes not specified in config file')
         
         max_gsn_get_schedule_wait_minutes = int(self.getOptionValue('max_gsn_get_schedule_wait_minutes'))
