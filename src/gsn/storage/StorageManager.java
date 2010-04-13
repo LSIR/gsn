@@ -10,18 +10,11 @@ import gsn.utils.GSNRuntimeException;
 import gsn.utils.ValidityTools;
 
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Properties;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp.*;
 import org.apache.log4j.Logger;
 
 public class StorageManager {
@@ -33,9 +26,26 @@ public class StorageManager {
 	 * Given a connection, gets the appropriate DATABASE object from the
 	 * DATABASE Enum.
 	 */
-	public static DATABASE getDatabaseForConnection(Connection connection)
-	throws SQLException {
-		String name = connection.getMetaData().getDatabaseProductName();
+	public static DATABASE getDatabaseForConnection(Connection connection) throws SQLException {
+
+        // Note:
+        // The dbcp wraps the Connection objects in DelegatingConnection (or its subclass) objects.
+        // However, each call to the DelegatingConnection.getMetaData() will create a new DelegatingDatabaseMetaData
+        // object. These DelegatingDatabaseMetaData objects are only deferenced and thus destroyed once the connection
+        // is closed.
+        // Then, as we are not closing the connection, this lead to a OutOfMemory error.
+        //
+        // To fix this, we are calling the getMetaData() method on the wrapper Connection object.
+        //
+        DatabaseMetaData metaData = null;
+        if (connection instanceof DelegatingConnection) {
+            Connection delegate = ((DelegatingConnection) connection).getInnermostDelegate();
+            metaData = delegate == null ? connection.getMetaData() : delegate.getMetaData();
+        }
+        else
+            metaData = connection.getMetaData();
+        String name = metaData == null ? null : metaData.getDatabaseProductName();
+
 		if (name.toLowerCase().indexOf("h2") >= 0)
 			return DATABASE.H2;
 		else if (name.toLowerCase().indexOf("mysql") >= 0)
@@ -1231,6 +1241,7 @@ public class StorageManager {
 	        pool.setUrl(databaseURL);
             pool.setMaxActive(maxDBConnections);
             pool.setMaxIdle(maxDBConnections);
+        pool.setAccessToUnderlyingConnectionAllowed(true);
 		try {
 		
 			con = getConnection();
