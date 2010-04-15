@@ -121,10 +121,10 @@ public class PushRemoteWrapper extends AbstractWrapper {
 			} else {
                 InputStream content = null;
                 try {
-				    logger.warn ( new StringBuilder ( ).append ( "Wants to consume the strcture packet from " ).append(initParams.getRemoteContactPoint()));
+				    logger.debug ( new StringBuilder ( ).append ( "Wants to consume the strcture packet from " ).append(initParams.getRemoteContactPoint()));
 				    content = entity.getContent();
 				    structure = (DataField[]) XSTREAM.fromXML(content);
-				    logger.warn("Connection established for: "+ initParams.getRemoteContactPoint());
+				    logger.debug("Connection established for: "+ initParams.getRemoteContactPoint());
                     break;
                 }
                 finally {

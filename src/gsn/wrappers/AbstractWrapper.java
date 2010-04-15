@@ -255,7 +255,7 @@ public abstract class AbstractWrapper extends Thread {
 		Connection conn = null;
 		try {
             if (isOutOfOrder(se)) {
-				logger.warn("Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
+				logger.debug("Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
 				return false;
 			}
 			conn = StorageManager.getInstance().getConnection();
