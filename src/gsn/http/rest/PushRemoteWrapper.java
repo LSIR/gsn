@@ -6,6 +6,7 @@ import gsn.wrappers.AbstractWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,13 +119,18 @@ public class PushRemoteWrapper extends AbstractWrapper {
 					httpclient.getCredentialsProvider().setCredentials(authScope, creds);
 				}
 			} else {
-				logger.debug ( new StringBuilder ( ).append ( "Wants to consume the strcture packet from " ).append(initParams.getRemoteContactPoint()));
-				InputStream content = entity.getContent();
-				structure = (DataField[]) XSTREAM.fromXML(content);
-				logger.debug("Connection established for: "+ initParams.getRemoteContactPoint());
-								
-				content.close();
-				break;	
+                InputStream content = null;
+                try {
+				    logger.warn ( new StringBuilder ( ).append ( "Wants to consume the strcture packet from " ).append(initParams.getRemoteContactPoint()));
+				    content = entity.getContent();
+				    structure = (DataField[]) XSTREAM.fromXML(content);
+				    logger.warn("Connection established for: "+ initParams.getRemoteContactPoint());
+                    break;
+                }
+                finally {
+                    if (content != null) 
+				        content.close();
+                }
 			}
 		}
 
@@ -138,8 +144,25 @@ public class PushRemoteWrapper extends AbstractWrapper {
 		logger.debug ( new StringBuilder ( ).append ( "Received Stream Element at the push wrapper."));
 		StreamElement4Rest se = (StreamElement4Rest) XSTREAM.fromXML(Xstream4Rest);
 		StreamElement streamElement = se.toStreamElement();
-		lastReceivedTimestamp = streamElement.getTimeStamp();
-		return postStreamElement(streamElement);
+
+        try {
+            // If the stream element is out of order, we accept the stream element and wait for the next (update the last received time and return true)
+            if (isOutOfOrder(streamElement)) {
+                lastReceivedTimestamp = streamElement.getTimeStamp();
+                return true;
+            }
+            // Otherwise, we first try to insert the stream element.
+            // If the stream element was inserted succesfully, we wait for the next,
+            // otherwise, we return false.
+            boolean status = postStreamElement(streamElement);
+            if (status)
+                lastReceivedTimestamp = streamElement.getTimeStamp();    
+            return status;
+        }
+        catch (SQLException e) {
+            logger.warn(e.getMessage(), e);
+            return false;
+        }
 	}
 
 	public void run() {
@@ -149,31 +172,24 @@ public class PushRemoteWrapper extends AbstractWrapper {
 			try {
 				Thread.sleep(KEEP_ALIVE_PERIOD);
 				httpPost.setEntity(new UrlEncodedFormEntity(postParameters, HTTP.UTF_8));
-
-				response = httpclient.execute(httpPost);
-				int status = response.getStatusLine().getStatusCode();
+                response = null;
+                response = httpclient.execute(httpPost);
+                int status = response.getStatusLine().getStatusCode();
 				if (status != RestStreamHanlder.SUCCESS_200) {
 					logger.error("Cant register to the remote client, retrying in:"+ (KEEP_ALIVE_PERIOD/1000)+" seconds.");
 					structure = registerAndGetStructure();
 				}
 
-			} catch (InterruptedException e) {
-				logger.warn(e.getMessage(),e);
-			} catch (ClientProtocolException e) {
-				logger.warn(e.getMessage(),e);
-			} catch (IOException e) {
-				logger.warn(e.getMessage(),e);		
-			} catch (ClassNotFoundException e) {
+			} catch (Exception e) {
 				logger.warn(e.getMessage(),e);
 			}finally {
-				if( response!=null)
+				if( response!=null) {
 					try {
-						response.getEntity().getContent().close();
-					} catch (IllegalStateException e) {
-						logger.warn(e.getMessage(), e);
-					} catch (IOException e) {
+                        response.getEntity().getContent().close();
+					} catch (Exception e) {
 						logger.warn(e.getMessage(),e);
 					}
+                }
 			}
 		}
 	}

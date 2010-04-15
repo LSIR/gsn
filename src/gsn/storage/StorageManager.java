@@ -260,7 +260,7 @@ public class StorageManager {
 
 	public static void close(Connection conn) {
 		try{
-			if (conn!=null & !conn.isClosed()){
+			if (conn!=null && !conn.isClosed()){
 				conn.close();
 				connectionCount--;
 			}
