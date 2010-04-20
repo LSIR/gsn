@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 import javax.servlet.ServletException;
@@ -37,9 +39,15 @@ public class RestStreamHanlder extends HttpServlet {
 		Object is2ndPass = request.getAttribute("2ndPass");
 		Continuation continuation = ContinuationSupport.getContinuation(request);
 
+        if(continuation.isExpired()){
+            logger.debug("Continuation has expired.");
+            return;
+        }
+
 		if(is2ndPass == null) {
             continuation.setAttribute("2ndPass", Boolean.TRUE);
-            continuation.setAttribute("lock", new Semaphore(0, true));
+            continuation.setAttribute("status", new LinkedBlockingQueue<Boolean>(1));
+            continuation.setTimeout(-1); // Disable the timeout on the continuation.
             continuation.suspend();
             final DefaultDistributionRequest streamingReq;
             try {
@@ -52,9 +60,18 @@ public class RestStreamHanlder extends HttpServlet {
                 continuation.complete();
             }
 		}else {
+            boolean status = false;
+            try{
+                status = !continuation.getServletResponse().getWriter().checkError();
+            } catch (Exception e) {
+                logger.debug(e.getMessage(), e);
+            }
             continuation.suspend();
-            Semaphore lock = (Semaphore) continuation.getAttribute("lock");
-            lock.release();
+            try {
+                ((LinkedBlockingQueue<Boolean>)continuation.getAttribute("status")).put(status);
+            } catch (InterruptedException e) {
+                logger.debug(e.getMessage(), e);
+            }
 		}
 	}
 	/**
