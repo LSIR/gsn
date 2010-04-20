@@ -53,6 +53,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
         HttpConnectionParams.setTcpNoDelay(params, false);
         HttpConnectionParams.setSocketBufferSize(params, 8192);
         HttpConnectionParams.setStaleCheckingEnabled(params, true);
+        HttpConnectionParams.setConnectionTimeout(params, 30 * 1000);    // Set the connection time to 30s
         HttpConnectionParams.setSoTimeout(params, timeout);
         HttpProtocolParams.setUserAgent(params, "GSN-HTTP-CLIENT");
         return params;
