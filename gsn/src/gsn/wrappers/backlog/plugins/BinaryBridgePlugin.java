@@ -21,8 +21,9 @@ public class BinaryBridgePlugin extends AbstractPlugin {
 	private final transient Logger logger = Logger.getLogger( BinaryBridgePlugin.class );
 	
 	private final DataField[] dataField = new DataField[] {new DataField("TIMESTAMP", "BIGINT"),
-										  				   new DataField("FILEPATH", "VARCHAR(255)"),
-										  				   new DataField("DATA", "binary")};
+															new DataField("CORE_STATION_ID", "INTEGER"),
+										  				   	new DataField("FILEPATH", "VARCHAR(255)"),
+										  				   	new DataField("DATA", "binary")};
 
 	@Override
 	public byte getMessageType() {
@@ -41,7 +42,7 @@ public class BinaryBridgePlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
 		StringBuffer sb = new StringBuffer();
 		int i;
 		for (i = 0; i < packet.length; i++) {
@@ -49,7 +50,7 @@ public class BinaryBridgePlugin extends AbstractPlugin {
 			sb.append((char) packet[i]);
 		}
 		// find index of first null byte
-		Serializable[] data = {timestamp, sb.toString(), java.util.Arrays.copyOfRange(packet, i+1, packet.length)};
+		Serializable[] data = {timestamp, coreStationId, sb.toString(), java.util.Arrays.copyOfRange(packet, i+1, packet.length)};
 		if(dataProcessed(System.currentTimeMillis(), data)) {
 			ackMessage(timestamp);
 			return true;

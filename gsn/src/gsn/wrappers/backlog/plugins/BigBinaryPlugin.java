@@ -83,6 +83,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	protected final transient Logger logger = Logger.getLogger( BigBinaryPlugin.class );
 	
 	private DataField[] dataField = new DataField[] {new DataField("MODIFICATIONTIME", "BIGINT"),
+										new DataField("CORE_STATION_ID", "INTEGER"),
 			   							new DataField("RELATIVEFILE", "VARCHAR(255)"),
 			   							new DataField("STORAGEDIRECTORY", "VARCHAR(255)"),
 			   							new DataField("DATA", "binary")};
@@ -449,7 +450,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     							}
 
     							String relDir = remoteBinaryName;
-    							Serializable[] data = {binaryTimestamp, relDir, null, tmp};
+    							Serializable[] data = {binaryTimestamp, getCoreStationID(), relDir, null, tmp};
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data  (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") could not be stored in the database.");
     							}
@@ -460,7 +461,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
     						}
     						else {
     							String relLocalName = localBinaryName.replaceAll(rootBinaryDir, "");
-    							Serializable[] data = {binaryTimestamp, relLocalName, rootBinaryDir, null};
+    							Serializable[] data = {binaryTimestamp, getCoreStationID(), relLocalName, rootBinaryDir, null};
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
     							}
@@ -496,7 +497,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	
 
 	@Override
-	public boolean messageReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
 		try {
 			logger.debug("message received with timestamp " + timestamp);
 			msgQueue.add(new Message(timestamp, packet));

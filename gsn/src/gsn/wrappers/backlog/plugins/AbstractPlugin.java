@@ -3,7 +3,6 @@ package gsn.wrappers.backlog.plugins;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Properties;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -42,7 +41,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * @return true if the initialization was successful otherwise
 	 * 			 false
 	 */
-	public boolean initialize ( BackLogWrapper backLogWrapper, String deployment, Properties props ) {
+	public boolean initialize ( BackLogWrapper backLogWrapper, String coreStationName ) {
 		activeBackLogWrapper = backLogWrapper;
 		registerListener();
 		return true;
@@ -223,12 +222,40 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * 			The data to be processed. Its format must correspond
 	 * 			to the one specified by the plugin's getOutputFormat()
 	 * 			function.
+	 * @param id 
 	 * @return false if not connected to the deployment
 	 * 
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
 	public boolean sendRemote(long timestamp, byte[] data) throws Exception {
-		return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data));
+		return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null);
+	}
+
+
+
+	/**
+	 * This function can be called by the plugin, if it has processed
+	 * the data received from GSN or on any other occasion which asks
+	 * for sending data to the deployment.
+	 * 
+	 * 
+	 * @param timestamp
+	 * 			The timestamp in milliseconds this data has been
+	 * 			generated.
+	 * @param data 
+	 * 			The data to be processed. Its format must correspond
+	 * 			to the one specified by the plugin's getOutputFormat()
+	 * 			function.
+	 * @param id 
+	 * 			The id of the CoreStation the message should be sent to.
+	 * 
+	 * @return false if not connected to the deployment
+	 * 
+	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
+	 * 			or the CoreStationId does not exist.
+	 */
+	public boolean sendRemote(long timestamp, byte[] data, Integer id) throws Exception {
+		return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id);
 	}
 
 
@@ -278,6 +305,16 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	
 	public final AddressBean getActiveAddressBean ( ) {
 		return activeBackLogWrapper.getActiveAddressBean();
+	}
+
+
+	/**
+	 * This function returns the CoreStationId this plugin is connected to.
+	 * 
+	 * @return the CoreStationId
+	 */
+	public int getCoreStationID() {
+		return activeBackLogWrapper.getBLMessageMultiplexer().getCoreStationID();
 	}
 	
 

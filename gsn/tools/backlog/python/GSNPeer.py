@@ -24,7 +24,8 @@ PING_ACK_CHECK_INTERVAL_SEC = 60.0
 
 SEND_QUEUE_SIZE = 25
 
-STUFFING_BYTE = 0
+STUFFING_BYTE = 0x7e
+HELLO_BYTE = 0x7d
 
 SOL_IP = 0
 IP_MTU = 14
@@ -49,10 +50,9 @@ class GSNPeerClass(Thread):
     _backlogCounter
     _work
     _stopped
-    _stuff
     '''
 
-    def __init__(self, parent, port):
+    def __init__(self, parent, id, port):
         '''
         Inititalizes the GSN server.
         
@@ -67,6 +67,7 @@ class GSNPeerClass(Thread):
         
         # initialize variables
         self._parent = parent
+        self._id = id
         self._port = port
 
         self._inCounter = 0
@@ -75,7 +76,6 @@ class GSNPeerClass(Thread):
         self._backlogCounter = 0
         self._connected = False
         self._stopped = False
-        self._stuff = False
         self._work = Event()
         
         # try to open a server socket to which GSN can connect to
@@ -268,6 +268,7 @@ class GSNListener(Thread):
     _clientaddr
     _lock
     _stopped
+    _stuff
     _stuffread
     '''
 
@@ -288,6 +289,7 @@ class GSNListener(Thread):
         self._parent = parent
         self._port = port
         self._serversocket = serversocket
+        self._stuff = False
         
         self._gsnwriter = GSNWriter(self)
 
@@ -309,6 +311,7 @@ class GSNListener(Thread):
         pkt = None
         msgType = None
         msgTypeValid = None
+        connecting = True
         
         # listen for a connection request by a GSN instance (this is blocking)
         self._logger.info('listening on port ' + str(self._port))
@@ -318,8 +321,7 @@ class GSNListener(Thread):
                 self._logger.info('died')
                 return
             self._connected = True
-            self._gsnwriter.sendStuffingByte()
-            self._parent.connected()
+            self._gsnwriter.sendHelloMsg()
         except socket.error, e:
             if not self._stopped:
                 self.error('exception while accepting connection: ' + e.__str__())
@@ -337,34 +339,55 @@ class GSNListener(Thread):
 
             while not self._stopped:
                 self._logger.debug('rcv...')
-                # read the length (4 bytes) of the incoming packet (this is blocking)
-                try:
-                    pkt = self.pktReadAndDestuff(4)
-                    if not pkt:
-                        continue
                 
-                    if len(pkt) != 4:
-                        raise IOError('packet length does not match')
-                except (IOError, socket.error), e:
-                    if not self._stopped:
-                        raise
-                    break
-                
-                pkt_len = int(struct.unpack('<I', pkt)[0])
-
-                try:
-                    pkt = self.pktReadAndDestuff(pkt_len)
-                    if not pkt:
-                        continue
-                
-                    if len(pkt) != pkt_len:
-                        raise IOError('packet length does not match')
-                except (IOError,socket.error), e:
-                    if not self._stopped:
-                        raise
-                    break
-                
-                self._parent.pktReceived(pkt)
+                if connecting:
+                    try:
+                        helloByte = self.pktReadAndDestuff(1)
+                        if not helloByte:
+                            continue
+                    
+                        if len(helloByte) != 1:
+                            raise IOError('packet length does not match')
+                    except (IOError, socket.error), e:
+                        if not self._stopped:
+                            raise
+                        break
+                    
+                    if ord(helloByte) != HELLO_BYTE:
+                        raise IOError('hello byte does not match')
+                    else:
+                        connecting = False
+                        self._logger.debug('hello byte received')
+                        self._parent.connected()
+                else:
+                    # read the length (4 bytes) of the incoming packet (this is blocking)
+                    try:
+                        pkt = self.pktReadAndDestuff(4)
+                        if not pkt:
+                            continue
+                    
+                        if len(pkt) != 4:
+                            raise IOError('packet length does not match')
+                    except (IOError, socket.error), e:
+                        if not self._stopped:
+                            raise
+                        break
+                    
+                    pkt_len = int(struct.unpack('<I', pkt)[0])
+    
+                    try:
+                        pkt = self.pktReadAndDestuff(pkt_len)
+                        if not pkt:
+                            continue
+                    
+                        if len(pkt) != pkt_len:
+                            raise IOError('packet length does not match')
+                    except (IOError,socket.error), e:
+                        if not self._stopped:
+                            raise
+                        break
+                    
+                    self._parent.pktReceived(pkt)
         except Exception, e:
             self.disconnect()
             self._logger.exception(e.__str__())
@@ -374,21 +397,24 @@ class GSNListener(Thread):
         
     def pktReadAndDestuff(self, length):
         out = self._stuffread
+        if length == 1 and out:
+            self._stuffread = ''
+            return out
         index = 0
         while True:
             c = self.clientsocket.recv(1)
             if not c:
                 raise IOError('None returned from socket')
             
-            if ord(c) == STUFFING_BYTE and not self._parent._stuff:
-                self._parent._stuff = True
-            elif self._parent._stuff:
+            if ord(c) == STUFFING_BYTE and not self._stuff:
+                self._stuff = True
+            elif self._stuff:
                 if ord(c) == STUFFING_BYTE:
                     out += c
-                    self._parent._stuff = False
+                    self._stuff = False
                 else:
                     self._logger.warn('stuffing mark reached')
-                    self._parent._stuff = False
+                    self._stuff = False
                     self._stuffread = c
                     return None
             else:
@@ -541,7 +567,7 @@ class GSNWriter(Thread):
                 try:
                     self._parent.clientsocket.sendall(pkt)
                     if msg.__class__.__name__ != BackLogMessage.__name__ + 'Class':
-                        self._logger.debug('stuffing byte sent')
+                        self._logger.debug('hello message sent')
                     else:
                         self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
                 except socket.error, e:
@@ -557,10 +583,12 @@ class GSNWriter(Thread):
     def pktStuffing(self, pkt):
         c = chr(STUFFING_BYTE)
         return pkt.replace(c, c+c)
-    
-    
-    def sendStuffingByte(self):
-        self.addMsg(chr(STUFFING_BYTE))
+        
+        
+    def sendHelloMsg(self):
+        helloMsg = chr(STUFFING_BYTE) + chr(HELLO_BYTE)
+        helloMsg += self.pktStuffing(struct.pack('<I', self._parent._parent._id))
+        self.addMsg(helloMsg)
 
 
     def stop(self):

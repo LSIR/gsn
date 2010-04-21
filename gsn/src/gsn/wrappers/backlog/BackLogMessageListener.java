@@ -15,12 +15,13 @@ public interface BackLogMessageListener extends java.util.EventListener {
      * implemented by any listener which likes to register itself at
      * a {@link DeploymentClient}.
 	 *
+     * @param coreStationId the CoreStationId the message has been received from
      * @param timestamp contained in the message {@link BackLogMessage}
      * @param payload of the message
      * 
      * @return true, if the listener did acknowledge the message
      */
-    public boolean messageReceived(long timestamp, byte[] payload);
+    public boolean messageReceived(int coreStationId, long timestamp, byte[] payload);
 
     /**
      * This method is called to signal remote connection lost. It must be

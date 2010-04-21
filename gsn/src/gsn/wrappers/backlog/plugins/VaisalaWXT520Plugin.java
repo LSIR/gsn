@@ -9,7 +9,8 @@ import gsn.beans.DataField;
 
 public class VaisalaWXT520Plugin extends AbstractPlugin {
 
-	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"), 
+	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"),
+						new DataField("CORE_STATION_ID", "INTEGER"),
 						new DataField("Wu", "VARCHAR(100)"),
 						new DataField("Tu", "VARCHAR(100)"),
 						new DataField("Ru", "VARCHAR(100)"),
@@ -34,13 +35,14 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
 		Serializable[] data = new Serializable[dataField.length];
 
 		data[0] = timestamp;
+		data[1] = coreStationId;
 
 		int len;
-		int count = 0;
+		int count = 1;
 		int start_index = 0;
 		for (int i = 0; i<packet.length; i++) {
 			if (packet[i] == 0) {
@@ -54,7 +56,7 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 			}
 		}
 
-		if (count != (dataField.length - 1)) {
+		if (count != (dataField.length - 2)) {
 			logger.warn("The message with timestamp >" + timestamp + "< seems unparsable.");
 			return true;
 		}

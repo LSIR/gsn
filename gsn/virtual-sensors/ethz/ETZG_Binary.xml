@@ -4,6 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT" />
+            <field name="CORE_STATION_ID" type="INTEGER" />
             <field name="FILEPATH" type="VARCHAR(255)" />
             <field name="DATA" type="binary" />
         </output-structure>

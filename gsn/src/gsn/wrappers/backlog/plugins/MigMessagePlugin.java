@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Properties;
 
 import net.tinyos.message.SerialPacket;
 import net.tinyos.packet.Serial;
@@ -62,10 +61,10 @@ public class MigMessagePlugin extends AbstractPlugin
 	private static Hashtable<Class<?>,Method> parseMapping = null;
 
 	@Override
-	public boolean initialize(BackLogWrapper backlogwrapper, String deployment, Properties props) {
+	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName) {
 		super.activeBackLogWrapper = backlogwrapper;
 		try {
-			migMsgMultiplexer = MigMessageMultiplexer.getInstance(deployment, props, backlogwrapper.getBLMessageMultiplexer());
+			migMsgMultiplexer = MigMessageMultiplexer.getInstance(coreStationName, getActiveAddressBean(), backlogwrapper.getBLMessageMultiplexer());
 			
 			// get the Mig message class for the specified TOS packet
 			parameters = new MigMessageParameters();
@@ -77,7 +76,7 @@ public class MigMessagePlugin extends AbstractPlugin
 			
 			// if it is a TinyOS1.x message class we need the platform name
 			if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
-				tinyos1x_platform = props.getProperty(MigMessageMultiplexer.TINYOS1X_PLATFORM);
+				tinyos1x_platform = getActiveAddressBean().getPredicateValue(MigMessageMultiplexer.TINYOS1X_PLATFORM);
 				msgType = ((net.tinyos1x.message.Message) messageConstructor.newInstance(new byte [1])).amType();
 
 				// a template message for this platform has to be instantiated to be able to get the data offset
@@ -107,7 +106,7 @@ public class MigMessagePlugin extends AbstractPlugin
 
 	
 	@Override
-	public boolean messageReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
 		Method getter = null;
 		Object res = null;
 
@@ -178,6 +177,7 @@ public class MigMessagePlugin extends AbstractPlugin
 				new LinkedHashMap<String, DataField>(2 + parameters.getOutputStructure().length);
 			outputstructuremap.put("timestamp", new DataField("timestamp", DataTypes.BIGINT));
 			outputstructuremap.put("generationtime", new DataField("generationtime", DataTypes.BIGINT));
+			outputstructuremap.put("CORE_STATION_ID", new DataField("CORE_STATION_ID", DataTypes.INTEGER));
 			for(int i=0; i<parameters.getOutputStructure().length; i++) {
 				outputstructuremap.put(parameters.getOutputStructure()[i].getName(), 
 						parameters.getOutputStructure()[i]);

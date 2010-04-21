@@ -4,11 +4,13 @@
         <unique-timestamps>false</unique-timestamps>
         <web-input password="test">
             <command name="backlog">
+                <field name="core_station_id" type="*text">core_station_id</field>
                 <field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
             </command>
         </web-input>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT" />
+            <field name="CORE_STATION_ID" type="INTEGER" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
             <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />

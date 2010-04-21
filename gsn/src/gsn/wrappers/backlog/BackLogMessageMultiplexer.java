@@ -9,7 +9,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -20,7 +19,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-public class BackLogMessageMultiplexer extends Thread implements DeploymentListener {
+public class BackLogMessageMultiplexer extends Thread implements CoreStationListener {
 
 	/** Ping request interval in seconds. */
 	public static final int PING_INTERVAL_SEC = 10;
@@ -29,7 +28,9 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	    been received, the connection is considered broken. */
 	public static final int PING_ACK_CHECK_INTERVAL_SEC = 60;
 	
-	public static final int STUFFING_BYTE = 0;
+	public static final byte STUFFING_BYTE = 0x7e;
+	
+	public static final byte HELLO_BYTE = 0x7d;
 	
 	protected final transient Logger logger = Logger.getLogger( BackLogMessageMultiplexer.class );
 	
@@ -38,36 +39,32 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 
 	private Map<Integer,Vector<BackLogMessageListener>> msgTypeListener; // Mapping from type to Listener
 
-	protected AsyncDeploymentClient asyncDeploymentClient = null;
+	protected AsyncCoreStationClient asyncCoreStationClient = null;
 	private BlockingQueue<byte []> recvQueue = new LinkedBlockingQueue<byte[]>();
 	private boolean dispose = false;
+	private boolean connecting = true;
 	private int activPluginCounter = 0;
+	private Integer coreStationId = null;
 
 	private Timer pingTimer = null;
 	private Timer pingWatchDogTimer = null;
 
 	private InetAddress hostAddress;
 	private int hostPort;
-	private String deploymentName;
+	private String coreStationName;
 	boolean stuff = false;
 	
 	
 	public BackLogMessageMultiplexer() throws Exception {
-		throw new Exception("use 'getInstance(String deployment)' function for instantiation");
+		throw new Exception("use 'getInstance(String CoreStation)' function for instantiation");
 	}
 	
 	
-	private BackLogMessageMultiplexer(String deployment, Properties props) throws Exception {
+	private BackLogMessageMultiplexer(String coreStationAddress) throws Exception {
 		msgTypeListener = new HashMap<Integer,Vector<BackLogMessageListener>> ();
-		deploymentName = deployment;
-		
-		String address = props.getProperty("address");
-		if (address == null) {
-			throw new Exception("Could not get property 'address' from property file");
-		}
 		
 		// a first pattern match test for >host:port<
-    	Matcher m = Pattern.compile("(.*):(.*)").matcher(address);
+    	Matcher m = Pattern.compile("(.*):(.*)").matcher(coreStationAddress);
     	if ( m.find() ) {
 			try {
 				hostAddress = InetAddress.getByName(m.group(1));
@@ -79,25 +76,24 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
     	else {
 			throw new IOException("Remote BackLog host string does not match >host:port<");
     	}
+		coreStationName = hostAddress.getCanonicalHostName();
     	
-    	asyncDeploymentClient = AsyncDeploymentClient.getSingletonObject();
-    	
-		asyncDeploymentClient.registerListener(this);
+    	asyncCoreStationClient = AsyncCoreStationClient.getSingletonObject();
 		
-		setName("BackLogMessageMultiplexer-Thread:" + deployment);
+		setName("BackLogMessageMultiplexer-Thread:" + coreStationName);
 	}
 	
 	
-	public synchronized static BackLogMessageMultiplexer getInstance(String deployment, Properties props) throws Exception {
+	public synchronized static BackLogMessageMultiplexer getInstance(String coreStationAddress) throws Exception {
 		if( PING_ACK_CHECK_INTERVAL_SEC <= PING_INTERVAL_SEC )
 			throw new Exception("PING_ACK_CHECK_INTERVAL_SEC must be bigger than PING_INTERVAL_SEC");
 		
-		if(blMultiplexerMap.containsKey(deployment)) {
-			return blMultiplexerMap.get(deployment);
+		if(blMultiplexerMap.containsKey(coreStationAddress)) {
+			return blMultiplexerMap.get(coreStationAddress);
 		}
 		else {
-			BackLogMessageMultiplexer blMulti = new BackLogMessageMultiplexer(deployment, props);
-			blMultiplexerMap.put(deployment, blMulti);
+			BackLogMessageMultiplexer blMulti = new BackLogMessageMultiplexer(coreStationAddress);
+			blMultiplexerMap.put(coreStationAddress, blMulti);
 			return blMulti;
 		}
 	}
@@ -112,9 +108,12 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	
 	public void run() {
 		logger.debug("thread started");
-		
-		if (!asyncDeploymentClient.isAlive())
-			asyncDeploymentClient.start();
+    	
+		try {
+			asyncCoreStationClient.registerListener(this);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
 
 		ByteArrayOutputStream pkt = new ByteArrayOutputStream();
 		boolean newPacket = true;
@@ -132,21 +131,45 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				if (!pktDestuffing(in, baos)) {
 					logger.warn("stuffing mark reached");
+					connecting = true;
 					recvQueue.clear();
 					newPacket = true;
 					packetLength = -1;
 					pkt = new ByteArrayOutputStream();
 					
-					if (baos.size() == 0)
+					if (baos.size() == 0) {
 						continue;
+					}
 				}
 
 				pkt.write(baos.toByteArray());
 				if (dispose)
 					break;
 				
+				if (connecting) {
+					if (pkt.size() >= 5) {
+						byte[] tmp = pkt.toByteArray();
+						pkt = new ByteArrayOutputStream();
+						
+						if (tmp.length > 5)
+							pkt.write(java.util.Arrays.copyOfRange(tmp, (int) (5), tmp.length));
+
+						coreStationId = AbstractPlugin.arr2int(tmp, 1);
+						
+						if (tmp[0] != HELLO_BYTE) {
+							logger.error("connection hello message does not match");
+							asyncCoreStationClient.reconnect(this);
+						}
+						else {
+							asyncCoreStationClient.addCoreStationId(this, coreStationId);
+							connecting = false;
+							connectionFinished();
+						}
+					}
+				}
+				
 				boolean hasMorePkt = true;
-				while(hasMorePkt) {
+				while(hasMorePkt && !connecting) {
 					if (newPacket) {
 						if (pkt.size() >= 4) {
 							logger.debug("rcv...");
@@ -176,7 +199,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 		    		    	// restart ping checker timer
 			    			logger.debug("reset ping watchdog");
 		    				pingWatchDogTimer.cancel();
-		    		        pingWatchDogTimer = new Timer("PingWatchDog-" + deploymentName);
+		    		        pingWatchDogTimer = new Timer("PingWatchDog-" + coreStationName);
 		    		        pingWatchDogTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000 );
 			    		}
 			    		else
@@ -203,16 +226,16 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 					stuff = false;
 				}
 				else {
-					destuffed = new ByteArrayOutputStream();
+					try {
+						destuffed.flush();
+					} catch (IOException e) {
+						logger.error(e.getMessage(), e);
+					}
+					stuff = false;
 					if (in.length-i != 0) {
-						try {
-							destuffed.write(java.util.Arrays.copyOfRange(in, i, in.length));
-						} catch (IOException e) {
-							logger.error(e.getMessage(), e);
-						}
+						pktDestuffing(java.util.Arrays.copyOfRange(in, i, in.length), destuffed);
 					}
 					
-					stuff = false;
 					return false;
 				}
 			}
@@ -225,9 +248,11 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 
 	private void dispose() {
     	// stop ping timer
-        pingTimer.cancel();
+		if (pingTimer != null)
+			pingTimer.cancel();
     	// stop ping checker timer
-        pingWatchDogTimer.cancel();
+		if (pingWatchDogTimer != null)
+			pingWatchDogTimer.cancel();
         
 		dispose = true;
 		try {
@@ -237,27 +262,32 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 		}
 		recvQueue.clear();
 		
-		blMultiplexerMap.remove(deploymentName);
+		blMultiplexerMap.remove(coreStationName);
 		
-		asyncDeploymentClient.deregisterListener(this);
+		asyncCoreStationClient.deregisterListener(this);
 	}
 
 
 	/**
-	 * Send the message to the basestation this client is connected to.
+	 * Send the message to the CoreStation with the specific id.
 	 * The timestamp field in the BackLogMessage will be overwritten
 	 * with System.currentTimeMillis() in this function!
 	 * 
 	 * @param message
-	 *          a BackLogMessage to be sent to the basestation
+	 *          a BackLogMessage to be sent to the CoreStation
 	 *          
-	 * @return false if the connection to the deployment is not established
+	 * @param id
+	 *          the id of the CoreStation the message should be sent to or null
+	 *          if the message should be sent to the CoreStation this BackLogMessageMultiplexer
+	 *          is connected to
+	 *          
+	 * @return false if the connection to the CoreStation is not established
 	 * 
-	 * @throws IOException if the message is too long
+	 * @throws IOException if the message is too long or the CoreStationId does not exist
 	 */
-	public boolean sendMessage(BackLogMessage message) throws IOException {
+	public boolean sendMessage(BackLogMessage message, Integer id) throws IOException {
 		logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
-		return asyncDeploymentClient.send(this, message.getMessage());
+		return asyncCoreStationClient.send(this, message.getMessage(), id);
 	}
 
 
@@ -341,7 +371,7 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 			BackLogMessage received = message.clone();
 			
 			// send the message to the listener
-			if (temp.messageReceived(received.getTimestamp(), received.getPayload()) == true)
+			if (temp.messageReceived(coreStationId, received.getTimestamp(), received.getPayload()) == true)
 				ReceiverCount++;
 		}
 		if (ReceiverCount == 0)
@@ -366,28 +396,21 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 		BackLogMessage ack = new BackLogMessage(BackLogMessage.ACK_MESSAGE_TYPE, timestamp);
 		logger.debug("Ack sent: timestamp: " + timestamp);
 		try {
-			sendMessage(ack);
+			sendMessage(ack, null);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
-
-
-	@Override
-	public void connectionEstablished() {
-		logger.debug("connection established");
-
-		try {
-			asyncDeploymentClient.sendStuffingByte(this);
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
+	
+	
+	private void connectionFinished() {
+		logger.debug("connection finished");
 		
     	// start ping timer
-        pingTimer = new Timer("PingTimer-" + deploymentName);
+        pingTimer = new Timer("PingTimer-" + coreStationName);
         pingTimer.schedule( new PingTimer(this), PING_INTERVAL_SEC * 1000, PING_INTERVAL_SEC * 1000 );
     	// start ping checker timer
-        pingWatchDogTimer = new Timer("PingWatchDog-" + deploymentName);
+        pingWatchDogTimer = new Timer("PingWatchDog-" + coreStationName);
         pingWatchDogTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000 );
         
 		Iterator<Vector<BackLogMessageListener>> iter = msgTypeListener.values().iterator();
@@ -402,13 +425,28 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 
 
 	@Override
+	public void connectionEstablished() {
+		logger.debug("connection established");
+
+		try {
+			connecting = true;
+			asyncCoreStationClient.sendHelloMsg(this);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+
+	@Override
 	public void connectionLost() {
 		logger.debug("connection lost");
 		
     	// stop ping timer
-        pingTimer.cancel();
+		if (pingTimer != null)
+			pingTimer.cancel();
     	// stop ping checker timer
-        pingWatchDogTimer.cancel();
+		if (pingWatchDogTimer != null)
+			pingWatchDogTimer.cancel();
 
 		Iterator<Vector<BackLogMessageListener>> iter = msgTypeListener.values().iterator();
 		while (iter.hasNext()) {
@@ -418,18 +456,20 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 				en.nextElement().remoteConnLost();
 			}
 		}
+		
+		asyncCoreStationClient.removeCoreStationId(coreStationId);
 	}
 	
 
 	/**
-	 * Send a ping message to the deployment.
+	 * Send a ping message to the CoreStation.
 	 * 
-	 * @return false if not connected to the deployment
+	 * @return false if not connected to the CoreStation
 	 */
 	protected boolean sendPing() {
 		// send ping
 		try {
-			return sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()));
+			return sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()), null);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 			return false;
@@ -438,14 +478,14 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 	
 
 	/**
-	 * Send a ping acknowledge message to the deployment.
+	 * Send a ping acknowledge message to the CoreStation.
 	 * 
-	 * @return false if not connected to the deployment
+	 * @return false if not connected to the CoreStation
 	 */
 	private boolean sendPingAck(long timestamp) {
 		// send ping ACK
 		try {
-			return sendMessage(new BackLogMessage(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp));
+			return sendMessage(new BackLogMessage(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp), null);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 			return false;
@@ -454,20 +494,25 @@ public class BackLogMessageMultiplexer extends Thread implements DeploymentListe
 
 
 	@Override
-	public String getDeploymentName() {
-		return deploymentName;
+	public String getCoreStationName() {
+		return coreStationName;
 	}
 	
 	
 	public boolean isConnected() {
-		return asyncDeploymentClient.isConnected(this);
+		return asyncCoreStationClient.isConnected(this);
+	}
+
+
+	public int getCoreStationID() {
+		return coreStationId;
 	}
 }
 
 
 
 /**
- * Sends a ping to the deployment.
+ * Sends a ping to the CoreStation.
  * 
  * @author Tonio Gsell
  */
@@ -502,6 +547,6 @@ class PingWatchDog extends TimerTask {
 	
 	public void run() {
 		logger.debug("connection lost");
-		parent.asyncDeploymentClient.reconnect(parent);
+		parent.asyncCoreStationClient.reconnect(parent);
 	}
 }

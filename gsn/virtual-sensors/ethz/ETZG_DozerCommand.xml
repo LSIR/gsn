@@ -4,6 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <web-input>
             <command name="tosmsg">
+                <field name="core_station_id" type="*text">core_station_id</field>
                 <field name="destination" type="*text" defaultvalue="65535">destination</field>
                 <field name="cmd" type="*select:|IDLE_CMD,0|DATA_CONTROL_CMD,1|OBJECT_TRANSFER,7|ACCESSNODE_QUEUE_CTRL_CMD,8|GUMSTIX_CTRL_CMD,14">cmd</field>
                 <field name="arg" type="*text">destination</field>
@@ -12,6 +13,7 @@
         </web-input>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="CORE_STATION_ID" type="INTEGER" />
             <field name="DESTINATION" type="INTEGER"/>
             <field name="CMD" type="TINYINT" />
             <field name="ARG" type="SMALLINT" />

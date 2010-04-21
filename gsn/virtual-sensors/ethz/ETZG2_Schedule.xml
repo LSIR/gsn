@@ -4,12 +4,14 @@
         <unique-timestamps>false</unique-timestamps>
        	<web-input password="test">
          	<command name="schedule_command">
-			<field name="schedule" type="*binary:1mb">schedule</field>
+                <field name="core_station_id" type="*text">core_station_id</field>
+				<field name="schedule" type="*binary:1mb">schedule</field>
         	</command>
    		</web-input>
        	<output-structure>
 			<field name="CREATION_TIME" type="BIGINT" />
 			<field name="TRANSMISSION_TIME" type="BIGINT" />
+			<field name="CORE_STATION_ID" type="INTEGER" />
 			<field name="SCHEDULE" type="binary" />
        	</output-structure>
     </processing-class>

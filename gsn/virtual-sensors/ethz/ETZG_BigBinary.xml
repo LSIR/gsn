@@ -5,6 +5,7 @@
         <output-structure>
             <field name="MODIFICATIONTIME" type="BIGINT" />
             <field name="RELATIVEFILE" type="VARCHAR(255)" />
+            <field name="CORE_STATION_ID" type="INTEGER" />
             <field name="STORAGEDIRECTORY" type="VARCHAR(255)" />
             <field name="DATA" type="binary" />
         </output-structure>

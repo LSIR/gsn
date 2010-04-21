@@ -4,6 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT" />
+            <field name="CORE_STATION_ID" type="INTEGER" />
             <field name="V_PV_MV" type="INTEGER" />
             <field name="I_PV_UA" type="INTEGER" />
             <field name="V_12BAT_MV" type="INTEGER" />

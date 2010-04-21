@@ -1,9 +1,7 @@
 package gsn.wrappers;
 
-import java.io.FileInputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -94,6 +92,13 @@ public class BackLogWrapper extends AbstractWrapper {
 	    addressBean = getActiveAddressBean();
 
 		String deployment = addressBean.getVirtualSensorName().split("_")[0].toLowerCase();
+		String coreStationAddress = null;
+		try {
+			coreStationAddress = addressBean.getPredicateValueWithException("remote-connection");
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return false;
+		}
 		
 		synchronized (sync) {
 			if (storage == null) {
@@ -118,19 +123,9 @@ public class BackLogWrapper extends AbstractWrapper {
 				}
 			}
 		}
-	    
-		Properties props;
-		String propertyfile = "conf/permasense/" + deployment + ".properties";
-		try {
-			props = new Properties();
-			props.load(new FileInputStream(propertyfile));
-		} catch (Exception e) {
-			logger.error("Could not load property file: " + propertyfile, e);
-			return false;
-		}
 		
 		try {
-			blMsgMultiplexer = BackLogMessageMultiplexer.getInstance(deployment, props);
+			blMsgMultiplexer = BackLogMessageMultiplexer.getInstance(coreStationAddress);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return false;
@@ -159,7 +154,7 @@ public class BackLogWrapper extends AbstractWrapper {
 		
 		
 		// initializing the plugin
-        if( !pluginObject.initialize(this, deployment, props) ) {
+        if( !pluginObject.initialize(this, blMsgMultiplexer.getCoreStationName()) ) {
     		logger.error("Could not load BackLog plugin: >" + plugin + "<");
         	return false;
         }

@@ -19,6 +19,7 @@ import gsn.beans.DataField;
 public class BackLogStatusPlugin extends AbstractPlugin {
 	
 	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"), 
+						new DataField("CORE_STATION_ID", "INTEGER"),
 						new DataField("ERROR_COUNTER", "INTEGER"),
 						new DataField("EXCEPTION_COUNTER", "INTEGER"),
 						new DataField("BACKLOG_DB_ENTRIES", "INTEGER"),
@@ -47,7 +48,9 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
+		logger.debug("message received from CoreStation with Id: " + coreStationId);
+		
 		Integer error_counter = null;
 		Integer exception_counter = null;
 		Integer backlog_db_entries = null;
@@ -74,7 +77,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 		if(packet.length >= 32)
 			connection_losses = arr2int(packet, 28);
 		
-		Serializable[] data = {timestamp, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses};
+		Serializable[] data = {timestamp, coreStationId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses};
 		
 		if (dataProcessed(System.currentTimeMillis(), data))
 			ackMessage(timestamp);
@@ -96,14 +99,18 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	@Override
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		if( action.compareToIgnoreCase("backlog") == 0 ) {
+			Integer id = null;
 			byte[] command = {0};
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if ( paramNames[i].compareToIgnoreCase("resend_data") == 0 ) {
 					command[0] = 1;
 				}
+				else if ( paramNames[i].compareToIgnoreCase("core_station_id") == 0 ) {
+					id = Integer.parseInt((String) paramValues[i]);
+				}
 			}
 			try {
-				if( sendRemote(System.currentTimeMillis(), command) ) {
+				if( sendRemote(System.currentTimeMillis(), command, id) ) {
 					logger.debug("Upload command sent (resend data " + command[0] + ")");
 				}
 				else {

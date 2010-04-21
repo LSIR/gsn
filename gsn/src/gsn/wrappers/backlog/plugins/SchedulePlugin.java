@@ -41,6 +41,7 @@ public class SchedulePlugin extends AbstractPlugin {
 	
 	private DataField[] dataField = {new DataField("CREATION_TIME", "BIGINT"),
 			new DataField("TRANSMISSION_TIME", "BIGINT"),
+			new DataField("CORE_STATION_ID", "INTEGER"),
 			new DataField("SCHEDULE", "binary")};
 
 	@Override
@@ -59,19 +60,20 @@ public class SchedulePlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(long timestamp, byte[] payload) {
+	public boolean messageReceived(int coreStationId, long timestamp, byte[] payload) {
 		if (payload[0] == GSN_TYPE_GET_SCHEDULE) {
 			Connection conn = null;
 			try {
 				// get the newest schedule from the SQL database
 				conn = StorageManager.getInstance().getConnection();
 				StringBuilder query = new StringBuilder();
-				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" order by timed desc limit 1");
+				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where core_station_id = ").append(coreStationId).append(" order by timed desc limit 1");
 				ResultSet rs = StorageManager.executeQueryWithResultSet(query, conn);
 				
 				if (rs.next()) {
 					// get the creation time of the newest schedule
 					long creationtime = rs.getLong("creation_time");
+					Integer id = rs.getInt("core_station_id");
 					logger.debug("creation time: " + creationtime);
 					if (timestamp ==  creationtime) {
 						// if the schedule on the deployment has the same creation
@@ -94,7 +96,7 @@ public class SchedulePlugin extends AbstractPlugin {
 						
 						if (rs.getLong("transmission_time") == 0) {
 							long time = System.currentTimeMillis();
-							Serializable[] data = {creationtime, time, schedule};
+							Serializable[] data = {creationtime, time, id, schedule};
 							dataProcessed(time, data);
 						}
 					}
@@ -120,32 +122,39 @@ public class SchedulePlugin extends AbstractPlugin {
 	@Override
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		if( action.compareToIgnoreCase("schedule_command") == 0 ) {
+			byte [] schedule = null;
+			long time = 0;
+			Integer id = null;
 			for (int i = 0 ; i < paramNames.length ; i++) {
-				if( paramNames[i].compareToIgnoreCase("schedule") == 0) {
+				if( paramNames[i].compareToIgnoreCase("schedule") == 0 ) {
 					// store the schedule received from the web input in the database
-					long time = System.currentTimeMillis();
-					byte [] schedule = decode(((String)paramValues[i]).toCharArray());
-					
-					byte [] pkt = new byte [schedule.length + 9];
-					pkt[0] = TYPE_NEW_SCHEDULE;
-					System.arraycopy(long2arr(time), 0, pkt, 1, 8);
-					System.arraycopy(schedule, 0, pkt, 9, schedule.length);
-					boolean sent = false;
-					// and try to send it to the deployment
-					try {
-						sent = sendRemote(System.currentTimeMillis(), pkt);
-					} catch (Exception e) {
-						logger.error(e.getMessage(), e);
-					}
-					if (sent) {
-						Serializable[] data = {time, time, schedule};
-						dataProcessed(time, data);
-					}
-					else {
-						Serializable[] data = {time, null, schedule};
-						dataProcessed(time, data);
-					}
+					time = System.currentTimeMillis();
+					schedule = decode(((String)paramValues[i]).toCharArray());
 				}
+				else if ( paramNames[i].compareToIgnoreCase("core_station_id") == 0 ) {
+					id = Integer.parseInt((String) paramValues[i]);
+				}
+			}
+			
+			byte [] pkt = new byte [schedule.length + 9];
+			pkt[0] = TYPE_NEW_SCHEDULE;
+			System.arraycopy(long2arr(time), 0, pkt, 1, 8);
+			System.arraycopy(schedule, 0, pkt, 9, schedule.length);
+			boolean sent = false;
+			// and try to send it to the deployment
+			try {
+				sent = sendRemote(System.currentTimeMillis(), pkt, id);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				return false;
+			}
+			if (sent) {
+				Serializable[] data = {time, time, id, schedule};
+				dataProcessed(time, data);
+			}
+			else {
+				Serializable[] data = {time, null, id, schedule};
+				dataProcessed(time, data);
 			}
 		}
 		else

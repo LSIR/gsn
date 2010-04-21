@@ -83,6 +83,8 @@ class BackLogMainClass(Thread):
         # set default options
         gsn_port = DEFAULT_OPTION_GSN_PORT
         backlog_db = DEFAULT_OPTION_BACKLOG_DB
+        
+        id = None
 
         # readout options from config
         for entry in config_options:
@@ -92,12 +94,20 @@ class BackLogMainClass(Thread):
                 gsn_port = int(value)
             elif name == 'backlog_db':
                 backlog_db = value
+            elif name == 'core_station_id':
+                id = int(value)
+                
+        if id == None:
+            raise TypeError('core_station_id has to be specified in the configuration file')
+        if id >= 65535 or id < 0:
+            raise TypeError('core_station_id has to be in the range of 0 and 65534 (both inclusive)')
 
         # printout options
+        self._logger.info('core_station_id: ' + str(id))
         self._logger.info('gsn_port: ' + str(gsn_port))
         self._logger.info('backlog_db: ' + backlog_db)
 
-        self.gsnpeer = GSNPeerClass(self, gsn_port)
+        self.gsnpeer = GSNPeerClass(self, id, gsn_port)
         self.backlog = BackLogDBClass(self, backlog_db)
 
         # get plugins section from config files

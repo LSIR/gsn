@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Properties;
 
 import net.tinyos.message.SerialPacket;
 import net.tinyos.packet.Serial;
@@ -39,9 +38,9 @@ public class MigUploadPlugin extends AbstractPlugin {
 
 
 	@Override
-	public boolean initialize(BackLogWrapper backlogwrapper, String deployment, Properties props) {
+	public boolean initialize(BackLogWrapper backlogwrapper, String deployment) {
 		activeBackLogWrapper = backlogwrapper;
-		tinyos1x_platform = props.getProperty(MigMessageMultiplexer.TINYOS1X_PLATFORM);
+		tinyos1x_platform = getActiveAddressBean().getPredicateValue(MigMessageMultiplexer.TINYOS1X_PLATFORM);
 
 		// a template message for this platform has to be instantiated to be able to get the data offset
 		// if a message has to be sent to the deployment
@@ -78,7 +77,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(long timestamp, byte[] packet) {
+	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
 		return true;
 	}
 

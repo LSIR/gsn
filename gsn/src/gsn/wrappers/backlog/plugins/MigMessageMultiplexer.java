@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -13,6 +12,7 @@ import org.apache.log4j.Logger;
 import net.tinyos.message.SerialPacket;
 import net.tinyos.packet.Serial;
 import net.tinyos1x.message.TOSMsg;
+import gsn.beans.AddressBean;
 import gsn.wrappers.backlog.BackLogMessage;
 import gsn.wrappers.backlog.BackLogMessageListener;
 import gsn.wrappers.backlog.BackLogMessageMultiplexer;
@@ -36,7 +36,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	private SFListen sfListen = null;
 	private SFv1Listen sfv1Listen = null;
 	
-	private String deploymentName = null;
+	private String coreStationName = null;
 	private BackLogMessageMultiplexer blMessageMultiplexer;
 	
 	
@@ -45,11 +45,11 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	}
 	
 	
-	private MigMessageMultiplexer(String deployment, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
-		deploymentName = deployment;
+	private MigMessageMultiplexer(String coreStationName, AddressBean addressBean, BackLogMessageMultiplexer blMsgMulti) throws Exception {
+		this.coreStationName = coreStationName;
 		blMessageMultiplexer = blMsgMulti;
-		tinyos1x_platform = props.getProperty(TINYOS1X_PLATFORM);
-		String sflocalport = props.getProperty(SF_LOCAL_PORT);
+		tinyos1x_platform = addressBean.getPredicateValue(TINYOS1X_PLATFORM);
+		String sflocalport = addressBean.getPredicateValue(SF_LOCAL_PORT);
 		
 		// start optional local serial forwarder
 		if (tinyos1x_platform == null) {
@@ -57,10 +57,10 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				int port = -1;
 				try {
 					port = Integer.parseInt(sflocalport);
-					logger.info("initializing local serial forwarder on port " + port + " for deployment: >" + deployment + "<");
+					logger.info("initializing local serial forwarder on port " + port + " for deployment: >" + coreStationName + "<");
 					sfListen = new SFListen(port, blMsgMulti);
 				} catch (Exception e) {
-					logger.error("Could not start serial forwarder on port " + port + " for deployment: >" + deployment + "<");							
+					logger.error("Could not start serial forwarder on port " + port + " for deployment: >" + coreStationName + "<");							
 				}
 			}
 			
@@ -70,10 +70,10 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				int port = -1;
 				try {
 					port = Integer.parseInt(sflocalport);
-					logger.info("initializing local serial forwarder 1.x on port " + port + " for deployment: >" + deployment + "<");
+					logger.info("initializing local serial forwarder 1.x on port " + port + " for deployment: >" + coreStationName + "<");
 					sfv1Listen = new SFv1Listen(port, blMsgMulti, tinyos1x_platform);
 				} catch (Exception e) {
-					logger.error("Could not start serial forwarder 1.x on port " + port + " for deployment: >" + deployment + "<");							
+					logger.error("Could not start serial forwarder 1.x on port " + port + " for deployment: >" + coreStationName + "<");							
 				}
 			}
 			
@@ -89,13 +89,13 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	}
 	
 	
-	public synchronized static MigMessageMultiplexer getInstance(String deployment, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
-		if(migMsgMultiplexerMap.containsKey(deployment)) {
-			return migMsgMultiplexerMap.get(deployment);
+	public synchronized static MigMessageMultiplexer getInstance(String coreStationName, AddressBean addressBean, BackLogMessageMultiplexer blMsgMulti) throws Exception {
+		if(migMsgMultiplexerMap.containsKey(coreStationName)) {
+			return migMsgMultiplexerMap.get(coreStationName);
 		}
 		else {
-			MigMessageMultiplexer blMulti = new MigMessageMultiplexer(deployment, props, blMsgMulti);
-			migMsgMultiplexerMap.put(deployment, blMulti);
+			MigMessageMultiplexer blMulti = new MigMessageMultiplexer(coreStationName, addressBean, blMsgMulti);
+			migMsgMultiplexerMap.put(coreStationName, blMulti);
 			return blMulti;
 		}
 	}
@@ -176,12 +176,12 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS1x_MESSAGE_TYPE, this, true);
 		else
 			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this, true);
-		migMsgMultiplexerMap.remove(deploymentName);
+		migMsgMultiplexerMap.remove(coreStationName);
 	}
 	
 	
 	@Override
-	public boolean messageReceived(long timestamp, byte[] payload) {
+	public boolean messageReceived(int coreStationId, long timestamp, byte[] payload) {
 		// which TinyOS messages are we looking for?
 		if (tinyos1x_platform != null) {
 			// the following functionality has been extracted from net.tinyos1x.message.Receiver
@@ -226,7 +226,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				MigMessagePlugin temp = en.nextElement();
 				
 				// send the message to the listener
-				if (temp.messageReceived(timestamp, received.dataGet()) == true)
+				if (temp.messageReceived(coreStationId, timestamp, received.dataGet()) == true)
 					ReceiverCount++;
 			}
 			if (ReceiverCount == 0)
@@ -271,7 +271,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				MigMessagePlugin temp = en.nextElement();
 				
 				// send the message to the listener
-				if (temp.messageReceived(timestamp, received.dataGet()) == true)
+				if (temp.messageReceived(coreStationId, timestamp, received.dataGet()) == true)
 					ReceiverCount++;
 			}
 			if (ReceiverCount == 0)
