@@ -20,7 +20,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">82.130.103.18:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BigBinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etzg/etzg-reverse/</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzg-reverse/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -31,7 +31,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BigBinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etzg/etzg-bs01/</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzg-bs01/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -42,7 +42,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BigBinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etzg/etzl-bs01/</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzl-bs01/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
