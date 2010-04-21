@@ -1,4 +1,4 @@
-<virtual-sensor name="REMOTEPUSH_{@vsname.upcase}{@id}">
+<virtual-sensor name="REMOTEPUSH_#{@vsname.upcase}#{@id}">
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
         <unique-timestamps>true</unique-timestamps>
@@ -9,14 +9,14 @@
             <field name="PENDING_FINALIZATION_COUNT" type="double"/>
         </output-structure>
     </processing-class>
-    <description>Test Virtual Sensor for the Rest Remote Wrapper -- Gets data from the {@vsname.upcase} Virtual Sensor.</description>
+    <description>Test Virtual Sensor for the Rest Remote Wrapper -- Gets data from the #{@vsname.upcase} Virtual Sensor.</description>
     <addressing/>
     <storage/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote">
-                    <predicate key="query">select * from {@vsname.upcase}</predicate>
+                    <predicate key="query">select * from #{@vsname.upcase}</predicate>
                     <predicate key="local-contact-point">#{@local_contact_point}</predicate>
                     <predicate key="remote-contact-point">#{@remote_contact_point}</predicate>
                     <predicate key="start-time">2006-11-01T00:00:01.000+01:00</predicate>
