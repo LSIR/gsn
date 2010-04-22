@@ -174,7 +174,7 @@ public class MigMessagePlugin extends AbstractPlugin
 		if (outputstructure == null) {
 			String s;
 			LinkedHashMap<String, DataField> outputstructuremap = 
-				new LinkedHashMap<String, DataField>(2 + parameters.getOutputStructure().length);
+				new LinkedHashMap<String, DataField>(3 + parameters.getOutputStructure().length);
 			outputstructuremap.put("timestamp", new DataField("timestamp", DataTypes.BIGINT));
 			outputstructuremap.put("generationtime", new DataField("generationtime", DataTypes.BIGINT));
 			outputstructuremap.put("CORE_STATION_ID", new DataField("CORE_STATION_ID", DataTypes.INTEGER));
@@ -222,6 +222,7 @@ public class MigMessagePlugin extends AbstractPlugin
 		boolean ret = false;
 		logger.debug("action: " + action);
 		if( action.compareToIgnoreCase("payload") == 0 ) {
+			// TODO: CoreStationId selection possibility
 			int moteId = -257;
 			int amType = -257;
 			byte[] data = null;
