@@ -98,19 +98,14 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	 */
 	@Override
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
-		if( action.compareToIgnoreCase("backlog") == 0 ) {
-			byte[] command = {0};
-			for (int i = 0 ; i < paramNames.length ; i++) {
-				if ( paramNames[i].compareToIgnoreCase("resend_data") == 0 ) {
-					command[0] = 1;
-				}
-			}
+		if( action.compareToIgnoreCase("resend_backlogged_data") == 0 ) {
+			byte[] command = {1};
 			try {
 				if( sendRemote(System.currentTimeMillis(), command) ) {
-					logger.debug("Upload command sent (resend data " + command[0] + ")");
+					logger.debug("Upload command sent (resend backlogged data)");
 				}
 				else {
-					logger.warn("Upload command (resend data " + command[0] + ") has not been sent!");
+					logger.warn("Upload command (resend backlogged data)");
 					return false;
 				}
 			} catch (Exception e) {

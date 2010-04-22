@@ -100,7 +100,7 @@ public class AsyncCoreStationClient extends Thread  {
 	    					break;
 	    				case ChangeRequest.TYPE_RECONNECT:
 	    					logger.debug("Selector:reconnect");
-	    					if (change.socket != null && change.socket.keyFor(selector).isValid())
+	    					if (change.socket.keyFor(selector).isValid())
 	    						closeConnection(change.socket.keyFor(selector), change.socket);
 	    					CoreStationListener listener;
 	    					synchronized (socketToListenerList) {
@@ -112,7 +112,7 @@ public class AsyncCoreStationClient extends Thread  {
 			    					listenerToSocketList.remove(listener);
 								}
 		    					logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
-		    					Timer timer = new Timer("Reconnect" + listener.getCoreStationName() + "Timer");
+		    					Timer timer = new Timer("ReconnectTimer-" + listener.getCoreStationName());
 		    					timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
 	    					}
 	    					break;
@@ -286,13 +286,11 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 	
-	public void registerListener(CoreStationListener listener) throws IOException
+	public synchronized void registerListener(CoreStationListener listener) throws IOException
 	{
-		synchronized (socketToListenerList) {
-			if (!this.isAlive()) {
-				dispose = false;
-				this.start();
-			}
+		if (!this.isAlive()) {
+			dispose = false;
+			this.start();
 		}
 		
 		SocketChannel socketChannel = SocketChannel.open();
@@ -313,7 +311,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 	
 	
-	public void deregisterListener(CoreStationListener listener)
+	public synchronized void deregisterListener(CoreStationListener listener)
 	{
 		SocketChannel sc = listenerToSocketList.get(listener);
 		try {
@@ -451,18 +449,14 @@ public class AsyncCoreStationClient extends Thread  {
 	
 	
 	public void reconnect(CoreStationListener listener) {
-		ChangeRequest cr = new ChangeRequest(listenerToSocketList.get(listener), ChangeRequest.TYPE_RECONNECT, -1);
+		writeBuffer.clear();
+    	writeBuffer.flip();
 		synchronized (changeRequests) {
-			if (!changeRequests.contains(cr)) {
-				writeBuffer.clear();
-		    	writeBuffer.flip();
-		    	
-				logger.debug("add reconnect request");
-				// Indicate we want the interest ops set changed
-				changeRequests.add(cr);
-				selector.wakeup();
-			}
+			logger.debug("add reconnect request");
+			// Indicate we want the interest ops set changed
+			changeRequests.add(new ChangeRequest(listenerToSocketList.get(listener), ChangeRequest.TYPE_RECONNECT, -1));
 		}
+		selector.wakeup();
 	}
 	
 	

@@ -38,7 +38,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 
 
 	@Override
-	public boolean initialize(BackLogWrapper backlogwrapper, String deployment) {
+	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName) {
 		activeBackLogWrapper = backlogwrapper;
 		tinyos1x_platform = getActiveAddressBean().getPredicateValue(MigMessageMultiplexer.TINYOS1X_PLATFORM);
 
@@ -86,7 +86,6 @@ public class MigUploadPlugin extends AbstractPlugin {
 		boolean ret = false;
 		logger.debug("action: " + action);
 		if( action.compareToIgnoreCase("payload") == 0 ) {
-			// TODO: CoreStationId selection possibility
 			int moteId = -257;
 			int amType = -257;
 			byte[] data = null;
