@@ -56,8 +56,8 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 			}
 		}
 
-		if (count != (dataField.length - 2)) {
-			logger.warn("The message with timestamp >" + timestamp + "< seems unparsable.");
+		if (count != (dataField.length - 1)) {
+			logger.error("The message with timestamp >" + timestamp + "< seems unparsable.");
 			return true;
 		}
 		

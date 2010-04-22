@@ -258,8 +258,24 @@ public class BackLogWrapper extends AbstractWrapper {
 	 */
 	@Override
 	public boolean sendToWrapper ( String action , String [ ] paramNames , Object [ ] paramValues ) throws OperationNotSupportedException {
-		logger.debug("Upload command received.");
-		return pluginObject.sendToPlugin(action, paramNames, paramValues);
+		Integer id = null;
+		for (int i = 0 ; i < paramNames.length ; i++) {
+			if ( paramNames[i].compareToIgnoreCase("core_station_id") == 0 ) {
+				id = Integer.parseInt((String) paramValues[i]);
+			}
+		}
+		
+		if (id == null) {
+			logger.error("core_station_id has to be defined in the web input!");
+			return false;
+		}
+		
+		if ( id == blMsgMultiplexer.getCoreStationID() || id == 65535) {
+			logger.debug("Upload command received.");
+			return pluginObject.sendToPlugin(action, paramNames, paramValues);
+		}
+		
+		return true;
 	}
 
 

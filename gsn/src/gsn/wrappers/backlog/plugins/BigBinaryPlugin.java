@@ -99,7 +99,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	protected String localBinaryName = null;
 	protected long downloadedSize = -1;
 	protected long lastChunkNumber = -1;
-	private static Set<String> deploymentList = new HashSet<String>();
+	private static Set<String> coreStationsList = new HashSet<String>();
     private static int threadCounter = 0;
 
 	private Server web;
@@ -111,7 +111,7 @@ public class BigBinaryPlugin extends AbstractPlugin {
 	private boolean dispose = false;
 	
 	
-	public boolean initialize ( BackLogWrapper backlogwrapper, String deployment, Properties props) {
+	public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName) {
 		activeBackLogWrapper = backlogwrapper;
 
 		AddressBean addressBean = getActiveAddressBean();
@@ -141,8 +141,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		}
 		
 		// check if this plugin has already be used for this deployment
-		synchronized (deploymentList) {
-			if (!deploymentList.add(deployment)) {
+		synchronized (coreStationsList) {
+			if (!coreStationsList.add(coreStationName)) {
 				logger.error("This plugin can only be used once per deployment!");
 				return false;
 			}
@@ -213,8 +213,8 @@ public class BigBinaryPlugin extends AbstractPlugin {
 		dispose = true;
 		msgQueue.add(new Message());
 		
-		synchronized (deploymentList) {
-			deploymentList.remove(deployment);
+		synchronized (coreStationsList) {
+			coreStationsList.remove(deployment);
 		}
 		
         threadCounter--;

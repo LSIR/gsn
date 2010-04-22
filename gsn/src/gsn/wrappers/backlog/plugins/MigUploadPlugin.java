@@ -86,6 +86,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 		boolean ret = false;
 		logger.debug("action: " + action);
 		if( action.compareToIgnoreCase("payload") == 0 ) {
+			// TODO: CoreStationId selection possibility
 			int moteId = -257;
 			int amType = -257;
 			byte[] data = null;

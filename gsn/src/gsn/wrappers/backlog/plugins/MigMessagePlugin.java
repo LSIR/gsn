@@ -115,6 +115,7 @@ public class MigMessagePlugin extends AbstractPlugin
 		
 		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[0], timestamp);
 		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[1], null);
+		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[2], coreStationId);
 		
 		try {
 			Object msg = (Object) messageConstructor.newInstance(packet);

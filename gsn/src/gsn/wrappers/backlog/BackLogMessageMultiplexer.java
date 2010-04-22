@@ -174,7 +174,6 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 						if (pkt.size() >= 4) {
 							logger.debug("rcv...");
 							packetLength = AbstractPlugin.arr2uint(pkt.toByteArray(), 0);
-							logger.debug("packet length: " + packetLength);
 							newPacket = false;
 						}
 						else

@@ -124,15 +124,11 @@ public class SchedulePlugin extends AbstractPlugin {
 		if( action.compareToIgnoreCase("schedule_command") == 0 ) {
 			byte [] schedule = null;
 			long time = 0;
-			Integer id = null;
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("schedule") == 0 ) {
 					// store the schedule received from the web input in the database
 					time = System.currentTimeMillis();
 					schedule = decode(((String)paramValues[i]).toCharArray());
-				}
-				else if ( paramNames[i].compareToIgnoreCase("core_station_id") == 0 ) {
-					id = Integer.parseInt((String) paramValues[i]);
 				}
 			}
 			
@@ -143,17 +139,17 @@ public class SchedulePlugin extends AbstractPlugin {
 			boolean sent = false;
 			// and try to send it to the deployment
 			try {
-				sent = sendRemote(System.currentTimeMillis(), pkt, id);
+				sent = sendRemote(System.currentTimeMillis(), pkt);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				return false;
 			}
 			if (sent) {
-				Serializable[] data = {time, time, id, schedule};
+				Serializable[] data = {time, time, getCoreStationID(), schedule};
 				dataProcessed(time, data);
 			}
 			else {
-				Serializable[] data = {time, null, id, schedule};
+				Serializable[] data = {time, null, getCoreStationID(), schedule};
 				dataProcessed(time, data);
 			}
 		}
