@@ -3,9 +3,8 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <web-input password="test">
-            <command name="backlog">
-                <field name="core_station_id" type="*text">core_station_id</field>
-                <field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
+            <command name="resend_backlogged_data">
+                <field name="core_station_id" type="*text" defaultvalue="65535">core_station_id</field>
             </command>
         </web-input>
         <output-structure>
