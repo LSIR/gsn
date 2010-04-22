@@ -25,6 +25,9 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,7 +36,9 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 
 import gsn.beans.DataTypes;
+import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
+import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.utils.ParamParser;
 import gsn.vsensor.permasense.Converter;
@@ -50,8 +55,6 @@ import org.h2.tools.Server;
 public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 {
 	private static final int DEFAULT_WIDTH = 610;
-	private static final String DEFAULT_STREAM_NAME = "data";
-	private static final String DEFAULT_STREAM_SOURCE = "source";
 	
 	private static final SimpleDateFormat datetimefm = new SimpleDateFormat(Main.getContainerConfig().getTimeFormat());
 	private static final MyFilenameFilter filter = new MyFilenameFilter();
@@ -68,9 +71,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 	private PreparedStatement conversion_query = null;
 	private Server web;
 	private int width;
-	private String stream_name = null;
-	private String stream_source = null;
-	private AbstractWrapper backlog = null;
+	private List<AbstractWrapper> backlogWrapperList = new LinkedList<AbstractWrapper>();
 	private Vector<String> timestamp_to_string;
 	private Vector<String> jpeg_scaled;
 	private boolean position_mapping = false;
@@ -88,14 +89,14 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		deployment = vsensor.getName().split("_")[0].toLowerCase();
 		
 		width = ParamParser.getInteger(params.get("width"), DEFAULT_WIDTH);
-		stream_name = params.get("stream-name");
-		if (stream_name == null) stream_name = DEFAULT_STREAM_NAME;
-		stream_source = params.get("stream-source");
-		if (stream_source == null) stream_source = DEFAULT_STREAM_SOURCE;
-		try {
-			backlog = vsensor.getInputStream(stream_name).getSource(stream_source).getWrapper();
-		} catch (Exception e) {
-			logger.info("backlog wrapper instance not found in " + vsensor.getName() + "->" + stream_source);
+
+		
+		Iterator<InputStream> streams = vsensor.getInputStreams().iterator();
+		while (streams.hasNext()) {
+			StreamSource[] sources = streams.next().getSources();
+			for (int j=0; j<sources.length; j++) {
+				backlogWrapperList.add(sources[j].getWrapper());
+			}
 		}
 
 		String[] timestamp = null;
@@ -345,14 +346,19 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 	
 	@Override
 	public boolean dataFromWeb(String command, String[] paramNames, Serializable[] paramValues) {
-		if (backlog != null) {
+		boolean ret = false;
+		
+		Iterator<AbstractWrapper> wrappers = backlogWrapperList.iterator();
+		while (wrappers.hasNext()) {
 			try {
-				return backlog.sendToWrapper(command, paramNames, paramValues);
+				if (wrappers.next().sendToWrapper(command, paramNames, paramValues))
+					ret = true;
 			} catch (Exception e) {
 				logger.warn(e.getMessage());
 			}
 		}
-		return false;
+		
+		return ret;
 	}
 	
 	private Integer getPosition(int node_id, Timestamp generationtime) {
