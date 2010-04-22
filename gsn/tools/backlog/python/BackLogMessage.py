@@ -42,7 +42,6 @@ TOS1x_MESSAGE_TYPE = 21
 # The binary message type. This message type is used to
 # send any binary data to GSN.
 BINARY_MESSAGE_TYPE = 30
-BIG_BINARY_MESSAGE_TYPE = 31
 
 # The Vaisala weather sensor (WXT520) message type.
 VAISALA_WXT520_MESSAGE_TYPE = 40

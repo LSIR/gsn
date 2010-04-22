@@ -183,7 +183,7 @@ public class BinaryPlugin extends AbstractPlugin {
 
 	@Override
 	public byte getMessageType() {
-		return gsn.wrappers.backlog.BackLogMessage.BIG_BINARY_MESSAGE_TYPE;
+		return gsn.wrappers.backlog.BackLogMessage.BINARY_MESSAGE_TYPE;
 	}
 
 	@Override
