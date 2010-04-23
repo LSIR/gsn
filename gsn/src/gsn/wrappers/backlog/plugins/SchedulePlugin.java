@@ -67,13 +67,13 @@ public class SchedulePlugin extends AbstractPlugin {
 				// get the newest schedule from the SQL database
 				conn = StorageManager.getInstance().getConnection();
 				StringBuilder query = new StringBuilder();
-				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where core_station_id = ").append(deviceId).append(" order by timed desc limit 1");
+				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" order by timed desc limit 1");
 				ResultSet rs = StorageManager.executeQueryWithResultSet(query, conn);
 				
 				if (rs.next()) {
 					// get the creation time of the newest schedule
 					long creationtime = rs.getLong("creation_time");
-					Integer id = rs.getInt("core_station_id");
+					Integer id = rs.getInt("device_id");
 					logger.debug("creation time: " + creationtime);
 					if (timestamp ==  creationtime) {
 						// if the schedule on the deployment has the same creation
