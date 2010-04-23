@@ -281,15 +281,10 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	}
 
 	@Override
-	public void remoteConnEstablished() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void remoteConnEstablished() { }
 
 	@Override
-	public void remoteConnLost() {
-		// TODO Auto-generated method stub
-	}
+	public void remoteConnLost() {	}
 	
 //	
 // following functions are only used for TinyOS1.x messages	
