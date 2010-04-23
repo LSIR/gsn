@@ -66,10 +66,10 @@ public class BackLogMessage {
 	 *  {@link gsn.wrappers.backlog.plugins.BackLogStatusPlugin BackLogStatusPlugin}. */
 	public static final byte BACKLOG_STATUS_MESSAGE_TYPE = 10;
 
-	/** The basestation status message type. This message type is used to
-     *  receive basestation status messages by the
-	 *  {@link gsn.wrappers.backlog.plugins.BasestationStatusPlugin BasestationStatusPlugin}. */
-	public static final byte BASESTATION_STATUS_MESSAGE_TYPE = 11;
+	/** The CoreStation status message type. This message type is used to
+     *  receive CoreStation status messages by the
+	 *  {@link gsn.wrappers.backlog.plugins.CoreStationStatusPlugin CoreStationStatusPlugin}. */
+	public static final byte CORESTATION_STATUS_MESSAGE_TYPE = 11;
 
 	/** The TOS message type. This message type is used to
 	 *  send/receive TOS messages by the

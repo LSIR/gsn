@@ -19,11 +19,11 @@ DEFAULT_BACKLOG = True
 RTC_USR = '/sys/class/i2c-adapter/i2c-0/0-006f/usr'
 CALIB_FILE = '/etc/i_sense.cal'
 
-class BasestationStatusPluginClass(AbstractPluginClass):
+class CoreStationStatusPluginClass(AbstractPluginClass):
     '''
-    This plugin sends status information from the basestation to GSN.
+    This plugin sends status information from the CoreStation to GSN.
     
-    Any new status information coming directly from the basestation should be implemented here.
+    Any new status information coming directly from the CoreStation should be implemented here.
     '''
 
     '''
@@ -55,7 +55,7 @@ class BasestationStatusPluginClass(AbstractPluginClass):
         
     
     def getMsgType(self):
-        return BackLogMessage.BASESTATION_STATUS_MESSAGE_TYPE
+        return BackLogMessage.CORESTATION_STATUS_MESSAGE_TYPE
         
         
     def isBusy(self):

@@ -30,9 +30,9 @@ PING_ACK_MESSAGE_TYPE = 3
 # plugins.BackLogStatusPlugin.
 BACKLOG_STATUS_MESSAGE_TYPE = 10
 
-# The basestation status message type. This message type is used to
-# send basestation status messages to GSN.
-BASESTATION_STATUS_MESSAGE_TYPE = 11
+# The CoreStation status message type. This message type is used to
+# send CoreStation status messages to GSN.
+CORESTATION_STATUS_MESSAGE_TYPE = 11
 
 # The TOS message type. This message type is used to
 # send/receive TOS messages by the plugins.TOSPlugin.
