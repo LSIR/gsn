@@ -181,7 +181,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	
 	
 	@Override
-	public boolean messageReceived(int coreStationId, long timestamp, byte[] payload) {
+	public boolean messageReceived(int deviceID, long timestamp, byte[] payload) {
 		// which TinyOS messages are we looking for?
 		if (tinyos1x_platform != null) {
 			// the following functionality has been extracted from net.tinyos1x.message.Receiver
@@ -226,7 +226,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				MigMessagePlugin temp = en.nextElement();
 				
 				// send the message to the listener
-				if (temp.messageReceived(coreStationId, timestamp, received.dataGet()) == true)
+				if (temp.messageReceived(deviceID, timestamp, received.dataGet()) == true)
 					ReceiverCount++;
 			}
 			if (ReceiverCount == 0)
@@ -271,7 +271,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				MigMessagePlugin temp = en.nextElement();
 				
 				// send the message to the listener
-				if (temp.messageReceived(coreStationId, timestamp, received.dataGet()) == true)
+				if (temp.messageReceived(deviceID, timestamp, received.dataGet()) == true)
 					ReceiverCount++;
 			}
 			if (ReceiverCount == 0)

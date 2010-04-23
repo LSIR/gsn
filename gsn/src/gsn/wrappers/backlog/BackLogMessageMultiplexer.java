@@ -163,7 +163,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 							asyncCoreStationClient.reconnect(this);
 						}
 						else {
-							asyncCoreStationClient.addCoreStationId(deploymentName, coreStationDeviceId, this);
+							asyncCoreStationClient.addDeviceId(deploymentName, coreStationDeviceId, this);
 							connecting = false;
 							connectionFinished();
 						}
@@ -284,7 +284,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	 *          
 	 * @return false if the connection to the CoreStation is not established
 	 * 
-	 * @throws IOException if the message is too long or the CoreStationId does not exist
+	 * @throws IOException if the message is too long or the DeviceId does not exist
 	 */
 	public boolean sendMessage(BackLogMessage message, Integer id) throws IOException {
 		logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
@@ -458,7 +458,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			}
 		}
 		
-		asyncCoreStationClient.removeCoreStationId(deploymentName, coreStationDeviceId);
+		asyncCoreStationClient.removeDeviceId(deploymentName, coreStationDeviceId);
 	}
 	
 

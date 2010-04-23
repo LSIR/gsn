@@ -335,8 +335,8 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public void addCoreStationId(String deployment, Integer id, CoreStationListener listener) {
-		logger.debug("adding CoreStationId " + id + "for " + deployment + " deployment");
+	public void addDeviceId(String deployment, Integer id, CoreStationListener listener) {
+		logger.debug("adding DeviceId " + id + "for " + deployment + " deployment");
 
 		synchronized (deploymentToIdListenerMapList) {
 			if (!deploymentToIdListenerMapList.containsKey(deployment)) {
@@ -348,8 +348,8 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public void removeCoreStationId(String deployment, Integer id) {
-		logger.debug("removing CoreStationId: " + id);
+	public void removeDeviceId(String deployment, Integer id) {
+		logger.debug("removing DeviceId: " + id + "for " + deployment + " deployment");
 		synchronized (deploymentToIdListenerMapList) {
 			deploymentToIdListenerMapList.get(deployment).remove(id);
 			
@@ -398,7 +398,7 @@ public class AsyncCoreStationClient extends Thread  {
 					listener = deploymentToIdListenerMapList.get(deployment).get(id);
 				}
 				if (listener == null)
-					throw new IOException("The CoreStationId (" + id + ") does not exist");
+					throw new IOException("The DeviceId (" + id + ") does not exist" + "for the " + deployment + " deployment");
 				
 				ret = send(listener, data, true);
 			}

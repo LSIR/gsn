@@ -252,7 +252,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * @return false if not connected to the deployment
 	 * 
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
-	 * 			or the CoreStationId does not exist.
+	 * 			or the DeviceId does not exist.
 	 */
 	public boolean sendRemote(long timestamp, byte[] data, Integer id) throws Exception {
 		return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id);

@@ -35,11 +35,11 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
+	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
 		Serializable[] data = new Serializable[dataField.length];
 
 		data[0] = timestamp;
-		data[1] = coreStationId;
+		data[1] = deviceId;
 
 		int len;
 		int count = 1;

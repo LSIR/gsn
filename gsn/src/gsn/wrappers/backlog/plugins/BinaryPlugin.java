@@ -498,7 +498,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	
 
 	@Override
-	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
+	public boolean messageReceived(int deviceID, long timestamp, byte[] packet) {
 		try {
 			logger.debug("message received with timestamp " + timestamp);
 			msgQueue.add(new Message(timestamp, packet));
