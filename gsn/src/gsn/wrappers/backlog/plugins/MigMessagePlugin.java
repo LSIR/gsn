@@ -106,7 +106,7 @@ public class MigMessagePlugin extends AbstractPlugin
 
 	
 	@Override
-	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
+	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
 		Method getter = null;
 		Object res = null;
 
@@ -115,7 +115,7 @@ public class MigMessagePlugin extends AbstractPlugin
 		
 		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[0], timestamp);
 		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[1], null);
-		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[2], coreStationId);
+		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[2], null);
 		
 		try {
 			Object msg = (Object) messageConstructor.newInstance(packet);
@@ -158,7 +158,15 @@ public class MigMessagePlugin extends AbstractPlugin
 			outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[1], timestamp - (atime * 1000));
 		} else {
 			// should never happen
-			logger.warn("invalid gentime field");
+			logger.error("invalid gentime field");
+		}
+		
+		if (outputvaluesmap.containsKey(parameters.getTinyosGetterPrefix() + "header_originatorid")) {
+			Integer id = ((Integer) outputvaluesmap.get(parameters.getTinyosGetterPrefix() + "header_originatorid")).intValue();
+			outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[2], id);
+		} else {
+			// should never happen
+			logger.error("no header_originatorid field available");
 		}
 		
 		if (dataProcessed(System.currentTimeMillis(), outputvaluesmap.values().toArray(new Serializable[] {})))
@@ -178,7 +186,8 @@ public class MigMessagePlugin extends AbstractPlugin
 				new LinkedHashMap<String, DataField>(3 + parameters.getOutputStructure().length);
 			outputstructuremap.put("timestamp", new DataField("timestamp", DataTypes.BIGINT));
 			outputstructuremap.put("generationtime", new DataField("generationtime", DataTypes.BIGINT));
-			outputstructuremap.put("CORE_STATION_ID", new DataField("CORE_STATION_ID", DataTypes.INTEGER));
+			outputstructuremap.put("device_id", new DataField("device_id", DataTypes.INTEGER));
+			
 			for(int i=0; i<parameters.getOutputStructure().length; i++) {
 				outputstructuremap.put(parameters.getOutputStructure()[i].getName(), 
 						parameters.getOutputStructure()[i]);
@@ -239,9 +248,9 @@ public class MigMessagePlugin extends AbstractPlugin
 			for( int i=0; i<3; i++ ) {
 				try {
 					String tmp = paramNames[i];
-					if( tmp.compareToIgnoreCase("mote id") == 0 )
+					if( tmp.compareToIgnoreCase("destination") == 0 )
 						moteId = Integer.parseInt((String) paramValues[i]);
-					else if( tmp.compareToIgnoreCase("am type") == 0 )
+					else if( tmp.compareToIgnoreCase("am_type") == 0 )
 						amType = Integer.parseInt((String) paramValues[i]);
 					else if( tmp.compareToIgnoreCase("payload") == 0 )
 						data = ((String) paramValues[i]).getBytes();

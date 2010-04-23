@@ -3,9 +3,9 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="GENERATIONTIME" type="BIGINT" unit="unixtime"/>
-            <field name="CORE_STATION_ID" type="INTEGER" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
@@ -46,7 +46,7 @@
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerDecagonMuxMsg</predicate>
                 </address>
                 <!--query> select * from wrapper </query -->
-                <query> select TIMESTAMP, GENERATIONTIME, CORE_STATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
+                <query> select TIMESTAMP, GENERATIONTIME, DEVICE_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
                      PAYLOAD_DATA_CONDUCTIVITY0, PAYLOAD_DATA_DIELECTRIC0, PAYLOAD_DATA_TEMPERATURE0, PAYLOAD_MUX_VALID0,
                      PAYLOAD_DATA_CONDUCTIVITY1, PAYLOAD_DATA_DIELECTRIC1, PAYLOAD_DATA_TEMPERATURE1, PAYLOAD_MUX_VALID1,
                      PAYLOAD_DATA_CONDUCTIVITY2, PAYLOAD_DATA_DIELECTRIC2, PAYLOAD_DATA_TEMPERATURE2, PAYLOAD_MUX_VALID2,
@@ -65,7 +65,7 @@
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerDecagonMuxMsg</predicate>
                 </address>
                 <!--query> select * from wrapper </query -->
-                <query> select TIMESTAMP, GENERATIONTIME, CORE_STATION_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
+                <query> select TIMESTAMP, GENERATIONTIME, DEVICE_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
                      PAYLOAD_DATA_CONDUCTIVITY0, PAYLOAD_DATA_DIELECTRIC0, PAYLOAD_DATA_TEMPERATURE0, PAYLOAD_MUX_VALID0,
                      PAYLOAD_DATA_CONDUCTIVITY1, PAYLOAD_DATA_DIELECTRIC1, PAYLOAD_DATA_TEMPERATURE1, PAYLOAD_MUX_VALID1,
                      PAYLOAD_DATA_CONDUCTIVITY2, PAYLOAD_DATA_DIELECTRIC2, PAYLOAD_DATA_TEMPERATURE2, PAYLOAD_MUX_VALID2,

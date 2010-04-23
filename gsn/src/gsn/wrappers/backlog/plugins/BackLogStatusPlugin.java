@@ -19,7 +19,7 @@ import gsn.beans.DataField;
 public class BackLogStatusPlugin extends AbstractPlugin {
 	
 	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"), 
-						new DataField("CORE_STATION_ID", "INTEGER"),
+						new DataField("DEVICE_ID", "INTEGER"),
 						new DataField("ERROR_COUNTER", "INTEGER"),
 						new DataField("EXCEPTION_COUNTER", "INTEGER"),
 						new DataField("BACKLOG_DB_ENTRIES", "INTEGER"),
@@ -48,8 +48,8 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
-		logger.debug("message received from CoreStation with Id: " + coreStationId);
+	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
+		logger.debug("message received from CoreStation with DeviceId: " + deviceId);
 		
 		Integer error_counter = null;
 		Integer exception_counter = null;
@@ -77,7 +77,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 		if(packet.length >= 32)
 			connection_losses = arr2int(packet, 28);
 		
-		Serializable[] data = {timestamp, coreStationId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses};
+		Serializable[] data = {timestamp, deviceId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses};
 		
 		if (dataProcessed(System.currentTimeMillis(), data))
 			ackMessage(timestamp);

@@ -41,7 +41,7 @@ public class SchedulePlugin extends AbstractPlugin {
 	
 	private DataField[] dataField = {new DataField("CREATION_TIME", "BIGINT"),
 			new DataField("TRANSMISSION_TIME", "BIGINT"),
-			new DataField("CORE_STATION_ID", "INTEGER"),
+			new DataField("DEVICE_ID", "INTEGER"),
 			new DataField("SCHEDULE", "binary")};
 
 	@Override
@@ -60,14 +60,14 @@ public class SchedulePlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int coreStationId, long timestamp, byte[] payload) {
+	public boolean messageReceived(int deviceId, long timestamp, byte[] payload) {
 		if (payload[0] == GSN_TYPE_GET_SCHEDULE) {
 			Connection conn = null;
 			try {
 				// get the newest schedule from the SQL database
 				conn = StorageManager.getInstance().getConnection();
 				StringBuilder query = new StringBuilder();
-				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where core_station_id = ").append(coreStationId).append(" order by timed desc limit 1");
+				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where core_station_id = ").append(deviceId).append(" order by timed desc limit 1");
 				ResultSet rs = StorageManager.executeQueryWithResultSet(query, conn);
 				
 				if (rs.next()) {
@@ -145,11 +145,11 @@ public class SchedulePlugin extends AbstractPlugin {
 				return false;
 			}
 			if (sent) {
-				Serializable[] data = {time, time, getCoreStationID(), schedule};
+				Serializable[] data = {time, time, getDeviceID(), schedule};
 				dataProcessed(time, data);
 			}
 			else {
-				Serializable[] data = {time, null, getCoreStationID(), schedule};
+				Serializable[] data = {time, null, getDeviceID(), schedule};
 				dataProcessed(time, data);
 			}
 		}

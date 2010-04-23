@@ -125,7 +125,7 @@ public class BackLogWrapper extends AbstractWrapper {
 		}
 		
 		try {
-			blMsgMultiplexer = BackLogMessageMultiplexer.getInstance(coreStationAddress);
+			blMsgMultiplexer = BackLogMessageMultiplexer.getInstance(deployment, coreStationAddress);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return false;
@@ -260,17 +260,22 @@ public class BackLogWrapper extends AbstractWrapper {
 	public boolean sendToWrapper ( String action , String [ ] paramNames , Object [ ] paramValues ) throws OperationNotSupportedException {
 		Integer id = null;
 		for (int i = 0 ; i < paramNames.length ; i++) {
-			if ( paramNames[i].compareToIgnoreCase("core_station_id") == 0 ) {
+			if ( paramNames[i].compareToIgnoreCase("device_id") == 0 ) {
 				id = Integer.parseInt((String) paramValues[i]);
 			}
 		}
 		
 		if (id == null) {
-			logger.error("core_station_id has to be defined in the web input!");
+			logger.error("device_id has to be defined in the web input!");
 			return false;
 		}
 		
-		if ( id == blMsgMultiplexer.getCoreStationID() || id == 65535) {
+		if (id < 0 || id > 65535) {
+			logger.error("device_id has to be between 0 and 65535 (inclusive)");
+			return false;
+		}
+		
+		if ( id == blMsgMultiplexer.getDeviceID() || id == 65535) {
 			logger.debug("Upload command received.");
 			return pluginObject.sendToPlugin(action, paramNames, paramValues);
 		}

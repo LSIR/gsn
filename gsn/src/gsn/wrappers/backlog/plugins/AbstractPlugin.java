@@ -309,12 +309,12 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 
 
 	/**
-	 * This function returns the CoreStationId this plugin is connected to.
+	 * This function returns the DeviceId of the CoreStation this plugin is connected to.
 	 * 
-	 * @return the CoreStationId
+	 * @return the DeviceId of the connected CoreStation
 	 */
-	public int getCoreStationID() {
-		return activeBackLogWrapper.getBLMessageMultiplexer().getCoreStationID();
+	public int getDeviceID() {
+		return activeBackLogWrapper.getBLMessageMultiplexer().getDeviceID();
 	}
 	
 

@@ -4,12 +4,12 @@
         <unique-timestamps>false</unique-timestamps>
         <web-input password="test">
             <command name="resend_backlogged_data">
-                <field name="core_station_id" type="*text" defaultvalue="65535">core_station_id</field>
+                <field name="device_id" type="*text" defaultvalue="65535">device_id</field>
             </command>
         </web-input>
         <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="TIMESTAMP" type="BIGINT" />
-            <field name="CORE_STATION_ID" type="INTEGER" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
             <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />

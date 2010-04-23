@@ -18,7 +18,7 @@ import gsn.beans.DataField;
 public class CoreStationStatusPlugin extends AbstractPlugin {
 	
 	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"),
-						new DataField("CORE_STATION_ID", "INTEGER"),
+						new DataField("DEVICE_ID", "INTEGER"),
 						new DataField("V_PV_MV", "INTEGER"),
 						new DataField("I_PV_UA", "INTEGER"),
 						new DataField("V_12BAT_MV", "INTEGER"),
@@ -49,10 +49,10 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int coreStationId, long timestamp, byte[] packet) {
+	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
 		Serializable[] data = new Serializable[dataField.length];
 		data[0] = timestamp;
-		data[1] = coreStationId;
+		data[1] = deviceId;
 		if(packet.length == 40) {
 			for( int i=2; i<dataField.length; i++) {
 				Integer tmp = arr2int(packet, (i-2)*4);

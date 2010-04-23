@@ -42,7 +42,7 @@ public class AsyncCoreStationClient extends Thread  {
 
 	protected Map<SocketChannel,CoreStationListener> socketToListenerList = new HashMap<SocketChannel,CoreStationListener>();
 	protected Map<CoreStationListener,SocketChannel> listenerToSocketList = new HashMap<CoreStationListener,SocketChannel>();
-	protected Map<Integer,CoreStationListener> idToListenerList = new HashMap<Integer,CoreStationListener>();
+	private static Map<String,Map<Integer,CoreStationListener>> deploymentToIdListenerMapList = new HashMap<String,Map<Integer,CoreStationListener>>();
 
 	private ByteBuffer writeBuffer;
 	private ByteBuffer readBuffer;
@@ -335,15 +335,27 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public void addCoreStationId(CoreStationListener listener, int id) {
-		logger.debug("adding CoreStationId: " + id);
-		idToListenerList.put(id, listener);
+	public void addCoreStationId(String deployment, Integer id, CoreStationListener listener) {
+		logger.debug("adding CoreStationId " + id + "for " + deployment + " deployment");
+
+		synchronized (deploymentToIdListenerMapList) {
+			if (!deploymentToIdListenerMapList.containsKey(deployment)) {
+				deploymentToIdListenerMapList.put(deployment, new HashMap<Integer, CoreStationListener>());
+			}
+			
+			deploymentToIdListenerMapList.get(deployment).put(id, listener);
+		}
 	}
 
 
-	public void removeCoreStationId(Integer id) {
+	public void removeCoreStationId(String deployment, Integer id) {
 		logger.debug("removing CoreStationId: " + id);
-		idToListenerList.remove(id);
+		synchronized (deploymentToIdListenerMapList) {
+			deploymentToIdListenerMapList.get(deployment).remove(id);
+			
+			if (deploymentToIdListenerMapList.get(deployment).isEmpty())
+				deploymentToIdListenerMapList.remove(deployment);
+		}
 	}
 
 
@@ -369,21 +381,21 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public boolean send(CoreStationListener listener, byte[] data, Integer id) throws IOException {
+	public boolean send(String deployment, Integer id, CoreStationListener listener, byte[] data) throws IOException {
 		boolean ret = false;
 		if (id != null) {
 			if (id == 65535) {
-				synchronized (idToListenerList) {
-					Iterator<Integer> iter = idToListenerList.keySet().iterator();
+				synchronized (deploymentToIdListenerMapList) {
+					Iterator<Integer> iter = deploymentToIdListenerMapList.get(deployment).keySet().iterator();
 					while (iter.hasNext()) {
-						if(send(idToListenerList.get(iter.next()), data, true))
+						if(send(deploymentToIdListenerMapList.get(deployment).get(iter.next()), data, true))
 							ret = true;
 					}
 				}
 			}
 			else {
-				synchronized (idToListenerList) {
-					listener = idToListenerList.get(id);
+				synchronized (deploymentToIdListenerMapList) {
+					listener = deploymentToIdListenerMapList.get(deployment).get(id);
 				}
 				if (listener == null)
 					throw new IOException("The CoreStationId (" + id + ") does not exist");

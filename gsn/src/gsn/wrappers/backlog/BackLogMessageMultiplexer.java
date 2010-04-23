@@ -44,7 +44,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private boolean dispose = false;
 	private boolean connecting = true;
 	private int activPluginCounter = 0;
-	private Integer coreStationId = null;
+	private Integer coreStationDeviceId = null;
 
 	private Timer pingTimer = null;
 	private Timer pingWatchDogTimer = null;
@@ -52,6 +52,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private InetAddress hostAddress;
 	private int hostPort;
 	private String coreStationName;
+	private String deploymentName;
 	boolean stuff = false;
 	
 	
@@ -60,7 +61,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	}
 	
 	
-	private BackLogMessageMultiplexer(String coreStationAddress) throws Exception {
+	private BackLogMessageMultiplexer(String deployment, String coreStationAddress) throws Exception {
 		msgTypeListener = new HashMap<Integer,Vector<BackLogMessageListener>> ();
 		
 		// a first pattern match test for >host:port<
@@ -76,6 +77,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
     	else {
 			throw new IOException("Remote BackLog host string does not match >host:port<");
     	}
+    	deploymentName = deployment;
 		coreStationName = hostAddress.getCanonicalHostName();
     	
     	asyncCoreStationClient = AsyncCoreStationClient.getSingletonObject();
@@ -84,7 +86,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	}
 	
 	
-	public synchronized static BackLogMessageMultiplexer getInstance(String coreStationAddress) throws Exception {
+	public synchronized static BackLogMessageMultiplexer getInstance(String deployment, String coreStationAddress) throws Exception {
 		if( PING_ACK_CHECK_INTERVAL_SEC <= PING_INTERVAL_SEC )
 			throw new Exception("PING_ACK_CHECK_INTERVAL_SEC must be bigger than PING_INTERVAL_SEC");
 		
@@ -92,7 +94,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			return blMultiplexerMap.get(coreStationAddress);
 		}
 		else {
-			BackLogMessageMultiplexer blMulti = new BackLogMessageMultiplexer(coreStationAddress);
+			BackLogMessageMultiplexer blMulti = new BackLogMessageMultiplexer(deployment, coreStationAddress);
 			blMultiplexerMap.put(coreStationAddress, blMulti);
 			return blMulti;
 		}
@@ -154,14 +156,14 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 						if (tmp.length > 5)
 							pkt.write(java.util.Arrays.copyOfRange(tmp, (int) (5), tmp.length));
 
-						coreStationId = AbstractPlugin.arr2int(tmp, 1);
+						coreStationDeviceId = AbstractPlugin.arr2int(tmp, 1);
 						
 						if (tmp[0] != HELLO_BYTE) {
 							logger.error("connection hello message does not match");
 							asyncCoreStationClient.reconnect(this);
 						}
 						else {
-							asyncCoreStationClient.addCoreStationId(this, coreStationId);
+							asyncCoreStationClient.addCoreStationId(deploymentName, coreStationDeviceId, this);
 							connecting = false;
 							connectionFinished();
 						}
@@ -286,7 +288,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	 */
 	public boolean sendMessage(BackLogMessage message, Integer id) throws IOException {
 		logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
-		return asyncCoreStationClient.send(this, message.getMessage(), id);
+		return asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, message.getMessage());
 	}
 
 
@@ -370,7 +372,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			BackLogMessage received = message.clone();
 			
 			// send the message to the listener
-			if (temp.messageReceived(coreStationId, received.getTimestamp(), received.getPayload()) == true)
+			if (temp.messageReceived(coreStationDeviceId, received.getTimestamp(), received.getPayload()) == true)
 				ReceiverCount++;
 		}
 		if (ReceiverCount == 0)
@@ -456,7 +458,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			}
 		}
 		
-		asyncCoreStationClient.removeCoreStationId(coreStationId);
+		asyncCoreStationClient.removeCoreStationId(deploymentName, coreStationDeviceId);
 	}
 	
 
@@ -503,8 +505,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	}
 
 
-	public int getCoreStationID() {
-		return coreStationId;
+	public int getDeviceID() {
+		return coreStationDeviceId;
 	}
 }
 

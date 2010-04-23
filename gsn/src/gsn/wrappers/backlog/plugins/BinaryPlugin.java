@@ -83,7 +83,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	protected final transient Logger logger = Logger.getLogger( BinaryPlugin.class );
 	
 	private DataField[] dataField = new DataField[] {new DataField("MODIFICATIONTIME", "BIGINT"),
-										new DataField("CORE_STATION_ID", "INTEGER"),
+										new DataField("DEVICE_ID", "INTEGER"),
 			   							new DataField("RELATIVEFILE", "VARCHAR(255)"),
 			   							new DataField("STORAGEDIRECTORY", "VARCHAR(255)"),
 			   							new DataField("DATA", "binary")};
@@ -103,7 +103,7 @@ public class BinaryPlugin extends AbstractPlugin {
     private static int threadCounter = 0;
 
 	private Server web;
-	private String deployment = null;
+	private String coreStationName = null;
 	
 	private CalculateChecksum calcChecksumThread;
 	protected BigBinarySender bigBinarySender;
@@ -113,6 +113,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	
 	public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName) {
 		activeBackLogWrapper = backlogwrapper;
+		this.coreStationName = coreStationName;
 
 		AddressBean addressBean = getActiveAddressBean();
 		
@@ -143,7 +144,7 @@ public class BinaryPlugin extends AbstractPlugin {
 		// check if this plugin has already be used for this deployment
 		synchronized (coreStationsList) {
 			if (!coreStationsList.add(coreStationName)) {
-				logger.error("This plugin can only be used once per deployment!");
+				logger.error("This plugin can only be used once per CoreStation!");
 				return false;
 			}
 		}
@@ -214,7 +215,7 @@ public class BinaryPlugin extends AbstractPlugin {
 		msgQueue.add(new Message());
 		
 		synchronized (coreStationsList) {
-			coreStationsList.remove(deployment);
+			coreStationsList.remove(coreStationName);
 		}
 		
         threadCounter--;
@@ -450,7 +451,7 @@ public class BinaryPlugin extends AbstractPlugin {
     							}
 
     							String relDir = remoteBinaryName;
-    							Serializable[] data = {binaryTimestamp, getCoreStationID(), relDir, null, tmp};
+    							Serializable[] data = {binaryTimestamp, getDeviceID(), relDir, null, tmp};
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data  (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") could not be stored in the database.");
     							}
@@ -461,7 +462,7 @@ public class BinaryPlugin extends AbstractPlugin {
     						}
     						else {
     							String relLocalName = localBinaryName.replaceAll(rootBinaryDir, "");
-    							Serializable[] data = {binaryTimestamp, getCoreStationID(), relLocalName, rootBinaryDir, null};
+    							Serializable[] data = {binaryTimestamp, getDeviceID(), relLocalName, rootBinaryDir, null};
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
     							}

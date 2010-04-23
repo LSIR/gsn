@@ -3,8 +3,8 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="MODIFICATIONTIME" type="BIGINT" />
-            <field name="CORE_STATION_ID" type="INTEGER" />
             <field name="RELATIVEFILE" type="VARCHAR(255)" />
             <field name="STORAGEDIRECTORY" type="VARCHAR(255)" />
             <field name="DATA" type="binary" />
