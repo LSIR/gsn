@@ -97,7 +97,7 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 			try {
 				msg = new BackLogMessage(BackLogMessage.TOS_MESSAGE_TYPE, 0, packet);
 
-				// TODO: to which CoreStationId has the message to be sent to?
+				// TODO: to which DeviceId has the message to be sent to?
 			    if (!listenServer.source.sendMessage(msg, null))
 			    	logger.error("write failed");
 			    else
@@ -109,7 +109,7 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
     }
 
 	@Override
-	public boolean messageReceived(int coreStationId, long timestamp, byte[] payload) {
+	public boolean messageReceived(int deviceId, long timestamp, byte[] payload) {
 		try {
 		    if(writeSourcePacket(payload))
 		    	logger.debug("Message with timestamp " + timestamp + " successfully written to sf client " + socket.getLocalAddress().getHostAddress());
