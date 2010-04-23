@@ -94,16 +94,16 @@ class BackLogMainClass(Thread):
                 gsn_port = int(value)
             elif name == 'backlog_db':
                 backlog_db = value
-            elif name == 'core_station_id':
+            elif name == 'device_id':
                 id = int(value)
                 
         if id == None:
-            raise TypeError('core_station_id has to be specified in the configuration file')
+            raise TypeError('device_id has to be specified in the configuration file')
         if id >= 65535 or id < 0:
-            raise TypeError('core_station_id has to be in the range of 0 and 65534 (both inclusive)')
+            raise TypeError('device_id has to be in the range of 0 and 65534 (both inclusive)')
 
         # printout options
-        self._logger.info('core_station_id: ' + str(id))
+        self._logger.info('device_id: ' + str(id))
         self._logger.info('gsn_port: ' + str(gsn_port))
         self._logger.info('backlog_db: ' + backlog_db)
 

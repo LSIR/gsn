@@ -39,6 +39,7 @@ class GSNPeerClass(Thread):
     data/instance attributes:
     _logger
     _parent
+    _deviceid
     _port
     _serversocket
     _pingtimer
@@ -52,7 +53,7 @@ class GSNPeerClass(Thread):
     _stopped
     '''
 
-    def __init__(self, parent, id, port):
+    def __init__(self, parent, deviceid, port):
         '''
         Inititalizes the GSN server.
         
@@ -67,7 +68,7 @@ class GSNPeerClass(Thread):
         
         # initialize variables
         self._parent = parent
-        self._id = id
+        self._deviceid = deviceid
         self._port = port
 
         self._inCounter = 0
@@ -587,7 +588,7 @@ class GSNWriter(Thread):
         
     def sendHelloMsg(self):
         helloMsg = chr(STUFFING_BYTE) + chr(HELLO_BYTE)
-        helloMsg += self.pktStuffing(struct.pack('<I', self._parent._parent._id))
+        helloMsg += self.pktStuffing(struct.pack('<I', self._parent._parent._deviceid))
         self.addMsg(helloMsg)
 
 
