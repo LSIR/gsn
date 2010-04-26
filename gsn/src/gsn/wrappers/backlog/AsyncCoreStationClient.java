@@ -398,7 +398,7 @@ public class AsyncCoreStationClient extends Thread  {
 					listener = deploymentToIdListenerMapList.get(deployment).get(id);
 				}
 				if (listener == null)
-					throw new IOException("The DeviceId (" + id + ") does not exist" + "for the " + deployment + " deployment");
+					throw new IOException("The DeviceId " + id + " is not connected or does not exist for the " + deployment + " deployment");
 				
 				ret = send(listener, data, true);
 			}

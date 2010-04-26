@@ -41,7 +41,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * @return true if the initialization was successful otherwise
 	 * 			 false
 	 */
-	public boolean initialize ( BackLogWrapper backLogWrapper, String coreStationName ) {
+	public boolean initialize ( BackLogWrapper backLogWrapper, String coreStationName, String deploymentName ) {
 		activeBackLogWrapper = backLogWrapper;
 		registerListener();
 		return true;

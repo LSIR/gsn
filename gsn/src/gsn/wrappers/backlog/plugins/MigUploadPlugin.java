@@ -38,7 +38,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 
 
 	@Override
-	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName) {
+	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		activeBackLogWrapper = backlogwrapper;
 		tinyos1x_platform = getActiveAddressBean().getPredicateValue(MigMessageMultiplexer.TINYOS1X_PLATFORM);
 

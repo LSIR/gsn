@@ -154,7 +154,7 @@ public class BackLogWrapper extends AbstractWrapper {
 		
 		
 		// initializing the plugin
-        if( !pluginObject.initialize(this, blMsgMultiplexer.getCoreStationName()) ) {
+        if( !pluginObject.initialize(this, blMsgMultiplexer.getCoreStationName(), deployment) ) {
     		logger.error("Could not load BackLog plugin: >" + plugin + "<");
         	return false;
         }

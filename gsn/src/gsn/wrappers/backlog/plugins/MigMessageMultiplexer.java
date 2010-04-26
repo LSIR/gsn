@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -12,7 +13,6 @@ import org.apache.log4j.Logger;
 import net.tinyos.message.SerialPacket;
 import net.tinyos.packet.Serial;
 import net.tinyos1x.message.TOSMsg;
-import gsn.beans.AddressBean;
 import gsn.wrappers.backlog.BackLogMessage;
 import gsn.wrappers.backlog.BackLogMessageListener;
 import gsn.wrappers.backlog.BackLogMessageMultiplexer;
@@ -45,11 +45,11 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	}
 	
 	
-	private MigMessageMultiplexer(String coreStationName, AddressBean addressBean, BackLogMessageMultiplexer blMsgMulti) throws Exception {
+	private MigMessageMultiplexer(String coreStationName, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
 		this.coreStationName = coreStationName;
 		blMessageMultiplexer = blMsgMulti;
-		tinyos1x_platform = addressBean.getPredicateValue(TINYOS1X_PLATFORM);
-		String sflocalport = addressBean.getPredicateValue(SF_LOCAL_PORT);
+		tinyos1x_platform = props.getProperty(TINYOS1X_PLATFORM);
+		String sflocalport = props.getProperty(SF_LOCAL_PORT);
 		
 		// start optional local serial forwarder
 		if (tinyos1x_platform == null) {
@@ -89,12 +89,12 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	}
 	
 	
-	public synchronized static MigMessageMultiplexer getInstance(String coreStationName, AddressBean addressBean, BackLogMessageMultiplexer blMsgMulti) throws Exception {
+	public synchronized static MigMessageMultiplexer getInstance(String coreStationName, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
 		if(migMsgMultiplexerMap.containsKey(coreStationName)) {
 			return migMsgMultiplexerMap.get(coreStationName);
 		}
 		else {
-			MigMessageMultiplexer blMulti = new MigMessageMultiplexer(coreStationName, addressBean, blMsgMulti);
+			MigMessageMultiplexer blMulti = new MigMessageMultiplexer(coreStationName, props, blMsgMulti);
 			migMsgMultiplexerMap.put(coreStationName, blMulti);
 			return blMulti;
 		}

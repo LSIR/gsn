@@ -111,7 +111,8 @@ public class BinaryPlugin extends AbstractPlugin {
 	private boolean dispose = false;
 	
 	
-	public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName) {
+	@Override
+	public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		activeBackLogWrapper = backlogwrapper;
 		this.coreStationName = coreStationName;
 

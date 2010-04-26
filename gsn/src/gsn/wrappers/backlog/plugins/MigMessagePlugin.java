@@ -4,6 +4,8 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.wrappers.BackLogWrapper;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Properties;
 
 import net.tinyos.message.SerialPacket;
 import net.tinyos.packet.Serial;
@@ -61,10 +64,21 @@ public class MigMessagePlugin extends AbstractPlugin
 	private static Hashtable<Class<?>,Method> parseMapping = null;
 
 	@Override
-	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName) {
+	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		super.activeBackLogWrapper = backlogwrapper;
+		
+		String propertyfile = "conf/permasense/" + deploymentName + "-migmessageplugin.properties";
+		Properties props = new Properties(); 
 		try {
-			migMsgMultiplexer = MigMessageMultiplexer.getInstance(coreStationName, getActiveAddressBean(), backlogwrapper.getBLMessageMultiplexer());
+			props.load(new FileInputStream(propertyfile));
+		} catch (FileNotFoundException e) {
+			logger.warn("migmessageplugin property file not available for " + deploymentName + " deployment");
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+		
+		try {
+			migMsgMultiplexer = MigMessageMultiplexer.getInstance(coreStationName, props, backlogwrapper.getBLMessageMultiplexer());
 			
 			// get the Mig message class for the specified TOS packet
 			parameters = new MigMessageParameters();
@@ -76,7 +90,7 @@ public class MigMessagePlugin extends AbstractPlugin
 			
 			// if it is a TinyOS1.x message class we need the platform name
 			if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1) {
-				tinyos1x_platform = getActiveAddressBean().getPredicateValue(MigMessageMultiplexer.TINYOS1X_PLATFORM);
+				tinyos1x_platform = props.getProperty(MigMessageMultiplexer.TINYOS1X_PLATFORM);
 				msgType = ((net.tinyos1x.message.Message) messageConstructor.newInstance(new byte [1])).amType();
 
 				// a template message for this platform has to be instantiated to be able to get the data offset
