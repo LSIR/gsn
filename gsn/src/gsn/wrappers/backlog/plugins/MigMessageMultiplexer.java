@@ -80,10 +80,10 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 			blMsgMulti.registerListener(BackLogMessage.TOS1x_MESSAGE_TYPE, this, true);
 		}
 		
-		if (sfListen != null) {
+		if (sfListen != null && !sfListen.isAlive()) {
 			sfListen.start();
 		}
-		else if (sfv1Listen != null) {
+		else if (sfv1Listen != null && !sfv1Listen.isAlive()) {
 			sfv1Listen.start();
 		}
 	}
