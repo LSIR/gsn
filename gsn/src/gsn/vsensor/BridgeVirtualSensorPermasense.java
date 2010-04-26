@@ -1,7 +1,5 @@
 package gsn.vsensor;
 
-import gsn.Main;
-
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
@@ -19,9 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,7 +52,6 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 {
 	private static final int DEFAULT_WIDTH = 610;
 	
-	private static final SimpleDateFormat datetimefm = new SimpleDateFormat(Main.getContainerConfig().getTimeFormat());
 	private static final MyFilenameFilter filter = new MyFilenameFilter();
 	
 	private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensorPermasense.class);
@@ -72,7 +67,6 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 	private Server web;
 	private int width;
 	private List<AbstractWrapper> backlogWrapperList = new LinkedList<AbstractWrapper>();
-	private Vector<String> timestamp_to_string;
 	private Vector<String> jpeg_scaled;
 	private boolean position_mapping = false;
 	private boolean sensortype_mapping = false;
@@ -97,16 +91,6 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 			for (int j=0; j<sources.length; j++) {
 				backlogWrapperList.add(sources[j].getWrapper());
 			}
-		}
-
-		String[] timestamp = null;
-		s = params.get("timestamp_to_string");
-		if (s != null)
-			timestamp = s.split(",");
-		if (timestamp == null) timestamp = new String[]{ };
-		timestamp_to_string = new Vector<String>(timestamp.length);
-		for (i = 0; i < timestamp.length; i++) {
-			timestamp_to_string.addElement(timestamp[i].trim().toLowerCase());
 		}
 		
 		String[] jpeg = null;
@@ -156,7 +140,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 					// check if table is already created
 					if (!deployments.contains(deployment)) {
 						Statement stat = conn.createStatement();
-						stat.execute("CREATE TABLE positionmapping(node_id INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, position INT NOT NULL, comment CLOB, PRIMARY KEY(node_id, begin, end))");
+						stat.execute("CREATE TABLE positionmapping(device_id INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, position INT NOT NULL, comment CLOB, PRIMARY KEY(device_id, begin, end))");
 						logger.info("create positionmapping table for " + deployment + " deployment");
 						s = "conf/permasense/" + deployment + "-positionmapping.csv";
 						if (new File(s).exists()) {
@@ -198,7 +182,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 					}
 					
 					if (position_mapping) {
-						position_query = conn.prepareStatement("SELECT position FROM positionmapping WHERE node_id = ? AND ? BETWEEN begin AND end LIMIT 1");
+						position_query = conn.prepareStatement("SELECT position FROM positionmapping WHERE device_id = ? AND ? BETWEEN begin AND end LIMIT 1");
 					}
 					if (sensortype_mapping) {
 						sensortype_query = conn.prepareStatement("SELECT sensortype, sensortype_args FROM sensormapping WHERE position = ? AND ? BETWEEN begin AND end AND sensortype != 'serialid'");
@@ -298,17 +282,6 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 					logger.debug("conversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");				
 			}
 		}
-		for (Enumeration<String> elem = timestamp_to_string.elements() ; elem.hasMoreElements() ; ) {
-			// convert timestamps to human readable form
-			s = elem.nextElement();
-			if (data.getData(s) != null) {
-				try {
-					data = new StreamElement(data, new String[]{ s+"_string", }, new Byte[]{ DataTypes.VARCHAR, }, new Serializable[]{ datetimefm.format(new Date(((Long) data.getData(s)).longValue())), });
-				} catch (IllegalArgumentException e) {
-					logger.error(e.getMessage(), e);
-				}
-			}
-		}
 		for (Enumeration<String> elem = jpeg_scaled.elements() ; elem.hasMoreElements() ; ) {
 			// scale image to given width
 			s = elem.nextElement();
@@ -361,11 +334,11 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		return ret;
 	}
 	
-	private Integer getPosition(int node_id, Timestamp generationtime) {
+	private Integer getPosition(int device_id, Timestamp generationtime) {
 		Integer res = null;
 		long start = System.nanoTime();
 		try {
-			position_query.setInt(1, node_id);
+			position_query.setInt(1, device_id);
 			position_query.setTimestamp(2, generationtime);
 			ResultSet rs = position_query.executeQuery();
 			if (rs.next()) {
