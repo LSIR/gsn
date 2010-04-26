@@ -5,6 +5,8 @@ import gsn.wrappers.backlog.BackLogMessageMultiplexer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -27,6 +29,7 @@ public class SFv1Listen extends Thread {
     private String platform = null;
 	
 	private final transient Logger logger = Logger.getLogger( SFv1Listen.class );
+	private static Map<String,SFv1Listen> sfv1ListenMap = new HashMap<String,SFv1Listen>();
 	
 	private int serverPort = -1;
 	
@@ -39,6 +42,17 @@ public class SFv1Listen extends Thread {
 			throw new IOException("localPort must be a positive integer smaller than 65536");
 		
 		setName("SFv1Listen-Thread:" + sfListenThreadCounter++);
+	}
+	
+	public synchronized static SFv1Listen getInstance(int localPort, BackLogMessageMultiplexer bc, String platform, String deploymentName) throws Exception {
+		if(sfv1ListenMap.containsKey(deploymentName)) {
+			return sfv1ListenMap.get(deploymentName);
+		}
+		else {
+			SFv1Listen sfListen = new SFv1Listen(localPort, bc, platform);
+			sfv1ListenMap.put(deploymentName, sfListen);
+			return sfListen;
+		}
 	}
 
     public void run() {
@@ -102,7 +116,7 @@ public class SFv1Listen extends Thread {
         clients.remove(clientS);
     }
 
-    public void interrupt() {
+    public void interrupt(String deploymentName) {
     	try {
     	    if (serverSocket != null) {
     	    	serverSocket.close();
@@ -111,6 +125,7 @@ public class SFv1Listen extends Thread {
     	catch (IOException e) {
     	    logger.error("shutdown error " + e);
     	}
+    	sfv1ListenMap.remove(deploymentName);
     	sfListenThreadCounter--;
     }
     

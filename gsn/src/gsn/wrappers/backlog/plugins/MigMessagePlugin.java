@@ -78,7 +78,7 @@ public class MigMessagePlugin extends AbstractPlugin
 		}
 		
 		try {
-			migMsgMultiplexer = MigMessageMultiplexer.getInstance(coreStationName, props, backlogwrapper.getBLMessageMultiplexer());
+			migMsgMultiplexer = MigMessageMultiplexer.getInstance(coreStationName, deploymentName, props, backlogwrapper.getBLMessageMultiplexer());
 			
 			// get the Mig message class for the specified TOS packet
 			parameters = new MigMessageParameters();

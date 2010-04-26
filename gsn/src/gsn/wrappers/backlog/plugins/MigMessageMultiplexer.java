@@ -45,7 +45,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	}
 	
 	
-	private MigMessageMultiplexer(String coreStationName, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
+	private MigMessageMultiplexer(String coreStationName, String deploymentName, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
 		this.coreStationName = coreStationName;
 		blMessageMultiplexer = blMsgMulti;
 		tinyos1x_platform = props.getProperty(TINYOS1X_PLATFORM);
@@ -58,7 +58,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				try {
 					port = Integer.parseInt(sflocalport);
 					logger.info("initializing local serial forwarder on port " + port + " for deployment: >" + coreStationName + "<");
-					sfListen = new SFListen(port, blMsgMulti);
+					sfListen = SFListen.getInstance(port, blMsgMulti, deploymentName);
 				} catch (Exception e) {
 					logger.error("Could not start serial forwarder on port " + port + " for deployment: >" + coreStationName + "<");							
 				}
@@ -71,7 +71,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				try {
 					port = Integer.parseInt(sflocalport);
 					logger.info("initializing local serial forwarder 1.x on port " + port + " for deployment: >" + coreStationName + "<");
-					sfv1Listen = new SFv1Listen(port, blMsgMulti, tinyos1x_platform);
+					sfv1Listen = SFv1Listen.getInstance(port, blMsgMulti, tinyos1x_platform, deploymentName);
 				} catch (Exception e) {
 					logger.error("Could not start serial forwarder 1.x on port " + port + " for deployment: >" + coreStationName + "<");							
 				}
@@ -89,12 +89,12 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	}
 	
 	
-	public synchronized static MigMessageMultiplexer getInstance(String coreStationName, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
+	public synchronized static MigMessageMultiplexer getInstance(String coreStationName, String deploymentName, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
 		if(migMsgMultiplexerMap.containsKey(coreStationName)) {
 			return migMsgMultiplexerMap.get(coreStationName);
 		}
 		else {
-			MigMessageMultiplexer blMulti = new MigMessageMultiplexer(coreStationName, props, blMsgMulti);
+			MigMessageMultiplexer blMulti = new MigMessageMultiplexer(coreStationName, deploymentName, props, blMsgMulti);
 			migMsgMultiplexerMap.put(coreStationName, blMulti);
 			return blMulti;
 		}
@@ -155,20 +155,24 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	
 	
 	public void dispose() {
-		if (sfListen != null) {
-			sfListen.interrupt();
-			try {
-				sfListen.join();
-			} catch (InterruptedException e) {
-				logger.error(e.getMessage(), e);
+		migMsgMultiplexerMap.remove(coreStationName);
+		
+		if (migMsgMultiplexerMap.isEmpty()) {
+			if (sfListen != null) {
+				sfListen.interrupt();
+				try {
+					sfListen.join();
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage(), e);
+				}
 			}
-		}
-		else if (sfv1Listen != null) {
-			sfv1Listen.interrupt();
-			try {
-				sfv1Listen.join();
-			} catch (InterruptedException e) {
-				logger.error(e.getMessage(), e);
+			else if (sfv1Listen != null) {
+				sfv1Listen.interrupt();
+				try {
+					sfv1Listen.join();
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage(), e);
+				}
 			}
 		}
 
@@ -176,7 +180,6 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS1x_MESSAGE_TYPE, this, true);
 		else
 			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this, true);
-		migMsgMultiplexerMap.remove(coreStationName);
 	}
 	
 	

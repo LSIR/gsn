@@ -5,6 +5,8 @@ import gsn.wrappers.backlog.BackLogMessageMultiplexer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -26,6 +28,7 @@ public class SFListen extends Thread {
     private static int sfListenThreadCounter = 1;
 	
 	private final transient Logger logger = Logger.getLogger( SFListen.class );
+	private static Map<String,SFListen> sfListenMap = new HashMap<String,SFListen>();
 	
 	private int serverPort = -1;
 	
@@ -37,6 +40,17 @@ public class SFListen extends Thread {
 			throw new IOException("localPort must be a positive integer smaller than 65536");
 		
 		setName("SFListen-Thread:" + sfListenThreadCounter++);
+	}
+	
+	public synchronized static SFListen getInstance(int localPort, BackLogMessageMultiplexer bc, String deploymentName) throws Exception {
+		if(sfListenMap.containsKey(deploymentName)) {
+			return sfListenMap.get(deploymentName);
+		}
+		else {
+			SFListen sfListen = new SFListen(localPort, bc);
+			sfListenMap.put(deploymentName, sfListen);
+			return sfListen;
+		}
 	}
 
     public void run() {
@@ -100,7 +114,7 @@ public class SFListen extends Thread {
         clients.remove(clientS);
     }
 
-    public void interrupt() {
+    public void interrupt(String deploymentName) {
     	try {
     	    if (serverSocket != null) {
     	    	serverSocket.close();
@@ -109,6 +123,7 @@ public class SFListen extends Thread {
     	catch (IOException e) {
     	    logger.error("shutdown error " + e);
     	}
+    	sfListenMap.remove(deploymentName);
     	sfListenThreadCounter--;
     }
     
