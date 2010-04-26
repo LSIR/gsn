@@ -9,7 +9,7 @@
         </web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
-            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
             <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
