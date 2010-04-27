@@ -58,7 +58,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				try {
 					port = Integer.parseInt(sflocalport);
 					logger.info("initializing local serial forwarder on port " + port + " for deployment: >" + coreStationName + "<");
-					sfListen = SFListen.getInstance(port, blMsgMulti, deploymentName);
+					sfListen = SFListen.getInstance(port, blMsgMulti, coreStationName, deploymentName);
 				} catch (Exception e) {
 					logger.error("Could not start serial forwarder on port " + port + " for deployment: >" + coreStationName + "<");							
 				}
@@ -71,7 +71,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				try {
 					port = Integer.parseInt(sflocalport);
 					logger.info("initializing local serial forwarder 1.x on port " + port + " for deployment: >" + coreStationName + "<");
-					sfv1Listen = SFv1Listen.getInstance(port, blMsgMulti, tinyos1x_platform, deploymentName);
+					sfv1Listen = SFv1Listen.getInstance(port, blMsgMulti, tinyos1x_platform, coreStationName, deploymentName);
 				} catch (Exception e) {
 					logger.error("Could not start serial forwarder 1.x on port " + port + " for deployment: >" + coreStationName + "<");							
 				}

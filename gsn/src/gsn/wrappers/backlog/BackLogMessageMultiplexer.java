@@ -288,7 +288,12 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	 */
 	public boolean sendMessage(BackLogMessage message, Integer id) throws IOException {
 		logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
-		return asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, message.getMessage());
+		if (id == null) {
+			return asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, message.getMessage());
+		}
+		else {
+			return asyncCoreStationClient.send(deploymentName, id, this, message.getMessage());
+		}
 	}
 
 

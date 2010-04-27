@@ -5,6 +5,7 @@ import gsn.wrappers.backlog.BackLogMessageMultiplexer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -22,19 +23,20 @@ import org.apache.log4j.Logger;
  * @author	Tonio Gsell
  */
 public class SFListen extends Thread {
-    BackLogMessageMultiplexer source;
     private ServerSocket serverSocket;
     private Vector<SFClient> clients  = new Vector<SFClient>();
     private static int sfListenThreadCounter = 1;
 	
 	private final transient Logger logger = Logger.getLogger( SFListen.class );
 	private static Map<String,SFListen> sfListenMap = new HashMap<String,SFListen>();
+	private static Map<String, Map<String, BackLogMessageMultiplexer>> deplToSourcesMap = new HashMap<String, Map<String, BackLogMessageMultiplexer>>();
 	
 	private int serverPort = -1;
+	private String deploymentName = null;
 	
-	public SFListen(int localPort, BackLogMessageMultiplexer bc) throws IOException {
+	public SFListen(int localPort, String deploymentName) throws IOException {
 		serverPort = localPort;
-		source = bc;
+		this.deploymentName = deploymentName;
 		
 		if( serverPort < 0 | serverPort > 65536 )
 			throw new IOException("localPort must be a positive integer smaller than 65536");
@@ -42,12 +44,16 @@ public class SFListen extends Thread {
 		setName("SFListen-Thread:" + sfListenThreadCounter++);
 	}
 	
-	public synchronized static SFListen getInstance(int localPort, BackLogMessageMultiplexer bc, String deploymentName) throws Exception {
+	public synchronized static SFListen getInstance(int localPort, BackLogMessageMultiplexer bc, String coreStationName, String deploymentName) throws Exception {
 		if(sfListenMap.containsKey(deploymentName)) {
+			if(!deplToSourcesMap.get(deploymentName).containsKey(coreStationName))
+				deplToSourcesMap.get(deploymentName).put(coreStationName, bc);
 			return sfListenMap.get(deploymentName);
 		}
 		else {
-			SFListen sfListen = new SFListen(localPort, bc);
+			deplToSourcesMap.put(deploymentName, new HashMap<String, BackLogMessageMultiplexer>());
+			deplToSourcesMap.get(deploymentName).put(coreStationName, bc);
+			SFListen sfListen = new SFListen(localPort, deploymentName);
 			sfListenMap.put(deploymentName, sfListen);
 			return sfListen;
 		}
@@ -83,6 +89,10 @@ public class SFListen extends Thread {
 	    
 	    logger.debug("stop thread");
     }
+    
+    public Collection<BackLogMessageMultiplexer> getSources() {
+    	return deplToSourcesMap.get(deploymentName).values();
+    }
 
     private void cleanup() {
 		shutdownAllSFClients();
@@ -110,21 +120,25 @@ public class SFListen extends Thread {
 		}
     }
 
-    public void removeSFClient(SFClient clientS) {
-        clients.remove(clientS);
+    public void removeSFClient(SFClient client) {
+        clients.remove(client);
     }
 
-    public void interrupt(String deploymentName) {
-    	try {
-    	    if (serverSocket != null) {
-    	    	serverSocket.close();
-    	    }
+    public void interrupt(String coreStationName) {
+    	deplToSourcesMap.get(deploymentName).remove(coreStationName);
+    	if(deplToSourcesMap.get(deploymentName).isEmpty()) {
+	    	try {
+	    	    if (serverSocket != null) {
+	    	    	serverSocket.close();
+	    	    }
+	    	}
+	    	catch (IOException e) {
+	    	    logger.error("shutdown error " + e);
+	    	}
+	    	sfListenMap.remove(deploymentName);
+	    	deplToSourcesMap.remove(deploymentName);
+	    	sfListenThreadCounter--;
     	}
-    	catch (IOException e) {
-    	    logger.error("shutdown error " + e);
-    	}
-    	sfListenMap.remove(deploymentName);
-    	sfListenThreadCounter--;
     }
     
     public int getLocalPort() {

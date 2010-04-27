@@ -2,10 +2,12 @@ package gsn.wrappers.backlog.sf;
 
 import gsn.wrappers.backlog.BackLogMessage;
 import gsn.wrappers.backlog.BackLogMessageListener;
+import gsn.wrappers.backlog.BackLogMessageMultiplexer;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
@@ -58,7 +60,9 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 
     private void init() throws IOException {
     	open(this);
-		listenServer.source.registerListener(BackLogMessage.TOS_MESSAGE_TYPE, this, false);
+    	Iterator<BackLogMessageMultiplexer> sources = listenServer.getSources().iterator();
+    	while(sources.hasNext())
+    		sources.next().registerListener(BackLogMessage.TOS_MESSAGE_TYPE, this, false);
     }
 
     public void shutdown() {
@@ -84,7 +88,9 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 		}
 		catch (IOException e) { }
 		finally {
-		    listenServer.source.deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this, false);
+	    	Iterator<BackLogMessageMultiplexer> sources = listenServer.getSources().iterator();
+	    	while(sources.hasNext())
+	    		sources.next().deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this, false);
 		    listenServer.removeSFClient(this);
 		    shutdown();
 		}
@@ -92,13 +98,16 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 	
     private void readPackets() throws IOException {
 		for (;;) {
+			// TODO: register this listener to newly started MigMessageMultiplexer
+			// (till now only registering in init, thus, no new MigMessageMultiplexers
+			// are considered...)
 			byte[] packet = readPacket();
 		    BackLogMessage msg;
 			try {
 				msg = new BackLogMessage(BackLogMessage.TOS_MESSAGE_TYPE, 0, packet);
-
+				
 				// TODO: to which DeviceId has the message to be sent to?
-			    if (!listenServer.source.sendMessage(msg, null))
+			    if (!((BackLogMessageMultiplexer) listenServer.getSources().toArray()[0]).sendMessage(msg, null))
 			    	logger.error("write failed");
 			    else
 					logger.debug("Message from SF with address >" + socket.getInetAddress().getHostName() + "< received and forwarded");

@@ -212,7 +212,8 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	/**
 	 * This function can be called by the plugin, if it has processed
 	 * the data received from GSN or on any other occasion which asks
-	 * for sending data to the deployment.
+	 * for sending data to the deployment. The data will be sent to
+	 * the same CoreStation this plugin receives data from.
 	 * 
 	 * 
 	 * @param timestamp
@@ -236,7 +237,9 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	/**
 	 * This function can be called by the plugin, if it has processed
 	 * the data received from GSN or on any other occasion which asks
-	 * for sending data to the deployment.
+	 * for sending data to the deployment. The data can be sent to
+	 * any CoreStation at the deployment this plugin is connected
+	 * to.
 	 * 
 	 * 
 	 * @param timestamp
