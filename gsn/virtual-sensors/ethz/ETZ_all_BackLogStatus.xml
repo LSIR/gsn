@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZG_all_BackLogStatus_1743" priority="10" >
+<virtual-sensor name="ETZ_all_BackLogStatus_1743" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -7,7 +7,7 @@
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
-            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
             <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />

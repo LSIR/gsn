@@ -8,8 +8,8 @@
         </init-params>        
         <output-structure>
             <field name="POSITION" type="INTEGER" />
-            <field name="TIMESTAMP" type="BIGINT"/>
-            <field name="GENERATIONTIME" type="BIGINT"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="GENERATIONTIME" type="BIGINT" unit="unixtime"/>
             <field name="SENSORTYPE" type="VARCHAR(30)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />

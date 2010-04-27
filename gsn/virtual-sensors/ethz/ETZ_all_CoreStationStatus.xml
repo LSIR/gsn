@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZG_all_CoreStationStatus_1743" priority="10" >
+<virtual-sensor name="ETZ_all_CoreStationStatus_1743" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -7,7 +7,7 @@
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
-            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="V_PV_MV" type="INTEGER" />
             <field name="I_PV_UA" type="INTEGER" />
             <field name="V_12BAT_MV" type="INTEGER" />
@@ -20,7 +20,7 @@
             <field name="VCC_4_2_MV" type="INTEGER" />
         </output-structure>
     </processing-class>
-    <description>basestation status from ETZG deployment</description>
+    <description>basestation status from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -28,7 +28,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
-                    <predicate key="query"> select * from ETZG_BasestationStatus_1355 </predicate>
+                    <predicate key="query"> select * from ETZ_CoreStationStatus_1355 </predicate>
                     <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>

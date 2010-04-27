@@ -1,0 +1,28 @@
+<virtual-sensor name="ETZ_pos0_Webcam_scaled" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="jpeg_scaled">JPEG_SCALED</param>
+        </init-params>
+        <output-structure>
+            <field name="MODIFICATIONTIME" type="BIGINT" unit="unixtime" />
+            <field name="JPEG_SCALED" type="binary:image/jpeg" />
+        </output-structure>
+    </processing-class>
+    <description>webcam pictures from position 0 at ETZ deployment as thumbnails</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1"/>
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select MODIFICATIONTIME, DATA from ETZ_all_Binary_1743 where POSITION = 0 and RELATIVEFILE='webcam1/webcam.jpg'</predicate>
+                </address>
+                <query> select MODIFICATIONTIME, DATA as JPEG_SCALED from wrapper</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

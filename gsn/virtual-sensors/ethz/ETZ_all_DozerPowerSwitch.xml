@@ -7,7 +7,6 @@
         </init-params>        
         <output-structure>
             <field name="POSITION" type="INTEGER" />
-            <field name="DEVICE_ID" type="INTEGER" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="GENERATIONTIME" type="BIGINT" unit="unixtime"/>
             <field name="HEADER_SEQNR" type="INTEGER" />

@@ -136,10 +136,8 @@ public class AsyncCoreStationClient extends Thread  {
 	    			if (key.channel() instanceof SocketChannel) {
 		    			try {
 		    				if (key.isReadable()) {
-		    					logger.debug("Selector:read");
 		    					this.read(key);
 		    				} else if (key.isWritable()) {
-		    					logger.debug("Selector:write");
 		    					this.write(key);
 		    				} else if (key.isConnectable()) {
 		    					logger.debug("Selector:connect");
