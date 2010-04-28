@@ -24,13 +24,12 @@
     <streams>
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME0, PAYLOAD_EVENTLOG_ID0, PAYLOAD_EVENTLOG_TYPE0, PAYLOAD_EVENTLOG_VALUE0
-                        from ETZ_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID0 != -1
+                        from ETZ_all_DozerEventLogger_muxed_1743 where PAYLOAD_EVENTLOG_ID0 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -44,13 +43,12 @@
         </stream>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME1, PAYLOAD_EVENTLOG_ID1, PAYLOAD_EVENTLOG_TYPE1, PAYLOAD_EVENTLOG_VALUE1
-                        from ETZ_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID1 != -1
+                        from ETZ_all_DozerEventLogger_muxed_1743 where PAYLOAD_EVENTLOG_ID1 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -64,13 +62,12 @@
         </stream>
         <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME2, PAYLOAD_EVENTLOG_ID2, PAYLOAD_EVENTLOG_TYPE2, PAYLOAD_EVENTLOG_VALUE2
-                        from ETZ_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID2 != -1
+                        from ETZ_all_DozerEventLogger_muxed_1743 where PAYLOAD_EVENTLOG_ID2 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -84,13 +81,12 @@
         </stream>
         <stream name="data3">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME3, PAYLOAD_EVENTLOG_ID3, PAYLOAD_EVENTLOG_TYPE3, PAYLOAD_EVENTLOG_VALUE3
-                        from ETZ_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID3 != -1
+                        from ETZ_all_DozerEventLogger_muxed_1743 where PAYLOAD_EVENTLOG_ID3 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -104,13 +100,12 @@
         </stream>
         <stream name="data4">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME4, PAYLOAD_EVENTLOG_ID4, PAYLOAD_EVENTLOG_TYPE4, PAYLOAD_EVENTLOG_VALUE4
-                        from ETZ_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID4 != -1
+                        from ETZ_all_DozerEventLogger_muxed_1743 where PAYLOAD_EVENTLOG_ID4 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -124,13 +119,12 @@
         </stream>
         <stream name="data5">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME5, PAYLOAD_EVENTLOG_ID5, PAYLOAD_EVENTLOG_TYPE5, PAYLOAD_EVENTLOG_VALUE5
-                        from ETZ_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID5 != -1
+                        from ETZ_all_DozerEventLogger_muxed_1743 where PAYLOAD_EVENTLOG_ID5 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -144,13 +138,12 @@
         </stream>
         <stream name="data6">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME6, PAYLOAD_EVENTLOG_ID6, PAYLOAD_EVENTLOG_TYPE6, PAYLOAD_EVENTLOG_VALUE6
-                        from ETZ_DozerEventLogger_muxed_mapped_1396 where PAYLOAD_EVENTLOG_ID6 != -1
+                        from ETZ_all_DozerEventLogger_muxed_1743 where PAYLOAD_EVENTLOG_ID6 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 

@@ -10,10 +10,12 @@ ETZ_all_DozerDecagonMux.xml
 ETZ_all_DozerDigitalDCX.xml
 ETZ_all_DozerDrift.xml
 ETZ_all_DozerEventLogger.xml
+ETZ_all_DozerEventLogger_muxed.xml
 ETZ_all_DozerNodeHealth.xml
 ETZ_all_DozerNodeInfo.xml
 ETZ_all_DozerPowerSwitch.xml
 ETZ_all_DozerRssi.xml
+ETZ_all_DozerRssi_muxed.xml
 ETZ_all_DozerStateCounter.xml
 ETZ_all_VaisalaWXT520.xml
 ETZ_pos0_BackLogStatus_chart.xml

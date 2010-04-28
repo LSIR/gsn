@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_DozerRssi_1743" priority="10" >
+<virtual-sensor name="ETZ_all_DozerRssi_1743" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -20,13 +20,12 @@
     <streams>
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_RSSI_ID0, PAYLOAD_RSSI_RSSI0 from ETZ_DozerRssi_muxed_mapped_1396 
+                        PAYLOAD_RSSI_ID0, PAYLOAD_RSSI_RSSI0 from ETZ_all_DozerRssi_muxed_1743 
                         where PAYLOAD_RSSI_RSSI0 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -38,13 +37,12 @@
         </stream>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_RSSI_ID1, PAYLOAD_RSSI_RSSI1 from ETZ_DozerRssi_muxed_mapped_1396 
+                        PAYLOAD_RSSI_ID1, PAYLOAD_RSSI_RSSI1 from ETZ_all_DozerRssi_muxed_1743 
                         where PAYLOAD_RSSI_RSSI1 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -56,13 +54,12 @@
         </stream>
         <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_RSSI_ID2, PAYLOAD_RSSI_RSSI2 from ETZ_DozerRssi_muxed_mapped_1396 
+                        PAYLOAD_RSSI_ID2, PAYLOAD_RSSI_RSSI2 from ETZ_all_DozerRssi_muxed_1743 
                         where PAYLOAD_RSSI_RSSI2 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -74,13 +71,12 @@
         </stream>
         <stream name="data3">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_RSSI_ID3, PAYLOAD_RSSI_RSSI3 from ETZ_DozerRssi_muxed_mapped_1396 
+                        PAYLOAD_RSSI_ID3, PAYLOAD_RSSI_RSSI3 from ETZ_all_DozerRssi_muxed_1743 
                         where PAYLOAD_RSSI_RSSI3 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -92,13 +88,12 @@
         </stream>
         <stream name="data4">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_RSSI_ID4, PAYLOAD_RSSI_RSSI4 from ETZ_DozerRssi_muxed_mapped_1396 
+                        PAYLOAD_RSSI_ID4, PAYLOAD_RSSI_RSSI4 from ETZ_all_DozerRssi_muxed_1743 
                         where PAYLOAD_RSSI_RSSI4 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -110,13 +105,12 @@
         </stream>
         <stream name="data5">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_RSSI_ID5, PAYLOAD_RSSI_RSSI5 from ETZ_DozerRssi_muxed_mapped_1396 
+                        PAYLOAD_RSSI_ID5, PAYLOAD_RSSI_RSSI5 from ETZ_all_DozerRssi_muxed_1743 
                         where PAYLOAD_RSSI_RSSI5 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
@@ -128,13 +122,12 @@
         </stream>
         <stream name="data6">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query">
                         select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_RSSI_ID6, PAYLOAD_RSSI_RSSI6 from ETZ_DozerRssi_muxed_mapped_1396 
+                        PAYLOAD_RSSI_ID6, PAYLOAD_RSSI_RSSI6 from ETZ_all_DozerRssi_muxed_1743 
                         where PAYLOAD_RSSI_RSSI6 != -1
                     </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
