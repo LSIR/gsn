@@ -208,6 +208,10 @@ public final class Main {
 		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
 		try {
 			new ZabbixAgent();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		try {
 			Main.getInstance();
 		}catch (Exception e) {
 			updateSplashIfNeeded(new String[] {"Starting GSN failed! Look at logs/gsn.log for more information."});
