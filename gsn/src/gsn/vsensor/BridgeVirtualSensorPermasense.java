@@ -224,6 +224,14 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 							new Byte[]{DataTypes.INTEGER}, 
 							new Serializable[]{position});
 				}
+				else if (data.getData("modificationtime") != null) {
+					Integer position = getPosition(((Integer) data.getData("device_id")).intValue(),
+							new Timestamp(((Long) data.getData("modificationtime")).longValue()));
+					data = new StreamElement(data, 
+							new String[]{"position"}, 
+							new Byte[]{DataTypes.INTEGER}, 
+							new Serializable[]{position});
+				}
 			}
 			if (sensortype_mapping && 
 					data.getData("position") != null &&	data.getData("generationtime") != null) {
