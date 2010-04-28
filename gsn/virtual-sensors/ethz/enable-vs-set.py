@@ -44,7 +44,7 @@ for line in fd:
     if not os.path.exists(link):
       print link + ' -> ' + source
       os.symlink(source, link)
-      time.sleep(300)
+#      time.sleep(300)
   else:
     print 'cannot create symlink ' + link + '...'
 fd.close()
