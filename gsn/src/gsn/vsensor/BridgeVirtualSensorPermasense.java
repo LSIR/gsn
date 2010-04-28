@@ -206,14 +206,24 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		String s;
 		if (conn != null) {
-			if (position_mapping && 
-					data.getData("header_originatorid") != null && data.getData("generationtime") != null) {
-				Integer position = getPosition(((Integer) data.getData("header_originatorid")).intValue(),
-						new Timestamp(((Long) data.getData("generationtime")).longValue()));
-				data = new StreamElement(data, 
-						new String[]{"position"}, 
-						new Byte[]{DataTypes.INTEGER}, 
-						new Serializable[]{position});
+			if (position_mapping && data.getData("device_id") != null) {
+				// TODO: insert a unique generationtime field for all devices
+				if (data.getData("generationtime") != null) {
+					Integer position = getPosition(((Integer) data.getData("device_id")).intValue(),
+							new Timestamp(((Long) data.getData("generationtime")).longValue()));
+					data = new StreamElement(data, 
+							new String[]{"position"}, 
+							new Byte[]{DataTypes.INTEGER}, 
+							new Serializable[]{position});
+				}
+				else if (data.getData("timestamp") != null) {
+					Integer position = getPosition(((Integer) data.getData("device_id")).intValue(),
+							new Timestamp(((Long) data.getData("timestamp")).longValue()));
+					data = new StreamElement(data, 
+							new String[]{"position"}, 
+							new Byte[]{DataTypes.INTEGER}, 
+							new Serializable[]{position});
+				}
 			}
 			if (sensortype_mapping && 
 					data.getData("position") != null &&	data.getData("generationtime") != null) {
