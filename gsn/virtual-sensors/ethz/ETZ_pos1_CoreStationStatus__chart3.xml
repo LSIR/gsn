@@ -1,0 +1,33 @@
+<virtual-sensor name="ETZ_pos1_CoreStationStatus__chart3" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Access node current health (7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">mA</param>
+            <param name="history-size">10080</param>
+            <param name="time-stream-name">TIMESTAMP</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>basestation health status from position 1 at ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select TIMESTAMP, I_VCC_NODE_UA from ETZ_CoreStationStatus__mapped__1750 where POSITION = 1</predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select TIMESTAMP, I_VCC_NODE_UA/1000 as NODE_CURRENT from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

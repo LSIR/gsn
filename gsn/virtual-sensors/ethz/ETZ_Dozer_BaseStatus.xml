@@ -1,0 +1,54 @@
+<virtual-sensor name="ETZ_Dozer_BaseStatus__1750" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="GENERATIONTIME" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" />
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="PAYLOAD_UPTIME" type="INTEGER" />
+            <field name="PAYLOAD_TEMPERATURE" type="INTEGER" />
+            <field name="PAYLOAD_HUMIDITY" type="INTEGER" />
+            <field name="PAYLOAD_MSPVOLTAGE" type="INTEGER" />
+            <field name="PAYLOAD_MSPTEMPERATURE" type="INTEGER" />
+            <field name="PAYLOAD_QUEUESIZE" type="SMALLINT" />
+            <field name="PAYLOAD_PACKETSSENT" type="INTEGER" />
+            <field name="PAYLOAD_PACKETSRECEIVED" type="INTEGER" />
+            <field name="PAYLOAD_CHILDCOUNT" type="SMALLINT" />
+            <field name="PAYLOAD_RSSI" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerBaseStatusMsg) from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerBaseStatusMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerBaseStatusMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
