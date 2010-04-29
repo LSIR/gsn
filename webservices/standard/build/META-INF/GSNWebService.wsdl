@@ -261,11 +261,25 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="createVirtualSensorResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="1" name="status" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="deleteVirtualSensor">
                 <xs:complexType>
                     <xs:attribute name="username" type="xs:string" use="required"/>
                     <xs:attribute name="password" type="xs:string" use="required"/>
                     <xs:attribute name="vsname" type="xs:string" use="required"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteVirtualSensorResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="registerQuery">
@@ -280,12 +294,26 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="registerQueryResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="unregisterQuery">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="1" minOccurs="1" name="username" nillable="false" type="xs:string"/>
                         <xs:element maxOccurs="1" minOccurs="1" name="password" nillable="false" type="xs:string"/>
                         <xs:element maxOccurs="1" minOccurs="1" name="queryName" nillable="false" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="unregisterQueryResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -299,12 +327,20 @@
   </wsdl:message>
   <wsdl:message name="listWrapperURLsRequest">
   </wsdl:message>
-  <wsdl:message name="getNextDataResponse">
-    <wsdl:part name="parameters" element="ns:getNextDataResponse">
+  <wsdl:message name="createVirtualSensorResponse">
+    <wsdl:part name="parameters" element="ns:createVirtualSensorResponse">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="deleteVirtualSensorRequest">
     <wsdl:part name="parameters" element="ns:deleteVirtualSensor">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getNextDataResponse">
+    <wsdl:part name="parameters" element="ns:getNextDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="unregisterQueryResponse">
+    <wsdl:part name="parameters" element="ns:unregisterQueryResponse">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="registerQueryRequest">
@@ -343,6 +379,14 @@
     <wsdl:part name="parameters" element="ns:getMultiDataResponse">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="registerQueryResponse">
+    <wsdl:part name="parameters" element="ns:registerQueryResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteVirtualSensorResponse">
+    <wsdl:part name="parameters" element="ns:deleteVirtualSensorResponse">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="getLatestMultiDataRequest">
     <wsdl:part name="parameters" element="ns:getLatestMultiData">
     </wsdl:part>
@@ -379,6 +423,8 @@
     <wsdl:operation name="registerQuery">
       <wsdl:input message="ns:registerQueryRequest" wsaw:Action="urn:registerQuery">
     </wsdl:input>
+      <wsdl:output message="ns:registerQueryResponse" wsaw:Action="urn:registerQueryResponse">
+    </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getNextData">
       <wsdl:input message="ns:getNextDataRequest" wsaw:Action="urn:getNextData">
@@ -395,10 +441,14 @@
     <wsdl:operation name="unregisterQuery">
       <wsdl:input message="ns:unregisterQueryRequest" wsaw:Action="urn:unregisterQuery">
     </wsdl:input>
+      <wsdl:output message="ns:unregisterQueryResponse" wsaw:Action="urn:unregisterQueryResponse">
+    </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="deleteVirtualSensor">
       <wsdl:input message="ns:deleteVirtualSensorRequest" wsaw:Action="urn:deleteVirtualSensor">
     </wsdl:input>
+      <wsdl:output message="ns:deleteVirtualSensorResponse" wsaw:Action="urn:deleteVirtualSensorResponse">
+    </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getVirtualSensorsDetails">
       <wsdl:input message="ns:getVirtualSensorsDetailsRequest" wsaw:Action="urn:getVirtualSensorsDetails">
@@ -409,6 +459,8 @@
     <wsdl:operation name="createVirtualSensor">
       <wsdl:input message="ns:createVirtualSensorRequest" wsaw:Action="urn:createVirtualSensor">
     </wsdl:input>
+      <wsdl:output message="ns:createVirtualSensorResponse" wsaw:Action="urn:createVirtualSensorResponse">
+    </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="listWrapperURLs">
       <wsdl:input message="ns:listWrapperURLsRequest" wsaw:Action="urn:listWrapperURLs">
@@ -460,12 +512,18 @@
       <wsdl:input>
         <soap12:body use="literal"/>
       </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="unregisterQuery">
       <soap12:operation soapAction="urn:unregisterQuery" style="document"/>
       <wsdl:input>
         <soap12:body use="literal"/>
       </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getLatestMultiData">
       <soap12:operation soapAction="urn:getLatestMultiData" style="document"/>
@@ -481,6 +539,9 @@
       <wsdl:input>
         <soap12:body use="literal"/>
       </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getVirtualSensorsDetails">
       <soap12:operation soapAction="urn:getVirtualSensorsDetails" style="document"/>
@@ -496,6 +557,9 @@
       <wsdl:input>
         <soap12:body use="literal"/>
       </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="listWrapperURLs">
       <soap12:operation soapAction="urn:listWrapperURLs" style="document"/>
@@ -550,12 +614,18 @@
       <wsdl:input>
         <mime:content part="registerQuery" type="text/xml"/>
       </wsdl:input>
+      <wsdl:output>
+        <mime:content part="registerQuery" type="text/xml"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="unregisterQuery">
       <http:operation location="GSNWebService/unregisterQuery"/>
       <wsdl:input>
         <mime:content part="unregisterQuery" type="text/xml"/>
       </wsdl:input>
+      <wsdl:output>
+        <mime:content part="unregisterQuery" type="text/xml"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getLatestMultiData">
       <http:operation location="GSNWebService/getLatestMultiData"/>
@@ -571,6 +641,9 @@
       <wsdl:input>
         <mime:content part="deleteVirtualSensor" type="text/xml"/>
       </wsdl:input>
+      <wsdl:output>
+        <mime:content part="deleteVirtualSensor" type="text/xml"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getVirtualSensorsDetails">
       <http:operation location="GSNWebService/getVirtualSensorsDetails"/>
@@ -586,6 +659,9 @@
       <wsdl:input>
         <mime:content part="createVirtualSensor" type="text/xml"/>
       </wsdl:input>
+      <wsdl:output>
+        <mime:content part="createVirtualSensor" type="text/xml"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="listWrapperURLs">
       <http:operation location="GSNWebService/listWrapperURLs"/>
@@ -640,12 +716,18 @@
       <wsdl:input>
         <soap:body use="literal"/>
       </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="unregisterQuery">
       <soap:operation soapAction="urn:unregisterQuery" style="document"/>
       <wsdl:input>
         <soap:body use="literal"/>
       </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getLatestMultiData">
       <soap:operation soapAction="urn:getLatestMultiData" style="document"/>
@@ -661,6 +743,9 @@
       <wsdl:input>
         <soap:body use="literal"/>
       </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getVirtualSensorsDetails">
       <soap:operation soapAction="urn:getVirtualSensorsDetails" style="document"/>
@@ -676,6 +761,9 @@
       <wsdl:input>
         <soap:body use="literal"/>
       </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="listWrapperURLs">
       <soap:operation soapAction="urn:listWrapperURLs" style="document"/>

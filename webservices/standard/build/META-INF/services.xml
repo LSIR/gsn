@@ -28,9 +28,11 @@
         </operation>
         <operation name="unregisterQuery" mep="http://www.w3.org/ns/wsdl/in-only" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:unregisterQuery</actionMapping>
+            <outputActionMapping>urn:unregisterQueryResponse</outputActionMapping>
         </operation>
         <operation name="createVirtualSensor" mep="http://www.w3.org/ns/wsdl/in-only" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:createVirtualSensor</actionMapping>
+            <outputActionMapping>urn:createVirtualSensorResponse</outputActionMapping>
         </operation>
         <operation name="getMultiData" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:getMultiData</actionMapping>
@@ -38,6 +40,7 @@
         </operation>
         <operation name="registerQuery" mep="http://www.w3.org/ns/wsdl/in-only" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:registerQuery</actionMapping>
+            <outputActionMapping>urn:registerQueryResponse</outputActionMapping>
         </operation>
         <operation name="getVirtualSensorDetails" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:getVirtualSensorDetails</actionMapping>
@@ -53,6 +56,7 @@
         </operation>
         <operation name="deleteVirtualSensor" mep="http://www.w3.org/ns/wsdl/in-only" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:deleteVirtualSensor</actionMapping>
+            <outputActionMapping>urn:deleteVirtualSensorResponse</outputActionMapping>
         </operation>
     </service>
 </serviceGroup>

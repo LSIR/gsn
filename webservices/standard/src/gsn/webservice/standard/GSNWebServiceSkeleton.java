@@ -190,18 +190,33 @@ public class GSNWebServiceSkeleton {
     }
 
 
+        /**
+     * Auto generated method signature
+     *
+     * @param registerQuery
+     */
+
+    public RegisterQueryResponse registerQuery
+            (
+                    gsn.webservice.standard.RegisterQuery registerQuery
+            ) {
+        //TODO : fill this with the necessary business logic
+        throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
+    }
+
+
     /**
      * Auto generated method signature
      *
      * @param unregisterQuery
      */
 
-    public void unregisterQuery
+    public UnregisterQueryResponse unregisterQuery
             (
                     gsn.webservice.standard.UnregisterQuery unregisterQuery
             ) {
         //TODO : fill this with the necessary business logic
-
+        throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
     }
 
 
@@ -211,14 +226,35 @@ public class GSNWebServiceSkeleton {
      * @param createVirtualSensor
      */
 
-    public void createVirtualSensor
-            (
-                    gsn.webservice.standard.CreateVirtualSensor createVirtualSensor
-            ) {
-        //TODO : fill this with the necessary business logic
-
+    public gsn.webservice.standard.CreateVirtualSensorResponse createVirtualSensor(gsn.webservice.standard.CreateVirtualSensor createVirtualSensor) {
+        CreateVirtualSensorResponse response = new CreateVirtualSensorResponse();
+        return response;
+        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
+        //throw new RuntimeException("Failed to create the Virtual Sensor.");
     }
 
+    /*
+    //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#createVirtualSensor");
+        CreateVirtualSensorResponse response = new CreateVirtualSensorResponse();
+        String message = "Created the configuration file (" + gsn.VSensorLoader.getVSConfigurationFilePath(createVirtualSensor.getVsname()) + ")";
+        Status status = new Status();
+        status.setStatus(STATUS_OK);
+        //
+        try {
+            gsn.VSensorLoader.getInstance(gsn.Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY).loadVirtualSensor(
+                    createVirtualSensor.getDescriptionFileContent(),
+                    createVirtualSensor.getVsname()
+            );
+        } catch (Exception e) {
+            message = "Unable to create the configuration file (" + gsn.VSensorLoader.getVSConfigurationFilePath(createVirtualSensor.getVsname()) + ")\nCause " + e.getMessage();
+            status.setStatus(STATUS_ERR);
+        }
+        //
+        status.setMessage(message);
+        response.setCreateVirtualSensorResponse(status);
+        logger.info(status.getMessage());
+        return response;
+     */
 
     /**
      * Auto generated method signature
@@ -538,19 +574,6 @@ public class GSNWebServiceSkeleton {
         return result;
     }
 
-    /**
-     * Auto generated method signature
-     *
-     * @param registerQuery
-     */
-
-    public void registerQuery
-            (
-                    gsn.webservice.standard.RegisterQuery registerQuery
-            ) {
-        //TODO : fill this with the necessary business logic
-
-    }
 
 
     /**
@@ -605,12 +628,12 @@ public class GSNWebServiceSkeleton {
      * @param deleteVirtualSensor
      */
 
-    public void deleteVirtualSensor
+    public DeleteVirtualSensorResponse deleteVirtualSensor
             (
                     gsn.webservice.standard.DeleteVirtualSensor deleteVirtualSensor
             ) {
         //TODO : fill this with the necessary business logic
-
+        throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
     }
 
 

@@ -101,62 +101,116 @@
                                         envelope = toEnvelope(getSOAPFactory(msgContext), getLatestMultiDataResponse10, false);
                                     } else 
 
+            if("unregisterQuery".equals(methodName)){
+                
+                gsn.webservice.standard.UnregisterQueryResponse unregisterQueryResponse12 = null;
+	                        gsn.webservice.standard.UnregisterQuery wrappedParam =
+                                                             (gsn.webservice.standard.UnregisterQuery)fromOM(
+                                    msgContext.getEnvelope().getBody().getFirstElement(),
+                                    gsn.webservice.standard.UnregisterQuery.class,
+                                    getEnvelopeNamespaces(msgContext.getEnvelope()));
+                                                
+                                               unregisterQueryResponse12 =
+                                                   
+                                                   
+                                                         skel.unregisterQuery(wrappedParam)
+                                                    ;
+                                            
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), unregisterQueryResponse12, false);
+                                    } else 
+
+            if("createVirtualSensor".equals(methodName)){
+                
+                gsn.webservice.standard.CreateVirtualSensorResponse createVirtualSensorResponse14 = null;
+	                        gsn.webservice.standard.CreateVirtualSensor wrappedParam =
+                                                             (gsn.webservice.standard.CreateVirtualSensor)fromOM(
+                                    msgContext.getEnvelope().getBody().getFirstElement(),
+                                    gsn.webservice.standard.CreateVirtualSensor.class,
+                                    getEnvelopeNamespaces(msgContext.getEnvelope()));
+                                                
+                                               createVirtualSensorResponse14 =
+                                                   
+                                                   
+                                                         skel.createVirtualSensor(wrappedParam)
+                                                    ;
+                                            
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), createVirtualSensorResponse14, false);
+                                    } else 
+
             if("getMultiData".equals(methodName)){
                 
-                gsn.webservice.standard.GetMultiDataResponse getMultiDataResponse12 = null;
+                gsn.webservice.standard.GetMultiDataResponse getMultiDataResponse16 = null;
 	                        gsn.webservice.standard.GetMultiData wrappedParam =
                                                              (gsn.webservice.standard.GetMultiData)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     gsn.webservice.standard.GetMultiData.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               getMultiDataResponse12 =
+                                               getMultiDataResponse16 =
                                                    
                                                    
                                                          skel.getMultiData(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), getMultiDataResponse12, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), getMultiDataResponse16, false);
                                     } else 
 
-            if("getVirtualSensorDetails".equals(methodName)){
+            if("registerQuery".equals(methodName)){
                 
-                gsn.webservice.standard.GetVirtualSensorDetailsResponse getVirtualSensorDetailsResponse14 = null;
-	                        gsn.webservice.standard.GetVirtualSensorDetails wrappedParam =
-                                                             (gsn.webservice.standard.GetVirtualSensorDetails)fromOM(
+                gsn.webservice.standard.RegisterQueryResponse registerQueryResponse18 = null;
+	                        gsn.webservice.standard.RegisterQuery wrappedParam =
+                                                             (gsn.webservice.standard.RegisterQuery)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
-                                    gsn.webservice.standard.GetVirtualSensorDetails.class,
+                                    gsn.webservice.standard.RegisterQuery.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               getVirtualSensorDetailsResponse14 =
+                                               registerQueryResponse18 =
                                                    
                                                    
-                                                         skel.getVirtualSensorDetails(wrappedParam)
+                                                         skel.registerQuery(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), getVirtualSensorDetailsResponse14, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), registerQueryResponse18, false);
                                     } else 
 
             if("getContainerInfo".equals(methodName)){
                 
-                gsn.webservice.standard.GetContainerInfoResponse getContainerInfoResponse16 = null;
-	                        getContainerInfoResponse16 =
+                gsn.webservice.standard.GetContainerInfoResponse getContainerInfoResponse20 = null;
+	                        getContainerInfoResponse20 =
                                                      
                                                  skel.getContainerInfo()
                                                 ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), getContainerInfoResponse16, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), getContainerInfoResponse20, false);
                                     } else 
 
             if("listVirtualSensorNames".equals(methodName)){
                 
-                gsn.webservice.standard.ListVirtualSensorNamesResponse listVirtualSensorNamesResponse18 = null;
-	                        listVirtualSensorNamesResponse18 =
+                gsn.webservice.standard.ListVirtualSensorNamesResponse listVirtualSensorNamesResponse22 = null;
+	                        listVirtualSensorNamesResponse22 =
                                                      
                                                  skel.listVirtualSensorNames()
                                                 ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), listVirtualSensorNamesResponse18, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), listVirtualSensorNamesResponse22, false);
+                                    } else 
+
+            if("deleteVirtualSensor".equals(methodName)){
+                
+                gsn.webservice.standard.DeleteVirtualSensorResponse deleteVirtualSensorResponse24 = null;
+	                        gsn.webservice.standard.DeleteVirtualSensor wrappedParam =
+                                                             (gsn.webservice.standard.DeleteVirtualSensor)fromOM(
+                                    msgContext.getEnvelope().getBody().getFirstElement(),
+                                    gsn.webservice.standard.DeleteVirtualSensor.class,
+                                    getEnvelopeNamespaces(msgContext.getEnvelope()));
+                                                
+                                               deleteVirtualSensorResponse24 =
+                                                   
+                                                   
+                                                         skel.deleteVirtualSensor(wrappedParam)
+                                                    ;
+                                            
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), deleteVirtualSensorResponse24, false);
                                     
             } else {
               throw new java.lang.RuntimeException("method not found");
@@ -284,12 +338,40 @@
 
             }
         
+            private  org.apache.axiom.om.OMElement  toOM(gsn.webservice.standard.UnregisterQueryResponse param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(gsn.webservice.standard.UnregisterQueryResponse.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
             private  org.apache.axiom.om.OMElement  toOM(gsn.webservice.standard.CreateVirtualSensor param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
 
             
                         try{
                              return param.getOMElement(gsn.webservice.standard.CreateVirtualSensor.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(gsn.webservice.standard.CreateVirtualSensorResponse param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(gsn.webservice.standard.CreateVirtualSensorResponse.MY_QNAME,
                                           org.apache.axiom.om.OMAbstractFactory.getOMFactory());
                         } catch(org.apache.axis2.databinding.ADBException e){
                             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -340,26 +422,12 @@
 
             }
         
-            private  org.apache.axiom.om.OMElement  toOM(gsn.webservice.standard.GetVirtualSensorDetails param, boolean optimizeContent)
+            private  org.apache.axiom.om.OMElement  toOM(gsn.webservice.standard.RegisterQueryResponse param, boolean optimizeContent)
             throws org.apache.axis2.AxisFault {
 
             
                         try{
-                             return param.getOMElement(gsn.webservice.standard.GetVirtualSensorDetails.MY_QNAME,
-                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
-                        } catch(org.apache.axis2.databinding.ADBException e){
-                            throw org.apache.axis2.AxisFault.makeFault(e);
-                        }
-                    
-
-            }
-        
-            private  org.apache.axiom.om.OMElement  toOM(gsn.webservice.standard.GetVirtualSensorDetailsResponse param, boolean optimizeContent)
-            throws org.apache.axis2.AxisFault {
-
-            
-                        try{
-                             return param.getOMElement(gsn.webservice.standard.GetVirtualSensorDetailsResponse.MY_QNAME,
+                             return param.getOMElement(gsn.webservice.standard.RegisterQueryResponse.MY_QNAME,
                                           org.apache.axiom.om.OMAbstractFactory.getOMFactory());
                         } catch(org.apache.axis2.databinding.ADBException e){
                             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -402,6 +470,20 @@
             
                         try{
                              return param.getOMElement(gsn.webservice.standard.DeleteVirtualSensor.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(gsn.webservice.standard.DeleteVirtualSensorResponse param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(gsn.webservice.standard.DeleteVirtualSensorResponse.MY_QNAME,
                                           org.apache.axiom.om.OMAbstractFactory.getOMFactory());
                         } catch(org.apache.axis2.databinding.ADBException e){
                             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -486,6 +568,44 @@
                                 return wrappedElement;
                          }
                     
+                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.webservice.standard.UnregisterQueryResponse param, boolean optimizeContent)
+                        throws org.apache.axis2.AxisFault{
+                      try{
+                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+                           
+                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.webservice.standard.UnregisterQueryResponse.MY_QNAME,factory));
+                                
+
+                         return emptyEnvelope;
+                    } catch(org.apache.axis2.databinding.ADBException e){
+                        throw org.apache.axis2.AxisFault.makeFault(e);
+                    }
+                    }
+                    
+                         private gsn.webservice.standard.UnregisterQueryResponse wrapunregisterQuery(){
+                                gsn.webservice.standard.UnregisterQueryResponse wrappedElement = new gsn.webservice.standard.UnregisterQueryResponse();
+                                return wrappedElement;
+                         }
+                    
+                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.webservice.standard.CreateVirtualSensorResponse param, boolean optimizeContent)
+                        throws org.apache.axis2.AxisFault{
+                      try{
+                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+                           
+                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.webservice.standard.CreateVirtualSensorResponse.MY_QNAME,factory));
+                                
+
+                         return emptyEnvelope;
+                    } catch(org.apache.axis2.databinding.ADBException e){
+                        throw org.apache.axis2.AxisFault.makeFault(e);
+                    }
+                    }
+                    
+                         private gsn.webservice.standard.CreateVirtualSensorResponse wrapcreateVirtualSensor(){
+                                gsn.webservice.standard.CreateVirtualSensorResponse wrappedElement = new gsn.webservice.standard.CreateVirtualSensorResponse();
+                                return wrappedElement;
+                         }
+                    
                     private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.webservice.standard.GetMultiDataResponse param, boolean optimizeContent)
                         throws org.apache.axis2.AxisFault{
                       try{
@@ -505,12 +625,12 @@
                                 return wrappedElement;
                          }
                     
-                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.webservice.standard.GetVirtualSensorDetailsResponse param, boolean optimizeContent)
+                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.webservice.standard.RegisterQueryResponse param, boolean optimizeContent)
                         throws org.apache.axis2.AxisFault{
                       try{
                           org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
                            
-                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.webservice.standard.GetVirtualSensorDetailsResponse.MY_QNAME,factory));
+                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.webservice.standard.RegisterQueryResponse.MY_QNAME,factory));
                                 
 
                          return emptyEnvelope;
@@ -519,8 +639,8 @@
                     }
                     }
                     
-                         private gsn.webservice.standard.GetVirtualSensorDetailsResponse wrapgetVirtualSensorDetails(){
-                                gsn.webservice.standard.GetVirtualSensorDetailsResponse wrappedElement = new gsn.webservice.standard.GetVirtualSensorDetailsResponse();
+                         private gsn.webservice.standard.RegisterQueryResponse wrapregisterQuery(){
+                                gsn.webservice.standard.RegisterQueryResponse wrappedElement = new gsn.webservice.standard.RegisterQueryResponse();
                                 return wrappedElement;
                          }
                     
@@ -559,6 +679,25 @@
                     
                          private gsn.webservice.standard.ListVirtualSensorNamesResponse wraplistVirtualSensorNames(){
                                 gsn.webservice.standard.ListVirtualSensorNamesResponse wrappedElement = new gsn.webservice.standard.ListVirtualSensorNamesResponse();
+                                return wrappedElement;
+                         }
+                    
+                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, gsn.webservice.standard.DeleteVirtualSensorResponse param, boolean optimizeContent)
+                        throws org.apache.axis2.AxisFault{
+                      try{
+                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+                           
+                                    emptyEnvelope.getBody().addChild(param.getOMElement(gsn.webservice.standard.DeleteVirtualSensorResponse.MY_QNAME,factory));
+                                
+
+                         return emptyEnvelope;
+                    } catch(org.apache.axis2.databinding.ADBException e){
+                        throw org.apache.axis2.AxisFault.makeFault(e);
+                    }
+                    }
+                    
+                         private gsn.webservice.standard.DeleteVirtualSensorResponse wrapdeleteVirtualSensor(){
+                                gsn.webservice.standard.DeleteVirtualSensorResponse wrappedElement = new gsn.webservice.standard.DeleteVirtualSensorResponse();
                                 return wrappedElement;
                          }
                     
@@ -635,9 +774,23 @@
 
                 }
            
+                if (gsn.webservice.standard.UnregisterQueryResponse.class.equals(type)){
+                
+                           return gsn.webservice.standard.UnregisterQueryResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
                 if (gsn.webservice.standard.CreateVirtualSensor.class.equals(type)){
                 
                            return gsn.webservice.standard.CreateVirtualSensor.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (gsn.webservice.standard.CreateVirtualSensorResponse.class.equals(type)){
+                
+                           return gsn.webservice.standard.CreateVirtualSensorResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                     
 
                 }
@@ -663,16 +816,9 @@
 
                 }
            
-                if (gsn.webservice.standard.GetVirtualSensorDetails.class.equals(type)){
+                if (gsn.webservice.standard.RegisterQueryResponse.class.equals(type)){
                 
-                           return gsn.webservice.standard.GetVirtualSensorDetails.Factory.parse(param.getXMLStreamReaderWithoutCaching());
-                    
-
-                }
-           
-                if (gsn.webservice.standard.GetVirtualSensorDetailsResponse.class.equals(type)){
-                
-                           return gsn.webservice.standard.GetVirtualSensorDetailsResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                           return gsn.webservice.standard.RegisterQueryResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                     
 
                 }
@@ -694,6 +840,13 @@
                 if (gsn.webservice.standard.DeleteVirtualSensor.class.equals(type)){
                 
                            return gsn.webservice.standard.DeleteVirtualSensor.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (gsn.webservice.standard.DeleteVirtualSensorResponse.class.equals(type)){
+                
+                           return gsn.webservice.standard.DeleteVirtualSensorResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                     
 
                 }

@@ -19,13 +19,13 @@ public interface GSNWebService {
     // Management
     // -------------
 
-    public void createVirtualSensor(String username, String password, String vsname, String descriptionFileContent);
+    public boolean createVirtualSensor(String username, String password, String vsname, String descriptionFileContent);
 
-    public void deleteVirtualSensor(String username, String password, String vsname);
+    public boolean deleteVirtualSensor(String username, String password, String vsname);
 
-    public void registerQuery(String username, String password, String queryName, DataField[] outputStructure, String[] vsnames, String query);
+    public boolean registerQuery(String username, String password, String queryName, DataField[] outputStructure, String[] vsnames, String query);
 
-    public void unregisterQuery(String username, String password, String queryName);
+    public boolean unregisterQuery(String username, String password, String queryName);
 
     //
 
