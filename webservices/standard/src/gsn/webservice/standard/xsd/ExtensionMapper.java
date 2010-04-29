@@ -39,20 +39,20 @@
 
               
                   if (
-                  "http://datarequest.http.gsn/xsd".equals(namespaceURI) &&
-                  "AggregationCriterion".equals(typeName)){
+                  "http://standard.webservice.gsn/xsd".equals(namespaceURI) &&
+                  "GSNWebService_WrapperURL".equals(typeName)){
                    
-                            return  gsn.http.datarequest.xsd.AggregationCriterion.Factory.parse(reader);
+                            return  gsn.webservice.standard.xsd.GSNWebService_WrapperURL.Factory.parse(reader);
                         
 
                   }
 
               
                   if (
-                  "http://standard.webservice.gsn/xsd".equals(namespaceURI) &&
-                  "GSNWebService_ConfWrapperOutputFormat".equals(typeName)){
+                  "http://datarequest.http.gsn/xsd".equals(namespaceURI) &&
+                  "AggregationCriterion".equals(typeName)){
                    
-                            return  gsn.webservice.standard.xsd.GSNWebService_ConfWrapperOutputFormat.Factory.parse(reader);
+                            return  gsn.http.datarequest.xsd.AggregationCriterion.Factory.parse(reader);
                         
 
                   }
@@ -153,6 +153,16 @@
                   "GSNWebService_ConfPredicate".equals(typeName)){
                    
                             return  gsn.webservice.standard.xsd.GSNWebService_ConfPredicate.Factory.parse(reader);
+                        
+
+                  }
+
+              
+                  if (
+                  "http://standard.webservice.gsn/xsd".equals(namespaceURI) &&
+                  "GSNWebService_WrapperDetails".equals(typeName)){
+                   
+                            return  gsn.webservice.standard.xsd.GSNWebService_WrapperDetails.Factory.parse(reader);
                         
 
                   }

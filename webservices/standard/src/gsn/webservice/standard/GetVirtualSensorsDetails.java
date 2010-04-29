@@ -33,6 +33,88 @@
         
 
                         /**
+                        * field for FieldSelector
+                        * This was an Array!
+                        */
+
+                        
+                                    protected gsn.webservice.standard.xsd.GSNWebService_FieldSelector[] localFieldSelector ;
+                                
+                           /*  This tracker boolean wil be used to detect whether the user called the set method
+                          *   for this attribute. It will be used to determine whether to include this field
+                           *   in the serialized XML
+                           */
+                           protected boolean localFieldSelectorTracker = false ;
+                           
+
+                           /**
+                           * Auto generated getter method
+                           * @return gsn.webservice.standard.xsd.GSNWebService_FieldSelector[]
+                           */
+                           public  gsn.webservice.standard.xsd.GSNWebService_FieldSelector[] getFieldSelector(){
+                               return localFieldSelector;
+                           }
+
+                           
+                        
+
+
+                               
+                              /**
+                               * validate the array for FieldSelector
+                               */
+                              protected void validateFieldSelector(gsn.webservice.standard.xsd.GSNWebService_FieldSelector[] param){
+                             
+                              }
+
+
+                             /**
+                              * Auto generated setter method
+                              * @param param FieldSelector
+                              */
+                              public void setFieldSelector(gsn.webservice.standard.xsd.GSNWebService_FieldSelector[] param){
+                              
+                                   validateFieldSelector(param);
+
+                               
+                                          if (param != null){
+                                             //update the setting tracker
+                                             localFieldSelectorTracker = true;
+                                          } else {
+                                             localFieldSelectorTracker = false;
+                                                 
+                                          }
+                                      
+                                      this.localFieldSelector=param;
+                              }
+
+                               
+                             
+                             /**
+                             * Auto generated add method for the array for convenience
+                             * @param param gsn.webservice.standard.xsd.GSNWebService_FieldSelector
+                             */
+                             public void addFieldSelector(gsn.webservice.standard.xsd.GSNWebService_FieldSelector param){
+                                   if (localFieldSelector == null){
+                                   localFieldSelector = new gsn.webservice.standard.xsd.GSNWebService_FieldSelector[]{};
+                                   }
+
+                            
+                                 //update the setting tracker
+                                localFieldSelectorTracker = true;
+                            
+
+                               java.util.List list =
+                            org.apache.axis2.databinding.utils.ConverterUtil.toList(localFieldSelector);
+                               list.add(param);
+                               this.localFieldSelector =
+                             (gsn.webservice.standard.xsd.GSNWebService_FieldSelector[])list.toArray(
+                            new gsn.webservice.standard.xsd.GSNWebService_FieldSelector[list.size()]);
+
+                             }
+                             
+
+                        /**
                         * field for DetailsType
                         * This was an Array!
                         */
@@ -210,7 +292,25 @@
 
                
                    }
-                if (localDetailsTypeTracker){
+                if (localFieldSelectorTracker){
+                                       if (localFieldSelector!=null){
+                                            for (int i = 0;i < localFieldSelector.length;i++){
+                                                if (localFieldSelector[i] != null){
+                                                 localFieldSelector[i].serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn","fieldSelector"),
+                                                           factory,xmlWriter);
+                                                } else {
+                                                   
+                                                        // we don't have to do any thing since minOccures is zero
+                                                    
+                                                }
+
+                                            }
+                                     } else {
+                                        
+                                               throw new org.apache.axis2.databinding.ADBException("fieldSelector cannot be null!!");
+                                        
+                                    }
+                                 } if (localDetailsTypeTracker){
                                        if (localDetailsType!=null){
                                             for (int i = 0;i < localDetailsType.length;i++){
                                                 if (localDetailsType[i] != null){
@@ -390,7 +490,28 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                 if (localDetailsTypeTracker){
+                 if (localFieldSelectorTracker){
+                             if (localFieldSelector!=null) {
+                                 for (int i = 0;i < localFieldSelector.length;i++){
+
+                                    if (localFieldSelector[i] != null){
+                                         elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
+                                                                          "fieldSelector"));
+                                         elementList.add(localFieldSelector[i]);
+                                    } else {
+                                        
+                                                // nothing to do
+                                            
+                                    }
+
+                                 }
+                             } else {
+                                 
+                                        throw new org.apache.axis2.databinding.ADBException("fieldSelector cannot be null!!");
+                                    
+                             }
+
+                        } if (localDetailsTypeTracker){
                              if (localDetailsType!=null) {
                                  for (int i = 0;i < localDetailsType.length;i++){
 
@@ -489,15 +610,17 @@
                 
                         java.util.ArrayList list1 = new java.util.ArrayList();
                     
+                        java.util.ArrayList list2 = new java.util.ArrayList();
+                    
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","detailsType").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","fieldSelector").equals(reader.getName())){
                                 
                                     
                                     
                                     // Process the array and step past its final element's end.
-                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_DetailsType.Factory.parse(reader));
+                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_FieldSelector.Factory.parse(reader));
                                                                 
                                                         //loop until we find a start element that is not part of this array
                                                         boolean loopDone1 = false;
@@ -514,8 +637,8 @@
                                                                 //two continuous end elements means we are exiting the xml structure
                                                                 loopDone1 = true;
                                                             } else {
-                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn","detailsType").equals(reader.getName())){
-                                                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_DetailsType.Factory.parse(reader));
+                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn","fieldSelector").equals(reader.getName())){
+                                                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_FieldSelector.Factory.parse(reader));
                                                                         
                                                                 }else{
                                                                     loopDone1 = true;
@@ -524,10 +647,56 @@
                                                         }
                                                         // call the converter utility  to convert and set the array
                                                         
+                                                        object.setFieldSelector((gsn.webservice.standard.xsd.GSNWebService_FieldSelector[])
+                                                            org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
+                                                                gsn.webservice.standard.xsd.GSNWebService_FieldSelector.class,
+                                                                list1));
+                                                            
+                              }  // End of if for expected property start element
+                                
+                                    else {
+                                        
+                                    }
+                                
+                                    
+                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","detailsType").equals(reader.getName())){
+                                
+                                    
+                                    
+                                    // Process the array and step past its final element's end.
+                                    list2.add(gsn.webservice.standard.xsd.GSNWebService_DetailsType.Factory.parse(reader));
+                                                                
+                                                        //loop until we find a start element that is not part of this array
+                                                        boolean loopDone2 = false;
+                                                        while(!loopDone2){
+                                                            // We should be at the end element, but make sure
+                                                            while (!reader.isEndElement())
+                                                                reader.next();
+                                                            // Step out of this element
+                                                            reader.next();
+                                                            // Step to next element event.
+                                                            while (!reader.isStartElement() && !reader.isEndElement())
+                                                                reader.next();
+                                                            if (reader.isEndElement()){
+                                                                //two continuous end elements means we are exiting the xml structure
+                                                                loopDone2 = true;
+                                                            } else {
+                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn","detailsType").equals(reader.getName())){
+                                                                    list2.add(gsn.webservice.standard.xsd.GSNWebService_DetailsType.Factory.parse(reader));
+                                                                        
+                                                                }else{
+                                                                    loopDone2 = true;
+                                                                }
+                                                            }
+                                                        }
+                                                        // call the converter utility  to convert and set the array
+                                                        
                                                         object.setDetailsType((gsn.webservice.standard.xsd.GSNWebService_DetailsType[])
                                                             org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
                                                                 gsn.webservice.standard.xsd.GSNWebService_DetailsType.class,
-                                                                list1));
+                                                                list2));
                                                             
                               }  // End of if for expected property start element
                                 

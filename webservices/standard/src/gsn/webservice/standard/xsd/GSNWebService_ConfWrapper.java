@@ -32,26 +32,26 @@
         
 
                         /**
-                        * field for Predicates
+                        * field for WrapperDetails
                         * This was an Array!
                         */
 
                         
-                                    protected gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[] localPredicates ;
+                                    protected gsn.webservice.standard.xsd.GSNWebService_WrapperDetails[] localWrapperDetails ;
                                 
                            /*  This tracker boolean wil be used to detect whether the user called the set method
                           *   for this attribute. It will be used to determine whether to include this field
                            *   in the serialized XML
                            */
-                           protected boolean localPredicatesTracker = false ;
+                           protected boolean localWrapperDetailsTracker = false ;
                            
 
                            /**
                            * Auto generated getter method
-                           * @return gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[]
+                           * @return gsn.webservice.standard.xsd.GSNWebService_WrapperDetails[]
                            */
-                           public  gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[] getPredicates(){
-                               return localPredicates;
+                           public  gsn.webservice.standard.xsd.GSNWebService_WrapperDetails[] getWrapperDetails(){
+                               return localWrapperDetails;
                            }
 
                            
@@ -60,120 +60,58 @@
 
                                
                               /**
-                               * validate the array for Predicates
+                               * validate the array for WrapperDetails
                                */
-                              protected void validatePredicates(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[] param){
+                              protected void validateWrapperDetails(gsn.webservice.standard.xsd.GSNWebService_WrapperDetails[] param){
                              
                               }
 
 
                              /**
                               * Auto generated setter method
-                              * @param param Predicates
+                              * @param param WrapperDetails
                               */
-                              public void setPredicates(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[] param){
+                              public void setWrapperDetails(gsn.webservice.standard.xsd.GSNWebService_WrapperDetails[] param){
                               
-                                   validatePredicates(param);
+                                   validateWrapperDetails(param);
 
                                
                                           if (param != null){
                                              //update the setting tracker
-                                             localPredicatesTracker = true;
+                                             localWrapperDetailsTracker = true;
                                           } else {
-                                             localPredicatesTracker = false;
+                                             localWrapperDetailsTracker = false;
                                                  
                                           }
                                       
-                                      this.localPredicates=param;
+                                      this.localWrapperDetails=param;
                               }
 
                                
                              
                              /**
                              * Auto generated add method for the array for convenience
-                             * @param param gsn.webservice.standard.xsd.GSNWebService_ConfPredicate
+                             * @param param gsn.webservice.standard.xsd.GSNWebService_WrapperDetails
                              */
-                             public void addPredicates(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate param){
-                                   if (localPredicates == null){
-                                   localPredicates = new gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[]{};
+                             public void addWrapperDetails(gsn.webservice.standard.xsd.GSNWebService_WrapperDetails param){
+                                   if (localWrapperDetails == null){
+                                   localWrapperDetails = new gsn.webservice.standard.xsd.GSNWebService_WrapperDetails[]{};
                                    }
 
                             
                                  //update the setting tracker
-                                localPredicatesTracker = true;
+                                localWrapperDetailsTracker = true;
                             
 
                                java.util.List list =
-                            org.apache.axis2.databinding.utils.ConverterUtil.toList(localPredicates);
+                            org.apache.axis2.databinding.utils.ConverterUtil.toList(localWrapperDetails);
                                list.add(param);
-                               this.localPredicates =
-                             (gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[])list.toArray(
-                            new gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[list.size()]);
+                               this.localWrapperDetails =
+                             (gsn.webservice.standard.xsd.GSNWebService_WrapperDetails[])list.toArray(
+                            new gsn.webservice.standard.xsd.GSNWebService_WrapperDetails[list.size()]);
 
                              }
                              
-
-                        /**
-                        * field for Wrapper
-                        * This was an Attribute!
-                        */
-
-                        
-                                    protected java.lang.String localWrapper ;
-                                
-
-                           /**
-                           * Auto generated getter method
-                           * @return java.lang.String
-                           */
-                           public  java.lang.String getWrapper(){
-                               return localWrapper;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param Wrapper
-                               */
-                               public void setWrapper(java.lang.String param){
-                            
-                                            this.localWrapper=param;
-                                    
-
-                               }
-                            
-
-                        /**
-                        * field for WrapperURL
-                        * This was an Attribute!
-                        */
-
-                        
-                                    protected java.lang.String localWrapperURL ;
-                                
-
-                           /**
-                           * Auto generated getter method
-                           * @return java.lang.String
-                           */
-                           public  java.lang.String getWrapperURL(){
-                               return localWrapperURL;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param WrapperURL
-                               */
-                               public void setWrapperURL(java.lang.String param){
-                            
-                                            this.localWrapperURL=param;
-                                    
-
-                               }
-                            
 
      /**
      * isReaderMTOMAware
@@ -271,37 +209,11 @@
 
                
                    }
-               
-                                            if (localWrapper != null){
-                                        
-                                                writeAttribute("http://standard.webservice.gsn/xsd",
-                                                         "wrapper",
-                                                         org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localWrapper), xmlWriter);
-
-                                            
-                                      }
-                                    
-                                      else {
-                                          throw new org.apache.axis2.databinding.ADBException("required attribute localWrapper is null");
-                                      }
-                                    
-                                            if (localWrapperURL != null){
-                                        
-                                                writeAttribute("http://standard.webservice.gsn/xsd",
-                                                         "wrapperURL",
-                                                         org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localWrapperURL), xmlWriter);
-
-                                            
-                                      }
-                                    
-                                      else {
-                                          throw new org.apache.axis2.databinding.ADBException("required attribute localWrapperURL is null");
-                                      }
-                                     if (localPredicatesTracker){
-                                       if (localPredicates!=null){
-                                            for (int i = 0;i < localPredicates.length;i++){
-                                                if (localPredicates[i] != null){
-                                                 localPredicates[i].serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","predicates"),
+                if (localWrapperDetailsTracker){
+                                       if (localWrapperDetails!=null){
+                                            for (int i = 0;i < localWrapperDetails.length;i++){
+                                                if (localWrapperDetails[i] != null){
+                                                 localWrapperDetails[i].serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapperDetails"),
                                                            factory,xmlWriter);
                                                 } else {
                                                    
@@ -312,7 +224,7 @@
                                             }
                                      } else {
                                         
-                                               throw new org.apache.axis2.databinding.ADBException("predicates cannot be null!!");
+                                               throw new org.apache.axis2.databinding.ADBException("wrapperDetails cannot be null!!");
                                         
                                     }
                                  }
@@ -477,14 +389,14 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                 if (localPredicatesTracker){
-                             if (localPredicates!=null) {
-                                 for (int i = 0;i < localPredicates.length;i++){
+                 if (localWrapperDetailsTracker){
+                             if (localWrapperDetails!=null) {
+                                 for (int i = 0;i < localWrapperDetails.length;i++){
 
-                                    if (localPredicates[i] != null){
+                                    if (localWrapperDetails[i] != null){
                                          elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd",
-                                                                          "predicates"));
-                                         elementList.add(localPredicates[i]);
+                                                                          "wrapperDetails"));
+                                         elementList.add(localWrapperDetails[i]);
                                     } else {
                                         
                                                 // nothing to do
@@ -494,21 +406,11 @@
                                  }
                              } else {
                                  
-                                        throw new org.apache.axis2.databinding.ADBException("predicates cannot be null!!");
+                                        throw new org.apache.axis2.databinding.ADBException("wrapperDetails cannot be null!!");
                                     
                              }
 
                         }
-                            attribList.add(
-                            new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapper"));
-                            
-                                      attribList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localWrapper));
-                                
-                            attribList.add(
-                            new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapperURL"));
-                            
-                                      attribList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localWrapperURL));
-                                
 
                 return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
             
@@ -581,42 +483,6 @@
                 
 
                  
-                    // handle attribute "wrapper"
-                    java.lang.String tempAttribWrapper =
-                        
-                                reader.getAttributeValue("http://standard.webservice.gsn/xsd","wrapper");
-                            
-                   if (tempAttribWrapper!=null){
-                         java.lang.String content = tempAttribWrapper;
-                        
-                                                 object.setWrapper(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(tempAttribWrapper));
-                                            
-                    } else {
-                       
-                               throw new org.apache.axis2.databinding.ADBException("Required attribute wrapper is missing");
-                           
-                    }
-                    handledAttributes.add("wrapper");
-                    
-                    // handle attribute "wrapperURL"
-                    java.lang.String tempAttribWrapperURL =
-                        
-                                reader.getAttributeValue("http://standard.webservice.gsn/xsd","wrapperURL");
-                            
-                   if (tempAttribWrapperURL!=null){
-                         java.lang.String content = tempAttribWrapperURL;
-                        
-                                                 object.setWrapperURL(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(tempAttribWrapperURL));
-                                            
-                    } else {
-                       
-                               throw new org.apache.axis2.databinding.ADBException("Required attribute wrapperURL is missing");
-                           
-                    }
-                    handledAttributes.add("wrapperURL");
-                    
                     
                     reader.next();
                 
@@ -625,12 +491,12 @@
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","predicates").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapperDetails").equals(reader.getName())){
                                 
                                     
                                     
                                     // Process the array and step past its final element's end.
-                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate.Factory.parse(reader));
+                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_WrapperDetails.Factory.parse(reader));
                                                                 
                                                         //loop until we find a start element that is not part of this array
                                                         boolean loopDone1 = false;
@@ -647,8 +513,8 @@
                                                                 //two continuous end elements means we are exiting the xml structure
                                                                 loopDone1 = true;
                                                             } else {
-                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","predicates").equals(reader.getName())){
-                                                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate.Factory.parse(reader));
+                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapperDetails").equals(reader.getName())){
+                                                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_WrapperDetails.Factory.parse(reader));
                                                                         
                                                                 }else{
                                                                     loopDone1 = true;
@@ -657,9 +523,9 @@
                                                         }
                                                         // call the converter utility  to convert and set the array
                                                         
-                                                        object.setPredicates((gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[])
+                                                        object.setWrapperDetails((gsn.webservice.standard.xsd.GSNWebService_WrapperDetails[])
                                                             org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
-                                                                gsn.webservice.standard.xsd.GSNWebService_ConfPredicate.class,
+                                                                gsn.webservice.standard.xsd.GSNWebService_WrapperDetails.class,
                                                                 list1));
                                                             
                               }  // End of if for expected property start element

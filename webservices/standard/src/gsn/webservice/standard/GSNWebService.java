@@ -29,9 +29,9 @@ public interface GSNWebService {
 
     //
 
-    public VirtualSensorDetails[] getVirtualSensorsDetails(String[] infos);
+    public VirtualSensorDetails[] getVirtualSensorsDetails(FieldSelector[] virtualSensors, String[] infos);
 
-    public VirtualSensorDetails getVirtualSensorDetails(String vsname, String[] infos);
+    //public VirtualSensorDetails getVirtualSensorDetails(String vsname, String[] infos);
 
     public ContainerDetails getContainerInfo();
 

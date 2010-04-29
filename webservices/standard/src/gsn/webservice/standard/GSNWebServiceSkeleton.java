@@ -17,8 +17,10 @@ import gsn.http.datarequest.xsd.StandardCriterion;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import gsn.webservice.standard.xsd.*;
+import gsn.wrappers.AbstractWrapper;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
+import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -38,12 +40,104 @@ public class GSNWebServiceSkeleton {
      * @param getVirtualSensorsDetails
      */
 
-    public gsn.webservice.standard.GetVirtualSensorsDetailsResponse getVirtualSensorsDetails
-            (
-                    gsn.webservice.standard.GetVirtualSensorsDetails getVirtualSensorsDetails
-            ) {
-        //TODO : fill this with the necessary business logic
-        throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getVirtualSensorsDetails");
+    public gsn.webservice.standard.GetVirtualSensorsDetailsResponse getVirtualSensorsDetails(gsn.webservice.standard.GetVirtualSensorsDetails getVirtualSensorsDetails) {
+        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getVirtualSensorsDetails");
+        GetVirtualSensorsDetailsResponse response = new GetVirtualSensorsDetailsResponse();
+        //
+
+        //
+        HashMap<String, ArrayList<String>> vsAndFields = buildSelection(getVirtualSensorsDetails.getFieldSelector());
+        for (Map.Entry<String, ArrayList<String>> selection : vsAndFields.entrySet()) {
+            VSensorConfig config = Mappings.getConfig(selection.getKey());
+            if (config != null) {
+                GSNWebService_VirtualSensorDetails details = new GSNWebService_VirtualSensorDetails();
+                details.setVsname(selection.getKey());
+                for (GSNWebService_DetailsType detail : getVirtualSensorsDetails.getDetailsType()) {
+                    if ("INFO".equals(detail.getValue())) {
+                        GSNWebService_ConfInfo info = new GSNWebService_ConfInfo();
+                        info.setDescription(config.getDescription());
+                        details.setInfo(info);
+                    } else if ("PROCESSOR".equals(detail.getValue())) {
+                        GSNWebService_ConfProcessor processor = new GSNWebService_ConfProcessor();
+                        processor.setClassName(config.getProcessingClass());
+                        for (Map.Entry<String, String> entry : config.getMainClassInitialParams().entrySet()) {
+                            GSNWebService_ConfPredicate predicate = new GSNWebService_ConfPredicate();
+                            predicate.setName(entry.getKey().toString());
+                            predicate.setString(entry.getValue().toString());
+                            processor.addInitParams(predicate);
+                        }
+                        details.setProcessor(processor);
+                    } else if ("ADDRESSING".equals(detail.getValue())) {
+                        GSNWebService_ConfAddressing addressing = new GSNWebService_ConfAddressing();
+                        for (KeyValue kv : config.getAddressing()) {
+                            GSNWebService_ConfPredicate predicate = new GSNWebService_ConfPredicate();
+                            predicate.setName(kv.getKey().toString());
+                            predicate.setString(kv.getValue().toString());
+                            addressing.addPredicates(predicate);
+                        }
+                        details.setAddressing(addressing);
+                    } else if ("OUTPUTSTRUCTURE".equals(detail.getValue())) {
+                        GSNWebService_ConfOutputStructure outputstructure = new GSNWebService_ConfOutputStructure();
+                        for (DataField df : config.getOutputStructure()) {
+                            GSNWebService_DataField dataField = new GSNWebService_DataField();
+                            if (df.getDescription() != null)
+                                dataField.setDescription(df.getDescription());
+                            if (df.getName() != null)
+                                dataField.setName(df.getName());
+                            if (df.getType() != null)
+                                dataField.setType(df.getType());
+                            dataField.setString("");
+                            outputstructure.addFields(dataField);
+                        }
+                        details.setOutputStructure(outputstructure);
+                    } else if ("WRAPPER".equals(detail.getValue())) {
+                        GSNWebService_ConfWrapper wrapperConf = new GSNWebService_ConfWrapper();
+                        for (gsn.beans.InputStream inputStream : config.getInputStreams()) {
+                            for (gsn.beans.StreamSource source : inputStream.getSources()) {
+                                AddressBean ab = source.getActiveAddressBean();
+                                //
+                                GSNWebService_WrapperDetails wd = new GSNWebService_WrapperDetails();
+                                //
+                                GSNWebService_WrapperURL wrapperURL = new GSNWebService_WrapperURL();
+                                wrapperURL.setVirtualSensor(config.getName());
+                                wrapperURL.setStream(inputStream.getInputStreamName());
+                                wrapperURL.setSource(source.getAlias().toString());
+                                wrapperURL.setWrapper(source.getActiveAddressBean().getWrapper());
+                                wd.setWrapperURLs(wrapperURL);
+                                //
+                                for (KeyValue kv : ab.getPredicates()) {
+                                    GSNWebService_ConfPredicate predicate = new GSNWebService_ConfPredicate();
+                                    predicate.setName(kv.getKey().toString());
+                                    predicate.setString(kv.getValue().toString());
+                                    wd.addPredicates(predicate);
+                                }
+                                //
+                                for (DataField df : source.getWrapper().getOutputFormat()) {
+                                    GSNWebService_DataField dataField = new GSNWebService_DataField();
+                                    if (df.getDescription() != null)
+                                        dataField.setDescription(df.getDescription());
+                                    if (df.getName() != null)
+                                        dataField.setName(df.getName());
+                                    if (df.getType() != null)
+                                        dataField.setType(df.getType());
+                                    dataField.setString("");
+                                    wd.addOutputFormat(dataField);
+                                }
+                                wrapperConf.addWrapperDetails(wd);
+                            }
+                        }
+                        details.setWrapper(wrapperConf);
+                    }
+                }
+                response.addVirtualSensorDetails(details);
+            }
+        }
+
+
+        //
+
+        //
+        return response;
     }
 
 
@@ -61,19 +155,15 @@ public class GSNWebServiceSkeleton {
             config = iter.next();
             for (gsn.beans.InputStream is : config.getInputStreams()) {
                 for (gsn.beans.StreamSource source : is.getSources()) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(config.getName());
-                    sb.append("/");
-                    sb.append(is.getInputStreamName());
-                    sb.append("/");
-                    sb.append(source.getAlias());
-                    sb.append("/");
-                    sb.append(source.getActiveAddressBean().getWrapper());
-                    wrappers.add(sb.toString());
+                    GSNWebService_WrapperURL wrapperURL = new GSNWebService_WrapperURL();
+                    wrapperURL.setVirtualSensor(config.getName());
+                    wrapperURL.setStream(is.getInputStreamName());
+                    wrapperURL.setSource(source.getAlias().toString());
+                    wrapperURL.setWrapper(source.getActiveAddressBean().getWrapper());
+                    response.addWrapperURLs(wrapperURL);
                 }
             }
         }
-        response.setWrapperUrl(wrappers.toArray(new String[wrappers.size()]));
         return response;
     }
 
@@ -84,12 +174,19 @@ public class GSNWebServiceSkeleton {
      * @param getLatestMultiData
      */
 
-    public gsn.webservice.standard.GetLatestMultiDataResponse getLatestMultiData
-            (
-                    gsn.webservice.standard.GetLatestMultiData getLatestMultiData
-            ) {
-        //TODO : fill this with the necessary business logic
-        throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getLatestMultiData");
+    public gsn.webservice.standard.GetLatestMultiDataResponse getLatestMultiData(gsn.webservice.standard.GetLatestMultiData getLatestMultiData) {
+        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getLatestMultiData");
+        GetLatestMultiDataResponse response = new GetLatestMultiDataResponse();
+        //
+        GetMultiData input = new GetMultiData();
+        input.setFieldSelector(getLatestMultiData.getFieldSelector());
+        input.setTo(Long.MIN_VALUE);
+        input.setFrom(Long.MIN_VALUE);
+        input.setNb(1);
+        //
+        response.setQueryResult(getMultiData(input).getQueryResult());
+        //
+        return response;
     }
 
 
@@ -145,19 +242,7 @@ public class GSNWebServiceSkeleton {
     }
 
 
-    /**
-     * Auto generated method signature
-     *
-     * @param getMultiData
-     */
-
-    public gsn.webservice.standard.GetMultiDataResponse getMultiData(gsn.webservice.standard.GetMultiData getMultiData) {
-
-        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMultiData");
-        GetMultiDataResponse response = new GetMultiDataResponse();
-        //
-
-        Map<String, String[]> requestParameters = new HashMap<String, String[]>();
+    private HashMap<String, ArrayList<String>> buildSelection(GSNWebService_FieldSelector[] fieldSelectors) {
 
         // Build Mappings
         HashMap<String, ArrayList<String>> vsToField = new HashMap<String, ArrayList<String>>();
@@ -178,10 +263,8 @@ public class GSNWebServiceSkeleton {
             vsToField.put(vsConfig.getName(), fields);
         }
 
-        // virtual sensor and field selection
-
         HashMap<String, ArrayList<String>> vsAndFields = new HashMap<String, ArrayList<String>>();
-        GSNWebService_FieldSelector[] fieldSelectors = getMultiData.getFieldSelector();
+
         for (GSNWebService_FieldSelector fs : fieldSelectors) {
             String[] fields = fs.getFieldNames();
             // 1. Virtual Sensor Selection
@@ -218,6 +301,27 @@ public class GSNWebServiceSkeleton {
                 }
             }
         }
+        return vsAndFields;
+    }
+
+    /**
+     * Auto generated method signature
+     *
+     * @param getMultiData
+     */
+
+    public gsn.webservice.standard.GetMultiDataResponse getMultiData(gsn.webservice.standard.GetMultiData getMultiData) {
+
+        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMultiData");
+        GetMultiDataResponse response = new GetMultiDataResponse();
+        //
+
+        Map<String, String[]> requestParameters = new HashMap<String, String[]>();
+
+        // virtual sensor and field selection
+
+        HashMap<String, ArrayList<String>> vsAndFields = buildSelection(getMultiData.getFieldSelector());
+
 
         ArrayList<String> vsnames = new ArrayList<String>();
         for (Map.Entry<String, ArrayList<String>> entry : vsAndFields.entrySet()) {
@@ -259,13 +363,12 @@ public class GSNWebServiceSkeleton {
                         // We add this criterion for all the virtual sensors and all their fields
                         selection = vsAndFields;
                     } else {
-                        ArrayList<String> vss = fieldToVs.get(criterion.getField());
+                        //ArrayList<String> vss = fieldToVs.get(criterion.getField());
                         ArrayList<String> crit = new ArrayList<String>();
                         crit.add(criterion.getField());
-                        if (vss != null) {
-                            for (String vsname : vss) {
-                                if (vsAndFields.containsKey(vsname))
-                                    selection.put(vsname, crit);
+                        for (Map.Entry<String, ArrayList<String>> entry : vsAndFields.entrySet()) {
+                            if (entry.getValue() != null && entry.getValue().contains(criterion.getField())) {
+                                selection.put(entry.getKey(), crit);
                             }
                         }
                     }
@@ -447,21 +550,6 @@ public class GSNWebServiceSkeleton {
             ) {
         //TODO : fill this with the necessary business logic
 
-    }
-
-
-    /**
-     * Auto generated method signature
-     *
-     * @param getVirtualSensorDetails
-     */
-
-    public gsn.webservice.standard.GetVirtualSensorDetailsResponse getVirtualSensorDetails
-            (
-                    gsn.webservice.standard.GetVirtualSensorDetails getVirtualSensorDetails
-            ) {
-        //TODO : fill this with the necessary business logic
-        throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getVirtualSensorDetails");
     }
 
 

@@ -252,50 +252,6 @@
                             
 
                         /**
-                        * field for WrapperOutputFormat
-                        */
-
-                        
-                                    protected gsn.webservice.standard.xsd.GSNWebService_ConfWrapperOutputFormat localWrapperOutputFormat ;
-                                
-                           /*  This tracker boolean wil be used to detect whether the user called the set method
-                          *   for this attribute. It will be used to determine whether to include this field
-                           *   in the serialized XML
-                           */
-                           protected boolean localWrapperOutputFormatTracker = false ;
-                           
-
-                           /**
-                           * Auto generated getter method
-                           * @return gsn.webservice.standard.xsd.GSNWebService_ConfWrapperOutputFormat
-                           */
-                           public  gsn.webservice.standard.xsd.GSNWebService_ConfWrapperOutputFormat getWrapperOutputFormat(){
-                               return localWrapperOutputFormat;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param WrapperOutputFormat
-                               */
-                               public void setWrapperOutputFormat(gsn.webservice.standard.xsd.GSNWebService_ConfWrapperOutputFormat param){
-                            
-                                       if (param != null){
-                                          //update the setting tracker
-                                          localWrapperOutputFormatTracker = true;
-                                       } else {
-                                          localWrapperOutputFormatTracker = false;
-                                              
-                                       }
-                                   
-                                            this.localWrapperOutputFormat=param;
-                                    
-
-                               }
-                            
-
-                        /**
                         * field for Vsname
                         * This was an Attribute!
                         */
@@ -464,12 +420,6 @@
                                                  throw new org.apache.axis2.databinding.ADBException("wrapper cannot be null!!");
                                             }
                                            localWrapper.serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapper"),
-                                               factory,xmlWriter);
-                                        } if (localWrapperOutputFormatTracker){
-                                            if (localWrapperOutputFormat==null){
-                                                 throw new org.apache.axis2.databinding.ADBException("wrapperOutputFormat cannot be null!!");
-                                            }
-                                           localWrapperOutputFormat.serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapperOutputFormat"),
                                                factory,xmlWriter);
                                         }
                     xmlWriter.writeEndElement();
@@ -678,15 +628,6 @@
                                          throw new org.apache.axis2.databinding.ADBException("wrapper cannot be null!!");
                                     }
                                     elementList.add(localWrapper);
-                                } if (localWrapperOutputFormatTracker){
-                            elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd",
-                                                                      "wrapperOutputFormat"));
-                            
-                            
-                                    if (localWrapperOutputFormat==null){
-                                         throw new org.apache.axis2.databinding.ADBException("wrapperOutputFormat cannot be null!!");
-                                    }
-                                    elementList.add(localWrapperOutputFormat);
                                 }
                             attribList.add(
                             new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","vsname"));
@@ -852,21 +793,6 @@
                                     if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapper").equals(reader.getName())){
                                 
                                                 object.setWrapper(gsn.webservice.standard.xsd.GSNWebService_ConfWrapper.Factory.parse(reader));
-                                              
-                                        reader.next();
-                                    
-                              }  // End of if for expected property start element
-                                
-                                    else {
-                                        
-                                    }
-                                
-                                    
-                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
-                                
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapperOutputFormat").equals(reader.getName())){
-                                
-                                                object.setWrapperOutputFormat(gsn.webservice.standard.xsd.GSNWebService_ConfWrapperOutputFormat.Factory.parse(reader));
                                               
                                         reader.next();
                                     

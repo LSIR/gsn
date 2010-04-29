@@ -32,34 +32,41 @@
         
 
                         /**
-                        * field for Value
+                        * field for String
                         */
 
                         
-                                    protected java.lang.String localValue ;
+                                    protected java.lang.String localString ;
                                 
 
                            /**
                            * Auto generated getter method
                            * @return java.lang.String
                            */
-                           public  java.lang.String getValue(){
-                               return localValue;
+                           public  java.lang.String getString(){
+                               return localString;
                            }
 
                            
                         
                             /**
                                * Auto generated setter method
-                               * @param param Value
+                               * @param param String
                                */
-                               public void setValue(java.lang.String param){
+                               public void setString(java.lang.String param){
                             
-                                            this.localValue=param;
+                                            this.localString=param;
                                     
 
                                }
                             
+
+                            public java.lang.String toString(){
+                                
+                                        return localString.toString();
+                                    
+                            }
+                        
 
                         /**
                         * field for Name
@@ -202,40 +209,19 @@
                                           throw new org.apache.axis2.databinding.ADBException("required attribute localName is null");
                                       }
                                     
-                                    namespace = "http://standard.webservice.gsn/xsd";
-                                    if (! namespace.equals("")) {
-                                        prefix = xmlWriter.getPrefix(namespace);
 
-                                        if (prefix == null) {
-                                            prefix = generatePrefix(namespace);
-
-                                            xmlWriter.writeStartElement(prefix,"value", namespace);
-                                            xmlWriter.writeNamespace(prefix, namespace);
-                                            xmlWriter.setPrefix(prefix, namespace);
-
-                                        } else {
-                                            xmlWriter.writeStartElement(namespace,"value");
-                                        }
-
-                                    } else {
-                                        xmlWriter.writeStartElement("value");
-                                    }
-                                
-
-                                          if (localValue==null){
+                                          if (localString==null){
                                               // write the nil attribute
                                               
-                                                     writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","nil","1",xmlWriter);
+                                                     throw new org.apache.axis2.databinding.ADBException("string cannot be null!!");
                                                   
                                           }else{
 
                                         
-                                                   xmlWriter.writeCharacters(localValue);
+                                                   xmlWriter.writeCharacters(localString);
                                             
                                           }
                                     
-                                   xmlWriter.writeEndElement();
-                             
                     xmlWriter.writeEndElement();
                
 
@@ -398,11 +384,14 @@
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
                 
-                                      elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd",
-                                                                      "value"));
+                                     
+                                     elementList.add(org.apache.axis2.databinding.utils.reader.ADBXMLStreamReader.ELEMENT_TEXT);
                                  
-                                         elementList.add(localValue==null?null:
-                                         org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localValue));
+                                        if (localString != null){
+                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localString));
+                                        } else {
+                                           throw new org.apache.axis2.databinding.ADBException("string cannot be null!!");
+                                        }
                                     
                             attribList.add(
                             new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","name"));
@@ -425,6 +414,29 @@
 
         
         
+                public static GSNWebService_ConfPredicate fromString(java.lang.String value,
+                                                    java.lang.String namespaceURI){
+                    GSNWebService_ConfPredicate returnValue = new  GSNWebService_ConfPredicate();
+                    
+                            returnValue.setString(
+                                org.apache.axis2.databinding.utils.ConverterUtil.convertToString(value));
+                        
+
+                    return returnValue;
+                }
+
+                public static GSNWebService_ConfPredicate fromString(javax.xml.stream.XMLStreamReader xmlStreamReader,
+                                                                    java.lang.String content) {
+                    if (content.indexOf(":") > -1){
+                        java.lang.String prefix = content.substring(0,content.indexOf(":"));
+                        java.lang.String namespaceUri = xmlStreamReader.getNamespaceContext().getNamespaceURI(prefix);
+                        return GSNWebService_ConfPredicate.Factory.fromString(content,namespaceUri);
+                    } else {
+                       return GSNWebService_ConfPredicate.Factory.fromString(content,"");
+                    }
+                }
+
+            
 
         /**
         * static method to create the object
@@ -498,45 +510,29 @@
                            
                     }
                     handledAttributes.add("name");
-                    
-                    
-                    reader.next();
+                       
+                while(!reader.isEndElement()) {
+                    if (reader.isStartElement()  || reader.hasText()){
                 
-                                    
-                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                    if (reader.isStartElement()  || reader.hasText()){
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","value").equals(reader.getName())){
-                                
-                                       nillableValue = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance","nil");
-                                       if (!"true".equals(nillableValue) && !"1".equals(nillableValue)){
-                                    
                                     java.lang.String content = reader.getElementText();
                                     
-                                              object.setValue(
+                                              object.setString(
                                                     org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
                                             
-                                       } else {
-                                           
-                                           
-                                           reader.getElementText(); // throw away text nodes if any.
-                                       }
-                                      
-                                        reader.next();
-                                    
                               }  // End of if for expected property start element
                                 
-                                else{
-                                    // A start element we are not expecting indicates an invalid parameter was passed
-                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
-                                }
-                              
-                            while (!reader.isStartElement() && !reader.isEndElement())
+                             else{
+                                        // A start element we are not expecting indicates an invalid parameter was passed
+                                        throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                             }
+                          
+                             } else {
                                 reader.next();
-                            
-                                if (reader.isStartElement())
-                                // A start element we are not expecting indicates a trailing invalid property
-                                throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
-                            
+                             }  
+                           }  // end of while loop
+                        
 
 
 

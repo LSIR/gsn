@@ -1,6 +1,6 @@
 
 /**
- * GSNWebService_ConfWrapperOutputFormat.java
+ * GSNWebService_WrapperDetails.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
@@ -10,13 +10,13 @@
             
 
             /**
-            *  GSNWebService_ConfWrapperOutputFormat bean class
+            *  GSNWebService_WrapperDetails bean class
             */
         
-        public  class GSNWebService_ConfWrapperOutputFormat
+        public  class GSNWebService_WrapperDetails
         implements org.apache.axis2.databinding.ADBBean{
         /* This type was generated from the piece of schema that had
-                name = GSNWebService_ConfWrapperOutputFormat
+                name = GSNWebService_WrapperDetails
                 Namespace URI = http://standard.webservice.gsn/xsd
                 Namespace Prefix = ns1
                 */
@@ -30,6 +30,36 @@
         }
 
         
+
+                        /**
+                        * field for WrapperURLs
+                        */
+
+                        
+                                    protected gsn.webservice.standard.xsd.GSNWebService_WrapperURL localWrapperURLs ;
+                                
+
+                           /**
+                           * Auto generated getter method
+                           * @return gsn.webservice.standard.xsd.GSNWebService_WrapperURL
+                           */
+                           public  gsn.webservice.standard.xsd.GSNWebService_WrapperURL getWrapperURLs(){
+                               return localWrapperURLs;
+                           }
+
+                           
+                        
+                            /**
+                               * Auto generated setter method
+                               * @param param WrapperURLs
+                               */
+                               public void setWrapperURLs(gsn.webservice.standard.xsd.GSNWebService_WrapperURL param){
+                            
+                                            this.localWrapperURLs=param;
+                                    
+
+                               }
+                            
 
                         /**
                         * field for OutputFormat
@@ -113,6 +143,88 @@
                              }
                              
 
+                        /**
+                        * field for Predicates
+                        * This was an Array!
+                        */
+
+                        
+                                    protected gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[] localPredicates ;
+                                
+                           /*  This tracker boolean wil be used to detect whether the user called the set method
+                          *   for this attribute. It will be used to determine whether to include this field
+                           *   in the serialized XML
+                           */
+                           protected boolean localPredicatesTracker = false ;
+                           
+
+                           /**
+                           * Auto generated getter method
+                           * @return gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[]
+                           */
+                           public  gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[] getPredicates(){
+                               return localPredicates;
+                           }
+
+                           
+                        
+
+
+                               
+                              /**
+                               * validate the array for Predicates
+                               */
+                              protected void validatePredicates(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[] param){
+                             
+                              }
+
+
+                             /**
+                              * Auto generated setter method
+                              * @param param Predicates
+                              */
+                              public void setPredicates(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[] param){
+                              
+                                   validatePredicates(param);
+
+                               
+                                          if (param != null){
+                                             //update the setting tracker
+                                             localPredicatesTracker = true;
+                                          } else {
+                                             localPredicatesTracker = false;
+                                                 
+                                          }
+                                      
+                                      this.localPredicates=param;
+                              }
+
+                               
+                             
+                             /**
+                             * Auto generated add method for the array for convenience
+                             * @param param gsn.webservice.standard.xsd.GSNWebService_ConfPredicate
+                             */
+                             public void addPredicates(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate param){
+                                   if (localPredicates == null){
+                                   localPredicates = new gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[]{};
+                                   }
+
+                            
+                                 //update the setting tracker
+                                localPredicatesTracker = true;
+                            
+
+                               java.util.List list =
+                            org.apache.axis2.databinding.utils.ConverterUtil.toList(localPredicates);
+                               list.add(param);
+                               this.localPredicates =
+                             (gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[])list.toArray(
+                            new gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[list.size()]);
+
+                             }
+                             
+
      /**
      * isReaderMTOMAware
      * @return true if the reader supports MTOM
@@ -145,7 +257,7 @@
                        new org.apache.axis2.databinding.ADBDataSource(this,parentQName){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       GSNWebService_ConfWrapperOutputFormat.this.serialize(parentQName,factory,xmlWriter);
+                       GSNWebService_WrapperDetails.this.serialize(parentQName,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
@@ -199,17 +311,23 @@
                    java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://standard.webservice.gsn/xsd");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":GSNWebService_ConfWrapperOutputFormat",
+                           namespacePrefix+":GSNWebService_WrapperDetails",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "GSNWebService_ConfWrapperOutputFormat",
+                           "GSNWebService_WrapperDetails",
                            xmlWriter);
                    }
 
                
                    }
-                if (localOutputFormatTracker){
+               
+                                            if (localWrapperURLs==null){
+                                                 throw new org.apache.axis2.databinding.ADBException("wrapperURLs cannot be null!!");
+                                            }
+                                           localWrapperURLs.serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapperURLs"),
+                                               factory,xmlWriter);
+                                         if (localOutputFormatTracker){
                                        if (localOutputFormat!=null){
                                             for (int i = 0;i < localOutputFormat.length;i++){
                                                 if (localOutputFormat[i] != null){
@@ -225,6 +343,24 @@
                                      } else {
                                         
                                                throw new org.apache.axis2.databinding.ADBException("outputFormat cannot be null!!");
+                                        
+                                    }
+                                 } if (localPredicatesTracker){
+                                       if (localPredicates!=null){
+                                            for (int i = 0;i < localPredicates.length;i++){
+                                                if (localPredicates[i] != null){
+                                                 localPredicates[i].serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","predicates"),
+                                                           factory,xmlWriter);
+                                                } else {
+                                                   
+                                                        // we don't have to do any thing since minOccures is zero
+                                                    
+                                                }
+
+                                            }
+                                     } else {
+                                        
+                                               throw new org.apache.axis2.databinding.ADBException("predicates cannot be null!!");
                                         
                                     }
                                  }
@@ -389,7 +525,16 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                 if (localOutputFormatTracker){
+                
+                            elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd",
+                                                                      "wrapperURLs"));
+                            
+                            
+                                    if (localWrapperURLs==null){
+                                         throw new org.apache.axis2.databinding.ADBException("wrapperURLs cannot be null!!");
+                                    }
+                                    elementList.add(localWrapperURLs);
+                                 if (localOutputFormatTracker){
                              if (localOutputFormat!=null) {
                                  for (int i = 0;i < localOutputFormat.length;i++){
 
@@ -407,6 +552,27 @@
                              } else {
                                  
                                         throw new org.apache.axis2.databinding.ADBException("outputFormat cannot be null!!");
+                                    
+                             }
+
+                        } if (localPredicatesTracker){
+                             if (localPredicates!=null) {
+                                 for (int i = 0;i < localPredicates.length;i++){
+
+                                    if (localPredicates[i] != null){
+                                         elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd",
+                                                                          "predicates"));
+                                         elementList.add(localPredicates[i]);
+                                    } else {
+                                        
+                                                // nothing to do
+                                            
+                                    }
+
+                                 }
+                             } else {
+                                 
+                                        throw new org.apache.axis2.databinding.ADBException("predicates cannot be null!!");
                                     
                              }
 
@@ -435,9 +601,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static GSNWebService_ConfWrapperOutputFormat parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            GSNWebService_ConfWrapperOutputFormat object =
-                new GSNWebService_ConfWrapperOutputFormat();
+        public static GSNWebService_WrapperDetails parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            GSNWebService_WrapperDetails object =
+                new GSNWebService_WrapperDetails();
 
             int event;
             java.lang.String nillableValue = null;
@@ -461,10 +627,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"GSNWebService_ConfWrapperOutputFormat".equals(type)){
+                            if (!"GSNWebService_WrapperDetails".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (GSNWebService_ConfWrapperOutputFormat)gsn.webservice.standard.xsd.ExtensionMapper.getTypeObject(
+                                return (GSNWebService_WrapperDetails)gsn.webservice.standard.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -486,8 +652,26 @@
                     
                     reader.next();
                 
-                        java.util.ArrayList list1 = new java.util.ArrayList();
+                        java.util.ArrayList list2 = new java.util.ArrayList();
                     
+                        java.util.ArrayList list3 = new java.util.ArrayList();
+                    
+                                    
+                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","wrapperURLs").equals(reader.getName())){
+                                
+                                                object.setWrapperURLs(gsn.webservice.standard.xsd.GSNWebService_WrapperURL.Factory.parse(reader));
+                                              
+                                        reader.next();
+                                    
+                              }  // End of if for expected property start element
+                                
+                                else{
+                                    // A start element we are not expecting indicates an invalid parameter was passed
+                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                }
+                            
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
@@ -496,11 +680,11 @@
                                     
                                     
                                     // Process the array and step past its final element's end.
-                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_DataField.Factory.parse(reader));
+                                    list2.add(gsn.webservice.standard.xsd.GSNWebService_DataField.Factory.parse(reader));
                                                                 
                                                         //loop until we find a start element that is not part of this array
-                                                        boolean loopDone1 = false;
-                                                        while(!loopDone1){
+                                                        boolean loopDone2 = false;
+                                                        while(!loopDone2){
                                                             // We should be at the end element, but make sure
                                                             while (!reader.isEndElement())
                                                                 reader.next();
@@ -511,13 +695,13 @@
                                                                 reader.next();
                                                             if (reader.isEndElement()){
                                                                 //two continuous end elements means we are exiting the xml structure
-                                                                loopDone1 = true;
+                                                                loopDone2 = true;
                                                             } else {
                                                                 if (new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","outputFormat").equals(reader.getName())){
-                                                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_DataField.Factory.parse(reader));
+                                                                    list2.add(gsn.webservice.standard.xsd.GSNWebService_DataField.Factory.parse(reader));
                                                                         
                                                                 }else{
-                                                                    loopDone1 = true;
+                                                                    loopDone2 = true;
                                                                 }
                                                             }
                                                         }
@@ -526,7 +710,53 @@
                                                         object.setOutputFormat((gsn.webservice.standard.xsd.GSNWebService_DataField[])
                                                             org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
                                                                 gsn.webservice.standard.xsd.GSNWebService_DataField.class,
-                                                                list1));
+                                                                list2));
+                                                            
+                              }  // End of if for expected property start element
+                                
+                                    else {
+                                        
+                                    }
+                                
+                                    
+                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","predicates").equals(reader.getName())){
+                                
+                                    
+                                    
+                                    // Process the array and step past its final element's end.
+                                    list3.add(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate.Factory.parse(reader));
+                                                                
+                                                        //loop until we find a start element that is not part of this array
+                                                        boolean loopDone3 = false;
+                                                        while(!loopDone3){
+                                                            // We should be at the end element, but make sure
+                                                            while (!reader.isEndElement())
+                                                                reader.next();
+                                                            // Step out of this element
+                                                            reader.next();
+                                                            // Step to next element event.
+                                                            while (!reader.isStartElement() && !reader.isEndElement())
+                                                                reader.next();
+                                                            if (reader.isEndElement()){
+                                                                //two continuous end elements means we are exiting the xml structure
+                                                                loopDone3 = true;
+                                                            } else {
+                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","predicates").equals(reader.getName())){
+                                                                    list3.add(gsn.webservice.standard.xsd.GSNWebService_ConfPredicate.Factory.parse(reader));
+                                                                        
+                                                                }else{
+                                                                    loopDone3 = true;
+                                                                }
+                                                            }
+                                                        }
+                                                        // call the converter utility  to convert and set the array
+                                                        
+                                                        object.setPredicates((gsn.webservice.standard.xsd.GSNWebService_ConfPredicate[])
+                                                            org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
+                                                                gsn.webservice.standard.xsd.GSNWebService_ConfPredicate.class,
+                                                                list3));
                                                             
                               }  // End of if for expected property start element
                                 

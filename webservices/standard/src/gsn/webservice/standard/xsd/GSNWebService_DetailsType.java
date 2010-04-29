@@ -68,9 +68,6 @@
                                     public static final java.lang.String _WRAPPER =
                                         org.apache.axis2.databinding.utils.ConverterUtil.convertToString("WRAPPER");
                                 
-                                    public static final java.lang.String _WRAPPEROUTPUTFORMAT =
-                                        org.apache.axis2.databinding.utils.ConverterUtil.convertToString("WRAPPEROUTPUTFORMAT");
-                                
                                 public static final GSNWebService_DetailsType INFO =
                                     new GSNWebService_DetailsType(_INFO,true);
                             
@@ -85,9 +82,6 @@
                             
                                 public static final GSNWebService_DetailsType WRAPPER =
                                     new GSNWebService_DetailsType(_WRAPPER,true);
-                            
-                                public static final GSNWebService_DetailsType WRAPPEROUTPUTFORMAT =
-                                    new GSNWebService_DetailsType(_WRAPPEROUTPUTFORMAT,true);
                             
 
                                 public java.lang.String getValue() { return localGSNWebService_DetailsType;}

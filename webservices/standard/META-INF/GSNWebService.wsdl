@@ -28,7 +28,6 @@
                     <xs:enumeration value="ADDRESSING"/>
                     <xs:enumeration value="OUTPUTSTRUCTURE"/>
                     <xs:enumeration value="WRAPPER"/>
-                    <xs:enumeration value="WRAPPEROUTPUTFORMAT"/>
                 </xs:restriction>
             </xs:simpleType>
             <xs:complexType name="GSNWebService_QueryResult">
@@ -64,7 +63,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="outputStructure" nillable="false" type="ax21:GSNWebService_ConfOutputStructure"/>
                     <xs:element minOccurs="0" maxOccurs="1" name="processor" nillable="false" type="ax21:GSNWebService_ConfProcessor"/>
                     <xs:element minOccurs="0" maxOccurs="1" name="wrapper" nillable="false" type="ax21:GSNWebService_ConfWrapper"/>
-                    <xs:element minOccurs="0" maxOccurs="1" name="wrapperOutputFormat" nillable="false" type="ax21:GSNWebService_ConfWrapperOutputFormat"/>
+                    <!--<xs:element minOccurs="0" maxOccurs="1" name="wrapperOutputFormat" nillable="false" type="ax21:GSNWebService_ConfWrapperOutputFormat"/>-->
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfAddressing">
@@ -73,10 +72,11 @@
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfPredicate">
-                <xs:attribute use="required" name="name" type="xs:string"/>
-                <xs:sequence>
-                    <xs:element minOccurs="1" maxOccurs="1" name="value" nillable="true" type="xs:string"/>
-                </xs:sequence>
+                <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                        <xs:attribute use="required" name="name" type="xs:string"/>
+                    </xs:extension>
+                </xs:simpleContent>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfInfo">
                 <xs:sequence>
@@ -98,9 +98,16 @@
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfWrapper">
-                <xs:attribute use="required" name="wrapper" type="xs:string"/>
-                <xs:attribute use="required" name="wrapperURL" type="xs:string"/>
+                <!--<xs:attribute use="required" name="wrapper" type="xs:string"/>
+                <xs:attribute use="required" name="wrapperURL" type="xs:string"/>-->
                 <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="wrapperDetails" nillable="false" type="ax21:GSNWebService_WrapperDetails"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="GSNWebService_WrapperDetails">
+                <xs:sequence>
+                    <xs:element maxOccurs="1" minOccurs="1" name="wrapperURLs" nillable="false" type="ax21:GSNWebService_WrapperURL"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputFormat" nillable="false" type="ax21:GSNWebService_DataField"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="predicates" nillable="false" type="ax21:GSNWebService_ConfPredicate"/>
                 </xs:sequence>
             </xs:complexType>
@@ -110,11 +117,11 @@
                 <xs:attribute use="required" name="stream" type="xs:string"/>
                 <xs:attribute use="required" name="wrapper" type="xs:string"/>
             </xs:complexType>
-            <xs:complexType name="GSNWebService_ConfWrapperOutputFormat">
+            <!--<xs:complexType name="GSNWebService_ConfWrapperOutputFormat">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="outputFormat" nillable="false" type="ax21:GSNWebService_DataField"/>
                 </xs:sequence>
-            </xs:complexType>
+            </xs:complexType>-->
         </xs:schema>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://datarequest.http.gsn/xsd">
             <xs:complexType name="AbstractCriterion">
@@ -198,6 +205,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <!--
             <xs:element name="getVirtualSensorDetails">
                 <xs:complexType>
                     <xs:attribute name="vsname" use="required" type="xs:string"/>
@@ -213,9 +221,11 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            -->
             <xs:element name="getVirtualSensorsDetails">
                 <xs:complexType>
                     <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="fieldSelector" nillable="false" type="ax22:GSNWebService_FieldSelector"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="detailsType" nillable="false" type="ax22:GSNWebService_DetailsType"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -237,7 +247,7 @@
             <xs:element name="listWrapperURLsResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="wrapperUrl" nillable="false" type="xs:string"/>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="wrapperURLs" nillable="false" type="ax22:GSNWebService_WrapperURL"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -304,12 +314,14 @@
     <wsdl:message name="getNextDataResponse">
         <wsdl:part name="parameters" element="ns:getNextDataResponse"/>
     </wsdl:message>
+    <!--
     <wsdl:message name="getVirtualSensorDetailsRequest">
         <wsdl:part name="parameters" element="ns:getVirtualSensorDetails"/>
     </wsdl:message>
     <wsdl:message name="getVirtualSensorDetailsResponse">
         <wsdl:part name="parameters" element="ns:getVirtualSensorDetailsResponse"/>
     </wsdl:message>
+    -->
     <wsdl:message name="getLatestMultiDataRequest">
         <wsdl:part name="parameters" element="ns:getLatestMultiData"/>
     </wsdl:message>
@@ -355,10 +367,12 @@
             <wsdl:input message="ns:getNextDataRequest" wsaw:Action="urn:getNextData"/>
             <wsdl:output message="ns:getNextDataResponse" wsaw:Action="urn:getNextDataResponse"/>
         </wsdl:operation>
+        <!--
         <wsdl:operation name="getVirtualSensorDetails">
             <wsdl:input message="ns:getVirtualSensorDetailsRequest" wsaw:Action="urn:getVirtualSensorDetails"/>
             <wsdl:output message="ns:getVirtualSensorDetailsResponse" wsaw:Action="urn:getVirtualSensorDetailsResponse"/>
         </wsdl:operation>
+        -->
         <wsdl:operation name="getLatestMultiData">
             <wsdl:input message="ns:getLatestMultiDataRequest" wsaw:Action="urn:getLatestMultiData"/>
             <wsdl:output message="ns:getLatestMultiDataResponse" wsaw:Action="urn:getLatestMultiDataResponse"/>
@@ -425,6 +439,7 @@
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
+        <!--
         <wsdl:operation name="getVirtualSensorDetails">
             <soap:operation soapAction="urn:getVirtualSensorDetails" style="document"/>
             <wsdl:input>
@@ -434,6 +449,7 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        -->
         <wsdl:operation name="unregisterQuery">
             <soap:operation soapAction="urn:unregisterQuery" style="document"/>
             <wsdl:input>
@@ -524,6 +540,7 @@
                 <soap12:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
+        <!--
         <wsdl:operation name="getVirtualSensorDetails">
             <soap12:operation soapAction="urn:getVirtualSensorDetails" style="document"/>
             <wsdl:input>
@@ -533,6 +550,7 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
+        -->
         <wsdl:operation name="unregisterQuery">
             <soap12:operation soapAction="urn:unregisterQuery" style="document"/>
             <wsdl:input>
@@ -623,6 +641,7 @@
                 <mime:content type="text/xml" part="registerQuery"/>
             </wsdl:input>
         </wsdl:operation>
+        <!--
         <wsdl:operation name="getVirtualSensorDetails">
             <http:operation location="GSNWebService/getVirtualSensorDetails"/>
             <wsdl:input>
@@ -632,6 +651,7 @@
                 <mime:content type="text/xml" part="getVirtualSensorDetails"/>
             </wsdl:output>
         </wsdl:operation>
+        -->
         <wsdl:operation name="unregisterQuery">
             <http:operation location="GSNWebService/unregisterQuery"/>
             <wsdl:input>
