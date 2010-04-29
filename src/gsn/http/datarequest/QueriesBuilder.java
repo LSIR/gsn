@@ -108,75 +108,11 @@ public class QueriesBuilder {
 		Entry<String, FieldsCollection> next;
 		String[] fields;
 		String vsname;
-		StringBuilder partFields;
-		//StringBuilder partVS;
-		StringBuilder sqlQuery;
 		while (iter.hasNext()) {
-
 			next = iter.next();
 			fields = next.getValue().getFields();
 			vsname = next.getKey();
-
-			// Standard Criteria
-			StringBuilder partStandardCriteria = new StringBuilder () ;
-			if (standardCriteria != null) {
-				StandardCriterion lastStandardCriterionLinkedToVs = null;
-				StandardCriterion cc ;
-				for (int i = 0 ; i < standardCriteria.size() ; i++) {
-					cc = standardCriteria.get(i);
-					if (cc.getVsname().compareTo("") == 0 || cc.getVsname().compareToIgnoreCase(vsname) == 0) {
-
-						if (lastStandardCriterionLinkedToVs != null) {
-							partStandardCriteria.append(lastStandardCriterionLinkedToVs.getCritJoin() + " " + cc.getNegation() + " " + cc.getField() + " " + cc.getOperator() + " ");
-						}
-						else {
-							partStandardCriteria.append(cc.getNegation() + " " + cc.getField() + " " + cc.getOperator() + " ");
-						}
-
-						lastStandardCriterionLinkedToVs = cc;
-
-						if (cc.getOperator().compareToIgnoreCase("like") == 0) partStandardCriteria.append("'%");
-
-						partStandardCriteria.append(cc.getValue());
-
-						if (cc.getOperator().compareToIgnoreCase("like") == 0) partStandardCriteria.append("%'");
-						partStandardCriteria.append(" ");
-					}
-				}
-				if (lastStandardCriterionLinkedToVs != null) partStandardCriteria.insert(0, "where ");				
-			}
-
-			partFields = new StringBuilder () ;
-			for (int i = 0 ; i < fields.length ; i++) {
-				if (partFields.length()>0)
-					partFields.append(", ");
-				if (aggregationCriterion != null) 	partFields.append(aggregationCriterion.getGroupOperator() + "(");
-				partFields.append(fields[i]);
-				if (aggregationCriterion != null)	partFields.append(") as " + fields[i]);
-
-			}										
-
-			if (aggregationCriterion != null) {
-				if (partFields.length() > 0) {
-					partFields.append(", ");
-				}
-				partFields.append("floor(timed/" + aggregationCriterion.getTimeRange() + ") as aggregation_interval ");
-			}
-			else partFields.append(" ");
-
-
-			// Build a final query
-			sqlQuery = new StringBuilder();
-			sqlQuery.append("select ");
-			sqlQuery.append(partFields);
-			sqlQuery.append("from ").append(vsname).append(" ");
-			sqlQuery.append(partStandardCriteria);
-			if (aggregationCriterion == null)	sqlQuery.append("order by timed desc ");
-			else 								sqlQuery.append("group by aggregation_interval desc ");
-
-			logger.debug("SQL Query built >" + sqlQuery.toString() + "<");
-
-			this.sqlQueries.put(vsname, new AbstractQuery(sqlQuery, limitCriterion));
+			this.sqlQueries.put(vsname, new AbstractQuery(limitCriterion, aggregationCriterion, vsname, fields, standardCriteria));
 		}
 	}
 

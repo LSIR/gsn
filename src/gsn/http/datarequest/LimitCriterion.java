@@ -22,14 +22,24 @@ public class LimitCriterion extends AbstractCriterion{
 		offset	= Integer.parseInt(crits[0]);
 		size	= Integer.parseInt(crits[1]);
 	}
+
+    public LimitCriterion() {}
 	
 	public Integer getOffset() {
 		return offset;
 	}
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
 	
 	public Integer getSize() {
 		return size;
 	}
+
+    public void setSize(int size) {
+        this.size = size;
+    }
 	
 	public String toString () {
 		return "size: " + size + " offset: " + offset;
