@@ -278,7 +278,7 @@
             <xs:element name="deleteVirtualSensorResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                        <xs:element maxOccurs="1" minOccurs="1" name="status" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -297,7 +297,7 @@
             <xs:element name="registerQueryResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                        <xs:element maxOccurs="1" minOccurs="1" name="status" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -313,7 +313,7 @@
             <xs:element name="unregisterQueryResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                        <xs:element maxOccurs="1" minOccurs="1" name="status" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>

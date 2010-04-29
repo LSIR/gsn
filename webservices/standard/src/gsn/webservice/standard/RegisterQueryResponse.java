@@ -33,45 +33,30 @@
         
 
                         /**
-                        * field for _return
+                        * field for Status
                         */
 
                         
-                                    protected boolean local_return ;
+                                    protected boolean localStatus ;
                                 
-                           /*  This tracker boolean wil be used to detect whether the user called the set method
-                          *   for this attribute. It will be used to determine whether to include this field
-                           *   in the serialized XML
-                           */
-                           protected boolean local_returnTracker = false ;
-                           
 
                            /**
                            * Auto generated getter method
                            * @return boolean
                            */
-                           public  boolean get_return(){
-                               return local_return;
+                           public  boolean getStatus(){
+                               return localStatus;
                            }
 
                            
                         
                             /**
                                * Auto generated setter method
-                               * @param param _return
+                               * @param param Status
                                */
-                               public void set_return(boolean param){
+                               public void setStatus(boolean param){
                             
-                                       // setting primitive attribute tracker to true
-                                       
-                                               if (false) {
-                                           local_returnTracker = false;
-                                              
-                                       } else {
-                                          local_returnTracker = true;
-                                       }
-                                   
-                                            this.local_return=param;
+                                            this.localStatus=param;
                                     
 
                                }
@@ -173,7 +158,7 @@
 
                
                    }
-                if (local_returnTracker){
+               
                                     namespace = "http://standard.webservice.gsn";
                                     if (! namespace.equals("")) {
                                         prefix = xmlWriter.getPrefix(namespace);
@@ -181,28 +166,28 @@
                                         if (prefix == null) {
                                             prefix = generatePrefix(namespace);
 
-                                            xmlWriter.writeStartElement(prefix,"return", namespace);
+                                            xmlWriter.writeStartElement(prefix,"status", namespace);
                                             xmlWriter.writeNamespace(prefix, namespace);
                                             xmlWriter.setPrefix(prefix, namespace);
 
                                         } else {
-                                            xmlWriter.writeStartElement(namespace,"return");
+                                            xmlWriter.writeStartElement(namespace,"status");
                                         }
 
                                     } else {
-                                        xmlWriter.writeStartElement("return");
+                                        xmlWriter.writeStartElement("status");
                                     }
                                 
                                                if (false) {
                                            
-                                                         throw new org.apache.axis2.databinding.ADBException("return cannot be null!!");
+                                                         throw new org.apache.axis2.databinding.ADBException("status cannot be null!!");
                                                       
                                                } else {
-                                                    xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(local_return));
+                                                    xmlWriter.writeCharacters(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localStatus));
                                                }
                                     
                                    xmlWriter.writeEndElement();
-                             }
+                             
                     xmlWriter.writeEndElement();
                
 
@@ -364,13 +349,13 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                 if (local_returnTracker){
+                
                                       elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
-                                                                      "return"));
+                                                                      "status"));
                                  
                                 elementList.add(
-                                   org.apache.axis2.databinding.utils.ConverterUtil.convertToString(local_return));
-                            }
+                                   org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localStatus));
+                            
 
                 return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
             
@@ -449,21 +434,22 @@
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","return").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","status").equals(reader.getName())){
                                 
                                     java.lang.String content = reader.getElementText();
                                     
-                                              object.set_return(
+                                              object.setStatus(
                                                     org.apache.axis2.databinding.utils.ConverterUtil.convertToBoolean(content));
                                               
                                         reader.next();
                                     
                               }  // End of if for expected property start element
                                 
-                                    else {
-                                        
-                                    }
-                                  
+                                else{
+                                    // A start element we are not expecting indicates an invalid parameter was passed
+                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                }
+                              
                             while (!reader.isStartElement() && !reader.isEndElement())
                                 reader.next();
                             

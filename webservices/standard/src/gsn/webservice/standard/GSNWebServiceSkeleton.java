@@ -228,34 +228,18 @@ public class GSNWebServiceSkeleton {
 
     public gsn.webservice.standard.CreateVirtualSensorResponse createVirtualSensor(gsn.webservice.standard.CreateVirtualSensor createVirtualSensor) {
         CreateVirtualSensorResponse response = new CreateVirtualSensorResponse();
-        return response;
-        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
-        //throw new RuntimeException("Failed to create the Virtual Sensor.");
-    }
-
-    /*
-    //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#createVirtualSensor");
-        CreateVirtualSensorResponse response = new CreateVirtualSensorResponse();
-        String message = "Created the configuration file (" + gsn.VSensorLoader.getVSConfigurationFilePath(createVirtualSensor.getVsname()) + ")";
-        Status status = new Status();
-        status.setStatus(STATUS_OK);
-        //
         try {
             gsn.VSensorLoader.getInstance(gsn.Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY).loadVirtualSensor(
                     createVirtualSensor.getDescriptionFileContent(),
                     createVirtualSensor.getVsname()
             );
+            response.setStatus(true);
         } catch (Exception e) {
-            message = "Unable to create the configuration file (" + gsn.VSensorLoader.getVSConfigurationFilePath(createVirtualSensor.getVsname()) + ")\nCause " + e.getMessage();
-            status.setStatus(STATUS_ERR);
+            logger.warn("Unable to create the configuration file (" + gsn.VSensorLoader.getVSConfigurationFilePath(createVirtualSensor.getVsname()) + ")\nCause " + e.getMessage());
         }
-        //
-        status.setMessage(message);
-        response.setCreateVirtualSensorResponse(status);
-        logger.info(status.getMessage());
         return response;
-     */
-
+    }
+    
     /**
      * Auto generated method signature
      *
