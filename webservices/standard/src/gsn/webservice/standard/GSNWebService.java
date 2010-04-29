@@ -9,7 +9,7 @@ public interface GSNWebService {
     // Data Access
     // --------------
 
-    public QueryResult[] getMultiData(FieldSelector[] virtualSensors, long from, long to, long nb, StandardCriterion[] conditions, AggregationCriterion aggregation, String timeFormat);
+    public QueryResult[] getMultiData(FieldSelector[] virtualSensors, long from, long to, int nb, StandardCriterion[] conditions, AggregationCriterion aggregation, String timeFormat);
 
     public QueryResult[] getNextData(String sid);
 
@@ -53,8 +53,34 @@ public interface GSNWebService {
         public String executedQuery;
         public String sid;
         public boolean hasNext;
-        public DataField header;
-        public DataField[] body;
+        //public DataField header;
+        public DataField[] streamElement;
+    }
+
+    public class StreamElement {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public DataField[] fields;
     }
 
     public class DataField {
