@@ -197,68 +197,6 @@
                              
 
                         /**
-                        * field for Username
-                        * This was an Attribute!
-                        */
-
-                        
-                                    protected java.lang.String localUsername ;
-                                
-
-                           /**
-                           * Auto generated getter method
-                           * @return java.lang.String
-                           */
-                           public  java.lang.String getUsername(){
-                               return localUsername;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param Username
-                               */
-                               public void setUsername(java.lang.String param){
-                            
-                                            this.localUsername=param;
-                                    
-
-                               }
-                            
-
-                        /**
-                        * field for Password
-                        * This was an Attribute!
-                        */
-
-                        
-                                    protected java.lang.String localPassword ;
-                                
-
-                           /**
-                           * Auto generated getter method
-                           * @return java.lang.String
-                           */
-                           public  java.lang.String getPassword(){
-                               return localPassword;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param Password
-                               */
-                               public void setPassword(java.lang.String param){
-                            
-                                            this.localPassword=param;
-                                    
-
-                               }
-                            
-
-                        /**
                         * field for QueryName
                         * This was an Attribute!
                         */
@@ -417,32 +355,6 @@
                
                    }
                
-                                            if (localUsername != null){
-                                        
-                                                writeAttribute("http://standard.webservice.gsn",
-                                                         "username",
-                                                         org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localUsername), xmlWriter);
-
-                                            
-                                      }
-                                    
-                                      else {
-                                          throw new org.apache.axis2.databinding.ADBException("required attribute localUsername is null");
-                                      }
-                                    
-                                            if (localPassword != null){
-                                        
-                                                writeAttribute("http://standard.webservice.gsn",
-                                                         "password",
-                                                         org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localPassword), xmlWriter);
-
-                                            
-                                      }
-                                    
-                                      else {
-                                          throw new org.apache.axis2.databinding.ADBException("required attribute localPassword is null");
-                                      }
-                                    
                                             if (localQueryName != null){
                                         
                                                 writeAttribute("http://standard.webservice.gsn",
@@ -737,16 +649,6 @@
 
                         }
                             attribList.add(
-                            new javax.xml.namespace.QName("http://standard.webservice.gsn","username"));
-                            
-                                      attribList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localUsername));
-                                
-                            attribList.add(
-                            new javax.xml.namespace.QName("http://standard.webservice.gsn","password"));
-                            
-                                      attribList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localPassword));
-                                
-                            attribList.add(
                             new javax.xml.namespace.QName("http://standard.webservice.gsn","queryName"));
                             
                                       attribList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localQueryName));
@@ -828,42 +730,6 @@
                 
 
                  
-                    // handle attribute "username"
-                    java.lang.String tempAttribUsername =
-                        
-                                reader.getAttributeValue("http://standard.webservice.gsn","username");
-                            
-                   if (tempAttribUsername!=null){
-                         java.lang.String content = tempAttribUsername;
-                        
-                                                 object.setUsername(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(tempAttribUsername));
-                                            
-                    } else {
-                       
-                               throw new org.apache.axis2.databinding.ADBException("Required attribute username is missing");
-                           
-                    }
-                    handledAttributes.add("username");
-                    
-                    // handle attribute "password"
-                    java.lang.String tempAttribPassword =
-                        
-                                reader.getAttributeValue("http://standard.webservice.gsn","password");
-                            
-                   if (tempAttribPassword!=null){
-                         java.lang.String content = tempAttribPassword;
-                        
-                                                 object.setPassword(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(tempAttribPassword));
-                                            
-                    } else {
-                       
-                               throw new org.apache.axis2.databinding.ADBException("Required attribute password is missing");
-                           
-                    }
-                    handledAttributes.add("password");
-                    
                     // handle attribute "queryName"
                     java.lang.String tempAttribQueryName =
                         

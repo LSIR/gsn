@@ -19,19 +19,17 @@ public interface GSNWebService {
     // Management
     // -------------
 
-    public boolean createVirtualSensor(String username, String password, String vsname, String descriptionFileContent);
+    public boolean createVirtualSensor(String vsname, String descriptionFileContent);
 
-    public boolean deleteVirtualSensor(String username, String password, String vsname);
+    public boolean deleteVirtualSensor(String vsname);
 
-    public boolean registerQuery(String username, String password, String queryName, DataField[] outputStructure, String[] vsnames, String query);
+    public boolean registerQuery(String queryName, DataField[] outputStructure, String[] vsnames, String query);
 
-    public boolean unregisterQuery(String username, String password, String queryName);
+    public boolean unregisterQuery(String queryName);
 
     //
 
     public VirtualSensorDetails[] getVirtualSensorsDetails(FieldSelector[] virtualSensors, String[] infos);
-
-    //public VirtualSensorDetails getVirtualSensorDetails(String vsname, String[] infos);
 
     public ContainerDetails getContainerInfo();
 
@@ -58,28 +56,6 @@ public interface GSNWebService {
     }
 
     public class StreamElement {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public DataField[] fields;
     }
 

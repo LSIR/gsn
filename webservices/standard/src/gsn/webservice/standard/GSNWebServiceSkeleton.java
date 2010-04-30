@@ -202,8 +202,6 @@ public class GSNWebServiceSkeleton {
         RegisterQueryResponse response = new RegisterQueryResponse();
         //
         CreateVirtualSensor cvs = new CreateVirtualSensor();
-        cvs.setUsername(registerQuery.getUsername());
-        cvs.setPassword(registerQuery.getPassword());
         cvs.setDescriptionFileContent(createVSConfigurationFileContent(registerQuery));
         cvs.setVsname(registerQuery.getQueryName());
 
@@ -224,8 +222,6 @@ public class GSNWebServiceSkeleton {
         UnregisterQueryResponse response = new UnregisterQueryResponse();
         //
         DeleteVirtualSensor dvs = new DeleteVirtualSensor();
-        dvs.setUsername(unregisterQuery.getUsername());
-        dvs.setPassword(unregisterQuery.getPassword());
         dvs.setVsname(unregisterQuery.getQueryName());
         response.setStatus(deleteVirtualSensor(dvs).getStatus());
         //

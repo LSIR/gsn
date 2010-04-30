@@ -63,7 +63,6 @@
                     <xs:element maxOccurs="1" minOccurs="0" name="outputStructure" nillable="false" type="ax21:GSNWebService_ConfOutputStructure"/>
                     <xs:element maxOccurs="1" minOccurs="0" name="processor" nillable="false" type="ax21:GSNWebService_ConfProcessor"/>
                     <xs:element maxOccurs="1" minOccurs="0" name="wrapper" nillable="false" type="ax21:GSNWebService_ConfWrapper"/>
-                    <!--<xs:element minOccurs="0" maxOccurs="1" name="wrapperOutputFormat" nillable="false" type="ax21:GSNWebService_ConfWrapperOutputFormat"/>-->
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfAddressing">
@@ -98,8 +97,6 @@
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfWrapper">
-                <!--<xs:attribute use="required" name="wrapper" type="xs:string"/>
-                <xs:attribute use="required" name="wrapperURL" type="xs:string"/>-->
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="wrapperDetails" nillable="false" type="ax21:GSNWebService_WrapperDetails"/>
                 </xs:sequence>
@@ -117,11 +114,6 @@
                 <xs:attribute name="stream" type="xs:string" use="required"/>
                 <xs:attribute name="wrapper" type="xs:string" use="required"/>
             </xs:complexType>
-            <!--<xs:complexType name="GSNWebService_ConfWrapperOutputFormat">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputFormat" nillable="false" type="ax21:GSNWebService_DataField"/>
-                </xs:sequence>
-            </xs:complexType>-->
         </xs:schema>
     <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://datarequest.http.gsn/xsd">
             <xs:complexType name="AbstractCriterion">
@@ -205,23 +197,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <!--
-            <xs:element name="getVirtualSensorDetails">
-                <xs:complexType>
-                    <xs:attribute name="vsname" use="required" type="xs:string"/>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="detailsType" nillable="false" type="ax22:GSNWebService_DetailsType"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getVirtualSensorDetailsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="1" maxOccurs="1" name="virtualSensorDetails" nillable="false" type="ax22:GSNWebService_VirtualSensorDetails"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            -->
             <xs:element name="getVirtualSensorsDetails">
                 <xs:complexType>
                     <xs:sequence>
@@ -253,8 +228,6 @@
             </xs:element>
             <xs:element name="createVirtualSensor">
                 <xs:complexType>
-                    <xs:attribute name="username" type="xs:string" use="required"/>
-                    <xs:attribute name="password" type="xs:string" use="required"/>
                     <xs:attribute name="vsname" type="xs:string" use="required"/>
                     <xs:sequence>
                         <xs:element maxOccurs="1" minOccurs="1" name="descriptionFileContent" nillable="false" type="xs:string"/>
@@ -270,8 +243,6 @@
             </xs:element>
             <xs:element name="deleteVirtualSensor">
                 <xs:complexType>
-                    <xs:attribute name="username" type="xs:string" use="required"/>
-                    <xs:attribute name="password" type="xs:string" use="required"/>
                     <xs:attribute name="vsname" type="xs:string" use="required"/>
                 </xs:complexType>
             </xs:element>
@@ -284,8 +255,6 @@
             </xs:element>
             <xs:element name="registerQuery">
                 <xs:complexType>
-                    <xs:attribute name="username" type="xs:string" use="required"/>
-                    <xs:attribute name="password" type="xs:string" use="required"/>
                     <xs:attribute name="queryName" type="xs:string" use="required"/>
                     <xs:attribute name="query" type="xs:string" use="required"/>
                     <xs:sequence>
@@ -304,8 +273,6 @@
             <xs:element name="unregisterQuery">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element maxOccurs="1" minOccurs="1" name="username" nillable="false" type="xs:string"/>
-                        <xs:element maxOccurs="1" minOccurs="1" name="password" nillable="false" type="xs:string"/>
                         <xs:element maxOccurs="1" minOccurs="1" name="queryName" nillable="false" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
