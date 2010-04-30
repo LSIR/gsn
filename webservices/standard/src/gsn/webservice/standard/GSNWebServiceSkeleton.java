@@ -23,6 +23,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.sql.Connection;
 import java.util.*;
 
@@ -196,12 +197,19 @@ public class GSNWebServiceSkeleton {
      * @param registerQuery
      */
 
-    public RegisterQueryResponse registerQuery
-            (
-                    gsn.webservice.standard.RegisterQuery registerQuery
-            ) {
-        //TODO : fill this with the necessary business logic
-        throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
+    public gsn.webservice.standard.RegisterQueryResponse registerQuery(gsn.webservice.standard.RegisterQuery registerQuery) {
+        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
+        RegisterQueryResponse response = new RegisterQueryResponse();
+        //
+        CreateVirtualSensor cvs = new CreateVirtualSensor();
+        cvs.setUsername(registerQuery.getUsername());
+        cvs.setPassword(registerQuery.getPassword());
+        cvs.setDescriptionFileContent(createVSConfigurationFileContent(registerQuery));
+        cvs.setVsname(registerQuery.getQueryName());
+
+        response.setStatus(createVirtualSensor(cvs).getStatus());
+        //
+        return response;
     }
 
 
@@ -211,12 +219,17 @@ public class GSNWebServiceSkeleton {
      * @param unregisterQuery
      */
 
-    public UnregisterQueryResponse unregisterQuery
-            (
-                    gsn.webservice.standard.UnregisterQuery unregisterQuery
-            ) {
-        //TODO : fill this with the necessary business logic
-        throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
+    public gsn.webservice.standard.UnregisterQueryResponse unregisterQuery(gsn.webservice.standard.UnregisterQuery unregisterQuery) {
+        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
+        UnregisterQueryResponse response = new UnregisterQueryResponse();
+        //
+        DeleteVirtualSensor dvs = new DeleteVirtualSensor();
+        dvs.setUsername(unregisterQuery.getUsername());
+        dvs.setPassword(unregisterQuery.getPassword());
+        dvs.setVsname(unregisterQuery.getQueryName());
+        response.setStatus(deleteVirtualSensor(dvs).getStatus());
+        //
+        return response;
     }
 
 
@@ -612,12 +625,16 @@ public class GSNWebServiceSkeleton {
      * @param deleteVirtualSensor
      */
 
-    public DeleteVirtualSensorResponse deleteVirtualSensor
-            (
-                    gsn.webservice.standard.DeleteVirtualSensor deleteVirtualSensor
-            ) {
-        //TODO : fill this with the necessary business logic
-        throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
+    public gsn.webservice.standard.DeleteVirtualSensorResponse deleteVirtualSensor(gsn.webservice.standard.DeleteVirtualSensor deleteVirtualSensor) {
+        //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
+        DeleteVirtualSensorResponse response = new DeleteVirtualSensorResponse();
+        if (unloadVirtualSensor(deleteVirtualSensor.getVsname())) {
+            logger.warn("Failed to delete the following Virtual Sensor: " + deleteVirtualSensor.getVsname());
+        } else {
+            logger.debug("Deleted the following Virtual Sensor: " + deleteVirtualSensor.getVsname());
+            response.setStatus(true);
+        }
+        return response;
     }
 
 
@@ -770,6 +787,48 @@ public class GSNWebServiceSkeleton {
         public int pageIndex;
         public AbstractQuery query;
         public long lastAccessTime;
+    }
+
+    private boolean unloadVirtualSensor(String virtualSensorName) {
+        File vsConfigurationFile = new File(gsn.VSensorLoader.getVSConfigurationFilePath(virtualSensorName));
+        return !vsConfigurationFile.delete();
+    }
+
+    private String createVSConfigurationFileContent(gsn.webservice.standard.RegisterQuery registerQuery) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<virtual-sensor name=\"" + registerQuery.getQueryName() + "\" priority=\"10\" >\n");
+        sb.append("             <processing-class>\n");
+        sb.append("                     <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>\n");
+        sb.append("                     <init-params/>\n");
+        sb.append("                     <output-structure>\n");
+        GSNWebService_DataField df;
+        for (int i = 0; i < registerQuery.getOutputStructure().length; i++) {
+            df = registerQuery.getOutputStructure()[i];
+            sb.append("                     <field name=\"" + df.getName() + "\" type=\"" + df.getType() + "\"/>\n");
+        }
+        sb.append("                     </output-structure>\n");
+        sb.append("             </processing-class>\n");
+        sb.append("             <description>this VS implements the registered query: memquery</description>\n");
+        sb.append("             <addressing>\n");
+        sb.append("             </addressing>\n");
+        sb.append("             <storage />\n");
+        sb.append("             <streams>\n");
+        sb.append("                     <stream name=\"data\">\n");
+        String vsname;
+        for (int i = 0; i < registerQuery.getVsnames().length; i++) {
+            vsname = registerQuery.getVsnames()[i];
+            sb.append("                     <source alias=\"" + vsname + "\" storage-size=\"1\" sampling-rate=\"1\">\n");
+            sb.append("                             <address wrapper=\"local\">\n");
+            sb.append("                                     <predicate key=\"NAME\">" + vsname + "</predicate>\n");
+            sb.append("                             </address>\n");
+            sb.append("                             <query>select * from wrapper</query>\n");
+            sb.append("                     </source>\n");
+        }
+        sb.append("                             <query>" + registerQuery.getQuery() + "</query>\n");
+        sb.append("                     </stream>\n");
+        sb.append("             </streams>\n");
+        sb.append("</virtual-sensor>");
+        return sb.toString();
     }
 }
     
