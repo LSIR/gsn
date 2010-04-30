@@ -17,7 +17,6 @@ import gsn.http.datarequest.xsd.StandardCriterion;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 import gsn.webservice.standard.xsd.*;
-import gsn.wrappers.AbstractWrapper;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.commons.collections.KeyValue;
@@ -528,8 +527,7 @@ public class GSNWebServiceSkeleton {
                 }
                 //
                 GSNWebService_StreamElement gse = new GSNWebService_StreamElement();
-                //gse.setTimed(String.valueOf(se.getTimeStamp()));
-                gse.setTimed(new Date(se.getTimeStamp()).toString());
+                gse.setTimed(String.valueOf(se.getTimeStamp()));
                 for (String field : se.getFieldNames()) {
                     GSNWebService_DataField df = new GSNWebService_DataField();
                     df.setString(se.getData(field).toString());
