@@ -4,6 +4,7 @@
     <property name="safe-storage-controller-port" value="25012"/>
     <property name="gsn-controller-port" value="22232"/>
     <property name="max-servlets" value="20"/>
+    <property name="max-db-connections" value="8"/>
 
     <import file="${basedir}/installer/build.xml"/>
 
@@ -95,6 +96,7 @@
             <classpath refid="classpath"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-DmaxServlets=${max-servlets}"/>
+            <jvmarg value="-DmaxDBConnections=${max-db-connections}"/>
             <arg id="gsnc-port" value="${gsn-controller-port}"/>
             <!-- <jvmarg value="-server"/> Sometimes on windows compaines about a missing dll.-->
             <jvmarg value="-Dcom.sun.management.jmxremote"/>

@@ -81,7 +81,7 @@ public final class Main {
 
 	private static int gsnControllerPort;
 
-	private Main() throws Exception {
+    private Main() throws Exception {
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
@@ -99,13 +99,14 @@ public final class Main {
 			logger.error ( "Check the path of the configuration file and try again." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
 			throw new Exception(e);
-		} 
-		StorageManager.getInstance ( ).init ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) );
+		}
+        int maxDBConnections = System.getProperty("maxDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxDBConnections"));
+        int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
+        StorageManager.getInstance ( ).init ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) , maxDBConnections);
 		if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
 
 		try {
-			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" ...");
-            int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
+			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxServlets:"+maxServlets+")"+" ...");
             Server jettyServer = getJettyServer(Main.getContainerConfig().getContainerPort(), maxServlets);
 			jettyServer.start ( );
 			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
@@ -195,6 +196,8 @@ public final class Main {
 	private GSNController controlSocket;
 
     private static final int DEFAULT_JETTY_SERVLETS = 100;
+
+    public static final int DEFAULT_MAX_DB_CONNECTIONS = 8;
 
 	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 

@@ -35,7 +35,7 @@ public class TestStreamSource {
 	public static void setUpBeforeClass() throws Exception {
 	  PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 	  DriverManager.registerDriver( new org.h2.Driver( ) );
-		StorageManager.getInstance ( ).init ( "org.h2.Driver","sa","" ,"jdbc:h2:mem:." );
+		StorageManager.getInstance ( ).init ( "org.h2.Driver","sa","" ,"jdbc:h2:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
 		
 	}
 

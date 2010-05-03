@@ -1205,7 +1205,7 @@ public class StorageManager {
 	private BasicDataSource pool;
 
 	public void init(String databaseDriver, String username,
-			String password, String databaseURL) {
+			String password, String databaseURL, int maxDBConnections) {
 		this.databaseURL = databaseURL;
 		if (databaseDriver.trim().equalsIgnoreCase( DATABASE.H2.getJDBCDriverClass()))
 			h2 = true;
@@ -1229,8 +1229,9 @@ public class StorageManager {
 	        pool.setUsername(username);
 	        pool.setPassword(password);
 	        pool.setUrl(databaseURL);
-			pool.setMaxActive(-1);
-			pool.setMaxWait(30000);
+		pool.setMaxActive(maxDBConnections);
+		pool.setMaxIdle(maxDBConnections);
+		pool.setMaxWait(30000);
 		try {
 		
 			con = getConnection();

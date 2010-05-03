@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import gsn.Main;
 import gsn.VirtualSensor;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.AddressBean;
@@ -84,14 +85,14 @@ public class TestWindowing1 {
 	private static void initDB(int dbType) throws SQLException {
 		if (StorageManager.MYSQL_DB == dbType) {
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-			StorageManager.getInstance().init("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest");
+			StorageManager.getInstance().init("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest", Main.DEFAULT_MAX_DB_CONNECTIONS);
 		} else if (StorageManager.H2_DB == dbType) {
 			DriverManager.registerDriver(new org.h2.Driver());
-			StorageManager.getInstance().init("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.");
+			StorageManager.getInstance().init("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
 		} else {
 			DriverManager.registerDriver(new net.sourceforge.jtds.jdbc.Driver());
 			StorageManager.getInstance().init("net.sourceforge.jtds.jdbc.Driver", "mehdi", "mehdi",
-					"jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3");
+					"jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3", Main.DEFAULT_MAX_DB_CONNECTIONS);
 		}
 	}
 
