@@ -253,10 +253,28 @@ public abstract class AbstractWrapper extends Thread {
 
 		Connection conn = null;
 		try {
+            if (isOutOfOrder(se)) {
+				logger.debug("Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
+				return false;
+			}
 			conn = StorageManager.getInstance().getConnection();
+			StorageManager.executeInsert(aliasCodeS, getOutputFormat(), se, conn);
+            lastInOrderTimestamp = se.getTimeStamp();
+            return true;
+		} finally {
+			StorageManager.close(conn);
+		}
+	}
+
+    public boolean isOutOfOrder(StreamElement se) throws SQLException {
+        if (listeners.size() == 0)
+			return false;
+        Connection conn = null;
+		try {
 			// Checks if the stream element is out of order
-			if (lastInOrderTimestamp == null) {
-				StringBuilder query = new StringBuilder();
+            if (lastInOrderTimestamp == null) {
+                conn = StorageManager.getInstance().getConnection();
+                StringBuilder query = new StringBuilder();
 				query.append("select max(timed) from ").append(aliasCodeS);
 
 				ResultSet rs = StorageManager.executeQueryWithResultSet(query,
@@ -267,23 +285,11 @@ public abstract class AbstractWrapper extends Thread {
 					lastInOrderTimestamp = Long.MIN_VALUE; // Table is empty
 				}
 			}
-
-			if (se.getTimeStamp() <= lastInOrderTimestamp) {
-				logger
-						.warn("Out of order data item detected, it is not propagated into the system : ["
-								+ se.toString() + "]");
-				return false;
-			}
-
-			lastInOrderTimestamp = se.getTimeStamp();
-			StorageManager.executeInsert(aliasCodeS, getOutputFormat(), se,
-					conn);
-			return true;
+            return (se.getTimeStamp() <= lastInOrderTimestamp);
 		} finally {
 			StorageManager.close(conn);
 		}
-
-	}
+    }
 
 	/**
 	 * This method is called whenever the wrapper wants to send a data item back

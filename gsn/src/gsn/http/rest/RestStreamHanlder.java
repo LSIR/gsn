@@ -97,8 +97,11 @@ public class RestStreamHanlder extends HttpServlet {
 		PushRemoteWrapper notification = NotificationRegistry.getInstance().getNotification(notificationId);
 		try {
 			if (notification!=null) {
-				notification.manualDataInsertion(request.getParameter(PushDelivery.DATA));
-				response.setStatus(SUCCESS_200);
+				boolean status = notification.manualDataInsertion(request.getParameter(PushDelivery.DATA));
+                if (status)
+                    response.setStatus(SUCCESS_200);
+                else
+                    response.setStatus(_300);
 			}else {
 				logger.warn("Received a Http put request for an INVALID notificationId: " + notificationId);
 				response.sendError(_300);

@@ -96,27 +96,23 @@ public class PushDelivery implements DeliverySystem {
 
 	}
 
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		long temp;
-		temp = Double.doubleToLongBits(notificationId);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		return result;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PushDelivery that = (PushDelivery) o;
+        if (Double.compare(that.notificationId, notificationId) != 0) return false;
+        if (httpPut != null ? !httpPut.getURI().equals(that.httpPut.getURI()) : that.httpPut != null) return false;
+        return true;
+    }
 
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		PushDelivery other = (PushDelivery) obj;
-		if (Double.doubleToLongBits(notificationId) != Double
-				.doubleToLongBits(other.notificationId))
-			return false;
-		return true;
-	}
-
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = httpPut != null ? httpPut.getURI().hashCode() : 0;
+        temp = notificationId != +0.0d ? Double.doubleToLongBits(notificationId) : 0L;
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }
