@@ -18,6 +18,7 @@ public class RemoteWrapperParamParser {
 	private boolean isPushBased;
 	private String query,deliveryContactPoint,remoteContactPoint;
 	private String username,password;
+    private int timeout = 10 * 60 * 1000;  // 10 minutes.
 
 	private  final String CURRENT_TIME = ISODateTimeFormat.dateTime().print(System.currentTimeMillis());
 
@@ -32,7 +33,10 @@ public class RemoteWrapperParamParser {
 
 		username = addressBean.getPredicateValue( "username" );
 		password = addressBean.getPredicateValue( "password" );
-		/**
+
+        timeout = addressBean.getPredicateValueAsInt("timeout", timeout);
+        
+        /**
 		 * First looks for URL parameter, if it is there it will be used otherwise
 		 * looks for host and port parameters.
 		 */
@@ -92,7 +96,11 @@ public class RemoteWrapperParamParser {
 		return password;
 	}
 
-	public String getRemoteContactPointEncoded(long lastModifiedTime) {
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public String getRemoteContactPointEncoded(long lastModifiedTime) {
 		String toSend;
 		try {
 			toSend = getRemoteContactPoint()+URLEncoder.encode(query, "UTF-8")+"/"+URLEncoder.encode(getStartTimeInString(lastModifiedTime), "UTF-8");

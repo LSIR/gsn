@@ -52,10 +52,12 @@ public class RestDelivery implements DeliverySystem {
 
     public void close() {
         try {
-            if (objectStream != null)
+            if (objectStream != null){
+                continuation.complete();
                 objectStream.close();
-        } catch (IOException e) {
-            logger.warn(e.getMessage(), e);
+            }
+        } catch (Exception e) {
+            logger.debug(e.getMessage(), e);
         }
 
     }

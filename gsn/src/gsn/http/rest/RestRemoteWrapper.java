@@ -13,15 +13,20 @@ import java.sql.SQLException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthState;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
@@ -29,170 +34,209 @@ import com.thoughtworks.xstream.XStream;
 
 public class RestRemoteWrapper extends AbstractWrapper {
 
-	private final XStream XSTREAM = StreamElement4Rest.getXstream();
+    private final XStream XSTREAM = StreamElement4Rest.getXstream();
 
-	private final transient Logger     logger                 = Logger.getLogger ( RestRemoteWrapper.class );
+    private final transient Logger logger = Logger.getLogger(RestRemoteWrapper.class);
 
-	private  DataField[]    structure               = null;
+    private DataField[] structure = null;
 
-	private DefaultHttpClient httpclient = new DefaultHttpClient();
+    private DefaultHttpClient httpclient;
 
-	private ObjectInputStream inputStream;
-	
-	private long lastReceivedTimestamp = -1;
-	
-	
-	private HttpResponse response;
+    private long lastReceivedTimestamp = -1;
 
-	public DataField[] getOutputFormat() {
-		return structure;
-	}
+    private ObjectInputStream inputStream;
 
-	private RemoteWrapperParamParser params;
-	
-	public String getWrapperName() {
-		return "Rest Remote Wrapper";
-	}
+    private HttpResponse response;
 
-	public boolean initialize() {
-			params = new RemoteWrapperParamParser(getActiveAddressBean(),false);
-			String startTime = getActiveAddressBean().getPredicateValue("start-time");
-			if (startTime != null && startTime.equals("continue")) {
-				Connection conn = null;
-				try {
-					conn = StorageManager.getInstance().getConnection();
+    private HttpParams getHttpClientParams(int timeout) {
+        HttpParams params = new BasicHttpParams();
+        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+        HttpProtocolParams.setContentCharset(params, HTTP.DEFAULT_CONTENT_CHARSET);
+        HttpProtocolParams.setUseExpectContinue(params, true);
+        HttpConnectionParams.setTcpNoDelay(params, false);
+        HttpConnectionParams.setSocketBufferSize(params, 8192);
+        HttpConnectionParams.setStaleCheckingEnabled(params, true);
+        HttpConnectionParams.setConnectionTimeout(params, 30 * 1000);    // Set the connection time to 30s
+        HttpConnectionParams.setSoTimeout(params, timeout);
+        HttpProtocolParams.setUserAgent(params, "GSN-HTTP-CLIENT");
+        return params;
+    }
 
-					// check if table already exists
-					ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
-					if (rs.next()) {
-						StringBuilder query = new StringBuilder();
-						query.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
-						rs = StorageManager.executeQueryWithResultSet(query, conn);
-						if (rs.next()) {
-							lastReceivedTimestamp = rs.getLong(1);
-						}
-					}
-					else
-						logger.info("Table '" + getActiveAddressBean().getVirtualSensorName() + "' doesn't exist => using all data from the remote database");
-				} catch (SQLException e) {
-					logger.error(e.getMessage(), e);
-					return false;
-				} finally {
-					StorageManager.close(conn);
-				}
-			} else if (startTime != null && startTime.startsWith("-")) {
-				try {
-					lastReceivedTimestamp = System.currentTimeMillis() - Long.parseLong(startTime.substring(1));
-				} catch (NumberFormatException e) {
-					logger.error("Problem in parsing the start-time parameter, the provided value is: " + startTime);
-					logger.error(e.getMessage(), e);
-					return false;
-				}
-			} else {
-				lastReceivedTimestamp = params.getStartTime();
-			}
-			logger.info("lastReceivedTimestamp=" + String.valueOf(lastReceivedTimestamp));
-			
+    public DataField[] getOutputFormat() {
+        return structure;
+    }
+
+    private RemoteWrapperParamParser params;
+
+    public String getWrapperName() {
+        return "Rest Remote Wrapper";
+    }
+
+    public boolean initialize() {
+        params = new RemoteWrapperParamParser(getActiveAddressBean(), false);
+        httpclient = new DefaultHttpClient(getHttpClientParams(params.getTimeout()));
+
+		String startTime = getActiveAddressBean().getPredicateValue("start-time");
+		if (startTime != null && startTime.equals("continue")) {
+			Connection conn = null;
 			try {
-				structure = connectToRemote();
-			} catch (Exception e) {
+				conn = StorageManager.getInstance().getConnection();
+
+				// check if table already exists
+				ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
+				if (rs.next()) {
+					StringBuilder query = new StringBuilder();
+					query.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
+					rs = StorageManager.executeQueryWithResultSet(query, conn);
+					if (rs.next()) {
+						lastReceivedTimestamp = rs.getLong(1);
+					}
+				}
+				else
+					logger.info("Table '" + getActiveAddressBean().getVirtualSensorName() + "' doesn't exist => using all data from the remote database");
+			} catch (SQLException e) {
+				logger.error(e.getMessage(), e);
+				return false;
+			} finally {
+				StorageManager.close(conn);
+			}
+		} else if (startTime != null && startTime.startsWith("-")) {
+			try {
+				lastReceivedTimestamp = System.currentTimeMillis() - Long.parseLong(startTime.substring(1));
+			} catch (NumberFormatException e) {
+				logger.error("Problem in parsing the start-time parameter, the provided value is: " + startTime);
 				logger.error(e.getMessage(), e);
 				return false;
 			}
-		return true;
-	}
-
-	
-	private DataField[] connectToRemote() throws ClientProtocolException, IOException, ClassNotFoundException {
-		HttpGet httpget = new HttpGet(params.getRemoteContactPointEncoded(lastReceivedTimestamp));
-		HttpContext localContext = new BasicHttpContext();
-		
-		structure = null;
-		
-		
-		int tries = 0;
-		while(tries < 2){
-			tries++;
-			
-			response = httpclient.execute(httpget, localContext);
-			
-			int sc = response.getStatusLine().getStatusCode();
-			AuthState authState = null;
-			if (sc == HttpStatus.SC_UNAUTHORIZED) {
-				// Target host authentication required
-				authState = (AuthState) localContext.getAttribute(ClientContext.TARGET_AUTH_STATE);
-			}
-			if (sc == HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED) {
-				// Proxy authentication required
-				authState = (AuthState) localContext.getAttribute(ClientContext.PROXY_AUTH_STATE);
-			}
-
-			if (authState != null) {
-				if(params.getUsername() == null || tries > 1){
-					logger.error("A valid username/password required to connect to the remote host: " + params.getRemoteContactPoint());
-				}else{
-					AuthScope authScope = authState.getAuthScope();
-					Credentials creds = new UsernamePasswordCredentials(params.getUsername(), params.getPassword());
-					httpclient.getCredentialsProvider().setCredentials(authScope, creds);
-				}
-			} else {
-				logger.debug ( new StringBuilder ( ).append ( "Wants to consume the strcture packet from " ).append(params.getRemoteContactPoint()));
-				inputStream = XSTREAM.createObjectInputStream( response.getEntity().getContent());
-				structure = (DataField[]) inputStream.readObject();
-				logger.debug("Connection established for: "+ params.getRemoteContactPoint());
-				break;	
-			}
+		} else {
+			lastReceivedTimestamp = params.getStartTime();
 		}
-		
-		if(structure == null)
-			throw new RuntimeException("Cannot connect to the remote host.");
-
-		return structure;
-		
-	}
-	
-	private void reconnectToRemote() {
-		logger.info("trying to reconnect every 3 seconds... ");
-		while(isActive()) {
-			try {
-				Thread.sleep(3000);
-				if(isActive())
-					connectToRemote();
-				return;
-			} catch (Exception err) {
-				logger.warn(err.getMessage());
-			}
-		}
-	}
-
-	public void dispose() {
-		try {
-			httpclient.getConnectionManager().shutdown(); //This closes the connection already in use by the response
+		logger.info("lastReceivedTimestamp=" + String.valueOf(lastReceivedTimestamp));
+        
+        try {
+			structure = connectToRemote();
 		} catch (Exception e) {
-			logger.debug(e.getMessage(),e);
+			logger.error(e.getMessage(), e);
+			return false;
 		}
-	}
+        return true;
+    }
 
-	public void run() {
-		StreamElement4Rest se = null;
-		while(isActive()) {
-			try {
-				while(isActive() && (se = (StreamElement4Rest)inputStream.readObject())!=null) { 
-					StreamElement streamElement = se.toStreamElement();
-					postStreamElement(streamElement);
-					lastReceivedTimestamp = streamElement.getTimeStamp();
-				}
-			} catch (Exception e) {
-				if(isActive()) {
-					logger.warn("Connection to: "+params.getRemoteContactPoint()+" is lost (Exception: " + e.getMessage() + ")");
-					reconnectToRemote();
-				}
-			}
-		}
-	}
 
-	public boolean manualDataInsertion(StreamElement se) {
-		lastReceivedTimestamp = se.getTimeStamp();
-		return postStreamElement(se);
-	}
+    public DataField[] connectToRemote() throws IOException, ClassNotFoundException {
+        HttpGet httpget = new HttpGet(params.getRemoteContactPointEncoded(lastReceivedTimestamp));
+        HttpContext localContext = new BasicHttpContext();
+
+        structure = null;
+        int tries = 0;
+        while (tries < 2) {
+            tries++;
+            try {
+                if (inputStream != null) {
+                    try {
+                        response.getEntity().consumeContent();
+                        inputStream.close();
+                        inputStream = null;
+                    }
+                    catch (Exception e) {
+                        logger.debug(e.getMessage(), e);
+                    }
+                }
+                response = httpclient.execute(httpget, localContext);
+                int sc = response.getStatusLine().getStatusCode();
+                AuthState authState = null;
+                if (sc == HttpStatus.SC_UNAUTHORIZED) {
+                    // Target host authentication required
+                    authState = (AuthState) localContext.getAttribute(ClientContext.TARGET_AUTH_STATE);
+                }
+                if (sc == HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED) {
+                    // Proxy authentication required
+                    authState = (AuthState) localContext.getAttribute(ClientContext.PROXY_AUTH_STATE);
+                }
+
+                if (authState != null) {
+                    if (params.getUsername() == null || tries > 1) {
+                        logger.error("A valid username/password required to connect to the remote host: " + params.getRemoteContactPoint());
+                    } else {
+                        AuthScope authScope = authState.getAuthScope();
+                        Credentials creds = new UsernamePasswordCredentials(params.getUsername(), params.getPassword());
+                        httpclient.getCredentialsProvider().setCredentials(authScope, creds);
+                    }
+                } else {
+                    logger.debug(new StringBuilder().append("Wants to consume the strcture packet from ").append(params.getRemoteContactPoint()));
+                    inputStream = XSTREAM.createObjectInputStream(response.getEntity().getContent());
+                    structure = (DataField[]) inputStream.readObject();
+                    logger.warn("Connection established to the remote host: " + params.getRemoteContactPoint());
+                    break;
+                }
+            }
+            catch (RuntimeException ex) {
+                // In case of an unexpected exception you may want to abort
+                // the HTTP request in order to shut down the underlying
+                // connection and release it back to the connection manager.
+                httpget.abort();
+                throw ex;
+            }
+        }
+        if (structure == null)
+            throw new RuntimeException("Cannot connect to the remote host: " + params.getRemoteContactPoint());
+        return structure;
+    }
+
+    public void dispose() {
+        try {
+            httpclient.getConnectionManager().shutdown(); //This closes the connection already in use by the response
+        } catch (Exception e) {
+            logger.debug(e.getMessage(), e);
+        }
+    }
+
+    public void run() {
+        StreamElement4Rest se = null;
+        while (isActive()) {
+            try {
+                while (isActive() && (se = (StreamElement4Rest) inputStream.readObject()) != null) {
+                    StreamElement streamElement = se.toStreamElement();
+                    boolean status = manualDataInsertion(streamElement);
+                    if (!status && inputStream != null) {
+                        response.getEntity().consumeContent();
+                        inputStream.close();
+                        inputStream = null;
+                    }
+                }
+            }
+            catch (Exception e) {
+                logger.warn("Connection to the remote host: " + params.getRemoteContactPoint() + " is lost, trying to reconnect in 3 seconds...");
+                try {
+                    if (isActive()) {
+                        Thread.sleep(3000);
+                        connectToRemote();
+                    }
+                } catch (Exception err) {
+                    logger.debug(err.getMessage(), err);
+                }
+            }
+        }
+    }
+
+    public boolean manualDataInsertion(StreamElement se) {
+        try {
+            // If the stream element is out of order, we accept the stream element and wait for the next (update the last received time and return true)
+            if (isOutOfOrder(se)) {
+                lastReceivedTimestamp = se.getTimeStamp();
+                return true;
+            }
+            // Otherwise, we first try to insert the stream element.
+            // If the stream element was inserted succesfully, we wait for the next,
+            // otherwise, we return false.
+            boolean status = postStreamElement(se);
+            if (status)
+                lastReceivedTimestamp = se.getTimeStamp();
+            return status;
+        }
+        catch (SQLException e) {
+            logger.warn(e.getMessage(), e);
+            return false;
+        }
+    }
 }
