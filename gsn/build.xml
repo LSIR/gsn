@@ -130,6 +130,88 @@
         </java>
     </target>
 
+
+    <!--
+     Default Setting for compiling/generating/packaging the default GSN web services.
+     Use the ant -D options to override these values in order to operate with your own webservice.
+     eg: ant -Dwsroot=foo/bar -Dwsname=MyWebService dev-ws-generate-aar
+
+     http://localhost:22001/services/standard/GSNDataAccess?wsdl
+     
+      -->
+
+     <!-- Default Web Service root path -->
+     <property name="wsroot" value="${basedir}/webservices/standard"/>
+     <!-- Default Web Service SOAP Address -->
+     <property name="soapaddress" value="http://localhost:22001/services/standard/GSNDataAccess"/>
+     <!-- Default source class used to generate the service (contract Last approach) -->
+     <property name="sourceclass" value="gsn.webservice.standard.GSNDataAccess"/>
+     <!-- Default WSDL used to generate the service (Contract First approach) -->
+     <property name="sourcewsdl" value="${wsroot}/META-INF/GSNDataAccess.wsdl"/>
+     <!-- Default name for the Axis deployable ARchive (.aar) -->
+     <property name="wsname" value="GSNDataAccess"/>
+
+     <!--
+     Generate the web service deployable axis archive (.aar).
+     The archive contains the service description (wsdl), schema (xsd) and service file (xml) as well as the compiled
+     classes for the service.
+     Move the .aar archive to the webapp/WEB-INF/services in order to enable the webservice.
+     -->
+     <target name="dev-ws-package" depends="dev-ws-compile" description="Generate the web service deployable axis archive (.aar).">
+         <!--
+         <copy toDir="${wsroot}/build/META-INF" failonerror="false">
+             <fileset dir="${wsroot}/resources/">
+                 <include name="*.xml"/>
+                 <include name="*.wsdl"/>
+                 <include name="*.xsd"/>
+             </fileset>
+         </copy>
+         -->
+         <jar destfile="${wsroot}/${wsname}.aar">
+             <fileset excludes="**/Test.class" dir="${wsroot}/build"/>
+         </jar>
+     </target>
+
+     <!--
+     The java source files are generated in the ${wsroot}/src directory.
+     The ${sourcewsdl} sets the path to the WSDL file used to generate the classes.
+     -->
+     <target name="dev-ws-wsdl2java" depends="bind" description="Generates java code according to the given WSDL file to handle Web service invocation.">
+         <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="false" dir="${basedir}" classpathref="classpath">
+             <arg value="-o"/>
+             <arg value="${wsroot}"/>
+             <arg value="-s"/>
+             <arg value="-ss"/>
+             <arg value="-sd"/>
+             <arg value="-R"/>
+             <arg value="build/META-INF"/>
+             <arg value="-uri"/>
+             <arg value="${sourcewsdl}"/>
+         </java>
+     </target>
+
+     <!--
+     The WSDL is created in the ${wsroot}/META-INF directory, according to the ${sourceclass} class.
+     The ${soapaddress} url defines the access point to the webservice.
+     -->
+     <target name="dev-ws-java2wsdl" depends="dev-ws-compile" description="Generates the appropriate WSDL file for the given java class.">
+         <java classname="org.apache.ws.java2wsdl.Java2WSDL" fork="false" dir="${basedir}" classpathref="classpath">
+             <arg value="-o"/>
+             <arg value="${wsroot}/META-INF"/>
+             <arg value="-cp"/>
+             <arg value="${wsroot}/build/"/>
+             <arg value="-l"/>
+             <arg value="${soapaddress}"/>
+             <arg value="-cn"/>
+             <arg value="${sourceclass}"/>
+         </java>
+     </target>
+
+     <target name="dev-ws-compile" depends="bind" description="Compile the Web Service java classes.">
+         <javac debug="true" srcdir="${wsroot}/src" optimize="off" destdir="${wsroot}/build" failonerror="true" classpathref="classpath"/>
+     </target>
+    
+
     <target name="compile-reports" depends="init" description="Compile the Jasper Reports Layout files (.jrxml).">
         <taskdef name="jrc" classname="net.sf.jasperreports.ant.JRAntCompileTask">
             <classpath refid="classpath"/>
