@@ -7,7 +7,7 @@
             <param name="file_type">nef</param>
         </init-params>
         <output-structure>
-            <field name="MODIFICATIONTIME" type="BIGINT" unit="unixtime" />
+            <field name="GENERATIONTIME" type="BIGINT" unit="unixtime" />
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
