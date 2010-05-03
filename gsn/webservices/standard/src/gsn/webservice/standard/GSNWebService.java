@@ -9,7 +9,7 @@ public interface GSNWebService {
     // Data Access
     // --------------
 
-    public QueryResult[] getMultiData(FieldSelector[] virtualSensors, long from, long to, long nb, StandardCriterion[] conditions, AggregationCriterion aggregation, String timeFormat);
+    public QueryResult[] getMultiData(FieldSelector[] virtualSensors, long from, long to, int nb, StandardCriterion[] conditions, AggregationCriterion aggregation, String timeFormat);
 
     public QueryResult[] getNextData(String sid);
 
@@ -19,19 +19,19 @@ public interface GSNWebService {
     // Management
     // -------------
 
-    public void createVirtualSensor(String username, String password, String vsname, String descriptionFileContent);
+    public boolean createVirtualSensor(String username, String password, String vsname, String descriptionFileContent);
 
-    public void deleteVirtualSensor(String username, String password, String vsname);
+    public boolean deleteVirtualSensor(String username, String password, String vsname);
 
-    public void registerQuery(String username, String password, String queryName, DataField[] outputStructure, String[] vsnames, String query);
+    public boolean registerQuery(String username, String password, String queryName, DataField[] outputStructure, String[] vsnames, String query);
 
-    public void unregisterQuery(String username, String password, String queryName);
+    public boolean unregisterQuery(String username, String password, String queryName);
 
     //
 
-    public VirtualSensorDetails[] getVirtualSensorsDetails(String[] infos);
+    public VirtualSensorDetails[] getVirtualSensorsDetails(FieldSelector[] virtualSensors, String[] infos);
 
-    public VirtualSensorDetails getVirtualSensorDetails(String vsname, String[] infos);
+    //public VirtualSensorDetails getVirtualSensorDetails(String vsname, String[] infos);
 
     public ContainerDetails getContainerInfo();
 
@@ -53,8 +53,34 @@ public interface GSNWebService {
         public String executedQuery;
         public String sid;
         public boolean hasNext;
-        public DataField header;
-        public DataField[] body;
+        //public DataField header;
+        public DataField[] streamElement;
+    }
+
+    public class StreamElement {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public DataField[] fields;
     }
 
     public class DataField {
