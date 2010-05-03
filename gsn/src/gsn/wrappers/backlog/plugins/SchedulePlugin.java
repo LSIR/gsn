@@ -141,8 +141,7 @@ public class SchedulePlugin extends AbstractPlugin {
 			try {
 				sent = sendRemote(System.currentTimeMillis(), pkt);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				return false;
+				logger.warn(e.getMessage());
 			}
 			if (sent) {
 				Serializable[] data = {time, time, getDeviceID(), schedule};
