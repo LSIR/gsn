@@ -30,27 +30,24 @@ public class MultiDataDownload extends HttpServlet {
 
 	private static final long serialVersionUID = 4249739276150343437L;
 
-	private static SimpleDateFormat sdfWeb = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ; // 29/10/2008 22:25:07
-
 	private static transient Logger logger = Logger.getLogger(MultiDataDownload.class);
 
-	public void doGet(HttpServletRequest req, HttpServletResponse res)
-	throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		doPost(req, res);
 	}
 
-	public void doPost(HttpServletRequest req, HttpServletResponse res)
-	throws IOException {
-		try {
+	public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
+		SimpleDateFormat sdfWeb = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ; // 29/10/2008 22:25:07
+        try {
 			logger.debug("Query string: " + req.getQueryString());
 
             String downloadFormat = req.getParameter("download_format") == null ? "csv" : req.getParameter("download_format");
 			String downloadMode = req.getParameter("download_mode") == null ? "attachement" : req.getParameter("download_mode");
-            Map<String, String[]> parameterMap = parseParameters(req, downloadFormat);
-			if ("csv".compareTo(downloadFormat) == 0) {
+            Map<String, String[]> parameterMap = parseParameters(req, downloadFormat, sdfWeb);
+			if ("csv".equals(downloadFormat)) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
 				dd.process();
-                if ("inline".compareTo(downloadMode) != 0) {
+                if (! "inline".equals(downloadMode)) {
 				    res.setContentType("application/x-download");
 				    res.setHeader("content-disposition","attachment; filename=data.csv");
                 }
@@ -59,16 +56,16 @@ public class MultiDataDownload extends HttpServlet {
 				dd.outputResult(res.getOutputStream());
 				//res.getOutputStream().flush();
 			}
-			else if ("xml".compareTo(downloadFormat) == 0) {
+			else if ("xml".equals(downloadFormat)) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
 				dd.process();
 				res.setContentType("text/xml");
-				if ("inline".compareTo(downloadMode) != 0) 
+				if (! "inline".equals(downloadMode)) 
                     res.setHeader("content-disposition","attachment; filename=data.xml");
 				dd.outputResult(res.getOutputStream());
 				//res.getOutputStream().flush();
 			}
-			else if ("pdf".compareTo(downloadFormat) == 0) {
+			else if ("pdf".equals(downloadFormat)) {
 				DownloadReport rpd = new DownloadReport (parameterMap) ;
 				rpd.process();
 				res.setContentType("application/pdf");
@@ -86,7 +83,7 @@ public class MultiDataDownload extends HttpServlet {
 		}
 	}
 	
-	private Map<String, String[]> parseParameters (HttpServletRequest req, String downloadFormat) {
+	private Map<String, String[]> parseParameters (HttpServletRequest req, String downloadFormat, SimpleDateFormat sdfWeb) {
 		
 		Map<String, String[]> parameterMap = new Hashtable<String, String[]>();
 
@@ -119,13 +116,7 @@ public class MultiDataDownload extends HttpServlet {
 		}
 		
 		// Download format
-		//String req_download_format = req.getParameter("download_format");
-		//if (req_download_format != null) {
-			parameterMap.put("outputtype", new String[] { downloadFormat });
-		//}
-		//else {
-		//	parameterMap.put("outputtype", new String[] { "csv" });
-		//}
+	    parameterMap.put("outputtype", new String[] { downloadFormat });
 		
 		// CRITFIELDS
 		// TIME LIMITS
