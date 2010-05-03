@@ -33,12 +33,8 @@ public class DownloadData extends AbstractDataRequest {
 
     private String csvDelimiter = ",";
 
-    private boolean paginated = false;
-
     public DownloadData(Map<String, String[]> requestParameters) throws DataRequestException {
         super(requestParameters);
-        if (requestParameters.get("paginated") != null && requestParameters.get("paginated").length > 0)
-            paginated = "true".equals(requestParameters.get("paginated")[0]);
     }
 
     @Override
@@ -94,11 +90,8 @@ public class DownloadData extends AbstractDataRequest {
                 Connection connection = null;
 
                 connection = StorageManager.getInstance().getConnection();
-                if (paginated)
-                    de = StorageManager.getInstance().streamedExecuteQuery(nextSqlQuery.getValue(), false, connection);
-                else
-                    de = StorageManager.getInstance().executeQuery(nextSqlQuery.getValue(), false, connection);
-
+                de = StorageManager.getInstance().streamedExecuteQuery(nextSqlQuery.getValue(), false, connection);
+                
                 logger.debug("Data Enumerator: " + de);
                 if (ot == AllowedOutputType.csv) {
                     respond.println("##vsname:" + nextSqlQuery.getKey());
