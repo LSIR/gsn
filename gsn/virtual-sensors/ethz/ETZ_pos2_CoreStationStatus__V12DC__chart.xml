@@ -1,9 +1,9 @@
-<virtual-sensor name="ETZ_pos2_CoreStationStatus__V12__chart1" priority="10" >
+<virtual-sensor name="ETZ_pos2_CoreStationStatus__V12DC__chart1" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Basestation V12 voltage health (7d)</param>
+            <param name="title">Basestation V12DC voltage health (7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
             <param name="vertical-axis">V</param>
