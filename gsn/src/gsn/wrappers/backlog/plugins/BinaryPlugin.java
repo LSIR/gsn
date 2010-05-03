@@ -84,8 +84,8 @@ public class BinaryPlugin extends AbstractPlugin {
 	
 	private DataField[] dataField = new DataField[] {new DataField("GENERATION_TIME", "BIGINT"),
 										new DataField("DEVICE_ID", "INTEGER"),
-			   							new DataField("RELATIVEFILE", "VARCHAR(255)"),
-			   							new DataField("STORAGEDIRECTORY", "VARCHAR(255)"),
+			   							new DataField("RELATIVE_FILE", "VARCHAR(255)"),
+			   							new DataField("STORAGE_DIRECTORY", "VARCHAR(255)"),
 			   							new DataField("DATA", "binary")};
 	
 	private LinkedBlockingQueue<Message> msgQueue = new LinkedBlockingQueue<Message>();
