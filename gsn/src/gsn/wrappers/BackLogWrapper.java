@@ -277,7 +277,7 @@ public class BackLogWrapper extends AbstractWrapper {
 		
 		if (blMsgMultiplexer.getDeviceID() == null) {
 			logger.warn("no device id from core station (" + blMsgMultiplexer.getCoreStationName() + ") determined yet (no connection since last GSN start)");
-			return false;
+			return pluginObject.sendToPlugin(action, paramNames, paramValues);
 		}
 		if ( id == blMsgMultiplexer.getDeviceID() || id == 65535) {
 			logger.debug("Upload command received.");
