@@ -18,7 +18,7 @@ import gsn.beans.DataField;
 public class CoreStationStatusPlugin extends AbstractPlugin {
 	
 	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"),
-						new DataField("GENERATIONTIME", "BIGINT"),
+						new DataField("GENERATION_TIME", "BIGINT"),
 						new DataField("DEVICE_ID", "INTEGER"),
 						new DataField("V_PV_MV", "INTEGER"),
 						new DataField("I_PV_UA", "INTEGER"),

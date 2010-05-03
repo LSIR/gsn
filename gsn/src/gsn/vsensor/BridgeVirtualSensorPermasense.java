@@ -207,26 +207,9 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		String s;
 		if (conn != null) {
 			if (position_mapping && data.getData("device_id") != null) {
-				// TODO: insert a unique generationtime field for all devices
-				if (data.getData("generationtime") != null) {
+				if (data.getData("generation_time") != null) {
 					Integer position = getPosition(((Integer) data.getData("device_id")).intValue(),
-							new Timestamp(((Long) data.getData("generationtime")).longValue()));
-					data = new StreamElement(data, 
-							new String[]{"position"}, 
-							new Byte[]{DataTypes.INTEGER}, 
-							new Serializable[]{position});
-				}
-				else if (data.getData("timestamp") != null) {
-					Integer position = getPosition(((Integer) data.getData("device_id")).intValue(),
-							new Timestamp(((Long) data.getData("timestamp")).longValue()));
-					data = new StreamElement(data, 
-							new String[]{"position"}, 
-							new Byte[]{DataTypes.INTEGER}, 
-							new Serializable[]{position});
-				}
-				else if (data.getData("modificationtime") != null) {
-					Integer position = getPosition(((Integer) data.getData("device_id")).intValue(),
-							new Timestamp(((Long) data.getData("modificationtime")).longValue()));
+							new Timestamp(((Long) data.getData("generation_time")).longValue()));
 					data = new StreamElement(data, 
 							new String[]{"position"}, 
 							new Byte[]{DataTypes.INTEGER}, 
@@ -234,16 +217,16 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 				}
 			}
 			if (sensortype_mapping && 
-					data.getData("position") != null &&	data.getData("generationtime") != null) {
+					data.getData("position") != null &&	data.getData("generation_time") != null) {
 				Serializable[] sensortype = getSensorType(((Integer) data.getData("position")).intValue(), 
-						new Timestamp(((Long) data.getData("generationtime")).longValue()));
+						new Timestamp(((Long) data.getData("generation_time")).longValue()));
 				data = new StreamElement(data, 
 						new String[]{"sensortype", "sensortype_serialid"}, 
 						new Byte[]{DataTypes.VARCHAR, DataTypes.BIGINT},
 						sensortype);
 			}
 			if (sensorvalue_conversion &&
-					data.getData("position") != null &&	data.getData("generationtime") != null) {
+					data.getData("position") != null &&	data.getData("generation_time") != null) {
 				String physical, conversion, input, value;
 				Converter converter;
 				HashMap<String, Serializable> map = new HashMap<String, Serializable>();
@@ -251,7 +234,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 				ListIterator<String> list = Arrays.asList(data.getFieldNames()).listIterator();
 				try {
 					conversion_query.setInt(1, ((Integer) data.getData("position")).intValue());
-					conversion_query.setTimestamp(2, new Timestamp(((Long) data.getData("generationtime")).longValue()));
+					conversion_query.setTimestamp(2, new Timestamp(((Long) data.getData("generation_time")).longValue()));
 					while (list.hasNext()) {
 						s = list.next().toLowerCase();
 						if (s.startsWith("payload_") && !s.startsWith("payload_sample_") && data.getData(s) != null) {
@@ -352,12 +335,12 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		return ret;
 	}
 	
-	private Integer getPosition(int device_id, Timestamp generationtime) {
+	private Integer getPosition(int device_id, Timestamp generation_time) {
 		Integer res = null;
 		long start = System.nanoTime();
 		try {
 			position_query.setInt(1, device_id);
-			position_query.setTimestamp(2, generationtime);
+			position_query.setTimestamp(2, generation_time);
 			ResultSet rs = position_query.executeQuery();
 			if (rs.next()) {
 				res = rs.getInt(1);
@@ -372,7 +355,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		return res;
 	}
 
-	private Serializable[] getSensorType(int position, Timestamp generationtime) {
+	private Serializable[] getSensorType(int position, Timestamp generation_time) {
 		Long serialid = null;
 		String s = null;
 		ResultSet rs;
@@ -381,7 +364,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		long start = System.nanoTime();
 		try {
 			sensortype_query.setInt(1, position);
-			sensortype_query.setTimestamp(2, generationtime);			
+			sensortype_query.setTimestamp(2, generation_time);			
 			rs = sensortype_query.executeQuery();
 			if (rs.first()) {
 				do {
@@ -392,7 +375,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 			}
 			
 			serialid_query.setInt(1, position);
-			serialid_query.setTimestamp(2, generationtime);
+			serialid_query.setTimestamp(2, generation_time);
 			rs = serialid_query.executeQuery();
 			if (rs.next()) {
 				serialid = rs.getLong(1);

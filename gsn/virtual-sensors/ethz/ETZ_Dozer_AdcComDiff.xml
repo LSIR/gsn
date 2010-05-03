@@ -4,7 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
-            <field name="GENERATIONTIME" type="BIGINT" unit="unixtime"/>
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
@@ -34,7 +34,7 @@
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAdcComDiffDeprecatedMsg</predicate>
                 </address>
                 <!--query> select * from wrapper </query -->
-                <query> select TIMESTAMP, GENERATIONTIME, DEVICE_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
+                <query> select TIMESTAMP, GENERATION_TIME, DEVICE_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
                     IF(PAYLOAD_A0=-1,NULL,PAYLOAD_A0) as PAYLOAD_A0,
                     PAYLOAD_A1, PAYLOAD_A2, PAYLOAD_A3, PAYLOAD_ADIFF01_1, PAYLOAD_ADIFF23_1, PAYLOAD_ADIFF01_2, PAYLOAD_ADIFF23_2 from wrapper
                 </query>
@@ -49,7 +49,7 @@
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAdcComDiffDeprecatedMsg</predicate>
                 </address>
                 <!--query> select * from wrapper </query -->
-                <query> select TIMESTAMP, GENERATIONTIME, DEVICE_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
+                <query> select TIMESTAMP, GENERATION_TIME, DEVICE_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
                     IF(PAYLOAD_A0=-1,NULL,PAYLOAD_A0) as PAYLOAD_A0,
                     PAYLOAD_A1, PAYLOAD_A2, PAYLOAD_A3, PAYLOAD_ADIFF01_1, PAYLOAD_ADIFF23_1, PAYLOAD_ADIFF01_2, PAYLOAD_ADIFF23_2 from wrapper
                 </query>

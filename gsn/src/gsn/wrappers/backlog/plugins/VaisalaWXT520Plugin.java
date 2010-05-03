@@ -10,7 +10,7 @@ import gsn.beans.DataField;
 public class VaisalaWXT520Plugin extends AbstractPlugin {
 
 	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"),
-						new DataField("GENERATIONTIME", "BIGINT"),
+						new DataField("GENERATION_TIME", "BIGINT"),
 						new DataField("DEVICE_ID", "INTEGER"),
 						new DataField("Wu", "VARCHAR(100)"),
 						new DataField("Tu", "VARCHAR(100)"),

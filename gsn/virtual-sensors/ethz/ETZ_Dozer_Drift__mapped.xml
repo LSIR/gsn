@@ -4,7 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
-            <field name="GENERATIONTIME" type="BIGINT" unit="unixtime"/>
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
@@ -23,12 +23,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_MYTEMP0, PAYLOAD_PARENTTEMP0, PAYLOAD_DRIFTPPM0 from ETZ_Dozer_Drift__muxed__mapped__1750 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,
+                <query> select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,
                     PAYLOAD_MYTEMP0 as LOCALTEMP,
                     PAYLOAD_PARENTTEMP0 as PARENTTEMP,
                     PAYLOAD_DRIFTPPM0 as DRIFTPPM from wrapper 
@@ -40,12 +40,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,  
+                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,  
                         PAYLOAD_MYTEMP1, PAYLOAD_PARENTTEMP1, PAYLOAD_DRIFTPPM1 from ETZ_Dozer_Drift__muxed__mapped__1750
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATIONTIME+1 as GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select TIMESTAMP, GENERATION_TIME+1 as GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_MYTEMP1 as LOCALTEMP,
                     PAYLOAD_PARENTTEMP1 as PARENTTEMP,
                     PAYLOAD_DRIFTPPM1 as DRIFTPPM from wrapper
@@ -57,12 +57,12 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_MYTEMP2, PAYLOAD_PARENTTEMP2, PAYLOAD_DRIFTPPM2 from ETZ_Dozer_Drift__muxed__mapped__1750
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATIONTIME+2 as GENERATIONTIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select TIMESTAMP, GENERATION_TIME+2 as GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_MYTEMP2 as LOCALTEMP,
                     PAYLOAD_PARENTTEMP2 as PARENTTEMP,
                     PAYLOAD_DRIFTPPM2 as DRIFTPPM from wrapper

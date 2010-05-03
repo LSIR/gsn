@@ -6,7 +6,7 @@
             <param name="jpeg_scaled">JPEG_SCALED</param>
         </init-params>
         <output-structure>
-            <field name="GENERATIONTIME" type="BIGINT" unit="unixtime" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
@@ -18,9 +18,9 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select GENERATIONTIME, DATA from ETZ_Binary__mapped__1750 where POSITION = 2 and RELATIVEFILE='webcam1/webcam.jpg'</predicate>
+                    <predicate key="query">select GENERATION_TIME, DATA from ETZ_Binary__mapped__1750 where POSITION = 2 and RELATIVEFILE='webcam1/webcam.jpg'</predicate>
                 </address>
-                <query> select GENERATIONTIME, DATA as JPEG_SCALED from wrapper</query>
+                <query> select GENERATION_TIME, DATA as JPEG_SCALED from wrapper</query>
             </source>
             <query> select * from source </query>
         </stream>
