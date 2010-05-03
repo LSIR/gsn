@@ -510,7 +510,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	}
 
 
-	public int getDeviceID() {
+	public Integer getDeviceID() {
 		return coreStationDeviceId;
 	}
 }

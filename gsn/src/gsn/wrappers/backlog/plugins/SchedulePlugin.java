@@ -123,12 +123,15 @@ public class SchedulePlugin extends AbstractPlugin {
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		if( action.compareToIgnoreCase("schedule_command") == 0 ) {
 			byte [] schedule = null;
-			long time = 0;
+			int id = -1;
+			long time = System.currentTimeMillis();
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("schedule") == 0 ) {
 					// store the schedule received from the web input in the database
-					time = System.currentTimeMillis();
 					schedule = decode(((String)paramValues[i]).toCharArray());
+				}
+				else if( paramNames[i].compareToIgnoreCase("schedule") == 0 ) {
+					id = Integer.parseInt((String)paramValues[i]);
 				}
 			}
 			
@@ -144,13 +147,13 @@ public class SchedulePlugin extends AbstractPlugin {
 				logger.warn(e.getMessage());
 			}
 			if (sent) {
-				Serializable[] data = {getDeviceID(), time, time, schedule};
+				Serializable[] data = {id, time, time, schedule};
 				dataProcessed(time, data);
 
 				logger.info("Received schedule which has been directly transmitted");
 			}
 			else {
-				Serializable[] data = {getDeviceID(), time, null, schedule};
+				Serializable[] data = {id, time, null, schedule};
 				dataProcessed(time, data);
 
 				logger.info("Received schedule and will transmit it the next time it is requested.");
