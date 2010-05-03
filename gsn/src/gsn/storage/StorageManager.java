@@ -438,9 +438,40 @@ public class StorageManager {
 		return new DataEnumerator(connection.prepareStatement(query.toString()),binaryFieldsLinked);
 	}
 
+    public DataEnumerator streamedExecuteQuery(AbstractQuery abstractQuery,boolean binaryFieldsLinked, Connection connection) throws SQLException {
+		if (abstractQuery.getLimitCriterion() == null) {
+			return streamedExecuteQuery(abstractQuery.getStandardQuery().toString(), binaryFieldsLinked, connection);
+		}
+		DATABASE db = getDatabaseForConnection(connection);
+		String query = db.addLimit(abstractQuery.getStandardQuery().toString(), abstractQuery.getLimitCriterion().getSize(), abstractQuery.getLimitCriterion().getOffset());
+		if (logger.isDebugEnabled())
+			logger.debug("Executing query: " + query + "(" + binaryFieldsLinked	+ ")");
+		return streamedExecuteQuery(query, binaryFieldsLinked, connection);
+	}
+
 	public DataEnumerator executeQuery(StringBuilder query,boolean binaryFieldsLinked) throws SQLException {
 		return executeQuery(query, binaryFieldsLinked, getConnection());
 	}
+
+    public DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked, Connection conn) throws SQLException {
+            PreparedStatement ps = null;
+            // Support streamed queries for MySQL -- see MySQL Implementation notes:
+            // http://dev.mysql.com/doc/refman/5.0/en/connector-j-reference-implementation-notes.html
+            if (isMysqlDB()) {
+                ps = conn.prepareStatement(query, java.sql.ResultSet.TYPE_FORWARD_ONLY, java.sql.ResultSet.CONCUR_READ_ONLY);
+                ps.setFetchSize(Integer.MIN_VALUE);
+            }
+            else {
+                ps = conn.prepareStatement(query);
+            }
+            return new DataEnumerator(ps, binaryFieldsLinked);
+        }
+
+
+    public DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked) throws SQLException {
+        return streamedExecuteQuery(query, binaryFieldsLinked, getConnection());
+    }
+
 
 	public void executeCreateView(CharSequence viewName, CharSequence selectQuery) throws SQLException {
 		Connection connection = null;

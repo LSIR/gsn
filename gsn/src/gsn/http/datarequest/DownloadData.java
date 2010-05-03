@@ -33,8 +33,12 @@ public class DownloadData extends AbstractDataRequest {
 
     private String csvDelimiter = ",";
 
+    private boolean paginated = false;
+
     public DownloadData(Map<String, String[]> requestParameters) throws DataRequestException {
         super(requestParameters);
+        if (requestParameters.get("paginated") != null && requestParameters.get("paginated").length > 0)
+            paginated = "true".equals(requestParameters.get("paginated")[0]);
     }
 
     @Override
@@ -69,11 +73,11 @@ public class DownloadData extends AbstractDataRequest {
         }
     }
 
-    public String outputResult() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        outputResult(baos);
-        return baos.toString();
-    }
+//    public String outputResult() {
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        outputResult(baos);
+//        return baos.toString();
+//    }
 
     @Override
     public void outputResult(OutputStream os) {
@@ -90,7 +94,11 @@ public class DownloadData extends AbstractDataRequest {
                 Connection connection = null;
 
                 connection = StorageManager.getInstance().getConnection();
-                de = StorageManager.getInstance().executeQuery(nextSqlQuery.getValue(), false, connection);
+                if (paginated)
+                    de = StorageManager.getInstance().streamedExecuteQuery(nextSqlQuery.getValue(), false, connection);
+                else
+                    de = StorageManager.getInstance().executeQuery(nextSqlQuery.getValue(), false, connection);
+
                 logger.debug("Data Enumerator: " + de);
                 if (ot == AllowedOutputType.csv) {
                     respond.println("##vsname:" + nextSqlQuery.getKey());
@@ -100,7 +108,6 @@ public class DownloadData extends AbstractDataRequest {
                     respond.println("\t<data vsname=\"" + nextSqlQuery.getKey() + "\">");
                 }
                 FieldsCollection fc = qbuilder.getVsnamesAndStreams().get(nextSqlQuery.getKey());
-                //boolean wantTimed = fc != null ? fc.isWantTimed() : false;
                 boolean wantTimed = true;
                 boolean firstLine = true;
                 while (de.hasMoreElements()) {
@@ -111,7 +118,8 @@ public class DownloadData extends AbstractDataRequest {
                     }
                     firstLine = false;
                 }
-                if (ot == AllowedOutputType.xml) respond.println("\t</data>");
+                if (ot == AllowedOutputType.xml)
+                    respond.println("\t</data>");
             }
             if (ot == AllowedOutputType.xml) {
                 respond.println("</result>");
@@ -119,6 +127,7 @@ public class DownloadData extends AbstractDataRequest {
         } catch (SQLException e) {
             logger.debug(e.getMessage());
         } finally {
+            respond.flush();
             if (de != null)
                 de.close();
         }
@@ -130,18 +139,23 @@ public class DownloadData extends AbstractDataRequest {
             respond.print("#");
             for (int i = 0; i < se.getData().length; i++) {
                 respond.print(se.getFieldNames()[i]);
-                if (i != se.getData().length - 1) respond.print(cvsDelimiter);
+                if (i != se.getData().length - 1)
+                    respond.print(cvsDelimiter);
             }
-            if (wantTimed && se.getData().length != 0) respond.print(cvsDelimiter);
-            if (wantTimed) respond.print("timed");
+            if (wantTimed && se.getData().length != 0)
+                respond.print(cvsDelimiter);
+            if (wantTimed)
+                respond.print("timed");
             respond.println();
         }
         for (int i = 0; i < se.getData().length; i++) {
             respond.print(se.getData()[i]);
-            if (i != se.getData().length - 1) respond.print(cvsDelimiter);
+            if (i != se.getData().length - 1)
+                respond.print(cvsDelimiter);
         }
         if (wantTimed) {
-            if (se.getData().length != 0) respond.print(cvsDelimiter);
+            if (se.getData().length != 0)
+                respond.print(cvsDelimiter);
             respond.print(qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
         }
         respond.println();
@@ -153,7 +167,8 @@ public class DownloadData extends AbstractDataRequest {
             for (int i = 0; i < se.getData().length; i++) {
                 respond.println("\t\t\t<field>" + se.getFieldNames()[i] + "</field>");
             }
-            if (wantTimed) respond.println("\t\t\t<field>timed</field>");
+            if (wantTimed)
+                respond.println("\t\t\t<field>timed</field>");
             respond.println("\t\t</header>");
         }
         respond.println("\t\t<tuple>");

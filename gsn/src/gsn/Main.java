@@ -105,7 +105,8 @@ public final class Main {
 
 		try {
 			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" ...");
-			Server jettyServer = getJettyServer(Main.getContainerConfig().getContainerPort());
+            int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
+            Server jettyServer = getJettyServer(Main.getContainerConfig().getContainerPort(), maxServlets);
 			jettyServer.start ( );
 			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
 		} catch ( Exception e ) {
@@ -192,6 +193,8 @@ public final class Main {
 	}
 
 	private GSNController controlSocket;
+
+    private static final int DEFAULT_JETTY_SERVLETS = 100;
 
 	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 
@@ -396,7 +399,7 @@ public final class Main {
 	 * This method is used ONLY for ORACLE DB.
 	 * ADDS the postfix at the end of the tableName. If the table name ends with " then
 	 * updates it properly.   
-	 * @param tableName
+	 * @param table_name
 	 * @return
 	 */
 	public static String tableNamePostFixAppender(CharSequence table_name,String postFix) {
@@ -420,12 +423,12 @@ public final class Main {
 		return tableNameGeneratorInString(sb);
 	}
 
-	public Server getJettyServer(int port) throws IOException {
+	public Server getJettyServer(int port, int maxThreads) throws IOException {
 		Server server = new Server();
 		Connector connector=new SelectChannelConnector();//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
 		HandlerCollection handlers = new HandlerCollection();
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
-		server.setThreadPool(new QueuedThreadPool(100));
+		server.setThreadPool(new QueuedThreadPool(maxThreads));
 		connector.setPort ( port );
 
 		SslSocketConnector sslSocketConnector = null;

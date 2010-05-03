@@ -56,13 +56,13 @@ public abstract class AbstractDataRequest {
 
 	public abstract void outputResult (OutputStream os) ;
 
-	public InputStream getInputStream(int bufferSize) {
-		DataRequestReaderTarget drrt = new DataRequestReaderTarget(bufferSize);
-		(new Thread(drrt)).start();
-		return drrt.getInputStream();
-	}
+//	public InputStream getInputStream(int bufferSize) {
+//		DataRequestReaderTarget drrt = new DataRequestReaderTarget(bufferSize);
+//		(new Thread(drrt)).start();
+//		return drrt.getInputStream();
+//	}
 	
-	private class DataRequestReaderTarget implements Runnable {		
+/*	private class DataRequestReaderTarget implements Runnable {
 
 		private OutputInputStream ois = null;
 
@@ -82,5 +82,5 @@ public abstract class AbstractDataRequest {
 		public InputStream getInputStream () {
 			return ois.getInputStream();
 		}
-	}
+	}*/
 }

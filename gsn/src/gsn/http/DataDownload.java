@@ -5,7 +5,6 @@ import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -45,171 +44,175 @@ public class DataDownload extends HttpServlet {
      * param-name:
      */
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, java.io.IOException {
-
-        SimpleDateFormat sdf = new SimpleDateFormat(Main.getInstance().getContainerConfig().getTimeFormat());
-        SimpleDateFormat sdf_from_ui = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
-        boolean responseCVS = false;
-        boolean wantTimeStamp = false;
-        boolean commonReq = true;
-        boolean groupByTimed = false;
         PrintWriter respond = res.getWriter();
-        String vsName = HttpRequestUtils.getStringParameter("vsName", null, req);
-        if (vsName == null)
-            vsName = HttpRequestUtils.getStringParameter("vsname", null, req);
-        if (vsName == null) {
-            res.sendError(WebConstants.MISSING_VSNAME_ERROR, "The virtual sensor name is missing");
-            return;
-        }
-        if (req.getParameter("display") != null && req.getParameter("display").equals("CSV")) {
-            responseCVS = true;
-            res.setContentType("text/csv");
-            //res.setContentType("text/html");
-        } else {
-            res.setContentType("text/xml");
-        }
-        if (req.getParameter("commonReq") != null && req.getParameter("commonReq").equals("false")) {
-            commonReq = false;
-        }
-        String separator = ";";
-        if (req.getParameter("delimiter") != null && !req.getParameter("delimiter").equals("")) {
-            String reqSeparator = req.getParameter("delimiter");
-            if (reqSeparator.equals("tab")) {
-                separator = "\t";
-            } else if (reqSeparator.equals("space")) {
-                separator = " ";
-            } else if (reqSeparator.equals("other") && req.getParameter("otherdelimiter") != null && !req.getParameter("otherdelimiter").equals("")) {
-                separator = req.getParameter("otherdelimiter");
-            }
-        }
-        String generated_request_query = "";
-        String expression = "";
-        String line = "";
-        String groupby = "";
-        String[] fields = req.getParameterValues("fields");
-        if (commonReq) {
-            if (req.getParameter("fields") != null) {
-                for (int i = 0; i < fields.length; i++) {
-                    if (fields[i].equals("timed")) {
-                        wantTimeStamp = true;
-                    }
-                    generated_request_query += ", " + fields[i];
-                }
-            }
-        } else {
-            if (req.getParameter("fields") == null) {
-                respond.println("Request ERROR");
+        DataEnumerator result = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(Main.getInstance().getContainerConfig().getTimeFormat());
+            SimpleDateFormat sdf_from_ui = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
+            boolean responseCVS = false;
+            boolean wantTimeStamp = false;
+            boolean commonReq = true;
+            boolean groupByTimed = false;
+
+            String vsName = HttpRequestUtils.getStringParameter("vsName", null, req);
+            if (vsName == null)
+                vsName = HttpRequestUtils.getStringParameter("vsname", null, req);
+            if (vsName == null) {
+                res.sendError(WebConstants.MISSING_VSNAME_ERROR, "The virtual sensor name is missing");
                 return;
+            }
+            if (req.getParameter("display") != null && req.getParameter("display").equals("CSV")) {
+                responseCVS = true;
+                res.setContentType("text/csv");
+                //res.setContentType("text/html");
             } else {
-                for (int i = 0; i < fields.length; i++) {
-                    if (fields[i].equals("timed")) {
-                        wantTimeStamp = true;
-                    }
-                    generated_request_query += ", " + fields[i];
+                res.setContentType("text/xml");
+            }
+            if (req.getParameter("commonReq") != null && req.getParameter("commonReq").equals("false")) {
+                commonReq = false;
+            }
+            String separator = ";";
+            if (req.getParameter("delimiter") != null && !req.getParameter("delimiter").equals("")) {
+                String reqSeparator = req.getParameter("delimiter");
+                if (reqSeparator.equals("tab")) {
+                    separator = "\t";
+                } else if (reqSeparator.equals("space")) {
+                    separator = " ";
+                } else if (reqSeparator.equals("other") && req.getParameter("otherdelimiter") != null && !req.getParameter("otherdelimiter").equals("")) {
+                    separator = req.getParameter("otherdelimiter");
                 }
             }
-            if (req.getParameter("groupby") != null) {
-                if (req.getParameter("groupby").equals("timed")) {
-                    groupByTimed = true;
-                    int periodmeasure = 1;
-                    if (req.getParameter("groupbytimed") != null) {
-                        periodmeasure = new Integer(req.getParameter("groupbytimed"));
-                        periodmeasure = java.lang.Math.max(periodmeasure, 1);
+            String generated_request_query = "";
+            String expression = "";
+            String line = "";
+            String groupby = "";
+            String[] fields = req.getParameterValues("fields");
+            if (commonReq) {
+                if (req.getParameter("fields") != null) {
+                    for (int i = 0; i < fields.length; i++) {
+                        if (fields[i].equals("timed")) {
+                            wantTimeStamp = true;
+                        }
+                        generated_request_query += ", " + fields[i];
                     }
-                    generated_request_query += ", Min(timed), FLOOR(timed/" + periodmeasure + ") period ";
-                    groupby = "GROUP BY period";
+                }
+            } else {
+                if (req.getParameter("fields") == null) {
+                    respond.println("Request ERROR");
+                    return;
                 } else {
-                    groupby = "GROUP BY " + req.getParameter("groupby");
+                    for (int i = 0; i < fields.length; i++) {
+                        if (fields[i].equals("timed")) {
+                            wantTimeStamp = true;
+                        }
+                        generated_request_query += ", " + fields[i];
+                    }
                 }
-            }
-        }
-        
-        String where = "";
-        if (req.getParameter("critfield") != null) {
-            try {
-                String[] critJoin = req.getParameterValues("critJoin");
-                String[] neg = req.getParameterValues("neg");
-                String[] critfields = req.getParameterValues("critfield");
-                String[] critop = req.getParameterValues("critop");
-                String[] critval = req.getParameterValues("critval");
-                for (int i = 0; i < critfields.length; i++) {
-                    if (critop[i].equals("LIKE")) {
-                        if (i > 0) {
-                            where += " " + critJoin[i - 1] + " " + neg[i] + " " + critfields[i] + " LIKE '%"; // + critval[i] + "%'";
-                        } else {
-                            where += neg[i] + " " + critfields[i] + " LIKE '%"; // + critval[i] + "%'";
+                if (req.getParameter("groupby") != null) {
+                    if (req.getParameter("groupby").equals("timed")) {
+                        groupByTimed = true;
+                        int periodmeasure = 1;
+                        if (req.getParameter("groupbytimed") != null) {
+                            periodmeasure = new Integer(req.getParameter("groupbytimed"));
+                            periodmeasure = java.lang.Math.max(periodmeasure, 1);
                         }
-                        if (critfields[i].equals("timed")) {
-                            try {
-                                //Date d = sdf.parse(critval[i]);
-                                Date d = sdf_from_ui.parse(critval[i]);
-                                where += d.getTime();
-                            } catch (Exception e) {
-                                where += "0";
-                            }
-                        } else {
-                            where += critval[i];
-                        }
-                        where += "%'";
+                        generated_request_query += ", Min(timed), FLOOR(timed/" + periodmeasure + ") period ";
+                        groupby = "GROUP BY period";
                     } else {
-                        if (i > 0) {
-                            where += " " + critJoin[i - 1] + " " + neg[i] + " " + critfields[i] + " " + critop[i] + " "; //critval[i];
-                        } else {
-                            where += neg[i] + " " + critfields[i] + " " + critop[i] + " "; //critval[i];
-                        }
-                        if (critfields[i].equals("timed")) {
-                            try {
-                                //Date d = sdf.parse(critval[i]);
-                                Date d = sdf_from_ui.parse(critval[i]);
-                                where += d.getTime();
-                            } catch (Exception e) {
-                                where += "0";
-                            }
-                        } else {
-                            where += critval[i];
-                        }
+                        groupby = "GROUP BY " + req.getParameter("groupby");
                     }
                 }
-                where = " WHERE " + where;
-            } catch (NullPointerException npe) {
-                where = " ";
-            }
-        }
-
-        if (!generated_request_query.equals("")) {
-            generated_request_query = generated_request_query.substring(2);
-            if (!commonReq) {
-                expression = generated_request_query;
-            }
-            generated_request_query = "select " + generated_request_query + " from " + vsName + where + "  order by timed DESC  ";
-            if (commonReq)
-                if (req.getParameter("nb") != null && req.getParameter("nb") != "") {
-                    int nb = new Integer(req.getParameter("nb"));
-                    if (nb < 0)
-                        nb = 0;
-                    String limit = "";
-                    if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
-                        if (nb >= 0)
-                            limit = "LIMIT " + nb + "  offset 0";
-                        generated_request_query += limit;
-                    } else if (StorageManager.isOracle()) {
-                        generated_request_query = "select * from (" + generated_request_query + " ) where rownum <" + (nb + 1);
-                    }
-                }
-
-            generated_request_query += " " + groupby;
-            generated_request_query += ";";
-
-            if (req.getParameter("sql") != null) {
-                res.setContentType("text/html");
-                respond.println("#" + generated_request_query);
-                return;
             }
 
-            DataEnumerator result = null;
-            try {
+            String where = "";
+            if (req.getParameter("critfield") != null) {
                 try {
-                    result = StorageManager.getInstance().executeQuery(new StringBuilder(generated_request_query), false);
+                    String[] critJoin = req.getParameterValues("critJoin");
+                    String[] neg = req.getParameterValues("neg");
+                    String[] critfields = req.getParameterValues("critfield");
+                    String[] critop = req.getParameterValues("critop");
+                    String[] critval = req.getParameterValues("critval");
+                    for (int i = 0; i < critfields.length; i++) {
+                        if (critop[i].equals("LIKE")) {
+                            if (i > 0) {
+                                where += " " + critJoin[i - 1] + " " + neg[i] + " " + critfields[i] + " LIKE '%"; // + critval[i] + "%'";
+                            } else {
+                                where += neg[i] + " " + critfields[i] + " LIKE '%"; // + critval[i] + "%'";
+                            }
+                            if (critfields[i].equals("timed")) {
+                                try {
+                                    //Date d = sdf.parse(critval[i]);
+                                    Date d = sdf_from_ui.parse(critval[i]);
+                                    where += d.getTime();
+                                } catch (Exception e) {
+                                    where += "0";
+                                }
+                            } else {
+                                where += critval[i];
+                            }
+                            where += "%'";
+                        } else {
+                            if (i > 0) {
+                                where += " " + critJoin[i - 1] + " " + neg[i] + " " + critfields[i] + " " + critop[i] + " "; //critval[i];
+                            } else {
+                                where += neg[i] + " " + critfields[i] + " " + critop[i] + " "; //critval[i];
+                            }
+                            if (critfields[i].equals("timed")) {
+                                try {
+                                    //Date d = sdf.parse(critval[i]);
+                                    Date d = sdf_from_ui.parse(critval[i]);
+                                    where += d.getTime();
+                                } catch (Exception e) {
+                                    where += "0";
+                                }
+                            } else {
+                                where += critval[i];
+                            }
+                        }
+                    }
+                    where = " WHERE " + where;
+                } catch (NullPointerException npe) {
+                    where = " ";
+                }
+            }
+
+            if (!generated_request_query.equals("")) {
+                generated_request_query = generated_request_query.substring(2);
+                if (!commonReq) {
+                    expression = generated_request_query;
+                }
+                generated_request_query = "select " + generated_request_query + " from " + vsName + where + "  order by timed DESC  ";
+                if (commonReq)
+                    if (req.getParameter("nb") != null && req.getParameter("nb") != "") {
+                        int nb = new Integer(req.getParameter("nb"));
+                        if (nb < 0)
+                            nb = 0;
+                        String limit = "";
+                        if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
+                            if (nb >= 0)
+                                limit = "LIMIT " + nb + "  offset 0";
+                            generated_request_query += limit;
+                        } else if (StorageManager.isOracle()) {
+                            generated_request_query = "select * from (" + generated_request_query + " ) where rownum <" + (nb + 1);
+                        }
+                    }
+
+                generated_request_query += " " + groupby;
+                generated_request_query += ";";
+
+                if (req.getParameter("sql") != null) {
+                    res.setContentType("text/html");
+                    respond.println("#" + generated_request_query);
+                    return;
+                }
+
+
+                try {
+                    if ("true".equals(req.getParameter("paginated")))
+                        result = StorageManager.getInstance().streamedExecuteQuery(new String(generated_request_query), false);
+                    else 
+                        result = StorageManager.getInstance().executeQuery(new StringBuilder(generated_request_query), false);
                 } catch (SQLException e) {
                     logger.error("ERROR IN EXECUTING, query: " + generated_request_query);
                     logger.error(e.getMessage(), e);
@@ -308,18 +311,19 @@ public class DataDownload extends HttpServlet {
                             respond.println("\t\t<field>" + sdf.format(d) + "</field>");
                         }
                         respond.println("\t</line>");
-                        respond.flush();
                     }
                     respond.println("</data>");
                 }
             }
-            finally {
-                if (result != null) result.close();
-            }
             //*/
-        } else {
-            res.setContentType("text/html");
-            respond.println("Please select some fields");
+            else {
+                res.setContentType("text/html");
+                respond.println("Please select some fields");
+            }
+        }
+        finally {
+            if (result != null) result.close();
+            respond.flush();
         }
     }
 }
