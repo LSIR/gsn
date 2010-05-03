@@ -84,7 +84,11 @@ public class ContainerInfoHandler implements RequestHandler {
                 sb.append( se.getData( df.getName( ) ) );
               else if (unixtime) {
             	  try {
-            		  sb.append(sdf.format(new Date((Long)se.getData(StringEscapeUtils.escapeXml( df.getName( ) )))));
+            		  Long t = (Long)se.getData(StringEscapeUtils.escapeXml( df.getName( ) ));
+            		  if(t != null)
+            			  sb.append(sdf.format(new Date(t)));
+            		  else
+            			  sb.append(t);
             	  }
             	  catch (ClassCastException e) {
             		  logger.warn("Stream element ["+se+"] could not be cast to date string");
