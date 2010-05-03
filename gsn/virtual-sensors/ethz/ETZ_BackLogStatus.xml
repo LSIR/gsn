@@ -9,6 +9,7 @@
         </web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATIONTIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />

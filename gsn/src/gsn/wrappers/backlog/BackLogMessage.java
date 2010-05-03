@@ -5,8 +5,8 @@ import java.io.IOException;
 
 /**
  * Defines a backlog message, used by the protocol communicated 
- * between the Python backlog program running at the deployment and
- * the {@link DeploymentClient} on side of GSN. It offers the
+ * between the Python backlog program running on a CoreStation and
+ * the {@link AsyncCoreStationClient} on side of GSN. It offers the
  * functionality to access the message format.
  * <p>
  * The binary message has the following format:

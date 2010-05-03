@@ -39,7 +39,7 @@ public class SchedulePlugin extends AbstractPlugin {
 
 	private final transient Logger logger = Logger.getLogger( SchedulePlugin.class );
 	
-	private DataField[] dataField = {new DataField("CREATION_TIME", "BIGINT"),
+	private DataField[] dataField = {new DataField("GENERATIONTIME", "BIGINT"),
 			new DataField("TRANSMISSION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			new DataField("SCHEDULE", "binary")};
@@ -72,7 +72,7 @@ public class SchedulePlugin extends AbstractPlugin {
 				
 				if (rs.next()) {
 					// get the creation time of the newest schedule
-					long creationtime = rs.getLong("creation_time");
+					long creationtime = rs.getLong("generationtime");
 					Integer id = rs.getInt("device_id");
 					logger.debug("creation time: " + creationtime);
 					if (timestamp ==  creationtime) {

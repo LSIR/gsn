@@ -19,6 +19,7 @@ import gsn.beans.DataField;
 public class BackLogStatusPlugin extends AbstractPlugin {
 	
 	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"), 
+						new DataField("GENERATIONTIME", "BIGINT"),
 						new DataField("DEVICE_ID", "INTEGER"),
 						new DataField("ERROR_COUNTER", "INTEGER"),
 						new DataField("EXCEPTION_COUNTER", "INTEGER"),
@@ -77,7 +78,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 		if(packet.length >= 32)
 			connection_losses = arr2int(packet, 28);
 		
-		Serializable[] data = {timestamp, deviceId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses};
+		Serializable[] data = {timestamp, timestamp, deviceId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses};
 		
 		if (dataProcessed(System.currentTimeMillis(), data))
 			ackMessage(timestamp);

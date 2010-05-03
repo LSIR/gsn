@@ -82,7 +82,7 @@ public class BinaryPlugin extends AbstractPlugin {
 
 	protected final transient Logger logger = Logger.getLogger( BinaryPlugin.class );
 	
-	private DataField[] dataField = new DataField[] {new DataField("MODIFICATIONTIME", "BIGINT"),
+	private DataField[] dataField = new DataField[] {new DataField("GENERATIONTIME", "BIGINT"),
 										new DataField("DEVICE_ID", "INTEGER"),
 			   							new DataField("RELATIVEFILE", "VARCHAR(255)"),
 			   							new DataField("STORAGEDIRECTORY", "VARCHAR(255)"),

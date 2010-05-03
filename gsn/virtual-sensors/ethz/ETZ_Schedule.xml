@@ -10,7 +10,7 @@
    		</web-input>
        	<output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
-			<field name="CREATION_TIME" type="BIGINT" unit="unixtime" />
+			<field name="GENERATIONTIME" type="BIGINT" unit="unixtime" />
 			<field name="TRANSMISSION_TIME" type="BIGINT" unit="unixtime" />
 			<field name="SCHEDULE" type="binary" />
        	</output-structure>

@@ -7,7 +7,7 @@
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
-            <field name="MODIFICATIONTIME" type="BIGINT" unit="unixtime" />
+            <field name="GENERATIONTIME" type="BIGINT" unit="unixtime" />
             <field name="RELATIVEFILE" type="VARCHAR(255)" />
             <field name="STORAGEDIRECTORY" type="VARCHAR(255)" />
             <field name="DATA" type="binary" />

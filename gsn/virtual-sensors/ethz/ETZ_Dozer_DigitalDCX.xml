@@ -4,8 +4,8 @@
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
-            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="GENERATIONTIME" type="BIGINT" unit="unixtime"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" />
