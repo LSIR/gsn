@@ -328,7 +328,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 				if (wrappers.next().sendToWrapper(command, paramNames, paramValues))
 					ret = true;
 			} catch (Exception e) {
-				logger.warn(e.getMessage());
+				logger.error(e.getMessage(), e);
 			}
 		}
 		

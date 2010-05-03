@@ -39,9 +39,9 @@ public class SchedulePlugin extends AbstractPlugin {
 
 	private final transient Logger logger = Logger.getLogger( SchedulePlugin.class );
 	
-	private DataField[] dataField = {new DataField("GENERATION_TIME", "BIGINT"),
+	private DataField[] dataField = {new DataField("DEVICE_ID", "INTEGER"),
+			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("TRANSMISSION_TIME", "BIGINT"),
-			new DataField("DEVICE_ID", "INTEGER"),
 			new DataField("SCHEDULE", "binary")};
 
 	@Override
@@ -146,18 +146,20 @@ public class SchedulePlugin extends AbstractPlugin {
 			if (sent) {
 				Serializable[] data = {time, time, getDeviceID(), schedule};
 				dataProcessed(time, data);
+
+				logger.info("Received schedule which has been directly transmitted");
 			}
 			else {
 				Serializable[] data = {time, null, getDeviceID(), schedule};
 				dataProcessed(time, data);
+
+				logger.info("Received schedule and will transmit it the next time it is requested.");
 			}
+
+			return true;
 		}
 		else
 			return false;
-
-		logger.info("Received schedule and will transmit it the next time it is requested.");
-
-		return true;
 	}
 	
 	
