@@ -5,6 +5,7 @@ import gsn.beans.StreamElement;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
@@ -34,15 +35,10 @@ public class RestDelivery implements DeliverySystem {
 
     public boolean writeStreamElement(StreamElement se) {
         try {
-            continuation.resume();
-            Semaphore lock = (Semaphore) continuation.getAttribute("lock");
-            lock.acquire();
             objectStream.writeObject(new StreamElement4Rest(se));
             objectStream.flush();
-            if (continuation.getServletResponse().getWriter().checkError()) {
-                return false;
-            }
-            return true;
+            continuation.resume();
+            return ((LinkedBlockingQueue<Boolean>) continuation.getAttribute("status")).take();
         } catch (Exception e) {
             logger.debug(e.getMessage(), e);
             return false;
@@ -53,8 +49,8 @@ public class RestDelivery implements DeliverySystem {
     public void close() {
         try {
             if (objectStream != null){
-                continuation.complete();
                 objectStream.close();
+                continuation.complete();
             }
         } catch (Exception e) {
             logger.debug(e.getMessage(), e);
