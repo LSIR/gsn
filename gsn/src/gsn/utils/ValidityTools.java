@@ -134,7 +134,7 @@ public class ValidityTools {
 		}
 	}
 
-	public static final ArrayList < String >      NETWORK_LOCAL_ADDRESS       = new ArrayList < String >( );
+	//public static final ArrayList < String >      NETWORK_LOCAL_ADDRESS       = new ArrayList < String >( );
 
 	public static final ArrayList < InetAddress > NETWORK_LOCAL_INETADDRESSES = new ArrayList < InetAddress >( );
 	static {
@@ -144,7 +144,7 @@ public class ValidityTools {
 				Enumeration < InetAddress > address = netint.getInetAddresses( );
 				for ( InetAddress addr : Collections.list( address ) ) {
 					if ( !addr.isMulticastAddress( ) ) {
-						NETWORK_LOCAL_ADDRESS.add( addr.getCanonicalHostName( ) );
+						//NETWORK_LOCAL_ADDRESS.add( addr.getCanonicalHostName( ) );
 						NETWORK_LOCAL_INETADDRESSES.add( addr );
 					}
 				}
