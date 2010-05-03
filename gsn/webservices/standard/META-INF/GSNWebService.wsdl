@@ -63,7 +63,6 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="outputStructure" nillable="false" type="ax21:GSNWebService_ConfOutputStructure"/>
                     <xs:element minOccurs="0" maxOccurs="1" name="processor" nillable="false" type="ax21:GSNWebService_ConfProcessor"/>
                     <xs:element minOccurs="0" maxOccurs="1" name="wrapper" nillable="false" type="ax21:GSNWebService_ConfWrapper"/>
-                    <!--<xs:element minOccurs="0" maxOccurs="1" name="wrapperOutputFormat" nillable="false" type="ax21:GSNWebService_ConfWrapperOutputFormat"/>-->
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfAddressing">
@@ -98,8 +97,6 @@
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfWrapper">
-                <!--<xs:attribute use="required" name="wrapper" type="xs:string"/>
-                <xs:attribute use="required" name="wrapperURL" type="xs:string"/>-->
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="wrapperDetails" nillable="false" type="ax21:GSNWebService_WrapperDetails"/>
                 </xs:sequence>
@@ -117,11 +114,6 @@
                 <xs:attribute use="required" name="stream" type="xs:string"/>
                 <xs:attribute use="required" name="wrapper" type="xs:string"/>
             </xs:complexType>
-            <!--<xs:complexType name="GSNWebService_ConfWrapperOutputFormat">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="outputFormat" nillable="false" type="ax21:GSNWebService_DataField"/>
-                </xs:sequence>
-            </xs:complexType>-->
         </xs:schema>
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://datarequest.http.gsn/xsd">
             <xs:complexType name="AbstractCriterion">
@@ -205,23 +197,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <!--
-            <xs:element name="getVirtualSensorDetails">
-                <xs:complexType>
-                    <xs:attribute name="vsname" use="required" type="xs:string"/>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="detailsType" nillable="false" type="ax22:GSNWebService_DetailsType"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getVirtualSensorDetailsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="1" maxOccurs="1" name="virtualSensorDetails" nillable="false" type="ax22:GSNWebService_VirtualSensorDetails"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            -->
             <xs:element name="getVirtualSensorsDetails">
                 <xs:complexType>
                     <xs:sequence>
@@ -253,8 +228,6 @@
             </xs:element>
             <xs:element name="createVirtualSensor">
                 <xs:complexType>
-                    <xs:attribute name="username" use="required" type="xs:string"/>
-                    <xs:attribute name="password" use="required" type="xs:string"/>
                     <xs:attribute name="vsname" use="required" type="xs:string"/>
                     <xs:sequence>
                         <xs:element minOccurs="1" maxOccurs="1" name="descriptionFileContent" nillable="false" type="xs:string"/>
@@ -270,8 +243,6 @@
             </xs:element>
             <xs:element name="deleteVirtualSensor">
                 <xs:complexType>
-                    <xs:attribute name="username" use="required" type="xs:string"/>
-                    <xs:attribute name="password" use="required" type="xs:string"/>
                     <xs:attribute name="vsname" use="required" type="xs:string"/>
                 </xs:complexType>
             </xs:element>
@@ -284,8 +255,6 @@
             </xs:element>
             <xs:element name="registerQuery">
                 <xs:complexType>
-                    <xs:attribute name="username" use="required" type="xs:string"/>
-                    <xs:attribute name="password" use="required" type="xs:string"/>
                     <xs:attribute name="queryName" use="required" type="xs:string"/>
                     <xs:attribute name="query" use="required" type="xs:string"/>
                     <xs:sequence>
@@ -304,8 +273,6 @@
             <xs:element name="unregisterQuery">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="1" maxOccurs="1" name="username" nillable="false" type="xs:string"/>
-                        <xs:element minOccurs="1" maxOccurs="1" name="password" nillable="false" type="xs:string"/>
                         <xs:element minOccurs="1" maxOccurs="1" name="queryName" nillable="false" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -345,14 +312,6 @@
     <wsdl:message name="getNextDataResponse">
         <wsdl:part name="parameters" element="ns:getNextDataResponse"/>
     </wsdl:message>
-    <!--
-    <wsdl:message name="getVirtualSensorDetailsRequest">
-        <wsdl:part name="parameters" element="ns:getVirtualSensorDetails"/>
-    </wsdl:message>
-    <wsdl:message name="getVirtualSensorDetailsResponse">
-        <wsdl:part name="parameters" element="ns:getVirtualSensorDetailsResponse"/>
-    </wsdl:message>
-    -->
     <wsdl:message name="getLatestMultiDataRequest">
         <wsdl:part name="parameters" element="ns:getLatestMultiData"/>
     </wsdl:message>
@@ -408,12 +367,6 @@
             <wsdl:input message="ns:getNextDataRequest" wsaw:Action="urn:getNextData"/>
             <wsdl:output message="ns:getNextDataResponse" wsaw:Action="urn:getNextDataResponse"/>
         </wsdl:operation>
-        <!--
-        <wsdl:operation name="getVirtualSensorDetails">
-            <wsdl:input message="ns:getVirtualSensorDetailsRequest" wsaw:Action="urn:getVirtualSensorDetails"/>
-            <wsdl:output message="ns:getVirtualSensorDetailsResponse" wsaw:Action="urn:getVirtualSensorDetailsResponse"/>
-        </wsdl:operation>
-        -->
         <wsdl:operation name="getLatestMultiData">
             <wsdl:input message="ns:getLatestMultiDataRequest" wsaw:Action="urn:getLatestMultiData"/>
             <wsdl:output message="ns:getLatestMultiDataResponse" wsaw:Action="urn:getLatestMultiDataResponse"/>
@@ -486,17 +439,6 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <!--
-        <wsdl:operation name="getVirtualSensorDetails">
-            <soap:operation soapAction="urn:getVirtualSensorDetails" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-        -->
         <wsdl:operation name="unregisterQuery">
             <soap:operation soapAction="urn:unregisterQuery" style="document"/>
             <wsdl:input>

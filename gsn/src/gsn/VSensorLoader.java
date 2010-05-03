@@ -10,8 +10,7 @@ import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.WrappersUtil;
 
-import java.io.File;
-import java.io.FileFilter;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,9 +41,11 @@ public class VSensorLoader extends Thread {
 
 	private boolean                                                isActive                              = true;
 
-	private static int                                             VSENSOR_LOADER_THREAD_COUNTER       = 0;
+    private static int                                             VSENSOR_LOADER_THREAD_COUNTER       = 0;
 
-	private ArrayList<VSensorStateChangeListener> changeListeners = new ArrayList<VSensorStateChangeListener>();
+    private static VSensorLoader singleton = null;
+
+    private ArrayList<VSensorStateChangeListener> changeListeners = new ArrayList<VSensorStateChangeListener>();
 
 	public void addVSensorStateChangeListener(VSensorStateChangeListener listener) {
 		if (!changeListeners.contains(listener))
@@ -78,6 +79,12 @@ public class VSensorLoader extends Thread {
 	public VSensorLoader ( String pluginsPath ) {
 		this.pluginsDir = pluginsPath;
 	}
+
+    public static VSensorLoader getInstance(String path) {
+        if (singleton == null)
+            singleton = new VSensorLoader(path);
+        return singleton;
+    }
 	
 	public void startLoading() {
 		Thread thread = new Thread ( this );
@@ -99,76 +106,125 @@ public class VSensorLoader extends Thread {
 		}
 	}
 
-	public void loadPlugin ( ) throws SQLException , JiBXException {
-		Modifications modifications = getUpdateStatus ( pluginsDir );
-		ArrayList < VSensorConfig > removeIt = modifications.getRemove ( );
-		ArrayList<VSensorConfig> addIt = modifications.getAdd();
-		for ( VSensorConfig configFile : removeIt ) {
-			removeVirtualSensor(configFile);
-		}
-		try {
-			Thread.sleep ( 3000 );
-		} catch ( InterruptedException e ) {
-			logger.error ( e.getMessage ( ) , e );
-		}finally {
-			if ( this.isActive == false ) return;
-		}
+    public synchronized void loadVirtualSensor(String vsConfigurationFileContent, String fileName) throws Exception {
+        String filePath = getVSConfigurationFilePath(fileName);
+        File file = new File(filePath);
+        if (!file.exists()) {
+            try {
+                // Create the VS configuration file
+                Writer fw = new BufferedWriter(new FileWriter(filePath, true));
+                fw.write(vsConfigurationFileContent);
+                fw.flush();
+                // Try to load it
+                if ( ! loadPlugin(fileName)) {
+                    throw new Exception("Failed to load the Virtual Sensor: " + fileName + " because there is syntax error in the configuration file. Please check the configuration file and try again.");
+                }
+            }
+            catch (Exception e) {
+                logger.warn(e.getMessage(), e);
+                if (file.exists()) file.delete();
+                throw e;
+            }
+        } else {
+            logger.warn("The configuration file:" + filePath + " already exist.");
+            throw new Exception("The configuration file:" + filePath + " already exist.");
+        }
+    }
 
-		for ( VSensorConfig vs : addIt ) {
-			if (!isVirtualSensorValid(vs))
-				continue ;
+     public static String getVSConfigurationFilePath(String fileName) {
+        return Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY + File.separator + fileName + ".xml";
+    }
 
-			VirtualSensor pool = new VirtualSensor( vs );
-			try {
-				if ( createInputStreams (  pool ) == false ) {
-					logger.error ( "loading the >" + vs.getName() + "< virtual sensor is stoped due to error(s) in preparing the input streams." );
-					continue;
-				}
-			} catch (InstantiationException e2) {
-				logger.error(e2.getMessage(),e2);
-			} catch (IllegalAccessException e2) {
-				logger.error(e2.getMessage(),e2);
-			}
-			try {
-				if (!sm.tableExists( vs.getName ( ) , vs.getOutputStructure ( ) ))
-					sm.executeCreateTable ( vs.getName ( ) , vs.getOutputStructure ( ),pool.getConfig().getIsTimeStampUnique() );
-				else
-					logger.info("Reusing the existing "+vs.getName()+" table.");
-			} catch ( SQLException e ) {
-				if ( e.getMessage ( ).toLowerCase ( ).contains ( "table already exists" ) ) {
-					logger.error ( e.getMessage ( ) );
-					if ( logger.isInfoEnabled ( ) ) logger.info ( e.getMessage ( ) , e );
-					logger.error ( new StringBuilder ( ).append ( "Loading the virtual sensor specified in the file : " ).append ( vs.getFileName ( ) ).append ( " failed" ).toString ( ) );
-					logger.error ( new StringBuilder ( ).append ( "The table : " ).append ( vs.getName ( ) ).append ( " is exists in the database specified in :" ).append (
-							Main.getContainerConfig ( ).getContainerFileName ( ) ).append ( "." ).toString ( ) );
-					logger.error ( "Solutions : " );
-					logger.error ( new StringBuilder ( ).append ( "1. Change the virtual sensor name, in the : " ).append ( vs.getFileName ( ) ).toString ( ) );
-					logger.error ( new StringBuilder ( ).append ( "2. Change the URL of the database in " ).append ( Main.getContainerConfig ( ).getContainerFileName ( ) ).append (
-					" and choose another database." ).toString ( ) );
-					logger.error ( new StringBuilder ( ).append ( "3. Rename/Move the table with the name : " ).append ( Main.getContainerConfig ( ).getContainerFileName ( ) ).append ( " in the database." )
-							.toString ( ) );
-					logger.error ( new StringBuilder ( ).append ( "4. Change the overwrite-tables=\"true\" (be careful, this will overwrite all the data previously saved in " ).append (
-							vs.getName ( ) ).append ( " table )" ).toString ( ) );
-				} else {
-					logger.error ( e.getMessage ( ) , e );
-				}
-				continue;
-			}
-			logger.warn ( new StringBuilder ( "adding : " ).append ( vs.getName() ).append ( " virtual sensor[" ).append ( vs.getFileName ( ) ).append ( "]" ).toString ( ) );
-			if (Mappings.addVSensorInstance ( pool )) {
-				try {
-					fireVSensorLoading(pool.getConfig());
-					pool.start ( );
-				} catch ( VirtualSensorInitializationFailedException e1 ) {
-					logger.error ( "Creating the virtual sensor >" + vs.getName ( ) + "< failed." , e1 );
-					removeVirtualSensor(vs);
-				}
-			} else {
-				//TODO: release all vs resources
-			}
-		}
-	}
+    public synchronized void loadPlugin() throws SQLException, JiBXException {
 
+        Modifications modifications = getUpdateStatus(pluginsDir);
+        ArrayList<VSensorConfig> removeIt = modifications.getRemove();
+        ArrayList<VSensorConfig> addIt = modifications.getAdd();
+        for (VSensorConfig configFile : removeIt) {
+            removeVirtualSensor(configFile);
+        }
+        for (VSensorConfig vs : addIt) {
+            loadPlugin(vs);
+        }
+    }
+
+    public synchronized boolean loadPlugin(String fileFilterName) throws SQLException, JiBXException {
+        Modifications modifications = getUpdateStatus(pluginsDir, fileFilterName);
+        ArrayList<VSensorConfig> addIt = modifications.getAdd();
+
+        boolean found = false;
+        for (VSensorConfig config : addIt){
+            if (config.getName().equals(fileFilterName)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return false;
+        else
+            return loadPlugin(addIt.get(0));
+    }
+
+
+    private synchronized boolean loadPlugin(VSensorConfig vs) throws SQLException, JiBXException {
+
+        if (!isVirtualSensorValid(vs))
+            return false;
+
+        VirtualSensor pool = new VirtualSensor(vs);
+        try {
+            if (createInputStreams(pool) == false) {
+                logger.error("loading the >" + vs.getName() + "< virtual sensor is stoped due to error(s) in preparing the input streams.");
+                return false;
+            }
+        } catch (InstantiationException e2) {
+            logger.error(e2.getMessage(), e2);
+        } catch (IllegalAccessException e2) {
+            logger.error(e2.getMessage(), e2);
+        }
+        try {
+            if (!sm.tableExists(vs.getName(), vs.getOutputStructure()))
+                sm.executeCreateTable(vs.getName(), vs.getOutputStructure(), pool.getConfig().getIsTimeStampUnique());
+            else
+                logger.info("Reusing the existing " + vs.getName() + " table.");
+        } catch (SQLException e) {
+            if (e.getMessage().toLowerCase().contains("table already exists")) {
+                logger.error(e.getMessage());
+                if (logger.isInfoEnabled()) logger.info(e.getMessage(), e);
+                logger.error(new StringBuilder().append("Loading the virtual sensor specified in the file : ").append(vs.getFileName()).append(" failed").toString());
+                logger.error(new StringBuilder().append("The table : ").append(vs.getName()).append(" is exists in the database specified in :").append(
+                        Main.getContainerConfig().getContainerFileName()).append(".").toString());
+                logger.error("Solutions : ");
+                logger.error(new StringBuilder().append("1. Change the virtual sensor name, in the : ").append(vs.getFileName()).toString());
+                logger.error(new StringBuilder().append("2. Change the URL of the database in ").append(Main.getContainerConfig().getContainerFileName()).append(
+                        " and choose another database.").toString());
+                logger.error(new StringBuilder().append("3. Rename/Move the table with the name : ").append(Main.getContainerConfig().getContainerFileName()).append(" in the database.")
+                        .toString());
+                logger.error(new StringBuilder().append("4. Change the overwrite-tables=\"true\" (be careful, this will overwrite all the data previously saved in ").append(
+                        vs.getName()).append(" table )").toString());
+            } else {
+                logger.error(e.getMessage(), e);
+            }
+            return false;
+        }
+        logger.warn(new StringBuilder("adding : ").append(vs.getName()).append(" virtual sensor[").append(vs.getFileName()).append("]").toString());
+        if (Mappings.addVSensorInstance(pool)) {
+            try {
+                fireVSensorLoading(pool.getConfig());
+                pool.start();
+            } catch (VirtualSensorInitializationFailedException e1) {
+                logger.error("Creating the virtual sensor >" + vs.getName() + "< failed.", e1);
+                removeVirtualSensor(vs);
+                return false;
+            }
+        } else {
+            //TODO: release all vs resources
+        }
+        return true;
+
+    }
+
+    
 	private void removeVirtualSensor(VSensorConfig configFile) {
 		logger.warn ( new StringBuilder ( ).append ( "removing : " ).append ( configFile.getName ( ) ).toString ( ) );
 		VirtualSensor sensorInstance = Mappings.getVSensorInstanceByFileName ( configFile.getFileName ( ) );
@@ -254,40 +310,50 @@ public class VSensorLoader extends Thread {
 		}
 	}
 
-	public static Modifications getUpdateStatus ( String virtualSensorsPath ) {
-		ArrayList< String > remove = new ArrayList<String> ();
-		ArrayList< String > add = new ArrayList<String> ();
+    public static Modifications getUpdateStatus(String virtualSensorsPath) {
+            return getUpdateStatus(virtualSensorsPath, null);
+        }
 
-		String [ ] previous = Mappings.getAllKnownFileName ( );
-		FileFilter filter = new FileFilter ( ) {
+        public static Modifications getUpdateStatus(String virtualSensorsPath, String filterFileName) {
+            ArrayList<String> remove = new ArrayList<String>();
+            ArrayList<String> add = new ArrayList<String>();
 
-			public boolean accept ( File file ) {
-				if ( !file.isDirectory ( ) && file.getName ( ).endsWith ( ".xml" ) && !file.getName ( ).startsWith ( "." ) ) return true;
-				return false;
-			}
-		};
-		File files[] = new File ( virtualSensorsPath ).listFiles ( filter );
-		// --- preparing the remove list
-		// Removing those in the previous which are not existing the new files
-		// or modified.
-		main : for ( String pre : previous ) {
-			for ( File curr : files )
-				if ( pre.equals ( curr.getAbsolutePath ( ) ) && ( Mappings.getLastModifiedTime ( pre ) == curr.lastModified ( ) ) ) continue main;
-			remove.add ( pre );
-		}
-		// ---adding the new files to the Add List a new file should added if
-		//
-		// 1. it's just deployed.
-		// 2. it's modification time changed.
+            String[] previous = Mappings.getAllKnownFileName();
 
-		main : for ( File cur : files ) {
-			for ( String pre : previous )
-				if ( cur.getAbsolutePath ( ).equals ( pre ) && ( cur.lastModified ( ) == Mappings.getLastModifiedTime ( pre ) ) ) continue main;
-			add.add ( cur.getAbsolutePath ( ) );
-		}
-		Modifications result = new Modifications ( add , remove );
-		return result;
-	}
+            FileFilter filter = new FileFilter ( ) {
+                public boolean accept ( File file ) {
+                    if ( !file.isDirectory ( ) && file.getName ( ).endsWith ( ".xml" ) && !file.getName ( ).startsWith ( "." ) ) return true;
+                    return false;
+                }
+            };
+
+            File files[] = new File(virtualSensorsPath).listFiles(filter);
+            // --- preparing the remove list
+            // Removing those in the previous which are not existing the new files
+            // or modified.
+            main:
+            for (String pre : previous) {
+                for (File curr : files)
+                    if (pre.equals(curr.getAbsolutePath()) && (Mappings.getLastModifiedTime(pre) == curr.lastModified()))
+                        continue main;
+                remove.add(pre);
+            }
+            // ---adding the new files to the Add List a new file should added if
+            //
+            // 1. it's just deployed.
+            // 2. it's modification time changed.
+
+            main:
+            for (File cur : files) {
+                for (String pre : previous)
+                    if (cur.getAbsolutePath().equals(pre) && (cur.lastModified() == Mappings.getLastModifiedTime(pre)))
+                        continue main;
+                add.add(cur.getAbsolutePath());
+            }
+            Modifications result = new Modifications(add, remove);
+            return result;
+        }
+	
 
 	/**
 	 * The properties file contains information on wrappers for stream sources.
