@@ -136,20 +136,20 @@
      Use the ant -D options to override these values in order to operate with your own webservice.
      eg: ant -Dwsroot=foo/bar -Dwsname=MyWebService dev-ws-generate-aar
 
-     http://localhost:22001/services/standard/GSNDataAccess?wsdl
+     http://localhost:22001/services/standard/GSNWebService?wsdl
      
       -->
 
      <!-- Default Web Service root path -->
      <property name="wsroot" value="${basedir}/webservices/standard"/>
      <!-- Default Web Service SOAP Address -->
-     <property name="soapaddress" value="http://localhost:22001/services/standard/GSNDataAccess"/>
+     <property name="soapaddress" value="http://localhost:22001/services/standard/GSNWebService"/>
      <!-- Default source class used to generate the service (contract Last approach) -->
-     <property name="sourceclass" value="gsn.webservice.standard.GSNDataAccess"/>
+     <property name="sourceclass" value="gsn.webservice.standard.GSNWebService"/>
      <!-- Default WSDL used to generate the service (Contract First approach) -->
-     <property name="sourcewsdl" value="${wsroot}/META-INF/GSNDataAccess.wsdl"/>
+     <property name="sourcewsdl" value="${wsroot}/META-INF/GSNWebService.wsdl"/>
      <!-- Default name for the Axis deployable ARchive (.aar) -->
-     <property name="wsname" value="GSNDataAccess"/>
+     <property name="wsname" value="GSNWebService"/>
 
      <!--
      Generate the web service deployable axis archive (.aar).
