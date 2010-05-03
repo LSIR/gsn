@@ -96,7 +96,7 @@ public class SchedulePlugin extends AbstractPlugin {
 						
 						if (rs.getLong("transmission_time") == 0) {
 							long time = System.currentTimeMillis();
-							Serializable[] data = {creationtime, time, id, schedule};
+							Serializable[] data = {id, creationtime, time, schedule};
 							dataProcessed(time, data);
 						}
 					}
@@ -144,13 +144,13 @@ public class SchedulePlugin extends AbstractPlugin {
 				logger.warn(e.getMessage());
 			}
 			if (sent) {
-				Serializable[] data = {time, time, getDeviceID(), schedule};
+				Serializable[] data = {getDeviceID(), time, time, schedule};
 				dataProcessed(time, data);
 
 				logger.info("Received schedule which has been directly transmitted");
 			}
 			else {
-				Serializable[] data = {time, null, getDeviceID(), schedule};
+				Serializable[] data = {getDeviceID(), time, null, schedule};
 				dataProcessed(time, data);
 
 				logger.info("Received schedule and will transmit it the next time it is requested.");
