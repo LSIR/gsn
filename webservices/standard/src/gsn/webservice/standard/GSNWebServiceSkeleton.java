@@ -446,7 +446,12 @@ public class GSNWebServiceSkeleton {
         if (nb != java.lang.Long.MIN_VALUE) // check if nb is set
             requestParameters.put("nb", new String[]{"0:" + nb});
         */
-        int userNb = getMultiData.getNb();
+        int userNb = getMultiData.getNb() ;
+        if (userNb == java.lang.Integer.MIN_VALUE)
+            userNb = java.lang.Integer.MAX_VALUE;
+        else if (userNb < 0)
+            userNb = 0;
+            
 
         // aggregation
 
