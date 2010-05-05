@@ -15,7 +15,7 @@
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
-            <field name="HEADER_ATIME" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
             <field name="PAYLOAD_ID1" type="BIGINT" />
             <field name="PAYLOAD_ID2" type="BIGINT" />
             <field name="PAYLOAD_XE1205FREQUENCY" type="SMALLINT" />

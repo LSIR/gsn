@@ -8,14 +8,14 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
-            <field name="HEADER_ATIME" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME0" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME1" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME2" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME3" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME4" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME5" type="INTEGER" />
-            <field name="PAYLOAD_EVENTLOG_TIME6" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_EVENTLOG_TIME0" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_EVENTLOG_TIME1" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_EVENTLOG_TIME2" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_EVENTLOG_TIME3" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_EVENTLOG_TIME4" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_EVENTLOG_TIME5" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_EVENTLOG_TIME6" type="INTEGER" unit="relatime"/>
             <field name="PAYLOAD_EVENTLOG_ID0" type="SMALLINT" />
             <field name="PAYLOAD_EVENTLOG_ID1" type="SMALLINT" />
             <field name="PAYLOAD_EVENTLOG_ID2" type="SMALLINT" />

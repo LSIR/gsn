@@ -86,51 +86,51 @@ public class DozerEventLoggerDecodedMsg extends DozerEventLoggerMsg {
     	return 0;
     }
     
-	public int[] get_payload_eventlog_time() {
+	public Integer[] get_payload_eventlog_time() {
 		if(log == null)
 			parseEventLog();
-		int[] tmp = new int[numElements_payload_eventlog_time()];
+		Integer[] tmp = new Integer[numElements_payload_eventlog_time()];
 		int i;
 		for (i=0;i<log.size();i++)
 			tmp[i] = log.get(i).time;
 		for (;i<numElements_payload_eventlog_time();i++)
-			tmp[i] = -1;		
+			tmp[i] = null;		
 		return tmp;
 	}
 	
-	public short[] get_payload_eventlog_id() {
+	public Short[] get_payload_eventlog_id() {
 		if(log == null)
 			parseEventLog();
-		short[] tmp = new short[numElements_payload_eventlog_id()];
+		Short[] tmp = new Short[numElements_payload_eventlog_id()];
 		int i;
 		for (i=0;i<log.size();i++)
 			tmp[i] = log.get(i).id;
 		for (;i<numElements_payload_eventlog_id();i++)
-			tmp[i] = -1;
+			tmp[i] = null;
 		return tmp;
 	}
 	
-	public int[] get_payload_eventlog_type() {
+	public Integer[] get_payload_eventlog_type() {
 		if(log == null)
 			parseEventLog();
-		int[] tmp = new int[numElements_payload_eventlog_type()];
+		Integer[] tmp = new Integer[numElements_payload_eventlog_type()];
 		int i;
 		for (i=0;i<log.size();i++)
 			tmp[i] = log.get(i).type;
 		for (;i<numElements_payload_eventlog_type();i++)
-			tmp[i] = -1;
+			tmp[i] = null;
 		return tmp;
 	}
 	
-	public int[] get_payload_eventlog_value() {
+	public Integer[] get_payload_eventlog_value() {
 		if(log == null)
 			parseEventLog();
-		int[] tmp = new int[numElements_payload_eventlog_value()];
+		Integer[] tmp = new Integer[numElements_payload_eventlog_value()];
 		int i;
 		for (i=0;i<log.size();i++)
 			tmp[i] = log.get(i).value;
 		for (;i<numElements_payload_eventlog_value();i++)
-			tmp[i] = -1;
+			tmp[i] = null;
 		return tmp;
 	}
 	
@@ -162,22 +162,22 @@ public class DozerEventLoggerDecodedMsg extends DozerEventLoggerMsg {
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.eventlog_time=";
-        	int[] tmp0 = get_payload_eventlog_time();
+        Integer[] tmp0 = get_payload_eventlog_time();
         	for (int i=0;i<tmp0.length;i++)
         		s += tmp0[i]+" ";
         s += "]\n";
         s += "  [payload.eventlog_id=";
-    		short[] tmp1 = get_payload_eventlog_id();
+    	Short[] tmp1 = get_payload_eventlog_id();
     		for (int i=0;i<tmp1.length;i++)
     			s += tmp1[i]+" ";
         s += "]\n";
         s += "  [payload.eventlog_type=";
-    		int[] tmp2 = get_payload_eventlog_type();
+        Integer[] tmp2 = get_payload_eventlog_type();
     		for (int i=0;i<tmp2.length;i++)
     			s += tmp2[i]+" ";
         s += "]\n";
         s += "  [payload.eventlog_value=";
-    	int[] tmp3 = get_payload_eventlog_value();
+        Integer[] tmp3 = get_payload_eventlog_value();
     	for (int i=0;i<tmp3.length;i++)
     		s += tmp3[i]+" ";
         s += "]\n";
