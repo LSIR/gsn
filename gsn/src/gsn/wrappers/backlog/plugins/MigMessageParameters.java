@@ -256,6 +256,18 @@ public class MigMessageParameters {
 		typesMapping.put(long[].class, "BIGINT") ;
 		typesMapping.put(float[].class, "DOUBLE");
 		typesMapping.put(double[].class, "DOUBLE");
+		typesMapping.put(Byte.class, "TINYINT") ;
+		typesMapping.put(Short.class, "SMALLINT") ;
+		typesMapping.put(Integer.class, "INTEGER") ;
+		typesMapping.put(Long.class, "BIGINT") ;
+		typesMapping.put(Float.class, "DOUBLE");
+		typesMapping.put(Double.class, "DOUBLE");
+		typesMapping.put(Byte[].class, "TINYINT") ;
+		typesMapping.put(Short[].class, "SMALLINT") ;
+		typesMapping.put(Integer[].class, "INTEGER") ;
+		typesMapping.put(Long[].class, "BIGINT") ;
+		typesMapping.put(Float[].class, "DOUBLE");
+		typesMapping.put(Double[].class, "DOUBLE");
 	}
 
 	private void findTinyOSVersionFromClassHierarchy (Class<?> messageClass) {

@@ -476,12 +476,14 @@ public class MigMessagePlugin extends AbstractPlugin
 	
 	private void addValue(LinkedHashMap<String, Serializable> map, String name, Serializable obj) {
 		// convert Float/Double NaN to null
-		if (obj.getClass().isAssignableFrom(Float.class)) {
-			if (((Float) obj).isNaN())
-				obj = null;
-		} else if (obj.getClass().isAssignableFrom(Double.class)) {
-			if (((Double) obj).isNaN())
-				obj = null;
+		if (obj != null) {
+			if (obj.getClass().isAssignableFrom(Float.class)) {
+				if (((Float) obj).isNaN())
+					obj = null;
+			} else if (obj.getClass().isAssignableFrom(Double.class)) {
+				if (((Double) obj).isNaN())
+					obj = null;
+			}
 		}
 		map.put(name, obj);
 	}
