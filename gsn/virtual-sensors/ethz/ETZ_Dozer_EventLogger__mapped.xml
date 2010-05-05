@@ -4,6 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="SENSORTYPE" type="VARCHAR(30)" />
@@ -26,13 +27,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME0, PAYLOAD_EVENTLOG_ID0, PAYLOAD_EVENTLOG_TYPE0, PAYLOAD_EVENTLOG_VALUE0
                         from ETZ_Dozer_EventLogger__muxed__mapped__1750 where PAYLOAD_EVENTLOG_ID0 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME0 * 1000)) as EVENT_TIMESTAMP,
                     PAYLOAD_EVENTLOG_ID0 as EVENT_ID,
                     PAYLOAD_EVENTLOG_TYPE0 as EVENT_TYPE,
@@ -45,13 +46,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME1, PAYLOAD_EVENTLOG_ID1, PAYLOAD_EVENTLOG_TYPE1, PAYLOAD_EVENTLOG_VALUE1
                         from ETZ_Dozer_EventLogger__muxed__mapped__1750 where PAYLOAD_EVENTLOG_ID1 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME1 * 1000)) as EVENT_TIMESTAMP,
                     PAYLOAD_EVENTLOG_ID1 as EVENT_ID,
                     PAYLOAD_EVENTLOG_TYPE1 as EVENT_TYPE,
@@ -64,13 +65,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME2, PAYLOAD_EVENTLOG_ID2, PAYLOAD_EVENTLOG_TYPE2, PAYLOAD_EVENTLOG_VALUE2
                         from ETZ_Dozer_EventLogger__muxed__mapped__1750 where PAYLOAD_EVENTLOG_ID2 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME2 * 1000)) as EVENT_TIMESTAMP,
                     PAYLOAD_EVENTLOG_ID2 as EVENT_ID,
                     PAYLOAD_EVENTLOG_TYPE2 as EVENT_TYPE,
@@ -83,13 +84,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME3, PAYLOAD_EVENTLOG_ID3, PAYLOAD_EVENTLOG_TYPE3, PAYLOAD_EVENTLOG_VALUE3
                         from ETZ_Dozer_EventLogger__muxed__mapped__1750 where PAYLOAD_EVENTLOG_ID3 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME3 * 1000)) as EVENT_TIMESTAMP,
                     PAYLOAD_EVENTLOG_ID3 as EVENT_ID,
                     PAYLOAD_EVENTLOG_TYPE3 as EVENT_TYPE,
@@ -102,13 +103,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME4, PAYLOAD_EVENTLOG_ID4, PAYLOAD_EVENTLOG_TYPE4, PAYLOAD_EVENTLOG_VALUE4
                         from ETZ_Dozer_EventLogger__muxed__mapped__1750 where PAYLOAD_EVENTLOG_ID4 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME4 * 1000)) as EVENT_TIMESTAMP,
                     PAYLOAD_EVENTLOG_ID4 as EVENT_ID,
                     PAYLOAD_EVENTLOG_TYPE4 as EVENT_TYPE,
@@ -121,13 +122,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME5, PAYLOAD_EVENTLOG_ID5, PAYLOAD_EVENTLOG_TYPE5, PAYLOAD_EVENTLOG_VALUE5
                         from ETZ_Dozer_EventLogger__muxed__mapped__1750 where PAYLOAD_EVENTLOG_ID5 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME5 * 1000)) as EVENT_TIMESTAMP,
                     PAYLOAD_EVENTLOG_ID5 as EVENT_ID,
                     PAYLOAD_EVENTLOG_TYPE5 as EVENT_TYPE,
@@ -140,13 +141,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_EVENTLOG_TIME6, PAYLOAD_EVENTLOG_ID6, PAYLOAD_EVENTLOG_TYPE6, PAYLOAD_EVENTLOG_VALUE6
                         from ETZ_Dozer_EventLogger__muxed__mapped__1750 where PAYLOAD_EVENTLOG_ID6 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME6 * 1000)) as EVENT_TIMESTAMP,
                     PAYLOAD_EVENTLOG_ID6 as EVENT_ID,
                     PAYLOAD_EVENTLOG_TYPE6 as EVENT_TYPE,

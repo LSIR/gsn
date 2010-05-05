@@ -4,6 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="HEADER_SEQNR" type="INTEGER" />
@@ -22,13 +23,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID0, PAYLOAD_RSSI_RSSI0 from ETZ_Dozer_Rssi__muxed__mapped__1750 
                         where PAYLOAD_RSSI_RSSI0 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_RSSI_ID0 as RSSI_NODEID,
                     PAYLOAD_RSSI_RSSI0 as RSSI from wrapper 
                 </query>
@@ -39,13 +40,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID1, PAYLOAD_RSSI_RSSI1 from ETZ_Dozer_Rssi__muxed__mapped__1750 
                         where PAYLOAD_RSSI_RSSI1 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_RSSI_ID1 as RSSI_NODEID,
                     PAYLOAD_RSSI_RSSI1 as RSSI from wrapper 
                 </query>
@@ -56,13 +57,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID2, PAYLOAD_RSSI_RSSI2 from ETZ_Dozer_Rssi__muxed__mapped__1750 
                         where PAYLOAD_RSSI_RSSI2 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_RSSI_ID2 as RSSI_NODEID,
                     PAYLOAD_RSSI_RSSI2 as RSSI from wrapper 
                 </query>
@@ -73,13 +74,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID3, PAYLOAD_RSSI_RSSI3 from ETZ_Dozer_Rssi__muxed__mapped__1750 
                         where PAYLOAD_RSSI_RSSI3 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_RSSI_ID3 as RSSI_NODEID,
                     PAYLOAD_RSSI_RSSI3 as RSSI from wrapper 
                 </query>
@@ -90,13 +91,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID4, PAYLOAD_RSSI_RSSI4 from ETZ_Dozer_Rssi__muxed__mapped__1750 
                         where PAYLOAD_RSSI_RSSI4 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_RSSI_ID4 as RSSI_NODEID,
                     PAYLOAD_RSSI_RSSI4 as RSSI from wrapper 
                 </query>
@@ -107,13 +108,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID5, PAYLOAD_RSSI_RSSI5 from ETZ_Dozer_Rssi__muxed__mapped__1750 
                         where PAYLOAD_RSSI_RSSI5 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_RSSI_ID5 as RSSI_NODEID,
                     PAYLOAD_RSSI_RSSI5 as RSSI from wrapper 
                 </query>
@@ -124,13 +125,13 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID6, PAYLOAD_RSSI_RSSI6 from ETZ_Dozer_Rssi__muxed__mapped__1750 
                         where PAYLOAD_RSSI_RSSI6 != -1
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMESTAMP, GENERATION_TIME, POSITION, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_RSSI_ID6 as RSSI_NODEID,
                     PAYLOAD_RSSI_RSSI6 as RSSI from wrapper 
                 </query>
