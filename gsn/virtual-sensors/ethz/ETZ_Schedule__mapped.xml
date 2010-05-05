@@ -29,4 +29,5 @@
             </source>
             <query> select * from source </query>
         </stream>
+    </streams>
 </virtual-sensor>
