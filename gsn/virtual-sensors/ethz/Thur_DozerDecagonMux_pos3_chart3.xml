@@ -22,15 +22,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATIONTIME, PAYLOAD_DATA_TEMPERATURE0, PAYLOAD_MUX_VALID0, PAYLOAD_DATA_TEMPERATURE1, PAYLOAD_MUX_VALID1, PAYLOAD_DATA_TEMPERATURE2, PAYLOAD_MUX_VALID2, PAYLOAD_DATA_TEMPERATURE3, PAYLOAD_MUX_VALID3, PAYLOAD_DATA_TEMPERATURE4, PAYLOAD_MUX_VALID4 from Thur_DozerDecagonMux_mapped_1396 where POSITION = 3 and PAYLOAD_SAMPLE_VALID = 1 </predicate>
+                    <predicate key="query"> select GENERATIONTIME, TEMPERATURE0, TEMPERATURE1, TEMPERATURE2, TEMPERATURE3, TEMPERATURE4 from Thur_DozerDecagonMux_conv_1396 where POSITION = 3 and PAYLOAD_SAMPLE_VALID = 1 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select GENERATIONTIME, 
-                    IF(PAYLOAD_MUX_VALID0 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE0 - 400) / 10) as T0, 
-                    IF(PAYLOAD_MUX_VALID1 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE1 - 400) / 10) as T1, 
-                    IF(PAYLOAD_MUX_VALID2 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE2 - 400) / 10) as T2, 
-                    IF(PAYLOAD_MUX_VALID3 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE3 - 400) / 10) as T3, 
-                    IF(PAYLOAD_MUX_VALID4 = 0, NULL, (PAYLOAD_DATA_TEMPERATURE4 - 400) / 10) as T4 from wrapper
+                <query> select * from wrapper
                 </query>
             </source>
             <query> select * from source </query>

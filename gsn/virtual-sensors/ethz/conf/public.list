@@ -149,6 +149,7 @@ Thur_BasestationStatus_mapped.xml
 Thur_DozerBaseDebug_mapped.xml
 Thur_DozerBaseStatus_mapped.xml
 Thur_DozerDecagonMux_mapped.xml
+Thur_DozerDecagonMux_conv.xml
 Thur_DozerDecagonMux_pos1_chart1.xml
 Thur_DozerDecagonMux_pos1_chart2.xml
 Thur_DozerDecagonMux_pos1_chart3.xml
