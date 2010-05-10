@@ -96,9 +96,9 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 	public long getOldestTimestamp() {
 		long timed1 = -1;
 		long timed2 = -1;
-		int maxTupleCount = 0;
-		int maxSlideForTupleBased = 0;
-		int maxWindowSize = 0;
+		long maxTupleCount = 0;
+		long maxSlideForTupleBased = 0;
+		long maxWindowSize = 0;
 
 		synchronized (streamSources) {
 			for (StreamSource streamSource : streamSources) {
@@ -188,7 +188,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 				throw new GSNRuntimeException("Validation of this object the stream source failed, please check the logs.");
 			}
 			CharSequence wrapperAlias = streamSource.getWrapper().getDBAliasInStr();
-			int windowSize = streamSource.getParsedStorageSize();
+			long windowSize = streamSource.getParsedStorageSize();
 			if (streamSource.getSamplingRate() == 0 || (streamSource.isStorageCountBased() && windowSize == 0)) {
 				return cachedSqlQuery = new StringBuilder("select * from ").append(wrapperAlias).append(" where 1=0");
 			}

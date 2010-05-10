@@ -182,13 +182,13 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
   
   private WindowType windowingType = DEFAULT_WINDOW_TYPE;
   
-  public static final int   STORAGE_SIZE_NOT_SET = -1;
-  public static final int   DEFAULT_SLIDE_VALUE = 1;
+  public static final long   STORAGE_SIZE_NOT_SET = -1;
+  public static final long   DEFAULT_SLIDE_VALUE = 1;
   public static final WindowType   DEFAULT_WINDOW_TYPE = WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE;
   
-  private transient int     parsedStorageSize    = STORAGE_SIZE_NOT_SET;
+  private transient long     parsedStorageSize    = STORAGE_SIZE_NOT_SET;
   
-  private transient int     parsedSlideValue    = DEFAULT_SLIDE_VALUE;
+  private transient long     parsedSlideValue    = DEFAULT_SLIDE_VALUE;
   
   private transient boolean isValidated = false;
   private transient boolean validationResult = false;
@@ -225,7 +225,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
       final int sIndex = this.rawHistorySize.indexOf( "s" );
       if ( mIndex < 0 && hIndex < 0 && sIndex < 0 ) {
         try {
-          this.parsedStorageSize = Integer.parseInt( this.rawHistorySize );
+          this.parsedStorageSize = Long.parseLong(this.rawHistorySize );
           this.isStorageCountBased = true;
           windowingType = WindowType.TUPLE_BASED;
         } catch ( final NumberFormatException e ) {
@@ -236,10 +236,10 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
       } else
         try {
           final StringBuilder shs = new StringBuilder( this.rawHistorySize );
-          if ( mIndex >= 0 && mIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
-          else if ( hIndex >= 0 && hIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
-          else if ( sIndex >= 0 && sIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
-          else Integer.parseInt("");
+          if ( mIndex >= 0 && mIndex == shs.length() - 1) this.parsedStorageSize = Long.parseLong(shs.deleteCharAt( mIndex ).toString( ) ) * minute;
+          else if ( hIndex >= 0 && hIndex == shs.length() - 1) this.parsedStorageSize = Long.parseLong( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
+          else if ( sIndex >= 0 && sIndex == shs.length() - 1) this.parsedStorageSize = Long.parseLong( shs.deleteCharAt( sIndex ).toString( ) ) * second;
+          else Long.parseLong("");
           this.isStorageCountBased = false;
           windowingType = WindowType.TIME_BASED;
         } catch ( NumberFormatException e ) {
@@ -270,7 +270,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
         final int sIndex = this.rawSlideValue.indexOf( "s" );
         if ( mIndex < 0 && hIndex < 0 && sIndex < 0 ) {
           try {
-            this.parsedSlideValue = Integer.parseInt( this.rawSlideValue );
+            this.parsedSlideValue = Long.parseLong( this.rawSlideValue );
             if(parsedSlideValue == 1){//We consider this as a special case
             	windowingType = (windowingType == WindowType.TIME_BASED) ? WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE : WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE;
             }
@@ -284,10 +284,10 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
         } else
           try {
             final StringBuilder shs = new StringBuilder( this.rawSlideValue );
-            if ( mIndex >= 0 && mIndex == shs.length() - 1) this.parsedSlideValue = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
-            else if ( hIndex >= 0 && hIndex == shs.length() - 1) this.parsedSlideValue = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
-            else if ( sIndex >= 0 && sIndex == shs.length() - 1) this.parsedSlideValue = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
-            else Integer.parseInt("");
+            if ( mIndex >= 0 && mIndex == shs.length() - 1) this.parsedSlideValue = Long.parseLong( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
+            else if ( hIndex >= 0 && hIndex == shs.length() - 1) this.parsedSlideValue = Long.parseLong( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
+            else if ( sIndex >= 0 && sIndex == shs.length() - 1) this.parsedSlideValue = Long.parseLong( shs.deleteCharAt( sIndex ).toString( ) ) * second;
+            else Long.parseLong("");
             if(windowingType == WindowType.TUPLE_BASED)
             	windowingType = WindowType.TUPLE_BASED_WIN_TIME_BASED_SLIDE;
           } catch ( NumberFormatException e ) {
@@ -305,7 +305,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
     return this.isStorageCountBased;
   }
   
-  public int getParsedStorageSize ( ) {
+  public long getParsedStorageSize ( ) {
     validate();
     return this.parsedStorageSize;
   }
@@ -315,7 +315,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
 	  return windowingType;
   }
   
-  public int getParsedSlideValue(){
+  public long getParsedSlideValue(){
 	  validate();
 	  return parsedSlideValue;
   }
