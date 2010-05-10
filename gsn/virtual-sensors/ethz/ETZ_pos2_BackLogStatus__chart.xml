@@ -8,7 +8,7 @@
             <param name="width">610</param>
             <param name="vertical-axis">#</param>
             <param name="history-size">10080</param>
-            <param name="time-stream-name">TIMESTAMP</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
         </init-params>
         <output-structure>
             <field name="data" type="binary:image/jpeg"/>
@@ -22,7 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select TIMESTAMP, BACKLOG_DB_ENTRIES from ETZ_BackLogStatus__mapped__1750 where POSITION = 2</predicate>
+                    <predicate key="query"> select GENERATION_TIME, BACKLOG_DB_ENTRIES from ETZ_BackLogStatus__mapped__1750 where POSITION = 2</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select * from wrapper </query>

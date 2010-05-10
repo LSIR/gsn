@@ -14,7 +14,7 @@
             <field name="data" type="binary:image/jpeg"/>
         </output-structure>
     </processing-class>
-    <description>basestation health status from position 0 at ETZ deployment</description>
+    <description>Corestation health status from position 0 at ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage history-size="1" />

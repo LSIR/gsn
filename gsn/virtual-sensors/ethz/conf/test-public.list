@@ -8,6 +8,7 @@ ETZ_Dozer_AdcMux2__mapped.xml
 ETZ_Dozer_BaseDebug__mapped.xml
 ETZ_Dozer_BaseStatus__mapped.xml
 ETZ_Dozer_BaseStatus__conv.xml
+ETZ_Dozer_Command__mapped.xml
 ETZ_Dozer_DecagonMux__mapped.xml
 ETZ_Dozer_DecagonMux__conv.xml
 ETZ_Dozer_DigitalDCX__mapped.xml
