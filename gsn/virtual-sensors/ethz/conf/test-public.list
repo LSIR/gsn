@@ -1,5 +1,6 @@
 ETZ_BackLogStatus__mapped.xml
 ETZ_Binary__mapped.xml
+ETZ_CoreStationStatus__conv.xml
 ETZ_CoreStationStatus__mapped.xml
 ETZ_Dozer_AdcComDiff__mapped.xml
 ETZ_Dozer_AdcMux1__mapped.xml

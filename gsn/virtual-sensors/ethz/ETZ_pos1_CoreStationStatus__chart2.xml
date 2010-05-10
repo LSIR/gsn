@@ -22,10 +22,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select TIMESTAMP, I_V12DC_EXT_UA, I_V12DC_IN_UA from ETZ_CoreStationStatus__mapped__1750 where POSITION = 1</predicate>
+                    <predicate key="query"> select GENERATION_TIME, I_V12DC_EXT, I_V12DC_IN from ETZ_CoreStationStatus__conv__1750 where POSITION = 1</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select TIMESTAMP, I_V12DC_EXT_UA/1000 as 12V_EXT_CURRENT, I_V12DC_IN_UA/1000 as 12V_IN_CURRENT from wrapper </query>
+                <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

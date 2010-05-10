@@ -22,10 +22,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select TIMESTAMP, VCC_5_0_MV, VCC_NODE_MV, VCC_4_2_MV from ETZ_CoreStationStatus__mapped__1750 where POSITION = 2</predicate>
+                    <predicate key="query"> select GENERATION_TIME, VCC_5_0, VCC_NODE, VCC_4_2 from ETZ_CoreStationStatus__conv__1750 where POSITION = 2</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select TIMESTAMP, VCC_5_0_MV/1000 as 5V, VCC_NODE_MV/1000 as 3V3NODE, VCC_4_2_MV/1000 as 4V2 from wrapper </query>
+                <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
