@@ -20,16 +20,16 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"),
 						new DataField("GENERATION_TIME", "BIGINT"),
 						new DataField("DEVICE_ID", "INTEGER"),
-						new DataField("V_PV_MV", "INTEGER"),
-						new DataField("I_PV_UA", "INTEGER"),
-						new DataField("V_12BAT_MV", "INTEGER"),
-						new DataField("I_V12DC_EXT_UA", "INTEGER"),
-						new DataField("V12DC_IN_MV", "INTEGER"),
-						new DataField("I_V12DC_IN_UA", "INTEGER"),
-						new DataField("VCC_5_0_MV", "INTEGER"),
-						new DataField("VCC_NODE_MV", "INTEGER"),
-						new DataField("I_VCC_NODE_UA", "INTEGER"),
-						new DataField("VCC_4_2_MV", "INTEGER")};
+						new DataField("V_PV", "INTEGER"),
+						new DataField("I_PV", "INTEGER"),
+						new DataField("V_12BAT", "INTEGER"),
+						new DataField("I_V12DC_EXT", "INTEGER"),
+						new DataField("V12DC_IN", "INTEGER"),
+						new DataField("I_V12DC_IN", "INTEGER"),
+						new DataField("VCC_5_0", "INTEGER"),
+						new DataField("VCC_NODE", "INTEGER"),
+						new DataField("I_VCC_NODE", "INTEGER"),
+						new DataField("VCC_4_2", "INTEGER")};
 
 	private final transient Logger logger = Logger.getLogger( CoreStationStatusPlugin.class );
 
