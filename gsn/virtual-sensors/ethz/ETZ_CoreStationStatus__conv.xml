@@ -29,22 +29,11 @@
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
-                    <predicate key="query"> select * from ETZ_CoreStationStatus__1750 </predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_CoreStationStatus__mapped__1750 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP,
-                	cast(round((V_PV/1000, 3) as CHAR(30)) as V_PV,
-                	cast(round((I_PV/1000, 3) as CHAR(30)) as I_PV,
-                	cast(round((V_12BAT/1000, 3) as CHAR(30)) as V_12BAT,
-                	cast(round((I_V12DC_EXT/1000, 3) as CHAR(30)) as I_V12DC_EXT,
-                	cast(round((V12DC_IN/1000, 3) as CHAR(30)) as V12DC_IN,
-                	cast(round((I_V12DC_IN/1000, 3) as CHAR(30)) as I_V12DC_IN,
-                	cast(round((VCC_5_0/1000, 3) as CHAR(30)) as VCC_5_0,
-                	cast(round((VCC_NODE/1000, 3) as CHAR(30)) as VCC_NODE,
-                	cast(round((I_VCC_NODE/1000, 3) as CHAR(30)) as I_VCC_NODE,
-                	cast(round((VCC_4_2/1000, 3) as CHAR(30)) as VCC_4_2 from wrapper </query>
+                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, cast(round(V_PV/1000, 3) as CHAR(30)) as V_PV, cast(round(I_PV/1000, 3) as CHAR(30)) as I_PV, cast(round(V_12BAT/1000, 3) as CHAR(30)) as V_12BAT, cast(round(I_V12DC_EXT/1000, 3) as CHAR(30)) as I_V12DC_EXT, cast(round(V12DC_IN/1000, 3) as CHAR(30)) as V12DC_IN, cast(round(I_V12DC_IN/1000, 3) as CHAR(30)) as I_V12DC_IN, cast(round(VCC_5_0/1000, 3) as CHAR(30)) as VCC_5_0, cast(round(VCC_NODE/1000, 3) as CHAR(30)) as VCC_NODE, cast(round(I_VCC_NODE/1000, 3) as CHAR(30)) as I_VCC_NODE, cast(round(VCC_4_2/1000, 3) as CHAR(30)) as VCC_4_2 from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
