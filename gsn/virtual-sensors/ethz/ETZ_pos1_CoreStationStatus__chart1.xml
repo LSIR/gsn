@@ -1,9 +1,9 @@
-<virtual-sensor name="ETZ_pos1_CoreStationStatus__internalV__chart1" priority="10" >
+<virtual-sensor name="ETZ_pos1_CoreStationStatus__chart1" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Corestation internal voltage health (7d)</param>
+            <param name="title">Corestation V12DC voltage health (7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
             <param name="vertical-axis">V</param>
@@ -22,7 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, VCC_5_0, VCC_NODE, VCC_4_2 from ETZ_CoreStationStatus__conv__1750 where POSITION = 1</predicate>
+                    <predicate key="query"> select GENERATION_TIME, V12DC_IN from ETZ_CoreStationStatus__mapped__1750 where POSITION = 1</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select * from wrapper </query>
