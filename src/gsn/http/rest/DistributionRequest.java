@@ -7,16 +7,18 @@ public interface DistributionRequest {
 
 	public abstract boolean deliverStreamElement(StreamElement se);
 
-	public abstract long getLastVisitedTime();
+    public boolean deliverKeepAliveMessage();
 
-	public abstract String getQuery();
+    public abstract long getLastVisitedTime();
 
-	public abstract VSensorConfig getVSensorConfig();
+    public abstract String getQuery();
 
-	public abstract void close();
+    public abstract VSensorConfig getVSensorConfig();
 
-	public abstract boolean isClosed();
-	
-	public abstract DeliverySystem getDeliverySystem();
+    public abstract void close();
+
+    public abstract boolean isClosed();
+
+    public abstract DeliverySystem getDeliverySystem();
 
 }

@@ -158,12 +158,16 @@ public class RestRemoteWrapper extends AbstractWrapper {
             try {
                 while (isActive() && (se = (StreamElement4Rest) inputStream.readObject()) != null) {
                     StreamElement streamElement = se.toStreamElement();
-                    boolean status = manualDataInsertion(streamElement);
-                    if (!status && inputStream != null) {
-                        response.getEntity().consumeContent();
-                        inputStream.close();
-                        inputStream = null;
+                    if (streamElement.getFieldNames().length == 1 && streamElement.getFieldNames()[0].equals("keepalive")) {
+                        boolean status = manualDataInsertion(streamElement);
+                        if (!status && inputStream != null) {
+                            response.getEntity().consumeContent();
+                            inputStream.close();
+                            inputStream = null;
+                        }
                     }
+                    else
+                        logger.debug("Received a keep alive message.");
                 }
             }
             catch (Exception e) {

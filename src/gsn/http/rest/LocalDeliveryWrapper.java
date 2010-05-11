@@ -138,7 +138,11 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		return true;
 	}
 
-	public void dispose() {
+    public boolean writeKeepAliveStreamElement() {
+        return true;
+    }
+
+    public void dispose() {
 		
 	}
 
