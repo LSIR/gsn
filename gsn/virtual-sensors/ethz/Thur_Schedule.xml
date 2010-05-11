@@ -1,14 +1,18 @@
-<virtual-sensor name="Thur_Schedule_1646" priority="10" >
+<virtual-sensor name="Thur_Schedule__1823" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
        	<web-input password="test">
-         	<command name="schedule_command">
-			<field name="schedule" type="*binary:1mb">schedule</field>
-        	</command>
-   		</web-input>
+            <command name="schedule_command">
+                <field name="device_id" type="*text">device_id</field>
+                <field name="schedule" type="*binary:1mb">schedule</field>
+            </command>
+   	</web-input>
        	<output-structure>
-			<field name="SCHEDULE" type="BINARY" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TRANSMISSION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="SCHEDULE" type="binary" />
        	</output-structure>
     </processing-class>
     <description>schedules for Thur deployment</description>
@@ -16,9 +20,10 @@
     <addressing />
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>

@@ -1,11 +1,12 @@
-<virtual-sensor name="Jungfraujoch_Thermistorchain_1396" priority="10" >
+<virtual-sensor name="Jungfraujoch_Thermistorchain__1823" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
-            <field name="TIMESTAMP" type="BIGINT"/>
-            <field name="GENERATIONTIME" type="BIGINT"/>
             <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="SENSORTYPE" type="VARCHAR(30)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
@@ -35,7 +36,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Jungfraujoch_Thermistorchain1_1396 </predicate>
+                    <predicate key="query"> select * from Jungfraujoch_Thermistorchain1__1823 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -45,7 +46,7 @@
         <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Jungfraujoch_Thermistorchain2_1396 </predicate>
+                    <predicate key="query"> select * from Jungfraujoch_Thermistorchain2__1823 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

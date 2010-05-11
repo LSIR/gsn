@@ -1,0 +1,33 @@
+<virtual-sensor name="Matterhorn_Dozer_SeqNumber__chart1" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Dozer sequence number (7d)</param>
+            <param name="height">900</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">#</param>
+            <param name="history-size">100000</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer sequence number information from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select GENERATION_TIME, HEADER_SEQNR from Matterhorn_Dozer_NodeHealth__mapped__1823 </predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select GENERATION_TIME, HEADER_SEQNR as SEQNR from wrapper where GENERATION_TIME > (unix_timestamp()*1000 - 604800000) </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

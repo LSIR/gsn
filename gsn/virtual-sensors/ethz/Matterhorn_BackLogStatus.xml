@@ -1,14 +1,16 @@
-<virtual-sensor name="Matterhorn_BackLogStatus_1355" priority="10" >
+<virtual-sensor name="Matterhorn_BackLogStatus__1823" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <web-input password="test">
-            <command name="backlog">
-                <field name="resend_data" type="checkbox:resend" >resend all backlogged data</field>
+            <command name="resend_backlogged_data">
+                <field name="device_id" type="*text" defaultvalue="65535">device_id</field>
             </command>
         </web-input>
         <output-structure>
-            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
             <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
@@ -19,23 +21,24 @@
             <field name="CONNECTION_LOSSES" type="INTEGER" />
         </output-structure>
     </processing-class>
-    <description>show status information of PSBackLog and send commands to the Matterhorn deployment</description>
+    <description>show status information of the BackLogs and send commands to the Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Matterhorn deployment</predicate>
-        <predicate key="LATITUDE">45.981007</predicate>
-        <predicate key="LONGITUDE">7.671047</predicate>
+        <predicate key="LATITUDE">46.547451</predicate>
+        <predicate key="LONGITUDE">7.982092</predicate>
     </addressing>
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
+                    <predicate key="remote-connection">82.130.103.18:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
-            <query> select * from source</query>
+            <query> select * from source </query>
         </stream>
     </streams>
 </virtual-sensor>

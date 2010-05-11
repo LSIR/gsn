@@ -1,0 +1,49 @@
+<virtual-sensor name="Thur_Thermistorchain__1823" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="SENSORTYPE" type="VARCHAR(30)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" />
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="TC_REF1" type="VARCHAR(30)" />
+            <field name="TC_REF2" type="VARCHAR(30)" />
+            <field name="TC_T1" type="VARCHAR(30)" />
+            <field name="TC_T2" type="VARCHAR(30)" />
+            <field name="TC_T3" type="VARCHAR(30)" />
+            <field name="TC_T4" type="VARCHAR(30)" />
+            <field name="TC_REF3" type="VARCHAR(30)" />
+            <field name="TC_REF4" type="VARCHAR(30)" />
+            <field name="TC_T5" type="VARCHAR(30)" />
+            <field name="TC_T6" type="VARCHAR(30)" />
+            <field name="TC_T7" type="VARCHAR(30)" />
+            <field name="TC_T8" type="VARCHAR(30)" />
+        </output-structure>
+    </processing-class>
+    <description>Thermistorchain/TC data (merged) from Thur deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Thur_Thermistorchain1__1823 </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Thur_Thermistorchain2__1823 

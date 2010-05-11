@@ -1,22 +1,30 @@
-<virtual-sensor name="Thur_Binary_1355" priority="10" >
+<virtual-sensor name="Thur_Binary__1823" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
-            <field name="TIMESTAMP" type="BIGINT" />
-            <field name="FILEPATH" type="VARCHAR(255)" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="RELATIVE_FILE" type="VARCHAR(255)" />
+            <field name="STORAGE_DIRECTORY" type="VARCHAR(255)" />
             <field name="DATA" type="binary" />
         </output-structure>
     </processing-class>
     <description>binaries from the Thur deployment</description>
     <life-cycle pool-size="10" />
-    <addressing />
+    <addressing>
+        <predicate key="type">PermaSense Thur deployment</predicate>
+        <predicate key="LATITUDE">46.547451</predicate>
+        <predicate key="LONGITUDE">7.982092</predicate>
+    </addressing>
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryBridgePlugin</predicate>
+                    <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-binaries/thur/pos0/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

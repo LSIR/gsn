@@ -1,0 +1,34 @@
+<virtual-sensor name="Thur_pos4_DozerDecagonMux__chart3" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Temperature (Position 4, 7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">5040</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerDecagonMuxMsg) information from Thur deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select GENERATION_TIME, TEMPERATURE0, TEMPERATURE1, TEMPERATURE2, TEMPERATURE3, TEMPERATURE4 from Thur_Dozer_DecagonMux__conv__1823 where POSITION = 4 and PAYLOAD_SAMPLE_VALID = 1 </predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select * from wrapper
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

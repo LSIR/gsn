@@ -1,28 +1,31 @@
-<virtual-sensor name="Matterhorn_VaisalaWXT520_1412" priority="10" >
+<virtual-sensor name="Matterhorn_VaisalaWXT520__1823" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
-            <field name="TIMESTAMP" type="BIGINT" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="Wu" type="VARCHAR(100)" />
             <field name="Tu" type="VARCHAR(100)" />
             <field name="Ru" type="VARCHAR(100)" />
             <field name="Su" type="VARCHAR(100)" />
         </output-structure>
     </processing-class>
-    <description>show weather sensor values of Vaisala WXT520 on Basestation from the Matterhorn deployment</description>
+    <description>show weather sensor values of Vaisala WXT520 from CoreStations at the Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
+                    <predicate key="remote-connection">82.130.103.18:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.VaisalaWXT520Plugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
-            <query> select * from source</query>
+            <query> select * from source </query>
         </stream>
     </streams>
 </virtual-sensor>
