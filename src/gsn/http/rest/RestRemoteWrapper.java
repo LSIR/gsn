@@ -158,7 +158,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
             try {
                 while (isActive() && (se = (StreamElement4Rest) inputStream.readObject()) != null) {
                     StreamElement streamElement = se.toStreamElement();
-                    if (streamElement.getFieldNames().length == 1 && streamElement.getFieldNames()[0].equals("keepalive")) {
+                    if ( ! (streamElement.getFieldNames().length == 1 && streamElement.getFieldNames()[0].equals("keepalive"))) {
                         boolean status = manualDataInsertion(streamElement);
                         if (!status && inputStream != null) {
                             response.getEntity().consumeContent();
