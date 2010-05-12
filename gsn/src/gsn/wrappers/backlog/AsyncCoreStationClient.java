@@ -349,10 +349,17 @@ public class AsyncCoreStationClient extends Thread  {
 	public void removeDeviceId(String deployment, Integer id) {
 		logger.debug("removing DeviceId: " + id + "for " + deployment + " deployment");
 		synchronized (deploymentToIdListenerMapList) {
-			deploymentToIdListenerMapList.get(deployment).remove(id);
+			if (deployment != null) {
+				if (id != null)
+					deploymentToIdListenerMapList.get(deployment).remove(id);
+				else
+					logger.error("id is null");
 			
-			if (deploymentToIdListenerMapList.get(deployment).isEmpty())
-				deploymentToIdListenerMapList.remove(deployment);
+				if (deploymentToIdListenerMapList.get(deployment).isEmpty())
+					deploymentToIdListenerMapList.remove(deployment);
+			}
+			else
+				logger.error("deployment is null");
 		}
 	}
 
@@ -381,6 +388,11 @@ public class AsyncCoreStationClient extends Thread  {
 
 	public boolean send(String deployment, Integer id, CoreStationListener listener, byte[] data) throws IOException {
 		boolean ret = false;
+		if (deployment == null) {
+			logger.error("deployment should not be null...");
+			return false;
+		}
+			
 		if (id != null) {
 			if (id == 65535) {
 				synchronized (deploymentToIdListenerMapList) {
