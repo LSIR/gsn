@@ -29,7 +29,22 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">permasense-jungfraujochg-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAdcComDiffDeprecatedMsg</predicate>
+                </address>
+                <!--query> select * from wrapper </query -->
+                <query> select TIMESTAMP, GENERATION_TIME, DEVICE_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
+                    IF(PAYLOAD_A0=-1,NULL,PAYLOAD_A0) as PAYLOAD_A0,
+                    PAYLOAD_A1, PAYLOAD_A2, PAYLOAD_A3, PAYLOAD_ADIFF01_1, PAYLOAD_ADIFF23_1, PAYLOAD_ADIFF01_2, PAYLOAD_ADIFF23_2 from wrapper
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-jungfraujochl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAdcComDiffDeprecatedMsg</predicate>
                 </address>

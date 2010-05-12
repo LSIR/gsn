@@ -1,4 +1,3 @@
- 
 <virtual-sensor name="Jungfraujoch_Dozer_DecagonMux__conv__1823" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>

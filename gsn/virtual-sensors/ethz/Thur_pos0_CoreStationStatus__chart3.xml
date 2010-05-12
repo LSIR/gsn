@@ -3,7 +3,7 @@
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Basestation current health (7d)</param>
+            <param name="title">Corestation current health (7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
             <param name="vertical-axis">mA</param>
@@ -14,7 +14,7 @@
             <field name="data" type="binary:image/jpeg"/>
         </output-structure>
     </processing-class>
-    <description>basestation health status from position 0 at Thur deployment</description>
+    <description>Corestation health status from position 0 at Thur deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage history-size="1" />
