@@ -25,12 +25,12 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 
 	private static final transient Logger logger = Logger.getLogger(TupleBasedSlidingHandler.class);
 	private List<StreamSource> streamSources; //only holds WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE types of stream sources
-	private Map<StreamSource, Integer> slidingHashMap;
+	private Map<StreamSource, Long> slidingHashMap;
 	private AbstractWrapper wrapper;
 
 	public TupleBasedSlidingHandler(AbstractWrapper wrapper) {
 		streamSources = Collections.synchronizedList(new ArrayList<StreamSource>());
-		slidingHashMap = Collections.synchronizedMap(new HashMap<StreamSource, Integer>());
+		slidingHashMap = Collections.synchronizedMap(new HashMap<StreamSource, Long>());
 		this.wrapper = wrapper;
 	}
 
@@ -39,7 +39,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			if (streamSource.getWindowingType() == WindowType.TUPLE_BASED) {
 				slidingHashMap.put(streamSource, streamSource.getParsedSlideValue() - streamSource.getParsedStorageSize());
 			} else {
-				slidingHashMap.put(streamSource, 0);
+				slidingHashMap.put(streamSource, 0L);
 			}
 		} else {
 			streamSources.add(streamSource);
@@ -58,7 +58,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 		}
 		synchronized (slidingHashMap) {
 			for (StreamSource streamSource : slidingHashMap.keySet()) {
-				int slideVar = slidingHashMap.get(streamSource) + 1;
+				long slideVar = slidingHashMap.get(streamSource) + 1;
 				if (slideVar == streamSource.getParsedSlideValue()) {
 					toReturn = streamSource.getQueryRewriter().dataAvailable(streamElement.getTimeStamp()) || toReturn;
 					slideVar = 0;
@@ -72,9 +72,9 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 	public long getOldestTimestamp() {
 		long timed1 = -1;
 		long timed2 = -1;
-		int maxTupleCount = 0;
-		int maxTupleForTimeBased = 0;
-		int maxWindowSize = 0;
+		long maxTupleCount = 0;
+		long maxTupleForTimeBased = 0;
+		long maxWindowSize = 0;
 
 		//WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE sliding windows are saved in streamSources list 
 		synchronized (streamSources) {
@@ -232,7 +232,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 				throw new GSNRuntimeException("Validation of this object the stream source failed, please check the logs.");
 			}
 			CharSequence wrapperAlias = streamSource.getWrapper().getDBAliasInStr();
-			int windowSize = streamSource.getParsedStorageSize();
+			long windowSize = streamSource.getParsedStorageSize();
 			if (streamSource.getSamplingRate() == 0 || windowSize == 0) {
 				return cachedSqlQuery = new StringBuilder("select * from ").append(wrapperAlias).append(" where 1=0");
 			}

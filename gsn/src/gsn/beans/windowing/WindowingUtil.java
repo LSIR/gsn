@@ -2,14 +2,14 @@ package gsn.beans.windowing;
 
 public class WindowingUtil {
 
-    public static int GCD(int a, int b) {
+    public static long GCD(long a, long b) {
         if (a == 0 || b == 0) {
             return 0;
         }
         return GCDHelper(a, b);
     }
 
-    private static int GCDHelper(int a, int b) {
+    private static long GCDHelper(long a, long b) {
         if (b == 0) {
             return a;
         }

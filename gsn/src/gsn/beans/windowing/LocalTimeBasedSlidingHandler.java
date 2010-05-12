@@ -29,12 +29,12 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
     private List<StreamSource> streamSources;
     private AbstractWrapper wrapper;
     private Timer timer;
-    private int timerTick = -1;
-    private Map<StreamSource, Integer> slidingHashMap;
+    private long timerTick = -1;
+    private Map<StreamSource, Long> slidingHashMap;
 
     public LocalTimeBasedSlidingHandler(AbstractWrapper wrapper) {
         streamSources = Collections.synchronizedList(new ArrayList<StreamSource>());
-        slidingHashMap = Collections.synchronizedMap(new HashMap<StreamSource, Integer>());
+        slidingHashMap = Collections.synchronizedMap(new HashMap<StreamSource, Long>());
         timer = new Timer("LocalTimeBasedSlidingHandlerTimer" + (++timerCount));
         this.wrapper = wrapper;
     }
@@ -44,7 +44,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
         rewriter.setStreamSource(streamSource);
         rewriter.initialize();
         if (streamSource.getWindowingType() != WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE) {
-            int oldTimerTick = timerTick;
+            long oldTimerTick = timerTick;
             if (streamSource.getWindowingType() == WindowType.TIME_BASED) {
                 slidingHashMap.put(streamSource, streamSource.getParsedSlideValue() - streamSource.getParsedStorageSize());
                 if (timerTick == -1) {
@@ -53,7 +53,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                     timerTick = GCD(timerTick, GCD(streamSource.getParsedStorageSize(), streamSource.getParsedSlideValue()));
                 }
             } else {
-                slidingHashMap.put(streamSource, 0);
+                slidingHashMap.put(streamSource, 0L);
                 if (timerTick == -1) {
                     timerTick = streamSource.getParsedSlideValue();
                 } else {
@@ -73,7 +73,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
         }
     }
 
-    public int GCD(int a, int b) {
+    public long GCD(long a, long b) {
         return WindowingUtil.GCD(a, b);
     }
 
@@ -83,7 +83,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
         public void run() {
             synchronized (slidingHashMap) {
                 for (StreamSource streamSource : slidingHashMap.keySet()) {
-                    int slideVar = slidingHashMap.get(streamSource) + timerTick;
+                    long slideVar = slidingHashMap.get(streamSource) + timerTick;
                     if (slideVar >= streamSource.getParsedSlideValue()) {
                         slideVar = 0;
                         streamSource.getQueryRewriter().dataAvailable(System.currentTimeMillis());
@@ -109,9 +109,9 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
     public long getOldestTimestamp() {
         long timed1 = -1;
         long timed2 = -1;
-        int maxTupleCount = 0;
-        int maxSlideForTupleBased = 0;
-        int maxWindowSize = 0;
+        long maxTupleCount = 0;
+        long maxSlideForTupleBased = 0;
+        long maxWindowSize = 0;
 
         synchronized (streamSources) {
             for (StreamSource streamSource : streamSources) {
@@ -178,7 +178,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
     }
 
     private void updateTimerTick() {
-        int oldTimerTick = timerTick;
+        long oldTimerTick = timerTick;
         // recalculating timer tick
         timerTick = -1;
         synchronized (slidingHashMap) {
@@ -191,7 +191,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                         timerTick = GCD(timerTick, GCD(streamSource.getParsedStorageSize(), streamSource.getParsedSlideValue()));
                     }
                 } else {
-                    slidingHashMap.put(streamSource, 0);
+                    slidingHashMap.put(streamSource, 0L);
                     if (timerTick == -1) {
                         timerTick = streamSource.getParsedSlideValue();
                     } else {
@@ -243,7 +243,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                 throw new GSNRuntimeException("Validation of this object the stream source failed, please check the logs.");
             }
             CharSequence wrapperAlias = streamSource.getWrapper().getDBAliasInStr();
-            int windowSize = streamSource.getParsedStorageSize();
+            long windowSize = streamSource.getParsedStorageSize();
             if (streamSource.getSamplingRate() == 0 || windowSize == 0) {
                 return cachedSqlQuery = new StringBuilder("select * from ").append(wrapperAlias).append(" where 1=0");
             }
