@@ -27,4 +27,11 @@
                 </address>
                 <query> select GENERATION_TIME, 
                     if(PAYLOAD_MCUACTIVE = 0, NULL, PAYLOAD_MCUACTIVE * 1000 / PAYLOAD_PERIOD) as MCUACTIVE, 
-               
+                    if(PAYLOAD_RADIOTX = 0, NULL, PAYLOAD_RADIOTX * 1000 / PAYLOAD_PERIOD) as RADIOTX, 
+                    if(PAYLOAD_RADIORX = 0, NULL, PAYLOAD_RADIORX * 1000 / PAYLOAD_PERIOD) as RADIORX from wrapper
+                </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

@@ -1,26 +1,28 @@
-<virtual-sensor name="Jungfraujoch_pos0_CoreStationStatus__chart3" priority="10" >
+<virtual-sensor name="Jungfraujoch_pos0_Webcam__scaled" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
         <init-params>
-            <param name="input-Stream">data</param>
-            <param name="title">Basestation current health (7d)</param>
-            <param name="height">400</param>
-            <param name="width">610</param>
-            <param name="vertical-axis">mA</param>
-            <param name="history-size">10080</param>
-            <param name="time-stream-name">GENERATION_TIME</param>
+            <param name="jpeg_scaled">JPEG_SCALED</param>
         </init-params>
         <output-structure>
-            <field name="data" type="binary:image/jpeg"/>
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>basestation health status from position 0 at Jungfraujoch deployment</description>
+    <description>webcam pictures from position 0 at Jungfraujoch deployment as thumbnails</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage history-size="1" />
+    <storage history-size="1"/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, I_V12DC_EXT, I_V12DC_IN from Jungfraujoch_CoreStationStatus__conv__1823 where POSITION = 0</predicate>
-                    <predicate key="start-time">-604
+                    <predicate key="query">select GENERATION_TIME, DATA from Jungfraujoch_Binary__mapped__1823 where POSITION = 0 and RELATIVE_FILE='webcam1/webcam.jpg'</predicate>
+                </address>
+                <query> select GENERATION_TIME, DATA as JPEG_SCALED from wrapper</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

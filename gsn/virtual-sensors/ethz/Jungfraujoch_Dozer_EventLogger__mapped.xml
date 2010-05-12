@@ -1,3 +1,4 @@
+ 
 <virtual-sensor name="Jungfraujoch_Dozer_EventLogger__mapped__1823" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>

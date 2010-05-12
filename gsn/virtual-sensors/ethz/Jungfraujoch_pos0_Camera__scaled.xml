@@ -1,29 +1,29 @@
-<virtual-sensor name="Jungfraujoch_pos0_BackLogStatus__chart" priority="10" >
+<virtual-sensor name="Jungfraujoch_pos0_Camera__scaled" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <class-name>gsn.vsensor.FileGetterVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
         <init-params>
-            <param name="input-Stream">data</param>
-            <param name="title">Backlog queue size (7d)</param>
-            <param name="height">400</param>
-            <param name="width">610</param>
-            <param name="vertical-axis">#</param>
-            <param name="history-size">10080</param>
-            <param name="time-stream-name">GENERATION_TIME</param>
+            <param name="jpeg_scaled">JPEG_SCALED</param>
+            <param name="file_type">nef</param>
         </init-params>
         <output-structure>
-            <field name="data" type="binary:image/jpeg"/>
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>backlog health status from position 0 at Jungfraujoch deployment</description>
+    <description>camera pictures from position 0 at Jungfraujoch deployment as thumbnail</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage history-size="1" />
+    <storage history-size="1"/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, BACKLOG_DB_ENTRIES from Jungfraujoch_BackLogStatus__mapped__1823 where POSITION = 0</predicate>
-                    <predicate key="start-time">-604800000</predicate>
+                    <predicate key="query">select GENERATION_TIME, RELATIVE_FILE, STORAGE_DIRECTORY from Jungfraujoch_Binary__mapped__1823 where POSITION = 0 and RELATIVE_FILE like 'camera1/%'</predicate>
                 </address>
-                <query> select * from wrapper </query>
-            </sou
+                <query> select GENERATION_TIME, concat(STORAGE_DIRECTORY,RELATIVE_FILE) as FILE from wrapper</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
