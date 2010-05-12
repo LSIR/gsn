@@ -1,5 +1,6 @@
 package gsn;
 
+import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.http.rest.DeliverySystem;
@@ -8,6 +9,9 @@ import gsn.storage.DataEnumerator;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -21,17 +25,36 @@ import org.apache.log4j.Logger;
 
 public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener, Runnable {
 
+    public static final int KEEP_ALIVE_PERIOD =  10 * 60 * 1000;  // 10 minutes.
+    
+    private javax.swing.Timer keepAliveTimer = null;
+
     private static transient Logger logger = Logger.getLogger(DataDistributer.class);
 
     private static HashMap<Class<? extends DeliverySystem>, DataDistributer> singletonMap = new HashMap<Class<? extends DeliverySystem>, DataDistributer>();
     private Thread thread;
 
     private DataDistributer() {
-
         try {
             db = StorageManager.getInstance().getConnection();
             thread = new Thread(this);
             thread.start();
+            // Start the keep alive Timer -- Note that the implementation is backed by one single thread for all the RestDelivery instances.
+            keepAliveTimer = new  javax.swing.Timer(KEEP_ALIVE_PERIOD, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    // write the keep alive message to the stream
+                    synchronized (listeners) {
+                        ArrayList<DistributionRequest> clisteners = (ArrayList<DistributionRequest>) listeners.clone();
+                        for (DistributionRequest listener : clisteners) {
+                            if ( ! listener.deliverKeepAliveMessage()) {
+                                logger.debug("remove the listener.");
+                                removeListener(listener);
+                            }
+                        }
+                    }
+                }
+            });
+            keepAliveTimer.start();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -244,6 +267,8 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             while (!listeners.isEmpty())
                 removeListener(listeners.get(0));
         }
+        if (keepAliveTimer != null)
+            keepAliveTimer.stop();
     }
 
     public boolean contains(DeliverySystem delivery) {

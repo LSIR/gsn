@@ -6,6 +6,7 @@ import gsn.beans.VSensorConfig;
 import gsn.storage.SQLValidator;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -41,6 +42,10 @@ public class DefaultDistributionRequest implements DistributionRequest {
 		StringBuilder sb = new StringBuilder("DefaultDistributionRequest Request[[ Delivery System: ").append(deliverySystem.getClass().getName()).append("],[Query:").append(query).append("],[StartTime:").append(lastVisitedTime).append("],[VirtualSensorName:").append(vSensorConfig.getName()).append("]]");
 		return sb.toString();
 	}
+
+    public boolean deliverKeepAliveMessage() {
+        return deliverySystem.writeKeepAliveStreamElement();
+    }
 
 	public boolean deliverStreamElement(StreamElement se) {		
 		boolean success = deliverySystem.writeStreamElement(se);

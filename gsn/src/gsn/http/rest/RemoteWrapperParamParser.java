@@ -3,6 +3,7 @@ package gsn.http.rest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import gsn.DataDistributer;
 import gsn.beans.AddressBean;
 import gsn.beans.ContainerConfig;
 import gsn.utils.Helpers;
@@ -18,7 +19,9 @@ public class RemoteWrapperParamParser {
 	private boolean isPushBased;
 	private String query,deliveryContactPoint,remoteContactPoint;
 	private String username,password;
-    private int timeout = 10 * 60 * 1000;  // 10 minutes.
+    // The default timeout is set to 3 times the rate of the periodical Keep alive messages.
+    // The timeout can be overriden in the virtual sensor description files.
+    private int timeout =  3 * DataDistributer.KEEP_ALIVE_PERIOD;
 
 	private  final String CURRENT_TIME = ISODateTimeFormat.dateTime().print(System.currentTimeMillis());
 

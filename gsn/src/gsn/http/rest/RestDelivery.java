@@ -5,8 +5,8 @@ import gsn.beans.StreamElement;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
@@ -18,6 +18,8 @@ public class RestDelivery implements DeliverySystem {
 
     private Continuation continuation;
     private ObjectOutputStream objectStream;
+
+    private static final StreamElement keepAliveMsg = new StreamElement(new DataField[]{new DataField("keepalive", "string")}, new Serializable[]{"keep-alive message"}, Long.MIN_VALUE);
 
     public RestDelivery(Continuation connection) throws IOException {
         this.continuation = connection;
@@ -33,7 +35,7 @@ public class RestDelivery implements DeliverySystem {
         continuation.getServletResponse().flushBuffer();
     }
 
-    public boolean writeStreamElement(StreamElement se) {
+    public synchronized boolean writeStreamElement(StreamElement se) {
         try {
             objectStream.writeObject(new StreamElement4Rest(se));
             objectStream.flush();
@@ -45,6 +47,10 @@ public class RestDelivery implements DeliverySystem {
         }
     }
 
+    public boolean writeKeepAliveStreamElement() {
+        logger.debug("Sending the keepalive message.");
+        return writeStreamElement(keepAliveMsg);
+    }
 
     public void close() {
         try {
@@ -55,7 +61,6 @@ public class RestDelivery implements DeliverySystem {
         } catch (Exception e) {
             logger.debug(e.getMessage(), e);
         }
-
     }
 
     public boolean isClosed() {

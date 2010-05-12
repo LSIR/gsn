@@ -64,7 +64,11 @@ public class PushDelivery implements DeliverySystem {
 		return success;
 	}
 
-	public void close() {
+    public boolean writeKeepAliveStreamElement() {
+        return true;
+    }
+
+    public void close() {
 		httpclient.getConnectionManager().shutdown();
 		isClosed = true;
 	}
