@@ -15,7 +15,22 @@ public class ModelFitting {
                                                 "chebyschev_deg3"
                                                };
 
-	public static boolean FitAndMarkDirty(int model, double errorBound, int windowSize, double[] stream, long[] timestamps, double[] processed, double[] dirtyness)
+    /*
+    * Returns the model id, given a string
+    * comparison is case insensitive
+    * */
+    public static int getModelIdFromString(String strModel) {
+        int result = -1;
+        for (int i=0;i<MODEL_NAMES.length;i++) {
+            if (MODEL_NAMES[i].toUpperCase().equals(strModel.toUpperCase())) {
+                result = i;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public static boolean FitAndMarkDirty(int model, double errorBound, int windowSize, double[] stream, long[] timestamps, double[] processed, double[] dirtyness)
 	{
 
 

@@ -3,6 +3,8 @@ package gsn.utils;
 import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -31,6 +33,19 @@ public class Helpers {
 		DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
 		return fmt.parseDateTime(time).getMillis();
 	}
+
+    public static String convertTimeFromLongToIso(long timestamp) {
+        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+        DateTime dt = new DateTime(timestamp);
+        return fmt.print(dt);
+	}
+
+    public static String convertTimeFromLongToIso(long timestamp, String format) {
+        DateTimeFormatter fmt = DateTimeFormat.forPattern(format);
+        DateTime dt = new DateTime(timestamp);
+        return fmt.print(dt);
+	}
+
 }
 
 
