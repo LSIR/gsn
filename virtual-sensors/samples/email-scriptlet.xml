@@ -31,8 +31,8 @@
         <output-structure/>
     </processing-class>
     <description>
-        This Virtual Sensor demonstrates the use of the scriplet processor (gsn.processor.ScriptletProcessor) for data
-        calibration. It gets its data from the MemoryMonitorVS and process it with a Groovy scriplet.
+        This Virtual Sensor demonstrates the use of the scriplet processor (gsn.processor.ScriptletProcessor) for email
+        notifications. It gets its data from the MemoryMonitorVS and sends a new email each time the MemoryMonitorVS.HEAP field reached a new maxima.
     </description>
     <addressing/>
     <storage history-size="1"/>
