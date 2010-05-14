@@ -14,10 +14,6 @@
                     println 'binding: ' + binding.getVariables();
 
                     // Example of usage of a stateful variable
-                    //
-                    def isdef(var) {
-                        (binding.getVariables().containsKey(var))
-                    }
                     // Initialisation
                     statefulCounter = isdef('statefulCounter') ? statefulCounter + 1 : 0;
                     println 'Stateful Counter: ' + statefulCounter;
