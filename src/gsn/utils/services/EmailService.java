@@ -10,17 +10,14 @@ import javax.mail.Session;
 import java.util.ArrayList;
 
 /**
- * This class provides an access to Notification services such as Email, SMS, messenger. Only the Email service is
- * implemented though.
- * <p/>
- * Email Service
- * The email service implementation is based on the Apache commons Email library @see http://commons.apache.org/email/
+ * This class provides an access to Email Notification services.
+ * The implementation is based on the Apache commons Email library @see http://commons.apache.org/email/
  * Prior to use this service, you MUST configure the SMTP server (postfix, gmail, ...) which will send your emails.
  * The smtp parameters are configured in the conf/emails.properties.
  */
-public class Notifications {
+public class EmailService {
 
-    private static final transient Logger logger = Logger.getLogger(Notifications.class);
+    private static final transient Logger logger = Logger.getLogger(EmailService.class);
 
     private static final String SMTP_FILE = "conf/emails.properties";
 

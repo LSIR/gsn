@@ -63,8 +63,8 @@ import java.util.TreeMap;
  * The following classes providing services are, by default, statically imported to your scriptlet and thus, all their
  * static methods can be used directly in your scriptlet.
  *
- * 1. The {@link gsn.utils.services.Notifications} class provides access to notifications services such emails.
- *
+ * 1. The {@link gsn.utils.services.EmailService} class provides access the Email notification services.
+ * 2. The {@link gsn.utils.services.TwitterService} class provides access to Twitter notifications services.
  * 
  * LIMITATIONS
  * -----------
@@ -139,7 +139,8 @@ public class ScriptletProcessor extends AbstractVirtualSensor {
         StringBuilder scriptlet = new StringBuilder();
         scriptlet.append("// start auto generated part --\n");
         // Add the static import (for predefined services)
-        scriptlet.append("import static gsn.utils.services.Notifications.*;\n");
+        scriptlet.append("import static gsn.utils.services.EmailService.*;\n");
+        scriptlet.append("import static gsn.utils.services.TwitterService.*;\n");
 
         // Add the syntactic sugars
         scriptlet.append("def isdef(var){(binding.getVariables().containsKey(var))}\n");
