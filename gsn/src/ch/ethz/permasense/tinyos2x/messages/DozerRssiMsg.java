@@ -433,8 +433,8 @@ public class DozerRssiMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeade
     /**
      * Return an element (as a int) of the array 'payload.rssi.id'
      */
-    public Integer getElement_payload_rssi_id(int index1) {
-        try {return (int)getUIntBEElement(offsetBits_payload_rssi_id(index1), 16);} catch (IndexOutOfBoundsException e) { return null; }
+    public int getElement_payload_rssi_id(int index1) {
+        try {return (int)getUIntBEElement(offsetBits_payload_rssi_id(index1), 16);} catch (IndexOutOfBoundsException e) { return -1; }
     }
 
     /**
@@ -561,8 +561,8 @@ public class DozerRssiMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeade
     /**
      * Return an element (as a short) of the array 'payload.rssi.rssi'
      */
-    public Short getElement_payload_rssi_rssi(int index1) {
-        try {return (short)getUIntBEElement(offsetBits_payload_rssi_rssi(index1), 8);} catch (IndexOutOfBoundsException e) { return null; }
+    public short getElement_payload_rssi_rssi(int index1) {
+        try {return (short)getUIntBEElement(offsetBits_payload_rssi_rssi(index1), 8);} catch (IndexOutOfBoundsException e) { return -1; }
     }
 
     /**
@@ -644,8 +644,8 @@ public class DozerRssiMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeade
          char carr[] = new char[Math.min(net.tinyos.message.Message.MAX_CONVERTED_STRING_LENGTH,7)];
          int i;
          for (i = 0; i < carr.length; i++) {
-             if ((char)getElement_payload_rssi_rssi(i).shortValue() == (char)0) break;
-             carr[i] = (char)getElement_payload_rssi_rssi(i).shortValue();
+             if ((char)getElement_payload_rssi_rssi(i) == (char)0) break;
+             carr[i] = (char)getElement_payload_rssi_rssi(i);
          }
          return new String(carr,0,i);
     }
