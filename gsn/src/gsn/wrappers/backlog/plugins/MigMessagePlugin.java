@@ -296,7 +296,7 @@ public class MigMessagePlugin extends AbstractPlugin
 						ret = sendRemote(System.currentTimeMillis(), packet);
 						logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
 					} catch (Exception e) {
-						logger.error(e.getMessage(), e);
+						logger.error(e.getMessage());
 					}
 				}
 				else {

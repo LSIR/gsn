@@ -112,7 +112,7 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 			    else
 					logger.debug("Message from SF with address >" + socket.getInetAddress().getHostName() + "< received and forwarded");
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				logger.error(e.getMessage());
 			}
         }
     }

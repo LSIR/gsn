@@ -482,7 +482,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 					pingWatchDogTimer.cancel();
 			}
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(e.getMessage());
 		}
 	}
 	
@@ -497,7 +497,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		try {
 			return sendMessage(new BackLogMessage(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp), null);
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(e.getMessage());
 			return false;
 		}
 	}
