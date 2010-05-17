@@ -171,16 +171,14 @@ public class MigMessagePlugin extends AbstractPlugin
 			long atime = ((Integer) outputvaluesmap.get(parameters.getTinyosGetterPrefix() + "header_atime")).longValue();
 			outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[1], timestamp - (atime * 1000));
 		} else {
-			// should never happen
-			logger.error("invalid gentime field");
+			outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[1], timestamp);
 		}
 		
 		if (outputvaluesmap.containsKey(parameters.getTinyosGetterPrefix() + "header_originatorid")) {
 			Integer id = ((Integer) outputvaluesmap.get(parameters.getTinyosGetterPrefix() + "header_originatorid")).intValue();
 			outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[2], id);
 		} else {
-			// should never happen
-			logger.error("no header_originatorid field available");
+			outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[2], deviceId);
 		}
 		
 		if (dataProcessed(System.currentTimeMillis(), outputvaluesmap.values().toArray(new Serializable[] {})))
