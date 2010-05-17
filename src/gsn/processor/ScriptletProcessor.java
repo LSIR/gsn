@@ -139,9 +139,9 @@ public class ScriptletProcessor extends AbstractVirtualSensor {
         StringBuilder scriptlet = new StringBuilder();
         scriptlet.append("// start auto generated part --\n");
         // Add the static import (for predefined services)
-        scriptlet.append("import static gsn.utils.services.EmailService.*;\n");
-        scriptlet.append("import static gsn.utils.services.TwitterService.*;\n");
-
+        scriptlet.append("import static ").append(gsn.utils.services.EmailService.class.getCanonicalName()).append(".*;\n");
+        scriptlet.append("import static ").append(gsn.utils.services.TwitterService.class.getCanonicalName()).append(".*;\n");
+        
         // Add the syntactic sugars
         scriptlet.append("def isdef(var){(binding.getVariables().containsKey(var))}\n");
 
@@ -158,7 +158,7 @@ public class ScriptletProcessor extends AbstractVirtualSensor {
             logger.warn("Failed to compile the scriptlet " + e.getMessage());
             return false;
         }
-        logger.info("scriptlet: " + scriptlet);
+        logger.warn("scriptlet: " + scriptlet);
 
         // Optional Parameters
 
