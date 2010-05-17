@@ -489,9 +489,10 @@ class SchedulePluginClass(AbstractPluginClass):
             self.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
     
             # Schedule next duty wakeup
-            next_schedule = self._schedule.getNextSchedules(datetime.utcnow())[0]
-            self.info('schedule next duty wakeup')
-            self._scheduleNextDutyWakeup(next_schedule[0] - datetime.utcnow(), next_schedule[1])
+            if self._schedule:
+                next_schedule = self._schedule.getNextSchedules(datetime.utcnow())[0]
+                self.info('schedule next duty wakeup')
+                self._scheduleNextDutyWakeup(next_schedule[0] - datetime.utcnow(), next_schedule[1])
                     
             # wait for jobs to finish
             if not self._allJobsFinishedEvent.isSet():
