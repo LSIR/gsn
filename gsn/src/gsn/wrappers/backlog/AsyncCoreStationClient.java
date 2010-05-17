@@ -392,21 +392,23 @@ public class AsyncCoreStationClient extends Thread  {
 			logger.error("deployment should not be null...");
 			return false;
 		}
+		Map<Integer, CoreStationListener> corestationMap = null;
+		synchronized (deploymentToIdListenerMapList) {
+			 corestationMap = deploymentToIdListenerMapList.get(deployment);
+		}
+		if (corestationMap == null)
+			throw new IOException("The " + deployment + " deployment is not connected or does not exist");
 			
 		if (id != null) {
 			if (id == 65535) {
-				synchronized (deploymentToIdListenerMapList) {
-					Iterator<Integer> iter = deploymentToIdListenerMapList.get(deployment).keySet().iterator();
-					while (iter.hasNext()) {
-						if(send(deploymentToIdListenerMapList.get(deployment).get(iter.next()), data, true))
-							ret = true;
-					}
+				Iterator<Integer> iter = corestationMap.keySet().iterator();
+				while (iter.hasNext()) {
+					if(send(corestationMap.get(iter.next()), data, true))
+						ret = true;
 				}
 			}
 			else {
-				synchronized (deploymentToIdListenerMapList) {
-					listener = deploymentToIdListenerMapList.get(deployment).get(id);
-				}
+				listener = corestationMap.get(id);
 				if (listener == null)
 					throw new IOException("The DeviceId " + id + " is not connected or does not exist for the " + deployment + " deployment");
 				
