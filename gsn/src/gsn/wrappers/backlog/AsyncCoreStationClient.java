@@ -286,9 +286,13 @@ public class AsyncCoreStationClient extends Thread  {
 	
 	public synchronized void registerListener(CoreStationListener listener) throws IOException
 	{
-		if (!this.isAlive()) {
-			dispose = false;
-			this.start();
+		try {
+			if (!this.isAlive()) {
+				dispose = false;
+				this.start();
+			}
+		} catch (IllegalThreadStateException e) {
+			logger.error("thread already running");
 		}
 		
 		SocketChannel socketChannel = SocketChannel.open();

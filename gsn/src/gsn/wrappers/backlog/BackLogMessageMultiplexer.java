@@ -469,16 +469,20 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 	/**
 	 * Send a ping message to the CoreStation.
-	 * 
-	 * @return false if not connected to the CoreStation
 	 */
-	protected boolean sendPing() {
+	protected void sendPing() {
 		// send ping
 		try {
-			return sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()), null);
+			if (!sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()), null)) {
+		    	// stop ping timer
+				if (pingTimer != null)
+					pingTimer.cancel();
+		    	// stop ping checker timer
+				if (pingWatchDogTimer != null)
+					pingWatchDogTimer.cancel();
+			}
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
-			return false;
 		}
 	}
 	
