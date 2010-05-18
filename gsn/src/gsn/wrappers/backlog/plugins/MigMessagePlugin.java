@@ -66,7 +66,11 @@ public class MigMessagePlugin extends AbstractPlugin
 	@Override
 	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		super.activeBackLogWrapper = backlogwrapper;
-		super.priority = Integer.valueOf(getActiveAddressBean().getPredicateValue("priority"));
+		String p = getActiveAddressBean().getPredicateValue("priority");
+		if (p == null)
+			priority = null;
+		else
+			priority = Integer.valueOf(p);
 		
 		String propertyfile = "conf/permasense/" + deploymentName + "-migmessageplugin.properties";
 		Properties props = new Properties(); 

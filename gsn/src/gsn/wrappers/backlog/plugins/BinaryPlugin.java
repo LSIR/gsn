@@ -117,7 +117,11 @@ public class BinaryPlugin extends AbstractPlugin {
 		this.coreStationName = coreStationName;
 
 		AddressBean addressBean = getActiveAddressBean();
-		super.priority = Integer.valueOf(addressBean.getPredicateValue("priority"));
+		String p = addressBean.getPredicateValue("priority");
+		if (p == null)
+			priority = null;
+		else
+			priority = Integer.valueOf(p);
 		
 		calcChecksumThread = new CalculateChecksum(this);
 		bigBinarySender = new BigBinarySender(this);

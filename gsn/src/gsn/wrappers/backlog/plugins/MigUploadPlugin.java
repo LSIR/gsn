@@ -40,7 +40,11 @@ public class MigUploadPlugin extends AbstractPlugin {
 	@Override
 	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		activeBackLogWrapper = backlogwrapper;
-		super.priority = Integer.valueOf(getActiveAddressBean().getPredicateValue("priority"));
+		String p = getActiveAddressBean().getPredicateValue("priority");
+		if (p == null)
+			priority = null;
+		else
+			priority = Integer.valueOf(p);
 		tinyos1x_platform = getActiveAddressBean().getPredicateValue(MigMessageMultiplexer.TINYOS1X_PLATFORM);
 
 		// a template message for this platform has to be instantiated to be able to get the data offset

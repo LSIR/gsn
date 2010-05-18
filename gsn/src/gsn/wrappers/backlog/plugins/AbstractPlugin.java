@@ -46,7 +46,11 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 */
 	public boolean initialize ( BackLogWrapper backLogWrapper, String coreStationName, String deploymentName ) {
 		activeBackLogWrapper = backLogWrapper;
-		priority = Integer.valueOf(getActiveAddressBean().getPredicateValue("priority"));
+		String p = getActiveAddressBean().getPredicateValue("priority");
+		if (p == null)
+			priority = null;
+		else
+			priority = Integer.valueOf(p);
 		registerListener();
 		return true;
 	}
