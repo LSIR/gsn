@@ -4,27 +4,20 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.utils.Helpers;
 import gsn.utils.models.ModelFitting;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.ConnectException;
-import java.net.UnknownHostException;
+import java.io.UnsupportedEncodingException;
 import java.util.TreeMap;
 
-import static gsn.utils.Helpers.convertTimeFromLongToIso;
 import static gsn.utils.models.ModelFitting.getModelIdFromString;
 
 
@@ -41,13 +34,13 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
     private static final String DIRTINESS = "_dirtiness";
 
     private static final String xml_template = "<metadata>\n" +
-            "\t<deployement>"+DEPLOYMENT+"</deployment>\n" +
-            "\t<operator>"+OPERATOR+"</operator>\n" +
-            "\t<station>"+STATION+"</station>\n" +
-            "\t<sensor>"+SENSOR+"</sensor>\n" +
-            "\t<from>"+FROM+"</from>\n" +
-            "\t<to>"+TO+"</to>\n" +
-            "\t<dirtiness>"+DIRTINESS+"</dirtiness>\n" +
+            "\t<deployement>" + DEPLOYMENT + "</deployment>\n" +
+            "\t<operator>" + OPERATOR + "</operator>\n" +
+            "\t<station>" + STATION + "</station>\n" +
+            "\t<sensor>" + SENSOR + "</sensor>\n" +
+            "\t<from>" + FROM + "</from>\n" +
+            "\t<to>" + TO + "</to>\n" +
+            "\t<dirtiness>" + DIRTINESS + "</dirtiness>\n" +
             "</metadata>";
 
     private static final String PARAM_MODEL = "model";
@@ -64,6 +57,8 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
     private static final String PARAM_METADATA_DEPLOYEMENT = "deployment"; // name of deployemnt for metadata server
     private static final String PARAM_METADATA_STATION = "station"; // name of station for metadata server
     private static final String PARAM_METADATA_SENSOR = "sensor"; // name of station for metadata server
+
+    private static final int NORMAL_RESULT = 200; // normal result after http post
 
     private int model = -1;
     private int window_size = 0;
@@ -190,10 +185,16 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
                 dataProduced(se);
                 if ((dirtiness[j] > 0) && publish_to_metadata_server) {
                     try {
-                        //postToWiki(metadata_server_url);// + "?request=" + outputAsXML(stream[j], processed[j], dirtiness[j], timestamps[j], timestamps[j]));
-                        System.out.println("?request=" + outputAsXML(stream[j], processed[j], dirtiness[j], timestamps[j], timestamps[j]));
+                        String request = outputAsXML(stream[j], processed[j], dirtiness[j], timestamps[j], timestamps[j]);
+                        boolean result = httpPost(metadata_server_url, request);
+                        if (!result) {
+                            logger.warn("Couldn't post request => " + request);
+                        }
+                        else {
+                            logger.warn("Posted => " + request);
+                        }
                     } catch (Exception e) {
-                        logger.warn("Error while trying to post to metadata server. "+e.getMessage()+e);
+                        logger.warn("Error while trying to post to metadata server. " + e.getMessage() + e);
                     }
                 }
             }
@@ -202,55 +203,59 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
     }
 
 
-    public String postToWiki(String url) {
+    public boolean httpPost(String url, String xmlString) {
 
-        String httpAddress = url;
-
-        DefaultHttpClient client = new DefaultHttpClient();
-
+        boolean success = true;
+        PostMethod post = new PostMethod(url);
+        RequestEntity entity;
+        HttpClient httpclient = new HttpClient();
 
         if (metadata_server_requieres_password) {
-            client.getCredentialsProvider().setCredentials(
+            httpclient.getState().setCredentials(
                     new AuthScope(metadata_server_url, 80),
                     new UsernamePasswordCredentials(username, password)
             );
         }
 
-        logger.warn("Querying server: " + httpAddress);
-        HttpGet get = new HttpGet(httpAddress);
-
         try {
-            // execute the GET, getting string directly
-            ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String responseBody = client.execute(get, responseHandler);
+            entity = new StringRequestEntity(xmlString, "text/xml", "ISO-8859-1");
 
-        }
-        catch (HttpResponseException e) {
-            logger.warn(new StringBuilder("HTTP 401 Authentication Needed for : ")
-                    .append(httpAddress));
+            post.setRequestEntity(entity);
+            int result = httpclient.executeMethod(post);
+
+            if (result != NORMAL_RESULT) {
+                logger.warn("Response status code: " + result);
+
+                // Display response
+                logger.warn("Response body: ");
+                logger.warn(post.getResponseBodyAsString());
+                success = false;
+            }
         }
 
-        catch (UnknownHostException e) {
-            logger.warn(new StringBuilder("Unknown host: ")
-                    .append(httpAddress));
+        catch (UnsupportedEncodingException e) {
+            logger.warn(new StringBuilder("Unsupported encoding for: ").append(url));
+            success = false;
         }
 
-        catch (ConnectException e) {
-            logger.warn(new StringBuilder("Connection refused to host: ")
-                    .append(httpAddress));
-        }
-        catch (ClientProtocolException e) {
+        catch (HttpException e) {
             logger.warn(new StringBuilder("Error for: ")
-                    .append(httpAddress).append(e));
-
-        } catch (IOException e) {
-            logger.warn(new StringBuilder("Error for: ")
-                    .append(httpAddress).append(e));
-        } finally {
-            // release any connection resources used by the method
-            client.getConnectionManager().shutdown();
+                    .append(url).append(e));
+            success = false;
         }
-        return null;
+
+        catch (IOException e) {
+            logger.warn(new StringBuilder("Error for: ")
+                    .append(url).append(e));
+            success = false;
+        }
+
+        finally {
+            post.releaseConnection();
+        }
+
+
+        return success;
     }
 
     /*
@@ -258,8 +263,8 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
    * */
     public String outputAsXML(double stream, double processed, double dirtiness, long from_date, long to_date) throws Exception {
         String output = prepared_xml_request.replaceAll(DIRTINESS, Double.toString(dirtiness));
-        output = output.replaceAll(FROM, Helpers.convertTimeFromLongToIso(from_date,"yyyy-MM-dd'T'HH:mm:ss.SSSZZ"));
-        output = output.replaceAll(TO, Helpers.convertTimeFromLongToIso(to_date,"yyyy-MM-dd'T'HH:mm:ss.SSSZZ"));
+        output = output.replaceAll(FROM, Helpers.convertTimeFromLongToIso(from_date, "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"));
+        output = output.replaceAll(TO, Helpers.convertTimeFromLongToIso(to_date, "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"));
 
         return output;
     }
