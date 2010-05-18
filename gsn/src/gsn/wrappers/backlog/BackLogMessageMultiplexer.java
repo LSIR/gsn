@@ -42,7 +42,6 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	protected AsyncCoreStationClient asyncCoreStationClient = null;
 	private BlockingQueue<byte []> recvQueue = new LinkedBlockingQueue<byte[]>();
 	private boolean dispose = false;
-	private boolean connecting = true;
 	private int activPluginCounter = 0;
 	private Integer coreStationDeviceId = null;
 
@@ -119,6 +118,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 		ByteArrayOutputStream pkt = new ByteArrayOutputStream();
 		boolean newPacket = true;
+		boolean conn = false;
+		boolean connecting = true;
 		long packetLength = -1;
 		while(!dispose) {
 			try {
@@ -129,12 +130,14 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 					logger.debug(e.getMessage());
 					break;
 				}
+				if (dispose)
+					break;
 				
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				if (!pktDestuffing(in, baos)) {
 					logger.warn("stuffing mark reached");
 					connecting = true;
-					recvQueue.clear();
+					conn = false;
 					newPacket = true;
 					packetLength = -1;
 					pkt = new ByteArrayOutputStream();
@@ -145,8 +148,6 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 				}
 
 				pkt.write(baos.toByteArray());
-				if (dispose)
-					break;
 				
 				if (connecting) {
 					if (pkt.size() >= 5) {
@@ -157,21 +158,23 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 							pkt.write(java.util.Arrays.copyOfRange(tmp, (int) (5), tmp.length));
 
 						coreStationDeviceId = AbstractPlugin.arr2int(tmp, 1);
-						
+
+						connecting = false;
 						if (tmp[0] != HELLO_BYTE) {
-							logger.error("connection hello message does not match");
+							logger.error("connection hello message does not match -> reconnect");
 							asyncCoreStationClient.reconnect(this);
+							recvQueue.clear();
 						}
 						else {
 							asyncCoreStationClient.addDeviceId(deploymentName, coreStationDeviceId, this);
-							connecting = false;
 							connectionFinished();
+							conn = true;
 						}
 					}
 				}
 				
 				boolean hasMorePkt = true;
-				while(hasMorePkt && !connecting) {
+				while(hasMorePkt && conn) {
 					if (newPacket) {
 						if (pkt.size() >= 4) {
 							logger.debug("rcv...");
@@ -404,7 +407,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		try {
 			sendMessage(ack, null);
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			logger.error(e.getMessage());
 		}
 	}
 	
@@ -435,7 +438,6 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		logger.debug("connection established");
 
 		try {
-			connecting = true;
 			asyncCoreStationClient.sendHelloMsg(this);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
@@ -473,14 +475,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	protected void sendPing() {
 		// send ping
 		try {
-			if (!sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()), null)) {
-		    	// stop ping timer
-				if (pingTimer != null)
-					pingTimer.cancel();
-		    	// stop ping checker timer
-				if (pingWatchDogTimer != null)
-					pingWatchDogTimer.cancel();
-			}
+			sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()), null);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
