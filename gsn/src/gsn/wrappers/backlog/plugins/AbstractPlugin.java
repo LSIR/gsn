@@ -21,7 +21,10 @@ import gsn.wrappers.backlog.BackLogMessageListener;
  */
 public abstract class AbstractPlugin extends Thread implements BackLogMessageListener {
 	
+	private static final int DEFAULT_PRIORITY = 99;
+
 	protected BackLogWrapper activeBackLogWrapper = null;
+	protected Integer priority = null;
 	private volatile Thread pluginThread;
 
 
@@ -43,6 +46,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 */
 	public boolean initialize ( BackLogWrapper backLogWrapper, String coreStationName, String deploymentName ) {
 		activeBackLogWrapper = backLogWrapper;
+		priority = Integer.valueOf(getActiveAddressBean().getPredicateValue("priority"));
 		registerListener();
 		return true;
 	}
@@ -223,13 +227,20 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * 			The data to be processed. Its format must correspond
 	 * 			to the one specified by the plugin's getOutputFormat()
 	 * 			function.
-	 * @param id 
+	 * @param priority
+	 *          the priority this message has. The smaller the number the higher the
+	 *          priority to send this message as soon as possible is. It should be somewhere
+	 *          between 10 and 1000. If it is set null, the default priority will be
+	 *          used.
 	 * @return false if not connected to the deployment
 	 * 
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
-	public boolean sendRemote(long timestamp, byte[] data) throws Exception {
-		return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null);
+	public boolean sendRemote(long timestamp, byte[] data, Integer priority) throws Exception {
+		if (priority == null)
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, DEFAULT_PRIORITY);
+		else
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, priority);
 	}
 
 
@@ -251,14 +262,22 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * 			function.
 	 * @param id 
 	 * 			The id of the CoreStation the message should be sent to.
+	 * @param priority
+	 *          the priority this message has. The smaller the number the higher the
+	 *          priority to send this message as soon as possible is. It should be somewhere
+	 *          between 10 and 1000. If it is set null, the default priority will be
+	 *          used.
 	 * 
 	 * @return false if not connected to the deployment
 	 * 
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 * 			or the DeviceId does not exist.
 	 */
-	public boolean sendRemote(long timestamp, byte[] data, Integer id) throws Exception {
-		return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id);
+	public boolean sendRemote(long timestamp, byte[] data, Integer id, Integer priority) throws Exception {
+		if (priority == null)
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id, DEFAULT_PRIORITY);
+		else
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id, priority);
 	}
 
 
@@ -279,9 +298,17 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * 			The timestamp is used to acknowledge a message. Thus
 	 * 			it has to be equal to the timestamp from the received
 	 * 			message we want to acknowledge.
+	 * @param priority
+	 *          the priority this message has. The smaller the number the higher the
+	 *          priority to send this message as soon as possible is. It should be somewhere
+	 *          between 10 and 1000. If it is set null, the default priority will be
+	 *          used.
 	 */
-	public void ackMessage(long timestamp) {
-		activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp);
+	public void ackMessage(long timestamp, Integer priority) {
+		if (priority == null)
+			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, DEFAULT_PRIORITY);
+		else
+			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, priority);
 	}
 
 

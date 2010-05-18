@@ -10,12 +10,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,7 +38,7 @@ public class AsyncCoreStationClient extends Thread  {
 	protected List<ChangeRequest> changeRequests = new LinkedList<ChangeRequest>();
 
 	// Maps a SocketChannel to a list of ByteBuffer instances
-	private Map<SocketChannel, ArrayList<byte[]>> pendingData = new HashMap<SocketChannel, ArrayList<byte[]>>();
+	private Map<SocketChannel, PriorityQueue<PriorityDataElement>> pendingData = new HashMap<SocketChannel, PriorityQueue<PriorityDataElement>>();
 
 	protected Map<SocketChannel,CoreStationListener> socketToListenerList = new HashMap<SocketChannel,CoreStationListener>();
 	protected Map<CoreStationListener,SocketChannel> listenerToSocketList = new HashMap<CoreStationListener,SocketChannel>();
@@ -215,7 +215,7 @@ public class AsyncCoreStationClient extends Thread  {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 		try {
 			synchronized (this.pendingData) {
-				ArrayList<byte[]> queue = this.pendingData.get(socketChannel);
+				PriorityQueue<PriorityDataElement> queue = this.pendingData.get(socketChannel);
 
 				while (writeBuffer.hasRemaining()) {
 					if (socketChannel.write(writeBuffer) == 0)
@@ -226,7 +226,7 @@ public class AsyncCoreStationClient extends Thread  {
 				while (!queue.isEmpty()) {
 					writeBuffer.clear();
 					try {
-						writeBuffer.put(queue.get(0));
+						writeBuffer.put(queue.poll().getData());
 					} catch (BufferOverflowException e) {
 						logger.error(e.getMessage(), e);
 					} finally {
@@ -390,7 +390,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public boolean send(String deployment, Integer id, CoreStationListener listener, byte[] data) throws IOException {
+	public boolean send(String deployment, Integer id, CoreStationListener listener, int priority, byte[] data) throws IOException {
 		boolean ret = false;
 		if (deployment == null) {
 			logger.error("deployment should not be null...");
@@ -407,7 +407,7 @@ public class AsyncCoreStationClient extends Thread  {
 			if (id == 65535) {
 				Iterator<Integer> iter = corestationMap.keySet().iterator();
 				while (iter.hasNext()) {
-					if(send(corestationMap.get(iter.next()), data, true))
+					if(send(corestationMap.get(iter.next()), priority, data, true))
 						ret = true;
 				}
 			}
@@ -416,17 +416,17 @@ public class AsyncCoreStationClient extends Thread  {
 				if (listener == null)
 					throw new IOException("The DeviceId " + id + " is not connected or does not exist for the " + deployment + " deployment");
 				
-				ret = send(listener, data, true);
+				ret = send(listener, priority, data, true);
 			}
 		}
 		else {
-			ret = send(listener, data, true);
+			ret = send(listener, priority, data, true);
 		}
 		return ret;
 	}
 
 
-	private boolean send(CoreStationListener listener, byte[] data, boolean stuff) throws IOException {
+	private boolean send(CoreStationListener listener, int priority, byte[] data, boolean stuff) throws IOException {
 		if (data.length > BUFFER_SIZE-4) 
 			throw new IOException("data limited to " + (BUFFER_SIZE-4) + " bytes");
 		
@@ -441,19 +441,19 @@ public class AsyncCoreStationClient extends Thread  {
 		      
 				// And queue the data we want written
 				synchronized (this.pendingData) {
-					ArrayList<byte[]> queue = this.pendingData.get(socketChannel);
+					PriorityQueue<PriorityDataElement> queue = this.pendingData.get(socketChannel);
 					if (queue == null) {
-						queue = new ArrayList<byte[]>();
+						queue = new PriorityQueue<PriorityDataElement>();
 						this.pendingData.put(socketChannel, queue);
 					}
 					if (stuff) {
 		        		ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length + 4);
 		        		baos.write(AbstractPlugin.uint2arr(data.length));
 						baos.write(data);
-						queue.add(pktStuffing(baos.toByteArray()));
+						queue.offer(new PriorityDataElement(priority, pktStuffing(baos.toByteArray())));
 					}
 					else
-						queue.add(data);
+						queue.offer(new PriorityDataElement(priority, data));
 				}
 			}
 		    
@@ -472,7 +472,7 @@ public class AsyncCoreStationClient extends Thread  {
 		logger.debug("send hello message");
 		byte[] data = {BackLogMessageMultiplexer.STUFFING_BYTE, BackLogMessageMultiplexer.HELLO_BYTE};
 		
-		return send(listener, data, false);
+		return send(listener, 0, data, false);
 	}
 	
 	
@@ -513,6 +513,35 @@ class ChangeRequest
 		this.socket = socket;
 		this.type = type;
 		this.ops = ops;
+	}
+}
+
+
+class PriorityDataElement implements Comparable<PriorityDataElement>
+{
+	private int priority;
+	private byte[] data;
+	
+	public PriorityDataElement(int priority, byte[] data) {
+		this.priority = priority;
+		this.data = data;
+	}
+	
+	public byte[] getData() {
+		return data;
+	}
+	
+	@Override
+	public int compareTo(PriorityDataElement obj) {
+		if (obj == null)
+			throw new NullPointerException();
+		
+		if (priority < obj.priority)
+			return -1;
+		else if (priority > obj.priority)
+			return 1;
+		else
+			return 0;
 	}
 }
 

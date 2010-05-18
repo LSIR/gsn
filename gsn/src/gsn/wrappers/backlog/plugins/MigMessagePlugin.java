@@ -66,6 +66,7 @@ public class MigMessagePlugin extends AbstractPlugin
 	@Override
 	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		super.activeBackLogWrapper = backlogwrapper;
+		super.priority = Integer.valueOf(getActiveAddressBean().getPredicateValue("priority"));
 		
 		String propertyfile = "conf/permasense/" + deploymentName + "-migmessageplugin.properties";
 		Properties props = new Properties(); 
@@ -182,7 +183,7 @@ public class MigMessagePlugin extends AbstractPlugin
 		}
 		
 		if (dataProcessed(System.currentTimeMillis(), outputvaluesmap.values().toArray(new Serializable[] {})))
-			ackMessage(timestamp);
+			ackMessage(timestamp, super.priority);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 
@@ -282,7 +283,7 @@ public class MigMessagePlugin extends AbstractPlugin
 			}
 			
 			try {
-				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data));
+				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data), super.priority);
 				logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -293,7 +294,7 @@ public class MigMessagePlugin extends AbstractPlugin
 				byte [] packet = ((String) paramValues[0]).getBytes();
 				if(packet.length > 0) {
 					try {
-						ret = sendRemote(System.currentTimeMillis(), packet);
+						ret = sendRemote(System.currentTimeMillis(), packet, super.priority);
 						logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
 					} catch (Exception e) {
 						logger.error(e.getMessage());
@@ -356,7 +357,7 @@ public class MigMessagePlugin extends AbstractPlugin
 					net.tinyos.message.Message tosmsg = (net.tinyos.message.Message)msg;
 					packet = createTOSpacket(0xffff, tosmsg.amType(), tosmsg.dataGet());
 				}
-				ret = sendRemote(System.currentTimeMillis(), packet);
+				ret = sendRemote(System.currentTimeMillis(), packet, super.priority);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				return false;

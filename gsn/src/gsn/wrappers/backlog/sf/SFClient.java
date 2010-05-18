@@ -29,6 +29,9 @@ import net.tinyos.util.Messenger;
  * @author	Tonio Gsell
  */
 public class SFClient extends SFProtocol implements Runnable, BackLogMessageListener, Messenger {
+	
+	private static final int SF_MESSAGE_PRIORITY = 20;
+	
     private Thread thread;
     private Socket socket = null;
     private SFListen listenServer;
@@ -107,7 +110,7 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 				msg = new BackLogMessage(BackLogMessage.TOS_MESSAGE_TYPE, 0, packet);
 				
 				// TODO: to which DeviceId has the message to be sent to?
-			    if (!((BackLogMessageMultiplexer) listenServer.getSources().toArray()[0]).sendMessage(msg, null))
+			    if (!((BackLogMessageMultiplexer) listenServer.getSources().toArray()[0]).sendMessage(msg, null, SF_MESSAGE_PRIORITY))
 			    	logger.error("write failed");
 			    else
 					logger.debug("Message from SF with address >" + socket.getInetAddress().getHostName() + "< received and forwarded");

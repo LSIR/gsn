@@ -40,6 +40,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 	@Override
 	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		activeBackLogWrapper = backlogwrapper;
+		super.priority = Integer.valueOf(getActiveAddressBean().getPredicateValue("priority"));
 		tinyos1x_platform = getActiveAddressBean().getPredicateValue(MigMessageMultiplexer.TINYOS1X_PLATFORM);
 
 		// a template message for this platform has to be instantiated to be able to get the data offset
@@ -124,7 +125,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 			}
 			
 			try {
-				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data));
+				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data), super.priority);
 				logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -136,7 +137,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 				byte [] packet = ((String) paramValues[0]).getBytes();
 				if(packet.length > 0) {
 					try {
-						ret = sendRemote(System.currentTimeMillis(), packet);
+						ret = sendRemote(System.currentTimeMillis(), packet, super.priority);
 					} catch (Exception e) {
 						logger.error(e.getMessage());
 						return false;

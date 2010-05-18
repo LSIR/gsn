@@ -285,17 +285,22 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	 *          if the message should be sent to the CoreStation this BackLogMessageMultiplexer
 	 *          is connected to
 	 *          
+	 * @param priority
+	 *          the priority this message has. The smaller the number the higher the
+	 *          priority to send this message as soon as possible is. It should be somewhere
+	 *          between 10 and 1000.
+	 *          
 	 * @return false if the connection to the CoreStation is not established
 	 * 
 	 * @throws IOException if the message is too long or the DeviceId does not exist
 	 */
-	public boolean sendMessage(BackLogMessage message, Integer id) throws IOException {
+	public boolean sendMessage(BackLogMessage message, Integer id, int priority) throws IOException {
 		logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
 		if (id == null) {
-			return asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, message.getMessage());
+			return asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, priority, message.getMessage());
 		}
 		else {
-			return asyncCoreStationClient.send(deploymentName, id, this, message.getMessage());
+			return asyncCoreStationClient.send(deploymentName, id, this, priority, message.getMessage());
 		}
 	}
 
@@ -400,12 +405,12 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	}
 
 
-	public void sendAck(long timestamp) {
+	public void sendAck(long timestamp, int priority) {
 		// send ACK with corresponding timestamp
 		BackLogMessage ack = new BackLogMessage(BackLogMessage.ACK_MESSAGE_TYPE, timestamp);
 		logger.debug("Ack sent: timestamp: " + timestamp);
 		try {
-			sendMessage(ack, null);
+			sendMessage(ack, null, priority);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
@@ -475,7 +480,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	protected void sendPing() {
 		// send ping
 		try {
-			sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()), null);
+			sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()), null, 0);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
@@ -490,7 +495,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private boolean sendPingAck(long timestamp) {
 		// send ping ACK
 		try {
-			return sendMessage(new BackLogMessage(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp), null);
+			return sendMessage(new BackLogMessage(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp), null, 0);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			return false;

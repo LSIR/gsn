@@ -117,6 +117,7 @@ public class BinaryPlugin extends AbstractPlugin {
 		this.coreStationName = coreStationName;
 
 		AddressBean addressBean = getActiveAddressBean();
+		super.priority = Integer.valueOf(addressBean.getPredicateValue("priority"));
 		
 		calcChecksumThread = new CalculateChecksum(this);
 		bigBinarySender = new BigBinarySender(this);
@@ -744,7 +745,7 @@ class BigBinarySender extends Thread
 			
 			if(triggered) {
 				try {
-					if(!parent.sendRemote(System.currentTimeMillis(), packet))
+					if(!parent.sendRemote(System.currentTimeMillis(), packet, parent.priority))
 						stopSending();
 				} catch (Exception e) {
 					parent.logger.error(e.getMessage(), e);
@@ -787,7 +788,7 @@ class BigBinarySender extends Thread
     		baos.write(BinaryPlugin.CHUNK_PACKET);
 			try {
 				baos.write(BinaryPlugin.uint2arr(ackNr));
-				parent.sendRemote(System.currentTimeMillis(), baos.toByteArray());
+				parent.sendRemote(System.currentTimeMillis(), baos.toByteArray(), parent.priority);
 			} catch (Exception e) {
 				parent.logger.error(e.getMessage(), e);
 			}
@@ -804,7 +805,7 @@ class BigBinarySender extends Thread
 			packet[0] = BinaryPlugin.ACK_PACKET;
 			packet[1] = BinaryPlugin.INIT_PACKET;
 			try {
-				parent.sendRemote(System.currentTimeMillis(), packet);
+				parent.sendRemote(System.currentTimeMillis(), packet, parent.priority);
 			} catch (Exception e) {
 				parent.logger.error(e.getMessage(), e);
 			}
@@ -821,7 +822,7 @@ class BigBinarySender extends Thread
 			packet[0] = BinaryPlugin.ACK_PACKET;
 			packet[1] = BinaryPlugin.CRC_PACKET;
 			try {
-				parent.sendRemote(System.currentTimeMillis(), packet);
+				parent.sendRemote(System.currentTimeMillis(), packet, parent.priority);
 			} catch (Exception e) {
 				parent.logger.error(e.getMessage(), e);
 			}

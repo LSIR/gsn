@@ -81,7 +81,7 @@ public class SchedulePlugin extends AbstractPlugin {
 						// to resend it
 						logger.debug("no new schedule available");
 						byte [] pkt = {TYPE_SCHEDULE_SAME};
-						sendRemote(System.currentTimeMillis(), pkt);
+						sendRemote(System.currentTimeMillis(), pkt, super.priority);
 					}
 					else {
 						// send the new schedule to the deployment
@@ -92,7 +92,7 @@ public class SchedulePlugin extends AbstractPlugin {
 						pkt[0] = TYPE_NEW_SCHEDULE;
 						System.arraycopy(long2arr(creationtime), 0, pkt, 1, 8);
 						System.arraycopy(schedule, 0, pkt, 9, schedule.length);
-						sendRemote(System.currentTimeMillis(), pkt);
+						sendRemote(System.currentTimeMillis(), pkt, super.priority);
 						
 						if (rs.getLong("transmission_time") == 0) {
 							long time = System.currentTimeMillis();
@@ -103,7 +103,7 @@ public class SchedulePlugin extends AbstractPlugin {
 				} else {
 					// we do not have any schedule available in the database
 					byte [] pkt = {TYPE_NO_SCHEDULE_AVAILABLE};
-					sendRemote(System.currentTimeMillis(), pkt);
+					sendRemote(System.currentTimeMillis(), pkt, super.priority);
 					logger.warn("schedule request received but no schedule available in database");
 				}
 			} catch (Exception e) {
@@ -142,7 +142,7 @@ public class SchedulePlugin extends AbstractPlugin {
 			boolean sent = false;
 			// and try to send it to the deployment
 			try {
-				sent = sendRemote(System.currentTimeMillis(), pkt);
+				sent = sendRemote(System.currentTimeMillis(), pkt, super.priority);
 			} catch (Exception e) {
 				logger.warn(e.getMessage());
 			}

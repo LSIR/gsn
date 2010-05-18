@@ -64,7 +64,7 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 		}
 		
 		if( dataProcessed(System.currentTimeMillis(), data) )
-			ackMessage(timestamp);
+			ackMessage(timestamp, super.priority);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 

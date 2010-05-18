@@ -81,7 +81,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 		Serializable[] data = {timestamp, timestamp, deviceId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses};
 		
 		if (dataProcessed(System.currentTimeMillis(), data))
-			ackMessage(timestamp);
+			ackMessage(timestamp, super.priority);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 		return true;
@@ -102,7 +102,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 		if( action.compareToIgnoreCase("resend_backlogged_data") == 0 ) {
 			byte[] command = {1};
 			try {
-				if( sendRemote(System.currentTimeMillis(), command) ) {
+				if( sendRemote(System.currentTimeMillis(), command, super.priority) ) {
 					logger.debug("Upload command sent (resend backlogged data)");
 				}
 				else {
