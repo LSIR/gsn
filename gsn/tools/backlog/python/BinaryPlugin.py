@@ -90,6 +90,7 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options)
+        
         self._parent = parent
         
         self._isBusy = True
@@ -291,7 +292,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 elif pktType == INIT_PACKET:
                     if self._lastRecvPacketType == INIT_PACKET:
                         self.debug('init packet already received')
-                        self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._backlog)
+                        self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._priority, self._backlog)
                         if not self._msgdeque:
                             self._lock.acquire()
                             self._work.clear()
@@ -309,12 +310,12 @@ class BinaryPluginClass(AbstractPluginClass):
                     
                     self._lastRecvPacketType = INIT_PACKET
                     self._lastSentPacketType = ACK_PACKET
-                    self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._backlog)
+                    self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._priority, self._backlog)
                 # if the type is RESEND_PACKET we have to resend a part of a file...
                 elif pktType == RESEND_PACKET:
                     if self._lastRecvPacketType == RESEND_PACKET:
                         self.debug('binary retransmission request already received')
-                        self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._backlog)
+                        self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._priority, self._backlog)
                         if not self._msgdeque:
                             self._lock.acquire()
                             self._work.clear()
@@ -377,7 +378,7 @@ class BinaryPluginClass(AbstractPluginClass):
                     
                     self._lastRecvPacketType = RESEND_PACKET
                     self._lastSentPacketType = ACK_PACKET
-                    self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._backlog)
+                    self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._priority, self._backlog)
             except  IndexError:
                 pass
         
@@ -480,7 +481,7 @@ class BinaryPluginClass(AbstractPluginClass):
                     if not first:
                         self.info('resend message')
                     self._waitforack = True
-                    self.processMsg(self.getTimeStamp(), packet, self._backlog)
+                    self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
                     # and resend it if no ack has been received
                     self._work.wait(RESEND_INTERVAL_SEC)
                     first = False

@@ -196,7 +196,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             
             packet = struct.pack('<IIIIIIIIII', v1, v2, v3, v4, v5, v6, v7, v8, v9, v10)
             
-            self.processMsg(self.getTimeStamp(), packet, self._backlog)
+            self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
             
         self.info('died')
 

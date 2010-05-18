@@ -131,7 +131,7 @@ class GSNPeerClass(Thread):
         return self._connected
 
 
-    def sendToGSN(self, msg, resend=False):
+    def sendToGSN(self, msg, priority, resend=False):
         '''
         Send message to GSN.
         
@@ -141,9 +141,9 @@ class GSNPeerClass(Thread):
         '''        
         self._outCounter += 1
         if resend:
-            return self._gsnlistener._gsnwriter.addResendMsg(msg)        
+            return self._gsnlistener._gsnwriter.addResendMsg(msg, priority)        
         else:
-            return self._gsnlistener._gsnwriter.addMsg(msg)
+            return self._gsnlistener._gsnwriter.addMsg(msg, priority)
         
         
     def pktReceived(self, pkt):
@@ -200,14 +200,14 @@ class GSNPeerClass(Thread):
 
 
     def ping(self):
-        self.sendToGSN(BackLogMessage.BackLogMessageClass(BackLogMessage.PING_MESSAGE_TYPE, int(time.time()*1000)))
+        self.sendToGSN(BackLogMessage.BackLogMessageClass(BackLogMessage.PING_MESSAGE_TYPE, int(time.time()*1000)), 0)
 
 
     def pingAck(self, timestamp):
-        self.sendToGSN(BackLogMessage.BackLogMessageClass(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp))
+        self.sendToGSN(BackLogMessage.BackLogMessageClass(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp), 0)
 
 
-    def processMsg(self, msgType, timestamp, payload, backlog=False):
+    def processMsg(self, msgType, timestamp, payload, priority, backlog=False):
         '''
         Store the message in the backlog database if needed and try to send
         it to GSN.
@@ -236,13 +236,13 @@ class GSNPeerClass(Thread):
             ret = self._parent.backlog.storeMsg(timestamp, msgType, payload)
             
         # send the message to the GSN backend
-        self.sendToGSN(BackLogMessage.BackLogMessageClass(msgType, timestamp, payload))
+        self.sendToGSN(BackLogMessage.BackLogMessageClass(msgType, timestamp, payload), priority)
                 
         return ret
 
 
     def processResendMsg(self, msgType, timestamp, payload):
-        return self.sendToGSN(BackLogMessage.BackLogMessageClass(msgType, timestamp, payload), True)
+        return self.sendToGSN(BackLogMessage.BackLogMessageClass(msgType, timestamp, payload), 99, True)
 
 
     def error(self, msg):
@@ -538,7 +538,7 @@ class GSNWriter(Thread):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
         self._parent = parent
-        self._sendqueue = Queue.Queue(SEND_QUEUE_SIZE)
+        self._sendqueue = Queue.PriorityQueue(SEND_QUEUE_SIZE)
         self._work = Event()
         self._stopped = False
 
@@ -553,7 +553,7 @@ class GSNWriter(Thread):
             # is there something to do?
             while self._parent._connected and not self._sendqueue.empty() and not self._stopped:
                 try:
-                    msg = self._sendqueue.get_nowait()
+                    msg = self._sendqueue.get_nowait()[1]
                 except Queue.Empty:
                     self._logger.warning('send queue is empty')
                     break
@@ -589,7 +589,7 @@ class GSNWriter(Thread):
     def sendHelloMsg(self):
         helloMsg = chr(STUFFING_BYTE) + chr(HELLO_BYTE)
         helloMsg += self.pktStuffing(struct.pack('<I', self._parent._parent._deviceid))
-        self.addMsg(helloMsg)
+        self.addMsg(helloMsg, 0)
 
 
     def stop(self):
@@ -609,10 +609,10 @@ class GSNWriter(Thread):
                 break
 
 
-    def addMsg(self, msg):
+    def addMsg(self, msg, priority):
         if self._parent._connected and not self._stopped:
             try:
-                self._sendqueue.put_nowait(msg)
+                self._sendqueue.put_nowait((priority, msg))
             except Queue.Full:
                 self._logger.warning('send queue is full')
             self._work.set()
@@ -620,13 +620,13 @@ class GSNWriter(Thread):
         return False
 
         
-    def addResendMsg(self, msg):
+    def addResendMsg(self, msg, priority=100):
         # wait until send queue is empty
         self._sendqueue.join()
         assert self._sendqueue.not_empty != True
         if self._parent._connected and not self._stopped:
             try:
-                self._sendqueue.put_nowait(msg)
+                self._sendqueue.put_nowait((priority, msg))
             except Queue.Full:
                 self._logger.warning('send queue is full (resend)')
             self._work.set()

@@ -87,7 +87,7 @@ class TOSPluginClass(AbstractPluginClass):
 
             # tell PSBackLogMain to send the packet to GSN and backlog
             # using the serial port we can guarantee flow control to the backlog database!
-            if self.processMsg(timestamp, payload, self._backlog):
+            if self.processMsg(timestamp, payload, self._priority, self._backlog):
                 try:
                     self._serialsource.sendAck()
                 except Exception, e:

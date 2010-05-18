@@ -136,7 +136,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
                 self.debug(line)
                 packet += self.packString(line)
                 
-                self.processMsg(self.getTimeStamp(), packet, self._backlog)
+                self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
             except Exception, e:
                 self.error(e.__str__())
                 continue

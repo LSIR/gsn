@@ -260,9 +260,9 @@ class SchedulePluginClass(AbstractPluginClass):
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
                 self.info('request schedule from gsn')
                 if self._schedule:
-                    self.processMsg(self._schedule.getCreationTime(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE))
+                    self.processMsg(self._schedule.getCreationTime(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), self._priority)
                 else:
-                    self.processMsg(self.getTimeStamp(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE))
+                    self.processMsg(self.getTimeStamp(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), self._priority)
                 self._scheduleEvent.wait(3)
                 if self._stopped:
                     self.info('died')

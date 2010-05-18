@@ -24,7 +24,7 @@ class AbstractPluginClass(Thread):
     _backlog
     '''
 
-    def __init__(self, parent, config, backlog_default=False):
+    def __init__(self, parent, config, backlog_default=False, priority_default=99):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
         self._parent = parent
@@ -39,7 +39,14 @@ class AbstractPluginClass(Thread):
                 self._backlog = backlog_default
         else:
             self._backlog = backlog_default
+        
+        value = self.getOptionValue('priority')
+        if value is None:
+            self._priority = priority_default
+        else:
+            self._priority = int(value)
         self.info('backlog: ' + str(self._backlog))
+        self.info('priority: ' + str(self._priority))
         
 
     def getOptionValue(self, key):
@@ -103,7 +110,7 @@ class AbstractPluginClass(Thread):
         pass
     
     
-    def processMsg(self, timestamp, payload, backlogging=False):
+    def processMsg(self, timestamp, payload, priority, backlogging=False):
         '''
         Store the message in the backlog and backup database if needed and try to send
         it to GSN.
@@ -119,7 +126,7 @@ class AbstractPluginClass(Thread):
         @return: True if the message has been stored successfully into the backlog database if needed,
                  otherwise False.
         '''
-        return self._parent.gsnpeer.processMsg(self.getMsgType(), timestamp, payload, backlogging)
+        return self._parent.gsnpeer.processMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
        
         
     def run(self):

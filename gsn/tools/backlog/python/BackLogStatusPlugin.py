@@ -79,7 +79,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             connectionLosses = gsnpeerstatus[3]
             packet += struct.pack('<IIII', incounter, outcounter, backlogcounter, connectionLosses)
             
-            self.processMsg(self.getTimeStamp(), packet, self._backlog)
+            self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
             
         self.info('died')
         
