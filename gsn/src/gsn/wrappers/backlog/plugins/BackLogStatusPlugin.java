@@ -83,46 +83,46 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 			backlog_db_entries = arr2int(packet, 8);
 		if(packet.length >= 16)
 			backlog_db_size = arr2int(packet, 12);
-		if(packet.length >= 20) {
-			minstoretime = arr2int(packet, 16);
+		if(packet.length >= 20)
+			in_counter = arr2int(packet, 16);
+		if(packet.length >= 24)
+			out_counter = arr2int(packet, 20);
+		if(packet.length >= 28)
+			backlog_counter = arr2int(packet, 24);
+		if(packet.length >= 32)
+			connection_losses = arr2int(packet, 28);
+		if(packet.length >= 36)
+			backlog_uptime = arr2int(packet, 32);
+		if(packet.length >= 40) {
+			minstoretime = arr2int(packet, 36);
 			if (minstoretime == -1)
 				minstoretime = null;
 		}
-		if(packet.length >= 24) {
-			maxstoretime = arr2int(packet, 20);
+		if(packet.length >= 44) {
+			maxstoretime = arr2int(packet, 40);
 			if (maxstoretime == -1)
 				maxstoretime = null;
 		}
-		if(packet.length >= 28) {
-			meanstoretime = arr2int(packet, 24);
+		if(packet.length >= 48) {
+			meanstoretime = arr2int(packet, 44);
 			if (meanstoretime == -1)
 				meanstoretime = null;
 		}
-		if(packet.length >= 32) {
-			minremovetime = arr2int(packet, 28);
+		if(packet.length >= 52) {
+			minremovetime = arr2int(packet, 48);
 			if (minremovetime == -1)
 				minremovetime = null;
 		}
-		if(packet.length >= 36) {
-			maxremovetime = arr2int(packet, 32);
+		if(packet.length >= 56) {
+			maxremovetime = arr2int(packet, 52);
 			if (maxremovetime == -1)
 				maxremovetime = null;
 		}
-		if(packet.length >= 40) {
-			meanremovetime = arr2int(packet, 36);
+		if(packet.length >= 60) {
+			meanremovetime = arr2int(packet, 56);
 			if (meanremovetime == -1)
 				meanremovetime = null;
 		}
-		if(packet.length >= 44)
-			backlog_uptime = arr2int(packet, 40);
-		if(packet.length >= 48)
-			in_counter = arr2int(packet, 44);
-		if(packet.length >= 52)
-			out_counter = arr2int(packet, 48);
-		if(packet.length >= 56)
-			backlog_counter = arr2int(packet, 52);
-		if(packet.length >= 60)
-			connection_losses = arr2int(packet, 56);
 		
 		Serializable[] data = {timestamp, timestamp, deviceId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses, backlog_uptime, minstoretime, meanstoretime, maxstoretime, minremovetime, meanremovetime, maxremovetime};
 		

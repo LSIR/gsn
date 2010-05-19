@@ -32,7 +32,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
     '''
 
     def __init__(self, parent, config):
-        _startTime = time.time()
+        self._startTime = time.time()
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         
         value = self.getOptionValue('poll_interval')
@@ -72,22 +72,22 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             
             packet = struct.pack('<II', self.getErrorCounter(), self.getExceptionCounter())
             backlogstatus = self.getBackLogStatus()
-            backlogdbentries = backlogstatus[0]
-            backlogdbsize = backlogstatus[1]
-            minstoretime = backlogstatus[2]
-            maxstoretime = backlogstatus[3]
-            meanstoretime = backlogstatus[4]
-            minremovetime = backlogstatus[5]
-            maxremovetime = backlogstatus[6]
-            meanremovetime = backlogstatus[7]
-            packet += struct.pack('<IIIIIIII', backlogdbentries, backlogdbsize, minstoretime, maxstoretime, meanstoretime, minremovetime, maxremovetime, meanremovetime)
+            backlogdbentries = int(backlogstatus[0])
+            backlogdbsize = int(backlogstatus[1])
+            minstoretime = int(backlogstatus[2])
+            maxstoretime = int(backlogstatus[3])
+            meanstoretime = int(backlogstatus[4])
+            minremovetime = int(backlogstatus[5])
+            maxremovetime = int(backlogstatus[6])
+            meanremovetime = int(backlogstatus[7])
+            packet += struct.pack('<II', backlogdbentries, backlogdbsize)
             gsnpeerstatus = self.getGSNPeerStatus()
-            incounter = gsnpeerstatus[0]
-            outcounter = gsnpeerstatus[1]
-            backlogcounter = gsnpeerstatus[2]
-            connectionLosses = gsnpeerstatus[3]
-            uptime = time.time()-_startTime
-            packet += struct.pack('<IIIII', uptime, incounter, outcounter, backlogcounter, connectionLosses)
+            incounter = int(gsnpeerstatus[0])
+            outcounter = int(gsnpeerstatus[1])
+            backlogcounter = int(gsnpeerstatus[2])
+            connectionLosses = int(gsnpeerstatus[3])
+            uptime = int(time.time()-self._startTime)
+            packet += struct.pack('<IIIIIIIIIII', incounter, outcounter, backlogcounter, connectionLosses, uptime, minstoretime, maxstoretime, meanstoretime, minremovetime, maxremovetime, meanremovetime)
             
             self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
             
