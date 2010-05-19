@@ -11,6 +11,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="UPTIME" type="INTEGER" unit="relatime" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
             <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
@@ -19,6 +20,12 @@
             <field name="OUT_COUNTER" type="INTEGER" />
             <field name="BACKLOG_COUNTER" type="INTEGER" />
             <field name="CONNECTION_LOSSES" type="INTEGER" />
+            <field name="DB_STORE_TIME_MIN" type="INTEGER" unit="ms" />
+            <field name="DB_STORE_TIME_MEAN" type="INTEGER" unit="ms" />
+            <field name="DB_STORE_TIME_MAX" type="INTEGER" unit="ms" />
+            <field name="DB_REMOVE_TIME_MIN" type="INTEGER" unit="ms" />
+            <field name="DB_REMOVE_TIME_MEAN" type="INTEGER" unit="ms" />
+            <field name="DB_REMOVE_TIME_MAX" type="INTEGER" unit="ms" />
         </output-structure>
     </processing-class>
     <description>show status information of the BackLogs and send commands to the Thur deployment</description>

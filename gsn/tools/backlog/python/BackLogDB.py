@@ -34,6 +34,14 @@ class BackLogDBClass(Thread):
     _con
     _cur
     _dbNumberOfEntries
+    _minStoreTime
+    _maxStoreTime
+    _meanStoreTime
+    _storeCounter
+    _minRemoveTime
+    _maxRemoveTime
+    _meanRemoveTime
+    _removeCounter
     _lock
     _sleep
     _resend
@@ -57,7 +65,15 @@ class BackLogDBClass(Thread):
         @raise Exception: if there is a problem with the sqlite3 database.
         '''
         Thread.__init__(self)
-        
+        self._minStoreTime = -1
+        self._maxStoreTime = -1
+        self._meanStoreTime = -1
+        self._storeCounter = 1
+        self._minRemoveTime = -1
+        self._maxRemoveTime = -1
+        self._meanRemoveTime = -1
+        self._removeCounter = 1
+
         self._logger = logging.getLogger(self.__class__.__name__)
         
         # initialize variables
@@ -130,7 +146,17 @@ class BackLogDBClass(Thread):
             self._con.commit()
             self._dbNumberOfEntries += 1
             self._lock.release()
-            self._logger.debug('store (%d,%d,%d): %f s' % (msgType, timestamp, len(data), (time.time() - t)))
+            storeTime = time.time() - t
+            if self._minStoreTime == -1 or storeTime*1000 < self._minStoreTime:
+                self._minStoreTime = storeTime*1000
+            if self._maxStoreTime == -1 or storeTime*1000 > self._maxStoreTime:
+                self._maxStoreTime = storeTime*1000
+            if self._meanStoreTime == -1:
+                self._meanStoreTime = storeTime*1000
+            else:
+                self._meanStoreTime += storeTime*1000
+                self._storeCounter += 1
+            self._logger.debug('store (%d,%d,%d): %f s' % (msgType, timestamp, len(data), storeTime))
             return True
         except sqlite3.Error, e:
             self._lock.release()
@@ -159,7 +185,17 @@ class BackLogDBClass(Thread):
                 self._con.commit()
                 self._dbNumberOfEntries -= cnt
             self._lock.release()
-            self._logger.debug('del (?,%d,?): %f s' % (timestamp, (time.time() - t)))
+            removeTime = time.time() - t
+            if self._minRemoveTime == -1 or removeTime*1000 < self._minRemoveTime:
+                self._minRemoveTime = removeTime*1000
+            if self._maxRemoveTime == -1 or removeTime*1000 > self._maxRemoveTime:
+                self._maxRemoveTime = removeTime*1000
+            if self._meanRemoveTime == -1:
+                self._meanRemoveTime = removeTime*1000
+            else:
+                self._meanRemoveTime += removeTime*1000
+                self._removeCounter += 1
+            self._logger.debug('del (?,%d,?): %f s' % (timestamp, removeTime))
         except sqlite3.Error, e:
             self._lock.release()
             if not self._stopped:
@@ -173,8 +209,18 @@ class BackLogDBClass(Thread):
         
         @return: status of the backlog database as tuple (number of database entries, database file size)
         '''
+        ret = (self._dbNumberOfEntries, os.path.getsize(self._dbname)/1024, self._minStoreTime, self._maxStoreTime, self._meanStoreTime/self._storeCounter, self._minRemoveTime, self._maxRemoveTime, self._meanRemoveTime/self._removeCounter)
         
-        return (self._dbNumberOfEntries, os.path.getsize(self._dbname)/1024)            
+        self._minStoreTime = -1
+        self._maxStoreTime = -1
+        self._meanStoreTime = -1
+        self._storeCounter = 1
+        self._minRemoveTime = -1
+        self._maxRemoveTime = -1
+        self._meanRemoveTime = -1
+        self._removeCounter = 1
+        
+        return ret            
             
                 
     def resend(self, sleep=False):

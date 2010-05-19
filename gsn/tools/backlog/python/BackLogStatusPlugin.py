@@ -6,6 +6,7 @@ Created on Jul 15, 2009
 '''
 
 import struct
+import time
 from threading import Event
 
 import BackLogMessage
@@ -24,12 +25,14 @@ class BackLogStatusPluginClass(AbstractPluginClass):
 
     '''
     data/instance attributes:
+    _startTime
     _interval
     _stopped
     _sleeper
     '''
 
     def __init__(self, parent, config):
+        _startTime = time.time()
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         
         value = self.getOptionValue('poll_interval')
@@ -71,13 +74,20 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             backlogstatus = self.getBackLogStatus()
             backlogdbentries = backlogstatus[0]
             backlogdbsize = backlogstatus[1]
-            packet += struct.pack('<II', backlogdbentries, backlogdbsize)
+            minstoretime = backlogstatus[2]
+            maxstoretime = backlogstatus[3]
+            meanstoretime = backlogstatus[4]
+            minremovetime = backlogstatus[5]
+            maxremovetime = backlogstatus[6]
+            meanremovetime = backlogstatus[7]
+            packet += struct.pack('<IIIIIIII', backlogdbentries, backlogdbsize, minstoretime, maxstoretime, meanstoretime, minremovetime, maxremovetime, meanremovetime)
             gsnpeerstatus = self.getGSNPeerStatus()
             incounter = gsnpeerstatus[0]
             outcounter = gsnpeerstatus[1]
             backlogcounter = gsnpeerstatus[2]
             connectionLosses = gsnpeerstatus[3]
-            packet += struct.pack('<IIII', incounter, outcounter, backlogcounter, connectionLosses)
+            uptime = time.time()-_startTime
+            packet += struct.pack('<IIIII', uptime, incounter, outcounter, backlogcounter, connectionLosses)
             
             self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
             
