@@ -150,7 +150,7 @@ public class AsyncCoreStationClient extends Thread  {
 	    				logger.debug("no handler for " + key.channel().getClass().getName());
 	    			}
 	    		}
-	    	} catch (IOException e) {
+	    	} catch (Exception e) {
 	    		logger.error(e.getMessage(), e);
 	    	}
 	    }
@@ -273,14 +273,18 @@ public class AsyncCoreStationClient extends Thread  {
 			return;
 		}
 
-		CoreStationListener listener;
-		synchronized (socketToListenerList) {
-			listener = socketToListenerList.get((SocketChannel)key.channel());
+		try {
+			CoreStationListener listener;
+			synchronized (socketToListenerList) {
+				listener = socketToListenerList.get((SocketChannel)key.channel());
+			}
+			listener.connectionEstablished();
+		  
+			// Register an interest in reading on this channel
+			key.interestOps(SelectionKey.OP_READ);
+		} catch (Exception e) {
+			logger.error(e.getMessage() ,e);
 		}
-		listener.connectionEstablished();
-	  
-		// Register an interest in reading on this channel
-		key.interestOps(SelectionKey.OP_READ);
 	}
 
 	
@@ -295,21 +299,25 @@ public class AsyncCoreStationClient extends Thread  {
 			logger.error("thread already running");
 		}
 		
-		SocketChannel socketChannel = SocketChannel.open();
-		socketChannel.configureBlocking(false);
-		socketChannel.connect(new InetSocketAddress(listener.getHostAddress(), listener.getPort()));
+		try {
+			SocketChannel socketChannel = SocketChannel.open();
+			socketChannel.configureBlocking(false);
+			socketChannel.connect(new InetSocketAddress(listener.getHostAddress(), listener.getPort()));
 		
-		synchronized(socketToListenerList) {
-			socketToListenerList.put(socketChannel, listener);
+			synchronized(socketToListenerList) {
+				socketToListenerList.put(socketChannel, listener);
+			}
+			synchronized (listenerToSocketList) {
+				listenerToSocketList.put(listener, socketChannel);
+			}
+			
+			synchronized(changeRequests) {
+				changeRequests.add(new ChangeRequest(socketChannel, ChangeRequest.TYPE_REGISTER, SelectionKey.OP_CONNECT));
+			}
+			selector.wakeup();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
-		synchronized (listenerToSocketList) {
-			listenerToSocketList.put(listener, socketChannel);
-		}
-		
-		synchronized(changeRequests) {
-			changeRequests.add(new ChangeRequest(socketChannel, ChangeRequest.TYPE_REGISTER, SelectionKey.OP_CONNECT));
-		}
-		selector.wakeup();
 	}
 	
 	
@@ -322,53 +330,65 @@ public class AsyncCoreStationClient extends Thread  {
 			logger.error(e.getMessage(), e);
 		}
 
-		sc.keyFor(selector).cancel();
-		
-		synchronized(socketToListenerList) {
-			socketToListenerList.remove(sc);
+		try {
+			sc.keyFor(selector).cancel();
+			
+			synchronized(socketToListenerList) {
+				socketToListenerList.remove(sc);
+			}
+			
+			synchronized(listenerToSocketList) {
+				listenerToSocketList.remove(listener);
+			}
+			
+			if (socketToListenerList.isEmpty())
+				dispose();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
-		
-		synchronized(listenerToSocketList) {
-			listenerToSocketList.remove(listener);
-		}
-		
-		if (socketToListenerList.isEmpty())
-			dispose();
 	}
 
 
 	public void addDeviceId(String deployment, Integer id, CoreStationListener listener) {
 		logger.debug("adding DeviceId " + id + "for " + deployment + " deployment");
 
-		synchronized (deploymentToIdListenerMapList) {
-			if (!deploymentToIdListenerMapList.containsKey(deployment)) {
-				deploymentToIdListenerMapList.put(deployment, new HashMap<Integer, CoreStationListener>());
+		try {
+			synchronized (deploymentToIdListenerMapList) {
+				if (!deploymentToIdListenerMapList.containsKey(deployment)) {
+					deploymentToIdListenerMapList.put(deployment, new HashMap<Integer, CoreStationListener>());
+				}
+				
+				deploymentToIdListenerMapList.get(deployment).put(id, listener);
 			}
-			
-			deploymentToIdListenerMapList.get(deployment).put(id, listener);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
 
 	public void removeDeviceId(String deployment, Integer id) {
 		logger.debug("removing DeviceId: " + id + " for " + deployment + " deployment");
-		synchronized (deploymentToIdListenerMapList) {
-			if (deployment != null) {
-				Map<Integer, CoreStationListener> list = deploymentToIdListenerMapList.get(deployment);
-				if (list == null) {
-					logger.error("there is no core station listener for deployment " + deployment);
-					return;
+		try {
+			synchronized (deploymentToIdListenerMapList) {
+				if (deployment != null) {
+					Map<Integer, CoreStationListener> list = deploymentToIdListenerMapList.get(deployment);
+					if (list == null) {
+						logger.error("there is no core station listener for deployment " + deployment);
+						return;
+					}
+					if (id != null)
+						list.remove(id);
+					else
+						logger.error("id is null");
+				
+					if (list.isEmpty())
+						deploymentToIdListenerMapList.remove(deployment);
 				}
-				if (id != null)
-					list.remove(id);
 				else
-					logger.error("id is null");
-			
-				if (list.isEmpty())
-					deploymentToIdListenerMapList.remove(deployment);
+					logger.error("deployment is null");
 			}
-			else
-				logger.error("deployment is null");
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -385,13 +405,18 @@ public class AsyncCoreStationClient extends Thread  {
 	
 	
 	private byte[] pktStuffing(byte[] message) {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		for (int i=0; i<message.length; i++) {
-			baos.write(message[i]);
-			if (message[i] == BackLogMessageMultiplexer.STUFFING_BYTE)
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			for (int i=0; i<message.length; i++) {
 				baos.write(message[i]);
+				if (message[i] == BackLogMessageMultiplexer.STUFFING_BYTE)
+					baos.write(message[i]);
+			}
+			return baos.toByteArray();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return null;
 		}
-		return baos.toByteArray();
 	}
 
 
@@ -482,14 +507,18 @@ public class AsyncCoreStationClient extends Thread  {
 	
 	
 	public void reconnect(CoreStationListener listener) {
-		writeBuffer.clear();
-    	writeBuffer.flip();
-		synchronized (changeRequests) {
-			logger.debug("add reconnect request");
-			// Indicate we want the interest ops set changed
-			changeRequests.add(new ChangeRequest(listenerToSocketList.get(listener), ChangeRequest.TYPE_RECONNECT, -1));
+		try {
+			writeBuffer.clear();
+	    	writeBuffer.flip();
+			synchronized (changeRequests) {
+				logger.debug("add reconnect request");
+				// Indicate we want the interest ops set changed
+				changeRequests.add(new ChangeRequest(listenerToSocketList.get(listener), ChangeRequest.TYPE_RECONNECT, -1));
+			}
+			selector.wakeup();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
-		selector.wakeup();
 	}
 	
 	
