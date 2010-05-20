@@ -351,15 +351,20 @@ public class AsyncCoreStationClient extends Thread  {
 
 
 	public void removeDeviceId(String deployment, Integer id) {
-		logger.debug("removing DeviceId: " + id + "for " + deployment + " deployment");
+		logger.debug("removing DeviceId: " + id + " for " + deployment + " deployment");
 		synchronized (deploymentToIdListenerMapList) {
 			if (deployment != null) {
+				Map<Integer, CoreStationListener> list = deploymentToIdListenerMapList.get(deployment);
+				if (list == null) {
+					logger.error("there is no core station listener for deployment " + deployment);
+					return;
+				}
 				if (id != null)
-					deploymentToIdListenerMapList.get(deployment).remove(id);
+					list.remove(id);
 				else
 					logger.error("id is null");
 			
-				if (deploymentToIdListenerMapList.get(deployment).isEmpty())
+				if (list.isEmpty())
 					deploymentToIdListenerMapList.remove(deployment);
 			}
 			else
