@@ -42,7 +42,8 @@ class BackLogDBClass(Thread):
     _maxRemoveTime
     _meanRemoveTime
     _removeCounter
-    _lock
+    _dblock
+    _counterlock
     _sleep
     _resend
     _stopped
@@ -116,7 +117,8 @@ class BackLogDBClass(Thread):
             raise TypeError(e.__str__())
         
         # thread lock to coordinate access to the database
-        self._lock = Lock()
+        self._dblock = Lock()
+        self._counterlock = Lock()
         self._resend = Event()
         self._sleepEvent = Event()
     
@@ -141,12 +143,13 @@ class BackLogDBClass(Thread):
         t = time.time()
         
         try:
-            self._lock.acquire()
+            self._dblock.acquire()
             self._con.execute('INSERT INTO backlogmsg VALUES (?,?,?)', (timestamp, msgType, sqlite3.Binary(data)))
             self._con.commit()
             self._dbNumberOfEntries += 1
-            self._lock.release()
+            self._dblock.release()
             storeTime = time.time() - t
+            self._counterlock.acquire()
             if self._minStoreTime == -1 or storeTime*1000 < self._minStoreTime:
                 self._minStoreTime = storeTime*1000
             if self._maxStoreTime == -1 or storeTime*1000 > self._maxStoreTime:
@@ -156,10 +159,11 @@ class BackLogDBClass(Thread):
             else:
                 self._meanStoreTime += storeTime*1000
                 self._storeCounter += 1
+            self._counterlock.release()
             self._logger.debug('store (%d,%d,%d): %f s' % (msgType, timestamp, len(data), storeTime))
             return True
         except sqlite3.Error, e:
-            self._lock.release()
+            self._dblock.release()
             if not self._stopped:
                 self.exception(e)
             return False
@@ -177,15 +181,16 @@ class BackLogDBClass(Thread):
         t = time.time()
 
         try:
-            self._lock.acquire()
+            self._dblock.acquire()
             self._cur.execute('SELECT COUNT(1) FROM backlogmsg WHERE timestamp = ?', (timestamp,))
             cnt = self._cur.fetchone()[0]
             if cnt >= 1:
                 self._con.execute('DELETE FROM backlogmsg WHERE timestamp = ?', (timestamp,))
                 self._con.commit()
                 self._dbNumberOfEntries -= cnt
-            self._lock.release()
+            self._dblock.release()
             removeTime = time.time() - t
+            self._counterlock.acquire()
             if self._minRemoveTime == -1 or removeTime*1000 < self._minRemoveTime:
                 self._minRemoveTime = removeTime*1000
             if self._maxRemoveTime == -1 or removeTime*1000 > self._maxRemoveTime:
@@ -195,9 +200,10 @@ class BackLogDBClass(Thread):
             else:
                 self._meanRemoveTime += removeTime*1000
                 self._removeCounter += 1
+            self._counterlock.release()
             self._logger.debug('del (?,%d,?): %f s' % (timestamp, removeTime))
         except sqlite3.Error, e:
-            self._lock.release()
+            self._dblock.release()
             if not self._stopped:
                 self.exception(e) 
             
@@ -209,6 +215,7 @@ class BackLogDBClass(Thread):
         
         @return: status of the backlog database as tuple (number of database entries, database file size)
         '''
+        self._counterlock.acquire()
         ret = (self._dbNumberOfEntries, os.path.getsize(self._dbname)/1024, self._minStoreTime, self._maxStoreTime, self._meanStoreTime/self._storeCounter, self._minRemoveTime, self._maxRemoveTime, self._meanRemoveTime/self._removeCounter)
         
         self._minStoreTime = -1
@@ -219,6 +226,7 @@ class BackLogDBClass(Thread):
         self._maxRemoveTime = -1
         self._meanRemoveTime = -1
         self._removeCounter = 1
+        self._counterlock.release()
         
         return ret            
             
@@ -249,12 +257,12 @@ class BackLogDBClass(Thread):
 
             while not self._stopped:
                 try:
-                    self._lock.acquire()
+                    self._dblock.acquire()
                     self._cur.execute('SELECT * FROM backlogmsg WHERE timestamp > ? order by timestamp asc LIMIT 1', (timestamp,))
                     row = self._cur.fetchone()
-                    self._lock.release()
+                    self._dblock.release()
                 except sqlite3.Error, e:
-                    self._lock.release()
+                    self._dblock.release()
                     self.exception(e)
                     break
                     
