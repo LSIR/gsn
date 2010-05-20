@@ -79,7 +79,7 @@ class GPSPluginClass(AbstractPluginClass):
             measurementNo += 1
 
         # die...
-        self.finalize()
+        self.stop()
 
 
     def _pollGpsMessage(self, msgId):
