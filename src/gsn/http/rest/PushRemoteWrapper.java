@@ -5,25 +5,21 @@ import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
+import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthState;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
@@ -85,67 +81,74 @@ public class PushRemoteWrapper extends AbstractWrapper {
         return "Push-Remote Wrapper";
     }
 
-    public DataField[] registerAndGetStructure() throws ClientProtocolException, IOException, ClassNotFoundException {
+    public DataField[] registerAndGetStructure() throws IOException, ClassNotFoundException {
+        // Create the POST request
         HttpPost httpPost = new HttpPost(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
+        // Add the POST parameters
         httpPost.setEntity(new UrlEncodedFormEntity(postParameters, HTTP.UTF_8));
+        //
+        httpPost.getParams().setParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, Boolean.FALSE);
+        // Create local execution context
         HttpContext localContext = new BasicHttpContext();
+        //
         NotificationRegistry.getInstance().addNotification(uid, this);
-        HttpResponse response = null;
         int tries = 0;
+        AuthState authState = null;
+        //
         while (tries < 2) {
             tries++;
+            HttpResponse response = null;
             try {
-
-                if (response != null && response.getEntity() != null) {
-                    response.getEntity().consumeContent();
-                }
-
-                response  = httpclient.execute(httpPost, localContext);
-                
+                // Execute the POST request
+                response = httpclient.execute(httpPost, localContext);
+                //
                 int sc = response.getStatusLine().getStatusCode();
-                AuthState authState = null;
-                if (sc == HttpStatus.SC_UNAUTHORIZED) {
-                    // Target host authentication required
-                    authState = (AuthState) localContext.getAttribute(ClientContext.TARGET_AUTH_STATE);
-                }
-                if (sc == HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED) {
-                    // Proxy authentication required
-                    authState = (AuthState) localContext.getAttribute(ClientContext.PROXY_AUTH_STATE);
-                }
-
-                if (authState != null) {
-                    if (initParams.getUsername() == null || tries > 1) {
-                        logger.error("A valid username/password required to connect to the remote host: " + initParams.getRemoteContactPoint());
-                    } else {
-                        AuthScope authScope = authState.getAuthScope();
-                        Credentials creds = new UsernamePasswordCredentials(initParams.getUsername(), initParams.getPassword());
-                        httpclient.getCredentialsProvider().setCredentials(authScope, creds);
-                    }
+                //
+                if (sc == HttpStatus.SC_OK) {
+                    logger.debug(new StringBuilder().append("Wants to consume the structure packet from ").append(initParams.getRemoteContactPoint()));
+                    structure = (DataField[]) XSTREAM.fromXML(response.getEntity().getContent());
+                    logger.debug("Connection established for: " + initParams.getRemoteContactPoint());
+                    break;
                 } else {
-                    InputStream content = null;
-                    try {
-                        logger.debug(new StringBuilder().append("Wants to consume the strcture packet from ").append(initParams.getRemoteContactPoint()));
-                        content = response.getEntity().getContent();
-                        structure = (DataField[]) XSTREAM.fromXML(content);
-                        logger.debug("Connection established for: " + initParams.getRemoteContactPoint());
-                        break;
+                    if (sc == HttpStatus.SC_UNAUTHORIZED)
+                        authState = (AuthState) localContext.getAttribute(ClientContext.TARGET_AUTH_STATE); // Target host authentication required
+                    else if (sc == HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED)
+                        authState = (AuthState) localContext.getAttribute(ClientContext.PROXY_AUTH_STATE); // Proxy authentication required
+                    else {
+                        logger.error(new StringBuilder()
+                                .append("Unexpected POST status code returned: ")
+                                .append(sc)
+                                .append("\nreason: ")
+                                .append(response.getStatusLine().getReasonPhrase()));
                     }
-                    finally {
-                        if (content != null)
-                            content.close();
+                    if (authState != null) {
+                        if (initParams.getUsername() == null || (tries > 1 && initParams.getUsername() != null)) {
+                            logger.error("A valid username/password required to connect to the remote host: " + initParams.getRemoteContactPoint());
+                        } else {
+                            
+                            AuthScope authScope = authState.getAuthScope();
+                            logger.warn(new StringBuilder().append("Setting Credentials for host: ").append(authScope.getHost()).append(":").append(authScope.getPort()));
+                            Credentials creds = new UsernamePasswordCredentials(initParams.getUsername(), initParams.getPassword());
+                            httpclient.getCredentialsProvider().setCredentials(authScope, creds);
+                        }
                     }
                 }
-
             }
             catch (RuntimeException ex) {
                 // In case of an unexpected exception you may want to abort
                 // the HTTP request in order to shut down the underlying
                 // connection and release it back to the connection manager.
+                logger.warn("Aborting the HTTP POST request.");
                 httpPost.abort();
                 throw ex;
             }
+            finally {
+                if (response != null && response.getEntity() != null) {
+                    response.getEntity().consumeContent();
+                }
+            }
         }
-
+        
         if (structure == null)
             throw new RuntimeException("Cannot connect to the remote host.");
 
@@ -179,7 +182,11 @@ public class PushRemoteWrapper extends AbstractWrapper {
 
     public void run() {
         HttpPost httpPost = new HttpPost(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
+        //
+        httpPost.getParams().setParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, Boolean.FALSE);
+        //
         HttpResponse response = null; //This is acting as keep alive.
+        //
         while (isActive()) {
             try {
                 Thread.sleep(KEEP_ALIVE_PERIOD);
