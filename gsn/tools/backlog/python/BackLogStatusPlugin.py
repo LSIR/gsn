@@ -70,7 +70,8 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             if self._sleeper.isSet():
                 continue
             
-            packet = struct.pack('<II', self.getErrorCounter(), self.getExceptionCounter())
+            packet = struct.pack('<i', self.getErrorCounter())
+            packet += struct.pack('<i', self.getExceptionCounter())
             backlogstatus = self.getBackLogStatus()
             backlogdbentries = int(backlogstatus[0])
             backlogdbsize = int(backlogstatus[1])
@@ -80,14 +81,25 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             minremovetime = int(backlogstatus[5])
             maxremovetime = int(backlogstatus[6])
             meanremovetime = int(backlogstatus[7])
-            packet += struct.pack('<II', backlogdbentries, backlogdbsize)
+            packet += struct.pack('<i', backlogdbentries)
+            packet += struct.pack('<i', backlogdbsize)
             gsnpeerstatus = self.getGSNPeerStatus()
             incounter = int(gsnpeerstatus[0])
             outcounter = int(gsnpeerstatus[1])
             backlogcounter = int(gsnpeerstatus[2])
             connectionLosses = int(gsnpeerstatus[3])
             uptime = int(time.time()-self._startTime)
-            packet += struct.pack('<IIIIIIIIIII', incounter, outcounter, backlogcounter, connectionLosses, uptime, minstoretime, maxstoretime, meanstoretime, minremovetime, maxremovetime, meanremovetime)
+            packet += struct.pack('<i', incounter)
+            packet += struct.pack('<i', outcounter)
+            packet += struct.pack('<i', backlogcounter)
+            packet += struct.pack('<i', connectionLosses)
+            packet += struct.pack('<i', uptime)
+            packet += struct.pack('<i', minstoretime)
+            packet += struct.pack('<i', maxstoretime)
+            packet += struct.pack('<i', meanstoretime)
+            packet += struct.pack('<i', minremovetime)
+            packet += struct.pack('<i', maxremovetime)
+            packet += struct.pack('<i', meanremovetime)
             
             self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
             

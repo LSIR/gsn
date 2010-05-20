@@ -1,6 +1,8 @@
 package gsn.wrappers.backlog.plugins;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import org.apache.log4j.Logger;
 
@@ -58,71 +60,42 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
 		logger.debug("message received from CoreStation with DeviceId: " + deviceId);
-		
-		Integer error_counter = null;
-		Integer exception_counter = null;
-		Integer backlog_db_entries = null;
-		Integer backlog_db_size = null;
-		Integer minstoretime = null;
-		Integer maxstoretime = null;
-		Integer meanstoretime = null;
-		Integer minremovetime = null;
-		Integer maxremovetime = null;
-		Integer meanremovetime = null;
-		Integer backlog_uptime = null;
-		Integer in_counter = null;
-		Integer out_counter = null;
-		Integer backlog_counter = null;
-		Integer connection_losses = null;
 
-		if(packet.length >= 4)
-			error_counter = arr2int(packet, 0);
-		if(packet.length >= 8)
-			exception_counter = arr2int(packet, 4);
-		if(packet.length >= 12)
-			backlog_db_entries = arr2int(packet, 8);
-		if(packet.length >= 16)
-			backlog_db_size = arr2int(packet, 12);
-		if(packet.length >= 20)
-			in_counter = arr2int(packet, 16);
-		if(packet.length >= 24)
-			out_counter = arr2int(packet, 20);
-		if(packet.length >= 28)
-			backlog_counter = arr2int(packet, 24);
-		if(packet.length >= 32)
-			connection_losses = arr2int(packet, 28);
-		if(packet.length >= 36)
-			backlog_uptime = arr2int(packet, 32);
-		if(packet.length >= 40) {
-			minstoretime = arr2int(packet, 36);
-			if (minstoretime == -1)
-				minstoretime = null;
-		}
-		if(packet.length >= 44) {
-			maxstoretime = arr2int(packet, 40);
-			if (maxstoretime == -1)
-				maxstoretime = null;
-		}
-		if(packet.length >= 48) {
-			meanstoretime = arr2int(packet, 44);
-			if (meanstoretime == -1)
-				meanstoretime = null;
-		}
-		if(packet.length >= 52) {
-			minremovetime = arr2int(packet, 48);
-			if (minremovetime == -1)
-				minremovetime = null;
-		}
-		if(packet.length >= 56) {
-			maxremovetime = arr2int(packet, 52);
-			if (maxremovetime == -1)
-				maxremovetime = null;
-		}
-		if(packet.length >= 60) {
-			meanremovetime = arr2int(packet, 56);
-			if (meanremovetime == -1)
-				meanremovetime = null;
-		}
+		// Parse the Message
+		ByteBuffer buffer = ByteBuffer.allocate(packet.length);
+		buffer.put(packet);
+		
+		buffer.position(0);
+		buffer.order(ByteOrder.LITTLE_ENDIAN);
+		
+		Integer error_counter = buffer.getInt();
+		Integer exception_counter = buffer.getInt();
+		Integer backlog_db_entries = buffer.getInt();
+		Integer backlog_db_size = buffer.getInt();
+		Integer in_counter = buffer.getInt();
+		Integer out_counter = buffer.getInt();
+		Integer backlog_counter = buffer.getInt();
+		Integer connection_losses = buffer.getInt();
+		Integer backlog_uptime = buffer.getInt();
+		Integer minstoretime = buffer.getInt();
+		Integer maxstoretime = buffer.getInt();
+		Integer meanstoretime = buffer.getInt();
+		Integer minremovetime = buffer.getInt();
+		Integer maxremovetime = buffer.getInt();
+		Integer meanremovetime = buffer.getInt();
+
+		if (minstoretime == -1)
+			minstoretime = null;
+		if (maxstoretime == -1)
+			maxstoretime = null;
+		if (meanstoretime == -1)
+			meanstoretime = null;
+		if (minremovetime == -1)
+			minremovetime = null;
+		if (maxremovetime == -1)
+			maxremovetime = null;
+		if (meanremovetime == -1)
+			meanremovetime = null;
 		
 		Serializable[] data = {timestamp, timestamp, deviceId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses, backlog_uptime, minstoretime, meanstoretime, maxstoretime, minremovetime, meanremovetime, maxremovetime};
 		
