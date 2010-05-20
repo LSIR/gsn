@@ -5,14 +5,16 @@ require 'tenjin'        # gem install tenjin
 # This script generates a set of virtual sensor description file for testing the
 # local, remote and remote-rest wrappers.
 #
-# Usage: ruby testcase-generator.rb <LOW_ID> <HIGH_ID> <LOCAL_CONTACT_POINT> <REMOTE_CONTACT_POINT> <VSNAME>
-# eg.  : ruby testcase-generator.rb 1 10 "http://localhost:22011/streaming/" "http://localhost:22010/streaming/" "MEMORYMONITORVS"
+# Usage: ruby testcase-generator.rb <LOW_ID> <HIGH_ID> <LOCAL_CONTACT_POINT> <REMOTE_CONTACT_POINT> <VSNAME> <USERNAME> <PASSWORD>
+# eg.  : ruby testcase-generator.rb 1 10 "http://localhost:22011/streaming/" "http://localhost:22010/streaming/" "MEMORYMONITORVS" "tim" "tim"
 #
 # <LOW_ID>               :
 # <HIGH_ID>              :
 # <LOCAL_CONTACT_POINT>  :
 # <REMOTE_CONTACT_POINT> :
 # <VSNAME>               :
+# <USERNAME>             :
+# <PASSWORD>             :
 
 
 # Get the script parameters
@@ -22,6 +24,8 @@ HIGH_ID = ARGV[1]
 LOCAL_CONTACT_POINT = ARGV[2]
 REMOTE_CONTACT_POINT = ARGV[3]
 VSNAME = ARGV[4]
+USERNAME = ARGV[5]
+PASSWORD = ARGV[6]
 
 # Generate the output XML file
 
@@ -31,7 +35,9 @@ VSNAME = ARGV[4]
 	    :id=>index,
 	    :local_contact_point=>LOCAL_CONTACT_POINT,
 	    :remote_contact_point=>REMOTE_CONTACT_POINT,
-	    :vsname=>VSNAME
+	    :vsname=>VSNAME,
+            :username=>USERNAME,
+            :password=>PASSWORD
     }
 
     # Generate the Local Wrapper Virtual Sensor Description File
