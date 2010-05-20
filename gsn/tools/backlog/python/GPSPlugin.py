@@ -7,8 +7,10 @@ Created on May 20, 2010
 
 import struct
 import time
+import serial
 from threading import Event
 
+import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_BACKLOG = True
@@ -27,7 +29,7 @@ class GPSPluginClass(AbstractPluginClass):
         self._rateMessageId = struct.pack('2B', 0x06, 0x08)
         # TODO Insert new message type headers here
        
-        self._runEv = threading.Event()
+        self._runEv = Event()
 
         # initialize measurment parameters
         self._device = serial.Serial(self.getOptionValue('gps_device'))

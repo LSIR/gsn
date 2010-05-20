@@ -114,8 +114,7 @@ public class BackLogWrapper extends AbstractWrapper {
 						storage = sm;
 					}
 					else {
-						logger.error("Currently only MySQL supported!");
-						return false;
+						logger.error("Currently only MySQL supported for function creation -> this may lead to missbehaviour!");
 					}
 				} catch (SQLException e) {
 					logger.error("Could not add SQL cast functions", e);
