@@ -95,6 +95,7 @@ public class SchedulePlugin extends AbstractPlugin {
 						sendRemote(System.currentTimeMillis(), pkt, super.priority);
 						
 						if (rs.getLong("transmission_time") == 0) {
+							StorageManager.close(conn);
 							long time = System.currentTimeMillis();
 							Serializable[] data = {id, creationtime, time, schedule};
 							dataProcessed(time, data);
