@@ -1,17 +1,17 @@
-<sensor-server>
+ensor-server>
    <name>GSN Server</name>
    <author>GSN Development Team.</author>
    <email>my email address</email>
    <description>Not Provided</description>
-   <port>22011</port>
+   <port>22001</port>
 <!-- OTHER DATABASE OPTIONS -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />   -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:MyFile" /> -->
-<!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" /> -->
+<!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" /> --> 
 <!-- <storage user="gsn" password="gsn" driver="net.sourceforge.jtds.jdbc.Driver" url="jdbc:jtds:sqlserver://192.168.51.14:12345/gsn;cachemetadata=true;prepareSQL=3" />-->
-<!-- <storage user="sgsn" password="d70ZZp.GKLLQDYCf" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/testdb" overwrite-tables="" permanent-storage=""/> -->
-<storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/gsnclient" />
+<storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" />
+<!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/gsn" /> -->
 <!--  <storage user="gsn" password="gsn" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521" /> -->
 <!-- <storage user="gsn" password="ge-S3-ne" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@dom.slf.local:1521:sdbt" /> -->
-<!-- <storage user="gsn" password="c83WZy.HZDYVXKYd" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/debugdb"/> -->
-</sensor-server>
+
+ </sensor-server>
