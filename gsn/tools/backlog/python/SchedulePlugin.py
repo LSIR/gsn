@@ -520,10 +520,11 @@ class SchedulePluginClass(AbstractPluginClass):
             # (if so, we do not want to shutdown)
             self.info('get node wakeup states')
             self._serialHandler.write(CMD_WAKEUP_QUERY, blocking=True)
-            if self._stopped or not self._shutdown_mode:
+            if self._stopped:
                 return
 
             # Tell TinyNode to shut us down in X seconds
+            self._pingThread.stop()
             shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
             self._serialHandler.write(CMD_SHUTDOWN, argument=shutdown_offset)
             self.info('we\'re going to do a hard shut down in '+str(shutdown_offset)+' seconds ...')
