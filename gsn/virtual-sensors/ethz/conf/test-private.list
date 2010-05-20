@@ -16,5 +16,6 @@ ETZ_Dozer_NodeInfo.xml
 ETZ_Dozer_PowerSwitch.xml
 ETZ_Dozer_Rssi.xml
 ETZ_Dozer_StateCounter.xml
+ETZ_GPS.xml
 ETZ_Schedule.xml
 ETZ_VaisalaWXT520.xml

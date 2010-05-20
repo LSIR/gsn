@@ -23,6 +23,7 @@ ETZ_Dozer_PowerSwitch__mapped.xml
 ETZ_Dozer_Rssi__mapped.xml
 ETZ_Dozer_Rssi__muxed__mapped.xml
 ETZ_Dozer_StateCounter__mapped.xml
+ETZ_GPS__mapped.xml
 ETZ_pos0_BackLogStatus__chart.xml
 ETZ_pos0_CoreStationStatus__chart1.xml
 ETZ_pos0_CoreStationStatus__chart2.xml
