@@ -73,8 +73,8 @@ public class RestRemoteWrapper extends AbstractWrapper {
     }
 
     public boolean initialize() {
-        params = new RemoteWrapperParamParser(getActiveAddressBean(), false);
-        httpclient = new DefaultHttpClient(getHttpClientParams(params.getTimeout()));
+        initParams = new RemoteWrapperParamParser(getActiveAddressBean(), false);
+        httpclient = new DefaultHttpClient(getHttpClientParams(initParams.getTimeout()));
 
 		String startTime = getActiveAddressBean().getPredicateValue("start-time");
 		if (startTime != null && startTime.equals("continue")) {
@@ -109,7 +109,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
 				return false;
 			}
 		} else {
-			lastReceivedTimestamp = params.getStartTime();
+			lastReceivedTimestamp = initParams.getStartTime();
 		}
 		logger.info("lastReceivedTimestamp=" + String.valueOf(lastReceivedTimestamp));
         
