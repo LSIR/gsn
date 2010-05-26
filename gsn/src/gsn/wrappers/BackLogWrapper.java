@@ -260,7 +260,11 @@ public class BackLogWrapper extends AbstractWrapper {
 		Integer id = null;
 		for (int i = 0 ; i < paramNames.length ; i++) {
 			if ( paramNames[i].compareToIgnoreCase("device_id") == 0 ) {
-				id = Integer.parseInt((String) paramValues[i]);
+				try {
+					id = Integer.parseInt((String) paramValues[i]);
+				} catch (NumberFormatException e) {
+					logger.error("The device_id field has to be an integer.");
+				}
 			}
 		}
 		

@@ -818,7 +818,7 @@ class JobsObserver(Thread):
                             self._parent.debug('job (' + proc[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
                             new_list.append((proc[0], proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS, proc[2]))
                     else:
-                        self._parent.info('job (' + proc[2] + ') finished with return code ' + str(ret))
+                        self._parent.debug('job (' + proc[2] + ') finished with return code ' + str(ret))
                 
                 self._lock.acquire()
                 self._process_list = new_list
@@ -841,7 +841,7 @@ class JobsObserver(Thread):
             self._lock.acquire()
             self._process_list.append((process, max_runtime_seconds, job_name))
             self._lock.release()
-            self._parent.info('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_seconds/60) + ' minutes')
+            self._parent.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_seconds/60) + ' minutes')
             
             self._work.set()
             return True

@@ -279,6 +279,7 @@ public class AsyncCoreStationClient extends Thread  {
 				listener = socketToListenerList.get((SocketChannel)key.channel());
 			}
 			listener.connectionEstablished();
+			logger.info("connection established to core station: " + listener.getCoreStationName());
 		  
 			// Register an interest in reading on this channel
 			key.interestOps(SelectionKey.OP_READ);
@@ -290,6 +291,7 @@ public class AsyncCoreStationClient extends Thread  {
 	
 	public synchronized void registerListener(CoreStationListener listener) throws IOException
 	{
+		logger.debug("register core station: " + listener.getCoreStationName());
 		try {
 			if (!this.isAlive()) {
 				dispose = false;
@@ -302,6 +304,7 @@ public class AsyncCoreStationClient extends Thread  {
 		try {
 			SocketChannel socketChannel = SocketChannel.open();
 			socketChannel.configureBlocking(false);
+			logger.debug("trying to connect to core station: " + listener.getCoreStationName());
 			socketChannel.connect(new InetSocketAddress(listener.getHostAddress(), listener.getPort()));
 		
 			synchronized(socketToListenerList) {
