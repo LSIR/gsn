@@ -7,6 +7,7 @@ import gsn.http.rest.PushDelivery;
 import gsn.http.rest.RestDelivery;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
+import gsn.storage.StorageManagerFactory;
 import gsn.utils.ValidityTools;
 import gsn.vsensor.SQLValidatorIntegration;
 import gsn.wrappers.WrappersUtil;
@@ -102,8 +103,9 @@ public final class Main {
 		}
         int maxDBConnections = System.getProperty("maxDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxDBConnections"));
         int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
-        StorageManager.getInstance ( ).init ( containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) , maxDBConnections);
-		if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
+
+        mainStorage = StorageManagerFactory.getInstance(containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) , maxDBConnections);
+        if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
 
 		try {
 			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxServlets:"+maxServlets+")"+" ...");
@@ -194,6 +196,8 @@ public final class Main {
 			}
 			return singleton;
 	}
+
+    private static StorageManager mainStorage = null;
 
 	private GSNController controlSocket;
 
@@ -487,4 +491,8 @@ public final class Main {
 
 		return server;
 	}
+
+    public static StorageManager getMainStorage() {
+        return mainStorage;    
+    }
 }
