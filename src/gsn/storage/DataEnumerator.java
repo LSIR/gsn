@@ -1,5 +1,6 @@
 package gsn.storage;
 
+import gsn.Main;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
@@ -185,9 +186,9 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 			if (!manualCloseConnection && resultSet.getStatement() != null) {
                 java.sql.Statement s = resultSet.getStatement();
                 java.sql.Connection c = s.getConnection();
-                StorageManager.close(resultSet);
-                StorageManager.closeStatement(s);
-                StorageManager.close(c);
+                Main.getMainStorage().close(resultSet);
+                Main.getMainStorage().closeStatement(s);
+                Main.getMainStorage().close(c);
                 resultSet = null;
             }else {
 				try {

@@ -96,13 +96,13 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 
 		if (maxTupleCount > 0) {
 			StringBuilder query = new StringBuilder();
-			if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
+			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
 				query.append(" select timed from ").append(wrapper.getDBAliasInStr());
 				query.append(" order by timed desc limit 1 offset ").append(maxTupleCount - 1);
-			} else if (StorageManager.isSqlServer()) {
+			} else if (Main.getWindowStorage().isSqlServer()) {
 				query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
 						wrapper.getDBAliasInStr()).append(" order by timed desc )as X  ");
-			}else if (StorageManager.isOracle()) {
+			}else if (Main.getWindowStorage().isOracle()) {
 				query.append(" select timed from (select timed from ").append(Main.tableNameGeneratorInString(wrapper.getDBAliasInStr()));
 				query.append(" order by timed desc) where rownum = ").append(maxTupleCount);
 			}
@@ -111,7 +111,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			}
 			Connection conn = null;
 			try {
-				ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query,conn=StorageManager.getInstance().getConnection());
+				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
 				if (resultSet.next()) {
 					timed1 = resultSet.getLong(1);
 				} else {
@@ -120,19 +120,19 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				StorageManager.close(conn);
+				Main.getWindowStorage().close(conn);
 			}
 		}
 
 		if (maxTupleCount > 0) {
 			StringBuilder query = new StringBuilder();
-			if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
+			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
 				query.append(" select timed from ").append(wrapper.getDBAliasInStr());
 				query.append(" order by timed desc limit 1 offset ").append(maxTupleCount - 1);
-			} else if (StorageManager.isSqlServer()) {
+			} else if (Main.getWindowStorage().isSqlServer()) {
 				query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
 						wrapper.getDBAliasInStr()).append(" order by timed desc )as X  ");
-			}else if (StorageManager.isOracle()) {
+			}else if (Main.getWindowStorage().isOracle()) {
 				query.append(" select timed from ( select timed from ").append(Main.tableNameGeneratorInString(wrapper.getDBAliasInStr()));
 				query.append(" order by timed desc) where rownum = ").append(maxTupleCount);
 			}
@@ -141,7 +141,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			}
 			Connection conn = null;
 			try {
-				ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query,conn=StorageManager.getInstance().getConnection());
+				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
 				if (resultSet.next()) {
 					timed1 = resultSet.getLong(1);
 				} else {
@@ -150,22 +150,22 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				StorageManager.close(conn);
+				Main.getWindowStorage().close(conn);
 			}
 		}
 
 		if (maxWindowSize > 0) {
 			StringBuilder query = new StringBuilder();
-			if (StorageManager.isMysqlDB()) {
+			if (Main.getWindowStorage().isMysqlDB()) {
 				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from ").append(wrapper.getDBAliasInStr());
 				query.append(" order by timed desc limit 1 offset ").append(maxTupleForTimeBased - 1).append(" ) as X ");
-			} else if (StorageManager.isH2()) {
+			} else if (Main.getWindowStorage().isH2()) {
 				query.append(" select timed - ").append(maxWindowSize).append(" from ").append(wrapper.getDBAliasInStr()).append(
 				" where timed in (select timed from ").append(wrapper.getDBAliasInStr());
 				query.append(" order by timed desc limit 1 offset ").append(maxTupleForTimeBased - 1).append(" ) ");
-			} else if (StorageManager.isSqlServer()) {
+			} else if (Main.getWindowStorage().isSqlServer()) {
 				query.append(" select min(timed) - ").append(maxWindowSize).append(" from (select top ").append(maxTupleForTimeBased).append(" * ").append(" from ").append(wrapper.getDBAliasInStr()).append(" order by timed desc ) as X  ");
-			}else if (StorageManager.isOracle()){
+			}else if (Main.getWindowStorage().isOracle()){
 				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from (select timed from ").append(Main.tableNameGeneratorInString(wrapper.getDBAliasInStr()));
 				query.append(" order by timed desc) where rownum = ").append(maxTupleForTimeBased).append(") ) ");
 			}
@@ -174,7 +174,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			}
 			Connection conn = null;
 			try {
-				ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query,conn=StorageManager.getInstance().getConnection());
+				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
 				if (resultSet.next()) {
 					timed2 = resultSet.getLong(1);
 				} else {
@@ -183,7 +183,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				StorageManager.close(conn);
+				Main.getWindowStorage().close(conn);
 			}
 		}
 
@@ -243,7 +243,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
             StringBuilder toReturn = new StringBuilder();
             
             int fromIndex = sqlQuery.indexOf(" from ");
-            if(StorageManager.isH2() && fromIndex > -1){
+            if(Main.getWindowStorage().isH2() && fromIndex > -1){
             	toReturn.append(sqlQuery.substring(0, fromIndex + 6)).append(" (select * from ").append(sqlQuery.substring(fromIndex + 6));
             }else{
             	toReturn.append(sqlQuery);
@@ -256,7 +256,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			}
 
 			if (streamSource.getSamplingRate() != 1) {
-				if (StorageManager.isH2()) {
+				if (Main.getWindowStorage().isH2()) {
 					toReturn.append("( timed - (timed / 100) * 100 < ").append(streamSource.getSamplingRate() * 100).append(") and ");
 				} else {
 					toReturn.append("( mod( timed , 100)< ").append(streamSource.getSamplingRate() * 100).append(") and ");
@@ -264,15 +264,15 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			}
 			WindowType windowingType = streamSource.getWindowingType();
 			if (windowingType == WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE) {
-				if (StorageManager.isMysqlDB()) {
+				if (Main.getWindowStorage().isMysqlDB()) {
 					toReturn.append("timed >= (select timed from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ) order by timed desc ");
-				} else if (StorageManager.isH2()) {
+				} else if (Main.getWindowStorage().isH2()) {
 					toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" where timed in (select timed from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(
 					" )) order by timed desc ");
-				} else if (StorageManager.isSqlServer()) {
+				} else if (Main.getWindowStorage().isSqlServer()) {
 					toReturn.append("timed >= (select min(timed) from (select TOP ").append(windowSize).append(" timed from ").append(
 							wrapperAlias).append(" order by timed desc ) as y )");
-				}else if (StorageManager.isOracle()) {
+				}else if (Main.getWindowStorage().isOracle()) {
 					toReturn.append("(timed >= (select timed from (select timed from "+Main.tableNameGeneratorInString(wrapperAlias)+" order by timed desc ) where rownum="+windowSize+") )");
 				}else {
 					logger.fatal("Not supported DB!");
@@ -280,14 +280,14 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			} else {
 				CharSequence viewHelperTableName =Main.tableNameGeneratorInString(SQLViewQueryRewriter.VIEW_HELPER_TABLE);
 				if (windowingType == WindowType.TUPLE_BASED) {
-					if (StorageManager.isMysqlDB()) {
+					if (Main.getWindowStorage().isMysqlDB()) {
 						toReturn.append("timed <= (select timed from ").append(viewHelperTableName).append(
 						" where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
 						toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");
 						toReturn.append(viewHelperTableName).append(" where U_ID='").append(streamSource.getUIDStr());
 						toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" )");
 						toReturn.append(" order by timed desc ");
-					} else if (StorageManager.isH2()) {
+					} else if (Main.getWindowStorage().isH2()) {
 						toReturn.append("timed <= (select timed from ").append(viewHelperTableName).append(
 						" where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select distinct(timed) from ");
 						toReturn.append(wrapperAlias).append(" where timed in (select timed from ").append(wrapperAlias).append(
@@ -295,10 +295,10 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 						toReturn.append(viewHelperTableName).append(" where U_ID='").append(streamSource.getUIDStr());
 						toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ))");
 						toReturn.append(" order by timed desc ");
-					} else if (StorageManager.isSqlServer()) {
+					} else if (Main.getWindowStorage().isSqlServer()) {
 						toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(
 						" where timed <= (select timed from ").append(viewHelperTableName).append(" where U_ID='").append(streamSource.getUIDStr()).append("') order by timed desc) ");
-					}else if (StorageManager.isOracle()) {
+					}else if (Main.getWindowStorage().isOracle()) {
 						toReturn.append("timed <= (select timed from ").append(Main.tableNameGeneratorInString(viewHelperTableName)).append(
 						" where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
 						toReturn.append(wrapperAlias).append(" where timed <= (select * from (select timed from ");
@@ -322,7 +322,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 
 			}
 			
-			if(StorageManager.isH2() && fromIndex > -1){
+			if(Main.getWindowStorage().isH2() && fromIndex > -1){
             	toReturn.append(")");
             }
 

@@ -8,6 +8,7 @@ import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
+import gsn.storage.StorageManagerFactory;
 import gsn.wrappers.MockWrapper;
 
 import java.io.File;
@@ -24,10 +25,12 @@ import org.junit.Test;
 
 public class TestVSensorLoader {
 
+    private static StorageManager sm = null;
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.h2.Driver( ) );
-		StorageManager.getInstance ( ).init ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
+		sm = StorageManagerFactory.getInstance( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
 	}
 
 	@AfterClass
@@ -99,7 +102,7 @@ public class TestVSensorLoader {
 		assertTrue(ss2.validate());
 //		assertTrue(loader.prepareStreamSource(is,ss2));
 		ss1.getWrapper().releaseResources();
-		assertFalse(StorageManager.getInstance().tableExists(ss1.getWrapper().getDBAliasInStr()));
+		assertFalse(sm.tableExists(ss1.getWrapper().getDBAliasInStr()));
 	}
 	
 	@Test
@@ -110,14 +113,14 @@ public class TestVSensorLoader {
 		ss.setSamplingRate(1);
 		assertTrue(ss.validate());
 //		assertTrue(loader.prepareStreamSource(is,ss));
-		assertTrue(StorageManager.getInstance().tableExists(ss.getWrapper().getDBAliasInStr()));
-		assertTrue(StorageManager.getInstance().tableExists(ss.getUIDStr()));
+		assertTrue(sm.tableExists(ss.getWrapper().getDBAliasInStr()));
+		assertTrue(sm.tableExists(ss.getUIDStr()));
 		assertFalse(is.getRenamingMapping().isEmpty());
 		loader.releaseStreamSource(ss);
 		assertTrue(is.getRenamingMapping().isEmpty());
-		assertFalse(StorageManager.getInstance().tableExists(ss.getUIDStr()));
+		assertFalse(sm.tableExists(ss.getUIDStr()));
 		assertFalse(ss.getWrapper().isActive());
-		assertFalse(StorageManager.getInstance().tableExists(ss.getWrapper().getDBAliasInStr()));
+		assertFalse(sm.tableExists(ss.getWrapper().getDBAliasInStr()));
 		assertTrue(is.getRenamingMapping().isEmpty());
 		ss = new StreamSource().setAlias("my-stream1").setAddressing(addressing).setSqlQuery("select * from wrapper").setRawHistorySize("2").setInputStream(is);		
 		ss.setSamplingRate(1);

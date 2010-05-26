@@ -1,5 +1,6 @@
 package gsn.http;
 
+import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
@@ -53,8 +54,8 @@ public class FieldDownloadServlet extends HttpServlet {
 		StringBuilder query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
 		Connection conn = null;
 		try {
-			conn = StorageManager.getInstance().getConnection();
-			ResultSet rs = StorageManager.getInstance( ).getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) ,conn);
+			conn = Main.getMainStorage().getConnection();
+			ResultSet rs = Main.getMainStorage().getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) ,conn);
 			if ( !rs.next() ) {
 				res.sendError( res.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
 			}else {
@@ -84,7 +85,7 @@ public class FieldDownloadServlet extends HttpServlet {
 			logger.error(e1.getMessage(),e1);
 			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
 		}finally{
-			StorageManager.close(conn);
+			Main.getMainStorage().close(conn);
 		}
 	}
 

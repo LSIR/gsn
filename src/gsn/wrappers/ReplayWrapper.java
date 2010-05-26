@@ -1,4 +1,5 @@
 package gsn.wrappers;
+import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
@@ -58,13 +59,13 @@ public class ReplayWrapper  extends AbstractWrapper{
     
     try {
       logger.info("Initializing the ReplayWrapper with : "+dbname +". Loading the table structure ...");
-      connection = StorageManager.getInstance().getConnection();
-	output = StorageManager.tableToStructure(dbname,connection );
+      connection = Main.getMainStorage().getConnection();
+	output = Main.getMainStorage().tableToStructure(dbname,connection );
     } catch (SQLException e) {
       logger.error(e.getMessage(),e);
       return false;
     }finally{
-    	StorageManager.close(connection);
+    	Main.getMainStorage().close(connection);
     }
     
     dt= new DelayedDataEnumerator(dbname,speed);
@@ -103,7 +104,7 @@ class DelayedDataEnumerator implements Enumeration<ScheduledStreamElement>{
     this.speed = speed;
     StringBuilder query = new StringBuilder("select * from ").append(dbName).append(" order by TIMED asc");
     try {
-      data = StorageManager.getInstance().executeQuery(query,false);
+      data = Main.getMainStorage().executeQuery(query,false);
       
     }catch (SQLException e) {
       logger.error(e.getMessage(),e);

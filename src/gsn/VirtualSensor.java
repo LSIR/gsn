@@ -97,12 +97,13 @@ public class VirtualSensor {
     public void dispose() {
     }
 
+    // apply the storage size parameter to the virtual sensor table
     public void DoUselessDataRemoval() {
         if (config.getParsedStorageSize() == VSensorConfig.STORAGE_SIZE_NOT_SET) return;
         StringBuilder query = uselessDataRemovalQuery();
         int effected = 0;
         try {
-            effected = StorageManager.getInstance().executeUpdate(query);
+            effected = Main.getMainStorage().executeUpdate(query);
         } catch (SQLException e) {
             logger.error("Error in executing: " + query);
             logger.error(e.getMessage(), e);
@@ -113,23 +114,25 @@ public class VirtualSensor {
 
     /**
      * @return
+     * TODO Move this to the Storage Manager
+     * @deprecated
      */
     public StringBuilder uselessDataRemovalQuery() {
         String virtualSensorName = config.getName();
         StringBuilder query = null;
         if (config.isStorageCountBased()) {
-            if (StorageManager.isH2()) {
+            if (Main.getMainStorage().isH2()) {
                 query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed not in ( select ").append(
                         virtualSensorName).append(".timed from ").append(virtualSensorName).append(" order by ").append(virtualSensorName).append(".timed DESC  LIMIT  ").append(
                         config.getParsedStorageSize()).append(" offset 0 )");
-            } else if (StorageManager.isMysqlDB()) {
+            } else if (Main.getMainStorage().isMysqlDB()) {
                 query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed <= ( SELECT * FROM ( SELECT timed FROM ")
                         .append(virtualSensorName).append(" group by ").append(virtualSensorName).append(".timed ORDER BY ").append(virtualSensorName).append(".timed DESC LIMIT 1 offset ")
                         .append(config.getParsedStorageSize()).append("  ) AS TMP)");
-            } else if (StorageManager.isSqlServer()) {
+            } else if (Main.getMainStorage().isSqlServer()) {
                 query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed < (select min(timed) from (select top ").append(config.getParsedStorageSize()).append(
                         " * ").append(" from ").append(virtualSensorName).append(" order by ").append(virtualSensorName).append(".timed DESC ) as x ) ");
-            } else if (StorageManager.isOracle()) {
+            } else if (Main.getMainStorage().isOracle()) {
                 query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where timed <= ( SELECT * FROM ( SELECT timed FROM ")
                         .append(virtualSensorName).append(" group by timed ORDER BY timed DESC) where rownum = ")
                         .append(config.getParsedStorageSize() + 1).append(" )");
@@ -138,13 +141,13 @@ public class VirtualSensor {
             long timedToRemove = -1;
             Connection conn = null;
             try {
-                ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName), conn = StorageManager.getInstance().getConnection());
+                ResultSet rs = Main.getMainStorage().executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName), conn = Main.getMainStorage().getConnection());
                 if (rs.next())
                     timedToRemove = rs.getLong(1);
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);
             } finally {
-                StorageManager.close(conn);
+                Main.getMainStorage().close(conn);
 
             }
             query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed < ").append(timedToRemove);

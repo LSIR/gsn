@@ -1,5 +1,6 @@
 package gsn.beans.windowing;
 
+import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.storage.SQLUtils;
@@ -136,11 +137,11 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 
         if (maxTupleCount > 0) {
             StringBuilder query = new StringBuilder();
-            if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
+            if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
                 query.append(" select timed from ").append(wrapper.getDBAliasInStr()).append(" where timed <= ");
                 query.append(System.currentTimeMillis() - maxSlideForTupleBased).append(" order by timed desc limit 1 offset ").append(
                         maxTupleCount - 1);
-            } else if (StorageManager.isSqlServer()) {
+            } else if (Main.getWindowStorage().isSqlServer()) {
                 query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
                         wrapper.getDBAliasInStr()).append(" where timed <= ").append(System.currentTimeMillis() - maxSlideForTupleBased).append(" order by timed desc) as X  ");
             }
@@ -150,7 +151,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             }
             Connection conn = null;
             try {
-            	ResultSet resultSet = StorageManager.getInstance().executeQueryWithResultSet(query,conn=StorageManager.getInstance().getConnection());
+            	ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
                 if (resultSet.next()) {
                     timed2 = resultSet.getLong(1);
                 } else {
@@ -159,7 +160,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);
             } finally {
-               	StorageManager.close(conn);
+               	Main.getWindowStorage().close(conn);
             }
         }
 
@@ -254,7 +255,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             StringBuilder toReturn = new StringBuilder();
             
             int fromIndex = sqlQuery.indexOf(" from ");
-            if(StorageManager.isH2() && fromIndex > -1){
+            if(Main.getWindowStorage().isH2() && fromIndex > -1){
             	toReturn.append(sqlQuery.substring(0, fromIndex + 6)).append(" (select * from ").append(sqlQuery.substring(fromIndex + 6));
             }else{
             	toReturn.append(sqlQuery);
@@ -268,7 +269,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             }
 
             if (streamSource.getSamplingRate() != 1) {
-                if (StorageManager.isH2()) {
+                if (Main.getWindowStorage().isH2()) {
                     toReturn.append("( timed - (timed / 100) * 100 < ").append(streamSource.getSamplingRate() * 100).append(") and ");
                 } else {
                     toReturn.append("( mod( timed , 100)< ").append(streamSource.getSamplingRate() * 100).append(") and ");
@@ -279,11 +280,11 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             if (windowingType == WindowType.TIME_BASED_SLIDE_ON_EACH_TUPLE) {
 
                 toReturn.append("(wrapper.timed >");
-                if (StorageManager.isH2()) {
+                if (Main.getWindowStorage().isH2()) {
                     toReturn.append(" (NOW_MILLIS()");
-                } else if (StorageManager.isMysqlDB()) {
+                } else if (Main.getWindowStorage().isMysqlDB()) {
                     toReturn.append(" (UNIX_TIMESTAMP()*1000");
-                } else if (StorageManager.isSqlServer()) {
+                } else if (Main.getWindowStorage().isSqlServer()) {
                     // NOTE1 : The value retuend is in seconds (hence 1000)
                     // NOTE2 : There is no time in the date for the epoch, maybe
                     // doesn't match with the current system time, needs
@@ -294,7 +295,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                 long timeDifferenceInMillis = storageManager.getTimeDifferenceInMillis();
                 // System.out.println(timeDifferenceInMillis);
                 toReturn.append(" - ").append(windowSize).append(" - ").append(timeDifferenceInMillis).append(" )");
-                if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
+                if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
                     toReturn.append(") order by timed desc ");
                 }
 
@@ -304,20 +305,20 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                     toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where U_ID='").append(streamSource.getUIDStr()).append(
                             "') and timed >= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
                             " where U_ID='").append(streamSource.getUIDStr()).append("') - ").append(windowSize).append(" ) ");
-                    if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
+                    if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
                         toReturn.append(" order by timed desc ");
                     }
 
                 } else {// WindowType.TUPLE_BASED_WIN_TIME_BASED_SLIDE
 
-                    if (StorageManager.isMysqlDB()) {
+                    if (Main.getWindowStorage().isMysqlDB()) {
                         toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
                                 " where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
                         toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");
                         toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where U_ID='").append(streamSource.getUIDStr());
                         toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" )");
                         toReturn.append(" order by timed desc ");
-                    } else if (StorageManager.isH2()) {
+                    } else if (Main.getWindowStorage().isH2()) {
                         toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
                                 " where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select distinct(timed) from ");
                         toReturn.append(wrapperAlias).append(" where timed in (select timed from ").append(wrapperAlias).append(
@@ -325,14 +326,14 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                         toReturn.append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where U_ID='").append(streamSource.getUIDStr());
                         toReturn.append("') ").append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ))");
                         toReturn.append(" order by timed desc ");
-                    } else if (StorageManager.isSqlServer()) {
+                    } else if (Main.getWindowStorage().isSqlServer()) {
                         toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(
                                 " where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where U_ID='").append(streamSource.getUIDStr()).append("') order by timed desc ) ");
                     }
                 }
             }
 
-            if(StorageManager.isH2() && fromIndex > -1){
+            if(Main.getWindowStorage().isH2() && fromIndex > -1){
             	toReturn.append(")");
             }
             toReturn = new StringBuilder(SQLUtils.newRewrite(toReturn, rewritingMapping));

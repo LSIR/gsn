@@ -15,6 +15,7 @@ import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
+import gsn.storage.StorageManagerFactory;
 import gsn.vsensor.BridgeVirtualSensor;
 import gsn.wrappers.AbstractWrapper;
 
@@ -62,7 +63,7 @@ public class TestWindowing2 {
 
 	private WrapperForTest2 wrapper = new WrapperForTest2();
 
-	private StorageManager sm = StorageManager.getInstance();
+	private static StorageManager sm = null;//StorageManager.getInstance();
 
 	private AddressBean[] addressing = new AddressBean[] { new AddressBean("wrapper-for-test") };
 
@@ -74,13 +75,13 @@ public class TestWindowing2 {
 	private static void initDB(int dbType) throws SQLException {
 		if (StorageManager.MYSQL_DB == dbType) {
 			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-			StorageManager.getInstance().init("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest", Main.DEFAULT_MAX_DB_CONNECTIONS);
+			sm = StorageManagerFactory.getInstance("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest", Main.DEFAULT_MAX_DB_CONNECTIONS);
 		} else if (StorageManager.H2_DB == dbType) {
 			DriverManager.registerDriver(new org.h2.Driver());
-			StorageManager.getInstance().init("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
+			sm = StorageManagerFactory.getInstance("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
 		} else {
 			DriverManager.registerDriver(new net.sourceforge.jtds.jdbc.Driver());
-			StorageManager.getInstance().init("net.sourceforge.jtds.jdbc.Driver", "mehdi", "mehdi",
+			sm = StorageManagerFactory.getInstance("net.sourceforge.jtds.jdbc.Driver", "mehdi", "mehdi",
 					"jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3", Main.DEFAULT_MAX_DB_CONNECTIONS);
 		}
 	}
@@ -139,8 +140,8 @@ public class TestWindowing2 {
 
 		long time = System.currentTimeMillis();
 		wrapper.postStreamElement(createStreamElement(time));
-		Connection conn = StorageManager.getInstance().getConnection();
-		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
+		Connection conn = sm.getConnection();
+		ResultSet rs = sm.executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertFalse(rs.next());
 
@@ -157,7 +158,7 @@ public class TestWindowing2 {
 		wrapper.postStreamElement(createStreamElement(time2));
 
 		DataEnumerator dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
+		rs = sm.executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
@@ -213,8 +214,8 @@ public class TestWindowing2 {
 
 		long time = System.currentTimeMillis() + 2000;
 		wrapper.postStreamElement(createStreamElement(time));
-		Connection conn = StorageManager.getInstance().getConnection();
-		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
+		Connection conn = sm.getConnection();
+		ResultSet rs = sm.executeQueryWithResultSet(query,conn);
 		assertFalse(rs.next());
 
 		StringBuilder vsQuery = new StringBuilder("select * from ").append(config.getName());
@@ -236,7 +237,7 @@ public class TestWindowing2 {
 		long time3 = time + 4200;
 		wrapper.postStreamElement(createStreamElement(time3));
 		DataEnumerator dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
+		rs = sm.executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
@@ -254,7 +255,7 @@ public class TestWindowing2 {
 		assertEquals(rs.getLong(1), time4);
 
 		dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
+		rs = sm.executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertTrue(rs.next());
@@ -313,8 +314,8 @@ public class TestWindowing2 {
 
 		long time = System.currentTimeMillis() + 2000;
 		wrapper.postStreamElement(createStreamElement(time));
-		Connection conn = StorageManager.getInstance().getConnection();
-		ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
+		Connection conn = sm.getConnection();
+		ResultSet rs = sm.executeQueryWithResultSet(query,conn);
 		assertFalse(rs.next());
 
 		StringBuilder vsQuery = new StringBuilder("select * from ").append(config.getName());
@@ -337,7 +338,7 @@ public class TestWindowing2 {
 		wrapper.postStreamElement(createStreamElement(time3));
 
 		DataEnumerator dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
+		rs = sm.executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());
@@ -355,7 +356,7 @@ public class TestWindowing2 {
 		assertEquals(rs.getLong(1), time4);
 
 		dm = sm.executeQuery(query, true);
-		rs = StorageManager.getInstance().executeQueryWithResultSet(query,conn);
+		rs = sm.executeQueryWithResultSet(query,conn);
 		assertTrue(rs.next());
 		assertTrue(rs.next());
 		assertFalse(rs.next());

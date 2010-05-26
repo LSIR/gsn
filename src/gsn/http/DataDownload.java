@@ -189,11 +189,11 @@ public class DataDownload extends HttpServlet {
                         if (nb < 0)
                             nb = 0;
                         String limit = "";
-                        if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
+                        if (Main.getMainStorage().isH2() || Main.getMainStorage().isMysqlDB()) {
                             if (nb >= 0)
                                 limit = "LIMIT " + nb + "  offset 0";
                             generated_request_query += limit;
-                        } else if (StorageManager.isOracle()) {
+                        } else if (Main.getMainStorage().isOracle()) {
                             generated_request_query = "select * from (" + generated_request_query + " ) where rownum <" + (nb + 1);
                         }
                     }
@@ -209,7 +209,7 @@ public class DataDownload extends HttpServlet {
 
 
                 try {
-                    result = StorageManager.getInstance().streamedExecuteQuery(new String(generated_request_query), false);
+                    result = Main.getMainStorage().streamedExecuteQuery(new String(generated_request_query), false);
                 } catch (SQLException e) {
                     logger.error("ERROR IN EXECUTING, query: " + generated_request_query);
                     logger.error(e.getMessage(), e);

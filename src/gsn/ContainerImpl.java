@@ -41,7 +41,7 @@ public class ContainerImpl  {
 
 	public void publishData ( AbstractVirtualSensor sensor ,StreamElement data) throws SQLException {
 		String name = sensor.getVirtualSensorConfiguration( ).getName( ).toLowerCase();
-		StorageManager storageMan = StorageManager.getInstance( );
+		StorageManager storageMan = Main.getMainStorage();
 		synchronized ( psLock ) {
 			storageMan.executeInsert( name ,sensor.getVirtualSensorConfiguration().getOutputStructure(), data );
 		}

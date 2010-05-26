@@ -105,6 +105,9 @@ public final class Main {
         int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
 
         mainStorage = StorageManagerFactory.getInstance(containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) , maxDBConnections);
+        //windowStorage = StorageManagerFactory.getInstance(containerConfig.getJdbcDriver ( ) , containerConfig.getJdbcUsername ( ) , containerConfig.getJdbcPassword ( ) , containerConfig.getJdbcURL ( ) , maxDBConnections);
+        windowStorage = buildProcessingStorageManager();
+        
         if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
 
 		try {
@@ -186,6 +189,37 @@ public final class Main {
 		return headless_check;
 	}
 
+        public static StorageManager buildProcessingStorageManager() {
+
+        /*
+        H2 In-Memory Databases
+
+        For certain use cases (for example: rapid prototyping, testing, high performance operations, read-only databases),
+        it may not be required to persist data, or persist changes to the data. This database supports the in-memory mode,
+        where the data is not persisted.
+
+        In some cases, only one connection to a in-memory database is required. This means the database to be opened is private.
+        In this case, the database URL is jdbc:h2:mem: Opening two connections within the same virtual machine means
+        opening two different (private) databases.
+
+        Sometimes multiple connections to the same in-memory database are required. In this case, the database URL must
+        include a name. Example: jdbc:h2:mem:db1. Accessing the same database in this way only works within the same
+        virtual machine and class loader environment.
+
+        In-memory can be accessed remotely (or from multiple processes in the same machine) using TCP/IP or SSL/TLS.
+        An example database URL is: jdbc:h2:tcp://localhost/mem:db1.
+
+        By default, closing the last connection to a database closes the database. For an in-memory database,
+        this means the content is lost. To keep the database open, add ;DB_CLOSE_DELAY=-1 to the database URL.
+        To keep the content of an in-memory database as long as the virtual machine is alive, use jdbc:h2:mem:test;DB_CLOSE_DELAY=-1.
+         */
+        return StorageManagerFactory.getInstance("org.h2.Driver" , "sa" , "" , "jdbc:h2:mem:windowproc;DB_CLOSE_DELAY=-1" , 8);
+
+
+        //return StorageManagerFactory.getInstance("org.h2.Driver" , "sa" , "" , "jdbc:h2:gsninternal/gsn_internal_processing.h2;TRACE_LEVEL_FILE=3;TRACE_LEVEL_SYSTEM_OUT=1" , 8);
+
+    }
+
 	public synchronized static Main getInstance() {
 		if (singleton==null)
 			try {
@@ -198,6 +232,8 @@ public final class Main {
 	}
 
     private static StorageManager mainStorage = null;
+
+    private static StorageManager windowStorage = null;
 
 	private GSNController controlSocket;
 
@@ -386,6 +422,11 @@ public final class Main {
 				return singleton.containerConfig;
 	}
 
+    /**
+     * Mote to storage Manager
+     * @param length
+     * @return
+     */
 	public static String randomTableNameGenerator ( int length ) {
 		byte oneCharacter;
 		StringBuffer result = new StringBuffer ( length );
@@ -396,10 +437,15 @@ public final class Main {
 		return result.toString ( );
 	}
 
+    /**
+     * TODO Move to storage ,manager
+     * @return
+     */
 	public static int tableNameGenerator ( ) {
 		return randomTableNameGenerator ( 15 ).hashCode ( );
 	}
 	/**
+     * TODO Move to Storage Manager
 	 * This method is used ONLY for ORACLE DB.
 	 * ADDS the postfix at the end of the tableName. If the table name ends with " then
 	 * updates it properly.   
@@ -414,11 +460,22 @@ public final class Main {
 			return tableName+postFix;
 	}
 
+    /**
+     * TODO Move to storage manager
+     * @param tableName
+     * @return
+     */
 	public static StringBuilder tableNameGeneratorInString (CharSequence tableName) {
-		if (tableName.charAt(0)=='_' && StorageManager.isOracle())
+		if (tableName.charAt(0)=='_' && getMainStorage().isOracle())
 			return new StringBuilder( "\"").append(tableName).append("\"");
 		return new StringBuilder(tableName);
 	}
+
+    /**
+     * TODO Move to storage manager
+     * @param code
+     * @return
+     */
 	public static StringBuilder tableNameGeneratorInString (int code) {
 		StringBuilder sb = new StringBuilder ("_");
 		if (code<0)
@@ -494,5 +551,9 @@ public final class Main {
 
     public static StorageManager getMainStorage() {
         return mainStorage;    
+    }
+
+    public static StorageManager getWindowStorage() {
+        return windowStorage;
     }
 }

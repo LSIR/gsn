@@ -1,5 +1,6 @@
 package gsn.beans;
 
+import gsn.Main;
 import gsn.VirtualSensor;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.storage.StorageManager;
@@ -22,7 +23,7 @@ public class InputStream implements Serializable{
 
 	private transient static final Logger               logger                = Logger.getLogger( InputStream.class );
 
-	private transient StorageManager                    storageMan = StorageManager.getInstance();
+	//private transient StorageManager                    storageMan = StorageManager.getInstance();
 
 	private String                                      inputStreamName;
 
@@ -258,16 +259,16 @@ public class InputStream implements Serializable{
 		if ( !queryCached ) {
 			rewriteQuery();
 			if ( logger.isDebugEnabled( ) && queryCached)
-				logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( this.storageMan.isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
+				logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( Main.getWindowStorage().isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
 						.toString( ) );
 		}
 		int elementCounterForDebugging = 0;
-		if ( queryCached && StorageManager.getInstance( ).isThereAnyResult( this.rewrittenSQL ) ) {
+		if ( queryCached && Main.getWindowStorage().isThereAnyResult( this.rewrittenSQL ) ) {
 			this.currentCount++;
 			AbstractVirtualSensor sensor = null;
 			if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
 
-			final Enumeration < StreamElement > resultOfTheQuery = StorageManager.getInstance( ).executeQuery( this.rewrittenSQL , false );
+			final Enumeration < StreamElement > resultOfTheQuery = Main.getWindowStorage().executeQuery( this.rewrittenSQL , false );
 			try {
 				sensor = pool.borrowVS( );
 				while ( resultOfTheQuery.hasMoreElements( ) ) {

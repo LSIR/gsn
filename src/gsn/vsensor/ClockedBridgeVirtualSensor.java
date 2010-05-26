@@ -1,5 +1,6 @@
 package gsn.vsensor;
 
+import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
@@ -66,8 +67,8 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 		Connection connection = null;
 
 		try {
-			connection = StorageManager.getInstance().getConnection();
-			ResultSet rs = StorageManager.getInstance().executeQueryWithResultSet(query, connection);
+			connection = Main.getMainStorage().getConnection();
+			ResultSet rs = Main.getMainStorage().executeQueryWithResultSet(query, connection);
 			if (rs.next()) {
 				Long i = rs.getLong(1); // get result from first column (1)
 				logger.warn("LAST UPDATE: "+ Long.toString(i));
@@ -76,7 +77,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 		} finally {
-			StorageManager.close(connection);
+			Main.getMainStorage().close(connection);
 		}
 
 
@@ -101,7 +102,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 		StringBuilder query = new StringBuilder("select * from "+table_name+" where timed > "+last_updated+" order by timed asc");
 
 		try {
-			DataEnumerator data = StorageManager.getInstance().executeQuery(query,true);
+			DataEnumerator data = Main.getMainStorage().executeQuery(query,true);
 			while (data.hasMoreElements()){
 				StreamElement se = data.nextElement();
 				last_updated = se.getTimeStamp();
