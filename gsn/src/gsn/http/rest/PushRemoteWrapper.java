@@ -33,117 +33,129 @@ import com.thoughtworks.xstream.XStream;
 
 public class PushRemoteWrapper extends AbstractWrapper {
 
-	private static final int KEEP_ALIVE_PERIOD = 5000;
+    private static final int KEEP_ALIVE_PERIOD = 5000;
 
-	private final transient Logger     logger                 = Logger.getLogger ( PushRemoteWrapper.class );
+    private final transient Logger logger = Logger.getLogger(PushRemoteWrapper.class);
 
-	private final XStream XSTREAM = StreamElement4Rest.getXstream();
+    private final XStream XSTREAM = StreamElement4Rest.getXstream();
 
-	private double uid = -1; //only set for push based delivery(default)
+    private double uid = -1; //only set for push based delivery(default)
 
-	private RemoteWrapperParamParser initParams;
+    private RemoteWrapperParamParser initParams;
 
-	private DefaultHttpClient httpclient = new DefaultHttpClient();
+    private DefaultHttpClient httpclient = new DefaultHttpClient();
 
-	private long lastReceivedTimestamp;
+    private long lastReceivedTimestamp;
 
-	private DataField[] structure;
+    private DataField[] structure;
 
-	List <NameValuePair> postParameters;
+    List<NameValuePair> postParameters;
 
-	public void dispose() {
-		NotificationRegistry.getInstance().removeNotification(uid);
-	}
+    public void dispose() {
+        NotificationRegistry.getInstance().removeNotification(uid);
+    }
 
-	public boolean initialize() {
+    public boolean initialize() {
 
-		try {
-			initParams = new RemoteWrapperParamParser(getActiveAddressBean(),true);
-			uid  = Math.random();
+        try {
+            initParams = new RemoteWrapperParamParser(getActiveAddressBean(), true);
+            uid = Math.random();
 
-			postParameters = new ArrayList <NameValuePair>();
-			postParameters.add(new BasicNameValuePair(PushDelivery.NOTIFICATION_ID_KEY, Double.toString(uid)));
-			postParameters.add(new BasicNameValuePair(PushDelivery.LOCAL_CONTACT_POINT, initParams.getLocalContactPoint()));
+            postParameters = new ArrayList<NameValuePair>();
+            postParameters.add(new BasicNameValuePair(PushDelivery.NOTIFICATION_ID_KEY, Double.toString(uid)));
+            postParameters.add(new BasicNameValuePair(PushDelivery.LOCAL_CONTACT_POINT, initParams.getLocalContactPoint()));
 
-			lastReceivedTimestamp = initParams.getStartTime();
-			structure = registerAndGetStructure();
-		}catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			NotificationRegistry.getInstance().removeNotification(uid);
-			return false;
-		}
+            lastReceivedTimestamp = initParams.getStartTime();
+            structure = registerAndGetStructure();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            NotificationRegistry.getInstance().removeNotification(uid);
+            return false;
+        }
 
 
-		return true;
-	}
+        return true;
+    }
 
-	public DataField[] getOutputFormat() {
-		return structure;
-	}
+    public DataField[] getOutputFormat() {
+        return structure;
+    }
 
-	public String getWrapperName() {
-		return "Push-Remote Wrapper";
-	}
+    public String getWrapperName() {
+        return "Push-Remote Wrapper";
+    }
 
-	public DataField[] registerAndGetStructure() throws ClientProtocolException, IOException, ClassNotFoundException {
-		HttpPost httpPost = new HttpPost(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
-		httpPost.setEntity(new UrlEncodedFormEntity(postParameters, HTTP.UTF_8));
+    public DataField[] registerAndGetStructure() throws ClientProtocolException, IOException, ClassNotFoundException {
+        HttpPost httpPost = new HttpPost(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
+        httpPost.setEntity(new UrlEncodedFormEntity(postParameters, HTTP.UTF_8));
+        HttpContext localContext = new BasicHttpContext();
+        NotificationRegistry.getInstance().addNotification(uid, this);
+        HttpResponse response = null;
+        int tries = 0;
+        while (tries < 2) {
+            tries++;
+            try {
 
-		HttpContext localContext = new BasicHttpContext();
-
-		NotificationRegistry.getInstance().addNotification(uid, this);
-
-		int tries = 0;
-		while(tries < 2){
-			tries++;
-			HttpResponse response = httpclient.execute(httpPost, localContext);
-			HttpEntity entity = response.getEntity();
-
-			int sc = response.getStatusLine().getStatusCode();
-			AuthState authState = null;
-			if (sc == HttpStatus.SC_UNAUTHORIZED) {
-				// Target host authentication required
-				authState = (AuthState) localContext.getAttribute(ClientContext.TARGET_AUTH_STATE);
-			}
-			if (sc == HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED) {
-				// Proxy authentication required
-				authState = (AuthState) localContext.getAttribute(ClientContext.PROXY_AUTH_STATE);
-			}
-
-			if (authState != null) {
-				if(initParams.getUsername() == null || tries > 1){
-					logger.error("A valid username/password required to connect to the remote host: " + initParams.getRemoteContactPoint());
-				}else{
-					AuthScope authScope = authState.getAuthScope();
-					Credentials creds = new UsernamePasswordCredentials(initParams.getUsername(), initParams.getPassword());
-					httpclient.getCredentialsProvider().setCredentials(authScope, creds);
-				}
-			} else {
-                InputStream content = null;
-                try {
-				    logger.debug ( new StringBuilder ( ).append ( "Wants to consume the strcture packet from " ).append(initParams.getRemoteContactPoint()));
-				    content = entity.getContent();
-				    structure = (DataField[]) XSTREAM.fromXML(content);
-				    logger.debug("Connection established for: "+ initParams.getRemoteContactPoint());
-                    break;
+                if (response != null && response.getEntity() != null) {
+                    response.getEntity().consumeContent();
                 }
-                finally {
-                    if (content != null) 
-				        content.close();
+
+                response  = httpclient.execute(httpPost, localContext);
+                
+                int sc = response.getStatusLine().getStatusCode();
+                AuthState authState = null;
+                if (sc == HttpStatus.SC_UNAUTHORIZED) {
+                    // Target host authentication required
+                    authState = (AuthState) localContext.getAttribute(ClientContext.TARGET_AUTH_STATE);
                 }
-			}
-		}
+                if (sc == HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED) {
+                    // Proxy authentication required
+                    authState = (AuthState) localContext.getAttribute(ClientContext.PROXY_AUTH_STATE);
+                }
 
-		if(structure == null)
-			throw new RuntimeException("Cannot connect to the remote host.");
+                if (authState != null) {
+                    if (initParams.getUsername() == null || tries > 1) {
+                        logger.error("A valid username/password required to connect to the remote host: " + initParams.getRemoteContactPoint());
+                    } else {
+                        AuthScope authScope = authState.getAuthScope();
+                        Credentials creds = new UsernamePasswordCredentials(initParams.getUsername(), initParams.getPassword());
+                        httpclient.getCredentialsProvider().setCredentials(authScope, creds);
+                    }
+                } else {
+                    InputStream content = null;
+                    try {
+                        logger.debug(new StringBuilder().append("Wants to consume the strcture packet from ").append(initParams.getRemoteContactPoint()));
+                        content = response.getEntity().getContent();
+                        structure = (DataField[]) XSTREAM.fromXML(content);
+                        logger.debug("Connection established for: " + initParams.getRemoteContactPoint());
+                        break;
+                    }
+                    finally {
+                        if (content != null)
+                            content.close();
+                    }
+                }
 
-		return structure;
-	}
+            }
+            catch (RuntimeException ex) {
+                // In case of an unexpected exception you may want to abort
+                // the HTTP request in order to shut down the underlying
+                // connection and release it back to the connection manager.
+                httpPost.abort();
+                throw ex;
+            }
+        }
 
-	public boolean manualDataInsertion(String Xstream4Rest) {
-		logger.debug ( new StringBuilder ( ).append ( "Received Stream Element at the push wrapper."));
-		StreamElement4Rest se = (StreamElement4Rest) XSTREAM.fromXML(Xstream4Rest);
-		StreamElement streamElement = se.toStreamElement();
+        if (structure == null)
+            throw new RuntimeException("Cannot connect to the remote host.");
+
+        return structure;
+    }
+
+    public boolean manualDataInsertion(String Xstream4Rest) {
+        logger.debug(new StringBuilder().append("Received Stream Element at the push wrapper."));
+        StreamElement4Rest se = (StreamElement4Rest) XSTREAM.fromXML(Xstream4Rest);
+        StreamElement streamElement = se.toStreamElement();
 
         try {
             // If the stream element is out of order, we accept the stream element and wait for the next (update the last received time and return true)
@@ -156,41 +168,40 @@ public class PushRemoteWrapper extends AbstractWrapper {
             // otherwise, we return false.
             boolean status = postStreamElement(streamElement);
             if (status)
-                lastReceivedTimestamp = streamElement.getTimeStamp();    
+                lastReceivedTimestamp = streamElement.getTimeStamp();
             return status;
         }
         catch (SQLException e) {
             logger.warn(e.getMessage(), e);
             return false;
         }
-	}
+    }
 
-	public void run() {
-		HttpPost httpPost = new HttpPost(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
-		HttpResponse response = null; //This is acting as keep alive.
-		while(isActive()) {
-			try {
-				Thread.sleep(KEEP_ALIVE_PERIOD);
-				httpPost.setEntity(new UrlEncodedFormEntity(postParameters, HTTP.UTF_8));
+    public void run() {
+        HttpPost httpPost = new HttpPost(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
+        HttpResponse response = null; //This is acting as keep alive.
+        while (isActive()) {
+            try {
+                Thread.sleep(KEEP_ALIVE_PERIOD);
+                httpPost.setEntity(new UrlEncodedFormEntity(postParameters, HTTP.UTF_8));
                 response = null;
                 response = httpclient.execute(httpPost);
                 int status = response.getStatusLine().getStatusCode();
-				if (status != RestStreamHanlder.SUCCESS_200) {
-					logger.error("Cant register to the remote client, retrying in:"+ (KEEP_ALIVE_PERIOD/1000)+" seconds.");
-					structure = registerAndGetStructure();
-				}
-
-			} catch (Exception e) {
-				logger.warn(e.getMessage(),e);
-			}finally {
-				if( response!=null) {
-					try {
-                        response.getEntity().getContent().close();
-					} catch (Exception e) {
-						logger.warn(e.getMessage(),e);
-					}
+                if (status != RestStreamHanlder.SUCCESS_200) {
+                    logger.error("Cant register to the remote client, retrying in:" + (KEEP_ALIVE_PERIOD / 1000) + " seconds.");
+                    structure = registerAndGetStructure();
                 }
-			}
-		}
-	}
+            } catch (Exception e) {
+                logger.warn(e.getMessage(), e);
+            } finally {
+                if (response != null) {
+                    try {
+                        response.getEntity().getContent().close();
+                    } catch (Exception e) {
+                        logger.warn(e.getMessage(), e);
+                    }
+                }
+            }
+        }
+    }
 }
