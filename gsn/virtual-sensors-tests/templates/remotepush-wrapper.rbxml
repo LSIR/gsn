@@ -16,6 +16,8 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote">
+                    <predicate key="username">#{@username}</predicate>
+                    <predicate key="password">#{@password}</predicate>                    
                     <predicate key="query">select * from #{@vsname.upcase}</predicate>
                     <predicate key="local-contact-point">#{@local_contact_point}</predicate>
                     <predicate key="remote-contact-point">#{@remote_contact_point}</predicate>
