@@ -19,7 +19,7 @@ from string import join
 
 DEFAULT_DATE_TIME_FORMATE = 'yyyy-MM-dd'
 
-RESEND_INTERVAL_SEC = 10
+RESEND_INTERVAL_SEC = 30
 
 CHUNK_SIZE = 64000
 

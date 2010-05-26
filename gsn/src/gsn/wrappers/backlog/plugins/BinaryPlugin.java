@@ -54,7 +54,7 @@ import gsn.wrappers.BackLogWrapper;
  */
 public class BinaryPlugin extends AbstractPlugin {
 	
-	protected static final int RESEND_INTERVAL_SEC = 10;
+	protected static final int RESEND_INTERVAL_SEC = 30;
 	
 	private static final String STORAGE_DIRECTORY = "storage-directory";
 	
