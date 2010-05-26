@@ -114,10 +114,6 @@ public class RestRemoteWrapper extends AbstractWrapper {
 		logger.info("lastReceivedTimestamp=" + String.valueOf(lastReceivedTimestamp));
         
         try {
-            initParams = new RemoteWrapperParamParser(getActiveAddressBean(), false);
-            httpclient = new DefaultHttpClient(getHttpClientParams(initParams.getTimeout()));
-
-            lastReceivedTimestamp = initParams.getStartTime();
             structure = connectToRemote();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
