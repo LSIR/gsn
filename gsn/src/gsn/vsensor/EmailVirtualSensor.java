@@ -15,6 +15,8 @@ import org.apache.log4j.Logger;
  * 
  * Receiver's e-mail address can be defined either in the VS's configuration
  * parameters, or it can be get from the datastream.
+ *
+ * @deprecated Replaced by the {@link gsn.processor.ScriptletProcessor} class and the {@link gsn.utils.services.Notifications} services.
  */
 public class EmailVirtualSensor extends AbstractVirtualSensor {
 

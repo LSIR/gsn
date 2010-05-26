@@ -14,7 +14,7 @@ import java.util.TreeMap;
  * This Processor (processing class) executes a scriptlet upon reception of a new  StreamElement and can be used to
  * implement arbitrary complex processing class by specifying its logic directly in the virtual sensor description file.
  * This is especially useful for setting up flexible, complex and DBMS independent calibration functions.
- * The current implementation supports the Groovy (http://groovy.codehaus.org) scripting language.
+ * The current implementation supports the Groovy scripting language @see http://groovy.codehaus.org .
  *
  * Data Binding
  * ------------
@@ -31,14 +31,14 @@ import java.util.TreeMap;
  * State
  * -----
  *
- * In order to save the state of a variable for the next evaluation, you can use the following code in your script:
+ * In order to save the state of a variable for the next evaluation, the following code is automatically added to your
+ * script:
  *
- * // The following fonction must be included once
  * def isdef(var) {
  *   (binding.getVariables().containsKey(var))
  * }
  *
- * // Then you can update or initialize the variable like below:
+ * It can be used for initializing or updating a variable like below:
  * 
  * statefulCounter = isdef('statefulCounter') ? statefulCounter + 1 : 0;
  * 
@@ -57,6 +57,14 @@ import java.util.TreeMap;
  * 2. persistant, boolean, optional
  * Sets wether or not a StreamElement is created and stored at the end of the scriplet execution.
  *
+ * PREDEFINED SERVICES
+ * -------------------
+ *
+ * The following classes providing services are, by default, statically imported to your scriptlet and thus, all their
+ * static methods can be used directly in your scriptlet.
+ *
+ * 1. The {@link gsn.utils.services.EmailService} class provides access the Email notification services.
+ * 2. The {@link gsn.utils.services.TwitterService} class provides access to Twitter notifications services.
  * 
  * LIMITATIONS
  * -----------
@@ -122,20 +130,35 @@ public class ScriptletProcessor extends AbstractVirtualSensor {
 
         // Mandatory Parameters
 
-        String scriptlet = parameters.get("scriptlet");
-        if (scriptlet == null) {
+        String ps = parameters.get("scriptlet");
+        if (ps == null) {
             logger.warn("The Initial Parameter >scriptlet< MUST be provided in the configuration file for the processing class.");
             return false;
         }
+
+        StringBuilder scriptlet = new StringBuilder();
+        scriptlet.append("// start auto generated part --\n");
+        // Add the static import (for predefined services)
+        scriptlet.append("import static ").append(gsn.utils.services.EmailService.class.getCanonicalName()).append(".*;\n");
+        scriptlet.append("import static ").append(gsn.utils.services.TwitterService.class.getCanonicalName()).append(".*;\n");
+        
+        // Add the syntactic sugars
+        scriptlet.append("def isdef(var){(binding.getVariables().containsKey(var))}\n");
+
+        scriptlet.append("// end auto generated part --\n");
+
+        // Append the scriplet from the parameter
+        scriptlet.append(ps);
+
         GroovyShell shell = new GroovyShell();
         try {
-            script = shell.parse(scriptlet);
+            script = shell.parse(scriptlet.toString());
         }
         catch (Exception e) {
             logger.warn("Failed to compile the scriptlet " + e.getMessage());
             return false;
         }
-        logger.info("scriptlet: " + scriptlet);
+        logger.warn("scriptlet: " + scriptlet);
 
         // Optional Parameters
 
