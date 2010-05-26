@@ -69,12 +69,15 @@ public class SchedulePlugin extends AbstractPlugin {
 				StringBuilder query = new StringBuilder();
 				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" order by timed desc limit 1");
 				ResultSet rs = StorageManager.executeQueryWithResultSet(query, conn);
-				StorageManager.close(conn);
 				
 				if (rs.next()) {
 					// get the creation time of the newest schedule
 					long creationtime = rs.getLong("generation_time");
+					long transmissiontime = rs.getLong("transmission_time");
 					Integer id = rs.getInt("device_id");
+					byte[] schedule = rs.getBytes("schedule");
+					StorageManager.close(conn);
+					
 					logger.debug("creation time: " + creationtime);
 					if (timestamp ==  creationtime) {
 						// if the schedule on the deployment has the same creation
@@ -86,7 +89,6 @@ public class SchedulePlugin extends AbstractPlugin {
 					}
 					else {
 						// send the new schedule to the deployment
-						byte[] schedule = rs.getBytes("schedule");
 						logger.debug("send new schedule (" + new String(schedule) + ")");
 	
 						byte [] pkt = new byte [schedule.length + 9];
@@ -95,7 +97,7 @@ public class SchedulePlugin extends AbstractPlugin {
 						System.arraycopy(schedule, 0, pkt, 9, schedule.length);
 						sendRemote(System.currentTimeMillis(), pkt, super.priority);
 						
-						if (rs.getLong("transmission_time") == 0) {
+						if (transmissiontime == 0) {
 							long time = System.currentTimeMillis();
 							Serializable[] data = {id, creationtime, time, schedule};
 							dataProcessed(time, data);
