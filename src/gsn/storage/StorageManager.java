@@ -1211,9 +1211,9 @@ public class StorageManager {
      * @deprecated
      * @return
      */
-	//public static StorageManager getInstance() {
-	//	return Main.getMainStorage();
-	//}
+	public static StorageManager getInstance() {
+		return Main.getMainStorage();
+	}
 
 	public StorageManager() {
 	}

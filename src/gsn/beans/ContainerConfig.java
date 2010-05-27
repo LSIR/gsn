@@ -53,20 +53,6 @@ public class ContainerConfig {
 
 	protected String                      containerFileName;
 
-	protected String                      jdbcDriver;
-
-	protected String                      jdbcUsername;
-
-	public static final String            FIELD_NAME_jdbcUsername          = "jdbcUsername";
-
-	protected String                      jdbcPassword;
-
-	public static final String            FIELD_NAME_jdbcPassword          = "jdbcPassword";
-
-	protected String                      jdbcURL;
-
-	public static final String            FIELD_NAME_jdbcURL               = "jdbcURL";
-
 	protected int                         storagePoolSize    =-1              ;
 
 	private int sslPort ;
@@ -75,8 +61,19 @@ public class ContainerConfig {
 
 	private String sslKeyPassword;
 
+    private StorageConfig storage ;
 
-	public String getContainerFileName ( ) {
+    private SlidingConfig sliding;
+
+    public StorageConfig getStorage() {
+        return storage;
+    }
+
+    public SlidingConfig getSliding() {
+        return sliding;
+    }
+
+    public String getContainerFileName ( ) {
 		return this.containerFileName;
 	}
 
@@ -94,44 +91,6 @@ public class ContainerConfig {
 			this.webAuthor = this.webAuthor.trim( );
 		return this.webAuthor;
 
-	}
-
-	public String getJdbcDriver ( ) {
-		return this.jdbcDriver;
-	}
-
-	public String getJdbcUsername ( ) {
-		return this.jdbcUsername;
-	}
-
-	public String getJdbcPassword ( ) {
-		return this.jdbcPassword;
-	}
-
-	public static final String FIELD_NAME_jdbcDriver = "jdbcDriver";
-
-	public void setJdbcDriver ( String newValue ) {
-		String oldValue = this.jdbcDriver;
-		this.jdbcDriver = newValue;
-	}
-
-	public void setJdbcPassword ( String newValue ) {
-		String oldValue = this.jdbcPassword;
-		this.jdbcPassword = newValue;
-	}
-
-	public void setJdbcUsername ( String newValue ) {
-		String oldValue = this.jdbcUsername;
-		this.jdbcUsername = newValue;
-	}
-
-	public void setJdbcURL ( String newValue ) {
-		String oldValue = this.jdbcURL;
-		this.jdbcURL = newValue;
-	}
-
-	public String getJdbcURL ( ) {
-		return this.jdbcURL;
 	}
 
 	/**
@@ -250,8 +209,6 @@ public class ContainerConfig {
 
 	public static final String [ ] LOGGING_LEVELS                     = { "DEBUG" , "INFO" , "WARN" , "ERROR" };
 
-	//public static String [ ]       NETWORK_ADDRESSES;
-
 	public static final String [ ] JDBC_SYSTEMS                       = { "H2 in Memory" , "H2 in File" , "MySql", "SQL Server" };
 
 	public static final String [ ] JDBC_URLS                          = new String [ ] { "jdbc:h2:mem:." , "jdbc:h2:file:/path/to/file" , "jdbc:mysql://localhost:3306/gsn", "jdbc:jtds:sqlserver://localhost/gsn" };
@@ -327,6 +284,8 @@ public class ContainerConfig {
 		return this.gsnLogFileName;
 	}
 
+
+
     /*
 	static {
 		int i = 0;
@@ -386,20 +345,21 @@ public class ContainerConfig {
 	public void setdatabaseSystem ( String newValue ) {
 		isdatabaseSystemInitialzied = true;
 		String oldValue = this.databaseSystem;
-		this.databaseSystem = newValue;
-		setJdbcDriver( convertToDriver( newValue ) );
-		if ( newValue == JDBC_SYSTEMS[ 0 ] ) {
-			setJdbcPassword( "" );
-			setJdbcUsername( "sa" );
-			setJdbcURL( JDBC_URLS[ 0 ] );
+		databaseSystem = newValue;
+        storage = new StorageConfig();
+        storage.setJdbcDriver(convertToDriver( newValue ));
+        if ( newValue == JDBC_SYSTEMS[ 0 ] ) {
+			storage.setJdbcPassword("");
+            storage.setJdbcUsername("sa");
+            storage.setJdbcURL(JDBC_URLS[ 0 ]);
 		} else if ( newValue == JDBC_SYSTEMS[ 1 ] ) {
-			setJdbcPassword( "" );
-			setJdbcUsername( "sa" );
-			setJdbcURL( JDBC_URLS[ 1 ] );
+			storage.setJdbcPassword("");
+            storage.setJdbcUsername("sa");
+            storage.setJdbcURL(JDBC_URLS[ 1 ]);
 		} else if ( newValue == JDBC_SYSTEMS[ 2 ] ) {
-			setJdbcURL( JDBC_URLS[ 2 ] );
+			storage.setJdbcURL(JDBC_URLS[ 2 ]);
 		} else if ( newValue == JDBC_SYSTEMS[ 3 ] ) {
-			setJdbcURL( JDBC_URLS[ 3 ] );
+			storage.setJdbcURL(JDBC_URLS[ 3 ]);
 		}
 	}
 
@@ -408,7 +368,7 @@ public class ContainerConfig {
 			isdatabaseSystemInitialzied = true;
 
 			for ( int i = 0 ; i < JDBC_URLS_PREFIX.length ; i++ )
-				if ( getJdbcURL( ).toLowerCase( ).trim( ).startsWith( JDBC_URLS_PREFIX[ i ] ) ) {
+				if ( storage.getJdbcURL().toLowerCase( ).trim( ).startsWith( JDBC_URLS_PREFIX[ i ] ) ) {
 					setdatabaseSystem( JDBC_SYSTEMS[ i ] );
 					break;
 				}
@@ -431,10 +391,10 @@ public class ContainerConfig {
 		st.setAttribute( "author" , getWebAuthor( ) );
 		st.setAttribute( "description" , getWebDescription( ) );
 		st.setAttribute( "email" , getWebEmail( ) );
-		st.setAttribute( "db_user" , getJdbcUsername( ) );
-		st.setAttribute( "db_password" , getJdbcPassword( ) );
-		st.setAttribute( "db_driver" , getJdbcDriver( ) );
-		st.setAttribute( "db_url" , getJdbcURL( ) );
+		st.setAttribute( "db_user" , storage.getJdbcUsername( ) );
+		st.setAttribute( "db_password" , storage.getJdbcPassword( ) );
+		st.setAttribute( "db_driver" , storage.getJdbcDriver( ) );
+		st.setAttribute( "db_url" , storage.getJdbcURL( ) );
 		st.setAttribute( "gsn_port" , getContainerPort( ) );
 
 		gsnLog4JProperties.store( new FileOutputStream( gsnLog4jFile ) , "" );
@@ -451,10 +411,11 @@ public class ContainerConfig {
 	public static ContainerConfig getDefaultConfiguration ( ) {
 		ContainerConfig bean = new ContainerConfig( );
 		bean.setContainerPort( ContainerConfig.DEFAULT_GSN_PORT );
-		bean.setJdbcDriver( ContainerConfig.JDBC_SYSTEMS[ 0 ] );
-		bean.setJdbcPassword( "" );
-		bean.setJdbcURL( "sa" );
-		bean.setJdbcURL( ContainerConfig.JDBC_URLS[ 0 ] );
+		bean.storage = new StorageConfig();
+        bean.storage.setJdbcDriver( ContainerConfig.JDBC_SYSTEMS[ 0 ] );
+		bean.storage.setJdbcPassword( "" );
+		bean.storage.setJdbcURL( "sa" );
+		bean.storage.setJdbcURL( ContainerConfig.JDBC_URLS[ 0 ] );
 		bean.setWebName( "NoName." );
 		bean.setWebAuthor( "Author not specified." );
 		bean.setWebEmail( "Email not specified." );
