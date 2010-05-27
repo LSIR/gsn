@@ -5,6 +5,8 @@ import gsn.wrappers.backlog.plugins.AbstractPlugin;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,9 +50,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private Timer pingTimer = null;
 	private Timer pingWatchDogTimer = null;
 
-	private InetAddress hostAddress;
+	private InetAddress inetAddress;
 	private int hostPort;
-	private String coreStationName;
 	private String deploymentName;
 	boolean stuff = false;
 	
@@ -61,13 +62,13 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	
 	
 	private BackLogMessageMultiplexer(String deployment, String coreStationAddress) throws Exception {
-		msgTypeListener = new HashMap<Integer,Vector<BackLogMessageListener>> ();
+		msgTypeListener = Collections.synchronizedMap(new HashMap<Integer,Vector<BackLogMessageListener>> ());
 		
 		// a first pattern match test for >host:port<
     	Matcher m = Pattern.compile("(.*):(.*)").matcher(coreStationAddress);
     	if ( m.find() ) {
 			try {
-				hostAddress = InetAddress.getByName(m.group(1));
+				inetAddress = InetAddress.getByName(m.group(1));
 				hostPort = new Integer(m.group(2));
 			} catch(Exception e) {
 				throw new IOException("Remote BackLog host string does not match >host:port<");
@@ -77,11 +78,10 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			throw new IOException("Remote BackLog host string does not match >host:port<");
     	}
     	deploymentName = deployment;
-		coreStationName = hostAddress.getCanonicalHostName();
     	
     	asyncCoreStationClient = AsyncCoreStationClient.getSingletonObject();
 		
-		setName("BackLogMessageMultiplexer-Thread:" + coreStationName);
+		setName("BackLogMessageMultiplexer-Thread:" + getCoreStationName());
 	}
 	
 	
@@ -203,7 +203,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		    		    	// restart ping checker timer
 			    			logger.debug("reset ping watchdog");
 		    				pingWatchDogTimer.cancel();
-		    		        pingWatchDogTimer = new Timer("PingWatchDog-" + coreStationName);
+		    		        pingWatchDogTimer = new Timer("PingWatchDog-" + getCoreStationName());
 		    		        pingWatchDogTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000 );
 			    		}
 			    		else
@@ -266,7 +266,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		}
 		recvQueue.clear();
 		
-		blMultiplexerMap.remove(coreStationName);
+		blMultiplexerMap.remove(getCoreStationName());
 		
 		asyncCoreStationClient.deregisterListener(this);
 	}
@@ -394,8 +394,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 
 	@Override
-	public InetAddress getHostAddress() {
-		return hostAddress;
+	public InetAddress getInetAddress() {
+		return inetAddress;
 	}
 
 
@@ -421,18 +421,21 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		logger.debug("connection finished");
 		
     	// start ping timer
-        pingTimer = new Timer("PingTimer-" + coreStationName);
+        pingTimer = new Timer("PingTimer-" + getCoreStationName());
         pingTimer.schedule( new PingTimer(this), PING_INTERVAL_SEC * 1000, PING_INTERVAL_SEC * 1000 );
     	// start ping checker timer
-        pingWatchDogTimer = new Timer("PingWatchDog-" + coreStationName);
+        pingWatchDogTimer = new Timer("PingWatchDog-" + getCoreStationName());
         pingWatchDogTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000 );
-        
-		Iterator<Vector<BackLogMessageListener>> iter = msgTypeListener.values().iterator();
-		while (iter.hasNext()) {
-			Enumeration<BackLogMessageListener> en = iter.next().elements();
-			// send the message to all listeners
-			while (en.hasMoreElements()) {
-				en.nextElement().remoteConnEstablished();
+
+		Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
+		synchronized (msgTypeListener) {
+			Iterator<Vector<BackLogMessageListener>> iter = val.iterator();
+			while (iter.hasNext()) {
+				Enumeration<BackLogMessageListener> en = iter.next().elements();
+				// send the message to all listeners
+				while (en.hasMoreElements()) {
+					en.nextElement().remoteConnEstablished();
+				}
 			}
 		}
 	}
@@ -461,12 +464,15 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		if (pingWatchDogTimer != null)
 			pingWatchDogTimer.cancel();
 
-		Iterator<Vector<BackLogMessageListener>> iter = msgTypeListener.values().iterator();
-		while (iter.hasNext()) {
-			Enumeration<BackLogMessageListener> en = iter.next().elements();
-			// send the message to all listeners
-			while (en.hasMoreElements()) {
-				en.nextElement().remoteConnLost();
+		Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
+		synchronized (msgTypeListener) {
+		Iterator<Vector<BackLogMessageListener>> iter = val.iterator();
+			while (iter.hasNext()) {
+				Enumeration<BackLogMessageListener> en = iter.next().elements();
+				// send the message to all listeners
+				while (en.hasMoreElements()) {
+					en.nextElement().remoteConnLost();
+				}
 			}
 		}
 		
@@ -505,7 +511,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 	@Override
 	public String getCoreStationName() {
-		return coreStationName;
+		return inetAddress.getHostName();
 	}
 	
 	

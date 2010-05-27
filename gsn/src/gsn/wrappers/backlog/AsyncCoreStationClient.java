@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,7 +43,7 @@ public class AsyncCoreStationClient extends Thread  {
 
 	protected Map<SocketChannel,CoreStationListener> socketToListenerList = new HashMap<SocketChannel,CoreStationListener>();
 	protected Map<CoreStationListener,SocketChannel> listenerToSocketList = new HashMap<CoreStationListener,SocketChannel>();
-	private static Map<String,Map<Integer,CoreStationListener>> deploymentToIdListenerMapList = new HashMap<String,Map<Integer,CoreStationListener>>();
+	private static Map<String,Map<Integer,CoreStationListener>> deploymentToIdListenerMapList = Collections.synchronizedMap(new HashMap<String,Map<Integer,CoreStationListener>>());
 
 	private ByteBuffer writeBuffer;
 	private ByteBuffer readBuffer;
@@ -267,7 +268,7 @@ public class AsyncCoreStationClient extends Thread  {
 			socketChannel.finishConnect();
 		} catch (IOException e) {
 			synchronized (socketToListenerList) {
-				logger.error("could not connect to " + socketToListenerList.get(socketChannel).getHostAddress() + ": " + e.getMessage());
+				logger.error("could not connect to " + socketToListenerList.get(socketChannel).getCoreStationName() + ": " + e.getMessage());
 				reconnect(socketToListenerList.get(socketChannel));
 			}
 			return;
@@ -305,7 +306,7 @@ public class AsyncCoreStationClient extends Thread  {
 			SocketChannel socketChannel = SocketChannel.open();
 			socketChannel.configureBlocking(false);
 			logger.debug("trying to connect to core station: " + listener.getCoreStationName());
-			socketChannel.connect(new InetSocketAddress(listener.getHostAddress(), listener.getPort()));
+			socketChannel.connect(new InetSocketAddress(listener.getInetAddress(), listener.getPort()));
 		
 			synchronized(socketToListenerList) {
 				socketToListenerList.put(socketChannel, listener);
@@ -356,13 +357,11 @@ public class AsyncCoreStationClient extends Thread  {
 		logger.debug("adding DeviceId " + id + "for " + deployment + " deployment");
 
 		try {
-			synchronized (deploymentToIdListenerMapList) {
-				if (!deploymentToIdListenerMapList.containsKey(deployment)) {
-					deploymentToIdListenerMapList.put(deployment, new HashMap<Integer, CoreStationListener>());
-				}
-				
-				deploymentToIdListenerMapList.get(deployment).put(id, listener);
+			if (!deploymentToIdListenerMapList.containsKey(deployment)) {
+				deploymentToIdListenerMapList.put(deployment, new HashMap<Integer, CoreStationListener>());
 			}
+			
+			deploymentToIdListenerMapList.get(deployment).put(id, listener);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -372,24 +371,22 @@ public class AsyncCoreStationClient extends Thread  {
 	public void removeDeviceId(String deployment, Integer id) {
 		logger.debug("removing DeviceId: " + id + " for " + deployment + " deployment");
 		try {
-			synchronized (deploymentToIdListenerMapList) {
-				if (deployment != null) {
-					Map<Integer, CoreStationListener> list = deploymentToIdListenerMapList.get(deployment);
-					if (list == null) {
-						logger.error("there is no core station listener for deployment " + deployment);
-						return;
-					}
-					if (id != null)
-						list.remove(id);
-					else
-						logger.error("id is null");
-				
-					if (list.isEmpty())
-						deploymentToIdListenerMapList.remove(deployment);
+			if (deployment != null) {
+				Map<Integer, CoreStationListener> list = deploymentToIdListenerMapList.get(deployment);
+				if (list == null) {
+					logger.error("there is no core station listener for deployment " + deployment);
+					return;
 				}
+				if (id != null)
+					list.remove(id);
 				else
-					logger.error("deployment is null");
+					logger.error("id is null");
+			
+				if (list.isEmpty())
+					deploymentToIdListenerMapList.remove(deployment);
 			}
+			else
+				logger.error("deployment is null");
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -423,16 +420,14 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public boolean send(String deployment, Integer id, CoreStationListener listener, int priority, byte[] data) throws IOException {
+	public synchronized boolean send(String deployment, Integer id, CoreStationListener listener, int priority, byte[] data) throws IOException {
 		boolean ret = false;
 		if (deployment == null) {
 			logger.error("deployment should not be null...");
 			return false;
 		}
 		Map<Integer, CoreStationListener> corestationMap = null;
-		synchronized (deploymentToIdListenerMapList) {
-			 corestationMap = deploymentToIdListenerMapList.get(deployment);
-		}
+		corestationMap = deploymentToIdListenerMapList.get(deployment);
 		if (corestationMap == null)
 			throw new IOException("The " + deployment + " deployment is not connected or does not exist");
 			

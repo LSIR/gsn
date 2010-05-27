@@ -13,7 +13,7 @@ public interface CoreStationListener {
     public int getPort();
 
 
-    public InetAddress getHostAddress();
+    public InetAddress getInetAddress();
 
     
     public void connectionLost();
