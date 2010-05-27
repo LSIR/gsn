@@ -41,8 +41,8 @@ public class AsyncCoreStationClient extends Thread  {
 	// Maps a SocketChannel to a list of ByteBuffer instances
 	private Map<SocketChannel, PriorityQueue<PriorityDataElement>> pendingData = new HashMap<SocketChannel, PriorityQueue<PriorityDataElement>>();
 
-	protected Map<SocketChannel,CoreStationListener> socketToListenerList = new HashMap<SocketChannel,CoreStationListener>();
-	protected Map<CoreStationListener,SocketChannel> listenerToSocketList = new HashMap<CoreStationListener,SocketChannel>();
+	protected Map<SocketChannel,CoreStationListener> socketToListenerList = Collections.synchronizedMap(new HashMap<SocketChannel,CoreStationListener>());
+	protected Map<CoreStationListener,SocketChannel> listenerToSocketList = Collections.synchronizedMap(new HashMap<CoreStationListener,SocketChannel>());
 	private static Map<String,Map<Integer,CoreStationListener>> deploymentToIdListenerMapList = Collections.synchronizedMap(new HashMap<String,Map<Integer,CoreStationListener>>());
 
 	private ByteBuffer writeBuffer;
@@ -104,14 +104,10 @@ public class AsyncCoreStationClient extends Thread  {
 	    					if (change.socket.keyFor(selector).isValid())
 	    						closeConnection(change.socket.keyFor(selector), change.socket);
 	    					CoreStationListener listener;
-	    					synchronized (socketToListenerList) {
-	    						listener = socketToListenerList.get(change.socket);
-	    						socketToListenerList.remove(change.socket);
-	    					}
+    						listener = socketToListenerList.get(change.socket);
+    						socketToListenerList.remove(change.socket);
 	    					if (listener != null) {
-	    						synchronized (listenerToSocketList) {
-			    					listenerToSocketList.remove(listener);
-								}
+			    				listenerToSocketList.remove(listener);
 		    					logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
 		    					Timer timer = new Timer("ReconnectTimer-" + listener.getCoreStationName());
 		    					timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
@@ -172,22 +168,16 @@ public class AsyncCoreStationClient extends Thread  {
 		    	logger.debug("connection closed");
 	        	// Remote entity shut the socket down cleanly. Do the
 	        	// same from our end and cancel the channel.
-				synchronized (socketToListenerList) {
-					reconnect(socketToListenerList.get(socketChannel));
-				}
+				reconnect(socketToListenerList.get(socketChannel));
 				return;
 	        }
 			
-			synchronized(socketToListenerList) {
-			    // Hand the data over to our listener thread
-				socketToListenerList.get(socketChannel).processData(readBuffer.array(), numRead);
-			}
+		    // Hand the data over to our listener thread
+			socketToListenerList.get(socketChannel).processData(readBuffer.array(), numRead);
 	    } catch (IOException e) {
 	    	logger.debug("connection closed: " + e.getMessage());
 	    	// The remote forcibly closed the connection
-			synchronized (socketToListenerList) {
-				reconnect(socketToListenerList.get(socketChannel));
-			}
+			reconnect(socketToListenerList.get(socketChannel));
 	    }
 	}
 	
@@ -202,9 +192,7 @@ public class AsyncCoreStationClient extends Thread  {
 				logger.error(e.getMessage(), e);
 			}
 			CoreStationListener listener;
-			synchronized (socketToListenerList) {
-				listener = socketToListenerList.get(sc);
-			}
+			listener = socketToListenerList.get(sc);
 			listener.connectionLost();
     	}
     	writeBuffer.clear();
@@ -251,9 +239,7 @@ public class AsyncCoreStationClient extends Thread  {
 	    } catch (IOException e) {
 	    	logger.debug("connection closed: " + e.getMessage());
 	    	// The remote forcibly closed the connection
-			synchronized (socketToListenerList) {
-				reconnect(socketToListenerList.get(socketChannel));
-			}
+			reconnect(socketToListenerList.get(socketChannel));
 	    	return;
 	    }
 	}
@@ -267,18 +253,14 @@ public class AsyncCoreStationClient extends Thread  {
 		try {
 			socketChannel.finishConnect();
 		} catch (IOException e) {
-			synchronized (socketToListenerList) {
-				logger.error("could not connect to " + socketToListenerList.get(socketChannel).getCoreStationName() + ": " + e.getMessage());
-				reconnect(socketToListenerList.get(socketChannel));
-			}
+			logger.warn("could not connect to " + socketToListenerList.get(socketChannel).getCoreStationName() + ": " + e.getMessage());
+			reconnect(socketToListenerList.get(socketChannel));
 			return;
 		}
 
 		try {
 			CoreStationListener listener;
-			synchronized (socketToListenerList) {
-				listener = socketToListenerList.get((SocketChannel)key.channel());
-			}
+			listener = socketToListenerList.get((SocketChannel)key.channel());
 			listener.connectionEstablished();
 			logger.info("connection established to core station: " + listener.getCoreStationName());
 		  
@@ -305,16 +287,11 @@ public class AsyncCoreStationClient extends Thread  {
 		try {
 			SocketChannel socketChannel = SocketChannel.open();
 			socketChannel.configureBlocking(false);
-			logger.debug("trying to connect to core station: " + listener.getCoreStationName());
+			logger.info("trying to connect to core station: " + listener.getCoreStationName());
 			socketChannel.connect(new InetSocketAddress(listener.getInetAddress(), listener.getPort()));
 		
-			synchronized(socketToListenerList) {
-				socketToListenerList.put(socketChannel, listener);
-			}
-			synchronized (listenerToSocketList) {
-				listenerToSocketList.put(listener, socketChannel);
-			}
-			
+			socketToListenerList.put(socketChannel, listener);
+			listenerToSocketList.put(listener, socketChannel);
 			synchronized(changeRequests) {
 				changeRequests.add(new ChangeRequest(socketChannel, ChangeRequest.TYPE_REGISTER, SelectionKey.OP_CONNECT));
 			}
@@ -337,14 +314,9 @@ public class AsyncCoreStationClient extends Thread  {
 		try {
 			sc.keyFor(selector).cancel();
 			
-			synchronized(socketToListenerList) {
-				socketToListenerList.remove(sc);
-			}
-			
-			synchronized(listenerToSocketList) {
-				listenerToSocketList.remove(listener);
-			}
-			
+			socketToListenerList.remove(sc);
+			listenerToSocketList.remove(listener);
+				
 			if (socketToListenerList.isEmpty())
 				dispose();
 		} catch (Exception e) {
@@ -353,7 +325,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public void addDeviceId(String deployment, Integer id, CoreStationListener listener) {
+	public synchronized void addDeviceId(String deployment, Integer id, CoreStationListener listener) {
 		logger.debug("adding DeviceId " + id + "for " + deployment + " deployment");
 
 		try {
@@ -368,7 +340,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public void removeDeviceId(String deployment, Integer id) {
+	public synchronized void removeDeviceId(String deployment, Integer id) {
 		logger.debug("removing DeviceId: " + id + " for " + deployment + " deployment");
 		try {
 			if (deployment != null) {
@@ -420,7 +392,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public synchronized boolean send(String deployment, Integer id, CoreStationListener listener, int priority, byte[] data) throws IOException {
+	public boolean send(String deployment, Integer id, CoreStationListener listener, int priority, byte[] data) throws IOException {
 		boolean ret = false;
 		if (deployment == null) {
 			logger.error("deployment should not be null...");
@@ -459,9 +431,8 @@ public class AsyncCoreStationClient extends Thread  {
 			throw new IOException("data limited to " + (BUFFER_SIZE-4) + " bytes");
 		
 		SocketChannel socketChannel;
-		synchronized (listenerToSocketList) {
-			socketChannel = listenerToSocketList.get(listener);
-		}
+		socketChannel = listenerToSocketList.get(listener);
+
 		if (socketChannel != null && socketChannel.isConnected()) {
 			synchronized (this.changeRequests) {
 				// Indicate we want the interest ops set changed
@@ -500,7 +471,7 @@ public class AsyncCoreStationClient extends Thread  {
 		logger.debug("send hello message");
 		byte[] data = {BackLogMessageMultiplexer.STUFFING_BYTE, BackLogMessageMultiplexer.HELLO_BYTE};
 		
-		return send(listener, 0, data, false);
+		return send(listener, 1, data, false);
 	}
 	
 	

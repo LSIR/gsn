@@ -44,7 +44,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	protected AsyncCoreStationClient asyncCoreStationClient = null;
 	private BlockingQueue<byte []> recvQueue = new LinkedBlockingQueue<byte[]>();
 	private boolean dispose = false;
-	private int activPluginCounter = 0;
+	private Integer activPluginCounter = 0;
 	private Integer coreStationDeviceId = null;
 
 	private Timer pingTimer = null;
@@ -216,7 +216,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 				logger.error(e.getMessage(), e);
 			}
 		}
-		logger.debug("thread stoped");
+		logger.info("thread stoped");
 	}
 	
 	
@@ -251,6 +251,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 
 	private void dispose() {
+		logger.info("dispose");
     	// stop ping timer
 		if (pingTimer != null)
 			pingTimer.cancel();
@@ -294,7 +295,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	 * 
 	 * @throws IOException if the message is too long or the DeviceId does not exist
 	 */
-	public boolean sendMessage(BackLogMessage message, Integer id, int priority) throws IOException {
+	public synchronized boolean sendMessage(BackLogMessage message, Integer id, int priority) throws IOException {
 		logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
 		if (id == null) {
 			return asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, priority, message.getMessage());
@@ -486,7 +487,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	protected void sendPing() {
 		// send ping
 		try {
-			sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()), null, 0);
+			sendMessage(new BackLogMessage(BackLogMessage.PING_MESSAGE_TYPE, System.currentTimeMillis()), null, 1);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
@@ -501,7 +502,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private boolean sendPingAck(long timestamp) {
 		// send ping ACK
 		try {
-			return sendMessage(new BackLogMessage(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp), null, 0);
+			return sendMessage(new BackLogMessage(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp), null, 1);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			return false;

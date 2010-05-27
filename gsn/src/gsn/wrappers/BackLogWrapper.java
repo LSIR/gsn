@@ -165,8 +165,10 @@ public class BackLogWrapper extends AbstractWrapper {
 	
 	@Override
 	public void run() {
-		if (!blMsgMultiplexer.isAlive())
-			blMsgMultiplexer.start();
+		synchronized (blMsgMultiplexer) {
+			if (!blMsgMultiplexer.isAlive())
+				blMsgMultiplexer.start();
+		}
 		
 		logger.debug("Starting BackLog plugin: >" + plugin + "<");
 		pluginObject.start();
