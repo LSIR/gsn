@@ -106,7 +106,8 @@ class BinaryPluginClass(AbstractPluginClass):
             self._rootdir += '/'
         
         if not os.path.isdir(self._rootdir):
-            raise TypeError('rootdir >' + self._rootdir + '< is not a directory')
+            self.warning('rootdir >' + self._rootdir + '< is not a directory -> creating it')
+            os.makedirs(self._rootdir)
 
         if not watches:
             watches.append('.,filesystem')
