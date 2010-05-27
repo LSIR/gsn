@@ -199,13 +199,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			    		if( msg.getType() == BackLogMessage.PING_MESSAGE_TYPE ) {
 			    			sendPingAck(msg.getTimestamp());
 			    		}
-			    		else if( msg.getType() == BackLogMessage.PING_ACK_MESSAGE_TYPE ) {
-		    		    	// restart ping checker timer
-			    			logger.debug("reset ping watchdog");
-		    				pingWatchDogTimer.cancel();
-		    		        pingWatchDogTimer = new Timer("PingWatchDog-" + getCoreStationName());
-		    		        pingWatchDogTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000 );
-			    		}
+			    		else if( msg.getType() == BackLogMessage.PING_ACK_MESSAGE_TYPE )
+			    	        resetWatchDog();
 			    		else
 			    			multiplexMessage(msg);
 					}
@@ -424,9 +419,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
     	// start ping timer
         pingTimer = new Timer("PingTimer-" + getCoreStationName());
         pingTimer.schedule( new PingTimer(this), PING_INTERVAL_SEC * 1000, PING_INTERVAL_SEC * 1000 );
-    	// start ping checker timer
-        pingWatchDogTimer = new Timer("PingWatchDog-" + getCoreStationName());
-        pingWatchDogTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000 );
+
+        resetWatchDog();
 
 		Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
 		synchronized (msgTypeListener) {
@@ -445,6 +439,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	@Override
 	public void connectionEstablished() {
 		logger.debug("connection established");
+		
+		resetWatchDog();
 
 		try {
 			asyncCoreStationClient.sendHelloMsg(this);
@@ -478,6 +474,16 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		}
 		
 		asyncCoreStationClient.removeDeviceId(deploymentName, coreStationDeviceId);
+	}
+	
+	
+	private void resetWatchDog() {
+    	// reset watch dog timer
+		logger.debug("reset ping watchdog");
+		if (pingWatchDogTimer != null)
+			pingWatchDogTimer.cancel();
+        pingWatchDogTimer = new Timer("PingWatchDog-" + getCoreStationName());
+        pingWatchDogTimer.schedule( new PingWatchDog(this), PING_ACK_CHECK_INTERVAL_SEC * 1000 );
 	}
 	
 

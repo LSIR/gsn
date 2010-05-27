@@ -461,7 +461,7 @@ public class AsyncCoreStationClient extends Thread  {
 			return true;
 		}
 		else {
-			logger.debug("not connected");
+			logger.warn("not connected");
 			return false;
 		}
 	}
