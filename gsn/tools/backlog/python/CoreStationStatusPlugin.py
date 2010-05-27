@@ -8,6 +8,7 @@ Created on Jul 15, 2009
 import struct
 import os
 import binascii
+import subprocess
 from threading import Event
 
 import BackLogMessage
@@ -37,6 +38,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
+        
+        subprocess.Popen('modprobe ad77x8', shell=True)
         
         value = self.getOptionValue('poll_interval')
         if value is None:
