@@ -109,7 +109,9 @@ public final class Main {
         //
         StorageConfig sc = containerConfig.getSliding() != null ? containerConfig.getSliding().getStorage() : containerConfig.getStorage() ;
         windowStorage = StorageManagerFactory.getInstance(sc.getJdbcDriver ( ) , sc.getJdbcUsername ( ) , sc.getJdbcPassword ( ) , sc.getJdbcURL ( ), Main.DEFAULT_MAX_DB_CONNECTIONS);
-        
+        //
+        validationStorage = StorageManagerFactory.getInstance("org.h2.Driver", "sa", "", "jdbc:h2:mem:dum", Main.DEFAULT_MAX_DB_CONNECTIONS);
+
         if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
 
 		try {
@@ -205,6 +207,8 @@ public final class Main {
     private static StorageManager mainStorage = null;
 
     private static StorageManager windowStorage = null;
+
+    private static StorageManager validationStorage = null;
 
 	private GSNController controlSocket;
 
@@ -393,68 +397,6 @@ public final class Main {
 				return singleton.containerConfig;
 	}
 
-    /**
-     * Mote to storage Manager
-     * @param length
-     * @return
-     */
-	public static String randomTableNameGenerator ( int length ) {
-		byte oneCharacter;
-		StringBuffer result = new StringBuffer ( length );
-		for ( int i = 0 ; i < length ; i++ ) {
-			oneCharacter = ( byte ) ( ( Math.random ( ) * ( 'z' - 'a' + 1 ) ) + 'a' );
-			result.append ( ( char ) oneCharacter );
-		}
-		return result.toString ( );
-	}
-
-    /**
-     * TODO Move to storage ,manager
-     * @return
-     */
-	public static int tableNameGenerator ( ) {
-		return randomTableNameGenerator ( 15 ).hashCode ( );
-	}
-	/**
-     * TODO Move to Storage Manager
-	 * This method is used ONLY for ORACLE DB.
-	 * ADDS the postfix at the end of the tableName. If the table name ends with " then
-	 * updates it properly.   
-	 * @param table_name
-	 * @return
-	 */
-	public static String tableNamePostFixAppender(CharSequence table_name,String postFix) {
-		String tableName = table_name.toString();
-		if (tableName.endsWith("\""))
-			return (tableName.substring(0, tableName.length()-2))+postFix+"\"";
-		else
-			return tableName+postFix;
-	}
-
-    /**
-     * TODO Move to storage manager
-     * @param tableName
-     * @return
-     */
-	public static StringBuilder tableNameGeneratorInString (CharSequence tableName) {
-		if (tableName.charAt(0)=='_' && getMainStorage().isOracle())
-			return new StringBuilder( "\"").append(tableName).append("\"");
-		return new StringBuilder(tableName);
-	}
-
-    /**
-     * TODO Move to storage manager
-     * @param code
-     * @return
-     */
-	public static StringBuilder tableNameGeneratorInString (int code) {
-		StringBuilder sb = new StringBuilder ("_");
-		if (code<0)
-			sb.append ( "_" );
-		sb.append ( Math.abs (code) );
-		return tableNameGeneratorInString(sb);
-	}
-
 	public Server getJettyServer(int port, int maxThreads) throws IOException {
 		Server server = new Server();
 		Connector connector=new SelectChannelConnector();//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
@@ -519,6 +461,10 @@ public final class Main {
 
 		return server;
 	}
+
+    public static StorageManager getValidationStorage() {
+        return validationStorage;
+    }
 
     public static StorageManager getMainStorage() {
         return mainStorage;    

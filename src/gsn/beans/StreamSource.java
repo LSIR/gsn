@@ -347,8 +347,8 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
     if (validate()==false)
       return null;
     if (uidS==null) {
-      uid    = Main.tableNameGenerator( );
-      uidS   = Main.tableNameGeneratorInString( uid );
+      uid    = Main.getWindowStorage().tableNameGenerator( );
+      uidS   = Main.getWindowStorage().tableNameGeneratorInString( uid );
     }
     return uidS;
     

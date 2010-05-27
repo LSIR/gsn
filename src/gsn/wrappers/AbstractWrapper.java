@@ -162,9 +162,8 @@ public abstract class AbstractWrapper extends Thread {
 
 	private long noOfCallsToPostSE = 0;
 
-	private final transient int aliasCode = Main.tableNameGenerator();
-	private final CharSequence aliasCodeS = Main
-			.tableNameGeneratorInString(aliasCode);
+	private final transient int aliasCode = Main.getWindowStorage().tableNameGenerator();
+	private final CharSequence aliasCodeS = Main.getWindowStorage().tableNameGeneratorInString(aliasCode);
 
 	public int getDBAlias() {
 		return aliasCode;
