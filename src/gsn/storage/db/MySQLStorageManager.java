@@ -159,6 +159,23 @@ public class MySQLStorageManager extends StorageManager {
                 .append("  ) AS TMP)");
     }
 
+    @Override
+    public StringBuilder getStatementRemoveUselessDataCountBased(String virtualSensorName, long storageSize) {
+        return new StringBuilder()
+                .append("delete from ")
+                .append(virtualSensorName)
+                .append(" where ")
+                .append(virtualSensorName)
+                .append(".timed <= ( SELECT * FROM ( SELECT timed FROM ")
+                .append(virtualSensorName)
+                .append(" group by ")
+                .append(virtualSensorName)
+                .append(".timed ORDER BY ")
+                .append(virtualSensorName)
+                .append(".timed DESC LIMIT 1 offset ")
+                .append(storageSize).append("  ) AS TMP)");
+    }
+
     //
 
     @Override

@@ -130,12 +130,29 @@ public class SQLServerStorageManager extends StorageManager {
                 .append(virtualSensorName)
                 .append(".timed < (select min(timed) from (select top ")
                 .append(storageSize)
-                .append(" * ")
-                .append(" from ")
+                .append(" * from ")
                 .append(virtualSensorName)
                 .append(" order by ")
                 .append(virtualSensorName)
                 .append(".timed DESC ) as x ) ");
     }
+
+    @Override
+    public StringBuilder getStatementRemoveUselessDataCountBased(String virtualSensorName, long storageSize) {
+        return new StringBuilder()
+                .append("delete from ")
+                .append(virtualSensorName)
+                .append(" where ")
+                .append(virtualSensorName)
+                .append(".timed < (select min(timed) from (select top ")
+                .append(storageSize)
+                .append(" * from ")
+                .append(virtualSensorName)
+                .append(" order by ")
+                .append(virtualSensorName)
+                .append(".timed DESC ) as x ) ");
+
+    }
+
 
 }

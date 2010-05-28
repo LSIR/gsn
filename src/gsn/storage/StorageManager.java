@@ -118,6 +118,26 @@ public abstract class StorageManager {
     }
 
 
+    public abstract StringBuilder getStatementRemoveUselessDataCountBased(String virtualSensorName, long storageSize) ;
+
+    public StringBuilder getStatementRemoveUselessDataTimeBased(String virtualSensorName, long storageSize) {
+        StringBuilder query = null;
+        long timedToRemove = -1;
+        Connection conn = null;
+        try {
+            ResultSet rs = Main.getMainStorage().executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName), conn = Main.getMainStorage().getConnection());
+            if (rs.next())
+                timedToRemove = rs.getLong(1);
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            Main.getMainStorage().close(conn);
+        }
+        query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed < ").append(timedToRemove);
+        query.append(" - ").append(storageSize);
+        return query;
+    }
+
     public DataField[] tableToStructure(CharSequence tableName, Connection connection) throws SQLException {
         StringBuilder sb = new StringBuilder("select * from ").append(tableName).append(" where 1=0 ");
         ResultSet rs = null;
