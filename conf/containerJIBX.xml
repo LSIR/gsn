@@ -10,7 +10,7 @@
         <value name="ssl-key-store-password" field="sslKeyStorePassword" usage="optional"/>
         <value name="ssl-key-password" field="sslKeyPassword" usage="optional"/>
         <structure field="storage"/>
-        <structure name="sliding" usage="optional">
+        <structure name="sliding" field="sliding" usage="optional">
             <structure field="storage"/>
         </structure>
         <collection name="microsoft-research-sensormap"    field="msrMap"  item-type="gsn.utils.KeyValueImp" usage="optional" />

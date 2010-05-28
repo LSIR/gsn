@@ -20,7 +20,7 @@ public class StorageManagerFactory {
      *         if the driver can't be found.
      */
     public static StorageManager getInstance(String driver, String username, String password, String databaseURL, int maxDBConnections) {
-        logger.info("Creating a " + driver + " StorageManager");
+        
         //
         StorageManager storageManager = null;
         // Select the correct implementation
