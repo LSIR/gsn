@@ -124,9 +124,9 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 	public boolean messageReceived(int deviceId, long timestamp, byte[] payload) {
 		try {
 		    if(writeSourcePacket(payload))
-		    	logger.debug("Message with timestamp " + timestamp + " successfully written to sf client " + socket.getLocalAddress().getHostAddress());
+		    	logger.debug("Message with timestamp " + timestamp + " successfully written to sf client " + socket.getInetAddress().getHostName());
 		    else
-		    	logger.error("Message with timestamp " + timestamp + " could not be written to sf client " + socket.getLocalAddress().getHostAddress());
+		    	logger.error("Message with timestamp " + timestamp + " could not be written to sf client " + socket.getInetAddress().getHostName());
 		}
 		catch (IOException e) {
 		    shutdown();

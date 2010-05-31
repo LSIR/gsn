@@ -128,9 +128,9 @@ public class SFv1Client extends SFProtocol implements Runnable, BackLogMessageLi
 	public boolean messageReceived(int deviceId, long timestamp, byte[] payload) {
 		try {
 		    if(writePacket(payload))
-		    	logger.debug("Message with timestamp " + timestamp + " successfully written to sfv1 client " + socket.getLocalAddress().getHostAddress());
+		    	logger.debug("Message with timestamp " + timestamp + " successfully written to sfv1 client " + socket.getInetAddress().getHostName());
 		    else
-		    	logger.error("Message with timestamp " + timestamp + " could not be written to sfv1 client " + socket.getLocalAddress().getHostAddress());
+		    	logger.error("Message with timestamp " + timestamp + " could not be written to sfv1 client " + socket.getInetAddress().getHostName());
 		}
 		catch (IOException e) {
 		    shutdown();
