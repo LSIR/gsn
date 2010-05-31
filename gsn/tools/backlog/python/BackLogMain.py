@@ -5,6 +5,14 @@ Created on 11.05.2009
 @author: Tonio Gsell
 @author: Mustafa Yuecel
 '''
+
+__author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
+__copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
+__license__     = "GPL"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
  
 import os
 import sys
@@ -102,6 +110,12 @@ class BackLogMainClass(Thread):
         if id >= 65535 or id < 0:
             raise TypeError('device_id has to be in the range of 0 and 65534 (both inclusive)')
 
+        # printout info
+        self._logger.info('revision: ' + str(__version__))
+        self._logger.info('date: ' + str(__date__))
+        self._logger.info('id: ' + str(__id__))
+        self._logger.info('source: ' + str(__source__))
+        
         # printout options
         self._logger.info('device_id: ' + str(id))
         self._logger.info('gsn_port: ' + str(gsn_port))
@@ -186,6 +200,7 @@ class BackLogMainClass(Thread):
         
     def pluginsBusy(self):
         for plugin_entry in self.plugins:
+            #TODO: wait for backlogdb if it is resending
             try:
                 if plugin_entry[1].isBusy():
                     return True

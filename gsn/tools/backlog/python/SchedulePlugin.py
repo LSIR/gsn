@@ -17,7 +17,6 @@ from datetime import datetime, timedelta
 from threading import Event, Lock, Thread
 
 import BackLogMessage
-import tos
 from crontab import CronTab
 from AbstractPlugin import AbstractPluginClass
 
@@ -179,6 +178,7 @@ class SchedulePluginClass(AbstractPluginClass):
         shutdown_mode = self.getOptionValue('shutdown_mode')
         if shutdown_mode is not None and shutdown_mode == '1':
             self.info('running in shutdown mode')
+            import tos
             self._shutdown_mode = True
         else:
             self.info('not running in shutdown mode')

@@ -289,8 +289,10 @@ class BackLogDBClass(Thread):
 
 
     def __del__(self):
-        self._cur.close()
-        self._con.close()
+        if '_cur' in locals():
+            self._cur.close()
+        if '_con' in locals():
+            self._con.close()
         
         
     def isBusy(self):
