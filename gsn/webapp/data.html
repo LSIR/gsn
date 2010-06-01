@@ -158,7 +158,7 @@
                     plotAccordingToChoices();
                 }
 
-                function option_list_key(name,items,all){
+                function option_list_key(name,items,all,selected){
                     to_return = '<select name="' + name + '" class="' + name+ '">'
                     if (all){
                         to_return+='<option value="All" >' + all + '</option>';
@@ -170,7 +170,10 @@
                     sorteditems.sort();
                     for (var i=0;i<sorteditems.length;i++) {
                         var item = sorteditems[i];
-                        to_return+='<option value="' + item+'" >'+item+'</option>';
+                        if (item == selected)
+                          to_return+='<option value="' + item+'" selected="selected">'+item+'</option>';
+                        else
+                          to_return+='<option value="' + item+'" >'+item+'</option>';
                     }
                     to_return+='</select>'
                     return to_return;
@@ -189,7 +192,15 @@
                 }
 
                 function add_data_output () {
-                    $('#data-outputs').append('<li>' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors") + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
+                    var vsscount = $('#data-outputs .vss').length;
+                    if (vsscount>0) {
+                      var vssselect = $('#data-outputs .vss')[vsscount-1];
+                      var last = vssselect.options[vssselect.selectedIndex].value;
+                      $('#data-outputs').append('<li>' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors", last) + option_list_value('fields',virtual_sensor_to_fields[last],"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
+                    }
+                    else
+                      $('#data-outputs').append('<li>' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors", last) + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
+
                     $('.vss').change(function(){
                         var vs = $(this).val();
                         if (vs == 'All') {
