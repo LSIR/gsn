@@ -1,11 +1,4 @@
 #! /usr/bin/python
-'''
-Created on 11.05.2009
-
-@author: Tonio Gsell
-@author: Mustafa Yuecel
-'''
-
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
