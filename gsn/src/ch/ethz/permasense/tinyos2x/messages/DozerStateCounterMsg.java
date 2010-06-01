@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerStateCounterMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 23;
+    public static final int DEFAULT_MESSAGE_SIZE = 25;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 158;
 
-    /** Create a new DozerStateCounterMsg of size 23. */
+    /** Create a new DozerStateCounterMsg of size 25. */
     public DozerStateCounterMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -109,6 +109,9 @@ public class DozerStateCounterMsg extends ch.ethz.permasense.tinyos2x.messages.D
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.radioRx=0x"+Long.toHexString(get_payload_radioRx())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.transmissionFailures=0x"+Long.toHexString(get_payload_transmissionFailures())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -617,6 +620,69 @@ public class DozerStateCounterMsg extends ch.ethz.permasense.tinyos2x.messages.D
      */
     public static int sizeBits_payload_radioRx() {
         return 32;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.transmissionFailures
+    //   Field type: int
+    //   Offset (bits): 184
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.transmissionFailures' is signed (false).
+     */
+    public static boolean isSigned_payload_transmissionFailures() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.transmissionFailures' is an array (false).
+     */
+    public static boolean isArray_payload_transmissionFailures() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.transmissionFailures'
+     */
+    public static int offset_payload_transmissionFailures() {
+        return (184 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.transmissionFailures'
+     */
+    public static int offsetBits_payload_transmissionFailures() {
+        return 184;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.transmissionFailures'
+     */
+    public int get_payload_transmissionFailures() {
+        return (int)getUIntBEElement(offsetBits_payload_transmissionFailures(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.transmissionFailures'
+     */
+    public void set_payload_transmissionFailures(int value) {
+        setUIntBEElement(offsetBits_payload_transmissionFailures(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.transmissionFailures'
+     */
+    public static int size_payload_transmissionFailures() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.transmissionFailures'
+     */
+    public static int sizeBits_payload_transmissionFailures() {
+        return 16;
     }
 
 }
