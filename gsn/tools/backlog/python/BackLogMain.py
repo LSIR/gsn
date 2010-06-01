@@ -104,10 +104,10 @@ class BackLogMainClass(Thread):
             raise TypeError('device_id has to be in the range of 0 and 65534 (both inclusive)')
 
         # printout info
-        self._logger.info('revision: ' + str(__version__))
-        self._logger.info('date: ' + str(__date__))
-        self._logger.info('id: ' + str(__id__))
-        self._logger.info('source: ' + str(__source__))
+        self._logger.info(str(__version__))
+        self._logger.info(str(__date__))
+        self._logger.info(str(__id__))
+        self._logger.info(str(__source__))
         
         # printout options
         self._logger.info('device_id: ' + str(id))
