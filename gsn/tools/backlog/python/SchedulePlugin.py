@@ -812,8 +812,11 @@ class JobsObserver(Thread):
                         pid = proc[0].pid
                         if proc[1] <= JOB_PROCESS_CHECK_INTERVAL_SECONDS:
                             self._parent.error('job (' + proc[2] + ') with PID ' + str(pid) + ' has not finished in time -> kill it')
-                            # Terminate this process by sending a SIGINT
-                            os.kill(pid, signal.SIGTERM)
+                            if pid <= 1:
+                                self._parent.error('wanted to kill PID ' + str(pid))
+                            else:
+                                # Terminate this process by sending a SIGINT
+                                os.kill(pid, signal.SIGTERM)
                         else:
                             self._parent.debug('job (' + proc[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
                             new_list.append((proc[0], proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS, proc[2]))
