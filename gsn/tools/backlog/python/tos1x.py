@@ -50,7 +50,7 @@ except ImportError, e:
     print "Please install PySerial first."
     sys.exit(1)
 
-__version__ = "$Id: tos.py,v 1.9 2009/03/17 19:30:26 razvanm Exp $"
+__version__ = "$Id$"
 
 __all__ = ['Serial', 'AM',
            'Packet', 'RawPacket',
