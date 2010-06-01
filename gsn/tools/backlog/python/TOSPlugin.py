@@ -46,6 +46,7 @@ class TOSPluginClass(AbstractPluginClass):
             try:
                 # try to open a connection to the specified serial port
                 serial = tos.getSource(address, debug)
+                serial.setTimeout(5)
                 self._serialsource = tos.AM(serial)
             except Exception, e:
                 raise TypeError('could not initialize serial source: ' + e.__str__())
