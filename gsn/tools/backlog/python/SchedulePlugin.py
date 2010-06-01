@@ -593,6 +593,7 @@ class SerialHandler(Thread):
             try:
                 # try to open a connection to the specified serial port
                 serial = tos.getSource(address, debug)
+                serial.setTimeout(5)
                 self._serialsource = tos.AM(serial)
             except Exception, e:
                 raise TypeError('could not initialize serial source: ' + e.__str__())
@@ -616,7 +617,6 @@ class SerialHandler(Thread):
             except Exception, e:
                 if not self._stopped:
                     self._schedulePlugin.error('could not read from serial source: ' + e.__str__())
-                continuepacket
             
             # if the packet is None just continue
             if not packet:
