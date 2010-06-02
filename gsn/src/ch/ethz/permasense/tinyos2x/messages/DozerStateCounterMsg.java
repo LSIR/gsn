@@ -9,7 +9,7 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerStateCounterMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 25;
+//    public static final int DEFAULT_MESSAGE_SIZE = 25;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 158;
@@ -660,8 +660,8 @@ public class DozerStateCounterMsg extends ch.ethz.permasense.tinyos2x.messages.D
     /**
      * Return the value (as a int) of the field 'payload.transmissionFailures'
      */
-    public int get_payload_transmissionFailures() {
-        return (int)getUIntBEElement(offsetBits_payload_transmissionFailures(), 16);
+    public Integer get_payload_transmissionFailures() {
+        try {return (int)getUIntBEElement(offsetBits_payload_transmissionFailures(), 16);} catch (IndexOutOfBoundsException e) { return null; }
     }
 
     /**
