@@ -83,7 +83,14 @@ class BackLogDBClass(Thread):
         self._parent = parent
         self._dbname = dbname
         
+        # thread lock to coordinate access to the database
+        self._dblock = Lock()
+        self._counterlock = Lock()
+        self._resend = Event()
+        self._sleepEvent = Event()
+        
         # try to create/open database
+        self._dblock.acquire()
         try:
             # check_same_thread is not necessary, we are use a global lock 
             self._con = sqlite3.connect(self._dbname, check_same_thread=False)
@@ -105,6 +112,7 @@ class BackLogDBClass(Thread):
             
             self._cur.execute('SELECT COUNT(1) FROM backlogmsg')
             self._dbNumberOfEntries = self._cur.fetchone()[0]
+            self._dblock.release()
             self._logger.info(str(self._dbNumberOfEntries) + ' entries in database')
             
             if self._dbNumberOfEntries > 0:
@@ -114,15 +122,11 @@ class BackLogDBClass(Thread):
             
             self._con.commit()
         except sqlite3.Error, e:
+            self._dblock.release()
             raise TypeError('sqlite3: ' + e.__str__())
         except Exception, e:
+            self._dblock.release()
             raise TypeError(e.__str__())
-        
-        # thread lock to coordinate access to the database
-        self._dblock = Lock()
-        self._counterlock = Lock()
-        self._resend = Event()
-        self._sleepEvent = Event()
     
         self._stopped = False
         self._sleep = False
@@ -291,10 +295,12 @@ class BackLogDBClass(Thread):
 
 
     def __del__(self):
+        self._dblock.acquire()
         if '_cur' in locals():
             self._cur.close()
         if '_con' in locals():
             self._con.close()
+        self._dblock.release()
         
         
     def isBusy(self):
