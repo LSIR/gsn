@@ -20,12 +20,12 @@
             <field name="PAYLOAD_PARENTID" type="INTEGER" />
             <field name="PAYLOAD_HOPCOUNT" type="TINYINT" />
             <field name="PAYLOAD_CHILDCOUNT" type="TINYINT" />
-            <field name="SYSVOLTAGE" type="VARCHAR(30)" />
-            <field name="SDIVOLTAGE" type="VARCHAR(30)" />
-            <field name="TEMPERATURE" type="VARCHAR(30)" />
-            <field name="HUMIDITY" type="VARCHAR(30)" />
-            <field name="SIBCURRENT" type="VARCHAR(30)" />
-            <field name="MSPTEMPERATURE" type="VARCHAR(30)" />
+            <field name="SYSVOLTAGE" type="VARCHAR(30)" unit="V"/>
+            <field name="SDIVOLTAGE" type="VARCHAR(30)" unit="V"/>
+            <field name="TEMPERATURE" type="VARCHAR(30)" unit="°C"/>
+            <field name="HUMIDITY" type="VARCHAR(30)" unit="%"/>
+            <field name="SIBCURRENT" type="VARCHAR(30)" unit="mA"/>
+            <field name="MSPTEMPERATURE" type="VARCHAR(30)" unit="°C"/>
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerNodeHealthMsg) from ETZ deployment converted</description>
