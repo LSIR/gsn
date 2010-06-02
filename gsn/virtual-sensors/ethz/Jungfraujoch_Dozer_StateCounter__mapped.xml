@@ -17,6 +17,7 @@
             <field name="PAYLOAD_MCUACTIVE" type="BIGINT" />
             <field name="PAYLOAD_RADIOTX" type="BIGINT" />
             <field name="PAYLOAD_RADIORX" type="BIGINT" />
+            <field name="PAYLOAD_TRANSMISSIONFAILURES" type="INTEGER" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerStateCounterMsg) from Jungfraujoch deployment</description>
