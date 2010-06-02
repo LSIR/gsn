@@ -18,10 +18,10 @@
             <field name="PAYLOAD_PACKETSRECEIVED" type="INTEGER" />
             <field name="PAYLOAD_CHILDCOUNT" type="SMALLINT" />
             <field name="PAYLOAD_RSSI" type="SMALLINT" />
-            <field name="TEMPERATURE" type="VARCHAR(30)" />
-            <field name="HUMIDITY" type="VARCHAR(30)" />
-            <field name="MSPVOLTAGE" type="VARCHAR(30)" />
-            <field name="MSPTEMPERATURE" type="VARCHAR(30)" />
+            <field name="TEMPERATURE" type="VARCHAR(30)" unit="°C"/>
+            <field name="HUMIDITY" type="VARCHAR(30)" unit="%"/>
+            <field name="MSPVOLTAGE" type="VARCHAR(30)" unit="V"/>
+            <field name="MSPTEMPERATURE" type="VARCHAR(30)" unit="°C"/>
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerBaseStatusMsg) from Jungfraujoch deployment converted</description>
