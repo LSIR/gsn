@@ -25,7 +25,7 @@
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID0, PAYLOAD_RSSI_RSSI0 from ETZ_Dozer_Rssi__muxed__mapped__1750 
-                        where PAYLOAD_RSSI_RSSI0 != -1
+                        where PAYLOAD_RSSI_RSSI0 is not null
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -42,7 +42,7 @@
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID1, PAYLOAD_RSSI_RSSI1 from ETZ_Dozer_Rssi__muxed__mapped__1750 
-                        where PAYLOAD_RSSI_RSSI1 != -1
+                        where PAYLOAD_RSSI_RSSI1 is not null
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -59,7 +59,7 @@
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID2, PAYLOAD_RSSI_RSSI2 from ETZ_Dozer_Rssi__muxed__mapped__1750 
-                        where PAYLOAD_RSSI_RSSI2 != -1
+                        where PAYLOAD_RSSI_RSSI2 is not null
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -76,7 +76,7 @@
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID3, PAYLOAD_RSSI_RSSI3 from ETZ_Dozer_Rssi__muxed__mapped__1750 
-                        where PAYLOAD_RSSI_RSSI3 != -1
+                        where PAYLOAD_RSSI_RSSI3 is not null
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -93,7 +93,7 @@
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID4, PAYLOAD_RSSI_RSSI4 from ETZ_Dozer_Rssi__muxed__mapped__1750 
-                        where PAYLOAD_RSSI_RSSI4 != -1
+                        where PAYLOAD_RSSI_RSSI4 is not null
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -110,7 +110,7 @@
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID5, PAYLOAD_RSSI_RSSI5 from ETZ_Dozer_Rssi__muxed__mapped__1750 
-                        where PAYLOAD_RSSI_RSSI5 != -1
+                        where PAYLOAD_RSSI_RSSI5 is not null
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -127,7 +127,7 @@
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                         PAYLOAD_RSSI_ID6, PAYLOAD_RSSI_RSSI6 from ETZ_Dozer_Rssi__muxed__mapped__1750 
-                        where PAYLOAD_RSSI_RSSI6 != -1
+                        where PAYLOAD_RSSI_RSSI6 is not null
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
