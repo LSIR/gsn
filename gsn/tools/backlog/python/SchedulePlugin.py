@@ -812,7 +812,10 @@ class JobsObserver(Thread):
                             new_list.append((proc[0], proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS, proc[2]))
                     else:
                         if ret == 0:
-                            self._parent.debug('job (' + proc[2] + ') finished successfully')
+                            if self._parent._shutdown_mode:
+                                self._parent.info('job (' + proc[2] + ') finished successfully')
+                            else:
+                                self._parent.debug('job (' + proc[2] + ') finished successfully')
                         else:
                             self._parent.error('job (' + proc[2] + ') finished with return code ' + str(ret))
                 
