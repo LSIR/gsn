@@ -259,24 +259,20 @@ public class BackLogWrapper extends AbstractWrapper {
 	 */
 	@Override
 	public boolean sendToWrapper ( String action , String [ ] paramNames , Object [ ] paramValues ) throws OperationNotSupportedException {
-		Integer id = null;
+		Integer id = 65535;
 		for (int i = 0 ; i < paramNames.length ; i++) {
-			if ( paramNames[i].compareToIgnoreCase("device_id") == 0 ) {
+			if ( paramNames[i].compareToIgnoreCase("core_station") == 0 ) {
 				try {
 					id = Integer.parseInt((String) paramValues[i]);
 				} catch (NumberFormatException e) {
-					logger.error("The device_id field has to be an integer.");
+					logger.error("The device_id in the core station field has to be an integer.");
+					return false;
 				}
 			}
 		}
 		
-		if (id == null) {
-			logger.error("device_id has to be defined in the web input!");
-			return false;
-		}
-		
 		if (id < 0 || id > 65535) {
-			logger.error("device_id has to be between 0 and 65535 (inclusive)");
+			logger.error("device_id has to be a number between 0 and 65535 (inclusive)");
 			return false;
 		}
 		

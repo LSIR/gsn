@@ -133,7 +133,7 @@ public class SchedulePlugin extends AbstractPlugin {
 					// store the schedule received from the web input in the database
 					schedule = decode(((String)paramValues[i]).toCharArray());
 				}
-				else if( paramNames[i].compareToIgnoreCase("device_id") == 0 ) {
+				else if( paramNames[i].compareToIgnoreCase("core_station") == 0 ) {
 					id = Integer.parseInt((String)paramValues[i]);
 				}
 			}

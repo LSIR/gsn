@@ -4,7 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <web-input password="test">
             <command name="resend_backlogged_data">
-                <field name="device_id" type="*text" defaultvalue="65535">device_id</field>
+                <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
             </command>
         </web-input>
         <output-structure>
