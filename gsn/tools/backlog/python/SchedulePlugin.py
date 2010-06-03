@@ -336,9 +336,7 @@ class SchedulePluginClass(AbstractPluginClass):
                             stop = True
                             break
                 else:
-                    if schedule[0] <= dtnow:
-                        self.debug('start >' + schedule[1] + '< now')
-                    else:
+                    if schedule[0] > dtnow:
                         self.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if self._stopped or self._newSchedule:
@@ -347,6 +345,8 @@ class SchedulePluginClass(AbstractPluginClass):
                             break
                 
                 try:
+                    if self._shutdown_mode:
+                        self.info('executing >' + schedule[1] + '< now')
                     proc = subprocess.Popen(schedule[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 except Exception, e:
                     self.error('error in scheduled job >' + schedule[1] + '<:' + str(e))
@@ -811,7 +811,10 @@ class JobsObserver(Thread):
                             self._parent.debug('job (' + proc[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
                             new_list.append((proc[0], proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS, proc[2]))
                     else:
-                        self._parent.debug('job (' + proc[2] + ') finished with return code ' + str(ret))
+                        if ret == 0:
+                            self._parent.debug('job (' + proc[2] + ') finished successfully')
+                        else:
+                            self._parent.error('job (' + proc[2] + ') finished with return code ' + str(ret))
                 
                 self._lock.acquire()
                 self._process_list = new_list
