@@ -3,13 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-	<title>PermaSense :: GSN</title>
+	<title>GSN</title>
 	
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
 	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
+        <script type="text/javascript" src="js/jquery.cookie.js"></script>
 		
 	<script type="text/javascript" src="js/constants.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
@@ -20,6 +21,7 @@
 
 var initialUpdateVal = 600;
 var nextUpdateVal = initialUpdateVal;
+var deployments = new Array();
 
 function updateTopology()
 {
@@ -50,15 +52,78 @@ function nextUpdate()
 }
 
 $(document).ready(function() {
-	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
-	
-	//load the requested page
-	$.historyInit(GSN.load);
-		
-	$("#nextUpdate").text(nextUpdateVal);
-	setTimeout("nextUpdate()",1000);
-	
-});	
+
+        $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+        
+        $("#nextUpdate").text(nextUpdateVal);
+        setTimeout("nextUpdate()",1000);
+
+        // deployments
+        // load deployments
+        $.ajax({
+              type: "GET",
+              url: "/gsn",
+              success: function(data){
+                if ($(document).attr("title")=="GSN") {
+                  var gsn = $("gsn",data);
+                  $(document).attr("title",$(gsn).attr("name"));
+                  $("#gsn-name").empty().append($(gsn).attr("name"));
+                  $("#gsn-desc").empty().append($(gsn).attr("description"));
+                  $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+                }
+                $("#gsn-name").show();
+                var arraySize = 0;
+                $("virtual-sensor",data).each(function(){
+                    var deploymentname = $(this).attr("name").split("_", 1)[0];
+                    if(deploymentname.length > 1) {
+                        deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
+                        if ($.inArray(deploymentname, deployments) < 0) {
+                            deployments.push(deploymentname);
+                        }
+                    }
+                });
+                // display
+                var visible;
+                if ($.inArray($.cookie("deployment"), deployments)>-1)
+                  visible = $.cookie("deployment");
+                else
+                  visible = deployments[0];
+                for (var i in deployments) {
+                    // add tab
+                    $("#deployment_menu").append($.LI({}, $.A({
+                      "id":"deployment_menu_item_"+deployments[i],
+                      "href":"javascript:showTopology("+i+")"
+                    },deployments[i])));
+                    if ($("#weather_"+deployments[i]).length == 0) {
+                      // add div
+                      $("#weathercontainer").append(
+                        $.DIV({
+                            "id":"weather_"+deployments[i]
+                              }));
+                    }
+                    if (deployments[i]!=visible) {
+                      $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
+                      $("#weather_"+deployments[i]).hide();
+                    }
+                    else {
+                      $("#deployment_menu_item_"+deployments[i]).addClass("selected");
+                      $("#weather_"+deployments[i]).show();
+                    }
+                }
+              }
+        });     
+});
+
+function showTopology(id) {
+  for (var i in deployments) {
+      $("#weather_"+deployments[i]).hide();
+      $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
+  }
+  $("#weather_"+deployments[id]).show();
+  $("#deployment_menu_item_"+deployments[id]).addClass("selected");
+  $.cookie("deployment" , deployments[id]);
+}
+
 //]]>-->
 </script>
 </head>
@@ -66,7 +131,7 @@ $(document).ready(function() {
 
 <div id="container">
 	<div id="header">
-		<h1><a href="." id="gsn-name">PermaSense :: GSN</a></h1>
+		<h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
 	</div>
 	<div id="navigation">
 		<ul id="menu">
@@ -92,93 +157,120 @@ $(document).ready(function() {
 	
 	
 	<div id="maindiv">
-	
-		<p id="updatetext">next update in <span id="nextUpdate">??</span> seconds</p>
-		<br/>
-		<table width="100%">
-			<tr>
-			<td>
-				<b>Live Webcam:</b><br/><br/>
-				
-				<table><tr><td><img src="http://www.zermatt.ch/html/bergbahnen/webcams/riffelberg.jpg"/></td></tr></table>
-			</td>
-			<td valign="top">
-				<b>Weather-Info </b><br/>
-				
-				<table><tr><td>Kleines Matterhorn</td><td>Solvay</td></tr>
-				       <tr><td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067471.png"/></td>
-					   <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069730.png"/></td>
-					</tr>
-				</table>
-				<img src="http://people.ee.ethz.ch/~perma/webcam.php?id=0" width="250" height="300">
-			</td>
-			</tr>
-			<tr>
-			<td>
-				<table><tr><td><img src="http://www.swisspanorama.com/assets/images/jungfraujoch.jpg"/>
-                                               <img src="http://www.swisspanorama.com/assets/images/maennlichen.jpg"/></td></tr></table>
-			</td>
-			<td>
-				<table>
-					<tr><td>Jungfraujoch</td><td>Konkordiahuette</td></tr>
-					<tr>
-						<td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067300.png"/></td>
-						<td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069710.png"/></td>
-					</tr>
-				</table>
-			</td>
-			</tr>
-	
-		</table>
+                <div id="deployment_navigation">
+                <ul id="deployment_menu">
+                </ul>
+                </div>  
+        
+                <p id="updatetext">next update in <span id="nextUpdate">??</span> seconds</p>
 
-		
-		<p style="margin-top:30px;">
-			<b>Measured values from Zermatt Weatherstation (&copy; MeteoSchweiz)</b><br/><br/>
-		
-			<table width="100%">
-		
-				<tr>
-					<td><b>Temperature (mean):</b></td>
-					<td><b>Minutes of Sunshine:</b></td>
-				</tr>
-				<tr>
-					<td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.temp.ZER.gif"/></td>
-					<td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.son.ZER.gif"/></td>
-					
-				</tr>
-				<tr><td>&nbsp;</td></tr>
-				<tr>
-					<td><b>Precipitation:</b></td>
-					<td><b>Windspeed (peak and mean) [km/h]:</b></td>
-				</tr>
-				<tr>
-					<td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.reg.ZER.gif"/></td>
-					<td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.win.ZER.gif"/></td>
-					
-				</tr>
-	
-			</table>
-		
-		</p>
-		
+                <div id="weathercontainer">
+                
+                <div id="weather_Matterhorn" style="display:none">
+                <table width="100%">
+                        <tr>
+                        <td>
+                                <b>Live Webcam:</b><br/><br/>
+                                
+                                <table><tr><td><img src="http://www.zermatt.ch/html/bergbahnen/webcams/riffelberg.jpg"/></td></tr></table>
+                        </td>
+                        <td valign="top">
+                                <b>Weather-Info </b><br/>
+                                
+                                <table><tr><td>Kleines Matterhorn</td><td>Solvay</td></tr>
+                                       <tr><td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067471.png"/></td>
+                                           <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069730.png"/></td>
+                                        </tr>
+                                </table>
+                                <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=0" width="250" height="300">
+                        </td>
+                        </tr>
+                </table>
+                <p style="margin-top:30px;">
+                        <b>Measured values from Zermatt Weatherstation (&copy; MeteoSchweiz)</b><br/><br/>
+                
+                        <table width="100%">
+                
+                                <tr>
+                                        <td><b>Temperature (mean):</b></td>
+                                        <td><b>Minutes of Sunshine:</b></td>
+                                </tr>
+                                <tr>
+                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.temp.ZER.gif"/></td>
+                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.son.ZER.gif"/></td>
+                                        
+                                </tr>
+                                <tr><td>&nbsp;</td></tr>
+                                <tr>
+                                        <td><b>Precipitation:</b></td>
+                                        <td><b>Windspeed (peak and mean) [km/h]:</b></td>
+                                </tr>
+                                <tr>
+                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.reg.ZER.gif"/></td>
+                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.win.ZER.gif"/></td>
+                                        
+                                </tr>
+                        </table>
+                
+                </p>
+                <p style="text-align:center;margin-top:30px;">
+                        <b>4-Days Forecast</b><br/><br/>
+                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067471.png"/>
+                </p>
+
+                </div>
+
+                <div id="weather_Jungfraujoch" style="display:none">
+                <table width="100%">
+                        <tr>
+                        <td>
+                                <table><tr><td><img src="http://www.swisspanorama.com/assets/images/jungfraujoch.jpg"/>
+                                               <img src="http://www.swisspanorama.com/assets/images/maennlichen.jpg"/></td></tr></table>
+                        </td>
+                        <td>
+                                <table>
+                                        <tr><td>Jungfraujoch</td><td>Konkordiahuette</td></tr>
+                                        <tr>
+                                                <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067300.png"/></td>
+                                                <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069710.png"/></td>
+                                        </tr>
+                                </table>
+                        </td>
+                        </tr>
+        
+                </table>
+                <p style="text-align:center;margin-top:30px;">
+                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067300.png"/>
+                </p>
+
+                </div>
+                <div id="weather_Thur" style="display:none">
+                      <div style="position:relative;height:430px;width:500px;float:left">
+                      <div style="position:absolute;top:0px;left:0px;z-index:2">
+                        <img src="http://www.hw.zh.ch/hochwasser/mac/aawthur_map.gif" width="500" height="405">
+                      </div>
+                      <div style="position:absolute;top:0px;left:0px;z-index:1">
+                        <img src="http://www.hw.zh.ch/hochwasser/mac/aawthur.gif" width="500" height="405">
+                      </div>
+                      </div>
+                      <div style="height:430px">
+                        <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=2" width="448" height="336">
+                      </div>
+                </div>
+                </div>
+
+		<br/>
+
 		<p style="text-align:center;margin-top:30px;">
 			<b>Precipitation Radar:</b><br/><br/>
 			<img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter/radarbild.Par.0004.Image.gif"/>
 		</p>
-
 		<p style="text-align:center;margin-top:30px;">
 			<b>Precipitation Forecast:</b><br/><br/>
 			<img src="http://www.meteoschweiz.admin.ch/web/de/wetter/modelle/Vorhersagen.Par.0002.DownloadFile.ext.tmp/gross.gif"/>
 		</p>		
 
-		<p style="text-align:center;margin-top:30px;">
-			<b>4-Days Forecast</b><br/><br/>
-			<img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067471.png"/>
-		</p>
 
-		<p style="text-align:center;margin-top:30px;">
-			<img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067300.png"/>
-		</p>
 		
 
 	</div>

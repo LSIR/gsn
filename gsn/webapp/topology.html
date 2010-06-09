@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-	<title>PermaSense :: GSN</title>
+	<title>GSN</title>
 	
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
 	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
@@ -50,10 +50,7 @@ $(document).ready(function() {
 
 	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 	
-	//load the requested page
-	$.historyInit(GSN.load);
-		
-	$("#nextUpdate").text(nextUpdateVal);
+        $("#nextUpdate").text(nextUpdateVal);
 	setTimeout("nextUpdate()",1000);
 
 	// deployments
@@ -62,6 +59,14 @@ $(document).ready(function() {
 	      type: "GET",
 	      url: "/gsn",
 	      success: function(data){
+                if ($(document).attr("title")=="GSN") {
+                  var gsn = $("gsn",data);
+                  $(document).attr("title",$(gsn).attr("name"));
+                  $("#gsn-name").empty().append($(gsn).attr("name"));
+                  $("#gsn-desc").empty().append($(gsn).attr("description"));
+                  $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+                }
+                $("#gsn-name").show();
 		var arraySize = 0;
 		$("virtual-sensor",data).each(function(){
 		    var deploymentname = $(this).attr("name").split("_", 1)[0];
@@ -118,7 +123,7 @@ function showTopology(id) {
 
 <div id="container">
 	<div id="header">
-		<h1><a href="." id="gsn-name">PermaSense :: GSN</a></h1>
+		<h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
 	</div>
 	<div id="navigation">
 		<ul id="menu">

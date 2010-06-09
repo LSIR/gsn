@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-        <title>PermaSense :: GSN</title>
+        <title>GSN</title>
         <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
         <link rel="stylesheet" href="style/ui.datepicker.css" type="text/css" media="screen,projection" />
         <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
@@ -280,6 +280,15 @@
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
                 $.get("/gsn?REQUEST=0", function(xml){
                     lovs = xml
+                    if ($(document).attr("title")=="GSN") {
+                      var gsn = $("gsn",xml);
+                      $(document).attr("title",$(gsn).attr("name"));
+                      $("#gsn-name").empty().append($(gsn).attr("name"));
+                      $("#gsn-desc").empty().append($(gsn).attr("description"));
+                      $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+                    }
+                    $("#gsn-name").show();
+
                     $('virtual-sensor',xml).each(function(){
                         var vsname = $(this).attr('name');
                         virtual_sensor_to_fields[vsname] = virtual_sensor_to_fields[vsname] || []
@@ -421,7 +430,7 @@
     <body>
         <div id="container">
             <div id="header">
-                <h1><a href="." id="gsn-name">PermaSense :: GSN</a></h1>
+                <h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
             </div>
 			<div id="navigation" style="text-align:right;">
 				<ul id="menu">
