@@ -534,13 +534,15 @@ class AM(SimpleAM):
     def read(self, timeout=None):
         return self.oobHook(super(AM, self).read(timeout))
 
-    def write(self, packet, amId, timeout=None, blocking=True):
+    def write(self, packet, amId, timeout=None, blocking=True, maxretries = None):
+        retries = 0
         if not timeout:
            timeout=self._source.ackTimeout
         r = super(AM, self).write(packet, amId, timeout, blocking)
-        while not r and not self._stopped:
+        while not r and not self._stopped and (maxretries == None or retries < maxretries):
+            retries += 1
             r = super(AM, self).write(packet, amId, timeout, blocking, inc=0)
-        return True
+        return r
 
 
 # class SFClient:

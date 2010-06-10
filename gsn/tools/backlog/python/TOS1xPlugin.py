@@ -69,8 +69,8 @@ class TOS1xPluginClass(TOSPluginClass, AbstractPluginClass):
         return array.array('B', message).tolist()
 
     def sendCloseQueueCommand(self):
-        self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x00, 0x80]).tolist(), 0x00, 0.2, True)
-        time.sleep(35)
+        if self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x00, 0x80]).tolist(), 0x00, 0.2, True, 10):
+            time.sleep(35)
 
     def sendOpenQueueCommand(self):
-        self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x01, 0x80]).tolist(), 0x00, 0.2, True)
+        return self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x01, 0x80]).tolist(), 0x00, 0.2, True, 10)
