@@ -845,7 +845,7 @@ var GSN = {
 							
                     //set the value
                     if (cat == null) {
-                        if (value == "") {
+                        if (value == "" || value =="null") {
                             value = "null";
                         } else if (type.indexOf("svg") != -1){
                             value = '<embed type="image/svg+xml" width="400" height="400" src="'+value+'" PLUGINSPAGE="http://www.adobe.com/svg/viewer/install/" />';
