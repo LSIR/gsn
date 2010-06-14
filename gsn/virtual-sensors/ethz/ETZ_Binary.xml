@@ -18,17 +18,6 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etzl-gps01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzg-reverse/</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-        <stream name="data2">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
                     <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzg-bs01/</predicate>
@@ -37,7 +26,7 @@
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data3">
+        <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
