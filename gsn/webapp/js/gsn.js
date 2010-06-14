@@ -932,11 +932,11 @@ var GSN = {
                     field = $("field[@name="+$(dd).attr("class")+"]",vs);
                     type = $(field).attr("type");
                     unit = $(field).attr("unit");
-                    if (unit==null)
+                    value = $(field).text();
+                    if (unit==null || value=="null")
                         unit="";
                     else
                         unit=" "+unit;
-                    value = $(field).text();
                     if (value!="") {
                         if (type.indexOf("svg") != -1){
                             $("embed",dd).attr("src",value);
