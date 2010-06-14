@@ -758,13 +758,12 @@ class SerialWriter(Thread):
     
     
     def stop(self):
+        # send close queue cmd to access node
+        self._serialHandler._schedulePlugin.info('SerialWriter: stopped')
+        
         self._stopped = True
         self._work.set()
         self._ackEvent.set()
-        self.join()
-        
-        # send close queue cmd to access node
-        self._serialHandler._schedulePlugin.info('SerialWriter: stopped')
          
         
         
@@ -849,10 +848,10 @@ class JobsObserver(Thread):
 
 
     def stop(self):
+        self._parent.info('JobsObserver: stopped')
         self._stopped = True
         self._work.set()
         self._wait.set()
-        self._parent.info('JobsObserver: stopped')   
         
         
         
