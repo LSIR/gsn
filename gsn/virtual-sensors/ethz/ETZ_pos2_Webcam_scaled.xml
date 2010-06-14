@@ -18,7 +18,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select GENERATION_TIME, DATA from ETZ_Binary__mapped__1750 where POSITION = 2 and RELATIVE_FILE='webcam1/webcam.jpg'</predicate>
+                    <predicate key="query">select GENERATION_TIME, DATA from ETZ_Binary__mapped__1946 where POSITION = 2 and RELATIVE_FILE='webcam1/webcam.jpg'</predicate>
                 </address>
                 <query> select GENERATION_TIME, DATA as JPEG_SCALED from wrapper</query>
             </source>

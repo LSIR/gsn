@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_Binary__1750" priority="10" >
+<virtual-sensor name="ETZ_Binary__1946" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -18,7 +18,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">82.130.103.18:9003</predicate>
+                    <predicate key="remote-connection">permasense-etzl-gps01:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
                     <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzg-reverse/</predicate>
                 </address>
