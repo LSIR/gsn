@@ -22,7 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, SP_DV1_1, SP_DV1_2, SP_DV2_1, SP_DV2_2 from Matterhorn_Selfpotential__1823 where POSITION = 13 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="query"> select GENERATION_TIME, SP_DV1_1, SP_DV1_2, SP_DV2_1, SP_DV2_2 from Matterhorn_Selfpotential__1950 where POSITION = 13 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select * from wrapper </query>

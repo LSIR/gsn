@@ -22,7 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, HEADER_SEQNR from Jungfraujoch_Dozer_NodeHealth__mapped__1823 </predicate>
+                    <predicate key="query"> select GENERATION_TIME, HEADER_SEQNR from Jungfraujoch_Dozer_NodeHealth__mapped__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select GENERATION_TIME, HEADER_SEQNR as SEQNR from wrapper where GENERATION_TIME > (unix_timestamp()*1000 - 604800000) </query>

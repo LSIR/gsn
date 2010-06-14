@@ -1,4 +1,4 @@
-<virtual-sensor name="Jungfraujoch_Sensorrod1__1823" priority="10" >
+<virtual-sensor name="Jungfraujoch_Sensorrod1__1950" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -37,7 +37,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Jungfraujoch_Dozer_AdcMux1__mapped__1823 where SENSORTYPE is not null and locate(" sr:", SENSORTYPE) != 0 </predicate>
+                    <predicate key="query"> select * from Jungfraujoch_Dozer_AdcMux1__mapped__1950 where SENSORTYPE is not null and locate(" sr:", SENSORTYPE) != 0 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

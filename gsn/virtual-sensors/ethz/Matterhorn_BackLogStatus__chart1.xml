@@ -22,7 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select TIMESTAMP, BACKLOG_DB_ENTRIES from Matterhorn_BackLogStatus__mapped__1823 where position=0</predicate>
+                    <predicate key="query"> select TIMESTAMP, BACKLOG_DB_ENTRIES from Matterhorn_BackLogStatus__mapped__1950 where position=0</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select * from wrapper </query>

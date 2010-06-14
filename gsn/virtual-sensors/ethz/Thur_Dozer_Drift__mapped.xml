@@ -1,4 +1,4 @@
-<virtual-sensor name="Thur_Dozer_Drift__mapped__1823" priority="10" >
+<virtual-sensor name="Thur_Dozer_Drift__mapped__1950" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -25,7 +25,7 @@
                 <address wrapper="local">
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_MYTEMP0, PAYLOAD_PARENTTEMP0, PAYLOAD_DRIFTPPM0 from Thur_Dozer_Drift__muxed__mapped__1823 
+                        PAYLOAD_MYTEMP0, PAYLOAD_PARENTTEMP0, PAYLOAD_DRIFTPPM0 from Thur_Dozer_Drift__muxed__mapped__1950 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -42,7 +42,7 @@
                 <address wrapper="local">
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,  
-                        PAYLOAD_MYTEMP1, PAYLOAD_PARENTTEMP1, PAYLOAD_DRIFTPPM1 from Thur_Dozer_Drift__muxed__mapped__1823
+                        PAYLOAD_MYTEMP1, PAYLOAD_PARENTTEMP1, PAYLOAD_DRIFTPPM1 from Thur_Dozer_Drift__muxed__mapped__1950
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -59,7 +59,7 @@
                 <address wrapper="local">
                     <predicate key="query">
                         select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_MYTEMP2, PAYLOAD_PARENTTEMP2, PAYLOAD_DRIFTPPM2 from Thur_Dozer_Drift__muxed__mapped__1823
+                        PAYLOAD_MYTEMP2, PAYLOAD_PARENTTEMP2, PAYLOAD_DRIFTPPM2 from Thur_Dozer_Drift__muxed__mapped__1950
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>

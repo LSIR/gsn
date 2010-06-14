@@ -23,7 +23,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, SR_R1, SR_R2, SR_R3, SR_R4, SR_R12, SR_R23, SR_R34, SR_R31, SR_R42, SR_R41 from Jungfraujoch_Sensorrod__1823 where POSITION = 3 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="query"> select GENERATION_TIME, SR_R1, SR_R2, SR_R3, SR_R4, SR_R12, SR_R23, SR_R34, SR_R31, SR_R42, SR_R41 from Jungfraujoch_Sensorrod__1950 where POSITION = 3 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select * from wrapper </query>

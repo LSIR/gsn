@@ -1,4 +1,4 @@
-<virtual-sensor name="Jungfraujoch_VaisalaWXT520__mapped__1823" priority="10" >
+<virtual-sensor name="Jungfraujoch_VaisalaWXT520__mapped__1950" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.VaisalaDemuxBridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -41,7 +41,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from Jungfraujoch_VaisalaWXT520__muxed__mapped__1823</predicate>
+                    <predicate key="query">select * from Jungfraujoch_VaisalaWXT520__muxed__mapped__1950</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

@@ -1,4 +1,4 @@
-<virtual-sensor name="Thur_VaisalaWXT520__muxed__mapped__1823" priority="10" >
+<virtual-sensor name="Thur_VaisalaWXT520__muxed__mapped__1950" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -24,8 +24,8 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
-                    <predicate key="query"> select * from Thur_VaisalaWXT520__1823</predicate>
-                    <predicate key="remote-contact-point">http://tik51x.ee.ethz.ch:22001/streaming/</predicate>
+                    <predicate key="query"> select * from Thur_VaisalaWXT520__1950</predicate>
+                    <predicate key="remote-contact-point">http://yosemite.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
