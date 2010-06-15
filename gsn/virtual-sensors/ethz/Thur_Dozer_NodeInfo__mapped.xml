@@ -18,7 +18,7 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
             <field name="PAYLOAD_ID1" type="BIGINT" />
             <field name="PAYLOAD_ID2" type="BIGINT" />
-            <field name="PAYLOAD_XE1205FREQUENCY" type="SMALLINT" />
+            <field name="PAYLOAD_RADIOCHANNEL" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerNodeInfoMsg) from Thur deployment</description>
