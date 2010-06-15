@@ -1,6 +1,7 @@
 package gsn.wrappers.backlog.plugins;
 
 import java.io.Serializable;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -67,22 +68,42 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 		
 		buffer.position(0);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+		Integer error_counter = null;
+		Integer exception_counter = null;
+		Integer backlog_db_entries = null;
+		Integer backlog_db_size = null;
+		Integer in_counter = null;
+		Integer out_counter = null;
+		Integer backlog_counter = null;
+		Integer connection_losses = null;
+		Integer backlog_uptime = null;
+		Integer minstoretime = null;
+		Integer maxstoretime = null;
+		Integer meanstoretime = null;
+		Integer minremovetime = null;
+		Integer maxremovetime = null;
+		Integer meanremovetime = null;
 		
-		Integer error_counter = buffer.getInt();
-		Integer exception_counter = buffer.getInt();
-		Integer backlog_db_entries = buffer.getInt();
-		Integer backlog_db_size = buffer.getInt();
-		Integer in_counter = buffer.getInt();
-		Integer out_counter = buffer.getInt();
-		Integer backlog_counter = buffer.getInt();
-		Integer connection_losses = buffer.getInt();
-		Integer backlog_uptime = buffer.getInt();
-		Integer minstoretime = buffer.getInt();
-		Integer maxstoretime = buffer.getInt();
-		Integer meanstoretime = buffer.getInt();
-		Integer minremovetime = buffer.getInt();
-		Integer maxremovetime = buffer.getInt();
-		Integer meanremovetime = buffer.getInt();
+		try {
+			error_counter = buffer.getInt();
+			exception_counter = buffer.getInt();
+			backlog_db_entries = buffer.getInt();
+			backlog_db_size = buffer.getInt();
+			in_counter = buffer.getInt();
+			out_counter = buffer.getInt();
+			backlog_counter = buffer.getInt();
+			connection_losses = buffer.getInt();
+			backlog_uptime = buffer.getInt();
+			minstoretime = buffer.getInt();
+			maxstoretime = buffer.getInt();
+			meanstoretime = buffer.getInt();
+			minremovetime = buffer.getInt();
+			maxremovetime = buffer.getInt();
+			meanremovetime = buffer.getInt();
+		} catch (BufferUnderflowException e) {
+			logger.error(e.getMessage());
+		}
 
 		if (minstoretime == -1)
 			minstoretime = null;
