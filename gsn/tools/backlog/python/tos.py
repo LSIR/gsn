@@ -29,6 +29,7 @@ __source__      = "$URL$"
 
 # @author Razvan Musaloiu-E. <razvanm@cs.jhu.edu>
 # @author David Purdy <david@radioretail.co.za>
+# @author Tonio Gsell <tgsell@ee.ethz.ch>
 
 """
 A library that implements the T2 serial communication.

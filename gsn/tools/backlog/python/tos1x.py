@@ -176,6 +176,7 @@ class HDLC:
     """
     def __init__(self, source):
         self._s = source
+        self._stopped = False
 
     # Returns the next incoming serial packet
     def read(self, timeout=None):
@@ -233,7 +234,7 @@ class HDLC:
             ts = time.time()
             if d != HDLC_FLAG_BYTE:
                 self.log("Skipping byte %d" % d)
-                while d != HDLC_FLAG_BYTE:
+                while d != HDLC_FLAG_BYTE and not self._stopped:
                     d = self._s.getByte()
                     self.log("Skipping byte %d" % d)
                     ts = time.time()
@@ -244,7 +245,7 @@ class HDLC:
 
             # Is the next byte also HDLC_FLAG_BYTE?
             d = self._s.getByte()
-            while d == HDLC_FLAG_BYTE:
+            while d == HDLC_FLAG_BYTE and not self._stopped:
                 d = self._s.getByte()
                 ts = time.time()
 
@@ -254,7 +255,7 @@ class HDLC:
 
             # Read bytes from serial until we read another HDLC_FLAG_BYTE
             # value (end of the current packet):
-            while d != HDLC_FLAG_BYTE:
+            while d != HDLC_FLAG_BYTE and not self._stopped:
                 d = self._s.getByte()
                 packet.append(d)
 
@@ -385,6 +386,9 @@ class HDLC:
         if self._s.debug:
             print s
 
+    def stop(self):
+        self._stopped = True
+
 class SimpleAM(Thread):
     def __init__(self, source, oobHook=None):
         self._lastseqno = -1
@@ -491,6 +495,9 @@ class SimpleAM(Thread):
     def stop(self):
          self._stopped = True
          self._DataEvent.set()
+         self._hdlc.stop()
+         self._source.close()
+         print "SimpleAM - stopped"
 
 def printfHook(packet):
 #    if packet == None:
@@ -536,7 +543,7 @@ class AM(SimpleAM):
         if not timeout:
            timeout=self._source.ackTimeout
         r = super(AM, self).write(packet, amId, timeout, blocking)
-        while not r and (maxretries == None or retries < maxretries):
+        while not r and not self._stopped and (maxretries == None or retries < maxretries):
             r = super(AM, self).write(packet, amId, timeout, blocking, inc=0)
         return r
 
