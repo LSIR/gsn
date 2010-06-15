@@ -105,17 +105,17 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 			logger.error(e.getMessage());
 		}
 
-		if (minstoretime == -1)
+		if (minstoretime != null && minstoretime == -1)
 			minstoretime = null;
-		if (maxstoretime == -1)
+		if (maxstoretime != null && maxstoretime == -1)
 			maxstoretime = null;
-		if (meanstoretime == -1)
+		if (meanstoretime != null && meanstoretime == -1)
 			meanstoretime = null;
-		if (minremovetime == -1)
+		if (minremovetime != null && minremovetime == -1)
 			minremovetime = null;
-		if (maxremovetime == -1)
+		if (maxremovetime != null && maxremovetime == -1)
 			maxremovetime = null;
-		if (meanremovetime == -1)
+		if (meanremovetime != null && meanremovetime == -1)
 			meanremovetime = null;
 		
 		Serializable[] data = {timestamp, timestamp, deviceId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses, backlog_uptime, minstoretime, meanstoretime, maxstoretime, minremovetime, meanremovetime, maxremovetime};
