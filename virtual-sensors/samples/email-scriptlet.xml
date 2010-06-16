@@ -21,7 +21,7 @@
                         // Notify by email
                         def emailTitle = "GSN Notification - New HEAP maxima reached: " + HEAP;
                         def emailContent = "Warning, the HEAP maxima has been reached: " + HEAP;
-                        def recipients = ["recipient1@server.com"];
+                        def recipients = ["recipient1@server.com", "recipient2@server.com", "recipientn@server.com"]; // Define one or more recipients
 
                         sendEmail(recipients, emailTitle, emailContent); // note that the sendMail method is, by default, imported statically to the script.
                     }
