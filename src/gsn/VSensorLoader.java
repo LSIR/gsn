@@ -146,6 +146,12 @@ public class VSensorLoader extends Thread {
         for (VSensorConfig vs : addIt) {
             loadPlugin(vs);
         }
+        
+		try {
+			Thread.sleep ( 3000 );
+		} catch ( InterruptedException e ) {
+			logger.error ( e.getMessage ( ) , e );
+		}
     }
 
     public synchronized boolean loadPlugin(String fileFilterName) throws SQLException, JiBXException {
