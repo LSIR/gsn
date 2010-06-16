@@ -247,7 +247,8 @@ public class MigMessagePlugin extends AbstractPlugin
 	@Override
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		boolean ret = false;
-		logger.debug("action: " + action);
+		if (logger.isDebugEnabled())
+			logger.debug("action: " + action);
 		if( action.compareToIgnoreCase("payload") == 0 ) {
 			int moteId = -257;
 			int amType = -257;
@@ -288,7 +289,8 @@ public class MigMessagePlugin extends AbstractPlugin
 			
 			try {
 				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data), super.priority);
-				logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
+				if (logger.isDebugEnabled())
+					logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -299,7 +301,8 @@ public class MigMessagePlugin extends AbstractPlugin
 				if(packet.length > 0) {
 					try {
 						ret = sendRemote(System.currentTimeMillis(), packet, super.priority);
-						logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
+						if (logger.isDebugEnabled())
+							logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
 					} catch (Exception e) {
 						logger.error(e.getMessage());
 					}
@@ -339,7 +342,8 @@ public class MigMessagePlugin extends AbstractPlugin
 							Class<?>[] setterparams = setter.getParameterTypes();
 							if (setterparams.length==1) {
 								Class<?> param = setterparams[0];
-								logger.debug("set field "+name+" to "+ (String)paramValues[i]);
+								if (logger.isDebugEnabled())
+									logger.debug("set field "+name+" to "+ (String)paramValues[i]);
 								Method parser = parseMapping.get(param);
 								setter.invoke(msg, parser.invoke(null, paramValues[i]));
 							}
@@ -350,7 +354,8 @@ public class MigMessagePlugin extends AbstractPlugin
 						}
 					}
 				}
-				logger.debug(msg);
+				if (logger.isDebugEnabled())
+					logger.debug(msg);
 				// switch tos version
 				byte[] packet;
 				if (tinyos1x_platform != null) {

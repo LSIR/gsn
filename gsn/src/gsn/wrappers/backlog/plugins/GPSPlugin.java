@@ -43,7 +43,8 @@ public class GPSPlugin extends AbstractPlugin {
 
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
-		logger.debug("message received from CoreStation with DeviceId: " + deviceId);
+		if (logger.isDebugEnabled())
+			logger.debug("message received from CoreStation with DeviceId: " + deviceId);
 		
 		// Parse the Message
 		ByteBuffer buffer = ByteBuffer.allocate(packet.length);

@@ -136,7 +136,8 @@ public class MigMessageParameters {
 	 * @param fields
 	 */
 	public void buildOutputStructure (Class<?> tosmsgClass, ArrayList<DataField> fields, ArrayList<Method> getters, ArrayList<Method> setters) throws RuntimeException {
-		logger.debug("Building output structure for class: " + tosmsgClass.getCanonicalName() + " and getter prefix: " + tinyosGetterPrefix+" and setter prefix: " + tinyosSetterPrefix);
+		if (logger.isDebugEnabled())
+			logger.debug("Building output structure for class: " + tosmsgClass.getCanonicalName() + " and getter prefix: " + tinyosGetterPrefix+" and setter prefix: " + tinyosSetterPrefix);
 
 		if (typesMapping == null) buildMappings() ;
 
@@ -204,13 +205,15 @@ public class MigMessageParameters {
 								}
 					            for(j=0; j < size; j++) {
 									nextField = new DataField (name.substring(tinyosGetterPrefix.length()).toUpperCase() + j , map_type) ;
-									logger.debug("next data field: " + nextField);
+									if (logger.isDebugEnabled())
+										logger.debug("next data field: " + nextField);
 									fields.add(nextField);
 					            }
 				            }
 							else {
 								nextField = new DataField (name.substring(tinyosGetterPrefix.length()).toUpperCase() , map_type) ;
-								logger.debug("next data field: " + nextField);
+								if (logger.isDebugEnabled())
+									logger.debug("next data field: " + nextField);
 								fields.add(nextField);
 							}
 							getters.add(method);
@@ -219,7 +222,8 @@ public class MigMessageParameters {
 				}
 				// select setters
 				else if (method.getName().startsWith(tinyosSetterPrefix)) {
-					logger.debug("setter: " + method.getName());
+					if (logger.isDebugEnabled())
+						logger.debug("setter: " + method.getName());
 					if ( isInMethodList(setters, method) ) {
 						logger.warn("The method >" + method.getName() + "< is already defined in a subclass. This setter is skipped.");
 					}
@@ -276,16 +280,19 @@ public class MigMessageParameters {
 		boolean found = false;
 		while ( ! found ) {
 			messageSuperClass = currentMessageClass.getSuperclass();
-			logger.debug("message super class: " + messageSuperClass.getCanonicalName()) ;
+			if (logger.isDebugEnabled())
+				logger.debug("message super class: " + messageSuperClass.getCanonicalName()) ;
 			if (messageSuperClass == Object.class) break;
 			else if (messageSuperClass == net.tinyos1x.message.Message.class) {
-				logger.debug("> TinyOS v1.x message") ;
+				if (logger.isDebugEnabled())
+					logger.debug("> TinyOS v1.x message") ;
 				tinyosVersion = TINYOS_VERSION_1 ;
 				found = true;
 			}
 			else if (messageSuperClass == net.tinyos.message.Message.class) {
 				tinyosVersion = TINYOS_VERSION_2 ; 
-				logger.debug("> TinyOS v2.x message") ;
+				if (logger.isDebugEnabled())
+					logger.debug("> TinyOS v2.x message") ;
 				found = true;
 			}
 			currentMessageClass = messageSuperClass;

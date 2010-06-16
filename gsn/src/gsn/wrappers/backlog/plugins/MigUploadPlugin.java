@@ -89,7 +89,8 @@ public class MigUploadPlugin extends AbstractPlugin {
 	@Override
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		boolean ret = false;
-		logger.debug("action: " + action);
+		if (logger.isDebugEnabled())
+			logger.debug("action: " + action);
 		if( action.compareToIgnoreCase("payload") == 0 ) {
 			int moteId = -257;
 			int amType = -257;
@@ -130,7 +131,8 @@ public class MigUploadPlugin extends AbstractPlugin {
 			
 			try {
 				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data), super.priority);
-				logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
+				if (logger.isDebugEnabled())
+					logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 				return false;
@@ -146,7 +148,8 @@ public class MigUploadPlugin extends AbstractPlugin {
 						logger.error(e.getMessage());
 						return false;
 					}
-					logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
+					if (logger.isDebugEnabled())
+						logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
 				}
 				else {
 					logger.error("Upload failed due to empty 'binary packet' field");

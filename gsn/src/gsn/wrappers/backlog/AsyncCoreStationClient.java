@@ -75,7 +75,8 @@ public class AsyncCoreStationClient extends Thread  {
 	
 	public void run()
 	{
-		logger.debug("thread started");
+		if (logger.isDebugEnabled())
+			logger.debug("thread started");
 		SelectionKey key;
 
 	    while (!dispose) {
@@ -90,17 +91,20 @@ public class AsyncCoreStationClient extends Thread  {
 	    					if (key == null || !key.isValid())
 	    						continue;
 	    					if (!change.socket.isConnectionPending()) {
-		    					logger.debug("Selector:changeops");
+	    						if (logger.isDebugEnabled())
+	    							logger.debug("Selector:changeops");
 	    						key.interestOps(change.ops);
 	    						key.attach(change);
 	    					}
 	    					break;
 	    				case ChangeRequest.TYPE_REGISTER:
-	    					logger.debug("Selector:register");
+	    					if (logger.isDebugEnabled())
+	    						logger.debug("Selector:register");
     						change.socket.register(selector, change.ops, change);
 	    					break;
 	    				case ChangeRequest.TYPE_RECONNECT:
-	    					logger.debug("Selector:reconnect");
+	    					if (logger.isDebugEnabled())
+	    						logger.debug("Selector:reconnect");
 	    					if (change.socket.keyFor(selector).isValid())
 	    						closeConnection(change.socket.keyFor(selector), change.socket);
 	    					CoreStationListener listener;
@@ -108,7 +112,8 @@ public class AsyncCoreStationClient extends Thread  {
     						socketToListenerList.remove(change.socket);
 	    					if (listener != null) {
 			    				listenerToSocketList.remove(listener);
-		    					logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
+			    				if (logger.isDebugEnabled())
+			    					logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
 		    					Timer timer = new Timer("ReconnectTimer-" + listener.getCoreStationName());
 		    					timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
 	    					}
@@ -137,14 +142,16 @@ public class AsyncCoreStationClient extends Thread  {
 		    				} else if (key.isWritable()) {
 		    					this.write(key);
 		    				} else if (key.isConnectable()) {
-		    					logger.debug("Selector:connect");
+		    					if (logger.isDebugEnabled())
+		    						logger.debug("Selector:connect");
 		    					this.finishConnection(key);
 		    				}
 		    			} catch (IOException e) {
 		    	    		logger.error(e.getMessage(), e);
 		    			}
 	    			} else {
-	    				logger.debug("no handler for " + key.channel().getClass().getName());
+	    				if (logger.isDebugEnabled())
+	    					logger.debug("no handler for " + key.channel().getClass().getName());
 	    			}
 	    		}
 	    	} catch (Exception e) {
@@ -152,7 +159,7 @@ public class AsyncCoreStationClient extends Thread  {
 	    	}
 	    }
 	    
-		logger.debug("thread stoped");
+		logger.info("thread stoped");
 	}
 	
 	
@@ -165,7 +172,8 @@ public class AsyncCoreStationClient extends Thread  {
 
 	        int numRead = socketChannel.read(readBuffer);
 	        if (numRead == -1) {
-		    	logger.debug("connection closed");
+				if (logger.isDebugEnabled())
+					logger.debug("connection closed");
 	        	// Remote entity shut the socket down cleanly. Do the
 	        	// same from our end and cancel the channel.
 				reconnect(socketToListenerList.get(socketChannel));
@@ -175,7 +183,8 @@ public class AsyncCoreStationClient extends Thread  {
 		    // Hand the data over to our listener thread
 			socketToListenerList.get(socketChannel).processData(readBuffer.array(), numRead);
 	    } catch (IOException e) {
-	    	logger.debug("connection closed: " + e.getMessage());
+			if (logger.isDebugEnabled())
+				logger.debug("connection closed: " + e.getMessage());
 	    	// The remote forcibly closed the connection
 			reconnect(socketToListenerList.get(socketChannel));
 	    }
@@ -237,7 +246,8 @@ public class AsyncCoreStationClient extends Thread  {
 				}
 			}
 	    } catch (IOException e) {
-	    	logger.debug("connection closed: " + e.getMessage());
+			if (logger.isDebugEnabled())
+				logger.debug("connection closed: " + e.getMessage());
 	    	// The remote forcibly closed the connection
 			reconnect(socketToListenerList.get(socketChannel));
 	    	return;
@@ -274,7 +284,8 @@ public class AsyncCoreStationClient extends Thread  {
 	
 	public synchronized void registerListener(CoreStationListener listener) throws IOException
 	{
-		logger.debug("register core station: " + listener.getCoreStationName());
+		if (logger.isDebugEnabled())
+			logger.debug("register core station: " + listener.getCoreStationName());
 		try {
 			if (!this.isAlive()) {
 				dispose = false;
@@ -326,7 +337,8 @@ public class AsyncCoreStationClient extends Thread  {
 
 
 	public synchronized void addDeviceId(String deployment, Integer id, CoreStationListener listener) {
-		logger.debug("adding DeviceId " + id + "for " + deployment + " deployment");
+		if (logger.isDebugEnabled())
+			logger.debug("adding DeviceId " + id + "for " + deployment + " deployment");
 
 		try {
 			if (!deploymentToIdListenerMapList.containsKey(deployment)) {
@@ -341,7 +353,8 @@ public class AsyncCoreStationClient extends Thread  {
 
 
 	public synchronized void removeDeviceId(String deployment, Integer id) {
-		logger.debug("removing DeviceId: " + id + " for " + deployment + " deployment");
+		if (logger.isDebugEnabled())
+			logger.debug("removing DeviceId: " + id + " for " + deployment + " deployment");
 		try {
 			if (deployment != null) {
 				Map<Integer, CoreStationListener> list = deploymentToIdListenerMapList.get(deployment);
@@ -468,7 +481,8 @@ public class AsyncCoreStationClient extends Thread  {
 
 
 	public boolean sendHelloMsg(CoreStationListener listener) throws IOException {
-		logger.debug("send hello message");
+		if (logger.isDebugEnabled())
+			logger.debug("send hello message");
 		byte[] data = {BackLogMessageMultiplexer.STUFFING_BYTE, BackLogMessageMultiplexer.HELLO_BYTE};
 		
 		return send(listener, 1, data, false);
@@ -480,7 +494,8 @@ public class AsyncCoreStationClient extends Thread  {
 			writeBuffer.clear();
 	    	writeBuffer.flip();
 			synchronized (changeRequests) {
-				logger.debug("add reconnect request");
+				if (logger.isDebugEnabled())
+					logger.debug("add reconnect request");
 				// Indicate we want the interest ops set changed
 				changeRequests.add(new ChangeRequest(listenerToSocketList.get(listener), ChangeRequest.TYPE_RECONNECT, -1));
 			}

@@ -87,7 +87,8 @@ public class BackLogWrapper extends AbstractWrapper {
 	 */
 	@Override
 	public boolean initialize() {
-		logger.debug("BackLog wrapper initialize started...");
+		if (logger.isDebugEnabled())
+			logger.debug("BackLog wrapper initialize started...");
 		
 	    addressBean = getActiveAddressBean();
 
@@ -139,7 +140,8 @@ public class BackLogWrapper extends AbstractWrapper {
 	    }
 		
 		// instantiating the plugin class specified in the XML file
-		logger.debug("Loading BackLog plugin: >" + plugin + "<");
+		if (logger.isDebugEnabled())
+			logger.debug("Loading BackLog plugin: >" + plugin + "<");
 		try {
 			Class<?> cl = Class.forName(plugin);
 			pluginObject = (AbstractPlugin) cl.getConstructor().newInstance();
@@ -169,8 +171,9 @@ public class BackLogWrapper extends AbstractWrapper {
 			if (!blMsgMultiplexer.isAlive())
 				blMsgMultiplexer.start();
 		}
-		
-		logger.debug("Starting BackLog plugin: >" + plugin + "<");
+
+		if (logger.isDebugEnabled())
+			logger.debug("Starting BackLog plugin: >" + plugin + "<");
 		pluginObject.start();
 	}
 
@@ -195,7 +198,8 @@ public class BackLogWrapper extends AbstractWrapper {
 	 * @return false if storing the new item fails otherwise true
 	 */
 	public boolean dataProcessed(long timestamp, Serializable... data) {
-		logger.debug("dataProcessed timestamp: " + timestamp);
+		if (logger.isDebugEnabled())
+			logger.debug("dataProcessed timestamp: " + timestamp);
 		return postStreamElement(timestamp, data);
 	}
 	
@@ -281,7 +285,8 @@ public class BackLogWrapper extends AbstractWrapper {
 			return pluginObject.sendToPlugin(action, paramNames, paramValues);
 		}
 		if ( id == blMsgMultiplexer.getDeviceID() || id == 65535) {
-			logger.debug("Upload command received.");
+			if (logger.isDebugEnabled())
+				logger.debug("Upload command received.");
 			return pluginObject.sendToPlugin(action, paramNames, paramValues);
 		}
 		
@@ -309,7 +314,8 @@ public class BackLogWrapper extends AbstractWrapper {
 	 */
 	@Override
 	public boolean sendToWrapper ( Object dataItem ) throws OperationNotSupportedException {
-		logger.debug("Upload object received.");
+		if (logger.isDebugEnabled())
+			logger.debug("Upload object received.");
 		return pluginObject.sendToPlugin(dataItem);
 	}
 

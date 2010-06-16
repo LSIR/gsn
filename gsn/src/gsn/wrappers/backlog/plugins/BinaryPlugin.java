@@ -170,9 +170,11 @@ public class BinaryPlugin extends AbstractPlugin {
 		}
 		
 		propertyFileName = rootBinaryDir + PROPERTY_FILE_NAME;
-		
-		logger.debug("property file name: " + propertyFileName);
-		logger.debug("local binary directory: " + rootBinaryDir);
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("property file name: " + propertyFileName);
+			logger.debug("local binary directory: " + rootBinaryDir);
+		}
 
         setName(getPluginName() + "-Thread" + (++threadCounter));
         
@@ -200,7 +202,8 @@ public class BinaryPlugin extends AbstractPlugin {
 	
 	@Override
 	public void dispose() {
-		logger.debug("dispose thread");
+		if (logger.isDebugEnabled())
+			logger.debug("dispose thread");
 		calcChecksumThread.dispose();
 		try {
 			calcChecksumThread.join();
@@ -262,15 +265,19 @@ public class BinaryPlugin extends AbstractPlugin {
     		
 			if (pktType == ACK_PACKET) {
 				byte ackType = msg.getPacket()[1];
-				logger.debug("acknowledge packet type >" + ackType + "< received");
+				if (logger.isDebugEnabled())
+					logger.debug("acknowledge packet type >" + ackType + "< received");
 				
 				lastRecvPacketType = ACK_PACKET;
 			}
 			else if (pktType == INIT_PACKET) {
-				if (lastRecvPacketType == INIT_PACKET)
-					logger.debug("init packet already received");
+				if (lastRecvPacketType == INIT_PACKET) {
+					if (logger.isDebugEnabled())
+						logger.debug("init packet already received");
+				}
 				else {
-					logger.debug("init packet received");
+					if (logger.isDebugEnabled())
+						logger.debug("init packet received");
     				StringBuffer name = new StringBuffer();
     				
     				// get file info
@@ -302,16 +309,19 @@ public class BinaryPlugin extends AbstractPlugin {
     					storeInDatabase = true;
     				else
     					storeInDatabase = false;
-    	
-    				logger.debug("new incoming binary:");
-    				logger.debug("   remote binary name: " + remoteBinaryName);
-    				logger.debug("   timestamp of the binary: " + binaryTimestamp);
-    				logger.debug("   binary length: " + binaryLength);
-    				if (storeInDatabase)
-    					logger.debug("   store in database");
-    				else
-    					logger.debug("   store on disk");
-    				logger.debug("   folder date time format: " + datetimefm);
+
+    				if (logger.isDebugEnabled()) {
+						logger.debug("new incoming binary:");
+						logger.debug("   remote binary name: " + remoteBinaryName);
+						logger.debug("   timestamp of the binary: " + binaryTimestamp);
+						logger.debug("   binary length: " + binaryLength);
+
+	    				if (storeInDatabase)
+	    					logger.debug("   store in database");
+	    				else
+	    					logger.debug("   store on disk");
+	    				logger.debug("   folder date time format: " + datetimefm);
+    				}
     	
     			    File f = new File(remoteBinaryName);
     			    
@@ -322,7 +332,8 @@ public class BinaryPlugin extends AbstractPlugin {
     			    	String subpath = f.getParent();
     			    	if (subpath == null	)
     			    		subpath = "";
-    			    	logger.debug("subpath: " + subpath);
+    					if (logger.isDebugEnabled())
+    						logger.debug("subpath: " + subpath);
     					
     					if(!subpath.endsWith("/"))
     						subpath += "/";
@@ -345,7 +356,8 @@ public class BinaryPlugin extends AbstractPlugin {
     				// delete the file if it already exists
     				f = new File(localBinaryName);
     			    if (f.exists()) {
-    			    	logger.debug("overwrite already existing binary >" + localBinaryName + "<");
+    					if (logger.isDebugEnabled())
+    						logger.debug("overwrite already existing binary >" + localBinaryName + "<");
     			    	f.delete();
     			    }
     			    
@@ -375,7 +387,8 @@ public class BinaryPlugin extends AbstractPlugin {
 			else if (pktType == CHUNK_PACKET) {
 				// get number of this chunk
 				long chunknum = arr2uint(msg.getPacket(), 1);
-				logger.debug("Chunk for " + remoteBinaryName + " with number " + chunknum + " received");
+				if (logger.isDebugEnabled())
+					logger.debug("Chunk for " + remoteBinaryName + " with number " + chunknum + " received");
 				
 				if (chunknum == lastChunkNumber)
 					logger.info("chunk already received");
@@ -393,7 +406,8 @@ public class BinaryPlugin extends AbstractPlugin {
 						}
 						byte [] chunk = java.util.Arrays.copyOfRange(msg.getPacket(), 5, msg.getPacket().length);
 						calculatedCRC.update(chunk);
-						logger.debug("updated crc: " + calculatedCRC.getValue());
+						if (logger.isDebugEnabled())
+							logger.debug("updated crc: " + calculatedCRC.getValue());
 						fos.write(chunk);
 						fos.close();
 						filelen = file.length();
@@ -402,8 +416,9 @@ public class BinaryPlugin extends AbstractPlugin {
 						configFile.setProperty(PROPERTY_DOWNLOADED_SIZE, Long.toString(filelen));
 						configFile.setProperty(PROPERTY_CHUNK_NUMBER, Long.toString(chunknum));
 						configFile.store(new FileOutputStream(propertyFileName), null);
-	    				
-	    				logger.debug("actual length of concatenated binary is " + filelen + " bytes");
+
+						if (logger.isDebugEnabled())
+							logger.debug("actual length of concatenated binary is " + filelen + " bytes");
 					}
 					catch (IOException e) {
 						logger.error(e.getMessage(), e);
@@ -425,17 +440,20 @@ public class BinaryPlugin extends AbstractPlugin {
 				long crc = arr2uint(msg.getPacket(), 1);
 				
 				if (lastRecvPacketType == CRC_PACKET) {
-					logger.debug("crc packet already received -> drop it");
+					if (logger.isDebugEnabled())
+						logger.debug("crc packet already received -> drop it");
 		    		bigBinarySender.sendCRCAck();
 				}
 				else {
-					logger.debug("crc packet with crc32 >" + crc + "< received");
+					if (logger.isDebugEnabled())
+						logger.debug("crc packet with crc32 >" + crc + "< received");
 					
     				// do we really have the whole binary?
     				if ((new File(localBinaryName)).length() == binaryLength) {
     					// check crc
     					if (calculatedCRC.getValue() == crc) {
-    						logger.debug("crc is correct");
+    						if (logger.isDebugEnabled())
+    							logger.debug("crc is correct");
     						if (storeInDatabase) {
     							byte[] tmp = null;
     							File file = new File(localBinaryName);
@@ -461,8 +479,10 @@ public class BinaryPlugin extends AbstractPlugin {
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data  (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") could not be stored in the database.");
     							}
-    							else
-    								logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored in database");
+    							else {
+    								if (logger.isDebugEnabled())
+    									logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored in database");
+    							}
     							
     							file.delete();
     						}
@@ -474,7 +494,8 @@ public class BinaryPlugin extends AbstractPlugin {
     							}
     							if (!(new File(localBinaryName)).setLastModified(binaryTimestamp))
     								logger.warn("could not set modification time for " + localBinaryName);
-    							logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored on disk");
+    							if (logger.isDebugEnabled())
+    								logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored on disk");
     						}
     					
     						File stat = new File(propertyFileName);
@@ -506,7 +527,8 @@ public class BinaryPlugin extends AbstractPlugin {
 	@Override
 	public boolean messageReceived(int deviceID, long timestamp, byte[] packet) {
 		try {
-			logger.debug("message received with timestamp " + timestamp);
+			if (logger.isDebugEnabled())
+				logger.debug("message received with timestamp " + timestamp);
 			msgQueue.add(new Message(timestamp, packet));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -518,7 +540,8 @@ public class BinaryPlugin extends AbstractPlugin {
 
 	@Override
 	public void remoteConnEstablished() {
-		logger.debug("Connection established");
+		if (logger.isDebugEnabled())
+			logger.debug("Connection established");
 		if (connectionTestTimer != null)
 			connectionTestTimer.cancel();
 		else
@@ -569,8 +592,9 @@ public class BinaryPlugin extends AbstractPlugin {
 			    		subpath = "";
 			    	else if(!subpath.endsWith("/"))
 						subpath += "/";
-	
-			    	logger.debug("subpath: " + subpath);
+
+					if (logger.isDebugEnabled())
+						logger.debug("subpath: " + subpath);
 			    	
 				    String datedir = rootBinaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
 				    String filename = f.getName();
@@ -595,7 +619,8 @@ public class BinaryPlugin extends AbstractPlugin {
 
 	@Override
 	public void remoteConnLost() {
-		logger.debug("Connection lost");
+		if (logger.isDebugEnabled())
+			logger.debug("Connection lost");
 
 		msgQueue.clear();
 		bigBinarySender.stopSending();
@@ -659,7 +684,8 @@ class CalculateChecksum extends Thread {
 			try {
 				file = fileQueue.take();
 			} catch (InterruptedException e) {
-				parent.logger.debug(e.getMessage());
+				if (parent.logger.isDebugEnabled())
+					parent.logger.debug(e.getMessage());
 				break;
 			}
 			if (this.dispose)
@@ -667,7 +693,8 @@ class CalculateChecksum extends Thread {
 			
 			// if the property file exists we have already downloaded a part of a binary -> resume
 			// calculate crc from already downloaded binary
-			parent.logger.debug("calculating cheksum for already downloaded part of binary >" + parent.localBinaryName + "<");
+			if (parent.logger.isDebugEnabled())
+				parent.logger.debug("calculating cheksum for already downloaded part of binary >" + parent.localBinaryName + "<");
 	        try {
 	            // Computer CRC32 checksum
 	            cis = new CheckedInputStream(
@@ -687,8 +714,9 @@ class CalculateChecksum extends Thread {
 			}
 	        
 	        parent.calculatedCRC = (CRC32) cis.getChecksum();
-			
-	        parent.logger.debug("recalculated crc (" + parent.calculatedCRC.getValue() + ") from " + parent.localBinaryName);
+
+			if (parent.logger.isDebugEnabled())
+				parent.logger.debug("recalculated crc (" + parent.calculatedCRC.getValue() + ") from " + parent.localBinaryName);
 			
 			parent.bigBinarySender.resumeBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue()+1, parent.calculatedCRC.getValue());
 		}
@@ -768,7 +796,8 @@ class BigBinarySender extends Thread
 	}
 	
 	public void stopSending() {
-		parent.logger.debug("stop sending");
+		if (parent.logger.isDebugEnabled())
+			parent.logger.debug("stop sending");
 		synchronized (event) {
 			triggered = false;
 			packet = null;
@@ -786,7 +815,8 @@ class BigBinarySender extends Thread
 		if (triggered)
 			parent.logger.error("already sending a message");
 		else {
-			parent.logger.debug("acknowledge for chunk number >" + ackNr + "< sent");
+			if (parent.logger.isDebugEnabled())
+				parent.logger.debug("acknowledge for chunk number >" + ackNr + "< sent");
     		ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
     		baos.write(BinaryPlugin.ACK_PACKET);
     		baos.write(BinaryPlugin.CHUNK_PACKET);
@@ -804,7 +834,8 @@ class BigBinarySender extends Thread
 		if (triggered)
 			parent.logger.error("already sending a message");
 		else {
-			parent.logger.debug("init acknowledge sent");
+			if (parent.logger.isDebugEnabled())
+				parent.logger.debug("init acknowledge sent");
 			byte [] packet = new byte[2];
 			packet[0] = BinaryPlugin.ACK_PACKET;
 			packet[1] = BinaryPlugin.INIT_PACKET;
@@ -821,7 +852,8 @@ class BigBinarySender extends Thread
 		if (triggered)
 			parent.logger.error("already sending a message");
 		else {
-			parent.logger.debug("crc acknowledge sent");
+			if (parent.logger.isDebugEnabled())
+				parent.logger.debug("crc acknowledge sent");
 			byte [] packet = new byte[2];
 			packet[0] = BinaryPlugin.ACK_PACKET;
 			packet[1] = BinaryPlugin.CRC_PACKET;
@@ -858,7 +890,8 @@ class BigBinarySender extends Thread
 		// delete the file if it already exists
 		File f = new File(parent.localBinaryName);
 	    if (f.exists()) {
-	    	parent.logger.debug("overwrite already existing binary >" + parent.localBinaryName + "<");
+			if (parent.logger.isDebugEnabled())
+				parent.logger.debug("overwrite already existing binary >" + parent.localBinaryName + "<");
 	    	f.delete();
 	    }
 		requestSpecificBinary(remoteLocation, 0, 0, 0);
@@ -916,7 +949,8 @@ class ConnectionCheckTimer extends TimerTask {
 	}
 	
 	public void run() {
-		parent.logger.debug("connection check timer fired");
+		if (parent.logger.isDebugEnabled())
+			parent.logger.debug("connection check timer fired");
 		if (parent.isConnected())
 			parent.remoteConnEstablished();
 	}

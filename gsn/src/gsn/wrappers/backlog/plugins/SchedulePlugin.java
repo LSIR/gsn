@@ -77,19 +77,22 @@ public class SchedulePlugin extends AbstractPlugin {
 					Integer id = rs.getInt("device_id");
 					byte[] schedule = rs.getBytes("schedule");
 					StorageManager.close(conn);
-					
-					logger.debug("creation time: " + creationtime);
+
+					if (logger.isDebugEnabled())
+						logger.debug("creation time: " + creationtime);
 					if (timestamp ==  creationtime) {
 						// if the schedule on the deployment has the same creation
 						// time as the newest one in the database, we do not have
 						// to resend it
-						logger.debug("no new schedule available");
+						if (logger.isDebugEnabled())
+							logger.debug("no new schedule available");
 						byte [] pkt = {TYPE_SCHEDULE_SAME};
 						sendRemote(System.currentTimeMillis(), pkt, super.priority);
 					}
 					else {
 						// send the new schedule to the deployment
-						logger.debug("send new schedule (" + new String(schedule) + ")");
+						if (logger.isDebugEnabled())
+							logger.debug("send new schedule (" + new String(schedule) + ")");
 	
 						byte [] pkt = new byte [schedule.length + 9];
 						pkt[0] = TYPE_NEW_SCHEDULE;

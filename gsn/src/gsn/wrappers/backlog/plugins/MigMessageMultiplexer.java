@@ -118,8 +118,9 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	    }
 	    vec.addElement(listener);
 	    msgTypeListener.put(msgTypeInt, vec);
-	    
-	    logger.debug("Listener for mig message type " + msgType + " registered");
+
+		if (logger.isDebugEnabled())
+			logger.debug("Listener for mig message type " + msgType + " registered");
 	}
 
 	
@@ -147,8 +148,9 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 			dispose();
 			return false;
 		}
-		
-	    logger.debug("Listener for mig message type " + msgTypeInt + " deregistered");
+
+		if (logger.isDebugEnabled())
+			logger.debug("Listener for mig message type " + msgTypeInt + " deregistered");
 	    
 	    return true;
 	}

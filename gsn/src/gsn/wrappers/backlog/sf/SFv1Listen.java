@@ -62,7 +62,7 @@ public class SFv1Listen extends Thread {
 	}
 
     public void run() {
-    	logger.debug("start thread");
+    	logger.info("start thread");
 	
 	    // open up our server socket
 	    try {
@@ -89,7 +89,7 @@ public class SFv1Listen extends Thread {
 		    cleanup();
         }
 
-	    logger.debug("stop thread");
+	    logger.info("stop thread");
     }
     
     public Collection<BackLogMessageMultiplexer> getSources() {
@@ -98,7 +98,8 @@ public class SFv1Listen extends Thread {
 
     private void cleanup() {
 		shutdownAllSFClients();
-		logger.debug("Closing socket");
+		if (logger.isDebugEnabled())
+			logger.debug("Closing socket");
 		if (serverSocket != null) {
 		    try {
 		    	serverSocket.close();

@@ -116,8 +116,10 @@ public class SFv1Client extends SFProtocol implements Runnable, BackLogMessageLi
 				// TODO: to which DeviceId has the message to be sent to?
 			    if (!((BackLogMessageMultiplexer) listenServer.getSources().toArray()[0]).sendMessage(msg, null, SF_MESSAGE_PRIORITY))
 			    	logger.error("write failed");
-			    else
-					logger.debug("Message from SFv1 with address >" + socket.getInetAddress().getHostName() + "< received and forwarded");
+			    else {
+					if (logger.isDebugEnabled())
+						logger.debug("Message from SFv1 with address >" + socket.getInetAddress().getHostName() + "< received and forwarded");
+			    }
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
@@ -127,9 +129,11 @@ public class SFv1Client extends SFProtocol implements Runnable, BackLogMessageLi
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, byte[] payload) {
 		try {
-		    if(writePacket(payload))
-		    	logger.debug("Message with timestamp " + timestamp + " successfully written to sfv1 client " + socket.getInetAddress().getHostName());
-		    else
+		    if(writePacket(payload)) {
+				if (logger.isDebugEnabled())
+					logger.debug("Message with timestamp " + timestamp + " successfully written to sfv1 client " + socket.getInetAddress().getHostName());
+		    }
+			else
 		    	logger.error("Message with timestamp " + timestamp + " could not be written to sfv1 client " + socket.getInetAddress().getHostName());
 		}
 		catch (IOException e) {
