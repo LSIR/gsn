@@ -103,19 +103,23 @@ public class AsyncCoreStationClient extends Thread  {
     						change.socket.register(selector, change.ops, change);
 	    					break;
 	    				case ChangeRequest.TYPE_RECONNECT:
-	    					if (logger.isDebugEnabled())
-	    						logger.debug("Selector:reconnect");
-	    					if (change.socket.keyFor(selector).isValid())
-	    						closeConnection(change.socket.keyFor(selector), change.socket);
-	    					CoreStationListener listener;
-    						listener = socketToListenerList.get(change.socket);
-    						socketToListenerList.remove(change.socket);
-	    					if (listener != null) {
-			    				listenerToSocketList.remove(listener);
-			    				if (logger.isDebugEnabled())
-			    					logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
-		    					Timer timer = new Timer("ReconnectTimer-" + listener.getCoreStationName());
-		    					timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
+	    					try {
+		    					if (logger.isDebugEnabled())
+		    						logger.debug("Selector:reconnect");
+		    					if (change.socket.keyFor(selector).isValid())
+		    						closeConnection(change.socket.keyFor(selector), change.socket);
+		    					CoreStationListener listener;
+	    						listener = socketToListenerList.get(change.socket);
+	    						socketToListenerList.remove(change.socket);
+		    					if (listener != null) {
+				    				listenerToSocketList.remove(listener);
+				    				if (logger.isDebugEnabled())
+				    					logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
+			    					Timer timer = new Timer("ReconnectTimer-" + listener.getCoreStationName());
+			    					timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
+		    					}
+	    					} catch (Exception e) {
+	    						logger.error(e.getMessage(), e);
 	    					}
 	    					break;
 	    				}
