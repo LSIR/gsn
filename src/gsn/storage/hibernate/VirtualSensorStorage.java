@@ -24,4 +24,15 @@ public interface VirtualSensorStorage {
      */
     public StreamElement getStreamElement(Serializable pk) throws GSNRuntimeException ;
 
+    /**
+     * @return The number of {@link gsn.beans.StreamElement} in the storage.
+     * @throws GSNRuntimeException
+     */
+    public long countStreamElement() throws GSNRuntimeException ;
+
+    //public void getStreamElements() throws GSNRuntimeException ;
+
+
+    //TODO native SQL query.
+
 }
