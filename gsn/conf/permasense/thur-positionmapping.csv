@@ -1,4 +1,4 @@
-"NODE_ID","BEGIN","END","POSITION","COMMENT"
+"DEVICE_ID","BEGIN","END","POSITION","COMMENT"
 
 # access nodes are mapped to position 0 (this has to be changed as soon
 # as multiple access nodes are used concurrently)
