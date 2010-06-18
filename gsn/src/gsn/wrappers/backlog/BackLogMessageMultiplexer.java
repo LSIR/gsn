@@ -45,7 +45,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 	protected AsyncCoreStationClient asyncCoreStationClient = null;
 	private BlockingQueue<byte []> recvQueue = new LinkedBlockingQueue<byte[]>();
-	private PluginMessageHandler pluginMessageMultiplexer;
+	private PluginMessageHandler pluginMessageHandler;
 	private boolean dispose = false;
 	private Integer activPluginCounter = 0;
 	private Integer coreStationDeviceId = null;
@@ -82,7 +82,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
     	}
     	deploymentName = deployment;
     	
-    	pluginMessageMultiplexer = new PluginMessageHandler(this, PLUGIN_MESSAGE_QUEUE_SIZE);
+    	pluginMessageHandler = new PluginMessageHandler(this, PLUGIN_MESSAGE_QUEUE_SIZE);
     	
     	asyncCoreStationClient = AsyncCoreStationClient.getSingletonObject();
 		
@@ -115,7 +115,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	public void run() {
 		logger.info("thread started");
 		
-		pluginMessageMultiplexer.start();
+		pluginMessageHandler.start();
     	
 		try {
 			asyncCoreStationClient.registerListener(this);
@@ -212,7 +212,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			    		else if( msg.getType() == BackLogMessage.PING_ACK_MESSAGE_TYPE )
 			    	        resetWatchDog();
 			    		else
-			    			pluginMessageMultiplexer.newPluginMessage(msg);
+			    			pluginMessageHandler.newPluginMessage(msg);
 					}
 					else
 						hasMorePkt = false;
@@ -275,7 +275,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		
 		asyncCoreStationClient.deregisterListener(this);
 		
-		pluginMessageMultiplexer.dispose();
+		pluginMessageHandler.dispose();
 		recvQueue.clear();
 	}
 
