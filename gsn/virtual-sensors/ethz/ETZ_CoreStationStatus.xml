@@ -20,7 +20,11 @@
     </processing-class>
     <description>show status information of the CoreStations from the ETZ deployment</description>
     <life-cycle pool-size="10" />
-    <addressing />
+    <addressing>
+        <predicate key="type">PermaSense ETZ test deployment</predicate>
+        <predicate key="LATITUDE">47.377326</predicate>
+        <predicate key="LONGITUDE">8.552935</predicate>
+    </addressing>
     <storage />
     <streams>
         <stream name="data1">

@@ -14,8 +14,8 @@
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Thur deployment</predicate>
-        <predicate key="LATITUDE">46.547451</predicate>
-        <predicate key="LONGITUDE">7.982092</predicate>
+        <predicate key="LATITUDE">47.589889</predicate>
+        <predicate key="LONGITUDE">8.773874</predicate>
     </addressing>
     <storage />
     <streams>

@@ -21,7 +21,11 @@
     </processing-class>
     <description>basestation status from Matterhorn deployment</description>
     <life-cycle pool-size="10" />
-    <addressing />
+    <addressing>
+        <predicate key="type">PermaSense Matterhorn deployment</predicate>
+        <predicate key="LATITUDE">45.980126</predicate>
+        <predicate key="LONGITUDE">7.670109</predicate>
+    </addressing>
     <storage />
     <streams>
         <stream name="data">
