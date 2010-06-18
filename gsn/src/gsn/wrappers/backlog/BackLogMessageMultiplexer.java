@@ -86,7 +86,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
     	
     	asyncCoreStationClient = AsyncCoreStationClient.getSingletonObject();
 		
-		setName("BackLogMessageMultiplexer-Thread:" + getCoreStationName());
+		setName("BackLogMessageMultiplexer-" + getCoreStationName() + "-Thread");
 	}
 	
 	
@@ -565,7 +565,7 @@ class PluginMessageHandler extends Thread {
 		plugMsgQueue = new LinkedBlockingQueue<BackLogMessage>(maxQueueSize);
 		blMsgMulti = parent;
 		
-		setName("PluginMessageHandler-" + blMsgMulti.getCoreStationName());
+		setName("PluginMessageHandler-" + blMsgMulti.getCoreStationName() + "-Thread");
 	}
 	
 	public boolean newPluginMessage(BackLogMessage msg) {

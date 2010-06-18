@@ -100,10 +100,9 @@ public class BinaryPlugin extends AbstractPlugin {
 	protected long downloadedSize = -1;
 	protected long lastChunkNumber = -1;
 	private static Set<String> coreStationsList = new HashSet<String>();
-    private static int threadCounter = 0;
 
 	private Server web;
-	private String coreStationName = null;
+	protected String coreStationName = null;
 	
 	private CalculateChecksum calcChecksumThread;
 	protected BigBinarySender bigBinarySender;
@@ -115,6 +114,8 @@ public class BinaryPlugin extends AbstractPlugin {
 	public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		activeBackLogWrapper = backlogwrapper;
 		this.coreStationName = coreStationName;
+
+        setName(getPluginName() + "-" + coreStationName + "-Thread");
 
 		AddressBean addressBean = getActiveAddressBean();
 		String p = addressBean.getPredicateValue("priority");
@@ -175,8 +176,6 @@ public class BinaryPlugin extends AbstractPlugin {
 			logger.debug("property file name: " + propertyFileName);
 			logger.debug("local binary directory: " + rootBinaryDir);
 		}
-
-        setName(getPluginName() + "-Thread" + (++threadCounter));
         
         registerListener();
 		
@@ -226,8 +225,6 @@ public class BinaryPlugin extends AbstractPlugin {
 		synchronized (coreStationsList) {
 			coreStationsList.remove(coreStationName);
 		}
-		
-        threadCounter--;
         
         super.dispose();
 	}
@@ -671,7 +668,7 @@ class CalculateChecksum extends Thread {
 	private LinkedBlockingQueue<String> fileQueue = new LinkedBlockingQueue<String>();
 	
 	public CalculateChecksum(BinaryPlugin plug) {
-		this.setName("CalculateChecksumThread");
+		this.setName("CalculateChecksum-" + plug.coreStationName + "-Thread");
 		parent = plug;
 	}
 	
@@ -752,7 +749,7 @@ class BigBinarySender extends Thread
 	private byte [] packet = null;
 	
 	BigBinarySender(BinaryPlugin plug) {
-		this.setName("BigBinarySenderThread");
+		setName("BigBinarySender-" + plug.coreStationName + "-Thread");
 		parent = plug;
 	}
 	
