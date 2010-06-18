@@ -30,7 +30,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	    been received, the connection is considered broken. */
 	public static final int PING_ACK_CHECK_INTERVAL_SEC = 60;
 	
-	public static final int PLUGIN_MESSAGE_QUEUE_SIZE = 50;
+	public static final int PLUGIN_MESSAGE_QUEUE_SIZE = 1000;
 	
 	public static final byte STUFFING_BYTE = 0x7e;
 	
