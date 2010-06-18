@@ -30,6 +30,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	    been received, the connection is considered broken. */
 	public static final int PING_ACK_CHECK_INTERVAL_SEC = 60;
 	
+	public static final int PLUGIN_MESSAGE_QUEUE_SIZE = 50;
+	
 	public static final byte STUFFING_BYTE = 0x7e;
 	
 	public static final byte HELLO_BYTE = 0x7d;
@@ -43,6 +45,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 	protected AsyncCoreStationClient asyncCoreStationClient = null;
 	private BlockingQueue<byte []> recvQueue = new LinkedBlockingQueue<byte[]>();
+	private PluginMessageHandler pluginMessageMultiplexer;
 	private boolean dispose = false;
 	private Integer activPluginCounter = 0;
 	private Integer coreStationDeviceId = null;
@@ -79,6 +82,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
     	}
     	deploymentName = deployment;
     	
+    	pluginMessageMultiplexer = new PluginMessageHandler(this, PLUGIN_MESSAGE_QUEUE_SIZE);
+    	
     	asyncCoreStationClient = AsyncCoreStationClient.getSingletonObject();
 		
 		setName("BackLogMessageMultiplexer-Thread:" + getCoreStationName());
@@ -109,6 +114,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	
 	public void run() {
 		logger.info("thread started");
+		
+		pluginMessageMultiplexer.start();
     	
 		try {
 			asyncCoreStationClient.registerListener(this);
@@ -205,7 +212,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			    		else if( msg.getType() == BackLogMessage.PING_ACK_MESSAGE_TYPE )
 			    	        resetWatchDog();
 			    		else
-			    			multiplexMessage(msg);
+			    			pluginMessageMultiplexer.newPluginMessage(msg);
 					}
 					else
 						hasMorePkt = false;
@@ -263,11 +270,13 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
-		recvQueue.clear();
 		
 		blMultiplexerMap.remove(getCoreStationName());
 		
 		asyncCoreStationClient.deregisterListener(this);
+		
+		pluginMessageMultiplexer.dispose();
+		recvQueue.clear();
 	}
 
 
@@ -369,7 +378,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	 * 
 	 * @param message to be distributed
 	 */
-	private void multiplexMessage(BackLogMessage message) {
+	protected void multiplexMessage(BackLogMessage message) {
 		int ReceiverCount = 0;
 		Integer msgTypeInt = new Integer(message.getType());
 		Vector<BackLogMessageListener> vec = msgTypeListener.get(msgTypeInt);
@@ -540,6 +549,53 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 	public Integer getDeviceID() {
 		return coreStationDeviceId;
+	}
+}
+
+
+
+class PluginMessageHandler extends Thread {
+	protected final transient Logger logger = Logger.getLogger( PluginMessageHandler.class );
+
+	private BlockingQueue<BackLogMessage> plugMsgQueue;
+	private boolean dispose = false;
+	BackLogMessageMultiplexer blMsgMulti;
+	
+	public PluginMessageHandler(BackLogMessageMultiplexer parent, int maxQueueSize) {
+		plugMsgQueue = new LinkedBlockingQueue<BackLogMessage>(maxQueueSize);
+		blMsgMulti = parent;
+		
+		setName("PluginMessageHandler-" + blMsgMulti.getCoreStationName());
+	}
+	
+	public boolean newPluginMessage(BackLogMessage msg) {
+		boolean ret = plugMsgQueue.offer(msg);
+		if (!ret)
+			logger.warn("message queue is full");
+		return ret;
+	}
+	
+	public void run() {
+		logger.info("thread started");
+		BackLogMessage msg = null;
+		while (!dispose) {
+			try {
+				msg = plugMsgQueue.take();
+				if (dispose)
+					break;
+				
+				blMsgMulti.multiplexMessage(msg);
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+		logger.info("thread died");
+	}
+	
+	public void dispose() {
+		logger.info("dispose thread");
+		dispose = true;
+		plugMsgQueue.offer(new BackLogMessage((byte)'a'));
 	}
 }
 
