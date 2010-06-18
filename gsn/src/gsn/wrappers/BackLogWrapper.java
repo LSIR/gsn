@@ -59,6 +59,7 @@ public class BackLogWrapper extends AbstractWrapper {
 	private AbstractPlugin pluginObject = null;
 	private AddressBean addressBean = null;
 	private static StorageManager storage = null;
+    private static int threadCounter = 0;
 	
 	private final transient Logger logger = Logger.getLogger( BackLogWrapper.class );
 
@@ -159,6 +160,8 @@ public class BackLogWrapper extends AbstractWrapper {
     		logger.error("Could not load BackLog plugin: >" + plugin + "<");
         	return false;
         }
+        
+        setName("DiskSpaceWrapper-Thread" + (++threadCounter));
 		
 		return true;
 	}
@@ -342,6 +345,7 @@ public class BackLogWrapper extends AbstractWrapper {
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
+        threadCounter--;
 	}
 	
 	

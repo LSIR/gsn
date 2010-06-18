@@ -115,8 +115,6 @@ public class BinaryPlugin extends AbstractPlugin {
 		activeBackLogWrapper = backlogwrapper;
 		this.coreStationName = coreStationName;
 
-        setName(getPluginName() + "-" + coreStationName + "-Thread");
-
 		AddressBean addressBean = getActiveAddressBean();
 		String p = addressBean.getPredicateValue("priority");
 		if (p == null)
@@ -178,6 +176,8 @@ public class BinaryPlugin extends AbstractPlugin {
 		}
         
         registerListener();
+
+        setName("BinaryPlugin-" + coreStationName + "-Thread");
 		
 		return true;
 	}
@@ -185,7 +185,7 @@ public class BinaryPlugin extends AbstractPlugin {
 
 	@Override
 	public String getPluginName() {
-		return "BigBinaryPlugin";
+		return "BinaryPlugin";
 	}
 	
 
@@ -668,7 +668,7 @@ class CalculateChecksum extends Thread {
 	private LinkedBlockingQueue<String> fileQueue = new LinkedBlockingQueue<String>();
 	
 	public CalculateChecksum(BinaryPlugin plug) {
-		this.setName("CalculateChecksum-" + plug.coreStationName + "-Thread");
+		setName("CalculateChecksum-" + plug.coreStationName + "-Thread");
 		parent = plug;
 	}
 	
