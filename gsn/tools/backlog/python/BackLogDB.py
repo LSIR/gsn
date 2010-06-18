@@ -175,7 +175,7 @@ class BackLogDBClass(Thread):
             return False
 
         
-    def removeMsg(self, timestamp):
+    def removeMsg(self, timestamp, msgType):
         '''
         Remove a message out of the buffer/database with a given timestamp.
         
@@ -188,10 +188,10 @@ class BackLogDBClass(Thread):
 
         try:
             self._dblock.acquire()
-            self._cur.execute('SELECT COUNT(1) FROM backlogmsg WHERE timestamp = ?', (timestamp,))
+            self._cur.execute('SELECT COUNT(1) FROM backlogmsg WHERE timestamp = ? and type = ?', (timestamp,msgType))
             cnt = self._cur.fetchone()[0]
             if cnt >= 1:
-                self._con.execute('DELETE FROM backlogmsg WHERE timestamp = ?', (timestamp,))
+                self._con.execute('DELETE FROM backlogmsg WHERE timestamp = ? and type = ?', (timestamp,msgType))
                 self._con.commit()
                 self._dbNumberOfEntries -= cnt
             self._dblock.release()
@@ -207,7 +207,7 @@ class BackLogDBClass(Thread):
                 self._meanRemoveTime += removeTime*1000
                 self._removeCounter += 1
             self._counterlock.release()
-            self._logger.debug('del (?,%d,?): %f s' % (timestamp, removeTime))
+            self._logger.debug('del (%d,%d,?): %f s' % (msgType, timestamp, removeTime))
         except sqlite3.Error, e:
             self._dblock.release()
             if not self._stopped:

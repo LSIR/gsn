@@ -416,14 +416,16 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	}
 
 
-	public void sendAck(long timestamp, int priority) {
-		// send ACK with corresponding timestamp
-		BackLogMessage ack = new BackLogMessage(BackLogMessage.ACK_MESSAGE_TYPE, timestamp);
-		if (logger.isDebugEnabled())
-			logger.debug("Ack sent: timestamp: " + timestamp);
+	public void sendAck(long timestamp, int msgType, int priority) {
+		// send ACK with corresponding timestamp and message type
+		BackLogMessage ack;
 		try {
-			sendMessage(ack, null, priority);
-		} catch (IOException e) {
+			ack = new BackLogMessage(BackLogMessage.ACK_MESSAGE_TYPE, timestamp, AbstractPlugin.int2arr(msgType));
+			if (logger.isDebugEnabled())
+				logger.debug("Ack sent: (timestamp=" + timestamp + "/messageType=" + msgType + ")");
+
+				sendMessage(ack, null, priority);
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
 	}

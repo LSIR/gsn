@@ -167,7 +167,7 @@ class GSNPeerClass(Thread):
             self.pingAck(msg.getTimestamp())
         elif msgType == BackLogMessage.ACK_MESSAGE_TYPE:
             # if it is an acknowledge, tell BackLogMain to have received one
-            self._parent.ackReceived(msg.getTimestamp())
+            self._parent.ackReceived(msg.getTimestamp(), int(struct.unpack('<I', msg.getPayload())[0]))
         else:
             # send the packet to all plugins which 'use' this message type
             msgTypeValid = False

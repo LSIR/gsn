@@ -206,15 +206,16 @@ class BackLogMainClass(Thread):
     def resend(self):
         self.backlog.resend()
         
-    def ackReceived(self, timestamp):
+    def ackReceived(self, timestamp, msgType):
         # tell the plugins to have received an acknowledge message
         for plugin_entry in self.plugins:
             module_name = plugin_entry[0]
             plugin = plugin_entry[1]
-            plugin.ackReceived(timestamp)
+            if plugin.getMsgType() == msgType:
+                plugin.ackReceived(timestamp)
             
-        # remove the message from the backlog database using its timestamp
-        self.backlog.removeMsg(timestamp)
+        # remove the message from the backlog database using its timestamp and message type
+        self.backlog.removeMsg(timestamp, msgType)
         
     def connectionToGSNestablished(self):
         # tell the plugins that the connection to GSN has been established

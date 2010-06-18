@@ -310,9 +310,9 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 */
 	public void ackMessage(long timestamp, Integer priority) {
 		if (priority == null)
-			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, DEFAULT_PRIORITY);
+			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), DEFAULT_PRIORITY);
 		else
-			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, priority);
+			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), priority);
 	}
 
 
