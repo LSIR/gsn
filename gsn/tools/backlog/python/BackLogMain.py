@@ -25,6 +25,7 @@ DEFAULT_PLUGINS = [ 'BackLogStatusPlugin' ]
 DEFAULT_OPTION_GSN_PORT = 9002
 DEFAULT_OPTION_BACKLOG_DB = '/tmp/backlog.db'
 DEFAULT_OPTION_BACKLOG_RESEND_SLEEP = 0.1
+DEFAULT_TOS_VERSION = 2
 
 class BackLogMainClass(Thread):
     '''
@@ -88,6 +89,7 @@ class BackLogMainClass(Thread):
         
         id = None
         tos_address = None
+        tos_version = None
 
         # readout options from config
         for entry in config_options:
@@ -101,6 +103,8 @@ class BackLogMainClass(Thread):
                 id = int(value)
             elif name == 'tos_source_addr':
                 tos_address = value
+            elif name == 'tos_version':
+                tos_version = int(value)
                 
         if id == None:
             raise TypeError('device_id has to be specified in the configuration file')
@@ -119,13 +123,19 @@ class BackLogMainClass(Thread):
         self._logger.info('backlog_db: ' + backlog_db)
 
         self.gsnpeer = GSNPeerClass(self, id, gsn_port)
+        self._logger.info('loaded GSNPeerClass')
         self.backlog = BackLogDBClass(self, backlog_db)
+        self._logger.info('loaded BackLogDBClass')
         
         self.tospeer = None
         if tos_address:
+            if not tos_version:
+                tos_version = DEFAULT_TOS_VERSION
             self._logger.info('tos_source_addr: ' + tos_address)
+            self._logger.info('tos_version: ' + str(tos_version))
             try:
-                self.tospeer = TOSPeerClass(self, tos_address)
+                self.tospeer = TOSPeerClass(self, tos_address, tos_version)
+                self._logger.info('loaded TOSPeerClass')
             except Exception, e:
                 self._logger.error('TOSPeerClass could not be loaded: ' + e.__str__())
         else:

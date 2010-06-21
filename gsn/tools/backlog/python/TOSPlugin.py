@@ -27,4 +27,4 @@ class TOSPluginClass(AbstractPluginClass):
             
     def msgReceived(self, message):
         self.sendTOSmsg(message)
-                
+    
