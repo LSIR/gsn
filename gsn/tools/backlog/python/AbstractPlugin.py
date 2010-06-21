@@ -129,6 +129,37 @@ class AbstractPluginClass(Thread):
                  otherwise False.
         '''
         return self._parent.gsnpeer.processMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
+    
+    
+    def tosMsgReceived(self, timestamp, payload):
+        '''
+        This function will be executed if a TOS message has been received from the serial
+        port. If the plugin is interested in TOS messages it can process it.
+                   
+        @return: This function should ONLY return True if the message has been processed
+                 successfully. Thus, it will be acknowledged over the serial port.
+        '''
+        pass
+    
+    
+    def sendTOSmsg(self, message):
+        '''
+        Send a TOS message over the serial port.
+        
+        This function should be used by the plugins to send any data to a node running
+        TinyOS connected over the serial port.
+        
+        @param message: The TOS message to be sent.
+                       
+        @return: True if the message has been put into sendbuffer successfully.
+        
+        @raise TypeError: if the TOSPeerClass has not been started.
+        '''
+        if not self._parent._tospeer:
+            raise TypeError('TOSPeerClass has not been started')
+            return False
+        else:
+            return self._parent._tospeer.sendTOSMsg(message)
        
         
     def run(self):

@@ -86,6 +86,7 @@ class BackLogMainClass(Thread):
         backlog_db = DEFAULT_OPTION_BACKLOG_DB
         
         id = None
+        tos_address = None
 
         # readout options from config
         for entry in config_options:
@@ -97,6 +98,8 @@ class BackLogMainClass(Thread):
                 backlog_db = value
             elif name == 'device_id':
                 id = int(value)
+            elif name == 'tos_source_addr':
+                tos_address = value
                 
         if id == None:
             raise TypeError('device_id has to be specified in the configuration file')
@@ -116,6 +119,13 @@ class BackLogMainClass(Thread):
 
         self.gsnpeer = GSNPeerClass(self, id, gsn_port)
         self.backlog = BackLogDBClass(self, backlog_db)
+        
+        if tos_address:
+            self._logger.info('tos_source_addr: ' + tos_address)
+            self.tospeer = TOSPeerClass(self, tos_address)
+        else:
+            self.tospeer = None
+            self._logger.info('TOSPeer will not be loaded as no tos_source_addr is specified in config file')
 
         # get plugins section from config files
         try:
@@ -162,6 +172,8 @@ class BackLogMainClass(Thread):
 
         self.gsnpeer.start()
         self.backlog.start()
+        if self.tospeer:
+            self.tospeer.start()
 
         for plugin_entry in self.plugins:
             module_name = plugin_entry[0]
@@ -173,6 +185,8 @@ class BackLogMainClass(Thread):
             plugin = plugin_entry[1]
             plugin.join()
         
+        if self.tospeer:
+            self.tospeer.join()
         self.backlog.join()
         self.gsnpeer.join()
         
@@ -185,10 +199,20 @@ class BackLogMainClass(Thread):
             plugin = plugin_entry[1]           
             plugin.stop()
 
+        if self.tospeer:
+            self.tospeer.stop()
         self.backlog.stop()
         self.gsnpeer.stop()
         
         self._logger.info('stopped')
+        
+        
+    def processTOSMsg(self, timestamp, payload):
+        ret = False
+        for plugin_entry in self.plugins:
+            if plugin_entry[1].tosMsgReceived(timestamp, payload):
+                ret = True
+        return ret
         
         
     def pluginsBusy(self):
