@@ -1,4 +1,3 @@
-
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
@@ -11,11 +10,17 @@ __source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/pe
 import array
 import logging
 import time
+import Queue
+from threading import Thread, Event
+
 import tos
+import BackLogMessage
 
 DEFAULT_BACKLOG = True
 
 SEND_QUEUE_SIZE = 25
+
+DEBUG = False
 
 class TOSPeerClass(Thread):
     '''
@@ -31,6 +36,7 @@ class TOSPeerClass(Thread):
     '''
     
     def __init__(self, parent, address):
+        Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
         
         # split the address (it should have the form serial@port:baudrate)
@@ -38,7 +44,7 @@ class TOSPeerClass(Thread):
         if source[0] == 'serial':
             try:
                 # try to open a connection to the specified serial port
-                serial = tos.getSource(address, self._logger.isEnabledFor('DEBUG'))
+                serial = tos.getSource(address, DEBUG)
                 serial.setTimeout(5)
                 self._serialsource = tos.AM(serial)
             except Exception, e:
@@ -76,15 +82,15 @@ class TOSPeerClass(Thread):
             
             # if the packet is None just continue
             if not packet:
-                #self.debug('read packet None')
+                #self._logger.debug('read packet None')
                 continue
         
-            timestamp = self.getTimeStamp()
+            timestamp = int(time.time()*1000)
 
             length = len(packet.payload())
             payload = self.tos2backlog(packet);
 
-            self._logger.debug('rcv (%d,%d,%d)' % (self.getMsgType(), timestamp, length))
+            self._logger.debug('rcv (%d,%d,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, timestamp, length))
 
             # tell PSBackLogMain to send the packet to the plugins
             # using the serial port we can guarantee flow control to the backlog database!
@@ -125,7 +131,7 @@ class TOSPeerClass(Thread):
         self.sendCloseQueueCommand()
         
         self._serialsource.stop()
-        self.info('stopped')
+        self._logger.info('stopped')
 
 
 
@@ -159,15 +165,15 @@ class TOSWriter(Thread):
             # is there something to do?
             while not self._sendqueue.empty() and not self._stopped:
                 try:
-                    msg = self._sendqueue.get_nowait()[1]
+                    message = self._sendqueue.get_nowait()[1]
                 except Queue.Empty:
                     self._logger.warning('send queue is empty')
                     break
                 
-                packet = self.backlog2tos(msg)
+                packet = self.backlog2tos(message)
                 try:
                     self._parent._serialsource.write(packet, 0x00, 0.2, True)
-                    self._logger.debug('snd (%d,?,%d)' % (self.getMsgType(), len(message)))
+                    self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(message)))
                 except Exception, e:
                     if not self._stopped:
                         self._logger.warning('could not write message to serial port: ' + e.__str__())

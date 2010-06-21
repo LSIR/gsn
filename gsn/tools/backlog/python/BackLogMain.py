@@ -18,6 +18,7 @@ from threading import Thread, Lock
 
 from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
+from TOSPeer import TOSPeerClass
 
 DEFAULT_CONFIG_FILE = '/etc/backlog.cfg'
 DEFAULT_PLUGINS = [ 'BackLogStatusPlugin' ]
@@ -120,11 +121,14 @@ class BackLogMainClass(Thread):
         self.gsnpeer = GSNPeerClass(self, id, gsn_port)
         self.backlog = BackLogDBClass(self, backlog_db)
         
+        self.tospeer = None
         if tos_address:
             self._logger.info('tos_source_addr: ' + tos_address)
-            self.tospeer = TOSPeerClass(self, tos_address)
+            try:
+                self.tospeer = TOSPeerClass(self, tos_address)
+            except Exception, e:
+                self._logger.error('TOSPeerClass could not be loaded: ' + e.__str__())
         else:
-            self.tospeer = None
             self._logger.info('TOSPeer will not be loaded as no tos_source_addr is specified in config file')
 
         # get plugins section from config files

@@ -155,11 +155,11 @@ class AbstractPluginClass(Thread):
         
         @raise TypeError: if the TOSPeerClass has not been started.
         '''
-        if not self._parent._tospeer:
+        if not self._parent.tospeer:
             raise TypeError('TOSPeerClass has not been started')
             return False
         else:
-            return self._parent._tospeer.sendTOSMsg(message)
+            return self._parent.tospeer.sendTOSMsg(message)
        
         
     def run(self):
