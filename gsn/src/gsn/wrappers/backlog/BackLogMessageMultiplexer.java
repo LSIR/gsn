@@ -265,18 +265,16 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			pingWatchDogTimer.cancel();
         
 		dispose = true;
-		try {
-			this.join();
-		} catch (InterruptedException e) {
-			logger.error(e.getMessage(), e);
-		}
+		recvQueue.clear();
+		byte[] end = {'e','n','d'};
+		recvQueue.offer(end);
+		msgTypeListener.clear();
+		
+		pluginMessageHandler.dispose();
 		
 		blMultiplexerMap.remove(getCoreStationName());
 		
 		asyncCoreStationClient.deregisterListener(this);
-		
-		pluginMessageHandler.dispose();
-		recvQueue.clear();
 	}
 
 
@@ -353,17 +351,19 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		Integer msgTypeInt = new Integer(msgType);
 		Vector<BackLogMessageListener> vec = msgTypeListener.get(msgTypeInt);
 		
-		if (vec == null)
-			throw new IllegalArgumentException( "No listeners registered for message type " + msgType);
-		
-		// Remove all occurrences
-		while (vec.removeElement(listener));
-
-		if (logger.isDebugEnabled())
-			logger.debug("Listener for message type " + msgTypeInt + " deregistered");
-
-		if (vec.size() == 0)
-			msgTypeListener.remove(msgTypeInt);
+		if (vec == null) {
+			logger.error("No listeners registered for message type " + msgType);
+		}
+		else {
+			// Remove all occurrences
+			while (vec.removeElement(listener));
+	
+			if (logger.isDebugEnabled())
+				logger.debug("Listener for message type " + msgTypeInt + " deregistered");
+	
+			if (vec.size() == 0)
+				msgTypeListener.remove(msgTypeInt);
+		}
 		
 		if (isPlugin)
 			activPluginCounter--;
