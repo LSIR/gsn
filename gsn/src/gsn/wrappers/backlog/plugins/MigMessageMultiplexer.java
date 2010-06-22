@@ -179,9 +179,9 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 		}
 
 		if (tinyos1x_platform == null)
-			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS1x_MESSAGE_TYPE, this, true);
-		else
 			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this, true);
+		else
+			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS1x_MESSAGE_TYPE, this, true);
 	}
 	
 	
