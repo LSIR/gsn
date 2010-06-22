@@ -37,6 +37,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	private SFv1Listen sfv1Listen = null;
 	
 	private String coreStationName = null;
+	private String deploymentName = null;
 	private BackLogMessageMultiplexer blMessageMultiplexer;
 	
 	
@@ -47,6 +48,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	
 	private MigMessageMultiplexer(String coreStationName, String deploymentName, Properties props, BackLogMessageMultiplexer blMsgMulti) throws Exception {
 		this.coreStationName = coreStationName;
+		this.deploymentName = deploymentName;
 		blMessageMultiplexer = blMsgMulti;
 		tinyos1x_platform = props.getProperty(TINYOS1X_PLATFORM);
 		String sflocalport = props.getProperty(SF_LOCAL_PORT);
@@ -143,23 +145,25 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 		while (vec.removeElement(listener));
 		if (vec.size() == 0)
 			msgTypeListener.remove(msgTypeInt);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Listener for mig message type " + msgTypeInt + " deregistered");
 		
 		if (msgTypeListener.size() == 0) {
 			dispose();
 			return false;
 		}
-
-		if (logger.isDebugEnabled())
-			logger.debug("Listener for mig message type " + msgTypeInt + " deregistered");
 	    
 	    return true;
 	}
 	
 	
 	public void dispose() {
+		logger.info("dispose called");
 		migMsgMultiplexerMap.remove(coreStationName);
 		
 		if (migMsgMultiplexerMap.isEmpty()) {
+			logger.info("close SF listener for " + deploymentName + " deployment");
 			if (sfListen != null) {
 				sfListen.interrupt();
 				try {
