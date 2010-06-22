@@ -53,6 +53,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private Timer pingTimer = null;
 	private Timer pingWatchDogTimer = null;
 
+	private String coreStationAddress;
 	private InetAddress inetAddress;
 	private int hostPort;
 	private String deploymentName;
@@ -68,6 +69,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		msgTypeListener = Collections.synchronizedMap(new HashMap<Integer,Vector<BackLogMessageListener>> ());
 		
 		// a first pattern match test for >host:port<
+		this.coreStationAddress = coreStationAddress;
     	Matcher m = Pattern.compile("(.*):(.*)").matcher(coreStationAddress);
     	if ( m.find() ) {
 			try {
@@ -273,7 +275,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		
 		pluginMessageHandler.dispose();
 		
-		blMultiplexerMap.remove(getCoreStationName());
+		blMultiplexerMap.remove(coreStationAddress);
 		
 		asyncCoreStationClient.deregisterListener(this);
 	}
