@@ -154,9 +154,10 @@ public class DataEnumerator implements DataEnumeratorIF {
 						output[ innerIndex ] = resultSet.getLong( actualColIndex );
 						break;
 					case DataTypes.BINARY :
-						if ( linkBinaryData )
-							output[ innerIndex ] = "/field?vs=" + resultSet.getMetaData( ).getTableName( actualColIndex ) + "&amp;field=" + resultSet.getMetaData( ).getColumnLabel( actualColIndex )
-							+ "&amp;pk=" + pkValue;
+						if ( linkBinaryData ) {
+							output[ innerIndex ] = "/field?vs=" + resultSet.getMetaData( ).getTableName( actualColIndex ) + "&amp;field=" + resultSet.getMetaData( ).getColumnLabel( actualColIndex ) + "&amp;pk=" + pkValue;
+                            resultSet.getBytes( actualColIndex );
+                        }
 						else
 							output[ innerIndex ] = resultSet.getBytes( actualColIndex );
 						break;
