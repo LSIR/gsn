@@ -118,8 +118,9 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		pluginMessageHandler.start();
     	
 		try {
+	    	asyncCoreStationClient = AsyncCoreStationClient.getSingletonObject();
 			asyncCoreStationClient.registerListener(this);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 

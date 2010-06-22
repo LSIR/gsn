@@ -390,6 +390,7 @@ public class AsyncCoreStationClient extends Thread  {
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
+		singletonObject = null;
 	}
 	
 	
