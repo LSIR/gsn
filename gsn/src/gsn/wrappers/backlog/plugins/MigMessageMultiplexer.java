@@ -162,25 +162,11 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 		logger.info("dispose called");
 		migMsgMultiplexerMap.remove(coreStationName);
 		
-		if (migMsgMultiplexerMap.isEmpty()) {
-			logger.info("close SF listener for " + deploymentName + " deployment");
-			if (sfListen != null) {
-				sfListen.interrupt();
-				try {
-					sfListen.join();
-				} catch (InterruptedException e) {
-					logger.error(e.getMessage(), e);
-				}
-			}
-			else if (sfv1Listen != null) {
-				sfv1Listen.interrupt();
-				try {
-					sfv1Listen.join();
-				} catch (InterruptedException e) {
-					logger.error(e.getMessage(), e);
-				}
-			}
-		}
+		logger.info("close SF listener for " + deploymentName + " deployment");
+		if (sfListen != null)
+			sfListen.dispose(coreStationName);
+		else if (sfv1Listen != null)
+			sfv1Listen.dispose(coreStationName);
 
 		if (tinyos1x_platform == null)
 			blMessageMultiplexer.deregisterListener(BackLogMessage.TOS_MESSAGE_TYPE, this, true);

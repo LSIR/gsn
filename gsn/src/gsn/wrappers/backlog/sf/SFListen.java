@@ -125,7 +125,7 @@ public class SFListen extends Thread {
         clients.remove(client);
     }
 
-    public void interrupt(String coreStationName) {
+    public void dispose(String coreStationName) {
     	deplToSourcesMap.get(deploymentName).remove(coreStationName);
     	if(deplToSourcesMap.get(deploymentName).isEmpty()) {
 	    	try {

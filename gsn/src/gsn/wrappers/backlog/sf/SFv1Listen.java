@@ -127,7 +127,7 @@ public class SFv1Listen extends Thread {
         clients.remove(clientS);
     }
 
-    public void interrupt(String deploymentName) {
+    public void dispose(String deploymentName) {
     	try {
     	    if (serverSocket != null) {
     	    	serverSocket.close();
