@@ -66,7 +66,7 @@ class GPSPluginClass(AbstractPluginClass):
             payload = rawMsg[2]
             payloadHeader = struct.unpack('ih2B', payload[0:8])
          
-            self.info('GPS Time: '+str(payloadHeader[0])+":"+str(payloadHeader[1]))
+            self.debug('GPS Time: '+str(payloadHeader[0])+":"+str(payloadHeader[1]))
 
             for i in range(0, payloadHeader[2]):
                 startIndex = 8+i*24

@@ -1,10 +1,10 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 1945 $"
-__date__        = "$Date: 2010-06-10 14:24:14 +0200 (Don, 10. Jun 2010) $"
-__id__          = "$Id: TOSPlugin.py 1945 2010-06-10 12:24:14Z rlim $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/TOSPlugin.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 
 #import struct
 import array

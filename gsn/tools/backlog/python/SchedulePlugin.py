@@ -287,7 +287,7 @@ class SchedulePluginClass(AbstractPluginClass):
                 self.info('died')
                 return
             else:
-                self.info('no schedule available at yet -> waiting for a schedule')
+                self.info('no schedule available yet -> waiting for a schedule')
                 self._scheduleEvent.wait()
         
         if self._shutdown_mode:
@@ -371,7 +371,6 @@ class SchedulePluginClass(AbstractPluginClass):
         self._stopEvent.set()
         if self._shutdown_mode:
             self._pingThread.stop()
-        if self._shutdown_mode:
             self._serialHandler.stop()
         self.info('stopped')
         
