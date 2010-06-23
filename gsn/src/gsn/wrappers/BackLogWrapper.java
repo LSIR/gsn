@@ -161,7 +161,7 @@ public class BackLogWrapper extends AbstractWrapper {
         	return false;
         }
         
-        setName("DiskSpaceWrapper-Thread" + (++threadCounter));
+        setName("BackLogWrapper-Thread" + (++threadCounter));
 		
 		return true;
 	}
