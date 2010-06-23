@@ -169,15 +169,7 @@ class GSNPeerClass(Thread):
             # if it is an acknowledge, tell BackLogMain to have received one
             self._parent.ackReceived(msg.getTimestamp(), int(struct.unpack('<I', msg.getPayload())[0]))
         else:
-            # send the packet to all plugins which 'use' this message type
-            msgTypeValid = False
-            for plug in self._parent.plugins:
-                if msgType == plug[1].getMsgType():
-                    plug[1].msgReceived(msg.getPayload())
-                    msgTypeValid = True
-                    break
-            if msgTypeValid == False:
-                self.error('unknown message type ' + str(msgType) + ' received')
+            self._parent.gsnMsgReceived(msg)
 
 
     def disconnect(self):

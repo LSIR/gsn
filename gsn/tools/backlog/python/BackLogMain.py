@@ -19,10 +19,11 @@ from threading import Thread, Lock
 from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
+from ScheduleHandler import ScheduleHandlerClass
 
 DEFAULT_CONFIG_FILE = '/etc/backlog.cfg'
 DEFAULT_PLUGINS = [ 'BackLogStatusPlugin' ]
-DEFAULT_OPTION_GSN_PORT = 9002
+DEFAULT_OPTION_GSN_PORT = 9003
 DEFAULT_OPTION_BACKLOG_DB = '/tmp/backlog.db'
 DEFAULT_OPTION_BACKLOG_RESEND_SLEEP = 0.1
 DEFAULT_TOS_VERSION = 2
@@ -90,6 +91,7 @@ class BackLogMainClass(Thread):
         id = None
         tos_address = None
         tos_version = None
+        dutycyclemode = None
 
         # readout options from config
         for entry in config_options:
@@ -105,6 +107,19 @@ class BackLogMainClass(Thread):
                 tos_address = value
             elif name == 'tos_version':
                 tos_version = int(value)
+            elif name == 'duty_cycle_mode':
+                dutycyclemode = int(value)
+        
+        if dutycyclemode is None:
+            raise TypeError('duty_cycle_mode has to be specified in the configuration file')
+        elif dutycyclemode != 1 and dutycyclemode != 0:
+            raise TypeError('duty_cycle_mode has to be set to 1 or 0 in config file')
+        elif duty_cycle_mode == '1':
+            self.info('running in duty-cycle mode')
+            duty_cycle_mode = True
+        else:
+            self.info('not running in duty-cycle mode')
+            duty_cycle_mode = False
                 
         if id == None:
             raise TypeError('device_id has to be specified in the configuration file')
@@ -140,6 +155,14 @@ class BackLogMainClass(Thread):
                 self._logger.error('TOSPeerClass could not be loaded: ' + e.__str__())
         else:
             self._logger.info('TOSPeer will not be loaded as no tos_source_addr is specified in config file')
+
+        # get schedule section from config files
+        try:
+            config_schedule = config.items('schedule')
+        except ConfigParser.NoSectionError:
+            raise TypeError('no [schedule] section specified in ' + config_file)
+            
+        self.schedulehandler = ScheduleHandlerClass(self, duty_cycle_mode, config_schedule)
 
         # get plugins section from config files
         try:
@@ -188,6 +211,7 @@ class BackLogMainClass(Thread):
         self.backlog.start()
         if self.tospeer:
             self.tospeer.start()
+        self.schedulehandler.start()
 
         for plugin_entry in self.plugins:
             module_name = plugin_entry[0]
@@ -199,6 +223,7 @@ class BackLogMainClass(Thread):
             plugin = plugin_entry[1]
             plugin.join()
         
+        self.schedulehandler.join()
         if self.tospeer:
             self.tospeer.join()
         self.backlog.join()
@@ -213,6 +238,7 @@ class BackLogMainClass(Thread):
             plugin = plugin_entry[1]           
             plugin.stop()
 
+        self.schedulehandler.stop()
         if self.tospeer:
             self.tospeer.stop()
         self.backlog.stop()
@@ -226,12 +252,13 @@ class BackLogMainClass(Thread):
         for plugin_entry in self.plugins:
             if plugin_entry[1].tosMsgReceived(timestamp, payload):
                 ret = True
+        if self.schedulehandler.tosMsgReceived(timestamp, payload):
+            ret = True
         return ret
         
         
     def pluginsBusy(self):
         for plugin_entry in self.plugins:
-            #TODO: wait for backlogdb if it is resending
             try:
                 if plugin_entry[1].isBusy():
                     return True
@@ -243,6 +270,22 @@ class BackLogMainClass(Thread):
     
     def resend(self):
         self.backlog.resend()
+        
+    def gsnMsgReceived(self, message):
+        msgTypeValid = False
+        if msgType == self._schedulehandler.getMsgType():
+            self.schedulehandler.msgReceived(msg.getPayload())
+            msgTypeValid = True
+        else:
+            # send the packet to all plugins which 'use' this message type
+            for plug in self.plugins:
+                if msgType == plug[1].getMsgType():
+                    plug[1].msgReceived(msg.getPayload())
+                    msgTypeValid = True
+                    break
+        if msgTypeValid == False:
+            self.error('unknown message type ' + str(msgType) + ' received')
+        
         
     def ackReceived(self, timestamp, msgType):
         # tell the plugins to have received an acknowledge message
@@ -261,6 +304,7 @@ class BackLogMainClass(Thread):
             module_name = plugin_entry[0]
             plugin = plugin_entry[1]
             plugin.connectionToGSNestablished()
+        self.schedulehandler.connectionToGSNestablished()
         
     def connectionToGSNlost(self):
         # tell the plugins that the connection to GSN has been lost
