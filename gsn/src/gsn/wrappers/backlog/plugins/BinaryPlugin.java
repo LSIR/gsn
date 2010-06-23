@@ -146,10 +146,10 @@ public class BinaryPlugin extends AbstractPlugin {
 			return false;
 		}
 		
-		// check if this plugin has already be used for this deployment
+		// check if this plugin has already been used for this core station
 		synchronized (coreStationsList) {
 			if (!coreStationsList.add(coreStationName)) {
-				logger.error("This plugin can only be used once per CoreStation!");
+				logger.error("This plugin can only be used once per CoreStation (core station " + coreStationName + "already used!");
 				return false;
 			}
 		}
