@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_pos2_Webcam__scaled" priority="10" >
+<virtual-sensor name="ETZ_pos1_Webcam__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -10,7 +10,7 @@
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>webcam pictures from position 2 at ETZ deployment as thumbnails</description>
+    <description>webcam pictures from position 1 at ETZ deployment as thumbnails</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage history-size="1"/>
@@ -18,7 +18,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select GENERATION_TIME, DATA from ETZ_Binary__mapped__1946 where POSITION = 2 and RELATIVE_FILE like 'webcam1/%'</predicate>
+                    <predicate key="query">select GENERATION_TIME, DATA from ETZ_Binary__mapped__1946 where POSITION = 1 and RELATIVE_FILE like 'webcam1/%'</predicate>
                 </address>
                 <query> select GENERATION_TIME, DATA as JPEG_SCALED from wrapper</query>
             </source>
