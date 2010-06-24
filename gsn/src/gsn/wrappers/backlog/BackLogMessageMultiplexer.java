@@ -168,8 +168,6 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 						if (tmp.length > 5)
 							pkt.write(java.util.Arrays.copyOfRange(tmp, (int) (5), tmp.length));
 
-						coreStationDeviceId = AbstractPlugin.arr2int(tmp, 1);
-
 						connecting = false;
 						if (tmp[0] != HELLO_BYTE) {
 							logger.error("connection hello message does not match -> reconnect");
@@ -177,6 +175,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 							recvQueue.clear();
 						}
 						else {
+							coreStationDeviceId = AbstractPlugin.arr2int(tmp, 1);
+							logger.info("core station with device id " + coreStationDeviceId + " connected successfully");
 							asyncCoreStationClient.addDeviceId(deploymentName, coreStationDeviceId, this);
 							connectionFinished();
 							conn = true;
