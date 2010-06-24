@@ -169,7 +169,7 @@ class GSNPeerClass(Thread):
             # if it is an acknowledge, tell BackLogMain to have received one
             self._parent.ackReceived(msg.getTimestamp(), int(struct.unpack('<I', msg.getPayload())[0]))
         else:
-            self._parent.gsnMsgReceived(msg)
+            self._parent.gsnMsgReceived(msgType, msg)
 
 
     def disconnect(self):

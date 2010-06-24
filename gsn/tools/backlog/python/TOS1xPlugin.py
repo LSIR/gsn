@@ -20,3 +20,20 @@ class TOS1xPluginClass(TOSPluginClass, AbstractPluginClass):
 
     def getMsgType(self):
         return BackLogMessage.TOS1x_MESSAGE_TYPE
+
+
+    def _sendCloseQueueCommand(self):
+        if self.sendTOSmsg(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x00, 0x80]).tolist(), 0x00, 0.2, True, 10):
+            time.sleep(35)
+
+
+    def _sendOpenQueueCommand(self):
+        return self.sendTOSmsg(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x01, 0x80]).tolist(), 0x00, 0.2, True, 10)
+        
+
+    def _backlog2tos(self, message):
+        return array.array('B', message).tolist()
+
+
+    def _tos2backlog(self, packet):
+        return array.array('B', packet.payload()).tostring()

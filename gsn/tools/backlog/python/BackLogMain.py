@@ -109,17 +109,6 @@ class BackLogMainClass(Thread):
                 tos_version = int(value)
             elif name == 'duty_cycle_mode':
                 dutycyclemode = int(value)
-        
-        if dutycyclemode is None:
-            raise TypeError('duty_cycle_mode has to be specified in the configuration file')
-        elif dutycyclemode != 1 and dutycyclemode != 0:
-            raise TypeError('duty_cycle_mode has to be set to 1 or 0 in config file')
-        elif duty_cycle_mode == '1':
-            self.info('running in duty-cycle mode')
-            duty_cycle_mode = True
-        else:
-            self.info('not running in duty-cycle mode')
-            duty_cycle_mode = False
                 
         if id == None:
             raise TypeError('device_id has to be specified in the configuration file')
@@ -136,6 +125,17 @@ class BackLogMainClass(Thread):
         self._logger.info('device_id: ' + str(id))
         self._logger.info('gsn_port: ' + str(gsn_port))
         self._logger.info('backlog_db: ' + backlog_db)
+        
+        if dutycyclemode is None:
+            raise TypeError('duty_cycle_mode has to be specified in the configuration file')
+        elif dutycyclemode != 1 and dutycyclemode != 0:
+            raise TypeError('duty_cycle_mode has to be set to 1 or 0 in config file')
+        elif dutycyclemode == 1:
+            self._logger.info('running in duty-cycle mode')
+            duty_cycle_mode = True
+        else:
+            self._logger.info('not running in duty-cycle mode')
+            duty_cycle_mode = False
 
         self.gsnpeer = GSNPeerClass(self, id, gsn_port)
         self._logger.info('loaded GSNPeerClass')
@@ -271,16 +271,16 @@ class BackLogMainClass(Thread):
     def resend(self):
         self.backlog.resend()
         
-    def gsnMsgReceived(self, message):
+    def gsnMsgReceived(self, msgType, message):
         msgTypeValid = False
-        if msgType == self._schedulehandler.getMsgType():
-            self.schedulehandler.msgReceived(msg.getPayload())
+        if msgType == self.schedulehandler.getMsgType():
+            self.schedulehandler.msgReceived(message.getPayload())
             msgTypeValid = True
         else:
             # send the packet to all plugins which 'use' this message type
             for plug in self.plugins:
                 if msgType == plug[1].getMsgType():
-                    plug[1].msgReceived(msg.getPayload())
+                    plug[1].msgReceived(message.getPayload())
                     msgTypeValid = True
                     break
         if msgTypeValid == False:

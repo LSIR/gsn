@@ -142,14 +142,18 @@ class AbstractPluginClass(Thread):
         pass
     
     
-    def sendTOSmsg(self, message):
+    def sendTOSmsg(self, packet, amId, timeout, blocking, maxretries):
         '''
         Send a TOS message over the serial port.
         
         This function should be used by the plugins to send any data to a node running
         TinyOS connected over the serial port.
         
-        @param message: The TOS message to be sent.
+        @param packet: The packet to be sent.
+        @param amId: the amId
+        @param timeout: should there be a timeout
+        @param blocking: 
+        @param maxretries: 
                        
         @return: True if the message has been put into sendbuffer successfully.
         
@@ -159,7 +163,8 @@ class AbstractPluginClass(Thread):
             raise TypeError('TOSPeerClass has not been started')
             return False
         else:
-            return self._parent.tospeer.sendTOSMsg(message)
+            self.info('sendTOSMsg (AbstractPlugin): %d' % (len(packet)))
+            return self._parent.tospeer.sendTOSMsg(packet, amId, timeout, blocking, maxretries)
        
         
     def run(self):

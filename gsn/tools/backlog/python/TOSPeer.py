@@ -61,7 +61,6 @@ class TOSPeerClass(Thread):
         
         self._toswriter = TOSWriter(self)
 
-        self._version = version
         self._parent = parent
         self._stopped = False
             
@@ -70,12 +69,6 @@ class TOSPeerClass(Thread):
         self._logger.info('started')
 
         self._serialsource.start()
-
-        # open accessnode queue, just in case if we closed it before...
-        while not self.sendOpenQueueCommand()and not self._stopped:
-            self.error('could not send OpenQueue command')
-            time.sleep(5)
-            
         self._toswriter.start()
         
         while not self._stopped:
@@ -96,16 +89,12 @@ class TOSPeerClass(Thread):
             timestamp = int(time.time()*1000)
 
             length = len(packet.payload())
-            payload = self.tos2backlog(packet);
 
-            if self._version == 2:
-                self._logger.debug('rcv (%d,%d,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, timestamp, length))
-            elif self._version == 1:
-                self._logger.debug('rcv (%d,%d,%d)' % (BackLogMessage.TOS1x_MESSAGE_TYPE, timestamp, length))
+            self._logger.debug('rcv (?,%d,%d)' % (timestamp, length))
 
             # tell PSBackLogMain to send the packet to the plugins
             # using the serial port we can guarantee flow control to the backlog database!
-            if self._parent.processTOSMsg(timestamp, payload):
+            if self._parent.processTOSMsg(timestamp, packet):
                 try:
                     self._serialsource.sendAck()
                 except Exception, e:
@@ -113,37 +102,9 @@ class TOSPeerClass(Thread):
                         self.error('could not send ack: ' + e.__str__())
 
         self._logger.info('died')
-
-    def tos2backlog(self, packet):
-        if self._version == 2:
-            # TODO: append zero at start should not really happen here -> needs bugfix for tos.py
-            return array.array('B', [0] + packet.payload()).tostring()
-        elif self._version == 1:
-            return array.array('B', packet.payload()).tostring()
-        
-
-    def backlog2tos(self, message):
-        if self._version == 2:
-            return array.array('B', message[1:]).tolist()
-        elif self._version == 1:
-            return array.array('B', message).tolist()
-
-    def sendCloseQueueCommand(self):
-        if self._version == 2:
-            if self._serialsource.write(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x00, 0x00]).tolist(), 0x00, 0.2, True, 10):
-                time.sleep(35)
-        elif self._version == 1:
-            if self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x00, 0x80]).tolist(), 0x00, 0.2, True, 10):
-                time.sleep(35)
-
-    def sendOpenQueueCommand(self):
-        if self._version == 2:
-            return self._serialsource.write(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x01, 0x00]).tolist(), 0x00, 0.2, True, 10)
-        elif self._version == 1:
-            return self._serialsource.write(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x01, 0x80]).tolist(), 0x00, 0.2, True, 10)
             
-    def sendTOSMsg(self, message):
-        return self._toswriter.addMsg(message)
+    def sendTOSMsg(self, packet, amId, timeout=None, blocking=True, maxretries = None):
+        return self._toswriter.addMsg(packet, amId, timeout, blocking, maxretries)
 
 
     def error(self, msg):
@@ -154,10 +115,6 @@ class TOSPeerClass(Thread):
     def stop(self):
         self._stopped = True
         self._toswriter.stop()
-        
-        # send close queue cmd to access node
-        self.sendCloseQueueCommand()
-        
         self._serialsource.stop()
         self._logger.info('stopped')
 
@@ -193,15 +150,14 @@ class TOSWriter(Thread):
             # is there something to do?
             while not self._sendqueue.empty() and not self._stopped:
                 try:
-                    message = self._sendqueue.get_nowait()[1]
+                    list = self._sendqueue.get_nowait()
                 except Queue.Empty:
                     self._logger.warning('send queue is empty')
                     break
                 
-                packet = self._parent.backlog2tos(message)
                 try:
-                    self._parent._serialsource.write(packet, 0x00, 0.2, True)
-                    self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(message)))
+                    self._parent._serialsource.write(list[0], list[1], list[2], list[3], list[4])
+                    self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(list[0])))
                 except Exception, e:
                     if not self._stopped:
                         self._logger.warning('could not write message to serial port: ' + e.__str__())
@@ -217,10 +173,10 @@ class TOSWriter(Thread):
         self._logger.info('stopped')
 
 
-    def addMsg(self, msg):
+    def addMsg(self, packet, amId, timeout, blocking, maxretries):
         if not self._stopped:
             try:
-                self._sendqueue.put_nowait(msg)
+                self._sendqueue.put_nowait((packet, amId, timeout, blocking, maxretries))
                 self._work.set()
             except Queue.Full:
                 self._logger.warning('TOS send queue is full')

@@ -15,16 +15,59 @@ DEFAULT_BACKLOG = True
 class TOSPluginClass(AbstractPluginClass):
     '''
     This plugin forwards all incoming TOS packets to GSN and vice versa.
+    
+    data/instance attributes:
+    _ready
     '''
     
-    def tosMsgReceived(self, timestamp, payload):
-        return self.processMsg(timestamp, payload, self._priority, self._backlog)
+    def __init__(self, parent, options):
+        AbstractPluginClass.__init__(self, parent, options)
+        
+        self._ready = False
     
+    
+    def run(self):
+        # open accessnode queue, just in case if we closed it before...
+        while not self._sendOpenQueueCommand() and not self._stopped:
+            self.error('could not send OpenQueue command')
+            time.sleep(5)
+            
+        self._ready = True
+        
+    
+    def stop(self):
+        self._ready = False
+        # send close queue cmd to access node
+        self._sendCloseQueueCommand()
+    
+    
+    def tosMsgReceived(self, timestamp, payload):
+        return self.processMsg(timestamp, self._tos2backlog(packet), self._priority, self._backlog)
+        
         
     def getMsgType(self):
         return BackLogMessage.TOS_MESSAGE_TYPE
     
             
     def msgReceived(self, message):
-        self.sendTOSmsg(message)
+        if self._ready:
+            self.sendTOSmsg(self._parent._backlog2tos(message), 0x00, 0.2, True)
+
+
+    def _sendCloseQueueCommand(self):
+        if self.sendTOSmsg(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x00, 0x00]).tolist(), 0x00, 0.2, True, 10):
+            time.sleep(35)
+
+
+    def _sendOpenQueueCommand(self):
+        return self.sendTOSmsg(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x01, 0x00]).tolist(), 0x00, 0.2, True, 10)
+        
+
+    def _backlog2tos(self, message):
+        return array.array('B', message[1:]).tolist()
+
+
+    def _tos2backlog(self, packet):
+        # TODO: append zero at start should not really happen here -> needs bugfix for tos.py
+        return array.array('B', [0] + packet.payload()).tostring()
     

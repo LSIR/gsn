@@ -2,10 +2,10 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 1989 $"
-__date__        = "$Date: 2010-06-22 14:13:40 +0200 (Die, 22. Jun 2010) $"
-__id__          = "$Id: SchedulePlugin.py 1989 2010-06-22 12:13:40Z tgsell $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/SchedulePlugin.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 
 import time
 import struct
@@ -16,6 +16,7 @@ import signal
 import pickle
 import subprocess
 import Queue
+import logging
 from datetime import datetime, timedelta
 from threading import Event, Lock, Thread
 
@@ -115,12 +116,12 @@ class ScheduleHandlerClass(Thread):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
         
-        if dutycyclemode and not self._parent.tospeer:
-            raise TypeError('TOSPeerClass is needed if in duty-cycle mode but has not been started')
-        
         self._parent = parent
         self._duty_cycle_mode = dutycyclemode
         self._config = options
+        
+        if dutycyclemode and not self._parent.tospeer:
+            raise TypeError('TOSPeerClass is needed if in duty-cycle mode but has not been started')
         
         service_wakeup_minutes = int(self.getOptionValue('service_wakeup_minutes'))
         if service_wakeup_minutes is None:
@@ -231,7 +232,7 @@ class ScheduleHandlerClass(Thread):
             self._scheduleNextDutyWakeup(safety_schedule[0] - datetime.utcnow(), safety_schedule[1])
             
         # wait some time for GSN to connect
-        if self.isGSNConnected():
+        if self._parent.gsnpeer.isConnected():
             self._gsnconnected = True
         else:
             self._logger.info('waiting for gsn to connect for a maximum of ' + self.getOptionValue('max_gsn_connect_wait_minutes') + ' minutes')
@@ -248,9 +249,9 @@ class ScheduleHandlerClass(Thread):
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
                 self._logger.info('request schedule from gsn')
                 if self._schedule:
-                    self.processMsg(self._schedule.getCreationTime(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY)
+                    self._parent.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY, False)
                 else:
-                    self.processMsg(self.getTimeStamp(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY)
+                    self._parent.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY, False)
                 self._scheduleEvent.wait(3)
                 if self._stopped:
                     self._logger.info('died')
@@ -363,10 +364,6 @@ class ScheduleHandlerClass(Thread):
     def allJobsFinished(self):
         self._logger.debug('all jobs finished')
         self._allJobsFinishedEvent.set()
-        
-        
-    def isBusy(self):
-        return False
     
     
     def beaconReceived(self):
@@ -435,7 +432,8 @@ class ScheduleHandlerClass(Thread):
             
             
     def tosMsgReceived(self, timestamp, payload):
-        self._tosMessageHandler.received(payload)
+        if self._duty_cycle_mode:
+            self._tosMessageHandler.received(payload)
         
         
     def _serviceTime(self):
@@ -605,7 +603,7 @@ class TOSMessageHandler(Thread):
                     self._sentCmd = item[0]['command']
 
                 self._scheduleHandler._logger.debug('snd...')
-                self._scheduleHandler._parent.tospeer.sendTOSMsg(item[0])
+                self._scheduleHandler._parent.tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG)
                 
                 if item[1]:
                     self._ackEvent.wait()
