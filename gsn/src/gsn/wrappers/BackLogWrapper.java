@@ -289,7 +289,7 @@ public class BackLogWrapper extends AbstractWrapper {
 		}
 		else if ( id == blMsgMultiplexer.getDeviceID() || id == 65535) {
 			if (logger.isDebugEnabled())
-				logger.debug("Upload command received.");
+				logger.debug("Upload command received for device id " + id);
 			return pluginObject.sendToPlugin(action, paramNames, paramValues);
 		}
 		else {
