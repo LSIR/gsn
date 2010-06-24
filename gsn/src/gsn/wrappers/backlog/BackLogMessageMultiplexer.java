@@ -176,7 +176,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 						}
 						else {
 							coreStationDeviceId = AbstractPlugin.arr2int(tmp, 1);
-							logger.info("core station with device id " + coreStationDeviceId + " connected successfully");
+							logger.info("connected successfully to core station with device id " + coreStationDeviceId + " at " + deploymentName + " deployment");
 							asyncCoreStationClient.addDeviceId(deploymentName, coreStationDeviceId, this);
 							connectionFinished();
 							conn = true;

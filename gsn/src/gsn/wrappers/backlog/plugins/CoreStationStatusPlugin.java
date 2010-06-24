@@ -58,7 +58,7 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 		if(packet.length == 40) {
 			for( int i=3; i<dataField.length; i++) {
 				Integer tmp = arr2int(packet, (i-3)*4);
-				if( tmp == 0xFFFFFFFF )
+				if( tmp.compareTo(0xFFFFFFFF) == 0 )
 					tmp = null;
 				data[i] = tmp;
 			}
