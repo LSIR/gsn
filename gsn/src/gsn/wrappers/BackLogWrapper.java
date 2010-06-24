@@ -292,10 +292,7 @@ public class BackLogWrapper extends AbstractWrapper {
 				logger.debug("Upload command received for device id " + id);
 			return pluginObject.sendToPlugin(action, paramNames, paramValues);
 		}
-		else {
-			logger.error("device id " + id + " unknown");
-			return false;
-		}
+		return true;
 	}
 
 
