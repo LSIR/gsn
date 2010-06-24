@@ -255,7 +255,7 @@ public class MigMessagePlugin extends AbstractPlugin
 			byte[] data = null;
 			
 			if( paramNames.length != 3 ) {
-				logger.error("upload action must have three parameter names: 'moteid', 'amtype' and 'data'");
+				logger.error("upload action must have three parameter names: 'destination', 'amtype' and 'data'");
 				return false;
 			}
 			if( paramValues.length != 3 ) {
@@ -270,7 +270,7 @@ public class MigMessagePlugin extends AbstractPlugin
 						moteId = Integer.parseInt((String) paramValues[i]);
 					else if( tmp.compareToIgnoreCase("am_type") == 0 )
 						amType = Integer.parseInt((String) paramValues[i]);
-					else if( tmp.compareToIgnoreCase("payload") == 0 )
+					else if( tmp.compareToIgnoreCase("data") == 0 )
 						data = ((String) paramValues[i]).getBytes();
 				} catch(Exception e) {
 					logger.error("Could not interprete upload arguments: " + e.getMessage());
@@ -279,18 +279,18 @@ public class MigMessagePlugin extends AbstractPlugin
 			}
 			
 			if( moteId < -256 | amType < -256 | data == null ) {
-				logger.error("upload action must contain all three parameter names: 'mote id', 'am type' and 'payload'");
+				logger.error("upload action must contain all three parameter names: 'destination', 'am type' and 'data'");
 				return false;
 			}
 			
 			if(data.length == 0) {
-				logger.warn("Upload message's payload is empty");
+				logger.warn("Upload message's data field is empty");
 			}
 			
 			try {
 				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data), super.priority);
 				if (logger.isDebugEnabled())
-					logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
+					logger.debug("Mig message sent to destination " + moteId + " with AM type " + amType);
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			}
