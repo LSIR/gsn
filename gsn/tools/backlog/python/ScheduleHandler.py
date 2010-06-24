@@ -259,6 +259,7 @@ class ScheduleHandlerClass(Thread):
                     self._logger.info('died')
                     return
                 if self._scheduleEvent.isSet():
+                    self._scheduleEvent.clear()
                     break
                 timeout += 3
             
