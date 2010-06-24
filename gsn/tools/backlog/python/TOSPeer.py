@@ -6,8 +6,6 @@ __date__        = "$Date$"
 __id__          = "$Id$"
 __source__      = "$URL$"
 
-#import struct
-import array
 import logging
 import time
 import Queue

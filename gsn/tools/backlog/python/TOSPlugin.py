@@ -7,6 +7,9 @@ __date__        = "$Date$"
 __id__          = "$Id$"
 __source__      = "$URL$"
 
+import array
+import time
+
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
@@ -41,7 +44,7 @@ class TOSPluginClass(AbstractPluginClass):
         self._sendCloseQueueCommand()
     
     
-    def tosMsgReceived(self, timestamp, payload):
+    def tosMsgReceived(self, timestamp, packet):
         return self.processMsg(timestamp, self._tos2backlog(packet), self._priority, self._backlog)
         
         

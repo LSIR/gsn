@@ -7,6 +7,9 @@ __date__        = "$Date$"
 __id__          = "$Id$"
 __source__      = "$URL$"
 
+import array
+import time
+
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 from TOSPlugin import TOSPluginClass

@@ -109,6 +109,7 @@ class ScheduleHandlerClass(Thread):
     _pingThread
     _config
     _logger
+    _tosMessageHandler
     _stopped
     '''
     
@@ -171,6 +172,7 @@ class ScheduleHandlerClass(Thread):
             
         self._max_next_schedule_wait_delta = timedelta(minutes=max_next_schedule_wait_minutes)
             
+        self._tosMessageHandler = None
         if self._duty_cycle_mode:
             self._tosMessageHandler = TOSMessageHandler(self)
             self._pingThread = PingThread(self, PING_INTERVAL_SEC, WATCHDOG_TIMEOUT_SEC)
@@ -432,7 +434,7 @@ class ScheduleHandlerClass(Thread):
             
             
     def tosMsgReceived(self, timestamp, payload):
-        if self._duty_cycle_mode:
+        if self._tosMessageHandler:
             self._tosMessageHandler.received(payload)
         
         
