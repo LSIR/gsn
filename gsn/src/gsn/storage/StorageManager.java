@@ -1236,13 +1236,12 @@ public class StorageManager {
 
 		Connection con = null;
 		pool = new BasicDataSource();
-	        pool.setDriverClassName(databaseDriver);
-	        pool.setUsername(username);
-	        pool.setPassword(password);
-	        pool.setUrl(databaseURL);
+	    pool.setDriverClassName(databaseDriver);
+	    pool.setUsername(username);
+	    pool.setPassword(password);
+	    pool.setUrl(databaseURL);
 		pool.setMaxActive(maxDBConnections);
 		pool.setMaxIdle(maxDBConnections);
-		pool.setMaxWait(30000);
         pool.setAccessToUnderlyingConnectionAllowed(true);
 		try {
 		
