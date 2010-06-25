@@ -83,7 +83,8 @@ Matterhorn_CoreStationStatus__conv.xml
 Matterhorn_CoreStationStatus__mapped.xml
 Matterhorn_Crackmeter__nctc.xml
 Matterhorn_Crackmeter__nctt.xml
-Matterhorn_Crackmeter__tccc.xml
+Matterhorn_Crackmeter__ccct.xml
+Matterhorn_Crackmeter__ccnn.xml
 Matterhorn_Crackmeter__tctc.xml
 Matterhorn_Dozer_AdcComDiff__mapped.xml
 Matterhorn_Dozer_AdcMux1__mapped.xml
@@ -132,6 +133,7 @@ Matterhorn_pos12_Sensorrod__chart2.xml
 Matterhorn_pos12_Sensorrod__chart3.xml
 Matterhorn_pos12_Temperature__chart1.xml
 Matterhorn_pos13_Selfpotential__chart1.xml
+Matterhorn_pos19_Camera__scaled.xml
 Matterhorn_pos1_Crackmeter__chart1.xml
 Matterhorn_pos1_Crackmeter__chart2.xml
 Matterhorn_pos1_DozerDutyCycle__chart1.xml
