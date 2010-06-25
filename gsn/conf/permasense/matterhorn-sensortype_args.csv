@@ -18,3 +18,17 @@
 "1","nctc_dx1","100",
 "1","nctc_t1","0.0",
 "1","nctc_dx2","150",
+
+# adccomdiff_ccct
+"1","ccct_dx0","100",
+"1","ccct_dx1","200",
+"1","ccct_dx2","200",
+"1","ccct_t3","0.0",
+
+# adccomdiff_ccnn
+"1","ccnn_dx0","100",
+"1","ccnn_dx1","150",
+"2","ccnn_dx0","100",
+"2","ccnn_dx1","150",
+"3","ccnn_dx0","100",
+"3","ccnn_dx1","150",
