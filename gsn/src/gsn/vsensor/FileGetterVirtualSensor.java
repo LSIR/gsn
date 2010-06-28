@@ -68,7 +68,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 				if (dcraw_flip == null)
 					p = Runtime.getRuntime().exec(DCRAW + " -c -e " + file.getAbsolutePath());
 				else
-					p = Runtime.getRuntime().exec(DCRAW + " -c -e " + file.getAbsolutePath() + " -t " + dcraw_flip);
+					p = Runtime.getRuntime().exec(DCRAW + " -c -t " + dcraw_flip + " -e " + file.getAbsolutePath());
 				is = p.getInputStream();
 			} catch (IOException e) {
 		    	logger.error(e.getMessage(), e);
