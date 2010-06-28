@@ -3,10 +3,10 @@
        <value name="name" field="name" style="attribute" />
        <value name="protected" field="access_protected" style="attribute"  usage="optional" />
        <value name="priority" field="priority" usage="optional" style="attribute" />
-       <value name="publish-to-microsoft-research-sensor-map" field="sensorMap" usage="optional" style="attribute" />  
+       <value name="publish-to-microsoft-research-sensor-map" field="sensorMap" usage="optional" style="attribute" />
        <structure name="processing-class" usage="optional" >
               <value name="class-name" field="mainClass"  />
-              <value name="unique-timestamps" field="isTimestampUnique" usage="optional" default="true" />  
+              <value name="unique-timestamps" field="isTimestampUnique" usage="optional" default="true" />
               <structure name="init-params" usage="optional" >
                 <collection field="mainClassInitialParams"  >
                    <structure  name="param" type="gsn.utils.KeyValueImp">
@@ -18,7 +18,7 @@
               <structure name="output-specification" usage="optional" >
           		<value name="rate"  field="outputStreamRate" style="attribute"  />
       		 </structure>
-  		 <structure name="web-input"  usage="optional">  
+  		 <structure name="web-input"  usage="optional">
 	          <value name="password"  field="webParameterPassword" style="attribute" usage="optional" />
    	          <collection field="webinput"  item-type="gsn.beans.WebInput" />
          </structure>
@@ -26,16 +26,14 @@
        </structure>
        <value name="description" field="description"  usage="optional"/>
        <!-- life-cycle and its content is deprecated -->
-       <structure name="life-cycle"  usage="optional">  
+       <structure name="life-cycle"  usage="optional">
           <value name="pool-size"  field="lifeCyclePoolSize" style="attribute" />
        </structure>
       <collection name="addressing"    field="addressing"  item-type="gsn.utils.KeyValueImp" usage="optional" />
-      <structure name="storage" usage="optional" >
-	      <value name="history-size" field="storageHistorySize" style="attribute" usage="optional" />
-	   </structure>
-      <collection name="streams"   field="inputStreams"  item-type="gsn.beans.InputStream" />
+      <structure field="storage" usage="optional"/>
+	  <collection name="streams"   field="inputStreams"  item-type="gsn.beans.InputStream" />
    </mapping>
-	
+
    <mapping name="predicate" class="gsn.utils.KeyValueImp" >
   	   <value name="key"   field="key"   style="attribute"/>
    	<value field="value" style="text"/>
@@ -66,7 +64,7 @@
                  <value  name="query" field="sqlQuery" />
             </structure>
         </collection>
-	    <value name="query" field="query"   /> 
+	    <value name="query" field="query"   />
    </mapping>
 
    <mapping name="field" class="gsn.beans.DataField">
@@ -74,9 +72,18 @@
    	<value name="type" field="type" style="attribute"/>
    	<value field="description" style="text" usage="optional"/>
    </mapping>
-   
-   <mapping name="command" class="gsn.beans.WebInput"> 	 
+
+   <mapping name="command" class="gsn.beans.WebInput">
    		<value name="name" field="name" style="attribute"/>
 	    <collection    field="parameters"  item-type="gsn.beans.DataField" />
    </mapping>
+
+    <mapping name="storage" class="gsn.beans.StorageConfig">
+        <value name="history-size" field="storageSize" usage="optional"  style="attribute" />
+        <value name="driver" field="jdbcDriver" usage="optional" style="attribute" />
+        <value name="user" field="jdbcUsername" usage="optional" style="attribute" />
+        <value name="password" field="jdbcPassword" usage="optional" style="attribute" />
+        <value name="url" field="jdbcURL" usage="optional" style="attribute" />
+        <value name="identifier" field="identifier" usage="optional" style="attribute" />
+    </mapping>
 </binding>
