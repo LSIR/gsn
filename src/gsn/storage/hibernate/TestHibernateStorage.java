@@ -11,7 +11,6 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumeratorIF;
-import org.apache.xmlbeans.impl.xb.xsdschema.RestrictionDocument;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -26,12 +25,12 @@ public class TestHibernateStorage {
 
     private ArrayList<DataField> dataField = null;
 
-    private static HibernateUtil.DBConnectionInfo dbInfo = null;
+    private static DBConnectionInfo dbInfo = null;
 
     @BeforeClass
     public static void initClass() {
         //dbInfo = new HibernateUtil.DBConnectionInfo("org.h2.Driver", "jdbc:h2:mem:test", "sa", "");
-        dbInfo = new HibernateUtil.DBConnectionInfo("com.mysql.jdbc.Driver", "jdbc:mysql://localhost/gsn", "root", "");
+        dbInfo = new DBConnectionInfo("com.mysql.jdbc.Driver", "jdbc:mysql://localhost/gsn", "root", "");
     }
 
     @Before

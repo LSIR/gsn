@@ -5,7 +5,6 @@ import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
-import gsn.storage.StorageManager;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -54,8 +53,8 @@ public class FieldDownloadServlet extends HttpServlet {
 		StringBuilder query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
 		Connection conn = null;
 		try {
-			conn = Main.getMainStorage().getConnection();
-			ResultSet rs = Main.getMainStorage().getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) ,conn);
+			conn = Main.getStorage(vsName).getConnection();
+			ResultSet rs = Main.getStorage(vsName).getBinaryFieldByQuery( query , colName , Long.parseLong( primaryKey ) ,conn);
 			if ( !rs.next() ) {
 				res.sendError( res.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
 			}else {
@@ -85,7 +84,7 @@ public class FieldDownloadServlet extends HttpServlet {
 			logger.error(e1.getMessage(),e1);
 			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
 		}finally{
-			Main.getMainStorage().close(conn);
+			Main.getStorage(vsName).close(conn);
 		}
 	}
 

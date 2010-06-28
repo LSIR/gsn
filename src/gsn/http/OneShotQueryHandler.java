@@ -6,7 +6,6 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -43,7 +42,7 @@ public class OneShotQueryHandler implements RequestHandler{
       StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0" );
       DataEnumerator result;
 	try {
-		result = Main.getMainStorage().executeQuery( query , true );
+		result = Main.getStorage(vsName).executeQuery( query , true );
 	} catch (SQLException e) {
 		logger.error("ERROR IN EXECUTING, query: "+query);
 		logger.error(e.getMessage(),e);

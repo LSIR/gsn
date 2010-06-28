@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Enumeration;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -44,6 +43,8 @@ public class DataEnumerator implements DataEnumeratorIF {
 
 	boolean                  linkBinaryData           = false;
 
+    private StorageManager   storageManager           = null;
+
 	private boolean manualCloseConnection;
 
 	/**
@@ -57,12 +58,13 @@ public class DataEnumerator implements DataEnumeratorIF {
 		return resultSet == null;
 	}
 
-	public DataEnumerator ( PreparedStatement preparedStatement , boolean binaryLinked ) {
-		this(preparedStatement,binaryLinked,false);
+	public DataEnumerator (StorageManager storageManager, PreparedStatement preparedStatement , boolean binaryLinked ) {
+		this(storageManager, preparedStatement,binaryLinked,false);
 	}
 	
-	public DataEnumerator ( PreparedStatement preparedStatement , boolean binaryLinked ,boolean manualClose) {
-		this.manualCloseConnection=manualClose;
+	public DataEnumerator ( StorageManager storageManager, PreparedStatement preparedStatement , boolean binaryLinked ,boolean manualClose) {
+		this.storageManager = storageManager;
+        this.manualCloseConnection=manualClose;
 		if ( preparedStatement == null ) {
 			if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
 			hasNext = false;
@@ -85,8 +87,11 @@ public class DataEnumerator implements DataEnumeratorIF {
 			// Initializing the fieldNames and fieldTypes.
 			// Also setting the values for <code> hasTimedFieldInResultSet</code>
 			// if the timed field is present in the result set.
-			for ( int i = 1 ; i <= resultSet.getMetaData( ).getColumnCount( ) ; i++ ) {
-				String colName = resultSet.getMetaData( ).getColumnLabel( i );
+			String tableName = null;
+            for ( int i = 1 ; i <= resultSet.getMetaData( ).getColumnCount( ) ; i++ ) {
+				if (i == 1)
+                    tableName = resultSet.getMetaData().getTableName(1);
+                String colName = resultSet.getMetaData( ).getColumnLabel( i );
 				int colTypeInJDBCFormat = resultSet.getMetaData( ).getColumnType( i );
 				int colScale=resultSet.getMetaData().getScale(i);
 				if ( colName.equalsIgnoreCase( "PK" ) ) {
@@ -95,7 +100,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 					indexOfTimedField = i;
 				} else {
 					fieldNames.add( colName );
-					fieldTypes.add( Main.getMainStorage().convertLocalTypeToGSN(colTypeInJDBCFormat,colScale ) );
+					fieldTypes.add( storageManager.convertLocalTypeToGSN(colTypeInJDBCFormat,colScale ) );
 				}
 			}
 			dataFieldNames = fieldNames.toArray( new String [ ] {} );
@@ -187,9 +192,10 @@ public class DataEnumerator implements DataEnumeratorIF {
 			if (!manualCloseConnection && resultSet.getStatement() != null) {
                 java.sql.Statement s = resultSet.getStatement();
                 java.sql.Connection c = s.getConnection();
-                Main.getMainStorage().close(resultSet);
-                Main.getMainStorage().closeStatement(s);
-                Main.getMainStorage().close(c);
+                String tableName = resultSet.getMetaData().getTableName(1);
+                storageManager.close(resultSet);
+                storageManager.closeStatement(s);
+                storageManager.close(c);
                 resultSet = null;
             }else {
 				try {

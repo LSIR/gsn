@@ -11,7 +11,6 @@ import gsn.utils.ValidityTools;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import org.apache.commons.dbcp.*;
 import org.apache.log4j.Logger;
@@ -124,13 +123,13 @@ public abstract class StorageManager {
         long timedToRemove = -1;
         Connection conn = null;
         try {
-            ResultSet rs = Main.getMainStorage().executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName), conn = Main.getMainStorage().getConnection());
+            ResultSet rs = Main.getStorage(virtualSensorName).executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName), conn = Main.getStorage(virtualSensorName).getConnection());
             if (rs.next())
                 timedToRemove = rs.getLong(1);
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            Main.getMainStorage().close(conn);
+            Main.getStorage(virtualSensorName).close(conn);
         }
         query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed < ").append(timedToRemove);
         query.append(" - ").append(storageSize);
@@ -439,7 +438,7 @@ public abstract class StorageManager {
     public DataEnumerator executeQuery(StringBuilder query, boolean binaryFieldsLinked, Connection connection) throws SQLException {
         if (logger.isDebugEnabled())
             logger.debug("Executing query: " + query + "( Binary Field Linked:" + binaryFieldsLinked + ")");
-        return new DataEnumerator(connection.prepareStatement(query.toString()), binaryFieldsLinked);
+        return new DataEnumerator(this, connection.prepareStatement(query.toString()), binaryFieldsLinked);
     }
 
     /**
@@ -458,7 +457,7 @@ public abstract class StorageManager {
         String query = addLimit(abstractQuery.getStandardQuery().toString(), abstractQuery.getLimitCriterion().getSize(), abstractQuery.getLimitCriterion().getOffset());
         if (logger.isDebugEnabled())
             logger.debug("Executing query: " + query + "(" + binaryFieldsLinked + ")");
-        return new DataEnumerator(connection.prepareStatement(query.toString()), binaryFieldsLinked);
+        return new DataEnumerator(this, connection.prepareStatement(query.toString()), binaryFieldsLinked);
     }
 
     public DataEnumerator streamedExecuteQuery(AbstractQuery abstractQuery, boolean binaryFieldsLinked, Connection connection) throws SQLException {
@@ -476,7 +475,7 @@ public abstract class StorageManager {
     }
 
     public DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked, Connection conn) throws SQLException {
-        return new DataEnumerator(conn.prepareStatement(query), binaryFieldsLinked);
+        return new DataEnumerator(this, conn.prepareStatement(query), binaryFieldsLinked);
     }
 
 

@@ -7,7 +7,6 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.beans.WebInput;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,7 +121,7 @@ public class ContainerInfoHandler implements RequestHandler {
     StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(")");
     ArrayList<StreamElement> toReturn=new ArrayList<StreamElement>() ;
     try {
-      DataEnumerator result = Main.getMainStorage().executeQuery( query , true );
+      DataEnumerator result = Main.getStorage(virtual_sensor_name).executeQuery( query , true );
       while ( result.hasMoreElements( ) ) 
         toReturn.add(result.nextElement());
     } catch (SQLException e) {

@@ -20,7 +20,6 @@ public class StorageManagerFactory {
      *         if the driver can't be found.
      */
     public static StorageManager getInstance(String driver, String username, String password, String databaseURL, int maxDBConnections) {
-        
         //
         StorageManager storageManager = null;
         // Select the correct implementation
@@ -38,7 +37,7 @@ public class StorageManagerFactory {
         }
 		else {
 			logger.error(new StringBuilder().append("The GSN doesn't support the database driver : ").append(driver).toString());
-			logger.error(new StringBuilder().append("Please check the storage element in the file gsn.xml configuration file."));
+			logger.error(new StringBuilder().append("Please check the storage elements in the configuration files."));
 		}
         // Initialise the storage manager
         if (storageManager != null) {
