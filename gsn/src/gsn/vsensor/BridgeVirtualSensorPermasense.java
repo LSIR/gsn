@@ -68,6 +68,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 	private int width;
 	private List<AbstractWrapper> backlogWrapperList = new LinkedList<AbstractWrapper>();
 	private Vector<String> jpeg_scaled;
+	private String rotate_image;
 	private boolean position_mapping = false;
 	private boolean sensortype_mapping = false;
 	private boolean sensorvalue_conversion = false;
@@ -84,6 +85,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		
 		width = ParamParser.getInteger(params.get("width"), DEFAULT_WIDTH);
 
+		rotate_image = params.get("rotate_image");
 		
 		Iterator<InputStream> streams = vsensor.getInputStreams().iterator();
 		while (streams.hasNext()) {
@@ -300,6 +302,9 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		    		double factor = (float) width / image.getWidth();
 		    		BufferedImage scaled = new BufferedImage(width, (int) (image.getHeight() * factor), BufferedImage.TYPE_INT_RGB);
 		    		Graphics2D g = scaled.createGraphics();
+		    		if (rotate_image != null) {
+		    			g.rotate(Integer.parseInt(rotate_image));
+		    		}
 		    		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		    		AffineTransform at = AffineTransform.getScaleInstance(factor, factor);
 		    		g.drawRenderedImage(image,at);
