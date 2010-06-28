@@ -5,6 +5,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.http.datarequest.AbstractQuery;
+import gsn.storage.hibernate.DBConnectionInfo;
 import gsn.utils.GSNRuntimeException;
 import gsn.utils.ValidityTools;
 
@@ -39,6 +40,9 @@ public abstract class StorageManager {
     public void init(String databaseDriver, String username, String password, String databaseURL, int maxDBConnections) {
         this.databaseDriver = databaseDriver;
         //this.databaseURL = databaseURL;
+
+        pool = DataSources.getDataSource(new DBConnectionInfo(databaseDriver,databaseURL,username,password));
+        /*
         pool = new BasicDataSource();
         pool.setDriverClassName(databaseDriver);
         pool.setUsername(username);
@@ -47,6 +51,7 @@ public abstract class StorageManager {
         pool.setMaxActive(maxDBConnections);
         pool.setMaxIdle(maxDBConnections);
         pool.setAccessToUnderlyingConnectionAllowed(true);
+        */
         //
         Connection con = null;
         try {

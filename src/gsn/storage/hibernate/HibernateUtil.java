@@ -1,6 +1,8 @@
 package gsn.storage.hibernate;
 
-import gsn.storage.hibernate.GSNJNDI;
+import gsn.storage.DataSources;
+import gsn.utils.jndi.GSNContext;
+import gsn.utils.jndi.GSNContextFactory;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -10,28 +12,11 @@ import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.hbm2ddl.SchemaValidator;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.util.Properties;
-
 public class HibernateUtil {
 
     private static final transient Logger logger = Logger.getLogger( HibernateUtil.class );
 
-    private static InitialContext mainContext;
-
-    private static Properties props;
-
-    static {
-        props = new Properties();
-        props.put(Context.INITIAL_CONTEXT_FACTORY, GSNJNDI.class.getCanonicalName());
-        try {
-            mainContext = new InitialContext(props);
-        } catch (NamingException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
+    
 
     /**
      * 
@@ -43,22 +28,15 @@ public class HibernateUtil {
      * @return
      */
     public static SessionFactory getSessionFactory(String driverClass, String url, String userName, String password, String entityMapping) {
+
         DBConnectionInfo conn = new DBConnectionInfo(driverClass,url,userName,password);
-        try {
-            if (mainContext.lookup(Integer.toString(conn.hashCode())) == null){
-                BasicDataSource ds = conn.createDataSource();
-                mainContext.bind(Integer.toString(conn.hashCode()),ds);
-            }
-        } catch (NamingException e) {
-            logger.error(e.getMessage(), e);
-            return null;
-        }
+        DataSources.getDataSource(conn);
         //
         Configuration cfg = new Configuration();
         cfg.setProperty("hibernate.current_session_context_class", "thread");
         cfg.setProperty("hibernate.default_entity_mode", "dynamic-map");
         cfg.setProperty("hibernate.connection.datasource",Integer.toString(conn.hashCode()));
-        cfg.setProperty("hibernate.jndi.class", GSNJNDI.class.getCanonicalName());
+        cfg.setProperty("hibernate.jndi.class", GSNContextFactory.class.getCanonicalName());
         cfg.setProperty("hibernate.show_sql", "false");
         cfg.setProperty("hibernate.format_sql", "true");
         cfg.addXML(entityMapping);
