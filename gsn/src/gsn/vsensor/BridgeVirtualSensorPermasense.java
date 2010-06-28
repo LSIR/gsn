@@ -303,7 +303,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		    		BufferedImage scaled = new BufferedImage(width, (int) (image.getHeight() * factor), BufferedImage.TYPE_INT_RGB);
 		    		Graphics2D g = scaled.createGraphics();
 		    		if (rotate_image != null) {
-		    			g.rotate(Integer.parseInt(rotate_image));
+		    			g.rotate(Math.toRadians(Integer.parseInt(rotate_image)), scaled.getWidth() / 2d, scaled.getHeight() / 2d);
 		    		}
 		    		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		    		AffineTransform at = AffineTransform.getScaleInstance(factor, factor);
