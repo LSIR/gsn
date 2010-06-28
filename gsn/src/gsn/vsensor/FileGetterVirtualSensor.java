@@ -21,6 +21,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	private static final transient Logger logger = Logger.getLogger(FileGetterVirtualSensor.class);
 	
 	private String filetype = null;
+	private String dcraw_flip = null;
 	
 	
 	@Override
@@ -33,6 +34,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 			logger.error("file_type has to be defined in the virtual sensors xml file");
 			return false;
 		}
+		dcraw_flip = params.get("dcraw_flip");
 		
 		return super.initialize();
 	}
@@ -62,7 +64,11 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 		else if (filetype.equalsIgnoreCase("nef")) {
 			logger.debug("exctracting jpeg from: " + file.getAbsolutePath());
 			try {
-				Process p = Runtime.getRuntime().exec(DCRAW + " -c -e " + file.getAbsolutePath());
+				Process p;
+				if (dcraw_flip == null)
+					p = Runtime.getRuntime().exec(DCRAW + " -c -e " + file.getAbsolutePath());
+				else
+					p = Runtime.getRuntime().exec(DCRAW + " -c -e " + file.getAbsolutePath() + " -t " + dcraw_flip);
 				is = p.getInputStream();
 			} catch (IOException e) {
 		    	logger.error(e.getMessage(), e);
