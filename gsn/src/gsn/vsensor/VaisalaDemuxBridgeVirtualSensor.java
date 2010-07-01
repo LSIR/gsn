@@ -58,6 +58,16 @@ public class VaisalaDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasen
 
 		int index = 5;
 		try {
+			// check input correctness
+			if (Integer.parseInt(r1[0].split("R")[1]) != 1)
+				throw new Exception("wu should start with #R1");
+			if (Integer.parseInt(r2[0].split("R")[1]) != 2)
+				throw new Exception("tu should start with #R2");
+			if (Integer.parseInt(r3[0].split("R")[1]) != 3)
+				throw new Exception("ru should start with #R3");
+			if (Integer.parseInt(r5[0].split("R")[1]) != 5)
+				throw new Exception("su should start with #R5");
+			
 			for (int i=1; i<r1.length; i++) {
 				if (r1[i].endsWith("#"))
 					serialized_data[index++] = null;
@@ -89,8 +99,8 @@ public class VaisalaDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasen
 						serialized_data[index++] = String.valueOf(r5[i].charAt(r5[i].length()-1));
 				}
 			}
-		} catch (IndexOutOfBoundsException e) {
-			logger.error("incoming message could not be parsed properly -> drop it");
+		} catch (Exception e) {
+			logger.error("incoming message could not be parsed properly (" + e.getMessage() + ") -> drop it");
 			return;
 		}
 
