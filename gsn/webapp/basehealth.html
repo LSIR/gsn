@@ -22,6 +22,7 @@
 var initialUpdateVal = 600;
 var nextUpdateVal = initialUpdateVal;
 var deployments = new Array();
+var weatherStation = new Array();
 
 function updateHealth()
 {
@@ -75,7 +76,14 @@ $(document).ready(function() {
 			deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
 			if ($.inArray(deploymentname, deployments) < 0) {
 			    deployments.push(deploymentname);
+                            weatherStation.push(false);
 			}
+                        if ($(this).attr("name").indexOf("vaisalawxt520")>0) {
+                            var i;
+                            for (i=0;i<deployments.length;i++)
+                              if (deployments[i]==deploymentname)
+                                weatherStation[i]=true;
+                        }
 		    }
 		});
 		// display
@@ -108,6 +116,47 @@ $(document).ready(function() {
 			    "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_BasestationHumidity.png"
 			  }))
 			));
+                    if (weatherStation[i]==true) {
+                      $("#health_"+deployments[i]).append(
+                          $.P({},"Weatherstation"),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Voltages.png"
+                          })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Humidity.png"
+                          })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Temperature.png"
+                          })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Air-Pressure.png"
+                          })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Rain.png"
+                          })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Hail.png"
+                          })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Winddirection.png"
+                          })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Windspeed.png"
+                          })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/rose_"+deployments[i].toLowerCase()+"_Winddirection.png"
+                          }))
+                        );
+                    }
 		    if (deployments[i]!=visible)
 			$("#health_"+deployments[i]).hide();
 		    else
@@ -170,7 +219,7 @@ function showHealth(id) {
 
 		<div id="healthcontainer"></div>
 		
-		<!-- <p>Matterhorn Weatherstation</p>
+<!--		<p>Matterhorn Weatherstation</p>
 		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Voltages.png"/></p>
 	        <p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Humidity.png"/></p>
 	        <p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Temperature.png"/></p> 
@@ -179,7 +228,7 @@ function showHealth(id) {
 		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Hail.png"/></p>
 		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Winddirection.png"/></p>
 		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Windspeed.png"/></p>
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/rose_matterhorn_Winddirection.png"/></p> -->
+		<p><img src="http://people.ee.ethz.ch/~perma/plots/rose_matterhorn_Winddirection.png"/></p>-->
 	</div>
 	<div class="separator">
 		<div id="footer">
