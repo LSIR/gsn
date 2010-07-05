@@ -427,7 +427,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 				sendMessage(ack, null, priority);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.warn(e.getMessage());
 		}
 	}
 	
