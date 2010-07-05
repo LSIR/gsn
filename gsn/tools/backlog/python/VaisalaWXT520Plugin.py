@@ -87,7 +87,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
 
         ser.write(id + 'WU,R=1111110000000000,I=60\r\n')
         ser.readline()
-        ser.write(id + 'WU,A=60,G=1,U=K,D=0,N=W,F=4\r\n')
+        ser.write(id + 'WU,A=3,G=1,U=K,D=0,N=W,F=4\r\n')
         ser.readline()
         ser.write(id + 'WU\r\n')
         self.info(ser.readline().strip())
