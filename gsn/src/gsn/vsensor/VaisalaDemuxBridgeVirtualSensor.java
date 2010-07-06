@@ -54,10 +54,10 @@ public class VaisalaDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasen
 		String[] r3 = ((String) data.getData("ru")).split(",");
 		String[] r5 = ((String) data.getData("su")).split(",");
 
-		serialized_data[4] = Integer.parseInt(r1[0].split("R")[0]);
-
 		int index = 5;
 		try {
+			serialized_data[4] = Integer.parseInt(r1[0].split("R")[0]);
+			
 			// check input correctness
 			if (Integer.parseInt(r1[0].split("R")[1]) != 1)
 				throw new Exception("wu should start with #R1:timestamp=" + data.getTimeStamp());
