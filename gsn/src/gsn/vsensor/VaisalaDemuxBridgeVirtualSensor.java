@@ -60,13 +60,13 @@ public class VaisalaDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasen
 		try {
 			// check input correctness
 			if (Integer.parseInt(r1[0].split("R")[1]) != 1)
-				throw new Exception("wu should start with #R1");
+				throw new Exception("wu should start with #R1:timestamp=" + data.getTimeStamp());
 			if (Integer.parseInt(r2[0].split("R")[1]) != 2)
-				throw new Exception("tu should start with #R2");
+				throw new Exception("tu should start with #R2:timestamp=" + data.getTimeStamp());
 			if (Integer.parseInt(r3[0].split("R")[1]) != 3)
-				throw new Exception("ru should start with #R3");
+				throw new Exception("ru should start with #R3:timestamp=" + data.getTimeStamp());
 			if (Integer.parseInt(r5[0].split("R")[1]) != 5)
-				throw new Exception("su should start with #R5");
+				throw new Exception("su should start with #R5:timestamp=" + data.getTimeStamp());
 			
 			for (int i=1; i<r1.length; i++) {
 				if (r1[i].endsWith("#"))
@@ -104,7 +104,7 @@ public class VaisalaDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasen
 			return;
 		}
 
-		data = new StreamElement(dataField, serialized_data);
+		data = new StreamElement(dataField, serialized_data, data.getTimeStamp());
 		super.dataAvailable(inputStreamName, data);
 	}
 }
