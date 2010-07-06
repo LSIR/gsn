@@ -163,7 +163,6 @@ class AbstractPluginClass(Thread):
             raise TypeError('TOSPeerClass has not been started')
             return False
         else:
-            self.info('sendTOSMsg (AbstractPlugin): %d' % (len(packet)))
             return self._parent.tospeer.sendTOSMsg(packet, amId, timeout, blocking, maxretries)
        
         

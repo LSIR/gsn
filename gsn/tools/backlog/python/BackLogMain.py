@@ -284,7 +284,8 @@ class BackLogMainClass(Thread):
                     msgTypeValid = True
                     break
         if msgTypeValid == False:
-            self.error('unknown message type ' + str(msgType) + ' received')
+            self._logger.error('unknown message type ' + str(msgType) + ' received')
+            self.incrementErrorCounter()
         
         
     def ackReceived(self, timestamp, msgType):

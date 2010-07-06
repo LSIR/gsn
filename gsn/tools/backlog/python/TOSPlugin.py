@@ -24,7 +24,7 @@ class TOSPluginClass(AbstractPluginClass):
     '''
     
     def __init__(self, parent, options):
-        AbstractPluginClass.__init__(self, parent, options)
+        AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
         
         self._ready = False
     
