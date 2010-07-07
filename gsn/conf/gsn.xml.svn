@@ -13,4 +13,12 @@
 <!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/gsn" /> -->
 <!--  <storage user="gsn" password="gsn" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521" /> -->
 <!-- <storage user="gsn" password="ge-S3-ne" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@dom.slf.local:1521:sdbt" /> -->
+
+<!-- Optional sliding processor, If not specified, the sliding is implemented using the Main Storage Database specified above  -->
+<!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:gsninternal/gsn_internal_processing.h2;TRACE_LEVEL_FILE=3;TRACE_LEVEL_SYSTEM_OUT=1" />-->
+<!--
+<sliding>
+   <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:sliding;DB_CLOSE_DELAY=-1" />
+</sliding>
+-->
  </sensor-server>
