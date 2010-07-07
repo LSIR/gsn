@@ -1,14 +1,14 @@
 package gsn.storage;
 
 import static org.junit.Assert.assertEquals;
-import gsn.storage.StorageManager.DATABASE;
 
 import org.junit.Test;
 
 public class TestStorageManager {
   
   @Test public void testOracleRewrites() {
-    DATABASE db = StorageManager.DATABASE.ORACLE;
+
+    StorageManager db = StorageManagerFactory.getInstance("oracle.jdbc.driver.OracleDriver", "sa", "", "jdbc:oracle:thin:.", 100);
     final String sampleQuery1 = "SELECT * FROM SYSTEM.HELP";
     String oracle = db.addLimit( sampleQuery1, 10, 0);
     assertEquals("SELECT * FROM SYSTEM.HELP WHERE ROWNUM <= 10", oracle.replace("  ", " "));

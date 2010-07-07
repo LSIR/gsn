@@ -15,7 +15,7 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
 
     private static final transient Logger logger = Logger.getLogger(SQLViewQueryRewriter.class);
     protected static StorageManager storageManager = Main.getWindowStorage();
-    public static final CharSequence VIEW_HELPER_TABLE = Main.tableNameGeneratorInString("_SQL_VIEW_HELPER_".toLowerCase());
+    public static final CharSequence VIEW_HELPER_TABLE = Main.getWindowStorage().tableNameGeneratorInString("_SQL_VIEW_HELPER_".toLowerCase());
     private static DataField[] viewHelperFields = new DataField[]{new DataField("u_id", "varchar(17)")};
 
     static {

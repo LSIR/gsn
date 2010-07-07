@@ -80,21 +80,16 @@ public class TestWindowing1 {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		initDB(StorageManager.H2_DB);
-	}
-
-	private static void initDB(int dbType) throws SQLException {
-		if (StorageManager.MYSQL_DB == dbType) {
-			DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-			sm = StorageManagerFactory.getInstance("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest", Main.DEFAULT_MAX_DB_CONNECTIONS);
-		} else if (StorageManager.H2_DB == dbType) {
-			DriverManager.registerDriver(new org.h2.Driver());
+        // Mysql
+        //DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+	    //sm = StorageManagerFactory.getInstance("com.mysql.jdbc.Driver", "mehdi", "mehdi", "jdbc:mysql://localhost/gsntest", Main.DEFAULT_MAX_DB_CONNECTIONS);
+		//h2
+        	DriverManager.registerDriver(new org.h2.Driver());
 			sm = StorageManagerFactory.getInstance("org.hsqldb.jdbcDriver", "sa", "", "jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
-		} else {
-			DriverManager.registerDriver(new net.sourceforge.jtds.jdbc.Driver());
-			sm = StorageManagerFactory.getInstance("net.sourceforge.jtds.jdbc.Driver", "mehdi", "mehdi",
-					"jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3", Main.DEFAULT_MAX_DB_CONNECTIONS);
-		}
+		// sqlserver
+        //	DriverManager.registerDriver(new net.sourceforge.jtds.jdbc.Driver());
+		//	sm = StorageManagerFactory.getInstance("net.sourceforge.jtds.jdbc.Driver", "mehdi", "mehdi",
+		//			"jdbc:jtds:sqlserver://172.16.4.121:10101/gsntest;cachemetadata=true;prepareSQL=3", Main.DEFAULT_MAX_DB_CONNECTIONS);
 	}
 
 	@Before

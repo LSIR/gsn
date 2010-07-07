@@ -95,7 +95,7 @@ public class DataEnumerator implements Enumeration<StreamElement> {
 					indexOfTimedField = i;
 				} else {
 					fieldNames.add( colName );
-					fieldTypes.add( StorageManager.getDatabaseForConnection(preparedStatement.getConnection()).convertLocalTypeToGSN(colTypeInJDBCFormat,colScale ) );
+					fieldTypes.add( Main.getMainStorage().convertLocalTypeToGSN(colTypeInJDBCFormat,colScale ) );
 				}
 			}
 			dataFieldNames = fieldNames.toArray( new String [ ] {} );

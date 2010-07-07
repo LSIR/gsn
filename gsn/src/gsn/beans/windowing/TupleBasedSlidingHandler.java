@@ -103,7 +103,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 				query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
 						wrapper.getDBAliasInStr()).append(" order by timed desc )as X  ");
 			}else if (Main.getWindowStorage().isOracle()) {
-				query.append(" select timed from (select timed from ").append(Main.tableNameGeneratorInString(wrapper.getDBAliasInStr()));
+				query.append(" select timed from (select timed from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
 				query.append(" order by timed desc) where rownum = ").append(maxTupleCount);
 			}
 			if (logger.isDebugEnabled()) {
@@ -133,7 +133,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 				query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
 						wrapper.getDBAliasInStr()).append(" order by timed desc )as X  ");
 			}else if (Main.getWindowStorage().isOracle()) {
-				query.append(" select timed from ( select timed from ").append(Main.tableNameGeneratorInString(wrapper.getDBAliasInStr()));
+				query.append(" select timed from ( select timed from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
 				query.append(" order by timed desc) where rownum = ").append(maxTupleCount);
 			}
 			if (logger.isDebugEnabled()) {
@@ -166,7 +166,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			} else if (Main.getWindowStorage().isSqlServer()) {
 				query.append(" select min(timed) - ").append(maxWindowSize).append(" from (select top ").append(maxTupleForTimeBased).append(" * ").append(" from ").append(wrapper.getDBAliasInStr()).append(" order by timed desc ) as X  ");
 			}else if (Main.getWindowStorage().isOracle()){
-				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from (select timed from ").append(Main.tableNameGeneratorInString(wrapper.getDBAliasInStr()));
+				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from (select timed from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
 				query.append(" order by timed desc) where rownum = ").append(maxTupleForTimeBased).append(") ) ");
 			}
 			if (logger.isDebugEnabled()) {
@@ -273,12 +273,12 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 					toReturn.append("timed >= (select min(timed) from (select TOP ").append(windowSize).append(" timed from ").append(
 							wrapperAlias).append(" order by timed desc ) as y )");
 				}else if (Main.getWindowStorage().isOracle()) {
-					toReturn.append("(timed >= (select timed from (select timed from "+Main.tableNameGeneratorInString(wrapperAlias)+" order by timed desc ) where rownum="+windowSize+") )");
+					toReturn.append("(timed >= (select timed from (select timed from "+Main.getWindowStorage().tableNameGeneratorInString(wrapperAlias)+" order by timed desc ) where rownum="+windowSize+") )");
 				}else {
 					logger.fatal("Not supported DB!");
 				}
 			} else {
-				CharSequence viewHelperTableName =Main.tableNameGeneratorInString(SQLViewQueryRewriter.VIEW_HELPER_TABLE);
+				CharSequence viewHelperTableName =Main.getWindowStorage().tableNameGeneratorInString(SQLViewQueryRewriter.VIEW_HELPER_TABLE);
 				if (windowingType == WindowType.TUPLE_BASED) {
 					if (Main.getWindowStorage().isMysqlDB()) {
 						toReturn.append("timed <= (select timed from ").append(viewHelperTableName).append(
@@ -299,10 +299,10 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 						toReturn.append("timed in (select TOP ").append(windowSize).append(" timed from ").append(wrapperAlias).append(
 						" where timed <= (select timed from ").append(viewHelperTableName).append(" where U_ID='").append(streamSource.getUIDStr()).append("') order by timed desc) ");
 					}else if (Main.getWindowStorage().isOracle()) {
-						toReturn.append("timed <= (select timed from ").append(Main.tableNameGeneratorInString(viewHelperTableName)).append(
+						toReturn.append("timed <= (select timed from ").append(Main.getWindowStorage().tableNameGeneratorInString(viewHelperTableName)).append(
 						" where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
 						toReturn.append(wrapperAlias).append(" where timed <= (select * from (select timed from ");
-						toReturn.append(viewHelperTableName).append(" where U_ID='").append(Main.tableNameGeneratorInString(streamSource.getUIDStr()));
+						toReturn.append(viewHelperTableName).append(" where U_ID='").append(Main.getWindowStorage().tableNameGeneratorInString(streamSource.getUIDStr()));
 						toReturn.append("' order by timed desc  ) where rownum = "+windowSize+")  ").append(" )");
 						toReturn.append(" order by timed desc ");
 						// Note, in oracle rownum starts with 1.
@@ -310,9 +310,9 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 						logger.fatal("Not supported DB!");
 					}
 				} else { // WindowType.TIME_BASED_WIN_TUPLE_BASED_SLIDE
-					toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(viewHelperTableName).append(" where U_ID='").append(Main.tableNameGeneratorInString(streamSource.getUIDStr())).append(
+					toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(viewHelperTableName).append(" where U_ID='").append(Main.getWindowStorage().tableNameGeneratorInString(streamSource.getUIDStr())).append(
 					"') and timed >= (select timed from ").append(viewHelperTableName).append(
-					" where U_ID='").append(Main.tableNameGeneratorInString(streamSource.getUIDStr())).append("') - ").append(windowSize).append(" ) ");
+					" where U_ID='").append(Main.getWindowStorage().tableNameGeneratorInString(streamSource.getUIDStr())).append("') - ").append(windowSize).append(" ) ");
 					//					if (StorageManager.isH2() || StorageManager.isMysqlDB()) {
 					toReturn.append(" order by timed desc ");
 					//					} else if (StorageManager.isOracle()) {
