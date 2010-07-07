@@ -158,13 +158,31 @@
                     plotAccordingToChoices();
                 }
 
+                function getSortedKeys(obj){
+                    var keys = [];
+                    for(var key in obj){
+                        keys.push(key);
+                    }
+                    return keys.sort();
+                }
+
+                function getSortedValues(obj){
+                    var values = [];
+                    for(var value in obj){
+                        values.push(value);
+                    }
+                    return values.sort();
+                }
+
                 function option_list_key(name,items,all){
                     to_return = '<select name="' + name + '" class="' + name+ '">'
                     if (all){
                         to_return+='<option value="All" >' + all + '</option>';
                     }
-                    for (var item in items){
-                        to_return+='<option value="' + item+'" >'+item+'</option>';
+                    var sk = getSortedKeys(items);
+                    var l = sk.length;
+                    for (var i = 0 ; i < l ; i++) {
+                        to_return+='<option value="' + sk[i]+'" >'+sk[i]+'</option>';
                     }
                     to_return+='</select>'
                     return to_return;
@@ -175,8 +193,10 @@
                     if (all!=null){
                         to_return+='<option value="All" >' + all + '</option>';
                     }
-                    for (var item in items){
-                        to_return+='<option value="' + items[item]+'" >'+items[item]+'</option>';
+                    var sv = getSortedValues(items);
+                    var l = sv.length;
+                    for (var i = 0 ; i < l ; i++) {
+                        to_return+='<option value="' + items[sv[i]]+'" >'+items[sv[i]]+'</option>';
                     }
                     to_return+='</select>'
                     return to_return;
@@ -326,7 +346,7 @@
                     return true;
                 });
 
-    
+
 
                 $(".plot").click(function(){
                     datasets={};
