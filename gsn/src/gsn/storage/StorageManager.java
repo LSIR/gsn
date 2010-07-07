@@ -638,10 +638,10 @@ public abstract class StorageManager {
             ps.setLong(counter, streamElement.getTimeStamp());
             ps.execute();
         } catch (GSNRuntimeException e) {
-            if (e.getType() == GSNRuntimeException.UNEXPECTED_VIRTUAL_SENSOR_REMOVAL) {
-                if (logger.isDebugEnabled())
-                    logger.debug("An stream element dropped due to unexpected virtual sensor removal. (Stream element: " + streamElement.toString() + ")+ Query: " + query, e);
-            } else
+            //if (e.getType() == GSNRuntimeException.UNEXPECTED_VIRTUAL_SENSOR_REMOVAL) {
+            //    if (logger.isDebugEnabled())
+            //        logger.debug("An stream element dropped due to unexpected virtual sensor removal. (Stream element: " + streamElement.toString() + ")+ Query: " + query, e);
+            //} else
                 logger.warn("Inserting a stream element failed : "
                         + streamElement.toString(), e);
         } catch (SQLException e) {
