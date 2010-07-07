@@ -32,7 +32,10 @@ public class H2StorageManager extends StorageManager {
                     case DataTypes.VARCHAR:
                         // Because the parameter for the varchar is not
                         // optional.
-                        convertedType = gsnType.getType();
+                    	if (gsnType.getType().trim().equalsIgnoreCase("string"))
+                            convertedType = "TEXT";
+                        else
+                            convertedType = gsnType.getType();
                         break;
                     default:
                         convertedType = DataTypes.TYPE_NAMES[gsnType.getDataTypeID()];
