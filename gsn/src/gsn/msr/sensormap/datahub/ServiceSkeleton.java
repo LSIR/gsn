@@ -6,6 +6,7 @@
  */
     package gsn.msr.sensormap.datahub;
 
+import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
@@ -129,7 +130,7 @@ private static final transient Logger         logger          = Logger.getLogger
 				SignalRequest req = new SignalRequest(signalInfo);
                 StringBuilder query = new StringBuilder("select pk,TIMED, ").append(req.getFieldName()).append(" as data from ").append(req.getVsName());
                 //if oracle
-                if (StorageManager.getInstance().isOracle()) {
+                if (Main.getMainStorage().isOracle()) {
                     query.append(" where rownum<=1 order by timed desc");
                 }
                 else {
@@ -223,7 +224,7 @@ private static final transient Logger         logger          = Logger.getLogger
 		ArrayOfSensorData toReturn = new ArrayOfSensorData();
 		try {
 			DataEnumerator output = null;
-			output = StorageManager.getInstance().executeQuery(query, is_binary_linked);
+			output = Main.getMainStorage().executeQuery(query, is_binary_linked);
 			SensorData data = new SensorData(); 
 			ArrayOfDateTime arrayOfDateTime = new ArrayOfDateTime();
 			ArrayList<Double> sensor_readings = new ArrayList();

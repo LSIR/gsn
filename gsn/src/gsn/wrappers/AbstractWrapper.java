@@ -109,10 +109,10 @@ public abstract class AbstractWrapper extends Thread {
 		return listeners;
 	}
 
-	protected StorageManager getStorageManager() {
-		return StorageManager.getInstance();
-
-	}
+	//protected StorageManager getStorageManager() {
+	//	return StorageManager.getInstance();
+    //
+	//}
 
 	/**
 	 * This method is called whenever the wrapper wants to send a data item back
@@ -257,12 +257,12 @@ public abstract class AbstractWrapper extends Thread {
 				logger.debug("Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
 				return false;
 			}
-			conn = StorageManager.getInstance().getConnection();
-			StorageManager.executeInsert(aliasCodeS, getOutputFormat(), se, conn);
+			conn = Main.getWindowStorage().getConnection();
+			Main.getWindowStorage().executeInsert(aliasCodeS, getOutputFormat(), se, conn);
             lastInOrderTimestamp = se.getTimeStamp();
             return true;
 		} finally {
-			StorageManager.close(conn);
+			Main.getWindowStorage().close(conn);
 		}
 	}
 
@@ -273,11 +273,11 @@ public abstract class AbstractWrapper extends Thread {
 		try {
 			// Checks if the stream element is out of order
             if (lastInOrderTimestamp == null) {
-                conn = StorageManager.getInstance().getConnection();
+                conn = Main.getWindowStorage().getConnection();
                 StringBuilder query = new StringBuilder();
 				query.append("select max(timed) from ").append(aliasCodeS);
 
-				ResultSet rs = StorageManager.executeQueryWithResultSet(query,
+				ResultSet rs = Main.getWindowStorage().executeQueryWithResultSet(query,
 						conn);
 				if (rs.next()) {
 					lastInOrderTimestamp = rs.getLong(1);
@@ -287,7 +287,7 @@ public abstract class AbstractWrapper extends Thread {
 			}
             return (se.getTimeStamp() <= lastInOrderTimestamp);
 		} finally {
-			StorageManager.close(conn);
+			Main.getWindowStorage().close(conn);
 		}
     }
 
@@ -357,7 +357,7 @@ public abstract class AbstractWrapper extends Thread {
 			logger.debug(new StringBuilder().append(
 					"RESULTING QUERY FOR Table Size Enforce ").append(query)
 					.toString());
-		int deletedRows = StorageManager.getInstance().executeUpdate(query);
+		int deletedRows = Main.getWindowStorage().executeUpdate(query);
 		if (logger.isDebugEnabled())
 			logger.debug(new StringBuilder().append(deletedRows).append(
 					" old rows dropped from ").append(getDBAliasInStr())
@@ -374,7 +374,7 @@ public abstract class AbstractWrapper extends Thread {
 		for (SlidingHandler slidingHandler : slidingHandlers.values()) {
 			slidingHandler.dispose();
 		}
-		getStorageManager().executeDropTable(aliasCodeS);
+		Main.getWindowStorage().executeDropTable(aliasCodeS);
 	}
 
 	public static final String TIME_FIELD = "timed";

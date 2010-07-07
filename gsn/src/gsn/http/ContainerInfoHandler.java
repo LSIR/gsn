@@ -176,7 +176,7 @@ public class ContainerInfoHandler implements RequestHandler {
     StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(")");
     ArrayList<StreamElement> toReturn=new ArrayList<StreamElement>() ;
     try {
-      DataEnumerator result = StorageManager.getInstance( ).executeQuery( query , true );
+      DataEnumerator result = Main.getMainStorage().executeQuery( query , true );
       while ( result.hasMoreElements( ) ) 
         toReturn.add(result.nextElement());
     } catch (SQLException e) {

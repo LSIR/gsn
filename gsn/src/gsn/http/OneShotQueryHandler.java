@@ -43,7 +43,7 @@ public class OneShotQueryHandler implements RequestHandler{
       StringBuilder query = new StringBuilder( "select " + vsFields + " from " + vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0" );
       DataEnumerator result;
 	try {
-		result = StorageManager.getInstance( ).executeQuery( query , true );
+		result = Main.getMainStorage().executeQuery( query , true );
 	} catch (SQLException e) {
 		logger.error("ERROR IN EXECUTING, query: "+query);
 		logger.error(e.getMessage(),e);

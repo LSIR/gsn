@@ -10,6 +10,7 @@ import gsn.storage.StorageManager;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import gsn.storage.StorageManagerFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,11 +19,11 @@ import org.junit.Test;
 
 public class TestValidityTools {
 
-	static StorageManager sm = StorageManager.getInstance();
+	static StorageManager sm = null;
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.h2.Driver( ) );
-		sm.init ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
+		sm = StorageManagerFactory.getInstance( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
 	}
 
 	@AfterClass

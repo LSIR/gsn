@@ -395,17 +395,17 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
 // toReturn.append(" wrapper.timed >=").append(getStartDate().getTime()).append(" and timed <=").append(getEndDate().getTime()).append(" and ");
     
     if (isStorageCountBased()) {
-  		if (StorageManager.isH2()||StorageManager.isMysqlDB())
+  		if (Main.getWindowStorage().isH2()||Main.getWindowStorage().isMysqlDB())
   			toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" order by timed desc limit 1 offset " ).append(getParsedStorageSize()-1).append( " )" );
-  		else if (StorageManager.isSqlServer())
+  		else if (Main.getWindowStorage().isSqlServer())
   			toReturn.append("timed >= (select min(timed) from (select TOP ").append(getParsedStorageSize()).append(" timed from (select distinct(timed) from ").append(wrapperAlias).append(") as x  order by timed desc ) as y )" );
     }else { //time based
       toReturn.append("(wrapper.timed >");
-      if ( StorageManager.isH2( ) ) 
+      if ( Main.getWindowStorage().isH2( ) )
         toReturn.append( " (NOW_MILLIS()");
-      else if ( StorageManager.isMysqlDB( ) ) 
+      else if ( Main.getWindowStorage().isMysqlDB( ) )
         toReturn.append(" (UNIX_TIMESTAMP()*1000");
-      else if (StorageManager.isSqlServer()) {
+      else if (Main.getWindowStorage().isSqlServer()) {
     	  // NOTE1 : The value retuend is in seconds (hence 1000)
     	  // NOTE2 : There is no time in the date for the epoch, maybe doesn't match with the current system time, needs checking.
     	  toReturn.append(" (convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 )");

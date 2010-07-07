@@ -14,6 +14,7 @@ import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.storage.StorageManager;
+import gsn.storage.StorageManagerFactory;
 import gsn.wrappers.MockWrapper;
 
 import java.io.Serializable;
@@ -33,20 +34,19 @@ public class TestDataPropogation {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		DriverManager.registerDriver( new org.h2.Driver( ) );
-		StorageManager.getInstance ( ).init ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
+		sm = StorageManagerFactory.getInstance ( "org.hsqldb.jdbcDriver","sa","" ,"jdbc:hsqldb:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 	}
 
-	private StorageManager sm;
+	private static StorageManager sm;
 	private MockWrapper wrapper;
 	private StreamSource streamSource;
 	
 	@Before
 	public void setUp() throws Exception {
-		sm = StorageManager.getInstance();
 		Properties p = new Properties();
 		p.put("mock-test", "gsn.wrappers.MockWrapper");
 	//		Main.loadWrapperList(propertiesConfiguration);

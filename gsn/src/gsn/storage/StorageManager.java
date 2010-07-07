@@ -25,6 +25,7 @@ public class StorageManager {
 	/**
 	 * Given a connection, gets the appropriate DATABASE object from the
 	 * DATABASE Enum.
+     * @deprecated
 	 */
 	public static DATABASE getDatabaseForConnection(Connection connection) throws SQLException {
 
@@ -85,13 +86,13 @@ public class StorageManager {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static boolean tableExists(CharSequence tableName,
+	public boolean tableExists(CharSequence tableName,
 			Connection connection) throws SQLException {
 		return tableExists(tableName, new DataField[] {}, connection);
 	}
 
 
-	public static DataField[] tableToStructure(CharSequence tableName,Connection connection) throws SQLException {
+	public DataField[] tableToStructure(CharSequence tableName,Connection connection) throws SQLException {
 		StringBuilder sb = new StringBuilder("select * from ").append(tableName).append(" where 1=0 ");
 		ResultSet rs = null;
 		DataField[] toReturn = null;
@@ -128,7 +129,7 @@ public class StorageManager {
 	 * @Throws GSNRuntimeException
 	 */
 
-	public static boolean tableExists(CharSequence tableName, DataField[] fields, Connection connection) throws SQLException,
+	public boolean tableExists(CharSequence tableName, DataField[] fields, Connection connection) throws SQLException,
 	GSNRuntimeException {
 		if (!ValidityTools.isValidJavaVariable(tableName))
 			throw new GSNRuntimeException("Table name is not valid");
@@ -221,7 +222,7 @@ public class StorageManager {
 	 * @throws SQLException
 	 */
 
-	public static ResultSet getBinaryFieldByQuery(StringBuilder query,
+	public ResultSet getBinaryFieldByQuery(StringBuilder query,
 			String colName, Long pk, Connection connection) throws SQLException {
 		PreparedStatement ps = connection.prepareStatement(query.toString());
 		if (pk != null)
@@ -229,7 +230,7 @@ public class StorageManager {
 		return ps.executeQuery();
 	}
 
-	public static void closeStatement(Statement stmt) {
+	public void closeStatement(Statement stmt) {
 		try {
 			if (stmt != null){
 				stmt.close();
@@ -239,7 +240,7 @@ public class StorageManager {
 		}
 	}
 
-	public static void close(ResultSet resultSet) {
+	public void close(ResultSet resultSet) {
 		try {
 			if (resultSet != null){
 				resultSet.close();
@@ -249,7 +250,7 @@ public class StorageManager {
 		}
 	}
 
-	public static void close(PreparedStatement preparedStatement) {
+	public void close(PreparedStatement preparedStatement) {
 		try {
 			if (preparedStatement != null){
 				preparedStatement.close();
@@ -259,7 +260,7 @@ public class StorageManager {
 		}
 	}
 
-	public static void close(Connection conn) {
+	public void close(Connection conn) {
 		try{
 			if (conn!=null && !conn.isClosed()){
 				conn.close();
@@ -278,7 +279,7 @@ public class StorageManager {
 	 * @throws SQLException
 	 */
 	public void shutdown() throws SQLException {
-		if (StorageManager.isH2()) {
+		if (isH2()) {
 			getConnection().createStatement().execute("SHUTDOWN");
 			logger.warn("Closing the database server (for HSqlDB) [done].");
 		}
@@ -382,7 +383,7 @@ public class StorageManager {
 	 * @param connection
 	 * @throws SQLException
 	 */
-	public static void executeCreateTable(CharSequence tableName, DataField[] structure,boolean unique, Connection connection) throws SQLException {
+	public void executeCreateTable(CharSequence tableName, DataField[] structure,boolean unique, Connection connection) throws SQLException {
 		StringBuilder sql = getStatementCreateTable(tableName, structure,connection);
 		if (logger.isDebugEnabled())
 			logger.debug(new StringBuilder().append("The create table statement is : ").append(sql).toString());
@@ -410,7 +411,7 @@ public class StorageManager {
 
 	}
 
-	public static ResultSet executeQueryWithResultSet(StringBuilder query,
+	public ResultSet executeQueryWithResultSet(StringBuilder query,
 			Connection connection) throws SQLException {
 		return connection.prepareStatement(query.toString()).executeQuery();
 	}
@@ -424,7 +425,7 @@ public class StorageManager {
 		return executeQueryWithResultSet(new StringBuilder(query),c);
 	}
 
-	public static DataEnumerator executeQuery(StringBuilder query,boolean binaryFieldsLinked, Connection connection) throws SQLException {
+	public DataEnumerator executeQuery(StringBuilder query,boolean binaryFieldsLinked, Connection connection) throws SQLException {
 		if (logger.isDebugEnabled())
 			logger.debug("Executing query: " + query + "( Binary Field Linked:" + binaryFieldsLinked	+ ")");
 		return new DataEnumerator(connection.prepareStatement(query.toString()),binaryFieldsLinked);
@@ -438,7 +439,7 @@ public class StorageManager {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static DataEnumerator executeQuery(AbstractQuery abstractQuery,boolean binaryFieldsLinked, Connection connection) throws SQLException {
+	public DataEnumerator executeQuery(AbstractQuery abstractQuery,boolean binaryFieldsLinked, Connection connection) throws SQLException {
 		if (abstractQuery.getLimitCriterion() == null) {
 			return executeQuery(abstractQuery.getStandardQuery(), binaryFieldsLinked, connection);
 		}
@@ -514,7 +515,7 @@ public class StorageManager {
 	 * @return Number of effected rows or -1 if there is an error.
 	 */
 
-	public static void executeCommand(String sql, Connection connection) {
+	public void executeCommand(String sql, Connection connection) {
 		Statement stmt = null;
 		try {
 			stmt = connection.createStatement();
@@ -538,7 +539,7 @@ public class StorageManager {
 			}
 		}
 	}
-	public static int executeUpdate(String updateStatement, Connection connection) {
+	public int executeUpdate(String updateStatement, Connection connection) {
 		int toReturn = -1;
 		PreparedStatement prepareStatement = null;
 		try {
@@ -549,7 +550,7 @@ public class StorageManager {
 		}
 		return toReturn;
 	}
-	public static int executeUpdate(StringBuilder updateStatement, Connection connection) {
+	public int executeUpdate(StringBuilder updateStatement, Connection connection) {
 		int to_return = -1;
 		to_return = executeUpdate(updateStatement.toString(), connection);
 		return to_return;
@@ -575,7 +576,7 @@ public class StorageManager {
 		}
 	}
 
-	public static void executeInsert(CharSequence tableName,DataField[] fields, StreamElement streamElement,Connection connection) throws SQLException {
+	public void executeInsert(CharSequence tableName,DataField[] fields, StreamElement streamElement,Connection connection) throws SQLException {
 		PreparedStatement ps = null;
 		String query = getStatementInsert(tableName, fields).toString();
 		try {
@@ -677,7 +678,7 @@ public class StorageManager {
 	 * @return A sql statement which can be used for inserting the provided
 	 *         stream element into the specified table.
 	 */
-	public static StringBuilder getStatementInsert(CharSequence tableName, DataField fields[]) {
+	public StringBuilder getStatementInsert(CharSequence tableName, DataField fields[]) {
 		StringBuilder toReturn = new StringBuilder("insert into ").append( tableName).append(" ( ");
 		int numberOfQuestionMarks = 1; //Timed is always there.
 		for (DataField dataField : fields) {
@@ -694,12 +695,12 @@ public class StorageManager {
 		return toReturn;
 	}
 
-	public static String getStatementRenameTable(String oldName, String newName) {
+	public String getStatementRenameTable(String oldName, String newName) {
 		return new StringBuilder("alter table ").append(oldName).append(
 		" rename to ").append(newName).toString();
 	}
 
-	public static StringBuilder getStatementDropTable(CharSequence tableName,Connection conn) throws SQLException {
+	public StringBuilder getStatementDropTable(CharSequence tableName,Connection conn) throws SQLException {
 		StringBuilder sb = new StringBuilder("Drop table ");
 		DATABASE db = getDatabaseForConnection(conn);
 		if (db.getDBType()==MYSQL_DB || db.getDBType()== H2_DB)
@@ -717,21 +718,21 @@ public class StorageManager {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static StringBuilder getStatementDropIndex(CharSequence indexName, CharSequence tableName,
+	public StringBuilder getStatementDropIndex(CharSequence indexName, CharSequence tableName,
 			Connection connection) throws SQLException {
 		DATABASE db = getDatabaseForConnection(connection);
 		return new StringBuilder(db.getStatementDropIndex().replace("#NAME",
 				indexName).replace("#TABLE",tableName ));
 	}
 
-	public static StringBuilder getStatementDropView(CharSequence viewName,
+	public StringBuilder getStatementDropView(CharSequence viewName,
 			Connection connection) throws SQLException {
 		DATABASE db = getDatabaseForConnection(connection);
 		return new StringBuilder(db.getStatementDropView().replace("#NAME",
 				viewName));
 	}
 
-	public static StringBuilder getStatementCreateIndexOnTimed(
+	public StringBuilder getStatementCreateIndexOnTimed(
 			CharSequence tableName,boolean unique) throws SQLException {
 		StringBuilder toReturn = new StringBuilder("CREATE ");
 		if (unique)
@@ -740,7 +741,7 @@ public class StorageManager {
 		return toReturn;
 	}
 
-	public static StringBuilder getStatementCreateTable(CharSequence tableName,
+	public StringBuilder getStatementCreateTable(CharSequence tableName,
 			DataField[] structure, Connection connection) throws SQLException {
 		StringBuilder result = new StringBuilder("CREATE TABLE ").append(tableName);
 		DATABASE db = getDatabaseForConnection(connection);
@@ -762,11 +763,11 @@ public class StorageManager {
 		return result;
 	}
 
-	public static boolean isSqlServer() {
+	public boolean isSqlServer() {
 		return sqlserver;
 	}
 
-	public static StringBuilder getStatementCreateView(CharSequence viewName,
+	public StringBuilder getStatementCreateView(CharSequence viewName,
 			CharSequence selectQuery) {
 		return new StringBuilder("create view ").append(viewName).append(
 		" AS ( ").append(selectQuery).append(" ) ");
@@ -775,9 +776,9 @@ public class StorageManager {
 	/***************************************************************************
 	 * INITIALIZATION PARAMETERS. SET IN THE FIRST TIME THIS CLASS USED.
 	 **************************************************************************/
-	private static boolean mysql = false;
-	private static boolean h2 = false;
-	private static boolean oracle = false;
+	private  boolean mysql = false;
+	private  boolean h2 = false;
+	private  boolean oracle = false;
 
 	public static final int MYSQL_DB=1;
 	public static final int SQLSERVER_DB=2;
@@ -823,16 +824,18 @@ public class StorageManager {
 			}
 
 			public String getStatementDropIndex() {
-				if (isSqlServer())
-					return "DROP TABLE #NAME";
-				else
+				// Should never occurs since we are in the MYSQL type
+                //if (isSqlServer())
+				//	return "DROP TABLE #NAME";
+				//else
 					return "DROP TABLE IF EXISTS #NAME";
 			}
 
 			public String getStatementDropView() {
-				if (isSqlServer())
-					return "DROP VIEW #NAME";
-				else
+				// Should never occurs since we are in the MYSQL type
+                //if (isSqlServer())
+				//	return "DROP VIEW #NAME";
+				//else
 					return "DROP VIEW IF EXISTS #NAME";
 			}
 			public  int getDBType() {return MYSQL_DB;}
@@ -897,11 +900,13 @@ public class StorageManager {
 			}
 
 			public String getStatementDropIndex() {
-				if (StorageManager.isH2()||StorageManager.isSqlServer())
+				// Should always occurs since we are in the H2 type
+                //if (isH2()||isSqlServer())
 					return "DROP INDEX #NAME";
-				if (StorageManager.isMysqlDB())
-					return "DROP INDEX #NAME IF EXISTS";
-				return null;
+				// Should never occurs since we are in the H2 type
+                //if (isMysqlDB())
+				//	return "DROP INDEX #NAME IF EXISTS";
+				//return null;
 			}
 
 			public String getStatementDropView() {
@@ -1177,7 +1182,7 @@ public class StorageManager {
 	 *
 	 * @return Returns true if the database used is mysql.
 	 */
-	public static boolean isMysqlDB() {
+	public boolean isMysqlDB() {
 		return mysql;
 	}
 
@@ -1186,10 +1191,10 @@ public class StorageManager {
 	 *
 	 * @return true if the database used is HSqlDB.
 	 */
-	public static boolean isH2() {
+	public boolean isH2() {
 		return h2;
 	}
-	public static boolean isOracle() {
+	public boolean isOracle() {
 		return oracle;
 	}
 
@@ -1200,16 +1205,16 @@ public class StorageManager {
 	public static final int DEFAULT_STORAGE_POOL_SIZE = 100;
 
 
-	private static boolean sqlserver;
+	private boolean sqlserver;
 
     /**
      * The Storage Manager instance should be injected and not accessed through this static method.
      * @deprecated
      * @return
      */
-	public static StorageManager getInstance() {
-		return Main.getMainStorage();
-	}
+	//public static StorageManager getInstance() {
+	//	return Main.getMainStorage();
+	//}
 
 	public StorageManager() {
 	}
@@ -1252,10 +1257,10 @@ public class StorageManager {
 		
 			con = getConnection();
 			Statement stmt = con.createStatement();
-			if (StorageManager.isH2()) {
+			if (isH2()) {
 				stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
 				stmt.execute("CREATE ALIAS IF NOT EXISTS NOW_MILLIS FOR \"java.lang.System.currentTimeMillis\";");
-			} else if (StorageManager.isMysqlDB()) {
+			} else if (isMysqlDB()) {
 				ResultSet rs = stmt.executeQuery("select version();");
 				rs.next();
 				String versionInfo = rs.getString(1);
@@ -1285,7 +1290,7 @@ public class StorageManager {
 		}
 	}
 
-	static int connectionCount = 0;
+	int connectionCount = 0;
 
 	/**
 	 * Obtains the default database connection.
@@ -1318,11 +1323,11 @@ public class StorageManager {
 	 */
 	public long getTimeDifferenceInMillis(){
 		StringBuilder query = new StringBuilder();
-		if (StorageManager.isH2())
+		if (isH2())
 			query.append("call NOW_MILLIS()");
-		else if (StorageManager.isMysqlDB())
+		else if (isMysqlDB())
 			query.append("select  UNIX_TIMESTAMP()*1000");
-		else if (StorageManager.isSqlServer()) {
+		else if (isSqlServer()) {
 			query.append("select convert(bigint,datediff(second,'1/1/1970',current_timestamp))*1000 ");
 		}
 		Connection connection = null;

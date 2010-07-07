@@ -35,7 +35,7 @@ public class VSensorLoader extends Thread {
 	 */
 	private  final List < AbstractWrapper > activeWrappers                   = new ArrayList< AbstractWrapper >( );
 
-	private StorageManager                                         sm                      = StorageManager.getInstance ( );
+	//private StorageManager                                         sm                      = StorageManager.getInstance ( );
 
 	private String                                                 pluginsDir;
 
@@ -93,7 +93,7 @@ public class VSensorLoader extends Thread {
 	}
 
 	public void run ( ) {
-		if ( sm == null ) {
+		if ( Main.getMainStorage() == null || Main.getWindowStorage() == null ) {
 			logger.fatal ( "The Storage Manager shouldn't be null, possible a BUG." );
 			return;
 		}
@@ -190,8 +190,8 @@ public class VSensorLoader extends Thread {
             logger.error(e2.getMessage(), e2);
         }
         try {
-            if (!sm.tableExists(vs.getName(), vs.getOutputStructure()))
-                sm.executeCreateTable(vs.getName(), vs.getOutputStructure(), pool.getConfig().getIsTimeStampUnique());
+            if (!Main.getMainStorage().tableExists(vs.getName(), vs.getOutputStructure()))
+                Main.getMainStorage().executeCreateTable(vs.getName(), vs.getOutputStructure(), pool.getConfig().getIsTimeStampUnique());
             else
                 logger.info("Reusing the existing " + vs.getName() + " table.");
         } catch (SQLException e) {
@@ -403,8 +403,8 @@ public class VSensorLoader extends Thread {
 				return null;
 			try {
 				logger.debug("Wrapper name: "+wrapper.getWrapperName()+ " -- view name "+ wrapper.getDBAliasInStr());
-				if (!sm.tableExists(wrapper.getDBAliasInStr(),wrapper.getOutputFormat()))
-					sm.executeCreateTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ),wrapper.isTimeStampUnique() );
+				if (!Main.getWindowStorage().tableExists(wrapper.getDBAliasInStr(),wrapper.getOutputFormat()))
+					Main.getWindowStorage().executeCreateTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ),wrapper.isTimeStampUnique() );
 			} catch ( SQLException e ) {
 				logger.error ( e.getMessage ( ) , e );
 				return null;
@@ -454,7 +454,8 @@ public class VSensorLoader extends Thread {
 			logger.warn ( "Removing the resources associated with : " + sensorInstance.getConfig ( ).getFileName ( ) + " [done]." );
 		}
 		try {
-			sm.shutdown ( );
+			Main.getWindowStorage().shutdown( );
+            Main.getMainStorage().shutdown();
 		} catch ( SQLException e ) {
 			logger.error(e.getMessage(),e);
 		}finally {
