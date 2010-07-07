@@ -15,13 +15,13 @@ public class CleanDB {
     PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
     ContainerConfig cc =Main.getContainerConfig();
     Class.forName(cc.getJdbcDriver());
-    StorageManager.getInstance ( ).init ( cc.getJdbcDriver ( ) , cc.getJdbcUsername ( ) , cc.getJdbcPassword ( ) , cc.getJdbcURL ( ), Main.DEFAULT_MAX_DB_CONNECTIONS);
-    ArrayList<String> tables = StorageManager.getInstance().getInternalTables();
+    StorageManager sm = StorageManagerFactory.getInstance(cc.getJdbcDriver ( ) , cc.getJdbcUsername ( ) , cc.getJdbcPassword ( ) , cc.getJdbcURL ( ), Main.DEFAULT_MAX_DB_CONNECTIONS);
+    ArrayList<String> tables = sm.getInternalTables();
     for (String t : tables) 
-      StorageManager.getInstance().executeDropTable(t);
-    tables = StorageManager.getInstance().getInternalTables();
+      sm.executeDropTable(t);
+    tables = sm.getInternalTables();
     for (String t : tables) 
-      StorageManager.getInstance().executeDropView(new StringBuilder(t));
+      sm.executeDropView(new StringBuilder(t));
       
   }
 }

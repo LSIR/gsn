@@ -1193,7 +1193,7 @@ public class StorageManager {
 		return oracle;
 	}
 
-	private static StorageManager singleton = new StorageManager();
+	//private static StorageManager singleton = new StorageManager();
 
 	private static final transient Logger logger = Logger.getLogger(StorageManager.class);
 
@@ -1202,11 +1202,16 @@ public class StorageManager {
 
 	private static boolean sqlserver;
 
+    /**
+     * The Storage Manager instance should be injected and not accessed through this static method.
+     * @deprecated
+     * @return
+     */
 	public static StorageManager getInstance() {
-		return singleton;
+		return Main.getMainStorage();
 	}
 
-	private StorageManager() {
+	public StorageManager() {
 	}
 
 	private String databaseURL;
