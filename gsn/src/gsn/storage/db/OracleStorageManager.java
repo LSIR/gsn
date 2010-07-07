@@ -227,6 +227,18 @@ public class OracleStorageManager extends StorageManager {
 
     }
 
+    @Override
+    public StringBuilder getStatementRemoveUselessDataCountBased(String virtualSensorName, long storageSize) {
+        return new StringBuilder()
+                .append("delete from ")
+                .append(virtualSensorName)
+                .append(" where timed <= ( SELECT * FROM ( SELECT timed FROM ")
+                .append(virtualSensorName)
+                .append(" group by timed ORDER BY timed DESC) where rownum = ")
+                .append(storageSize + 1)
+                .append(" )");
+    }
+
     // private
 
     /**

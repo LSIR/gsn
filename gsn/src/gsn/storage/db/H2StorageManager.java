@@ -144,6 +144,24 @@ public class H2StorageManager extends StorageManager {
                 .append(" offset 0 )");
     }
 
+    @Override
+    public StringBuilder getStatementRemoveUselessDataCountBased(String virtualSensorName, long storageSize) {
+        return new StringBuilder()
+                .append("delete from ")
+                .append(virtualSensorName)
+                .append(" where ")
+                .append(virtualSensorName)
+                .append(".timed not in ( select ")
+                .append(virtualSensorName)
+                .append(".timed from ")
+                .append(virtualSensorName)
+                .append(" order by ")
+                .append(virtualSensorName)
+                .append(".timed DESC  LIMIT  ")
+                .append(storageSize).append(" offset 0 )");
+
+    }
+
     //
 
     /*
