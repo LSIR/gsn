@@ -1,8 +1,8 @@
 package gsn.http.rest;
 
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
 
 import java.io.IOException;
@@ -80,14 +80,14 @@ public class RestRemoteWrapper extends AbstractWrapper {
 		if (startTime != null && startTime.equals("continue")) {
 			Connection conn = null;
 			try {
-				conn = StorageManager.getInstance().getConnection();
+				conn = Main.getMainStorage().getConnection();
 
 				// check if table already exists
 				ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
 				if (rs.next()) {
 					StringBuilder query = new StringBuilder();
 					query.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
-					rs = StorageManager.executeQueryWithResultSet(query, conn);
+					rs = Main.getMainStorage().executeQueryWithResultSet(query, conn);
 					if (rs.next()) {
 						lastReceivedTimestamp = rs.getLong(1);
 					}
@@ -98,7 +98,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
 				logger.error(e.getMessage(), e);
 				return false;
 			} finally {
-				StorageManager.close(conn);
+				Main.getMainStorage().close(conn);
 			}
 		} else if (startTime != null && startTime.startsWith("-")) {
 			try {

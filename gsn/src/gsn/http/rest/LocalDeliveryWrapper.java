@@ -1,6 +1,7 @@
 package gsn.http.rest;
 
 import gsn.DataDistributer;
+import gsn.Main;
 import gsn.Mappings;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.AddressBean;
@@ -9,7 +10,6 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.SQLUtils;
 import gsn.storage.SQLValidator;
-import gsn.storage.StorageManager;
 import gsn.utils.Helpers;
 import gsn.vsensor.AbstractVirtualSensor;
 import gsn.wrappers.AbstractWrapper;
@@ -64,14 +64,14 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		if (startTime.equals("continue")) {
 			Connection conn = null;
 			try {
-				conn = StorageManager.getInstance().getConnection();
+				conn = Main.getMainStorage().getConnection();
 				
 				ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
 				if (rs.next()) {
 					StringBuilder dbquery = new StringBuilder();
 					dbquery.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
 
-					rs = StorageManager.executeQueryWithResultSet(dbquery, conn);
+					rs = Main.getMainStorage().executeQueryWithResultSet(dbquery, conn);
 					if (rs.next()) {
 						lastVisited = rs.getLong(1);
 					}
@@ -79,7 +79,7 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				StorageManager.close(conn);
+				Main.getMainStorage().close(conn);
 			}
 		} else if (startTime.startsWith("-")) {
 			try {

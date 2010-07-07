@@ -51,7 +51,7 @@ public abstract class StorageManager {
         //
         Connection con = null;
         try {
-            con = getConnection();
+            initDatabaseAccess(con = getConnection());
             logger.warn(new StringBuilder().append("StorageManager DB connection initialized successfuly. driver:").append(databaseDriver).append(" url:").append(databaseURL));
         } catch (Exception e) {
             logger.error(new StringBuilder().append("Connecting to the database with the following properties failed :").append("\n\t UserName :").append(username).append("\n\t Password : ").append(password).append("\n\t Driver class : ").append(databaseDriver).append("\n\t Database URL : ").append(databaseURL).toString());
@@ -64,6 +64,8 @@ public abstract class StorageManager {
             close(con);
         }
     }
+
+    public void initDatabaseAccess(Connection con) throws Exception {}
 
     public abstract byte convertLocalTypeToGSN(int jdbcType, int precision);
 
@@ -841,3 +843,5 @@ public abstract class StorageManager {
 
 
 }
+
+ 	  	 

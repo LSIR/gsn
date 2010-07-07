@@ -1,13 +1,11 @@
 package gsn.wrappers;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 
 import javax.naming.OperationNotSupportedException;
 
 import org.apache.log4j.Logger;
 
-import gsn.storage.StorageManager;
 import gsn.wrappers.backlog.BackLogMessageMultiplexer;
 import gsn.wrappers.backlog.plugins.AbstractPlugin;
 import gsn.beans.AddressBean;
@@ -54,11 +52,9 @@ public class BackLogWrapper extends AbstractWrapper {
 	private static final String BACKLOG_PLUGIN = "plugin-classname";
 	
 	private BackLogMessageMultiplexer blMsgMultiplexer = null;
-	private Object sync = new Object();
 	private String plugin = null;
 	private AbstractPlugin pluginObject = null;
 	private AddressBean addressBean = null;
-	private static StorageManager storage = null;
     private static int threadCounter = 0;
 	
 	private final transient Logger logger = Logger.getLogger( BackLogWrapper.class );
@@ -100,29 +96,6 @@ public class BackLogWrapper extends AbstractWrapper {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return false;
-		}
-		
-		synchronized (sync) {
-			if (storage == null) {
-				try {
-					StorageManager sm = getStorageManager();
-					if (StorageManager.getDatabaseForConnection(sm.getConnection()) == StorageManager.DATABASE.MYSQL) {
-						sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_tinyint"));
-						sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_tinyint(number bigint) RETURNS tinyint BEGIN return number; END"));
-						sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_smallint"));
-						sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_smallint(number bigint) RETURNS smallint BEGIN return number; END"));
-						sm.executeUpdate(new StringBuilder("DROP FUNCTION IF EXISTS to_integer"));
-						sm.executeUpdate(new StringBuilder("CREATE FUNCTION to_integer(number bigint) RETURNS integer BEGIN return number; END"));
-						storage = sm;
-					}
-					else {
-						logger.error("Currently only MySQL supported for function creation -> this may lead to missbehaviour!");
-					}
-				} catch (SQLException e) {
-					logger.error("Could not add SQL cast functions", e);
-					return false;
-				}
-			}
 		}
 		
 		try {

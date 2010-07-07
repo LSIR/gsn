@@ -21,6 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
+import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.storage.StorageManager;
@@ -152,20 +153,6 @@ public class BinaryPlugin extends AbstractPlugin {
 				logger.error("This plugin can only be used once per CoreStation (core station " + coreStationName + " already used!");
 				return false;
 			}
-		}
-
-		try {
-			if (logger.isDebugEnabled() && StorageManager.getDatabaseForConnection(StorageManager.getInstance().getConnection()) == StorageManager.DATABASE.H2) {
-				try {
-					String [] args = {"-webPort", "8082", "-webAllowOthers", "false"};
-					web = Server.createWebServer(args);
-					web.start();
-				} catch (SQLException e) {
-					logger.warn(e.getMessage(), e);
-				}
-			}
-		} catch (SQLException e) {
-			logger.warn(e.getMessage(), e);
 		}
 		
 		propertyFileName = rootBinaryDir + PROPERTY_FILE_NAME;

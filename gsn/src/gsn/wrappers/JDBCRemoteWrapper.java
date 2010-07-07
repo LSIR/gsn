@@ -4,11 +4,11 @@ import org.apache.log4j.Logger;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.AddressBean;
 import gsn.beans.StreamElement;
 import gsn.beans.DataTypes;
-import gsn.storage.StorageManager;
 import gsn.storage.DataEnumerator;
 
 import java.sql.DriverManager;
@@ -171,7 +171,7 @@ public class JDBCRemoteWrapper extends AbstractWrapper {
         	
             logger.info("Initializing the structure of JDBCRemoteWrapper with : " + table_name);
             connection = DriverManager.getConnection(props.getProperty("url").trim(), props.getProperty("user").trim(), props.getProperty("password").trim());
-            outputFormat = StorageManager.tableToStructure(table_name, connection);
+            outputFormat = Main.getMainStorage().tableToStructure(table_name, connection);
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             try {
@@ -293,7 +293,7 @@ public class JDBCRemoteWrapper extends AbstractWrapper {
         long latest = -1;
         StringBuilder query = new StringBuilder("select max(timed) from ").append(this.getActiveAddressBean().getVirtualSensorName());
         try {
-            data = StorageManager.getInstance().executeQuery(query, false);
+            data = Main.getMainStorage().executeQuery(query, false);
             logger.warn("Running query " + query);
 
             while (data.hasMoreElements()) {
