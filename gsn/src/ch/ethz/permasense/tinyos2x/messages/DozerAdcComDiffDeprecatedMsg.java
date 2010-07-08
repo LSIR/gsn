@@ -805,9 +805,9 @@ public class DozerAdcComDiffDeprecatedMsg extends ch.ethz.permasense.tinyos2x.me
     /**
      * Return the entire array 'payload.A' as a int[]
      */
-    public int[] get_payload_A() {
-        int[] tmp = new int[4];
-        tmp[0] = -1;
+    public Integer[] get_payload_A() {
+        Integer[] tmp = new Integer[4];
+        tmp[0] = null;
         for (int index0 = 1; index0 < numElements_payload_A(0); index0++) {
             tmp[index0] = getElement_payload_A(index0-1);
         }
