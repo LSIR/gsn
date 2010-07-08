@@ -21,7 +21,8 @@ from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
 from ScheduleHandler import ScheduleHandlerClass
 
-PROFILE = False
+PROFILE = True
+PROFILE_FILE = '/media/card/backlog.profile'
 
 DEFAULT_CONFIG_FILE = '/etc/backlog.cfg'
 DEFAULT_PLUGINS = [ 'BackLogStatusPlugin' ]
@@ -382,6 +383,6 @@ def main():
 if __name__ == '__main__':
     if PROFILE:
         import cProfile
-        cProfile.run('main()')
+        cProfile.run('main()', PROFILE_FILE)
     else:
         main()
