@@ -21,6 +21,8 @@ from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
 from ScheduleHandler import ScheduleHandlerClass
 
+PROFILE = False
+
 DEFAULT_CONFIG_FILE = '/etc/backlog.cfg'
 DEFAULT_PLUGINS = [ 'BackLogStatusPlugin' ]
 DEFAULT_OPTION_GSN_PORT = 9003
@@ -378,4 +380,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if PROFILE:
+        import cProfile
+        cProfile.run('main()')
+    else:
+        main()

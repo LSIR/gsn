@@ -395,7 +395,6 @@ class GSNListener(Thread):
         if length == 1 and out:
             self._stuffread = ''
             return out
-        index = 0
         while True:
             c = self.clientsocket.recv(1)
             if not c:
@@ -414,8 +413,6 @@ class GSNListener(Thread):
                     return None
             else:
                 out += c
-                    
-                index += 1
             
             if len(out) == length:
                 break
@@ -534,6 +531,8 @@ class GSNWriter(Thread):
         self._parent = parent
         self._sendqueue = Queue.PriorityQueue(SEND_QUEUE_SIZE)
         self._work = Event()
+        self._stuff = chr(STUFFING_BYTE)
+        self._dblstuff = self._stuff + self._stuff
         self._stopped = False
 
 
@@ -576,11 +575,11 @@ class GSNWriter(Thread):
         
         
     def pktStuffing(self, pkt):
-        c = chr(STUFFING_BYTE)
-        return pkt.replace(c, c+c)
+        return pkt.replace(self._stuff, self._dblstuff)
         
         
     def sendHelloMsg(self):
+        self.emptyQueue()
         helloMsg = chr(STUFFING_BYTE) + chr(HELLO_BYTE)
         helloMsg += self.pktStuffing(struct.pack('<I', self._parent._parent._deviceid))
         self.addMsg(helloMsg, 0)
@@ -626,3 +625,4 @@ class GSNWriter(Thread):
             self._work.set()
             return True
         return False
+    

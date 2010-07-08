@@ -41,6 +41,8 @@ class GPSPluginClass(AbstractPluginClass):
 
         # configure the receiver to the correct measurement rate
         self._sendGpsMessage(self._rateMessageId, struct.pack('3H', self._interval*1000, 1, 1))
+        
+        self._stopped = False
 
     def run(self):
 
@@ -53,7 +55,7 @@ class GPSPluginClass(AbstractPluginClass):
         # scheduling my death...
         self._endTime = startTime + self._measTime
 
-        while time.time() <= self._endTime:
+        while time.time() <= self._endTime and not self._stopped:
             # Wait for next measurement time
             self._runEv.wait((startTime + measurementNo * self._interval) - time.time())
             if self._runEv.isSet():
@@ -96,7 +98,7 @@ class GPSPluginClass(AbstractPluginClass):
         '''
         Receive a UBX Command from the GPS Device
         '''
-        while True:
+        while not self._stopped:
             # Wait for the Header
             a = 'a'
             while not self._runEv.isSet() and len(a)==1 and ord(a) != 0xB5:
@@ -164,4 +166,5 @@ class GPSPluginClass(AbstractPluginClass):
         return BackLogMessage.GPS_MESSAGE_TYPE
 
     def stop(self):
+        self._stopped = True
         self._runEv.set()
