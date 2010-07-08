@@ -110,6 +110,8 @@ class BackLogDBClass(Thread):
             
             self._con.execute('CREATE table IF NOT EXISTS backlogmsg (timestamp INTEGER PRIMARY KEY ON CONFLICT REPLACE, type INTEGER, message BLOB)')
             
+            self._con.execute('CREATE INDEX IF NOT EXISTS type_index ON backlogmsg (type)')
+            
             self._cur.execute('SELECT COUNT(1) FROM backlogmsg')
             self._dbNumberOfEntries = self._cur.fetchone()[0]
             self._dblock.release()
