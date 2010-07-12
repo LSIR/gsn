@@ -512,8 +512,8 @@ public class GSNWebServiceSkeleton {
             session.query.updateCriterion(stc);
 
             //
-            Connection connection = StorageManager.getInstance().getConnection();
-            de = StorageManager.getInstance().streamedExecuteQuery(session.query, false, connection);
+            Connection connection = Main.getStorage(session.vsname).getConnection();
+            de = Main.getStorage(session.vsname).streamedExecuteQuery(session.query, false, connection);
             int page = 0;
             while (de.hasMoreElements() && page < PAGE_SIZE) {
                 StreamElement se = de.nextElement();

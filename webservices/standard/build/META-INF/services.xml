@@ -5,7 +5,7 @@
     <service name="GSNWebService" scope="application">
         <messageReceivers>
             <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="gsn.webservice.standard.GSNWebServiceMessageReceiverInOut"/>
-            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only" class="gsn.webservice.standard.GSNWebServiceMessageReceiverInOnly"/>
+            <!--<messageReceiver mep="http://www.w3.org/ns/wsdl/in-only" class="gsn.webservice.standard.GSNWebServiceMessageReceiverInOnly"/>-->
         </messageReceivers>
         <parameter name="ServiceClass">gsn.webservice.standard.GSNWebServiceSkeleton</parameter>
         <parameter name="useOriginalwsdl">true</parameter>
