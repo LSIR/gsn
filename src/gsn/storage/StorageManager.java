@@ -20,43 +20,20 @@ public abstract class StorageManager {
 
     private static final transient Logger logger = Logger.getLogger(StorageManager.class);
 
-    public static final int DEFAULT_STORAGE_POOL_SIZE = 100;
-
-    //private String databaseURL;
-
-    //private Properties dbConnectionProperties;
-
     private String databaseDriver;
 
     private BasicDataSource pool;
 
-    private int connectionCount;
-
-    public StorageManager() {
-        //dbConnectionProperties = new Properties();
-        connectionCount = 0;
-    }
-
     public void init(String databaseDriver, String username, String password, String databaseURL, int maxDBConnections) {
         this.databaseDriver = databaseDriver;
-        //this.databaseURL = databaseURL;
-
         pool = DataSources.getDataSource(new DBConnectionInfo(databaseDriver,databaseURL,username,password));
-        /*
-        pool = new BasicDataSource();
-        pool.setDriverClassName(databaseDriver);
-        pool.setUsername(username);
-        pool.setPassword(password);
-        pool.setUrl(databaseURL);
         pool.setMaxActive(maxDBConnections);
         pool.setMaxIdle(maxDBConnections);
-        pool.setAccessToUnderlyingConnectionAllowed(true);
-        */
         //
         Connection con = null;
         try {
             initDatabaseAccess(con = getConnection());
-            logger.warn(new StringBuilder().append("StorageManager DB connection initialized successfuly. driver:").append(databaseDriver).append(" url:").append(databaseURL));
+            logger.info(new StringBuilder().append("StorageManager DB connection initialized successfuly. driver:").append(databaseDriver).append(" url:").append(databaseURL));
         } catch (Exception e) {
             logger.error(new StringBuilder().append("Connecting to the database with the following properties failed :").append("\n\t UserName :").append(username).append("\n\t Password : ").append(password).append("\n\t Driver class : ").append(databaseDriver).append("\n\t Database URL : ").append(databaseURL).toString());
             logger.error(new StringBuilder().append(e.getMessage()).append(", Please refer to the logs for more detailed information.").toString());
@@ -308,7 +285,6 @@ public abstract class StorageManager {
         try {
             if (conn != null && !conn.isClosed()) {
                 conn.close();
-                connectionCount--;
             }
         } catch (SQLException e) {
             logger.debug(e.getMessage(), e);
@@ -763,7 +739,14 @@ public abstract class StorageManager {
      */
     public Connection getConnection() throws SQLException {
         if (logger.isDebugEnabled())
-            logger.debug("Asking for connections to default DB=> busy: " + pool.getNumActive() + ", max-size:" + pool.getMaxActive() + ", idle:" + pool.getNumIdle());
+            logger.debug(new StringBuilder("Asking a con. to DB: ")
+                    .append(pool.getUrl())
+                    .append(" => busy: ")
+                    .append(pool.getNumActive())
+                    .append(", max-size: ")
+                    .append(pool.getMaxActive())
+                    .append(", idle: ")
+                    .append(pool.getNumIdle()));
         return pool.getConnection();
     }
 

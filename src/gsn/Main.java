@@ -105,19 +105,20 @@ public final class Main {
 			throw new Exception(e);
 		}
         int maxDBConnections = System.getProperty("maxDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxDBConnections"));
+        int maxSlidingDBConnections = System.getProperty("maxSlidingDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxSlidingDBConnections"));
         int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
 
         mainStorage = StorageManagerFactory.getInstance(containerConfig.getStorage().getJdbcDriver ( ) , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) , maxDBConnections);
         //
         StorageConfig sc = containerConfig.getSliding() != null ? containerConfig.getSliding().getStorage() : containerConfig.getStorage() ;
-        windowStorage = StorageManagerFactory.getInstance(sc.getJdbcDriver ( ) , sc.getJdbcUsername ( ) , sc.getJdbcPassword ( ) , sc.getJdbcURL ( ), Main.DEFAULT_MAX_DB_CONNECTIONS);
+        windowStorage = StorageManagerFactory.getInstance(sc.getJdbcDriver ( ) , sc.getJdbcUsername ( ) , sc.getJdbcPassword ( ) , sc.getJdbcURL ( ), maxSlidingDBConnections);
         //
-        validationStorage = StorageManagerFactory.getInstance("org.h2.Driver", "sa", "", "jdbc:h2:mem:dum", Main.DEFAULT_MAX_DB_CONNECTIONS);
+        validationStorage = StorageManagerFactory.getInstance("org.h2.Driver", "sa", "", "jdbc:h2:mem:validator", Main.DEFAULT_MAX_DB_CONNECTIONS);
 
         if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
 
 		try {
-			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxServlets:"+maxServlets+")"+" ...");
+			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxSlidingDBConnections: " + maxSlidingDBConnections + ", maxServlets:"+maxServlets+")"+" ...");
             Server jettyServer = getJettyServer(Main.getContainerConfig().getContainerPort(), maxServlets);
 			jettyServer.start ( );
 			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
@@ -252,8 +253,6 @@ public final class Main {
 
 	private  ContainerConfig                       containerConfig;
 
-	private  HashMap < String , VSensorConfig >    virtualSensors;
-
 	public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
 		ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
@@ -372,16 +371,16 @@ public final class Main {
 		return null;
 	}
 
-	public final HashMap < String , VSensorConfig > getVirtualSensors ( ) {
-		return virtualSensors;
-	}
+//	public final HashMap < String , VSensorConfig > getVirtualSensors ( ) {
+//		return virtualSensors;
+//	}
 
-	public  boolean justConsumes ( ) {
-		Iterator < VSensorConfig > vsconfigs = virtualSensors.values ( ).iterator ( );
-		while ( vsconfigs.hasNext ( ) )
-			if ( !vsconfigs.next ( ).needsStorage ( ) ) return false;
-		return true;
-	}
+//	public  boolean justConsumes ( ) {
+//		Iterator < VSensorConfig > vsconfigs = virtualSensors.values ( ).iterator ( );
+//		while ( vsconfigs.hasNext ( ) )
+//			if ( !vsconfigs.next ( ).needsStorage ( ) ) return false;
+//		return true;
+//	}
 
 	/**
 	 * Get's the GSN configuration without starting GSN.
@@ -495,7 +494,7 @@ public final class Main {
             }
             sm = storages.get(dci.hashCode());
             if (sm == null) {
-                sm = StorageManagerFactory.getInstance(config.getStorage().getJdbcDriver(), config.getStorage().getJdbcUsername(), config.getStorage().getJdbcPassword(), config.getStorage().getJdbcURL(), 8);
+                sm = StorageManagerFactory.getInstance(config.getStorage().getJdbcDriver(), config.getStorage().getJdbcUsername(), config.getStorage().getJdbcPassword(), config.getStorage().getJdbcURL(), DEFAULT_MAX_DB_CONNECTIONS);
                 storages.put(dci.hashCode(), sm);
                 storagesConfigs.put(config, sm);
             }

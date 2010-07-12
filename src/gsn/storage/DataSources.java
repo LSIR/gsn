@@ -18,27 +18,13 @@ public class DataSources {
             ds = (BasicDataSource)GSNContext.getMainContext().lookup(Integer.toString(dci.hashCode()));
             if (ds == null) {
                 ds = new BasicDataSource();
-                /*
-                BasicDataSource ds = new BasicDataSource();
-                ds.setDriverClassName(driverClass);
-                ds.setUsername(userName);
-                ds.setPassword(password);
-                ds.setUrl(url);
-
-                ds.setMaxActive(maxActive);
-                ds.setMaxIdle(maxIde);
-                ds.setMaxWait(maxWait);
-                ds.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-                ds.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
-                */
                 ds.setDriverClassName(dci.getDriverClass());
                 ds.setUsername(dci.getUserName());
                 ds.setPassword(dci.getPassword());
                 ds.setUrl(dci.getUrl());
-                ds.setMaxActive(8);
-                ds.setMaxIdle(8);
-                ds.setAccessToUnderlyingConnectionAllowed(true);
+                ds.setAccessToUnderlyingConnectionAllowed(true); // TODO 
                 GSNContext.getMainContext().bind(Integer.toString(dci.hashCode()), ds);
+                logger.warn("Created a DataSource to: " + ds.getUrl());
             }
         } catch (NamingException e) {
             logger.error(e.getMessage(), e);
