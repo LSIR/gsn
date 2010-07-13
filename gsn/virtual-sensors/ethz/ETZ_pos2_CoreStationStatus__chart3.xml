@@ -22,10 +22,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, I_V12DC_EXT, I_V12DC_IN from ETZ_CoreStationStatus__conv__1946 where POSITION = 2</predicate>
+                    <predicate key="query"> select timed, GENERATION_TIME, I_V12DC_EXT, I_V12DC_IN from ETZ_CoreStationStatus__conv__1946</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select * from wrapper where POSITION = 2 </query>
             </source>
             <query> select * from source </query>
         </stream>
