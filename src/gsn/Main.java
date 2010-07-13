@@ -10,7 +10,6 @@ import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 import gsn.storage.StorageManagerFactory;
 import gsn.storage.hibernate.DBConnectionInfo;
-import gsn.storage.hibernate.HibernateStorage;
 import gsn.utils.ValidityTools;
 import gsn.vsensor.SQLValidatorIntegration;
 import gsn.wrappers.WrappersUtil;
@@ -46,7 +45,6 @@ import java.security.cert.CertificateFactory;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
 
@@ -508,6 +506,10 @@ public final class Main {
 
     public static StorageManager getStorage(String vsName) {
         return getStorage(Mappings.getVSensorConfig(vsName));
+    }
+
+    public static StorageManager getDefaultStorage() {
+        return getStorage((VSensorConfig)null);
     }
 
     public static StorageManager getWindowStorage() {
