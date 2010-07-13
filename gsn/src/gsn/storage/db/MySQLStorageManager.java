@@ -37,7 +37,7 @@ public class MySQLStorageManager extends StorageManager {
                     convertedType = gsnType.getType();
                 break;
             case DataTypes.BINARY:
-                convertedType = "BLOB";
+                convertedType = "LONGBLOB";
                 break;
             case DataTypes.DOUBLE:
                 convertedType = "double precision";
