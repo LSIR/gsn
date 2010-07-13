@@ -22,10 +22,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, CONDUCTIVITY0, CONDUCTIVITY1, CONDUCTIVITY2, CONDUCTIVITY3, CONDUCTIVITY4 from Thur_Dozer_DecagonMux__conv__1950 where POSITION = 3 and PAYLOAD_SAMPLE_VALID = 1 </predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, CONDUCTIVITY0, CONDUCTIVITY1, CONDUCTIVITY2, CONDUCTIVITY3, CONDUCTIVITY4 from Thur_Dozer_DecagonMux__conv__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper
+                <query> select * from wrapper where POSITION = 3 and PAYLOAD_SAMPLE_VALID = 1
                 </query>
             </source>
             <query> select * from source </query>

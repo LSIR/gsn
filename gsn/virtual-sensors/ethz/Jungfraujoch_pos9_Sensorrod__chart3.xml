@@ -22,10 +22,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, SR_REF1, SR_REF2, SR_REF3, SR_REF4, SR_REF5 from Jungfraujoch_Sensorrod__1950 where POSITION = 9 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, SR_REF1, SR_REF2, SR_REF3, SR_REF4, SR_REF5 from Jungfraujoch_Sensorrod__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select * from wrapper where POSITION = 9 and PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

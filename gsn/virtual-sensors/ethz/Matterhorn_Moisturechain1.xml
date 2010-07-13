@@ -37,10 +37,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Dozer_AdcMux1__mapped__1950 where SENSORTYPE is not null and locate(" tm:", SENSORTYPE) != 0 </predicate>
+                    <predicate key="query"> select * from Matterhorn_Dozer_AdcMux1__mapped__1950 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select * from wrapper where SENSORTYPE is not null and locate(" tm:", SENSORTYPE) != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

@@ -30,7 +30,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Dozer_DigitalDCX__mapped__1950 where PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="query"> select * from Matterhorn_Dozer_DigitalDCX__mapped__1950 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select *, 
@@ -39,7 +39,7 @@
                     FORMAT(PAYLOAD_DCX_FLOATVALUE1 * 1000, 2) as DCX_P2, 
                     FORMAT(PAYLOAD_DCX_FLOATVALUE0 * 1000, 2) as DCX_P12, 
                     FORMAT(PAYLOAD_DCX_FLOATVALUE2, 3) as DCX_TOB1, 
-                    FORMAT(PAYLOAD_DCX_FLOATVALUE3, 3) as DCX_TOB2 from wrapper </query>
+                    FORMAT(PAYLOAD_DCX_FLOATVALUE3, 3) as DCX_TOB2 from wrapper where PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

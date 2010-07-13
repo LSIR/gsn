@@ -23,10 +23,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, SR_R1, SR_R2, SR_R3, SR_R4, SR_R12, SR_R23, SR_R34, SR_R31, SR_R42, SR_R41 from Matterhorn_Sensorrod__1950 where POSITION = 10 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, SR_R1, SR_R2, SR_R3, SR_R4, SR_R12, SR_R23, SR_R34, SR_R31, SR_R42, SR_R41 from Matterhorn_Sensorrod__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select * from wrapper where POSITION = 10 and PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

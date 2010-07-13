@@ -23,12 +23,12 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, PAYLOAD_PERIOD, PAYLOAD_MCUACTIVE, PAYLOAD_RADIOTX, PAYLOAD_RADIORX from Jungfraujoch_Dozer_StateCounter__mapped__1950 where POSITION = 13 </predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_PERIOD, PAYLOAD_MCUACTIVE, PAYLOAD_RADIOTX, PAYLOAD_RADIORX from Jungfraujoch_Dozer_StateCounter__mapped__1950 </predicate>
                 </address>
-                <query> select GENERATION_TIME, 
+                <query> select timed, GENERATION_TIME, 
                     IF(PAYLOAD_MCUACTIVE = 0, NULL, PAYLOAD_MCUACTIVE * 1000 / PAYLOAD_PERIOD) as MCUACTIVE, 
                     IF(PAYLOAD_RADIOTX = 0, NULL, PAYLOAD_RADIOTX * 1000 / PAYLOAD_PERIOD) as RADIOTX, 
-                    IF(PAYLOAD_RADIORX = 0, NULL, PAYLOAD_RADIORX * 1000 / PAYLOAD_PERIOD) as RADIORX from wrapper
+                    IF(PAYLOAD_RADIORX = 0, NULL, PAYLOAD_RADIORX * 1000 / PAYLOAD_PERIOD) as RADIORX from wrapper where POSITION = 13
                 </query>
             </source>
             <query> select * from source </query>

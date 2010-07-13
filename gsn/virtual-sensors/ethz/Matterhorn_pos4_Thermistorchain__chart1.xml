@@ -22,10 +22,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, TC_T1, TC_T2, TC_T3, TC_T4, TC_T5, TC_T6, TC_T7, TC_T8 from Matterhorn_Thermistorchain__1950 where POSITION = 4 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, TC_T1, TC_T2, TC_T3, TC_T4, TC_T5, TC_T6, TC_T7, TC_T8 from Matterhorn_Thermistorchain__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select * from wrapper where POSITION = 4 and PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

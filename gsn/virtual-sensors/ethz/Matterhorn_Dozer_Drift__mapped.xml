@@ -24,12 +24,11 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_MYTEMP0, PAYLOAD_PARENTTEMP0, PAYLOAD_DRIFTPPM0 from Matterhorn_Dozer_Drift__muxed__mapped__1950 
+                        select * from Matterhorn_Dozer_Drift__muxed__mapped__1950 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,
+                <query> select timed, POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,
                     PAYLOAD_MYTEMP0 as LOCALTEMP,
                     PAYLOAD_PARENTTEMP0 as PARENTTEMP,
                     PAYLOAD_DRIFTPPM0 as DRIFTPPM from wrapper 
@@ -41,12 +40,11 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,  
-                        PAYLOAD_MYTEMP1, PAYLOAD_PARENTTEMP1, PAYLOAD_DRIFTPPM1 from Matterhorn_Dozer_Drift__muxed__mapped__1950
+                        select * from Matterhorn_Dozer_Drift__muxed__mapped__1950
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME+1 as GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select timed, POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME+1 as GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_MYTEMP1 as LOCALTEMP,
                     PAYLOAD_PARENTTEMP1 as PARENTTEMP,
                     PAYLOAD_DRIFTPPM1 as DRIFTPPM from wrapper
@@ -58,12 +56,11 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
-                        PAYLOAD_MYTEMP2, PAYLOAD_PARENTTEMP2, PAYLOAD_DRIFTPPM2 from Matterhorn_Dozer_Drift__muxed__mapped__1950
+                        select * from Matterhorn_Dozer_Drift__muxed__mapped__1950
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME+2 as GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                <query> select timed, POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME+2 as GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
                     PAYLOAD_MYTEMP2 as LOCALTEMP,
                     PAYLOAD_PARENTTEMP2 as PARENTTEMP,
                     PAYLOAD_DRIFTPPM2 as DRIFTPPM from wrapper

@@ -40,7 +40,7 @@
                     <predicate key="query"> select * from Jungfraujoch_Dozer_DecagonMux__mapped__1950</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
                     CASEWHEN(PAYLOAD_MUX_VALID0 = 0, NULL, cast(round(PAYLOAD_DATA_CONDUCTIVITY0 / 50, 2) as CHAR(30))) as CONDUCTIVITY0, 
                     CASEWHEN(PAYLOAD_MUX_VALID1 = 0, NULL, cast(round(PAYLOAD_DATA_CONDUCTIVITY1 / 50, 2) as CHAR(30))) as CONDUCTIVITY1, 
                     CASEWHEN(PAYLOAD_MUX_VALID2 = 0, NULL, cast(round(PAYLOAD_DATA_CONDUCTIVITY2 / 50, 2) as CHAR(30))) as CONDUCTIVITY2, 

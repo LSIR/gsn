@@ -34,7 +34,7 @@
                     <predicate key="query"> select * from Thur_CoreStationStatus__mapped__1950 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, cast(round(V_PV/1000, 3) as CHAR(30)) as V_PV, cast(round(I_PV/1000, 3) as CHAR(30)) as I_PV, cast(round(V_12BAT/1000, 3) as CHAR(30)) as V_12BAT, cast(round(I_V12DC_EXT/1000, 3) as CHAR(30)) as I_V12DC_EXT, cast(round(V12DC_IN/1000, 3) as CHAR(30)) as V12DC_IN, cast(round(I_V12DC_IN/1000, 3) as CHAR(30)) as I_V12DC_IN, cast(round(VCC_5_0/1000, 3) as CHAR(30)) as VCC_5_0, cast(round(VCC_NODE/1000, 3) as CHAR(30)) as VCC_NODE, cast(round(I_VCC_NODE/1000, 3) as CHAR(30)) as I_VCC_NODE, cast(round(VCC_4_2/1000, 3) as CHAR(30)) as VCC_4_2 from wrapper </query>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, cast(round(V_PV/1000, 3) as CHAR(30)) as V_PV, cast(round(I_PV/1000, 3) as CHAR(30)) as I_PV, cast(round(V_12BAT/1000, 3) as CHAR(30)) as V_12BAT, cast(round(I_V12DC_EXT/1000, 3) as CHAR(30)) as I_V12DC_EXT, cast(round(V12DC_IN/1000, 3) as CHAR(30)) as V12DC_IN, cast(round(I_V12DC_IN/1000, 3) as CHAR(30)) as I_V12DC_IN, cast(round(VCC_5_0/1000, 3) as CHAR(30)) as VCC_5_0, cast(round(VCC_NODE/1000, 3) as CHAR(30)) as VCC_NODE, cast(round(I_VCC_NODE/1000, 3) as CHAR(30)) as I_VCC_NODE, cast(round(VCC_4_2/1000, 3) as CHAR(30)) as VCC_4_2 from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

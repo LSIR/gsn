@@ -23,10 +23,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, TM_M1, TM_M2, TM_M3, TM_M4 from Matterhorn_Moisturechain__1950 where POSITION = 5 and PAYLOAD_SAMPLE_VALID != 0 </predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, TM_M1, TM_M2, TM_M3, TM_M4 from Matterhorn_Moisturechain__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select * from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

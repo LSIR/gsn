@@ -26,10 +26,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select GENERATION_TIME, I_VCC_NODE from Matterhorn_CoreStationStatus__conv__1950 where POSITION = 0</predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, I_VCC_NODE from Matterhorn_CoreStationStatus__conv__1950</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select * from wrapper where POSITION = 0 </query>
             </source>
             <query> select * from source </query>
         </stream>
