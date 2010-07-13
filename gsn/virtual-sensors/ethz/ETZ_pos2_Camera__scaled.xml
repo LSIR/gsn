@@ -19,7 +19,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select timed, GENERATION_TIME, RELATIVE_FILE, STORAGE_DIRECTORY from ETZ_Binary__mapped__1946 where RELATIVE_FILE like 'camera1/%'</predicate>
+                    <predicate key="query">select timed, POSITION, GENERATION_TIME, RELATIVE_FILE, STORAGE_DIRECTORY from ETZ_Binary__mapped__1946 where RELATIVE_FILE like 'camera1/%'</predicate>
                 </address>
                 <query> select timed, GENERATION_TIME, concat(STORAGE_DIRECTORY,RELATIVE_FILE) as FILE from wrapper where POSITION = 2</query>
             </source>
