@@ -31,7 +31,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAdcComDiffDeprecatedMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAdcComDiffMsg</predicate>
                 </address>
                 <!--query> select * from wrapper </query -->
                 <query> select TIMESTAMP, GENERATION_TIME, DEVICE_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
@@ -45,7 +45,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAdcComDiffDeprecatedMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAdcComDiffMsg</predicate>
                 </address>
                 <!--query> select * from wrapper </query -->
                 <query> select TIMESTAMP, GENERATION_TIME, DEVICE_ID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, 
