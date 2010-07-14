@@ -118,6 +118,27 @@
     <!-- Dev -->
 
     <target name="generate-msr" depends="bind" description="Generate the Microsoft Sensor Map Webservice.">
+        <!-- generate the stub for the user management -->
+        <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="false" dir="${basedir}" classpathref="classpath">
+            <arg value="-o"/>
+            <arg value="generated"/>
+            <arg value="-p"/>
+            <arg value="gsn.msr.sensormap.userman"/>
+            <arg value="-s"/>
+            <arg value="-uri"/>
+            <arg value="http://www.sensormap.org/SenseWebV3/usermanager/service.asmx?WSDL"/>
+        </java>
+        <!-- generate the stub for sensor management -->
+        <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="false" dir="${basedir}" classpathref="classpath">
+            <arg value="-o"/>
+            <arg value="generated"/>
+            <arg value="-p"/>
+            <arg value="gsn.msr.sensormap.sensorman"/>
+            <arg value="-s"/>
+            <arg value="-uri"/>
+            <arg value="http://www.sensormap.org/SenseWebV3/sensormanager/service.asmx?WSDL"/>
+        </java>
+        <!-- generate the skeleton for the datahub -->
         <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="false" dir="${basedir}" classpathref="classpath">
             <arg value="-o"/>
             <arg value="generated"/>
@@ -127,7 +148,7 @@
             <arg value="-ss"/>
             <arg value="-sd"/>
             <arg value="-uri"/>
-            <arg value="service.asmx.xml"/>
+            <arg value="http://www.sensormap.org/SenseWebV3/DataHub/Service.asmx?WSDL"/>
         </java>
     </target>
 
