@@ -543,5 +543,21 @@ private static final transient Logger         logger          = Logger.getLogger
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#DeleteVectorSensor");
         }
 
+/**
+         * Auto generated method signature
+         *
+                                     * @param setSensorData
+         */
+
+                 public org.tempuri.SetSensorDataResponse SetSensorData
+                  (
+                  org.tempuri.SetSensorData setSensorData
+                  )
+            {
+                //TODO : fill this with the necessary business logic
+                throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#SetSensorData");
+        }
+               
+
     }
     
