@@ -26,6 +26,7 @@
             <field name="PAYLOAD_ADIFF23_1" type="INTEGER" />
             <field name="PAYLOAD_ADIFF01_2" type="INTEGER" />
             <field name="PAYLOAD_ADIFF23_2" type="INTEGER" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerAdcComDiffMsg) from Thur deployment</description>

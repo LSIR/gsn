@@ -21,6 +21,7 @@
             <field name="PAYLOAD_A0_8" type="INTEGER" />
             <field name="PAYLOAD_A0_9" type="INTEGER" />
             <field name="PAYLOAD_A0_10" type="INTEGER" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>dozer messages (DozerAdcMux1Msg) from ETZ deployment</description>

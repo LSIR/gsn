@@ -31,6 +31,7 @@
             <field name="PAYLOAD_DATA_DIELECTRIC4" type="SMALLINT" />
             <field name="PAYLOAD_DATA_TEMPERATURE4" type="SMALLINT" />
             <field name="PAYLOAD_MUX_VALID4" type="TINYINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerDecagonMuxMsg) from Matterhorn deployment</description>

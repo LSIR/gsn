@@ -14,6 +14,7 @@
             <field name="Tu" type="VARCHAR(100)" />
             <field name="Ru" type="VARCHAR(100)" />
             <field name="Su" type="VARCHAR(100)" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show weather sensor values of Vaisala WXT520 at the Matterhorn deployment</description>

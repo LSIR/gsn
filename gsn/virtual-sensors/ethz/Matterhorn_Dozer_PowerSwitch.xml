@@ -18,6 +18,7 @@
             <field name="PAYLOAD_PORT1ON" type="TINYINT" />
             <field name="PAYLOAD_PORT2ON" type="TINYINT" />
             <field name="PAYLOAD_POWERSTATE" type="TINYINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerPowerSwitchMsg) from Matterhorn deployment</description>

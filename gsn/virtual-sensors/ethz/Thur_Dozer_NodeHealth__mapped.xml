@@ -30,6 +30,7 @@
             <field name="PAYLOAD_PARENTID" type="INTEGER" />
             <field name="PAYLOAD_HOPCOUNT" type="TINYINT" />
             <field name="PAYLOAD_CHILDCOUNT" type="TINYINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerNodeHealthMsg) from Thur deployment</description>

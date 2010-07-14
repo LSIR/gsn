@@ -14,6 +14,7 @@
             <field name="PAYLOAD_RADIOTX" type="BIGINT" />
             <field name="PAYLOAD_RADIORX" type="BIGINT" />
             <field name="PAYLOAD_TRANSMISSIONFAILURES" type="INTEGER" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerStateCounterMsg) from Matterhorn deployment</description>

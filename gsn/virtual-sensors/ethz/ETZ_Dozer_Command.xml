@@ -18,6 +18,7 @@
             <field name="CMD" type="TINYINT" />
             <field name="ARG" type="SMALLINT" />
             <field name="REPETITIONCNT" type="SMALLINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerCommandMsg) from ETZ deployment</description>

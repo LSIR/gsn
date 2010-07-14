@@ -8,6 +8,7 @@
             <field name="RELATIVE_FILE" type="VARCHAR(255)" />
             <field name="STORAGE_DIRECTORY" type="VARCHAR(255)" />
             <field name="DATA" type="binary" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>binaries from the Jungfraujoch deployment</description>

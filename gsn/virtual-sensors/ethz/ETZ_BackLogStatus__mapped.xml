@@ -25,6 +25,7 @@
             <field name="DB_REMOVE_TIME_MIN" type="INTEGER" unit="ms" />
             <field name="DB_REMOVE_TIME_MEAN" type="INTEGER" unit="ms" />
             <field name="DB_REMOVE_TIME_MAX" type="INTEGER" unit="ms" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>status information of BackLog from ETZ deployment</description>

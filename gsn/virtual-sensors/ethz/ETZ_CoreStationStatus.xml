@@ -16,6 +16,7 @@
             <field name="VCC_NODE" type="INTEGER" unit="mV"/>
             <field name="I_VCC_NODE" type="INTEGER" unit="µA"/>
             <field name="VCC_4_2" type="INTEGER" unit="mV"/>
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show status information of the CoreStations from the ETZ deployment</description>
