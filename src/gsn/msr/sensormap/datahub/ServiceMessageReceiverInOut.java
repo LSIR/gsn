@@ -288,184 +288,202 @@
                                         envelope = toEnvelope(getSOAPFactory(msgContext), getAggregateScalarDataResponse27, false);
                                     } else 
 
+            if("SetSensorData".equals(methodName)){
+                
+                org.tempuri.SetSensorDataResponse setSensorDataResponse29 = null;
+	                        org.tempuri.SetSensorData wrappedParam =
+                                                             (org.tempuri.SetSensorData)fromOM(
+                                    msgContext.getEnvelope().getBody().getFirstElement(),
+                                    org.tempuri.SetSensorData.class,
+                                    getEnvelopeNamespaces(msgContext.getEnvelope()));
+                                                
+                                               setSensorDataResponse29 =
+                                                   
+                                                   
+                                                         skel.SetSensorData(wrappedParam)
+                                                    ;
+                                            
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), setSensorDataResponse29, false);
+                                    } else 
+
             if("StoreBinaryData".equals(methodName)){
                 
-                org.tempuri.StoreBinaryDataResponse storeBinaryDataResponse29 = null;
+                org.tempuri.StoreBinaryDataResponse storeBinaryDataResponse31 = null;
 	                        org.tempuri.StoreBinaryData wrappedParam =
                                                              (org.tempuri.StoreBinaryData)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.StoreBinaryData.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               storeBinaryDataResponse29 =
+                                               storeBinaryDataResponse31 =
                                                    
                                                    
                                                          skel.StoreBinaryData(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), storeBinaryDataResponse29, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), storeBinaryDataResponse31, false);
                                     } else 
 
             if("GetScalarDataSeries".equals(methodName)){
                 
-                org.tempuri.GetScalarDataSeriesResponse getScalarDataSeriesResponse31 = null;
+                org.tempuri.GetScalarDataSeriesResponse getScalarDataSeriesResponse33 = null;
 	                        org.tempuri.GetScalarDataSeries wrappedParam =
                                                              (org.tempuri.GetScalarDataSeries)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.GetScalarDataSeries.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               getScalarDataSeriesResponse31 =
+                                               getScalarDataSeriesResponse33 =
                                                    
                                                    
                                                          skel.GetScalarDataSeries(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), getScalarDataSeriesResponse31, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), getScalarDataSeriesResponse33, false);
                                     } else 
 
             if("GetSensorsByPublisher".equals(methodName)){
                 
-                org.tempuri.GetSensorsByPublisherResponse getSensorsByPublisherResponse33 = null;
+                org.tempuri.GetSensorsByPublisherResponse getSensorsByPublisherResponse35 = null;
 	                        org.tempuri.GetSensorsByPublisher wrappedParam =
                                                              (org.tempuri.GetSensorsByPublisher)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.GetSensorsByPublisher.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               getSensorsByPublisherResponse33 =
+                                               getSensorsByPublisherResponse35 =
                                                    
                                                    
                                                          skel.GetSensorsByPublisher(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), getSensorsByPublisherResponse33, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), getSensorsByPublisherResponse35, false);
                                     } else 
 
             if("GetLatestScalarDataInBatch".equals(methodName)){
                 
-                org.tempuri.GetLatestScalarDataInBatchResponse getLatestScalarDataInBatchResponse35 = null;
+                org.tempuri.GetLatestScalarDataInBatchResponse getLatestScalarDataInBatchResponse37 = null;
 	                        org.tempuri.GetLatestScalarDataInBatch wrappedParam =
                                                              (org.tempuri.GetLatestScalarDataInBatch)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.GetLatestScalarDataInBatch.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               getLatestScalarDataInBatchResponse35 =
+                                               getLatestScalarDataInBatchResponse37 =
                                                    
                                                    
                                                          skel.GetLatestScalarDataInBatch(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), getLatestScalarDataInBatchResponse35, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), getLatestScalarDataInBatchResponse37, false);
                                     } else 
 
             if("DataToString".equals(methodName)){
                 
-                org.tempuri.DataToStringResponse dataToStringResponse37 = null;
+                org.tempuri.DataToStringResponse dataToStringResponse39 = null;
 	                        org.tempuri.DataToString wrappedParam =
                                                              (org.tempuri.DataToString)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.DataToString.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               dataToStringResponse37 =
+                                               dataToStringResponse39 =
                                                    
                                                    
                                                          skel.DataToString(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), dataToStringResponse37, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), dataToStringResponse39, false);
                                     } else 
 
             if("StoreVectorDataByComponentIndex".equals(methodName)){
                 
-                org.tempuri.StoreVectorDataByComponentIndexResponse storeVectorDataByComponentIndexResponse39 = null;
+                org.tempuri.StoreVectorDataByComponentIndexResponse storeVectorDataByComponentIndexResponse41 = null;
 	                        org.tempuri.StoreVectorDataByComponentIndex wrappedParam =
                                                              (org.tempuri.StoreVectorDataByComponentIndex)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.StoreVectorDataByComponentIndex.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               storeVectorDataByComponentIndexResponse39 =
+                                               storeVectorDataByComponentIndexResponse41 =
                                                    
                                                    
                                                          skel.StoreVectorDataByComponentIndex(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), storeVectorDataByComponentIndexResponse39, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), storeVectorDataByComponentIndexResponse41, false);
                                     } else 
 
             if("RegisterVectorSensor".equals(methodName)){
                 
-                org.tempuri.RegisterVectorSensorResponse registerVectorSensorResponse41 = null;
+                org.tempuri.RegisterVectorSensorResponse registerVectorSensorResponse43 = null;
 	                        org.tempuri.RegisterVectorSensor wrappedParam =
                                                              (org.tempuri.RegisterVectorSensor)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.RegisterVectorSensor.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               registerVectorSensorResponse41 =
+                                               registerVectorSensorResponse43 =
                                                    
                                                    
                                                          skel.RegisterVectorSensor(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), registerVectorSensorResponse41, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), registerVectorSensorResponse43, false);
                                     } else 
 
             if("StoreScalarData".equals(methodName)){
                 
-                org.tempuri.StoreScalarDataResponse storeScalarDataResponse43 = null;
+                org.tempuri.StoreScalarDataResponse storeScalarDataResponse45 = null;
 	                        org.tempuri.StoreScalarData wrappedParam =
                                                              (org.tempuri.StoreScalarData)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.StoreScalarData.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               storeScalarDataResponse43 =
+                                               storeScalarDataResponse45 =
                                                    
                                                    
                                                          skel.StoreScalarData(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), storeScalarDataResponse43, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), storeScalarDataResponse45, false);
                                     } else 
 
             if("DeleteVectorSensor".equals(methodName)){
                 
-                org.tempuri.DeleteVectorSensorResponse deleteVectorSensorResponse45 = null;
+                org.tempuri.DeleteVectorSensorResponse deleteVectorSensorResponse47 = null;
 	                        org.tempuri.DeleteVectorSensor wrappedParam =
                                                              (org.tempuri.DeleteVectorSensor)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.DeleteVectorSensor.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               deleteVectorSensorResponse45 =
+                                               deleteVectorSensorResponse47 =
                                                    
                                                    
                                                          skel.DeleteVectorSensor(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), deleteVectorSensorResponse45, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), deleteVectorSensorResponse47, false);
                                     } else 
 
             if("GetAggregateScalarDataSeries".equals(methodName)){
                 
-                org.tempuri.GetAggregateScalarDataSeriesResponse getAggregateScalarDataSeriesResponse47 = null;
+                org.tempuri.GetAggregateScalarDataSeriesResponse getAggregateScalarDataSeriesResponse49 = null;
 	                        org.tempuri.GetAggregateScalarDataSeries wrappedParam =
                                                              (org.tempuri.GetAggregateScalarDataSeries)fromOM(
                                     msgContext.getEnvelope().getBody().getFirstElement(),
                                     org.tempuri.GetAggregateScalarDataSeries.class,
                                     getEnvelopeNamespaces(msgContext.getEnvelope()));
                                                 
-                                               getAggregateScalarDataSeriesResponse47 =
+                                               getAggregateScalarDataSeriesResponse49 =
                                                    
                                                    
                                                          skel.GetAggregateScalarDataSeries(wrappedParam)
                                                     ;
                                             
-                                        envelope = toEnvelope(getSOAPFactory(msgContext), getAggregateScalarDataSeriesResponse47, false);
+                                        envelope = toEnvelope(getSOAPFactory(msgContext), getAggregateScalarDataSeriesResponse49, false);
                                     
             } else {
               throw new java.lang.RuntimeException("method not found");
@@ -865,6 +883,34 @@
             
                         try{
                              return param.getOMElement(org.tempuri.GetAggregateScalarDataResponse.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(org.tempuri.SetSensorData param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(org.tempuri.SetSensorData.MY_QNAME,
+                                          org.apache.axiom.om.OMAbstractFactory.getOMFactory());
+                        } catch(org.apache.axis2.databinding.ADBException e){
+                            throw org.apache.axis2.AxisFault.makeFault(e);
+                        }
+                    
+
+            }
+        
+            private  org.apache.axiom.om.OMElement  toOM(org.tempuri.SetSensorDataResponse param, boolean optimizeContent)
+            throws org.apache.axis2.AxisFault {
+
+            
+                        try{
+                             return param.getOMElement(org.tempuri.SetSensorDataResponse.MY_QNAME,
                                           org.apache.axiom.om.OMAbstractFactory.getOMFactory());
                         } catch(org.apache.axis2.databinding.ADBException e){
                             throw org.apache.axis2.AxisFault.makeFault(e);
@@ -1419,6 +1465,25 @@
                                 return wrappedElement;
                          }
                     
+                    private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, org.tempuri.SetSensorDataResponse param, boolean optimizeContent)
+                        throws org.apache.axis2.AxisFault{
+                      try{
+                          org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory.getDefaultEnvelope();
+                           
+                                    emptyEnvelope.getBody().addChild(param.getOMElement(org.tempuri.SetSensorDataResponse.MY_QNAME,factory));
+                                
+
+                         return emptyEnvelope;
+                    } catch(org.apache.axis2.databinding.ADBException e){
+                        throw org.apache.axis2.AxisFault.makeFault(e);
+                    }
+                    }
+                    
+                         private org.tempuri.SetSensorDataResponse wrapSetSensorData(){
+                                org.tempuri.SetSensorDataResponse wrappedElement = new org.tempuri.SetSensorDataResponse();
+                                return wrappedElement;
+                         }
+                    
                     private  org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory, org.tempuri.StoreBinaryDataResponse param, boolean optimizeContent)
                         throws org.apache.axis2.AxisFault{
                       try{
@@ -1818,6 +1883,20 @@
                 if (org.tempuri.GetAggregateScalarDataResponse.class.equals(type)){
                 
                            return org.tempuri.GetAggregateScalarDataResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (org.tempuri.SetSensorData.class.equals(type)){
+                
+                           return org.tempuri.SetSensorData.Factory.parse(param.getXMLStreamReaderWithoutCaching());
+                    
+
+                }
+           
+                if (org.tempuri.SetSensorDataResponse.class.equals(type)){
+                
+                           return org.tempuri.SetSensorDataResponse.Factory.parse(param.getXMLStreamReaderWithoutCaching());
                     
 
                 }

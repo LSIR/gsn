@@ -133,6 +133,7 @@ public class LoginToMSRSense {
 				pType = df.getName();
 			}
 			if (!dataTypeCache.contains(pType)) {
+                /* TODO
 				gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorTypeWithDT createType = new gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorTypeWithDT();
 				createType.setPublisherName(username);
 				createType.setPassCode(passGUID);
@@ -140,11 +141,13 @@ public class LoginToMSRSense {
 				createType.setUnit(pUnit);
 				createType.setDataType("scalar");
 				createType.setIconUrl("");
+
 				String result = stub.CreateSensorTypeWithDT(createType)
 						.getCreateSensorTypeWithDTResult();
 				logger.info("Registering data type: " + pType
 						+ " , MSR's output: " + result);
 				dataTypeCache.add(pType);
+				*/
 			}
 
 		}
@@ -169,7 +172,7 @@ public class LoginToMSRSense {
 		call_output = stub.DeleteVectorSensor(deleteVSensorParam)
 				.getDeleteVectorSensorResult();
 		logger.info("Unregister: " + conf.getName() + " - MSR: " + call_output);
-
+        /*TODO
 		gsn.msr.sensormap.sensorman.ServiceStub.CreateVectorSensorTypeAndRegisterSensor registerVectorSensorParams = new gsn.msr.sensormap.sensorman.ServiceStub.CreateVectorSensorTypeAndRegisterSensor();
 
 		registerVectorSensorParams.setPublisherName(username);
@@ -193,7 +196,7 @@ public class LoginToMSRSense {
 		call_output = stub.CreateVectorSensorTypeAndRegisterSensor(
 				registerVectorSensorParams)
 				.getCreateVectorSensorTypeAndRegisterSensorResult();
-
+        */
 		if (call_output.indexOf("OK") >= 0) {
 			logger.warn("Sensor " + conf.getName()
 					+ " registered correctly. SensorMap says: " + call_output);
