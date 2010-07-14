@@ -1,10 +1,7 @@
-<virtual-sensor name="Matterhorn_Thermistorchain1__1950" priority="10" >
+<virtual-sensor name="Matterhorn_Waterpressure__1950" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="sensorvalue_conversion" />
-        </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
@@ -15,20 +12,17 @@
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" unit="relatime" />
-            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_VALID" type="SMALLINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TC_REF1" type="VARCHAR(30)" />
-            <field name="TC_REF2" type="VARCHAR(30)" />
-            <field name="TC_T1" type="VARCHAR(30)" />
-            <field name="TC_T2" type="VARCHAR(30)" />
-            <field name="TC_T3" type="VARCHAR(30)" />
-            <field name="TC_T4" type="VARCHAR(30)" />
-            <field name="TC_REF3" type="VARCHAR(30)" />
-            <field name="TC_REF4" type="VARCHAR(30)" />
-            <field name="TC_T5" type="VARCHAR(30)" />
+            <field name="DCX_BATTERY" type="SMALLINT" />
+            <field name="DCX_P1" type="VARCHAR(30)" />
+            <field name="DCX_P2" type="VARCHAR(30)" />
+            <field name="DCX_P12" type="VARCHAR(30)" />
+            <field name="DCX_TOB1" type="VARCHAR(30)" />
+            <field name="DCX_TOB2" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>
-    <description>Thermistorchain/TC data (part 1) from Matterhorn deployment</description>
+    <description>Waterpressure/PS data from Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -36,10 +30,16 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Dozer_AdcMux1__mapped__1950 </predicate>
+                    <predicate key="query"> select * from Matterhorn_Dozer_DigitalDCX__mapped__1950 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where SENSORTYPE is not null and locate(" tc:", SENSORTYPE) != 0 </query>
+                <query> select *, 
+                    PAYLOAD_DCX_BATTERYSTATUS as DCX_BATTERY, 
+                    FORMAT((PAYLOAD_DCX_FLOATVALUE1 + PAYLOAD_DCX_FLOATVALUE0) * 1000, 2) as DCX_P1, 
+                    FORMAT(PAYLOAD_DCX_FLOATVALUE1 * 1000, 2) as DCX_P2, 
+                    FORMAT(PAYLOAD_DCX_FLOATVALUE0 * 1000, 2) as DCX_P12, 
+                    FORMAT(PAYLOAD_DCX_FLOATVALUE2, 3) as DCX_TOB1, 
+                    FORMAT(PAYLOAD_DCX_FLOATVALUE3, 3) as DCX_TOB2 from wrapper where PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

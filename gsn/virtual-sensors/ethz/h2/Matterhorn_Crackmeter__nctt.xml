@@ -1,4 +1,4 @@
-<virtual-sensor name="Matterhorn_Thermistorchain1__1950" priority="10" >
+<virtual-sensor name="Matterhorn_Crackmeter__nctt__1950" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -17,18 +17,12 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="relatime" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TC_REF1" type="VARCHAR(30)" />
-            <field name="TC_REF2" type="VARCHAR(30)" />
-            <field name="TC_T1" type="VARCHAR(30)" />
-            <field name="TC_T2" type="VARCHAR(30)" />
-            <field name="TC_T3" type="VARCHAR(30)" />
-            <field name="TC_T4" type="VARCHAR(30)" />
-            <field name="TC_REF3" type="VARCHAR(30)" />
-            <field name="TC_REF4" type="VARCHAR(30)" />
-            <field name="TC_T5" type="VARCHAR(30)" />
+            <field name="NCTT_DX1" type="VARCHAR(30)" />
+            <field name="NCTT_T1" type="VARCHAR(30)" />
+            <field name="NCTT_T2" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>
-    <description>Thermistorchain/TC data (part 1) from Matterhorn deployment</description>
+    <description>Crackmeter/NCTT data from Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -36,10 +30,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Dozer_AdcMux1__mapped__1950 </predicate>
+                    <predicate key="query"> select * from Matterhorn_Dozer_AdcComDiff__mapped__1950 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where SENSORTYPE is not null and locate(" tc:", SENSORTYPE) != 0 </query>
+                <query> select * from wrapper where SENSORTYPE is not null and locate(' nctt:', SENSORTYPE) != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

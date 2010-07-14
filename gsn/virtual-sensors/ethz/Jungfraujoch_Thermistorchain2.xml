@@ -33,7 +33,7 @@
                     <predicate key="query"> select * from Jungfraujoch_Dozer_AdcMux2__mapped__1950 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where SENSORTYPE is not null and locate("tc:", SENSORTYPE) != 0 </query>
+                <query> select * from wrapper where SENSORTYPE is not null and locate(" tc:", SENSORTYPE) != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>
