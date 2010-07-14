@@ -37,7 +37,7 @@
                     (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME0 * 1000)) as EVENT_TIMESTAMP,
                     PAYLOAD_EVENTLOG_ID0 as EVENT_ID,
                     PAYLOAD_EVENTLOG_TYPE0 as EVENT_TYPE,
-                    CASEWHEN(PAYLOAD_EVENTLOG_TYPE0=0,NULL,PAYLOAD_EVENTLOG_VALUE0) as EVENT_VALUE from wrapperwhere PAYLOAD_EVENTLOG_ID0 is not NULL 
+                    CASEWHEN(PAYLOAD_EVENTLOG_TYPE0=0,NULL,PAYLOAD_EVENTLOG_VALUE0) as EVENT_VALUE from wrapper where PAYLOAD_EVENTLOG_ID0 is not NULL 
                 </query>
             </source>
             <query> select * from source </query>
