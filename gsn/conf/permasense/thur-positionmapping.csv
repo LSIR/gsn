@@ -1,11 +1,12 @@
 "DEVICE_ID","BEGIN","END","POSITION","COMMENT"
 
-# access nodes are mapped to position 0 (this has to be changed as soon
-# as multiple access nodes are used concurrently)
+# access node mapping
+# access node Thur begin until open end
 "0","1970-01-01 00:00:00","9999-01-01 00:00:00","0","access node"
-"1","1970-01-01 00:00:00","9999-01-01 00:00:00","0","access node"
-"2","1970-01-01 00:00:00","9999-01-01 00:00:00","0","access node"
 
+
+
+# sensor node mapping
 # Deployment Thur 25.03.2010
 "2049","2010-03-30 14:45:19+02:00","9999-01-01 00:00:00","1",""
 "2052","2010-03-30 12:35:31+02:00","9999-01-01 00:00:00","4",""

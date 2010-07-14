@@ -1,8 +1,6 @@
 "DEVICE_ID","BEGIN","END","POSITION","COMMENT"
 
-# access nodes are mapped to position 0 (this has to be changed as soon
-# as multiple access nodes are used concurrently)
-
+# access node mapping
 # access node Matterhorn 25.07.2008 00:00:00+02:00 until 22.06.2010 00:00:00+02:00
 "1","1970-01-01 00:00:00","2010-06-22 00:00:00+02:00","0","access node"
 
@@ -11,7 +9,7 @@
 
 
 
-
+# sensor node mapping
 # Deployment Matterhorn 25.07.2008 00:00:00+02:00 until 27.08.2008 00:00:00+02:00
 "2021","2008-07-25 00:00:00+02:00","2008-08-27 00:00:00+02:00","1","detachment right"
 "2022","2008-07-25 00:00:00+02:00","2008-08-27 00:00:00+02:00","2","detachment bottom lower"

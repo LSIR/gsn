@@ -1,11 +1,15 @@
 "DEVICE_ID","BEGIN","END","POSITION","COMMENT"
 
-# access nodes are mapped to position 0 (this has to be changed as soon
-# as multiple access nodes are used concurrently)
-"0","1970-01-01 00:00:00","9999-01-01 00:00:00","0","access node"
-"1","1970-01-01 00:00:00","9999-01-01 00:00:00","0","access node"
-"2","1970-01-01 00:00:00","9999-01-01 00:00:00","0","access node"
+# access node mapping
+# access node Jungfraujoch begin until 14.01.2010 00:00:00+02:00
+"1","1970-01-01 00:00:00","2010-01-14 00:00:00+02:00","0","access node"
 
+# access node Jungfraujoch 14.01.2010 14:00:00+02:00 until open end
+"0","2010-01-14 14:00:00+02:00","9999-01-01 00:00:00","0","access node"
+
+
+
+# sensor node mapping
 # Deployment Jungfraujoch 07.02.2009 00:00:00+01:00 until 01.07.2009 00:00:00+02:00
 "2004","2009-02-07 00:00:00+01:00","2009-07-01 00:00:00+02:00","1","south snowfield"
 "2015","2009-02-07 00:00:00+01:00","2009-07-01 00:00:00+02:00","2","south upper gully"
