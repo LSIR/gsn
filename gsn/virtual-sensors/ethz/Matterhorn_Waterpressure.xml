@@ -34,12 +34,12 @@
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select *, 
-                    PAYLOAD_DCX_BATTERYSTATUS as DCX_BATTERY, 
-                    FORMAT((PAYLOAD_DCX_FLOATVALUE1 + PAYLOAD_DCX_FLOATVALUE0) * 1000, 2) as DCX_P1, 
-                    FORMAT(PAYLOAD_DCX_FLOATVALUE1 * 1000, 2) as DCX_P2, 
-                    FORMAT(PAYLOAD_DCX_FLOATVALUE0 * 1000, 2) as DCX_P12, 
-                    FORMAT(PAYLOAD_DCX_FLOATVALUE2, 3) as DCX_TOB1, 
-                    FORMAT(PAYLOAD_DCX_FLOATVALUE3, 3) as DCX_TOB2 from wrapper where PAYLOAD_SAMPLE_VALID != 0 </query>
+                    PAYLOAD_DCX_BATTERYSTATUS as DCX_BATTERY,  
+                    cast(round((PAYLOAD_DCX_FLOATVALUE1 + PAYLOAD_DCX_FLOATVALUE0) * 1000, 2) as CHAR(30)) as DCX_P1, 
+                    cast(round(PAYLOAD_DCX_FLOATVALUE1 * 1000, 2) as CHAR(30)) as DCX_P2, 
+                    cast(round(PAYLOAD_DCX_FLOATVALUE0 * 1000, 2) as CHAR(30)) as DCX_P12, 
+                    cast(round(PAYLOAD_DCX_FLOATVALUE2, 3) as CHAR(30)) as DCX_TOB1, 
+                    cast(round(PAYLOAD_DCX_FLOATVALUE3, 3) as CHAR(30)) as DCX_TOB2 from wrapper where PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>
