@@ -173,7 +173,7 @@ public class ContainerInfoHandler implements RequestHandler {
    * @return
    */
   public static ArrayList<StreamElement> getMostRecentValueFor(String virtual_sensor_name) {
-    StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(")");
+    StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(") order by PK desc limit 1");
     ArrayList<StreamElement> toReturn=new ArrayList<StreamElement>() ;
     try {
       DataEnumerator result = Main.getMainStorage().executeQuery( query , true );
