@@ -14,6 +14,7 @@ import re
 import os
 import signal
 import pickle
+import shlex
 import subprocess
 import Queue
 import logging
@@ -336,7 +337,7 @@ class ScheduleHandlerClass(Thread):
                 try:
                     if self._duty_cycle_mode:
                         self._logger.info('executing >' + schedule[1] + '< now')
-                    proc = subprocess.Popen(schedule[1], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    proc = subprocess.Popen(shlex.split(schedule[1]), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 except Exception, e:
                     self.error('error in scheduled job >' + schedule[1] + '<:' + str(e))
                 else:
@@ -685,33 +686,32 @@ class JobsObserver(Thread):
             self._work.clear()
             
             while not self._stopped:
-                self._wait.wait(JOB_PROCESS_CHECK_INTERVAL_SECONDS)
-                if self._stopped:
-                    break
-                
                 new_list = []
                 for proc in self._process_list:
                     ret = proc[0].poll()
                     if ret == None:
                         pid = proc[0].pid
                         if proc[1] <= JOB_PROCESS_CHECK_INTERVAL_SECONDS:
-                            self._parent.error('job (' + proc[2] + ') with PID ' + str(pid) + ' has not finished in time -> kill it')
                             if pid <= 1:
                                 self._parent.error('wanted to kill PID ' + str(pid))
                             else:
-                                # Terminate this process by sending a SIGINT
-                                os.kill(pid, signal.SIGTERM)
+                                proc[0].kill()
+                                self._parent._logger.warning('wait for job (' + proc[2] + ') to be killed')
+                                proc[0].wait()
+                                output = proc[0].communicate()
+                                self._parent.error('job (' + proc[2] + ') with PID ' + str(pid) + ' has not finished in time  (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                         else:
                             self._parent._logger.debug('job (' + proc[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
                             new_list.append((proc[0], proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS, proc[2]))
                     else:
+                        output = proc[0].communicate()
                         if ret == 0:
                             if self._parent._duty_cycle_mode:
-                                self._parent._logger.info('job (' + proc[2] + ') finished successfully')
+                                self._parent._logger.info('job (' + proc[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                             else:
-                                self._parent._logger.debug('job (' + proc[2] + ') finished successfully')
+                                self._parent._logger.debug('job (' + proc[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                         else:
-                            self._parent.error('job (' + proc[2] + ') finished with return code ' + str(ret))
+                            self._parent.error('job (' + proc[2] + ') finished with return code ' + str(ret) + ' (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                 
                 self._lock.acquire()
                 self._process_list = new_list
@@ -719,6 +719,8 @@ class JobsObserver(Thread):
                 if not self._process_list:
                     self._parent.allJobsFinished()
                     break
+                
+                self._wait.wait(JOB_PROCESS_CHECK_INTERVAL_SECONDS)
  
         self._parent._logger.info('JobsObserver: died')
         
@@ -746,6 +748,15 @@ class JobsObserver(Thread):
         self._stopped = True
         self._work.set()
         self._wait.set()
+        
+        for proc in self._process_list:
+            self._parent.error('job (' + proc[2] + ') with PID ' + str(proc[0].pid) + ' has not finished yet -> kill it')
+            proc[0].kill()
+            self._parent._logger.warning('wait for job (' + proc[2] + ') to be killed')
+            proc[0].wait()
+            output = proc[0].communicate()
+            self._parent.error('job (' + proc[2] + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+            
         self._parent._logger.info('JobsObserver: stopped')
         
         

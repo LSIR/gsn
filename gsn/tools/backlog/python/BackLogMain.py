@@ -382,9 +382,7 @@ def main():
     logging.shutdown()
     if backlog.shutdown:
         print 'shutdown now'
-        subprocess.Popen('shutdown -h now', shell=True)
-
-    sys.exit(0)
+        subprocess.Popen(['shutdown', '-h', 'now'])
 
 
 if __name__ == '__main__':

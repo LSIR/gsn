@@ -41,7 +41,18 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         
-        subprocess.Popen('modprobe ad77x8', shell=True)
+        p = subprocess.Popen(['modprobe', 'ad77x8'])
+        self.info('wait for modprobe ad77x8 to finish')
+        p.wait()
+        output = p.communicate()
+        if output[0]:
+            if output[1]:
+                self.info('modprope ad77x8: (STDOUT=' + output[0] + 'STDERR=' + output[1] + ')')
+            else:
+                self.info('modprope ad77x8: (STDOUT=' + output[0] + ')')
+        elif output[1]:
+                self.info('modprope ad77x8: (STDERR=' + output[1] + ')')
+        
         
         value = self.getOptionValue('poll_interval')
         if value is None:
