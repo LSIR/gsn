@@ -6,12 +6,15 @@ import gsn.beans.VSensorConfig;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
 public final class Mappings {
    
    private static final ConcurrentHashMap<String,VSensorConfig>              vsNameTOVSConfig               = new ConcurrentHashMap<String,VSensorConfig>( );
+
+   private static final ConcurrentHashMap<String,CopyOnWriteArrayList<VSensorConfig>>              vsGroupTOVSConfig               = new ConcurrentHashMap<String,CopyOnWriteArrayList<VSensorConfig>>( );
    
    private static final ConcurrentHashMap < String , VirtualSensor>             fileNameToVSInstance           = new ConcurrentHashMap < String , VirtualSensor>(  );
    
@@ -36,6 +39,14 @@ public final class Mappings {
          vsNameToOutputStructureFields.put( fields.getName( ) , Boolean.TRUE );
       vsNameToOutputStructureFields.put( "timed" , Boolean.TRUE );
       vsNameTOVSConfig.put( sensorPool.getConfig( ).getName( ) , sensorPool.getConfig( ) );
+      if (sensorPool.getConfig( ).getGroup() != null) {
+    	  String group = sensorPool.getConfig( ).getGroup();
+    	  CopyOnWriteArrayList<VSensorConfig> list;
+    	  if (!vsGroupTOVSConfig.containsKey(group))
+    		  vsGroupTOVSConfig.put(group, new CopyOnWriteArrayList<VSensorConfig>());
+    	  list = vsGroupTOVSConfig.get(group);
+    	  list.add(sensorPool.getConfig( ));
+      }
       fileNameToVSInstance.put( sensorPool.getConfig( ).getFileName( ) , sensorPool );
       return true;
    }
@@ -57,6 +68,12 @@ public final class Mappings {
 	   if(fileNameToVSInstance.containsKey(fileName)){
 		   VSensorConfig config = ( fileNameToVSInstance.get( fileName ) ).getConfig( );
 		   vsNameTOVSConfig.remove( config.getName( ) );
+		   if (config.getGroup() != null) {
+			   CopyOnWriteArrayList<VSensorConfig> list = vsGroupTOVSConfig.get(config.getGroup());
+			   list.remove(config);
+			   if (list.isEmpty())
+				   vsGroupTOVSConfig.remove(config.getGroup());
+		   }
 		   fileNameToVSInstance.remove( fileName );
 	   }
    }
@@ -76,6 +93,10 @@ public final class Mappings {
    
    public static Iterator < VSensorConfig > getAllVSensorConfigs ( ) {
       return vsNameTOVSConfig.values( ).iterator( );
+   }
+   
+   public static Iterator < VSensorConfig > getVSensorGroupConfigs ( String group ) {
+	      return vsGroupTOVSConfig.get(group).iterator();
    }
    
    public static VirtualSensor getVSensorInstanceByVSName ( String vsensorName ) {

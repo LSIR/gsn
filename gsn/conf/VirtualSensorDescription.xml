@@ -4,6 +4,7 @@
        <value name="protected" field="access_protected" style="attribute"  usage="optional" />
        <value name="priority" field="priority" usage="optional" style="attribute" />
        <value name="publish-to-microsoft-research-sensor-map" field="sensorMap" usage="optional" style="attribute" />  
+       <value name="group" field="group" usage="optional" style="attribute" />
        <structure name="processing-class" usage="optional" >
               <value name="class-name" field="mainClass"  />
               <value name="unique-timestamps" field="isTimestampUnique" usage="optional" default="true" />  

@@ -31,12 +31,12 @@ public class ContainerInfoHandler implements RequestHandler {
   public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
 	  response.setStatus( HttpServletResponse.SC_OK );
 	  String reqName = request.getParameter("name");
-
-    response.getWriter( ).write( buildOutput(reqName) );
+	  String group = request.getParameter("group");
+	  response.getWriter( ).write( buildOutput(reqName, group) );
   }
   
   //return only the requested sensor if specified (otherwise use null)
-  public String buildOutput (String reqName) {
+  public String buildOutput (String reqName, String group) {
 	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 	  
 	  
@@ -46,7 +46,11 @@ public class ContainerInfoHandler implements RequestHandler {
     sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
     sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
     
-    Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
+    Iterator < VSensorConfig > vsIterator;
+    if (group!=null)
+    	vsIterator = Mappings.getVSensorGroupConfigs(group);
+    else
+    	vsIterator = Mappings.getAllVSensorConfigs( );
     
     
     while ( vsIterator.hasNext( ) ) {

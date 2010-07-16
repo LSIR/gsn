@@ -61,6 +61,8 @@ public class VSensorConfig implements Serializable {
 	private String sensorMap = "false";
 
 	private String access_protected = "false";
+	
+	private String group;
 	/**
 	 * @return Returns the addressing.
 	 */
@@ -477,6 +479,8 @@ public class VSensorConfig implements Serializable {
 		}
 	}
 
-
+	public String getGroup() {
+		return group;
+	}
 
 }
