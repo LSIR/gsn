@@ -42,6 +42,7 @@ class TOSPluginClass(AbstractPluginClass):
         self._ready = False
         # send close queue cmd to access node
         self._sendCloseQueueCommand()
+        self.info('stopped')
     
     
     def tosMsgReceived(self, timestamp, packet):
@@ -54,11 +55,12 @@ class TOSPluginClass(AbstractPluginClass):
             
     def msgReceived(self, message):
         if self._ready:
-            self.sendTOSmsg(self._parent._backlog2tos(message), 0x00, 0.2, True)
+            self.sendTOSmsg(self._backlog2tos(message), 0x00, 0.2, True, 10)
 
 
     def _sendCloseQueueCommand(self):
         if self.sendTOSmsg(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x00, 0x00]).tolist(), 0x00, 0.2, True, 10):
+            self.info('waiting 35 seconds for close queue command to be complete')
             time.sleep(35)
 
 

@@ -8,6 +8,7 @@ __id__          = "$Id$"
 __source__      = "$URL$"
  
 import os
+import subprocess
 import sys
 import signal
 import ConfigParser
@@ -21,7 +22,7 @@ from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
 from ScheduleHandler import ScheduleHandlerClass
 
-PROFILE = True
+PROFILE = False
 PROFILE_FILE = '/media/card/backlog.profile'
 
 DEFAULT_CONFIG_FILE = '/etc/backlog.cfg'
@@ -51,7 +52,7 @@ class BackLogMainClass(Thread):
     _errorCounterLock
     '''
     
-    def __init__(self, config_file=DEFAULT_CONFIG_FILE):
+    def __init__(self, config_file):
         '''
         Initialize the BackLogMain class
         
@@ -62,18 +63,15 @@ class BackLogMainClass(Thread):
         '''
 
         Thread.__init__(self)
-        
-        # config file?
-        if not os.path.isfile(config_file):
-            raise TypeError('config file not found')
-
-        # read config file for logging options
-        try:
-            logging.config.fileConfig(config_file)
-        except ConfigParser.NoSectionError, e:
-            logging.warning(e.__str__())
 
         self._logger = logging.getLogger(self.__class__.__name__)
+        
+        self.shutdown = False
+
+        self._exceptionCounter = 0
+        self._exceptionCounterLock = Lock()
+        self._errorCounter = 0
+        self._errorCounterLock = Lock()
 
         # read config file for other options
         config = ConfigParser.SafeConfigParser()
@@ -174,11 +172,6 @@ class BackLogMainClass(Thread):
             self._logger.warning('no [plugins] section specified in ' + config_file)
             config_plugins = DEFAULT_PLUGINS
             self._logger.warning('use default plugins: ' + config_plugins)
-
-        self._exceptionCounter = 0
-        self._exceptionCounterLock = Lock()
-        self._errorCounter = 0
-        self._errorCounterLock = Lock()
 
         # init each plugin
         self.plugins = []
@@ -352,10 +345,6 @@ class BackLogMainClass(Thread):
 
 
 def main():
-    
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname).1s %(name)-.12s - %(message)s", stream=sys.stdout)
-    logger = logging.getLogger('BackLogMain.main')
-    
     parser = optparse.OptionParser('usage: %prog [options]')
     
     parser.add_option('-c', '--config', type='string', dest='config_file', default=DEFAULT_CONFIG_FILE,
@@ -363,19 +352,37 @@ def main():
     
     (options, args) = parser.parse_args()
     
+        # config file?
+    if not os.path.isfile(options.config_file):
+        print 'config file not found'
+        sys.exit(1)
+
+    # read config file for logging options
+    try:
+        logging.config.fileConfig(options.config_file)
+    except ConfigParser.NoSectionError, e:
+        print e.__str__()
+        
+    logger = logging.getLogger('BackLogMain.main')
+        
     try:
         backlog = BackLogMainClass(options.config_file)
         backlog.start()
         signal.pause()
     except KeyboardInterrupt, e1:
-        logger.exception(e1)
+        logger.warning('KeyboardInterrupt')
         if backlog and backlog.isAlive():
             backlog.stop()
             backlog.join()
     except Exception, e:
-        logger.exception(e)
+        logger.error(e)
         logging.shutdown()
         sys.exit(1)
+        
+    logging.shutdown()
+    if backlog.shutdown:
+        print 'shutdown now'
+        subprocess.Popen('shutdown -h now', shell=True)
 
     sys.exit(0)
 

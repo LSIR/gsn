@@ -88,7 +88,7 @@ class ScheduleHandlerClass(Thread):
     offers the functionality (timers, startup/shutdown commands, etc.) to
     manage the power supply of the deployment system. Thus, job scheduling
     combined with duty-cycling can be used to minimize the energy consumption
-    of the system. If the duty-cycle mode is disabled the SchedulePlugin only
+    of the system. If the duty-cycle mode is disabled the ScheduleHandler only
     schedules jobs without offering any duty-cycling functionality.
 
 
@@ -347,6 +347,11 @@ class ScheduleHandlerClass(Thread):
                     
         if self._duty_cycle_mode and not self._stopped:
             self._shutdown(service_time)
+            
+        if self._duty_cycle_mode:
+            self._pingThread.join()
+            self._tosMessageHandler.join()
+        self._jobsObserver.join()
                 
         self._logger.info('died')
     
@@ -361,6 +366,7 @@ class ScheduleHandlerClass(Thread):
         if self._duty_cycle_mode:
             self._pingThread.stop()
             self._tosMessageHandler.stop()
+            
         self._logger.info('stopped')
         
         
@@ -437,6 +443,11 @@ class ScheduleHandlerClass(Thread):
     def tosMsgReceived(self, timestamp, payload):
         if self._tosMessageHandler:
             self._tosMessageHandler.received(payload)
+        
+        
+    def error(self, msg):
+        self._parent.incrementErrorCounter()
+        self._logger.error(msg)
         
         
     def _serviceTime(self):
@@ -522,54 +533,15 @@ class ScheduleHandlerClass(Thread):
             # Tell TinyNode to shut us down in X seconds
             self._pingThread.stop()
             shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
-            self._tosMessageHandler.addMsg(CMD_SHUTDOWN, argument=shutdown_offset)
+            self._tosMessageHandler.addMsg(CMD_SHUTDOWN, argument=shutdown_offset, blocking=True)
             self._logger.info('we\'re going to do a hard shut down in '+str(shutdown_offset)+' seconds ...')
     
+            self._parent.shutdown = True
             parentpid = os.getpid()
-            
-            try:
-                pid = os.fork()
-            except OSError, e:
-                self.error('could not fork: ' + str(e))
-                subprocess.Popen('shutdown -h now', shell=True)
-                
-            if pid == 0:
-                os.setsid()
-            
-                try:
-                    pid = os.fork()
-                except OSError, e:
-                    os._exit(0)
-                    
-                if (pid == 0):
-                    os.chdir('/')
-
-                    print 'waiting for parent (pid=' + str(parentpid) + ') to complete'
-                    while not self._dead(parentpid):
-                        print 'parent (pid=' + str(parentpid) + ') not yet dead'
-                        time.sleep(3)
-                    print 'parent completed'
-                    
-                    subprocess.Popen('shutdown -h now', shell=True)
-                else:
-                    os._exit(0)
-            else:
-                self._logger.info('sending myself SIGINT')
-                # Terminate PSBacklog by sending our own process a SIGINT
-                os.kill(parentpid, signal.SIGINT)
+            self._logger.info('sending myself (pid=' + str(parentpid) + ' SIGINT')
+            os.kill(parentpid, signal.SIGINT)
         else:
             self._logger.warning('shutdown called even if we are not in shutdown mode')
-        
-        
-    def _dead(self, pid):
-        try:
-            return os.kill(pid, 0)
-        except OSError, e:
-            #process is dead
-            if e.errno == 3: return True
-            #no permissions
-            elif e.errno == 1: return False
-            else: raise
             
             
             
@@ -609,12 +581,18 @@ class TOSMessageHandler(Thread):
                 self._scheduleHandler._parent.tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG)
                 
                 if item[1]:
-                    self._ackEvent.wait()
-                    if self._stopped:
-                        self._scheduleHandler._logger.info('TOSMessageHandler: died')
-                        return
-                    self._sentCmd = None
-                    self._ackEvent.clear()
+                    while True:
+                        self._ackEvent.wait(3)
+                        if self._stopped:
+                            self._scheduleHandler._logger.info('TOSMessageHandler: died')
+                            return
+                        elif not self._ackEvent.isSet():
+                            self._scheduleHandler._logger.info('resend command (' + str(self._sentCmd) + ') to TOS node')
+                            self._scheduleHandler._parent.tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG)
+                        else:
+                            self._sentCmd = None
+                            self._ackEvent.clear()
+                            break
             
                 self._sendqueue.task_done()
 
@@ -678,9 +656,9 @@ class TOSMessageHandler(Thread):
     
     def stop(self):
         self._stopped = True
-        self._scheduleHandler._logger.info('TOSMessageHandler: stopped')
         self._work.set()
         self._ackEvent.set()
+        self._scheduleHandler._logger.info('TOSMessageHandler: stopped')
          
         
         
@@ -765,10 +743,10 @@ class JobsObserver(Thread):
 
 
     def stop(self):
-        self._parent._logger.info('JobsObserver: stopped')
         self._stopped = True
         self._work.set()
         self._wait.set()
+        self._parent._logger.info('JobsObserver: stopped')
         
         
         

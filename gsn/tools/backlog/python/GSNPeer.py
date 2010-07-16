@@ -110,6 +110,10 @@ class GSNPeerClass(Thread):
             self._gsnlistener = GSNListener(self, self._port, self._serversocket)
             if not self._stopped:
                 self._gsnlistener.start()
+                
+        self._pingwatchdog.join()
+        self._pingtimer.join()
+        self._gsnlistener.join()
  
         self._logger.info('died')
 
@@ -386,6 +390,8 @@ class GSNListener(Thread):
         except Exception, e:
             self.disconnect()
             self._logger.exception(e.__str__())
+            
+        self._gsnwriter.join()
 
         self._logger.info('died')
         

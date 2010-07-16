@@ -224,7 +224,7 @@ class AbstractPluginClass(Thread):
         This function should return True if the plugin has still things to do.
         If nothing more has to be processed it should return False.
         
-        This function will get polled by the SchedulePlugin on shutdown. It will
+        This function will get polled by the ScheduleHandler on shutdown. It will
         wait a given time for all plugins to return False before shutdown. Thus, this
         function should only return True if it changes back to returning False again
         after a given time.

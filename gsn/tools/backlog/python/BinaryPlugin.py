@@ -79,7 +79,6 @@ class BinaryPluginClass(AbstractPluginClass):
     _msgdeque
     _isBusy
     _work
-    _lock
     _waitforack
     _rootdir
     _filedescriptor
@@ -117,9 +116,7 @@ class BinaryPluginClass(AbstractPluginClass):
         wm = WatchManager()
         self._notifier = ThreadedNotifier(wm, BinaryChangedProcessing(self))
         
-        self._lock = Lock()
         self._work = Event()
-        self._work.clear()
         self._filedeque = deque()
         self._msgdeque = deque()
         
@@ -195,21 +192,17 @@ class BinaryPluginClass(AbstractPluginClass):
     def msgReceived(self, msg):
         self.debug('message received')
         self._msgdeque.appendleft(msg)
-        self._lock.acquire()
         self._work.set()
-        self._lock.release()
         
     
     def connectionToGSNestablished(self):
         self.debug('connection established')
-        self._lock.acquire()
         self._lastRecvPacketType = None
         self._lastSentPacketType = None
         if self._filedescriptor:
             self._filedescriptor.close()
         self._msgdeque.clear()
         self._parent._waitforack = False
-        self._lock.release()
         
     
     def connectionToGSNlost(self):
@@ -284,9 +277,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         
                     if alreadyReceived:
                         if not self._msgdeque:
-                            self._lock.acquire()
                             self._work.clear()
-                            self._lock.release()
                         continue
                         
                     self._lastRecvPacketType = ACK_PACKET
@@ -297,9 +288,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         self.debug('init packet already received')
                         self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._priority, self._backlog)
                         if not self._msgdeque:
-                            self._lock.acquire()
                             self._work.clear()
-                            self._lock.release()
                         continue
                     else:
                         self.debug('new binary request received')
@@ -320,9 +309,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         self.debug('binary retransmission request already received')
                         self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._priority, self._backlog)
                         if not self._msgdeque:
-                            self._lock.acquire()
                             self._work.clear()
-                            self._lock.release()
                         continue
                     else:
                         self.debug('binary retransmission request received')
@@ -477,9 +464,7 @@ class BinaryPluginClass(AbstractPluginClass):
             
                 # tell BackLogMain to send the packet to GSN
                 first = True
-                self._lock.acquire()
                 self._work.clear()
-                self._lock.release()
                 while (not self._work.isSet() or first) and self.isGSNConnected():
                     if not first:
                         self.info('resend message')
@@ -491,9 +476,7 @@ class BinaryPluginClass(AbstractPluginClass):
             except IndexError:
                 # fifo is empty
                 self.debug('file FIFO is empty waiting for next file to arrive')
-                self._lock.acquire()
                 self._work.clear()
-                self._lock.release()
                 self._isBusy = False
             except Exception, e:
                 self._waitforack = False
@@ -513,9 +496,7 @@ class BinaryPluginClass(AbstractPluginClass):
         self._isBusy = False
         self._stopped = True
         self._notifier.stop()
-        self._lock.acquire()
         self._work.set()
-        self._lock.release()
         self._filedeque.clear()
         if self._filedescriptor and not self._filedescriptor.closed:
             os.chmod(self._filedescriptor.name, 0744)
@@ -543,6 +524,4 @@ class BinaryChangedProcessing(ProcessEvent):
         self._parent._filedeque.appendleft(event.pathname)
         if self._parent.isGSNConnected() and not self._parent._waitforack:
             self._parent._isBusy = True
-            self._parent._lock.acquire()
             self._parent._work.set()
-            self._parent._lock.release()

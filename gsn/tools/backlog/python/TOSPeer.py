@@ -98,6 +98,9 @@ class TOSPeerClass(Thread):
                 except Exception, e:
                     if not self._stopped:
                         self.error('could not send ack: ' + e.__str__())
+                        
+        self._toswriter.join()
+        self._serialsource.join()
 
         self._logger.info('died')
             

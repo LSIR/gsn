@@ -168,3 +168,4 @@ class GPSPluginClass(AbstractPluginClass):
     def stop(self):
         self._stopped = True
         self._runEv.set()
+        self.info('stopped')
