@@ -21,8 +21,10 @@ import org.apache.log4j.Logger;
 
 public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener, Runnable {
 
-    public static final int KEEP_ALIVE_PERIOD =  10 * 60 * 1000;  // 10 minutes.
-    
+    public static final int KEEP_ALIVE_PERIOD =  15 * 1000;  // 15 sec.
+
+    private static int keepAlivePeriod = -1;
+
     private javax.swing.Timer keepAliveTimer = null;
 
     private static transient Logger logger = Logger.getLogger(DataDistributer.class);
@@ -36,7 +38,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             thread = new Thread(this);
             thread.start();
             // Start the keep alive Timer -- Note that the implementation is backed by one single thread for all the RestDelivery instances.
-            keepAliveTimer = new  javax.swing.Timer(KEEP_ALIVE_PERIOD, new ActionListener() {
+            keepAliveTimer = new  javax.swing.Timer(getKeepAlivePeriod(), new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     // write the keep alive message to the stream
                     synchronized (listeners) {
@@ -62,6 +64,12 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
         if (toReturn == null)
             singletonMap.put(c, (toReturn = new DataDistributer()));
         return toReturn;
+    }
+
+    public static int getKeepAlivePeriod() {
+        if (keepAlivePeriod == -1)
+            keepAlivePeriod = System.getProperty("remoteKeepAlivePeriod") == null ? KEEP_ALIVE_PERIOD : Integer.parseInt(System.getProperty("remoteKeepAlivePeriod"));
+        return keepAlivePeriod;
     }
 
     private HashMap<DistributionRequest, PreparedStatement> preparedStatements = new HashMap<DistributionRequest, PreparedStatement>();

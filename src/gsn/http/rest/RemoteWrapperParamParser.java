@@ -21,7 +21,7 @@ public class RemoteWrapperParamParser {
 	private String username,password;
     // The default timeout is set to 3 times the rate of the periodical Keep alive messages.
     // The timeout can be overriden in the virtual sensor description files.
-    private int timeout =  3 * DataDistributer.KEEP_ALIVE_PERIOD;
+    private int timeout =  3 * DataDistributer.getKeepAlivePeriod();
 
 	private  final String CURRENT_TIME = ISODateTimeFormat.dateTime().print(System.currentTimeMillis());
 
