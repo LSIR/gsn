@@ -71,15 +71,19 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
 
         ser = serial.Serial('/dev/ttyUSB0', 19200, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=1)
         ser.open()
-        ser.write('?\r\n')
+        ser.flushInput()
         ser.flushOutput()
-        time.sleep(0.1)
-        id = str(str(ser.read(ser.inWaiting())).strip().decode('ascii'))
+
+        ser.write('?\r\n')
+        id = ser.readline().strip()
+        self.info('device address: ' + id)
+        if len(id) != 1 or not id.isalnum():
+            self.error('received invalid device address')
+            return
+        
         ser.write(id + 'XZM\r\n')
         ser.readline()
         ser.write(id + 'XZ\r\n')
-        ser.flushOutput()
-
         ser.readline()
 
         ser.write(id + 'XU\r\n')
