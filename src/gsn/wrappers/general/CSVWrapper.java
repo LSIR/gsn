@@ -40,7 +40,9 @@ public class CSVWrapper extends AbstractWrapper {
 		dataFile = addressBean.getPredicateValueWithException("file");
 		String csvFields = addressBean.getPredicateValueWithException("fields");
 		String csvFormats = addressBean.getPredicateValueWithException("formats");
-		String csvSeparator = addressBean.getPredicateValueWithDefault("separator",",");
+		//String csvSeparator = addressBean.getPredicateValueWithDefault("separator",",");
+        String value = addressBean.getPredicateValue("separator");
+		String csvSeparator = (value == null || value.length() == 0) ? "," : value;
 		checkPointDir = addressBean.getPredicateValueWithDefault("check-point-directory", "./csv-check-points");
 		String csvStringQuote = addressBean.getPredicateValueWithDefault("quote","\"");
 		int skipFirstXLine = addressBean.getPredicateValueAsInt("skip-first-lines", 0);
