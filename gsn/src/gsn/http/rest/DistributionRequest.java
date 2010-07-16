@@ -9,9 +9,7 @@ public interface DistributionRequest {
 
     public boolean deliverKeepAliveMessage();
 
-    public abstract long getStartTime();
-
-    public abstract long getLastVisitedPk();
+    public abstract long getLastVisitedTime();
 
     public abstract String getQuery();
 

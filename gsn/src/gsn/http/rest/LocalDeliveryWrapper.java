@@ -134,7 +134,7 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("LocalDistributionReq => [" ).append(distributionRequest.getQuery()).append(", Start-Time: ").append(new Date(distributionRequest.getStartTime())).append("]");
+		sb.append("LocalDistributionReq => [" ).append(distributionRequest.getQuery()).append(", Start-Time: ").append(new Date(distributionRequest.getLastVisitedTime())).append("]");
 		return sb.toString();
 	}
 	
