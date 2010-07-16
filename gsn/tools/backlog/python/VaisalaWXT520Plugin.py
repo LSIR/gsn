@@ -82,9 +82,9 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
             return
         
         ser.write(id + 'XZM\r\n')
-        ser.readline()
+        self.info(ser.readline().strip())
         ser.write(id + 'XZ\r\n')
-        ser.readline()
+        self.info(ser.readline().strip())
 
         ser.write(id + 'XU\r\n')
         self.info(ser.readline().strip())
