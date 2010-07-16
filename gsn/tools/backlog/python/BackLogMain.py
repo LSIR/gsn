@@ -384,8 +384,6 @@ def main():
         print 'shutdown now'
         subprocess.Popen('shutdown -h now', shell=True)
 
-    sys.exit(0)
-
 
 if __name__ == '__main__':
     if PROFILE:
