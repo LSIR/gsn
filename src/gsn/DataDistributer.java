@@ -89,7 +89,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             if (!listeners.contains(listener)) {
                 logger.warn("Adding a listener to Distributer:" + listener.toString());
                 boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
-                String query = listener.getQuery();
+                String query = SQLValidator.addPkField(listener.getQuery());
                 if (needsAnd)
                     query += " AND ";
                 else
