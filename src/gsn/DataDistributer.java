@@ -297,7 +297,8 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
         Connection c = connections.get(sm);
         if (c == null) {
             c = sm.getConnection();
-            connections.put(sm, c);
+            c.setReadOnly(true);
+	    connections.put(sm, c);
         }
         return c;
     }
