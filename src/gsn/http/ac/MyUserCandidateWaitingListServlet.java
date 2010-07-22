@@ -215,7 +215,7 @@ public class MyUserCandidateWaitingListServlet extends HttpServlet
     private void printAdmissionPart(PrintWriter out)
     {
         out.println("<table>");
-	    out.println("<tr><th>Do you allow this virtual sensor registration?</th></tr>");
+	    out.println("<tr><th>Do you allow this candidate registration?</th></tr>");
 		//out.println("<tr><td><INPUT  TYPE=RADIO NAME=register VALUE= Yes><FONT COLOR=#000000> Yes ");
         out.println("<tr><td><select name=register id=selectbox>");
         out.println("<option value= >Select</option>");
