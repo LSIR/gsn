@@ -67,6 +67,8 @@ public interface WebConstants {
    public static final int    ERROR_INVALID_VSNAME                   = 402;
    
    public static final int    WRONG_VSFIELD_ERROR                    = 403;
+
+   public static final int    ACCESS_DENIED                          = 406;   //if a user has not access to a page. 
    
   
 }

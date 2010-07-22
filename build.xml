@@ -7,6 +7,7 @@
     <property name="max-db-connections" value="8"/>
     <property name="max-sliding-db-connections" value="8"/>
     <property name="remote-keep-alive-period" value="15000"/>
+    <property name="aes-enc-salt" value="this is a simple clear salt"/>
 
     <import file="${basedir}/installer/build.xml"/>
 
@@ -99,6 +100,7 @@
             <jvmarg value="-DmaxServlets=${max-servlets}"/>
             <jvmarg value="-DmaxDBConnections=${max-db-connections}"/>
             <jvmarg value="-DmaxSlidingDBConnections=${max-sliding-db-connections}"/>
+            <jvmarg value="-Dsalt=${aes-enc-salt}"/>
             <jvmarg value="-DremoteKeepAlivePeriod=${remote-keep-alive-period}"/>
             <arg id="gsnc-port" value="${gsn-controller-port}"/>
             <!-- <jvmarg value="-server"/> Sometimes on windows compaines about a missing dll.-->

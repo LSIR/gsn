@@ -6,6 +6,8 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.beans.WebInput;
+//import gsn.http.accesscontrol.User;
+import gsn.http.ac.User;
 import gsn.storage.DataEnumerator;
 
 import java.io.File;
@@ -18,6 +20,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -31,11 +34,24 @@ public class ContainerInfoHandler implements RequestHandler {
 	  response.setStatus( HttpServletResponse.SC_OK );
 	  String reqName = request.getParameter("name");
 
-    response.getWriter( ).write( buildOutput(reqName) );
+
+
+        //Added by Behnaz
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+
+        response.setHeader("Cache-Control","no-store");
+        response.setDateHeader("Expires", 0);
+        response.setHeader("Pragma","no-cache");
+
+
+
+        response.getWriter( ).write( buildOutput(reqName,user));
   }
   
   //return only the requested sensor if specified (otherwise use null)
-  public String buildOutput (String reqName) {
+  //Added by Behnaz. New parameter User user to method buildOutput.
+  public String buildOutput (String reqName, User user) {
 	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 	  
 	  
@@ -44,13 +60,21 @@ public class ContainerInfoHandler implements RequestHandler {
     sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
     sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
     sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
-    
+
+
     Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
-    
+
     
     while ( vsIterator.hasNext( ) ) {
       VSensorConfig sensorConfig = vsIterator.next( );
-      if ( reqName != null && !sensorConfig.getName().equals(reqName) ) continue;
+      if(Main.getContainerConfig().isAcEnabled()==true)
+      {
+            if ( (reqName != null && !sensorConfig.getName().equals(reqName) )|| ( user.hasReadAccessRight(sensorConfig.getName())== false && user.isAdmin()==false) ) continue;
+      }
+      else
+      {
+            if ( (reqName != null && !sensorConfig.getName().equals(reqName))) continue;   
+      }
       sb.append("<virtual-sensor");
       sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
       sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
