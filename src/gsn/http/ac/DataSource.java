@@ -183,6 +183,39 @@ public class DataSource
         return hasACRight;
     }
 
+    public static boolean  isVSManaged(String vsname)
+    {
+        ConnectToDB ctdb=null;
+        boolean isManaged = false;
+        try
+        {
+            ctdb=new ConnectToDB();
+            if(ctdb.valueExistsForThisColumn(new Column("DATASOURCENAME",vsname), "ACDATASOURCE")==true)
+            {
+                isManaged = true;
+            }
+            else
+            {
+                isManaged=false;
+            }
+        }
+        catch(Exception e)
+        {
+            logger.error("ERROR IN isVSManaged METHOD :");
+            logger.error(e.getMessage(),e);
+        }
+        finally
+        {
+            if(ctdb!=null)
+            {
+                ctdb.closeStatement();
+                ctdb.closeConnection();
+            }
+        }
+        return isManaged;
+
+    }
+
 
 }
 
