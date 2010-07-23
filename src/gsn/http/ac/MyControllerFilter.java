@@ -3,6 +3,7 @@ package gsn.http.ac;
 
 
 import gsn.Main;
+import gsn.http.WebConstants;
 import org.apache.log4j.Logger;
 
 import javax.servlet.*;
@@ -47,6 +48,27 @@ public class MyControllerFilter implements Filter
                 }
                 else
                 {
+
+                    // bypass if servlet is gsn and request is for ContainerInfoHandler
+                    String rawRequest = req.getParameter ( WebConstants.REQUEST );
+                    int requestType = -1;
+                    if ( rawRequest == null || rawRequest.trim ( ).length ( ) == 0 ) {
+                        requestType = 0;
+                    } else
+                        try {
+                            requestType = Integer.parseInt ( ( String ) rawRequest );
+                        } catch ( Exception e ) {
+                            logger.debug ( e.getMessage ( ) , e );
+                            requestType = -1;
+                        }
+
+                    if ("/gsn".equals(req.getServletPath()) && requestType == 0)
+                    {
+                        chain.doFilter(requset,response);
+                        return ;
+                    }
+                    
+                    //
 
                     if (user == null)// if user has not already loogged-in
                     {

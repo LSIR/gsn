@@ -165,7 +165,7 @@ public class User
             found = DataSourceListHasReadAccessRight(srname);
         }
 
-		return found;
+		return found || ! DataSource.isVSManaged(srname);
 	}
     public boolean hasWriteAccessRight(String srname)
     {

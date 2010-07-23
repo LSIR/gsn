@@ -7,6 +7,7 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.beans.WebInput;
 //import gsn.http.accesscontrol.User;
+import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
 import gsn.storage.DataEnumerator;
 
@@ -67,9 +68,17 @@ public class ContainerInfoHandler implements RequestHandler {
     
     while ( vsIterator.hasNext( ) ) {
       VSensorConfig sensorConfig = vsIterator.next( );
-      if(Main.getContainerConfig().isAcEnabled()==true)
+      if(Main.getContainerConfig().isAcEnabled())
       {
-            if ( (reqName != null && !sensorConfig.getName().equals(reqName) )|| ( user.hasReadAccessRight(sensorConfig.getName())== false && user.isAdmin()==false) ) continue;
+          if (user != null)
+          {
+              if ( (reqName != null && !sensorConfig.getName().equals(reqName) )|| ( user.hasReadAccessRight(sensorConfig.getName())== false && user.isAdmin()==false) ) continue;
+          }
+          else
+              if ( (reqName != null && !sensorConfig.getName().equals(reqName)) || DataSource.isVSManaged(sensorConfig.getName()))
+              {
+                  continue;
+              }
       }
       else
       {
