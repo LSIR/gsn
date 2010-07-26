@@ -423,17 +423,6 @@
  
     <!-- Filter for accesscontrol package -->
 
-   <!--  <filter>
-     <display-name>ControllerFilter</display-name>
-     <filter-name>ControllerFilter</filter-name>
-     <filter-class>gsn.http.accesscontrol.ControllerFilter</filter-class>
-    </filter>
-
-   <filter-mapping>
-     <filter-name>ControllerFilter</filter-name>
-     <url-pattern>/gsn</url-pattern>
-   </filter-mapping> -->
-
 
      <filter>
      <display-name>MyControllerFilter</display-name>
