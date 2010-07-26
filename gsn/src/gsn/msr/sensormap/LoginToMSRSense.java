@@ -3,6 +3,7 @@ package gsn.msr.sensormap;
 import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
+import gsn.msr.sensormap.sensorman.ServiceStub;
 import gsn.utils.KeyValueImp;
 
 import java.io.FileNotFoundException;
@@ -57,10 +58,6 @@ public class LoginToMSRSense {
 	 *            username for sensorweb user account
 	 * @param password
 	 *            password for sensorweb user account
-	 * @param conf
-	 *            configuration of the virtual sensor
-	 * @param gsnURI
-	 *            URI of the GSN instance
 	 * @return status of operation is integer. 0 for not created, 1 for created
 	 *         new, 2 for already exists.
 	 * @throws RemoteException
@@ -133,17 +130,24 @@ public class LoginToMSRSense {
 				pType = df.getName();
 			}
 			if (!dataTypeCache.contains(pType)) {
-				gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorTypeWithDT createType = new gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorTypeWithDT();
-				createType.setPublisherName(username);
-				createType.setPassCode(passGUID);
-				createType.setName(pType);
-				createType.setUnit(pUnit);
-				createType.setDataType("scalar");
-				createType.setIconUrl("");
-				String result = stub.CreateSensorTypeWithDT(createType)
-						.getCreateSensorTypeWithDTResult();
-				logger.info("Registering data type: " + pType
-						+ " , MSR's output: " + result);
+
+                gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorType createType = new gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorType();
+                createType.setPublisherName(username);
+                createType.setPassCode(passGUID);
+                createType.setName(pType);
+                String result = stub.CreateSensorType(createType).getCreateSensorTypeResult();
+
+                // The type: CreateSensorTypeWithDT is not available anymore..
+				//gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorTypeWithDT createType = new gsn.msr.sensormap.sensorman.ServiceStub.CreateSensorTypeWithDT();
+				//createType.setPublisherName(username);
+				//createType.setPassCode(passGUID);
+				//createType.setName(pType);
+				//createType.setUnit(pUnit);
+				//createType.setDataType("scalar");
+				//createType.setIconUrl("");
+                //String result = stub.CreateSensorTypeWithDT(createType).getCreateSensorTypeWithDTResult();
+
+                logger.info("Registering data type: " + pType + " , MSR's output: " + result);
 				dataTypeCache.add(pType);
 			}
 
@@ -170,9 +174,38 @@ public class LoginToMSRSense {
 				.getDeleteVectorSensorResult();
 		logger.info("Unregister: " + conf.getName() + " - MSR: " + call_output);
 
-		gsn.msr.sensormap.sensorman.ServiceStub.CreateVectorSensorTypeAndRegisterSensor registerVectorSensorParams = new gsn.msr.sensormap.sensorman.ServiceStub.CreateVectorSensorTypeAndRegisterSensor();
 
-		registerVectorSensorParams.setPublisherName(username);
+
+
+        gsn.msr.sensormap.sensorman.ServiceStub.RegisterVectorSensor rvs = new gsn.msr.sensormap.sensorman.ServiceStub.RegisterVectorSensor();
+        gsn.msr.sensormap.sensorman.ServiceStub.SensorInfo si = new gsn.msr.sensormap.sensorman.ServiceStub.SensorInfo();
+        //
+        si.setPublisherName(username);
+        si.setSensorName(conf.getName());
+        si.setUrl(gsnURI + "services/Service?wsdl");
+        si.setAltitude(conf.getAltitude());
+        si.setLatitude(conf.getLatitude());
+        si.setLongitude(conf.getLongitude());
+        si.setDescription(conf.getDescription());
+        si.setSensorType("GSN-"+ conf.getName());
+        si.setComments(pComments.toString());
+        si.setMetaInfo(pMetadata.toString());
+        si.setAccessControl("protected");
+        si.setDataType("vector");
+        //si.setIcon("image/CImg/weather_tower.gif");
+        si.setGroupName(conf.getName());
+
+        //
+        rvs.setPublisherName(username);
+        rvs.setSensor(si);
+        rvs.setPassCode(passGUID);
+        call_output = stub.RegisterVectorSensor(rvs).getRegisterVectorSensorResult();
+        //
+
+
+        /*
+		gsn.msr.sensormap.sensorman.ServiceStub.CreateVectorSensorTypeAndRegisterSensor registerVectorSensorParams = new gsn.msr.sensormap.sensorman.ServiceStub.CreateVectorSensorTypeAndRegisterSensor();
+        registerVectorSensorParams.setPublisherName(username);
 		registerVectorSensorParams.setPassCode(passGUID);
 		registerVectorSensorParams.setVectorSensorName(conf.getName());
 		registerVectorSensorParams.setWsURL(gsnURI + "services/Service?wsdl");
@@ -189,11 +222,9 @@ public class LoginToMSRSense {
 		registerVectorSensorParams.setDataType("vector");
 		registerVectorSensorParams.setIcon("image/CImg/weather_tower.gif");
 		registerVectorSensorParams.setGroupName(conf.getName());
-
-		call_output = stub.CreateVectorSensorTypeAndRegisterSensor(
-				registerVectorSensorParams)
-				.getCreateVectorSensorTypeAndRegisterSensorResult();
-
+        call_output = stub.CreateVectorSensorTypeAndRegisterSensor(registerVectorSensorParams).getCreateVectorSensorTypeAndRegisterSensorResult();
+        */
+        
 		if (call_output.indexOf("OK") >= 0) {
 			logger.warn("Sensor " + conf.getName()
 					+ " registered correctly. SensorMap says: " + call_output);

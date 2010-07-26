@@ -69,20 +69,20 @@
 
               
                   if (
-                  "http://microsoft.com/wsdl/types/".equals(namespaceURI) &&
-                  "guid".equals(typeName)){
+                  "http://tempuri.org/".equals(namespaceURI) &&
+                  "SensorData".equals(typeName)){
                    
-                            return  com.microsoft.wsdl.types.Guid.Factory.parse(reader);
+                            return  org.tempuri.SensorData.Factory.parse(reader);
                         
 
                   }
 
               
                   if (
-                  "http://tempuri.org/".equals(namespaceURI) &&
-                  "SensorData".equals(typeName)){
+                  "http://microsoft.com/wsdl/types/".equals(namespaceURI) &&
+                  "guid".equals(typeName)){
                    
-                            return  org.tempuri.SensorData.Factory.parse(reader);
+                            return  com.microsoft.wsdl.types.Guid.Factory.parse(reader);
                         
 
                   }

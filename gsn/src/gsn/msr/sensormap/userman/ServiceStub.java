@@ -132,7 +132,7 @@
      */
     public ServiceStub(org.apache.axis2.context.ConfigurationContext configurationContext) throws org.apache.axis2.AxisFault {
         
-                    this(configurationContext,"http://atom.research.microsoft.com/SenseWebV3/usermanager/service.asmx" );
+                    this(configurationContext,"http://www.sensormap.org/SenseWebV3/usermanager/service.asmx" );
                 
     }
 
@@ -141,7 +141,7 @@
      */
     public ServiceStub() throws org.apache.axis2.AxisFault {
         
-                    this("http://atom.research.microsoft.com/SenseWebV3/usermanager/service.asmx" );
+                    this("http://www.sensormap.org/SenseWebV3/usermanager/service.asmx" );
                 
     }
 
@@ -543,7 +543,7 @@
         }
         return false;
     }
-     //http://atom.research.microsoft.com/SenseWebV3/usermanager/service.asmx
+     //http://www.sensormap.org/SenseWebV3/usermanager/service.asmx
         public static class AddGroupResponse
         implements org.apache.axis2.databinding.ADBBean{
         

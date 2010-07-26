@@ -1,3 +1,4 @@
+
 /**
  * ServiceSkeleton.java
  *
@@ -32,10 +33,11 @@ import org.tempuri.SensorData;
      *  ServiceSkeleton java skeleton for the axisService
      */
     public class ServiceSkeleton{
-     
+
+
 private static final transient Logger         logger          = Logger.getLogger( ServiceSkeleton.class );
 	/**
-	 * SensorTypes : 
+	 * SensorTypes :
 	 * public  int Unknown = 0;
 	 * public  int Generic = 1;
 	 * public  int Temperature = 2;
@@ -58,7 +60,7 @@ private static final transient Logger         logger          = Logger.getLogger
 
 	public org.tempuri.GetAggregateScalarDataSeriesInBatchResponse GetAggregateScalarDataSeriesInBatch(org.tempuri.GetAggregateScalarDataSeriesInBatch input) {
 		GetAggregateScalarDataSeriesInBatchResponse toReturn = new GetAggregateScalarDataSeriesInBatchResponse();
-		
+
 		long aggInMSec = input.getAggregateIntervalInSeconds()*1000;
 		ArrayOfSensorData items = new ArrayOfSensorData () ;
 		for (String signalInfo: input.getSensorNames().getString()) {
@@ -75,14 +77,14 @@ private static final transient Logger         logger          = Logger.getLogger
 		toReturn.setGetAggregateScalarDataSeriesInBatchResult(items);
 		return toReturn;
 	}
-	
+
     public org.tempuri.GetAggregateScalarDataSeriesResponse GetAggregateScalarDataSeries(org.tempuri.GetAggregateScalarDataSeries input){
     	org.tempuri.GetAggregateScalarDataSeriesResponse toReturn = new org.tempuri.GetAggregateScalarDataSeriesResponse();
-		
+
 		long aggInMSec = input.getAggregateIntervalInSeconds()*1000;
 		SensorData items = new SensorData () ;
-		String signalInfo =input.getSensorName(); 
-		
+		String signalInfo =input.getSensorName();
+
 			try {
 				SignalRequest req = new SignalRequest(signalInfo);
 				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by FLOOR(TIMED/").append(aggInMSec).append(") order by TIMED");
@@ -96,16 +98,16 @@ private static final transient Logger         logger          = Logger.getLogger
 			}
 		toReturn.setGetAggregateScalarDataSeriesResult(items);
 		return toReturn;
-		
+
     }
-    
+
     public org.tempuri.GetAggregateScalarDataResponse GetAggregateScalarData(org.tempuri.GetAggregateScalarData input){
     	GetAggregateScalarDataResponse toReturn = new GetAggregateScalarDataResponse();
-		
+
 //		long aggInMSec = input.getAggregateIntervalInSeconds()*1000;
 //		SensorData items = new SensorData () ;
-//		String signalInfo =input.getSensorName(); 
-//		
+//		String signalInfo =input.getSensorName();
+//
 //			try {
 //				SignalRequest req = new SignalRequest(signalInfo);
 //				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by FLOOR(TIMED/").append(aggInMSec).append(") order by TIMED");
@@ -117,7 +119,7 @@ private static final transient Logger         logger          = Logger.getLogger
 //			}
 //		toReturn.setGetAggregateScalarDataResult(items);
 		return toReturn;
-	
+
     }
 
 
@@ -146,7 +148,7 @@ private static final transient Logger         logger          = Logger.getLogger
 		toReturn.setGetLatestScalarDataInBatchResult(items);
 		return toReturn;
 	}
-	
+
 	/**
 	 * Gets the data published by a set of sensor within a specified time window
 	 * @param input
@@ -210,7 +212,7 @@ private static final transient Logger         logger          = Logger.getLogger
 			return conf.getName();
 		}
 	}
-	
+
 	private  ArrayOfSensorData transformToSensorDataArray(String vsName, StringBuilder query) {
 		boolean is_binary_linked= true;
 		if (query.toString().replaceAll(" ","").toLowerCase().indexOf("avg(")>0)
@@ -224,7 +226,7 @@ private static final transient Logger         logger          = Logger.getLogger
 		try {
 			DataEnumerator output = null;
 			output = Main.getStorage(vsName).executeQuery(query, is_binary_linked);
-			SensorData data = new SensorData(); 
+			SensorData data = new SensorData();
 			ArrayOfDateTime arrayOfDateTime = new ArrayOfDateTime();
 			ArrayList<Double> sensor_readings = new ArrayList();
 			while(output.hasMoreElements()) {
@@ -244,7 +246,7 @@ private static final transient Logger         logger          = Logger.getLogger
 		}catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 		}
-		
+
 		return toReturn;
 	}
 
@@ -253,16 +255,13 @@ private static final transient Logger         logger          = Logger.getLogger
 	/********************************************************************************************************/
 	/********************************* AUTO GENERATED METHODS START FROM HERE *******************************/
 	/********************************************************************************************************/
-	 
-         
-		 
-		 
+
         /**
          * Auto generated method signature
          * Deletes an existing sensor
                                      * @param deleteSensor
          */
-        
+
                  public org.tempuri.DeleteSensorResponse DeleteSensor
                   (
                   org.tempuri.DeleteSensor deleteSensor
@@ -271,14 +270,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#DeleteSensor");
         }
-     
-      
+
+
         /**
          * Auto generated method signature
          * Stores a series of sensor data in datahub
                                      * @param storeScalarDataBatch
          */
-        
+
                  public org.tempuri.StoreScalarDataBatchResponse StoreScalarDataBatch
                   (
                   org.tempuri.StoreScalarDataBatch storeScalarDataBatch
@@ -287,14 +286,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#StoreScalarDataBatch");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Gets data from one component sensor of a vector sensor
                                      * @param getLatestVectorDataByComponentIndex
          */
-        
+
                  public org.tempuri.GetLatestVectorDataByComponentIndexResponse GetLatestVectorDataByComponentIndex
                   (
                   org.tempuri.GetLatestVectorDataByComponentIndex getLatestVectorDataByComponentIndex
@@ -303,14 +302,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetLatestVectorDataByComponentIndex");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Returns the latest image data reported by a sensor
                                      * @param getLatestBinarySensorData
          */
-        
+
                  public org.tempuri.GetLatestBinarySensorDataResponse GetLatestBinarySensorData
                   (
                   org.tempuri.GetLatestBinarySensorData getLatestBinarySensorData
@@ -319,14 +318,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetLatestBinarySensorData");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Modifies location of a sensor
                                      * @param updateSensorLocation
          */
-        
+
                  public org.tempuri.UpdateSensorLocationResponse UpdateSensorLocation
                   (
                   org.tempuri.UpdateSensorLocation updateSensorLocation
@@ -335,14 +334,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#UpdateSensorLocation");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Gets the latest data published by a sensor
                                      * @param getLatestScalarData
          */
-        
+
                  public org.tempuri.GetLatestScalarDataResponse GetLatestScalarData
                   (
                   org.tempuri.GetLatestScalarData getLatestScalarData
@@ -351,14 +350,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetLatestScalarData");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Registers a new sensor
                                      * @param registerSensor
          */
-        
+
                  public org.tempuri.RegisterSensorResponse RegisterSensor
                   (
                   org.tempuri.RegisterSensor registerSensor
@@ -367,16 +366,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#RegisterSensor");
         }
-     
-         
-       
-         
+
+
         /**
          * Auto generated method signature
          * Stores data from a vector sensor
                                      * @param storeVectorData
          */
-        
+
                  public org.tempuri.StoreVectorDataResponse StoreVectorData
                   (
                   org.tempuri.StoreVectorData storeVectorData
@@ -385,14 +382,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#StoreVectorData");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Retreives metadata of an existing sensor
                                      * @param getSensorByPublisherAndName
          */
-        
+
                  public org.tempuri.GetSensorByPublisherAndNameResponse GetSensorByPublisherAndName
                   (
                   org.tempuri.GetSensorByPublisherAndName getSensorByPublisherAndName
@@ -401,14 +398,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetSensorByPublisherAndName");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Gets data from a vector sensor
                                      * @param getLatestVectorData
          */
-        
+
                  public org.tempuri.GetLatestVectorDataResponse GetLatestVectorData
                   (
                   org.tempuri.GetLatestVectorData getLatestVectorData
@@ -417,18 +414,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetLatestVectorData");
         }
-     
-         
-    
-         
-     
-         
+
+
         /**
          * Auto generated method signature
          * Send binary sensor data such as images, sound or video. Data are treated as a binary file. Time parameter is the time stamp of the first data.
                                      * @param storeBinaryData
          */
-        
+
                  public org.tempuri.StoreBinaryDataResponse StoreBinaryData
                   (
                   org.tempuri.StoreBinaryData storeBinaryData
@@ -437,14 +430,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#StoreBinaryData");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Gets the data published by a sensor within a specified time window
                                      * @param getScalarDataSeries
          */
-        
+
                  public org.tempuri.GetScalarDataSeriesResponse GetScalarDataSeries
                   (
                   org.tempuri.GetScalarDataSeries getScalarDataSeries
@@ -453,14 +446,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetScalarDataSeries");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Returns metadata of all the sensors published by a given publisher
                                      * @param getSensorsByPublisher
          */
-        
+
                  public org.tempuri.GetSensorsByPublisherResponse GetSensorsByPublisher
                   (
                   org.tempuri.GetSensorsByPublisher getSensorsByPublisher
@@ -469,16 +462,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#GetSensorsByPublisher");
         }
-     
-         
-      
-         
+
+
         /**
          * Auto generated method signature
          * Returns string representation of a sensor data
                                      * @param dataToString
          */
-        
+
                  public org.tempuri.DataToStringResponse DataToString
                   (
                   org.tempuri.DataToString dataToString
@@ -487,14 +478,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#DataToString");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Stores data from one component sensor of a vector sensor
                                      * @param storeVectorDataByComponentIndex
          */
-        
+
                  public org.tempuri.StoreVectorDataByComponentIndexResponse StoreVectorDataByComponentIndex
                   (
                   org.tempuri.StoreVectorDataByComponentIndex storeVectorDataByComponentIndex
@@ -503,14 +494,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#StoreVectorDataByComponentIndex");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Registers a new vector sensor
                                      * @param registerVectorSensor
          */
-        
+
                  public org.tempuri.RegisterVectorSensorResponse RegisterVectorSensor
                   (
                   org.tempuri.RegisterVectorSensor registerVectorSensor
@@ -519,14 +510,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#RegisterVectorSensor");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Stores a sensordata in datahub
                                      * @param storeScalarData
          */
-        
+
                  public org.tempuri.StoreScalarDataResponse StoreScalarData
                   (
                   org.tempuri.StoreScalarData storeScalarData
@@ -535,14 +526,14 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#StoreScalarData");
         }
-     
-         
+
+
         /**
          * Auto generated method signature
          * Deletes an existing vector sensor
                                      * @param deleteVectorSensor
          */
-        
+
                  public org.tempuri.DeleteVectorSensorResponse DeleteVectorSensor
                   (
                   org.tempuri.DeleteVectorSensor deleteVectorSensor
@@ -551,9 +542,22 @@ private static final transient Logger         logger          = Logger.getLogger
                 //TODO : fill this with the necessary business logic
                 throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#DeleteVectorSensor");
         }
-     
-         
-          
-     
+
+/**
+         * Auto generated method signature
+         *
+                                     * @param setSensorData
+         */
+
+                 public org.tempuri.SetSensorDataResponse SetSensorData
+                  (
+                  org.tempuri.SetSensorData setSensorData
+                  )
+            {
+                //TODO : fill this with the necessary business logic
+                throw new  java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#SetSensorData");
+        }
+               
+
     }
     
