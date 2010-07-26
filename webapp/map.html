@@ -26,6 +26,9 @@
 
             $(document).ready(function() {
 
+                $.get('/menu.jsp', {selected: "map"}, function(data) {
+                    $('#navigation').html(data);
+                });
 
                 mapProvider = GSN.util.getURLParam("mapProvider");
                 if(mapProvider.indexOf("#")!=-1){ //remove hash if any
@@ -76,13 +79,6 @@
                 <h1><a href="." id="gsn-name">GSN</a></h1>
             </div>
             <div id="navigation">
-                <ul id="menu">
-                    <li><a href="index.html#home">home</a></li>
-                    <li><a href="data.html#data">data</a></li>
-                    <li class="selected"><a href="map.html#map">map</a></li>
-                    <li><a href="fullmap.html#fullmap">fullmap</a></li>
-                </ul>
-                <ul id="linkWebsite"><li><a href="http://gsn.sourceforge.net/">GSN Home</a></li></ul>
             </div>
             <div id="main">
                 <noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
