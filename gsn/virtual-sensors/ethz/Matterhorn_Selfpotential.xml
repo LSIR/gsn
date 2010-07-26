@@ -17,10 +17,10 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="relatime" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="SP_DV1_1" type="VARCHAR(30)" />
-            <field name="SP_DV2_1" type="VARCHAR(30)" />
-            <field name="SP_DV1_2" type="VARCHAR(30)" />
-            <field name="SP_DV2_2" type="VARCHAR(30)" />
+            <field name="SP_DV1_1" type="VARCHAR(30)" unit="mv" />
+            <field name="SP_DV2_1" type="VARCHAR(30)" unit="mv" />
+            <field name="SP_DV1_2" type="VARCHAR(30)" unit="mv" />
+            <field name="SP_DV2_2" type="VARCHAR(30)" unit="mv" />
         </output-structure>
     </processing-class>
     <description>Selfpotential/SP data from Matterhorn deployment</description>

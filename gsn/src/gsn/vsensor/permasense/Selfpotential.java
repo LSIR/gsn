@@ -17,7 +17,7 @@ public class Selfpotential implements Converter {
 		//long start = System.nanoTime();
 		int v = ((Integer) input).intValue();
 		if (v <= 64000) {
-			result = decimal3.format(v * 2500.0 / 64000.0);
+			result = decimal3.format(v * 320.0 / 64000.0);
 		}
 		//if (logger.isDebugEnabled())
 		//	logger.debug("dilatationConversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
