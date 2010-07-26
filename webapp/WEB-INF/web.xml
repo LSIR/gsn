@@ -8,7 +8,7 @@
       WEB SERVICES CALL [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] ; there is
       another part down in this file which has to be uncommented to have the axis working.
      ******************************************************************************* -->
-<!-- 
+<!--
     <servlet>
         <servlet-name>AxisServlet</servlet-name>
         <display-name>Apache-Axis Servlet</display-name>
@@ -391,6 +391,36 @@
     </servlet-mapping>
  -->
 
+
+    <!-- Source IP Filtering for webservices -->
+
+    <!--
+    <filter>
+        <display-name>IPSourceFilter</display-name>
+        <filter-name>IPSourceFilter</filter-name>
+        <filter-class>gsn.http.IPSourceFilter</filter-class>
+        <init-param>
+            <param-name>allowedIps</param-name>
+            <param-value>131.107.151.211;195.176.244.27</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>IPSourceFilter</filter-name>
+        <url-pattern>/services/*</url-pattern>
+    </filter-mapping>
+
+        <security-constraint >
+        <web-resource-collection>
+            <web-resource-name>Open WebService</web-resource-name>
+            <url-pattern>/services/*</url-pattern>
+            <http-method>POST</http-method>
+            <http-method>GET</http-method>
+        </web-resource-collection>
+  </security-constraint>
+
+    -->
+ 
     <!-- Filter for accesscontrol package -->
 
    <!--  <filter>
