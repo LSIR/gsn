@@ -58,9 +58,18 @@ public class CSVWrapper extends AbstractWrapper {
 			csvStringQuote="\"";
 		}
 		try {
-			String checkPointFile = new File(checkPointDir).getAbsolutePath()+"/"+(new File(dataFile).getName())+"-"+addressBean.hashCode();
-
-			if (handler.initialize(dataFile.trim(), csvFields, csvFormats, csvSeparator.toCharArray()[0], csvStringQuote.toCharArray()[0], skipFirstXLine, nullValues,timezone,checkPointFile)==false) 
+            //String checkPointFile = new File(checkPointDir).getAbsolutePath()+"/"+(new File(dataFile).getName())+"-"+addressBean.hashCode();
+            StringBuilder checkPointFile = new StringBuilder()
+                    .append(new File(checkPointDir).getAbsolutePath())
+                    .append("/")
+                    .append(addressBean.getVirtualSensorName())
+                    .append("_")
+                    .append(addressBean.getInputStreamName())
+                    .append("_")
+                    .append(addressBean.getWrapper())
+                    .append("_")
+                    .append(new File(dataFile).getName());
+			if (! handler.initialize(dataFile.trim(), csvFields, csvFormats, csvSeparator.toCharArray()[0], csvStringQuote.toCharArray()[0], skipFirstXLine, nullValues,timezone,checkPointFile.toString())) 
 				return false;
 		}catch (Exception e) {
 			logger.error("Loading the csv-wrapper failed:" +e.getMessage(),e);  
