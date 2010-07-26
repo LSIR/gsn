@@ -3,19 +3,19 @@ package gsn.storage.hibernate;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.storage.DataEnumeratorIF;
 import gsn.utils.GSNRuntimeException;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HibernateStorage implements VirtualSensorStorage {
 
@@ -26,6 +26,8 @@ public class HibernateStorage implements VirtualSensorStorage {
     private String identifier;
 
     private DataField[] structure;
+
+    private static final int PAGE_SIZE = 1000;
 
     public static HibernateStorage newInstance(HibernateUtil.DBConnectionInfo dbInfo, String identifier, DataField[] structure, boolean unique) {
         try {
@@ -67,7 +69,7 @@ public class HibernateStorage implements VirtualSensorStorage {
             throw new GSNRuntimeException(e.getMessage());
         }
         catch (RuntimeException e) {
-            throw new GSNRuntimeException(e.getMessage());    
+            throw new GSNRuntimeException(e.getMessage());
         }
     }
 
@@ -91,7 +93,7 @@ public class HibernateStorage implements VirtualSensorStorage {
     }
 
     public long countStreamElement() throws GSNRuntimeException {
-       Transaction tx = null;
+        Transaction tx = null;
         try {
             Session session = sf.getCurrentSession();
             tx = session.beginTransaction();
@@ -99,7 +101,7 @@ public class HibernateStorage implements VirtualSensorStorage {
             criteria.setProjection(Projections.rowCount());
             List count = criteria.list();
             tx.commit();
-            return (Long)count.get(0);
+            return (Long) count.get(0);
 
         } catch (RuntimeException e) {
             try {
@@ -109,7 +111,15 @@ public class HibernateStorage implements VirtualSensorStorage {
                 logger.error("Couldn't roll back transaction.");
             }
             throw e;
-        } 
+        }
+    }
+
+    public DataEnumeratorIF getStreamElements(int pageSize, Order order, Criterion[] crits, int maxResults) throws GSNRuntimeException {
+        return new PaginatedDataEnumerator(pageSize, order, crits, maxResults);
+    }
+
+    public DataEnumeratorIF getStreamElements(int pageSize, Order order, Criterion[] crits) throws GSNRuntimeException {
+        return getStreamElements(pageSize, order, crits, -1);
     }
 
     //
@@ -146,7 +156,6 @@ public class HibernateStorage implements VirtualSensorStorage {
     //
 
     /**
-     * 
      * @param gsnType
      * @return
      */
@@ -162,7 +171,7 @@ public class HibernateStorage implements VirtualSensorStorage {
                 return "integer";
             case DataTypes.SMALLINT:
                 return "short";
-            case DataTypes.TINYINT:    
+            case DataTypes.TINYINT:
                 return "byte";
             case DataTypes.DOUBLE:
                 return "double";
@@ -176,8 +185,8 @@ public class HibernateStorage implements VirtualSensorStorage {
         ArrayList<Serializable> data = new ArrayList<Serializable>();
         long timed = (Long) dm.get("timed");
         for (DataField df : structure) {
-            if ( ! "timed".equalsIgnoreCase(df.getName()))
-                data.add(dm.get(df.getName()));   
+            if (!"timed".equalsIgnoreCase(df.getName()))
+                data.add(dm.get(df.getName()));
         }
         return new StreamElement(structure, data.toArray(new Serializable[]{data.size()}), timed);
     }
@@ -186,7 +195,7 @@ public class HibernateStorage implements VirtualSensorStorage {
         Map<String, Serializable> dm = new HashMap<String, Serializable>();
         dm.put("timed", se.getTimeStamp());
         for (String fieldName : se.getFieldNames()) {
-            if ( ! "timed".equalsIgnoreCase(fieldName))
+            if (!"timed".equalsIgnoreCase(fieldName))
                 dm.put(fieldName, se.getData(fieldName));
         }
         return dm;
@@ -231,7 +240,7 @@ public class HibernateStorage implements VirtualSensorStorage {
         sb.append(" />\n");
         // OTHER DATA FIELDS
         for (DataField df : structure) {
-            if ( ! "timed".equalsIgnoreCase(df.getName())) {
+            if (!"timed".equalsIgnoreCase(df.getName())) {
                 sb.append("<property name=\"")
                         .append(df.getName())
                         .append("\" column=\"")
@@ -244,5 +253,111 @@ public class HibernateStorage implements VirtualSensorStorage {
         sb.append("</class>\n");
         sb.append("</hibernate-mapping>\n");
         return sb.toString();
+    }
+
+    //
+
+    private class PaginatedDataEnumerator implements DataEnumeratorIF {
+
+        /** The global max number of result returned */
+        private int maxResults;
+
+        private int currentPage;
+
+        private int pageSize;
+
+        private Order order;
+
+        private Criterion[] crits;
+
+        private Iterator<Map<String, Serializable>> pci;
+
+        private boolean closed;
+
+        private PaginatedDataEnumerator(int pageSize, Order order, Criterion[] crits, int maxResults) {
+            this.maxResults = maxResults;
+            this.pageSize = pageSize;
+            this.order = order;
+            this.crits = crits;
+            currentPage = 0;
+            pci = null;             //page content iterator
+            if (maxResults == 0)
+                close();
+            hasMoreElements();
+        }
+
+        /**
+         * This method checks if there is one or more {@link gsn.beans.StreamElement} available in the DataEnumerator.
+         * If the current page is empty, it tries to load the next page.
+         * @return
+         */
+        public boolean hasMoreElements() {
+
+            // Check if the DataEnumerator is closed
+            if (closed)
+                return false;
+
+            // Check if there is still data in the current pageContent
+            if (pci != null && pci.hasNext())
+                return true;
+
+            // Compute the next number of elements to fetch
+            int offset = currentPage * pageSize;
+            int mr = pageSize;
+            if (maxResults > 0) {
+                int remaining = maxResults - offset;
+                mr = remaining > 0 ? remaining >= pageSize ? pageSize : remaining % pageSize : 0;
+            }
+
+            // Try to load the next page
+            pci = null;
+            Transaction tx = null;
+            try {
+                Session session = sf.getCurrentSession();
+                tx = session.beginTransaction();
+                //
+                Criteria criteria = session.createCriteria(identifier);
+                for (Criterion criterion : crits) {
+                    criteria.add(criterion);
+                }
+                criteria.addOrder(order);
+                criteria.setCacheable(true);
+                criteria.setReadOnly(true);
+                criteria.setFirstResult(offset);
+                criteria.setMaxResults(mr);
+                //
+                pci = criteria.list().iterator();
+                tx.commit();
+                currentPage++;
+
+            } catch (RuntimeException e) {
+                try {
+                    if (tx != null)
+                        tx.rollback();
+                } catch (RuntimeException ex) {
+                    logger.error("Couldn't roll back transaction.");
+                }
+                throw e;
+            }
+            if(pci != null &&  pci.hasNext()) {
+                return true;
+            }
+            else {
+                close();
+                return false;
+            }
+        }
+
+        public StreamElement nextElement() throws RuntimeException {
+            if ( ! hasMoreElements())
+                throw new IndexOutOfBoundsException("The DataEnumerator has no more StreamElement or is closed."); 
+            else
+                return dm2se(pci.next());
+        }
+
+        public void close() {
+            if (! closed)
+                 closed = true;
+        }
     }
 }

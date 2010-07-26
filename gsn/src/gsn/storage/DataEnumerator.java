@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
  * the single prepared statement (and then you have to wonder why you are using
  * threads) or you have multiple prepared statements for same thing.
  */
-public class DataEnumerator implements Enumeration<StreamElement> {
+public class DataEnumerator implements DataEnumeratorIF {
 
 	private transient Logger logger                   = Logger.getLogger( DataEnumerator.class );
 

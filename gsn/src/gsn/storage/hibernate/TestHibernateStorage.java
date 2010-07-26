@@ -10,8 +10,11 @@ import static org.junit.Assert.assertNotSame;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import org.hibernate.SessionFactory;
-import org.hibernate.metadata.ClassMetadata;
+import gsn.storage.DataEnumeratorIF;
+import org.apache.xmlbeans.impl.xb.xsdschema.RestrictionDocument;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -89,7 +92,7 @@ public class TestHibernateStorage {
 
     @Test
     public void testMinMaxStorageOfData() {
-        DataField[] structure = dataField.toArray(new DataField[]{}); 
+        DataField[] structure = dataField.toArray(new DataField[]{});
         //
         HibernateStorage storage = HibernateStorage.newInstance(dbInfo, "testMinMaxStorageOfData", dataField.toArray(new DataField[]{}), false);
         assertNotNull(storage);
@@ -139,7 +142,7 @@ public class TestHibernateStorage {
             assertNotNull(seOut.getData(df.getName()));
         }
         // Check that the values are equals
-        for (int i = 0 ; i < seOut.getData().length ; i++) {
+        for (int i = 0; i < seOut.getData().length; i++) {
             if (seOut.getFieldTypes()[i] != DataTypes.BINARY)
                 assertEquals(se.getData(seOut.getFieldNames()[i]), seOut.getData()[i]);
         }
@@ -162,13 +165,13 @@ public class TestHibernateStorage {
         assertNotNull(seOut);
         //
         for (DataField df : structure) {
-            if ( ! removed.getName().equalsIgnoreCase(df.getName()))
+            if (!removed.getName().equalsIgnoreCase(df.getName()))
                 assertNotNull(seOut.getData(df.getName()));
             else
                 assertNull(seOut.getData(df.getName()));
         }
         // Check that the values are equals
-        for (int i = 0 ; i < seOut.getData().length ; i++) {
+        for (int i = 0; i < seOut.getData().length; i++) {
             if (seOut.getFieldTypes()[i] != DataTypes.BINARY)
                 assertEquals(se.getData(seOut.getFieldNames()[i]), seOut.getData()[i]);
         }
@@ -193,7 +196,7 @@ public class TestHibernateStorage {
         StreamElement seOut = storage.getStreamElement(pk);
         assertNotNull(seOut);
         // Check that the values are equals
-        for (int i = 0 ; i < seOut.getData().length ; i++) {
+        for (int i = 0; i < seOut.getData().length; i++) {
             if (seOut.getFieldTypes()[i] != DataTypes.BINARY)
                 assertEquals(se.getData(seOut.getFieldNames()[i]), seOut.getData()[i]);
         }
@@ -209,7 +212,7 @@ public class TestHibernateStorage {
         DataField[] fields = dataField.toArray(new DataField[]{});
         StreamElement se = generateStreamElement(fields, Byte.MIN_VALUE);
         se.setTimeStamp(100);
-        for (int i = 0 ; i < se.getData().length ; i++) {
+        for (int i = 0; i < se.getData().length; i++) {
             se.setData(i, null);
         }
         //
@@ -218,7 +221,7 @@ public class TestHibernateStorage {
         StreamElement seOut = storage.getStreamElement(pk);
         assertNotNull(seOut);
         // Check that the values are equals
-        for (int i = 0 ; i < seOut.getData().length ; i++) {
+        for (int i = 0; i < seOut.getData().length; i++) {
             if (seOut.getFieldTypes()[i] != DataTypes.BINARY)
                 assertEquals(se.getData(seOut.getFieldNames()[i]), seOut.getData()[i]);
         }
@@ -265,20 +268,21 @@ public class TestHibernateStorage {
     @Test
     public void testConcurrentInsertion() {
         final int nbThread = 10;
-        final long nbStreamElement = 250;
+        final long nbStreamElement = 100;
         //
         final DataField[] structure = dataField.toArray(new DataField[]{});
         final HibernateStorage storage = HibernateStorage.newInstance(dbInfo, "testConcurrentInsertion", dataField.toArray(new DataField[]{}), false);
         assertNotNull(storage);
         //
         ArrayList<Thread> threads = new ArrayList<Thread>();
-        for (int i = 0 ; i < nbThread ; i++) {
+        for (int i = 0; i < nbThread; i++) {
             final int j = i;
             threads.add(new Thread() {
                 int tid = j;
+
                 public void run() {
                     System.out.println("Thread " + tid + " has started.");
-                    for (int k = 0 ; k < nbStreamElement ; k++) {
+                    for (int k = 0; k < nbStreamElement; k++) {
                         // Build a StreamElement to store
                         StreamElement se1 = generateStreamElement(structure, Byte.MIN_VALUE);
                         se1.setTimeStamp(System.currentTimeMillis());
@@ -307,32 +311,126 @@ public class TestHibernateStorage {
         assertEquals((nbThread * nbStreamElement), storage.countStreamElement());
     }
 
-   //
+    @Test
+    public void testPaginatedQueryWithoutCriterionWithLimit() {
+        int numberOfElements = 283;
+        String identifier = "testPaginatedQueryWithoutCriterionWithLimit";
+        generateDataTest(identifier, numberOfElements);
+        //
+        DataField[] structure = dataField.toArray(new DataField[]{});
+        HibernateStorage storage = HibernateStorage.newInstance(dbInfo, identifier, dataField.toArray(new DataField[]{}), false);
+        assertNotNull(storage);
+        //
+        int[] pageSizes = new int[]{1, 11, numberOfElements / 2, numberOfElements / 3, numberOfElements / 3 - 1, numberOfElements / 3 + 1, numberOfElements - 1, numberOfElements + 1, numberOfElements * 2};
+        //
+        for (int pageSize : pageSizes) {
+            System.out.println("testPaginatedQueryWithoutCriterionWithLimit ASC with pageSize: " + pageSize);
+            // Set the limit to a fixed number: 1
+            checkQueryResult(storage.getStreamElements(pageSize, Order.asc("timed"), new Criterion[]{}, 1), 1, 1);
+            // Set the limit to a fixed number: 11
+            checkQueryResult(storage.getStreamElements(pageSize, Order.asc("timed"), new Criterion[]{}, 11), 1, 11);
+            // Set the limit to numberOfElements/10+1
+            checkQueryResult(storage.getStreamElements(pageSize, Order.asc("timed"), new Criterion[]{}, numberOfElements / 10 + 1), 1, numberOfElements / 10 + 1);
+            // Set the limit to numberOfElements/10-1
+            checkQueryResult(storage.getStreamElements(pageSize, Order.asc("timed"), new Criterion[]{}, numberOfElements / 10 - 1), 1, numberOfElements / 10 - 1);
+            // Set the limit to 0
+            checkQueryResult(storage.getStreamElements(pageSize, Order.asc("timed"), new Criterion[]{}, 0), -1, -1);
+        }
+                //
+        for (int pageSize : pageSizes) {
+            System.out.println("testPaginatedQueryWithoutCriterionWithLimit DESC with pageSize: " + pageSize);
+            // Set the limit to a fixed number: 1
+            checkQueryResult(storage.getStreamElements(pageSize, Order.desc("timed"), new Criterion[]{}, 1), numberOfElements, numberOfElements);
+            // Set the limit to a fixed number: 11
+            checkQueryResult(storage.getStreamElements(pageSize, Order.desc("timed"), new Criterion[]{}, 11), numberOfElements, numberOfElements - 10);
+            // Set the limit to numberOfElements/10+1
+            checkQueryResult(storage.getStreamElements(pageSize, Order.desc("timed"), new Criterion[]{}, numberOfElements / 10 + 1), numberOfElements, numberOfElements - (numberOfElements / 10 + 1) + 1);
+            // Set the limit to numberOfElements/10-1
+            checkQueryResult(storage.getStreamElements(pageSize, Order.desc("timed"), new Criterion[]{}, numberOfElements / 10 - 1), numberOfElements, numberOfElements - (numberOfElements / 10 - 1) + 1);
+            // Set the limit to 0
+            checkQueryResult(storage.getStreamElements(pageSize, Order.desc("timed"), new Criterion[]{}, 0), -1, -1);
+        }
+    }
+
+    @Test
+    public void testPaginatedQueryWitCriterionWithLimit() {
+        int numberOfElements = 817;
+        String identifier = "testPaginatedQueryWitCriterionWithLimit";
+        generateDataTest(identifier, numberOfElements);
+        //
+        DataField[] structure = dataField.toArray(new DataField[]{});
+        HibernateStorage storage = HibernateStorage.newInstance(dbInfo, identifier, dataField.toArray(new DataField[]{}), false);
+        assertNotNull(storage);
+        //
+        int[] pageSizes = new int[]{1, 11, numberOfElements / 2, numberOfElements / 3, numberOfElements / 3 - 1, numberOfElements / 3 + 1, numberOfElements - 1, numberOfElements + 1, numberOfElements * 2};
+        //
+        for (int pageSize : pageSizes) {
+            System.out.println("testPaginatedQueryWitCriterionWithLimit with pageSize: " + pageSize);
+            // Set the limit to a fixed number: 1 and timed > numberOfElements/2
+            checkQueryResult(storage.getStreamElements(pageSize, Order.asc("timed"), new Criterion[]{Restrictions.gt("timed", (long)numberOfElements/2)}, 1), numberOfElements/2+1, numberOfElements/2+1);
+            // Set the limit to a fixed number: 11 and timed > numberOfElements/2
+            checkQueryResult(storage.getStreamElements(pageSize, Order.asc("timed"), new Criterion[]{Restrictions.gt("timed", (long)numberOfElements/2)}, 11), numberOfElements/2+1, numberOfElements/2+11);
+            // Set the limit to 0 and timed > numberOfElements/2
+            checkQueryResult(storage.getStreamElements(pageSize, Order.asc("timed"), new Criterion[]{Restrictions.gt("timed", (long)numberOfElements/2)}, 0), -1, -1);
+        }
+    }
+
+    private void checkQueryResult(DataEnumeratorIF de, int firstTimed, int lastTimed) {
+        System.out.println("Checking Query Result with expected firstTimed: " + firstTimed + ", expected lastTimed: " + lastTimed);
+        assertNotNull(de);
+        int nb = 0;
+        if (lastTimed < 0 || firstTimed < 0) {
+            while (de.hasMoreElements()) {
+                StreamElement se = de.nextElement();
+                assertNotNull(se);
+                nb++;
+            }
+            assertEquals(0, nb);
+        } else {
+            if (firstTimed <= lastTimed) { // ASC
+                while (de.hasMoreElements()) {
+                    StreamElement se = de.nextElement();
+                    assertNotNull(se);
+                    assertEquals(firstTimed + nb, (int) se.getTimeStamp());
+                    nb++;
+                }
+                assertEquals((lastTimed - firstTimed + 1), nb);
+            } else { // DESC
+                while (de.hasMoreElements()) {
+                    StreamElement se = de.nextElement();
+                    assertNotNull(se);
+                    assertEquals(firstTimed - nb, (int) se.getTimeStamp());
+                    nb++;
+                }
+                assertEquals((firstTimed - lastTimed + 1), nb);
+            }
+        }
+    }
+
+    //
 
     /**
-     *
      * @param fields
-     * @param mode
-     *        mode < 0    : return a StreamElement with the minimal value for each field
-     *        mode >= 0   : return a StreamElement with the maximal value for each field
+     * @param mode   mode < 0    : return a StreamElement with the minimal value for each field
+     *               mode >= 0   : return a StreamElement with the maximal value for each field
      * @return
      */
     private StreamElement generateStreamElement(DataField[] fields, byte mode) {
         ArrayList<Serializable> data = new ArrayList<Serializable>();
         for (DataField df : fields) {
             switch (df.getDataTypeID()) {
-                case DataTypes.VARCHAR :
-                case DataTypes.CHAR :
+                case DataTypes.VARCHAR:
+                case DataTypes.CHAR:
                     data.add("A message.");
                     break;
-                case DataTypes.INTEGER :
+                case DataTypes.INTEGER:
                     data.add(mode < 0 ? Integer.MIN_VALUE : Integer.MAX_VALUE);
                     break;
                 case DataTypes.BIGINT:
                     data.add(mode < 0 ? Long.MIN_VALUE : Long.MAX_VALUE);
                     break;
                 case DataTypes.BINARY:
-                    data.add(new byte[]{ 0x01, 0x02, 0x03});
+                    data.add(new byte[]{0x01, 0x02, 0x03});
                     break;
                 case DataTypes.DOUBLE:
                     data.add(mode < 0 ? -1000000000000.0 : 1000000000000.0); // We don't use the Double.MIN & Double.MAX as the DBMS round the values and thus change them to -inf or +inf
@@ -349,5 +447,21 @@ public class TestHibernateStorage {
             }
         }
         return new StreamElement(fields, data.toArray(new Serializable[]{}));
+    }
+
+    private void generateDataTest(String identifier, int nb) {
+        DataField[] structure = dataField.toArray(new DataField[]{});
+        HibernateStorage storage = HibernateStorage.newInstance(dbInfo, identifier, dataField.toArray(new DataField[]{}), false);
+        assertNotNull(storage);
+        //
+        for (int k = 1; k <= nb; k++) {
+            // Build a StreamElement to store
+            StreamElement se1 = generateStreamElement(structure, Byte.MIN_VALUE);
+            se1.setTimeStamp(k);
+            Serializable pk = storage.saveStreamElement(se1);
+            assertNotNull(pk);
+        }
+        //Check the number of elements
+        assertEquals((long) nb, storage.countStreamElement());
     }
 }
