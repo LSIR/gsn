@@ -96,8 +96,7 @@ public final class Main {
 			containerConfig = loadContainerConfiguration();
 			updateSplashIfNeeded(new String[] {"GSN is starting at port:"+containerConfig.getContainerPort(),"All GSN logs are available at: logs/gsn.log"});
 			System.out.println("Global Sensor Networks (GSN) is Starting on port "+containerConfig.getContainerPort()+"...");
-            System.out.println("SSL is Starting on port "+ContainerConfig.DEFAULT_SSL_PORT+"...");
-			System.out.println("The logs of GSN server are available in logs/gsn.log file.");
+            System.out.println("The logs of GSN server are available in logs/gsn.log file.");
 			System.out.println("To Stop GSN execute the gsn-stop script.");
 		} catch ( FileNotFoundException e ) {
 			logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
@@ -316,10 +315,10 @@ public final class Main {
 		return singleton.wrappers;
 	}
 
-	private static final String PUBLIC_KEY_FILE=".public_key";
+	//private static final String PUBLIC_KEY_FILE=".public_key";
 
-	private static final String PRIVATE_KEY_FILE=".private_key";
-
+	//private static final String PRIVATE_KEY_FILE=".private_key";
+    /*
 	public static void initPKI ( String publicKeyFile,String privateKeyFile ) throws NoSuchAlgorithmException , NoSuchProviderException , FileNotFoundException , IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
 		// TODO  : Use the pri/pub keys if they exist. (needs verification first).
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance ( "DSA" , "SUN" );
@@ -363,6 +362,8 @@ public final class Main {
 		KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
 		return keyFactory.generatePublic (pubKeySpec);
 	}
+	*/
+    
 	//FIXME: COPIED_FOR_SAFE_STOAGE
 	public  static Class < ? > getWrapperClass ( String id ) {
 		try {
@@ -426,11 +427,10 @@ public final class Main {
 		*/
 
         Server server = new Server();
-		AbstractConnector connector=new SelectChannelConnector (); // before was connector//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
 		HandlerCollection handlers = new HandlerCollection();
-		ContextHandlerCollection contexts = new ContextHandlerCollection();
-		server.setThreadPool(new QueuedThreadPool(100));
-
+        ContextHandlerCollection contexts = new ContextHandlerCollection();
+        server.setThreadPool(new QueuedThreadPool(maxThreads));
+        /*
         SslSocketConnector sslSocketConnector = new SslSocketConnector();
         sslSocketConnector.setPort(sslPort);  //getContainerConfig().getSSLPort()
         sslSocketConnector.setKeystore("conf/servertestkeystore");
@@ -438,13 +438,25 @@ public final class Main {
 		sslSocketConnector.setKeyPassword( getKeystorePassword());
         sslSocketConnector.setTruststore("conf/servertestkeystore");
         sslSocketConnector.setTrustPassword( getKeystorePassword());
+        */
 
-        server.addConnector(sslSocketConnector);
+        SslSocketConnector sslSocketConnector = null;
+        if (getContainerConfig().getSSLPort() > 0) {
+            System.out.println("SSL is Starting on port "+ContainerConfig.DEFAULT_SSL_PORT+"...");
+			sslSocketConnector = new SslSocketConnector();
+            sslSocketConnector.setPort(getContainerConfig().getSSLPort());
+            sslSocketConnector.setKeystore("conf/servertestkeystore");
+            sslSocketConnector.setPassword(getContainerConfig().getSSLKeyPassword());
+            sslSocketConnector.setKeyPassword(getContainerConfig().getSSLKeyStorePassword());
+            sslSocketConnector.setTruststore("conf/servertestkeystore");
+            sslSocketConnector.setTrustPassword(getContainerConfig().getSSLKeyStorePassword());
+        }
+        
+        AbstractConnector connector=new SelectChannelConnector (); // before was connector//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
         connector.setPort ( port );
         connector.setMaxIdleTime(30000);
         connector.setAcceptors(2);
         connector.setConfidentialPort(sslPort);
-         //server.addConnector(connector);
 
 		if (sslSocketConnector==null)
 			server.setConnectors ( new Connector [ ] { connector } );
@@ -494,7 +506,7 @@ public final class Main {
 		return server;
 	}
 
-
+    /*
     private String getKeystorePassword() {
         String pwd=null;
         Properties props = new Properties(); //create an instance of properties class
@@ -514,6 +526,7 @@ public final class Main {
          return pwd;
 
     }
+    */
 
 
     public static StorageManager getValidationStorage() {

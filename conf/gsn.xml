@@ -4,6 +4,14 @@
    <email>my email address</email>
    <description>Not Provided</description>
    <port>22001</port>
+
+<!-- Enable SSL -->
+<!--
+   <ssl-port>8443</ssl-port>
+   <ssl-key-store-password>changeit</ssl-key-store-password>
+   <ssl-key-password>changeit</ssl-key-password>
+-->
+
 <!-- Main Storage Database Options -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />   -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:MyFile" /> -->
@@ -17,8 +25,8 @@
 <!-- Optional sliding processor, If not specified, the sliding is implemented using the Main Storage Database specified above  -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:gsninternal/gsn_internal_processing.h2;TRACE_LEVEL_FILE=3;TRACE_LEVEL_SYSTEM_OUT=1" />-->
 <!--
-<sliding>
-   <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:sliding;DB_CLOSE_DELAY=-1" />
-</sliding>
+   <sliding>
+      <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:sliding;DB_CLOSE_DELAY=-1" />
+   </sliding>
 -->
 </sensor-server>
