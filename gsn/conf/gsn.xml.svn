@@ -4,7 +4,18 @@
    <email>yuecel@tik.ee.ethz.ch</email>
    <description>Database Middleware for PermaSense</description>
    <port>22001</port>
-<!-- OTHER DATABASE OPTIONS -->
+
+<!-- Enable SSL -->
+<!--
+   <ssl-port>8443</ssl-port>
+   <ssl-key-store-password>changeit</ssl-key-store-password>
+   <ssl-key-password>changeit</ssl-key-password>
+-->
+
+<!-- Access Control -->
+<!--<access-control>true</access-control>-->
+
+<!-- Main Storage Database Options -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />   -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:MyFile" /> -->
 <!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" /> --> 
@@ -17,8 +28,8 @@
 <!-- Optional sliding processor, If not specified, the sliding is implemented using the Main Storage Database specified above  -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:gsninternal/gsn_internal_processing.h2;TRACE_LEVEL_FILE=3;TRACE_LEVEL_SYSTEM_OUT=1" />-->
 <!--
-<sliding>
-   <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:sliding;DB_CLOSE_DELAY=-1" />
-</sliding>
+	<sliding>
+	   <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:sliding;DB_CLOSE_DELAY=-1" />
+	</sliding>
 -->
  </sensor-server>

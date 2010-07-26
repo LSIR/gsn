@@ -57,7 +57,7 @@ public class ContainerConfig {
 
 	protected int                         storagePoolSize    =-1              ;
 
-	private int                           sslPort                           =DEFAULT_SSL_PORT;
+	private int                           sslPort                           = -1;
 
     private boolean                       acEnabled                     = false;
 
