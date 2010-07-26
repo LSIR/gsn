@@ -1,7 +1,6 @@
 package gsn.http.rest;
 
 import gsn.DataDistributer;
-import gsn.Main;
 import gsn.Mappings;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.AddressBean;
@@ -16,8 +15,6 @@ import gsn.wrappers.AbstractWrapper;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -26,7 +23,7 @@ import javax.naming.OperationNotSupportedException;
 import org.apache.log4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
 
-public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySystem {
+public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySystem{
 
 	private  final String CURRENT_TIME = ISODateTimeFormat.dateTime().print(System.currentTimeMillis());
 	
@@ -48,8 +45,10 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 
 	public boolean initialize() {
 		AddressBean params = getActiveAddressBean( );
-		String query = params.getPredicateValue("query");		
+		String query = params.getPredicateValue("query");
+		
 		String vsName = params.getPredicateValue( "name" );
+		String startTime = params.getPredicateValueWithDefault("start-time",CURRENT_TIME );
 
 		if (query==null && vsName == null) {
 			logger.error("For using local-wrapper, either >query< or >name< parameters should be specified"); 
@@ -59,47 +58,14 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		if (query == null) 
 			query = "select * from "+vsName;
 
-		long lastVisited = -1;
-		String startTime = params.getPredicateValueWithDefault("start-time", CURRENT_TIME);
-		if (startTime.equals("continue")) {
-			Connection conn = null;
-			try {
-				conn = Main.getMainStorage().getConnection();
-				
-				ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
-				if (rs.next()) {
-					StringBuilder dbquery = new StringBuilder();
-					dbquery.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
-
-					rs = Main.getMainStorage().executeQueryWithResultSet(dbquery, conn);
-					if (rs.next()) {
-						lastVisited = rs.getLong(1);
-					}
-				}
-			} catch (SQLException e) {
-				logger.error(e.getMessage(), e);
-			} finally {
-				Main.getMainStorage().close(conn);
-			}
-		} else if (startTime.startsWith("-")) {
-			try {
-				lastVisited = System.currentTimeMillis() - Long.parseLong(startTime.substring(1));
-			} catch (NumberFormatException e) {
-				logger.error("Problem in parsing the start-time parameter, the provided value is: " + startTime);
-				logger.error(e.getMessage(), e);
-				return false;				
-			}
-		} else {
-			try {
-				lastVisited = Helpers.convertTimeFromIsoToLong(startTime);
-			} catch (Exception e) {
-				logger.error("Problem in parsing the start-time parameter, the provided value is:"+startTime+" while a valid input is:"+CURRENT_TIME);
-				logger.error(e.getMessage(),e);
-				return false;
-			}
+		long lastVisited;
+		try {
+			lastVisited = Helpers.convertTimeFromIsoToLong(startTime);
+		}catch (Exception e) {
+			logger.error("Problem in parsing the start-time parameter, the provided value is:"+startTime+" while a valid input is:"+CURRENT_TIME);
+			logger.error(e.getMessage(),e);
+			return false;
 		}
-		logger.info("lastVisited=" + String.valueOf(lastVisited));
-		
 		try {
 			vsName = SQLValidator.getInstance().validateQuery(query);
 			if(vsName==null) //while the other instance is not loaded.
@@ -182,3 +148,5 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 
 
 }
+
+ 	  	 
