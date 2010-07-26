@@ -1,10 +1,31 @@
-package gsn.storage.hibernate;
+package gsn.utils.jndi;
+
+import org.apache.log4j.Logger;
 
 import javax.naming.*;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GSNContext  implements Context {
+
+    private static final transient Logger logger = Logger.getLogger(GSNContext.class);
+
+    private static InitialContext mainContext;
+
+    static {
+        Properties props = new Properties();
+        props.put(Context.INITIAL_CONTEXT_FACTORY, GSNContextFactory.class.getCanonicalName());
+        try {
+            mainContext = new InitialContext(props);
+        } catch (NamingException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    public static Context getMainContext() {
+        return mainContext;
+    }
 
     private ConcurrentHashMap<String,Object> map = new ConcurrentHashMap();
 

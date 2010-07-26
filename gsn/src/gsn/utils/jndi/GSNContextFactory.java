@@ -1,4 +1,4 @@
-package gsn.storage.hibernate;
+package gsn.utils.jndi;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -7,7 +7,7 @@ import java.util.Hashtable;
 
 
 
-public class GSNJNDI implements InitialContextFactory {
+public class GSNContextFactory implements InitialContextFactory {
 
     private static GSNContext singleton = new GSNContext();
 
