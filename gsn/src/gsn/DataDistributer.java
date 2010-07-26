@@ -9,6 +9,7 @@ import gsn.storage.SQLValidator;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import gsn.storage.StorageManager;
 import org.apache.log4j.Logger;
 
 public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener, Runnable {
@@ -89,7 +91,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             if (!listeners.contains(listener)) {
                 logger.warn("Adding a listener to Distributer:" + listener.toString());
                 boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
-                String query = listener.getQuery();
+                String query = SQLValidator.addPkField(listener.getQuery());
                 if (needsAnd)
                     query += " AND ";
                 else
@@ -97,7 +99,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                 query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
                 PreparedStatement prepareStatement = null;
                 try {
-                    prepareStatement = Main.getStorage(listener.getVSensorConfig().getName()).getConnection().prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
+                    prepareStatement = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
                     prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -286,6 +288,19 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 		}
 
 	}
+
+    //
+
+    private HashMap<StorageManager, Connection> connections = new HashMap<StorageManager, Connection>();
+    public Connection getPersistantConnection(VSensorConfig config) throws Exception {
+        StorageManager sm = Main.getStorage(config);
+        Connection c = connections.get(sm);
+        if (c == null) {
+            c = sm.getConnection();
+            connections.put(sm, c);
+        }
+        return c;
+    }
 
 }
 

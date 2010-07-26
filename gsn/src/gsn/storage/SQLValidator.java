@@ -156,6 +156,41 @@ public class SQLValidator implements VSensorStateChangeListener {
 		return select;
 	}
 
+    public static String addPkField(String query) {
+        logger.debug("< QUERY IN: " + query);
+        try {
+            SQLValidator sv = getInstance();
+            Select select = sv.queryToSelect(query);
+            if (select == null)
+                return query;
+            boolean hasPk = false;
+            boolean hasWildCard = false;
+            for (int i=0;i<select.getColumnCount();i++) {
+				String name = select.queryMeta().getColumnName(i);
+				if (name.equalsIgnoreCase("*")) {
+                    hasWildCard = true;
+                    break;
+                }
+                if (name.equalsIgnoreCase("pk")) {
+                    hasPk = true;
+                    break;
+                }
+			}
+            //
+            if (! hasPk && !hasWildCard) {
+                int is = query.toUpperCase().indexOf("SELECT");
+                query = new StringBuilder(query.substring(is,is+6))
+                        .append(" pk, ")
+                        .append(query.substring(is+7)).toString();
+            }
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(), e);    
+        }
+        logger.debug("> QUERY OUT: " + query);
+        return query;
+    }
+
 	public void release() throws Exception {
 		if(connection !=null && !connection.isClosed())
 			connection.close();
