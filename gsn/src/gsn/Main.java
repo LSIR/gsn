@@ -314,55 +314,6 @@ public final class Main {
 			return WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 		return singleton.wrappers;
 	}
-
-	//private static final String PUBLIC_KEY_FILE=".public_key";
-
-	//private static final String PRIVATE_KEY_FILE=".private_key";
-    /*
-	public static void initPKI ( String publicKeyFile,String privateKeyFile ) throws NoSuchAlgorithmException , NoSuchProviderException , FileNotFoundException , IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException {
-		// TODO  : Use the pri/pub keys if they exist. (needs verification first).
-		KeyPairGenerator keyGen = KeyPairGenerator.getInstance ( "DSA" , "SUN" );
-		SecureRandom random = SecureRandom.getInstance ( "SHA1PRNG" , "SUN" );
-		keyGen.initialize ( 512 , random );
-		KeyPair pair = keyGen.generateKeyPair ( );
-		PrivateKey priv = pair.getPrivate ( );
-		PublicKey pub = pair.getPublic ( );
-		CertificateFactory certificateFactory =  CertificateFactory.getInstance ("X.509");
-		File privateF = new File (privateKeyFile);
-		File publicF = new File (publicKeyFile);
-		publicF.createNewFile ();
-		privateF.createNewFile ();
-		OutputStream output = new FileOutputStream (privateF );
-		output.write ( priv.getEncoded ( ) );
-		output.close ( );
-		output = new FileOutputStream ( publicF );
-		output.write ( pub.getEncoded ( ) );
-		output.close ( );
-		KeyStore ksca = KeyStore.getInstance ("JKS","SUN");
-		ksca.load (null,null);
-		logger.warn ("Public and Private keys are generated successfully.");
-	}
-
-	private static PrivateKey readPrivateKey () throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException{
-		FileInputStream keyfis = new FileInputStream (PRIVATE_KEY_FILE);
-		byte[] encKey = new byte[keyfis.available ()];
-		keyfis.read (encKey);
-		keyfis.close ();
-		PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec (encKey);
-		KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
-		return keyFactory.generatePrivate (privKeySpec);
-	}
-
-	private static PublicKey readPublicKey () throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
-		FileInputStream keyfis = new FileInputStream (PUBLIC_KEY_FILE);
-		byte[] encKey = new byte[keyfis.available ()];
-		keyfis.read (encKey);
-		keyfis.close ();
-		PKCS8EncodedKeySpec pubKeySpec = new PKCS8EncodedKeySpec (encKey);
-		KeyFactory keyFactory = KeyFactory.getInstance ("DSA");
-		return keyFactory.generatePublic (pubKeySpec);
-	}
-	*/
     
 	//FIXME: COPIED_FOR_SAFE_STOAGE
 	public  static Class < ? > getWrapperClass ( String id ) {
@@ -379,17 +330,6 @@ public final class Main {
 		}
 		return null;
 	}
-
-//	public final HashMap < String , VSensorConfig > getVirtualSensors ( ) {
-//		return virtualSensors;
-//	}
-
-//	public  boolean justConsumes ( ) {
-//		Iterator < VSensorConfig > vsconfigs = virtualSensors.values ( ).iterator ( );
-//		while ( vsconfigs.hasNext ( ) )
-//			if ( !vsconfigs.next ( ).needsStorage ( ) ) return false;
-//		return true;
-//	}
 
 	/**
 	 * Get's the GSN configuration without starting GSN.
@@ -408,37 +348,11 @@ public final class Main {
 	}
 
 	public Server getJettyServer(int port, int sslPort, int maxThreads) throws IOException {
-		/*
-        Server server = new Server();
-		Connector connector=new SelectChannelConnector();//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
-		HandlerCollection handlers = new HandlerCollection();
-		ContextHandlerCollection contexts = new ContextHandlerCollection();
-		server.setThreadPool(new QueuedThreadPool(maxThreads));
-		connector.setPort ( port );
-
-		SslSocketConnector sslSocketConnector = null;
-		if (getContainerConfig().getSSLPort()>10){
-			sslSocketConnector = new SslSocketConnector();
-			sslSocketConnector.setKeystore("conf/gsn.jks");
-			sslSocketConnector.setKeyPassword(getContainerConfig().getSSLKeyPassword());
-			sslSocketConnector.setPassword(getContainerConfig().getSSLKeyStorePassword());
-			sslSocketConnector.setPort(getContainerConfig().getSSLPort());
-		}
-		*/
-
+		
         Server server = new Server();
 		HandlerCollection handlers = new HandlerCollection();
         ContextHandlerCollection contexts = new ContextHandlerCollection();
         server.setThreadPool(new QueuedThreadPool(maxThreads));
-        /*
-        SslSocketConnector sslSocketConnector = new SslSocketConnector();
-        sslSocketConnector.setPort(sslPort);  //getContainerConfig().getSSLPort()
-        sslSocketConnector.setKeystore("conf/servertestkeystore");
-        sslSocketConnector.setPassword(getKeystorePassword());
-		sslSocketConnector.setKeyPassword( getKeystorePassword());
-        sslSocketConnector.setTruststore("conf/servertestkeystore");
-        sslSocketConnector.setTrustPassword( getKeystorePassword());
-        */
 
         SslSocketConnector sslSocketConnector = null;
         if (getContainerConfig().getSSLPort() > 0) {
@@ -505,29 +419,6 @@ public final class Main {
 
 		return server;
 	}
-
-    /*
-    private String getKeystorePassword() {
-        String pwd=null;
-        Properties props = new Properties(); //create an instance of properties class
-
-        //try retrieve data from file
-         try
-         {
-             props.load(new FileInputStream("conf/keystore.properties"));
-             pwd = props.getProperty("password");
-             //System.out.println(pwd);
-         }
-         catch(IOException e)//catch exception in case properties file does not exist
-         {
-           e.printStackTrace();
-           logger.error(e.getMessage()) ;
-          }
-         return pwd;
-
-    }
-    */
-
 
     public static StorageManager getValidationStorage() {
         return validationStorage;
