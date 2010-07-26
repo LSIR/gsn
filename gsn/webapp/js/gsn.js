@@ -186,12 +186,11 @@ var GSN = {
         //show all the gsn container info
         if ($(document).attr("title")=="GSN") {
             var gsn = $("gsn",data);
-            $(document).attr("title",$(gsn).attr("name"));
-            $("#gsn-name").empty().append($(gsn).attr("name"));
+            $(document).attr("title",$(gsn).attr("name")+" :: GSN");
+            $("#gsn-name").empty().append($(gsn).attr("name")+" :: GSN");
             $("#gsn-desc").empty().append($(gsn).attr("description"));
             $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
         }
-        $("#gsn-name").show();
         //build the rightside vs menu
         $("#vsmenu").empty();
 		
@@ -211,13 +210,11 @@ var GSN = {
 		
         //Test example
         //GSN.vsName.push("genepi_meteo_10_replay", "genepi_meteo_11_replay","genepi_meteo_12_replay","genepi_meteo_13_replay","genepi_meteo_15_replay","genepi_meteo_16_replay","genepi_meteo_18_replay","genepi_meteo_2_replay","genepi_meteo_3_replay","genepi_meteo_4_replay","genepi_meteo_6_replay","genepi_meteo_7_replay");
-        //GSN.vsName = GSN.util.regroupByRubricSensorName(GSN.vsName);
-        GSN.vsName = GSN.util.regroupByUnderscore(GSN.vsName);		
-		
+        GSN.vsName = GSN.util.regroupByUnderscore(GSN.vsName);
+
         // Creation of the sidebar menu with categories
         var vsName = GSN.vsName;
-        var previousCategoryName, mainCategoryName;
-	var subgrouped = false;
+        var previousCategoryName;
         for(var i=0;i<vsName.length;++i){
             if(vsName[i][1] != previousCategoryName && vsName[i][1] != "others"){
                 // Append Group to menu if different from category others
@@ -227,49 +224,23 @@ var GSN = {
                         "href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+" span\"));",
                         "id":"menu-rubric-"+vsName[i][1]+""
                     },"  Group: "+vsName[i][1]));
-
                     $("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
                         'src':'../img/group.png'
                     }));
-
-		    previousCategoryName = vsName[i][1];
-		    // New category start with 0 sensors associated
-		    GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],0);
                 }
                 else{
-		    if(vsName[i][1].indexOf(mainCategoryName) == 0 && vsName[i][1] != previousCategoryName) {
-			$("#vsmenu").append($.DIV({
-			    "class":mainCategoryName + " subrubric",
-                            "id":"rubricmenu-"+vsName[i][1]
-			},$.A({
-			    "class":"subrubric",
-			    "href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+"> a\"));",
-			    "id":"menu-rubric-"+vsName[i][1]+""
-			},"  "+vsName[i][1].substr(mainCategoryName.length+1))));
-			$("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
-			    'src':'../img/group.png'
-			}));
-
-			subgrouped = true;
-			previousCategoryName = vsName[i][1];
-		    }
-		    else {
-			$("#vsmenu").append($.DIV({},$.A({
-			    "class":"rubric",
-			    "href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+" > a, ."+vsName[i][1]+".subrubric\"));",
-			    "id":"menu-rubric-"+vsName[i][1]+""
-			},"  "+vsName[i][1])));
-			$("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
-			    'src':'../img/group.png'
-			}));
-
-			previousCategoryName = vsName[i][1];
-			mainCategoryName = vsName[i][1];
-			subgrouped = false;
-			// New category start with 0 sensors associated
-			GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],0);
-		    }
+                    $("#vsmenu").append($.DIV({},$.A({
+                        "class":"rubric",
+                        "href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+" a\"));",
+                        "id":"menu-rubric-"+vsName[i][1]+""
+                    },"  Group: "+vsName[i][1])));
+                    $("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
+                        'src':'../img/group.png'
+                    }));
                 }
+                previousCategoryName = vsName[i][1];
+                // New category start with 0 sensors associated
+                GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],0);
             }
             if(vsName[i][1] != "others"){
                 // Append Sensor Name to menu if different from category others
@@ -282,34 +253,16 @@ var GSN = {
                     },vsName[i][0])));
                 }
                 else{
-		    if(subgrouped){
-			$("#rubricmenu-"+previousCategoryName).append($.DIV(
-			{
-			    "class":vsName[i][1]
-			},$.A({
-			    "class":"sensorName",
-			    "href":"javascript:GSN.menu('"+vsName[i][0]+"');",
-			    "id":"menu-"+vsName[i][0]+"",
-			},vsName[i][0].substr(vsName[i][1].length+1))));
-		    }
-		    else {
-			$("#vsmenu").append($.DIV({
-			    "class":vsName[i][1]
-			},$.A({
-			    "class":"sensorName",
-			    "href":"javascript:GSN.menu('"+vsName[i][0]+"');",
-			    "id":"menu-"+vsName[i][0]+""
-			},vsName[i][0].substr(vsName[i][1].length+1))));
-		    }
+                    $("#vsmenu").append($.DIV({
+                        "class":vsName[i][1]
+                    },$.A({
+                        "class":"sensorName",
+                        "href":"javascript:GSN.menu('"+vsName[i][0]+"');",
+                        "id":"menu-"+vsName[i][0]+""
+                    },vsName[i][0])));
                 }
-
-		
-		if(vsName[i][1].indexOf(mainCategoryName) == 0)
-		    // increment the number of sensors associated to the rubric
-		    GSN.numSensorAssociatedWithCategory.setItem(mainCategoryName,GSN.numSensorAssociatedWithCategory.getItem(mainCategoryName)+1);
-		else
-		    // increment the number of sensors associated to the rubric
-		    GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);
+                // increment the number of sensors associated to the rubric
+                GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);
             }
         }// End for
 		
@@ -368,7 +321,6 @@ var GSN = {
 		
         // Hide all the sensors in the side bar
         $(".sensorName").hide();
-        $(".subrubric").hide();
 		
         // Drag and Drop Functionnality
         if(GSN.context == "data"){
@@ -381,14 +333,6 @@ var GSN = {
 			
             // Sensor Group configuration
             $("#vsmenu .rubric").draggable({
-                cursor: 'move',
-                helper: 'clone',
-                revert: true,
-                start: function(){}
-            });
-			
-            // Sensor SubGroup configuration
-            $("#vsmenu .subrubric").draggable({
                 cursor: 'move',
                 helper: 'clone',
                 revert: true,
@@ -599,6 +543,17 @@ var GSN = {
                 //initalisation of gsn info, vsmenu
                 if (!GSN.loaded) GSN.init(data);
 			
+                //create vsbox on the first load
+                if (firstload && GSN.context == "home") {
+                    for (var i = 0; i < 10; ++i){
+                        var n = $($("virtual-sensor",data).get(i)).attr("name");
+                        if (n!=null) GSN.vsbox.add(n);
+                    }
+                } else if (firstload && GSN.context == "fullmap") {
+                    $("virtual-sensor",data).each(function(){
+                        GSN.vsbox.add($(this).attr("name"));
+                    });
+                }
 			
                 //update vsbox
                 $("virtual-sensor",data).each(function(){
@@ -703,11 +658,11 @@ var GSN = {
             $.LI({},$.A({
                 "href":"javascript:GSN.vsbox.toggle('"+vsName+"','upload');",
                 "class":"tabupload"
-            },"Upload"))
-//            $.LI({},$.A({
-//                "href":"./data.html",
-//                "class":"tabdata"
-//            },"Download"))
+            },"Upload")),
+            $.LI({},$.A({
+                "href":"./data.html",
+                "class":"tabdata"
+            },"Download"))
             ),
             $.DL({
                 "class":"dynamic"
@@ -785,25 +740,18 @@ var GSN = {
             var input = $("dl.input",vsdl.get(4));
             dl = dynamic;
 			
-            var name,cat,type,value,defaultvalue,unit;
+            var name,cat,type,value;
             var last_cmd,cmd;
             var hiddenclass ="";
             //update the vsbox the first time, when it's empty
             if ($(dynamic).children().size()==0 && $(static_).children().size()==0){
                 var gotDynamic,gotStatic,gotInput = false;
-                var addInput = $(input).children().size() == 0;
                 $("field",vs).each(function(){
                     name = $(this).attr("name");
                     cat = $(this).attr("category");
                     cmd = $(this).attr("command");
                     type = $(this).attr("type");
                     value = $(this).text();
-                    defaultvalue = $(this).attr("defaultvalue");
-                    unit = $(this).attr("unit");
-                    if (unit==null)
-                        unit="";
-                    else
-                        unit=" "+unit;
 				
                     if (name=="timed") {
                         //if (value != "") value = GSN.util.printDate(value);
@@ -821,7 +769,7 @@ var GSN = {
                         dl = static_;
                         if (!gotStatic) {
                             $("a.tabstatic", vsd).show();
-                            if (!gotDynamic && addInput) {
+                            if (!gotDynamic) {
                                 $(vsd).find("a.tabstatic").addClass("active");
                                 $(vsd).find("> dl").hide();
                                 $(vsd).find("dl.static").show();
@@ -845,7 +793,7 @@ var GSN = {
 							
                     //set the value
                     if (cat == null) {
-                        if (value == "" || value =="null") {
+                        if (value == "") {
                             value = "null";
                         } else if (type.indexOf("svg") != -1){
                             value = '<embed type="image/svg+xml" width="400" height="400" src="'+value+'" PLUGINSPAGE="http://www.adobe.com/svg/viewer/install/" />';
@@ -863,10 +811,8 @@ var GSN = {
                             });
                         } else if (type.indexOf("binary") != -1){
                             value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
-                        } else {
-                            value = value + unit;
                         }
-                    } else if (cat == "input" && addInput) {
+                    } else if (cat == "input") {
                         if (last_cmd != cmd) {
                             if (last_cmd != null) hiddenclass = ' hidden';
                             $("select.cmd", vsd).append($.OPTION({},cmd));
@@ -884,10 +830,7 @@ var GSN = {
                             var options = type.split(":")[1].split("|");
                             value = '<select name="'+cmd+";"+name+'">';
                             for (var i = 0; i < options.length;i++){
-                                if (options[i].split(",").length == 2)
-                                    value += '<option value="'+options[i].split(",")[1]+'">'+options[i].split(",")[0]+'</option>';
-                                else
-                                    value += '<option>'+options[i]+'</option>';
+                                value += '<option>'+options[i]+'</option>';
                             }
                             value += '</select>';
                         }  else if (type.split(":")[0].indexOf("radio") != -1 ||
@@ -898,23 +841,20 @@ var GSN = {
                                 value += '<input type="'+type.split(":")[0]+'" name="'+cmd+";"+name+'" value="'+options[i]+'">'+options[i]+'</input>';
                             }
                         } else {
-                            if (defaultvalue == null)
-                               defaultvalue="";
-                            value = '<input type="text" name="'+cmd+";"+name+'" value="'+defaultvalue+'"/>';
+                            value = '<input type="text" name="'+cmd+";"+name+'"/>';
                         }
                         if ($(this).attr("description")!=null)
                             value += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';
 					
                         name = comp+name;
                     }
-		    if (!(cat == "input" && !addInput))
-		      $(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
+                    $(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
                 });
 			  
                 if ($(vs).attr("description")!="") {
                     $("dl.description", vsd).empty().append($.DD({},$(vs).attr("description")));
                     $("a.tabdescription", vsd).show();
-                    if (!gotStatic && addInput) {
+                    if (!gotStatic) {
                         $(vsd).find("a.tabdescription", vsd).addClass("active");
                         $(vsd).find("> dl").hide();
                         $(vsd).find("dl.description").show();
@@ -926,17 +866,12 @@ var GSN = {
             } else {
                 //update the vsbox when the value already exists
                 var dds = $("dd",dl);
-                var dd,field,unit;
+                var dd,field;
                 for (var i = 0; i<dds.size();i++){
                     dd = dds.get(i);
                     field = $("field[@name="+$(dd).attr("class")+"]",vs);
                     type = $(field).attr("type");
-                    unit = $(field).attr("unit");
                     value = $(field).text();
-                    if (unit==null || value=="null")
-                        unit="";
-                    else
-                        unit=" "+unit;
                     if (value!="") {
                         if (type.indexOf("svg") != -1){
                             $("embed",dd).attr("src",value);
@@ -955,7 +890,7 @@ var GSN = {
                         } else if (type.indexOf("binary") != -1){
                             $("a",dd).attr("href",value);
                         } else {
-                            $(dd).empty().append(value + unit);
+                            $(dd).empty().append(value);
                         }
                     }
                 }
@@ -1167,7 +1102,6 @@ var GSN = {
             $("#dropArea img").remove();
             $(".sensorName").draggableDisable();
             $(".rubric").draggableDisable();
-            $(".subrubric").draggableDisable();
             $('.nextStepButton').remove();
 			
 			
@@ -2111,7 +2045,7 @@ var GSN = {
 		*/
         ,
         toggle: function(obj){
-            //$("a",obj).show();
+            $("a",obj).show();
             obj.toggle();
         }
 		
@@ -2172,50 +2106,25 @@ var GSN = {
 
         /**
                 * Take an array return a sorted array with grouping to the first underscore
-                */                    
+                */
         ,
         regroupByUnderscore: function(vsName){
-            var name, index, lastindex, arrindex, vsNameUnderscore;
+            var name, index;
 
-	    vsName.sort();
+            vsName.sort();
             vsNameUnderscore = new Array(vsName.length);
             for(var i=0;i<vsName.length;++i)
             {
-		lastindex = 0;
                 name = vsName[i];
-                vsNameUnderscore[i] = new Array();
-		vsNameUnderscore[i][0] = name;
-
-                while (true) {
-		    index = name.indexOf("_", lastindex);
-
-		    if (index == -1)
-			break;
-		    else {
-			if( name[index+1] == "_" )
-			    break
-			else
-			    lastindex = index+1;
-		    }
-		}
-                if(index>=1) vsNameUnderscore[i][1] = name.substr(0,lastindex-1);
+                vsNameUnderscore[i] = new Array(2);
+                index = name.indexOf("_");
+                vsNameUnderscore[i][0] = name;
+                if(index>=1) vsNameUnderscore[i][1] = name.substr(0,index);
                 else vsNameUnderscore[i][1] = "others";
             }
-            
-            vsNameUnderscore.sort(GSN.util.sort2Dimensional);
 
             return vsNameUnderscore;
         }
-        
-        ,
-        sort2Dimensional: function(a,b){
-	    if(a[1] < b[1])
-	      return -1;
-	    else if (a[1] > b[1])
-	      return 1;
-	    else
-	      return 0;
-	}
 		
         ,
         getURLParam: function(strParamName){
