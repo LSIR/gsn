@@ -7,7 +7,6 @@ import gsn.reports.beans.Data;
 import gsn.reports.beans.Report;
 import gsn.reports.beans.Stream;
 import gsn.reports.beans.VirtualSensor;
-import gsn.storage.StorageManager;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -95,8 +94,8 @@ public class DownloadReport extends AbstractDataRequest {
 			String lastModified = (qbuilder.getSdf() == null ? "UNIX: " + last : qbuilder.getSdf().format(new Date(last)));
 
 			// Create the streams
-			connection = Main.getMainStorage().getConnection();
-			ResultSet rs = Main.getMainStorage().executeQueryWithResultSet(qbuilder.getSqlQueries().get(vsname), connection);
+			connection = Main.getStorage(vsname).getConnection();
+			ResultSet rs = Main.getStorage(vsname).executeQueryWithResultSet(qbuilder.getSqlQueries().get(vsname), connection);
 			ResultSetMetaData rsmd = rs.getMetaData();
 
 			Hashtable<String, Stream> dataStreams = new Hashtable<String, Stream> () ;
@@ -136,7 +135,7 @@ public class DownloadReport extends AbstractDataRequest {
 			logger.debug("The query: ",e);
 			return null;
 		}finally{
-			Main.getMainStorage().close(connection);
+			Main.getStorage(vsname).close(connection);
 		}
 		//
 		boolean mappedVirtualSensor = (Mappings.getVSensorConfig(vsname) != null);

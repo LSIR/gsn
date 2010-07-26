@@ -10,6 +10,10 @@ public class StorageConfig {
 
     private String jdbcURL;
 
+    private String identifier;
+
+    private String storageSize;
+
     public String getJdbcDriver() {
         return jdbcDriver;
     }
@@ -41,4 +45,42 @@ public class StorageConfig {
     public void setJdbcURL(String jdbcURL) {
         this.jdbcURL = jdbcURL;
     }
+
+    public String getStorageSize() {
+        return storageSize;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public void setStorageSize(String storageSize) {
+        this.storageSize = storageSize;
+    }
+
+    public boolean isStorageSize() {
+        return storageSize != null;
+    }
+
+    public boolean isJdbcDefined() {
+        return jdbcDriver != null
+                && jdbcPassword != null
+                && jdbcURL != null
+                && jdbcUsername != null;
+    }
+
+    public boolean isIdentifierDefined() {
+        return identifier != null;
+    }
+
+    public boolean isDefined() {
+        return isJdbcDefined() || isIdentifierDefined();
+    }
+
+    
+
 }

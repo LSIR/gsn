@@ -3,7 +3,6 @@ package gsn.vsensor;
 import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
-import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
 
 import java.sql.Connection;
@@ -51,8 +50,8 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 			Class.forName(params.get(PARAM_DRIVER));
 			connection = getConnection();
 			logger.debug( "jdbc connection established." );
-			if (!Main.getMainStorage().tableExists(table_name,getVirtualSensorConfiguration().getOutputStructure() , connection))
-				Main.getMainStorage().executeCreateTable(table_name, getVirtualSensorConfiguration().getOutputStructure(), false,connection);
+			if (!Main.getStorage(table_name.toString()).tableExists(table_name,getVirtualSensorConfiguration().getOutputStructure() , connection))
+				Main.getStorage(table_name.toString()).executeCreateTable(table_name, getVirtualSensorConfiguration().getOutputStructure(), false,connection);
 		} catch (ClassNotFoundException e) {
 			logger.error(e.getMessage(),e);
 			logger.error("Initialization of the Stream Exporter VS failed !");
@@ -70,10 +69,10 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	public void dataAvailable ( String inputStreamName , StreamElement streamElement ) {
-		StringBuilder query = Main.getMainStorage().getStatementInsert(table_name, getVirtualSensorConfiguration().getOutputStructure());
+		StringBuilder query = Main.getStorage(table_name.toString()).getStatementInsert(table_name, getVirtualSensorConfiguration().getOutputStructure());
 		
 		try {
-			Main.getMainStorage().executeInsert(table_name ,getVirtualSensorConfiguration().getOutputStructure(),streamElement,getConnection() );
+			Main.getStorage(table_name.toString()).executeInsert(table_name ,getVirtualSensorConfiguration().getOutputStructure(),streamElement,getConnection() );
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 			logger.error("Insertion failed! ("+ query+")");

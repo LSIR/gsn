@@ -1,17 +1,14 @@
 package gsn;
 
-import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.http.rest.DeliverySystem;
 import gsn.http.rest.DistributionRequest;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLValidator;
-import gsn.storage.StorageManager;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -36,7 +33,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     private DataDistributer() {
         try {
-            db = Main.getMainStorage().getConnection();
+            //conn = Main.getStorage().getConnection();
             thread = new Thread(this);
             thread.start();
             // Start the keep alive Timer -- Note that the implementation is backed by one single thread for all the RestDelivery instances.
@@ -55,7 +52,8 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                 }
             });
             keepAliveTimer.start();
-        } catch (SQLException e) {
+        //} catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -71,7 +69,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     private ArrayList<DistributionRequest> listeners = new ArrayList<DistributionRequest>();
 
-    private Connection db;
+    //private Connection conn;
 
     private ConcurrentHashMap<DistributionRequest, DataEnumerator> candidateListeners = new ConcurrentHashMap<DistributionRequest, DataEnumerator>();
 
@@ -92,7 +90,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                 query += " timed > ? order by timed asc ";
                 PreparedStatement prepareStatement = null;
                 try {
-                    prepareStatement = db.prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
+                    prepareStatement = Main.getStorage(listener.getVSensorConfig().getName()).getConnection().prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
                     prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -258,7 +256,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             return new DataEnumerator();
         }
 
-        DataEnumerator dataEnum = new DataEnumerator(prepareStatement, false, true);
+        DataEnumerator dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
         return dataEnum;
     }
 

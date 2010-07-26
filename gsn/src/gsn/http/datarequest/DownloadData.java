@@ -4,9 +4,7 @@ import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.http.MultiDataDownload;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -90,8 +88,8 @@ public class DownloadData extends AbstractDataRequest {
                 nextSqlQuery = iter.next();
                 Connection connection = null;
 
-                connection = Main.getMainStorage().getConnection();
-                de = Main.getMainStorage().streamedExecuteQuery(nextSqlQuery.getValue(), false, connection);
+                connection = Main.getStorage(nextSqlQuery.getKey()).getConnection();
+                de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), false, connection);
                 
                 logger.debug("Data Enumerator: " + de);
                 if (ot == AllowedOutputType.csv) {

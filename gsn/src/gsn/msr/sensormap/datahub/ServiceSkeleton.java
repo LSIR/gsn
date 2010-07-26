@@ -11,7 +11,6 @@ import gsn.Mappings;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -66,7 +65,7 @@ private static final transient Logger         logger          = Logger.getLogger
 			try {
 				SignalRequest req = new SignalRequest(signalInfo);
 				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by FLOOR(TIMED/").append(aggInMSec).append(") order by TIMED");
-				items.addSensorData(transformToSensorDataArray(query).getSensorData()[0] );
+				items.addSensorData(transformToSensorDataArray(req.getVsName(), query).getSensorData()[0] );
 			}
 			catch (RuntimeException e) {
 				logger.debug("VS " + signalInfo + " not found");
@@ -88,7 +87,7 @@ private static final transient Logger         logger          = Logger.getLogger
 				SignalRequest req = new SignalRequest(signalInfo);
 				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED,AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis()).append(" group by FLOOR(TIMED/").append(aggInMSec).append(") order by TIMED");
 
-                items.setData(transformToSensorDataArray(query).getSensorData()[0].getData() );
+                items.setData(transformToSensorDataArray(req.getVsName(), query).getSensorData()[0].getData() );
 
 			}
 			catch (RuntimeException e) {
@@ -130,14 +129,14 @@ private static final transient Logger         logger          = Logger.getLogger
 				SignalRequest req = new SignalRequest(signalInfo);
                 StringBuilder query = new StringBuilder("select pk,TIMED, ").append(req.getFieldName()).append(" as data from ").append(req.getVsName());
                 //if oracle
-                if (Main.getMainStorage().isOracle()) {
+                if (Main.getStorage(req.getVsName()).isOracle()) {
                     query.append(" where rownum<=1 order by timed desc");
                 }
                 else {
 				    query.append(" order by timed desc limit 0,1");
                 }
 				//			logger.fatal(query);
-				items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
+				items.addSensorData(transformToSensorDataArray(req.getVsName(), query).getSensorData()[0]);
 			}
 			catch (RuntimeException e) {
 				logger.debug("VS " + signalInfo + " not found");
@@ -161,7 +160,7 @@ private static final transient Logger         logger          = Logger.getLogger
         	try {
         		SignalRequest req = new SignalRequest(signalInfo);
         		StringBuilder query = new StringBuilder("select TIMED, ").append(req.getFieldName()).append(" from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis());
-        		items.addSensorData(transformToSensorDataArray(query, false).getSensorData()[0]);
+        		items.addSensorData(transformToSensorDataArray(req.getVsName(), query, false).getSensorData()[0]);
         	}
         	catch (RuntimeException e) {
         		logger.debug("VS " + signalInfo + " not found");
@@ -179,7 +178,7 @@ private static final transient Logger         logger          = Logger.getLogger
 			try {
 				SignalRequest req = new SignalRequest(signalInfo);
 				StringBuilder query = new StringBuilder("select AVG(TIMED) as TIMED, AVG(").append(req.getFieldName()).append(") as data from ").append(req.getVsName()).append(" where TIMED >= ").append(input.getStartTime().getTimeInMillis()).append(" AND TIMED <= ").append(input.getEndTime().getTimeInMillis());
-				items.addSensorData(transformToSensorDataArray(query).getSensorData()[0]);
+				items.addSensorData(transformToSensorDataArray(req.getVsName(), query).getSensorData()[0]);
 			}
 			catch (RuntimeException e) {
 				logger.debug("VS " + signalInfo + " not found");
@@ -212,19 +211,19 @@ private static final transient Logger         logger          = Logger.getLogger
 		}
 	}
 	
-	private  ArrayOfSensorData transformToSensorDataArray(StringBuilder query) {
+	private  ArrayOfSensorData transformToSensorDataArray(String vsName, StringBuilder query) {
 		boolean is_binary_linked= true;
 		if (query.toString().replaceAll(" ","").toLowerCase().indexOf("avg(")>0)
 			is_binary_linked = false;
-		return transformToSensorDataArray(query, is_binary_linked);
+		return transformToSensorDataArray(vsName, query, is_binary_linked);
 	}
 
-	private  ArrayOfSensorData transformToSensorDataArray(StringBuilder query, boolean is_binary_linked) {
+	private  ArrayOfSensorData transformToSensorDataArray(String vsName, StringBuilder query, boolean is_binary_linked) {
 		System.out.println("QUERY : "+query);
 		ArrayOfSensorData toReturn = new ArrayOfSensorData();
 		try {
 			DataEnumerator output = null;
-			output = Main.getMainStorage().executeQuery(query, is_binary_linked);
+			output = Main.getStorage(vsName).executeQuery(query, is_binary_linked);
 			SensorData data = new SensorData(); 
 			ArrayOfDateTime arrayOfDateTime = new ArrayOfDateTime();
 			ArrayList<Double> sensor_readings = new ArrayList();

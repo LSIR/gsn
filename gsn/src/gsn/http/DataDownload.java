@@ -3,7 +3,6 @@ package gsn.http;
 import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -189,11 +188,11 @@ public class DataDownload extends HttpServlet {
                         if (nb < 0)
                             nb = 0;
                         String limit = "";
-                        if (Main.getMainStorage().isH2() || Main.getMainStorage().isMysqlDB()) {
+                        if (Main.getStorage(vsName).isH2() || Main.getStorage(vsName).isMysqlDB()) {
                             if (nb >= 0)
                                 limit = "LIMIT " + nb + "  offset 0";
                             generated_request_query += limit;
-                        } else if (Main.getMainStorage().isOracle()) {
+                        } else if (Main.getStorage(vsName).isOracle()) {
                             generated_request_query = "select * from (" + generated_request_query + " ) where rownum <" + (nb + 1);
                         }
                     }
@@ -209,7 +208,7 @@ public class DataDownload extends HttpServlet {
 
 
                 try {
-                    result = Main.getMainStorage().streamedExecuteQuery(new String(generated_request_query), false);
+                    result = Main.getStorage(vsName).streamedExecuteQuery(new String(generated_request_query), false);
                 } catch (SQLException e) {
                     logger.error("ERROR IN EXECUTING, query: " + generated_request_query);
                     logger.error(e.getMessage(), e);

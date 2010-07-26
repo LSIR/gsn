@@ -9,6 +9,8 @@ import gsn.http.rest.RestDelivery;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 import gsn.storage.StorageManagerFactory;
+import gsn.storage.hibernate.DBConnectionInfo;
+import gsn.storage.hibernate.HibernateStorage;
 import gsn.utils.ValidityTools;
 import gsn.vsensor.SQLValidatorIntegration;
 import gsn.wrappers.WrappersUtil;
@@ -469,8 +471,47 @@ public final class Main {
         return validationStorage;
     }
 
-    public static StorageManager getMainStorage() {
-        return mainStorage;    
+    private static HashMap<Integer, StorageManager> storages = new HashMap<Integer, StorageManager>();
+    private static HashMap<VSensorConfig, StorageManager> storagesConfigs = new HashMap<VSensorConfig, StorageManager>();
+    public static StorageManager getStorage(VSensorConfig config) {
+        //StringBuilder sb = new StringBuilder("get storage for: ").append(config == null ? null : config.getName()).append(" -> use ");
+        StorageManager sm = storagesConfigs.get(config == null ? null : config);
+        if  (sm != null)
+            return sm;
+        
+        DBConnectionInfo dci = null;
+        if (config == null || config.getStorage() == null || !config.getStorage().isDefined()) {
+            // Use the default storage
+        //    sb.append("(default) config: ").append(config);
+            sm = mainStorage;
+        } else {
+        //    sb.append("(specific) ");
+            // Use the virtual sensor specific storage
+            if (config.getStorage().isIdentifierDefined()) {
+                //TODO get the connection info with the identifier.
+                throw new IllegalArgumentException("Identifiers for storage is not supported yet.");
+            } else {
+                dci = new DBConnectionInfo(config.getStorage().getJdbcDriver(),
+                        config.getStorage().getJdbcURL(),
+                        config.getStorage().getJdbcUsername(),
+                        config.getStorage().getJdbcPassword());
+            }
+            sm = storages.get(dci.hashCode());
+            if (sm == null) {
+                sm = StorageManagerFactory.getInstance(config.getStorage().getJdbcDriver(), config.getStorage().getJdbcUsername(), config.getStorage().getJdbcPassword(), config.getStorage().getJdbcURL(), 8);
+                storages.put(dci.hashCode(), sm);
+                storagesConfigs.put(config, sm);
+            }
+        }
+        //sb.append("storage: ").append(sm.toString()).append(" dci: ").append(dci).append(" code: ").append(dci == null ? null : dci.hashCode());
+        //if (logger.isDebugEnabled())
+        //logger.warn(sb.toString());
+        return sm;
+
+    }
+
+    public static StorageManager getStorage(String vsName) {
+        return getStorage(Mappings.getVSensorConfig(vsName));
     }
 
     public static StorageManager getWindowStorage() {

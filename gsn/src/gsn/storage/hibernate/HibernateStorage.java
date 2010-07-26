@@ -29,7 +29,7 @@ public class HibernateStorage implements VirtualSensorStorage {
 
     private static final int PAGE_SIZE = 1000;
 
-    public static HibernateStorage newInstance(HibernateUtil.DBConnectionInfo dbInfo, String identifier, DataField[] structure, boolean unique) {
+    public static HibernateStorage newInstance(DBConnectionInfo dbInfo, String identifier, DataField[] structure, boolean unique) {
         try {
             return new HibernateStorage(dbInfo, identifier, structure, unique);
         }
@@ -39,7 +39,7 @@ public class HibernateStorage implements VirtualSensorStorage {
         }
     }
 
-    private HibernateStorage(HibernateUtil.DBConnectionInfo dbInfo, String identifier, DataField[] structure, boolean unique) throws RuntimeException {
+    private HibernateStorage(DBConnectionInfo dbInfo, String identifier, DataField[] structure, boolean unique) throws RuntimeException {
         String em = generateEntityMapping(identifier, structure, unique);
         this.sf = HibernateUtil.getSessionFactory(dbInfo.getDriverClass(), dbInfo.getUrl(), dbInfo.getUserName(), dbInfo.getPassword(), em);
         if (this.sf == null)

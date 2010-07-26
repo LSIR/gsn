@@ -40,7 +40,7 @@ public class VSensorConfig implements Serializable {
 
 	private String                                 webParameterPassword                             = null;
 
-	private String                                 storageHistorySize;
+	private String                                 storageHistorySize                               = null;
 
 	private final HashMap < String , InputStream > inputStreamNameToInputStreamObjectMapping = new HashMap < String , InputStream >();
 
@@ -52,7 +52,9 @@ public class VSensorConfig implements Serializable {
 
 	private String                       fileName;
 
-	private transient final Logger                 logger                                    = Logger.getLogger( VSensorConfig.class );
+	private StorageConfig storage;
+
+    private transient final Logger                 logger                                    = Logger.getLogger( VSensorConfig.class );
 
 	private String directoryQuery ;
 
@@ -61,9 +63,8 @@ public class VSensorConfig implements Serializable {
 	private String sensorMap = "false";
 
 	private String access_protected = "false";
-	
-	private String group;
-	/**
+
+    /**
 	 * @return Returns the addressing.
 	 */
 	public  KeyValue[] getAddressing ( ) {
@@ -201,7 +202,7 @@ public class VSensorConfig implements Serializable {
 	}
 
 	/**
-	 * @param name The name to set.
+	 * @param virtualSensorName The name to set.
 	 */
 	public void setName ( final String virtualSensorName ) {
 		this.name = virtualSensorName;
@@ -286,8 +287,13 @@ public class VSensorConfig implements Serializable {
 	 * @return Returns the storageHistorySize.
 	 */
 	public String getStorageHistorySize ( ) {
-		if ( this.storageHistorySize == null || this.storageHistorySize.trim( ).equals( "" ) ) this.storageHistorySize = "0";
-		return this.storageHistorySize;
+        if (storageHistorySize == null) {
+		    if ( storage == null || storage.getStorageSize() == null || storage.getStorageSize().trim( ).equals( "" ) )
+                storageHistorySize = "0";
+            else
+                storageHistorySize = storage.getStorageSize();
+        }
+		return storageHistorySize;
 	}
 
 	/**
@@ -339,7 +345,11 @@ public class VSensorConfig implements Serializable {
 		return true;
 	}
 
-	public boolean isStorageCountBased ( ) {
+    public StorageConfig getStorage() {
+        return storage;
+    }
+
+    public boolean isStorageCountBased ( ) {
 		return this.isStorageCountBased;
 	}
 
@@ -479,8 +489,5 @@ public class VSensorConfig implements Serializable {
 		}
 	}
 
-	public String getGroup() {
-		return group;
-	}
 
 }

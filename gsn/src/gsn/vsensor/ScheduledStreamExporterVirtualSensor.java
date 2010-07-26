@@ -2,7 +2,6 @@ package gsn.vsensor;
 
 import gsn.ContainerImpl;
 import gsn.Main;
-import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
 
 import java.sql.Connection;
@@ -48,8 +47,8 @@ import org.apache.log4j.Logger;
 			Class.forName(params.get(PARAM_DRIVER));
 			connection = getConnection();
 			logger.debug( "jdbc connection established." );
-			if (!Main.getMainStorage().tableExists(table_name,getVirtualSensorConfiguration().getOutputStructure() , connection))
-				Main.getMainStorage().executeCreateTable(table_name, getVirtualSensorConfiguration().getOutputStructure(), false,connection);
+			if (!Main.getStorage(table_name.toString()).tableExists(table_name,getVirtualSensorConfiguration().getOutputStructure() , connection))
+				Main.getStorage(table_name.toString()).executeCreateTable(table_name, getVirtualSensorConfiguration().getOutputStructure(), false,connection);
 		} catch (ClassNotFoundException e) {
 			logger.error(e.getMessage(),e);
 			logger.error("Initialization of the Stream Exporter VS failed !");
@@ -79,10 +78,10 @@ import org.apache.log4j.Logger;
 			
 			dataItem.setTimeStamp(System.currentTimeMillis());
 			logger.warn(getVirtualSensorConfiguration().getName() + " Timer Event ");
-			StringBuilder query = Main.getMainStorage().getStatementInsert(table_name, getVirtualSensorConfiguration().getOutputStructure());
+			StringBuilder query = Main.getStorage(table_name.toString()).getStatementInsert(table_name, getVirtualSensorConfiguration().getOutputStructure());
 			
 			try {
-				Main.getMainStorage().executeInsert(table_name ,getVirtualSensorConfiguration().getOutputStructure(),dataItem,getConnection() );
+				Main.getStorage(table_name.toString()).executeInsert(table_name ,getVirtualSensorConfiguration().getOutputStructure(),dataItem,getConnection() );
 				logger.warn(getVirtualSensorConfiguration().getName() + " Wrote to database ");
 			} catch (SQLException e) {
 				logger.error(e.getMessage(),e);

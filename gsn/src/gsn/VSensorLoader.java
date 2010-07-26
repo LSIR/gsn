@@ -6,7 +6,6 @@ import gsn.beans.InputStream;
 import gsn.beans.Modifications;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
-import gsn.storage.StorageManager;
 import gsn.wrappers.AbstractWrapper;
 import gsn.wrappers.WrappersUtil;
 
@@ -93,7 +92,7 @@ public class VSensorLoader extends Thread {
 	}
 
 	public void run ( ) {
-		if ( Main.getMainStorage() == null || Main.getWindowStorage() == null ) {
+		if ( Main.getStorage((VSensorConfig)null) == null || Main.getWindowStorage() == null ) { // Checks only if the default storage and the window storage are defined.
 			logger.fatal ( "The Storage Manager shouldn't be null, possible a BUG." );
 			return;
 		}
@@ -190,8 +189,8 @@ public class VSensorLoader extends Thread {
             logger.error(e2.getMessage(), e2);
         }
         try {
-            if (!Main.getMainStorage().tableExists(vs.getName(), vs.getOutputStructure()))
-                Main.getMainStorage().executeCreateTable(vs.getName(), vs.getOutputStructure(), pool.getConfig().getIsTimeStampUnique());
+            if (!Main.getStorage(vs).tableExists(vs.getName(), vs.getOutputStructure()))
+                Main.getStorage(vs).executeCreateTable(vs.getName(), vs.getOutputStructure(), pool.getConfig().getIsTimeStampUnique());
             else
                 logger.info("Reusing the existing " + vs.getName() + " table.");
         } catch (SQLException e) {
@@ -455,7 +454,10 @@ public class VSensorLoader extends Thread {
 		}
 		try {
 			Main.getWindowStorage().shutdown( );
-            Main.getMainStorage().shutdown();
+            Iterator<VSensorConfig> iter = Mappings.getAllVSensorConfigs();
+            while (iter.hasNext()) {
+                Main.getStorage(iter.next()).shutdown();
+            }
 		} catch ( SQLException e ) {
 			logger.error(e.getMessage(),e);
 		}finally {
