@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.sql.Connection;
 
 public class DataSources {
 
@@ -22,7 +23,8 @@ public class DataSources {
                 ds.setUsername(dci.getUserName());
                 ds.setPassword(dci.getPassword());
                 ds.setUrl(dci.getUrl());
-                ds.setAccessToUnderlyingConnectionAllowed(true); // TODO 
+		ds.setDefaultTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+                //ds.setAccessToUnderlyingConnectionAllowed(true); 
                 GSNContext.getMainContext().bind(Integer.toString(dci.hashCode()), ds);
                 logger.warn("Created a DataSource to: " + ds.getUrl());
             }

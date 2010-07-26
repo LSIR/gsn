@@ -27,6 +27,8 @@ public class ContainerConfig {
 
 	public static final int               DEFAULT_GSN_PORT                 = 22001;
 
+    public static final int               DEFAULT_SSL_PORT                 = 8443;
+
 	protected String                      webName;
 
 	public static final String            FIELD_NAME_webName               = "webName";
@@ -55,7 +57,9 @@ public class ContainerConfig {
 
 	protected int                         storagePoolSize    =-1              ;
 
-	private int sslPort ;
+	private int                           sslPort                           =DEFAULT_SSL_PORT;
+
+    private boolean                       acEnabled                     = false;
 
 	private String sslKeyStorePassword;
 
@@ -64,6 +68,10 @@ public class ContainerConfig {
     private StorageConfig storage ;
 
     private SlidingConfig sliding;
+
+    public boolean isAcEnabled() {
+        return acEnabled;
+    }
 
     public StorageConfig getStorage() {
         return storage;

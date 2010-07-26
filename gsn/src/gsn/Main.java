@@ -3,6 +3,7 @@ package gsn;
 import gsn.beans.ContainerConfig;
 import gsn.beans.StorageConfig;
 import gsn.beans.VSensorConfig;
+import gsn.http.ac.ConnectToDB;
 import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
 import gsn.http.rest.RestDelivery;
@@ -45,6 +46,7 @@ import java.security.cert.CertificateFactory;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
 
@@ -70,8 +72,8 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.eclipse.jetty.server.AbstractConnector;
 
-import org.kjkoster.zapcat.zabbix.ZabbixAgent;
 
 /**
  * Web Service URL : http://localhost:22001/services/Service?wsdl
@@ -84,6 +86,7 @@ public final class Main {
 	private static int gsnControllerPort;
 
     private Main() throws Exception {
+
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
@@ -92,9 +95,10 @@ public final class Main {
 			controlSocket = new GSNController(null, gsnControllerPort);
 			containerConfig = loadContainerConfiguration();
 			updateSplashIfNeeded(new String[] {"GSN is starting at port:"+containerConfig.getContainerPort(),"All GSN logs are available at: logs/gsn.log"});
-			//System.out.println("Global Sensor Networks (GSN) is Starting on port "+containerConfig.getContainerPort()+"...");
-			//System.out.println("The logs of GSN server are available in logs/gsn.log file.");
-			//System.out.println("To Stop GSN execute the gsn-stop script.");
+			System.out.println("Global Sensor Networks (GSN) is Starting on port "+containerConfig.getContainerPort()+"...");
+            System.out.println("SSL is Starting on port "+ContainerConfig.DEFAULT_SSL_PORT+"...");
+			System.out.println("The logs of GSN server are available in logs/gsn.log file.");
+			System.out.println("To Stop GSN execute the gsn-stop script.");
 		} catch ( FileNotFoundException e ) {
 			logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
 			logger.error ( e.getMessage ( ) );
@@ -105,6 +109,12 @@ public final class Main {
         int maxDBConnections = System.getProperty("maxDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxDBConnections"));
         int maxSlidingDBConnections = System.getProperty("maxSlidingDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxSlidingDBConnections"));
         int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
+
+        // Init the AC db connection.
+        if(Main.getContainerConfig().isAcEnabled()==true)
+        {
+            ConnectToDB.init ( containerConfig.getStorage().getJdbcDriver() , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) );
+        }
 
         mainStorage = StorageManagerFactory.getInstance(containerConfig.getStorage().getJdbcDriver ( ) , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) , maxDBConnections);
         //
@@ -117,7 +127,7 @@ public final class Main {
 
 		try {
 			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxSlidingDBConnections: " + maxSlidingDBConnections + ", maxServlets:"+maxServlets+")"+" ...");
-            Server jettyServer = getJettyServer(Main.getContainerConfig().getContainerPort(), maxServlets);
+            Server jettyServer = getJettyServer(Main.getContainerConfig().getContainerPort(), ContainerConfig.DEFAULT_SSL_PORT, maxServlets);
 			jettyServer.start ( );
 			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
 		} catch ( Exception e ) {
@@ -128,7 +138,7 @@ public final class Main {
 
 		String msrIntegration = "gsn.msr.sensormap.SensorMapIntegration";
 		try {
-			vsloader.addVSensorStateChangeListener((VSensorStateChangeListener) Class.forName(msrIntegration).newInstance());	
+			vsloader.addVSensorStateChangeListener((VSensorStateChangeListener) Class.forName(msrIntegration).newInstance());
 		}catch (Exception e) {
 			logger.warn("MSR Sensor Map integration is disabled.");
 		}
@@ -142,6 +152,8 @@ public final class Main {
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
 		vsloader.startLoading();
+
+
 	}
 
 	private static void closeSplashIfneeded() {
@@ -155,8 +167,8 @@ public final class Main {
 		if (splash.isVisible())
 			splash.close();
 	}
-	
-	
+
+
 
 	private static void updateSplashIfNeeded(String message[]) {
 		boolean headless_check = isHeadless();
@@ -187,7 +199,7 @@ public final class Main {
 	}
 
 	private static boolean isHeadless() {
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		boolean headless_check = ge.isHeadless();
 		return headless_check;
 	}
@@ -228,11 +240,6 @@ public final class Main {
 	public static void main ( String [ ]  args)  {
 		Main.gsnControllerPort = Integer.parseInt(args[0]) ;
 		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
-		try {
-			new ZabbixAgent();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
 		try {
 			Main.getInstance();
 		}catch (Exception e) {
@@ -360,12 +367,12 @@ public final class Main {
 	public  static Class < ? > getWrapperClass ( String id ) {
 		try {
 			String className =  getWrappers().getProperty(id);
-			if (className ==null) { 
+			if (className ==null) {
 				logger.error("The requested wrapper: "+id+" doesn't exist in the wrappers.properties file.");
 				return null;
 			}
 
-			return Class.forName(className);  
+			return Class.forName(className);
 		} catch (ClassNotFoundException e) {
 			logger.error(e.getMessage(),e);
 		}
@@ -399,8 +406,9 @@ public final class Main {
 				return singleton.containerConfig;
 	}
 
-	public Server getJettyServer(int port, int maxThreads) throws IOException {
-		Server server = new Server();
+	public Server getJettyServer(int port, int sslPort, int maxThreads) throws IOException {
+		/*
+        Server server = new Server();
 		Connector connector=new SelectChannelConnector();//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
 		HandlerCollection handlers = new HandlerCollection();
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
@@ -415,6 +423,28 @@ public final class Main {
 			sslSocketConnector.setPassword(getContainerConfig().getSSLKeyStorePassword());
 			sslSocketConnector.setPort(getContainerConfig().getSSLPort());
 		}
+		*/
+
+        Server server = new Server();
+		AbstractConnector connector=new SelectChannelConnector (); // before was connector//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
+		HandlerCollection handlers = new HandlerCollection();
+		ContextHandlerCollection contexts = new ContextHandlerCollection();
+		server.setThreadPool(new QueuedThreadPool(100));
+
+        SslSocketConnector sslSocketConnector = new SslSocketConnector();
+        sslSocketConnector.setPort(sslPort);  //getContainerConfig().getSSLPort()
+        sslSocketConnector.setKeystore("conf/servertestkeystore");
+        sslSocketConnector.setPassword(getKeystorePassword());
+		sslSocketConnector.setKeyPassword( getKeystorePassword());
+        sslSocketConnector.setTruststore("conf/servertestkeystore");
+        sslSocketConnector.setTrustPassword( getKeystorePassword());
+
+        server.addConnector(sslSocketConnector);
+        connector.setPort ( port );
+        connector.setMaxIdleTime(30000);
+        connector.setAcceptors(2);
+        connector.setConfidentialPort(sslPort);
+         //server.addConnector(connector);
 
 		if (sslSocketConnector==null)
 			server.setConnectors ( new Connector [ ] { connector } );
@@ -464,6 +494,28 @@ public final class Main {
 		return server;
 	}
 
+
+    private String getKeystorePassword() {
+        String pwd=null;
+        Properties props = new Properties(); //create an instance of properties class
+
+        //try retrieve data from file
+         try
+         {
+             props.load(new FileInputStream("conf/keystore.properties"));
+             pwd = props.getProperty("password");
+             //System.out.println(pwd);
+         }
+         catch(IOException e)//catch exception in case properties file does not exist
+         {
+           e.printStackTrace();
+           logger.error(e.getMessage()) ;
+          }
+         return pwd;
+
+    }
+
+
     public static StorageManager getValidationStorage() {
         return validationStorage;
     }
@@ -475,7 +527,7 @@ public final class Main {
         StorageManager sm = storagesConfigs.get(config == null ? null : config);
         if  (sm != null)
             return sm;
-        
+
         DBConnectionInfo dci = null;
         if (config == null || config.getStorage() == null || !config.getStorage().isDefined()) {
             // Use the default storage
