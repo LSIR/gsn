@@ -1,5 +1,6 @@
 package gsn.http.rest;
 
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
@@ -7,6 +8,8 @@ import gsn.wrappers.AbstractWrapper;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.ResultSet;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -70,11 +73,47 @@ public class RestRemoteWrapper extends AbstractWrapper {
     }
 
     public boolean initialize() {
-        try {
-            initParams = new RemoteWrapperParamParser(getActiveAddressBean(), false);
-            httpclient = new DefaultHttpClient(getHttpClientParams(initParams.getTimeout()));
+        initParams = new RemoteWrapperParamParser(getActiveAddressBean(), false);
+        httpclient = new DefaultHttpClient(getHttpClientParams(initParams.getTimeout()));
+        
+        String startTime = getActiveAddressBean().getPredicateValue("start-time");
+		if (startTime != null && startTime.equals("continue")) {
+			Connection conn = null;
+			try {
+				conn = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection();
 
-            lastReceivedTimestamp = initParams.getStartTime();
+				// check if table already exists
+				ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
+				if (rs.next()) {
+					StringBuilder query = new StringBuilder();
+					query.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
+					rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
+					if (rs.next()) {
+						lastReceivedTimestamp = rs.getLong(1);
+					}
+				}
+				else
+					logger.info("Table '" + getActiveAddressBean().getVirtualSensorName() + "' doesn't exist => using all data from the remote database");
+			} catch (SQLException e) {
+				logger.error(e.getMessage(), e);
+				return false;
+			} finally {
+				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
+			}
+		} else if (startTime != null && startTime.startsWith("-")) {
+			try {
+				lastReceivedTimestamp = System.currentTimeMillis() - Long.parseLong(startTime.substring(1));
+			} catch (NumberFormatException e) {
+				logger.error("Problem in parsing the start-time parameter, the provided value is: " + startTime);
+				logger.error(e.getMessage(), e);
+				return false;
+			}
+		} else {
+			lastReceivedTimestamp = initParams.getStartTime();
+		}
+		logger.info("lastReceivedTimestamp=" + String.valueOf(lastReceivedTimestamp));
+            
+        try {
             structure = connectToRemote();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

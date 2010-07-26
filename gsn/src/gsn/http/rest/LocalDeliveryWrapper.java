@@ -1,5 +1,6 @@
 package gsn.http.rest;
 
+import gsn.Main;
 import gsn.DataDistributer;
 import gsn.Mappings;
 import gsn.VirtualSensorInitializationFailedException;
@@ -16,6 +17,8 @@ import gsn.wrappers.AbstractWrapper;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.Date;
 
 import javax.naming.OperationNotSupportedException;
@@ -58,14 +61,47 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		if (query == null) 
 			query = "select * from "+vsName;
 
-		long lastVisited;
-		try {
-			lastVisited = Helpers.convertTimeFromIsoToLong(startTime);
-		}catch (Exception e) {
-			logger.error("Problem in parsing the start-time parameter, the provided value is:"+startTime+" while a valid input is:"+CURRENT_TIME);
-			logger.error(e.getMessage(),e);
-			return false;
+		
+		long lastVisited = -1;
+		if (startTime.equals("continue")) {
+			Connection conn = null;
+			try {
+				conn = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection();
+				
+				ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
+				if (rs.next()) {
+					StringBuilder dbquery = new StringBuilder();
+					dbquery.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
+
+					rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(dbquery, conn);
+					if (rs.next()) {
+						lastVisited = rs.getLong(1);
+					}
+				}
+			} catch (SQLException e) {
+				logger.error(e.getMessage(), e);
+			} finally {
+				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
+			}
+		} else if (startTime.startsWith("-")) {
+			try {
+				lastVisited = System.currentTimeMillis() - Long.parseLong(startTime.substring(1));
+			} catch (NumberFormatException e) {
+				logger.error("Problem in parsing the start-time parameter, the provided value is: " + startTime);
+				logger.error(e.getMessage(), e);
+				return false;				
+			}
+		} else {
+			try {
+				lastVisited = Helpers.convertTimeFromIsoToLong(startTime);
+			} catch (Exception e) {
+				logger.error("Problem in parsing the start-time parameter, the provided value is:"+startTime+" while a valid input is:"+CURRENT_TIME);
+				logger.error(e.getMessage(),e);
+				return false;
+			}
 		}
+		logger.info("lastVisited=" + String.valueOf(lastVisited));
+
 		try {
 			vsName = SQLValidator.getInstance().validateQuery(query);
 			if(vsName==null) //while the other instance is not loaded.
