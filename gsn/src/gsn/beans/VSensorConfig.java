@@ -61,6 +61,8 @@ public class VSensorConfig implements Serializable {
 		private WebInput[] webinput;
 
 	private String sensorMap = "false";
+	
+	private String group;
 
 	private String access_protected = "false";
 
@@ -489,5 +491,7 @@ public class VSensorConfig implements Serializable {
 		}
 	}
 
-
+	public String getGroup() { 
+		return group; 
+	} 
 }

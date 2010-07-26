@@ -47,12 +47,13 @@ public class ContainerInfoHandler implements RequestHandler {
 
 
 
-        response.getWriter( ).write( buildOutput(reqName,user));
+        String group = request.getParameter("group"); 
+     	response.getWriter( ).write( buildOutput(reqName, user, group) ); 
   }
   
   //return only the requested sensor if specified (otherwise use null)
   //Added by Behnaz. New parameter User user to method buildOutput.
-  public String buildOutput (String reqName, User user) {
+  public String buildOutput (String reqName, User user, String group) {
 	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 	  
 	  
@@ -63,7 +64,11 @@ public class ContainerInfoHandler implements RequestHandler {
     sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
 
 
-    Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
+    Iterator < VSensorConfig > vsIterator; 
+ 	if (group!=null) 
+ 		vsIterator = Mappings.getVSensorGroupConfigs(group); 
+	else 
+		vsIterator = Mappings.getAllVSensorConfigs( );
 
     
     while ( vsIterator.hasNext( ) ) {
