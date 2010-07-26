@@ -171,7 +171,7 @@ public class JDBCRemoteWrapper extends AbstractWrapper {
         	
             logger.info("Initializing the structure of JDBCRemoteWrapper with : " + table_name);
             connection = DriverManager.getConnection(props.getProperty("url").trim(), props.getProperty("user").trim(), props.getProperty("password").trim());
-            outputFormat = Main.getMainStorage().tableToStructure(table_name, connection);
+            outputFormat = Main.getDefaultStorage().tableToStructure(table_name, connection);
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             try {
@@ -293,7 +293,7 @@ public class JDBCRemoteWrapper extends AbstractWrapper {
         long latest = -1;
         StringBuilder query = new StringBuilder("select max(timed) from ").append(this.getActiveAddressBean().getVirtualSensorName());
         try {
-            data = Main.getMainStorage().executeQuery(query, false);
+            data = Main.getDefaultStorage().executeQuery(query, false);
             logger.warn("Running query " + query);
 
             while (data.hasMoreElements()) {

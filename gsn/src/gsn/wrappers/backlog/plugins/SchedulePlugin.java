@@ -65,10 +65,10 @@ public class SchedulePlugin extends AbstractPlugin {
 			Connection conn = null;
 			try {
 				// get the newest schedule from the SQL database
-				conn = Main.getMainStorage().getConnection();
+				conn = Main.getDefaultStorage().getConnection();
 				StringBuilder query = new StringBuilder();
 				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" order by timed desc limit 1");
-				ResultSet rs = Main.getMainStorage().executeQueryWithResultSet(query, conn);
+				ResultSet rs = Main.getDefaultStorage().executeQueryWithResultSet(query, conn);
 				
 				if (rs.next()) {
 					// get the creation time of the newest schedule
@@ -76,7 +76,7 @@ public class SchedulePlugin extends AbstractPlugin {
 					long transmissiontime = rs.getLong("transmission_time");
 					Integer id = rs.getInt("device_id");
 					byte[] schedule = rs.getBytes("schedule");
-					Main.getMainStorage().close(conn);
+					Main.getDefaultStorage().close(conn);
 
 					if (logger.isDebugEnabled())
 						logger.debug("creation time: " + creationtime);
@@ -115,7 +115,7 @@ public class SchedulePlugin extends AbstractPlugin {
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				Main.getMainStorage().close(conn);
+				Main.getDefaultStorage().close(conn);
 			}
 			return true;
 		}
