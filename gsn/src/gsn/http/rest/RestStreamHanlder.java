@@ -56,7 +56,7 @@ public class RestStreamHanlder extends HttpServlet {
                 streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
                 DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);
 			}catch (Exception e) {
-				logger.warn(e.getMessage(),e);
+				logger.warn(e.getMessage());
                 continuation.complete();
             }
 		}else {
@@ -159,11 +159,6 @@ public class RestStreamHanlder extends HttpServlet {
 		public long getStartTime() {
 			return startTime;
 		}
-
-		public String getTableName() {
-			return tableName;
-		}
-
 
 	}
 

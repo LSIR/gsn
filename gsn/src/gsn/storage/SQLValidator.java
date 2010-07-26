@@ -2,7 +2,6 @@ package gsn.storage;
 
 import gsn.VSensorStateChangeListener;
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
 
 import java.sql.Connection;
@@ -19,7 +18,6 @@ import org.h2.command.dml.Select;
 import org.h2.engine.ConnectionInfo;
 import org.h2.engine.Session;
 import org.h2.engine.SessionFactoryEmbedded;
-import org.h2.value.DataType;
 
 public class SQLValidator implements VSensorStateChangeListener {
 
@@ -105,10 +103,6 @@ public class SQLValidator implements VSensorStateChangeListener {
 		return getFields(select,vSensorConfig.getOutputStructure());
 	}
 
-	public Session getSession() {
-		return session;
-	}
-
 	public Connection getSampleConnection() {
 		return connection;
 	}
@@ -141,7 +135,7 @@ public class SQLValidator implements VSensorStateChangeListener {
 			}
 			return toReturn.toArray(new DataField[] {});
 		}catch (Exception e) {
-			logger.warn(e.getMessage(),e);
+			logger.debug(e.getMessage(),e);
 			return new DataField[0];
 		}
 		
@@ -157,7 +151,7 @@ public class SQLValidator implements VSensorStateChangeListener {
 			if (somePrepared instanceof Select && somePrepared.isQuery()) 
 				select = (Select) somePrepared;
 		} catch (SQLException e) {
-			logger.warn(e.getMessage(),e);
+			logger.debug(e.getMessage(),e);
 		}
 		return select;
 	}
