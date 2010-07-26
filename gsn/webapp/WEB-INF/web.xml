@@ -52,6 +52,12 @@
         <display-name>GSN Data Streaming Interface</display-name>
         <servlet-class>gsn.http.rest.RestStreamHanlder</servlet-class>
     </servlet>
+
+        <servlet>
+        <servlet-name>GeoData</servlet-name>
+        <display-name>Sensor Data with Geo Location</display-name>
+        <servlet-class>gsn.http.GeoDataServlet</servlet-class>
+    </servlet>
    
 	<!-- mapping for GSN -->
 	
@@ -79,6 +85,11 @@
         <servlet-name>Streaming</servlet-name>
         <url-pattern>/streaming/*</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GeoData</servlet-name>
+        <url-pattern>/geodata</url-pattern>
+    </servlet-mapping>
+
 	<!-- GSN END -->
 	
 	<!-- 
