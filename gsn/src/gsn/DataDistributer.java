@@ -9,7 +9,6 @@ import gsn.storage.SQLValidator;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -87,7 +86,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                     query += " AND ";
                 else
                     query += " WHERE ";
-                query += " timed > ? order by timed asc ";
+                query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
                 PreparedStatement prepareStatement = null;
                 try {
                     prepareStatement = Main.getStorage(listener.getVSensorConfig().getName()).getConnection().prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
@@ -250,7 +249,8 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
         PreparedStatement prepareStatement = preparedStatements.get(listener);
         try {
-            prepareStatement.setLong(1, listener.getLastVisitedTime());
+            //prepareStatement.setLong(1, listener.getStartTime());
+            prepareStatement.setLong(1, listener.getLastVisitedPk());
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             return new DataEnumerator();
