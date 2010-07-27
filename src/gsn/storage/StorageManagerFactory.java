@@ -1,9 +1,6 @@
 package gsn.storage;
 
-import gsn.storage.db.H2StorageManager;
-import gsn.storage.db.MySQLStorageManager;
-import gsn.storage.db.OracleStorageManager;
-import gsn.storage.db.SQLServerStorageManager;
+import gsn.storage.db.*;
 import org.apache.log4j.Logger;
 
 public class StorageManagerFactory {
@@ -34,6 +31,9 @@ public class StorageManagerFactory {
         }
         else if ("org.h2.Driver".equalsIgnoreCase(driver)) {
             storageManager = new H2StorageManager();
+        }         
+        else if ("org.postgresql.Driver".equalsIgnoreCase(driver)) {
+            storageManager = new PostgresStorageManager();
         }
 		else {
 			logger.error(new StringBuilder().append("The GSN doesn't support the database driver : ").append(driver).toString());
