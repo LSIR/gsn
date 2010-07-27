@@ -46,7 +46,7 @@ public class MyUpdateUserWaitingForDataSourceServlet extends HttpServlet
                ctdb=new ConnectToDB();
                if(ctdb.getDataSourceListForParameterSet(pm)==null)
                {
-                   res.sendRedirect("/index.jsp");
+                   res.sendRedirect("/");
                    return;
                }
                if(ctdb.getDataSourceListForParameterSet(pm).size()==0)
@@ -57,7 +57,7 @@ public class MyUpdateUserWaitingForDataSourceServlet extends HttpServlet
                newDataSource=(DataSource)ctdb.getDataSourceListForParameterSet(pm).get(0);
                if(newDataSource==null)
                {
-                   res.sendRedirect("/index.jsp");
+                   res.sendRedirect("/");
                    return;
                }
 

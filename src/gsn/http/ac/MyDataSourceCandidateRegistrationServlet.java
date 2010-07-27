@@ -111,7 +111,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
     private void printLinks(PrintWriter out)
     {
         //out.println("<a class=linkclass href=\"/gsn/MyLoginHandlerServlet\">login</a>");
-        //out.println("<a class=linkclass href=\"/index.jsp\">GSN home</a>");
+        //out.println("<a class=linkclass href=\"/\">GSN home</a>");
         //out.println("<a class=linkclass href=/gsn/MyAccessRightsManagementServlet>access rights management</a>");
         out.println("<a class=linkclass href=\"/gsn/MyUserAccountManagementServlet\">User account</a>");
         out.println("<a class=linkclass href=\"/gsn/MyLogoutHandlerServlet\">logout</a>");

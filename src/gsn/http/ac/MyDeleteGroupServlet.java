@@ -50,13 +50,13 @@ public class MyDeleteGroupServlet extends HttpServlet
                ParameterSet pm = new ParameterSet(req);
                if(pm.valueForName("groupname")==null)
                {
-                   res.sendRedirect("/index.jsp");
+                   res.sendRedirect("/");
                }
                else
                {
                    if(pm.valueForName("groupname").equals(""))
                    {
-                       res.sendRedirect("/index.jsp");
+                       res.sendRedirect("/");
                    }
                    try
                    {

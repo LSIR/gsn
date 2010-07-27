@@ -114,7 +114,7 @@ public class MyDisplayACTablesContentServlet extends HttpServlet
         out.println("<a class=linkclass href=\"/gsn/MyAdminManagementServlet\">admin only</a>");
         out.println("<a class=linkclass href=\"/gsn/MyLogoutHandlerServlet\">logout</a>");
 
-        //out.println("<a class=linkclass href=\"/index.jsp\">GSN home</a>");
+        //out.println("<a class=linkclass href=\"/\">GSN home</a>");
     }
     private void printUserName(PrintWriter out, User user)
     {
