@@ -159,6 +159,6 @@ public class PostgresStorageManager extends StorageManager {
 
     @Override
     public String getStatementDifferenceTimeInMillis() {
-        return null;   //TODO: add statement
+        return "SELECT extract(epoch FROM now())*1000";
     }
 }

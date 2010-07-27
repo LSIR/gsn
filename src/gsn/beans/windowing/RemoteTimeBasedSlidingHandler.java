@@ -138,7 +138,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 		}
 		if (maxTupleCount > 0) {
 			StringBuilder query = new StringBuilder();
-			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
+			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
 				query.append(" select timed from ").append(wrapper.getDBAliasInStr()).append(" where timed <= ");
 				query.append(System.currentTimeMillis() - timediff - maxSlideForTupleBased).append(" order by timed desc limit 1 offset ").append(
 						maxTupleCount - 1);
@@ -224,7 +224,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 				toReturn.append("(wrapper.timed >= (select timed from ").append(VIEW_HELPER_TABLE).append(" where U_ID='").append(
 						streamSource.getUIDStr());
 				toReturn.append("') - ").append(windowSize).append(") ");
-				if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
+				if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
 					toReturn.append(" order by timed desc ");
 				}
 			} else {
@@ -232,11 +232,11 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 					toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(" where U_ID='").append(streamSource.getUIDStr()).append(
 					"') and timed >= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
 					" where U_ID='").append(streamSource.getUIDStr()).append("') - ").append(windowSize).append(" ) ");
-					if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
+					if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
 						toReturn.append(" order by timed desc ");
 					}
 				} else {// WindowType.TUPLE_BASED_WIN_TIME_BASED_SLIDE
-					if (Main.getWindowStorage().isMysqlDB()) {
+					if (Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
 						toReturn.append("timed <= (select timed from ").append(SQLViewQueryRewriter.VIEW_HELPER_TABLE).append(
 						" where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
 						toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");
