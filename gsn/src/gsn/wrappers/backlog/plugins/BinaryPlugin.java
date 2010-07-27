@@ -10,7 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Properties;
@@ -21,10 +20,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
-import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
-import gsn.storage.StorageManager;
 import gsn.wrappers.BackLogWrapper;
 
 
