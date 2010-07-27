@@ -102,15 +102,67 @@ public class ContainerInfoHandler implements RequestHandler {
       if (ses!=null ) {
         for (StreamElement se:ses){
           for ( DataField df : sensorConfig.getOutputStructure( ) ) {
+          	boolean unixtime=false;
+        	boolean relatime=false;
             sb.append("\t<field");
             sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
             sb.append(" type=\"").append(df.getType()).append("\"");
+            if (df.getUnit() != null && df.getUnit().trim().length() != 0) {
+            	if(df.getUnit().compareToIgnoreCase("unixtime")==0) {
+            		unixtime = true;
+            	}
+            	else if(df.getUnit().compareToIgnoreCase("relatime")==0) {
+            		relatime = true;
+            	}
+            	else
+                	sb.append(" unit=\"").append(StringEscapeUtils.escapeXml(df.getUnit())).append("\"");
+            }
             if (df.getDescription() != null && df.getDescription().trim().length() != 0)
               sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
             sb.append(">");
             if (se!= null ) 
               if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
                 sb.append( se.getData( df.getName( ) ) );
+              else if (unixtime) {
+            	  try {
+            		  Long t = (Long)se.getData(StringEscapeUtils.escapeXml( df.getName( ) ));
+            		  if(t != null)
+            			  sb.append(sdf.format(new Date(t)));
+            		  else
+            			  sb.append(t);
+            	  }
+            	  catch (ClassCastException e) {
+            		  logger.warn("Stream element ["+se+"] could not be cast to date string");
+            		  sb.append("null");
+            	  }
+              }
+              else if (relatime) {
+            	  try {
+            		  Integer seconds = (Integer)se.getData(StringEscapeUtils.escapeXml( df.getName( ) ));
+            		  if(seconds != null) {
+            			  Integer minutes = (Integer) ((seconds / 60) % 60);
+            			  Integer hours = (Integer) ((seconds / 3600) % 24);
+            			  Integer days = (Integer) (seconds / 86400);
+
+            			  if(days == 0)
+            				  if(hours == 0)
+            					  if(minutes == 0)
+                        			  sb.append(String.format("%ds", (Integer)(seconds % 60)));
+            					  else
+            						  sb.append(String.format("%dm %ds", minutes,  (Integer)(seconds % 60)));
+            				  else
+            					  sb.append(String.format("%dh %dm %ds", hours, minutes,  (Integer)(seconds % 60)));
+            			  else
+            				  sb.append(String.format("%dd %dh %dm %ds", days, hours, minutes,  (Integer)(seconds % 60)));
+            		  }
+            		  else
+            			  sb.append(seconds);
+            	  }
+            	  catch (ClassCastException e) {
+            		  logger.warn("Stream element ["+se+"] could not be cast to date string");
+            		  sb.append("null");
+            	  }
+              }
               else
                 sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
             sb.append("</field>\n");
