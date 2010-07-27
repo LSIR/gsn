@@ -48,12 +48,12 @@ public class MyUpdateUserDataSourceServlet  extends HttpServlet
                ParameterSet pm = new ParameterSet(req);
                if(pm.valueForName("datasourcename")==null|| pm.valueForName("datasourcetype")==null|| pm.valueForName("update")==null || pm.valueForName("username")==null )
                {
-                   res.sendRedirect("/index.jsp");
+                   res.sendRedirect("/");
                    return;
                }
                if(pm.valueForName("datasourcename").equals("")|| pm.valueForName("datasourcetype").equals("")|| pm.valueForName("update").equals("")|| pm.valueForName("username").equals("") )
                {
-                   res.sendRedirect("/index.jsp");
+                   res.sendRedirect("/");
                    return;
                }
                try

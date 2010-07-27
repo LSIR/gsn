@@ -47,12 +47,12 @@ public class MyUpdateUserGroupServlet extends HttpServlet
                ParameterSet pm = new ParameterSet(req);
                if(pm.valueForName("groupname")==null|| pm.valueForName("grouptype")==null|| pm.valueForName("update")==null || pm.valueForName("username")==null )
                {
-                   res.sendRedirect("/index.jsp");
+                   res.sendRedirect("/");
                    return;
                }
                if(pm.valueForName("groupname").equals("")|| pm.valueForName("grouptype").equals("")|| pm.valueForName("update").equals("")|| pm.valueForName("username").equals("") )
                {
-                   res.sendRedirect("/index.jsp");
+                   res.sendRedirect("/");
                    return;
                }
                try

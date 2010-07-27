@@ -81,7 +81,7 @@ public class MyLoginHandlerServlet extends HttpServlet
 	{
 		out.println("</BODY>");
         out.println("<div class=loginhandlerlink>");
-        out.println("<p align=right><A  HREF=\"/index.jsp\"> GSN home</a></p>");
+        out.println("<p align=right><A  HREF=\"/\"> GSN home</a></p>");
         out.println("</div>");
 	}
     private void printFormInputs(PrintWriter out)
@@ -155,11 +155,11 @@ public class MyLoginHandlerServlet extends HttpServlet
                 {
                     if(session.getAttribute("scheme").equals("http"))
                     {
-                        res.sendRedirect("http://"+req.getServerName()+":"+ ContainerConfig.DEFAULT_GSN_PORT+"/index.jsp");
+                        res.sendRedirect("http://"+req.getServerName()+":"+ ContainerConfig.DEFAULT_GSN_PORT+"/");
                     }
                     else if(session.getAttribute("scheme").equals("https"))
                     {
-                        res.sendRedirect("/index.jsp");
+                        res.sendRedirect("/");
                     }
 				}
 			}

@@ -58,7 +58,7 @@ public class MyChangeGroupCombinationServlet  extends HttpServlet
                {
                    if(pm.valueForName("groupname").equals(""))
                    {
-                       res.sendRedirect("/index.jsp");
+                       res.sendRedirect("/");
 
                    }
                    try

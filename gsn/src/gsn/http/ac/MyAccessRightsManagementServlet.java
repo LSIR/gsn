@@ -94,7 +94,7 @@ public class MyAccessRightsManagementServlet extends HttpServlet
     private void printLinks(PrintWriter out, User user)
     {
         //out.println("<a class=linkclass href=\"/gsn/MyLoginHandlerServlet\">login</a>");
-        out.println("<a class=linkclass href=\"/index.jsp\">GSN home</a>");
+        out.println("<a class=linkclass href=\"/\">GSN home</a>");
         if(user!=null)
         {
             out.println("<a class=linkclass href=\"/gsn/MyLogoutHandlerServlet\">logout</a>");

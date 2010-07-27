@@ -50,13 +50,13 @@ public class MyHtmlResultSetServlet extends HttpServlet
                ParameterSet pm = new ParameterSet(req);
                if(pm.valueForName("tablename")==null)
                {
-                   res.sendRedirect("/index.jsp");
+                   res.sendRedirect("/");
                }
                else
                {
                    if(pm.valueForName("tablename").equals(""))
                    {
-                       res.sendRedirect("/index.jsp");
+                       res.sendRedirect("/");
                    }
                    else
                    {
@@ -159,7 +159,7 @@ public class MyHtmlResultSetServlet extends HttpServlet
         out.println("<a class=linkclass href=\"/gsn/MyDisplayACTablesContentServlet\"> display AC tables content</a>");
         out.println("<a class=linkclass href=\"/gsn/MyLogoutHandlerServlet\">logout</a>");
 
-        //out.println("<a class=linkclass href=\"/index.jsp\">GSN home</a>");
+        //out.println("<a class=linkclass href=\"/\">GSN home</a>");
 
     }
     private void printUserName(PrintWriter out, User user)

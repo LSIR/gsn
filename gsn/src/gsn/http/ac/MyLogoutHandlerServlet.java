@@ -31,7 +31,7 @@ public class MyLogoutHandlerServlet extends HttpServlet
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Pragma", "no-cache");
         res.setHeader("Expires", "0");
-        res.sendRedirect( "/index.jsp");
+        res.sendRedirect( "/");
     }
     public void doPost(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
     {

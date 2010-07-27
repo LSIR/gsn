@@ -37,13 +37,13 @@ public class MyGroupHtmlResultSetServlet  extends HttpServlet
         ParameterSet pm = new ParameterSet(req);
         if(pm.valueForName("groupname")==null)
         {
-            res.sendRedirect("/index.jsp");
+            res.sendRedirect("/");
         }
         else
         {
             if(pm.valueForName("groupname").equals(""))
             {
-                res.sendRedirect("/index.jsp");
+                res.sendRedirect("/");
             }
             else
             {
@@ -123,7 +123,7 @@ public class MyGroupHtmlResultSetServlet  extends HttpServlet
 
     private void printLinks(PrintWriter out)
     {
-        out.println("<a class=linkclass href=\"/index.jsp\">GSN home</a>");
+        out.println("<a class=linkclass href=\"/\">GSN home</a>");
 
     }
 
