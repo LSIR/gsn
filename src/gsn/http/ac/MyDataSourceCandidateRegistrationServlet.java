@@ -167,7 +167,8 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
         HttpSession session = req.getSession();
 		PrintWriter out = (PrintWriter) session.getAttribute("out");
         User user = (User) session.getAttribute("user");
-		ParameterSet pm = new ParameterSet(req,"/gsn/virtual-sensors/receivedVSFiles");
+		ParameterSet pm = new ParameterSet(req,"virtual-sensors/receivedVSFiles");
+        logger.warn(pm);
         if(pm.hasEmptyParameter())
         {
             //out.println("Please enter the virtual sensor name. <BR>");
@@ -182,7 +183,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
                 if(ctdb.valueExistsForThisColumn(new Column("DATASOURCENAME",pm.valueForName("vsname")),"ACDATASOURCE")!=true)
                 {
 
-                    DataSource ds = pm.fileUploader((pm.valueForName("vsname")).toLowerCase(),"/gsn/virtual-sensors/receivedVSFiles");
+                    DataSource ds = pm.fileUploader((pm.valueForName("vsname")).toLowerCase(),"virtual-sensors/receivedVSFiles");
                     if( ds !=null)
                     {
 
