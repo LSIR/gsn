@@ -25,7 +25,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, TM_REF1, TM_REF2, TM_REF3, TM_REF4, TM_REF5, TM_REF6 from Matterhorn_Moisturechain__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID != 0 </query>
+                <query> select GENERATION_TIME, TM_REF1, TM_REF2, TM_REF3, TM_REF4, TM_REF5, TM_REF6 from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

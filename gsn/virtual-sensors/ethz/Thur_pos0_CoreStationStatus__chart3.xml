@@ -29,7 +29,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, I_V12DC_EXT, I_V12DC_IN from Thur_CoreStationStatus__conv__1950</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper where POSITION = 0 </query>
+                <query> select GENERATION_TIME, I_V12DC_EXT, I_V12DC_IN from wrapper where POSITION = 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

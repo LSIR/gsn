@@ -25,7 +25,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, DCX_P1, DCX_P2 from Matterhorn_Waterpressure__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID != 0 </query>
+                <query> select GENERATION_TIME, DCX_P1, DCX_P2 from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

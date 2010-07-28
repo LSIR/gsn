@@ -20,10 +20,11 @@ ETZ_Dozer_NodeHealth__mapped.xml
 ETZ_Dozer_NodeHealth__conv.xml
 ETZ_Dozer_NodeInfo__mapped.xml
 ETZ_Dozer_PowerSwitch__mapped.xml
+ETZ_Dozer_Rssi__conv.xml
 ETZ_Dozer_Rssi__mapped.xml
 ETZ_Dozer_Rssi__muxed__mapped.xml
+ETZ_Dozer_StateCounter__conv.xml
 ETZ_Dozer_StateCounter__mapped.xml
-ETZ_GPS__mapped.xml
 ETZ_pos0_BackLogStatus__chart.xml
 ETZ_pos0_CoreStationStatus__chart1.xml
 ETZ_pos0_CoreStationStatus__chart2.xml
@@ -35,6 +36,7 @@ ETZ_pos1_CoreStationStatus__chart1.xml
 ETZ_pos1_CoreStationStatus__chart2.xml
 ETZ_pos1_CoreStationStatus__chart3.xml
 ETZ_pos1_CoreStationStatus__chart4.xml
+ETZ_pos1_Webcam__scaled.xml
 ETZ_pos2_BackLogStatus__chart.xml
 ETZ_pos2_Camera__scaled.xml
 ETZ_pos2_CoreStationStatus__chart1.xml
@@ -42,6 +44,7 @@ ETZ_pos2_CoreStationStatus__chart2.xml
 ETZ_pos2_CoreStationStatus__chart3.xml
 ETZ_pos2_CoreStationStatus__chart4.xml
 ETZ_pos2_Webcam_scaled.xml
+ETZ_pos22_Dozer__Configuration.xml
 ETZ_Schedule__mapped.xml
 ETZ_VaisalaWXT520__mapped.xml
 ETZ_VaisalaWXT520__muxed__mapped.xml

@@ -25,7 +25,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, NTNN_T1 from Matterhorn_Temperature__ntnn__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper where POSITION = 12 and PAYLOAD_SAMPLE_VALID != 0 </query>
+                <query> select GENERATION_TIME, NTNN_T1 from wrapper where POSITION = 12 and PAYLOAD_SAMPLE_VALID != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

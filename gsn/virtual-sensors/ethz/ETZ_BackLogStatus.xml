@@ -38,6 +38,7 @@
     </addressing>
     <storage />
     <streams>
+<!--
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
@@ -48,6 +49,7 @@
             </source>
             <query> select * from source </query>
         </stream>
+-->
         <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">

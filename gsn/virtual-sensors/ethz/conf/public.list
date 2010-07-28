@@ -1,4 +1,3 @@
-Jungfraujoch_BackLogStatus__chart1.xml
 Jungfraujoch_BackLogStatus__mapped.xml
 Jungfraujoch_CoreStationStatus__conv.xml
 Jungfraujoch_CoreStationStatus__mapped.xml
@@ -17,11 +16,10 @@ Jungfraujoch_Dozer_EventLogger__muxed__mapped.xml
 Jungfraujoch_Dozer_NodeHealth__conv.xml
 Jungfraujoch_Dozer_NodeHealth__mapped.xml
 Jungfraujoch_Dozer_NodeInfo__mapped.xml
-Jungfraujoch_Dozer_PowerSwitch__mapped.xml
+Jungfraujoch_Dozer_Rssi__conv.xml
 Jungfraujoch_Dozer_Rssi__mapped.xml
 Jungfraujoch_Dozer_Rssi__muxed__mapped.xml
-Jungfraujoch_Dozer_SeqNumber__chart1.xml
-Jungfraujoch_Dozer_SeqNumber__nodeidx__chart1.xml
+Jungfraujoch_Dozer_StateCounter__conv.xml
 Jungfraujoch_Dozer_StateCounter__mapped.xml
 Jungfraujoch_pos0_BackLogStatus__chart.xml
 Jungfraujoch_pos0_CoreStationStatus__chart1.xml
@@ -76,7 +74,6 @@ Jungfraujoch_Sensorrod.xml
 Jungfraujoch_Thermistorchain1.xml
 Jungfraujoch_Thermistorchain2.xml
 Jungfraujoch_Thermistorchain.xml
-Matterhorn_BackLogStatus__chart1.xml
 Matterhorn_BackLogStatus__mapped.xml
 Matterhorn_Binary__mapped.xml
 Matterhorn_CoreStationStatus__conv.xml
@@ -102,9 +99,10 @@ Matterhorn_Dozer_NodeHealth__conv.xml
 Matterhorn_Dozer_NodeHealth__mapped.xml
 Matterhorn_Dozer_NodeInfo__mapped.xml
 Matterhorn_Dozer_PowerSwitch__mapped.xml
+Matterhorn_Dozer_Rssi__conv.xml
 Matterhorn_Dozer_Rssi__mapped.xml
 Matterhorn_Dozer_Rssi__muxed__mapped.xml
-Matterhorn_Dozer_SeqNumber__chart1.xml
+Matterhorn_Dozer_StateCounter__conv.xml
 Matterhorn_Dozer_StateCounter__mapped.xml
 Matterhorn_Earthpressure_nepn.xml
 Matterhorn_Moisturechain1.xml
@@ -194,7 +192,6 @@ Matterhorn_Thermistorchain.xml
 Matterhorn_VaisalaWXT520__mapped.xml
 Matterhorn_VaisalaWXT520__muxed__mapped.xml
 Matterhorn_Waterpressure.xml
-Thur_BackLogStatus__chart1.xml
 Thur_BackLogStatus__mapped.xml
 Thur_Binary__mapped.xml
 Thur_CoreStationStatus__conv.xml
@@ -216,11 +213,10 @@ Thur_Dozer_EventLogger__muxed__mapped.xml
 Thur_Dozer_NodeHealth__conv.xml
 Thur_Dozer_NodeHealth__mapped.xml
 Thur_Dozer_NodeInfo__mapped.xml
-Thur_Dozer_PowerSwitch__mapped.xml
+Thur_Dozer_Rssi__conv.xml
 Thur_Dozer_Rssi__mapped.xml
 Thur_Dozer_Rssi__muxed__mapped.xml
-Thur_Dozer_SeqNumber__chart1.xml
-Thur_Dozer_SeqNumber__nodeidx__chart1.xml
+Thur_Dozer_StateCounter__conv.xml
 Thur_Dozer_StateCounter__mapped.xml
 Thur_pos0_BackLogStatus__chart.xml
 Thur_pos0_Camera__scaled.xml
@@ -249,4 +245,3 @@ Thur_pos5_DozerDecagonMux__chart1.xml
 Thur_pos5_DozerDecagonMux__chart2.xml
 Thur_pos5_DozerDecagonMux__chart3.xml
 Thur_pos5_DozerDutyCycle__chart1.xml
-Thur_Schedule__mapped.xml

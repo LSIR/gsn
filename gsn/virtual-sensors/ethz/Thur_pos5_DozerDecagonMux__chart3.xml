@@ -25,7 +25,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, TEMPERATURE0, TEMPERATURE1, TEMPERATURE2, TEMPERATURE3, TEMPERATURE4 from Thur_Dozer_DecagonMux__conv__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID = 1
+                <query> select GENERATION_TIME, TEMPERATURE0, TEMPERATURE1, TEMPERATURE2, TEMPERATURE3, TEMPERATURE4 from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID = 1
                 </query>
             </source>
             <query> select * from source </query>
