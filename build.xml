@@ -328,6 +328,18 @@
     </target>
 
 
+    <!-- Performance Evaluation -->
+
+    <target name="eval-queries" depends="bind" description="Run GSN evaluation queries.">
+        <java classname="gsn.tests.performance.Queries" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+            <classpath refid="classpath"/>
+            <jvmarg value="-DnbQueries=1"/>
+            <jvmarg value="-DnbThreads=10"/>
+            <jvmarg value="-DmaxQuerySize=50000"/>
+            <jvmarg value="-DgsnUrl=http://montblanc.slf.ch:22001"/>
+        </java>
+    </target>
+
     <!-- Safe Storage -->
 
     <target name="start-acquisition" depends="bind">
