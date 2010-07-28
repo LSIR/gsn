@@ -290,10 +290,15 @@ class ChartInfoBackLog {
 			   dataCollectionForTheChart.addSeries( timeSeries );
 		   }
 		   try {
+			   Double tmp = Double.parseDouble( streamElement.getData( )[ i ].toString( ) );
+			   if (this.logVerticalAxis && tmp <= 0.0) {
+				   logger.debug("Values less than or equal to zero not allowed with logarithmic axis");
+				   continue;
+			   }
 			   if (timeStreamName != null)
-				   timeSeries.addOrUpdate( new FixedMillisecond( ((Long) streamElement.getData(timeStreamName)).longValue() ) , Double.parseDouble( streamElement.getData( )[ i ].toString( ) ) );
+				   timeSeries.addOrUpdate( new FixedMillisecond( ((Long) streamElement.getData(timeStreamName)).longValue() ) , tmp );
 			   else
-				   timeSeries.addOrUpdate( new FixedMillisecond( streamElement.getTimeStamp( ) ) , Double.parseDouble( streamElement.getData( )[ i ].toString( ) ) );
+				   timeSeries.addOrUpdate( new FixedMillisecond( streamElement.getTimeStamp( ) ) , tmp );
 		   } catch ( SeriesException e ) {
 			   logger.warn( e.getMessage( ) , e );
 		   }
