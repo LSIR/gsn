@@ -23,7 +23,7 @@ public class DataSources {
                 ds.setUsername(dci.getUserName());
                 ds.setPassword(dci.getPassword());
                 ds.setUrl(dci.getUrl());
-		ds.setDefaultTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+		//ds.setDefaultTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
                 //ds.setAccessToUnderlyingConnectionAllowed(true); 
                 GSNContext.getMainContext().bind(Integer.toString(dci.hashCode()), ds);
                 logger.warn("Created a DataSource to: " + ds.getUrl());
