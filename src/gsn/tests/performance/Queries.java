@@ -1,6 +1,7 @@
 package gsn.tests.performance;
 
 import gsn.beans.DataField;
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -12,6 +13,7 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,45 +91,78 @@ public class Queries {
         }
 
         // Go through the results and compute the stats
-        long deltaSum = 0;
-        int rowsSum = 0;
-        int fieldsSum = 0;
-        int dataSizeSum = 0;
+        SummaryStatistics execTime = new SummaryStatistics();
+        SummaryStatistics tuples = new SummaryStatistics();
+        SummaryStatistics fields = new SummaryStatistics();
+        SummaryStatistics datas = new SummaryStatistics();
+        SummaryStatistics tuplesRate = new SummaryStatistics();
+        SummaryStatistics fieldsRate = new SummaryStatistics();
+        SummaryStatistics datasRate = new SummaryStatistics();
+
+
+        //int rowsSum = 0;
+        //int fieldsSum = 0;
+        //int dataSizeSum = 0;
         for (Future<QueryResult> result : futures) {
             try {
                 QueryResult r = result.get();
+                double deltaInSec = r.delta / 1000.0d;
+                double dataInMeg = r.dataSize * 8.0d / (1024.0d * 1024.0d);
                 System.out.println(r);
-                deltaSum += r.delta;
-                rowsSum += r.rows;
-                fieldsSum += r.nbFields;
-                dataSizeSum += r.dataSize;
+                execTime.addValue(deltaInSec); // s
+                tuples.addValue(r.rows);
+                fields.addValue(r.nbFields);
+                datas.addValue(dataInMeg); // MB
+                //
+                tuplesRate.addValue(r.rows / deltaInSec); // tuple/s
+                fieldsRate.addValue(r.nbFields / deltaInSec); // field/s
+                datasRate.addValue(dataInMeg / deltaInSec); //MB/s
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
         }
         long endTime = System.currentTimeMillis();
-        int sItems = rowsSum * fieldsSum;
-        float rowPsec = (float) (rowsSum * 1000.0) / deltaSum;
-        float itemsPsec = (float) (sItems * 1000.0) / deltaSum;
-        float avgOutputSize = (float) fieldsSum / (float) nbQueries;
-        float avgDRate = (float) (dataSizeSum * 8 * 1000.0f / 1024.0) / (float) deltaSum;
-        float avgDTime = (float) ((deltaSum / 1000.0f) / nbQueries);
+        //
+
+        //
+        float evalDuration = (endTime - startTime) / 1000.0f;   // s
         System.out.println(new StringBuilder()
                 .append("\n------ GSN Queries Result --------").append("\n")
                 .append("| URL: ").append(gsnUrl).append("\n")
-                .append("| Evaluation duration: ").append(Float.toString((endTime - startTime) / 1000.0f)).append(" s\n")
-                .append("| Nb Queries: ").append(nbQueries).append("\n")
-                .append("| Total # Tuples: ").append(rowsSum).append("\n")
-                .append("| Total Data: ").append(dataSizeSum * 8 / 1024).append(" kB\n")
-                .append("| Total # Fields: ").append(sItems).append("\n")
-                .append("| Avg Download time: ").append(Float.toString(avgDTime)).append(" s\n")
-                .append("| Avg Output Structure Size: ").append(avgOutputSize).append(" field\n")
-                .append("| Avg Tuple Rate: ").append(rowPsec).append(" tuple/s\n")
-                .append("| Avg Field Rate: ").append(itemsPsec).append(" field/s\n")
-                .append("| Avg Data Rate: ").append(avgDRate).append(" kB/s\n")
+                .append("| Eval duration: ").append(format(evalDuration)).append(" [s]\n")
+                .append("| Nb Queries   : ").append(nbQueries).append("\n")
+                .append("| Tuples       : ").append(printStats(tuples, "no unit")).append("\n")
+                .append("| Fields       : ").append(printStats(fields, "no unit")).append("\n")
+                .append("| Raw Data     : ").append(printStats(datas, "MB")).append("\n")
+                .append("| Download time: ").append(printStats(execTime, "s")).append("\n")
+                .append("| Tuple Rate   : ").append(printStats(tuplesRate, "tuple/s")).append("\n")
+                .append("| Field Rate   : ").append(printStats(fieldsRate, "field/s")).append("\n")
+                .append("| Data Rate    : ").append(printStats(datasRate, "MB/s")).append("\n")
                 .append("-----------------------------------\n"));
 
         executor.shutdown();
+    }
+
+    private String printStats(SummaryStatistics stats, String unit) {
+        return new StringBuilder()
+                .append("sum:")
+                .append(format(stats.getSum()))
+                .append(", min:")
+                .append(format(stats.getMin()))
+                .append(", max:")
+                .append(format(stats.getMax()))
+                .append(", mean:")
+                .append(format(stats.getMean()))
+                .append(", var:")
+                .append(format(stats.getVariance()))
+                .append(" [")
+                .append(unit)
+                .append("]")
+                .toString();
+    }
+
+    private String format(Number value) {
+        return new DecimalFormat("###.000").format(value);
     }
 
     private class QueryTask implements Callable<QueryResult> {
