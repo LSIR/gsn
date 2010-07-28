@@ -29,7 +29,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, I_VCC_NODE from Jungfraujoch_CoreStationStatus__conv__1950</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select GENERATION_TIME, I_VCC_NODE from wrapper where POSITION = 0 </query>
+                <query> select GENERATION_TIME, I_VCC_NODE from wrapper where POSITION = 0 and GENERATION_TIME >= (NOW() * 1000) - 604800000 </query>
             </source>
             <query> select * from source </query>
         </stream>

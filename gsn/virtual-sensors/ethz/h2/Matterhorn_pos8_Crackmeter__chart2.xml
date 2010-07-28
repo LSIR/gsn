@@ -26,7 +26,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, NCTC_T1 from Matterhorn_Crackmeter__nctc__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select GENERATION_TIME, NCTC_T1 from wrapper where POSITION = 8 and PAYLOAD_SAMPLE_VALID != 0 </query>
+                <query> select GENERATION_TIME, NCTC_T1 from wrapper where POSITION = 8 and PAYLOAD_SAMPLE_VALID != 0 and GENERATION_TIME >= (NOW() * 1000) - 604800000 </query>
             </source>
             <query> select * from source </query>
         </stream>

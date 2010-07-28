@@ -25,7 +25,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, I_V12DC_EXT, I_V12DC_IN from ETZ_CoreStationStatus__conv__1946</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select GENERATION_TIME, I_V12DC_EXT, I_V12DC_IN from wrapper where POSITION = 2 </query>
+                <query> select GENERATION_TIME, I_V12DC_EXT, I_V12DC_IN from wrapper where POSITION = 2 and GENERATION_TIME >= (NOW() * 1000) - 604800000 </query>
             </source>
             <query> select * from source </query>
         </stream>
