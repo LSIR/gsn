@@ -1,8 +1,8 @@
 <project name="gsn" default="build" basedir=".">
 
-    <property name="safe-storage-port" value="25000"/>
-    <property name="safe-storage-controller-port" value="25012"/>
-    <property name="gsn-controller-port" value="22232"/>
+    <property name="safe-storage-port" value="25700"/>
+    <property name="safe-storage-controller-port" value="25712"/>
+    <property name="gsn-controller-port" value="22932"/>
     <property name="max-servlets" value="20"/>
     <property name="max-db-connections" value="8"/>
     <property name="max-sliding-db-connections" value="8"/>
@@ -24,7 +24,7 @@
         <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
         <property name="reports" value="reports"/>
-        <property name="maxMemoryUsage" value="128m"/>
+        <property name="maxMemoryUsage" value="512m"/>
         <property name="jar.file" value="gsn-core.jar"/>
         <!--  Enable the following line when you want to use Java Media Framework.
               You should unarchive the complete archive provide by sun and fix the
@@ -333,10 +333,10 @@
     <target name="eval-queries" depends="bind" description="Run GSN evaluation queries.">
         <java classname="gsn.tests.performance.Queries" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
             <classpath refid="classpath"/>
-            <jvmarg value="-DnbQueries=1"/>
+            <jvmarg value="-DnbQueries=10"/>
             <jvmarg value="-DnbThreads=10"/>
             <jvmarg value="-DmaxQuerySize=50000"/>
-            <jvmarg value="-DgsnUrl=http://montblanc.slf.ch:22001"/>
+            <jvmarg value="-DgsnUrl=http://localhost:22001"/>
         </java>
     </target>
 
