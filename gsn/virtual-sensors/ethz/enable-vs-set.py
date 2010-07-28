@@ -6,11 +6,19 @@ import time
 
 abort = False
 
-if len(sys.argv) != 2:
-  print 'usage: enable-vs-set.py <target>'
+if len(sys.argv) != 2 and len(sys.argv) != 3:
+  print 'usage: enable-vs-set.py <target> <db>'
   sys.exit(-1)
 
 filepath = sys.path[0] + '/conf/' + sys.argv[1] + '.list'
+
+h2 = False
+if len(sys.argv) == 3:
+    if sys.argv[1].lower() == "h2":
+        h2 = True
+    elif sys.argv[1].lower() != "mysql":
+        print 'usage: <db> can only be h2 or mysql'
+        sys.exit(-1)
 
 # check if first arguments points to valid file
 if not os.path.exists(filepath):
@@ -39,7 +47,10 @@ for line in fd:
   if line.startswith('#'):
     continue
   link = line.rstrip()
-  source = 'ethz/' + link 
+  if h2:
+      source = 'ethz/h2/' + link 
+  else:
+      source = 'ethz/' + link 
   if os.path.exists(source):
     if not os.path.exists(link):
       print link + ' -> ' + source
