@@ -32,6 +32,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
     '''
     _interval
     _calibrated
+    _conf_calibrate
     _ain4_cal
     _ain9_cal
     _stopped
@@ -59,6 +60,10 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             self._interval = DEFAULT_STATUS_INTERVAL
         else:
             self._interval = float(value)
+            
+        self._conf_calibrate = False
+        if int(self.getOptionValue('calibrate')) == 1:
+            self._conf_calibrate = True
         
         self.info('interval: ' + str(self._interval))
     
@@ -85,7 +90,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             if self._sleeper.isSet():
                 continue
 
-            if not self._calibrated and os.path.isfile(CALIB_FILE):
+            if not self._calibrated and os.path.isfile(CALIB_FILE) and self._conf_calibrate:
                 # get the calibration data with channel offsets
                 try:
                     fcalib = None
@@ -173,16 +178,16 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 v9 = float(v9.split(' ')[0])
                 v10 = float(v10.split(' ')[0])
 
-                v6 = v6 - 0.3
+                if v4 < 0:
+                    v4 = 0
                 if v6 < 0:
                     v6 = 0
-                if self._calibrated:
+                if v9 < 0:
+                    v9 = 0
+                if self._calibrated and self._conf_calibrate:
+                    v6 = v6 - 0.3
                     v4 = v4 - self._ain4_cal
                     v9 = v9 - self._ain9_cal
-                    if v4 < 0:
-                        v4 = 0
-                    if v9 < 0:
-                        v9 = 0
 
                 v1 = int(round(v1 * 11))
                 v2 = 0xFFFFFFFF
@@ -194,7 +199,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 v8 = int(round(v8 * 2))
                 v9 = int(round(v9 * 200 / 3))
                 v10 = int(round(v10 * 2))
-                if not self._calibrated:
+                if not self._calibrated and self._conf_calibrate:
                     v4 = 0xFFFFFFFF
                     v9 = 0xFFFFFFFF
             except Exception, e:
