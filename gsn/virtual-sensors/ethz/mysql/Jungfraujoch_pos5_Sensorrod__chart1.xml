@@ -1,0 +1,34 @@
+<virtual-sensor name="Jungfraujoch_pos5_Sensorrod__chart1" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Sensorrod temperatures (Position 5, 7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">5020</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>Sensorrod/SR data (merged) from Jungfraujoch deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <!--  SR_T2 shows constant value around 56.2°C -->
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, SR_T1, SR_T3, SR_T4 from Jungfraujoch_Sensorrod__1950</predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select GENERATION_TIME, SR_T1, SR_T2, SR_T3, SR_T4 from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID != 0 </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

@@ -1,0 +1,35 @@
+<virtual-sensor name="Jungfraujoch_Binary__1950" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="RELATIVE_FILE" type="VARCHAR(255)" />
+            <field name="STORAGE_DIRECTORY" type="VARCHAR(255)" />
+            <field name="DATA" type="binary" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>binaries from the Jungfraujoch deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+        <predicate key="type">PermaSense Jungfraujoch deployment</predicate>
+        <predicate key="LATITUDE">46.547451</predicate>
+        <predicate key="LONGITUDE">7.982092</predicate>
+    </addressing>
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-jj-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-binaries/jungfraujoch/pos0/</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

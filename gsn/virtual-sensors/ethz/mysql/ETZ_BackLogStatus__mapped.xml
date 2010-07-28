@@ -1,0 +1,52 @@
+<virtual-sensor name="ETZ_BackLogStatus__mapped__1946" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="UPTIME" type="INTEGER" unit="relatime" />
+            <field name="ERROR_COUNTER" type="INTEGER" />
+            <field name="EXCEPTION_COUNTER" type="INTEGER" />
+            <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
+            <field name="BACKLOG_DB_SIZE_KB" type="INTEGER" />
+            <field name="IN_COUNTER" type="INTEGER" />
+            <field name="OUT_COUNTER" type="INTEGER" />
+            <field name="BACKLOG_COUNTER" type="INTEGER" />
+            <field name="CONNECTION_LOSSES" type="INTEGER" />
+            <field name="DB_STORE_TIME_MIN" type="INTEGER" unit="ms" />
+            <field name="DB_STORE_TIME_MEAN" type="INTEGER" unit="ms" />
+            <field name="DB_STORE_TIME_MAX" type="INTEGER" unit="ms" />
+            <field name="DB_REMOVE_TIME_MIN" type="INTEGER" unit="ms" />
+            <field name="DB_REMOVE_TIME_MEAN" type="INTEGER" unit="ms" />
+            <field name="DB_REMOVE_TIME_MAX" type="INTEGER" unit="ms" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>status information of BackLog from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+        <predicate key="type">PermaSense ETZ test deployment</predicate>
+        <predicate key="LATITUDE">47.377326</predicate>
+        <predicate key="LONGITUDE">8.552935</predicate>
+    </addressing>
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from ETZ_BackLogStatus__1946 </predicate>
+                    <predicate key="remote-contact-point">http://tik31x.ee.ethz.ch:22001/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

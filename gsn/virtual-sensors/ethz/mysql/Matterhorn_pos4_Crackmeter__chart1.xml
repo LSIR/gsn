@@ -1,0 +1,33 @@
+<virtual-sensor name="Matterhorn_pos4_Crackmeter__chart1" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Crackmeter dilatation (Position 4, 7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">mm</param>
+            <param name="history-size">5020</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>Crackmeter/NCTT data from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, NCTT_DX1 from Matterhorn_Crackmeter__nctt__1950 </predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select GENERATION_TIME, NCTT_DX1 from wrapper where POSITION = 4 and PAYLOAD_SAMPLE_VALID != 0 </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

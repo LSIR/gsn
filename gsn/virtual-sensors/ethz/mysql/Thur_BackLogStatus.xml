@@ -1,0 +1,52 @@
+<virtual-sensor name="Thur_BackLogStatus__1950" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <web-input password="test">
+            <command name="resend_backlogged_data">
+                <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
+            </command>
+        </web-input>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="UPTIME" type="INTEGER" unit="relatime" />
+            <field name="ERROR_COUNTER" type="INTEGER" />
+            <field name="EXCEPTION_COUNTER" type="INTEGER" />
+            <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
+            <field name="BACKLOG_DB_SIZE_KB" type="INTEGER" />
+            <field name="IN_COUNTER" type="INTEGER" />
+            <field name="OUT_COUNTER" type="INTEGER" />
+            <field name="BACKLOG_COUNTER" type="INTEGER" />
+            <field name="CONNECTION_LOSSES" type="INTEGER" />
+            <field name="DB_STORE_TIME_MIN" type="INTEGER" unit="ms" />
+            <field name="DB_STORE_TIME_MEAN" type="INTEGER" unit="ms" />
+            <field name="DB_STORE_TIME_MAX" type="INTEGER" unit="ms" />
+            <field name="DB_REMOVE_TIME_MIN" type="INTEGER" unit="ms" />
+            <field name="DB_REMOVE_TIME_MEAN" type="INTEGER" unit="ms" />
+            <field name="DB_REMOVE_TIME_MAX" type="INTEGER" unit="ms" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>show status information of the BackLogs and send commands to the Thur deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+        <predicate key="type">PermaSense Thur deployment</predicate>
+        <predicate key="LATITUDE">47.589889</predicate>
+        <predicate key="LONGITUDE">8.773874</predicate>
+    </addressing>
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-thur-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

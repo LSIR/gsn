@@ -1,0 +1,33 @@
+<virtual-sensor name="Matterhorn_pos3_Thermistorchain__chart1" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Thermistorchain temperatures (Position 3, 7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">5020</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>Thermistorchain/TC data (merged) from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, TC_T1, TC_T2, TC_T3, TC_T4, TC_T5, TC_T6, TC_T7, TC_T8 from Matterhorn_Thermistorchain__1950 </predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select GENERATION_TIME, TC_T1, TC_T2, TC_T3, TC_T4, TC_T5, TC_T6, TC_T7, TC_T8 from wrapper where POSITION = 3 and PAYLOAD_SAMPLE_VALID != 0 </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
