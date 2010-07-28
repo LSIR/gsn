@@ -178,16 +178,16 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 v9 = float(v9.split(' ')[0])
                 v10 = float(v10.split(' ')[0])
 
+                if self._calibrated and self._conf_calibrate:
+                    v6 = v6 - 0.3
+                    v4 = v4 - self._ain4_cal
+                    v9 = v9 - self._ain9_cal
                 if v4 < 0:
                     v4 = 0
                 if v6 < 0:
                     v6 = 0
                 if v9 < 0:
                     v9 = 0
-                if self._calibrated and self._conf_calibrate:
-                    v6 = v6 - 0.3
-                    v4 = v4 - self._ain4_cal
-                    v9 = v9 - self._ain9_cal
 
                 v1 = int(round(v1 * 11))
                 v2 = 0xFFFFFFFF
