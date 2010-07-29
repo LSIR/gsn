@@ -29,7 +29,7 @@
                 <query> select timed, GENERATION_TIME, 
                     CASEWHEN(PAYLOAD_MCUACTIVE = 0, NULL, PAYLOAD_MCUACTIVE * 1000 / PAYLOAD_PERIOD) as MCUACTIVE, 
                     CASEWHEN(PAYLOAD_RADIOTX = 0, NULL, PAYLOAD_RADIOTX * 1000 / PAYLOAD_PERIOD) as RADIOTX, 
-                    CASEWHEN(PAYLOAD_RADIORX = 0, NULL, PAYLOAD_RADIORX * 1000 / PAYLOAD_PERIOD) as RADIORX from wrapper where POSITION = 2 and GENERATION_TIME >= (NOW() * 1000) - 604800000
+                    CASEWHEN(PAYLOAD_RADIORX = 0, NULL, PAYLOAD_RADIORX * 1000 / PAYLOAD_PERIOD) as RADIORX from wrapper where POSITION = 2 and GENERATION_TIME >= (TIMESTAMPDIFF(second, 1970-01-01, NOW()) * 1000) - 604800000
                 </query>
             </source>
             <query> select * from source </query>

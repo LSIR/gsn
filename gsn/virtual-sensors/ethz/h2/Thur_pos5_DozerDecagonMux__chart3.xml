@@ -25,7 +25,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, TEMPERATURE0, TEMPERATURE1, TEMPERATURE2, TEMPERATURE3, TEMPERATURE4 from Thur_Dozer_DecagonMux__conv__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select GENERATION_TIME, TEMPERATURE0, TEMPERATURE1, TEMPERATURE2, TEMPERATURE3, TEMPERATURE4 from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID = 1 and GENERATION_TIME >= (NOW() * 1000) - 604800000
+                <query> select GENERATION_TIME, TEMPERATURE0, TEMPERATURE1, TEMPERATURE2, TEMPERATURE3, TEMPERATURE4 from wrapper where POSITION = 5 and PAYLOAD_SAMPLE_VALID = 1 and GENERATION_TIME >= (TIMESTAMPDIFF(second, 1970-01-01, NOW()) * 1000) - 604800000
                 </query>
             </source>
             <query> select * from source </query>
