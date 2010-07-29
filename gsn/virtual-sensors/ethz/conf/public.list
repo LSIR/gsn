@@ -171,6 +171,7 @@ Matterhorn_pos5_Waterpressure__chart1.xml
 Matterhorn_pos5_Waterpressure__chart2.xml
 Matterhorn_pos6_Crackmeter__chart1.xml
 Matterhorn_pos6_Crackmeter__chart2.xml
+Matterhorn_pos6_Crackmeter__chart3.xml
 Matterhorn_pos6_DozerDutyCycle__chart1.xml
 Matterhorn_pos7_DozerDutyCycle__chart1.xml
 Matterhorn_pos7_Earthpressure__chart1.xml
@@ -189,6 +190,8 @@ Matterhorn_pos8_Sensorrod__chart2.xml
 Matterhorn_pos8_Sensorrod__chart3.xml
 Matterhorn_pos9_Crackmeter__chart1.xml
 Matterhorn_pos9_Crackmeter__chart2.xml
+Matterhorn_pos9_Crackmeter__chart3.xml
+Matterhorn_pos9_Crackmeter__chart4.xml
 Matterhorn_pos9_DozerDutyCycle__chart1.xml
 Matterhorn_Schedule__mapped.xml
 Matterhorn_Selfpotential.xml

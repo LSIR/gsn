@@ -3,10 +3,10 @@
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Crackmeter temperatures (Position 9, 7d)</param>
+            <param name="title">Crackmeter dilatation (Position 9, 7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
-            <param name="vertical-axis">℃</param>
+            <param name="vertical-axis">mm</param>
             <param name="history-size">5020</param>
             <param name="time-stream-name">GENERATION_TIME</param>
         </init-params>
@@ -22,10 +22,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, CCCT_T3 from Matterhorn_Crackmeter__ccct__1950 </predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, CCCT_DX1 from Matterhorn_Crackmeter__ccct__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select GENERATION_TIME, CCCT_T3 from wrapper where POSITION = 9 and PAYLOAD_SAMPLE_VALID != 0 and GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000 </query>
+                <query> select GENERATION_TIME, CCCT_DX1 from wrapper where POSITION = 9 and PAYLOAD_SAMPLE_VALID != 0 and GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000 </query>
             </source>
             <query> select * from source </query>
         </stream>
