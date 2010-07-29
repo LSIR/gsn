@@ -26,7 +26,7 @@
                     <predicate key="query"> select timed, POSITION, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, SR_R1, SR_R2, SR_R3, SR_R4, SR_R12, SR_R23, SR_R34, SR_R31, SR_R42, SR_R41 from Jungfraujoch_Sensorrod__1950 </predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select GENERATION_TIME, SR_R1, SR_R2, SR_R3, SR_R4, SR_R12, SR_R23, SR_R34, SR_R31, SR_R42, SR_R41 from wrapper where POSITION = 7 and PAYLOAD_SAMPLE_VALID != 0 and GENERATION_TIME >= (TIMESTAMPDIFF(second, 1970-01-01, NOW()) * 1000) - 604800000 </query>
+                <query> select GENERATION_TIME, SR_R1, SR_R2, SR_R3, SR_R4, SR_R12, SR_R23, SR_R34, SR_R31, SR_R42, SR_R41 from wrapper where POSITION = 7 and PAYLOAD_SAMPLE_VALID != 0 and GENERATION_TIME >= (DATEDIFF(second, 1970-01-01, NOW()) * 1000) - 604800000 </query>
             </source>
             <query> select * from source </query>
         </stream>
