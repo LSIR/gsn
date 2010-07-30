@@ -26,22 +26,22 @@
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select GENERATION_TIME, 
-                CASEWHEN(POSITION = 1, HUMIDITY, null) as 1, 
-                CASEWHEN(POSITION = 2, HUMIDITY, null) as 2, 
-                CASEWHEN(POSITION = 3, HUMIDITY, null) as 3, 
-                CASEWHEN(POSITION = 4, HUMIDITY, null) as 4, 
-                CASEWHEN(POSITION = 5, HUMIDITY, null) as 5, 
-                CASEWHEN(POSITION = 6, HUMIDITY, null) as 6, 
-                CASEWHEN(POSITION = 7, HUMIDITY, null) as 7, 
-                CASEWHEN(POSITION = 8, HUMIDITY, null) as 8, 
-                CASEWHEN(POSITION = 9, HUMIDITY, null) as 9, 
-                CASEWHEN(POSITION = 10, HUMIDITY, null) as 10, 
-                CASEWHEN(POSITION = 11, HUMIDITY, null) as 11, 
-                CASEWHEN(POSITION = 12, HUMIDITY, null) as 12, 
-                CASEWHEN(POSITION = 13, HUMIDITY, null) as 13, 
-                CASEWHEN(POSITION = 14, HUMIDITY, null) as 14, 
-                CASEWHEN(POSITION = 15, HUMIDITY, null) as 15, 
-                CASEWHEN(POSITION = 16, HUMIDITY, null) as 16 
+                CASEWHEN(POSITION = 1, HUMIDITY, null) as p1, 
+                CASEWHEN(POSITION = 2, HUMIDITY, null) as p2, 
+                CASEWHEN(POSITION = 3, HUMIDITY, null) as p3, 
+                CASEWHEN(POSITION = 4, HUMIDITY, null) as p4, 
+                CASEWHEN(POSITION = 5, HUMIDITY, null) as p5, 
+                CASEWHEN(POSITION = 6, HUMIDITY, null) as p6, 
+                CASEWHEN(POSITION = 7, HUMIDITY, null) as p7, 
+                CASEWHEN(POSITION = 8, HUMIDITY, null) as p8, 
+                CASEWHEN(POSITION = 9, HUMIDITY, null) as p9, 
+                CASEWHEN(POSITION = 10, HUMIDITY, null) as p10, 
+                CASEWHEN(POSITION = 11, HUMIDITY, null) as p11, 
+                CASEWHEN(POSITION = 12, HUMIDITY, null) as p12, 
+                CASEWHEN(POSITION = 13, HUMIDITY, null) as p13, 
+                CASEWHEN(POSITION = 14, HUMIDITY, null) as p14, 
+                CASEWHEN(POSITION = 15, HUMIDITY, null) as p15, 
+                CASEWHEN(POSITION = 16, HUMIDITY, null) as p16 
                 from wrapper where GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000</query>
             </source>
             <query> select * from source </query>

@@ -26,22 +26,22 @@
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select GENERATION_TIME, 
-                CASEWHEN(POSITION = 1, SDIVOLTAGE, null) as 1, 
-                CASEWHEN(POSITION = 2, SDIVOLTAGE, null) as 2, 
-                CASEWHEN(POSITION = 3, SDIVOLTAGE, null) as 3, 
-                CASEWHEN(POSITION = 4, SDIVOLTAGE, null) as 4, 
-                CASEWHEN(POSITION = 5, SDIVOLTAGE, null) as 5, 
-                CASEWHEN(POSITION = 6, SDIVOLTAGE, null) as 6, 
-                CASEWHEN(POSITION = 7, SDIVOLTAGE, null) as 7, 
-                CASEWHEN(POSITION = 8, SDIVOLTAGE, null) as 8, 
-                CASEWHEN(POSITION = 9, SDIVOLTAGE, null) as 9, 
-                CASEWHEN(POSITION = 10, SDIVOLTAGE, null) as 10, 
-                CASEWHEN(POSITION = 11, SDIVOLTAGE, null) as 11, 
-                CASEWHEN(POSITION = 12, SDIVOLTAGE, null) as 12, 
-                CASEWHEN(POSITION = 13, SDIVOLTAGE, null) as 13, 
-                CASEWHEN(POSITION = 14, SDIVOLTAGE, null) as 14, 
-                CASEWHEN(POSITION = 15, SDIVOLTAGE, null) as 15, 
-                CASEWHEN(POSITION = 16, SDIVOLTAGE, null) as 16 
+                CASEWHEN(POSITION = 1, SDIVOLTAGE, null) as p1, 
+                CASEWHEN(POSITION = 2, SDIVOLTAGE, null) as p2, 
+                CASEWHEN(POSITION = 3, SDIVOLTAGE, null) as p3, 
+                CASEWHEN(POSITION = 4, SDIVOLTAGE, null) as p4, 
+                CASEWHEN(POSITION = 5, SDIVOLTAGE, null) as p5, 
+                CASEWHEN(POSITION = 6, SDIVOLTAGE, null) as p6, 
+                CASEWHEN(POSITION = 7, SDIVOLTAGE, null) as p7, 
+                CASEWHEN(POSITION = 8, SDIVOLTAGE, null) as p8, 
+                CASEWHEN(POSITION = 9, SDIVOLTAGE, null) as p9, 
+                CASEWHEN(POSITION = 10, SDIVOLTAGE, null) as p10, 
+                CASEWHEN(POSITION = 11, SDIVOLTAGE, null) as p11, 
+                CASEWHEN(POSITION = 12, SDIVOLTAGE, null) as p12, 
+                CASEWHEN(POSITION = 13, SDIVOLTAGE, null) as p13, 
+                CASEWHEN(POSITION = 14, SDIVOLTAGE, null) as p14, 
+                CASEWHEN(POSITION = 15, SDIVOLTAGE, null) as p15, 
+                CASEWHEN(POSITION = 16, SDIVOLTAGE, null) as p16 
                 from wrapper where GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000</query>
             </source>
             <query> select * from source </query>
