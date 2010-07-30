@@ -284,6 +284,8 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                     toReturn.append(" (NOW_MILLIS()");
                 } else if (Main.getWindowStorage().isMysqlDB()) {
                     toReturn.append(" (UNIX_TIMESTAMP()*1000");
+                } else if (Main.getWindowStorage().isPostgres()) {
+                    toReturn.append(" (extract(epoch FROM now())*1000");
                 } else if (Main.getWindowStorage().isSqlServer()) {
                     // NOTE1 : The value retuend is in seconds (hence 1000)
                     // NOTE2 : There is no time in the date for the epoch, maybe
