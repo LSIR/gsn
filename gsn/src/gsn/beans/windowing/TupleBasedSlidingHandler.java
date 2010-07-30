@@ -96,7 +96,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 
 		if (maxTupleCount > 0) {
 			StringBuilder query = new StringBuilder();
-			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
+			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
 				query.append(" select timed from ").append(wrapper.getDBAliasInStr());
 				query.append(" order by timed desc limit 1 offset ").append(maxTupleCount - 1);
 			} else if (Main.getWindowStorage().isSqlServer()) {
@@ -126,7 +126,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 
 		if (maxTupleCount > 0) {
 			StringBuilder query = new StringBuilder();
-			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB()) {
+			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
 				query.append(" select timed from ").append(wrapper.getDBAliasInStr());
 				query.append(" order by timed desc limit 1 offset ").append(maxTupleCount - 1);
 			} else if (Main.getWindowStorage().isSqlServer()) {
@@ -156,7 +156,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 
 		if (maxWindowSize > 0) {
 			StringBuilder query = new StringBuilder();
-			if (Main.getWindowStorage().isMysqlDB()) {
+			if (Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
 				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from ").append(wrapper.getDBAliasInStr());
 				query.append(" order by timed desc limit 1 offset ").append(maxTupleForTimeBased - 1).append(" ) as X ");
 			} else if (Main.getWindowStorage().isH2()) {
@@ -264,7 +264,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			}
 			WindowType windowingType = streamSource.getWindowingType();
 			if (windowingType == WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE) {
-				if (Main.getWindowStorage().isMysqlDB()) {
+				if (Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
 					toReturn.append("timed >= (select timed from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ) order by timed desc ");
 				} else if (Main.getWindowStorage().isH2()) {
 					toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" where timed in (select timed from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(
@@ -280,7 +280,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			} else {
 				CharSequence viewHelperTableName =Main.getWindowStorage().tableNameGeneratorInString(SQLViewQueryRewriter.VIEW_HELPER_TABLE);
 				if (windowingType == WindowType.TUPLE_BASED) {
-					if (Main.getWindowStorage().isMysqlDB()) {
+					if (Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
 						toReturn.append("timed <= (select timed from ").append(viewHelperTableName).append(
 						" where U_ID='").append(streamSource.getUIDStr()).append("') and timed >= (select timed from ");
 						toReturn.append(wrapperAlias).append(" where timed <= (select timed from ");

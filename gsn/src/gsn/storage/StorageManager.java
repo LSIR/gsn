@@ -824,10 +824,12 @@ public abstract class StorageManager {
     protected boolean isMysql ;
     protected boolean isOracle ;
     protected boolean isSqlServer ;
+    protected boolean isPostgres ;
     public boolean isOracle(){ return isOracle; }
     public boolean isH2(){ return isH2; }
     public boolean isSqlServer(){ return isSqlServer; }
     public boolean isMysqlDB(){ return isMysql; }
+    public boolean isPostgres(){ return isPostgres; }
 
 
 }
