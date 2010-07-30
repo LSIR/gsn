@@ -1,0 +1,50 @@
+<virtual-sensor name="Jungfraujoch_Dozer_NodeHealth__chart1" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Node health temperature (7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">5040</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>backlog health status at Jungfraujoch deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, TEMPERATURE from Jungfraujoch_Dozer_NodeHealth__conv__1950</predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select GENERATION_TIME, 
+                CASEWHEN(POSITION = 1, TEMPERATURE, null) as 1, 
+                CASEWHEN(POSITION = 2, TEMPERATURE, null) as 2, 
+                CASEWHEN(POSITION = 3, TEMPERATURE, null) as 3, 
+                CASEWHEN(POSITION = 4, TEMPERATURE, null) as 4, 
+                CASEWHEN(POSITION = 5, TEMPERATURE, null) as 5, 
+                CASEWHEN(POSITION = 6, TEMPERATURE, null) as 6, 
+                CASEWHEN(POSITION = 7, TEMPERATURE, null) as 7, 
+                CASEWHEN(POSITION = 8, TEMPERATURE, null) as 8, 
+                CASEWHEN(POSITION = 9, TEMPERATURE, null) as 9, 
+                CASEWHEN(POSITION = 10, TEMPERATURE, null) as 10, 
+                CASEWHEN(POSITION = 11, TEMPERATURE, null) as 11, 
+                CASEWHEN(POSITION = 12, TEMPERATURE, null) as 12, 
+                CASEWHEN(POSITION = 13, TEMPERATURE, null) as 13, 
+                CASEWHEN(POSITION = 14, TEMPERATURE, null) as 14, 
+                CASEWHEN(POSITION = 15, TEMPERATURE, null) as 15, 
+                CASEWHEN(POSITION = 16, TEMPERATURE, null) as 16 
+                from wrapper where GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

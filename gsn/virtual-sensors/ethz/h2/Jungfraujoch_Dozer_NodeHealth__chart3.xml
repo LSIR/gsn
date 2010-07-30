@@ -1,0 +1,50 @@
+<virtual-sensor name="Jungfraujoch_Dozer_NodeHealth__chart3" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Node health system voltage (7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">5040</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>backlog health status at Jungfraujoch deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, SYSVOLTAGE from Jungfraujoch_Dozer_NodeHealth__conv__1950</predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select GENERATION_TIME, 
+                CASEWHEN(POSITION = 1, SYSVOLTAGE, null) as 1, 
+                CASEWHEN(POSITION = 2, SYSVOLTAGE, null) as 2, 
+                CASEWHEN(POSITION = 3, SYSVOLTAGE, null) as 3, 
+                CASEWHEN(POSITION = 4, SYSVOLTAGE, null) as 4, 
+                CASEWHEN(POSITION = 5, SYSVOLTAGE, null) as 5, 
+                CASEWHEN(POSITION = 6, SYSVOLTAGE, null) as 6, 
+                CASEWHEN(POSITION = 7, SYSVOLTAGE, null) as 7, 
+                CASEWHEN(POSITION = 8, SYSVOLTAGE, null) as 8, 
+                CASEWHEN(POSITION = 9, SYSVOLTAGE, null) as 9, 
+                CASEWHEN(POSITION = 10, SYSVOLTAGE, null) as 10, 
+                CASEWHEN(POSITION = 11, SYSVOLTAGE, null) as 11, 
+                CASEWHEN(POSITION = 12, SYSVOLTAGE, null) as 12, 
+                CASEWHEN(POSITION = 13, SYSVOLTAGE, null) as 13, 
+                CASEWHEN(POSITION = 14, SYSVOLTAGE, null) as 14, 
+                CASEWHEN(POSITION = 15, SYSVOLTAGE, null) as 15, 
+                CASEWHEN(POSITION = 16, SYSVOLTAGE, null) as 16 
+                from wrapper where GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

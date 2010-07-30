@@ -1,0 +1,40 @@
+<virtual-sensor name="Thur_Dozer_NodeHealth__chart1" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
+        <init-params>
+            <param name="input-Stream">data</param>
+            <param name="title">Node health temperature (7d)</param>
+            <param name="height">400</param>
+            <param name="width">610</param>
+            <param name="vertical-axis">℃</param>
+            <param name="history-size">5040</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
+        </init-params>
+        <output-structure>
+            <field name="data" type="binary:image/jpeg"/>
+        </output-structure>
+    </processing-class>
+    <description>backlog health status at Thur deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, TEMPERATURE from Thur_Dozer_NodeHealth__conv__1950</predicate>
+                    <predicate key="start-time">-604800000</predicate>
+                </address>
+                <query> select GENERATION_TIME, 
+                CASEWHEN(POSITION = 1, TEMPERATURE, null) as 1, 
+                CASEWHEN(POSITION = 2, TEMPERATURE, null) as 2, 
+                CASEWHEN(POSITION = 3, TEMPERATURE, null) as 3, 
+                CASEWHEN(POSITION = 4, TEMPERATURE, null) as 4, 
+                CASEWHEN(POSITION = 5, TEMPERATURE, null) as 5, 
+                CASEWHEN(POSITION = 6, TEMPERATURE, null) as 6 
+                from wrapper where GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
