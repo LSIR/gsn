@@ -1,23 +1,23 @@
-<virtual-sensor name="Matterhorn_pos0_BackLogStatus__chart1" priority="10" >
+<virtual-sensor name="Matterhorn_pos0_BackLogStatus__chart2" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Backlog queue size (7d)</param>
+            <param name="title">Sqlite3 packet store time (7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
-            <param name="vertical-axis">#</param>
+            <param name="vertical-axis">ms</param>
             <param name="history-size">10080</param>
-            <param name="time-stream-name">TIMESTAMP</param>
+            <param name="time-stream-name">GENERATION_TIME</param>
         </init-params>
         <output-structure>
             <field name="data" type="binary:image/jpeg"/>
         </output-structure>
     </processing-class>
-    <description>backlog queue size chart from Matterhorn deployment at position 0</description>
+    <description>backlog health status from position 0 at Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
-        <predicate key="type">PermaSense Matterhorn deployment</predicate>
+        <predicate key="type">PermaSense Matterhorn test deployment</predicate>
         <predicate key="LATITUDE">45.980126</predicate>
         <predicate key="LONGITUDE">7.670109</predicate>
     </addressing>
@@ -26,10 +26,14 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select POSITION, TIMESTAMP, BACKLOG_DB_ENTRIES from Matterhorn_BackLogStatus__mapped__1950</predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, DB_STORE_TIME_MIN, DB_STORE_TIME_MEAN, DB_STORE_TIME_MAX from Matterhorn_BackLogStatus__mapped__1946</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select * from wrapper where position=0 </query>
+                <query> select GENERATION_TIME, 
+                DB_STORE_TIME_MIN as min, 
+                DB_STORE_TIME_MEAN as mean, 
+                DB_STORE_TIME_MAX as max 
+                from wrapper where POSITION = 0 and GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000</query>
             </source>
             <query> select * from source </query>
         </stream>
