@@ -107,6 +107,9 @@
             <!-- <jvmarg value="-server"/> Sometimes on windows compaines about a missing dll.-->
             <jvmarg value="-Dcom.sun.management.jmxremote"/>
             <!-- For JDK5 profiling <jvmarg value="-Xrunhprof:heap=sites,depth=15,force=n"/> -->
+        	<!-- disable Java's DNS caching to respect dynamic IPs from DynDns -->
+            <jvmarg value="-Dsun.net.inetaddr.ttl=0"/>
+            <jvmarg value="-Dsun.net.inetaddr.negative.ttl=0"/>
         </java>
     </target>
 
