@@ -51,6 +51,7 @@ public class DataDownload extends HttpServlet {
             TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
             boolean responseCVS = false;
             boolean wantTimeStamp = false;
+            boolean wantPk = false;
             boolean commonReq = true;
             boolean groupByTimed = false;
 
@@ -93,8 +94,12 @@ public class DataDownload extends HttpServlet {
                         if (fields[i].equals("timed")) {
                             wantTimeStamp = true;
                         }
+                        if ("pk".equalsIgnoreCase(fields[i]))
+                            wantPk = true;
                         generated_request_query += ", " + fields[i];
                     }
+                    if ( ! wantPk )
+                        generated_request_query += ", pk";    
                 }
             } else {
                 if (req.getParameter("fields") == null) {
@@ -105,8 +110,12 @@ public class DataDownload extends HttpServlet {
                         if (fields[i].equals("timed")) {
                             wantTimeStamp = true;
                         }
+                        if ("pk".equalsIgnoreCase(fields[i]))
+                            wantPk = true;
                         generated_request_query += ", " + fields[i];
                     }
+                    if ( ! wantPk )
+                        generated_request_query += ", pk";
                 }
                 if (req.getParameter("groupby") != null) {
                     if (req.getParameter("groupby").equals("timed")) {
@@ -208,7 +217,7 @@ public class DataDownload extends HttpServlet {
 
 
                 try {
-                    result = Main.getStorage(vsName).streamedExecuteQuery(new String(generated_request_query), false);
+                    result = Main.getStorage(vsName).streamedExecuteQuery(generated_request_query, true);
                 } catch (SQLException e) {
                     logger.error("ERROR IN EXECUTING, query: " + generated_request_query);
                     logger.error(e.getMessage(), e);

@@ -100,10 +100,16 @@ public class MultiDataDownload extends HttpServlet {
 			vsname = new StringBuilder();
 			vsname.append(vsAndFieldsEntry.getKey());
 			fieldsIterator = vsAndFieldsEntry.getValue().iterator();
-			while (fieldsIterator.hasNext()) {
+			boolean hasPk = false;
+            while (fieldsIterator.hasNext()) {
 				vsname.append(":");
-				vsname.append(fieldsIterator.next());
+				String n = fieldsIterator.next();
+                vsname.append(n);
+                if ("pk".equalsIgnoreCase(n)) 
+                    hasPk = true;
 			}
+            if (! hasPk) 
+                vsname.append(":pk");
 			vsnames.add(vsname.toString());
 		}
 		parameterMap.put("vsname", vsnames.toArray(new String[] {}));
