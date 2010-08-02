@@ -56,6 +56,16 @@ public class RestStreamHanlder extends HttpServlet {
             final DefaultDistributionRequest streamingReq;
             try {
                 URLParser parser = new URLParser(request);
+                //
+                String vsName = parser.getVSensorConfig().getName();
+                User user = GeneralServicesAPI.getInstance().doLogin(request.getParameter("username"), request.getParameter("password"));
+                if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)){
+                    if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+                        response.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+                        return;
+                    }
+                }
+                //
                 RestDelivery deliverySystem = new RestDelivery(continuation);
                 streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
                 DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);

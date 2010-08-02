@@ -1,11 +1,15 @@
 package gsn.http.rest;
 
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.security.KeyStore;
 import java.sql.SQLException;
 
 import org.apache.http.HttpResponse;
@@ -17,6 +21,9 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -73,7 +80,16 @@ public class RestRemoteWrapper extends AbstractWrapper {
         try {
             initParams = new RemoteWrapperParamParser(getActiveAddressBean(), false);
             httpclient = new DefaultHttpClient(getHttpClientParams(initParams.getTimeout()));
-
+            // Init the http client
+            KeyStore trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(new FileInputStream(new File("conf/servertestkeystore")), Main.getContainerConfig().getSSLKeyStorePassword().toCharArray());
+            SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
+            socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            Scheme sch = new Scheme("https", socketFactory, Main.getContainerConfig().getSSLPort());
+            Scheme plainsch = new Scheme("http", PlainSocketFactory.getSocketFactory(), Main.getContainerConfig().getContainerPort());
+            httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+            httpclient.getConnectionManager().getSchemeRegistry().register(plainsch);
+            //
             lastReceivedTimestamp = initParams.getStartTime();
             structure = connectToRemote();
         } catch (Exception e) {
@@ -86,7 +102,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
 
     public DataField[] connectToRemote() throws IOException, ClassNotFoundException {
         // Create the GET request
-        HttpGet httpget = new HttpGet(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
+        HttpGet httpget = new HttpGet(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp)+"?username=" + initParams.getUsername() + "&password=" + initParams.getPassword());
         // Create local execution context
         HttpContext localContext = new BasicHttpContext();
         //
