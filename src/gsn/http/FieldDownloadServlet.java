@@ -10,13 +10,17 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import gsn.http.ac.DataSource;
+import gsn.http.ac.User;
 import org.apache.log4j.Logger;
 
 //path="/WEB-INF/file_not_found.jpg"
@@ -31,7 +35,24 @@ public class FieldDownloadServlet extends HttpServlet {
 
 	public void doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 		String vsName = req.getParameter( "vs" );
-		if ( vsName == null || (vsName =vsName.trim( ).toLowerCase()).length( ) == 0 ) {
+
+        //
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
+
+        res.setHeader("Cache-Control","no-store");
+        res.setDateHeader("Expires", 0);
+        res.setHeader("Pragma","no-cache");
+
+        if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)) {
+            if(user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName))) {
+                res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+                return;
+            }
+        }
+        //
+
+        if ( vsName == null || (vsName =vsName.trim( ).toLowerCase()).length( ) == 0 ) {
 			res.sendError( WebConstants.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
 			return;
 		}
