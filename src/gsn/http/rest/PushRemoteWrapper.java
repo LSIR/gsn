@@ -4,10 +4,14 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.KeyStore;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import gsn.Main;
 
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
@@ -17,6 +21,9 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.CoreProtocolPNames;
@@ -60,7 +67,19 @@ public class PushRemoteWrapper extends AbstractWrapper {
             postParameters = new ArrayList<NameValuePair>();
             postParameters.add(new BasicNameValuePair(PushDelivery.NOTIFICATION_ID_KEY, Double.toString(uid)));
             postParameters.add(new BasicNameValuePair(PushDelivery.LOCAL_CONTACT_POINT, initParams.getLocalContactPoint()));
+            postParameters.add(new BasicNameValuePair("username", initParams.getUsername()));
+            postParameters.add(new BasicNameValuePair("password", initParams.getPassword()));
 
+            // Init the http client
+            KeyStore trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(new FileInputStream(new File("conf/servertestkeystore")), Main.getContainerConfig().getSSLKeyStorePassword().toCharArray());
+            SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
+            socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            Scheme sch = new Scheme("https", socketFactory, Main.getContainerConfig().getSSLPort());
+            Scheme plainsch = new Scheme("http", PlainSocketFactory.getSocketFactory(), Main.getContainerConfig().getContainerPort());
+            httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+            httpclient.getConnectionManager().getSchemeRegistry().register(plainsch);
+            //
             lastReceivedTimestamp = initParams.getStartTime();
             structure = registerAndGetStructure();
         } catch (Exception e) {

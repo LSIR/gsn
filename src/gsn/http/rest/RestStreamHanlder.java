@@ -1,8 +1,13 @@
 package gsn.http.rest;
 
 import gsn.DataDistributer;
+import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
+import gsn.http.WebConstants;
+import gsn.http.ac.DataSource;
+import gsn.http.ac.GeneralServicesAPI;
+import gsn.http.ac.User;
 import gsn.storage.SQLUtils;
 import gsn.storage.SQLValidator;
 import gsn.utils.Helpers;
@@ -11,9 +16,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.StringTokenizer;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -35,6 +38,7 @@ public class RestStreamHanlder extends HttpServlet {
 	private static transient Logger       logger     = Logger.getLogger ( RestStreamHanlder.class );
 
 	public void doGet ( HttpServletRequest request , HttpServletResponse response ) throws ServletException{
+
 
 		Object is2ndPass = request.getAttribute("2ndPass");
 		Continuation continuation = ContinuationSupport.getContinuation(request);
@@ -78,8 +82,18 @@ public class RestStreamHanlder extends HttpServlet {
 	 * This happens at the server
 	 */
 	public void doPost ( HttpServletRequest request , HttpServletResponse response ) throws ServletException  {
-		try {
+        try {
 			URLParser parser = new URLParser(request);
+            String vsName = parser.getVSensorConfig().getName();
+            //
+            User user = GeneralServicesAPI.getInstance().doLogin(request.getParameter("username"), request.getParameter("password"));
+            if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)){
+                if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+                    response.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+                    return;
+                }
+            }
+            //
 			Double notificationId = Double.parseDouble(request.getParameter(PushDelivery.NOTIFICATION_ID_KEY));
 			String localContactPoint = request.getParameter(PushDelivery.LOCAL_CONTACT_POINT);
 			if (localContactPoint == null) {
