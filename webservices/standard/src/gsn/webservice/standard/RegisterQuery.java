@@ -33,6 +33,50 @@
         
 
                         /**
+                        * field for AcDetails
+                        */
+
+                        
+                                    protected gsn.webservice.standard.xsd.GSNWebService_ACDetails localAcDetails ;
+                                
+                           /*  This tracker boolean wil be used to detect whether the user called the set method
+                          *   for this attribute. It will be used to determine whether to include this field
+                           *   in the serialized XML
+                           */
+                           protected boolean localAcDetailsTracker = false ;
+                           
+
+                           /**
+                           * Auto generated getter method
+                           * @return gsn.webservice.standard.xsd.GSNWebService_ACDetails
+                           */
+                           public  gsn.webservice.standard.xsd.GSNWebService_ACDetails getAcDetails(){
+                               return localAcDetails;
+                           }
+
+                           
+                        
+                            /**
+                               * Auto generated setter method
+                               * @param param AcDetails
+                               */
+                               public void setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails param){
+                            
+                                       if (param != null){
+                                          //update the setting tracker
+                                          localAcDetailsTracker = true;
+                                       } else {
+                                          localAcDetailsTracker = false;
+                                              
+                                       }
+                                   
+                                            this.localAcDetails=param;
+                                    
+
+                               }
+                            
+
+                        /**
                         * field for OutputStructure
                         * This was an Array!
                         */
@@ -380,7 +424,13 @@
                                       else {
                                           throw new org.apache.axis2.databinding.ADBException("required attribute localQuery is null");
                                       }
-                                     if (localOutputStructureTracker){
+                                     if (localAcDetailsTracker){
+                                            if (localAcDetails==null){
+                                                 throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
+                                            }
+                                           localAcDetails.serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails"),
+                                               factory,xmlWriter);
+                                        } if (localOutputStructureTracker){
                                        if (localOutputStructure!=null){
                                             for (int i = 0;i < localOutputStructure.length;i++){
                                                 if (localOutputStructure[i] != null){
@@ -603,7 +653,16 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                 if (localOutputStructureTracker){
+                 if (localAcDetailsTracker){
+                            elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
+                                                                      "acDetails"));
+                            
+                            
+                                    if (localAcDetails==null){
+                                         throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
+                                    }
+                                    elementList.add(localAcDetails);
+                                } if (localOutputStructureTracker){
                              if (localOutputStructure!=null) {
                                  for (int i = 0;i < localOutputStructure.length;i++){
 
@@ -769,10 +828,25 @@
                     
                     reader.next();
                 
-                        java.util.ArrayList list1 = new java.util.ArrayList();
-                    
                         java.util.ArrayList list2 = new java.util.ArrayList();
                     
+                        java.util.ArrayList list3 = new java.util.ArrayList();
+                    
+                                    
+                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails").equals(reader.getName())){
+                                
+                                                object.setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails.Factory.parse(reader));
+                                              
+                                        reader.next();
+                                    
+                              }  // End of if for expected property start element
+                                
+                                    else {
+                                        
+                                    }
+                                
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
@@ -781,11 +855,11 @@
                                     
                                     
                                     // Process the array and step past its final element's end.
-                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_DataField.Factory.parse(reader));
+                                    list2.add(gsn.webservice.standard.xsd.GSNWebService_DataField.Factory.parse(reader));
                                                                 
                                                         //loop until we find a start element that is not part of this array
-                                                        boolean loopDone1 = false;
-                                                        while(!loopDone1){
+                                                        boolean loopDone2 = false;
+                                                        while(!loopDone2){
                                                             // We should be at the end element, but make sure
                                                             while (!reader.isEndElement())
                                                                 reader.next();
@@ -796,13 +870,13 @@
                                                                 reader.next();
                                                             if (reader.isEndElement()){
                                                                 //two continuous end elements means we are exiting the xml structure
-                                                                loopDone1 = true;
+                                                                loopDone2 = true;
                                                             } else {
                                                                 if (new javax.xml.namespace.QName("http://standard.webservice.gsn","outputStructure").equals(reader.getName())){
-                                                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_DataField.Factory.parse(reader));
+                                                                    list2.add(gsn.webservice.standard.xsd.GSNWebService_DataField.Factory.parse(reader));
                                                                         
                                                                 }else{
-                                                                    loopDone1 = true;
+                                                                    loopDone2 = true;
                                                                 }
                                                             }
                                                         }
@@ -811,7 +885,7 @@
                                                         object.setOutputStructure((gsn.webservice.standard.xsd.GSNWebService_DataField[])
                                                             org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
                                                                 gsn.webservice.standard.xsd.GSNWebService_DataField.class,
-                                                                list1));
+                                                                list2));
                                                             
                               }  // End of if for expected property start element
                                 
@@ -827,11 +901,11 @@
                                     
                                     
                                     // Process the array and step past its final element's end.
-                                    list2.add(reader.getElementText());
+                                    list3.add(reader.getElementText());
                                             
                                             //loop until we find a start element that is not part of this array
-                                            boolean loopDone2 = false;
-                                            while(!loopDone2){
+                                            boolean loopDone3 = false;
+                                            while(!loopDone3){
                                                 // Ensure we are at the EndElement
                                                 while (!reader.isEndElement()){
                                                     reader.next();
@@ -843,20 +917,20 @@
                                                     reader.next();
                                                 if (reader.isEndElement()){
                                                     //two continuous end elements means we are exiting the xml structure
-                                                    loopDone2 = true;
+                                                    loopDone3 = true;
                                                 } else {
                                                     if (new javax.xml.namespace.QName("http://standard.webservice.gsn","vsnames").equals(reader.getName())){
-                                                         list2.add(reader.getElementText());
+                                                         list3.add(reader.getElementText());
                                                         
                                                     }else{
-                                                        loopDone2 = true;
+                                                        loopDone3 = true;
                                                     }
                                                 }
                                             }
                                             // call the converter utility  to convert and set the array
                                             
                                                     object.setVsnames((java.lang.String[])
-                                                        list2.toArray(new java.lang.String[list2.size()]));
+                                                        list3.toArray(new java.lang.String[list3.size()]));
                                                 
                               }  // End of if for expected property start element
                                 

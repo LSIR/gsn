@@ -33,6 +33,50 @@
         
 
                         /**
+                        * field for AcDetails
+                        */
+
+                        
+                                    protected gsn.webservice.standard.xsd.GSNWebService_ACDetails localAcDetails ;
+                                
+                           /*  This tracker boolean wil be used to detect whether the user called the set method
+                          *   for this attribute. It will be used to determine whether to include this field
+                           *   in the serialized XML
+                           */
+                           protected boolean localAcDetailsTracker = false ;
+                           
+
+                           /**
+                           * Auto generated getter method
+                           * @return gsn.webservice.standard.xsd.GSNWebService_ACDetails
+                           */
+                           public  gsn.webservice.standard.xsd.GSNWebService_ACDetails getAcDetails(){
+                               return localAcDetails;
+                           }
+
+                           
+                        
+                            /**
+                               * Auto generated setter method
+                               * @param param AcDetails
+                               */
+                               public void setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails param){
+                            
+                                       if (param != null){
+                                          //update the setting tracker
+                                          localAcDetailsTracker = true;
+                                       } else {
+                                          localAcDetailsTracker = false;
+                                              
+                                       }
+                                   
+                                            this.localAcDetails=param;
+                                    
+
+                               }
+                            
+
+                        /**
                         * field for FieldSelector
                         * This was an Array!
                         */
@@ -496,7 +540,13 @@
 
                                             
                                       }
-                                     if (localFieldSelectorTracker){
+                                     if (localAcDetailsTracker){
+                                            if (localAcDetails==null){
+                                                 throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
+                                            }
+                                           localAcDetails.serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails"),
+                                               factory,xmlWriter);
+                                        } if (localFieldSelectorTracker){
                                        if (localFieldSelector!=null){
                                             for (int i = 0;i < localFieldSelector.length;i++){
                                                 if (localFieldSelector[i] != null){
@@ -700,7 +750,16 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                 if (localFieldSelectorTracker){
+                 if (localAcDetailsTracker){
+                            elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
+                                                                      "acDetails"));
+                            
+                            
+                                    if (localAcDetails==null){
+                                         throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
+                                    }
+                                    elementList.add(localAcDetails);
+                                } if (localFieldSelectorTracker){
                              if (localFieldSelector!=null) {
                                  for (int i = 0;i < localFieldSelector.length;i++){
 
@@ -917,50 +976,19 @@
                     
                     reader.next();
                 
-                        java.util.ArrayList list1 = new java.util.ArrayList();
-                    
                         java.util.ArrayList list2 = new java.util.ArrayList();
+                    
+                        java.util.ArrayList list3 = new java.util.ArrayList();
                     
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","fieldSelector").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails").equals(reader.getName())){
                                 
+                                                object.setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails.Factory.parse(reader));
+                                              
+                                        reader.next();
                                     
-                                    
-                                    // Process the array and step past its final element's end.
-                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_FieldSelector.Factory.parse(reader));
-                                                                
-                                                        //loop until we find a start element that is not part of this array
-                                                        boolean loopDone1 = false;
-                                                        while(!loopDone1){
-                                                            // We should be at the end element, but make sure
-                                                            while (!reader.isEndElement())
-                                                                reader.next();
-                                                            // Step out of this element
-                                                            reader.next();
-                                                            // Step to next element event.
-                                                            while (!reader.isStartElement() && !reader.isEndElement())
-                                                                reader.next();
-                                                            if (reader.isEndElement()){
-                                                                //two continuous end elements means we are exiting the xml structure
-                                                                loopDone1 = true;
-                                                            } else {
-                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn","fieldSelector").equals(reader.getName())){
-                                                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_FieldSelector.Factory.parse(reader));
-                                                                        
-                                                                }else{
-                                                                    loopDone1 = true;
-                                                                }
-                                                            }
-                                                        }
-                                                        // call the converter utility  to convert and set the array
-                                                        
-                                                        object.setFieldSelector((gsn.webservice.standard.xsd.GSNWebService_FieldSelector[])
-                                                            org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
-                                                                gsn.webservice.standard.xsd.GSNWebService_FieldSelector.class,
-                                                                list1));
-                                                            
                               }  // End of if for expected property start element
                                 
                                     else {
@@ -970,12 +998,12 @@
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","conditions").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","fieldSelector").equals(reader.getName())){
                                 
                                     
                                     
                                     // Process the array and step past its final element's end.
-                                    list2.add(gsn.http.datarequest.xsd.StandardCriterion.Factory.parse(reader));
+                                    list2.add(gsn.webservice.standard.xsd.GSNWebService_FieldSelector.Factory.parse(reader));
                                                                 
                                                         //loop until we find a start element that is not part of this array
                                                         boolean loopDone2 = false;
@@ -992,8 +1020,8 @@
                                                                 //two continuous end elements means we are exiting the xml structure
                                                                 loopDone2 = true;
                                                             } else {
-                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn","conditions").equals(reader.getName())){
-                                                                    list2.add(gsn.http.datarequest.xsd.StandardCriterion.Factory.parse(reader));
+                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn","fieldSelector").equals(reader.getName())){
+                                                                    list2.add(gsn.webservice.standard.xsd.GSNWebService_FieldSelector.Factory.parse(reader));
                                                                         
                                                                 }else{
                                                                     loopDone2 = true;
@@ -1002,10 +1030,56 @@
                                                         }
                                                         // call the converter utility  to convert and set the array
                                                         
+                                                        object.setFieldSelector((gsn.webservice.standard.xsd.GSNWebService_FieldSelector[])
+                                                            org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
+                                                                gsn.webservice.standard.xsd.GSNWebService_FieldSelector.class,
+                                                                list2));
+                                                            
+                              }  // End of if for expected property start element
+                                
+                                    else {
+                                        
+                                    }
+                                
+                                    
+                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","conditions").equals(reader.getName())){
+                                
+                                    
+                                    
+                                    // Process the array and step past its final element's end.
+                                    list3.add(gsn.http.datarequest.xsd.StandardCriterion.Factory.parse(reader));
+                                                                
+                                                        //loop until we find a start element that is not part of this array
+                                                        boolean loopDone3 = false;
+                                                        while(!loopDone3){
+                                                            // We should be at the end element, but make sure
+                                                            while (!reader.isEndElement())
+                                                                reader.next();
+                                                            // Step out of this element
+                                                            reader.next();
+                                                            // Step to next element event.
+                                                            while (!reader.isStartElement() && !reader.isEndElement())
+                                                                reader.next();
+                                                            if (reader.isEndElement()){
+                                                                //two continuous end elements means we are exiting the xml structure
+                                                                loopDone3 = true;
+                                                            } else {
+                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn","conditions").equals(reader.getName())){
+                                                                    list3.add(gsn.http.datarequest.xsd.StandardCriterion.Factory.parse(reader));
+                                                                        
+                                                                }else{
+                                                                    loopDone3 = true;
+                                                                }
+                                                            }
+                                                        }
+                                                        // call the converter utility  to convert and set the array
+                                                        
                                                         object.setConditions((gsn.http.datarequest.xsd.StandardCriterion[])
                                                             org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
                                                                 gsn.http.datarequest.xsd.StandardCriterion.class,
-                                                                list2));
+                                                                list3));
                                                             
                               }  // End of if for expected property start element
                                 

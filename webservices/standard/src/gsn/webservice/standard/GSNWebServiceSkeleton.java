@@ -145,8 +145,11 @@ public class GSNWebServiceSkeleton {
      * Auto generated method signature
      */
 
-    public gsn.webservice.standard.ListWrapperURLsResponse listWrapperURLs() {
+    public gsn.webservice.standard.ListWrapperURLsResponse listWrapperURLs(gsn.webservice.standard.ListWrapperURLs listWrapperUrls) {
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#listWrapperURLs");
+        // If AC is enabled, check the username/password
+        //TOOD...
+        //
         ListWrapperURLsResponse response = new ListWrapperURLsResponse();
         Iterator<VSensorConfig> iter = Mappings.getAllVSensorConfigs();
         VSensorConfig config;
@@ -576,7 +579,7 @@ public class GSNWebServiceSkeleton {
      * Auto generated method signature
      */
 
-    public gsn.webservice.standard.GetContainerInfoResponse getContainerInfo() {
+    public gsn.webservice.standard.GetContainerInfoResponse getContainerInfo(gsn.webservice.standard.GetContainerInfo getContainerInfo) {
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getContainerInfo");
         GetContainerInfoResponse response = new GetContainerInfoResponse();
         GSNWebService_ContainerDetails cd = new GSNWebService_ContainerDetails();
@@ -603,7 +606,7 @@ public class GSNWebServiceSkeleton {
      * Auto generated method signature
      */
 
-    public gsn.webservice.standard.ListVirtualSensorNamesResponse listVirtualSensorNames() {
+    public gsn.webservice.standard.ListVirtualSensorNamesResponse listVirtualSensorNames(gsn.webservice.standard.ListVirtualSensorNames listVirtualSensorNames) {
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#listVirtualSensorNames");
         ListVirtualSensorNamesResponse response = new ListVirtualSensorNamesResponse();
         ArrayList<String> vsnames = new ArrayList<String>();

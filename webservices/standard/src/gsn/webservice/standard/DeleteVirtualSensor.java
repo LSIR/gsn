@@ -33,6 +33,50 @@
         
 
                         /**
+                        * field for AcDetails
+                        */
+
+                        
+                                    protected gsn.webservice.standard.xsd.GSNWebService_ACDetails localAcDetails ;
+                                
+                           /*  This tracker boolean wil be used to detect whether the user called the set method
+                          *   for this attribute. It will be used to determine whether to include this field
+                           *   in the serialized XML
+                           */
+                           protected boolean localAcDetailsTracker = false ;
+                           
+
+                           /**
+                           * Auto generated getter method
+                           * @return gsn.webservice.standard.xsd.GSNWebService_ACDetails
+                           */
+                           public  gsn.webservice.standard.xsd.GSNWebService_ACDetails getAcDetails(){
+                               return localAcDetails;
+                           }
+
+                           
+                        
+                            /**
+                               * Auto generated setter method
+                               * @param param AcDetails
+                               */
+                               public void setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails param){
+                            
+                                       if (param != null){
+                                          //update the setting tracker
+                                          localAcDetailsTracker = true;
+                                       } else {
+                                          localAcDetailsTracker = false;
+                                              
+                                       }
+                                   
+                                            this.localAcDetails=param;
+                                    
+
+                               }
+                            
+
+                        /**
                         * field for Vsname
                         * This was an Attribute!
                         */
@@ -172,7 +216,13 @@
                                       else {
                                           throw new org.apache.axis2.databinding.ADBException("required attribute localVsname is null");
                                       }
-                                    
+                                     if (localAcDetailsTracker){
+                                            if (localAcDetails==null){
+                                                 throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
+                                            }
+                                           localAcDetails.serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails"),
+                                               factory,xmlWriter);
+                                        }
                     xmlWriter.writeEndElement();
                
 
@@ -334,7 +384,16 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                
+                 if (localAcDetailsTracker){
+                            elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
+                                                                      "acDetails"));
+                            
+                            
+                                    if (localAcDetails==null){
+                                         throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
+                                    }
+                                    elementList.add(localAcDetails);
+                                }
                             attribList.add(
                             new javax.xml.namespace.QName("http://standard.webservice.gsn","vsname"));
                             
@@ -433,6 +492,28 @@
                     
                     reader.next();
                 
+                                    
+                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
+                                
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails").equals(reader.getName())){
+                                
+                                                object.setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails.Factory.parse(reader));
+                                              
+                                        reader.next();
+                                    
+                              }  // End of if for expected property start element
+                                
+                                    else {
+                                        
+                                    }
+                                  
+                            while (!reader.isStartElement() && !reader.isEndElement())
+                                reader.next();
+                            
+                                if (reader.isStartElement())
+                                // A start element we are not expecting indicates a trailing invalid property
+                                throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                            
 
 
 

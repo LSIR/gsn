@@ -1,6 +1,6 @@
 
 /**
- * GetVirtualSensorDetails.java
+ * GetContainerInfo.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
@@ -10,15 +10,15 @@
             
 
             /**
-            *  GetVirtualSensorDetails bean class
+            *  GetContainerInfo bean class
             */
         
-        public  class GetVirtualSensorDetails
+        public  class GetContainerInfo
         implements org.apache.axis2.databinding.ADBBean{
         
                 public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
                 "http://standard.webservice.gsn",
-                "getVirtualSensorDetails",
+                "getContainerInfo",
                 "ns3");
 
             
@@ -33,113 +33,44 @@
         
 
                         /**
-                        * field for DetailsType
-                        * This was an Array!
+                        * field for AcDetails
                         */
 
                         
-                                    protected gsn.webservice.standard.xsd.GSNWebService_DetailsType[] localDetailsType ;
+                                    protected gsn.webservice.standard.xsd.GSNWebService_ACDetails localAcDetails ;
                                 
                            /*  This tracker boolean wil be used to detect whether the user called the set method
                           *   for this attribute. It will be used to determine whether to include this field
                            *   in the serialized XML
                            */
-                           protected boolean localDetailsTypeTracker = false ;
+                           protected boolean localAcDetailsTracker = false ;
                            
 
                            /**
                            * Auto generated getter method
-                           * @return gsn.webservice.standard.xsd.GSNWebService_DetailsType[]
+                           * @return gsn.webservice.standard.xsd.GSNWebService_ACDetails
                            */
-                           public  gsn.webservice.standard.xsd.GSNWebService_DetailsType[] getDetailsType(){
-                               return localDetailsType;
-                           }
-
-                           
-                        
-
-
-                               
-                              /**
-                               * validate the array for DetailsType
-                               */
-                              protected void validateDetailsType(gsn.webservice.standard.xsd.GSNWebService_DetailsType[] param){
-                             
-                              }
-
-
-                             /**
-                              * Auto generated setter method
-                              * @param param DetailsType
-                              */
-                              public void setDetailsType(gsn.webservice.standard.xsd.GSNWebService_DetailsType[] param){
-                              
-                                   validateDetailsType(param);
-
-                               
-                                          if (param != null){
-                                             //update the setting tracker
-                                             localDetailsTypeTracker = true;
-                                          } else {
-                                             localDetailsTypeTracker = false;
-                                                 
-                                          }
-                                      
-                                      this.localDetailsType=param;
-                              }
-
-                               
-                             
-                             /**
-                             * Auto generated add method for the array for convenience
-                             * @param param gsn.webservice.standard.xsd.GSNWebService_DetailsType
-                             */
-                             public void addDetailsType(gsn.webservice.standard.xsd.GSNWebService_DetailsType param){
-                                   if (localDetailsType == null){
-                                   localDetailsType = new gsn.webservice.standard.xsd.GSNWebService_DetailsType[]{};
-                                   }
-
-                            
-                                 //update the setting tracker
-                                localDetailsTypeTracker = true;
-                            
-
-                               java.util.List list =
-                            org.apache.axis2.databinding.utils.ConverterUtil.toList(localDetailsType);
-                               list.add(param);
-                               this.localDetailsType =
-                             (gsn.webservice.standard.xsd.GSNWebService_DetailsType[])list.toArray(
-                            new gsn.webservice.standard.xsd.GSNWebService_DetailsType[list.size()]);
-
-                             }
-                             
-
-                        /**
-                        * field for Vsname
-                        * This was an Attribute!
-                        */
-
-                        
-                                    protected java.lang.String localVsname ;
-                                
-
-                           /**
-                           * Auto generated getter method
-                           * @return java.lang.String
-                           */
-                           public  java.lang.String getVsname(){
-                               return localVsname;
+                           public  gsn.webservice.standard.xsd.GSNWebService_ACDetails getAcDetails(){
+                               return localAcDetails;
                            }
 
                            
                         
                             /**
                                * Auto generated setter method
-                               * @param param Vsname
+                               * @param param AcDetails
                                */
-                               public void setVsname(java.lang.String param){
+                               public void setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails param){
                             
-                                            this.localVsname=param;
+                                       if (param != null){
+                                          //update the setting tracker
+                                          localAcDetailsTracker = true;
+                                       } else {
+                                          localAcDetailsTracker = false;
+                                              
+                                       }
+                                   
+                                            this.localAcDetails=param;
                                     
 
                                }
@@ -177,7 +108,7 @@
                        new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       GetVirtualSensorDetails.this.serialize(MY_QNAME,factory,xmlWriter);
+                       GetContainerInfo.this.serialize(MY_QNAME,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
@@ -231,48 +162,23 @@
                    java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://standard.webservice.gsn");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":getVirtualSensorDetails",
+                           namespacePrefix+":getContainerInfo",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "getVirtualSensorDetails",
+                           "getContainerInfo",
                            xmlWriter);
                    }
 
                
                    }
-               
-                                            if (localVsname != null){
-                                        
-                                                writeAttribute("http://standard.webservice.gsn",
-                                                         "vsname",
-                                                         org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localVsname), xmlWriter);
-
-                                            
-                                      }
-                                    
-                                      else {
-                                          throw new org.apache.axis2.databinding.ADBException("required attribute localVsname is null");
-                                      }
-                                     if (localDetailsTypeTracker){
-                                       if (localDetailsType!=null){
-                                            for (int i = 0;i < localDetailsType.length;i++){
-                                                if (localDetailsType[i] != null){
-                                                 localDetailsType[i].serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn","detailsType"),
-                                                           factory,xmlWriter);
-                                                } else {
-                                                   
-                                                        // we don't have to do any thing since minOccures is zero
-                                                    
-                                                }
-
+                if (localAcDetailsTracker){
+                                            if (localAcDetails==null){
+                                                 throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
                                             }
-                                     } else {
-                                        
-                                               throw new org.apache.axis2.databinding.ADBException("detailsType cannot be null!!");
-                                        
-                                    }
-                                 }
+                                           localAcDetails.serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails"),
+                                               factory,xmlWriter);
+                                        }
                     xmlWriter.writeEndElement();
                
 
@@ -434,33 +340,16 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                 if (localDetailsTypeTracker){
-                             if (localDetailsType!=null) {
-                                 for (int i = 0;i < localDetailsType.length;i++){
-
-                                    if (localDetailsType[i] != null){
-                                         elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
-                                                                          "detailsType"));
-                                         elementList.add(localDetailsType[i]);
-                                    } else {
-                                        
-                                                // nothing to do
-                                            
-                                    }
-
-                                 }
-                             } else {
-                                 
-                                        throw new org.apache.axis2.databinding.ADBException("detailsType cannot be null!!");
-                                    
-                             }
-
-                        }
-                            attribList.add(
-                            new javax.xml.namespace.QName("http://standard.webservice.gsn","vsname"));
+                 if (localAcDetailsTracker){
+                            elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
+                                                                      "acDetails"));
                             
-                                      attribList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localVsname));
-                                
+                            
+                                    if (localAcDetails==null){
+                                         throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
+                                    }
+                                    elementList.add(localAcDetails);
+                                }
 
                 return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
             
@@ -485,9 +374,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static GetVirtualSensorDetails parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            GetVirtualSensorDetails object =
-                new GetVirtualSensorDetails();
+        public static GetContainerInfo parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            GetContainerInfo object =
+                new GetContainerInfo();
 
             int event;
             java.lang.String nillableValue = null;
@@ -511,10 +400,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"getVirtualSensorDetails".equals(type)){
+                            if (!"getContainerInfo".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (GetVirtualSensorDetails)gsn.webservice.standard.xsd.ExtensionMapper.getTypeObject(
+                                return (GetContainerInfo)gsn.webservice.standard.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -533,69 +422,18 @@
                 
 
                  
-                    // handle attribute "vsname"
-                    java.lang.String tempAttribVsname =
-                        
-                                reader.getAttributeValue("http://standard.webservice.gsn","vsname");
-                            
-                   if (tempAttribVsname!=null){
-                         java.lang.String content = tempAttribVsname;
-                        
-                                                 object.setVsname(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(tempAttribVsname));
-                                            
-                    } else {
-                       
-                               throw new org.apache.axis2.databinding.ADBException("Required attribute vsname is missing");
-                           
-                    }
-                    handledAttributes.add("vsname");
-                    
                     
                     reader.next();
                 
-                        java.util.ArrayList list1 = new java.util.ArrayList();
-                    
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","detailsType").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails").equals(reader.getName())){
                                 
+                                                object.setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails.Factory.parse(reader));
+                                              
+                                        reader.next();
                                     
-                                    
-                                    // Process the array and step past its final element's end.
-                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_DetailsType.Factory.parse(reader));
-                                                                
-                                                        //loop until we find a start element that is not part of this array
-                                                        boolean loopDone1 = false;
-                                                        while(!loopDone1){
-                                                            // We should be at the end element, but make sure
-                                                            while (!reader.isEndElement())
-                                                                reader.next();
-                                                            // Step out of this element
-                                                            reader.next();
-                                                            // Step to next element event.
-                                                            while (!reader.isStartElement() && !reader.isEndElement())
-                                                                reader.next();
-                                                            if (reader.isEndElement()){
-                                                                //two continuous end elements means we are exiting the xml structure
-                                                                loopDone1 = true;
-                                                            } else {
-                                                                if (new javax.xml.namespace.QName("http://standard.webservice.gsn","detailsType").equals(reader.getName())){
-                                                                    list1.add(gsn.webservice.standard.xsd.GSNWebService_DetailsType.Factory.parse(reader));
-                                                                        
-                                                                }else{
-                                                                    loopDone1 = true;
-                                                                }
-                                                            }
-                                                        }
-                                                        // call the converter utility  to convert and set the array
-                                                        
-                                                        object.setDetailsType((gsn.webservice.standard.xsd.GSNWebService_DetailsType[])
-                                                            org.apache.axis2.databinding.utils.ConverterUtil.convertToArray(
-                                                                gsn.webservice.standard.xsd.GSNWebService_DetailsType.class,
-                                                                list1));
-                                                            
                               }  // End of if for expected property start element
                                 
                                     else {
