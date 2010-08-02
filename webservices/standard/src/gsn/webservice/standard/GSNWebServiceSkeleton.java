@@ -9,13 +9,15 @@ package gsn.webservice.standard;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.*;
+import gsn.http.ac.GeneralServicesAPI;
+import gsn.http.ac.User;
+import gsn.http.ac.UserInteractionsAPI;
 import gsn.http.datarequest.AbstractQuery;
 import gsn.http.datarequest.LimitCriterion;
 import gsn.http.datarequest.QueriesBuilder;
 import gsn.http.datarequest.xsd.AggregationCriterion;
 import gsn.http.datarequest.xsd.StandardCriterion;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 import gsn.webservice.standard.xsd.*;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
@@ -42,12 +44,16 @@ public class GSNWebServiceSkeleton {
 
     public gsn.webservice.standard.GetVirtualSensorsDetailsResponse getVirtualSensorsDetails(gsn.webservice.standard.GetVirtualSensorsDetails getVirtualSensorsDetails) {
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getVirtualSensorsDetails");
+        //
+        User user = getUserForAC(getVirtualSensorsDetails.getAcDetails());
+        //
         GetVirtualSensorsDetailsResponse response = new GetVirtualSensorsDetailsResponse();
         //
 
         //
         HashMap<String, ArrayList<String>> vsAndFields = buildSelection(getVirtualSensorsDetails.getFieldSelector());
         for (Map.Entry<String, ArrayList<String>> selection : vsAndFields.entrySet()) {
+            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(selection.getKey()) || user.isAdmin()))) {
             VSensorConfig config = Mappings.getConfig(selection.getKey());
             if (config != null) {
                 GSNWebService_VirtualSensorDetails details = new GSNWebService_VirtualSensorDetails();
@@ -131,6 +137,7 @@ public class GSNWebServiceSkeleton {
                 }
                 response.addVirtualSensorDetails(details);
             }
+            }
         }
 
 
@@ -140,6 +147,15 @@ public class GSNWebServiceSkeleton {
         return response;
     }
 
+    private User getUserForAC(GSNWebService_ACDetails acDetails) {
+        if (Main.getContainerConfig().isAcEnabled()) {
+            if (acDetails != null) {
+                return GeneralServicesAPI.getInstance().doLogin(acDetails.getUsername(), acDetails.getPassword());
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Auto generated method signature
@@ -147,23 +163,24 @@ public class GSNWebServiceSkeleton {
 
     public gsn.webservice.standard.ListWrapperURLsResponse listWrapperURLs(gsn.webservice.standard.ListWrapperURLs listWrapperUrls) {
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#listWrapperURLs");
-        // If AC is enabled, check the username/password
-        //TOOD...
+        //
+        User user = getUserForAC(listWrapperUrls.getAcDetails());
         //
         ListWrapperURLsResponse response = new ListWrapperURLsResponse();
         Iterator<VSensorConfig> iter = Mappings.getAllVSensorConfigs();
         VSensorConfig config;
-        ArrayList<String> wrappers = new ArrayList<String>();
         while (iter.hasNext()) {
             config = iter.next();
-            for (gsn.beans.InputStream is : config.getInputStreams()) {
-                for (gsn.beans.StreamSource source : is.getSources()) {
-                    GSNWebService_WrapperURL wrapperURL = new GSNWebService_WrapperURL();
-                    wrapperURL.setVirtualSensor(config.getName());
-                    wrapperURL.setStream(is.getInputStreamName());
-                    wrapperURL.setSource(source.getAlias().toString());
-                    wrapperURL.setWrapper(source.getActiveAddressBean().getWrapper());
-                    response.addWrapperURLs(wrapperURL);
+            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(config.getName()) || user.isAdmin()))) {
+                for (gsn.beans.InputStream is : config.getInputStreams()) {
+                    for (gsn.beans.StreamSource source : is.getSources()) {
+                        GSNWebService_WrapperURL wrapperURL = new GSNWebService_WrapperURL();
+                        wrapperURL.setVirtualSensor(config.getName());
+                        wrapperURL.setStream(is.getInputStreamName());
+                        wrapperURL.setSource(source.getAlias().toString());
+                        wrapperURL.setWrapper(source.getActiveAddressBean().getWrapper());
+                        response.addWrapperURLs(wrapperURL);
+                    }
                 }
             }
         }
@@ -186,6 +203,7 @@ public class GSNWebServiceSkeleton {
         input.setTo(Long.MIN_VALUE);
         input.setFrom(Long.MIN_VALUE);
         input.setNb(1);
+        input.setAcDetails(getLatestMultiData.getAcDetails());
         //
         response.setQueryResult(getMultiData(input).getQueryResult());
         //
@@ -206,7 +224,7 @@ public class GSNWebServiceSkeleton {
         CreateVirtualSensor cvs = new CreateVirtualSensor();
         cvs.setDescriptionFileContent(createVSConfigurationFileContent(registerQuery));
         cvs.setVsname(registerQuery.getQueryName());
-
+        cvs.setAcDetails(registerQuery.getAcDetails());
         response.setStatus(createVirtualSensor(cvs).getStatus());
         //
         return response;
@@ -225,6 +243,7 @@ public class GSNWebServiceSkeleton {
         //
         DeleteVirtualSensor dvs = new DeleteVirtualSensor();
         dvs.setVsname(unregisterQuery.getQueryName());
+        dvs.setAcDetails(unregisterQuery.getAcDetails());
         response.setStatus(deleteVirtualSensor(dvs).getStatus());
         //
         return response;
@@ -238,7 +257,11 @@ public class GSNWebServiceSkeleton {
      */
 
     public gsn.webservice.standard.CreateVirtualSensorResponse createVirtualSensor(gsn.webservice.standard.CreateVirtualSensor createVirtualSensor) {
+        //
+        User user = getUserForAC(createVirtualSensor.getAcDetails());
+        //
         CreateVirtualSensorResponse response = new CreateVirtualSensorResponse();
+        if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && user.isAdmin())) {
         try {
             gsn.VSensorLoader.getInstance(gsn.Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY).loadVirtualSensor(
                     createVirtualSensor.getDescriptionFileContent(),
@@ -247,6 +270,7 @@ public class GSNWebServiceSkeleton {
             response.setStatus(true);
         } catch (Exception e) {
             logger.warn("Unable to create the configuration file (" + gsn.VSensorLoader.getVSConfigurationFilePath(createVirtualSensor.getVsname()) + ")\nCause " + e.getMessage());
+        }
         }
         return response;
     }
@@ -259,13 +283,18 @@ public class GSNWebServiceSkeleton {
 
     public gsn.webservice.standard.GetNextDataResponse getNextData(gsn.webservice.standard.GetNextData getNextData) {
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getNextData");
+        //
+        User user = getUserForAC(getNextData.getAcDetails());
+        //
         GetNextDataResponse response = new GetNextDataResponse();
         //
         QuerySession session = getSession(getNextData.getSid());
         if (session != null) {
+            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(session.vsname) || user.isAdmin()))) {
             GSNWebService_QueryResult result = getResult(session);
             //
             response.addQueryResult(result);
+            }
         } else
             throw new IllegalArgumentException("The session '" + getNextData.getSid() + "' does not exist or is closed.");
         //
@@ -342,11 +371,12 @@ public class GSNWebServiceSkeleton {
      */
 
     public gsn.webservice.standard.GetMultiDataResponse getMultiData(gsn.webservice.standard.GetMultiData getMultiData) {
-
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getMultiData");
+        //
+        User user = getUserForAC(getMultiData.getAcDetails());
+        //
         GetMultiDataResponse response = new GetMultiDataResponse();
         //
-
         Map<String, String[]> requestParameters = new HashMap<String, String[]>();
 
         // virtual sensor and field selection
@@ -356,12 +386,14 @@ public class GSNWebServiceSkeleton {
 
         ArrayList<String> vsnames = new ArrayList<String>();
         for (Map.Entry<String, ArrayList<String>> entry : vsAndFields.entrySet()) {
+            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(entry.getKey()) || user.isAdmin()))) {
             StringBuilder sb = new StringBuilder();
             sb.append(entry.getKey());
             for (String elt : entry.getValue()) {
                 sb.append(":").append(elt);
             }
             vsnames.add(sb.toString());
+            }
         }
         requestParameters.put("vsname", vsnames.toArray(new String[]{}));
 
@@ -581,10 +613,14 @@ public class GSNWebServiceSkeleton {
 
     public gsn.webservice.standard.GetContainerInfoResponse getContainerInfo(gsn.webservice.standard.GetContainerInfo getContainerInfo) {
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#getContainerInfo");
+        //
+        User user = getUserForAC(getContainerInfo.getAcDetails());
+        //
         GetContainerInfoResponse response = new GetContainerInfoResponse();
         GSNWebService_ContainerDetails cd = new GSNWebService_ContainerDetails();
         //
         ContainerConfig cc = Main.getContainerConfig();
+        if ( ! Main.getContainerConfig().isAcEnabled() || (user != null)) {
         if (cc.getWebAuthor() != null)
             cd.setAuthor(cc.getWebAuthor());
         if (cc.getWebDescription() != null)
@@ -596,6 +632,7 @@ public class GSNWebServiceSkeleton {
         if (cc.getTimeFormat() != null)
             cd.setTimeFormat(cc.getTimeFormat());
         cd.setPort(cc.getContainerPort());
+        }
         //
         response.setContainerDetails(cd);
         return response;
@@ -608,13 +645,18 @@ public class GSNWebServiceSkeleton {
 
     public gsn.webservice.standard.ListVirtualSensorNamesResponse listVirtualSensorNames(gsn.webservice.standard.ListVirtualSensorNames listVirtualSensorNames) {
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#listVirtualSensorNames");
+        //
+        User user = getUserForAC(listVirtualSensorNames.getAcDetails());
+        //
         ListVirtualSensorNamesResponse response = new ListVirtualSensorNamesResponse();
         ArrayList<String> vsnames = new ArrayList<String>();
         Iterator<VSensorConfig> iter = Mappings.getAllVSensorConfigs();
         VSensorConfig config;
         while (iter.hasNext()) {
             config = iter.next();
-            vsnames.add(config.getName());
+            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(config.getName()) || user.isAdmin()))) {
+                vsnames.add(config.getName());
+            }
         }
         response.setVirtualSensorName(vsnames.toArray(new String[vsnames.size()]));
         return response;
@@ -629,12 +671,17 @@ public class GSNWebServiceSkeleton {
 
     public gsn.webservice.standard.DeleteVirtualSensorResponse deleteVirtualSensor(gsn.webservice.standard.DeleteVirtualSensor deleteVirtualSensor) {
         //throw new java.lang.UnsupportedOperationException("Please implement " + this.getClass().getName() + "#---");
+        //
+        User user = getUserForAC(deleteVirtualSensor.getAcDetails());
+        //
         DeleteVirtualSensorResponse response = new DeleteVirtualSensorResponse();
+        if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && user.isAdmin())) {
         if (unloadVirtualSensor(deleteVirtualSensor.getVsname())) {
             logger.warn("Failed to delete the following Virtual Sensor: " + deleteVirtualSensor.getVsname());
         } else {
             logger.debug("Deleted the following Virtual Sensor: " + deleteVirtualSensor.getVsname());
             response.setStatus(true);
+        }
         }
         return response;
     }
