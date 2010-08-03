@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
@@ -48,6 +49,21 @@ public class RestStreamHanlder extends HttpServlet {
             return;
         }
 
+        String[] cred = null;
+        if (Main.getContainerConfig().isAcEnabled()) {
+            cred = parseAuthorizationHeader(request);
+            if (cred == null) {
+                try {
+                    response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
+                    response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
+                }
+                catch (IOException e) {
+                    logger.debug(e.getMessage(), e);
+                }
+                return;
+            }
+        }
+
 		if(is2ndPass == null) {
             continuation.setAttribute("2ndPass", Boolean.TRUE);
             continuation.setAttribute("status", new LinkedBlockingQueue<Boolean>(1));
@@ -57,12 +73,15 @@ public class RestStreamHanlder extends HttpServlet {
             try {
                 URLParser parser = new URLParser(request);
                 //
-                String vsName = parser.getVSensorConfig().getName();
-                User user = GeneralServicesAPI.getInstance().doLogin(request.getParameter("username"), request.getParameter("password"));
-                if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)){
-                    if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
-                        response.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
-                        return;
+                if ( Main.getContainerConfig().isAcEnabled()){
+                    String vsName = parser.getVSensorConfig().getName();
+                    if (DataSource.isVSManaged(vsName)) {
+                        User user = GeneralServicesAPI.getInstance().doLogin(cred[0], cred[1]);
+                        if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+                            response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
+                            response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
+                            return;
+                        }
                     }
                 }
                 //
@@ -95,16 +114,31 @@ public class RestStreamHanlder extends HttpServlet {
         try {
 			URLParser parser = new URLParser(request);
             String vsName = parser.getVSensorConfig().getName();
+
             //
-            User user = GeneralServicesAPI.getInstance().doLogin(request.getParameter("username"), request.getParameter("password"));
-            if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)){
-                if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
-                    response.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+            if (Main.getContainerConfig().isAcEnabled()) {
+                String[] cred = parseAuthorizationHeader(request);
+                if (cred == null) {
+                    try {
+                        response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
+                        response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
+                    }
+                    catch (IOException e) {
+                        logger.debug(e.getMessage(), e);
+                    }
                     return;
+                }
+                if (DataSource.isVSManaged(vsName)){
+                    User user = GeneralServicesAPI.getInstance().doLogin(cred[0], cred[1]);
+                    if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+                        response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
+                        response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
+                        return;
+                    }
                 }
             }
             //
-			Double notificationId = Double.parseDouble(request.getParameter(PushDelivery.NOTIFICATION_ID_KEY));
+            Double notificationId = Double.parseDouble(request.getParameter(PushDelivery.NOTIFICATION_ID_KEY));
 			String localContactPoint = request.getParameter(PushDelivery.LOCAL_CONTACT_POINT);
 			if (localContactPoint == null) {
 				logger.warn("Push streaming request received without "+PushDelivery.LOCAL_CONTACT_POINT+" parameter !");
@@ -151,6 +185,37 @@ public class RestStreamHanlder extends HttpServlet {
 			logger.warn("Failed in writing the status code into the connection.\n"+e.getMessage(),e);
 		}
 	}
+
+    /**
+     *
+     * @param request
+     * @return [username,password] or null if unable to retrieve these pieces of information.
+     */
+    private String[] parseAuthorizationHeader(HttpServletRequest request) {
+        // Get username/password from the Authorization header
+        String authHeader = request.getHeader("Authorization"); // form: BASIC d2VibWFzdGVyOnRyeTJndWVTUw
+        if (authHeader != null) {
+            String[] ahs = authHeader.split(" ");
+            if (ahs.length == 2) {
+                String b64UsernamPassword = ahs[1]; // we get: d2VibWFzdGVyOnRyeTJndWVTUw
+                sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
+                try {
+                    String userPass = new String(decoder.decodeBuffer(b64UsernamPassword)); // form: username:passsword
+                    String[] ups;
+                    if ((ups = userPass.split(":")).length == 2) {
+                        return new String[]{
+                                ups[0], // username
+                                ups[1]  // password
+                        };
+                    }
+                }
+                catch (IOException e) {
+                    logger.debug(e.getMessage(), e);
+                }
+            }
+        }
+        return null;
+    }
 
 	class URLParser{
 		private String query,tableName;

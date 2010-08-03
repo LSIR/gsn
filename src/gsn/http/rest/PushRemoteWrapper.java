@@ -67,8 +67,6 @@ public class PushRemoteWrapper extends AbstractWrapper {
             postParameters = new ArrayList<NameValuePair>();
             postParameters.add(new BasicNameValuePair(PushDelivery.NOTIFICATION_ID_KEY, Double.toString(uid)));
             postParameters.add(new BasicNameValuePair(PushDelivery.LOCAL_CONTACT_POINT, initParams.getLocalContactPoint()));
-            postParameters.add(new BasicNameValuePair("username", initParams.getUsername()));
-            postParameters.add(new BasicNameValuePair("password", initParams.getPassword()));
 
             // Init the http client
             KeyStore trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
