@@ -10,7 +10,6 @@ import com.vividsolutions.jts.io.WKTReader;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
-import gsn.storage.StorageManager;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
@@ -37,7 +36,7 @@ public class GetSensorDataWithGeo {
     public static final String XML_FORMAT = "xml";
 
     private static final String NEWLINE = "\n";
-    private static final String SEPARATOR = ",";
+    public static final String SEPARATOR = ",";
 
     protected GetSensorDataWithGeo() {
 
@@ -125,7 +124,8 @@ public class GetSensorDataWithGeo {
     /*
     *  Returns the list of sensors whose locations are within the given envelope
     * */
-    public static String getListOfSensors(String envelope) throws ParseException {
+    /*
+    public static String getListOfSensorsAsString(String envelope) throws ParseException {
         Geometry geom = new WKTReader().read(envelope);
         List listEnvelope = geoIndex.query(geom.getEnvelopeInternal());
 
@@ -138,6 +138,18 @@ public class GetSensorDataWithGeo {
                 .trim()               // remove last trailing space
                 .replace(" ", SEPARATOR);   // replace other spaces with commas
     }
+    */
+
+    public static ArrayList<String> getListOfSensors(String envelope) throws ParseException {
+        Geometry geom = new WKTReader().read(envelope);
+        List listEnvelope = geoIndex.query(geom.getEnvelopeInternal());
+        ArrayList<String> sensors = new ArrayList<String>();
+        for (int i = 0; i < listEnvelope.size(); i++) {
+            sensors.add(searchForSensors_String((Point) listEnvelope.get(i)));
+        }
+        return sensors;
+    }
+
 
 
     public static String reformatQuery(String query, String matchingSensors, String unionElement) {
@@ -177,9 +189,9 @@ public class GetSensorDataWithGeo {
     * Execute query against a list of sensors
     *
     * */
-    public static String executeQuery(String envelope, String query, String format) throws ParseException {
+    public static String executeQuery(String envelope, String query, String matchingSensors, String format) throws ParseException {
 
-        String matchingSensors = getListOfSensors(envelope);
+        //String matchingSensors = getListOfSensorsAsString(envelope);
         String reformattedQuery = reformatQuery(query, matchingSensors);
         StringBuilder sb = new StringBuilder();
         Connection connection = null;
@@ -232,8 +244,8 @@ public class GetSensorDataWithGeo {
         return sb.toString();
     }
 
-    public static String executeQuery(String envelope, String query) throws ParseException {
-        return executeQuery(envelope, query, CSV_FORMAT);
+    public static String executeQuery(String envelope,String matchingSensors, String query) throws ParseException {
+        return executeQuery(envelope, query, matchingSensors, CSV_FORMAT);
     }
 
     public static void main(String[] args) throws ParseException, SQLException {
@@ -252,8 +264,8 @@ public class GetSensorDataWithGeo {
         g.buildGeoIndex();
         //String env = "POLYGON ((10 5, 40.5 20.7, 11.5 23.2, 32.5 41.8, 17.78 15.9, 29.67 2.876, 10 5))";
         String env = "POLYGON ((0 0, 0 100, 100 100, 100 0, 0 0))";
-        System.out.println(g.getListOfSensors(env));
-        System.out.println(getListOfSensors());
+        System.out.println(g.getListOfSensorsAsString(env));
+        System.out.println(getListOfSensorsAsString());
         System.out.println(executeQuery(env, "select * from sensors"));
         */
     }

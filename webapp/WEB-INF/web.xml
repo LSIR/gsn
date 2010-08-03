@@ -436,6 +436,7 @@
        <url-pattern>/field</url-pattern>
        <url-pattern>/data</url-pattern>
        <url-pattern>/multidata</url-pattern>
+       <url-pattern>/geodata</url-pattern>
    </filter-mapping>
 
       
