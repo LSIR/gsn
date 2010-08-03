@@ -5,29 +5,25 @@
    <description>Not Provided</description>
    <port>22001</port>
 
-<!-- Enable SSL -->
+<!-- SSL Support, Optional -->
 <!--
    <ssl-port>8443</ssl-port>
    <ssl-key-store-password>changeit</ssl-key-store-password>
    <ssl-key-password>changeit</ssl-key-password>
 -->
 
-<!-- Access Control -->
-<!--<access-control>true</access-control>-->
-
-<!-- Main Storage Database Options -->
+<!-- Main Storage Database, Mandatory -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />   -->
-<!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:MyFile" /> -->
+<storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:MyFile" />
 <!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" /> --> 
 <!-- <storage user="gsn" password="gsn" driver="net.sourceforge.jtds.jdbc.Driver" url="jdbc:jtds:sqlserver://192.168.51.14:12345/gsn;cachemetadata=true;prepareSQL=3" />-->
- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" /> 
+<!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" /> --> 
 <!--  <storage user="admin" password="" driver="org.postgresql.Driver" url="jdbc:postgresql://localhost/gsn" /> -->
 <!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/gsn" /> -->
 <!-- <storage user="gsn" password="gsn" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521" /> -->
 <!-- <storage user="gsn" password="ge-S3-ne" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@dom.slf.local:1521:sdbt" /> -->
 
-<!-- Optional sliding processor, If not specified, the sliding is implemented using the Main Storage Database specified above  -->
-<!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:gsninternal/gsn_internal_processing.h2;TRACE_LEVEL_FILE=3;TRACE_LEVEL_SYSTEM_OUT=1" />-->
+<!-- Processing Database, Optional. If not specified, the processing is implemented using the Main Storage Database specified above  -->
 <!--
    <sliding>
       <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:sliding;DB_CLOSE_DELAY=-1" />

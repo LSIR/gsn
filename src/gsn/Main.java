@@ -76,8 +76,9 @@ import org.eclipse.jetty.server.AbstractConnector;
 
 
 /**
- * Web Service URL : http://localhost:22001/services/Service?wsdl
- *
+ * Web Service URLs :
+ * Microsoft SensorMap: http://localhost:22001/services/Service?wsdl
+ * GSN: http://localhost:22001/services/GSNWebService?wsdl
  */
 public final class Main {
 
@@ -365,6 +366,8 @@ public final class Main {
             sslSocketConnector.setTruststore("conf/servertestkeystore");
             sslSocketConnector.setTrustPassword(getContainerConfig().getSSLKeyStorePassword());
         }
+        else if (getContainerConfig().isAcEnabled())
+            logger.error("SSL MUST be configured in the gsn.xml file when Access Control is enabled !");
         
         AbstractConnector connector=new SelectChannelConnector (); // before was connector//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
         connector.setPort ( port );
