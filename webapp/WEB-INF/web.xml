@@ -425,15 +425,17 @@
 
 
      <filter>
-     <display-name>MyControllerFilter</display-name>
-     <filter-name>MyControllerFilter</filter-name>
-     <filter-class>gsn.http.ac.MyControllerFilter</filter-class>
+        <display-name>MyControllerFilter</display-name>
+        <filter-name>MyControllerFilter</filter-name>
+        <filter-class>gsn.http.ac.MyControllerFilter</filter-class>
     </filter>
 
    <filter-mapping>
      <filter-name>MyControllerFilter</filter-name>
-     <url-pattern>/gsn</url-pattern>
-     <!--    <url-pattern>/streaming/*</url-pattern> -->
+       <url-pattern>/gsn</url-pattern>
+       <url-pattern>/field</url-pattern>
+       <url-pattern>/data</url-pattern>
+       <url-pattern>/multidata</url-pattern>
    </filter-mapping>
 
       
