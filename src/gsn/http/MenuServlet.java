@@ -18,8 +18,8 @@ public class MenuServlet extends HttpServlet {
         String selected = req.getParameter("selected");
         out.println("<ul id=\"menu\">");
         out.println("<li " + ("index".equals(selected) ? "class=\"selected\"" : "") + "<a href=\"index.html#home\">home</a></li>");
-        out.println("<li " + ("data".equals(selected) ? "class=\"selected\"" : "") + "<a href=\"data.html#data\">home</a></li>");
-        out.println("<li " + ("map".equals(selected) ? "class=\"selected\"" : "") + "<a href=\"map.html#map\">home</a></li>");
+        out.println("<li " + ("data".equals(selected) ? "class=\"selected\"" : "") + "<a href=\"data.html#data\">data</a></li>");
+        out.println("<li " + ("map".equals(selected) ? "class=\"selected\"" : "") + "<a href=\"map.html#map\">map</a></li>");
         out.println("<li " + ("fullmap".equals(selected) ? "class=\"selected\"" : "") + "<a href=\"fullmap.html#map\">fullmap</a></li>");
         if (Main.getContainerConfig().isAcEnabled()) {
             out.println("<li><a href=\"/gsn/MyAccessRightsManagementServlet\">access rights management</a></li>");
