@@ -60,6 +60,12 @@
     </servlet>
 
     <servlet>
+        <servlet-name>MenuServlet</servlet-name>
+        <display-name>GSN Main Menu</display-name>
+        <servlet-class>gsn.http.MenuServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>MyCreateGroupServlet</servlet-name>
         <display-name>MyCreateGroupServlet</display-name>
         <servlet-class>gsn.http.ac.MyCreateGroupServlet</servlet-class>
@@ -237,6 +243,11 @@
     <servlet-mapping>
         <servlet-name>GeoData</servlet-name>
         <url-pattern>/geodata</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>MenuServlet</servlet-name>
+        <url-pattern>/menu.jsp</url-pattern>
     </servlet-mapping>
 
       <servlet-mapping>
