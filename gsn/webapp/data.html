@@ -174,7 +174,7 @@
                     return values.sort();
                 }
 
-                function option_list_key(name,items,all){
+                function option_list_key(name,items,all,selected){
                     to_return = '<select name="' + name + '" class="' + name+ '">'
                     if (all){
                         to_return+='<option value="All" >' + all + '</option>';
@@ -182,7 +182,11 @@
                     var sk = getSortedKeys(items);
                     var l = sk.length;
                     for (var i = 0 ; i < l ; i++) {
-                        to_return+='<option value="' + sk[i]+'" >'+sk[i]+'</option>';
+                        var item = sk[i];
+                        if (item == selected)
+                          to_return+='<option value="' + item+'" selected="selected">'+item+'</option>';
+                        else
+                          to_return+='<option value="' + item+'" >'+item+'</option>';
                     }
                     to_return+='</select>'
                     return to_return;
