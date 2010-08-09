@@ -108,6 +108,17 @@ public class MultiDataDownload extends HttpServlet {
 		}
 		parameterMap.put("vsname", vsnames.toArray(new String[] {}));
 
+		// TIME LINE
+		String req_timeline = req.getParameter("timeline");
+		String timedfield;
+		if (req_timeline != null) {
+			timedfield = req_timeline;
+			parameterMap.put("timeline", new String[] {req_timeline});
+		}
+		else {
+			timedfield = "timed";
+			parameterMap.put("timeline", new String[] {"timed"});
+		}
 		
 		// TIME FORMAT
 		String req_time_format = req.getParameter("time_format");
@@ -130,7 +141,7 @@ public class MultiDataDownload extends HttpServlet {
 				vsAndFields = vssfm.entrySet().iterator();
 				while (vsAndFields.hasNext()) {
 					vsAndFieldsEntry = vsAndFields.next();
-					critFields.add("and::" + vsAndFieldsEntry.getKey() + ":timed:ge:" + timeLimit.getTime());
+					critFields.add("and::" + vsAndFieldsEntry.getKey() + ":"+timedfield+":ge:" + timeLimit.getTime());
 				}
 			}
 		} catch (ParseException e1) {
@@ -142,7 +153,7 @@ public class MultiDataDownload extends HttpServlet {
 				vsAndFields = vssfm.entrySet().iterator();
 				while (vsAndFields.hasNext()) {
 					vsAndFieldsEntry = vsAndFields.next();
-					critFields.add("and::" + vsAndFieldsEntry.getKey() + ":timed:leq:" + timeLimit.getTime());
+					critFields.add("and::" + vsAndFieldsEntry.getKey() + ":"+timedfield+":leq:" + timeLimit.getTime());
 				}
 			}
 		} catch (ParseException e1) {

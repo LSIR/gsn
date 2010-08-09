@@ -24,12 +24,14 @@ public class QueriesBuilder {
 	public static final String 			PARAM_STANDARD_CRITERIA		= "critfield";
 	public static final String 			PARAM_MAX_NB				= "nb";
 	public static final String			PARAM_TIME_FORMAT			= "timeformat";
+	public static final String			PARAM_TIME_LINE				= "timeline";
 
 	/* Parsed Parameters */
 	private HashMap<String, FieldsCollection> 	vsnamesAndStreams 			= null;
 	private AggregationCriterion 				aggregationCriterion 		= null;
 	private ArrayList<StandardCriterion> 		standardCriteria 			= null;
 	private LimitCriterion						limitCriterion				= null;
+	private String timedfield;
 
 	private Hashtable<String, AbstractQuery> sqlQueries ;
 
@@ -53,6 +55,11 @@ public class QueriesBuilder {
 	
 	private void parseParameters () throws DataRequestException {
 
+		String[] tf = requestParameters.get(PARAM_TIME_LINE);
+		if (tf.length==1)
+			timedfield = tf[0];
+		else
+			timedfield="timed";
 		String[] vsnamesParameters = requestParameters.get(PARAM_VSNAMES_AND_FIELDS);
 
 		if (vsnamesParameters == null) throw new DataRequestException ("You must specify at least one >" + PARAM_VSNAMES_AND_FIELDS + "< parameter.") ; 
@@ -71,7 +78,7 @@ public class QueriesBuilder {
 				streams = vsnamesParameters[i].substring(firstColumnIndex + 1).split(":");
 			}
 
-			vsnamesAndStreams.put(name, new FieldsCollection (streams));
+			vsnamesAndStreams.put(name, new FieldsCollection (streams, timedfield));
 		}
 
 		String ac = getParameter(requestParameters, PARAM_AGGREGATE_CRITERIA);
@@ -112,7 +119,7 @@ public class QueriesBuilder {
 			next = iter.next();
 			fields = next.getValue().getFields();
 			vsname = next.getKey();
-			this.sqlQueries.put(vsname, new AbstractQuery(limitCriterion, aggregationCriterion, vsname, fields, standardCriteria));
+			this.sqlQueries.put(vsname, new AbstractQuery(limitCriterion, aggregationCriterion, vsname, fields, standardCriteria, timedfield));
 		}
 	}
 

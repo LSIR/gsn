@@ -52,7 +52,7 @@
                                     headers = line.split(',');
                                     for (var i=0;i<headers.length;i++){
                                         headers[i] = headers[i].replace("#","");
-                                        if (headers[i]=='timed') {
+                                        if (headers[i]==$('#timeline').val()) {
                                             timestamp_idx=i;
                                         } else {
                                             lbl = vs_name+' ('+headers[i]+')';
@@ -66,10 +66,20 @@
                                 var timestamp = data[timestamp_idx];
                                 for (i=0;i<headers.length;i++){
                                     if(i != timestamp_idx && data[i]!=undefined ){
+                                        var key;
+                                        if (i>timestamp_idx)
+                                          key = keys[i-1];
+                                        else
+                                          key = keys[i];
+                                        var d;
+                                        if (data[i]=='null')
+                                          d=data[i];
+                                        else
+                                          d=parseFloat(data[i]);
                                         if (format == 'unix') {
-                                            datasets[keys[i]].data.push([parseInt(timestamp),parseFloat(data[i])]);
+                                            datasets[key].data.push([parseInt(timestamp),d]);
                                         } else {
-                                            datasets[keys[i]].data.push([timestamp,parseFloat(data[i])]);
+                                            datasets[key].data.push([timestamp,d]);
                                         }
                                         nb_elements++;
                                     }
@@ -206,15 +216,47 @@
                     return to_return;
                 }
 
+                function auto_add_condition(vs) {
+                  // add condition for vs if there isn't one
+                  var ccount=0;
+                  for (var i=0;i<$('#conditions .vss').length;i++) {
+                    if ($('#conditions .vss')[i].options[$('#conditions .vss')[i].selectedIndex].value == vs) {
+                      ccount++;
+                    }
+                  }
+                  if (ccount == 0)
+                    add_condition(vs);
+                }
+
+                function auto_remove_condition(vs) {
+                  // remove condition if there is no other vs in the data list
+                  var vscount = 0;
+                  for (var i=0;i<$('#data-outputs .vss').length;i++) {
+                    if ($($('#data-outputs .vss')[i]).val() == vs)
+                      vscount++;
+                  }
+                  if (vscount==0) {
+                    // remove conditions       
+                    $('#conditions .vss').each(function() {
+                      if (this.options[this.selectedIndex].value == vs) {
+                        $(this).parent().remove();
+                      }
+                    });
+                    $('.join:first').hide();
+                  }
+                }
+
                 function add_data_output () {
                     var vsscount = $('#data-outputs .vss').length;
                     if (vsscount>0) {
                       var vssselect = $('#data-outputs .vss')[vsscount-1];
                       var last = vssselect.options[vssselect.selectedIndex].value;
-                      $('#data-outputs').append('<li>' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors", last) + option_list_value('fields',virtual_sensor_to_fields[last],"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
                     }
-                    else
-                      $('#data-outputs').append('<li>' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors", last) + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
+                    if (last!=null && last !="All")
+                      $('#data-outputs').append('<li name="'+last+'">' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors", last) + option_list_value('fields',virtual_sensor_to_fields[last],"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
+                    else {
+                      $('#data-outputs').append('<li name="All">' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors") + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
+                    }
                       
                     $('.vss').change(function(){
                         var vs = $(this).val();
@@ -223,17 +265,24 @@
                         }
                         else {
                             $(this).next("select").replaceWith(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields"));
+                            auto_add_condition(vs);
                         }
+                        auto_remove_condition($(this).parent().attr('name'));
+                        $(this).parent().attr('name', vs);
                     });
                     $('.remove-criterion').click (function() {
-                        if ($(this).parent().parent().children().size() > 1) {
-                            $(this).parent().remove();
-                        }
+                        var vs = $($(this).parent().find('.vss')[0]).val();
+                        $(this).parent().remove();
+                        auto_remove_condition(vs);
+                        $('.join:first').hide();
                     });
                 }
 
-                function add_condition () {
-                    $('#conditions').append('<li><select class="join" name="join"><option value="and">AND</option><option value="or">OR</option></select>' +  option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors") + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' | Between <input class="min" type="text" size="3" value="-inf" /> and <input class="max" type="text" size="3" value="+inf" /><a class="remove-criterion" href="#"> Remove</a></li>');
+                function add_condition (selected) {
+                    if (selected != null)
+                      $('#conditions').append('<li><select class="join" name="join"><option value="and">AND</option><option value="or">OR</option></select>' +  option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors", selected) + option_list_value('fields',virtual_sensor_to_fields[selected],"All Fields") + ' | Between <input class="min" type="text" size="3" value="-inf" /> and <input class="max" type="text" size="3" value="+inf" /><a class="remove-criterion" href="#"> Remove</a></li>');
+                    else
+                      $('#conditions').append('<li><select class="join" name="join"><option value="and">AND</option><option value="or">OR</option></select>' +  option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors") + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' | Between <input class="min" type="text" size="3" value="-inf" /> and <input class="max" type="text" size="3" value="+inf" /><a class="remove-criterion" href="#"> Remove</a></li>');
                     $('.vss').change(function(){
                         var vs = $(this).val();
                         if (vs == 'All') {
@@ -403,7 +452,7 @@
                                 }
                             }
                             var data_length = fields[0]['data'].length;
-                            var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>timed</th>';
+                            var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>'+($('#timeline').val())+'</th>';
                             for (var i = 0; i < headers.length; i++) {
                                 grid += '<th>' + headers[i] + '</th>';
                             }
@@ -472,6 +521,10 @@
                                             <p>
                                                 <span>Aggregation</span>
                                                 <select id="agg_function" name="agg_function"><option value="-1">No Aggregation</option><option value="avg">AVG</option><option value="max">MAX</option><option value="min">MIN</option></select><input disabled="disabled" id="agg_period" name="agg_period" size="5" type="text" value="2" /><select disabled="disabled" id="agg_unit" name="agg_unit"><option value="3600000">Hours</option><option value="60000">Minutes</option><option value="1000">Seconds</option><option value="1">Milli Seconds</option></select>
+                                            </p>
+                                            <p>
+                                                <span>Timeline</span>
+                                                <select id="timeline" name="timeline"><option value="generation_time">generation_time</option><option value="timestamp">timestamp</option><option value="timed">timed</option></select>
                                             </p>
                                         </div>
                                         <div class="data-outputs-container">

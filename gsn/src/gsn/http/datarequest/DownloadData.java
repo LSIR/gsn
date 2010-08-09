@@ -31,9 +31,12 @@ public class DownloadData extends AbstractDataRequest {
     private AllowedOutputType ot;
 
     private String csvDelimiter = ",";
+    
+    private String timedfield;
 
     public DownloadData(Map<String, String[]> requestParameters) throws DataRequestException {
         super(requestParameters);
+        timedfield = QueriesBuilder.getParameter(requestParameters, QueriesBuilder.PARAM_TIME_LINE);
     }
 
     @Override
@@ -99,8 +102,9 @@ public class DownloadData extends AbstractDataRequest {
                     respond.println("\t<!-- " + nextSqlQuery.getValue().getStandardQuery() + " -->");
                     respond.println("\t<data vsname=\"" + nextSqlQuery.getKey() + "\">");
                 }
-                FieldsCollection fc = qbuilder.getVsnamesAndStreams().get(nextSqlQuery.getKey());
-                boolean wantTimed = true;
+                boolean wantTimed=false;
+                if (timedfield.equals("timed"))
+                	wantTimed = true;
                 boolean firstLine = true;
                 while (de.hasMoreElements()) {
                     if (ot == AllowedOutputType.csv) {
@@ -141,7 +145,10 @@ public class DownloadData extends AbstractDataRequest {
             respond.println();
         }
         for (int i = 0; i < se.getData().length; i++) {
-            respond.print(se.getData()[i]);
+        	if (se.getFieldNames()[i].equals(timedfield))
+        		respond.print(qbuilder.getSdf() == null ? timestampInUTC((Long)se.getData()[i]) : qbuilder.getSdf().format(new Date((Long)se.getData()[i])));
+        	else
+        		respond.print(se.getData()[i]);
             if (i != se.getData().length - 1)
                 respond.print(cvsDelimiter);
         }
