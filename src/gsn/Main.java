@@ -127,7 +127,7 @@ public final class Main {
 
 		try {
 			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxSlidingDBConnections: " + maxSlidingDBConnections + ", maxServlets:"+maxServlets+")"+" ...");
-            Server jettyServer = getJettyServer(Main.getContainerConfig().getContainerPort(), ContainerConfig.DEFAULT_SSL_PORT, maxServlets);
+            Server jettyServer = getJettyServer(getContainerConfig().getContainerPort(), getContainerConfig().getSSLPort(), maxServlets);
 			jettyServer.start ( );
 			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
 		} catch ( Exception e ) {
@@ -356,8 +356,8 @@ public final class Main {
         server.setThreadPool(new QueuedThreadPool(maxThreads));
 
         SslSocketConnector sslSocketConnector = null;
-        if (getContainerConfig().getSSLPort() > 0) {
-            System.out.println("SSL is Starting on port "+ContainerConfig.DEFAULT_SSL_PORT+"...");
+        if (sslPort > 0) {
+            System.out.println("SSL is Starting on port "+sslPort+"...");
 			sslSocketConnector = new SslSocketConnector();
             sslSocketConnector.setPort(getContainerConfig().getSSLPort());
             sslSocketConnector.setKeystore("conf/servertestkeystore");
