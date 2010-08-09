@@ -427,8 +427,9 @@
     <!-- The following remove all constraints as no auth-constraint is specified. -->
     <security-constraint >
         <web-resource-collection>
-            <web-resource-name>Open MSR WebService</web-resource-name>
+            <web-resource-name>Open Area</web-resource-name>
             <url-pattern>/services/Service/*</url-pattern>
+            <url-pattern>/menu.jsp</url-pattern>
         </web-resource-collection>
     </security-constraint>
  
