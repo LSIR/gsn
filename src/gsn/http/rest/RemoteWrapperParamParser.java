@@ -19,6 +19,7 @@ public class RemoteWrapperParamParser {
 	private boolean isPushBased;
 	private String query,deliveryContactPoint,remoteContactPoint;
 	private String username,password;
+    private boolean isSSLRequired;
     // The default timeout is set to 3 times the rate of the periodical Keep alive messages.
     // The timeout can be overriden in the virtual sensor description files.
     private int timeout =  3 * DataDistributer.getKeepAlivePeriod();
@@ -56,7 +57,9 @@ public class RemoteWrapperParamParser {
 		remoteContactPoint= remoteContactPoint.trim();
 		if (!remoteContactPoint.trim().endsWith("/"))
 			remoteContactPoint+="/";
-
+        //
+        isSSLRequired = remoteContactPoint.toLowerCase().startsWith("https");
+        
 		try {
 			startTime = Helpers.convertTimeFromIsoToLong(addressBean.getPredicateValueWithDefault("start-time",CURRENT_TIME ));
 		}catch (Exception e) {
@@ -99,6 +102,10 @@ public class RemoteWrapperParamParser {
 
     public int getTimeout() {
         return timeout;
+    }
+
+    public boolean isSSLRequired() {
+        return isSSLRequired;
     }
 
     public String getRemoteContactPointEncoded(long lastModifiedTime) {

@@ -61,9 +61,9 @@ public class ContainerConfig {
 
     private boolean                       acEnabled                     = false;
 
-	private String sslKeyStorePassword;
+	private String sslKeyStorePassword                                  = DEFAULT_SSL_KEYSTORE_PWD;
 
-	private String sslKeyPassword;
+	private String sslKeyPassword                                       = DEFAULT_SSL_KEY_PWD;
 
     private StorageConfig storage ;
 
@@ -178,6 +178,10 @@ public class ContainerConfig {
 	/****************************************************************************
 	 * UTILITY METHODS, Used by the GUI mainly.
 	 ***************************************************************************/
+
+    private static final String   DEFAULT_SSL_KEYSTORE_PWD = "changeit";
+
+    private static final String   DEFAULT_SSL_KEYS_PWD = "changeit";
 
 	private String                 directoryLoggingLevel;
 
