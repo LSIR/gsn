@@ -144,6 +144,7 @@ Matterhorn_pos12_Sensorrod__chart1.xml
 Matterhorn_pos12_Sensorrod__chart2.xml
 Matterhorn_pos12_Sensorrod__chart3.xml
 Matterhorn_pos12_Temperature__chart1.xml
+Matterhorn_pos13_DozerDutyCycle__chart1.xml
 Matterhorn_pos13_Selfpotential__chart1.xml
 Matterhorn_pos19_BackLogStatus__chart.xml
 Matterhorn_pos19_BackLogStatus__chart2.xml
@@ -283,3 +284,4 @@ Thur_pos5_DozerDecagonMux__chart1.xml
 Thur_pos5_DozerDecagonMux__chart2.xml
 Thur_pos5_DozerDecagonMux__chart3.xml
 Thur_pos5_DozerDutyCycle__chart1.xml
+Thur_pos6_DozerDutyCycle__chart1.xml
