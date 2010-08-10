@@ -181,7 +181,7 @@ public class ContainerConfig {
 
     private static final String   DEFAULT_SSL_KEYSTORE_PWD = "changeit";
 
-    private static final String   DEFAULT_SSL_KEYS_PWD = "changeit";
+    private static final String   DEFAULT_SSL_KEY_PWD = "changeit";
 
 	private String                 directoryLoggingLevel;
 
