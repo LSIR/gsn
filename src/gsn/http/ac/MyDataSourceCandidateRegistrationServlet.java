@@ -1,5 +1,6 @@
 package gsn.http.ac;
 
+import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
 import org.apache.log4j.Logger;
@@ -304,7 +305,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
            {
                req.getSession().setAttribute("scheme","http");
           }
-           res.sendRedirect("https://"+req.getServerName()+":"+ ContainerConfig.DEFAULT_SSL_PORT+"/gsn/MyDataSourceCandidateRegistrationServlet");
+           res.sendRedirect("https://"+req.getServerName()+":"+ Main.getContainerConfig().getSSLPort()+"/gsn/MyDataSourceCandidateRegistrationServlet");
 
        }
    }

@@ -1,5 +1,6 @@
 package gsn.http.ac;
 
+import gsn.Main;
 import gsn.beans.ContainerConfig;
 
 
@@ -133,7 +134,7 @@ public class MyUpdateUserWaitingForDataSourceServlet extends HttpServlet
             {
                 req.getSession().setAttribute("scheme","http");
             }
-            res.sendRedirect("https://"+req.getServerName()+":"+ ContainerConfig.DEFAULT_SSL_PORT+"/gsn/MyUpdateUserWaitingForDataSourceServlet");
+            res.sendRedirect("https://"+req.getServerName()+":"+ Main.getContainerConfig().getSSLPort()+"/gsn/MyUpdateUserWaitingForDataSourceServlet");
 
         }
     }
