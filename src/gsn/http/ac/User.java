@@ -48,6 +48,22 @@ public class User
         this.userName=userName;
     }
 
+    public User (User cuser)
+    {
+        
+        this.userName = cuser.userName;
+        this.password = cuser.password;
+		this.firstName = cuser.firstName;
+        this.lastName = cuser.lastName;
+        this.email = cuser.email;
+        this.groupList = cuser.groupList;
+        this.isCandidate = cuser.isCandidate;
+        this.dataSourceList = cuser.dataSourceList;
+        this.dataSource = cuser.dataSource;
+        this.isCandidate = cuser.isCandidate;
+        this.isWaiting = cuser.isWaiting;
+    }
+
     public User(String userName,DataSource dataSource)
     {
         this.userName =  userName;

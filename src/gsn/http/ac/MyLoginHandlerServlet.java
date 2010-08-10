@@ -215,7 +215,10 @@ public class MyLoginHandlerServlet extends HttpServlet
                     {
                         out.println("You are allowed to see the target!"+"<br>");
                         user = new User(pm.valueForName("username"),enc,ctdb.getDataSourceListForUserLogin(pm.valueForName("username")),ctdb.getGroupListForUser(pm.valueForName("username")));
-
+                        User userFromBD = ctdb.getUserForUserName(pm.valueForName("username"));
+                        user.setLastName(userFromBD.getLastName());
+                        user.setEmail(userFromBD.getEmail());
+                        user.setFirstName(userFromBD.getFirstName());
                     }
 
                 }
