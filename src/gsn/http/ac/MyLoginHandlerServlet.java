@@ -156,7 +156,7 @@ public class MyLoginHandlerServlet extends HttpServlet
                 {
                     if(session.getAttribute("scheme").equals("http"))
                     {
-                        res.sendRedirect("http://"+req.getServerName()+":"+ ContainerConfig.DEFAULT_GSN_PORT+"/");
+                        res.sendRedirect("http://"+req.getServerName()+":"+ Main.getContainerConfig().getContainerPort()+"/");
                     }
                     else if(session.getAttribute("scheme").equals("https"))
                     {
