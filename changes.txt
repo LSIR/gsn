@@ -1,6 +1,24 @@
 GSN Change logs
 ---------------
 
+r1.1.0
+Added Support for Flexible Storage Manager (processing/storage dbs, per virtual sensor db, in memory processing, transcient virtual sensor).
+Added Support for Access Control (alpha version, must not be used in production environment yet).
+Added Support for PostgreSQL as processing/storage db.
+Added Support for geospacial queries (see /geodata servlet).
+Added Support for GML output
+Added Support for periodical execution of code in the ScriptletProcessor.
+Added Support for SSL.
+Added A3DWebService Alpine3D Web Service.
+Added Wrapper that handles data grids (short name: grid).
+Added Timezone visualization per virtual sensor.
+Added Throughput performance evaluator and performance settings in build.xml
+Updated Microsoft SensorMap Web Service implementation to their latest API at sensormap.org.
+Fixed Missing duplicated stream elements with pagination.
+Fixed Multiple CSV wrappers reading from the same data file do not use the same checkpoint file anymore.
+Fixed Sorting the virtual sensor names and fields names in the web UI.
+Fixed the Virtual Earth js link.
+
 r1.0.1
 Added the 'ScriptletProcessor' processing class which can be used to implement arbitrary complex processing class by specifying its logic in the Groovy language, directly in the virtual sensor description file.
 Added pagination support for MySQL (/data and /multidata servlet and DataDistributer) which enable GSN to stream an arbitrary large amount of data.
