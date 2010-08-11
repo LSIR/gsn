@@ -61,9 +61,9 @@ public class ContainerConfig {
 
     private boolean                       acEnabled                     = false;
 
-	private String sslKeyStorePassword                                  = DEFAULT_SSL_KEYSTORE_PWD;
+	private String sslKeyStorePassword;
 
-	private String sslKeyPassword                                       = DEFAULT_SSL_KEY_PWD;
+	private String sslKeyPassword;
 
     private StorageConfig storage ;
 
@@ -444,10 +444,10 @@ public class ContainerConfig {
 		return sslPort;
 	}
 	public String getSSLKeyStorePassword(){
-		return sslKeyStorePassword;
+		return sslKeyStorePassword == null ? DEFAULT_SSL_KEYSTORE_PWD : sslKeyStorePassword;
 	}
 	public String getSSLKeyPassword(){
-		return sslKeyPassword;
+		return sslKeyPassword == null ? DEFAULT_SSL_KEY_PWD : sslKeyPassword;
 	}
 	
 	/**

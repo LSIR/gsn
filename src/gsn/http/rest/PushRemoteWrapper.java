@@ -1,5 +1,6 @@
 package gsn.http.rest;
 
+import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
@@ -67,14 +68,14 @@ public class PushRemoteWrapper extends AbstractWrapper {
             postParameters = new ArrayList<NameValuePair>();
             postParameters.add(new BasicNameValuePair(PushDelivery.NOTIFICATION_ID_KEY, Double.toString(uid)));
             postParameters.add(new BasicNameValuePair(PushDelivery.LOCAL_CONTACT_POINT, initParams.getLocalContactPoint()));
-
             // Init the http client
             if (initParams.isSSLRequired()) {
                 KeyStore trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
                 trustStore.load(new FileInputStream(new File("conf/servertestkeystore")), Main.getContainerConfig().getSSLKeyStorePassword().toCharArray());
                 SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
                 socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-                Scheme sch = new Scheme("https", socketFactory, Main.getContainerConfig().getSSLPort());
+                int sslPort = Main.getContainerConfig().getSSLPort() > 0 ? Main.getContainerConfig().getSSLPort() : ContainerConfig.DEFAULT_SSL_PORT;
+                Scheme sch = new Scheme("https", socketFactory, sslPort);
                 httpclient.getConnectionManager().getSchemeRegistry().register(sch);
             }
             Scheme plainsch = new Scheme("http", PlainSocketFactory.getSocketFactory(), Main.getContainerConfig().getContainerPort());
