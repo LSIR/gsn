@@ -6,7 +6,7 @@
             <param name="title">Dielectric Permittivity (Position 5, 7d)</param>
             <param name="height">400</param>
             <param name="width">610</param>
-            <param name="vertical-axis">dS/m</param>
+            <param name="vertical-axis">F/m</param>
             <param name="history-size">5040</param>
             <param name="time-stream-name">GENERATION_TIME</param>
         </init-params>
