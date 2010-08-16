@@ -26,7 +26,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.junit.runner.Request;
 
 public class ContainerInfoHandler implements RequestHandler {
   
