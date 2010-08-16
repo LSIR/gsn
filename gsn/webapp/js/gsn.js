@@ -588,44 +588,45 @@ var GSN = {
         GSN.updatenb++;
 		
         $(".refreshing").show();
+
+        function nextRefresh() {
+          var start = new Date();
+          //next refresh
+          if($("#refreshall_timeout").attr("value") > 0)
+            setTimeout("GSN.updateall("+GSN.updatenb+")", $("#refreshall_timeout").attr("value"));
+          $(".refreshing").hide();
+
+          var diff = new Date() - start;
+          GSN.log("updateall time:"+diff/1000);
+        }
 		
-		
-  		
-        $.ajax({
+        if (firstload)
+          $.ajax({
+            type: "GET",
+            url: "/gsn?structure",
+            success: function(data){
+                //initalisation of gsn info, vsmenu
+                GSN.init(data);
+                nextRefresh();
+                //update map
+                if (GSN.context=="map" || GSN.context=="fullmap"){
+                    GSN.map.showAllMarkers();
+                }
+                        
+            }
+          });
+        else	
+          $.ajax({
             type: "GET",
             url: "/gsn",
             success: function(data){
-                var start = new Date();
-                //initalisation of gsn info, vsmenu
-                if (!GSN.loaded) GSN.init(data);
-			
-			
                 //update vsbox
                 $("virtual-sensor",data).each(function(){
                     GSN.vsbox.update(this);
                 });
-			
-			
-                //next refresh
-                if($("#refreshall_timeout").attr("value") > 0)
-                    setTimeout("GSN.updateall("+GSN.updatenb+")", $("#refreshall_timeout").attr("value"));
-			
-                $(".refreshing").hide();
-			
-                var diff = new Date() - start;
-                GSN.log("updateall time:"+diff/1000);
-			
-                if(firstload){
-                    //update map
-                    if (GSN.context=="map" || GSN.context=="fullmap"){
-                        GSN.map.showAllMarkers();
-                    }
-                }
-			
+                nextRefresh();
             }
-        });
-		
-		
+          });
     }
 	
 	

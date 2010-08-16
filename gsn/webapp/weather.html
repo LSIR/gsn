@@ -62,7 +62,7 @@ $(document).ready(function() {
         // load deployments
         $.ajax({
               type: "GET",
-              url: "/gsn",
+              url: "/gsn?structure",
               success: function(data){
                 if ($(document).attr("title")=="GSN") {
                   var gsn = $("gsn",data);

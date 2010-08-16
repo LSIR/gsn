@@ -342,7 +342,7 @@
                 }
 
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
-                $.get("/gsn?REQUEST=0", function(xml){
+                $.get("/gsn?REQUEST=0&structure", function(xml){
                     lovs = xml
                     if ($(document).attr("title")=="GSN") {
                       var gsn = $("gsn",xml);
