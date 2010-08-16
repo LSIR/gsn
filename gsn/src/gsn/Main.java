@@ -86,6 +86,8 @@ public final class Main {
 	private static int gsnControllerPort;
 
     private Main() throws Exception {
+    	
+    	startTime = System.currentTimeMillis();
 
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
@@ -473,5 +475,11 @@ public final class Main {
 
     public static StorageManager getWindowStorage() {
         return windowStorage;
+    }
+    
+    private static Long startTime; 
+    
+    public static Long getUptime() {
+    	return System.currentTimeMillis() - startTime;
     }
 }

@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.junit.runner.Request;
 
 public class ContainerInfoHandler implements RequestHandler {
   
@@ -44,16 +45,15 @@ public class ContainerInfoHandler implements RequestHandler {
         response.setHeader("Cache-Control","no-store");
         response.setDateHeader("Expires", 0);
         response.setHeader("Pragma","no-cache");
-
-
-
-        String group = request.getParameter("group"); 
-     	response.getWriter( ).write( buildOutput(reqName, user, group) ); 
+ 
+     	response.getWriter( ).write( buildOutput(reqName, user,
+     			request.getParameter("group"),
+     			request.getParameter("structure")!=null) ); 
   }
   
   //return only the requested sensor if specified (otherwise use null)
   //Added by Behnaz. New parameter User user to method buildOutput.
-  public String buildOutput (String reqName, User user, String group) {
+  public String buildOutput (String reqName, User user, String group, Boolean structure) {
 	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 	  
 	  
@@ -61,7 +61,8 @@ public class ContainerInfoHandler implements RequestHandler {
     sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
     sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
     sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
-    sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
+    sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\" " );
+    sb.append( "uptime=\"" ).append( StringEscapeUtils.escapeXml( Main.getUptime().toString() ) ).append("\">\n" );
 
 
     Iterator < VSensorConfig > vsIterator; 
@@ -97,7 +98,14 @@ public class ContainerInfoHandler implements RequestHandler {
       }
       sb.append( ">\n" );
       
-      ArrayList<StreamElement> ses = getMostRecentValueFor(sensorConfig.getName());
+      ArrayList<StreamElement> ses;
+      if (structure) {
+          ses = new ArrayList<StreamElement>();
+          ses.add(null);
+      }
+      else {
+          ses = getMostRecentValueFor(sensorConfig.getName());  
+      }
       int counter = 1;
       if (ses!=null ) {
         for (StreamElement se:ses){
