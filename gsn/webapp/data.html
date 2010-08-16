@@ -15,6 +15,7 @@
         <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-datepicker-1.5.2.min.js"></script>
         <script type="text/javascript" src="js/jquery.flot.pack.js"></script>
         <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
+        <script type="text/javascript" src="js/uptime.js"></script>
         <script type="text/javascript">
             /* XML object loaded from the REQUEST_LIST_OF_VIRTUAL_SENSORS GSN request */
             var lovs = null;
@@ -352,6 +353,7 @@
                       $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
                     }
                     $("#gsn-name").show();
+                    uptime.setTime($(gsn).attr("uptime"));
                     
                     $('virtual-sensor',xml).each(function(){
                         var vsname = $(this).attr('name');
@@ -426,6 +428,7 @@
                 $(".grid").click(function(){
                     function drawGrid(datasets){
                         $("#sensorSelect").empty();
+                        $("#sensorSelect").unbind('change');
                         $("#sensorSelect").append('<option value="">Select a Virtual Sensor</option>');
                         var displayed = [];
                         for (var sensor in datasets) {
@@ -436,7 +439,6 @@
                                 $("#sensorSelect").append(option);
                             }
                         }
-
                         $("#sensorSelect").change(function(){
                             var choice = $("#sensorSelect").val();
                             $('#gridContainer').empty();

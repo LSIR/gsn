@@ -192,6 +192,7 @@ var GSN = {
             $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
         }
         $("#gsn-name").show();
+        uptime.setTime($(gsn).attr("uptime"));
         //build the rightside vs menu
         $("#vsmenu").empty();
 		

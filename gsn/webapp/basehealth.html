@@ -15,7 +15,7 @@
 	<script type="text/javascript" src="js/constants.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
 	
-	<script type="text/javascript" src="js/gsn.js"></script>
+        <script type="text/javascript" src="js/uptime.js"></script>
 <script type="text/javascript">
 <!--//<![CDATA[
 
@@ -69,6 +69,7 @@ $(document).ready(function() {
                   $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
                 }
                 $("#gsn-name").show();
+                uptime.setTime($(gsn).attr("uptime"));
 		var arraySize = 0;
 		$("virtual-sensor",data).each(function(){
 		    var deploymentname = $(this).attr("name").split("_", 1)[0];
