@@ -6,7 +6,6 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
