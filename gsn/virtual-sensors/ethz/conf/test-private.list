@@ -16,6 +16,7 @@ Dirruhorn_Dozer_Rssi.xml
 Dirruhorn_Dozer_StateCounter.xml
 Dirruhorn_Schedule.xml
 Dirruhorn_VaisalaWXT520.xml
+Dirruhorn_Topology.xml
 ETZ_BackLogStatus.xml
 ETZ_CoreStationStatus.xml
 ETZ_Binary.xml
@@ -36,3 +37,4 @@ ETZ_Dozer_Rssi.xml
 ETZ_Dozer_StateCounter.xml
 ETZ_Schedule.xml
 ETZ_VaisalaWXT520.xml
+ETZ_Topology.xml

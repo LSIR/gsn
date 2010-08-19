@@ -1,0 +1,310 @@
+<virtual-sensor name="ETZ_Topology__1946" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.TopologyVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="node-id-field">HEADER_ORIGINATORID</param>
+            <param name="parent-id-field">PAYLOAD_PARENTID</param>
+            <param name="timestamp-field">TIMESTAMP</param>
+            <param name="generation-time-field">GENERATION_TIME</param>
+            <param name="vsys-field">PAYLOAD_SYSVOLTAGE</param>
+            <param name="current-field">PAYLOAD_SIBCURRENT</param>
+            <param name="temperature-field">PAYLOAD_TEMPERATURE</param>
+            <param name="humidity-field">PAYLOAD_HUMIDITY</param>
+            <param name="flash-count-field">PAYLOAD_FLASHSTATUS</param>
+            <param name="uptime-field">PAYLOAD_UPTIME</param>
+            
+            <param name="access-node-stream-name">data4</param>
+            <param name="powerswitch-stream-name">data11</param>
+            <param name="rssi-stream-name">data_rssi</param>
+            <param name="rssi-node-id-field">RSSI_NODEID</param>
+            <param name="rssi-field">RSSI</param>
+        </init-params>
+        <output-structure>
+            <field name="DATA" type="BINARY"/>
+        </output-structure>
+    </processing-class>
+    <description>Sensornode Topology of ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+    
+      <stream name="data0">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_adccomdiff__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data1">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_adcmux1__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data2">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_adcmux2__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data3">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_basedebug__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data4">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_MSPVOLTAGE, PAYLOAD_UPTIME, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY
+            from etz_dozer_basestatus__1946
+          </predicate>
+        </address>
+        <query>select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_MSPVOLTAGE as PAYLOAD_SYSVOLTAGE, PAYLOAD_UPTIME, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data5">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_decagonmux__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data6">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_digitaldcx__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data7">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_drift__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data8">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_eventlogger__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data9">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_PARENTID, PAYLOAD_SYSVOLTAGE, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY, PAYLOAD_SIBCURRENT, PAYLOAD_FLASHSTATUS, PAYLOAD_UPTIME
+            from etz_dozer_nodehealth__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data10">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_nodeinfo__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data11">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_powerswitch__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data12">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_rssi__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data13">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_statecounter__1946
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+
+    <stream name="data_rssi0">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+             select * from etz_dozer_rssi__1946
+           </predicate>
+           <predicate key="start-time">continue</predicate>
+         </address>
+         <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
+                    PAYLOAD_RSSI_ID0 as RSSI_NODEID,
+                    PAYLOAD_RSSI_RSSI0 as RSSI from wrapper where PAYLOAD_RSSI_RSSI0 is not null
+         </query>
+       </source>
+     <query> select * from source </query>
+     </stream>
+    <stream name="data_rssi1">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+             select * from etz_dozer_rssi__1946
+           </predicate>
+           <predicate key="start-time">continue</predicate>
+         </address>
+         <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
+                    PAYLOAD_RSSI_ID1 as RSSI_NODEID,
+                    PAYLOAD_RSSI_RSSI1 as RSSI from wrapper where PAYLOAD_RSSI_RSSI1 is not null
+         </query>
+       </source>
+     <query> select * from source </query>
+     </stream>
+    <stream name="data_rssi2">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+             select * from etz_dozer_rssi__1946
+           </predicate>
+           <predicate key="start-time">continue</predicate>
+         </address>
+         <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
+                    PAYLOAD_RSSI_ID2 as RSSI_NODEID,
+                    PAYLOAD_RSSI_RSSI2 as RSSI from wrapper where PAYLOAD_RSSI_RSSI2 is not null
+         </query>
+       </source>
+     <query> select * from source </query>
+     </stream>
+    <stream name="data_rssi3">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+             select * from etz_dozer_rssi__1946
+           </predicate>
+           <predicate key="start-time">continue</predicate>
+         </address>
+         <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
+                    PAYLOAD_RSSI_ID3 as RSSI_NODEID,
+                    PAYLOAD_RSSI_RSSI3 as RSSI from wrapper where PAYLOAD_RSSI_RSSI3 is not null
+         </query>
+       </source>
+     <query> select * from source </query>
+     </stream>
+    <stream name="data_rssi4">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+             select * from etz_dozer_rssi__1946
+           </predicate>
+           <predicate key="start-time">continue</predicate>
+         </address>
+         <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
+                    PAYLOAD_RSSI_ID4 as RSSI_NODEID,
+                    PAYLOAD_RSSI_RSSI4 as RSSI from wrapper where PAYLOAD_RSSI_RSSI4 is not null
+         </query>
+       </source>
+     <query> select * from source </query>
+     </stream>
+    <stream name="data_rssi5">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+             select * from etz_dozer_rssi__1946
+           </predicate>
+           <predicate key="start-time">continue</predicate>
+         </address>
+         <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
+                    PAYLOAD_RSSI_ID5 as RSSI_NODEID,
+                    PAYLOAD_RSSI_RSSI5 as RSSI from wrapper where PAYLOAD_RSSI_RSSI5 is not null
+         </query>
+       </source>
+     <query> select * from source </query>
+     </stream>
+    <stream name="data_rssi6">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+             select * from etz_dozer_rssi__1946
+           </predicate>
+           <predicate key="start-time">continue</predicate>
+         </address>
+         <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
+                    PAYLOAD_RSSI_ID6 as RSSI_NODEID,
+                    PAYLOAD_RSSI_RSSI6 as RSSI from wrapper where PAYLOAD_RSSI_RSSI6 is not null
+         </query>
+       </source>
+     <query> select * from source </query>
+     </stream>
+     
+   
+    </streams>
+</virtual-sensor>

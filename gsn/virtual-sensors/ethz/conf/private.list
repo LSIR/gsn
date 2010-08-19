@@ -13,6 +13,7 @@ Jungfraujoch_Dozer_NodeHealth.xml
 Jungfraujoch_Dozer_NodeInfo.xml
 Jungfraujoch_Dozer_Rssi.xml
 Jungfraujoch_Dozer_StateCounter.xml
+Jungfraujoch_Topology.xml
 Matterhorn_BackLogStatus.xml
 Matterhorn_Binary.xml
 Matterhorn_CoreStationStatus.xml
@@ -32,6 +33,7 @@ Matterhorn_Dozer_Rssi.xml
 Matterhorn_Dozer_StateCounter.xml
 Matterhorn_Schedule.xml
 Matterhorn_VaisalaWXT520.xml
+Matterhorn_Topology.xml
 Thur_BackLogStatus.xml
 Thur_Binary.xml
 Thur_CoreStationStatus.xml
@@ -49,3 +51,4 @@ Thur_Dozer_NodeHealth.xml
 Thur_Dozer_NodeInfo.xml
 Thur_Dozer_Rssi.xml
 Thur_Dozer_StateCounter.xml
+Thur_Topology.xml
