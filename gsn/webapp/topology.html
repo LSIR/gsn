@@ -195,7 +195,7 @@ var topologyUpdateTimer;
       current_deployment.isUpdating = true;
       $.ajax({
         type: "GET",
-        url: "/field?vs="+current_deployment.name+"_topology&field=DATA&pk=latest",
+        url: "/field?vs="+current_deployment.topology_vs_name+"&field=DATA&pk=latest",
         success: function(data){
           updateTable($("sensornodes",data));
           updateGraph($("sensornodes",data));
@@ -231,15 +231,22 @@ $(document).ready(function() {
                 }
                 $("#gsn-name").show();
                 uptime.setTime($(gsn).attr("uptime"));
+                var topology_vs_name = new Array();
 		var arraySize = 0;
 		$("virtual-sensor",data).each(function(){
-		    var deploymentname = $(this).attr("name").split("_", 1)[0];
+                    var deploymentname = $(this).attr("name").split("_", 1)[0];
+		    var groupname = $(this).attr("name").split("_", 2)[1];
+                    deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
 		    if(deploymentname.length > 1) {
-			deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
-			if ($.inArray(deploymentname, deployments) < 0) {
-			    deployments.push(deploymentname);
-			}
-		    }
+                      if ($.inArray(deploymentname, deployments) < 0) {
+                        deployments.push(deploymentname);
+                      }
+                      if (groupname == "topology") {
+                        var i = $.inArray(deploymentname, deployments);
+                        if (i>-1)
+                          topology_vs_name[i]=$(this).attr("name");
+                      }
+		    }                    
 		});
 		// display
 		var visible;
@@ -262,6 +269,7 @@ $(document).ready(function() {
                     // add graph
                     deployment_data.push({
                       name : deployments[i],
+                      topology_vs_name : topology_vs_name[i],
                       sensornodes : new Array(),
                       links : new Array(),
                       isUpdating : false,
