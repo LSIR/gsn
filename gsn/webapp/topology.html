@@ -6,54 +6,217 @@
 	<title>GSN</title>
 	
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
 	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+        <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
 		
 	<script type="text/javascript" src="js/constants.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
         <script type="text/javascript" src="js/uptime.js"></script>
 
+
+        <script type="text/javascript" src="js/protovis-d3.3.js"></script>
 <script type="text/javascript">
 <!--//<![CDATA[
 
-var initialUpdateVal = 12;
-var nextUpdateVal = initialUpdateVal;
 var deployments = new Array();
+var deployment_data = new Array();
+var current_deployment;
+var selected_deployment;
 
-function updateTopology()
-{
-	var d = new Date();
-	for (var i in deployments) {
-	    $("#topology_"+deployments[i]).find("img").attr('src',"http://people.ee.ethz.ch/~perma/topology.php?host="+deployments[i]+"&date="+ d.getTime());
-	}
-}
+var ACTIVE_TIMEOUT_MS = 2000;
+var STANDBY_TIMEOUT_MS = 300000;
 
-function nextUpdate()
-{
-	if(nextUpdateVal==0) nextUpdateVal=initialUpdateVal+1;
-	
-	nextUpdateVal--;
-	
-	$("#nextUpdate").text(nextUpdateVal);
-	
-	if(nextUpdateVal==0) 
-	{
-		updateTopology();
-	}
-	setTimeout("nextUpdate()",1000);
-}
+var rssi_dist = 25;
+var topologyUpdateTimer;
+
+
+  function nodeindex(id) {
+    for (i=0;i<current_deployment.sensornodes.length;i++) {
+      if (current_deployment.sensornodes[i].node_id==id)
+        return i;
+    }
+    return -1;
+  }
+
+  function updateGraph(network) {
+    var topoloy_change=false;
+    current_deployment.links = new Array();
+    $(current_deployment.sensornodes).each(function(index,value) {
+      this.touched=false;
+    });
+    $("sensornode",network).each(function(){
+      var id = $(this).attr("node_id");
+      var index = nodeindex(id);
+      if (index < 0) {
+        current_deployment.sensornodes.push({node_id : $(this).attr("node_id"), timestamp :  $(this).attr("timestamp"), touched : true});
+        topoloy_change = true;
+      }
+      else {
+        current_deployment.sensornodes[index].timestamp = $(this).attr("timestamp");
+        current_deployment.sensornodes[index].touched = true;
+      }
+    });
+    var tmp = new Array();
+    $(current_deployment.sensornodes).each(function(index,value) {
+      if (this.touched)
+        tmp.push(this);
+      else {
+        topoloy_change=true;
+        removeIdFromTable(this.node_id);
+      }
+    });
+    current_deployment.sensornodes = tmp;
+    $("sensornode",network).each(function(){
+      if ($(this).attr("parent_id")) {
+        var src=nodeindex($(this).attr("node_id"));
+        var dst=nodeindex($(this).attr("parent_id"));
+        if (src >= 0 && dst >= 0) {
+          var srclink = $("links", this).children("[node_id='"+$(this).attr("parent_id")+"']")[0];
+          var dstlink = $($(network).children("[node_id='"+$(this).attr("parent_id")+"']")[0]).find("link[node_id='"+$(this).attr("node_id")+"']")[0];
+          current_deployment.links.push({source : src, target: dst, srcrssi : $(srclink).attr("rssi"), dstrssi : $(dstlink).attr("rssi")});
+        }
+      }
+    });
+
+    current_deployment.force.nodes(current_deployment.sensornodes);
+    current_deployment.force.links(current_deployment.links);
+
+    if (topoloy_change) {
+      current_deployment.force.reset();
+      current_deployment.force.iterations(100);
+    }
+    else {
+      current_deployment.force.iterations(1);
+    }
+    current_deployment.vis.render();
+  }
+
+  function expandNull(z, digits) {
+    z = ""+z;
+    for (var i = z.length; i<digits;i++)
+      z = "0"+z;
+    return z;
+  }
+
+  function formatTime(t) {
+    if (!t)
+      return "";
+    else {      
+      var d = new Date(0);
+      d.setUTCMilliseconds(t);
+      return (1900+d.getYear())+"-"+expandNull(d.getMonth()+1,2)+"-"+expandNull(d.getDate(),2)+" "+expandNull(d.getHours(),2)+":"+expandNull(d.getMinutes(),2)+":"+expandNull(d.getSeconds(),2)+" "+(d.getTimezoneOffset()<0?"+":"")+(-d.getTimezoneOffset()/60)+":00";
+    }
+  }
+
+  function unmarkNewData() {
+     $("tbody", "#topology_"+current_deployment.name).find("tr").each(function() {
+      $(this).removeClass("newdata");
+    });
+  }
+
+  function removeIdFromTable(id) {
+    var table = $("tbody", "#topology_"+current_deployment.name);
+    $("tr", table).each(function() {
+      if ($(this).find(">:first-child").text()==id)
+        $(this).remove();}
+    );
+  }
+
+  function updateTable(network) {
+    var table = $("tbody", "#topology_"+current_deployment.name);
+    var tablesorter = $("table.tablesorter", "#topology_"+current_deployment.name);
+    var sortlist = $(tablesorter).get(0).config.sortList;
+    var tabelChanged = false;
+    $("sensornode",network).each(function(){
+      var id = $(this).attr("node_id");
+      var index = nodeindex(id);
+      if ((index < 0) || ($(this).attr("timestamp") > current_deployment.sensornodes[index].timestamp)) {
+        removeIdFromTable(id);
+        table.append("<tr class=\"newdata\">"+
+          "<td>"+parseInt($(this).attr("node_id"))+"</td>"+
+          "<td>"+($(this).attr("packet_count") ? $(this).attr("packet_count") : "")+"</td>"+
+          "<td>"+($(this).attr("vsys") ? $(this).attr("vsys") : "") +"</td>"+
+          "<td>"+($(this).attr("current") ? + String($(this).attr("current")) : "")+"</td>"+
+          "<td>"+($(this).attr("temperature") ? + $(this).attr("temperature") : "")+"</td>"+
+          "<td>"+($(this).attr("humidity") ? + $(this).attr("humidity") : "")+"</td>"+
+          "<td>"+($(this).attr("flash_count") ? + $(this).attr("flash_count") : "")+"</td>"+
+          "<td>"+($(this).attr("uptime") ? + $(this).attr("uptime") : "")+"</td>"+
+          "<td>"+formatTime($(this).attr("generation_time"))+"</td>"+
+          "<td>"+formatTime($(this).attr("timestamp"))+"</td>"+
+          "</tr>");
+        tabelChanged = true;
+      }
+    });
+    if (tabelChanged) {
+      tablesorter.trigger("update");
+      if (sortlist.length > 0)
+        tablesorter.trigger("sorton", [sortlist]);
+      setTimeout("unmarkNewData()",500);
+    }    
+  }
+
+  function updateStatusBar(network) {
+    var packetcount = 0;
+    var nodeonlinecount = 0;
+    var nodetotalcount = 0;
+    var now=new Date().getTime();
+    $("sensornode",network).each(function(){
+      packetcount = packetcount+parseInt($(this).attr("packet_count"));
+      nodetotalcount = nodetotalcount + 1;
+      if (now - $(this).attr("timestamp") <= STANDBY_TIMEOUT_MS)
+        nodeonlinecount = nodeonlinecount + 1;
+    });
+    if (current_deployment.totalpackets == null) {
+      current_deployment.totalpackets = packetcount;
+    }
+    current_deployment.packethistory.push({rate : packetcount - current_deployment.totalpackets, time : now});
+    if (current_deployment.packethistory.length > 10)
+      current_deployment.packethistory.shift();
+    current_deployment.totalpackets = packetcount;
+    var starttime=now, endtime=0, sum=0;
+    $(current_deployment.packethistory).each(function(){
+      sum = sum + this.rate;
+      if (this.time < starttime) starttime = this.time;
+      if (this.time > endtime) endtime = this.time;
+    });
+    $(".statusbar", "#topology_"+current_deployment.name).empty();
+    $(".statusbar", "#topology_"+current_deployment.name).append("Total: "+nodetotalcount+" Online: "+nodeonlinecount+" Packetrate: "+parseFloat((sum / (endtime-starttime) * 1000)).toFixed(2)+" Pkts/s");
+    
+    
+  }
+
+  function fetchTopologyInfo() {
+    if (!current_deployment.isUpdating) {
+      current_deployment.isUpdating = true;
+      $.ajax({
+        type: "GET",
+        url: "/field?vs="+current_deployment.name+"_topology&field=DATA&pk=latest",
+        success: function(data){
+          updateTable($("sensornodes",data));
+          updateGraph($("sensornodes",data));
+          updateStatusBar($("sensornodes",data));
+          current_deployment.isUpdating = false;
+          current_deployment = selected_deployment;
+          topologyUpdateTimer = setTimeout("fetchTopologyInfo()",5000);
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown) {
+          current_deployment.isUpdating = false;
+          current_deployment = selected_deployment;
+          topologyUpdateTimer = setTimeout("fetchTopologyInfo()",10000);
+        }
+      });    
+    }
+  }
 
 $(document).ready(function() {
 
 	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 	
-        $("#nextUpdate").text(nextUpdateVal);
-	setTimeout("nextUpdate()",1000);
-
-	// deployments
 	// load deployments
 	$.ajax({
 	      type: "GET",
@@ -91,21 +254,114 @@ $(document).ready(function() {
 			"href":"javascript:showTopology("+i+")"
 		    },deployments[i])));
 		    // add div
-		    $("#topologycontainer").append(
-			$.DIV({
-			    "id":"topology_"+deployments[i]
-			      },
-			$.IMG({
-			    "id":"topology_img_"+deployments[i]
-			})));
+		    $("#topologycontainer").append("<div id=\"topology_"+deployments[i]+"\"><div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"ttable\"></div><div class=\"statusbar\"></div></div>");
 		    if (deployments[i]!=visible)
 			$("#topology_"+deployments[i]).hide();
 		    else
 			$("#deployment_menu_item_"+deployments[i]).addClass("selected");
-		}
-		updateTopology();
-	      }
-	});	
+                    // add graph
+                    deployment_data.push({
+                      name : deployments[i],
+                      sensornodes : new Array(),
+                      links : new Array(),
+                      isUpdating : false,
+                      totalpackets : null,
+                      packethistory : new Array(),
+                      vis : new pv.Panel()
+                        .width(700)
+                        .height(300)
+                        .fillStyle("white")
+                        .canvas("topology_graph_"+deployments[i])
+                    });
+                    deployment_data[deployment_data.length-1].force =
+                      deployment_data[deployment_data.length-1].vis
+                        .add(pv.Layout.Force)
+                        .springLength(70)
+                        .bound(true)
+                        .chargeConstant(-200)
+                        .springConstant(.4)
+                        .link.add(pv.Line).parent.add(pv.Label)
+                        .text(function(d) {
+                          return d.srcrssi;
+                        })
+                        .left(function(l) {
+                          var x = l.targetNode.px - l.sourceNode.px;
+                          var y = l.targetNode.py - l.sourceNode.py;
+                          var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
+                          return l.sourceNode.px + x * f-12;
+                        })
+                        .top(function(l) {
+                          var x = l.targetNode.px - l.sourceNode.px;
+                          var y = l.targetNode.py - l.sourceNode.py;
+                          var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
+                          return l.sourceNode.py + y * f+8;
+                        })
+                        .parent.add(pv.Label)
+                        .text(function(d) {
+                          return d.dstrssi;
+                        })
+                        .left(function(l) {
+                          var x = l.sourceNode.px - l.targetNode.px;
+                          var y = l.sourceNode.py - l.targetNode.py;
+                          var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
+                          return l.targetNode.px + x * f-12;
+                        })
+                        .top(function(l) {
+                          var x = l.sourceNode.px - l.targetNode.px;
+                          var y = l.sourceNode.py - l.targetNode.py;
+                          var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
+                          return l.targetNode.py + y * f+8;
+                        })
+                        .parent.parent;
+                    deployment_data[deployment_data.length-1].node =
+                      deployment_data[deployment_data.length-1].force
+                        .node.add(pv.Dot)
+                        .shapeSize(function(d) {return 230;})
+                        .fillStyle(function(d) {
+                          var now=new Date().getTime();
+                          if (now - d.timestamp > STANDBY_TIMEOUT_MS)
+                            return "#ffa0a0";
+                          else if (now - d.timestamp > ACTIVE_TIMEOUT_MS)
+                            return "#a0c0a0";
+                          else
+                            return "#a0ffa0";
+                        })
+                        .strokeStyle(function() {return this.fillStyle().darker()})
+                        .lineWidth(1); /*
+                        .event("mousedown", pv.Behavior.drag())
+                        .event("drag", deployment_data[deployment_data.length-1].force);*/
+                    deployment_data[deployment_data.length-1].force
+                      .label.add(pv.Label)
+                        .text(function(d) {return d.node_id;})
+                        .font(function() {return "bold 11px sans-serif";});
+                    // add table
+                    $($(".ttable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
+                    "<th class=\"header\">ID</th>"+
+                    "<th class=\"header\">Pkt Count</th>"+
+                    "<th class=\"header\">Vsys</th>"+
+                    "<th class=\"header\">I</th>"+
+                    "<th class=\"header\">Temp</th>"+
+                    "<th class=\"header\">Hum</th>"+
+                    "<th class=\"header\">Flash Count</th>"+
+                    "<th class=\"header\">Uptime</th>"+
+                    "<th class=\"header\">Generation Time</th>"+
+                    "<th class=\"header\">Timestamp</th>"+
+                    "</tr></thead><tbody></tbody></table>");
+                    $($(".tablesorter", "#topology_"+deployments[i])[0]).tablesorter({ 
+                      widthFixed: true
+                    });                    
+                    // add status bar
+                    if (deployments[i]==visible) {
+                      selected_deployment=deployment_data[i];
+                      current_deployment=deployment_data[deployment_data.length-1];
+                      current_deployment.force.nodes(current_deployment.sensornodes);
+                      current_deployment.force.links(current_deployment.links)
+                      current_deployment.vis.render();
+                    }
+                }
+                topologyUpdateTimer = setTimeout("fetchTopologyInfo()",100);
+              }
+       });
 });
 
 function showTopology(id) {
@@ -116,6 +372,13 @@ function showTopology(id) {
   $("#topology_"+deployments[id]).show();
   $("#deployment_menu_item_"+deployments[id]).addClass("selected");
   $.cookie("deployment" , deployments[id]);
+  selected_deployment = deployment_data[id];
+  if (!current_deployment.isUpdating) {
+    unmarkNewData();
+    current_deployment = selected_deployment;
+    clearTimeout(topologyUpdateTimer); 
+    topologyUpdateTimer = setTimeout("fetchTopologyInfo()",100);
+  }
 }
 //]]>-->
 </script>
@@ -150,13 +413,9 @@ function showTopology(id) {
 	
 	<div id="maindiv">
 		<div id="deployment_navigation">
-		<ul id="deployment_menu">
-		</ul>
+		<ul id="deployment_menu"></ul>
 		</div>	
-	
-		<p id="updatetext">next update in <span id="nextUpdate">??</span> seconds</p>
-
-		<div id="topologycontainer"></div>
+		<div id="topologycontainer" style="margin-top:5px"></div>
 	</div>
 	<div class="separator">
 		<div id="footer">
