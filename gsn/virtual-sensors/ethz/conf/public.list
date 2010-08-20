@@ -81,6 +81,7 @@ Jungfraujoch_Sensorrod.xml
 Jungfraujoch_Thermistorchain1.xml
 Jungfraujoch_Thermistorchain2.xml
 Jungfraujoch_Thermistorchain.xml
+Jungfraujoch_Topology_public.xml
 Matterhorn_BackLogStatus__mapped.xml
 Matterhorn_Binary__mapped.xml
 Matterhorn_CoreStationStatus__conv.xml
@@ -224,6 +225,7 @@ Matterhorn_Thermistorchain.xml
 Matterhorn_VaisalaWXT520__mapped.xml
 Matterhorn_VaisalaWXT520__muxed__mapped.xml
 Matterhorn_Waterpressure.xml
+Matterhorn_Topology_public.xml
 Thur_BackLogStatus__mapped.xml
 Thur_Binary__mapped.xml
 Thur_CoreStationStatus__conv.xml
@@ -285,3 +287,4 @@ Thur_pos5_DozerDecagonMux__chart2.xml
 Thur_pos5_DozerDecagonMux__chart3.xml
 Thur_pos5_DozerDutyCycle__chart1.xml
 Thur_pos6_DozerDutyCycle__chart1.xml
+Thur_Topology_public.xml
