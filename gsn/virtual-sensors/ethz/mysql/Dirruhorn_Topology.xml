@@ -205,7 +205,6 @@
           <predicate key="query">
              select * from dirruhorn_dozer_rssi__1946
            </predicate>
-           <predicate key="start-time">continue</predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
                     PAYLOAD_RSSI_ID0 as RSSI_NODEID,
@@ -220,7 +219,6 @@
           <predicate key="query">
              select * from dirruhorn_dozer_rssi__1946
            </predicate>
-           <predicate key="start-time">continue</predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
                     PAYLOAD_RSSI_ID1 as RSSI_NODEID,
@@ -235,7 +233,6 @@
           <predicate key="query">
              select * from dirruhorn_dozer_rssi__1946
            </predicate>
-           <predicate key="start-time">continue</predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
                     PAYLOAD_RSSI_ID2 as RSSI_NODEID,
@@ -250,7 +247,6 @@
           <predicate key="query">
              select * from dirruhorn_dozer_rssi__1946
            </predicate>
-           <predicate key="start-time">continue</predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
                     PAYLOAD_RSSI_ID3 as RSSI_NODEID,
@@ -265,7 +261,6 @@
           <predicate key="query">
              select * from dirruhorn_dozer_rssi__1946
            </predicate>
-           <predicate key="start-time">continue</predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
                     PAYLOAD_RSSI_ID4 as RSSI_NODEID,
@@ -280,7 +275,6 @@
           <predicate key="query">
              select * from dirruhorn_dozer_rssi__1946
            </predicate>
-           <predicate key="start-time">continue</predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
                     PAYLOAD_RSSI_ID5 as RSSI_NODEID,
@@ -295,7 +289,6 @@
           <predicate key="query">
              select * from dirruhorn_dozer_rssi__1946
            </predicate>
-           <predicate key="start-time">continue</predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
                     PAYLOAD_RSSI_ID6 as RSSI_NODEID,
