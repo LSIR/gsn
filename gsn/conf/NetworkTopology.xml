@@ -1,0 +1,34 @@
+<binding>
+    <mapping name="network" class="gsn.beans.NetworkTopology">
+       <collection name="sensornodes" field="sensornodes"  item-type="gsn.beans.SensorNode" />
+   </mapping>
+
+   <mapping name="sensornode" class="gsn.beans.SensorNode" >
+  	   <value name="node_id" field="node_id" style="attribute"/>
+  	   <value name="parent_id" field="parent_id" style="attribute" usage="optional"/>
+  	   <value name="timestamp" field="timestamp" style="attribute"/>
+  	   <value name="generation_time" field="generation_time" style="attribute"/>
+  	   
+  	   <value name="nodetype" field="nodetype" style="attribute" usage="optional"/>
+  	   <value name="packet_count" field="packet_count" style="attribute" usage="optional"/>
+  	   <value name="vsys" style="attribute" usage="optional" get-method="getVsys" set-method="setVsys"/>
+  	   <value name="current" style="attribute" usage="optional" get-method="getCurrent" set-method="setCurrent"/>
+  	   <value name="temperature" style="attribute" usage="optional" get-method="getTemperature" set-method="setTemperature"/>
+  	   <value name="humidity" style="attribute" usage="optional" get-method="getHumidity" set-method="setHumidity"/>
+  	   <value name="flash_count" field="flash_count" style="attribute" usage="optional"/>
+  	   <value name="uptime" field="uptime" style="attribute" usage="optional"/>
+  	   
+  	   <value name="dataconfig" field="dataconfig" style="attribute" usage="optional"/>
+  	   <value name="p1" field="p1" style="attribute" usage="optional"/>
+  	   <value name="p2" field="p2" style="attribute" usage="optional"/>
+  	   <value name="config_gentime_date" field="config_gentime_date" style="attribute" usage="optional"/>
+  	   
+  	   <collection name="links" field="links" item-type="gsn.beans.Link" />
+   </mapping>
+   
+   <mapping name="link" class="gsn.beans.Link" >
+  	   <value name="node_id" field="node_id" style="attribute"/>
+  	   <value name="rssi" field="rssi" style="attribute"/>
+  	   <value name="timestamp" field="timestamp" style="attribute"/>
+   </mapping>
+</binding>
