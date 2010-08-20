@@ -89,6 +89,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		else
 			logger.debug("already seen:"+node_id);
 		SensorNode node = nodes.get(node_id);
+		node.timestamp = timestamp;
+		node.generation_time = generation_time;
 		
 		if (inputStreamName.startsWith(configuration[12])) {
 			logger.debug( "got rssi info:" + data.getData("HEADER_ORIGINATORID") + " " + data.getData("RSSI_NODEID") + " " + data.getData("RSSI"));
@@ -181,9 +183,6 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		s = data.getData(configuration[9]);
 		if (s instanceof Integer)
 			node.uptime = (Integer)s;
-
-		node.timestamp = timestamp;
-		node.generation_time = generation_time;
 		
 		// remove outdated information
 		Long now = System.currentTimeMillis();
@@ -261,7 +260,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					NetworkTopology lastTopology = (NetworkTopology) uctx.unmarshalDocument(new ByteArrayInputStream(
 						(byte[])s), "UTF-8");
 					for (SensorNode n: lastTopology.sensornodes) {
-						nodes.put(n.node_id, n);
+						if (n.node_id !=null && n.timestamp != null && n.generation_time != null)
+							nodes.put(n.node_id, n);
 					}
 					logger.info("successfully imported last network topology.");
 				}
