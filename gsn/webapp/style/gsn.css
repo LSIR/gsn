@@ -1084,10 +1084,39 @@ text-decoration:none;
 	text-decoration:none;
 }
 
-#topologycontainer .ttable .newdata td {
+#topologycontainer .newdata td {
   background-color: #77d07a;
+}
+
+#topologycontainer .offline td {
+  background-color: #FFE0E0;
+}
+
+#topologycontainer .selected td {
+  background-color: #E0E0E0;
 }
 
 #topologycontainer table th {
     background-color: #b8caf7;
+}
+
+#topologycontainer table{
+  margin-bottom:0px;
+}
+#topologycontainer div table{
+  padding-bottom:0px;
+}
+
+#topologycontainer .tabnav a:link, #topologycontainer .tabnav a:visited {
+    border-top:0px;
+    border-bottom:1px solid #b8caf7;
+}
+
+#topologycontainer table input {
+  margin:0px;
+}
+
+#topologycontainer td div {
+  border:1px none;
+  float:left;
 }
