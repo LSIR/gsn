@@ -14,7 +14,7 @@ public class SensorNode {
 	static final int NODE_TYPE_POWERSWITCH = 2;
 	static final int NODE_TYPE_BBCONTROL = 3;
 	
-	Integer nodetype = NODE_TYPE_SIB; // default type
+	public Integer nodetype = NODE_TYPE_SIB; // default type
 		
 	public Integer node_id;
 	public Integer parent_id;
@@ -29,15 +29,10 @@ public class SensorNode {
 	public Double humidity;
 	public Integer flash_count;
 	public Integer uptime;
-		
-	/*
-	 * Eventlogger Data
-	 */
-	public Integer dataconfig;
-	public Boolean p1;
-	public Boolean p2;
-	public Long config_gentime_date;
 	
+	public SensorNodeConfiguration configuration;
+	public SensorNodeConfiguration pendingConfiguration;
+			
 	public ArrayList<Link> links;
 	
 	private DecimalFormat df = new DecimalFormat("0.00");

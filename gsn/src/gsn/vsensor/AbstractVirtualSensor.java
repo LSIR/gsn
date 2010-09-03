@@ -114,7 +114,7 @@ public abstract class AbstractVirtualSensor {
 					field.getDataTypeID() == DataTypes.TINYINT ) &&!(value instanceof Number)) 
 					||
 					( (field.getDataTypeID() == DataTypes.VARCHAR || field.getDataTypeID() == DataTypes.CHAR) && !(value instanceof String)) ||
-					( (field.getDataTypeID() == DataTypes.BINARY) && !(value instanceof byte[])) 
+					( (field.getDataTypeID() == DataTypes.BINARY) && !(value instanceof byte[] || value instanceof String)) 
 			){ 
 				logger.warn( "Validation problem for output field >" + field.getName( ) + ", The field type declared as >" + field.getType()+"< while in VSD it is defined as >"+DataTypes.TYPE_NAMES[outputStructure[ i ].getDataTypeID( )]);
 				return false;

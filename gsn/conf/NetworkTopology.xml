@@ -1,13 +1,14 @@
 <binding>
     <mapping name="network" class="gsn.beans.NetworkTopology">
        <collection name="sensornodes" field="sensornodes"  item-type="gsn.beans.SensorNode" />
+       <value name="configurable" field="configurable" style="attribute" usage="optional"/>
    </mapping>
 
    <mapping name="sensornode" class="gsn.beans.SensorNode" >
   	   <value name="node_id" field="node_id" style="attribute"/>
   	   <value name="parent_id" field="parent_id" style="attribute" usage="optional"/>
-  	   <value name="timestamp" field="timestamp" style="attribute"/>
-  	   <value name="generation_time" field="generation_time" style="attribute"/>
+  	   <value name="timestamp" field="timestamp" style="attribute" usage="optional"/>
+  	   <value name="generation_time" field="generation_time" style="attribute" usage="optional"/>
   	   
   	   <value name="nodetype" field="nodetype" style="attribute" usage="optional"/>
   	   <value name="packet_count" field="packet_count" style="attribute" usage="optional"/>
@@ -17,13 +18,12 @@
   	   <value name="humidity" style="attribute" usage="optional" get-method="getHumidity" set-method="setHumidity"/>
   	   <value name="flash_count" field="flash_count" style="attribute" usage="optional"/>
   	   <value name="uptime" field="uptime" style="attribute" usage="optional"/>
-  	   
-  	   <value name="dataconfig" field="dataconfig" style="attribute" usage="optional"/>
-  	   <value name="p1" field="p1" style="attribute" usage="optional"/>
-  	   <value name="p2" field="p2" style="attribute" usage="optional"/>
-  	   <value name="config_gentime_date" field="config_gentime_date" style="attribute" usage="optional"/>
-  	   
+  	     	   
   	   <collection name="links" field="links" item-type="gsn.beans.Link" />
+  	   
+  	   <structure field="configuration" name="configuration" usage="optional" />
+       <structure field="pendingConfiguration" name="pendingConfiguration" usage="optional" />
+       
    </mapping>
    
    <mapping name="link" class="gsn.beans.Link" >
@@ -31,4 +31,23 @@
   	   <value name="rssi" field="rssi" style="attribute"/>
   	   <value name="timestamp" field="timestamp" style="attribute"/>
    </mapping>
+   
+   <mapping abstract="true" class="gsn.beans.SensorNodeConfiguration" >
+   	<value name="info" field="info" style="attribute" usage="optional"/>
+	<value name="health" field="health" style="attribute" usage="optional"/>
+	<value name="adcmux" field="adcmux" style="attribute" usage="optional"/>
+	<value name="adccomdiff" field="adccomdiff" style="attribute" usage="optional"/>
+	<value name="dcx" field="dcx" style="attribute" usage="optional"/>
+	<value name="drift" field="drift" style="attribute" usage="optional"/>
+	<value name="events" field="events" style="attribute" usage="optional"/>
+	<value name="rssi" field="rssi" style="attribute" usage="optional"/>
+	<value name="statecounter" field="statecounter" style="attribute" usage="optional"/>
+	<value name="decagonmux" field="decagonmux" style="attribute" usage="optional"/>
+	<value name="powerswitch" field="powerswitch" style="attribute" usage="optional"/>
+	<value name="powerswitch_p1" field="powerswitch_p1" style="attribute" usage="optional"/>
+	<value name="powerswitch_p2" field="powerswitch_p2" style="attribute" usage="optional"/>
+	<value name="timestamp" field="timestamp" style="attribute" usage="optional"/>
+   </mapping>
+   
+   
 </binding>
