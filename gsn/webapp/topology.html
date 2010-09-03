@@ -2,24 +2,23 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-	<title>GSN</title>
-	
-	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
-        <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
-	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
-	<script type="text/javascript" src="js/jquery-dom.js"></script>
-	<script type="text/javascript" src="js/jquery.history.js"></script>
-	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
-	<script type="text/javascript" src="js/jquery.cookie.js"></script>
-        <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
-		
-	<script type="text/javascript" src="js/constants.js"></script>
-	<script type="text/javascript" src="js/functions.js"></script>
-        <script type="text/javascript" src="js/uptime.js"></script>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>GSN</title>
 
+  <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+  <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
+  <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="js/jquery-dom.js"></script>
+  <script type="text/javascript" src="js/jquery.history.js"></script>
+  <script type="text/javascript" src="js/jquery-tooltip.js"></script>
+  <script type="text/javascript" src="js/jquery.cookie.js"></script>
+  <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
 
-        <script type="text/javascript" src="js/protovis-d3.3.js"></script>
+  <script type="text/javascript" src="js/constants.js"></script>
+  <script type="text/javascript" src="js/functions.js"></script>
+  <script type="text/javascript" src="js/uptime.js"></script>
+  <script type="text/javascript" src="js/protovis-d3.3.js"></script>
+
 <script type="text/javascript">
 <!--//<![CDATA[
 
@@ -33,7 +32,27 @@ var STANDBY_TIMEOUT_MS = 300000;
 
 var rssi_dist = 25;
 var topologyUpdateTimer;
+var unmarkTimer;
+var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
+var healthitems=new Array("packet_count", "vsys", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
 
+var GSN = {
+  /**
+    * iframe msg callback for webupload
+    */
+    msgcallback: function (msg,code) {
+        $("#msg").html(msg);
+        $("#msg").removeClass();
+        if (code <= 200)
+            $("#msg").addClass("good");
+        else
+            $("#msg").addClass("bad");
+        $("#msg").append("<input style =\"margin-left:20px\" type=\"button\" value=\"OK\">");
+        $("input[type=\"button\"]","#msg").bind("click", function () { $("#msg").hide(); $("#msg").empty();});
+        $("#msg").show();
+        resetconfigurations(true);
+    }
+}
 
   function nodeindex(id) {
     for (i=0;i<current_deployment.sensornodes.length;i++) {
@@ -43,8 +62,17 @@ var topologyUpdateTimer;
     return -1;
   }
 
+  function linkExists(links, testlink) {
+    for (i=0;i<links.length;i++) {
+      if (links[i].source==testlink.source && links[i].target==testlink.target && links[i].srcrssi==testlink.srcrssi && links[i].dstrssi==testlink.dstrssi)
+        return true;
+    }
+    return false;
+  }
+
   function updateGraph(network) {
     var topoloy_change=false;
+    var oldlinks = current_deployment.links;
     current_deployment.links = new Array();
     $(current_deployment.sensornodes).each(function(index,value) {
       this.touched=false;
@@ -78,7 +106,10 @@ var topologyUpdateTimer;
         if (src >= 0 && dst >= 0) {
           var srclink = $("links", this).children("[node_id='"+$(this).attr("parent_id")+"']")[0];
           var dstlink = $($(network).children("[node_id='"+$(this).attr("parent_id")+"']")[0]).find("link[node_id='"+$(this).attr("node_id")+"']")[0];
-          current_deployment.links.push({source : src, target: dst, srcrssi : $(srclink).attr("rssi"), dstrssi : $(dstlink).attr("rssi")});
+          var newlink = {source : src, target: dst, srcrssi : $(srclink).attr("rssi"), dstrssi : $(dstlink).attr("rssi")};
+          current_deployment.links.push(newlink);
+          if (!linkExists(oldlinks, newlink))
+            topoloy_change=true;
         }
       }
     });
@@ -94,6 +125,31 @@ var topologyUpdateTimer;
       current_deployment.force.iterations(1);
     }
     current_deployment.vis.render();
+  }
+
+  function resetconfigurations(apply) {
+    $(".configtable tbody>tr", "#topologycontainer").each(function() {
+      if (!$(this).hasClass("disabled")) {
+        $(this).addClass("disabled");
+        $("td", this).each(function(){
+          $("input:first", this).attr("disabled","true");
+          if (!$("input:first",this).data("enabled_pending") || $("input:first",this).data("enabled")==$("input:first",this).data("enabled_pending"))
+            $(this).removeClass("changing");
+          // change if not equal
+          if ($("input:first",this).data("enabled")=="true" && !$("input:first", this).attr("checked")) {
+            $("input:first", this).attr("checked", "true");
+            if (apply)
+              $(this).addClass("changing");
+          }
+          else if ($("input:first",this).data("enabled")=="false" && $("input:first", this).attr("checked")) {
+            $("input:first", this).attr("checked", "");
+            if (apply)
+              $(this).addClass("changing");
+          }
+        });
+      }                
+    });
+    $("form", "#topologycontainer").remove();
   }
 
   function expandNull(z, digits) {
@@ -127,36 +183,210 @@ var topologyUpdateTimer;
     );
   }
 
-  function updateTable(network) {
-    var table = $("tbody", "#topology_"+current_deployment.name);
-    var tablesorter = $("table.tablesorter", "#topology_"+current_deployment.name);
+  function updateHealthTable(network) {
+    var tablesorter = $("#topology_"+current_deployment.name).find(".healthtable table");;
+    var table = tablesorter.find("tbody");
     var sortlist = $(tablesorter).get(0).config.sortList;
-    var tabelChanged = false;
+    if (sortlist.length == 0)
+      sortlist = [[0,0]];
+    var tableChanged = false;
+    var now=new Date().getTime();
     $("sensornode",network).each(function(){
       var id = $(this).attr("node_id");
       var index = nodeindex(id);
-      if ((index < 0) || ($(this).attr("timestamp") > current_deployment.sensornodes[index].timestamp)) {
-        removeIdFromTable(id);
-        table.append("<tr class=\"newdata\">"+
-          "<td>"+parseInt($(this).attr("node_id"))+"</td>"+
-          "<td>"+($(this).attr("packet_count") ? $(this).attr("packet_count") : "")+"</td>"+
-          "<td>"+($(this).attr("vsys") ? $(this).attr("vsys") : "") +"</td>"+
-          "<td>"+($(this).attr("current") ? + String($(this).attr("current")) : "")+"</td>"+
-          "<td>"+($(this).attr("temperature") ? + $(this).attr("temperature") : "")+"</td>"+
-          "<td>"+($(this).attr("humidity") ? + $(this).attr("humidity") : "")+"</td>"+
-          "<td>"+($(this).attr("flash_count") ? + $(this).attr("flash_count") : "")+"</td>"+
-          "<td>"+($(this).attr("uptime") ? + $(this).attr("uptime") : "")+"</td>"+
-          "<td>"+formatTime($(this).attr("generation_time"))+"</td>"+
-          "<td>"+formatTime($(this).attr("timestamp"))+"</td>"+
+      if (index < 0) {
+        table.append("<tr>"+
+          "<td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
           "</tr>");
-        tabelChanged = true;
+      }
+      var row = $("td:first-child", table).filter(function(index) { return $(this).text()==id;}).parent();
+      if (index < 0 || ($(this).attr("timestamp") > current_deployment.sensornodes[index].timestamp)) {
+        var data = this;
+        $("td", row).each(function(index,value) {
+          switch (index) {
+          case 0: break;
+          case 8:
+          case 9:
+            $(this).text(formatTime($(data).attr(healthitems[index-1])));
+            break;
+          default:
+            $(this).text($(data).attr(healthitems[index-1])?$(data).attr(healthitems[index-1]):"");
+            break;
+          }
+        });
+        $(row).addClass("newdata");
+        $(row).removeClass("offline");
+        $("td:first-child", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().removeClass("offline");
+        tableChanged = true;
+      }
+      if (now - $(data).attr("timestamp") > STANDBY_TIMEOUT_MS) {
+        $(row).addClass("offline");
+        $("td:first-child", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().addClass("offline");
       }
     });
-    if (tabelChanged) {
+    if (tableChanged) {
       tablesorter.trigger("update");
       if (sortlist.length > 0)
         tablesorter.trigger("sorton", [sortlist]);
-      setTimeout("unmarkNewData()",500);
+      if (unmarkTimer)
+        clearTimeout(unmarkTimer); 
+      unmarkTimer = setTimeout("unmarkNewData()",500);
+    }    
+  }
+
+  function updateConfigTable(network, isConfigurable) {
+    var tablesorter = $("#topology_"+current_deployment.name).find(".configtable table");;
+    var table = tablesorter.find("tbody");
+    var sortlist = $(tablesorter).get(0).config.sortList;
+    if (sortlist.length == 0)
+      sortlist = [[0,0]];
+    var tableChanged = false;
+    var now=new Date().getTime();
+    $("sensornode",network).each(function(){
+      var id = $(this).attr("node_id");
+      var index = nodeindex(id);
+      if (index < 0) {
+        table.append("<tr class=\"disabled\">"+
+          "<td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
+          "<td></td><td></td><td></td><td></td><td></td></tr>");
+        if (isConfigurable)
+        $("tr:last", table).bind("click",function() {
+          if (!$(this).hasClass("disabled"))
+            return;
+          $("input",this).each(function(){ $(this).removeAttr("disabled")});
+          $(this).removeClass("disabled");
+          if ($(".configtab input", "#topology_"+current_deployment.name).length==0) {
+            // add config form
+            var configtab = $(".configtab", "#topology_"+current_deployment.name);
+            configtab.append("<form action=\"/upload\" method=\"post\" enctype=\"multipart/form-data\" target=\"webupload\">"+
+                "<input type=\"submit\" value=\"apply\">"+
+                "<input type=\"button\" value=\"reset\">"+
+                "<input type=\"hidden\" name=\"vsname\" value=\""+current_deployment.topology_vs_name+"\">"+
+                "<input type=\"hidden\" name=\"cmd\" value=\"dataconfiguration\">"+
+                "<input type=\"hidden\" name=\"dataconfiguration;configuration\" value=\"\">"+
+                "</form>"
+            );
+            $("input:first", configtab).bind("click", function () {
+              // generate xml configuration
+              var generated_config="<?xml version=\"1.0\" encoding=\"UTF-8\"?><network><sensornodes>";
+              $(".configtable tbody>tr", "#topology_"+current_deployment.name).each(function() {
+                if (!$(this).hasClass("disabled")) {
+                  generated_config=generated_config+"<sensornode node_id=\""+$("td:first-child",this).text()+"\"><links />";
+                  var c = "";
+                  $("td", this).each(function(index,value) {
+                    switch (index) {
+                    case 0: break;
+                    case 2: // always enable health ..
+                    case 7: //  .. and event packets
+                      c = c + " "+configitems[index-1]+"=\"true\"";
+                      break;
+                    case 14: break;
+                    default:
+                      if ($(this).children().length > 0)
+                        c = c + " "+configitems[index-1]+"=\"" + ($("input:first", this).attr("checked")?"true":"false")+"\"";
+                    }
+                  });
+                  if (c.length>0)
+                    generated_config=generated_config+"<configuration "+$.trim(c)+" />";
+                  generated_config=generated_config+"</sensornode>";
+                }
+              });
+              generated_config=generated_config+"</sensornodes></network>";
+              $("input[name='dataconfiguration;configuration']", configtab).attr("value", generated_config);
+              // submit
+              $("form", configtab).submit();
+            });
+            // bind reset button
+            $("input[type='button']", configtab).bind("click", function () {
+              resetconfigurations(false);
+            });
+          }
+          
+        });
+        $("tr:last", table).hover(function() { $(this).parent().children().each(function(){$(this).removeClass("selected")});$(this).addClass("selected"); }, function() { $(this).removeClass("selected"); });
+      }
+      var row = $("td:first-child", table).filter(function(index) { return $(this).text()==id;}).parent();
+      var hasConfig = $("configuration", this).length>0;
+      var hasPendingConfig = $("pendingConfiguration", this).length>0;
+      var update=false;
+      var timestamp;
+      if (hasConfig) {
+        // do we need to update?
+        if (!$(row).data("hasConfig") || $(row).data("hasConfig")!=hasConfig)
+          update=true;
+        else if (hasPendingConfig && (!$(row).data("hasPendingConfig") || $(row).data("hasPendingConfig")!=hasPendingConfig))
+          update=true;
+        else if ($(row).data("hasPendingConfig") && !hasPendingConfig)
+          update=true;
+        else {
+          if ($("configuration",this).attr("timestamp"))
+            timestamp = $("configuration",this).attr("timestamp");
+          if ($("pendingConfiguration",this).attr("timestamp") && (!timestamp || $("pendingConfiguration",this).attr("timestamp")>timestamp))
+            timestamp = $("pendingConfiguration",this).attr("timestamp");
+          if (!row.data("timestamp") || row.data("timestamp") < timestamp) {
+            update=true;
+            row.data("timestamp", timestamp);
+          }
+        }
+        $(row).data("hasConfig",hasConfig);
+        if (!hasPendingConfig)
+          $(row).data("hasPendingConfig","");
+        else
+          $(row).data("hasPendingConfig",hasPendingConfig);
+      }
+      if (update) {
+        var data = $("configuration",this);
+        $("td", row).each(function(index,value) {
+            switch (index) {
+            case 0: break;
+            case 14:
+              $(this).text(formatTime($(data).attr(configitems[index-1])));
+              break;
+            default:
+              if ($(data).attr(configitems[index-1])) {
+                // fill empty cell
+                if ($(this).children().length == 0) {
+                  $(this).append("<div><input type=\"checkbox\" disabled=\""+($(this).parent().hasClass("disabled")?"disabled":"")+"\"></div>");                  
+                }
+                $("input:first", this).data("enabled", $(data).attr(configitems[index-1]));
+                var pending = $(data).parent().children("pendingConfiguration");
+                if (pending.length>0 && pending.attr(configitems[index-1]))
+                  $("input:first", this).data("enabled_pending", pending.attr(configitems[index-1]));
+                else
+                  $("input:first", this).data("enabled_pending","");
+                if ($(this).parent().hasClass("disabled")) { // if not changeable, just update
+                  if (pending.length>0 && pending.attr(configitems[index-1]) && pending.attr(configitems[index-1]) != $(data).attr(configitems[index-1]))
+                    $(this).addClass("changing");
+                  else
+                    $(this).removeClass("changing");
+                  $("input:first", this).attr("checked", $(data).attr(configitems[index-1])=="true"?"checked":"");
+                }
+                else {// compare to current status
+                  if ($("input:first", this).attr("checked") && $(data).attr(configitems[index-1])=="true" ||
+                      !$("input:first", this).attr("checked") && $(data).attr(configitems[index-1])=="false")
+                    $(this).removeClass("changing");
+                  else
+                    $(this).addClass("changing");
+                }
+              }
+              else {
+                // remove content
+                $(this).empty();
+              }
+              break;
+            }
+        });
+        $(row).addClass("newdata");
+        tableChanged = true;
+      }
+    });
+    if (tableChanged) {
+      tablesorter.trigger("update");
+      if (sortlist.length > 0)
+        tablesorter.trigger("sorton", [sortlist]);
+      if (unmarkTimer)
+        clearTimeout(unmarkTimer); 
+      unmarkTimer = setTimeout("unmarkNewData()",500);
     }    
   }
 
@@ -185,9 +415,7 @@ var topologyUpdateTimer;
       if (this.time > endtime) endtime = this.time;
     });
     $(".statusbar", "#topology_"+current_deployment.name).empty();
-    $(".statusbar", "#topology_"+current_deployment.name).append("Total: "+nodetotalcount+" Online: "+nodeonlinecount+" Packetrate: "+parseFloat((sum / (endtime-starttime) * 1000)).toFixed(2)+" Pkts/s");
-    
-    
+    $(".statusbar", "#topology_"+current_deployment.name).append("Total: "+nodetotalcount+"<br>Online: "+nodeonlinecount+"<br>Packetrate: "+parseFloat((sum / (endtime-starttime) * 1000)).toFixed(2)+" Pkts/s");
   }
 
   function fetchTopologyInfo() {
@@ -197,7 +425,8 @@ var topologyUpdateTimer;
         type: "GET",
         url: "/field?vs="+current_deployment.topology_vs_name+"&field=DATA&pk=latest",
         success: function(data){
-          updateTable($("sensornodes",data));
+          updateConfigTable($("sensornodes",data), $(data).attr("configurable")=="true");
+          updateHealthTable($("sensornodes",data));
           updateGraph($("sensornodes",data));
           updateStatusBar($("sensornodes",data));
           current_deployment.isUpdating = false;
@@ -215,167 +444,206 @@ var topologyUpdateTimer;
 
 $(document).ready(function() {
 
-	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
-	
-	// load deployments
-	$.ajax({
-	      type: "GET",
-	      url: "/gsn?structure",
-	      success: function(data){
-                if ($(document).attr("title")=="GSN") {
-                  var gsn = $("gsn",data);
-                  $(document).attr("title",$(gsn).attr("name"));
-                  $("#gsn-name").empty().append($(gsn).attr("name"));
-                  $("#gsn-desc").empty().append($(gsn).attr("description"));
-                  $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
-                }
-                $("#gsn-name").show();
-                uptime.setTime($(gsn).attr("uptime"));
-                var topology_vs_name = new Array();
-		var arraySize = 0;
-		$("virtual-sensor",data).each(function(){
-                    var deploymentname = $(this).attr("name").split("_", 1)[0];
-		    var groupname = $(this).attr("name").split("_", 2)[1];
-                    deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
-		    if(deploymentname.length > 1) {
-                      if ($.inArray(deploymentname, deployments) < 0) {
-                        deployments.push(deploymentname);
-                      }
-                      if (groupname == "topology") {
-                        var i = $.inArray(deploymentname, deployments);
-                        if (i>-1)
-                          topology_vs_name[i]=$(this).attr("name");
-                      }
-		    }                    
-		});
-		// display
-		var visible;
-		if ($.inArray($.cookie("deployment"), deployments)>-1)
-		  visible = $.cookie("deployment");
-		else
-		  visible = deployments[0];
-		for (var i in deployments) {
-		    // add tab
-		    $("#deployment_menu").append($.LI({}, $.A({
-			"id":"deployment_menu_item_"+deployments[i],
-			"href":"javascript:showTopology("+i+")"
-		    },deployments[i])));
-		    // add div
-		    $("#topologycontainer").append("<div id=\"topology_"+deployments[i]+"\"><div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"ttable\"></div><div class=\"statusbar\"></div></div>");
-		    if (deployments[i]!=visible)
-			$("#topology_"+deployments[i]).hide();
-		    else
-			$("#deployment_menu_item_"+deployments[i]).addClass("selected");
-                    // add graph
-                    deployment_data.push({
-                      name : deployments[i],
-                      topology_vs_name : topology_vs_name[i],
-                      sensornodes : new Array(),
-                      links : new Array(),
-                      isUpdating : false,
-                      totalpackets : null,
-                      packethistory : new Array(),
-                      vis : new pv.Panel()
-                        .width(700)
-                        .height(300)
-                        .fillStyle("white")
-                        .canvas("topology_graph_"+deployments[i])
-                    });
-                    deployment_data[deployment_data.length-1].force =
-                      deployment_data[deployment_data.length-1].vis
-                        .add(pv.Layout.Force)
-                        .springLength(70)
-                        .bound(true)
-                        .chargeConstant(-200)
-                        .springConstant(.4)
-                        .link.add(pv.Line).parent.add(pv.Label)
-                        .text(function(d) {
-                          return d.srcrssi;
-                        })
-                        .left(function(l) {
-                          var x = l.targetNode.px - l.sourceNode.px;
-                          var y = l.targetNode.py - l.sourceNode.py;
-                          var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
-                          return l.sourceNode.px + x * f-12;
-                        })
-                        .top(function(l) {
-                          var x = l.targetNode.px - l.sourceNode.px;
-                          var y = l.targetNode.py - l.sourceNode.py;
-                          var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
-                          return l.sourceNode.py + y * f+8;
-                        })
-                        .parent.add(pv.Label)
-                        .text(function(d) {
-                          return d.dstrssi;
-                        })
-                        .left(function(l) {
-                          var x = l.sourceNode.px - l.targetNode.px;
-                          var y = l.sourceNode.py - l.targetNode.py;
-                          var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
-                          return l.targetNode.px + x * f-12;
-                        })
-                        .top(function(l) {
-                          var x = l.sourceNode.px - l.targetNode.px;
-                          var y = l.sourceNode.py - l.targetNode.py;
-                          var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
-                          return l.targetNode.py + y * f+8;
-                        })
-                        .parent.parent;
-                    deployment_data[deployment_data.length-1].node =
-                      deployment_data[deployment_data.length-1].force
-                        .node.add(pv.Dot)
-                        .shapeSize(function(d) {return 230;})
-                        .fillStyle(function(d) {
-                          var now=new Date().getTime();
-                          if (now - d.timestamp > STANDBY_TIMEOUT_MS)
-                            return "#ffa0a0";
-                          else if (now - d.timestamp > ACTIVE_TIMEOUT_MS)
-                            return "#a0c0a0";
-                          else
-                            return "#a0ffa0";
-                        })
-                        .strokeStyle(function() {return this.fillStyle().darker()})
-                        .lineWidth(1); /*
-                        .event("mousedown", pv.Behavior.drag())
-                        .event("drag", deployment_data[deployment_data.length-1].force);*/
-                    deployment_data[deployment_data.length-1].force
-                      .label.add(pv.Label)
-                        .text(function(d) {return d.node_id;})
-                        .font(function() {return "bold 11px sans-serif";});
-                    // add table
-                    $($(".ttable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
-                    "<th class=\"header\">ID</th>"+
-                    "<th class=\"header\">Pkt Count</th>"+
-                    "<th class=\"header\">Vsys</th>"+
-                    "<th class=\"header\">I</th>"+
-                    "<th class=\"header\">Temp</th>"+
-                    "<th class=\"header\">Hum</th>"+
-                    "<th class=\"header\">Flash Count</th>"+
-                    "<th class=\"header\">Uptime</th>"+
-                    "<th class=\"header\">Generation Time</th>"+
-                    "<th class=\"header\">Timestamp</th>"+
-                    "</tr></thead><tbody></tbody></table>");
-                    $($(".tablesorter", "#topology_"+deployments[i])[0]).tablesorter({ 
-                      widthFixed: true
-                    });                    
-                    // add status bar
-                    if (deployments[i]==visible) {
-                      selected_deployment=deployment_data[i];
-                      current_deployment=deployment_data[deployment_data.length-1];
-                      current_deployment.force.nodes(current_deployment.sensornodes);
-                      current_deployment.force.links(current_deployment.links)
-                      current_deployment.vis.render();
-                    }
-                }
-                topologyUpdateTimer = setTimeout("fetchTopologyInfo()",100);
-              }
-       });
+  $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+
+  // load deployments
+  $.ajax({
+    type: "GET",
+    url: "/gsn?structure",
+    success: function(data){
+      if ($(document).attr("title")=="GSN") {
+        var gsn = $("gsn",data);
+        $(document).attr("title",$(gsn).attr("name"));
+        $("#gsn-name").empty().append($(gsn).attr("name"));
+        $("#gsn-desc").empty().append($(gsn).attr("description"));
+        $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+      }
+      $("#gsn-name").show();
+      uptime.setTime($(gsn).attr("uptime"));
+      var topology_vs_name = new Array();
+      var arraySize = 0;
+      $("virtual-sensor",data).each(function(){
+        var deploymentname = $(this).attr("name").split("_", 1)[0];
+        var groupname = $(this).attr("name").split("_", 2)[1];
+        deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
+        if(deploymentname.length > 1) {
+          if ($.inArray(deploymentname, deployments) < 0)
+            deployments.push(deploymentname);
+          if (groupname == "topology") {
+            var i = $.inArray(deploymentname, deployments);
+              if (i>-1)
+                topology_vs_name[i]=$(this).attr("name");
+          }
+        }                    
+      });
+      // display
+      var visible;
+      if ($.inArray($.cookie("deployment"), deployments)>-1)
+        visible = $.cookie("deployment");
+      else
+        visible = deployments[0];
+      for (var i in deployments) {
+        // add tab
+        $("#deployment_menu").append($.LI({}, $.A({
+          "id":"deployment_menu_item_"+deployments[i],
+          "href":"javascript:showTopology("+i+")"
+          },deployments[i])));
+        // add div
+        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\"class=\"statusbar\"></div><div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
+            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul></div>");
+        if (deployments[i]!=visible)
+          $("#topology_"+deployments[i]).hide();
+        else
+          $("#deployment_menu_item_"+deployments[i]).addClass("selected");
+        // add graph
+        deployment_data.push({
+          name : deployments[i],
+          topology_vs_name : topology_vs_name[i],
+          sensornodes : new Array(),
+          links : new Array(),
+          isUpdating : false,
+          totalpackets : null,
+          packethistory : new Array(),
+          vis : new pv.Panel()
+            .width(700)
+            .height(300)
+            .fillStyle("white")
+            .canvas("topology_graph_"+deployments[i])
+        });
+        deployment_data[deployment_data.length-1].force =
+          deployment_data[deployment_data.length-1].vis
+            .add(pv.Layout.Force)
+            .springLength(70)
+            .bound(true)
+            .chargeConstant(-200)
+            .springConstant(.4)
+            .link.add(pv.Line).parent.add(pv.Label)
+            .text(function(d) {
+              return d.srcrssi;
+            })
+            .left(function(l) {
+              var x = l.targetNode.px - l.sourceNode.px;
+              var y = l.targetNode.py - l.sourceNode.py;
+              var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
+              return l.sourceNode.px + x * f-12;
+            })
+            .top(function(l) {
+              var x = l.targetNode.px - l.sourceNode.px;
+              var y = l.targetNode.py - l.sourceNode.py;
+              var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
+              return l.sourceNode.py + y * f+8;
+            })
+            .parent.add(pv.Label)
+            .text(function(d) {
+              return d.dstrssi;
+            })
+            .left(function(l) {
+              var x = l.sourceNode.px - l.targetNode.px;
+              var y = l.sourceNode.py - l.targetNode.py;
+              var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
+              return l.targetNode.px + x * f-12;
+            })
+            .top(function(l) {
+              var x = l.sourceNode.px - l.targetNode.px;
+              var y = l.sourceNode.py - l.targetNode.py;
+              var f = rssi_dist / Math.sqrt(Math.pow(y,2)+Math.pow(x,2))
+              return l.targetNode.py + y * f+8;
+            })
+            .parent.parent;
+        deployment_data[deployment_data.length-1].node =
+          deployment_data[deployment_data.length-1].force
+            .node.add(pv.Dot)
+            .shapeSize(function(d) {return 230;})
+            .fillStyle(function(d) {
+              var now=new Date().getTime();
+              if (now - d.timestamp > STANDBY_TIMEOUT_MS)
+                return "#ffa0a0";
+              else if (now - d.timestamp > ACTIVE_TIMEOUT_MS)
+                return "#a0c0a0";
+              else
+                return "#a0ffa0";
+            })
+            .strokeStyle(function() {return this.fillStyle().darker()})
+            .lineWidth(1); /*
+            .event("mousedown", pv.Behavior.drag())
+            .event("drag", deployment_data[deployment_data.length-1].force);*/
+        deployment_data[deployment_data.length-1].force
+          .label.add(pv.Label)
+          .text(function(d) {return d.node_id;})
+          .font(function() {return "bold 11px sans-serif";});
+        // add health table
+        $($(".healthtable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
+            "<th class=\"header\" style=\"width:30px\">ID</th>"+
+            "<th class=\"header\">Pkt Count</th>"+
+            "<th class=\"header\">Vsys</th>"+
+            "<th class=\"header\">I</th>"+
+            "<th class=\"header\">Temp</th>"+
+            "<th class=\"header\">Hum</th>"+
+            "<th class=\"header\">Flash Count</th>"+
+            "<th class=\"header\">Uptime</th>"+
+            "<th class=\"header\">Generation Time</th>"+
+            "<th class=\"header\">Timestamp</th>"+
+            "</tr></thead><tbody></tbody></table>");
+        $("#topology_"+deployments[i]).find(".healthtable table").tablesorter({ 
+           widthFixed: true
+        });
+        // add config table
+        $($(".configtable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
+            "<th class=\"header\" style=\"width:30px\">ID</th>"+
+            "<th class=\"header\">info</th>"+
+            "<th class=\"header\">health</th>"+
+            "<th class=\"header\">adcmux</th>"+
+            "<th class=\"header\">adccomdiff</th>"+
+            "<th class=\"header\">dcx</th>"+
+            "<th class=\"header\">drift</th>"+
+            "<th class=\"header\">events</th>"+
+            "<th class=\"header\">rssi</th>"+
+            "<th class=\"header\">statecounter</th>"+
+            "<th class=\"header\">decagonmux</th>"+
+            "<th class=\"header\">powerswitch</th>"+
+            "<th class=\"header\">p1</th>"+
+            "<th class=\"header\">p2</th>"+
+            "<th class=\"header\">Timestamp</th>"+
+            "</tr></thead><tbody></tbody></table>");
+        $("#topology_"+deployments[i]).find(".configtable table").tablesorter({ 
+           widthFixed: true
+        });
+        // add status bar
+        if (deployments[i]==visible) {
+          selected_deployment=deployment_data[i];
+          current_deployment=deployment_data[deployment_data.length-1];
+          current_deployment.force.nodes(current_deployment.sensornodes);
+          current_deployment.force.links(current_deployment.links)
+          current_deployment.vis.render();
+        }
+        // bind tabs
+        $("#topology_"+deployments[i]).find(".configtab").click(function() { 
+          var thiscontainer = $(this).parent().parent().parent();
+          thiscontainer.find(".configtable").show();
+          thiscontainer.find(".healthtable").hide();
+          $(this).addClass("active");
+          thiscontainer.find(".healthtab").removeClass("active");
+          return false;
+        });
+        $("#topology_"+deployments[i]).find(".healthtab").click(function() { 
+          var thiscontainer = $(this).parent().parent().parent();
+          thiscontainer.find(".healthtable").show();
+          thiscontainer.find(".configtable").hide();
+          $(this).addClass("active");
+          thiscontainer.find(".configtab").removeClass("active");
+          resetconfigurations(false);
+          return false;
+        });
+      }
+      topologyUpdateTimer = setTimeout("fetchTopologyInfo()",100);
+    }
+  });
 });
 
 function showTopology(id) {
   for (var i in deployments) {
-      $("#topology_"+deployments[i]).hide();
-      $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
+    $("#topology_"+deployments[i]).hide();
+    $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
   }
   $("#topology_"+deployments[id]).show();
   $("#deployment_menu_item_"+deployments[id]).addClass("selected");
@@ -410,16 +678,10 @@ function showTopology(id) {
 		</ul>
 		<ul id="linkWebsite"><li><a href="http://www.permasense.ch" target="_blank">PermaSense Home</a></li></ul>
 	</div>
-	
-	<div id="separator">
-		<div id="starttext">
-			<p>
-				The current sensor network topology and status data. Sensor nodes have IDs above 1024, access nodes below.
-			</p>
-		</div>
-	</div>
-	
+		
 	<div id="maindiv">
+                <div id="msg" style="display:none"></div>
+                <iframe name="webupload" style="border:0;height:0;width:0;"></iframe>
 		<div id="deployment_navigation">
 		<ul id="deployment_menu"></ul>
 		</div>	
