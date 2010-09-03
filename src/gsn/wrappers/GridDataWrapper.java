@@ -121,9 +121,6 @@ public class GridDataWrapper extends AbstractWrapper {
             try {
 
                 listOfNewFiles(directory, fileMask);
-
-                //parseFile("dischma.dem");
-
                 Thread.sleep(rate);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
@@ -167,9 +164,9 @@ public class GridDataWrapper extends AbstractWrapper {
 
         if ((success) && (lines != null)) {
 
-            // replace tabs and multiple spaces with a single space
+            // trim white spaces, replace tabs and multiple spaces with a single space
             for (int i = 0; i < lines.size(); i++) {
-                lines.set(i, lines.get(i).replaceAll("[ \t]+", " "));
+                lines.set(i, lines.get(i).trim().replaceAll("[ \t]+", " "));
                 //System.out.println(lines.get(i));
             }
 
@@ -180,9 +177,9 @@ public class GridDataWrapper extends AbstractWrapper {
                     String[] split = lines.get(i).split(" ");
 
                     header[i] = split[1];
-                    System.out.println(split[0] + " <=> " + ESRI_Format[i]);
+                    logger.debug(split[0] + " <=> " + ESRI_Format[i]);
                     if (!split[0].equals(ESRI_Format[i])) {
-                        System.out.println("=> inCorrect");
+                        logger.debug("=> inCorrect");
                         success = false;
                     }
                 }
@@ -218,8 +215,15 @@ public class GridDataWrapper extends AbstractWrapper {
                     String[] aLine = lines.get(i).split(" ");
                     for (int j = 0; j < aLine.length; j++) {
 
+                        try {
                         Double d = Double.parseDouble(aLine[j]);
                         raw.add(d);
+                        }
+                        catch (java.lang.NumberFormatException e) {
+                            logger.warn(j+": \""+aLine[j]+"\"");
+                            logger.warn(e);
+                            logger.warn(e.getMessage());
+                        }
                         //System.out.println(i + "," + j + " : " + d);
                     }
 
@@ -315,7 +319,7 @@ public class GridDataWrapper extends AbstractWrapper {
 
             logger.debug("size => " + bos.toByteArray().length);
 
-            //deserialize(bos.toByteArray());
+            //testDeserialize(bos.toByteArray());
 
 
         } catch (IOException e) {
@@ -335,7 +339,7 @@ public class GridDataWrapper extends AbstractWrapper {
     /*
     * Test deserialization
     * */
-    private void deserialize(byte[] bytes) {
+    private void testDeserialize(byte[] bytes) {
 
         try {
             ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
@@ -351,10 +355,13 @@ public class GridDataWrapper extends AbstractWrapper {
             logger.debug("deserial.length" + deserial.length);
             logger.debug("deserial[0].length" + deserial[0].length);
 
-            for (int i = 0; i < deserial.length; i++)
+            for (int i = 0; i < deserial.length; i++) {
+                StringBuilder sb = new StringBuilder();
                 for (int j = 0; j < deserial[0].length; j++) {
-                    System.out.println(deserial[i][j]);
+                    sb.append(deserial[i][j]).append(" ");
                 }
+                System.out.println(sb.toString());
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
