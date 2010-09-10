@@ -64,6 +64,7 @@ function PacketRate() {
       this.packetcount=packetcount;
     var now=new Date().getTime();
     this.packethistory.push({rate : packetcount - this.packetcount, time : now});
+    this.packetcount=packetcount;
     if (this.packethistory.length > 20)
       this.packethistory.shift();
     else if (this.packethistory.length == 1) {
