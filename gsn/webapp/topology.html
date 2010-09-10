@@ -54,6 +54,33 @@ var GSN = {
     }
 }
 
+function PacketRate() {
+  this.packethistory = new Array();
+  this.packetcount;
+  this.rate = 0;
+  
+  this.update = function(packetcount) {
+    if (!this.packetcount)
+      this.packetcount=packetcount;
+    var now=new Date().getTime();
+    this.packethistory.push({rate : packetcount - this.packetcount, time : now});
+    if (this.packethistory.length > 20)
+      this.packethistory.shift();
+    else if (this.packethistory.length == 1) {
+      this.rate = parseFloat(0).toFixed(2);
+      return;
+    }
+    var starttime=now, endtime=0, sum=0;
+    $(this.packethistory).each(function(){
+      sum = sum + this.rate;
+      if (this.time < starttime) starttime = this.time;
+      if (this.time > endtime) endtime = this.time;
+    });
+    this.rate = parseFloat((sum / (endtime-starttime) * 1000)).toFixed(2);
+  }
+  
+}
+
   function nodeindex(id) {
     for (i=0;i<current_deployment.sensornodes.length;i++) {
       if (current_deployment.sensornodes[i].node_id==id)
@@ -196,7 +223,7 @@ var GSN = {
       var index = nodeindex(id);
       if (index < 0) {
         table.append("<tr>"+
-          "<td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
+          "<td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
           "</tr>");
       }
       var row = $("td:first-child", table).filter(function(index) { return $(this).text()==id;}).parent();
@@ -209,6 +236,8 @@ var GSN = {
           case 9:
             $(this).text(formatTime($(data).attr(healthitems[index-1])));
             break;
+          case 10:
+            break;
           default:
             $(this).text($(data).attr(healthitems[index-1])?$(data).attr(healthitems[index-1]):"");
             break;
@@ -219,15 +248,21 @@ var GSN = {
         $("td:first-child", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().removeClass("offline");
         tableChanged = true;
       }
+      if ($(this).attr("packet_count")) {
+        if (!$(row).data("packetrate"))
+          $(row).data("packetrate", new PacketRate());
+        $(row).data("packetrate").update($(this).attr("packet_count"));
+        $("td:last-child",row).text($(row).data("packetrate").rate);
+      }
       if (now - $(data).attr("timestamp") > STANDBY_TIMEOUT_MS) {
         $(row).addClass("offline");
         $("td:first-child", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().addClass("offline");
       }
     });
+    tablesorter.trigger("update");
+    if (sortlist.length > 0)
+      tablesorter.trigger("sorton", [sortlist]);
     if (tableChanged) {
-      tablesorter.trigger("update");
-      if (sortlist.length > 0)
-        tablesorter.trigger("sorton", [sortlist]);
       if (unmarkTimer)
         clearTimeout(unmarkTimer); 
       unmarkTimer = setTimeout("unmarkNewData()",500);
@@ -401,21 +436,9 @@ var GSN = {
       if (now - $(this).attr("timestamp") <= STANDBY_TIMEOUT_MS)
         nodeonlinecount = nodeonlinecount + 1;
     });
-    if (current_deployment.totalpackets == null) {
-      current_deployment.totalpackets = packetcount;
-    }
-    current_deployment.packethistory.push({rate : packetcount - current_deployment.totalpackets, time : now});
-    if (current_deployment.packethistory.length > 10)
-      current_deployment.packethistory.shift();
-    current_deployment.totalpackets = packetcount;
-    var starttime=now, endtime=0, sum=0;
-    $(current_deployment.packethistory).each(function(){
-      sum = sum + this.rate;
-      if (this.time < starttime) starttime = this.time;
-      if (this.time > endtime) endtime = this.time;
-    });
+    current_deployment.packethistory.update(packetcount);
     $(".statusbar", "#topology_"+current_deployment.name).empty();
-    $(".statusbar", "#topology_"+current_deployment.name).append("Total: "+nodetotalcount+"<br>Online: "+nodeonlinecount+"<br>Packetrate: "+parseFloat((sum / (endtime-starttime) * 1000)).toFixed(2)+" Pkts/s");
+    $(".statusbar", "#topology_"+current_deployment.name).append("Total: "+nodetotalcount+"<br>Online: "+nodeonlinecount+"<br>Packetrate: "+current_deployment.packethistory.rate+" Pkts/s");
   }
 
   function fetchTopologyInfo() {
@@ -502,8 +525,7 @@ $(document).ready(function() {
           sensornodes : new Array(),
           links : new Array(),
           isUpdating : false,
-          totalpackets : null,
-          packethistory : new Array(),
+          packethistory : new PacketRate(),
           vis : new pv.Panel()
             .width(700)
             .height(300)
@@ -583,6 +605,7 @@ $(document).ready(function() {
             "<th class=\"header\">Uptime</th>"+
             "<th class=\"header\">Generation Time</th>"+
             "<th class=\"header\">Timestamp</th>"+
+            "<th class=\"header\">Packetrate</th>"+
             "</tr></thead><tbody></tbody></table>");
         $("#topology_"+deployments[i]).find(".healthtable table").tablesorter({ 
            widthFixed: true
