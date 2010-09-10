@@ -36,7 +36,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	
 	public static final byte HELLO_BYTE = 0x7d;
 	
-	protected final transient Logger logger = Logger.getLogger( BackLogMessageMultiplexer.class );
+	static final transient Logger logger = Logger.getLogger( BackLogMessageMultiplexer.class );
 	
 
 	private static Map<String,BackLogMessageMultiplexer> blMultiplexerMap = new HashMap<String,BackLogMessageMultiplexer>();
@@ -65,24 +65,13 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	}
 	
 	
-	private BackLogMessageMultiplexer(String deployment, String coreStationAddress) throws Exception {
+	private BackLogMessageMultiplexer(String deployment, InetAddress inetAddress, Integer port) throws Exception {
 		msgTypeListener = Collections.synchronizedMap(new HashMap<Integer,Vector<BackLogMessageListener>> ());
 		
-		// a first pattern match test for >host:port<
-		this.coreStationAddress = coreStationAddress;
-    	Matcher m = Pattern.compile("(.*):(.*)").matcher(coreStationAddress);
-    	if ( m.find() ) {
-			try {
-				inetAddress = InetAddress.getByName(m.group(1));
-				hostPort = new Integer(m.group(2));
-			} catch(Exception e) {
-				throw new IOException("Remote BackLog host string does not match >host:port<");
-			}
-    	}
-    	else {
-			throw new IOException("Remote BackLog host string does not match >host:port<");
-    	}
-    	deploymentName = deployment;
+		this.coreStationAddress = inetAddress.getHostName() + ":" + hostPort;
+		this.inetAddress = inetAddress;
+		this.hostPort = port;
+    	this.deploymentName = deployment;
     	
     	pluginMessageHandler = new PluginMessageHandler(this, PLUGIN_MESSAGE_QUEUE_SIZE);
     	
@@ -93,17 +82,34 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	
 	
 	public synchronized static BackLogMessageMultiplexer getInstance(String deployment, String coreStationAddress) throws Exception {
+		String coreStationAddress_noIp;
+		InetAddress inetAddress;
+		Integer hostPort;
 		if( PING_ACK_CHECK_INTERVAL_SEC <= PING_INTERVAL_SEC )
 			throw new Exception("PING_ACK_CHECK_INTERVAL_SEC must be bigger than PING_INTERVAL_SEC");
 		
-		if(blMultiplexerMap.containsKey(coreStationAddress)) {
-			return blMultiplexerMap.get(coreStationAddress);
-		}
-		else {
-			BackLogMessageMultiplexer blMulti = new BackLogMessageMultiplexer(deployment, coreStationAddress);
-			blMultiplexerMap.put(coreStationAddress, blMulti);
-			return blMulti;
-		}
+		// a first pattern match test for >host:port<
+    	Matcher m = Pattern.compile("(.*):(.*)").matcher(coreStationAddress);
+    	if ( m.find() ) {
+			try {
+				inetAddress = InetAddress.getByName(m.group(1));
+                hostPort = new Integer(m.group(2));
+				coreStationAddress_noIp = inetAddress.getHostName() + ":" + hostPort;
+				if(blMultiplexerMap.containsKey(coreStationAddress_noIp)) {
+					return blMultiplexerMap.get(coreStationAddress_noIp);
+				}
+				else {
+					BackLogMessageMultiplexer blMulti = new BackLogMessageMultiplexer(deployment, inetAddress, hostPort);
+					blMultiplexerMap.put(coreStationAddress_noIp, blMulti);
+					return blMulti;
+				}
+			} catch(Exception e) {
+				throw new IOException("Remote BackLog host string does not match >host:port<");
+			}
+    	}
+    	else {
+			throw new IOException("Remote BackLog host string does not match >host:port<");
+    	}
 	}
 	  
 	
