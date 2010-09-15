@@ -56,3 +56,9 @@ ETZ_Schedule__mapped.xml
 ETZ_VaisalaWXT520__mapped.xml
 ETZ_VaisalaWXT520__muxed__mapped.xml
 ETZ_Topology_public.xml
+ETZ_Dozer_WXT520Prec__conv.xml
+ETZ_Dozer_WXT520Sup__conv.xml
+ETZ_Dozer_WXT520WindPth__conv.xml
+ETZ_Dozer_WXT520Prec__mapped.xml
+ETZ_Dozer_WXT520Sup__mapped.xml
+ETZ_Dozer_WXT520WindPth__mapped.xml
