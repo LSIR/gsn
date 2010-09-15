@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerWxt520SupMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 17;
+    public static final int DEFAULT_MESSAGE_SIZE = 18;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 150;
 
-    /** Create a new DozerWxt520SupMsg of size 17. */
+    /** Create a new DozerWxt520SupMsg of size 18. */
     public DozerWxt520SupMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -115,6 +115,9 @@ public class DozerWxt520SupMsg extends ch.ethz.permasense.tinyos2x.messages.Data
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.Su_Vr=0x"+Long.toHexString(get_payload_Su_Vr())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.HeatingMode=0x"+Long.toHexString(get_payload_HeatingMode())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -752,6 +755,69 @@ public class DozerWxt520SupMsg extends ch.ethz.permasense.tinyos2x.messages.Data
      */
     public static int sizeBits_payload_Su_Vr() {
         return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.HeatingMode
+    //   Field type: short
+    //   Offset (bits): 136
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.HeatingMode' is signed (false).
+     */
+    public static boolean isSigned_payload_HeatingMode() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.HeatingMode' is an array (false).
+     */
+    public static boolean isArray_payload_HeatingMode() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.HeatingMode'
+     */
+    public static int offset_payload_HeatingMode() {
+        return (136 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.HeatingMode'
+     */
+    public static int offsetBits_payload_HeatingMode() {
+        return 136;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.HeatingMode'
+     */
+    public short get_payload_HeatingMode() {
+        return (short)getUIntBEElement(offsetBits_payload_HeatingMode(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.HeatingMode'
+     */
+    public void set_payload_HeatingMode(short value) {
+        setUIntBEElement(offsetBits_payload_HeatingMode(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.HeatingMode'
+     */
+    public static int size_payload_HeatingMode() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.HeatingMode'
+     */
+    public static int sizeBits_payload_HeatingMode() {
+        return 8;
     }
 
 }
