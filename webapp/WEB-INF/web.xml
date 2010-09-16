@@ -217,6 +217,12 @@
     </servlet>
 
 
+   <servlet>
+       <servlet-name>GridDataServlet</servlet-name>
+       <display-name>GridDataServlet</display-name>
+       <servlet-class>gsn.http.GridDataServlet</servlet-class>
+   </servlet>
+
 
 
    
@@ -250,6 +256,12 @@
         <servlet-name>GeoData</servlet-name>
         <url-pattern>/geodata</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>GridDataServlet</servlet-name>
+        <url-pattern>/griddata</url-pattern>
+    </servlet-mapping>
+
 
     <servlet-mapping>
         <servlet-name>MenuServlet</servlet-name>
@@ -458,6 +470,7 @@
        <url-pattern>/data</url-pattern>
        <url-pattern>/multidata</url-pattern>
        <url-pattern>/geodata</url-pattern>
+       <url-pattern>/griddata</url-pattern>
    </filter-mapping>
 
       
