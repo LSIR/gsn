@@ -2,21 +2,22 @@ package gsn.http;
 
 import gsn.Main;
 import gsn.beans.DataTypes;
+import gsn.utils.Helpers;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.sql.*;
+import java.util.zip.*;
 
 
 public class GridDataServlet extends HttpServlet {
 
     private static transient Logger logger = Logger.getLogger(GridDataServlet.class);
+    private static final String DEFAULT_TIMEFORMAT = "yyyyMMddHHmmss";
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         /*
@@ -36,6 +37,7 @@ public class GridDataServlet extends HttpServlet {
         String xcol = HttpRequestUtils.getStringParameter("xcol", null, request);
         String ycol = HttpRequestUtils.getStringParameter("ycol", null, request);
         String timeformat = HttpRequestUtils.getStringParameter("timeformat", null, request);
+        String view = HttpRequestUtils.getStringParameter("view", null, request); // files or stream
 
         response.getWriter().write("sensor: " + sensor + "\n");
         response.getWriter().write("from: " + from + "\n");
@@ -43,8 +45,9 @@ public class GridDataServlet extends HttpServlet {
         response.getWriter().write("xcol: " + to + "\n");
         response.getWriter().write("ycol: " + to + "\n");
         response.getWriter().write("timeformat: " + to + "\n");
-        
-        response.getWriter().write(executeQuery("select * from "+sensor));
+        response.getWriter().write("view: " + to + "\n");
+
+        response.getWriter().write(executeQuery("select * from " + sensor));
 
 
         /*
@@ -65,7 +68,7 @@ public class GridDataServlet extends HttpServlet {
     public String executeQuery(String query) {
 
         Connection connection = null;
-        StringBuilder sb= new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
         try {
             connection = Main.getDefaultStorage().getConnection();
@@ -89,12 +92,8 @@ public class GridDataServlet extends HttpServlet {
 
             for (int col = 0; col < numCols; col++) {
                 columnLabel[col] = metaData.getColumnLabel(col + 1);
-                typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col+1));
-                // if (typ[col] == DataTypes.BINARY) logger.warn("type : BINARY");
-                // convertLocalTypeToGSN
-                // if (col < numCols - 1) sb.append(";");
+                typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
             }
-            // sb.append("\n");
 
             for (int row = 0; row < numRows; row++) {
                 results.absolute(row + 1);                // Go to the specified row
@@ -104,12 +103,12 @@ public class GridDataServlet extends HttpServlet {
                         s = "null";
                     else
                         s = o.toString();
-                        if (typ[col] == DataTypes.BINARY) {
-                            byte[] bin = (byte[]) o;
-                            sb.append(deserialize(bin));
-                        }   else {
-                            sb.append(columnLabel[col]+" "+s+"\n");
-                        }
+                    if (typ[col] == DataTypes.BINARY) {
+                        byte[] bin = (byte[]) o;
+                        sb.append(deserialize(bin));
+                    } else {
+                        sb.append(columnLabel[col] + " " + s + "\n");
+                    }
                 }
                 sb.append("\n");
             }
@@ -157,5 +156,56 @@ public class GridDataServlet extends HttpServlet {
         }
 
         return sb.toString();
+    }
+
+
+    private String generateASCIIFileName(String sensor, long timestamp, String timeFormat) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(sensor).append("_").append(Helpers.convertTimeFromLongToIso(timestamp, timeFormat));
+        return sb.toString();
+    }
+
+    private String generaACIIFIleName(String sensor, long timestamp) {
+        return generateASCIIFileName(sensor, timestamp, DEFAULT_TIMEFORMAT);
+    }
+
+
+    private void writeASCIIFile(String fileName, String folder, String content) {
+        try {
+            FileWriter outFile = new FileWriter(folder + "/" + fileName);
+            PrintWriter out = new PrintWriter(outFile);
+            out.print(content);
+            out.close();
+        } catch (IOException e) {
+            logger.warn(e);
+        }
+    }
+
+    private void writeZipFile(String folder, String[] filenames, String outFilename) {
+
+        byte[] buf = new byte[1024];
+
+        try {
+            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(folder+"/"+outFilename));
+
+            for (int i = 0; i < filenames.length; i++) {
+                FileInputStream fileInputStream = new FileInputStream(filenames[i]);
+
+                zipOutputStream.putNextEntry(new ZipEntry(filenames[i]));
+
+                int len;
+                while ((len = fileInputStream.read(buf)) > 0) {
+                    zipOutputStream.write(buf, 0, len);
+                }
+
+                zipOutputStream.closeEntry();
+                fileInputStream.close();
+            }
+
+            zipOutputStream.close();
+        } catch (IOException e) {
+        }
+
+
     }
 }
