@@ -12,7 +12,7 @@ public class DozerWxt520SupMsg extends ch.ethz.permasense.tinyos2x.messages.Data
     public static final int DEFAULT_MESSAGE_SIZE = 18;
 
     /** The Active Message type associated with this message. */
-    public static final int AM_TYPE = 162;
+    public static final int AM_TYPE = 164;
 
     /** Create a new DozerWxt520SupMsg of size 18. */
     public DozerWxt520SupMsg() {
