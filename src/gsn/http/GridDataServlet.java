@@ -1,6 +1,7 @@
 package gsn.http;
 
 import gsn.Main;
+import gsn.beans.DataTypes;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -32,11 +33,18 @@ public class GridDataServlet extends HttpServlet {
         String sensor = HttpRequestUtils.getStringParameter("sensor", null, request);
         String from = HttpRequestUtils.getStringParameter("from", null, request);
         String to = HttpRequestUtils.getStringParameter("to", null, request);
+        String xcol = HttpRequestUtils.getStringParameter("xcol", null, request);
+        String ycol = HttpRequestUtils.getStringParameter("ycol", null, request);
+        String timeformat = HttpRequestUtils.getStringParameter("timeformat", null, request);
 
         response.getWriter().write("sensor: " + sensor + "\n");
         response.getWriter().write("from: " + from + "\n");
         response.getWriter().write("to: " + to + "\n");
-        response.getWriter().write(executeQuery("select grid from "+sensor));
+        response.getWriter().write("xcol: " + to + "\n");
+        response.getWriter().write("ycol: " + to + "\n");
+        response.getWriter().write("timeformat: " + to + "\n");
+        
+        response.getWriter().write(executeQuery("select * from "+sensor));
 
 
         /*
@@ -75,12 +83,18 @@ public class GridDataServlet extends HttpServlet {
             // headers
             sb.append("# Query: " + query + "\n");
             sb.append("# ");
+
+            byte typ[] = new byte[numCols];
+            String columnLabel[] = new String[numCols];
+
             for (int col = 0; col < numCols; col++) {
-                sb.append(metaData.getColumnLabel(col + 1));
-                if (col < numCols - 1)
-                    sb.append(";");
+                columnLabel[col] = metaData.getColumnLabel(col + 1);
+                typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col+1));
+                // if (typ[col] == DataTypes.BINARY) logger.warn("type : BINARY");
+                // convertLocalTypeToGSN
+                // if (col < numCols - 1) sb.append(";");
             }
-            sb.append("\n");
+            // sb.append("\n");
 
             for (int row = 0; row < numRows; row++) {
                 results.absolute(row + 1);                // Go to the specified row
@@ -90,10 +104,12 @@ public class GridDataServlet extends HttpServlet {
                         s = "null";
                     else
                         s = o.toString();
-                        byte[] bin = (byte[]) o;
-                        sb.append(deserialize(bin));
-                    if (col < numCols - 1)
-                        sb.append(s).append(";");
+                        if (typ[col] == DataTypes.BINARY) {
+                            byte[] bin = (byte[]) o;
+                            sb.append(deserialize(bin));
+                        }   else {
+                            sb.append(columnLabel[col]+" "+s+"\n");
+                        }
                 }
                 sb.append("\n");
             }
