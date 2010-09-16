@@ -36,16 +36,16 @@
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
-                cast(PAYLOAD_WU_DN as CHAR(30)) as WIND_DIRECTION_MINIMUM,
-                cast(PAYLOAD_WU_DM as CHAR(30)) as WIND_DIRECTION_AVERAGE,
-                cast(PAYLOAD_WU_DX as CHAR(30)) as WIND_DIRECTION_MAXIMUM,
-                cast(round(PAYLOAD_WU_SN / 10.0, 2) as CHAR(30)) as WIND_SPEED_MINIMUM,
-                cast(round(PAYLOAD_WU_SM / 10.0, 2) as CHAR(30)) as WIND_SPEED_AVERAGE,
-                cast(round(PAYLOAD_WU_SX / 10.0, 2) as CHAR(30)) as WIND_SPEED_MAXIMUM,
-                cast(round(PAYLOAD_TU_TA / 10.0, 2) as CHAR(30)) as AIR_TEMPERATURE,
-                cast(round(PAYLOAD_TU_TP / 10.0, 2) as CHAR(30)) as INTERNAL_TEMPERATURE,
-                cast(round(PAYLOAD_TU_UA / 10.0, 2) as CHAR(30)) as RELATIVE_HUMIDITY,
-                cast(round(PAYLOAD_TU_PA / 10.0, 2) as CHAR(30)) as AIR_PRESSURE
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(PAYLOAD_WU_DN as CHAR(30)),NULL) as WIND_DIRECTION_MINIMUM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(PAYLOAD_WU_DM as CHAR(30)),NULL) as WIND_DIRECTION_AVERAGE,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(PAYLOAD_WU_DX as CHAR(30)),NULL) as WIND_DIRECTION_MAXIMUM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_WU_SN / 10.0, 2) as CHAR(30)),NULL) as WIND_SPEED_MINIMUM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_WU_SM / 10.0, 2) as CHAR(30)),NULL) as WIND_SPEED_AVERAGE,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_WU_SX / 10.0, 2) as CHAR(30)),NULL) as WIND_SPEED_MAXIMUM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_TU_TA / 10.0, 2) as CHAR(30)),NULL) as AIR_TEMPERATURE,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_TU_TP / 10.0, 2) as CHAR(30)),NULL) as INTERNAL_TEMPERATURE,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_TU_UA / 10.0, 2) as CHAR(30)),NULL) as RELATIVE_HUMIDITY,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_TU_PA / 10.0, 2) as CHAR(30)),NULL) as AIR_PRESSURE
                 from wrapper </query>
             </source>
             <query> select * from source </query>
