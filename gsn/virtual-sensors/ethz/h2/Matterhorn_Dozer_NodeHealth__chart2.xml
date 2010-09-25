@@ -48,7 +48,8 @@
                 CASEWHEN(POSITION = 20, HUMIDITY, null) as p20, 
                 CASEWHEN(POSITION = 21, HUMIDITY, null) as p21, 
                 CASEWHEN(POSITION = 22, HUMIDITY, null) as p22, 
-                CASEWHEN(POSITION = 23, HUMIDITY, null) as p23 
+                CASEWHEN(POSITION = 23, HUMIDITY, null) as p23, 
+                CASEWHEN(POSITION = 24, HUMIDITY, null) as p24
                 from wrapper where GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000</query>
             </source>
             <query> select * from source </query>
