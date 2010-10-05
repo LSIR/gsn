@@ -100,7 +100,12 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                 PreparedStatement prepareStatement = null;
                 try {
                     prepareStatement = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
-                    prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
+                    String maxRows = listener.getVSensorConfig().getMainClassInitialParams().get("maxrows");
+                    if (maxRows == null) {
+                        prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
+                    } else {
+                        prepareStatement.setMaxRows(Integer.parseInt(maxRows));
+                    }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
