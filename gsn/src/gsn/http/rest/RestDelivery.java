@@ -19,7 +19,7 @@ public class RestDelivery implements DeliverySystem {
     private Continuation continuation;
     private ObjectOutputStream objectStream;
 
-    private static final StreamElement keepAliveMsg = new StreamElement(new DataField[]{new DataField("keepalive", "string")}, new Serializable[]{"keep-alive message"}, Long.MIN_VALUE);
+    private static final StreamElement keepAliveMsg = new StreamElement(new DataField[]{new DataField("keepalive", "string")}, new Serializable[]{"keep-alive message"});
 
     public RestDelivery(Continuation connection) throws IOException {
         this.continuation = connection;
@@ -49,6 +49,7 @@ public class RestDelivery implements DeliverySystem {
 
     public boolean writeKeepAliveStreamElement() {
         logger.debug("Sending the keepalive message.");
+        keepAliveMsg.setTimeStamp(System.currentTimeMillis());
         return writeStreamElement(keepAliveMsg);
     }
 
