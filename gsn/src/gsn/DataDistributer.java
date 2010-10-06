@@ -104,7 +104,12 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                     if (maxRows == null) {
                         prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
                     } else {
-                        prepareStatement.setMaxRows(Integer.parseInt(maxRows));
+    			try {
+    			    prepareStatement.setMaxRows(Integer.parseInt(maxRows));
+    			} catch (NumberFormatException nfe) {
+    			    logger.warn("maxrows init-param is unparsable, set to default (1000)");
+    			    prepareStatement.setMaxRows(1000);
+    			}
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
