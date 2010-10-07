@@ -1,27 +1,30 @@
-<virtual-sensor name="ETZ_Dozer_Command__1946" priority="10" >
+<virtual-sensor name="ETZ_Dozer_WXT520WindPth__1946" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <web-input>
-            <command name="tosmsg">
-                <field name="destination" type="*text" defaultvalue="65535">the device_id of the receiver</field>
-                <field name="cmd" type="*select:|IDLE_CMD,0|DATA_CONTROL_CMD,1|DATA_CONTROL_NEW_CMD,3|WXT520_INIT_CMD,2|OBJECT_TRANSFER,7|ACCESSNODE_QUEUE_CTRL_CMD,8|GUMSTIX_CTRL_CMD,14">cmd</field>
-                <field name="arg" type="*text">destination</field>
-                <field name="repetitioncnt" type="*text" defaultvalue="0">repetition count</field>
-            </command>
-        </web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="DESTINATION" type="INTEGER"/>
-            <field name="CMD" type="TINYINT" />
-            <field name="ARG" type="SMALLINT" />
-            <field name="REPETITIONCNT" type="SMALLINT" />
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />            
+            <field name="PAYLOAD_WU_DN" type="INTEGER" />
+            <field name="PAYLOAD_WU_DM" type="INTEGER" />
+            <field name="PAYLOAD_WU_DX" type="INTEGER" />
+            <field name="PAYLOAD_WU_SN" type="INTEGER" />
+            <field name="PAYLOAD_WU_SM" type="INTEGER" />
+            <field name="PAYLOAD_WU_SX" type="INTEGER" />
+            <field name="PAYLOAD_TU_TA" type="INTEGER" />
+            <field name="PAYLOAD_TU_TP" type="INTEGER" />
+            <field name="PAYLOAD_TU_UA" type="INTEGER" />
+            <field name="PAYLOAD_TU_PA" type="INTEGER" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerCommandMsg) from ETZ deployment</description>
+    <description>Dozer messages (DozerWxt520WindPthMsg) from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -31,7 +34,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerCommandMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520WindPthMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -42,11 +45,11 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerCommandMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520WindPthMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
-    </streams>
+</streams>
 </virtual-sensor>
