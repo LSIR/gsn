@@ -5,7 +5,7 @@
         <web-input>
             <command name="tosmsg">
                 <field name="destination" type="*text" defaultvalue="65535">the device_id of the receiver</field>
-                <field name="cmd" type="*select:|IDLE_CMD,0|DATA_CONTROL_CMD,1|OBJECT_TRANSFER,7|ACCESSNODE_QUEUE_CTRL_CMD,8|GUMSTIX_CTRL_CMD,14">cmd</field>
+                <field name="cmd" type="*select:|IDLE_CMD,0|DATA_CONTROL_CMD,1|DATA_CONTROL_NEW_CMD,3|WXT520_INIT_CMD,2|OBJECT_TRANSFER,7|ACCESSNODE_QUEUE_CTRL_CMD,8|GUMSTIX_CTRL_CMD,14">cmd</field>
                 <field name="arg" type="*text">destination</field>
                 <field name="repetitioncnt" type="*text" defaultvalue="0">repetition count</field>
             </command>
@@ -48,5 +48,5 @@
             </source>
             <query> select * from source </query>
         </stream>
-    </streams>
+</streams>
 </virtual-sensor>
