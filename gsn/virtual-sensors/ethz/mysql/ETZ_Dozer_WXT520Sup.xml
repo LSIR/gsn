@@ -45,5 +45,5 @@
             </source>
             <query> select * from source </query>
         </stream>
-</streams>
+    </streams>
 </virtual-sensor>
