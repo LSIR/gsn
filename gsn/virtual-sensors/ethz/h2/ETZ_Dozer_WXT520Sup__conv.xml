@@ -14,7 +14,6 @@
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
             <field name="HEATING_TEMPERATURE" type="VARCHAR(30)" unit="°C"/>
             <field name="HEATING_VOLTAGE" type="VARCHAR(30)" unit="V"/>
-            <field name="HEATING_MODE" type="VARCHAR(1)"/>
             <field name="SUPPLY_VOLTAGE" type="VARCHAR(30)" unit="V"/>
             <field name="REF_VOLTAGE" type="VARCHAR(30)" unit="V"/>  
         </output-structure>
@@ -34,8 +33,7 @@
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_SU_TH / 10.0, 2) as CHAR(30)),NULL) as HEATING_TEMPERATURE,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_SU_VH / 1000.0, 2) as CHAR(30)),NULL) as HEATING_VOLTAGE,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_SU_VS / 1000.0, 2) as CHAR(30)),NULL) as SUPPLY_VOLTAGE,
-                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_SU_VR / 1000.0, 2) as CHAR(30)),NULL) as REF_VOLTAGE,
-                casewhen(PAYLOAD_SAMPLE_VALID=1,casewhen(PAYLOAD_HEATINGMODE = NULL, NULL, casewhen(PAYLOAD_HEATINGMODE = 0, 'N', 'Y')),NULL) as HEATING_MODE
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_SU_VR / 1000.0, 2) as CHAR(30)),NULL) as REF_VOLTAGE
                 from wrapper </query>
             </source>
             <query> select * from source </query>
