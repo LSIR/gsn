@@ -59,10 +59,12 @@ import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.session.HashSessionIdManager;
 import org.eclipse.jetty.server.ssl.SslSocketConnector;
@@ -91,7 +93,7 @@ public final class Main {
 
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
-		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
+		PropertyConfigurator.configureAndWatch ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 		//  initializeConfiguration();
 		try {
 			controlSocket = new GSNController(null, gsnControllerPort);
@@ -265,7 +267,7 @@ public final class Main {
 	public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
 		ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
-		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
+		PropertyConfigurator.configureAndWatch ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 		ContainerConfig toReturn = null;
 		try {
 			toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FILE );
@@ -354,7 +356,17 @@ public final class Main {
         Server server = new Server();
 		HandlerCollection handlers = new HandlerCollection();
         ContextHandlerCollection contexts = new ContextHandlerCollection();
+        RequestLogHandler requestLogHandler = new RequestLogHandler();
+        handlers.setHandlers(new Handler[]{contexts,new DefaultHandler(),requestLogHandler});
+        server.setHandler(handlers);
         server.setThreadPool(new QueuedThreadPool(maxThreads));
+
+        NCSARequestLog requestLog = new NCSARequestLog("./logs/jetty-yyyy_mm_dd.request.log");
+        requestLog.setRetainDays(90);
+        requestLog.setAppend(true);
+        requestLog.setExtended(true);
+        //requestLog.setLogTimeZone("GMT");
+        requestLogHandler.setRequestLog(requestLog);
 
         SslSocketConnector sslSocketConnector = null;
         if (getContainerConfig().getSSLPort() > 0) {
@@ -380,9 +392,6 @@ public final class Main {
 			server.setConnectors ( new Connector [ ] { connector,sslSocketConnector } );
 
 		WebAppContext webAppContext = new WebAppContext(contexts, DEFAULT_WEB_APP_PATH ,"/");
-
-		handlers.setHandlers(new Handler[]{contexts,new DefaultHandler()});
-		server.setHandler(handlers);
 
 		Properties usernames = new Properties();
 		usernames.load(new FileReader("conf/realm.properties"));
