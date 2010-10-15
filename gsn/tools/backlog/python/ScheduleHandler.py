@@ -489,19 +489,6 @@ class ScheduleHandlerClass(Thread):
                 if self._stopped:
                     return
             
-            # Synchronize Service Wakeup Time
-            time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
-            time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
-            self._logger.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
-            self._tosMessageHandler.addMsg(CMD_SERVICE_WINDOW, argument=time_to_service)
-            self._logger.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
-    
-            # Schedule next duty wakeup
-            if self._schedule:
-                next_schedule = self._schedule.getNextSchedules(datetime.utcnow())[0]
-                self._logger.info('schedule next duty wakeup')
-                self._scheduleNextDutyWakeup(next_schedule[0] - datetime.utcnow(), next_schedule[1])
-                    
             # wait for jobs to finish
             if not self._allJobsFinishedEvent.isSet():
                 self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(self._max_job_runtime_sec/60.0) + ' minutes')
@@ -531,6 +518,19 @@ class ScheduleHandlerClass(Thread):
             if self._stopped:
                 return
 
+            # Synchronize Service Wakeup Time
+            time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
+            time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
+            self._logger.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
+            self._tosMessageHandler.addMsg(CMD_SERVICE_WINDOW, argument=time_to_service)
+            self._logger.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
+    
+            # Schedule next duty wakeup
+            if self._schedule:
+                next_schedule = self._schedule.getNextSchedules(datetime.utcnow())[0]
+                self._logger.info('schedule next duty wakeup')
+                self._scheduleNextDutyWakeup(next_schedule[0] - datetime.utcnow(), next_schedule[1])
+                    
             # Tell TinyNode to shut us down in X seconds
             self._pingThread.stop()
             shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
