@@ -20,7 +20,7 @@ var uptime = {
   setTime : function(time) {
     uptime.s = Math.floor(time / 1000) * 1000;
     setTimeout("uptime.update()",1000 - time % 1000); 
-  },
+  }
 
 };
 
