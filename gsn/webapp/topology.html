@@ -228,8 +228,8 @@ function PacketRate() {
           "</tr>");
       }
       var row = $("td:first-child", table).filter(function(index) { return $(this).text()==id;}).parent();
+      var data = this;
       if (index < 0 || ($(this).attr("timestamp") > current_deployment.sensornodes[index].timestamp)) {
-        var data = this;
         $("td", row).each(function(index,value) {
           switch (index) {
           case 0: break;
