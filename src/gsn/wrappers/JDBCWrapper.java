@@ -1,6 +1,7 @@
 package gsn.wrappers;
 
 import gsn.Main;
+import gsn.storage.StorageManagerFactory;
 import org.apache.log4j.Logger;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.format.DateTimeFormatter;
@@ -39,11 +40,20 @@ public class JDBCWrapper extends AbstractWrapper {
     private long buffer_size = DEFAULT_BUFFER_SIZE;
     private long latest_timed;
     private String checkPointDir;
+
+    private String driver;
+    private String username;
+    private String password;
+    private String databaseURL;
+
     String checkPointFile;
+    StorageManager sm = null;
 
     String[] dataFieldNames;
     Byte[] dataFieldTypes;
     int dataFieldsLength;
+
+    boolean useDefaultStorageManager = true;
 
     public String getWrapperName() {
         return "JDBCWrapper";
@@ -60,13 +70,28 @@ public class JDBCWrapper extends AbstractWrapper {
     public boolean initialize() {
         setName(getWrapperName() + "-" + (++threadCounter));
         AddressBean addressBean = getActiveAddressBean();
+
         table_name = addressBean.getPredicateValue("table-name");
+
+        databaseURL = addressBean.getPredicateValue("jdbc-url");
+        username = addressBean.getPredicateValue("username");
+        password = addressBean.getPredicateValue("password");
+        driver = addressBean.getPredicateValue("driver");
+
+        if ((databaseURL!=null)&&(username!=null)&&(password!=null)&&(driver!=null)) {
+            useDefaultStorageManager = false;
+            sm = StorageManagerFactory.getInstance(driver , username , password , databaseURL, 8);
+            logger.warn("Using specified storage manager: " + databaseURL);
+        }
+        else {
+            sm = Main.getDefaultStorage();
+            logger.warn("Using default storage manager");
+        }
 
         if (table_name == null) {
             logger.warn("The > table-name < parameter is missing from the wrapper for VS " + this.getActiveAddressBean().getVirtualSensorName());
             return false;
         }
-
 
         //////////////////
         boolean usePreviousCheckPoint = true;
@@ -128,16 +153,18 @@ public class JDBCWrapper extends AbstractWrapper {
 
         //////////////////
 
+
+
         Connection connection = null;
         try {
             logger.info("Initializing the structure of JDBCWrapper with : " + table_name);
-            connection = Main.getDefaultStorage().getConnection();
-            outputFormat = Main.getDefaultStorage().tableToStructure(table_name, connection);
+            connection = sm.getConnection();
+            outputFormat = sm.tableToStructure(table_name, connection);
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             return false;
         } finally {
-            Main.getDefaultStorage().close(connection);
+            sm.close(connection);
         }
 
         dataFieldsLength = outputFormat.length;
@@ -174,10 +201,10 @@ public class JDBCWrapper extends AbstractWrapper {
 
         while (isActive()) {
             try {
-                conn = Main.getDefaultStorage().getConnection();
+                conn = sm.getConnection();
                 StringBuilder query = new StringBuilder("select * from ").append(table_name).append(" where timed > " + latest_timed + " limit 0," + buffer_size);
 
-                resultSet = Main.getDefaultStorage().executeQueryWithResultSet(query, conn);
+                resultSet = sm.executeQueryWithResultSet(query, conn);
 
                 //logger.debug(query);
 
@@ -236,8 +263,8 @@ public class JDBCWrapper extends AbstractWrapper {
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);
             } finally {
-                Main.getDefaultStorage().close(resultSet);
-                Main.getDefaultStorage().close(conn);
+                sm.close(resultSet);
+                sm.close(conn);
             }
 
             try {
@@ -257,7 +284,7 @@ public class JDBCWrapper extends AbstractWrapper {
         long latest = -1;
         StringBuilder query = new StringBuilder("select max(timed) from ").append(this.getActiveAddressBean().getVirtualSensorName());
         try {
-            data = Main.getDefaultStorage().executeQuery(query, false);
+            data = sm.executeQuery(query, false);
             logger.warn("Running query " + query);
 
             while (data.hasMoreElements()) {

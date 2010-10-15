@@ -25,6 +25,10 @@
 				<address wrapper="jdbc">
                     <predicate key="table-name">MultiFormatTemperatureHandler</predicate>
                     <predicate key="start-time">continue</predicate>
+                    <predicate key="driver">com.mysql.jdbc.Driver</predicate>
+                    <predicate key="jdbc-url">jdbc:mysql://localhost/gsn</predicate>
+                    <predicate key="username">sa</predicate>
+                    <predicate key="password"></predicate>
 				</address>
 				<query>SELECT light, temperature, packet_type, timed FROM wrapper</query>
 			</source>
