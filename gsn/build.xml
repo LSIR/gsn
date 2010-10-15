@@ -6,7 +6,7 @@
     <property name="max-servlets" value="20"/>
     <property name="max-db-connections" value="8"/>
     <property name="max-sliding-db-connections" value="8"/>
-    <property name="remote-keep-alive-period" value="15000"/>
+    <property name="remote-keep-alive-period" value="150000"/>
     <property name="aes-enc-salt" value="this is a simple clear salt"/>
 
     <import file="${basedir}/installer/build.xml"/>
@@ -19,6 +19,12 @@
         </tstamp>
         <property environment="env"/>
         <copy file="conf/gsn.xml.svn" tofile="conf/gsn.xml" overwrite="false"/>
+        <xmlproperty file="conf/gsn.xml" collapseAttributes="true"/>
+        <condition property="isPrivateStyle">
+          <contains string="${sensor-server.name}" substring="private" casesensitive="false" />
+        </condition>
+        <antcall target="webstyle-public"/>
+        <antcall target="webstyle-private"/>
         <property name="conf.dir" value="${basedir}/conf"/>
         <property name="build.dir" value="build/classes"/>
         <property name="src.dir" value="src"/>
@@ -47,6 +53,15 @@
         <available type="dir" file="${jmf.dir}" property="jmf.exists"/>
         <!--   	<fail unless="jmf.exists" message="The ${jmf.dir} directory is missing, please download  JMF from http://java.sun.com/products/java-media/jmf/2.1.1/download.html and place it in ${jmf.dir} directory." /> -->
     </target>
+    
+    <target name="webstyle-public" unless="isPrivateStyle">
+      <copy file="webapp/style/gsn.public.css" tofile="webapp/style/gsn.css" overwrite="true"/>
+    </target>
+    
+    <target name="webstyle-private" if="isPrivateStyle">
+      <copy file="webapp/style/gsn.private.css" tofile="webapp/style/gsn.css" overwrite="true"/>
+    </target>
+
 
     <target name="setup" depends="init" description="Setup the build target.">
         <mkdir dir="${build.dir}"/>
