@@ -290,7 +290,7 @@ var GSN = {
 			},$.A({
 			    "class":"sensorName",
 			    "href":"javascript:GSN.menu('"+vsName[i][0]+"');",
-			    "id":"menu-"+vsName[i][0]+"",
+			    "id":"menu-"+vsName[i][0]+""
 			},vsName[i][0].substr(vsName[i][1].length+1))));
 		    }
 		    else {
