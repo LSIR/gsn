@@ -38,6 +38,8 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 															new DataField("fetch_cnt", DataTypes.INTEGER),															
 															new DataField("fetch_max", DataTypes.INTEGER),
 															new DataField("fetch_avg", DataTypes.DOUBLE),
+															new DataField("query_usage", DataTypes.SMALLINT),
+															new DataField("fetch_usage", DataTypes.SMALLINT),
 															};	
 
 	private int sampling_rate = DEFAULT_SAMPLING_RATE_MS;
@@ -45,6 +47,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 	private boolean stopped = false;
 	private LinkedList<MySQLStat> queue = new LinkedList<MySQLStat>();
 	private Object event = new Object();
+	private long old_timestamp = System.currentTimeMillis();
 	
 	private class MySQLStat {
 		protected final long duration;
@@ -195,8 +198,12 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 				output[13] = null;
 				output[14] = null;
 			}
+			output[15] = (select_sum + insert_sum + delete_sum + others_sum) * 100 / (timestamp - old_timestamp);
+			output[16] = fetch_sum * 100 / (timestamp - old_timestamp);
 			
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
+			
+			old_timestamp = timestamp;
 		}
 	}
 
