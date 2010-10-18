@@ -41,7 +41,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 															new DataField("query_usage", DataTypes.SMALLINT),
 															new DataField("fetch_usage", DataTypes.SMALLINT),
 															};	
-
+	
 	private int sampling_rate = DEFAULT_SAMPLING_RATE_MS;
 	private Log mysqlLogger;
 	private boolean stopped = false;
@@ -51,14 +51,18 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 	
 	private class MySQLStat {
 		protected final long duration;
-		protected final String query_type;
-		protected MySQLStat(long duration, String query_type) {
+		protected final type query_type;
+		protected MySQLStat(long duration, type query_type) {
 			this.duration = duration;
 			this.query_type = query_type;
 		}
 		public String toString() {
 			return "MySQLStat:duration="+duration+",query_type="+query_type;
 		}
+	}
+	
+	private enum type {
+	    SELECT, INSERT, DELETE, OTHERS, FETCH 
 	}
 	
 	public boolean initialize()	{
@@ -124,37 +128,42 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 			fetch_sum = 0;
 			
 			for (int i=0; i<size; i++) {
-				if (elem[i].query_type.equalsIgnoreCase("select")) {
+				switch (elem[i].query_type) {
+				case SELECT:
 					if (elem[i].duration > select_max) {
 						select_max = elem[i].duration; 
 					}
 					select_sum += elem[i].duration;
 					select_cnt++;
-				} else if (elem[i].query_type.equalsIgnoreCase("insert")) {
+					break;
+				case INSERT:
 					if (elem[i].duration > insert_max) {
 						insert_max = elem[i].duration; 
 					}
 					insert_sum += elem[i].duration;
 					insert_cnt++;
-				} else if (elem[i].query_type.equalsIgnoreCase("delete")) {
+					break;
+				case DELETE:
 					if (elem[i].duration > delete_max) {
 						delete_max = elem[i].duration; 
 					}
 					delete_sum += elem[i].duration;
 					delete_cnt++;
-				} else if (elem[i].query_type.equals("fetch")) {
-					if (elem[i].duration > fetch_max) {
-						fetch_max = elem[i].duration; 
-					}
-					fetch_sum += elem[i].duration;
-					fetch_cnt++;
-				} else {
+					break;
+				case OTHERS:
 					if (elem[i].duration > others_max) {
 						others_max = elem[i].duration; 
 					}
 					others_sum += elem[i].duration;
 					others_cnt++;
-					logger.debug("put '"+elem[i].query_type+"' to others");
+					break;
+				case FETCH:
+					if (elem[i].duration > fetch_max) {
+						fetch_max = elem[i].duration; 
+					}
+					fetch_sum += elem[i].duration;
+					fetch_cnt++;
+					break;
 				}
 			}
 			
@@ -223,21 +232,33 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 	}
 
 	public void consumeEvent(ProfilerEvent evt) {
-		if (mysqlLogger == null) return;
+		if (mysqlLogger == null || stopped) return;
 		switch (evt.getEventType()) {
 		case (ProfilerEvent.TYPE_QUERY):
 			mysqlLogger.logInfo("[QUERY] "+evt.getEventDuration()+evt.getDurationUnits()+" "+evt.getMessage(), evt.getEventCreationPoint());
-			if (!stopped) {
+			if (evt.getMessage().startsWith("select ")) {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), evt.getMessage().substring(0, evt.getMessage().indexOf(' '))));
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.SELECT));
+				}
+			} else if (evt.getMessage().startsWith("insert ")) {
+				synchronized (queue) {
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.INSERT));
+				}
+			} else if (evt.getMessage().startsWith("delete ")) {
+				synchronized (queue) {
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.DELETE));
+				}
+			} else {
+				synchronized (queue) {
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.OTHERS));
 				}
 			}
 			break;
 		case (ProfilerEvent.TYPE_FETCH):
-			mysqlLogger.logInfo("[FETCH] "+evt.getEventDuration()+evt.getDurationUnits()+" "+evt.getMessage(), evt.getEventCreationPoint());
+			mysqlLogger.logInfo("[FETCH] "+evt.getEventDuration()+evt.getDurationUnits(), evt.getEventCreationPoint());
 			if (!stopped) {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), "fetch"));
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.FETCH));
 				}
 			}			
 			break;			
