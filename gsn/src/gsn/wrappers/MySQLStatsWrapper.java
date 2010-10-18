@@ -25,19 +25,19 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 	private final static DataField[] outputStructure = new DataField[] {
 															new DataField("select_cnt", DataTypes.INTEGER),
 															new DataField("select_max", DataTypes.INTEGER),
-															new DataField("select_avg", DataTypes.DOUBLE),
+															new DataField("select_avg", DataTypes.INTEGER),
 															new DataField("insert_cnt", DataTypes.INTEGER),
 															new DataField("insert_max", DataTypes.INTEGER),
-															new DataField("insert_avg", DataTypes.DOUBLE),
+															new DataField("insert_avg", DataTypes.INTEGER),
 															new DataField("delete_cnt", DataTypes.INTEGER),
 															new DataField("delete_max", DataTypes.INTEGER),
-															new DataField("delete_avg", DataTypes.DOUBLE),
+															new DataField("delete_avg", DataTypes.INTEGER),
 															new DataField("others_cnt", DataTypes.INTEGER),															
 															new DataField("others_max", DataTypes.INTEGER),
-															new DataField("others_avg", DataTypes.DOUBLE),
+															new DataField("others_avg", DataTypes.INTEGER),
 															new DataField("fetch_cnt", DataTypes.INTEGER),															
 															new DataField("fetch_max", DataTypes.INTEGER),
-															new DataField("fetch_avg", DataTypes.DOUBLE),
+															new DataField("fetch_avg", DataTypes.INTEGER),
 															new DataField("query_usage", DataTypes.SMALLINT),
 															new DataField("fetch_usage", DataTypes.SMALLINT),
 															};	
@@ -51,8 +51,8 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 	
 	private class MySQLStat {
 		protected final long duration;
-		protected final type query_type;
-		protected MySQLStat(long duration, type query_type) {
+		protected final QueryType query_type;
+		protected MySQLStat(long duration, QueryType query_type) {
 			this.duration = duration;
 			this.query_type = query_type;
 		}
@@ -61,7 +61,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 		}
 	}
 	
-	private enum type {
+	private static enum QueryType {
 	    SELECT, INSERT, DELETE, OTHERS, FETCH 
 	}
 	
@@ -170,7 +170,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 			output[0] = select_cnt;
 			if (select_cnt > 0) {
 				output[1] = select_max;
-				output[2] = (double) select_sum / select_cnt;
+				output[2] = select_sum / select_cnt;
 			} else {
 				output[1] = null;
 				output[2] = null;
@@ -178,7 +178,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 			output[3] = insert_cnt;
 			if (insert_cnt > 0) {
 				output[4] = insert_max;
-				output[5] = (double) insert_sum / insert_cnt;
+				output[5] = insert_sum / insert_cnt;
 			} else {
 				output[4] = null;
 				output[5] = null;
@@ -186,7 +186,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 			output[6] = delete_cnt;
 			if (delete_cnt > 0) {
 				output[7] = delete_max;
-				output[8] = (double) delete_sum / delete_cnt;
+				output[8] = delete_sum / delete_cnt;
 			} else {
 				output[7] = null;
 				output[8] = null;
@@ -194,7 +194,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 			output[9] = others_cnt;
 			if (others_cnt > 0) {
 				output[10] = others_max;
-				output[11] = (double) others_sum / others_cnt;
+				output[11] = others_sum / others_cnt;
 			} else {
 				output[10] = null;
 				output[11] = null;
@@ -202,7 +202,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 			output[12] = fetch_cnt;
 			if (fetch_cnt > 0) {
 				output[13] = fetch_max;
-				output[14] = (double) fetch_sum / fetch_cnt;
+				output[14] = fetch_sum / fetch_cnt;
 			} else {
 				output[13] = null;
 				output[14] = null;
@@ -238,19 +238,19 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 			mysqlLogger.logInfo("[QUERY] "+evt.getEventDuration()+evt.getDurationUnits()+" "+evt.getMessage(), evt.getEventCreationPoint());
 			if (evt.getMessage().startsWith("select ")) {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.SELECT));
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.SELECT));
 				}
 			} else if (evt.getMessage().startsWith("insert ")) {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.INSERT));
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.INSERT));
 				}
 			} else if (evt.getMessage().startsWith("delete ")) {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.DELETE));
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.DELETE));
 				}
 			} else {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.OTHERS));
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.OTHERS));
 				}
 			}
 			break;
@@ -258,7 +258,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 			mysqlLogger.logInfo("[FETCH] "+evt.getEventDuration()+evt.getDurationUnits(), evt.getEventCreationPoint());
 			if (!stopped) {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.type.FETCH));
+					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.FETCH));
 				}
 			}			
 			break;			
