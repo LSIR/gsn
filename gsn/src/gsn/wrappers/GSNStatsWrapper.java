@@ -53,7 +53,7 @@ public class GSNStatsWrapper extends AbstractWrapper
 	}
 	
 	public void run() {
-		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt, sum; 
+		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt; 
 		long timestamp, old_timestamp = -1, thread_blocked_acc, thread_blocked_time, thread_waited_acc, thread_waited_time, diff;
 		ThreadInfo[] threads;
 		Serializable[] output = new Serializable[outputStructure.length];

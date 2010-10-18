@@ -7,7 +7,6 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.log.Log;
 import com.mysql.jdbc.profiler.ProfilerEvent;
 import com.mysql.jdbc.profiler.ProfilerEventHandler;
 

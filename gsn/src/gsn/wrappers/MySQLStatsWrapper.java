@@ -58,7 +58,7 @@ public class MySQLStatsWrapper extends AbstractWrapper
 	
 	public void run() {
 		int size, select_cnt, insert_cnt, delete_cnt, others_cnt, fetch_cnt, select_max, insert_max, delete_max, others_max, fetch_max;
-		long timestamp, select_sum, insert_sum, delete_sum, others_sum, fetch_sum;
+		long timestamp, select_sum, insert_sum, delete_sum, others_sum, fetch_sum, diff;
 		Serializable[] output = new Serializable[outputStructure.length];
 		MySQLProfilerEventHandler.MySQLStat[] elem = null;
 		while (!stopped) {
@@ -70,20 +70,6 @@ public class MySQLStatsWrapper extends AbstractWrapper
 				break;
 			}
 		
-			timestamp = System.currentTimeMillis();
-			
-			synchronized (MySQLProfilerEventHandler.queue) {
-				size = MySQLProfilerEventHandler.queue.size();
-				if (size > 0) {
-					elem = new MySQLProfilerEventHandler.MySQLStat[size]; 
-					for (int i=0; i<size; i++) {
-						elem[i] = MySQLProfilerEventHandler.queue.poll();
-					}
-				}
-			}
-			
-			logger.debug("size="+size);
-			
 			select_cnt = 0;
 			select_max = 0;
 			select_sum = 0;
@@ -99,6 +85,18 @@ public class MySQLStatsWrapper extends AbstractWrapper
 			fetch_cnt = 0;
 			fetch_max = 0;
 			fetch_sum = 0;
+			
+			timestamp = System.currentTimeMillis();
+			
+			synchronized (MySQLProfilerEventHandler.queue) {
+				size = MySQLProfilerEventHandler.queue.size();
+				if (size > 0) {
+					elem = new MySQLProfilerEventHandler.MySQLStat[size]; 
+					for (int i=0; i<size; i++) {
+						elem[i] = MySQLProfilerEventHandler.queue.poll();
+					}
+				}
+			}
 			
 			for (int i=0; i<size; i++) {
 				switch (elem[i].query_type) {
@@ -180,8 +178,9 @@ public class MySQLStatsWrapper extends AbstractWrapper
 				output[13] = null;
 				output[14] = null;
 			}
-			output[15] = (short) ((select_sum + insert_sum + delete_sum + others_sum) * 100 / (timestamp - MySQLProfilerEventHandler.old_timestamp));
-			output[16] = (short) (fetch_sum * 100 / (timestamp - MySQLProfilerEventHandler.old_timestamp));
+			diff = timestamp - MySQLProfilerEventHandler.old_timestamp;
+			output[15] = (short) ((select_sum + insert_sum + delete_sum + others_sum) * 100 / diff);
+			output[16] = (short) (fetch_sum * 100 / diff);
 			
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
 			
