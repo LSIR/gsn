@@ -5,18 +5,10 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
 import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.log.Log;
-import com.mysql.jdbc.profiler.ProfilerEvent;
-import com.mysql.jdbc.profiler.ProfilerEventHandler;
-
-public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventHandler
+public class MySQLStatsWrapper extends AbstractWrapper
 {
 	private final transient Logger logger = Logger.getLogger( MySQLStatsWrapper.class );
 	
@@ -43,31 +35,13 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 															};	
 	
 	private int sampling_rate = DEFAULT_SAMPLING_RATE_MS;
-	private Log mysqlLogger;
 	private boolean stopped = false;
-	private LinkedList<MySQLStat> queue = new LinkedList<MySQLStat>();
 	private Object event = new Object();
 	private long old_timestamp = System.currentTimeMillis();
 	
-	private class MySQLStat {
-		protected final long duration;
-		protected final QueryType query_type;
-		protected MySQLStat(long duration, QueryType query_type) {
-			this.duration = duration;
-			this.query_type = query_type;
-		}
-		public String toString() {
-			return "MySQLStat:duration="+duration+",query_type="+query_type;
-		}
-	}
-	
-	private static enum QueryType {
-	    SELECT, INSERT, DELETE, OTHERS, FETCH 
-	}
-	
 	public boolean initialize()	{
-		if (mysqlLogger == null) {
-			logger.warn("make sure that profilerEventHandler=" + MySQLStatsWrapper.class.getName() + "and profileSQL=true properties are set in MySQL JDBC URL");
+		if (MySQLProfilerEventHandler.mysqlLogger == null) {
+			logger.warn("make sure that profilerEventHandler=" + MySQLProfilerEventHandler.class.getName() + " and profileSQL=true properties are set in MySQL JDBC URL");
 			return false;
 		}
 		
@@ -87,7 +61,7 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 		int size, select_cnt, insert_cnt, delete_cnt, others_cnt, fetch_cnt;
 		long timestamp, select_max, select_sum, insert_max, insert_sum, delete_max, delete_sum, others_max, others_sum, fetch_max, fetch_sum;
 		Serializable[] output = new Serializable[outputStructure.length];
-		MySQLStat[] elem = null;
+		MySQLProfilerEventHandler.MySQLStat[] elem = null;
 		while (!stopped) {
 			try {
 				synchronized (event) {
@@ -99,12 +73,12 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 		
 			timestamp = System.currentTimeMillis();
 			
-			synchronized (queue) {
-				size = queue.size();
+			synchronized (MySQLProfilerEventHandler.queue) {
+				size = MySQLProfilerEventHandler.queue.size();
 				if (size > 0) {
-					elem = new MySQLStat[size]; 
+					elem = new MySQLProfilerEventHandler.MySQLStat[size]; 
 					for (int i=0; i<size; i++) {
-						elem[i] = queue.poll();
+						elem[i] = MySQLProfilerEventHandler.queue.poll();
 					}
 				}
 			}
@@ -229,49 +203,5 @@ public class MySQLStatsWrapper extends AbstractWrapper implements ProfilerEventH
 
 	public String getWrapperName() {
 		return "MySQLStatsWrapper";
-	}
-
-	public void consumeEvent(ProfilerEvent evt) {
-		if (mysqlLogger == null || stopped) return;
-		switch (evt.getEventType()) {
-		case (ProfilerEvent.TYPE_QUERY):
-			mysqlLogger.logInfo("[QUERY] "+evt.getEventDuration()+evt.getDurationUnits()+" "+evt.getMessage(), evt.getEventCreationPoint());
-			if (evt.getMessage().startsWith("select ")) {
-				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.SELECT));
-				}
-			} else if (evt.getMessage().startsWith("insert ")) {
-				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.INSERT));
-				}
-			} else if (evt.getMessage().startsWith("delete ")) {
-				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.DELETE));
-				}
-			} else {
-				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.OTHERS));
-				}
-			}
-			break;
-		case (ProfilerEvent.TYPE_FETCH):
-			mysqlLogger.logInfo("[FETCH] "+evt.getEventDuration()+evt.getDurationUnits(), evt.getEventCreationPoint());
-			if (!stopped) {
-				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLStatsWrapper.QueryType.FETCH));
-				}
-			}			
-			break;			
-		case (ProfilerEvent.TYPE_SLOW_QUERY):
-			mysqlLogger.logWarn("[SLOWQ] "+evt.getEventDuration()+evt.getDurationUnits()+" "+evt.getMessage(), evt.getEventCreationPoint());
-			break;
-		default:
-			mysqlLogger.logDebug(evt);
-			break;
-		}
-	}
-
-	public void init(Connection conn, Properties props) throws SQLException {
-		mysqlLogger = conn.getLog();
 	}
 }
