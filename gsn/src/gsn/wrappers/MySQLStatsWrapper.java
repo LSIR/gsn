@@ -37,10 +37,9 @@ public class MySQLStatsWrapper extends AbstractWrapper
 	private int sampling_rate = DEFAULT_SAMPLING_RATE_MS;
 	private boolean stopped = false;
 	private Object event = new Object();
-	private long old_timestamp = System.currentTimeMillis();
 	
 	public boolean initialize()	{
-		if (MySQLProfilerEventHandler.mysqlLogger == null) {
+		if (!MySQLProfilerEventHandler.initialized) {
 			logger.warn("make sure that profilerEventHandler=" + MySQLProfilerEventHandler.class.getName() + " and profileSQL=true properties are set in MySQL JDBC URL");
 			return false;
 		}
@@ -58,8 +57,8 @@ public class MySQLStatsWrapper extends AbstractWrapper
 	}
 	
 	public void run() {
-		int size, select_cnt, insert_cnt, delete_cnt, others_cnt, fetch_cnt;
-		long timestamp, select_max, select_sum, insert_max, insert_sum, delete_max, delete_sum, others_max, others_sum, fetch_max, fetch_sum;
+		int size, select_cnt, insert_cnt, delete_cnt, others_cnt, fetch_cnt, select_max, insert_max, delete_max, others_max, fetch_max;
+		long timestamp, select_sum, insert_sum, delete_sum, others_sum, fetch_sum;
 		Serializable[] output = new Serializable[outputStructure.length];
 		MySQLProfilerEventHandler.MySQLStat[] elem = null;
 		while (!stopped) {
@@ -144,7 +143,7 @@ public class MySQLStatsWrapper extends AbstractWrapper
 			output[0] = select_cnt;
 			if (select_cnt > 0) {
 				output[1] = select_max;
-				output[2] = select_sum / select_cnt;
+				output[2] = (int) (select_sum / select_cnt);
 			} else {
 				output[1] = null;
 				output[2] = null;
@@ -152,7 +151,7 @@ public class MySQLStatsWrapper extends AbstractWrapper
 			output[3] = insert_cnt;
 			if (insert_cnt > 0) {
 				output[4] = insert_max;
-				output[5] = insert_sum / insert_cnt;
+				output[5] = (int) (insert_sum / insert_cnt);
 			} else {
 				output[4] = null;
 				output[5] = null;
@@ -160,7 +159,7 @@ public class MySQLStatsWrapper extends AbstractWrapper
 			output[6] = delete_cnt;
 			if (delete_cnt > 0) {
 				output[7] = delete_max;
-				output[8] = delete_sum / delete_cnt;
+				output[8] = (int) (delete_sum / delete_cnt);
 			} else {
 				output[7] = null;
 				output[8] = null;
@@ -168,7 +167,7 @@ public class MySQLStatsWrapper extends AbstractWrapper
 			output[9] = others_cnt;
 			if (others_cnt > 0) {
 				output[10] = others_max;
-				output[11] = others_sum / others_cnt;
+				output[11] = (int) (others_sum / others_cnt);
 			} else {
 				output[10] = null;
 				output[11] = null;
@@ -176,17 +175,17 @@ public class MySQLStatsWrapper extends AbstractWrapper
 			output[12] = fetch_cnt;
 			if (fetch_cnt > 0) {
 				output[13] = fetch_max;
-				output[14] = fetch_sum / fetch_cnt;
+				output[14] = (int) (fetch_sum / fetch_cnt);
 			} else {
 				output[13] = null;
 				output[14] = null;
 			}
-			output[15] = (select_sum + insert_sum + delete_sum + others_sum) * 100 / (timestamp - old_timestamp);
-			output[16] = fetch_sum * 100 / (timestamp - old_timestamp);
+			output[15] = (short) ((select_sum + insert_sum + delete_sum + others_sum) * 100 / (timestamp - MySQLProfilerEventHandler.old_timestamp));
+			output[16] = (short) (fetch_sum * 100 / (timestamp - MySQLProfilerEventHandler.old_timestamp));
 			
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
 			
-			old_timestamp = timestamp;
+			MySQLProfilerEventHandler.old_timestamp = timestamp;
 		}
 	}
 

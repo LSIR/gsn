@@ -1,0 +1,38 @@
+<virtual-sensor name="Statistics_MySQL__2321" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="SELECT_CNT" type="INTEGER" />
+            <field name="SELECT_MAX" type="INTEGER" unit="ms" />
+            <field name="SELECT_AVG" type="INTEGER" unit="ms" />
+            <field name="INSERT_CNT" type="INTEGER" />
+            <field name="INSERT_MAX" type="INTEGER" unit="ms" />
+            <field name="INSERT_AVG" type="INTEGER" unit="ms" />
+            <field name="DELETE_CNT" type="INTEGER" />
+            <field name="DELETE_MAX" type="INTEGER" unit="ms" />
+            <field name="DELETE_AVG" type="INTEGER" unit="ms" />
+            <field name="FETCH_CNT" type="INTEGER" />
+            <field name="FETCH_MAX" type="INTEGER" unit="ms" />
+            <field name="FETCH_AVG" type="INTEGER" unit="ms" />
+            <field name="QUERY_USAGE" type="SMALLINT" unit="%" />
+            <field name="FETCH_USAGE" type="SMALLINT" unit="%" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Statistics about MySQL usage</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="mysql">
+                    <predicate key="sampling-time">30000</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

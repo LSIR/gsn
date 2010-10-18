@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.log.Log;
 import com.mysql.jdbc.profiler.ProfilerEvent;
@@ -11,13 +13,16 @@ import com.mysql.jdbc.profiler.ProfilerEventHandler;
 
 public class MySQLProfilerEventHandler implements ProfilerEventHandler
 {
-	protected static Log mysqlLogger = null;
+	private final transient Logger logger = Logger.getLogger( MySQLProfilerEventHandler.class );
+
+	protected static boolean initialized = false;
 	protected static LinkedList<MySQLStat> queue = new LinkedList<MySQLStat>();
-	
+        protected static long old_timestamp = System.currentTimeMillis();	
+
 	protected class MySQLStat {
-		protected final long duration;
+		protected final int duration;
 		protected final QueryType query_type;
-		protected MySQLStat(long duration, QueryType query_type) {
+		protected MySQLStat(int duration, QueryType query_type) {
 			this.duration = duration;
 			this.query_type = query_type;
 		}
@@ -33,48 +38,73 @@ public class MySQLProfilerEventHandler implements ProfilerEventHandler
 	public MySQLProfilerEventHandler () { }
 
 	public void consumeEvent(ProfilerEvent evt) {
-		if (mysqlLogger == null) return;
 		switch (evt.getEventType()) {
 		case (ProfilerEvent.TYPE_QUERY):
-			mysqlLogger.logInfo("[QUERY] "+evt.getEventDuration()+evt.getDurationUnits()+" "+evt.getMessage(), evt.getEventCreationPoint());
+			logger.info("[QUERY] "+evt.getEventDuration()+evt.getDurationUnits()+" "+replaceNonPrintableCharactersWithSpace(evt.getMessage()));
 			if (evt.getMessage().startsWith("select ")) {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.SELECT));
+					queue.add(new MySQLStat((int) evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.SELECT));
 				}
 			} else if (evt.getMessage().startsWith("insert ")) {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.INSERT));
+					queue.add(new MySQLStat((int) evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.INSERT));
 				}
 			} else if (evt.getMessage().startsWith("delete ")) {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.DELETE));
+					queue.add(new MySQLStat((int) evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.DELETE));
 				}
 			} else {
 				synchronized (queue) {
-					queue.add(new MySQLStat(evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.OTHERS));
+					queue.add(new MySQLStat((int) evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.OTHERS));
 				}
 			}
 			break;
 		case (ProfilerEvent.TYPE_FETCH):
-			mysqlLogger.logInfo("[FETCH] "+evt.getEventDuration()+evt.getDurationUnits(), evt.getEventCreationPoint());
+			logger.info("[FETCH] "+evt.getEventDuration()+evt.getDurationUnits());
 			synchronized (queue) {
-				queue.add(new MySQLStat(evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.FETCH));
+				queue.add(new MySQLStat((int) evt.getEventDuration(), MySQLProfilerEventHandler.QueryType.FETCH));
 			}
 			break;			
 		case (ProfilerEvent.TYPE_SLOW_QUERY):
-			mysqlLogger.logWarn("[SLOWQ] "+evt.getEventDuration()+evt.getDurationUnits()+" "+evt.getMessage(), evt.getEventCreationPoint());
+			logger.warn("[SLOWQ] "+evt.getEventDuration()+evt.getDurationUnits()+" "+replaceNonPrintableCharactersWithSpace(evt.getMessage().substring(evt.getMessage().indexOf(':') + 2)));
 			break;
 		default:
-			mysqlLogger.logDebug(evt);
+			logger.debug(evt.getMessage());
 			break;
 		}
 	}
 
 	public void init(Connection conn, Properties props) throws SQLException {
-		mysqlLogger = conn.getLog();
+		initialized = true;
 	}
-	
-	public void destroy() {
-		mysqlLogger = null;
+
+	public void destroy() { }
+
+	private static String replaceNonPrintableCharactersWithSpace(String s) {
+		StringBuffer sb = new StringBuffer(s.trim());
+		char c;
+		boolean lastCharIsSpace = false;
+		// if non-printable character, replace it with space
+		for (int i=0; i<sb.length(); i++) {
+			c = sb.charAt(i);
+			if (c < ' ' || c > '~') {
+				sb.setCharAt(i, ' ');
+			}
+		}
+		// remove sequential spaces
+		for (int i=0; i<sb.length(); ) {
+			if (sb.charAt(i) == ' ') {
+				if (lastCharIsSpace) {
+					sb.deleteCharAt(i);
+				} else {
+					lastCharIsSpace = true;
+					i++;
+				}
+			} else {
+				lastCharIsSpace = false;
+				i++;
+			}
+		}
+		return sb.toString();
 	}
 }
