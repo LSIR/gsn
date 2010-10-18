@@ -54,7 +54,8 @@ public class GSNStatsWrapper extends AbstractWrapper
 	
 	public void run() {
 		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt; 
-		long timestamp, old_timestamp = -1, thread_blocked_acc, thread_blocked_time, thread_waited_acc, thread_waited_time, diff;
+		long timestamp, thread_blocked_acc, thread_blocked_time, thread_waited_acc, thread_waited_time, diff;
+		long old_timestamp = -1, thread_blocked_acc_old = -1, thread_blocked_time_old = -1, thread_waited_acc_old = -1, thread_waited_time_old = -1;
 		ThreadInfo[] threads;
 		Serializable[] output = new Serializable[outputStructure.length];
 		ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
@@ -122,10 +123,10 @@ public class GSNStatsWrapper extends AbstractWrapper
 			output[8] = thread_waiting_cnt;
 			if (old_timestamp != -1) {
 				diff = timestamp - old_timestamp;
-				output[9] = (int) (thread_blocked_acc / diff);
-				output[10] = (int) (thread_blocked_time / diff);
-				output[11] = (int) (thread_waited_acc / diff);
-				output[12] = (int) (thread_waited_time / diff);
+				output[9] = (int) ((thread_blocked_acc - thread_blocked_acc_old) * 1000 / diff);
+				output[10] = (int) ((thread_blocked_time - thread_blocked_time_old) / diff);
+				output[11] = (int) ((thread_waited_acc - thread_waited_acc_old) * 1000 / diff);
+				output[12] = (int) ((thread_waited_time - thread_waited_time_old) / diff);
 			} else {
 				output[9] = null;
 				output[10] = null;
@@ -136,6 +137,10 @@ public class GSNStatsWrapper extends AbstractWrapper
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
 			
 			old_timestamp = timestamp;
+			thread_blocked_acc_old = thread_blocked_acc;
+			thread_blocked_time_old = thread_blocked_time;
+			thread_waited_acc_old = thread_waited_acc;
+			thread_waited_time_old = thread_waited_time;
 		}
 	}
 
