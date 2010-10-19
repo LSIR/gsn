@@ -27,7 +27,7 @@
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="mysql">
+                <address wrapper="mysqlstats">
                     <predicate key="sampling-time">30000</predicate>
                 </address>
                 <query> select * from wrapper </query>

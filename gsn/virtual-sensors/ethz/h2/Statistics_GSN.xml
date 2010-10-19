@@ -1,0 +1,35 @@
+<virtual-sensor name="Statistics_GSN__2325" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="UPTIME" type="INTEGER" unit="s" />
+            <field name="MEMORY_HEAP_USED" type="INTEGER" unit="kB" />
+            <field name="MEMORY_NONHEAP_USED" type="INTEGER" unit="kB" />
+            <field name="THREAD_BLOCKED_CNT" type="SMALLINT" />
+            <field name="THREAD_NEW_CNT" type="SMALLINT" />
+            <field name="THREAD_RUNNABLE_CNT" type="SMALLINT" />
+            <field name="THREAD_TERMINATED_CNT" type="SMALLINT" />
+            <field name="THREAD_TIMED_WAITING_CNT" type="SMALLINT" />
+            <field name="THREAD_WAITING_CNT" type="SMALLINT" />
+            <field name="THREAD_BLOCKED_ACC" type="INTEGER" unit="Hz" />
+            <field name="THREAD_WAITED_ACC" type="INTEGER" unit="Hz" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Statistics about GSN internals</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="gsnstats">
+                    <predicate key="sampling-time">30000</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

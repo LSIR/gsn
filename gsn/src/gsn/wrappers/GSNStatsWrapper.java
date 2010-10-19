@@ -30,10 +30,8 @@ public class GSNStatsWrapper extends AbstractWrapper
 															new DataField("thread_timed_waiting_cnt", DataTypes.SMALLINT),
 															new DataField("thread_waiting_cnt", DataTypes.SMALLINT),
 															new DataField("thread_blocked_acc", DataTypes.INTEGER),
-															new DataField("thread_blocked_time", DataTypes.INTEGER),
 															new DataField("thread_waited_acc", DataTypes.INTEGER),
-															new DataField("thread_waited_time", DataTypes.INTEGER),
-															};	
+															};
 	
 	private int sampling_rate = DEFAULT_SAMPLING_RATE_MS;
 	private boolean stopped = false;
@@ -54,8 +52,8 @@ public class GSNStatsWrapper extends AbstractWrapper
 	
 	public void run() {
 		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt; 
-		long timestamp, thread_blocked_acc, thread_blocked_time, thread_waited_acc, thread_waited_time, diff;
-		long old_timestamp = -1, thread_blocked_acc_old = -1, thread_blocked_time_old = -1, thread_waited_acc_old = -1, thread_waited_time_old = -1;
+		long timestamp, thread_blocked_acc, thread_waited_acc, diff;
+		long old_timestamp = -1, thread_blocked_acc_old = -1, thread_waited_acc_old = -1;
 		ThreadInfo[] threads;
 		Serializable[] output = new Serializable[outputStructure.length];
 		ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
@@ -77,9 +75,7 @@ public class GSNStatsWrapper extends AbstractWrapper
 			thread_timed_waiting_cnt = 0;
 			thread_waiting_cnt = 0;
 			thread_blocked_acc = 0;
-			thread_blocked_time = 0;
 			thread_waited_acc = 0;
-			thread_waited_time = 0;
 			
 			timestamp = System.currentTimeMillis();
 			
@@ -110,9 +106,7 @@ public class GSNStatsWrapper extends AbstractWrapper
 					break;
 				}
 				thread_blocked_acc += threads[i].getBlockedCount();
-				thread_blocked_time += threads[i].getBlockedTime();
 				thread_waited_acc += threads[i].getWaitedCount();
-				thread_waited_time += threads[i].getWaitedTime();
 			}
 			
 			output[3] = thread_blocked_cnt;
@@ -124,23 +118,17 @@ public class GSNStatsWrapper extends AbstractWrapper
 			if (old_timestamp != -1) {
 				diff = timestamp - old_timestamp;
 				output[9] = (int) ((thread_blocked_acc - thread_blocked_acc_old) * 1000 / diff);
-				output[10] = (int) ((thread_blocked_time - thread_blocked_time_old) / diff);
-				output[11] = (int) ((thread_waited_acc - thread_waited_acc_old) * 1000 / diff);
-				output[12] = (int) ((thread_waited_time - thread_waited_time_old) / diff);
+				output[10] = (int) ((thread_waited_acc - thread_waited_acc_old) * 1000 / diff);
 			} else {
 				output[9] = null;
 				output[10] = null;
-				output[11] = null;
-				output[12] = null;				
 			}
 			
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
 			
 			old_timestamp = timestamp;
 			thread_blocked_acc_old = thread_blocked_acc;
-			thread_blocked_time_old = thread_blocked_time;
 			thread_waited_acc_old = thread_waited_acc;
-			thread_waited_time_old = thread_waited_time;
 		}
 	}
 
