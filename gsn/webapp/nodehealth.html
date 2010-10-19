@@ -72,7 +72,7 @@ $(document).ready(function() {
 		var arraySize = 0;
 		$("virtual-sensor",data).each(function(){
 		    var deploymentname = $(this).attr("name").split("_", 1)[0];
-		    if(deploymentname.length > 1) {
+		    if(deploymentname.length > 1 && deploymentname!='Statistics') {
 			deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
 			if ($.inArray(deploymentname, deployments) < 0) {
 			    deployments.push(deploymentname);

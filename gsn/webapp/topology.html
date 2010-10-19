@@ -490,7 +490,7 @@ $(document).ready(function() {
         var deploymentname = $(this).attr("name").split("_", 1)[0];
         var groupname = $(this).attr("name").split("_", 2)[1];
         deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
-        if(deploymentname.length > 1) {
+        if(deploymentname.length > 1 && deploymentname!='Statistics') {
           if ($.inArray(deploymentname, deployments) < 0)
             deployments.push(deploymentname);
           if (groupname == "topology") {
