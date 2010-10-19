@@ -29,8 +29,8 @@ public class GSNStatsWrapper extends AbstractWrapper
 															new DataField("thread_terminated_cnt", DataTypes.SMALLINT),
 															new DataField("thread_timed_waiting_cnt", DataTypes.SMALLINT),
 															new DataField("thread_waiting_cnt", DataTypes.SMALLINT),
-															new DataField("thread_blocked_acc", DataTypes.INTEGER),
-															new DataField("thread_waited_acc", DataTypes.INTEGER),
+															new DataField("thread_blocked_rate", DataTypes.INTEGER),
+															new DataField("thread_waited_rate", DataTypes.INTEGER),
 															};
 	
 	private int sampling_rate = DEFAULT_SAMPLING_RATE_MS;
