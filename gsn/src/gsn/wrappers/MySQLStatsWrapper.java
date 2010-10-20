@@ -179,8 +179,8 @@ public class MySQLStatsWrapper extends AbstractWrapper
 				output[14] = null;
 			}
 			diff = timestamp - MySQLProfilerEventHandler.old_timestamp;
-			output[15] = (short) ((select_sum + insert_sum + delete_sum + others_sum) * 100 / diff);
-			output[16] = (short) (fetch_sum * 100 / diff);
+			output[15] = (short) ((select_sum + insert_sum + delete_sum + others_sum) * 1000 / diff);
+			output[16] = (short) (fetch_sum * 1000 / diff);
 			
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
 			

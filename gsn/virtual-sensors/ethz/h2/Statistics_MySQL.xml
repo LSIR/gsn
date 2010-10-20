@@ -12,11 +12,14 @@
             <field name="DELETE_CNT" type="INTEGER" />
             <field name="DELETE_MAX" type="INTEGER" unit="ms" />
             <field name="DELETE_AVG" type="INTEGER" unit="ms" />
+            <field name="OTHERS_CNT" type="INTEGER" />
+            <field name="OTHERS_MAX" type="INTEGER" unit="ms" />
+            <field name="OTHERS_AVG" type="INTEGER" unit="ms" />
             <field name="FETCH_CNT" type="INTEGER" />
             <field name="FETCH_MAX" type="INTEGER" unit="ms" />
-            <field name="FETCH_AVG" type="INTEGER" unit="ms" />
-            <field name="QUERY_USAGE" type="SMALLINT" unit="%" />
-            <field name="FETCH_USAGE" type="SMALLINT" unit="%" />
+            <field name="FETCH_AVG" type="INTEGER" unit="ms"/>
+            <field name="QUERY_USAGE" type="SMALLINT" unit="‰" />
+            <field name="FETCH_USAGE" type="SMALLINT" unit="‰" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
