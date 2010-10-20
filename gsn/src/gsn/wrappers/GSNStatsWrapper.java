@@ -53,7 +53,7 @@ public class GSNStatsWrapper extends AbstractWrapper
 	}
 	
 	public void run() {
-		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt, thread_total_cnt;
+		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt;
 		long timestamp, diff, blockedCount, blockedTime, waitedCount;
 		long old_timestamp = 0;
 		double thread_blocked_acc, thread_blocked_acc_time, thread_waited_acc;
