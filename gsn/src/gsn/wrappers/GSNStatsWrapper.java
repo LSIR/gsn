@@ -56,8 +56,10 @@ public class GSNStatsWrapper extends AbstractWrapper
 	
 	public void run() {
 		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt, thread_total_cnt;
-		long timestamp, thread_blocked_acc, thread_blocked_acc_time, thread_waited_acc, diff, blockedCount, blockedTime, waitedCount;
-		long old_timestamp = -1, thread_blocked_acc_old = -1, thread_blocked_acc_time_old = -1, thread_waited_acc_old = -1;
+		long timestamp, diff, blockedCount, blockedTime, waitedCount;
+		long old_timestamp = 0;
+		double thread_blocked_acc, thread_blocked_acc_time, thread_waited_acc;
+		double thread_blocked_acc_old = 0.0, thread_blocked_acc_time_old = 0.0, thread_waited_acc_old = 0.0;
 		ThreadInfo[] threads;
 		Serializable[] output = new Serializable[outputStructure.length];
 		ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
@@ -79,9 +81,9 @@ public class GSNStatsWrapper extends AbstractWrapper
 			thread_terminated_cnt = 0;
 			thread_timed_waiting_cnt = 0;
 			thread_waiting_cnt = 0;
-			thread_blocked_acc = 0;
-			thread_blocked_acc_time = 0;
-			thread_waited_acc = 0;
+			thread_blocked_acc = 0.0;
+			thread_blocked_acc_time = 0.0;
+			thread_waited_acc = 0.0;
 			
 			timestamp = System.currentTimeMillis();
 			
@@ -128,11 +130,11 @@ public class GSNStatsWrapper extends AbstractWrapper
 			output[6] = thread_terminated_cnt;
 			output[7] = thread_timed_waiting_cnt;
 			output[8] = thread_waiting_cnt;
-			output[9] = threads.length;
+			output[9] = (short) threads.length;
 			thread_blocked_acc /= threads.length;
 			thread_blocked_acc_time /= threads.length;
 			thread_waited_acc /= threads.length;
-			if (old_timestamp != -1) {
+			if (old_timestamp != 0) {
 				diff = timestamp - old_timestamp;
 				output[10] = (short) ((thread_blocked_acc - thread_blocked_acc_old) * 60000 / diff);
 				output[11] = (int) ((thread_blocked_acc_time - thread_blocked_acc_time_old) * 1000000 / diff);
