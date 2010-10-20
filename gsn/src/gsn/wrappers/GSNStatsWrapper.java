@@ -5,8 +5,10 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
 import java.io.Serializable;
+import java.lang.management.LockInfo;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
+import java.lang.management.MonitorInfo;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -51,10 +53,12 @@ public class GSNStatsWrapper extends AbstractWrapper
 	}
 	
 	public void run() {
-		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt; 
-		long timestamp, thread_blocked_acc, thread_waited_acc, diff;
+		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt;
+		long timestamp, thread_blocked_acc, thread_waited_acc, diff, blockedCount, blockedTime, waitedCount, waitedTime;
 		long old_timestamp = -1, thread_blocked_acc_old = -1, thread_waited_acc_old = -1;
 		ThreadInfo[] threads;
+		MonitorInfo[] monitors;
+		LockInfo[] locks;
 		Serializable[] output = new Serializable[outputStructure.length];
 		ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
 		RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
@@ -104,6 +108,23 @@ public class GSNStatsWrapper extends AbstractWrapper
 				case WAITING:
 					thread_waiting_cnt++;
 					break;
+				}
+				blockedCount = threads[i].getBlockedCount();
+				blockedTime = threads[i].getBlockedTime();
+				waitedCount = threads[i].getWaitedCount();
+				waitedTime = threads[i].getWaitedTime();
+				if (logger.isInfoEnabled()) {
+					logger.info(threads[i].getThreadName()+" blocked:"+blockedCount+":"+blockedTime+"ms waited:"+waitedCount+":"+waitedTime+"ms");
+				}
+				if (logger.isDebugEnabled()) {
+					monitors = threads[i].getLockedMonitors();
+					locks = threads[i].getLockedSynchronizers();
+					for (int m=0; m<monitors.length; m++) {
+						logger.debug(threads[i].getThreadName()+" monitor:"+monitors[m].getClassName());
+					}
+					for (int l=0; l<locks.length; l++) {
+						logger.debug(threads[i].getThreadName()+" lock:"+locks[l].getClassName());
+					}
 				}
 				thread_blocked_acc += threads[i].getBlockedCount();
 				thread_waited_acc += threads[i].getWaitedCount();
