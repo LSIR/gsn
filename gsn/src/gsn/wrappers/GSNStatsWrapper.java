@@ -5,10 +5,8 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
 import java.io.Serializable;
-import java.lang.management.LockInfo;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
-import java.lang.management.MonitorInfo;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
