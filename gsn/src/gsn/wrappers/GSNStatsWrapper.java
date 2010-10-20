@@ -31,8 +31,10 @@ public class GSNStatsWrapper extends AbstractWrapper
 															new DataField("thread_terminated_cnt", DataTypes.SMALLINT),
 															new DataField("thread_timed_waiting_cnt", DataTypes.SMALLINT),
 															new DataField("thread_waiting_cnt", DataTypes.SMALLINT),
-															new DataField("thread_blocked_rate", DataTypes.INTEGER),
-															new DataField("thread_waited_rate", DataTypes.INTEGER),
+															new DataField("thread_total_cnt", DataTypes.SMALLINT),
+															new DataField("thread_blocked_rate", DataTypes.SMALLINT),
+															new DataField("thread_blocked_time", DataTypes.INTEGER),
+															new DataField("thread_waited_rate", DataTypes.SMALLINT),
 															};
 	
 	private int sampling_rate = DEFAULT_SAMPLING_RATE_MS;
@@ -53,14 +55,13 @@ public class GSNStatsWrapper extends AbstractWrapper
 	}
 	
 	public void run() {
-		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt;
-		long timestamp, thread_blocked_acc, thread_waited_acc, diff, blockedCount, blockedTime, waitedCount, waitedTime;
-		long old_timestamp = -1, thread_blocked_acc_old = -1, thread_waited_acc_old = -1;
+		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt, thread_total_cnt;
+		long timestamp, thread_blocked_acc, thread_blocked_acc_time, thread_waited_acc, diff, blockedCount, blockedTime, waitedCount;
+		long old_timestamp = -1, thread_blocked_acc_old = -1, thread_blocked_acc_time_old = -1, thread_waited_acc_old = -1;
 		ThreadInfo[] threads;
-		MonitorInfo[] monitors;
-		LockInfo[] locks;
 		Serializable[] output = new Serializable[outputStructure.length];
 		ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+		threadBean.setThreadContentionMonitoringEnabled(true);
 		RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
 		MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
 		while (!stopped) {
@@ -79,6 +80,7 @@ public class GSNStatsWrapper extends AbstractWrapper
 			thread_timed_waiting_cnt = 0;
 			thread_waiting_cnt = 0;
 			thread_blocked_acc = 0;
+			thread_blocked_acc_time = 0;
 			thread_waited_acc = 0;
 			
 			timestamp = System.currentTimeMillis();
@@ -112,22 +114,12 @@ public class GSNStatsWrapper extends AbstractWrapper
 				blockedCount = threads[i].getBlockedCount();
 				blockedTime = threads[i].getBlockedTime();
 				waitedCount = threads[i].getWaitedCount();
-				waitedTime = threads[i].getWaitedTime();
 				if (logger.isInfoEnabled()) {
-					logger.info(threads[i].getThreadName()+" blocked:"+blockedCount+":"+blockedTime+"ms waited:"+waitedCount+":"+waitedTime+"ms");
+					logger.info(threads[i].getThreadName()+" blocked:"+blockedCount+":"+blockedTime+"ms waited:"+waitedCount);
 				}
-				if (logger.isDebugEnabled()) {
-					monitors = threads[i].getLockedMonitors();
-					locks = threads[i].getLockedSynchronizers();
-					for (int m=0; m<monitors.length; m++) {
-						logger.debug(threads[i].getThreadName()+" monitor:"+monitors[m].getClassName());
-					}
-					for (int l=0; l<locks.length; l++) {
-						logger.debug(threads[i].getThreadName()+" lock:"+locks[l].getClassName());
-					}
-				}
-				thread_blocked_acc += threads[i].getBlockedCount();
-				thread_waited_acc += threads[i].getWaitedCount();
+				thread_blocked_acc += blockedCount;
+				thread_blocked_acc_time += blockedTime;
+				thread_waited_acc += waitedCount;
 			}
 			
 			output[3] = thread_blocked_cnt;
@@ -136,19 +128,26 @@ public class GSNStatsWrapper extends AbstractWrapper
 			output[6] = thread_terminated_cnt;
 			output[7] = thread_timed_waiting_cnt;
 			output[8] = thread_waiting_cnt;
+			output[9] = threads.length;
+			thread_blocked_acc /= threads.length;
+			thread_blocked_acc_time /= threads.length;
+			thread_waited_acc /= threads.length;
 			if (old_timestamp != -1) {
 				diff = timestamp - old_timestamp;
-				output[9] = (int) ((thread_blocked_acc - thread_blocked_acc_old) * 1000 / diff);
-				output[10] = (int) ((thread_waited_acc - thread_waited_acc_old) * 1000 / diff);
+				output[10] = (short) ((thread_blocked_acc - thread_blocked_acc_old) * 60000 / diff);
+				output[11] = (int) ((thread_blocked_acc_time - thread_blocked_acc_time_old) * 1000000 / diff);
+				output[12] = (short) ((thread_waited_acc - thread_waited_acc_old) * 60000 / diff);
 			} else {
-				output[9] = null;
 				output[10] = null;
+				output[11] = null;
+				output[12] = null;
 			}
 			
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
 			
 			old_timestamp = timestamp;
 			thread_blocked_acc_old = thread_blocked_acc;
+			thread_blocked_acc_time_old = thread_blocked_acc_time;
 			thread_waited_acc_old = thread_waited_acc;
 		}
 	}

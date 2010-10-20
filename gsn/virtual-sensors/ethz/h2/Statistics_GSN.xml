@@ -12,8 +12,9 @@
             <field name="THREAD_TERMINATED_CNT" type="SMALLINT" />
             <field name="THREAD_TIMED_WAITING_CNT" type="SMALLINT" />
             <field name="THREAD_WAITING_CNT" type="SMALLINT" />
-            <field name="THREAD_BLOCKED_RATE" type="INTEGER" unit="cps" />
-            <field name="THREAD_WAITED_RATE" type="INTEGER" unit="cps" />
+            <field name="THREAD_BLOCKED_RATE" type="SMALLINT" unit="cpm" />
+            <field name="THREAD_BLOCKED_TIME" type="INTEGER" unit="ppm" />
+            <field name="THREAD_WAITED_RATE" type="SMALLINT" unit="cpm" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
