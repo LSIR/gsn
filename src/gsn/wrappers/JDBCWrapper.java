@@ -28,8 +28,8 @@ import java.util.regex.Matcher;
  */
 public class JDBCWrapper extends AbstractWrapper {
 
-    private static long DEFAULT_RATE = 1000;   // 1 minute in milliseconds
-    private static long DEFAULT_BUFFER_SIZE = 10000;
+    private static long DEFAULT_RATE = 1000;   // 1 second in milliseconds
+    private static long DEFAULT_BUFFER_SIZE = 100;
 
     private transient Logger logger = Logger.getLogger(this.getClass());
     private DataField[] outputFormat;
@@ -78,12 +78,11 @@ public class JDBCWrapper extends AbstractWrapper {
         password = addressBean.getPredicateValue("password");
         driver = addressBean.getPredicateValue("driver");
 
-        if ((databaseURL!=null)&&(username!=null)&&(password!=null)&&(driver!=null)) {
+        if ((databaseURL != null) && (username != null) && (password != null) && (driver != null)) {
             useDefaultStorageManager = false;
-            sm = StorageManagerFactory.getInstance(driver , username , password , databaseURL, 8);
+            sm = StorageManagerFactory.getInstance(driver, username, password, databaseURL, 8);
             logger.warn("Using specified storage manager: " + databaseURL);
-        }
-        else {
+        } else {
             sm = Main.getDefaultStorage();
             logger.warn("Using default storage manager");
         }
@@ -154,12 +153,12 @@ public class JDBCWrapper extends AbstractWrapper {
         //////////////////
 
 
-
         Connection connection = null;
         try {
             logger.info("Initializing the structure of JDBCWrapper with : " + table_name);
             connection = sm.getConnection();
-            outputFormat = sm.tableToStructure(table_name, connection);
+
+            outputFormat = sm.tableToStructureByString(table_name, connection);
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             return false;
@@ -217,33 +216,33 @@ public class JDBCWrapper extends AbstractWrapper {
                     //logger.warn("pk => "+ pk);
                     //logger.warn("timed => "+ timed);
 
-                    for (int i = 1; i < dataFieldsLength; i++) {
+                    for (int i = 0; i < dataFieldsLength; i++) {
 
                         switch (dataFieldTypes[i]) {
                             case DataTypes.VARCHAR:
                             case DataTypes.CHAR:
-                                output[i] = resultSet.getString(i + 2);
+                                output[i] = resultSet.getString(i + 3);
                                 break;
                             case DataTypes.INTEGER:
-                                output[i] = resultSet.getInt(i + 2);
+                                output[i] = resultSet.getInt(i + 3);
                                 break;
                             case DataTypes.TINYINT:
-                                output[i] = resultSet.getByte(i + 2);
+                                output[i] = resultSet.getByte(i + 3);
                                 break;
                             case DataTypes.SMALLINT:
-                                output[i] = resultSet.getShort(i + 2);
+                                output[i] = resultSet.getShort(i + 3);
                                 break;
                             case DataTypes.DOUBLE:
-                                output[i] = resultSet.getDouble(i + 2);
+                                output[i] = resultSet.getDouble(i + 3);
                                 break;
                             case DataTypes.BIGINT:
-                                output[i] = resultSet.getLong(i + 2);
+                                output[i] = resultSet.getLong(i + 3);
                                 break;
                             case DataTypes.BINARY:
-                                output[i] = resultSet.getBytes(i + 2);
+                                output[i] = resultSet.getBytes(i + 3);
                                 break;
                         }
-                        //logger.warn(i+" => "+output[i]);
+                        //logger.warn(i+" (type: "+dataFieldTypes[i]+" ) => "+output[i]);
                     }
 
                     StreamElement se = new StreamElement(dataFieldNames, dataFieldTypes, output, timed);
