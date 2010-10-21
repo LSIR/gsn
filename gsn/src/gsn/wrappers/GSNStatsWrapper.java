@@ -77,21 +77,13 @@ public class GSNStatsWrapper extends AbstractWrapper
 		double thread_blocked_acc, thread_blocked_acc_time, thread_waited_acc, thread_waited_acc_time;
 		ThreadInfo[] threads;
 		ThreadEntry te;
-		Iterator<ThreadEntry> i;
+		Iterator<ThreadEntry> it;
 		Serializable[] output = new Serializable[outputStructure.length];
 		ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
 		threadBean.setThreadContentionMonitoringEnabled(true);
 		RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
 		MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
 		while (!stopped) {
-			try {
-				synchronized (event) {
-					event.wait(sampling_rate);
-				}
-			} catch (InterruptedException e) {
-				break;
-			}
-		
 			thread_blocked_cnt = 0;
 			thread_new_cnt = 0;
 			thread_runnable_cnt = 0;
@@ -103,9 +95,9 @@ public class GSNStatsWrapper extends AbstractWrapper
 			thread_waited_acc = 0.0;
 			thread_waited_acc_time = 0.0;
 			
-			i = thread_states.values().iterator();
-			while (i.hasNext()) {
-				i.next().valid = false;
+			it = thread_states.values().iterator();
+			while (it.hasNext()) {
+				it.next().valid = false;
 			}
 			
 			timestamp = System.currentTimeMillis();
@@ -167,19 +159,6 @@ public class GSNStatsWrapper extends AbstractWrapper
 				thread_waited_acc_time += waitedTime;
 			}
 
-			i = thread_states.values().iterator();
-			while (i.hasNext()) {
-				if (!i.next().valid) {
-					i.remove();
-				}
-			}
-
-			// recheck if nonvalid entries are removed
-			i = thread_states.values().iterator();
-			while (i.hasNext()) {
-				assert(i.next().valid);
-			}	
-			
 			output[3] = thread_blocked_cnt;
 			output[4] = thread_new_cnt;
 			output[5] = thread_runnable_cnt;
@@ -206,7 +185,22 @@ public class GSNStatsWrapper extends AbstractWrapper
 			
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
 			
+                        it = thread_states.values().iterator();
+                        while (it.hasNext()) {
+                                if (!it.next().valid) {
+                                        it.remove();
+                                }
+                        }
+
 			old_timestamp = timestamp;
+
+                        try {
+                                synchronized (event) {
+                                        event.wait(sampling_rate);
+                                }
+                        } catch (InterruptedException e) {
+                                break;
+                        }
 		}
 	}
 
