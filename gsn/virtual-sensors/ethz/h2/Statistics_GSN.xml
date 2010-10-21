@@ -12,6 +12,7 @@
             <field name="THREAD_TERMINATED_CNT" type="SMALLINT" />
             <field name="THREAD_TIMED_WAITING_CNT" type="SMALLINT" />
             <field name="THREAD_WAITING_CNT" type="SMALLINT" />
+            <field name="THREAD_TOTAL_CNT" type="SMALLINT" />            
             <field name="THREAD_BLOCKED_RATE" type="SMALLINT" unit="cpm" />
             <field name="THREAD_BLOCKED_TIME" type="INTEGER" unit="ppm" />
             <field name="THREAD_WAITED_RATE" type="SMALLINT" unit="cpm" />
