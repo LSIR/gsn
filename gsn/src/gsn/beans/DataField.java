@@ -24,6 +24,16 @@ public final class DataField implements Serializable {
       this.dataTypeID = DataTypes.convertTypeNameToGSNTypeID( type );
       this.description = description;
    }
+
+   /*
+   * Use this constructor only with types which require precision parameter (char, varchar, blob, binary)
+   * */
+   public DataField ( final String fieldName , final String type, final int precision , final String description ) throws GSNRuntimeException {
+      this.name = fieldName;
+      this.type = type +"("+precision+")";
+      this.dataTypeID = DataTypes.convertTypeNameToGSNTypeID( this.type );
+      this.description = description;
+   }
    
    public DataField ( final String name , final String type ) {
       this.name = name;
