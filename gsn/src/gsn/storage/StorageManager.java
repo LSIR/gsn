@@ -141,6 +141,40 @@ public abstract class StorageManager {
         return toReturn;
     }
 
+    /*
+    * Alternative method to 'tableToStructure'
+    * Useful for correctly creating structure for fields with variable length (like char, varchar, binary, blob)  
+    * */
+    public DataField[] tableToStructureByString(String tableName, Connection connection) throws SQLException {
+        StringBuilder sb = new StringBuilder("select * from ").append(tableName).append(" where 1=0 ");
+        ResultSet rs = null;
+        DataField[] toReturn = null;
+        try {
+            rs = executeQueryWithResultSet(sb, connection);
+            ResultSetMetaData structure = rs.getMetaData();
+            ArrayList<DataField> toReturnArr = new ArrayList<DataField>();
+            for (int i = 1; i <= structure.getColumnCount(); i++) {
+                String colName = structure.getColumnLabel(i);
+                if (colName.equalsIgnoreCase("pk")) continue;
+                if (colName.equalsIgnoreCase("timed")) continue;
+                int colType = structure.getColumnType(i);
+                String colTypeName = structure.getColumnTypeName(i);
+                int precision = structure.getPrecision(i);
+                byte colTypeInGSN = convertLocalTypeToGSN(colType);
+                if ((colTypeInGSN == DataTypes.VARCHAR) || (colTypeInGSN == DataTypes.CHAR))
+                    toReturnArr.add(new DataField(colName, colTypeName, precision, colName));
+                else
+                    toReturnArr.add(new DataField(colName, colTypeInGSN));
+            }
+            toReturn = toReturnArr.toArray(new DataField[]{});
+        } finally {
+            if (rs != null)
+                close(rs);
+        }
+        return toReturn;
+    }
+
+
     /**
      * Returns false if the table doesnt exist. If the table exists but the
      * structure is not compatible with the specified fields the method throws
@@ -830,6 +864,7 @@ public abstract class StorageManager {
     public boolean isSqlServer(){ return isSqlServer; }
     public boolean isMysqlDB(){ return isMysql; }
     public boolean isPostgres(){ return isPostgres; }
+
 
 
 }
