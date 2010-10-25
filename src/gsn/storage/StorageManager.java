@@ -646,8 +646,8 @@ public abstract class StorageManager {
                         break;
                     default:
                         logger.error("The type conversion is not supported for : "
-                                + streamElement.getFieldNames()[counter - 1] + "("
-                                + streamElement.getFieldTypes()[counter - 1] + ")");
+                                + dataField.getName() + "("
+                                + dataField.getDataTypeID() + ") : ");
                 }
                 counter++;
             }

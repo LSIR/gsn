@@ -279,8 +279,10 @@ public class CSVHandler {
 		for (int i=0;i<getFields().length;i++) {
 			String field = getFields()[i];
 			String type = getFormats()[i];
-			if (isTimeStampFormat(type))
-				fields.put(field, "time");
+			if (isTimeStampFormat(type)){
+				//GSN doesn't support timestamp data type, all timestamp values are supposed to be bigint.
+				fields.put(field, "bigint");
+			}
 			else if (type.equalsIgnoreCase("numeric"))
 				fields.put(field,"numeric");
 			else
