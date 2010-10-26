@@ -36,6 +36,7 @@ public class GSNStatsWrapper extends AbstractWrapper
 															new DataField("thread_blocked_time", DataTypes.INTEGER),
 															new DataField("thread_waited_rate", DataTypes.SMALLINT),
 															new DataField("thread_waited_time", DataTypes.INTEGER),
+															new DataField("thread_deadlocked_cnt", DataTypes.SMALLINT),
 															};
 	
 	private int sampling_rate = DEFAULT_SAMPLING_RATE_MS;
@@ -74,6 +75,7 @@ public class GSNStatsWrapper extends AbstractWrapper
 		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt;
 		long timestamp, diff, blockedCount, blockedTime, waitedCount, waitedTime;
 		long old_timestamp = 0;
+		long[] ids;
 		double thread_blocked_acc, thread_blocked_acc_time, thread_waited_acc, thread_waited_acc_time;
 		ThreadInfo[] threads;
 		ThreadEntry te;
@@ -182,25 +184,30 @@ public class GSNStatsWrapper extends AbstractWrapper
 				output[12] = null;
 				output[13] = null;
 			}
+			threads = threadBean.getThreadInfo(threadBean.findDeadlockedThreads());
+			output[14] = threads.length;
+			for (int i=0; i<threads.length; i++) {
+				logger.warn("deadlocked thread detected: "+threads[i].getThreadName()+"/"+threads[i].getLockName());
+			}
 			
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
 			
-                        it = thread_states.values().iterator();
-                        while (it.hasNext()) {
-                                if (!it.next().valid) {
-                                        it.remove();
-                                }
-                        }
+			it = thread_states.values().iterator();
+			while (it.hasNext()) {
+				if (!it.next().valid) {
+					it.remove();
+				}
+			}
 
 			old_timestamp = timestamp;
 
-                        try {
-                                synchronized (event) {
-                                        event.wait(sampling_rate);
-                                }
-                        } catch (InterruptedException e) {
-                                break;
-                        }
+			try {
+				synchronized (event) {
+					event.wait(sampling_rate);
+				}
+			} catch (InterruptedException e) {
+				break;
+			}
 		}
 	}
 

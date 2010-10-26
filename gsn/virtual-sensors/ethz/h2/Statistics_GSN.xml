@@ -17,6 +17,7 @@
             <field name="THREAD_BLOCKED_TIME" type="INTEGER" unit="ppm" />
             <field name="THREAD_WAITED_RATE" type="SMALLINT" unit="cpm" />
             <field name="THREAD_WAITED_TIME" type="INTEGER" unit="ppm" />
+            <field name="THREAD_DEADLOCKED_CNT" type="SMALLINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
