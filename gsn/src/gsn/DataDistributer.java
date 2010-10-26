@@ -91,12 +91,14 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             if (!listeners.contains(listener)) {
                 logger.warn("Adding a listener to Distributer:" + listener.toString());
                 boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
-                String query = SQLValidator.addPkField(listener.getQuery());
+                //String query = SQLValidator.addPkField(listener.getQuery());
+                String query = listener.getQuery();
                 if (needsAnd)
                     query += " AND ";
                 else
                     query += " WHERE ";
-                query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
+                //query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
+                query += " timed > ? order by timed asc ";
                 PreparedStatement prepareStatement = null;
                 try {
                     prepareStatement = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
@@ -269,8 +271,8 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
         PreparedStatement prepareStatement = preparedStatements.get(listener);
         try {
-            //prepareStatement.setLong(1, listener.getStartTime());
-            prepareStatement.setLong(1, listener.getLastVisitedPk());
+            prepareStatement.setLong(1, listener.getStartTime());
+            //prepareStatement.setLong(1, listener.getLastVisitedPk());
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             return new DataEnumerator();

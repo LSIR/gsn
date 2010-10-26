@@ -57,12 +57,11 @@ public class DefaultDistributionRequest implements DistributionRequest {
 		boolean success = deliverySystem.writeStreamElement(se);
 //		boolean success = true;
 		if (success) {
-			//startTime=se.getTimeStamp();
-            lastVisitedPk = se.getInternalPrimayKey();
+			startTime=se.getTimeStamp();
+            //lastVisitedPk = se.getInternalPrimayKey();
         }
 		return success;
 	}
-
 
 	public long getStartTime() {
 		return startTime;
