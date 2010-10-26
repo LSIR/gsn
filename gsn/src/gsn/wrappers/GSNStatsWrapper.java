@@ -184,10 +184,16 @@ public class GSNStatsWrapper extends AbstractWrapper
 				output[12] = null;
 				output[13] = null;
 			}
-			threads = threadBean.getThreadInfo(threadBean.findDeadlockedThreads());
-			output[14] = threads.length;
-			for (int i=0; i<threads.length; i++) {
-				logger.warn("deadlocked thread detected: "+threads[i].getThreadName()+"/"+threads[i].getLockName());
+			
+			ids = threadBean.findDeadlockedThreads();
+			if (ids != null) {
+				output[14] = (short) ids.length;
+				threads = threadBean.getThreadInfo(ids);
+				for (int i=0; i<threads.length; i++) {
+					logger.warn("deadlocked thread detected: "+threads[i].getThreadName()+"/"+threads[i].getLockName());
+				}
+			} else {
+				output[14] = (short) 0;
 			}
 			
 			postStreamElement(new StreamElement(outputStructure, output, timestamp));
