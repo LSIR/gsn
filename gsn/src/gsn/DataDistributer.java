@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener, Runnable {
 
     public static final int KEEP_ALIVE_PERIOD =  15 * 1000;  // 15 sec.
+    public static final int DATA_UPDATE_THREAD_POOL_SIZE = 3;
 
     private static int keepAlivePeriod = -1;
 
@@ -33,10 +34,14 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     private static HashMap<Class<? extends DeliverySystem>, DataDistributer> singletonMap = new HashMap<Class<? extends DeliverySystem>, DataDistributer>();
     private Thread thread;
+    
+    private ArrayList<Thread> DataUpdateThreadPool;
+    private ArrayList<DistributionRequest> FetchList = new ArrayList<DistributionRequest>();
+    private LinkedBlockingQueue<DistributionRequest> DataUpdateQueue = new LinkedBlockingQueue<DistributionRequest>();
+    private ConcurrentHashMap<DistributionRequest, Integer> DeliveryCount = new ConcurrentHashMap<DistributionRequest, Integer>();
 
     private DataDistributer() {
         try {
-            //conn = Main.getStorage().getConnection();
             thread = new Thread(this);
             thread.start();
             // Start the keep alive Timer -- Note that the implementation is backed by one single thread for all the RestDelivery instances.
@@ -55,6 +60,87 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                 }
             });
             keepAliveTimer.start();
+            DataUpdateThreadPool = new ArrayList<Thread>(DATA_UPDATE_THREAD_POOL_SIZE);
+            for (int i = 0; i<DATA_UPDATE_THREAD_POOL_SIZE;i++) {
+            	DataUpdateThreadPool.add(new Thread("DataUpdateThread "+i) {
+            		
+            	    private HashMap<StorageManager, Connection> connections = new HashMap<StorageManager, Connection>();
+            	    private Connection getPersistantConnection(VSensorConfig config) throws Exception {
+            	        StorageManager sm = Main.getStorage(config);
+            	        
+            	        Connection c = connections.get(sm);
+            	        if (c == null) {
+            	        	logger.debug("get new connection.");
+            	            c = sm.getConnection();
+            	            c.setReadOnly(true);
+            	            connections.put(sm, c);
+            	        }
+            	        return c;
+            	    }
+
+            		public void run() {
+            			DataEnumerator dataEnum;
+    	                PreparedStatement prepareStatement = null;
+            			try {
+            			while  (true)
+            			try {
+            				DistributionRequest listener= DataUpdateQueue.take();
+            				logger.debug("Fetching data for listener: " + listener.toString()+".");
+            				synchronized (listener) {
+            					if (listener.isClosed())
+            						continue;
+            					// make statement
+            	                try {
+            	                    prepareStatement = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(queries.get(listener)); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
+            	                    String maxRows = listener.getVSensorConfig().getMainClassInitialParams().get("maxrows");
+            	                    if (maxRows == null) {
+            	                        prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
+            	                    } else {
+            	                    	try {
+            	                    		prepareStatement.setMaxRows(Integer.parseInt(maxRows));
+            	                    	} catch (NumberFormatException nfe) {
+            	                    		logger.warn("maxrows init-param is unparsable, set to default (1000)");
+            	                    		prepareStatement.setMaxRows(1000);
+            	                    	}
+            	                    }
+            			            prepareStatement.setLong(1, listener.getStartTime());
+            			            //prepareStatement.setLong(1, listener.getLastVisitedPk());
+            			            DeliveryCount.put(listener, new Integer(prepareStatement.getMaxRows()));
+            	                } catch (Exception e) {
+            			            logger.error(e.getMessage(), e);
+            	                    throw new RuntimeException(e);
+            	                }
+            			        dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
+            				}
+            				synchronized (listeners) {
+            					if (dataEnum.hasMoreElements()) {
+			        				if (listeners.contains(listener)) {
+			        					// an element is only put to DataUpdateQueue if it is not in candidateListeners
+			        					logger.debug("Fetching data done for listener: " + listener.toString()+".");
+			        					candidateListeners.put(listener, dataEnum);
+	            			            preparedStatements.put(listener, prepareStatement);
+			        					locker.add(listener);
+			        					FetchList.remove(listener);
+			        				}
+								}
+            					else {
+            						prepareStatement.close();
+            						FetchList.remove(listener);
+            						logger.debug("Fetching data done, empty resultset. listener: " + listener.toString()+".");
+            					}
+			        		}
+						} catch (InterruptedException e) {
+							logger.error(e.getMessage(), e);
+						} catch (SQLException e) {
+							logger.error(e.getMessage());
+						}
+            			}catch (RuntimeException e) {
+            	    		logger.error(e.getMessage());
+            	    	}
+            		}
+            	});
+            	DataUpdateThreadPool.get(DataUpdateThreadPool.size()-1).start();
+            }
         //} catch (SQLException e) {
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -73,19 +159,17 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             keepAlivePeriod = System.getProperty("remoteKeepAlivePeriod") == null ? KEEP_ALIVE_PERIOD : Integer.parseInt(System.getProperty("remoteKeepAlivePeriod"));
         return keepAlivePeriod;
     }
-
+    
     private HashMap<DistributionRequest, PreparedStatement> preparedStatements = new HashMap<DistributionRequest, PreparedStatement>();
-
+    private HashMap<DistributionRequest, String> queries = new HashMap<DistributionRequest, String>();
     private ArrayList<DistributionRequest> listeners = new ArrayList<DistributionRequest>();
-
-    //private Connection conn;
 
     private ConcurrentHashMap<DistributionRequest, DataEnumerator> candidateListeners = new ConcurrentHashMap<DistributionRequest, DataEnumerator>();
 
     private LinkedBlockingQueue<DistributionRequest> locker = new LinkedBlockingQueue<DistributionRequest>();
 
     private ConcurrentHashMap<DistributionRequest, Boolean> candidatesForNextRound = new ConcurrentHashMap<DistributionRequest, Boolean>();
-
+    
     public void addListener(DistributionRequest listener) {
         synchronized (listeners) {
             if (!listeners.contains(listener)) {
@@ -99,27 +183,9 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                     query += " WHERE ";
                 //query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
                 query += " timed > ? order by timed asc ";
-                PreparedStatement prepareStatement = null;
-                try {
-                    prepareStatement = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
-                    String maxRows = listener.getVSensorConfig().getMainClassInitialParams().get("maxrows");
-                    if (maxRows == null) {
-                        prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
-                    } else {
-    			try {
-    			    prepareStatement.setMaxRows(Integer.parseInt(maxRows));
-    			} catch (NumberFormatException nfe) {
-    			    logger.warn("maxrows init-param is unparsable, set to default (1000)");
-    			    prepareStatement.setMaxRows(1000);
-    			}
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                preparedStatements.put(listener, prepareStatement);
+                queries.put(listener, query);
                 listeners.add(listener);
                 addListenerToCandidates(listener);
-
             } else {
                 logger.warn("Adding a listener to Distributer failed, duplicated listener! " + listener.toString());
             }
@@ -127,16 +193,31 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     }
 
 
-    private void addListenerToCandidates(DistributionRequest listener) {
+    private boolean addListenerToCandidates(DistributionRequest listener) {
         /**
          * Locker variable should be modified EXACTLY like candidateListeners variable.
          */
-        logger.debug("Adding the listener: " + listener.toString() + " to the candidates.");
-        DataEnumerator dataEnum = makeDataEnum(listener);
-        if (dataEnum.hasMoreElements()) {
-            candidateListeners.put(listener, dataEnum);
-            locker.add(listener);
+       	if (!DataUpdateQueue.contains(listener) && !candidateListeners.containsKey(listener) && !FetchList.contains(listener)) {
+            logger.debug("Adding the listener: " + listener.toString() + " to the candidates.");
+            FetchList.add(listener);
+       		try {
+       			DataUpdateQueue.put(listener);
+       			logger.debug(DataUpdateQueue.size() + " Entries in the update queue.");
+       		} catch (InterruptedException e) {
+       			FetchList.remove(listener);
+       			logger.error(e.getMessage(), e);
+       		}
+       		return true;
         }
+       	else {
+       		if (DataUpdateQueue.contains(listener))
+       			logger.debug("Listener in update queue, not added. listener: " + listener.toString());
+       		if (candidateListeners.containsKey(listener))
+       			logger.debug("Listener in candidateListeners, not added. listener: " + listener.toString());
+       		if (FetchList.contains(listener))
+       			logger.debug("Listener in FetchList, not added. listener: " + listener.toString());
+       		return false;
+       	}
     }
 
     private void removeListenerFromCandidates(DistributionRequest listener) {
@@ -144,18 +225,25 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
          * Locker variable should be modified EXACTLY like candidateListeners variable.
          */
         logger.debug("Updating the candidate list [" + listener.toString() + " (removed)].");
-        if (candidatesForNextRound.contains(listener)) {
-            candidateListeners.put(listener, makeDataEnum(listener));
-            candidatesForNextRound.remove(listener);
-        } else {
-            locker.remove(listener);
-            candidateListeners.remove(listener);
+        locker.remove(listener);
+        try {
+        	preparedStatements.get(listener).close();
+        } catch (SQLException e) {
+        	logger.error(e.getMessage(), e);
+        } finally {
+        	preparedStatements.remove(listener);
+        }
+        candidateListeners.remove(listener);
+        DeliveryCount.remove(listener);
+        if (candidatesForNextRound.containsKey(listener)) {
+        	addListenerToCandidates(listener);
+        	candidatesForNextRound.remove(listener);
         }
     }
 
     /**
      * This method only flushes one single stream element from the provided data enumerator.
-     * Returns false if the flushing the stream element fails. This method also cleans the prepared statements by removing the listener completely.
+     * Returns false if the flushing the stream element fails.
      *
      * @param dataEnum
      * @param listener
@@ -184,21 +272,17 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     }
 
     public void removeListener(DistributionRequest listener) {
-        synchronized (listeners) {
-            if (listeners.remove(listener)) {
-                try {
-                    candidatesForNextRound.remove(listener);
-                    removeListenerFromCandidates(listener);
-                    preparedStatements.get(listener).close();
-                    listener.close();
-                    logger.warn("Removing listener completely from Distributer [Listener: " + listener.toString() + "]");
-                } catch (SQLException e) {
-                    logger.error(e.getMessage(), e);
-                } finally {
-                    preparedStatements.remove(listener);
-                }
-            }
-        }
+    	synchronized (listeners) {
+    		if (listeners.remove(listener)) {
+    			candidatesForNextRound.remove(listener);
+    			removeListenerFromCandidates(listener);
+    			FetchList.remove(listener);
+    			synchronized (listener) {
+    				listener.close();						
+    			}
+    			logger.warn("Removing listener completely from Distributer [Listener: " + listener.toString() + "]");
+    		}
+    	}
     }
 
     public void consume(StreamElement se, VSensorConfig config) {
@@ -206,16 +290,14 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             for (DistributionRequest listener : listeners)
                 if (listener.getVSensorConfig() == config) {
                     logger.debug("sending stream element " + (se == null ? "second-chance-se" : se.toString()) + " produced by " + config.getName() + " to listener =>" + listener.toString());
-                    if (!candidateListeners.containsKey(listener)) {
-                        addListenerToCandidates(listener);
-                    } else {
-                        candidatesForNextRound.put(listener, Boolean.TRUE);
-                    }
+                    if (!addListenerToCandidates(listener))
+                    	candidatesForNextRound.put(listener, Boolean.TRUE);
                 }
         }
     }
 
     public void run() {
+    	try {
         while (true) {
             try {
                 if (locker.isEmpty()) {
@@ -229,19 +311,27 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
 
             for (Entry<DistributionRequest, DataEnumerator> item : candidateListeners.entrySet()) {
-                boolean success = flushStreamElement(item.getValue(), item.getKey());
+            	boolean success = flushStreamElement(item.getValue(), item.getKey());
                 if (success == false)
                     removeListener(item.getKey());
                 else {
+                	DeliveryCount.put(item.getKey(), DeliveryCount.get(item.getKey()).intValue()-1);
                     if (!item.getValue().hasMoreElements()) {
-                        removeListenerFromCandidates(item.getKey());
-                        // As we are limiting the number of elements returned by the JDBC driver
-                        // we consume the eventual remaining items.
-                        consume(null, item.getKey().getVSensorConfig());
+                    	logger.debug("deliverycount = "+ DeliveryCount.get(item.getKey()).intValue());
+                    	if (DeliveryCount.get(item.getKey()).intValue()==0) {
+                    		logger.debug("reached maxrows, look for new data for [Listener: "+item.getKey().toString()+"]");
+                    		candidatesForNextRound.put(item.getKey(), Boolean.TRUE);
+                    	}
+                    	synchronized(listeners) {
+                        	removeListenerFromCandidates(item.getKey());
+                    	}
                     }
                 }
             }
         }
+    	}catch (RuntimeException e) {
+    		logger.error(e.getMessage());
+    	}
     }
 
     public boolean vsLoading(VSensorConfig config) {
@@ -267,21 +357,6 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
         return true;
     }
 
-    private DataEnumerator makeDataEnum(DistributionRequest listener) {
-
-        PreparedStatement prepareStatement = preparedStatements.get(listener);
-        try {
-            prepareStatement.setLong(1, listener.getStartTime());
-            //prepareStatement.setLong(1, listener.getLastVisitedPk());
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-            return new DataEnumerator();
-        }
-
-        DataEnumerator dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
-        return dataEnum;
-    }
-
     public void release() {
         synchronized (listeners) {
             while (!listeners.isEmpty())
@@ -300,20 +375,6 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 		}
 
 	}
-
-    //
-
-    private HashMap<StorageManager, Connection> connections = new HashMap<StorageManager, Connection>();
-    public Connection getPersistantConnection(VSensorConfig config) throws Exception {
-        StorageManager sm = Main.getStorage(config);
-        Connection c = connections.get(sm);
-        if (c == null) {
-            c = sm.getConnection();
-            c.setReadOnly(true);
-	    connections.put(sm, c);
-        }
-        return c;
-    }
 
 }
 
