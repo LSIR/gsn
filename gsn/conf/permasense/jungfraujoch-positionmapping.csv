@@ -65,6 +65,9 @@
 "2038","2010-09-01 13:23:00+02:00","9999-01-01 00:00:00","10","north right ice"
 
 # changed relays for north side connectivity on 18-09-2010
-"2005","2010-09-18 18:30:00+02:00","9999-01-01 00:00:00","11","Relay top railing north"
+"2005","2010-09-18 18:30:00+02:00","2010-10-26 18:30:00+02:00","11","Relay top railing north"
 "2008","2010-09-18 18:30:00+02:00","9999-01-01 00:00:00","12","Relay top railing south"
+
+# changed relays for north side connectivity on 26-10-2010
+"2007","2010-10-26 18:30:00+02:00","9999-01-01 00:00:00","11","Relay top railing south"
 
