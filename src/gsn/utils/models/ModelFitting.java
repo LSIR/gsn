@@ -1,5 +1,8 @@
 package gsn.utils.models;
 
+import gsn.utils.models.jgarch.util.ArrayUtils;
+import gsn.utils.models.jgarch.wrappers.REngineManager;
+
 public class ModelFitting {
 	final public static int CONSTANT = 0;
 	final public static int LINEAR = 1;
@@ -7,12 +10,14 @@ public class ModelFitting {
 	final public static int CHEBYSHEV_DEG1 = 3;
 	final public static int CHEBYSHEV_DEG2 = 4;
 	final public static int CHEBYSHEV_DEG3 = 5;
+    final public static int ARMA_GARCH = 6;
     final public static String MODEL_NAMES[] = {"constant",
                                                 "linear",
                                                 "quadratic",
                                                 "chebyschev_deg1",
                                                 "chebyschev_deg2",
-                                                "chebyschev_deg3"
+                                                "chebyschev_deg3",
+                                                "arma_garch"
                                                };
 
     /*
@@ -64,6 +69,9 @@ public class ModelFitting {
 			case CHEBYSHEV_DEG3:
 				m = new ChebyshevPolynomialModel(3, windowSize, errorBound, _timestamps, stream);
 				break;
+            case ARMA_GARCH:
+			    m = new ArmaGarchModel(windowSize, errorBound, stream);
+                break;
 			default:
 				return false;
 		}
