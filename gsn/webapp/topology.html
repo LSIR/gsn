@@ -233,6 +233,21 @@ function PacketRate() {
         $("td", row).each(function(index,value) {
           switch (index) {
           case 0: break;
+          case 2:
+            var img;
+            if (!$(data).attr('batterylevel'))
+              img = 'none';
+            else if ($(data).attr('batterylevel')<=5)
+              img = 'empty';
+            else if ($(data).attr('batterylevel')<=25)
+              img = 'quarter';
+            else if ($(data).attr('batterylevel')<=50)
+              img = 'half';
+            else
+              img = 'full';
+            $(this).empty().text($(data).attr(healthitems[index-1])?$(data).attr(healthitems[index-1]):"");
+            $(this).append('<img style="margin:0px 0px 0px 5px;vertical-align:middle;" src="img/batterylevels/battery_'+img+'.png">');
+            break;
           case 8:
           case 9:
             $(this).text(formatTime($(data).attr(healthitems[index-1])));
