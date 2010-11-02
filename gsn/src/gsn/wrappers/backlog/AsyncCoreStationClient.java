@@ -286,15 +286,13 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 	
-	public synchronized void registerListener(CoreStationListener listener) throws IOException
+	public void registerListener(CoreStationListener listener) throws IOException
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("register core station: " + listener.getCoreStationName());
 		try {
-			if (!this.isAlive()) {
-				dispose = false;
+			if (!this.isAlive())
 				this.start();
-			}
 		} catch (IllegalThreadStateException e) {
 			logger.error("thread already running");
 		}
@@ -317,7 +315,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 	
 	
-	public synchronized void deregisterListener(CoreStationListener listener)
+	public void deregisterListener(CoreStationListener listener)
 	{
 		SocketChannel sc = listenerToSocketList.get(listener);
 		try {
@@ -340,7 +338,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public synchronized void addDeviceId(String deployment, Integer id, CoreStationListener listener) {
+	public void addDeviceId(String deployment, Integer id, CoreStationListener listener) {
 		if (logger.isDebugEnabled())
 			logger.debug("adding DeviceId " + id + "for " + deployment + " deployment");
 
@@ -356,7 +354,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public synchronized void removeDeviceId(String deployment, Integer id) {
+	public void removeDeviceId(String deployment, Integer id) {
 		if (logger.isDebugEnabled())
 			logger.debug("removing DeviceId: " + id + " for " + deployment + " deployment");
 		try {
