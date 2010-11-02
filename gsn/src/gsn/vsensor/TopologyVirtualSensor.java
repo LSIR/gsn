@@ -266,13 +266,13 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			s = data.getData(configuration[4]);
 			if (s instanceof Integer) {
 				if (node.isSibNode()) {
-					node.vsys =  new Double((Integer)s)  * (2.56d/65536d) * (39d/24d);
+					node.setVsys(new Double((Integer)s)  * (2.56d/65536d) * (39d/24d));
 				}
 				else if (node.isPowerSwitch()) {
-					node.vsys =  new Double((Integer)s)  * (2.5d / 4095d) * (8d/5d);
+					node.setVsys(new Double((Integer)s)  * (2.5d / 4095d) * (8d/5d));
 				} 
 				else {
-					node.vsys =  new Double((Integer)s)  * (3d / 4095d);
+					node.setVsys(new Double((Integer)s)  * (3d / 4095d));
 				}
 			}
 			s = data.getData(configuration[5]);

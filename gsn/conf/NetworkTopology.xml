@@ -18,6 +18,7 @@
   	   <value name="humidity" style="attribute" usage="optional" get-method="getHumidity" set-method="setHumidity"/>
   	   <value name="flash_count" field="flash_count" style="attribute" usage="optional"/>
   	   <value name="uptime" field="uptime" style="attribute" usage="optional"/>
+  	   <value name="batterylevel" style="attribute" get-method="getBatteryLevel" set-method="setBatteryLevel" usage="optional"/>
   	     	   
   	   <collection name="links" field="links" item-type="gsn.beans.Link" />
   	   
