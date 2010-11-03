@@ -309,7 +309,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	 * 
 	 * @throws IOException if the message is too long or the DeviceId does not exist
 	 */
-	public synchronized boolean sendMessage(BackLogMessage message, Integer id, int priority) throws IOException {
+	public boolean sendMessage(BackLogMessage message, Integer id, int priority) throws IOException {
 		if (logger.isDebugEnabled())
 			logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
 		if (id == null) {

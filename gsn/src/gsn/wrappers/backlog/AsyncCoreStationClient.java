@@ -109,14 +109,17 @@ public class AsyncCoreStationClient extends Thread  {
 		    					if (change.socket.keyFor(selector).isValid())
 		    						closeConnection(change.socket.keyFor(selector), change.socket);
 		    					CoreStationListener listener;
-	    						listener = socketToListenerList.get(change.socket);
-	    						socketToListenerList.remove(change.socket);
-		    					if (listener != null) {
-				    				listenerToSocketList.remove(listener);
-				    				if (logger.isDebugEnabled())
-				    					logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
-			    					Timer timer = new Timer("ReconnectTimer-" + listener.getCoreStationName());
-			    					timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
+
+		    					synchronized(listenerToSocketList) {
+		    						listener = socketToListenerList.get(change.socket);
+		    						socketToListenerList.remove(change.socket);
+			    					if (listener != null) {
+					    				listenerToSocketList.remove(listener);
+					    				if (logger.isDebugEnabled())
+					    					logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
+				    					Timer timer = new Timer("ReconnectTimer-" + listener.getCoreStationName());
+				    					timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
+			    					}
 		    					}
 	    					} catch (Exception e) {
 	    						logger.error(e.getMessage(), e);
@@ -302,9 +305,11 @@ public class AsyncCoreStationClient extends Thread  {
 			socketChannel.configureBlocking(false);
 			logger.info("trying to connect to core station: " + listener.getCoreStationName());
 			socketChannel.connect(new InetSocketAddress(listener.getInetAddress(), listener.getPort()));
-		
-			socketToListenerList.put(socketChannel, listener);
-			listenerToSocketList.put(listener, socketChannel);
+
+			synchronized(listenerToSocketList) {
+				socketToListenerList.put(socketChannel, listener);
+				listenerToSocketList.put(listener, socketChannel);
+			}
 			synchronized(changeRequests) {
 				changeRequests.add(new ChangeRequest(socketChannel, ChangeRequest.TYPE_REGISTER, SelectionKey.OP_CONNECT));
 			}
@@ -317,24 +322,26 @@ public class AsyncCoreStationClient extends Thread  {
 	
 	public void deregisterListener(CoreStationListener listener)
 	{
-		SocketChannel sc = listenerToSocketList.get(listener);
-		try {
-			sc.close();
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		}
-
-		try {
-			sc.keyFor(selector).cancel();
-			
-			socketToListenerList.remove(sc);
-			listenerToSocketList.remove(listener);
+		synchronized(listenerToSocketList) {
+			SocketChannel sc = listenerToSocketList.get(listener);
+			try {
+				sc.close();
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
+	
+			try {
+				sc.keyFor(selector).cancel();
 				
-			if (socketToListenerList.isEmpty())
-				dispose();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+				socketToListenerList.remove(sc);
+				listenerToSocketList.remove(listener);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
 		}
+		
+		if (socketToListenerList.isEmpty())
+			dispose();
 	}
 
 
@@ -381,6 +388,7 @@ public class AsyncCoreStationClient extends Thread  {
 
 
 	private void dispose() {
+		singletonObject = null;
 		dispose = true;
 		selector.wakeup();
 		try {
@@ -388,7 +396,6 @@ public class AsyncCoreStationClient extends Thread  {
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
-		singletonObject = null;
 	}
 	
 	
