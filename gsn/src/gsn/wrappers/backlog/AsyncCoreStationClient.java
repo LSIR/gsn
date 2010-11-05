@@ -29,7 +29,7 @@ public class AsyncCoreStationClient extends Thread  {
     to the CoreStation in case of a connection loss. */
 	public static final int RECONNECT_TIMEOUT_SEC = 30;
 
-	private static final int BUFFER_SIZE = 65536;
+	private static final int PACKET_SIZE = 65536;
 	
 	protected final transient Logger logger = Logger.getLogger( AsyncCoreStationClient.class );
 	
@@ -54,8 +54,8 @@ public class AsyncCoreStationClient extends Thread  {
 	private AsyncCoreStationClient() throws IOException {
 		this.selector = Selector.open();
 
-		writeBuffer = ByteBuffer.allocate(BUFFER_SIZE);
-		readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+		writeBuffer = ByteBuffer.allocate(PACKET_SIZE*2);
+		readBuffer = ByteBuffer.allocate(PACKET_SIZE*2);
 		writeBuffer.flip();
 		
 		setName("AsyncCoreStationClient-Thread");
@@ -450,8 +450,8 @@ public class AsyncCoreStationClient extends Thread  {
 
 
 	private boolean send(CoreStationListener listener, int priority, byte[] data, boolean stuff) throws IOException {
-		if (data.length > BUFFER_SIZE-4) 
-			throw new IOException("data limited to " + (BUFFER_SIZE-4) + " bytes");
+		if (data.length > PACKET_SIZE-4) 
+			throw new IOException("packet size limited to " + (PACKET_SIZE-4) + " bytes");
 		
 		SocketChannel socketChannel;
 		socketChannel = listenerToSocketList.get(listener);
