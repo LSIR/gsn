@@ -12,7 +12,7 @@ import os
 import logging
 import zlib
 from collections import deque
-from threading import Event, Thread, Lock
+from threading import Event
 from pyinotify import WatchManager, ThreadedNotifier, EventsCodes, ProcessEvent
 
 import BackLogMessage

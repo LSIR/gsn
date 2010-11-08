@@ -321,7 +321,7 @@ class GSNListener(Thread):
                 return
             self._connected = True
             self._gsnwriter.sendHelloMsg()
-        except socket.error, e:
+        except (IOError, socket.error), e:
             if not self._stopped:
                 self.error('exception while accepting connection: ' + e.__str__())
                 self.disconnect()
@@ -570,7 +570,7 @@ class GSNWriter(Thread):
                         self._logger.debug('hello message sent')
                     else:
                         self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
-                except socket.error, e:
+                except (IOError, socket.error), e:
                     if not self._stopped:
                         self._parent.disconnect() # sets connected to false
                         self._logger.exception(e.__str__())                  
