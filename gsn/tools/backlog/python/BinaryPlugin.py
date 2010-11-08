@@ -200,6 +200,7 @@ class BinaryPluginClass(AbstractPluginClass):
         self._lastRecvPacketType = None
         self._lastSentPacketType = None
         if self._filedescriptor:
+            self._filedeque.append(self._filedescriptor.name)
             self._filedescriptor.close()
         self._msgdeque.clear()
         self._parent._waitforack = False
