@@ -248,8 +248,6 @@ public class BinaryPlugin extends AbstractPlugin {
 				byte ackType = msg.getPacket()[1];
 				if (logger.isDebugEnabled())
 					logger.debug("acknowledge packet type >" + ackType + "< received");
-				
-				lastRecvPacketType = ACK_PACKET;
 			}
 			else if (pktType == INIT_PACKET) {
 				if (lastRecvPacketType == INIT_PACKET) {
