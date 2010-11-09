@@ -9,7 +9,6 @@ __source__      = "$URL$"
 
 import struct
 import os
-import binascii
 import subprocess
 from threading import Event
 

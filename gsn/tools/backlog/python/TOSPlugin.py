@@ -26,6 +26,7 @@ class TOSPluginClass(AbstractPluginClass):
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
         
+        self._stopped = False
         self._ready = False
     
     
@@ -40,6 +41,7 @@ class TOSPluginClass(AbstractPluginClass):
     
     def stop(self):
         self._ready = False
+        self._stopped = True
         # send close queue cmd to access node
         self._sendCloseQueueCommand()
         self.info('stopped')

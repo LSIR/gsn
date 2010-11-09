@@ -210,14 +210,11 @@ class BackLogMainClass(Thread):
         self.schedulehandler.start()
 
         for plugin_entry in self.plugins:
-            module_name = plugin_entry[0]
-            plugin = plugin_entry[1]
-            plugin.start()
+            self._logger.info('starting ' + plugin_entry[0])
+            plugin_entry[1].start()
         
         for plugin_entry in self.plugins:
-            module_name = plugin_entry[0]
-            plugin = plugin_entry[1]
-            plugin.join()
+            plugin_entry[1].join()
         
         self.schedulehandler.join()
         if self.tospeer:
@@ -229,10 +226,8 @@ class BackLogMainClass(Thread):
 
 
     def stop(self):
-        for plugin_entry in self.plugins:
-            module_name = plugin_entry[0]
-            plugin = plugin_entry[1]           
-            plugin.stop()
+        for plugin_entry in self.plugins:    
+            plugin_entry[1].stop()
 
         self.schedulehandler.stop()
         if self.tospeer:
@@ -279,7 +274,7 @@ class BackLogMainClass(Thread):
                     plug[1].msgReceived(message.getPayload())
                     msgTypeValid = True
                     break
-        if msgTypeValid == False:
+        if not msgTypeValid:
             self._logger.error('unknown message type ' + str(msgType) + ' received')
             self.incrementErrorCounter()
         
@@ -287,10 +282,8 @@ class BackLogMainClass(Thread):
     def ackReceived(self, timestamp, msgType):
         # tell the plugins to have received an acknowledge message
         for plugin_entry in self.plugins:
-            module_name = plugin_entry[0]
-            plugin = plugin_entry[1]
-            if plugin.getMsgType() == msgType:
-                plugin.ackReceived(timestamp)
+            if plugin_entry[1].getMsgType() == msgType:
+                plugin_entry[1].ackReceived(timestamp)
             
         # remove the message from the backlog database using its timestamp and message type
         self.backlog.removeMsg(timestamp, msgType)
@@ -298,17 +291,13 @@ class BackLogMainClass(Thread):
     def connectionToGSNestablished(self):
         # tell the plugins that the connection to GSN has been established
         for plugin_entry in self.plugins:
-            module_name = plugin_entry[0]
-            plugin = plugin_entry[1]
-            plugin.connectionToGSNestablished()
+            plugin_entry[1].connectionToGSNestablished()
         self.schedulehandler.connectionToGSNestablished()
         
     def connectionToGSNlost(self):
         # tell the plugins that the connection to GSN has been lost
         for plugin_entry in self.plugins:
-            module_name = plugin_entry[0]
-            plugin = plugin_entry[1]
-            plugin.connectionToGSNlost()
+            plugin_entry[1].connectionToGSNlost()
             
 
 
@@ -369,7 +358,7 @@ def main():
         backlog = BackLogMainClass(options.config_file)
         backlog.start()
         signal.pause()
-    except KeyboardInterrupt, e1:
+    except KeyboardInterrupt:
         logger.warning('KeyboardInterrupt')
         if backlog and backlog.isAlive():
             backlog.stop()

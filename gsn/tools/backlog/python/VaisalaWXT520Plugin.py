@@ -7,7 +7,6 @@ __date__        = "$Date$"
 __id__          = "$Id$"
 __source__      = "$URL$"
 
-import re
 import os
 import time
 import serial
