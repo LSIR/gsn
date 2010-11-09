@@ -224,7 +224,7 @@ class BackLogDBClass(Thread):
         @return: status of the backlog database as tuple (number of database entries, database file size)
         '''
         self._counterlock.acquire()
-        ret = (self._dbNumberOfEntries, os.path.getsize(self._dbname)/1024.0, self._minStoreTime, self._maxStoreTime, self._meanStoreTime/self._storeCounter, self._minRemoveTime, self._maxRemoveTime, self._meanRemoveTime/self._removeCounter)
+        ret = (self._dbNumberOfEntries, os.path.getsize(self._dbname)//1024, self._minStoreTime, self._maxStoreTime, self._meanStoreTime//self._storeCounter, self._minRemoveTime, self._maxRemoveTime, self._meanRemoveTime//self._removeCounter)
         
         self._minStoreTime = -1
         self._maxStoreTime = -1
