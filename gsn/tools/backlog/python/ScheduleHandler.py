@@ -106,7 +106,7 @@ class ScheduleHandlerClass(Thread):
     _newSchedule
     _duty_cycle_mode
     _max_next_schedule_wait_delta
-    _max_job_runtime_sec
+    _max_job_runtime_min
     _pingThread
     _config
     _logger
@@ -145,8 +145,7 @@ class ScheduleHandlerClass(Thread):
         if max_plugins_finish_wait_minutes is None:
             raise TypeError('max_plugins_finish_wait_minutes not specified in config file')
         
-        max_default_job_runtime_minutes = int(self.getOptionValue('max_default_job_runtime_minutes'))
-        if max_default_job_runtime_minutes is None:
+        if int(self.getOptionValue('max_default_job_runtime_minutes')) is None:
             raise TypeError('max_default_job_runtime_minutes not specified in config file')
         
         hard_shutdown_offset_minutes = int(self.getOptionValue('hard_shutdown_offset_minutes'))
@@ -164,7 +163,7 @@ class ScheduleHandlerClass(Thread):
         self._allJobsFinishedEvent = Event()
         self._allJobsFinishedEvent.set()
         
-        self._jobsObserver = JobsObserver(self, max_default_job_runtime_minutes)
+        self._jobsObserver = JobsObserver(self)
         self._gsnconnected = False
         self._schedulereceived = False
         self._schedule = None
@@ -287,7 +286,7 @@ class ScheduleHandlerClass(Thread):
         stop = False
         service_time = timedelta()
         while not stop and not self._stopped:
-            self._max_job_runtime_sec = int(self.getOptionValue('max_default_job_runtime_minutes'))*60
+            self._max_job_runtime_min = int(self.getOptionValue('max_default_job_runtime_minutes'))
             dtnow = datetime.utcnow() 
             # get the next schedule(s) in time
             if not self._duty_cycle_mode:
@@ -300,7 +299,7 @@ class ScheduleHandlerClass(Thread):
                 self._scheduleLock.release()
             
             for schedule in nextschedules:
-                self._logger.debug('(' + str(schedule[0]) + ',' + str(schedule[1]) + ')')
+                self._logger.debug('(' + str(schedule[0]) + ',' + str(schedule[1]) + ',' + str(schedule[2]) + ')')
                 dtnow = datetime.utcnow()
                 timediff = schedule[0] - dtnow
                 if self._duty_cycle_mode:
@@ -342,9 +341,12 @@ class ScheduleHandlerClass(Thread):
                     self.error('error in scheduled job >' + schedule[1] + '<:' + str(e))
                 else:
                     self._allJobsFinishedEvent.clear()
-                    if schedule[2] > self._max_job_runtime_sec:
-                        self._max_job_runtime_sec = schedule[2]
-                    self._jobsObserver.observeJob(proc, schedule[1], schedule[2])
+                    if not schedule[2]:
+                        self._jobsObserver.observeJob(proc, schedule[1], int(self.getOptionValue('max_default_job_runtime_minutes')))
+                    else:
+                        if schedule[2] > self._max_job_runtime_min:
+                            self._max_job_runtime_min = schedule[2]
+                        self._jobsObserver.observeJob(proc, schedule[1], schedule[2])
                     
         if self._duty_cycle_mode and not self._stopped:
             self._shutdown(service_time)
@@ -491,8 +493,8 @@ class ScheduleHandlerClass(Thread):
             
             # wait for jobs to finish
             if not self._allJobsFinishedEvent.isSet():
-                self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(self._max_job_runtime_sec/60.0) + ' minutes')
-                self._allJobsFinishedEvent.wait(1+self._max_job_runtime_sec)
+                self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(self._max_job_runtime_min) + ' minutes')
+                self._allJobsFinishedEvent.wait(1+(self._max_job_runtime_min*60))
                 if self._stopped:
                     return
                 if not self._allJobsFinishedEvent.isSet():
@@ -665,11 +667,10 @@ class TOSMessageHandler(Thread):
         
 class JobsObserver(Thread):
     
-    def __init__(self, parent, default_max_runtime_minute):
+    def __init__(self, parent):
         Thread.__init__(self)
         
         self._parent = parent
-        self._default_max_runtime_seconds = default_max_runtime_minute * 60.0
         self._lock = Lock()
         self._process_list = []
         self._work = Event()
@@ -728,15 +729,10 @@ class JobsObserver(Thread):
         
     def observeJob(self, process, job_name, max_runtime_minutes=None):
         if not self._stopped:
-            if not max_runtime_minutes:
-                max_runtime_seconds = self._default_max_runtime_seconds
-            else:
-                max_runtime_seconds = max_runtime_minutes * 60
-                
             self._lock.acquire()
-            self._process_list.append((process, max_runtime_seconds, job_name))
+            self._process_list.append((process, max_runtime_minutes * 60, job_name))
             self._lock.release()
-            self._parent._logger.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_seconds/60) + ' minutes')
+            self._parent._logger.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_minutes) + ' minutes')
             
             self._work.set()
             return True
@@ -807,7 +803,7 @@ class ScheduleCron(CronTab):
         backward_schedules = []
         now = datetime.utcnow()
         for schedule in self.crons:
-            runtimemin = None
+            runtimemax = None
             commandstring = str(schedule.command).strip()
             back_index = commandstring.lower().find(BACKWARD_TOLERANCE_NAME)
             run_index = commandstring.lower().find(MAX_RUNTIME_NAME)
@@ -815,23 +811,23 @@ class ScheduleCron(CronTab):
             
             if back_index != -1 and run_index != -1:
                 if back_index < run_index:
-                    runtimemin = int(commandstring[run_index:].strip().replace(MAX_RUNTIME_NAME+'=',''))
+                    runtimemax = int(commandstring[run_index:].strip().replace(MAX_RUNTIME_NAME+'=',''))
                     if look_backward:
                         backwardmin = int(commandstring[back_index:run_index].strip().replace(BACKWARD_TOLERANCE_NAME+'=',''))
                         td = timedelta(minutes=backwardmin)
                         nextdt = self._getNextSchedule(date_time - td, schedule)
                         if nextdt < now:
-                            backward_schedules.append((nextdt, commandstring.strip(), runtimemin))
+                            backward_schedules.append((nextdt, commandstring.strip(), runtimemax))
                         
                     commandstring = commandstring[:back_index].strip()
                 else:      
-                    runtimemin = int(commandstring[run_index:back_index].strip().replace(MAX_RUNTIME_NAME+'=',''))
+                    runtimemax = int(commandstring[run_index:back_index].strip().replace(MAX_RUNTIME_NAME+'=',''))
                     if look_backward:
                         backwardmin = int(commandstring[back_index:].strip().replace(BACKWARD_TOLERANCE_NAME+'=',''))
                         td = timedelta(minutes=backwardmin)
                         nextdt = self._getNextSchedule(date_time - td, schedule)
                         if nextdt < now:
-                            backward_schedules.append((nextdt, commandstring.strip(), runtimemin))
+                            backward_schedules.append((nextdt, commandstring.strip(), runtimemax))
                         
                     commandstring = commandstring[:run_index].strip()
             elif back_index != -1:
@@ -840,19 +836,19 @@ class ScheduleCron(CronTab):
                     td = timedelta(minutes=backwardmin)
                     nextdt = self._getNextSchedule(date_time - td, schedule)
                     if nextdt < now:
-                        backward_schedules.append((nextdt, commandstring.strip(), runtimemin))
+                        backward_schedules.append((nextdt, commandstring.strip(), runtimemax))
                     
                 commandstring = commandstring[:back_index].strip()
             elif run_index != -1:
-                runtimemin = int(commandstring[run_index:].strip().replace(MAX_RUNTIME_NAME+'=',''))
+                runtimemax = int(commandstring[run_index:].strip().replace(MAX_RUNTIME_NAME+'=',''))
                 commandstring = commandstring[:run_index].strip()
                 
             nextdt = self._getNextSchedule(date_time, schedule)
             if not future_schedules or nextdt < future_schedules[0][0]:
                 future_schedules = []
-                future_schedules.append((nextdt, commandstring, runtimemin))
+                future_schedules.append((nextdt, commandstring, runtimemax))
             elif nextdt == future_schedules[0][0]:
-                future_schedules.append((nextdt, commandstring, runtimemin))
+                future_schedules.append((nextdt, commandstring, runtimemax))
             
         return backward_schedules + future_schedules
     
