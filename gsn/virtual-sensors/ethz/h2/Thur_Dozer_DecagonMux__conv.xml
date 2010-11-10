@@ -12,19 +12,19 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="CONDUCTIVITY0" type="VARCHAR(30)" unit="dS/m" />
+            <field name="CONDUCTIVITY0" type="VARCHAR(30)" unit="µS/cm" />
             <field name="DIELECTRIC0" type="VARCHAR(30)" unit="F/m" />
             <field name="TEMPERATURE0" type="VARCHAR(30)" unit="°C" />
-            <field name="CONDUCTIVITY1" type="VARCHAR(30)" unit="dS/m" />
+            <field name="CONDUCTIVITY1" type="VARCHAR(30)" unit="µS/cm" />
             <field name="DIELECTRIC1" type="VARCHAR(30)" unit="F/m" />
             <field name="TEMPERATURE1" type="VARCHAR(30)" unit="°C" />
-            <field name="CONDUCTIVITY2" type="VARCHAR(30)" unit="dS/m" />
+            <field name="CONDUCTIVITY2" type="VARCHAR(30)" unit="µS/cm" />
             <field name="DIELECTRIC2" type="VARCHAR(30)" unit="F/m" />
             <field name="TEMPERATURE2" type="VARCHAR(30)" unit="°C" />
-            <field name="CONDUCTIVITY3" type="VARCHAR(30)" unit="dS/m" />
+            <field name="CONDUCTIVITY3" type="VARCHAR(30)" unit="µS/cm" />
             <field name="DIELECTRIC3" type="VARCHAR(30)" unit="F/m" />
             <field name="TEMPERATURE3" type="VARCHAR(30)" unit="°C" />
-            <field name="CONDUCTIVITY4" type="VARCHAR(30)" unit="dS/m" />
+            <field name="CONDUCTIVITY4" type="VARCHAR(30)" unit="µS/cm" />
             <field name="DIELECTRIC4" type="VARCHAR(30)" unit="F/m" />
             <field name="TEMPERATURE4" type="VARCHAR(30)" unit="°C" />
         </output-structure>
@@ -46,11 +46,11 @@
                     CASEWHEN(PAYLOAD_MUX_VALID2 = 0, NULL, cast(round(PAYLOAD_DATA_DIELECTRIC2 / 50.0, 2) as CHAR(30))) as DIELECTRIC2, 
                     CASEWHEN(PAYLOAD_MUX_VALID3 = 0, NULL, cast(round(PAYLOAD_DATA_DIELECTRIC3 / 50.0, 2) as CHAR(30))) as DIELECTRIC3, 
                     CASEWHEN(PAYLOAD_MUX_VALID4 = 0, NULL, cast(round(PAYLOAD_DATA_DIELECTRIC4 / 50.0, 2) as CHAR(30))) as DIELECTRIC4, 
-                    CASEWHEN(PAYLOAD_MUX_VALID0 = 0, NULL, cast(round(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY0 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY0 / 100.0, (700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY0 - 700)) / 100.0), 2) as CHAR(30))) as CONDUCTIVITY0, 
-                    CASEWHEN(PAYLOAD_MUX_VALID1 = 0, NULL, cast(round(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY1 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY1 / 100.0, (700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY1 - 700)) / 100.0), 2) as CHAR(30))) as CONDUCTIVITY1, 
-                    CASEWHEN(PAYLOAD_MUX_VALID2 = 0, NULL, cast(round(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY2 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY2 / 100.0, (700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY2 - 700)) / 100.0), 2) as CHAR(30))) as CONDUCTIVITY2, 
-                    CASEWHEN(PAYLOAD_MUX_VALID3 = 0, NULL, cast(round(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY3 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY3 / 100.0, (700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY3 - 700)) / 100.0), 2) as CHAR(30))) as CONDUCTIVITY3, 
-                    CASEWHEN(PAYLOAD_MUX_VALID4 = 0, NULL, cast(round(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY4 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY4 / 100.0, (700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY4 - 700)) / 100.0), 2) as CHAR(30))) as CONDUCTIVITY4, 
+                    CASEWHEN(PAYLOAD_MUX_VALID0 = 0, NULL, cast(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY0 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY0, 700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY0 - 700)) as CHAR(30))) as CONDUCTIVITY0,
+                    CASEWHEN(PAYLOAD_MUX_VALID1 = 0, NULL, cast(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY1 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY1, 700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY1 - 700)) as CHAR(30))) as CONDUCTIVITY1,
+                    CASEWHEN(PAYLOAD_MUX_VALID2 = 0, NULL, cast(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY2 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY2, 700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY2 - 700)) as CHAR(30))) as CONDUCTIVITY2,
+                    CASEWHEN(PAYLOAD_MUX_VALID3 = 0, NULL, cast(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY3 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY3, 700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY3 - 700)) as CHAR(30))) as CONDUCTIVITY3,
+                    CASEWHEN(PAYLOAD_MUX_VALID4 = 0, NULL, cast(CASEWHEN(PAYLOAD_DATA_CONDUCTIVITY4 between 0 and 700, PAYLOAD_DATA_CONDUCTIVITY4, 700 + 5 * (PAYLOAD_DATA_CONDUCTIVITY4 - 700)) as CHAR(30))) as CONDUCTIVITY4,
                     CASEWHEN(PAYLOAD_MUX_VALID0 = 0, NULL, cast(round((PAYLOAD_DATA_TEMPERATURE0 - 400) / 10.0, 1) as CHAR(30))) as TEMPERATURE0, 
                     CASEWHEN(PAYLOAD_MUX_VALID1 = 0, NULL, cast(round((PAYLOAD_DATA_TEMPERATURE1 - 400) / 10.0, 1) as CHAR(30))) as TEMPERATURE1, 
                     CASEWHEN(PAYLOAD_MUX_VALID2 = 0, NULL, cast(round((PAYLOAD_DATA_TEMPERATURE2 - 400) / 10.0, 1) as CHAR(30))) as TEMPERATURE2, 
