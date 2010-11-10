@@ -57,6 +57,7 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
     private static final String PARAM_METADATA_DEPLOYEMENT = "deployment"; // name of deployemnt for metadata server
     private static final String PARAM_METADATA_STATION = "station"; // name of station for metadata server
     private static final String PARAM_METADATA_SENSOR = "sensor"; // name of station for metadata server
+    private static final String PARAM_LOGGING_INTERVAL = "logging-interval";
 
     private static final int NORMAL_RESULT = 200; // normal result after http post
 
@@ -84,6 +85,9 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
 
 
     private int bufferCount = 0;
+    private boolean logging_timestamps = false;
+    private long logging_interval;
+    private long logging_counter = 0;
 
 
     public boolean initialize() {
@@ -165,10 +169,27 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
         processed = new double[window_size];
         dirtiness = new double[window_size];
 
+        String logging_interval_str = params.get(PARAM_LOGGING_INTERVAL);
+        if (logging_interval_str != null) {
+            logging_timestamps = true;
+            try {
+                logging_interval = Integer.parseInt(logging_interval_str.trim());
+            } catch (NumberFormatException e) {
+                logger.warn("Parameter \"" + PARAM_LOGGING_INTERVAL + "\" incorrect in Virtual Sensor file");
+                logging_timestamps = false;
+            }
+        }
+
         return true;
     }
 
     public void dataAvailable(String inputStreamName, StreamElement data) {
+
+        if (logging_counter % logging_interval == 0) {
+            logger.warn(getVirtualSensorConfiguration().getName() + " , " + logging_counter + " , " + System.currentTimeMillis());
+        }
+
+        logging_counter++;
 
         if (bufferCount < window_size) {
             timestamps[bufferCount] = data.getTimeStamp();
@@ -178,9 +199,9 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
             ModelFitting.FitAndMarkDirty(model, error_bound, window_size, stream, timestamps, processed, dirtiness);
 
             for (int j = 0; j < processed.length; j++) {
-                StreamElement se = new StreamElement(new String[]{"stream", "processed", "dirtiness"},
-                        new Byte[]{DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE},
-                        new Serializable[]{stream[j], processed[j], dirtiness[j]},
+                StreamElement se = new StreamElement(new String[]{"stream", "processed", "dirtiness", "distance"},
+                        new Byte[]{DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE},
+                        new Serializable[]{stream[j], processed[j], dirtiness[j], processed[j] - stream[j]},
                         timestamps[j]);
                 dataProduced(se);
                 if ((dirtiness[j] > 0) && publish_to_metadata_server) {
@@ -189,8 +210,7 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
                         boolean result = httpPost(metadata_server_url, request);
                         if (!result) {
                             logger.warn("Couldn't post request => " + request);
-                        }
-                        else {
+                        } else {
                             logger.warn("Posted => " + request);
                         }
                     } catch (Exception e) {
