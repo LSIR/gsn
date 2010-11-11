@@ -136,6 +136,10 @@ public class SensorNode {
 			mean+=d;
 		}
 		mean = mean / voltageHistory.size();
+		if (mean < 3.25) {
+			batterylevel = 0;
+			return batterylevel;
+		}
 		for (Double d:voltageHistory) {
 			std+=Math.pow(d-mean,2);
 		}
@@ -154,6 +158,7 @@ public class SensorNode {
 		if (uppercount==0 || lowercount==0)
 			return batterylevel;
 		Double level = noiseupper/uppercount - noiselower/lowercount;
+		logger.debug("voltage noise level for node "+node_id+" :"+level);
 		if (level<0.02)
 			batterylevel = 100;
 		else if (level<0.04)
