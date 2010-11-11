@@ -669,6 +669,7 @@ class JobsObserver(Thread):
     
     def __init__(self, parent):
         Thread.__init__(self)
+        self._logger = logging.getLogger(self.__class__.__name__)
         
         self._parent = parent
         self._lock = Lock()
@@ -679,7 +680,7 @@ class JobsObserver(Thread):
         
         
     def run(self):
-        self._parent._logger.info('JobsObserver: started')
+        self._logger.info('JobsObserver: started')
         while not self._stopped:
             self._work.wait()
             if self._stopped:
@@ -688,31 +689,34 @@ class JobsObserver(Thread):
             
             while not self._stopped:
                 new_list = []
+                
+                self._wait.wait(JOB_PROCESS_CHECK_INTERVAL_SECONDS)
+                
                 for proc in self._process_list:
                     ret = proc[0].poll()
                     if ret == None:
                         pid = proc[0].pid
                         if proc[1] <= JOB_PROCESS_CHECK_INTERVAL_SECONDS:
                             if pid <= 1:
-                                self._parent.error('wanted to kill PID ' + str(pid))
+                                self.error('wanted to kill PID ' + str(pid))
                             else:
                                 proc[0].kill()
-                                self._parent._logger.warning('wait for job (' + proc[2] + ') to be killed')
+                                self._logger.warning('wait for job (' + proc[2] + ') to be killed')
                                 proc[0].wait()
                                 output = proc[0].communicate()
-                                self._parent.error('job (' + proc[2] + ') with PID ' + str(pid) + ' has not finished in time  (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                self.error('job (' + proc[2] + ') with PID ' + str(pid) + ' has not finished in time  (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                         else:
-                            self._parent._logger.debug('job (' + proc[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
+                            self._logger.debug('job (' + proc[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
                             new_list.append((proc[0], proc[1]-JOB_PROCESS_CHECK_INTERVAL_SECONDS, proc[2]))
                     else:
                         output = proc[0].communicate()
                         if ret == 0:
                             if self._parent._duty_cycle_mode:
-                                self._parent._logger.info('job (' + proc[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                self._logger.info('job (' + proc[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                             else:
-                                self._parent._logger.debug('job (' + proc[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                self._logger.debug('job (' + proc[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                         else:
-                            self._parent.error('job (' + proc[2] + ') finished with return code ' + str(ret) + ' (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                            self.error('job (' + proc[2] + ') finished with return code ' + str(ret) + ' (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                 
                 self._lock.acquire()
                 self._process_list = new_list
@@ -720,10 +724,8 @@ class JobsObserver(Thread):
                 if not self._process_list:
                     self._parent.allJobsFinished()
                     break
-                
-                self._wait.wait(JOB_PROCESS_CHECK_INTERVAL_SECONDS)
  
-        self._parent._logger.info('JobsObserver: died')
+        self._logger.info('JobsObserver: died')
         
         
         
@@ -732,7 +734,7 @@ class JobsObserver(Thread):
             self._lock.acquire()
             self._process_list.append((process, max_runtime_minutes * 60, job_name))
             self._lock.release()
-            self._parent._logger.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_minutes) + ' minutes')
+            self._logger.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_minutes) + ' minutes')
             
             self._work.set()
             return True
@@ -746,14 +748,19 @@ class JobsObserver(Thread):
         self._wait.set()
         
         for proc in self._process_list:
-            self._parent.error('job (' + proc[2] + ') with PID ' + str(proc[0].pid) + ' has not finished yet -> kill it')
+            self.error('job (' + proc[2] + ') with PID ' + str(proc[0].pid) + ' has not finished yet -> kill it')
             proc[0].kill()
-            self._parent._logger.warning('wait for job (' + proc[2] + ') to be killed')
+            self._logger.warning('wait for job (' + proc[2] + ') to be killed')
             proc[0].wait()
             output = proc[0].communicate()
-            self._parent.error('job (' + proc[2] + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+            self.error('job (' + proc[2] + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
             
-        self._parent._logger.info('JobsObserver: stopped')
+        self._logger.info('JobsObserver: stopped')
+        
+        
+    def error(self, msg):
+        self._parent._parent.incrementErrorCounter()
+        self._logger.error(msg)
         
         
         
@@ -761,6 +768,7 @@ class PingThread(Thread):
     
     def __init__(self, parent, ping_interval_seconds=30, watchdog_timeout_seconds=300):
         Thread.__init__(self)
+        self._logger = logging.getLogger(self.__class__.__name__)
         self._ping_interval_seconds = ping_interval_seconds
         self._watchdog_timeout_seconds = watchdog_timeout_seconds
         self._parent = parent
@@ -769,18 +777,18 @@ class PingThread(Thread):
         
         
     def run(self):
-        self._parent._logger.info('PingThread: started')
+        self._logger.info('PingThread: started')
         while not self._stopped:
             self._parent._tosMessageHandler.addMsg(CMD_RESET_WATCHDOG, self._watchdog_timeout_seconds)
-            self._parent._logger.debug('reset watchdog')
+            self._logger.debug('reset watchdog')
             self._work.wait(self._ping_interval_seconds)
-        self._parent._logger.info('PingThread: died')
+        self._logger.info('PingThread: died')
 
 
     def stop(self):
         self._stopped = True
         self._work.set()
-        self._parent._logger.info('PingThread: stopped')
+        self._logger.info('PingThread: stopped')
         
         
         
