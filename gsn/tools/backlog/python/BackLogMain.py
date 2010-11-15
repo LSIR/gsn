@@ -9,6 +9,7 @@ __source__      = "$URL$"
  
 import os
 import subprocess
+import traceback
 import sys
 import signal
 import ConfigParser
@@ -333,6 +334,10 @@ class BackLogMainClass(Thread):
         return counter
 
 
+def sigillAction(signum, sigframe):
+    raise IOError('Signal handler called with signal ' + str(signum) + ': \n' + ''.join(traceback.format_stack(sigframe)))
+
+
 def main():
     parser = optparse.OptionParser('usage: %prog [options]')
     
@@ -357,6 +362,7 @@ def main():
     try:
         backlog = BackLogMainClass(options.config_file)
         backlog.start()
+        signal.signal(signal.SIGILL, sigillAction)
         signal.pause()
     except KeyboardInterrupt:
         logger.warning('KeyboardInterrupt')
@@ -365,6 +371,8 @@ def main():
             backlog.join()
     except Exception, e:
         logger.error(e)
+        if backlog and backlog.isAlive():
+            backlog.stop()
         logging.shutdown()
         sys.exit(1)
         
