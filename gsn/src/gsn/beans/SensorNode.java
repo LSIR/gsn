@@ -130,13 +130,21 @@ public class SensorNode {
 		Double std=0d;
 		Double noiseupper=0d;Double uppercount = 0d;
 		Double noiselower=0d;Double lowercount = 0d;
+		if (!isSibNode()) {
+			batterylevel = null;
+			return batterylevel;
+		}
 		if (voltageHistory.size()<2)
 			return batterylevel;
 		for (Double d:voltageHistory) {
 			mean+=d;
 		}
 		mean = mean / voltageHistory.size();
-		if (mean < 3.25) {
+		if (mean < 0.5) {
+			batterylevel = null;
+			return batterylevel;
+		}
+		else if (mean < 3.25) {
 			batterylevel = 0;
 			return batterylevel;
 		}
