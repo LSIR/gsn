@@ -169,6 +169,7 @@ class ScheduleHandlerClass(Thread):
         self._schedule = None
         self._newSchedule = False
         self._stopped = False
+        self._beacon = False
             
         self._max_next_schedule_wait_delta = timedelta(minutes=max_next_schedule_wait_minutes)
             
@@ -206,6 +207,7 @@ class ScheduleHandlerClass(Thread):
         
     def run(self):
         self._logger.info('started')
+        stop = False
         
         self._jobsObserver.start()
         
@@ -270,20 +272,19 @@ class ScheduleHandlerClass(Thread):
         
         # if there is no schedule at all shutdown again and wait for next service window  
         if not self._schedule:
-            if self._duty_cycle_mode:
+            if self._duty_cycle_mode and not self._beacon:
                 self._logger.warning('no schedule available at all -> shutdown')
-                self._shutdown()
-                self._logger.info('died')
-                return
+                stop = self._shutdown()
             else:
                 self._logger.info('no schedule available yet -> waiting for a schedule')
                 self._scheduleEvent.wait()
+                if self._duty_cycle_mode and not self._schedule:
+                    stop = self._shutdown()
         
         if self._duty_cycle_mode:
             lookback = True
         else:
             lookback = False
-        stop = False
         service_time = timedelta()
         while not stop and not self._stopped:
             self._max_job_runtime_min = int(self.getOptionValue('max_default_job_runtime_minutes'))
@@ -302,7 +303,7 @@ class ScheduleHandlerClass(Thread):
                 self._logger.debug('(' + str(schedule[0]) + ',' + str(schedule[1]) + ',' + str(schedule[2]) + ')')
                 dtnow = datetime.utcnow()
                 timediff = schedule[0] - dtnow
-                if self._duty_cycle_mode:
+                if self._duty_cycle_mode and not self._beacon:
                     service_time = self._serviceTime()
                     if schedule[0] <= dtnow:
                         self._logger.debug('start >' + schedule[1] + '< now')
@@ -310,6 +311,9 @@ class ScheduleHandlerClass(Thread):
                         self._logger.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if self._stopped:
+                            break
+                        if self._stopEvent.isSet():
+                            self._stopEvent.clear()
                             break
                     else:
                         if service_time <= self._max_next_schedule_wait_delta:
@@ -321,14 +325,14 @@ class ScheduleHandlerClass(Thread):
                         if self._stopped:
                             self._logger.info('died')
                             return
-                        if self._duty_cycle_mode:
+                        if not self._beacon:
                             stop = True
-                            break
+                        break
                 else:
                     if schedule[0] > dtnow:
                         self._logger.debug('start >' + schedule[1] + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
-                        if self._stopped or self._newSchedule:
+                        if (self._stopped or self._newSchedule) or (self._duty_cycle_mode and not self._beacon):
                             self._newSchedule = False
                             self._stopEvent.clear()
                             break
@@ -348,8 +352,9 @@ class ScheduleHandlerClass(Thread):
                             self._max_job_runtime_min = schedule[2]
                         self._jobsObserver.observeJob(proc, schedule[1], schedule[2])
                     
-        if self._duty_cycle_mode and not self._stopped:
-            self._shutdown(service_time)
+            if stop and self._duty_cycle_mode and not self._stopped and not self._beacon:
+                stop = self._shutdown(service_time)
+                    
             
         if self._duty_cycle_mode:
             self._pingThread.join()
@@ -379,7 +384,13 @@ class ScheduleHandlerClass(Thread):
     
     
     def beaconReceived(self):
-        self._duty_cycle_mode = False
+        self._beacon = True
+    
+    
+    def beaconCleared(self):
+        self._beacon = False
+        self._scheduleEvent.set()
+        self._stopEvent.set()
     
     
     def getMsgType(self):
@@ -489,14 +500,14 @@ class ScheduleHandlerClass(Thread):
                 self._logger.info('waiting ' + str(waitfor/60.0) + ' minutes for service windows to finish')
                 self._stopEvent.wait(waitfor)
                 if self._stopped:
-                    return
+                    return True
             
             # wait for jobs to finish
             if not self._allJobsFinishedEvent.isSet():
                 self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(self._max_job_runtime_min) + ' minutes')
                 self._allJobsFinishedEvent.wait(1+(self._max_job_runtime_min*60))
                 if self._stopped:
-                    return
+                    return True
                 if not self._allJobsFinishedEvent.isSet():
                     self.error('not all jobs have been killed (should not happen)')
                     
@@ -510,7 +521,7 @@ class ScheduleHandlerClass(Thread):
                     self._logger.debug('plugins are still busy')
                     self._stopEvent.wait(3)
                     if self._stopped:
-                        return
+                        return True
                     max_plugins_finish_wait_seconds -= 3
                     
             # last possible moment to check if a beacon has been sent to the node
@@ -518,7 +529,9 @@ class ScheduleHandlerClass(Thread):
             self._logger.info('get node wakeup states')
             self._tosMessageHandler.addMsg(CMD_WAKEUP_QUERY, blocking=True)
             if self._stopped:
-                return
+                return True
+            if self._beacon:
+                return False
 
             # Synchronize Service Wakeup Time
             time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
@@ -543,8 +556,10 @@ class ScheduleHandlerClass(Thread):
             parentpid = os.getpid()
             self._logger.info('sending myself (pid=' + str(parentpid) + ' SIGINT')
             os.kill(parentpid, signal.SIGINT)
+            return True
         else:
             self._logger.warning('shutdown called even if we are not in shutdown mode')
+            return False
             
             
             
@@ -616,6 +631,8 @@ class TOSMessageHandler(Thread):
                 if (node_state & WAKEUP_TYPE_BEACON) == WAKEUP_TYPE_BEACON:
                     self._scheduleHandler.beaconReceived()
                     s += 'BEACON '
+                elif self._scheduleHandler._beacon:
+                        self._scheduleHandler.beaconCleared()
                 if (node_state & WAKEUP_TYPE_NODE_REBOOT) == WAKEUP_TYPE_NODE_REBOOT:
                     s += 'NODE_REBOOT'
                 self._scheduleHandler._logger.info(s)
