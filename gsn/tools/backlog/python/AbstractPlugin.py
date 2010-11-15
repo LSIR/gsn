@@ -21,7 +21,7 @@ class AbstractPluginClass(Thread):
     '''
     data/instance attributes:
     _logger
-    _parent
+    _backlogMain
     _config
     _backlog
     '''
@@ -29,7 +29,7 @@ class AbstractPluginClass(Thread):
     def __init__(self, parent, config, backlog_default=False, priority_default=99):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
-        self._parent = parent
+        self._backlogMain = parent
         self._config = config
         backlog = self.getOptionValue('backlog')
         if backlog:
@@ -128,7 +128,7 @@ class AbstractPluginClass(Thread):
         @return: True if the message has been stored successfully into the backlog database if needed,
                  otherwise False.
         '''
-        return self._parent.gsnpeer.processMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
+        return self._backlogMain.gsnpeer.processMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
     
     
     def tosMsgReceived(self, timestamp, payload):
@@ -159,11 +159,11 @@ class AbstractPluginClass(Thread):
         
         @raise TypeError: if the TOSPeerClass has not been started.
         '''
-        if not self._parent.tospeer:
+        if not self._backlogMain.tospeer:
             raise TypeError('TOSPeerClass has not been started')
             return False
         else:
-            return self._parent.tospeer.sendTOSMsg(packet, amId, timeout, blocking, maxretries)
+            return self._backlogMain.tospeer.sendTOSMsg(packet, amId, timeout, blocking, maxretries)
        
         
     def run(self):
@@ -202,7 +202,7 @@ class AbstractPluginClass(Thread):
         '''
         Tells the BackLogDB class to resend all unacknowledged packets.
         '''
-        self._parent.backlog.resend()
+        self._backlogMain.backlog.resend()
 
 
     def getBackLogStatus(self):
@@ -212,11 +212,11 @@ class AbstractPluginClass(Thread):
         
         @return: status of the backlog database as tuple (number of database entries, database file size)
         '''
-        return self._parent.backlog.getStatus()
+        return self._backlogMain.backlog.getStatus()
 
 
     def getGSNPeerStatus(self):
-        return self._parent.gsnpeer.getStatus()
+        return self._backlogMain.gsnpeer.getStatus()
     
         
     def isBusy(self):
@@ -242,30 +242,30 @@ class AbstractPluginClass(Thread):
         
         @return: True if GSN is connected otherwise False
         '''
-        return self._parent.gsnpeer.isConnected()
+        return self._backlogMain.gsnpeer.isConnected()
 
 
     def getExceptionCounter(self):
         '''
         Returns the number of errors occurred since the last program start
         '''
-        return self._parent.getExceptionCounter()
+        return self._backlogMain.getExceptionCounter()
 
 
     def getErrorCounter(self):
         '''
         Returns the number of errors occurred since the last program start
         '''
-        return self._parent.getErrorCounter()
+        return self._backlogMain.getErrorCounter()
 
     
     def exception(self, e):
-        self._parent.incrementExceptionCounter()
+        self._backlogMain.incrementExceptionCounter()
         self._logger.exception(e.__str__())
     
     
     def error(self, msg):
-        self._parent.incrementErrorCounter()
+        self._backlogMain.incrementErrorCounter()
         self._logger.error(msg)
         
 

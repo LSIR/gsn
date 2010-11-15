@@ -72,7 +72,6 @@ class BinaryPluginClass(AbstractPluginClass):
 
 
     data/instance attributes:
-    _parent
     _notifier
     _stopped
     _filedeque
@@ -91,8 +90,6 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options)
-        
-        self._parent = parent
         
         self._isBusy = True
         
@@ -203,7 +200,7 @@ class BinaryPluginClass(AbstractPluginClass):
             self._filedeque.append(self._filedescriptor.name)
             self._filedescriptor.close()
         self._msgdeque.clear()
-        self._parent._waitforack = False
+        self._backlogMain._waitforack = False
         
     
     def connectionToGSNlost(self):
@@ -512,17 +509,17 @@ class BinaryChangedProcessing(ProcessEvent):
     '''
     data/instance attributes:
     _logger
-    _parent
+    _binaryPlugin
     '''
 
     def __init__(self, parent):
         self._logger = logging.getLogger(self.__class__.__name__)
-        self._parent = parent
+        self._binaryPlugin = parent
 
     def process_default(self, event):
         self._logger.debug(event.pathname + ' changed')
         
-        self._parent._filedeque.appendleft(event.pathname)
-        if self._parent.isGSNConnected() and not self._parent._waitforack:
-            self._parent._isBusy = True
-            self._parent._work.set()
+        self._binaryPlugin._filedeque.appendleft(event.pathname)
+        if self._binaryPlugin.isGSNConnected() and not self._binaryPlugin._waitforack:
+            self._binaryPlugin._isBusy = True
+            self._binaryPlugin._work.set()

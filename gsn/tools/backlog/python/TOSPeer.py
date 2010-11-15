@@ -28,6 +28,7 @@ class TOSPeerClass(Thread):
 
     '''
     data/instance attributes:
+    _backlogMain
     _serialsource
     _toswriter
     _version
@@ -59,7 +60,7 @@ class TOSPeerClass(Thread):
         
         self._toswriter = TOSWriter(self)
 
-        self._parent = parent
+        self._backlogMain = parent
         self._stopped = False
             
         
@@ -92,7 +93,7 @@ class TOSPeerClass(Thread):
 
             # tell PSBackLogMain to send the packet to the plugins
             # using the serial port we can guarantee flow control to the backlog database!
-            if self._parent.processTOSMsg(timestamp, packet):
+            if self._backlogMain.processTOSMsg(timestamp, packet):
                 try:
                     self._serialsource.sendAck()
                 except Exception, e:
@@ -109,7 +110,7 @@ class TOSPeerClass(Thread):
 
 
     def error(self, msg):
-        self._parent.incrementErrorCounter()
+        self._backlogMain.incrementErrorCounter()
         self._logger.error(msg)
 
         
@@ -126,7 +127,7 @@ class TOSWriter(Thread):
     '''
     data/instance attributes:
     _logger
-    _parent
+    _tosPeer
     _sendqueue
     _work
     _stopped
@@ -135,7 +136,7 @@ class TOSWriter(Thread):
     def __init__(self, parent):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
-        self._parent = parent
+        self._tosPeer = parent
         self._sendqueue = Queue.Queue(SEND_QUEUE_SIZE)
         self._work = Event()
         self._stopped = False
@@ -157,7 +158,7 @@ class TOSWriter(Thread):
                     break
                 
                 try:
-                    self._parent._serialsource.write(list[0], list[1], list[2], list[3], list[4])
+                    self._tosPeer._serialsource.write(list[0], list[1], list[2], list[3], list[4])
                     self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(list[0])))
                 except Exception, e:
                     if not self._stopped:

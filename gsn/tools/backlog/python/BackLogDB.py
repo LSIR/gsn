@@ -31,7 +31,7 @@ class BackLogDBClass(Thread):
     '''
     data/instance attributes:
     _logger
-    _parent
+    _backlogMain
     _dbname
     _con
     _cur
@@ -80,7 +80,7 @@ class BackLogDBClass(Thread):
         self._logger = logging.getLogger(self.__class__.__name__)
         
         # initialize variables
-        self._parent = parent
+        self._backlogMain = parent
         self._dbname = dbname
         
         # thread lock to coordinate access to the database
@@ -284,7 +284,7 @@ class BackLogDBClass(Thread):
                 message = row[2]
                 # should be blocking until queue is free and ready to send
                 self._logger.debug('rsnd...')
-                if self._parent.gsnpeer.processResendMsg(msgType, timestamp, message):
+                if self._backlogMain.gsnpeer.processResendMsg(msgType, timestamp, message):
                     self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
                 else:
                     self._logger.info('resend interrupted')
@@ -318,6 +318,6 @@ class BackLogDBClass(Thread):
         
         
     def exception(self, e):
-        self._parent.incrementExceptionCounter()
+        self._backlogMain.incrementExceptionCounter()
         self._logger.exception(e.__str__())
         

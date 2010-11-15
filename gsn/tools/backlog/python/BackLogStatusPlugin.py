@@ -45,7 +45,6 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         
         self.info('interval: ' + str(self._interval))
 
-        self._parent = parent
         self._stopped = False
         self._sleeper = Event()
     
@@ -62,7 +61,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         resend = ord(message[0])
         if resend == 1:
             self.info('received command resend')
-            self._parent.resend()
+            self._backlogMain.resend()
 
 
     def run(self):

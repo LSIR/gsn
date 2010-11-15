@@ -40,7 +40,7 @@ class GSNPeerClass(Thread):
     '''
     data/instance attributes:
     _logger
-    _parent
+    _backlogMain
     _deviceid
     _port
     _serversocket
@@ -69,7 +69,7 @@ class GSNPeerClass(Thread):
         self._logger = logging.getLogger(self.__class__.__name__)
         
         # initialize variables
-        self._parent = parent
+        self._backlogMain = parent
         self._deviceid = deviceid
         self._port = port
 
@@ -171,16 +171,16 @@ class GSNPeerClass(Thread):
             self.pingAck(msg.getTimestamp())
         elif msgType == BackLogMessage.ACK_MESSAGE_TYPE:
             # if it is an acknowledge, tell BackLogMain to have received one
-            self._parent.ackReceived(msg.getTimestamp(), int(struct.unpack('<I', msg.getPayload())[0]))
+            self._backlogMain.ackReceived(msg.getTimestamp(), int(struct.unpack('<I', msg.getPayload())[0]))
         else:
-            self._parent.gsnMsgReceived(msgType, msg)
+            self._backlogMain.gsnMsgReceived(msgType, msg)
 
 
     def disconnect(self):
         self._logger.debug('disconnect')
         self._connected = False
         self._connectionLosses += 1
-        self._parent.connectionToGSNlost()
+        self._backlogMain.connectionToGSNlost()
         self._pingwatchdog.pause()
         self._pingtimer.pause()
         self._work.set()
@@ -192,7 +192,7 @@ class GSNPeerClass(Thread):
         
     def connected(self):
         self._connected = True
-        self._parent.connectionToGSNestablished()
+        self._backlogMain.connectionToGSNestablished()
         self._pingtimer.resume()
         self._pingwatchdog.resume()
 
@@ -231,7 +231,7 @@ class GSNPeerClass(Thread):
         if backlog:
             self._backlogCounter += 1
             # back log the message
-            ret = self._parent.backlog.storeMsg(timestamp, msgType, payload)
+            ret = self._backlogMain.backlog.storeMsg(timestamp, msgType, payload)
             
         # send the message to the GSN backend
         self.sendToGSN(BackLogMessage.BackLogMessageClass(msgType, timestamp, payload), priority)
@@ -244,7 +244,7 @@ class GSNPeerClass(Thread):
 
 
     def error(self, msg):
-        self._parent.incrementErrorCounter()
+        self._backlogMain.incrementErrorCounter()
         self._logger.error(msg)
     
     
@@ -258,7 +258,7 @@ class GSNListener(Thread):
     '''
     data/instance attributes:
     _logger
-    _parent
+    _gsnPeer
     _port
     _serversocket
     _gsnwriter
@@ -275,7 +275,7 @@ class GSNListener(Thread):
         '''
         Inititalizes the GSN server.
         
-        @param parent: the BackLogMain object
+        @param parent: the GSNPeer object
         @param port: the local port the server should be listening on
         
         @raise Exception: if there is a problem opening the server socket
@@ -285,7 +285,7 @@ class GSNListener(Thread):
         self._logger = logging.getLogger(self.__class__.__name__)
         
         # initialize variables
-        self._parent = parent
+        self._gsnPeer = parent
         self._port = port
         self._serversocket = serversocket
         self._stuff = False
@@ -334,7 +334,7 @@ class GSNListener(Thread):
             self.clientsocket.settimeout(None)
 
             # let BackLogMain know that GSN successfully connected
-            self._parent._parent.backlog.resend(True)
+            self._gsnPeer._backlogMain.backlog.resend(True)
 
             while not self._stopped:
                 self._logger.debug('rcv...')
@@ -357,7 +357,7 @@ class GSNListener(Thread):
                     else:
                         connecting = False
                         self._logger.debug('hello byte received')
-                        self._parent.connected()
+                        self._gsnPeer.connected()
                 else:
                     # read the length (4 bytes) of the incoming packet (this is blocking)
                     try:
@@ -386,7 +386,7 @@ class GSNListener(Thread):
                             raise
                         break
                     
-                    self._parent.pktReceived(pkt)
+                    self._gsnPeer.pktReceived(pkt)
         except Exception, e:
             self.disconnect()
             self._logger.exception(e.__str__())
@@ -434,7 +434,7 @@ class GSNListener(Thread):
             try:
                 self.clientsocket.close()
             except Exception, e:
-                self._parent._parent.incrementExceptionCounter()
+                self._gsnPeer._backlogMain.incrementExceptionCounter()
                 self._logger.exception(e.__str__())
             self._connected = False
         self._logger.info('stopped')
@@ -445,12 +445,12 @@ class GSNListener(Thread):
         self._lock.acquire()
         if self._connected:
             self.stop()
-            self._parent.disconnect()
+            self._gsnPeer.disconnect()
         self._lock.release()
 
 
     def error(self, msg):
-        self._parent._parent.incrementErrorCounter()
+        self._gsnPeer._backlogMain.incrementErrorCounter()
         self._logger.error(msg)
 
 
@@ -525,7 +525,7 @@ class GSNWriter(Thread):
     '''
     data/instance attributes:
     _logger
-    _parent
+    _gsnListener
     _sendqueue
     _work
     _stopped
@@ -534,7 +534,7 @@ class GSNWriter(Thread):
     def __init__(self, parent):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
-        self._parent = parent
+        self._gsnListener = parent
         self._sendqueue = Queue.PriorityQueue(SEND_QUEUE_SIZE)
         self._work = Event()
         self._stuff = chr(STUFFING_BYTE)
@@ -550,7 +550,7 @@ class GSNWriter(Thread):
                 break
             self._work.clear()
             # is there something to do?
-            while self._parent._connected and not self._sendqueue.empty() and not self._stopped:
+            while self._gsnListener._connected and not self._sendqueue.empty() and not self._stopped:
                 try:
                     msg = self._sendqueue.get_nowait()[1]
                 except Queue.Empty:
@@ -565,14 +565,14 @@ class GSNWriter(Thread):
                     pkt = self.pktStuffing(struct.pack('<I', msglen) + message)
             
                 try:
-                    self._parent.clientsocket.sendall(pkt)
+                    self._gsnListener.clientsocket.sendall(pkt)
                     if msg.__class__.__name__ != BackLogMessage.__name__ + 'Class':
                         self._logger.debug('hello message sent')
                     else:
                         self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
                 except (IOError, socket.error), e:
                     if not self._stopped:
-                        self._parent.disconnect() # sets connected to false
+                        self._gsnListener.disconnect() # sets connected to false
                         self._logger.exception(e.__str__())                  
                 finally:
                     self._sendqueue.task_done()
@@ -587,7 +587,7 @@ class GSNWriter(Thread):
     def sendHelloMsg(self):
         self.emptyQueue()
         helloMsg = chr(STUFFING_BYTE) + chr(HELLO_BYTE)
-        helloMsg += self.pktStuffing(struct.pack('<I', self._parent._parent._deviceid))
+        helloMsg += self.pktStuffing(struct.pack('<I', self._gsnListener._gsnPeer._deviceid))
         self.addMsg(helloMsg, 0)
 
 
@@ -609,7 +609,7 @@ class GSNWriter(Thread):
 
 
     def addMsg(self, msg, priority):
-        if self._parent._connected and not self._stopped:
+        if self._gsnListener._connected and not self._stopped:
             try:
                 self._sendqueue.put_nowait((priority, msg))
             except Queue.Full:
@@ -623,7 +623,7 @@ class GSNWriter(Thread):
         # wait until send queue is empty
         self._sendqueue.join()
         assert self._sendqueue.not_empty != True
-        if self._parent._connected and not self._stopped:
+        if self._gsnListener._connected and not self._stopped:
             try:
                 self._sendqueue.put_nowait((priority, msg))
             except Queue.Full:

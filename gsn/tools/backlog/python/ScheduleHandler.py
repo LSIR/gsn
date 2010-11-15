@@ -29,7 +29,7 @@ from crontab import CronTab
 # Some Constants
 DEFAULT_BACKLOG = False
 
-JOB_PROCESS_CHECK_INTERVAL_SECONDS = 10
+JOB_PROCESS_CHECK_INTERVAL_SECONDS = 2
 
 SEND_QUEUE_SIZE = 25
 
@@ -94,6 +94,7 @@ class ScheduleHandlerClass(Thread):
 
 
     data/instance attributes:
+    _backlogMain
     _connectionEvent
     _scheduleEvent
     _scheduleLock
@@ -118,11 +119,11 @@ class ScheduleHandlerClass(Thread):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
         
-        self._parent = parent
+        self._backlogMain = parent
         self._duty_cycle_mode = dutycyclemode
         self._config = options
         
-        if dutycyclemode and not self._parent.tospeer:
+        if dutycyclemode and not self._backlogMain.tospeer:
             raise TypeError('TOSPeerClass is needed if in duty-cycle mode but has not been started')
         
         service_wakeup_minutes = int(self.getOptionValue('service_wakeup_minutes'))
@@ -236,7 +237,7 @@ class ScheduleHandlerClass(Thread):
             self._scheduleNextDutyWakeup(safety_schedule[0] - datetime.utcnow(), safety_schedule[1])
             
         # wait some time for GSN to connect
-        if self._parent.gsnpeer.isConnected():
+        if self._backlogMain.gsnpeer.isConnected():
             self._gsnconnected = True
         else:
             self._logger.info('waiting for gsn to connect for a maximum of ' + self.getOptionValue('max_gsn_connect_wait_minutes') + ' minutes')
@@ -253,9 +254,9 @@ class ScheduleHandlerClass(Thread):
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
                 self._logger.info('request schedule from gsn')
                 if self._schedule:
-                    self._parent.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY, False)
+                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY, False)
                 else:
-                    self._parent.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY, False)
+                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY, False)
                 self._scheduleEvent.wait(3)
                 if self._stopped:
                     self._logger.info('died')
@@ -460,7 +461,7 @@ class ScheduleHandlerClass(Thread):
         
         
     def error(self, msg):
-        self._parent.incrementErrorCounter()
+        self._backlogMain.incrementErrorCounter()
         self._logger.error(msg)
         
         
@@ -515,7 +516,7 @@ class ScheduleHandlerClass(Thread):
             max_plugins_finish_wait_seconds = int(self.getOptionValue('max_plugins_finish_wait_minutes'))*60
             self._logger.info('waiting for all active plugins to finish for a maximum of ' + self.getOptionValue('max_plugins_finish_wait_minutes') + ' minutes')
             while not max_plugins_finish_wait_seconds <= 0:
-                if not self._parent.pluginsBusy():
+                if not self._backlogMain.pluginsBusy():
                     break
                 else:
                     self._logger.debug('plugins are still busy')
@@ -552,7 +553,7 @@ class ScheduleHandlerClass(Thread):
             self._tosMessageHandler.addMsg(CMD_SHUTDOWN, argument=shutdown_offset, blocking=True)
             self._logger.info('we\'re going to do a hard shut down in '+str(shutdown_offset)+' seconds ...')
     
-            self._parent.shutdown = True
+            self._backlogMain.shutdown = True
             parentpid = os.getpid()
             self._logger.info('sending myself (pid=' + str(parentpid) + ' SIGINT')
             os.kill(parentpid, signal.SIGINT)
@@ -567,6 +568,7 @@ class TOSMessageHandler(Thread):
     
     def __init__(self, scheduleHandler):
         Thread.__init__(self)
+        self._logger = logging.getLogger(self.__class__.__name__)
         self._scheduleHandler = scheduleHandler
         self._stopped = False
         self._node_state = None
@@ -577,7 +579,7 @@ class TOSMessageHandler(Thread):
         
         
     def run(self):
-        self._scheduleHandler._logger.info('TOSMessageHandler: started')
+        self._logger.info('TOSMessageHandler: started')
         
         while not self._stopped:
             self._work.wait()
@@ -595,18 +597,18 @@ class TOSMessageHandler(Thread):
                 if item[1]:
                     self._sentCmd = item[0]['command']
 
-                self._scheduleHandler._logger.debug('snd...')
-                self._scheduleHandler._parent.tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG)
+                self._logger.debug('snd...')
+                self._scheduleHandler._backlogMain.tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG)
                 
                 if item[1]:
                     while True:
                         self._ackEvent.wait(3)
                         if self._stopped:
-                            self._scheduleHandler._logger.info('TOSMessageHandler: died')
+                            self._logger.info('TOSMessageHandler: died')
                             return
                         elif not self._ackEvent.isSet():
-                            self._scheduleHandler._logger.info('resend command (' + str(self._sentCmd) + ') to TOS node')
-                            self._scheduleHandler._parent.tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG)
+                            self._logger.info('resend command (' + str(self._sentCmd) + ') to TOS node')
+                            self._scheduleHandler._backlogMain.tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG)
                         else:
                             self._sentCmd = None
                             self._ackEvent.clear()
@@ -614,14 +616,14 @@ class TOSMessageHandler(Thread):
             
                 self._sendqueue.task_done()
 
-        self._scheduleHandler._logger.info('TOSMessageHandler: died')
+        self._logger.info('TOSMessageHandler: died')
             
             
     def received(self, msg):
         response = tos.Packet(TOS_CMD_STRUCTURE, msg['data'])
         if response['command'] == CMD_WAKEUP_QUERY:
             node_state = response['argument']
-            self._scheduleHandler._logger.debug('CMD_WAKEUP_QUERY response received with argument: ' + str(node_state))
+            self._logger.debug('CMD_WAKEUP_QUERY response received with argument: ' + str(node_state))
             if node_state != self._node_state:
                 s = 'TinyNode wakeup states are: '
                 if (node_state & WAKEUP_TYPE_SCHEDULED) == WAKEUP_TYPE_SCHEDULED:
@@ -635,22 +637,22 @@ class TOSMessageHandler(Thread):
                         self._scheduleHandler.beaconCleared()
                 if (node_state & WAKEUP_TYPE_NODE_REBOOT) == WAKEUP_TYPE_NODE_REBOOT:
                     s += 'NODE_REBOOT'
-                self._scheduleHandler._logger.info(s)
+                self._logger.info(s)
                 self._node_state = node_state
         elif response['command'] == CMD_SERVICE_WINDOW:
-            self._scheduleHandler._logger.info('CMD_SERVICE_WINDOW response received with argument: ' + str(response['argument']))
+            self._logger.info('CMD_SERVICE_WINDOW response received with argument: ' + str(response['argument']))
         elif response['command'] == CMD_NEXT_WAKEUP:
-            self._scheduleHandler._logger.info('CMD_NEXT_WAKEUP response received with argument: ' + str(response['argument']))
+            self._logger.info('CMD_NEXT_WAKEUP response received with argument: ' + str(response['argument']))
         elif response['command'] == CMD_SHUTDOWN:
-            self._scheduleHandler._logger.info('CMD_SHUTDOWN response received with argument: ' + str(response['argument']))
+            self._logger.info('CMD_SHUTDOWN response received with argument: ' + str(response['argument']))
         elif response['command'] == CMD_NET_STATUS:
-            self._scheduleHandler._logger.info('CMD_NET_STATUS response received with argument: ' + str(response['argument']))
+            self._logger.info('CMD_NET_STATUS response received with argument: ' + str(response['argument']))
         elif response['command'] == CMD_RESET_WATCHDOG:
-            self._scheduleHandler._logger.info('CMD_RESET_WATCHDOG response received with argument: ' + str(response['argument']))
+            self._logger.info('CMD_RESET_WATCHDOG response received with argument: ' + str(response['argument']))
         
               
         if response['command'] == self._sentCmd:
-            self._scheduleHandler._logger.debug('packet acknowledge received')
+            self._logger.debug('packet acknowledge received')
             self._ackEvent.set()
         
         
@@ -665,7 +667,8 @@ class TOSMessageHandler(Thread):
             try:
                 self._sendqueue.put_nowait((tos.Packet(TOS_CMD_STRUCTURE, [cmd, argument]), blocking))
             except Queue.Full:
-                self._scheduleHandler.error('send queue is full')
+                self._scheduleHandler._backlogMain.incrementErrorCounter()
+                self._logger.error('send queue is full')
                 return False
             self._work.set()
             if blocking:
@@ -678,7 +681,7 @@ class TOSMessageHandler(Thread):
         self._stopped = True
         self._work.set()
         self._ackEvent.set()
-        self._scheduleHandler._logger.info('TOSMessageHandler: stopped')
+        self._logger.info('TOSMessageHandler: stopped')
          
         
         
@@ -688,7 +691,7 @@ class JobsObserver(Thread):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
         
-        self._parent = parent
+        self._scheduleHandler = parent
         self._lock = Lock()
         self._process_list = []
         self._work = Event()
@@ -728,7 +731,7 @@ class JobsObserver(Thread):
                     else:
                         output = proc[0].communicate()
                         if ret == 0:
-                            if self._parent._duty_cycle_mode:
+                            if self._scheduleHandler._duty_cycle_mode:
                                 self._logger.info('job (' + proc[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                             else:
                                 self._logger.debug('job (' + proc[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
@@ -739,7 +742,7 @@ class JobsObserver(Thread):
                 self._process_list = new_list
                 self._lock.release()
                 if not self._process_list:
-                    self._parent.allJobsFinished()
+                    self._scheduleHandler.allJobsFinished()
                     break
  
         self._logger.info('JobsObserver: died')
@@ -776,7 +779,7 @@ class JobsObserver(Thread):
         
         
     def error(self, msg):
-        self._parent._parent.incrementErrorCounter()
+        self._scheduleHandler._backlogMain.incrementErrorCounter()
         self._logger.error(msg)
         
         
@@ -788,7 +791,7 @@ class PingThread(Thread):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._ping_interval_seconds = ping_interval_seconds
         self._watchdog_timeout_seconds = watchdog_timeout_seconds
-        self._parent = parent
+        self._scheduleHandler = parent
         self._work = Event()
         self._stopped = False
         
@@ -796,7 +799,7 @@ class PingThread(Thread):
     def run(self):
         self._logger.info('PingThread: started')
         while not self._stopped:
-            self._parent._tosMessageHandler.addMsg(CMD_RESET_WATCHDOG, self._watchdog_timeout_seconds)
+            self._scheduleHandler._tosMessageHandler.addMsg(CMD_RESET_WATCHDOG, self._watchdog_timeout_seconds)
             self._logger.debug('reset watchdog')
             self._work.wait(self._ping_interval_seconds)
         self._logger.info('PingThread: died')
