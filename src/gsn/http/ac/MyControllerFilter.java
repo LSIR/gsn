@@ -62,7 +62,7 @@ public class MyControllerFilter implements Filter {
 
                 if ( ("/gsn".equals(req.getServletPath()) && requestType == 0)
                         || ("/multidata".equals(req.getServletPath()))
-                        || ("/fields".equals(req.getServletPath())) 
+                        || ("/field".equals(req.getServletPath())) 
                         ) {
                     chain.doFilter(requset, response);
                     return;
