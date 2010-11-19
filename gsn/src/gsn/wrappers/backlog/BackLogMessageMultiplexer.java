@@ -104,7 +104,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 					return blMulti;
 				}
 			} catch(Exception e) {
-				throw new IOException("Remote BackLog host string does not match >host:port<");
+				throw new IOException("Remote BackLog host string (" + coreStationAddress + ") does not match >host:port<");
 			}
     	}
     	else {
