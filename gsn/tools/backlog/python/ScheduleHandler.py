@@ -271,17 +271,6 @@ class ScheduleHandlerClass(Thread):
         else:
             self._logger.warning('gsn has not connected')
         
-        # if there is no schedule at all shutdown again and wait for next service window  
-        if not self._schedule:
-            if self._duty_cycle_mode and not self._beacon:
-                self._logger.warning('no schedule available at all -> shutdown')
-                stop = self._shutdown()
-            else:
-                self._logger.info('no schedule available yet -> waiting for a schedule')
-                self._scheduleEvent.wait()
-                if self._duty_cycle_mode and not self._schedule:
-                    stop = self._shutdown()
-        
         if self._duty_cycle_mode:
             lookback = True
         else:
@@ -289,16 +278,25 @@ class ScheduleHandlerClass(Thread):
         service_time = timedelta()
         while not stop and not self._stopped:
             self._max_job_runtime_min = int(self.getOptionValue('max_default_job_runtime_minutes'))
-            dtnow = datetime.utcnow() 
+            dtnow = datetime.utcnow()
             # get the next schedule(s) in time
             if not self._duty_cycle_mode:
                 self._scheduleLock.acquire()
-            t = time.time()
             nextschedules = self._schedule.getNextSchedules(dtnow, lookback)
-            self._logger.debug('next schedule: %f s' % (time.time() - t))
             lookback = False
             if not self._duty_cycle_mode:
                 self._scheduleLock.release()
+                
+            # if there is no schedule shutdown again and wait for next service window or wait for a schedule
+            if not nextschedules:
+                if self._duty_cycle_mode and not self._beacon:
+                    self._logger.warning('no schedule or empty schedule available -> shutdown')
+                    stop = self._shutdown()
+                else:
+                    self._logger.info('no schedule or empty schedule available -> waiting for a schedule')
+                    self._scheduleEvent.clear()
+                    self._scheduleEvent.wait()
+                    continue
             
             for schedule in nextschedules:
                 self._logger.debug('(' + str(schedule[0]) + ',' + str(schedule[1]) + ',' + str(schedule[2]) + ')')
@@ -424,7 +422,7 @@ class ScheduleHandlerClass(Thread):
                     self._schedule = sc
                     if not self._duty_cycle_mode:
                         self._scheduleLock.release()
-                    
+                        
                     self._logger.info('updated internal schedule with the one received from GSN.')
                    
                     # Write schedule to disk (the plaintext one for debugging and the parsed one for better performance)
@@ -436,18 +434,15 @@ class ScheduleHandlerClass(Thread):
                     pickle.dump(self._schedule, compiled_schedule_file)
                     compiled_schedule_file.close()
     
-                    self._logger.info('updated %s and %s with the current schedule' % (schedule_file.name, schedule_file.name+".parsed")) 
+                    self._logger.info('updated %s and %s with the current schedule' % (schedule_file.name, schedule_file.name+".parsed"))
                 except Exception, e:
                     self.error('received schedule can not be used: ' + str(e))
                     if self._schedule:
                         self._logger.info('using locally stored schedule file')
     
             if self._schedulereceived and not self._duty_cycle_mode:
-                if not self._schedule:
-                    return
-                else:
-                    self._newSchedule = True
-                    self._stopEvent.set()
+                self._newSchedule = True
+                self._stopEvent.set()
             
             self._schedulereceived = True
             self._scheduleEvent.set()
