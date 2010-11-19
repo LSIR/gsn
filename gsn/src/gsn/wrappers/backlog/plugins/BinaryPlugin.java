@@ -103,7 +103,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	protected String coreStationName = null;
 	
 	private CalculateChecksum calcChecksumThread;
-	protected BigBinarySender bigBinarySender;
+	protected BinarySender binarySender;
 
 	private boolean dispose = false;
 	
@@ -121,7 +121,7 @@ public class BinaryPlugin extends AbstractPlugin {
 			priority = Integer.valueOf(p);
 		
 		calcChecksumThread = new CalculateChecksum(this);
-		bigBinarySender = new BigBinarySender(this);
+		binarySender = new BinarySender(this);
 		
 		try {
 			rootBinaryDir = addressBean.getPredicateValueWithException(STORAGE_DIRECTORY);
@@ -193,9 +193,9 @@ public class BinaryPlugin extends AbstractPlugin {
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
-		bigBinarySender.dispose();
+		binarySender.dispose();
 		try {
-			bigBinarySender.join();
+			binarySender.join();
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -217,7 +217,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	public void run() {
         logger.info("thread started");
         
-		bigBinarySender.start();
+		binarySender.start();
 		calcChecksumThread.start();
 		long lastRecvPacketType = -1;
 		
@@ -238,7 +238,7 @@ public class BinaryPlugin extends AbstractPlugin {
 			if (dispose)
 				break;
 			
-			bigBinarySender.stopSending();
+			binarySender.stopSending();
         	
     		long filelen = -1;
     		// get packet type
@@ -280,7 +280,7 @@ public class BinaryPlugin extends AbstractPlugin {
     					folderdatetimefm = new SimpleDateFormat(datetimefm);
     				} catch (IllegalArgumentException e) {
     					logger.error("the received init packet does contain a mallformed date time format >" + datetimefm + "<! Please check your backlog configuration on the deployment -> drop this binary");
-    					bigBinarySender.requestNewBinary();
+    					binarySender.requestNewBinary();
     					continue;
     				}
     				
@@ -323,7 +323,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	    			    if (!f.exists()) {
 	    			    	if (!f.mkdirs()) {
 	    			    		logger.error("could not mkdir >" + datedir + "<  -> drop remote binary " + remoteBinaryName);
-	    			    		bigBinarySender.requestNewBinary();
+	    			    		binarySender.requestNewBinary();
 	    			    		continue;
 	    			    	}
 	    			    }
@@ -361,7 +361,7 @@ public class BinaryPlugin extends AbstractPlugin {
     				calculatedCRC.reset();
 				}
 				
-	    		bigBinarySender.sendInitAck();
+	    		binarySender.sendInitAck();
 			}
 			else if (pktType == CHUNK_PACKET) {
 				// get number of this chunk
@@ -380,7 +380,7 @@ public class BinaryPlugin extends AbstractPlugin {
 							fos = new FileOutputStream(file, true);
 						} catch (FileNotFoundException e) {
 							logger.warn(e.getMessage());
-							bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
+							binarySender.requestRetransmissionOfBinary(remoteBinaryName);
 							continue;
 						}
 						byte [] chunk = java.util.Arrays.copyOfRange(msg.getPacket(), 5, msg.getPacket().length);
@@ -407,13 +407,13 @@ public class BinaryPlugin extends AbstractPlugin {
 				else {
 					// we should never reach this point...
 					logger.error("received chunk number (received nr=" + chunknum + "/last nr=" + lastChunkNumber + ") out of order -> request binary retransmission");
-					bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
+					binarySender.requestRetransmissionOfBinary(remoteBinaryName);
 					continue;
 				}
 
 				lastChunkNumber = chunknum;
 
-	    		bigBinarySender.sendChunkAck(lastChunkNumber);
+	    		binarySender.sendChunkAck(lastChunkNumber);
 			}
 			else if (pktType == CRC_PACKET) {
 				long crc = arr2uint(msg.getPacket(), 1);
@@ -421,7 +421,7 @@ public class BinaryPlugin extends AbstractPlugin {
 				if (lastRecvPacketType == CRC_PACKET) {
 					if (logger.isDebugEnabled())
 						logger.debug("crc packet already received -> drop it");
-		    		bigBinarySender.sendCRCAck();
+		    		binarySender.sendCRCAck();
 				}
 				else {
 					if (logger.isDebugEnabled())
@@ -446,7 +446,7 @@ public class BinaryPlugin extends AbstractPlugin {
     								fin.close();
     							} catch (FileNotFoundException e) {
     								logger.warn(e.getMessage());
-    								bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
+    								binarySender.requestRetransmissionOfBinary(remoteBinaryName);
     								continue;
     							} catch (IOException e) {
     								logger.error(e.getMessage(), e);
@@ -482,17 +482,17 @@ public class BinaryPlugin extends AbstractPlugin {
     						
     						localBinaryName = null;
 
-    			    		bigBinarySender.sendCRCAck();
+    			    		binarySender.sendCRCAck();
     					}
     					else {
     						logger.warn("crc does not match (received=" + crc + "/calculated=" + calculatedCRC.getValue() + ") -> request binary retransmission");
-    						bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
+    						binarySender.requestRetransmissionOfBinary(remoteBinaryName);
     					}
     				}
     				else {
     					// we should never reach this point as well...
     					logger.error("binary length does not match (actual length=" + (new File(localBinaryName)).length() + "/should be=" + binaryLength + ") -> request binary retransmission (should never happen!)");
-						bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
+						binarySender.requestRetransmissionOfBinary(remoteBinaryName);
     				}
     			}
 			}
@@ -584,14 +584,14 @@ public class BinaryPlugin extends AbstractPlugin {
 			    	calcChecksumThread.newChecksum(localBinaryName);
 			    else {
 			    	logger.error("binary >" + localBinaryName + "< does not exist -> request retransmission");
-			    	bigBinarySender.requestRetransmissionOfBinary(remoteBinaryName);
+			    	binarySender.requestRetransmissionOfBinary(remoteBinaryName);
 			    }
 			} catch (Exception e) {
 		    	logger.error(e.getMessage() + " -> request new binary");
-				bigBinarySender.requestNewBinary();
+				binarySender.requestNewBinary();
 			}
 		} else {
-			bigBinarySender.requestNewBinary();
+			binarySender.requestNewBinary();
 		}
 	}
 
@@ -602,7 +602,7 @@ public class BinaryPlugin extends AbstractPlugin {
 			logger.debug("Connection lost");
 
 		msgQueue.clear();
-		bigBinarySender.stopSending();
+		binarySender.stopSending();
 	}
 }
 
@@ -688,7 +688,7 @@ class CalculateChecksum extends Thread {
 	        } catch (Exception e) {
 				// no good... -> ask for retransmission of the binary
 				parent.logger.error(e.getMessage(), e);
-				parent.bigBinarySender.requestRetransmissionOfBinary(parent.remoteBinaryName);
+				parent.binarySender.requestRetransmissionOfBinary(parent.remoteBinaryName);
 				continue;
 			}
 	        
@@ -697,7 +697,7 @@ class CalculateChecksum extends Thread {
 			if (parent.logger.isDebugEnabled())
 				parent.logger.debug("recalculated crc (" + parent.calculatedCRC.getValue() + ") from " + parent.localBinaryName);
 			
-			parent.bigBinarySender.resumeBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue()+1, parent.calculatedCRC.getValue());
+			parent.binarySender.resumeBinary(parent.remoteBinaryName, parent.downloadedSize, Long.valueOf(parent.configFile.getProperty(BinaryPlugin.PROPERTY_CHUNK_NUMBER)).longValue()+1, parent.calculatedCRC.getValue());
 		}
         
         parent.logger.info("thread stopped");
@@ -722,7 +722,7 @@ class CalculateChecksum extends Thread {
 	}
 }
 
-class BigBinarySender extends Thread
+class BinarySender extends Thread
 {
     private BinaryPlugin parent = null;
 	private boolean stopped = false;
@@ -730,8 +730,8 @@ class BigBinarySender extends Thread
 	private Object event = new Object();
 	private byte [] packet = null;
 	
-	BigBinarySender(BinaryPlugin plug) {
-		setName("BigBinarySender-" + plug.coreStationName + "-Thread");
+	BinarySender(BinaryPlugin plug) {
+		setName("BinarySender-" + plug.coreStationName + "-Thread");
 		parent = plug;
 	}
 	
