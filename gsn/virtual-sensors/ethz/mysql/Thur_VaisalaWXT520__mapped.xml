@@ -11,9 +11,9 @@
             <field name="WIND_DIRECTION_MINIMUM" type="VARCHAR(30)" unit="°"/>
             <field name="WIND_DIRECTION_AVERAGE" type="VARCHAR(30)" unit="°"/>
             <field name="WIND_DIRECTION_MAXIMUM" type="VARCHAR(30)" unit="°"/>
-            <field name="WINDE_SPEED_MINIMUM" type="VARCHAR(30)" unit="km/h"/>
-            <field name="WINDE_SPEED_AVERAGE" type="VARCHAR(30)" unit="km/h"/>
-            <field name="WINDE_SPEED_MAXIMUM" type="VARCHAR(30)" unit="km/h"/>
+            <field name="WIND_SPEED_MINIMUM" type="VARCHAR(30)" unit="km/h"/>
+            <field name="WIND_SPEED_AVERAGE" type="VARCHAR(30)" unit="km/h"/>
+            <field name="WIND_SPEED_MAXIMUM" type="VARCHAR(30)" unit="km/h"/>
             <field name="AIR_TEMPERATURE" type="VARCHAR(30)" unit="°C"/>
             <field name="INTERNAL_TEMPERATURE" type="VARCHAR(30)" unit="°C"/>
             <field name="RELATIVE_HUMIDITY" type="VARCHAR(30)" unit="%RH"/>
