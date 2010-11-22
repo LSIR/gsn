@@ -9,7 +9,6 @@ __source__      = "$URL$"
  
 import os
 import subprocess
-import traceback
 import sys
 import signal
 import ConfigParser
@@ -32,6 +31,7 @@ DEFAULT_OPTION_GSN_PORT = 9003
 DEFAULT_OPTION_BACKLOG_DB = '/tmp/backlog.db'
 DEFAULT_OPTION_BACKLOG_RESEND_SLEEP = 0.1
 DEFAULT_TOS_VERSION = 2
+DEFAULT_BACKLOG_DB_RESEND = 12
 
 class BackLogMainClass(Thread):
     '''
@@ -94,6 +94,7 @@ class BackLogMainClass(Thread):
         tos_address = None
         tos_version = None
         dutycyclemode = None
+        backlog_db_resend_hr = None
 
         # readout options from config
         for entry in config_options:
@@ -103,6 +104,8 @@ class BackLogMainClass(Thread):
                 gsn_port = int(value)
             elif name == 'backlog_db':
                 backlog_db = value
+            elif name == 'backlog_db_resend_hr':
+                backlog_db_resend_hr = int(value)
             elif name == 'device_id':
                 id = int(value)
             elif name == 'tos_source_addr':
@@ -127,6 +130,12 @@ class BackLogMainClass(Thread):
         self._logger.info('device_id: ' + str(id))
         self._logger.info('gsn_port: ' + str(gsn_port))
         self._logger.info('backlog_db: ' + backlog_db)
+                
+        if backlog_db_resend_hr == None:
+            backlog_db_resend_hr = DEFAULT_BACKLOG_DB_RESEND
+            self._logger.info('backlog_db_resend_hr is not set using default value: ' + str(backlog_db_resend_hr))
+        else:
+            self._logger.info('backlog_db_resend_hr: ' + str(backlog_db_resend_hr))
         
         if dutycyclemode is None:
             raise TypeError('duty_cycle_mode has to be specified in the configuration file')
@@ -141,7 +150,7 @@ class BackLogMainClass(Thread):
 
         self.gsnpeer = GSNPeerClass(self, id, gsn_port)
         self._logger.info('loaded GSNPeerClass')
-        self.backlog = BackLogDBClass(self, backlog_db)
+        self.backlog = BackLogDBClass(self, backlog_db, backlog_db_resend_hr)
         self._logger.info('loaded BackLogDBClass')
         
         self.tospeer = None
@@ -294,11 +303,13 @@ class BackLogMainClass(Thread):
         for plugin_entry in self.plugins:
             plugin_entry[1].connectionToGSNestablished()
         self.schedulehandler.connectionToGSNestablished()
+        self.backlog.connectionToGSNestablished()
         
     def connectionToGSNlost(self):
         # tell the plugins that the connection to GSN has been lost
         for plugin_entry in self.plugins:
             plugin_entry[1].connectionToGSNlost()
+        self.backlog.connectionToGSNlost()
             
 
 
@@ -334,10 +345,6 @@ class BackLogMainClass(Thread):
         return counter
 
 
-def sigillAction(signum, sigframe):
-    raise IOError('Signal handler called with signal ' + str(signum) + ': \n' + ''.join(traceback.format_stack(sigframe)))
-
-
 def main():
     parser = optparse.OptionParser('usage: %prog [options]')
     
@@ -362,7 +369,6 @@ def main():
     try:
         backlog = BackLogMainClass(options.config_file)
         backlog.start()
-        signal.signal(signal.SIGILL, sigillAction)
         signal.pause()
     except KeyboardInterrupt:
         logger.warning('KeyboardInterrupt')

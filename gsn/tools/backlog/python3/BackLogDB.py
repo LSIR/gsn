@@ -48,22 +48,19 @@ class BackLogDBClass(Thread):
     _counterlock
     _sleep
     _resend
+    _resendtimer
     _stopped
     '''
 
-    def __init__(self, parent, dbname):
+    def __init__(self, parent, dbname, backlog_db_resend_hr):
         '''
         Inititalizes the backlog database.
         
         @param parent: the BackLogMain object
         @param dbname: the name/path of the slite3 database used for backlogging.
             If it does not yet exist a new database will be created.
-        @param buffer_size: the in memory buffer size to be used as volatile backlog.
-            If the buffer reaches this limit, it will be written to the backlog
-            sqlite3 database. Setting it to 0 is equal to storing the message
-            directly to the sqlite3 database. Using this buffer can drastically
-            speed up the backlog functionality.
-        @param resend_sleep: time to sleep between resending messages.
+        @param backlog_db_resend_hr: countinous backlog database content resend
+            interval in hours.
         
         @raise Exception: if there is a problem with the sqlite3 database.
         '''
@@ -132,6 +129,8 @@ class BackLogDBClass(Thread):
     
         self._stopped = False
         self._sleep = False
+        
+        self._resendtimer = ResendTimer(backlog_db_resend_hr*3600, self.resend())
         
         self._logger.debug('database ' + self._dbname + ' ready to use')
         
@@ -250,6 +249,7 @@ class BackLogDBClass(Thread):
 
     def run(self):
         self._logger.info('started')
+        self._resendtimer.start()
         while not self._stopped:
             self._resend.wait()
             if self._stopped:
@@ -294,6 +294,14 @@ class BackLogDBClass(Thread):
             self._resend.clear()
 
         self._logger.info('died')
+        
+        
+    def connectionToGSNlost(self):
+        self._resendtimer.pause()
+        
+        
+    def connectionToGSNestablished(self):
+        self._resendtimer.resume()
 
 
     def __del__(self):
@@ -314,10 +322,67 @@ class BackLogDBClass(Thread):
         self._stopped = True
         self._resend.set()
         self._sleepEvent.set()
+        self._resendtimer.stop()
         self._logger.info('stopped')
         
         
     def exception(self, e):
         self._backlogMain.incrementExceptionCounter()
         self._logger.exception(e.__str__())
+
+
+
+class ResendTimer(Thread):
+    
+    '''
+    data/instance attributes:
+    _logger
+    _interval
+    _action
+    _wait
+    _timer
+    _stopped
+    '''
+    
+    def __init__(self, interval, action):
+        Thread.__init__(self)
+        self._logger = logging.getLogger(self.__class__.__name__)
+        self._interval = interval
+        self._action = action
+        self._wait = None
+        self._timer = Event()
+        self._stopped = False
+        
+           
+    def run(self):
+        self._logger.info('started')
+        # wait for first resume
+        self._timer.wait()
+        self._timer.clear()
+        while not self._stopped:
+            self._timer.wait(self._wait)
+            if self._timer.isSet():
+                self._timer.clear()
+                continue
+            self._action()
+            
+        self._logger.info('died')
+    
+    
+    def pause(self):
+        self._wait = None
+        self._timer.set()
+        self._logger.info('paused')
+    
+            
+    def resume(self):
+        self._wait = self._interval
+        self._timer.set()
+        self._logger.info('resumed')
+    
+    
+    def stop(self):
+        self._stopped = True
+        self._timer.set()
+        self._logger.info('stopped')
         
