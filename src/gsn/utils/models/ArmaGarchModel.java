@@ -20,10 +20,14 @@ public class ArmaGarchModel implements IModel {
 		this.stream = stream;
 		this.windowSize = windowSize;
 		this.errorBound = errorBound;
+        //System.out.println(""+windowSize);
+        //System.out.println(""+errorBound);
+
 	}
 
 
 	public boolean FitAndMarkDirty(double[] processed, double[] dirtyness) {
+        //System.out.println("FitAndMarkDirty @ ARMA_GARCH");
          boolean allClean = true;
 		//double [] predUVar = new double[stream.length+1];
 		//double [] predLVar = new double[stream.length+1];
@@ -41,8 +45,20 @@ public class ArmaGarchModel implements IModel {
 		// Sliding Window
 		double[] tseries = new double[windowSize];
 
+        /*
+        System.out.println("windowSIze => " +    windowSize);
+        for (double t:tseries) {
+				System.out.print(t+ ",");
+			}
+	    */
+
+        int j = stream.length-windowSize-1;
+        //System.out.println("j => "+j + " stream.length "+ stream.length);
+
 		for (int i = 0; i <= (stream.length-windowSize-1); i++){
 			int currIdx = i + windowSize;
+
+            //System.out.println("i => " + i);
 
 			System.arraycopy(stream, i, tseries, 0, windowSize);
 
