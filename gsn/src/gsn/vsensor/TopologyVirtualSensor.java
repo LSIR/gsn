@@ -277,7 +277,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				else if (node.isPowerSwitch()) {
 					node.setVsys(new Double((Integer)s)  * (2.5d / 4095d) * (8d/5d));
 				} 
-				else {
+				else if (node.isAccessNode()) {
 					node.setVsys(new Double((Integer)s)  * (3d / 4095d));
 				}
 			}
@@ -322,6 +322,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			s = data.getData(configuration[21]);
 			if (s instanceof Integer) {
 				if (node.isBBControl()) {
+					logger.debug("BBControl system voltage: "+(new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d))+"("+s+")");
 					node.setVsys(new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d));
 				}
 			}
