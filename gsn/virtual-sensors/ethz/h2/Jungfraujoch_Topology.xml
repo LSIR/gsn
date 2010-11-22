@@ -8,6 +8,7 @@
             <param name="timestamp-field">TIMESTAMP</param>
             <param name="generation-time-field">GENERATION_TIME</param>
             <param name="vsys-field">PAYLOAD_SYSVOLTAGE</param>
+            <param name="sdivoltage-field">PAYLOAD_SDIVOLTAGE</param>
             <param name="current-field">PAYLOAD_SIBCURRENT</param>
             <param name="temperature-field">PAYLOAD_TEMPERATURE</param>
             <param name="humidity-field">PAYLOAD_HUMIDITY</param>
