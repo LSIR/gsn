@@ -40,8 +40,10 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	private static final long NODE_CONFIGURABLE_TIME = 5 * 60000; // time until a node is not configurable anymore
 	private static final long NODE_CONFIGURE_TIMEOUT = 6 * 60000; // time to wait until configuration is resent
 	private static final long NODE_CONFIGURE_NEXT_TRY_TIMEOUT = 30000; // time to wait until next configuration enry is tried
-	public static final short EVENT_DATACONFIG = 40;
-	public static final short EVENT_PSB_POWER = 32;
+	private static final short EVENT_DATACONFIG = 40;
+	private static final short EVENT_PSB_POWER = 32;
+	private static final short EVENT_BB_POWER_OFF = 30;
+	private static final short EVENT_BB_POWER_ON = 31;
 	public static final short DATA_CONTROL_CMD = 1;
 	public static final short GUMSTIX_CTRL_CMD = 14;
 	public static final short DATA_CONTROL_NETWORK_FLAG = 0x400;
@@ -73,6 +75,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		"valid-field",
 		"powerswitch-p1-field",
 		"powerswitch-p2-field",
+		"sdivoltage-field",
 	};
 	
 	private static final String commandConfigurationParameter = "dozer-command-vs";
@@ -211,6 +214,9 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				notifyscheduler=true;
 				node_type = new Integer(node.nodetype);
 			}
+			else if (event_id == EVENT_BB_POWER_ON || event_id == EVENT_BB_POWER_OFF) {
+				node.setBBControl();
+			}
 			// do not count events to packets
 		}
 		else {
@@ -313,6 +319,12 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			s = data.getData(configuration[9]);
 			if (s instanceof Integer)
 				node.uptime = (Integer)s;
+			s = data.getData(configuration[21]);
+			if (s instanceof Integer) {
+				if (node.isBBControl()) {
+					node.setVsys(new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d));
+				}
+			}
 		}
 		}
 		// remove outdated information
