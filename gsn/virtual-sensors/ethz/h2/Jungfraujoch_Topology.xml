@@ -157,7 +157,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_PARENTID, PAYLOAD_SYSVOLTAGE, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY, PAYLOAD_SIBCURRENT, PAYLOAD_FLASHSTATUS, PAYLOAD_UPTIME
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_PARENTID, PAYLOAD_SYSVOLTAGE, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY, PAYLOAD_SIBCURRENT, PAYLOAD_FLASHSTATUS, PAYLOAD_UPTIME, PAYLOAD_SDIVOLTAGE
             from jungfraujoch_dozer_nodehealth__1950
           </predicate>
         </address>
