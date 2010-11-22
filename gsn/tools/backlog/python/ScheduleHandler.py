@@ -279,13 +279,16 @@ class ScheduleHandlerClass(Thread):
         while not stop and not self._stopped:
             self._max_job_runtime_min = int(self.getOptionValue('max_default_job_runtime_minutes'))
             dtnow = datetime.utcnow()
-            # get the next schedule(s) in time
-            if not self._duty_cycle_mode:
-                self._scheduleLock.acquire()
-            nextschedules = self._schedule.getNextSchedules(dtnow, lookback)
-            lookback = False
-            if not self._duty_cycle_mode:
-                self._scheduleLock.release()
+            
+            nextschedules = None
+            if self._schedule:
+                # get the next schedule(s) in time
+                if not self._duty_cycle_mode:
+                    self._scheduleLock.acquire()
+                nextschedules = self._schedule.getNextSchedules(dtnow, lookback)
+                lookback = False
+                if not self._duty_cycle_mode:
+                    self._scheduleLock.release()
                 
             # if there is no schedule shutdown again and wait for next service window or wait for a schedule
             if not nextschedules:
