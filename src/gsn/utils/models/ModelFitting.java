@@ -119,7 +119,6 @@ public class ModelFitting {
         return v;
     }
 
-    //TODO: *************
     // data file, model, window, error, duration, rmse, anomalies
     static void appendOutputFile(String outputFile,
                                  String datafile, int model, int window, double error,
@@ -127,7 +126,7 @@ public class ModelFitting {
         FileWriter fstream = new FileWriter(outputFile,true);
         BufferedWriter out = new BufferedWriter(fstream);
         StringBuilder sb = new StringBuilder();
-        sb.append("\"").append(outputFile).append("\", ")
+        sb.append("\"").append(datafile).append("\", ")
                 .append(model).append(", ").append(window).append(", ").append(error).append(", ")
                 .append(rmse).append(", ").append(duration).append(", ").append(anomalies).append("\n");
 
@@ -138,13 +137,6 @@ public class ModelFitting {
     }
 
 
-    /*
-
-     ./clean.bat scripts/table1_wind_direction.csv scripts/table1_timed.csv 1 5 0.4 3 out.txt
-
-     ant datacleanbatch -Ddatafile=%1 -Dtimedfile=%2 -Dmodel=%3 -Dwindow=%4 -Derror=%5 -Doutfile=%6
-
-     */
     public static void main(String[] argv) throws IOException {
         //System.out.println(">>>>>>>> " + argv.length);
         if (argv.length < 6) {
@@ -230,24 +222,8 @@ public class ModelFitting {
         System.out.println("RMSE = " + RMSE);
         System.out.println("Anomalies = " + n_anomalies);
 
-        /*
-
-        (String outputFile,
-                                 String datafile, int model, int window, double error,
-                                 double rmse, long duration, long anomalies)
-
-        * */
-
         appendOutputFile(outfile, datafile, model, window, error, RMSE, startTime, n_anomalies);
 
-        //long cursor
-
-        /*
-
-
-
-
-
-        */
+       System.exit(0); // force exit, necessary for REngine 
     }
 }

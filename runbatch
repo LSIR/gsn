@@ -27,8 +27,6 @@ export LD_LIBRARY_PATH
 export CLASSPATH=${JAVA_CLASSPATH}
 
 ant datacleanbatch -Ddatafile=$1 -Dtimedfile=$2 -Dmodel=$3 -Dwindow=$4 -Derror=$5 -Doutfile=$6
-#ant modelfit
-#  ./clean.bat scripts/table1_wind_direction.csv scripts/table1_timed.csv 1 5 0.4 out.txt
 
-#  ant datacleanbatch -Ddatafile=%1 -Dtimedfile=%2 -Dmodel=%3 -Dwindow=%4 -Derror=%5 -Doutfile=out.txt
-
+# example of call:
+# ./runbatch scripts/table2_wind_direction.csv scripts/table2_timed.csv 1 5 0.4 out.txt
