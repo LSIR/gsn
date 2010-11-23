@@ -536,6 +536,7 @@ class GSNWriter(Thread):
         self._gsnListener = parent
         self._sendqueue = queue.PriorityQueue(SEND_QUEUE_SIZE)
         self._work = Event()
+        self._lock = Lock()
         self._stuff = STUFFING_BYTE
         self._dblstuff = self._stuff + self._stuff
         self._stopped = False
@@ -550,10 +551,12 @@ class GSNWriter(Thread):
             self._work.clear()
             # is there something to do?
             while self._gsnListener._connected and not self._sendqueue.empty() and not self._stopped:
+                self._lock.acquire()
                 try:
                     msg = self._sendqueue.get_nowait()[1]
                 except queue.Empty:
                     self._logger.warning('send queue is empty')
+                    self._lock.release()
                     break
             
                 if msg.__class__.__name__ != BackLogMessage.__name__ + 'Class':
@@ -570,11 +573,20 @@ class GSNWriter(Thread):
                     else:
                         self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
                 except (IOError, socket.error) as e:
+                    try:
+                        self._sendqueue.task_done()
+                    except ValueError as e:
+                        self.error(e)
+                    self._lock.release()
                     if not self._stopped:
                         self._gsnListener.disconnect() # sets connected to false
                         self._logger.exception(e.__str__())                  
-                finally:
-                    self._sendqueue.task_done()
+                else:
+                    try:
+                        self._sendqueue.task_done()
+                    except ValueError as e:
+                        self.error(e)
+                    self._lock.release()
  
         self._logger.info('died')
         
@@ -598,13 +610,18 @@ class GSNWriter(Thread):
 
 
     def emptyQueue(self):
+        self._lock.acquire()
         while not self._sendqueue.empty():
             try:
                 self._sendqueue.get_nowait()
-                self._sendqueue.task_done()
             except queue.Empty:
                 self._logger.warning('send queue is empty (emptyQueue)')
                 break
+            try:
+                self._sendqueue.task_done()
+            except ValueError as e:
+                self.error(e)
+        self._lock.release()
 
 
     def addMsg(self, msg, priority):
@@ -630,4 +647,9 @@ class GSNWriter(Thread):
             self._work.set()
             return True
         return False
+
+
+    def error(self, error):
+        self._gsnListener._gsnPeer._backlogMain.incrementErrorCounter()
+        self._logger.error(error)
     
