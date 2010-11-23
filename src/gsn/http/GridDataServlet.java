@@ -16,6 +16,9 @@ import java.util.zip.*;
 
 public class GridDataServlet extends HttpServlet {
 
+    private final static int REQUEST_TIMESERIES = 1;
+    private static final int REQUEST_DEFAULT = 0;
+
     private static transient Logger logger = Logger.getLogger(GridDataServlet.class);
     private static final String DEFAULT_TIMEFORMAT = "yyyyMMddHHmmss";
 
@@ -31,6 +34,7 @@ public class GridDataServlet extends HttpServlet {
         }
         */
 
+        String request_type = HttpRequestUtils.getStringParameter("request", null, request);
         String sensor = HttpRequestUtils.getStringParameter("sensor", null, request);
         String from = HttpRequestUtils.getStringParameter("from", null, request);
         String to = HttpRequestUtils.getStringParameter("to", null, request);
@@ -39,16 +43,19 @@ public class GridDataServlet extends HttpServlet {
         String timeformat = HttpRequestUtils.getStringParameter("timeformat", null, request);
         String view = HttpRequestUtils.getStringParameter("view", null, request); // files or stream
 
-        response.getWriter().write("sensor: " + sensor + "\n");
-        response.getWriter().write("from: " + from + "\n");
-        response.getWriter().write("to: " + to + "\n");
-        response.getWriter().write("xcol: " + to + "\n");
-        response.getWriter().write("ycol: " + to + "\n");
-        response.getWriter().write("timeformat: " + to + "\n");
-        response.getWriter().write("view: " + to + "\n");
+        response.getWriter().write("# request type: " + request_type + "\n");
+        response.getWriter().write("# sensor: " + sensor + "\n");
+        response.getWriter().write("# from: " + from + "\n");
+        response.getWriter().write("# to: " + to + "\n");
+        response.getWriter().write("# xcol: " + xcol + "\n");
+        response.getWriter().write("# ycol: " + ycol + "\n");
+        response.getWriter().write("# timeformat: " + timeformat + "\n");
+        response.getWriter().write("# view: " + view + "\n");
 
-        response.getWriter().write(executeQuery("select * from " + sensor));
-
+        if ((from != null) && (to != null))
+            response.getWriter().write(executeQuery("select * from " + sensor + " where timed >= " + from + " and timed <= " + to));
+        else
+            response.getWriter().write(executeQuery("select * from " + sensor));
 
         /*
         for (String vsName : sensors) {
@@ -65,8 +72,7 @@ public class GridDataServlet extends HttpServlet {
         doGet(request, res);
     }
 
-    public String executeQuery(String query) {
-
+    public String executeQuery(String query, int mode) {
         Connection connection = null;
         StringBuilder sb = new StringBuilder();
 
@@ -85,7 +91,6 @@ public class GridDataServlet extends HttpServlet {
 
             // headers
             sb.append("# Query: " + query + "\n");
-            sb.append("# ");
 
             byte typ[] = new byte[numCols];
             String columnLabel[] = new String[numCols];
@@ -120,6 +125,11 @@ public class GridDataServlet extends HttpServlet {
         }
 
         return sb.toString();
+    }
+
+    public String executeQuery(String query) {
+        return executeQuery(query, REQUEST_DEFAULT);
+
     }
 
     private String deserialize(byte[] bytes) {
@@ -186,7 +196,7 @@ public class GridDataServlet extends HttpServlet {
         byte[] buf = new byte[1024];
 
         try {
-            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(folder+"/"+outFilename));
+            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(folder + "/" + outFilename));
 
             for (int i = 0; i < filenames.length; i++) {
                 FileInputStream fileInputStream = new FileInputStream(filenames[i]);
