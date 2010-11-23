@@ -117,7 +117,7 @@ class Serial:
 
     def getByte(self):
         c = self._s.read()
-        if c == '':
+        if not c:
             raise Timeout
         #print 'Serial:getByte: 0x%02x' % ord(c)
         return ord(c)
