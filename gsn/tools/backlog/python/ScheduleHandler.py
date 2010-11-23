@@ -102,7 +102,6 @@ class ScheduleHandlerClass(Thread):
     _allJobsFinishedEvent
     _jobsObserver
     _gsnconnected
-    _schedulereceived
     _schedule
     _newSchedule
     _duty_cycle_mode
@@ -166,7 +165,6 @@ class ScheduleHandlerClass(Thread):
         
         self._jobsObserver = JobsObserver(self)
         self._gsnconnected = False
-        self._schedulereceived = False
         self._schedule = None
         self._newSchedule = False
         self._stopped = False
@@ -276,6 +274,8 @@ class ScheduleHandlerClass(Thread):
         else:
             lookback = False
         service_time = timedelta()
+        self._newSchedule = False
+        self._stopEvent.clear()
         while not stop and not self._stopped:
             self._max_job_runtime_min = int(self.getOptionValue('max_default_job_runtime_minutes'))
             dtnow = datetime.utcnow()
@@ -283,12 +283,10 @@ class ScheduleHandlerClass(Thread):
             nextschedules = None
             if self._schedule:
                 # get the next schedule(s) in time
-                if not self._duty_cycle_mode:
-                    self._scheduleLock.acquire()
+                self._scheduleLock.acquire()
                 nextschedules = self._schedule.getNextSchedules(dtnow, lookback)
                 lookback = False
-                if not self._duty_cycle_mode:
-                    self._scheduleLock.release()
+                self._scheduleLock.release()
                 
             # if there is no schedule shutdown again and wait for next service window or wait for a schedule
             if not nextschedules:
@@ -404,53 +402,46 @@ class ScheduleHandlerClass(Thread):
         Try to interpret a new received Config-Message from GSN
         '''
 
-        if not self._schedulereceived or not self._duty_cycle_mode:
-            # Is the Message filled with content or is it just an emty response?
-            pktType = struct.unpack('B', message[0])[0]
-            if pktType == GSN_TYPE_NO_SCHEDULE_AVAILABLE:
-                self._logger.info('GSN has no schedule available')
-            elif pktType == GSN_TYPE_SCHEDULE_SAME:
-                self._logger.info('no new schedule from GSN')
-            elif pktType == GSN_TYPE_NEW_SCHEDULE:
-                self._logger.info('new schedule from GSN received')
-                # Get the schedule creation time
-                creationtime = struct.unpack('<q', message[1:9])[0]
-                self._logger.debug('creation time: ' + str(creationtime))
-                # Get the schedule
-                schedule = message[9:]
-                try:
-                    sc = ScheduleCron(creationtime, fake_tab=schedule)
-                    if not self._duty_cycle_mode:
-                        self._scheduleLock.acquire()   
-                    self._schedule = sc
-                    if not self._duty_cycle_mode:
-                        self._scheduleLock.release()
-                        
-                    self._logger.info('updated internal schedule with the one received from GSN.')
-                   
-                    # Write schedule to disk (the plaintext one for debugging and the parsed one for better performance)
-                    schedule_file = open(self.getOptionValue('schedule_file'), 'w')
-                    schedule_file.write(schedule)
-                    schedule_file.close()
-                
-                    compiled_schedule_file = open(self.getOptionValue('schedule_file')+'.parsed', 'w')
-                    pickle.dump(self._schedule, compiled_schedule_file)
-                    compiled_schedule_file.close()
-    
-                    self._logger.info('updated %s and %s with the current schedule' % (schedule_file.name, schedule_file.name+".parsed"))
-                except Exception, e:
-                    self.error('received schedule can not be used: ' + str(e))
-                    if self._schedule:
-                        self._logger.info('using locally stored schedule file')
-    
-            if self._schedulereceived and not self._duty_cycle_mode:
-                self._newSchedule = True
-                self._stopEvent.set()
+        # Is the Message filled with content or is it just an emty response?
+        pktType = struct.unpack('B', message[0])[0]
+        if pktType == GSN_TYPE_NO_SCHEDULE_AVAILABLE:
+            self._logger.info('GSN has no schedule available')
+        elif pktType == GSN_TYPE_SCHEDULE_SAME:
+            self._logger.info('no new schedule from GSN')
+        elif pktType == GSN_TYPE_NEW_SCHEDULE:
+            self._logger.info('new schedule from GSN received')
+            # Get the schedule creation time
+            creationtime = struct.unpack('<q', message[1:9])[0]
+            self._logger.debug('creation time: ' + str(creationtime))
+            # Get the schedule
+            schedule = message[9:]
+            try:
+                sc = ScheduleCron(creationtime, fake_tab=schedule)
+                self._scheduleLock.acquire()   
+                self._schedule = sc
+                self._scheduleLock.release()
+                    
+                self._logger.info('updated internal schedule with the one received from GSN.')
+               
+                # Write schedule to disk (the plaintext one for debugging and the parsed one for better performance)
+                schedule_file = open(self.getOptionValue('schedule_file'), 'w')
+                schedule_file.write(schedule)
+                schedule_file.close()
             
-            self._schedulereceived = True
-            self._scheduleEvent.set()
-        else:
-            self._logger.info('schedule already received')
+                compiled_schedule_file = open(self.getOptionValue('schedule_file')+'.parsed', 'w')
+                pickle.dump(self._schedule, compiled_schedule_file)
+                compiled_schedule_file.close()
+
+                self._logger.info('updated %s and %s with the current schedule' % (schedule_file.name, schedule_file.name+".parsed"))
+            except Exception, e:
+                self.error('received schedule can not be used: ' + str(e))
+                if self._schedule:
+                    self._logger.info('using locally stored schedule file')
+
+            self._newSchedule = True
+            self._stopEvent.set()
+            
+        self._scheduleEvent.set()
             
             
     def tosMsgReceived(self, timestamp, payload):
