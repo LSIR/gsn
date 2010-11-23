@@ -1,0 +1,6 @@
+# stream  min max size
+wind_speed     0  12  12
+wind_direction 0 360 360
+rain_meter     0   1   1
+air_temp     -12 124 136
+air_humid     13 125 112
