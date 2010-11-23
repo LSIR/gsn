@@ -495,7 +495,7 @@ class ScheduleHandlerClass(Thread):
             # wait for jobs to finish
             if not self._allJobsFinishedEvent.isSet():
                 self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(self._max_job_runtime_min) + ' minutes')
-                self._allJobsFinishedEvent.wait(1+(self._max_job_runtime_min*60))
+                self._allJobsFinishedEvent.wait(2*JOB_PROCESS_CHECK_INTERVAL_SECONDS+(self._max_job_runtime_min*60))
                 if self._stopped:
                     return True
                 if not self._allJobsFinishedEvent.isSet():
