@@ -19,8 +19,6 @@ DEFAULT_BACKLOG = True
 
 SEND_QUEUE_SIZE = 25
 
-DEBUG = False
-
 class TOSPeerClass(Thread):
     '''
     Offers the functionality to communicate with a node running TOS.
@@ -46,11 +44,11 @@ class TOSPeerClass(Thread):
             try:
                 # try to open a connection to the specified serial port
                 if version == 2:
-                    serial = tos.getSource(address, DEBUG)
+                    serial = tos.getSource(address)
                     serial.setTimeout(5)
                     self._serialsource = tos.AM(serial)
                 elif version == 1:
-                    serial = tos1x.getSource(address, DEBUG)
+                    serial = tos1x.getSource(address)
                     serial.setTimeout(5)
                     self._serialsource = tos1x.AM(serial)
             except Exception, e:

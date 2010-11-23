@@ -40,6 +40,7 @@ tries to simplifies the work with arbitrary packets.
 """
 
 import sys, struct, time, socket, operator, os
+import logging
 import array
 import traceback
 from threading import Thread, Event, Lock
@@ -76,19 +77,19 @@ def list2hex(v):
 class Timeout(Exception):
     pass
 
-def getSource(comm, debug=False):
+def getSource(comm):
     source = comm.split('@')
     params = source[1].split(':')
 #    debug = '--debug' in sys.argv
     if source[0] == 'serial':
         try:
-            return Serial(params[0], int(params[1]), flush=True, debug=debug)
+            return Serial(params[0], int(params[1]), flush=True)
         except:
             print "ERROR: Unable to initialize a serial connection to", comm
             raise Exception
     elif source[0] == 'network':
         try:
-            return SerialMIB600(params[0], int(params[1]), debug=debug)
+            return SerialMIB600(params[0], int(params[1]))
         except:
             print "ERROR: Unable to initialize a network connection to", comm
             print "ERROR:", traceback.format_exc()
@@ -96,8 +97,9 @@ def getSource(comm, debug=False):
     raise Exception
 
 class Serial:
-    def __init__(self, port, baudrate, flush=False, debug=False, readTimeout=None, ackTimeout=0.02):
-        self.debug = debug
+    def __init__(self, port, baudrate, flush=False, readTimeout=None, ackTimeout=0.02):
+        self._logger = logging.getLogger(self.__class__.__name__)
+        
         self.readTimeout = readTimeout
         self.ackTimeout = ackTimeout
         self._ts = None
@@ -105,13 +107,12 @@ class Serial:
         self._s = serial.Serial(port, int(baudrate), rtscts=0, timeout=0.5)
         self._s.flushInput()
         if flush:
-            print >>sys.stdout, "Flushing the serial port",
+            self._logger.info("Flushing the serial port")
             endtime = time.time() + 1
             while time.time() < endtime:
                 self._s.read()
                 sys.stdout.write(".")
-            if not self.debug:
-                sys.stdout.write("\n")
+            sys.stdout.write("\n")
         self._s.close()
         self._s = serial.Serial(port, baudrate, rtscts=0, timeout=readTimeout)
 
@@ -136,14 +137,14 @@ class Serial:
         self._s.close()
 
 class SerialMIB600:
-    def __init__(self, host, port=10002, debug=False, readTimeout=None, ackTimeout=0.5):
-        self.debug = debug
+    def __init__(self, host, port=10002, readTimeout=None, ackTimeout=0.5):
+        self._logger = logging.getLogger(self.__class__.__name__)
         self.readTimeout = readTimeout
         self.ackTimeout = ackTimeout
         self._ts = None
         self._s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._s.connect((host, port))
-        print "Connected"
+        self._logger.info("Connected")
 
     def getByte(self):
         try:
@@ -175,6 +176,7 @@ class HDLC:
     source using a HDLC-like formating.
     """
     def __init__(self, source):
+        self._logger = logging.getLogger(self.__class__.__name__)
         self._s = source
         self._stopped = False
 
@@ -204,7 +206,7 @@ class HDLC:
         #
 
         if self._s.getTimeout() != timeout and timeout != None:
-            self.log("Set the timeout to %s, previous one was %s" % (timeout, self._s.getTimeout()))
+            self._logger.debug("Set the timeout to %s, previous one was %s" % (timeout, self._s.getTimeout()))
             self._s.setTimeout(timeout)
 
         #    +--- FLAG -----+
@@ -233,10 +235,10 @@ class HDLC:
             d = self._s.getByte()
             ts = time.time()
             if d != HDLC_FLAG_BYTE:
-                self.log("Skipping byte %d" % d)
+                self._logger.debug("Skipping byte %d" % d)
                 while d != HDLC_FLAG_BYTE and not self._stopped:
                     d = self._s.getByte()
-                    self.log("Skipping byte %d" % d)
+                    self._logger.debug("Skipping byte %d" % d)
                     ts = time.time()
 
             # Store HDLC_FLAG_BYTE at the start of the retrieved packet
@@ -260,7 +262,7 @@ class HDLC:
                 packet.append(d)
 
             # Done reading a whole packet from serial
-            self.log("SimpleSerial:_read: unescaped %s" % packet)
+            self._logger.debug("SimpleSerial:_read: unescaped %s" % packet)
 
             # Decode the packet, and check CRC:
             packet = self._unescape(packet)
@@ -269,11 +271,11 @@ class HDLC:
             packet_crc = self._decode(packet[-3:-1])
 
             if crc != packet_crc:
-                print "Warning: wrong CRC! %x != %x %s" % (crc, packet_crc, ["%2x" % i for i in packet])
+                self._logger.warning("Warning: wrong CRC! %x != %x %s" % (crc, packet_crc, ["%2x" % i for i in packet]))
                 return None
             if not self._s._ts:
                 self._s._ts = ts
-            self.log("Serial:_read: %.4f (%.4f) Recv: %s" % (ts, ts - self._s._ts, self._format(packet[1:-3])))
+            self._logger.debug("Serial:_read: %.4f (%.4f) Recv: %s" % (ts, ts - self._s._ts, self._format(packet[1:-3])))
             self._ts = ts
 
             # Packet was successfully retrieved, so return it in a
@@ -306,7 +308,7 @@ class HDLC:
         packet.append((crc >> 8) & 0xff)
         packet = [HDLC_FLAG_BYTE] + self._escape(packet) + [HDLC_FLAG_BYTE]
 
-        self.log("Serial: write %s" % packet)
+        self._logger.debug("Serial: write %s" % packet)
         self._s.putBytes(packet)
         
     def sendAck(self, seqno):
@@ -320,7 +322,7 @@ class HDLC:
         packet.append((crc >> 8) & 0xff)
         packet = [HDLC_FLAG_BYTE] + self._escape(packet) + [HDLC_FLAG_BYTE]
 
-        self.log("Serial: write ACK %s" % packet)
+        self._logger.debug("Serial: write ACK %s" % packet)
         self._s.putBytes(packet)
 
     def _format(self, payload):
@@ -384,15 +386,12 @@ class HDLC:
                 r.append(b)
         return r
 
-    def log(self, s):
-        if self._s.debug:
-            print s
-
     def stop(self):
         self._stopped = True
 
 class SimpleAM(Thread):
     def __init__(self, source, oobHook=None):
+        self._logger = logging.getLogger(self.__class__.__name__)
         self._lastseqno = -1
         self._source = source
         self._hdlc = HDLC(source)
@@ -416,25 +415,25 @@ class SimpleAM(Thread):
             if p.protocol == SERIAL_PROTO_ACK:
                 self._AckLock.acquire()
                 if self._AckPacket:
-                    print "WARN: unhandled ACK frame."
+                    self._logger.warning("WARN: unhandled ACK frame.")
                 self._AckPacket = AckFrame(f)
                 self._AckEvent.set()
                 self._AckLock.release()
             elif p.protocol == SERIAL_PROTO_PACKET_ACK:
                 self._DataLock.acquire()
                 if self._DataPacket:
-                    print "WARN: unhandled PACKET_ACK frame."
+                    self._logger.warning("WARN: unhandled PACKET_ACK frame.")
                 self._DataPacket = DataFrame(f)
                 self._DataEvent.set()
                 self._DataLock.release()
             elif p.protocol == SERIAL_PROTO_PACKET_NOACK:
                 self._DataLock.acquire()
                 if self._DataPacket:
-                    print "WARN: unhandled PACKET_NOACK frame."
+                    self._logger.warning("WARN: unhandled PACKET_NOACK frame.")
                 self._DataPacket = NoAckDataFrame(f)
                 self._DataEvent.set()
                 self._DataLock.release()
-        print "SimpleAM - died"
+        self._logger.info("SimpleAM - died")
 
     def readAck(self, timeout=None):
         p = None
@@ -494,7 +493,7 @@ class SimpleAM(Thread):
         self._DataEvent.set()
         self._hdlc.stop()
         self._source.close()
-        print "SimpleAM - stopped"
+        self._logger.info("SimpleAM - stopped")
 
 def printfHook(packet):
     if packet == None:
@@ -503,12 +502,13 @@ def printfHook(packet):
         s = "".join([chr(i) for i in packet.data]).strip('\0')
         lines = s.split('\n')
         for line in lines:
-            if line: print "PRINTF:", line
+            if line: self._logger.info("PRINTF:", line)
         #packet = None # No further processing for the printf packet
     return packet    
 
 class AM(SimpleAM):
     def __init__(self, s=None, oobHook=None):
+        self._logger = logging.getLogger(self.__class__.__name__)
         if s == None:
             try:
                 s = getSource(sys.argv[1])
@@ -523,7 +523,7 @@ class AM(SimpleAM):
                     try:
                         s = getSource(os.environ['MOTECOM'])
                     except:
-                        print "ERROR: Please indicate a way to connect to the mote"
+                        self._logger.error("Please indicate a way to connect to the mote")
                         sys.exit(-1)
         if oobHook == None:
             oobHook = printfHook

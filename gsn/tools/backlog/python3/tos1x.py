@@ -40,6 +40,7 @@ tries to simplifies the work with arbitrary packets.
 """
 
 import sys, struct, time, socket, operator, os
+import logging
 import array
 import traceback
 from threading import Thread, Event, Lock
