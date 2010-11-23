@@ -130,7 +130,7 @@ class BackLogDBClass(Thread):
         self._stopped = False
         self._sleep = False
         
-        self._resendtimer = ResendTimer(backlog_db_resend_hr*3600, self.resend())
+        self._resendtimer = ResendTimer(backlog_db_resend_hr*3600, self.resend)
         
         self._logger.debug('database ' + self._dbname + ' ready to use')
         
