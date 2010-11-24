@@ -230,7 +230,8 @@ class ScheduleHandlerClass(Thread):
             min += int(self.getOptionValue('max_plugins_finish_wait_minutes'))
             min += int(self.getOptionValue('max_default_job_runtime_minutes'))
             min += int(self.getOptionValue('hard_shutdown_offset_minutes'))
-            td = timedelta(minutes=min)
+            sec = int(self.getOptionValue('approximate_startup_seconds'))
+            td = timedelta(minutes=min, seconds=sec)
             safety_schedule = self._schedule.getNextSchedules(datetime.utcnow() + td)[0]
             self._scheduleNextDutyWakeup(safety_schedule[0] - datetime.utcnow(), safety_schedule[1])
             
@@ -526,13 +527,16 @@ class ScheduleHandlerClass(Thread):
             # Synchronize Service Wakeup Time
             time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
             time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
+            if time_to_service < 0-int(self.getOptionValue('approximate_startup_seconds')):
+                time_to_service += 86400
             self._logger.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
             self._tosMessageHandler.addMsg(CMD_SERVICE_WINDOW, argument=time_to_service)
             self._logger.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
     
             # Schedule next duty wakeup
             if self._schedule:
-                next_schedule = self._schedule.getNextSchedules(datetime.utcnow())[0]
+                td = timedelta(seconds=int(self.getOptionValue('approximate_startup_seconds')))
+                next_schedule = self._schedule.getNextSchedules(datetime.utcnow() + td)[0]
                 self._logger.info('schedule next duty wakeup')
                 self._scheduleNextDutyWakeup(next_schedule[0] - datetime.utcnow(), next_schedule[1])
                     
