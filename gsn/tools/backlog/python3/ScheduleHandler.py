@@ -250,7 +250,7 @@ class ScheduleHandlerClass(Thread):
             timeout = 0
             self._logger.info('waiting for gsn to answer a schedule request for a maximum of ' + self.getOptionValue('max_gsn_get_schedule_wait_minutes') + ' minutes')
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
-                self._logger.info('request schedule from gsn')
+                self._logger.debug('request schedule from gsn')
                 if self._schedule:
                     self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY, False)
                 else:
