@@ -38,24 +38,49 @@ public class GridDataServlet extends HttpServlet {
         String sensor = HttpRequestUtils.getStringParameter("sensor", null, request);
         String from = HttpRequestUtils.getStringParameter("from", null, request);
         String to = HttpRequestUtils.getStringParameter("to", null, request);
-        String xcol = HttpRequestUtils.getStringParameter("xcol", null, request);
-        String ycol = HttpRequestUtils.getStringParameter("ycol", null, request);
+        String str_xcol = HttpRequestUtils.getStringParameter("xcol", null, request);
+        String str_ycol = HttpRequestUtils.getStringParameter("ycol", null, request);
         String timeformat = HttpRequestUtils.getStringParameter("timeformat", null, request);
         String view = HttpRequestUtils.getStringParameter("view", null, request); // files or stream
 
-        response.getWriter().write("# request type: " + request_type + "\n");
+        Integer reqtype = null;
+        try {
+            reqtype = Integer.parseInt(request_type);
+        }
+        catch (NumberFormatException e) {
+            reqtype = 0;
+            logger.warn("request type missing or wrongly formatted, assumming deafalut request type (0)");
+        }
+
+        response.getWriter().write("# request type: " + reqtype + "\n");
         response.getWriter().write("# sensor: " + sensor + "\n");
         response.getWriter().write("# from: " + from + "\n");
         response.getWriter().write("# to: " + to + "\n");
-        response.getWriter().write("# xcol: " + xcol + "\n");
-        response.getWriter().write("# ycol: " + ycol + "\n");
+        response.getWriter().write("# xcol: " + str_xcol + "\n");
+        response.getWriter().write("# ycol: " + str_ycol + "\n");
         response.getWriter().write("# timeformat: " + timeformat + "\n");
         response.getWriter().write("# view: " + view + "\n");
 
+        String timeBounds = "";
         if ((from != null) && (to != null))
-            response.getWriter().write(executeQuery("select * from " + sensor + " where timed >= " + from + " and timed <= " + to));
-        else
-            response.getWriter().write(executeQuery("select * from " + sensor));
+            timeBounds = " where timed >= " + from + " and timed <= " + to;
+
+        if (reqtype == REQUEST_TIMESERIES) {
+            Integer xcol = null;
+            Integer ycol = null;
+            try {
+                xcol = Integer.parseInt(str_xcol);
+                ycol = Integer.parseInt(str_ycol);
+            }
+            catch (NumberFormatException e) {
+                logger.warn("Error in parsing xcol, ycol");
+            }
+            if ((xcol != null) && (ycol != null))
+                response.getWriter().write(getTimeSeries("select grid from " + sensor + timeBounds, xcol, ycol));
+            else
+                response.getWriter().write("Error: xcol, ycol are wrong or missing");
+        } else
+            response.getWriter().write(executeQuery("select * from " + sensor + timeBounds));
 
         /*
         for (String vsName : sensors) {
@@ -132,6 +157,61 @@ public class GridDataServlet extends HttpServlet {
 
     }
 
+    public String getTimeSeries(String query, int xcol, int ycol) {
+        Connection connection = null;
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            connection = Main.getDefaultStorage().getConnection();
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet results = statement.executeQuery(query);
+            ResultSetMetaData metaData;    // Additional information about the results
+            int numCols, numRows;          // How many rows and columns in the table
+            metaData = results.getMetaData();       // Get metadata on them
+            numCols = metaData.getColumnCount();    // How many columns?
+            results.last();                         // Move to last row
+            numRows = results.getRow();             // How many rows?
+
+            String s;
+
+            // headers
+            sb.append("# Query: " + query + "\n");
+
+            byte typ[] = new byte[numCols];
+            String columnLabel[] = new String[numCols];
+
+            for (int col = 0; col < numCols; col++) {
+                columnLabel[col] = metaData.getColumnLabel(col + 1);
+                typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
+            }
+
+            for (int row = 0; row < numRows; row++) {
+                results.absolute(row + 1);                // Go to the specified row
+                for (int col = 0; col < numCols; col++) {
+                    Object o = results.getObject(col + 1); // Get value of the column
+                    if (o == null)
+                        s = "null";
+                    else
+                        s = o.toString();
+                    if (typ[col] == DataTypes.BINARY) {
+                        byte[] bin = (byte[]) o;
+                        sb.append(deserializeOneElement(bin, xcol, ycol));
+                    } else {
+                        sb.append(columnLabel[col] + " " + s + "\n");
+                    }
+                }
+                sb.append("\n");
+            }
+        }
+        catch (SQLException e) {
+            sb.append("ERROR in execution of query: " + e.getMessage());
+        } finally {
+            Main.getDefaultStorage().close(connection);
+        }
+
+        return sb.toString();
+    }
+
     private String deserialize(byte[] bytes) {
 
         StringBuilder sb = new StringBuilder();
@@ -156,6 +236,40 @@ public class GridDataServlet extends HttpServlet {
                     sb.append(deserial[i][j]).append(" ");
                 }
                 sb.append("\n");
+            }
+
+        } catch (IOException e) {
+            logger.warn(e);
+        }
+        catch (ClassNotFoundException e) {
+            logger.warn(e);
+        }
+
+        return sb.toString();
+    }
+
+    private String deserializeOneElement(byte[] bytes, int xcol, int ycol) {
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+            ObjectInputStream in = null;
+
+            in = new ObjectInputStream(bis);
+
+            Double deserial[][] = new Double[0][];
+
+            deserial = (Double[][]) in.readObject();
+            in.close();
+
+            logger.debug("deserial.length" + deserial.length);
+            logger.debug("deserial[0].length" + deserial[0].length);
+
+            if ((ycol >= 0) && (ycol < deserial.length) && (xcol >= 0) && (xcol < deserial.length)) {
+                Double value = deserial[ycol][xcol];
+                sb.append(value);
+                //.append("\n");
             }
 
         } catch (IOException e) {
