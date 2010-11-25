@@ -143,7 +143,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
                 
                 self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
             except Exception, e:
-                self.error(e.__str__())
+                self.exception(e)
                 continue
 
         ser.close()         

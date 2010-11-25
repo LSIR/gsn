@@ -17,7 +17,6 @@ from pyinotify import WatchManager, ThreadedNotifier, EventsCodes, ProcessEvent
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
-from string import join
 
 DEFAULT_DATE_TIME_FORMATE = 'yyyy-MM-dd'
 
@@ -480,7 +479,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 self._waitforack = False
                 os.chmod(filename, 0744)
                 self._filedescriptor.close()
-                self.error(e.__str__())
+                self.exception(e)
             
 
         self.info('died')

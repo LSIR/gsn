@@ -183,7 +183,7 @@ class ScheduleHandlerClass(Thread):
                 with open(self.getOptionValue('schedule_file')+'.parsed', 'rb') as f:
                     self._schedule = pickle.load(f)
             except Exception as e:
-                self.error('', e)
+                self.exception(str(e))
         else:
             self._logger.info('there is no local schedule file available')
         
@@ -342,7 +342,7 @@ class ScheduleHandlerClass(Thread):
                         self._logger.info('executing >' + schedule[1] + '< now')
                     proc = subprocess.Popen(shlex.split(schedule[1]), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 except Exception as e:
-                    self.error('error in scheduled job >' + schedule[1] + '<:', e)
+                    self.exception('error in scheduled job >' + schedule[1] + '<:' + str(e))
                 else:
                     self._allJobsFinishedEvent.clear()
                     if not schedule[2]:
@@ -433,7 +433,7 @@ class ScheduleHandlerClass(Thread):
 
                 self._logger.info('updated %s and %s with the current schedule' % (schedule_file.name, schedule_file.name+".parsed"))
             except Exception as e:
-                self.error('received schedule can not be used: ', e)
+                self.exception('received schedule can not be used: ' + str(e))
                 if self._schedule:
                     self._logger.info('using locally stored schedule file')
                     
@@ -448,12 +448,9 @@ class ScheduleHandlerClass(Thread):
             self._tosMessageHandler.received(payload)
         
         
-    def error(self, msg, error=None):
-        self._backlogMain.incrementErrorCounter()
-        if error:
-            self._logger.error(msg, error)
-        else:
-            self._logger.error(msg)
+    def exception(self, exception):
+        self._backlogMain.incrementExceptionCounter()
+        self._logger.exception(exception)
         
         
     def _serviceTime(self):
@@ -501,7 +498,8 @@ class ScheduleHandlerClass(Thread):
                 if self._stopped:
                     return True
                 if not self._allJobsFinishedEvent.isSet():
-                    self.error('not all jobs have been killed (should not happen)')
+                    self._backlogMain.incrementErrorCounter()
+                    self._logger.error('not all jobs have been killed (should not happen)')
                     
             # wait for all plugins to finish
             max_plugins_finish_wait_seconds = int(self.getOptionValue('max_plugins_finish_wait_minutes'))*60
@@ -772,12 +770,9 @@ class JobsObserver(Thread):
         self._logger.info('JobsObserver: stopped')
         
         
-    def error(self, msg, error=None):
+    def error(self, msg):
         self._scheduleHandler._backlogMain.incrementErrorCounter()
-        if error:
-            self._logger.error(msg, error)
-        else:
-            self._logger.error(msg)
+        self._logger.error(msg)
         
         
         

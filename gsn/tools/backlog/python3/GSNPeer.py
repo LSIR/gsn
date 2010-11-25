@@ -318,7 +318,7 @@ class GSNListener(Thread):
             self._gsnwriter.sendHelloMsg()
         except (IOError, socket.error) as e:
             if not self._stopped:
-                self._gsnPeer._backlogMain.incrementErrorCounter()
+                self._gsnPeer._backlogMain.incrementExceptionCounter()
                 self._logger.exception('exception while accepting connection: ' + str(e))
                 self.disconnect()
             self._logger.info('died')
@@ -429,7 +429,8 @@ class GSNListener(Thread):
             try:
                 self.clientsocket.close()
             except Exception as e:
-                exception(e)
+                self._gsnPeer._backlogMain.incrementExceptionCounter()
+                self._logger.exception(str(e))
             self._connected = False
         self._logger.info('stopped')
 
@@ -565,12 +566,12 @@ class GSNWriter(Thread):
                 except (IOError, socket.error) as e:
                     try:
                         self._sendqueue.task_done()
-                    except ValueError as e:
-                        self.exception(e)
+                    except ValueError as e1:
+                        self.exception(e1)
                     self._lock.release()
                     if not self._stopped:
                         self._gsnListener.disconnect() # sets connected to false
-                        self._logger.exception(e)                  
+                        self._logger.error(str(e))
                 else:
                     try:
                         self._sendqueue.task_done()
@@ -646,6 +647,6 @@ class GSNWriter(Thread):
 
 
     def exception(self, error):
-        self._gsnListener._gsnPeer._backlogMain.incrementErrorCounter()
+        self._gsnListener._gsnPeer._backlogMain.incrementExceptionCounter()
         self._logger.exception(str(error))
     

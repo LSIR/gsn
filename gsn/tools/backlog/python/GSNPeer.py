@@ -241,11 +241,6 @@ class GSNPeerClass(Thread):
 
     def processResendMsg(self, msgType, timestamp, payload):
         return self.sendToGSN(BackLogMessage.BackLogMessageClass(msgType, timestamp, payload), 99, True)
-
-
-    def error(self, msg):
-        self._backlogMain.incrementErrorCounter()
-        self._logger.error(msg)
     
     
     
@@ -323,7 +318,8 @@ class GSNListener(Thread):
             self._gsnwriter.sendHelloMsg()
         except (IOError, socket.error), e:
             if not self._stopped:
-                self.error('exception while accepting connection: ' + e.__str__())
+                self._gsnPeer._backlogMain.incrementExceptionCounter()
+                self._logger.exception('exception while accepting connection: ' + str(e))
                 self.disconnect()
             self._logger.info('died')
             return
@@ -389,7 +385,7 @@ class GSNListener(Thread):
                     self._gsnPeer.pktReceived(pkt)
         except Exception, e:
             self.disconnect()
-            self._logger.exception(e.__str__())
+            self._logger.error(str(e))
             
         self._gsnwriter.join()
 
@@ -435,7 +431,7 @@ class GSNListener(Thread):
                 self.clientsocket.close()
             except Exception, e:
                 self._gsnPeer._backlogMain.incrementExceptionCounter()
-                self._logger.exception(e.__str__())
+                self._logger.exception(str(e))
             self._connected = False
         self._logger.info('stopped')
 
@@ -447,11 +443,6 @@ class GSNListener(Thread):
             self.stop()
             self._gsnPeer.disconnect()
         self._lock.release()
-
-
-    def error(self, msg):
-        self._gsnPeer._backlogMain.incrementErrorCounter()
-        self._logger.error(msg)
 
 
 
@@ -576,17 +567,17 @@ class GSNWriter(Thread):
                 except (IOError, socket.error), e:
                     try:
                         self._sendqueue.task_done()
-                    except ValueError as e:
-                        self.error(e)
+                    except ValueError, e1:
+                        self.exception(e1)
                     self._lock.release()
                     if not self._stopped:
                         self._gsnListener.disconnect() # sets connected to false
-                        self._logger.exception(e.__str__())                  
+                        self._logger.error(str(e))
                 else:
                     try:
                         self._sendqueue.task_done()
-                    except ValueError as e:
-                        self.error(e)
+                    except ValueError, e:
+                        self.exception(e)
                     self._lock.release()
  
         self._logger.info('died')
@@ -620,8 +611,8 @@ class GSNWriter(Thread):
                 break
             try:
                 self._sendqueue.task_done()
-            except ValueError as e:
-                self.error(e)
+            except ValueError, e:
+                self.exception(e)
         self._lock.release()
 
 
@@ -631,8 +622,11 @@ class GSNWriter(Thread):
                 self._sendqueue.put_nowait((priority, msg))
             except Queue.Full:
                 self._logger.warning('send queue is full')
-            self._work.set()
-            return True
+            except Exception, e:
+                self.exception(e)
+            else:
+                self._work.set()
+                return True
         return False
 
         
@@ -645,12 +639,15 @@ class GSNWriter(Thread):
                 self._sendqueue.put_nowait((priority, msg))
             except Queue.Full:
                 self._logger.warning('send queue is full (resend)')
-            self._work.set()
-            return True
+            except Exception, e:
+                self.exception(e)
+            else:
+                self._work.set()
+                return True
         return False
 
 
-    def error(self, error):
-        self._gsnListener._gsnPeer._backlogMain.incrementErrorCounter()
-        self._logger.error(error)
+    def exception(self, error):
+        self._gsnListener._gsnPeer._backlogMain.incrementExceptionCounter()
+        self._logger.exception(str(error))
     

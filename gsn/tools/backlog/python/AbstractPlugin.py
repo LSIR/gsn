@@ -259,14 +259,14 @@ class AbstractPluginClass(Thread):
         return self._backlogMain.getErrorCounter()
 
     
-    def exception(self, e):
+    def exception(self, exception):
         self._backlogMain.incrementExceptionCounter()
-        self._logger.exception(e.__str__())
+        self._logger.exception(str(exception))
     
     
-    def error(self, msg):
+    def error(self, error):
         self._backlogMain.incrementErrorCounter()
-        self._logger.error(msg)
+        self._logger.error(str(error))
         
 
     def warning(self, msg):
