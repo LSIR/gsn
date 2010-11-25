@@ -479,7 +479,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 self._waitforack = False
                 os.chmod(filename, 0o744)
                 self._filedescriptor.close()
-                self.error('', e)
+                self.exception(e)
             
 
         self.info('died')

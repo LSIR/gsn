@@ -164,7 +164,7 @@ class BackLogMainClass(Thread):
                 self.tospeer = TOSPeerClass(self, tos_address, tos_version)
                 self._logger.info('loaded TOSPeerClass')
             except Exception as e:
-                self._logger.error('TOSPeerClass could not be loaded: ' + e.__str__())
+                self._logger.exception('TOSPeerClass could not be loaded: ' + str(e))
         else:
             self._logger.info('TOSPeer will not be loaded as no tos_source_addr is specified in config file')
 
@@ -201,7 +201,7 @@ class BackLogMainClass(Thread):
                 self.plugins.append((module_name, plugin))
                 self._logger.info('loaded plugin ' + module_name)
             except Exception as e:
-                self._logger.error('could not load plugin ' + module_name + ': ', e)
+                self._logger.exception('could not load plugin ' + module_name + ': ' + str(e))
                 self.incrementErrorCounter()
                 continue
 
@@ -265,7 +265,7 @@ class BackLogMainClass(Thread):
                 if plugin_entry[1].isBusy():
                     return True
             except NotImplementedError as e:
-                self._logger.error(plugin_entry[0] + ': ' + e.__str__())
+                self._logger.error(plugin_entry[0] + ': ' + str(e))
                 self.incrementErrorCounter()
         return self.backlog.isBusy()
         

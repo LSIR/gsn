@@ -549,7 +549,7 @@ class ScheduleHandlerClass(Thread):
     
             self._backlogMain.shutdown = True
             parentpid = os.getpid()
-            self._logger.info('sending myself (pid=' + str(parentpid) + ' SIGINT')
+            self._logger.info('sending myself (pid=' + str(parentpid) + ') SIGINT')
             os.kill(parentpid, signal.SIGINT)
             return True
         else:

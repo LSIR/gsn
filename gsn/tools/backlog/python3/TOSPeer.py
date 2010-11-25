@@ -75,7 +75,7 @@ class TOSPeerClass(Thread):
                 packet = self._serialsource.read()
             except Exception as e:
                 if not self._stopped:
-                    self.error('could not read from serial source: ' + e.__str__())
+                    self.exception('could not read from serial source: ' + str(e))
                 continue
             
             # if the packet is None just continue
@@ -96,7 +96,7 @@ class TOSPeerClass(Thread):
                     self._serialsource.sendAck()
                 except Exception as e:
                     if not self._stopped:
-                        self.error('could not send ack: ' + e.__str__())
+                        self.exception('could not send ack: ' + str(e))
                         
         self._toswriter.join()
         self._serialsource.join()
@@ -107,9 +107,9 @@ class TOSPeerClass(Thread):
         return self._toswriter.addMsg(packet, amId, timeout, blocking, maxretries)
 
 
-    def error(self, msg):
-        self._backlogMain.incrementErrorCounter()
-        self._logger.error(msg)
+    def exception(self, exception):
+        self._backlogMain.incrementExceptionCounter()
+        self._logger.exception(str(exception))
 
         
     def stop(self):

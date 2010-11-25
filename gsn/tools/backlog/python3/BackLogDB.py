@@ -328,7 +328,7 @@ class BackLogDBClass(Thread):
         
     def exception(self, e):
         self._backlogMain.incrementExceptionCounter()
-        self._logger.exception(e.__str__())
+        self._logger.exception(str(e))
 
 
 
