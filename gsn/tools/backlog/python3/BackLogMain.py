@@ -95,6 +95,8 @@ class BackLogMainClass(Thread):
         tos_version = None
         dutycyclemode = None
         backlog_db_resend_hr = None
+        folder_to_check_size = None
+        folder_min_free_mb = None
 
         # readout options from config
         for entry in config_options:
@@ -114,6 +116,10 @@ class BackLogMainClass(Thread):
                 tos_version = int(value)
             elif name == 'duty_cycle_mode':
                 dutycyclemode = int(value)
+            elif name == 'folder_to_check_size':
+                folder_to_check_size = value
+            elif name == 'folder_min_free_mb':
+                folder_min_free_mb = int(value)
                 
         if id == None:
             raise TypeError('device_id has to be specified in the configuration file')
@@ -125,6 +131,30 @@ class BackLogMainClass(Thread):
         self._logger.info(str(__date__))
         self._logger.info(str(__id__))
         self._logger.info(str(__source__))
+        
+                
+        if not folder_to_check_size:
+            raise TypeError('folder_to_check_size has to be specified in the configuration file')
+        else:
+            if os.path.isdir(folder_to_check_size):
+                self._folder_to_check_size = folder_to_check_size
+                self._logger.info('folder_to_check_size: ' + folder_to_check_size)
+            else:
+                raise TypeError('folder_to_check_size has to be an existing directory')
+                
+        if not folder_min_free_mb:
+            raise TypeError('folder_min_free_mb has to be specified in the configuration file')
+        else:
+            if folder_min_free_mb > 0:
+                self._folder_min_free_mb = folder_min_free_mb
+                self._logger.info('folder_min_free_mb: ' + str(folder_min_free_mb))
+            else:
+                raise TypeError('folder_min_free_mb has to be a positive number')
+            
+        if not self.checkFolderUsage():
+            raise Exception('Not enough space left on ' + self._folder_to_check_size + ' (' + str(self.getFolderAvailableMb()) + '<' + str(self._folder_min_free_mb) + ')')
+        else:
+            self._logger.info('folder check succeeded (' + self._folder_to_check_size + ': ' + str(self.getFolderAvailableMb()) + ' MB available)')
         
         # printout options
         self._logger.info('device_id: ' + str(id))
@@ -311,6 +341,16 @@ class BackLogMainClass(Thread):
         for plugin_entry in self.plugins:
             plugin_entry[1].connectionToGSNlost()
         self.backlog.connectionToGSNlost()
+        
+        
+    def checkFolderUsage(self):
+        stats = os.statvfs(self._folder_to_check_size)
+        return self._folder_min_free_mb < (stats.f_bsize * stats.f_bavail / 1048576.0)
+        
+        
+    def getFolderAvailableMb(self):
+        stats = os.statvfs(self._folder_to_check_size)
+        return stats.f_bsize * stats.f_bavail / 1048576.0
             
 
 
@@ -367,6 +407,7 @@ def main():
         
     logger = logging.getLogger('BackLogMain.main')
         
+    backlog = None
     try:
         backlog = BackLogMainClass(options.config_file)
         backlog.start()
