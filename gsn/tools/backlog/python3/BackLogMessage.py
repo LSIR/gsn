@@ -115,6 +115,10 @@ class BackLogMessageClass:
         except Exception as e:
             raise TypeError('cannot pack message: ' + e.__str__())
         self._payload = payload
+        
+        
+    def __lt__(self, other):
+        return self._timestamp < other._timestamp
     
     
     def getMessage(self):
