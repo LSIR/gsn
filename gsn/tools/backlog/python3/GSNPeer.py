@@ -146,6 +146,8 @@ class GSNPeerClass(Thread):
         @return: True if the message could have been sent to GSN otherwise False
         '''        
         self._outCounter += 1
+        if not self._connected:
+            return False
         if resend:
             return self._gsnlistener._gsnwriter.addResendMsg(msg, priority)        
         else:

@@ -184,19 +184,11 @@ class BackLogMainClass(Thread):
         self.backlog = BackLogDBClass(self, backlog_db, backlog_db_resend_hr)
         self._logger.info('loaded BackLogDBClass')
         
-        self.tospeer = None
-        if tos_address:
-            if not tos_version:
-                tos_version = DEFAULT_TOS_VERSION
-            self._logger.info('tos_source_addr: ' + tos_address)
-            self._logger.info('tos_version: ' + str(tos_version))
-            try:
-                self.tospeer = TOSPeerClass(self, tos_address, tos_version)
-                self._logger.info('loaded TOSPeerClass')
-            except Exception as e:
-                self._logger.exception('TOSPeerClass could not be loaded: ' + str(e))
-        else:
-            self._logger.info('TOSPeer will not be loaded as no tos_source_addr is specified in config file')
+        self._tospeer = None
+        self._tos_address = tos_address
+        self._tos_version = tos_version
+        self._tosPeerLock = Lock()
+        self._tosListeners = []
 
         # get schedule section from config files
         try:
@@ -246,8 +238,6 @@ class BackLogMainClass(Thread):
 
         self.gsnpeer.start()
         self.backlog.start()
-        if self.tospeer:
-            self.tospeer.start()
         self.schedulehandler.start()
 
         for plugin_entry in self.plugins:
@@ -258,8 +248,8 @@ class BackLogMainClass(Thread):
             plugin_entry[1].join()
         
         self.schedulehandler.join()
-        if self.tospeer:
-            self.tospeer.join()
+        if self._tospeer:
+            self._tospeer.join()
         self.backlog.join()
         self.gsnpeer.join()
         
@@ -271,21 +261,45 @@ class BackLogMainClass(Thread):
             plugin_entry[1].stop()
 
         self.schedulehandler.stop()
-        if self.tospeer:
-            self.tospeer.stop()
+        if self._tospeer:
+            self._tospeer.stop()
         self.backlog.stop()
         self.gsnpeer.stop()
         
         self._logger.info('stopped')
         
         
+    def instantiateTOSPeer(self):
+        self._tosPeerLock.acquire()
+        if not self._tospeer:
+            if self._tos_address:
+                if not self._tos_version:
+                    self._tos_version = DEFAULT_TOS_VERSION
+                self._logger.info('tos_source_addr: ' + self._tos_address)
+                self._logger.info('tos_version: ' + str(self._tos_version))
+                try:
+                    self._tospeer = TOSPeerClass(self, self._tos_address, self._tos_version)
+                    self._tospeer.start()
+                    self._logger.info('TOSPeerClass instantiated')
+                except Exception as e:
+                    self._tosPeerLock.release()
+                    raise Exception('TOSPeerClass could not be loaded: ' + str(e))
+            else:
+                self._tosPeerLock.release()
+                raise TypeError('TOSPeer can not be loaded as no tos_source_addr is specified in config file')
+        self._tosPeerLock.release()
+        
+        
+    def registerTOSListener(self, listener):
+        self.instantiateTOSPeer()
+        self._tosListeners.append(listener)
+        
+        
     def processTOSMsg(self, timestamp, payload):
         ret = False
-        for plugin_entry in self.plugins:
-            if plugin_entry[1].tosMsgReceived(timestamp, payload):
+        for listener in self._tosListeners:
+            if listener.tosMsgReceived(timestamp, payload):
                 ret = True
-        if self.schedulehandler.tosMsgReceived(timestamp, payload):
-            ret = True
         return ret
         
         

@@ -122,9 +122,6 @@ class ScheduleHandlerClass(Thread):
         self._duty_cycle_mode = dutycyclemode
         self._config = options
         
-        if dutycyclemode and not self._backlogMain.tospeer:
-            raise TypeError('TOSPeerClass is needed if in duty-cycle mode but has not been started')
-        
         service_wakeup_minutes = int(self.getOptionValue('service_wakeup_minutes'))
         if service_wakeup_minutes is None:
             raise TypeError('service_wakeup_minutes not specified in config file')
@@ -155,6 +152,9 @@ class ScheduleHandlerClass(Thread):
         approximate_startup_seconds = int(self.getOptionValue('approximate_startup_seconds'))
         if approximate_startup_seconds is None:
             raise TypeError('approximate_startup_seconds not specified in config file')
+        
+        if dutycyclemode and not self._backlogMain._tospeer:
+            self._backlogMain.registerTOSListener()
         
         self._connectionEvent = Event()
         self._scheduleEvent = Event()
@@ -590,7 +590,7 @@ class TOSMessageHandler(Thread):
                     self._sentCmd = item[0]['command']
 
                 self._logger.debug('snd...')
-                self._scheduleHandler._backlogMain.tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG, 0.2)
+                self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG, 0.2)
                 
                 if item[1]:
                     while True:
@@ -600,7 +600,7 @@ class TOSMessageHandler(Thread):
                             return
                         elif not self._ackEvent.isSet():
                             self._logger.info('resend command (' + str(self._sentCmd) + ') to TOS node')
-                            self._scheduleHandler._backlogMain.tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG, 0.2)
+                            self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG, 0.2)
                         else:
                             self._sentCmd = None
                             self._ackEvent.clear()

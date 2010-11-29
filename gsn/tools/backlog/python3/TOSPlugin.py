@@ -25,6 +25,7 @@ class TOSPluginClass(AbstractPluginClass):
     
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
+        self.registerTOSListener()
         
         self._stopped = False
         self._ready = False

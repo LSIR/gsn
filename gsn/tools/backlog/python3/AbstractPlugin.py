@@ -131,10 +131,23 @@ class AbstractPluginClass(Thread):
         return self._backlogMain.gsnpeer.processMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
     
     
+    def registerTOSListener(self):
+        '''
+        Register a plugin as a TOS listener.
+        
+        This function should be used by the plugins to register themselves as TOS listeners.
+        After registering all incoming TOS messages will be received with tosMsgReceived(...).
+        
+        @raise Exception: if the TOSPeerClass can not be started.
+        '''
+        self._backlogMain.registerTOSListener(self)
+    
+    
     def tosMsgReceived(self, timestamp, payload):
         '''
         This function will be executed if a TOS message has been received from the serial
-        port. If the plugin is interested in TOS messages it can process it.
+        port and this plugin has been registered as a TOS listener (using registerTOSListener()).
+        All incoming TOS messages will be received.
                    
         @return: This function should ONLY return True if the message has been processed
                  successfully. Thus, it will be acknowledged over the serial port.
@@ -156,14 +169,8 @@ class AbstractPluginClass(Thread):
         @param maxretries: 
                        
         @return: True if the message has been put into sendbuffer successfully.
-        
-        @raise TypeError: if the TOSPeerClass has not been started.
         '''
-        if not self._backlogMain.tospeer:
-            raise TypeError('TOSPeerClass has not been started')
-            return False
-        else:
-            return self._backlogMain.tospeer.sendTOSMsg(packet, amId, timeout, blocking, maxretries)
+        return self._backlogMain._tospeer.sendTOSMsg(packet, amId, timeout, blocking, maxretries)
        
         
     def run(self):
