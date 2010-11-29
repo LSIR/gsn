@@ -31,7 +31,7 @@ class TOSPeerClass(Thread):
     _toswriter
     _version
     _logger 
-    _stopped
+    _tosPeerStop
     '''
     
     def __init__(self, parent, address, version):
@@ -59,7 +59,7 @@ class TOSPeerClass(Thread):
         self._toswriter = TOSWriter(self)
 
         self._backlogMain = parent
-        self._stopped = False
+        self._tosPeerStop = False
             
         
     def run(self):
@@ -68,13 +68,13 @@ class TOSPeerClass(Thread):
         self._serialsource.start()
         self._toswriter.start()
         
-        while not self._stopped:
+        while not self._tosPeerStop:
             # read packet from serial port (this is blocking)
             try:
                 self._logger.debug('rcv...')
                 packet = self._serialsource.read()
             except Exception as e:
-                if not self._stopped:
+                if not self._tosPeerStop:
                     self.exception('could not read from serial source: ' + str(e))
                 continue
             
@@ -95,7 +95,7 @@ class TOSPeerClass(Thread):
                 try:
                     self._serialsource.sendAck()
                 except Exception as e:
-                    if not self._stopped:
+                    if not self._tosPeerStop:
                         self.exception('could not send ack: ' + str(e))
                         
         self._toswriter.join()
@@ -113,7 +113,7 @@ class TOSPeerClass(Thread):
 
         
     def stop(self):
-        self._stopped = True
+        self._tosPeerStop = True
         self._toswriter.stop()
         self._serialsource.stop()
         self._logger.info('stopped')
@@ -128,7 +128,7 @@ class TOSWriter(Thread):
     _tosPeer
     _sendqueue
     _work
-    _stopped
+    _tosWriterStop
     '''
 
     def __init__(self, parent):
@@ -137,18 +137,18 @@ class TOSWriter(Thread):
         self._tosPeer = parent
         self._sendqueue = queue.Queue(SEND_QUEUE_SIZE)
         self._work = Event()
-        self._stopped = False
+        self._tosWriterStop = False
 
 
     def run(self):
         self._logger.info('started')
-        while not self._stopped:
+        while not self._tosWriterStop:
             self._work.wait()
-            if self._stopped:
+            if self._tosWriterStop:
                 break
             self._work.clear()
             # is there something to do?
-            while not self._sendqueue.empty() and not self._stopped:
+            while not self._sendqueue.empty() and not self._tosWriterStop:
                 try:
                     list = self._sendqueue.get_nowait()
                 except queue.Empty:
@@ -159,7 +159,7 @@ class TOSWriter(Thread):
                     self._tosPeer._serialsource.write(list[0], list[1], list[2], list[3], list[4])
                     self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(list[0])))
                 except Exception as e:
-                    if not self._stopped:
+                    if not self._tosWriterStop:
                         self._logger.warning('could not write message to serial port: ' + e.__str__())
                 finally:
                     self._sendqueue.task_done()
@@ -168,13 +168,13 @@ class TOSWriter(Thread):
 
 
     def stop(self):
-        self._stopped = True
+        self._tosWriterStop = True
         self._work.set()
         self._logger.info('stopped')
 
 
     def addMsg(self, packet, amId, timeout, blocking, maxretries):
-        if not self._stopped:
+        if not self._tosWriterStop:
             try:
                 self._sendqueue.put_nowait((packet, amId, timeout, blocking, maxretries))
                 self._work.set()

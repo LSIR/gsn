@@ -67,6 +67,21 @@ class AbstractPluginClass(Thread):
             if entry_key.startswith(key):
                 entries.append(entry_value)
         return entries
+    
+    
+    def action(self, parameters):
+        '''
+        This function will be fired by the schedule handler each time
+        this plugin is scheduled.
+        
+        The function should return as fast as possible. Thus, longer
+        calculation should be threaded!
+        
+        @param parameters: The parameters as one string given in the
+                            schedule file.
+        '''
+        pass
+    
 
     def getMsgType(self):
         '''
@@ -210,6 +225,15 @@ class AbstractPluginClass(Thread):
         Tells the BackLogDB class to resend all unacknowledged packets.
         '''
         self._backlogMain.backlog.resend()
+        
+        
+    def getUptime(self):
+        '''
+        Returns the uptime of the backlog program
+        
+        @return: uptime of the backlog program
+        '''
+        return self._backlogMain.getUptime()
 
 
     def getBackLogStatus(self):

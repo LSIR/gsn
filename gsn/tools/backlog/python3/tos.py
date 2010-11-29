@@ -178,7 +178,7 @@ class HDLC:
     def __init__(self, source):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._s = source
-        self._stopped = False
+        self._hdlcStop = False
 
     # Returns the next incoming serial packet
     def read(self, timeout=None):
@@ -236,7 +236,7 @@ class HDLC:
             ts = time.time()
             if d != HDLC_FLAG_BYTE:
                 self._logger.debug("Skipping byte %d" % d)
-                while d != HDLC_FLAG_BYTE and not self._stopped:
+                while d != HDLC_FLAG_BYTE and not self._hdlcStop:
                     d = self._s.getByte()
                     self._logger.debug("Skipping byte %d" % d)
                     ts = time.time()
@@ -247,7 +247,7 @@ class HDLC:
 
             # Is the next byte also HDLC_FLAG_BYTE?
             d = self._s.getByte()
-            while d == HDLC_FLAG_BYTE and not self._stopped:
+            while d == HDLC_FLAG_BYTE and not self._hdlcStop:
                 d = self._s.getByte()
                 ts = time.time()
 
@@ -257,7 +257,7 @@ class HDLC:
 
             # Read bytes from serial until we read another HDLC_FLAG_BYTE
             # value (end of the current packet):
-            while d != HDLC_FLAG_BYTE and not self._stopped:
+            while d != HDLC_FLAG_BYTE and not self._hdlcStop:
                 d = self._s.getByte()
                 packet.append(d)
 
@@ -387,7 +387,7 @@ class HDLC:
         return r
 
     def stop(self):
-        self._stopped = True
+        self._hdlcStop = True
 
 class SimpleAM(Thread):
     def __init__(self, source, oobHook=None):
@@ -406,10 +406,10 @@ class SimpleAM(Thread):
         self._DataEvent = Event()
         self._WriteLock = Lock()
         Thread.__init__(self)
-        self._stopped = False
+        self._simpleAMStop = False
 
     def run(self):
-        while not self._stopped:
+        while not self._simpleAMStop:
             f = self._hdlc.read()
             p = AckFrame(f)
             if p.protocol == SERIAL_PROTO_ACK:
@@ -449,7 +449,7 @@ class SimpleAM(Thread):
     def readData(self, timeout=None):
         p = None
         self._DataEvent.wait(timeout)
-        if self._DataEvent.isSet() and not self._stopped:
+        if self._DataEvent.isSet() and not self._simpleAMStop:
             self._DataLock.acquire()
             p = self._DataPacket
             if p:
@@ -489,7 +489,7 @@ class SimpleAM(Thread):
         self.oobHook = oobHook
 
     def stop(self):
-        self._stopped = True
+        self._simpleAMStop = True
         self._DataEvent.set()
         self._hdlc.stop()
         self._source.close()
@@ -540,7 +540,7 @@ class AM(SimpleAM):
         if not timeout:
            timeout=self._source.ackTimeout
         r = super(AM, self).write(packet, amId, timeout, blocking)
-        while not r and not self._stopped and (maxretries == None or retries < maxretries):
+        while not r and not self._simpleAMStop and (maxretries == None or retries < maxretries):
             retries += 1
             r = super(AM, self).write(packet, amId, timeout, blocking, inc=0)
         return r

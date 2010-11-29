@@ -72,7 +72,7 @@ class BinaryPluginClass(AbstractPluginClass):
 
     data/instance attributes:
     _notifier
-    _stopped
+    _plugStop
     _filedeque
     _msgdeque
     _isBusy
@@ -178,7 +178,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 
         self._filedescriptor = None
         self._waitforack = True
-        self._stopped = False
+        self._plugStop = False
 
 
     def getMsgType(self):
@@ -213,16 +213,16 @@ class BinaryPluginClass(AbstractPluginClass):
         try:
             self._notifier.start()
         except Exception as e:
-            if not self._stopped:
+            if not self._plugStop:
                 self.exception(e)
         chunkNumber = 0
         self._lastRecvPacketType = None
         self._lastSentPacketType = None
                 
-        while not self._stopped:
+        while not self._plugStop:
             # wait for the next file event to happen
             self._work.wait()
-            if self._stopped:
+            if self._plugStop:
                 break
             self._waitforack = False
                 
@@ -491,7 +491,7 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def stop(self):
         self._isBusy = False
-        self._stopped = True
+        self._plugStop = True
         self._notifier.stop()
         self._work.set()
         self._filedeque.clear()

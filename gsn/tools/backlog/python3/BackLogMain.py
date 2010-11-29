@@ -13,6 +13,7 @@ import sys
 import signal
 import configparser
 import optparse
+import time
 import logging
 import logging.config
 from threading import Thread, Lock
@@ -44,6 +45,7 @@ class BackLogMainClass(Thread):
     '''
     data/instance attributes:
     _logger
+    _startTime
     gsnpeer
     backlog
     plugins
@@ -63,6 +65,7 @@ class BackLogMainClass(Thread):
         @param options: options from the OptionParser
         '''
 
+        self._startTime = time.time()
         Thread.__init__(self)
 
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -75,13 +78,13 @@ class BackLogMainClass(Thread):
         self._errorCounterLock = Lock()
 
         # read config file for other options
-        config = configparser.SafeConfigParser()
-        config.optionxform = str # case sensitive
-        config.read(config_file)
+        self._config = configparser.SafeConfigParser()
+        self._config.optionxform = str # case sensitive
+        self._config.read(config_file)
 
         # get options section from config file
         try:
-            config_options = config.items('options')
+            config_options = self._config.items('options')
         except configparser.NoSectionError:
             self._logger.warning('no [options] section specified in ' + config_file)
             config_options = []
@@ -192,7 +195,7 @@ class BackLogMainClass(Thread):
 
         # get schedule section from config files
         try:
-            config_schedule = config.items('schedule')
+            config_schedule = self._config.items('schedule')
         except configparser.NoSectionError:
             raise TypeError('no [schedule] section specified in ' + config_file)
             
@@ -200,7 +203,7 @@ class BackLogMainClass(Thread):
 
         # get plugins section from config files
         try:
-            config_plugins = config.items('plugins')
+            config_plugins = self._config.items('plugins')
         except configparser.NoSectionError:
             self._logger.warning('no [plugins] section specified in ' + config_file)
             config_plugins = DEFAULT_PLUGINS
@@ -215,7 +218,7 @@ class BackLogMainClass(Thread):
                 module = __import__(module_name)
                 pluginclass = getattr(module, module_name + 'Class')
                 try:
-                    config_plugins_options = config.items(module_name + '_options')
+                    config_plugins_options = self._config.items(module_name + '_options')
                 except configparser.NoSectionError:
                     self._logger.warning('no [' + module_name + '_options] section specified in ' + config_file)
                     config_plugins_options = []
@@ -301,6 +304,32 @@ class BackLogMainClass(Thread):
             if listener.tosMsgReceived(timestamp, payload):
                 ret = True
         return ret
+    
+    
+    def pluginAction(self, pluginclassname, parameters):
+        pluginactive = False
+        for plugin_entry in self.plugins:
+            if plugin_entry[0] == pluginclassname:
+                plugin_entry[1].action(parameters)
+                pluginactive = True
+                
+        if not pluginactive:
+            try:
+                module = __import__(pluginclassname)
+                pluginclass = getattr(module, pluginclassname + 'Class')
+                try:
+                    config_plugins_options = self._config.items(pluginclassname + '_options')
+                except configparser.NoSectionError:
+                    self._logger.warning('no [' + pluginclassname + '_options] section specified in configuration file')
+                    config_plugins_options = []
+                plugin = pluginclass(self, config_plugins_options)
+                self.plugins.append((pluginclassname, plugin))
+                self._logger.info('loaded plugin ' + pluginclassname)
+            except Exception as e:
+                raise Exception('could not load plugin ' + pluginclassname + ': ' + str(e))
+            plugin.start()
+            plugin.action(parameters)
+        
         
         
     def pluginsBusy(self):
@@ -365,7 +394,10 @@ class BackLogMainClass(Thread):
     def getFolderAvailableMb(self):
         stats = os.statvfs(self._folder_to_check_size)
         return stats.f_bsize * stats.f_bavail / 1048576.0
-            
+    
+    
+    def getUptime(self):
+        return int(time.time()-self._startTime)
 
 
     def incrementExceptionCounter(self):

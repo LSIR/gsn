@@ -52,7 +52,7 @@ class GSNPeerClass(Thread):
     _connectionLosses
     _backlogCounter
     _work
-    _stopped
+    _gsnPeerStop
     '''
 
     def __init__(self, parent, deviceid, port):
@@ -78,7 +78,7 @@ class GSNPeerClass(Thread):
         self._connectionLosses = 0
         self._backlogCounter = 0
         self._connected = False
-        self._stopped = False
+        self._gsnPeerStop = False
         self._work = Event()
         
         # try to open a server socket to which GSN can connect to
@@ -101,14 +101,14 @@ class GSNPeerClass(Thread):
         self._pingtimer.start()
         self._work.set()
             
-        while not self._stopped:
+        while not self._gsnPeerStop:
             self._work.wait()
-            if self._stopped:
+            if self._gsnPeerStop:
                 break
             self._work.clear()
         
             self._gsnlistener = GSNListener(self, self._port, self._serversocket)
-            if not self._stopped:
+            if not self._gsnPeerStop:
                 self._gsnlistener.start()
                 
         self._pingwatchdog.join()
@@ -122,7 +122,7 @@ class GSNPeerClass(Thread):
         self._pingwatchdog.stop()
         self._pingtimer.stop()
         self._gsnlistener.stop()
-        self._stopped = True
+        self._gsnPeerStop = True
         self._work.set()
         self._serversocket.shutdown(socket.SHUT_RDWR)
         self._serversocket.close()
@@ -263,7 +263,7 @@ class GSNListener(Thread):
     _connected
     _clientaddr
     _lock
-    _stopped
+    _gsnListenerStop
     _stuff
     _stuffread
     '''
@@ -295,7 +295,7 @@ class GSNListener(Thread):
 
         self._connected = False
         self._lock = Lock()
-        self._stopped = False
+        self._gsnListenerStop = False
 
 
     def run(self):
@@ -313,13 +313,13 @@ class GSNListener(Thread):
         self._logger.info('listening on port ' + str(self._port))
         try:
             (self.clientsocket, self._clientaddr) = self._serversocket.accept()
-            if self._stopped:
+            if self._gsnListenerStop:
                 self._logger.info('died')
                 return
             self._connected = True
             self._gsnwriter.sendHelloMsg()
         except (IOError, socket.error) as e:
-            if not self._stopped:
+            if not self._gsnListenerStop:
                 self._gsnPeer._backlogMain.incrementExceptionCounter()
                 self._logger.exception('exception while accepting connection: ' + str(e))
                 self.disconnect()
@@ -334,7 +334,7 @@ class GSNListener(Thread):
             # let BackLogMain know that GSN successfully connected
             self._gsnPeer._backlogMain.backlog.resend(True)
 
-            while not self._stopped:
+            while not self._gsnListenerStop:
                 self._logger.debug('rcv...')
                 
                 if connecting:
@@ -346,7 +346,7 @@ class GSNListener(Thread):
                         if len(helloByte) != 1:
                             raise IOError('packet length does not match')
                     except (IOError, socket.error) as e:
-                        if not self._stopped:
+                        if not self._gsnListenerStop:
                             raise
                         break
                     
@@ -366,7 +366,7 @@ class GSNListener(Thread):
                         if len(pkt) != 4:
                             raise IOError('packet length does not match')
                     except (IOError, socket.error) as e:
-                        if not self._stopped:
+                        if not self._gsnListenerStop:
                             raise
                         break
                     
@@ -379,7 +379,7 @@ class GSNListener(Thread):
                         if len(pkt) != pkt_len:
                             raise IOError('packet length does not match')
                     except (IOError,socket.error) as e:
-                        if not self._stopped:
+                        if not self._gsnListenerStop:
                             raise
                         break
                     
@@ -425,7 +425,7 @@ class GSNListener(Thread):
 
 
     def stop(self):
-        self._stopped = True
+        self._gsnListenerStop = True
         self._gsnwriter.stop()
         if self._connected:
             try:
@@ -456,7 +456,7 @@ class PingTimer(Thread):
     _action
     _wait
     _timer
-    _stopped
+    _pingTimerStop
     '''
     
     def __init__(self, interval, action):
@@ -466,7 +466,7 @@ class PingTimer(Thread):
         self._action = action
         self._wait = None
         self._timer = Event()
-        self._stopped = False
+        self._pingTimerStop = False
         
            
     def run(self):
@@ -474,7 +474,7 @@ class PingTimer(Thread):
         # wait for first resume
         self._timer.wait()
         self._timer.clear()
-        while not self._stopped:
+        while not self._pingTimerStop:
             self._timer.wait(self._wait)
             if self._timer.isSet():
                 self._timer.clear()
@@ -498,7 +498,7 @@ class PingTimer(Thread):
     
     
     def stop(self):
-        self._stopped = True
+        self._pingTimerStop = True
         self._timer.set()
         self._logger.info('stopped')
 
@@ -520,7 +520,7 @@ class GSNWriter(Thread):
     _gsnListener
     _sendqueue
     _work
-    _stopped
+    _gsnWriterStop
     '''
 
     def __init__(self, parent):
@@ -532,18 +532,18 @@ class GSNWriter(Thread):
         self._lock = Lock()
         self._stuff = STUFFING_BYTE
         self._dblstuff = self._stuff + self._stuff
-        self._stopped = False
+        self._gsnWriterStop = False
 
 
     def run(self):
         self._logger.info('started')
-        while not self._stopped:
+        while not self._gsnWriterStop:
             self._work.wait()
-            if self._stopped:
+            if self._gsnWriterStop:
                 break
             self._work.clear()
             # is there something to do?
-            while self._gsnListener._connected and not self._sendqueue.empty() and not self._stopped:
+            while self._gsnListener._connected and not self._sendqueue.empty() and not self._gsnWriterStop:
                 self._lock.acquire()
                 try:
                     msg = self._sendqueue.get_nowait()[1]
@@ -571,7 +571,7 @@ class GSNWriter(Thread):
                     except ValueError as e1:
                         self.exception(e1)
                     self._lock.release()
-                    if not self._stopped:
+                    if not self._gsnWriterStop:
                         self._gsnListener.disconnect() # sets connected to false
                         self._logger.error(str(e))
                 else:
@@ -596,7 +596,7 @@ class GSNWriter(Thread):
 
 
     def stop(self):
-        self._stopped = True
+        self._gsnWriterStop = True
         self._work.set()
         self.emptyQueue() # to unblock addResendMsg
         self._logger.info('stopped')
@@ -618,7 +618,7 @@ class GSNWriter(Thread):
 
 
     def addMsg(self, msg, priority):
-        if self._gsnListener._connected and not self._stopped:
+        if self._gsnListener._connected and not self._gsnWriterStop:
             try:
                 self._sendqueue.put_nowait((priority, msg))
             except queue.Full:
@@ -635,7 +635,7 @@ class GSNWriter(Thread):
         # wait until send queue is empty
         self._sendqueue.join()
         assert self._sendqueue.not_empty != True
-        if self._gsnListener._connected and not self._stopped:
+        if self._gsnListener._connected and not self._gsnWriterStop:
             try:
                 self._sendqueue.put_nowait((priority, msg))
             except queue.Full:
