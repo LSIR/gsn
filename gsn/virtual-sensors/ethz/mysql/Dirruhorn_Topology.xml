@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_Topology__1946" priority="10" >
+<virtual-sensor name="Dirruhorn_Topology__1950" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.TopologyVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -27,7 +27,7 @@
             <param name="evenlogger-id-field">EVENT_ID</param>
             <param name="evenlogger-value-field">EVENT_VALUE</param>
             
-            <param name="dozer-command-vs">Dirruhorn_Dozer_Command__1946</param>
+            <param name="dozer-command-vs">Dirruhorn_Dozer_Command__1950</param>
         </init-params>
         <web-input>
             <command name="dataconfiguration">
@@ -49,7 +49,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_adccomdiff__1946
+            from dirruhorn_dozer_adccomdiff__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -61,7 +61,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_adcmux1__1946
+            from dirruhorn_dozer_adcmux1__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -73,7 +73,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_adcmux2__1946
+            from dirruhorn_dozer_adcmux2__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -85,7 +85,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_basedebug__1946
+            from dirruhorn_dozer_basedebug__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -97,7 +97,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_MSPVOLTAGE, PAYLOAD_UPTIME, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY
-            from dirruhorn_dozer_basestatus__1946
+            from dirruhorn_dozer_basestatus__1950
           </predicate>
         </address>
         <query>select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_MSPVOLTAGE as PAYLOAD_SYSVOLTAGE, PAYLOAD_UPTIME, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY from wrapper</query>
@@ -109,7 +109,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_decagonmux__1946
+            from dirruhorn_dozer_decagonmux__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -121,7 +121,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_digitaldcx__1946
+            from dirruhorn_dozer_digitaldcx__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -133,7 +133,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_drift__1946
+            from dirruhorn_dozer_drift__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -145,7 +145,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_eventlogger__1946
+            from dirruhorn_dozer_eventlogger__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -157,7 +157,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_PARENTID, PAYLOAD_SYSVOLTAGE, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY, PAYLOAD_SIBCURRENT, PAYLOAD_FLASHSTATUS, PAYLOAD_UPTIME
-            from dirruhorn_dozer_nodehealth__1946
+            from dirruhorn_dozer_nodehealth__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -169,7 +169,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_nodeinfo__1946
+            from dirruhorn_dozer_nodeinfo__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -181,7 +181,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_PORT1ON, PAYLOAD_PORT2ON
-            from dirruhorn_dozer_powerswitch__1946
+            from dirruhorn_dozer_powerswitch__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -193,7 +193,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_rssi__1946
+            from dirruhorn_dozer_rssi__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -205,7 +205,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from dirruhorn_dozer_statecounter__1946
+            from dirruhorn_dozer_statecounter__1950
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -217,7 +217,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from dirruhorn_dozer_rssi__1946
+             select * from dirruhorn_dozer_rssi__1950
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -231,7 +231,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from dirruhorn_dozer_rssi__1946
+             select * from dirruhorn_dozer_rssi__1950
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -245,7 +245,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from dirruhorn_dozer_rssi__1946
+             select * from dirruhorn_dozer_rssi__1950
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -259,7 +259,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from dirruhorn_dozer_rssi__1946
+             select * from dirruhorn_dozer_rssi__1950
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -273,7 +273,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from dirruhorn_dozer_rssi__1946
+             select * from dirruhorn_dozer_rssi__1950
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -287,7 +287,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from dirruhorn_dozer_rssi__1946
+             select * from dirruhorn_dozer_rssi__1950
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -301,7 +301,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from dirruhorn_dozer_rssi__1946
+             select * from dirruhorn_dozer_rssi__1950
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -316,7 +316,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Dirruhorn_Dozer_Eventlogger__1946
+              select * from Dirruhorn_Dozer_Eventlogger__1950
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME0 * 1000)) as GENERATION_TIME,
@@ -330,7 +330,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Dirruhorn_Dozer_Eventlogger__1946
+              select * from Dirruhorn_Dozer_Eventlogger__1950
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME1 * 1000)) as GENERATION_TIME,
@@ -344,7 +344,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Dirruhorn_Dozer_Eventlogger__1946
+              select * from Dirruhorn_Dozer_Eventlogger__1950
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME2 * 1000)) as GENERATION_TIME,
@@ -358,7 +358,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Dirruhorn_Dozer_Eventlogger__1946
+              select * from Dirruhorn_Dozer_Eventlogger__1950
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME3 * 1000)) as GENERATION_TIME,
@@ -372,7 +372,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Dirruhorn_Dozer_Eventlogger__1946
+              select * from Dirruhorn_Dozer_Eventlogger__1950
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME4 * 1000)) as GENERATION_TIME,
@@ -386,7 +386,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Dirruhorn_Dozer_Eventlogger__1946
+              select * from Dirruhorn_Dozer_Eventlogger__1950
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME5 * 1000)) as GENERATION_TIME,
@@ -400,7 +400,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Dirruhorn_Dozer_Eventlogger__1946
+              select * from Dirruhorn_Dozer_Eventlogger__1950
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME6 * 1000)) as GENERATION_TIME,
