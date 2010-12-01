@@ -28,7 +28,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         
         
     def isBusy(self):
-        return True
+        return False
     
     
     def msgReceived(self, message):
