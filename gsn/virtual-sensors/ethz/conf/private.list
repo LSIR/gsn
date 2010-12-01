@@ -12,6 +12,7 @@ Dirruhorn_Dozer_Drift.xml
 Dirruhorn_Dozer_EventLogger.xml
 Dirruhorn_Dozer_NodeHealth.xml
 Dirruhorn_Dozer_NodeInfo.xml
+Dirruhorn_Dozer_PowerSwitch.xml
 Dirruhorn_Dozer_Rssi.xml
 Dirruhorn_Dozer_StateCounter.xml
 Dirruhorn_Dozer_WXT520Ident.xml
