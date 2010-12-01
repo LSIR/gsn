@@ -1,0 +1,54 @@
+<virtual-sensor name="Dirruhorn_Dozer_WXT520WindPth__conv__1950" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="WIND_DIRECTION_MINIMUM" type="VARCHAR(30)" unit="°"/>
+            <field name="WIND_DIRECTION_AVERAGE" type="VARCHAR(30)" unit="°"/>
+            <field name="WIND_DIRECTION_MAXIMUM" type="VARCHAR(30)" unit="°"/>
+            <field name="WIND_SPEED_MINIMUM" type="VARCHAR(30)" unit="km/h"/>
+            <field name="WIND_SPEED_AVERAGE" type="VARCHAR(30)" unit="km/h"/>
+            <field name="WIND_SPEED_MAXIMUM" type="VARCHAR(30)" unit="km/h"/>
+            <field name="AIR_TEMPERATURE" type="VARCHAR(30)" unit="°C"/>
+            <field name="INTERNAL_TEMPERATURE" type="VARCHAR(30)" unit="°C"/>
+            <field name="RELATIVE_HUMIDITY" type="VARCHAR(30)" unit="%RH"/>
+            <field name="AIR_PRESSURE" type="VARCHAR(30)" unit="hPa"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerWxt520WindPthMsg) from Dirruhorn deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Dirruhorn_Dozer_WXT520WindPth__mapped__1950</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(PAYLOAD_WU_DN as CHAR(30)),NULL) as WIND_DIRECTION_MINIMUM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(PAYLOAD_WU_DM as CHAR(30)),NULL) as WIND_DIRECTION_AVERAGE,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(PAYLOAD_WU_DX as CHAR(30)),NULL) as WIND_DIRECTION_MAXIMUM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_WU_SN / 10.0, 2) as CHAR(30)),NULL) as WIND_SPEED_MINIMUM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_WU_SM / 10.0, 2) as CHAR(30)),NULL) as WIND_SPEED_AVERAGE,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_WU_SX / 10.0, 2) as CHAR(30)),NULL) as WIND_SPEED_MAXIMUM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_TU_TA / 10.0, 2) as CHAR(30)),NULL) as AIR_TEMPERATURE,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_TU_TP / 10.0, 2) as CHAR(30)),NULL) as INTERNAL_TEMPERATURE,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_TU_UA / 10.0, 2) as CHAR(30)),NULL) as RELATIVE_HUMIDITY,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_TU_PA / 10.0, 2) as CHAR(30)),NULL) as AIR_PRESSURE
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

@@ -1,0 +1,50 @@
+<virtual-sensor name="Matterhorn_Dozer_WXT520Prec__conv__1950" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="RAIN_ACCUMULATION" type="VARCHAR(30)" unit="mm"/>
+            <field name="RAIN_DURATION" type="VARCHAR(30)" unit="s"/>
+            <field name="RAIN_INTENSITY" type="VARCHAR(30)" unit="mm/h"/>
+            <field name="RAIN_PEAK_INTENSITY" type="VARCHAR(30)" unit="mm/h"/>
+            <field name="HAIL_ACCUMULATION" type="VARCHAR(30)" unit="hits/cm²"/>
+            <field name="HAIL_DURATION" type="VARCHAR(30)" unit="s"/>
+            <field name="HAIL_INTENSITY" type="VARCHAR(30)" unit="hits/cm²h"/>
+            <field name="HAIL_PEAK_INTENSITY" type="VARCHAR(30)" unit="hits/cm²h"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerWxt520PrecMsg) from Matterhorn deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Dozer_WXT520Prec__mapped__1950</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_RC / 100.0, 2) as CHAR(30)),NULL) as RAIN_ACCUMULATION,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_RD / 1.0, 2) as CHAR(30)),NULL) as RAIN_DURATION,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_RI / 100.0, 2) as CHAR(30)),NULL) as RAIN_INTENSITY,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_HC / 10.0, 2) as CHAR(30)),NULL) as HAIL_ACCUMULATION,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_HD / 1.0, 2) as CHAR(30)),NULL) as HAIL_DURATION,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_HI / 10.0, 2) as CHAR(30)),NULL) as HAIL_INTENSITY,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_RP / 100.0, 2) as CHAR(30)),NULL) as RAIN_PEAK_INTENSITY,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_HP / 10.0, 2) as CHAR(30)),NULL) as HAIL_PEAK_INTENSITY
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
