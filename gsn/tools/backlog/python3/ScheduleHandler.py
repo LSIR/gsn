@@ -214,9 +214,9 @@ class ScheduleHandlerClass(Thread):
             min = int(self.getOptionValue('max_gsn_connect_wait_minutes'))
             min += int(self.getOptionValue('max_gsn_get_schedule_wait_minutes'))
             min += int(self.getOptionValue('max_next_schedule_wait_minutes'))
-            min += self._backlogMain.getOverallPluginMaxRuntime()
             min += int(self.getOptionValue('hard_shutdown_offset_minutes'))
-            sec = int(self.getOptionValue('approximate_startup_seconds'))
+            sec = self._backlogMain.jobsobserver.getOverallPluginMaxRuntime()
+            sec += int(self.getOptionValue('approximate_startup_seconds'))
             td = timedelta(minutes=min, seconds=sec)
             nextdt, pluginclassname, commandstring, runtimemax = self._schedule.getNextSchedules(datetime.utcnow() + td)[0]
             self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), pluginclassname + ' ' + commandstring)
@@ -329,12 +329,11 @@ class ScheduleHandlerClass(Thread):
                     self._logger.debug('executing >' + pluginclassname + ' ' + commandstring + '< now')
                 if pluginclassname:
                     try:
-                        plugin = self._backlogMain.pluginAction(pluginclassname, commandstring)
+                        plugin = self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax)
                     except Exception as e:
                         self.exception('error in scheduled plugin >' + pluginclassname + ' ' + commandstring + '<:' + str(e))
                     else:
                         self._allJobsFinishedEvent.clear()
-                        self._backlogMain.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
                 else:
                     try:
                         job = subprocess.Popen(shlex.split(commandstring), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -489,8 +488,8 @@ class ScheduleHandlerClass(Thread):
             
             # wait for jobs to finish
             if not self._allJobsFinishedEvent.isSet():
-                self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(self._backlogMain.getOverallPluginMaxRuntime()) + ' minutes')
-                self._allJobsFinishedEvent.wait(2*JOB_PROCESS_CHECK_INTERVAL_SECONDS+(self._backlogMain.getOverallPluginMaxRuntime()*60))
+                self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(self._backlogMain.jobsobserver.getOverallPluginMaxRuntime()) + ' seconds')
+                self._allJobsFinishedEvent.wait(2*JOB_PROCESS_CHECK_INTERVAL_SECONDS+(self._backlogMain.jobsobserver.getOverallPluginMaxRuntime()))
                 if self._scheduleHandlerStop:
                     return True
                 if not self._allJobsFinishedEvent.isSet():

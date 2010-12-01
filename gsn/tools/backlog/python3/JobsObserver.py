@@ -119,6 +119,14 @@ class JobsObserverClass(Thread):
                 self._logger.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_minutes) + ' minutes')
             self._lock.release()
             self._work.set()
+            
+            
+    def getOverallPluginMaxRuntime(self):
+        overallMaxRuntime = 0
+        for job in self._jobList:
+            if overallMaxRuntime < job[3]:
+                overallMaxRuntime = job[3]
+        return overallMaxRuntime
 
 
     def stop(self):

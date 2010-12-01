@@ -329,11 +329,14 @@ class BackLogMainClass(Thread):
         return ret
     
     
-    def pluginAction(self, pluginclassname, parameters):
+    def pluginAction(self, pluginclassname, parameters, runtimemax):
         pluginactive = False
         for plugin_name, plugin in self.plugins.items():
             if plugin_name == pluginclassname:
-                self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
+                if runtimemax:
+                    self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
+                else:
+                    self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
                 plugin.action(parameters)
                 pluginactive = True
                 return plugin
@@ -349,7 +352,10 @@ class BackLogMainClass(Thread):
                     config_plugins_options = []
                 plugin = pluginclass(self, config_plugins_options)
                 self.plugins.update({pluginclassname: plugin})
-                self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
+                if runtimemax:
+                    self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
+                else:
+                    self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
                 self._logger.info('loaded plugin ' + pluginclassname)
             except Exception as e:
                 raise Exception('could not load plugin ' + pluginclassname + ': ' + str(e))
@@ -364,14 +370,6 @@ class BackLogMainClass(Thread):
                 plugin.stop()
                 del self.plugins[plugin_name]
                 return
-            
-            
-    def getOverallPluginMaxRuntime(self):
-        overallMaxRuntime = 0
-        for plugin in self.plugins.values():
-            if overallMaxRuntime < plugin.getMaxRuntime():
-                overallMaxRuntime = plugin.getMaxRuntime()
-        return overallMaxRuntime
         
         
         
