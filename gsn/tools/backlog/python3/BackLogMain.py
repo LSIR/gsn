@@ -16,11 +16,12 @@ import optparse
 import time
 import logging
 import logging.config
-from threading import Thread, Lock
+from threading import Thread, Lock, Event
 
 from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
+from JobsObserver import JobsObserverClass
 from ScheduleHandler import ScheduleHandlerClass
 
 PROFILE = False
@@ -46,9 +47,12 @@ class BackLogMainClass(Thread):
     data/instance attributes:
     _logger
     _startTime
+    jobsobserver
+    schedulehandler
     gsnpeer
     backlog
     plugins
+    duty_cycle_mode
     _exceptionCounter
     _exceptionCounterLock
     _errorCounter
@@ -72,10 +76,12 @@ class BackLogMainClass(Thread):
         
         self.shutdown = False
 
+        self.jobsobserver = JobsObserverClass(self)
         self._exceptionCounter = 0
         self._exceptionCounterLock = Lock()
         self._errorCounter = 0
         self._errorCounterLock = Lock()
+        self._stopEvent = Event()
 
         # read config file for other options
         self._config = configparser.SafeConfigParser()
@@ -177,10 +183,10 @@ class BackLogMainClass(Thread):
             raise TypeError('duty_cycle_mode has to be set to 1 or 0 in config file')
         elif dutycyclemode == 1:
             self._logger.info('running in duty-cycle mode')
-            duty_cycle_mode = True
+            self.duty_cycle_mode = True
         else:
             self._logger.info('not running in duty-cycle mode')
-            duty_cycle_mode = False
+            self.duty_cycle_mode = False
 
         self.gsnpeer = GSNPeerClass(self, id, gsn_port)
         self._logger.info('loaded GSNPeerClass')
@@ -199,7 +205,7 @@ class BackLogMainClass(Thread):
         except configparser.NoSectionError:
             raise TypeError('no [schedule] section specified in ' + config_file)
             
-        self.schedulehandler = ScheduleHandlerClass(self, duty_cycle_mode, config_schedule)
+        self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, config_schedule)
 
         # get plugins section from config files
         try:
@@ -210,7 +216,7 @@ class BackLogMainClass(Thread):
             self._logger.warning('use default plugins: ' + config_plugins)
 
         # init each plugin
-        self.plugins = []
+        self.plugins = {}
         for plugin_entry in config_plugins:
             if plugin_entry[1] == '0': continue
             module_name = plugin_entry[0]
@@ -223,7 +229,8 @@ class BackLogMainClass(Thread):
                     self._logger.warning('no [' + module_name + '_options] section specified in ' + config_file)
                     config_plugins_options = []
                 plugin = pluginclass(self, config_plugins_options)
-                self.plugins.append((module_name, plugin))
+                self.plugins.update({module_name: plugin})
+                self.jobsobserver.observeJob(plugin, module_name, True, plugin.getMaxRuntime())
                 self._logger.info('loaded plugin ' + module_name)
             except Exception as e:
                 self._logger.exception('could not load plugin ' + module_name + ': ' + str(e))
@@ -242,14 +249,18 @@ class BackLogMainClass(Thread):
         self.gsnpeer.start()
         self.backlog.start()
         self.schedulehandler.start()
+        self.jobsobserver.start()
 
-        for plugin_entry in self.plugins:
-            self._logger.info('starting ' + plugin_entry[0])
-            plugin_entry[1].start()
+        for plugin_name, plugin in self.plugins.items():
+            self._logger.info('starting ' + plugin_name)
+            plugin.start()
+            
+        self._stopEvent.wait()
         
-        for plugin_entry in self.plugins:
-            plugin_entry[1].join()
+        for plugin in self.plugins.values():
+            plugin.join()
         
+        self.jobsobserver.join()
         self.schedulehandler.join()
         if self._tospeer:
             self._tospeer.join()
@@ -260,10 +271,13 @@ class BackLogMainClass(Thread):
 
 
     def stop(self):
-        for plugin_entry in self.plugins:    
-            plugin_entry[1].stop()
-
+        self._stopEvent.set()
         self.schedulehandler.stop()
+        self.jobsobserver.stop()
+        
+        for plugin in self.plugins.values():  
+            plugin.stop()
+
         if self._tospeer:
             self._tospeer.stop()
         self.backlog.stop()
@@ -296,6 +310,15 @@ class BackLogMainClass(Thread):
     def registerTOSListener(self, listener):
         self.instantiateTOSPeer()
         self._tosListeners.append(listener)
+        self._logger.info(listener.__class__.__name__ + ' registered as TOS listener')
+        
+        
+    def deregisterTOSListener(self, listener):
+        for index, listenerfromlist in enumerate(self._tosListeners):
+            if listener == listenerfromlist:
+                del self._tosListeners[index]
+                self._logger.info(listener.__class__.__name__ + ' deregistered as TOS listener')
+                return
         
         
     def processTOSMsg(self, timestamp, payload):
@@ -308,10 +331,12 @@ class BackLogMainClass(Thread):
     
     def pluginAction(self, pluginclassname, parameters):
         pluginactive = False
-        for plugin_entry in self.plugins:
-            if plugin_entry[0] == pluginclassname:
-                plugin_entry[1].action(parameters)
+        for plugin_name, plugin in self.plugins.items():
+            if plugin_name == pluginclassname:
+                self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
+                plugin.action(parameters)
                 pluginactive = True
+                return plugin
                 
         if not pluginactive:
             try:
@@ -323,17 +348,35 @@ class BackLogMainClass(Thread):
                     self._logger.warning('no [' + pluginclassname + '_options] section specified in configuration file')
                     config_plugins_options = []
                 plugin = pluginclass(self, config_plugins_options)
-                self.plugins.append((pluginclassname, plugin))
+                self.plugins.update({pluginclassname: plugin})
+                self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
                 self._logger.info('loaded plugin ' + pluginclassname)
             except Exception as e:
                 raise Exception('could not load plugin ' + pluginclassname + ': ' + str(e))
             plugin.start()
             plugin.action(parameters)
+            return plugin
+        
+        
+    def pluginStop(self, pluginclassname):
+        for plugin_name, plugin in self.plugins.items():
+            if pluginclassname == plugin_name:
+                plugin.stop()
+                del self.plugins[plugin_name]
+                return
+            
+            
+    def getOverallPluginMaxRuntime(self):
+        overallMaxRuntime = 0
+        for plugin in self.plugins.values():
+            if overallMaxRuntime < plugin.getMaxRuntime():
+                overallMaxRuntime = plugin.getMaxRuntime()
+        return overallMaxRuntime
         
         
         
     def pluginsBusy(self):
-        for plugin_entry in self.plugins:
+        for plugin_entry in self.plugins.items():
             try:
                 if plugin_entry[1].isBusy():
                     return True
@@ -353,9 +396,9 @@ class BackLogMainClass(Thread):
             msgTypeValid = True
         else:
             # send the packet to all plugins which 'use' this message type
-            for plug in self.plugins:
-                if msgType == plug[1].getMsgType():
-                    plug[1].msgReceived(message.getPayload())
+            for plugin in self.plugins.values():
+                if msgType == plugin.getMsgType():
+                    plugin.msgReceived(message.getPayload())
                     msgTypeValid = True
                     break
         if not msgTypeValid:
@@ -365,24 +408,24 @@ class BackLogMainClass(Thread):
         
     def ackReceived(self, timestamp, msgType):
         # tell the plugins to have received an acknowledge message
-        for plugin_entry in self.plugins:
-            if plugin_entry[1].getMsgType() == msgType:
-                plugin_entry[1].ackReceived(timestamp)
+        for plugin in self.plugins.values():
+            if plugin.getMsgType() == msgType:
+                plugin.ackReceived(timestamp)
             
         # remove the message from the backlog database using its timestamp and message type
         self.backlog.removeMsg(timestamp, msgType)
         
     def connectionToGSNestablished(self):
         # tell the plugins that the connection to GSN has been established
-        for plugin_entry in self.plugins:
-            plugin_entry[1].connectionToGSNestablished()
+        for plugin in self.plugins.values():
+            plugin.connectionToGSNestablished()
         self.schedulehandler.connectionToGSNestablished()
         self.backlog.connectionToGSNestablished()
         
     def connectionToGSNlost(self):
         # tell the plugins that the connection to GSN has been lost
-        for plugin_entry in self.plugins:
-            plugin_entry[1].connectionToGSNlost()
+        for plugin in self.plugins.values():
+            plugin.connectionToGSNlost()
         self.backlog.connectionToGSNlost()
         
         

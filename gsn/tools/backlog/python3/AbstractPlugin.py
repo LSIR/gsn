@@ -24,6 +24,8 @@ class AbstractPluginClass(Thread):
     _backlogMain
     _config
     _backlog
+    _priority
+    _maxruntime
     '''
 
     def __init__(self, parent, config, backlog_default=False, priority_default=99):
@@ -47,8 +49,17 @@ class AbstractPluginClass(Thread):
             self._priority = priority_default
         else:
             self._priority = int(value)
+        
+        value = self.getOptionValue('max_runtime')
+        if value is None:
+            self._maxruntime = None
+        else:
+            self._maxruntime = int(value)
+            
         self.info('backlog: ' + str(self._backlog))
         self.info('priority: ' + str(self._priority))
+        if self._maxruntime:
+            self.info('max_runtime: ' + str(self._maxruntime))
         
 
     def getOptionValue(self, key):
@@ -158,6 +169,18 @@ class AbstractPluginClass(Thread):
         self._backlogMain.registerTOSListener(self)
     
     
+    def deregisterTOSListener(self):
+        '''
+        Deregister a plugin from TOS peer.
+        
+        This function should be used by the plugins to deregister themselves from the TOS peer.
+        After deregistering no more TOS messages will be received with tosMsgReceived(...).
+        If a plugin registered itself with registerTOSListener(), this function has to be called
+        at least once, if stop() is called!
+        '''
+        self._backlogMain.deregisterTOSListener(self)
+    
+    
     def tosMsgReceived(self, timestamp, payload):
         '''
         This function will be executed if a TOS message has been received from the serial
@@ -192,14 +215,14 @@ class AbstractPluginClass(Thread):
         '''
         This function will be executed as thread.
         '''
-        pass
+        self.info('started')
         
     
     def stop(self):
         '''
         This function have to stop the thread.
         '''
-        pass
+        self.info('stopped')
         
     
     def connectionToGSNestablished(self):
@@ -265,6 +288,15 @@ class AbstractPluginClass(Thread):
         @raise NotImplementedError: if this function is not implemented by the plugin
         '''
         raise NotImplementedError('isBusy is not implemented')
+    
+    
+    def isDutyCycleMode(self):
+        '''
+        Returns True if this Core Station is in duty-cycle mode.
+        
+        @return: True if this Core Station is in duty-cycle mode otherwise False
+        '''
+        return self._backlogMain.duty_cycle_mode
 
 
     def isGSNConnected(self):
@@ -274,6 +306,17 @@ class AbstractPluginClass(Thread):
         @return: True if GSN is connected otherwise False
         '''
         return self._backlogMain.gsnpeer.isConnected()
+    
+    
+    def getMaxRuntime(self):
+        '''
+        Returns the 'max_runtime' value set in the configuration file or
+        None if inexistent.
+        
+        @return: 'max_runtime' value set in the configuration file or
+                 None if inexistent.
+        '''
+        return self._maxruntime
 
 
     def getExceptionCounter(self):

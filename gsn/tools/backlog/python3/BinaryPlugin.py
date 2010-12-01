@@ -90,8 +90,6 @@ class BinaryPluginClass(AbstractPluginClass):
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options)
         
-        self._isBusy = True
-        
         self._rootdir = self.getOptionValue('rootdir')
         
         watches = self.getOptionValues('watch')
@@ -174,7 +172,11 @@ class BinaryPluginClass(AbstractPluginClass):
         for file in filetime:
             self._filedeque.appendleft(file[1])
             self.debug('putting existing file into FIFO: ' + file[1])
-
+            
+        if self._filedeque:
+            self._isBusy = True
+        else:
+            self._isBusy = False
                 
         self._filedescriptor = None
         self._waitforack = True

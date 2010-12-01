@@ -43,6 +43,7 @@ class TOSPluginClass(AbstractPluginClass):
     def stop(self):
         self._ready = False
         self._plugstop = True
+        self.deregisterTOSListener()
         # send close queue cmd to access node
         self._sendCloseQueueCommand()
         self.info('stopped')
@@ -59,6 +60,10 @@ class TOSPluginClass(AbstractPluginClass):
     def msgReceived(self, message):
         if self._ready:
             self.sendTOSmsg(self._backlog2tos(message), 0x00, 0.2, True, 10)
+            
+            
+    def isBusy(self):
+        return False
 
 
     def _sendCloseQueueCommand(self):
