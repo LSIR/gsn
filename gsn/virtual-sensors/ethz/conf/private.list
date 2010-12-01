@@ -14,6 +14,10 @@ Dirruhorn_Dozer_NodeHealth.xml
 Dirruhorn_Dozer_NodeInfo.xml
 Dirruhorn_Dozer_Rssi.xml
 Dirruhorn_Dozer_StateCounter.xml
+Dirruhorn_Dozer_WXT520Ident.xml
+Dirruhorn_Dozer_WXT520Prec.xml
+Dirruhorn_Dozer_WXT520Sup.xml
+Dirruhorn_Dozer_WXT520WindPth.xml
 Dirruhorn_Schedule.xml
 Dirruhorn_VaisalaWXT520.xml
 Dirruhorn_Topology.xml
@@ -50,6 +54,10 @@ Matterhorn_Dozer_NodeInfo.xml
 Matterhorn_Dozer_PowerSwitch.xml
 Matterhorn_Dozer_Rssi.xml
 Matterhorn_Dozer_StateCounter.xml
+Matterhorn_Dozer_WXT520Ident.xml
+Matterhorn_Dozer_WXT520Prec.xml
+Matterhorn_Dozer_WXT520Sup.xml
+Matterhorn_Dozer_WXT520WindPth.xml
 Matterhorn_Schedule.xml
 Matterhorn_VaisalaWXT520.xml
 Matterhorn_Topology.xml
