@@ -196,7 +196,7 @@ public class SensorNode {
 	private void updateVoltageHistory () {
 		voltageHistory.add(this.vsys);
 		if (voltageHistory.size()>VOLTAGE_HISTORY_SIZE)
-			voltageHistory.removeLast();
+			voltageHistory.removeFirst();
 	}
 
 	public void setCurrent(String current) {
