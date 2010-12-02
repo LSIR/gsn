@@ -16,6 +16,7 @@ import optparse
 import time
 import logging
 import logging.config
+import _thread
 from threading import Thread, Lock, Event
 
 from BackLogDB import BackLogDBClass
@@ -337,7 +338,7 @@ class BackLogMainClass(Thread):
                     self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
                 else:
                     self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
-                plugin.action(parameters)
+                _thread.start_new_thread(plugin.action, (parameters,))
                 pluginactive = True
                 return plugin
                 
@@ -360,7 +361,7 @@ class BackLogMainClass(Thread):
             except Exception as e:
                 raise Exception('could not load plugin ' + pluginclassname + ': ' + str(e))
             plugin.start()
-            plugin.action(parameters)
+            _thread.start_new_thread(plugin.action, (parameters,))
             return plugin
         
         

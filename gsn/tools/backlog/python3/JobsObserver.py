@@ -8,6 +8,8 @@ __id__          = "$Id: AbstractPlugin.py 2381 2010-11-15 13:51:38Z tgsell $"
 __source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/AbstractPlugin.py $"
 
 
+import os
+import signal
 import time
 import logging
 from threading import Event, Lock, Thread
@@ -27,6 +29,7 @@ class JobsObserverClass(Thread):
         self._jobList = []
         self._work = Event()
         self._wait = Event()
+        self._waitforjob = Event()
         self._jobsObserverStop = False
         
         
@@ -63,20 +66,29 @@ class JobsObserverClass(Thread):
                     else:
                         ret = job[1].poll()
                         if ret == None:
-                            pid = job[1].pid
-                            if job[3] <= JOB_PROCESS_CHECK_INTERVAL_SECONDS:
-                                if pid <= 1:
-                                    self.error('wanted to kill PID ' + str(pid))
+                            if job[3] != -1:
+                                pid = job[1].pid
+                                if job[3] <= JOB_PROCESS_CHECK_INTERVAL_SECONDS:
+                                    if pid <= 1:
+                                        self.error('wanted to kill PID ' + str(pid))
+                                    else:
+                                        self.error('job (' + job[2] + ') with PID ' + str(pid) + ' has not finished in time -> kill it')
+                                        os.killpg(pid, signal.SIGTERM)
+                                        self._logger.warning('wait for job (' + job[2] + ') to be killed')
+                                        self._wait.wait(0.1)
+                                        if not job[1].poll():
+                                            self._wait.wait(3)
+                                        if self._wait.isSet():
+                                            break
+                                        if not job[1].poll():
+                                            os.killpg(pid, signal.SIGKILL)
+                                        job[1].wait()
+                                        output = job[1].communicate()
+                                        self.error('job (' + job[2] + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                        del self._jobList[index]
                                 else:
-                                    job[1].kill()
-                                    self._logger.warning('wait for job (' + job[2] + ') to be killed')
-                                    job[1].wait()
-                                    output = job[1].communicate()
-                                    self.error('job (' + job[2] + ') with PID ' + str(pid) + ' has not finished in time  (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
-                                    del self._jobList[index]
-                            else:
-                                self._logger.debug('job (' + job[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(job[3]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
-                                self._jobList[index][3] = job[3]-JOB_PROCESS_CHECK_INTERVAL_SECONDS
+                                    self._logger.debug('job (' + job[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(job[3]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
+                                    self._jobList[index][3] = job[3]-JOB_PROCESS_CHECK_INTERVAL_SECONDS
                         else:
                             output = job[1].communicate()
                             if ret == 0:
@@ -101,7 +113,7 @@ class JobsObserverClass(Thread):
         
         
     def observeJob(self, job, job_name, isPlugin, max_runtime_minutes):
-        if max_runtime_minutes and not self._jobsObserverStop:
+        if (max_runtime_minutes or not isPlugin) and not self._jobsObserverStop:
             self._lock.acquire()
             if isPlugin:
                 jobexists = False
@@ -115,7 +127,10 @@ class JobsObserverClass(Thread):
                     self._jobList.append([isPlugin, job, job_name, max_runtime_minutes * 60])
                     self._logger.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_minutes) + ' minutes')
             else:
-                self._jobList.append([isPlugin, job, job_name, max_runtime_minutes * 60])
+                if max_runtime_minutes:
+                    self._jobList.append([isPlugin, job, job_name, max_runtime_minutes * 60])
+                else:
+                    self._jobList.append([isPlugin, job, job_name, -1])
                 self._logger.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_minutes) + ' minutes')
             self._lock.release()
             self._work.set()
@@ -124,8 +139,11 @@ class JobsObserverClass(Thread):
     def getOverallPluginMaxRuntime(self):
         overallMaxRuntime = 0
         for job in self._jobList:
-            if overallMaxRuntime < job[3]:
-                overallMaxRuntime = job[3]
+            if job[3] == -1:
+                return None
+            else:
+                if  overallMaxRuntime < job[3]:
+                    overallMaxRuntime = job[3]
         return overallMaxRuntime
 
 
@@ -139,8 +157,13 @@ class JobsObserverClass(Thread):
                 self._backlogMain.pluginStop(job[2])
             else:
                 self.error('job (' + job[2] + ') with PID ' + str(job[1].pid) + ' has not finished yet -> kill it')
-                job[1].kill()
+                os.killpg(job[1].pid, signal.SIGTERM)
                 self._logger.warning('wait for job (' + job[2] + ') to be killed')
+                self._wait.wait(0.1)
+                if not job[1].poll():
+                    self._wait.wait(3)
+                if not job[1].poll():
+                    os.killpg(job[1].pid, signal.SIGKILL)
                 job[1].wait()
                 output = job[1].communicate()
                 self.error('job (' + job[2] + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
