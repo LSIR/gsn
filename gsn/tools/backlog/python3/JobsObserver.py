@@ -137,10 +137,12 @@ class JobsObserverClass(Thread):
             
             
     def getOverallPluginMaxRuntime(self):
+        if not self._jobList:
+            return None
         overallMaxRuntime = 0
         for job in self._jobList:
             if job[3] == -1:
-                return None
+                return job[3]
             else:
                 if  overallMaxRuntime < job[3]:
                     overallMaxRuntime = job[3]

@@ -1,4 +1,3 @@
-
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
@@ -8,6 +7,7 @@ __id__          = "$Id: ScheduleHandler.py 2386 2010-11-19 10:08:38Z tgsell $"
 __source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/ScheduleHandler.py $"
 
 import time
+import string
 import struct
 import re
 import os
@@ -217,12 +217,13 @@ class ScheduleHandlerClass(Thread):
             min += int(self.getOptionValue('hard_shutdown_offset_minutes'))
             sec = int(self.getOptionValue('approximate_startup_seconds'))
             maxruntime = self._backlogMain.jobsobserver.getOverallPluginMaxRuntime()
-            if maxruntime:
+            if maxruntime and maxruntime != -1:
                 sec += maxruntime
             td = timedelta(minutes=min, seconds=sec)
             nextschedule, error = self._schedule.getNextSchedules(datetime.utcnow() + td)
             if error:
-                self.error('error while parsing the schedule file: ' + str(error))
+                for e in error:
+                    self.error('error while parsing the schedule file: ' + str(e))
             if nextschedule:
                 nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
                 self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), pluginclassname + ' ' + commandstring)
@@ -276,9 +277,11 @@ class ScheduleHandlerClass(Thread):
             if self._schedule:
                 # get the next schedule(s) in time
                 self._scheduleLock.acquire()
+#                t = time.time()
                 nextschedules, error = self._schedule.getNextSchedules(dtnow, lookback)
-                if error:
-                    self.error('error while parsing the schedule file: ' + str(error))
+#                self._logger.info('getNextSchedules time: ' + str(time.time()-t) + 's')
+                for e in error:
+                    self.error('error while parsing the schedule file: ' + str(e))
                 self._scheduleEvent.clear()
                 lookback = False
                 self._scheduleLock.release()
@@ -334,7 +337,10 @@ class ScheduleHandlerClass(Thread):
                         break
                 else:
                     if nextdt > dtnow:
-                        self._logger.debug('executing >' + pluginclassname + ' ' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                        if pluginclassname:
+                            self._logger.debug('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                        else:
+                            self._logger.debug('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if (self._scheduleHandlerStop or self._newSchedule) or (self._duty_cycle_mode and not self._beacon):
                             self._newSchedule = False
@@ -347,11 +353,10 @@ class ScheduleHandlerClass(Thread):
                     else:
                         self._logger.debug('executing >' + pluginclassname + '.action("' + commandstring + '")< now')
                     try:
+                        self._allJobsFinishedEvent.clear()
                         plugin = self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax)
                     except Exception as e:
                         self.exception('error in scheduled plugin >' + pluginclassname + ' ' + commandstring + '<:' + str(e))
-                    else:
-                        self._allJobsFinishedEvent.clear()
                 else:
                     if self._duty_cycle_mode:
                         self._logger.info('executing >' + commandstring + '< now')
@@ -512,11 +517,11 @@ class ScheduleHandlerClass(Thread):
                     return False
             
             # wait for jobs to finish
-            if not self._allJobsFinishedEvent.isSet():
-                maxruntime = self._backlogMain.jobsobserver.getOverallPluginMaxRuntime()
-                if maxruntime:
+            maxruntime = self._backlogMain.jobsobserver.getOverallPluginMaxRuntime()
+            if not self._allJobsFinishedEvent.isSet() and maxruntime:
+                if maxruntime != -1:
                     self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(maxruntime) + ' seconds')
-                    self._allJobsFinishedEvent.wait(5+(maxruntime))
+                    self._allJobsFinishedEvent.wait(5+maxruntime)
                 else:
                     self._logger.info('waiting for all active jobs to finish indefinitely')
                     self._allJobsFinishedEvent.wait()
@@ -551,8 +556,8 @@ class ScheduleHandlerClass(Thread):
             if self._schedule:
                 td = timedelta(seconds=int(self.getOptionValue('approximate_startup_seconds')))
                 nextschedule, error = self._schedule.getNextSchedules(datetime.utcnow() + td)
-                if error:
-                    self.error('error while parsing the schedule file: ' + str(error))
+                for e in error:
+                    self.error('error while parsing the schedule file: ' + str(e))
                 if nextschedule:
                     nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
                     self._logger.info('schedule next duty wakeup')
@@ -751,8 +756,15 @@ class ScheduleCron(CronTab):
         now = datetime.utcnow()
         error = []
         for schedule in self.crons:
-            runtimemax = None
             commandstring = str(schedule.command).strip()
+            
+            try:
+#                t = time.time()
+                backwardmin, commandstring = self._getSpecialParameter(commandstring, BACKWARD_TOLERANCE_NAME)
+                runtimemax, commandstring = self._getSpecialParameter(commandstring, MAX_RUNTIME_NAME)
+#                error.append('2*_getSpecialParameter time: ' + str(time.time()-t))
+            except TypeError as e:
+                error.append(e)
             
             splited = commandstring.split(None, 1)
             type = splited[0]
@@ -773,54 +785,61 @@ class ScheduleCron(CronTab):
                 error.append('PLUGIN or SCRIPT definition is missing in the current schedule >' + str(schedule) + '<')
                 continue
             
-            back_index = commandstring.lower().find(BACKWARD_TOLERANCE_NAME)
-            run_index = commandstring.lower().find(MAX_RUNTIME_NAME)
-            td = timedelta()
-            
-            if back_index != -1 and run_index != -1:
-                if back_index < run_index:
-                    runtimemax = int(commandstring[run_index:].strip().replace(MAX_RUNTIME_NAME+'=',''))
-                    if look_backward:
-                        backwardmin = int(commandstring[back_index:run_index].strip().replace(BACKWARD_TOLERANCE_NAME+'=',''))
-                        td = timedelta(minutes=backwardmin)
-                        nextdt = self._getNextSchedule(date_time - td, schedule)
-                        if nextdt < now:
-                            backward_schedules.append((nextdt, pluginclassname, commandstring[:back_index].strip(), runtimemax))
-                        
-                    commandstring = commandstring[:back_index].strip()
-                else:      
-                    runtimemax = int(commandstring[run_index:back_index].strip().replace(MAX_RUNTIME_NAME+'=',''))
-                    if look_backward:
-                        backwardmin = int(commandstring[back_index:].strip().replace(BACKWARD_TOLERANCE_NAME+'=',''))
-                        td = timedelta(minutes=backwardmin)
-                        nextdt = self._getNextSchedule(date_time - td, schedule)
-                        if nextdt < now:
-                            backward_schedules.append((nextdt, pluginclassname, commandstring[:run_index].strip(), runtimemax))
-                        
-                    commandstring = commandstring[:run_index].strip()
-            elif back_index != -1:
-                if look_backward:
-                    backwardmin = int(commandstring[back_index:].strip().replace(BACKWARD_TOLERANCE_NAME+'=',''))
-                    td = timedelta(minutes=backwardmin)
-                    nextdt = self._getNextSchedule(date_time - td, schedule)
-                    if nextdt < now:
-                        backward_schedules.append((nextdt, pluginclassname, commandstring[:back_index].strip(), runtimemax))
-                    
-                commandstring = commandstring[:back_index].strip()
-            elif run_index != -1:
-                runtimemax = int(commandstring[run_index:].strip().replace(MAX_RUNTIME_NAME+'=',''))
-                commandstring = commandstring[:run_index].strip()
+            if look_backward and backwardmin:
+                td = timedelta(minutes=backwardmin)
+#                t = time.time()
+                nextdt = self._getNextSchedule(date_time - td, schedule)
+#                error.append('_getNextSchedule time: ' + str(time.time()-t))
+                if nextdt < now:
+                    backward_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
             
                 
+#            t = time.time()
             nextdt = self._getNextSchedule(date_time, schedule)
+#            error.append('_getNextSchedule time: ' + str(time.time()-t))
             if not future_schedules or nextdt < future_schedules[0][0]:
                 future_schedules = []
-                future_schedules.append((nextdt, pluginclassname, commandstring, runtimemax))
+                future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
             elif nextdt == future_schedules[0][0]:
-                future_schedules.append((nextdt, pluginclassname, commandstring, runtimemax))
+                future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
             
         return ((backward_schedules + future_schedules), error)
-    
+
+
+    def _getSpecialParameter(self, commandstring, param_name):
+        param_start_index = commandstring.lower().find(param_name)
+        if param_start_index == -1:
+            return (None, commandstring)
+        param_end_index = param_start_index+len(param_name)
+        
+        try:
+            if commandstring[param_end_index] != '=':
+                raise TypeError('wrongly formatted \'' + param_name + '\' parameter in the schedule file (format: ' + param_name + '=INTEGER)')
+            else:
+                param_end_index += 1
+        except IndexError as e:
+            raise TypeError('wrongly formatted \'' + param_name + '\' parameter in the schedule file (format: ' + param_name + '=INTEGER)')
+            
+        digit = ''
+        while True:
+            try:
+                if commandstring[param_end_index] in string.digits:
+                    digit += commandstring[param_end_index]
+                    param_end_index += 1
+                elif commandstring[param_end_index] == ' ':
+                    param_end_index += 1
+                    break
+                else:
+                    raise TypeError('wrongly formatted \'' + param_name + '\' parameter in the schedule file (format: ' + param_name + '=INTEGER)')
+            except IndexError:
+                break
+            
+        if not digit:
+            raise TypeError('wrongly formatted \'' + param_name + '\' parameter in the schedule file (format: ' + param_name + '=INTEGER)')
+            
+        commandstring = commandstring[:param_start_index].strip() + ' ' + commandstring[param_end_index:].strip()
+        return (int(digit), commandstring)
+        
     
     def _getNextSchedule(self, date_time, schedule):
         second = 0
