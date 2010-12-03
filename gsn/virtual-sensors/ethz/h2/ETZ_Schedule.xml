@@ -48,7 +48,7 @@
         <stream name="data3">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">tik-gumstix02.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -58,7 +58,7 @@
         <stream name="data4">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">tik-gumstix03.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -68,7 +68,37 @@
         <stream name="data5">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">tik-gumstix04.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data6">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data7">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data8">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
