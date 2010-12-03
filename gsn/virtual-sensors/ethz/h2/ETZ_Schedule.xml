@@ -45,7 +45,7 @@
             </source>
             <query> select * from source </query>
         </stream>
-        <!--stream name="data2">
+        <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix01.ethz.ch:9003</predicate>
@@ -54,6 +54,36 @@
                 <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
-        </stream-->
+        </stream>
+        <stream name="data3">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data4">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix03.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data5">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix04.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
     </streams>
 </virtual-sensor>

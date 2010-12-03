@@ -49,5 +49,60 @@
             </source>
             <query> select * from source </query>
         </stream>
+        <stream name="data3">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520PrecMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data4">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520PrecMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data5">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520PrecMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data6">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520PrecMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data7">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520PrecMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
 </streams>
 </virtual-sensor>
