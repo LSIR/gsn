@@ -83,20 +83,20 @@ class JobsObserverClass(Thread):
                                         if not job.poll():
                                             os.killpg(pid, signal.SIGKILL)
                                         job.wait()
-                                        output = job.communicate()
-                                        self.error('job (' + job_name + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                        stdoutdata, stderrdata = job.communicate()
+                                        self.error('job (' + job_name + ') has been killed (STDOUT=' + stdoutdata.decode() + ' /STDERR=' + stderrdata.decode() + ')')
                                         del self._jobList[index]
                                 else:
                                     self._logger.debug('job (' + job_name + ') with PID ' + str(pid) + ' not yet finished -> ' + str(runtime_left-datetime.utcnow()) + ' time to run')
                         else:
-                            output = job.communicate()
+                            stdoutdata, stderrdata = job.communicate()
                             if ret == 0:
                                 if self._backlogMain.duty_cycle_mode:
-                                    self._logger.info('job (' + job_name + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                    self._logger.info('job (' + job_name + ') finished successfully (STDOUT=' + stdoutdata.decode() + ' /STDERR=' + stderrdata.decode() + ')')
                                 else:
-                                    self._logger.debug('job (' + job_name + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                    self._logger.debug('job (' + job_name + ') finished successfully (STDOUT=' + stdoutdata.decode() + ' /STDERR=' + stderrdata.decode() + ')')
                             else:
-                                self.error('job (' + job_name + ') finished with return code ' + str(ret) + ' (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                self.error('job (' + job_name + ') finished with return code ' + str(ret) + ' (STDOUT=' + stdoutdata.decode() + ' /STDERR=' + stderrdata.decode() + ')')
                             del self._jobList[index]
                 
                 self._lock.acquire()
