@@ -612,18 +612,18 @@ class TOSMessageHandler(Thread):
             # is there something to do?
             while not self._sendqueue.empty() and not self._tosMessageHandlerStop:
                 try:
-                    item = self._sendqueue.get_nowait()
+                    packet, blocking = self._sendqueue.get_nowait()
                 except queue.Empty:
                     self._logger.warning('send queue is empty')
                     break
                 
-                if item[1]:
-                    self._sentCmd = item[0]['command']
+                if blocking:
+                    self._sentCmd = packet['command']
 
                 self._logger.debug('snd...')
-                self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG, 0.2)
+                self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(packet, AM_CONTROL_CMD_MSG, 0.2)
                 
-                if item[1]:
+                if blocking:
                     while True:
                         self._ackEvent.wait(3)
                         if self._tosMessageHandlerStop:
@@ -631,7 +631,7 @@ class TOSMessageHandler(Thread):
                             return
                         elif not self._ackEvent.isSet():
                             self._logger.info('resend command (' + str(self._sentCmd) + ') to TOS node')
-                            self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(item[0], AM_CONTROL_CMD_MSG, 0.2)
+                            self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(packet, AM_CONTROL_CMD_MSG, 0.2)
                         else:
                             self._sentCmd = None
                             self._ackEvent.clear()
@@ -756,6 +756,7 @@ class ScheduleCron(CronTab):
         now = datetime.utcnow()
         error = []
         for schedule in self.crons:
+            runtimemax = None
             commandstring = str(schedule.command).strip()
             
             try:
@@ -826,7 +827,7 @@ class ScheduleCron(CronTab):
                 if commandstring[param_end_index] in string.digits:
                     digit += commandstring[param_end_index]
                     param_end_index += 1
-                elif commandstring[param_end_index] == ' ':
+                elif commandstring[param_end_index] in string.whitespace:
                     param_end_index += 1
                     break
                 else:

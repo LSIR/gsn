@@ -28,7 +28,7 @@ class AbstractPluginClass(Thread):
     _maxruntime
     '''
 
-    def __init__(self, parent, config, backlog_default=False, priority_default=99):
+    def __init__(self, parent, config, backlog_default=True, priority_default=99):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
         self._backlogMain = parent

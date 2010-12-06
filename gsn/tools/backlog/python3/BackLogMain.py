@@ -272,12 +272,13 @@ class BackLogMainClass(Thread):
 
 
     def stop(self):
-        self._stopEvent.set()
         self.schedulehandler.stop()
         self.jobsobserver.stop()
         
         for plugin in self.plugins.values():  
             plugin.stop()
+            
+        self._stopEvent.set()
 
         if self._tospeer:
             self._tospeer.stop()

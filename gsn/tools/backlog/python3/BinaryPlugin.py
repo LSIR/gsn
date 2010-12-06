@@ -163,8 +163,8 @@ class BinaryPluginClass(AbstractPluginClass):
                     time = os.stat(f).st_mtime
                     filetime.append((time, f))
                     
-        for watch in self._watches:
-            self.debug('watch: ' + watch[0] + '  -  ' + str(watch[1]) + '  -  ' + watch[2])
+        for path, storage, time_format in self._watches:
+            self.debug('watch: ' + path + '  -  ' + str(storage) + '  -  ' + time_format)
         
         # sort the existing files by time
         filetime.sort()

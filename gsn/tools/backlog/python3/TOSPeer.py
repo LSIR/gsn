@@ -150,14 +150,14 @@ class TOSWriter(Thread):
             # is there something to do?
             while not self._sendqueue.empty() and not self._tosWriterStop:
                 try:
-                    list = self._sendqueue.get_nowait()
+                    packet, amId, timeout, blocking, maxretries = self._sendqueue.get_nowait()
                 except queue.Empty:
                     self._logger.warning('send queue is empty')
                     break
                 
                 try:
-                    self._tosPeer._serialsource.write(list[0], list[1], list[2], list[3], list[4])
-                    self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(list[0])))
+                    self._tosPeer._serialsource.write(packet, amId, timeout, blocking, maxretries)
+                    self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(packet)))
                 except Exception as e:
                     if not self._tosWriterStop:
                         self._logger.warning('could not write message to serial port: ' + e.__str__())

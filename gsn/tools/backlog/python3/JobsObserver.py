@@ -10,8 +10,8 @@ __source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/pe
 
 import os
 import signal
-import time
 import logging
+from datetime import datetime, timedelta
 from threading import Event, Lock, Thread
 
 
@@ -46,58 +46,57 @@ class JobsObserverClass(Thread):
                 if self._jobsObserverStop:
                     break
                 
-                for index, job in enumerate(self._jobList):
-                    if job[0]:
-                        if job[1].isBusy():
-                            if job[3] <= JOB_PROCESS_CHECK_INTERVAL_SECONDS:
-                                self._logger.warning('plugin (' + job[2] + ') has not finished in time -> stop it')
-                                self._backlogMain.pluginStop(job[2])
+                for index, joblistentry in enumerate(self._jobList):
+                    isPlugin, job, job_name, runtime_left = joblistentry
+                    if isPlugin:
+                        if job.isBusy():
+                            if runtime_left < datetime.utcnow():
+                                self._logger.warning('plugin (' + job_name + ') has not finished in time -> stop it')
+                                self._backlogMain.pluginStop(job_name)
                                 del self._jobList[index]
                             else:
-                                self._logger.debug('plugin (' + job[2] + ') has not yet finished -> ' + str(job[3]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
-                                self._jobList[index][3] = job[3]-JOB_PROCESS_CHECK_INTERVAL_SECONDS
+                                self._logger.debug('plugin (' + job_name + ') has not yet finished -> ' + str(runtime_left-datetime.utcnow()) + ' time to run')
                         else:
                             if self._backlogMain.duty_cycle_mode:
-                                self._logger.info('plugin (' + job[2] + ') finished successfully')
+                                self._logger.info('plugin (' + job_name + ') finished successfully')
                             else:
-                                self._logger.debug('plugin (' + job[2] + ') finished successfully')
-                            self._backlogMain.pluginStop(job[2])
+                                self._logger.debug('plugin (' + job_name + ') finished successfully')
+                            self._backlogMain.pluginStop(job_name)
                             del self._jobList[index]
                     else:
-                        ret = job[1].poll()
+                        ret = job.poll()
                         if ret == None:
-                            if job[3] != -1:
-                                pid = job[1].pid
-                                if job[3] <= JOB_PROCESS_CHECK_INTERVAL_SECONDS:
+                            if runtime_left != -1:
+                                pid = job.pid
+                                if runtime_left < datetime.utcnow():
                                     if pid <= 1:
                                         self.error('wanted to kill PID ' + str(pid))
                                     else:
-                                        self.error('job (' + job[2] + ') with PID ' + str(pid) + ' has not finished in time -> kill it')
+                                        self.error('job (' + job_name + ') with PID ' + str(pid) + ' has not finished in time -> kill it')
                                         os.killpg(pid, signal.SIGTERM)
-                                        self._logger.warning('wait for job (' + job[2] + ') to be killed')
+                                        self._logger.warning('wait for job (' + job_name + ') to be killed')
                                         self._wait.wait(0.1)
-                                        if not job[1].poll():
+                                        if not job.poll():
                                             self._wait.wait(3)
                                         if self._wait.isSet():
                                             break
-                                        if not job[1].poll():
+                                        if not job.poll():
                                             os.killpg(pid, signal.SIGKILL)
-                                        job[1].wait()
-                                        output = job[1].communicate()
-                                        self.error('job (' + job[2] + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                        job.wait()
+                                        output = job.communicate()
+                                        self.error('job (' + job_name + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                                         del self._jobList[index]
                                 else:
-                                    self._logger.debug('job (' + job[2] + ') with PID ' + str(pid) + ' not yet finished -> ' + str(job[3]-JOB_PROCESS_CHECK_INTERVAL_SECONDS) + ' more seconds to run')
-                                    self._jobList[index][3] = job[3]-JOB_PROCESS_CHECK_INTERVAL_SECONDS
+                                    self._logger.debug('job (' + job_name + ') with PID ' + str(pid) + ' not yet finished -> ' + str(runtime_left-datetime.utcnow()) + ' time to run')
                         else:
-                            output = job[1].communicate()
+                            output = job.communicate()
                             if ret == 0:
                                 if self._backlogMain.duty_cycle_mode:
-                                    self._logger.info('job (' + job[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                    self._logger.info('job (' + job_name + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                                 else:
-                                    self._logger.debug('job (' + job[2] + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                    self._logger.debug('job (' + job_name + ') finished successfully (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                             else:
-                                self.error('job (' + job[2] + ') finished with return code ' + str(ret) + ' (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                                self.error('job (' + job_name + ') finished with return code ' + str(ret) + ' (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
                             del self._jobList[index]
                 
                 self._lock.acquire()
@@ -117,20 +116,20 @@ class JobsObserverClass(Thread):
             self._lock.acquire()
             if isPlugin:
                 jobexists = False
-                for index, jobfromlist in enumerate(self._jobList):
-                    if job_name == jobfromlist[2]:
-                        self._jobList[index] = [isPlugin, job, job_name, max_runtime_minutes * 60]
+                for index, joblistentry in enumerate(self._jobList):
+                    if job_name == joblistentry[2]:
+                        self._jobList[index] = (isPlugin, job, job_name, datetime.utcnow()+timedelta(minutes=max_runtime_minutes))
                         jobexists = True
                         self._logger.debug('job (' + job_name + ') updated with the maximum runtime of ' + str(max_runtime_minutes) + ' minutes')
                         break
                 if not jobexists:
-                    self._jobList.append([isPlugin, job, job_name, max_runtime_minutes * 60])
+                    self._jobList.append((isPlugin, job, job_name, datetime.utcnow()+timedelta(minutes=max_runtime_minutes)))
                     self._logger.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_minutes) + ' minutes')
             else:
                 if max_runtime_minutes:
-                    self._jobList.append([isPlugin, job, job_name, max_runtime_minutes * 60])
+                    self._jobList.append((isPlugin, job, job_name, datetime.utcnow()+timedelta(minutes=max_runtime_minutes)))
                 else:
-                    self._jobList.append([isPlugin, job, job_name, -1])
+                    self._jobList.append((isPlugin, job, job_name, -1))
                 self._logger.debug('new job (' + job_name + ') added with a maximum runtime of ' + str(max_runtime_minutes) + ' minutes')
             self._lock.release()
             self._work.set()
@@ -139,14 +138,14 @@ class JobsObserverClass(Thread):
     def getOverallPluginMaxRuntime(self):
         if not self._jobList:
             return None
-        overallMaxRuntime = 0
-        for job in self._jobList:
-            if job[3] == -1:
-                return job[3]
+        overallMaxRuntime = timedelta()
+        for isPlugin, job, job_name, runtime_left in self._jobList:
+            if runtime_left == -1:
+                return runtime_left
             else:
-                if  overallMaxRuntime < job[3]:
-                    overallMaxRuntime = job[3]
-        return overallMaxRuntime
+                if  overallMaxRuntime < runtime_left:
+                    overallMaxRuntime = runtime_left
+        return overallMaxRuntime.seconds + overallMaxRuntime.days * 86400 + overallMaxRuntime.microseconds/1000000.0
 
 
     def stop(self):
@@ -154,21 +153,21 @@ class JobsObserverClass(Thread):
         self._work.set()
         self._wait.set()
         
-        for job in self._jobList:
-            if job[0]:
-                self._backlogMain.pluginStop(job[2])
+        for isPlugin, job, job_name, runtime_left in self._jobList:
+            if isPlugin:
+                self._backlogMain.pluginStop(job_name)
             else:
-                self.error('job (' + job[2] + ') with PID ' + str(job[1].pid) + ' has not finished yet -> kill it')
-                os.killpg(job[1].pid, signal.SIGTERM)
-                self._logger.warning('wait for job (' + job[2] + ') to be killed')
+                self.error('job (' + job_name + ') with PID ' + str(job.pid) + ' has not finished yet -> kill it')
+                os.killpg(job.pid, signal.SIGTERM)
+                self._logger.warning('wait for job (' + job_name + ') to be killed')
                 self._wait.wait(0.1)
-                if not job[1].poll():
+                if not job.poll():
                     self._wait.wait(3)
-                if not job[1].poll():
-                    os.killpg(job[1].pid, signal.SIGKILL)
-                job[1].wait()
-                output = job[1].communicate()
-                self.error('job (' + job[2] + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
+                if not job.poll():
+                    os.killpg(job.pid, signal.SIGKILL)
+                job.wait()
+                output = job.communicate()
+                self.error('job (' + job_name + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
             
         self._logger.info('stopped')
         
