@@ -57,7 +57,7 @@ class TOSPluginClass(AbstractPluginClass):
             
     def msgReceived(self, message):
         if self._ready:
-            self.sendTOSmsg(self._backlog2tos(message), 0x00, 0.2, True, 10)
+            self.sendTOSmsg(self._backlog2tos(message), 0x00, 1, True, 10)
 
 
     def _sendCloseQueueCommand(self):
