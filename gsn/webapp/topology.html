@@ -33,7 +33,7 @@ var STANDBY_TIMEOUT_MS = 300000;
 var rssi_dist = 25;
 var topologyUpdateTimer;
 var unmarkTimer;
-var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
+var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520", "powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
 var healthitems=new Array("packet_count", "vsys", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
 
 var GSN = {
@@ -166,11 +166,13 @@ function PacketRate() {
           // change if not equal
           if ($("input:first",this).data("enabled")=="true" && !$("input:first", this).attr("checked")) {
             $("input:first", this).attr("checked", "true");
+            $("input:first", this).attr("name", "checked");
             if (apply)
               $(this).addClass("changing");
           }
           else if ($("input:first",this).data("enabled")=="false" && $("input:first", this).attr("checked")) {
             $("input:first", this).attr("checked", "");
+            $("input:first", this).attr("name", "none");
             if (apply)
               $(this).addClass("changing");
           }
@@ -298,13 +300,21 @@ function PacketRate() {
       var index = nodeindex(id);
       if (index < 0) {
         table.append("<tr class=\"disabled\">"+
-          "<td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
+          "<td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
           "<td></td><td></td><td></td><td></td><td></td></tr>");
         if (isConfigurable)
         $("tr:last", table).bind("click",function() {
           if (!$(this).hasClass("disabled"))
             return;
-          $("input",this).each(function(){ $(this).removeAttr("disabled")});
+          $("input",this).each(function(){
+            $(this).removeAttr("disabled");
+            $(this).bind("change", function() {
+              if ($(this).attr("checked"))
+                $(this).attr("name", "checked");
+              else
+                $(this).attr("name", "none");
+            });
+          });
           $(this).removeClass("disabled");
           if ($(".configtab input", "#topology_"+current_deployment.name).length==0) {
             // add config form
@@ -331,7 +341,7 @@ function PacketRate() {
                     case 7: //  .. and event packets
                       c = c + " "+configitems[index-1]+"=\"true\"";
                       break;
-                    case 14: break;
+                    case 15: break;
                     default:
                       if ($(this).children().length > 0)
                         c = c + " "+configitems[index-1]+"=\"" + ($("input:first", this).attr("checked")?"true":"false")+"\"";
@@ -343,6 +353,7 @@ function PacketRate() {
                 }
               });
               generated_config=generated_config+"</sensornodes></network>";
+              $("#debug").append(generated_config);
               $("input[name='dataconfiguration;configuration']", configtab).attr("value", generated_config);
               // submit
               $("form", configtab).submit();
@@ -390,7 +401,7 @@ function PacketRate() {
         $("td", row).each(function(index,value) {
             switch (index) {
             case 0: break;
-            case 14:
+            case 15:
               $(this).text(formatTime($(data).attr(configitems[index-1])));
               break;
             default:
@@ -411,6 +422,7 @@ function PacketRate() {
                   else
                     $(this).removeClass("changing");
                   $("input:first", this).attr("checked", $(data).attr(configitems[index-1])=="true"?"checked":"");
+                  $("input:first", this).attr("name", $(data).attr(configitems[index-1])=="true"?"checked":"none");
                 }
                 else {// compare to current status
                   if ($("input:first", this).attr("checked") && $(data).attr(configitems[index-1])=="true" ||
@@ -609,6 +621,27 @@ $(document).ready(function() {
           .label.add(pv.Label)
           .text(function(d) {return d.node_id;})
           .font(function() {return "bold 11px sans-serif";});
+        // add parser for sorting
+        $.tablesorter.addParser({ 
+          // set a unique id 
+          id: 'checkbox', 
+          is: function(s) { 
+            // return false so this parser is not auto detected 
+            return false; 
+          }, 
+          format: function(s) { 
+            // format your data for normalization 
+            var test = s;
+            if (s.length==0)
+              return 0;
+            else if (s.indexOf("checked")==-1)
+              return 1;
+            else
+              return 2;
+          }, 
+          // set type, either numeric or text 
+          type: 'numeric' 
+        }); 
         // add health table
         $($(".healthtable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
             "<th class=\"header\" style=\"width:30px\">ID</th>"+
@@ -624,7 +657,19 @@ $(document).ready(function() {
             "<th class=\"header\">Packetrate</th>"+
             "</tr></thead><tbody></tbody></table>");
         $("#topology_"+deployments[i]).find(".healthtable table").tablesorter({ 
-           widthFixed: true
+          widthFixed: true,
+          headers:
+            { 
+              0: { sorter: 'digit' },
+              1: { sorter: 'digit' },
+              2: { sorter: 'digit' },
+              3: { sorter: 'digit' },
+              4: { sorter: 'digit' },
+              5: { sorter: 'digit' },
+              6: { sorter: 'digit' },
+              7: { sorter: 'digit' },
+              10: { sorter: 'digit' }
+            } 
         });
         // add config table
         $($(".configtable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
@@ -639,13 +684,32 @@ $(document).ready(function() {
             "<th class=\"header\">rssi</th>"+
             "<th class=\"header\">statecounter</th>"+
             "<th class=\"header\">decagonmux</th>"+
+            "<th class=\"header\">vaisala</th>"+
             "<th class=\"header\">powerswitch</th>"+
             "<th class=\"header\">p1</th>"+
             "<th class=\"header\">p2</th>"+
             "<th class=\"header\">Timestamp</th>"+
             "</tr></thead><tbody></tbody></table>");
         $("#topology_"+deployments[i]).find(".configtable table").tablesorter({ 
-           widthFixed: true
+          widthFixed: true,
+          headers:
+            { 
+              0: { sorter: 'digit' },
+              1: { sorter: 'checkbox' },
+              2: { sorter: 'checkbox' },
+              3: { sorter: 'checkbox' },
+              4: { sorter: 'checkbox' },
+              5: { sorter: 'checkbox' },
+              6: { sorter: 'checkbox' },
+              7: { sorter: 'checkbox' },
+              8: { sorter: 'checkbox' },
+              9: { sorter: 'checkbox' },
+              10: { sorter: 'checkbox' },
+              11: { sorter: 'checkbox' },
+              12: { sorter: 'checkbox' },
+              13: { sorter: 'checkbox' },
+              14: { sorter: 'checkbox' },
+            } 
         });
         // add status bar
         if (deployments[i]==visible) {
@@ -737,6 +801,7 @@ function showTopology(id) {
 		</div>
 	</div>
 </div>
+<div id="debug"></div>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
