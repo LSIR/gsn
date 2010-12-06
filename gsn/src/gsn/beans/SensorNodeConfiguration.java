@@ -134,7 +134,7 @@ public class SensorNodeConfiguration {
 			(statecounter == null || !statecounter ? 0: 1 << INDEX_STATECOUNTER) +
 			(decagonmux == null || !decagonmux ? 0: 1 << INDEX_DECAGONMUX) +
 			(powerswitch == null || !powerswitch ? 0: 1 << INDEX_POWERSWITCH) +
-			(vaisala_wxt520 == null || !vaisala_wxt520 ? 0: 1 << INDEX_POWERSWITCH)
+			(vaisala_wxt520 == null || !vaisala_wxt520 ? 0: 1 << INDEX_VAISALA_WXT520)
 		);
 	}
 	

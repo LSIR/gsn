@@ -430,10 +430,16 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 							cn.pendingConfiguration = new SensorNodeConfiguration(
 									n.configuration,
 									cn.nodetype);
-							if (cn.pendingConfiguration.hasDataConfig() && cn.pendingConfiguration.getConfiguration().equals(cn.configuration.getConfiguration()))
+							logger.debug("old config "+ cn.configuration + " "+cn.configuration.getConfiguration());
+							logger.debug("new config "+ cn.pendingConfiguration + " "+cn.pendingConfiguration.getConfiguration());
+							if (cn.pendingConfiguration.hasDataConfig() && cn.pendingConfiguration.getConfiguration().equals(cn.configuration.getConfiguration())) {
 								cn.pendingConfiguration.removeDataConfig();
-							if (cn.pendingConfiguration.hasPortConfig() && cn.pendingConfiguration.getPortConfiguration().equals(cn.configuration.getPortConfiguration()))
+								logger.debug("same data config");
+							}
+							if (cn.pendingConfiguration.hasPortConfig() && cn.pendingConfiguration.getPortConfiguration().equals(cn.configuration.getPortConfiguration())) {
 								cn.pendingConfiguration.removePortConfig();
+								logger.debug("same port config");
+							}
 							if (!cn.pendingConfiguration.hasPortConfig() && !cn.pendingConfiguration.hasDataConfig())
 								cn.pendingConfiguration=null;
 							if (cn.pendingConfiguration!=null) {
