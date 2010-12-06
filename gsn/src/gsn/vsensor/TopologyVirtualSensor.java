@@ -45,9 +45,11 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	private static final short EVENT_BB_POWER_OFF = 30;
 	private static final short EVENT_BB_POWER_ON = 31;
 	public static final short DATA_CONTROL_CMD = 1;
+	public static final short NEW_DATA_CONTROL_CMD = 3;
 	public static final short GUMSTIX_CTRL_CMD = 14;
 	public static final short DATA_CONTROL_NETWORK_FLAG = 0x400;
 	public static final short DATA_CONTROL_SENSOR_FLAG = 0x800;
+	public static final short DATA_CONTROL_WRITE_FLAG = 0x800;
 	public static final int BROADCAST_ADDR = 0xFFFF;
 	private static short REPETITION_COUNT = 3;
 	
@@ -609,6 +611,11 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			AbstractVirtualSensor vs;
 			String[] fieldnames = {"destination","cmd","arg","repetitioncnt"};
 			Serializable[] values =  {destination.toString(), Short.toString(DATA_CONTROL_CMD), config==null?"0":(Short.toString((short)(config.getConfiguration() + DATA_CONTROL_NETWORK_FLAG + DATA_CONTROL_SENSOR_FLAG))), Short.toString(REPETITION_COUNT)};
+			// old or new config command ?
+			if (config != null && config.vaisala_wxt520) {
+				values[1]=Short.toString(NEW_DATA_CONTROL_CMD);
+				values[2]= config==null?"0":(Short.toString((short)(config.getConfiguration() + DATA_CONTROL_WRITE_FLAG)));
+			}
 			logger.debug(CommandVSName+"< dest: "+destination +" data config: "+(config==null?"null":config.getConfiguration()));
 			try {
 				vs = Mappings.getVSensorInstanceByVSName(CommandVSName).borrowVS();

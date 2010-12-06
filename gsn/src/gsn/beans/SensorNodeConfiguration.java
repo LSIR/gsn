@@ -13,6 +13,7 @@ public class SensorNodeConfiguration {
 	public Boolean statecounter = null;
 	public Boolean decagonmux = null;
 	public Boolean powerswitch = null;	// from powerswitch packet
+	public Boolean vaisala_wxt520 = null;
 	public Boolean powerswitch_p1 = null;
 	public Boolean powerswitch_p2 = null;
 	public Long timestamp;
@@ -28,6 +29,7 @@ public class SensorNodeConfiguration {
 	private final static int INDEX_STATECOUNTER = 8;
 	private final static int INDEX_DECAGONMUX = 9;
 	private final static int INDEX_POWERSWITCH = 9;
+	private final static int INDEX_VAISALA_WXT520 = 10;
 	
 	private final static int INDEX_POWERSWITCH_P1 = 0;
 	private final static int INDEX_POWERSWITCH_P2 = 1;
@@ -69,6 +71,7 @@ public class SensorNodeConfiguration {
 			decagonmux = (config & (1 << INDEX_DECAGONMUX)) > 0;
 		else if (node_type == SensorNode.NODE_TYPE_POWERSWITCH)
 			powerswitch= (config & (1 << INDEX_POWERSWITCH)) > 0;
+		vaisala_wxt520 = (config & (1 << INDEX_VAISALA_WXT520)) > 0;
 		timestamp = System.currentTimeMillis();
 	}
 	
@@ -99,7 +102,8 @@ public class SensorNodeConfiguration {
 			rssi!=null &&
 			statecounter!=null &&
 			(decagonmux!=null ||
-			powerswitch!=null);
+			powerswitch!=null) &&
+			vaisala_wxt520!=null;
 	}
 	
 	public void removeDataConfig() {
@@ -114,6 +118,7 @@ public class SensorNodeConfiguration {
 		statecounter=null;
 		decagonmux=null;
 		powerswitch=null;
+		vaisala_wxt520=null;
 	}
 	
 	public Short getConfiguration() {
@@ -128,7 +133,8 @@ public class SensorNodeConfiguration {
 			(rssi == null || !rssi ? 0: 1 << INDEX_RSSI) +
 			(statecounter == null || !statecounter ? 0: 1 << INDEX_STATECOUNTER) +
 			(decagonmux == null || !decagonmux ? 0: 1 << INDEX_DECAGONMUX) +
-			(powerswitch == null || !powerswitch ? 0: 1 << INDEX_POWERSWITCH)
+			(powerswitch == null || !powerswitch ? 0: 1 << INDEX_POWERSWITCH) +
+			(vaisala_wxt520 == null || !vaisala_wxt520 ? 0: 1 << INDEX_POWERSWITCH)
 		);
 	}
 	
@@ -161,7 +167,8 @@ public class SensorNodeConfiguration {
 				bothNullOrEqual(sc.decagonmux, this.decagonmux) &&
 				bothNullOrEqual(sc.powerswitch, this.powerswitch) &&
 				bothNullOrEqual(sc.powerswitch_p1, this.powerswitch_p1) &&
-				bothNullOrEqual(sc.powerswitch_p2, this.powerswitch_p2);
+				bothNullOrEqual(sc.powerswitch_p2, this.powerswitch_p2) &&
+				bothNullOrEqual(sc.vaisala_wxt520, this.vaisala_wxt520);
 		}
 		else
 			return false;
@@ -182,6 +189,7 @@ public class SensorNodeConfiguration {
 			"\npowerswitch: "+powerswitch+
 			"\npowerswitch_p1: "+powerswitch_p1+
 			"\npowerswitch_p2: "+powerswitch_p2+
+			"\nvaisala_wxt520: "+vaisala_wxt520+
 			"\ntimestamp:"+timestamp;
 	}
 
