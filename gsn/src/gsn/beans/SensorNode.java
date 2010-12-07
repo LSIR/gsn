@@ -36,6 +36,7 @@ public class SensorNode {
 	public Double humidity;
 	public Integer flash_count;
 	public Integer uptime;
+	public Boolean corestation_running;
 	
 	public SensorNodeConfiguration configuration;
 	public SensorNodeConfiguration pendingConfiguration;

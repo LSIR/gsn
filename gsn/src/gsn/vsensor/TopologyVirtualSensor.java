@@ -218,6 +218,10 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			}
 			else if (event_id == EVENT_BB_POWER_ON || event_id == EVENT_BB_POWER_OFF) {
 				node.setBBControl();
+				if (event_id == EVENT_BB_POWER_ON)
+					node.corestation_running = new Boolean(true);
+				else
+					node.corestation_running = new Boolean(false);
 			}
 			// do not count events to packets
 		}
