@@ -2,10 +2,10 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 1960 $"
-__date__        = "$Date: 2010-06-15 14:51:41 +0200 (Die, 15. Jun 2010) $"
-__id__          = "$Id: tos.py 1960 2010-06-15 12:51:41Z tgsell $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/tos.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 
 # Copyright (c) 2008 Johns Hopkins University.
 # All rights reserved.
@@ -51,7 +51,7 @@ except ImportError as e:
     print("Please install PySerial first.")
     sys.exit(1)
 
-__version__ = "$Id: tos.py 1960 2010-06-15 12:51:41Z tgsell $"
+__version__ = "$Id$"
 
 __all__ = ['Serial', 'AM',
            'Packet', 'RawPacket',

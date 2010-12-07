@@ -1,0 +1,57 @@
+import os
+from threading import Thread, Event, Lock
+
+
+class SubprocessFakeClass(Thread):
+    '''
+    This Module implements a similar interface as subprocess.py offers.
+    It has been designed to bypass a bug with subprocess.Popen() which
+    leads to a illegal instruction. Probably resulting from the os.fork()
+    call in subprocess.Popen() in some special thread state...
+    
+    As soon as this bug has been fixed this module should be replaced by
+    subprocess.Popen()!
+    '''
+    
+    def __init__(self, command):
+        Thread.__init__(self)
+        self.finishEvent = Event()
+        self._returncodelock = Lock()
+        self._cmd = command
+        self.returncode = None
+        self.stdoutdata = b''
+        self.stderrdata = b''
+        self.start()
+        
+        
+    def run(self):
+        ret = os.system(self._cmd)
+        
+        self._returncodelock.acquire()
+        self.returncode = ret
+        self._returncodelock.release()
+        
+        self.finishEvent.set()
+        
+        
+    def poll(self):
+        self._returncodelock.acquire()
+        ret = self.returncode
+        self._returncodelock.release()
+        return ret
+    
+    
+    def kill(self):
+        pass
+    
+    
+    def wait(self):
+        self.finishEvent.wait()
+        self._returncodelock.acquire()
+        ret = self.returncode
+        self._returncodelock.release()
+        return ret
+        
+        
+    def communicate(self):
+        return (self.stdoutdata, self.stderrdata)

@@ -1,10 +1,16 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 2386 $"
-__date__        = "$Date: 2010-11-19 11:08:38 +0100 (Fre, 19. Nov 2010) $"
-__id__          = "$Id: ScheduleHandler.py 2386 2010-11-19 10:08:38Z tgsell $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/ScheduleHandler.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
+
+
+# as soon as the subprocess.Popen() bug has been fixed the functionality related
+# to this variable should be removed
+SUBPROCESS_BUG_BYPASS = True
+
 
 import time
 import string
@@ -14,7 +20,12 @@ import os
 import signal
 import pickle
 import shlex
-import subprocess
+
+if SUBPROCESS_BUG_BYPASS:
+    from SubprocessFake import SubprocessFakeClass
+else:
+    import subprocess
+    
 import queue
 import logging
 from datetime import datetime, timedelta
@@ -356,16 +367,19 @@ class ScheduleHandlerClass(Thread):
                         self._allJobsFinishedEvent.clear()
                         plugin = self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax)
                     except Exception as e:
-                        self.exception('error in scheduled plugin >' + pluginclassname + ' ' + commandstring + '<:' + str(e))
+                        self.error('error in scheduled plugin >' + pluginclassname + ' ' + commandstring + '<:' + str(e))
                 else:
                     if self._duty_cycle_mode:
                         self._logger.info('executing >' + commandstring + '< now')
                     else:
                         self._logger.debug('executing >' + commandstring + '< now')
                     try:
-                        job = subprocess.Popen(shlex.split(commandstring), stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
+                        if SUBPROCESS_BUG_BYPASS:
+                            job = SubprocessFakeClass(commandstring)
+                        else:
+                            job = subprocess.Popen(shlex.split(commandstring), stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
                     except Exception as e:
-                        self.exception('error in scheduled script >' + commandstring + '<:' + str(e))
+                        self.error('error in scheduled script >' + commandstring + '<:' + str(e))
                     else:
                         self._allJobsFinishedEvent.clear()
                         self._backlogMain.jobsobserver.observeJob(job, commandstring, False, runtimemax)

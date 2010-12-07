@@ -2,10 +2,10 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 1929 $"
-__date__        = "$Date: 2010-06-01 17:25:59 +0200 (Die, 01. Jun 2010) $"
-__id__          = "$Id: BackLogMessage.py 1929 2010-06-01 15:25:59Z tgsell $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/BackLogMessage.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 
 import struct
 

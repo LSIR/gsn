@@ -2,10 +2,10 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 2380 $"
-__date__        = "$Date: 2010-11-15 14:21:29 +0100 (Mon, 15. Nov 2010) $"
-__id__          = "$Id: BackLogMain.py 2380 2010-11-15 13:21:29Z tgsell $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/BackLogMain.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
  
 import os
 import subprocess
@@ -24,6 +24,7 @@ from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
 from JobsObserver import JobsObserverClass
 from ScheduleHandler import ScheduleHandlerClass
+
 
 PROFILE = False
 PROFILE_FILE = '/media/card/backlog.profile'
@@ -234,7 +235,7 @@ class BackLogMainClass(Thread):
                 self.jobsobserver.observeJob(plugin, module_name, True, plugin.getMaxRuntime())
                 self._logger.info('loaded plugin ' + module_name)
             except Exception as e:
-                self._logger.exception('could not load plugin ' + module_name + ': ' + str(e))
+                self._logger.error('could not load plugin ' + module_name + ': ' + str(e))
                 self.incrementErrorCounter()
                 continue
 

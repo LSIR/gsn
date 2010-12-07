@@ -2,15 +2,20 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 2371 $"
-__date__        = "$Date: 2010-11-09 17:53:21 +0100 (Die, 09. Nov 2010) $"
-__id__          = "$Id: CoreStationStatusPlugin.py 2371 2010-11-09 16:53:21Z tgsell $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/CoreStationStatusPlugin.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 
 import struct
 import os
-import subprocess
 
+from ScheduleHandler import SUBPROCESS_BUG_BYPASS
+if SUBPROCESS_BUG_BYPASS:
+    from SubprocessFake import SubprocessFakeClass
+else:
+    import subprocess
+    
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
@@ -36,17 +41,23 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         
-        p = subprocess.Popen(['modprobe', 'ad77x8'])
+        if SUBPROCESS_BUG_BYPASS:
+            p = SubprocessFakeClass('modprobe ad77x8')
+        else:
+            p = subprocess.Popen(['modprobe', 'ad77x8'])
         self.info('wait for modprobe ad77x8 to finish')
-        p.wait()
+        ret = p.wait()
         output = p.communicate()
         if output[0]:
             if output[1]:
-                self.info('modprope ad77x8: (STDOUT=' + output[0] + 'STDERR=' + output[1] + ')')
+                self.info('modprobe ad77x8: (STDOUT=' + output[0] + 'STDERR=' + output[1] + ')')
             else:
-                self.info('modprope ad77x8: (STDOUT=' + output[0] + ')')
+                self.info('modprobe ad77x8: (STDOUT=' + output[0] + ')')
         elif output[1]:
-                self.info('modprope ad77x8: (STDERR=' + output[1] + ')')
+                self.info('modprobe ad77x8: (STDERR=' + output[1] + ')')
+                
+        if ret != 0:
+            raise Exception('module ad77x8 is not available (modprobe ad77x8 returned with code ' + str(ret) + ')')
             
         self._conf_calibrate = False
         if int(self.getOptionValue('calibrate')) == 1:

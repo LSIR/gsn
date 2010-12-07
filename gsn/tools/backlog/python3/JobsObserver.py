@@ -2,10 +2,10 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 2381 $"
-__date__        = "$Date: 2010-11-15 14:51:38 +0100 (Mon, 15. Nov 2010) $"
-__id__          = "$Id: AbstractPlugin.py 2381 2010-11-15 13:51:38Z tgsell $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/AbstractPlugin.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 
 
 import os
@@ -14,6 +14,7 @@ import logging
 from datetime import datetime, timedelta
 from threading import Event, Lock, Thread
 
+from ScheduleHandler import SUBPROCESS_BUG_BYPASS
 
 JOB_PROCESS_CHECK_INTERVAL_SECONDS = 2
         
@@ -67,13 +68,14 @@ class JobsObserverClass(Thread):
                         ret = job.poll()
                         if ret == None:
                             if runtime_left != -1:
-                                pid = job.pid
                                 if runtime_left < datetime.utcnow():
-                                    if pid <= 1:
-                                        self.error('wanted to kill PID ' + str(pid))
+                                    if SUBPROCESS_BUG_BYPASS:
+                                        self.error('job (' + job_name + ') has not finished in time -> kill it')
+                                        job.kill()
+                                        self._logger.warning('wait for job (' + job_name + ') to be killed')
                                     else:
-                                        self.error('job (' + job_name + ') with PID ' + str(pid) + ' has not finished in time -> kill it')
-                                        os.killpg(pid, signal.SIGTERM)
+                                        self.error('job (' + job_name + ') with PID ' + str(job.pid) + ' has not finished in time -> kill it')
+                                        os.killpg(job.pid, signal.SIGTERM)
                                         self._logger.warning('wait for job (' + job_name + ') to be killed')
                                         self._wait.wait(0.1)
                                         if not job.poll():
@@ -81,13 +83,16 @@ class JobsObserverClass(Thread):
                                         if self._wait.isSet():
                                             break
                                         if not job.poll():
-                                            os.killpg(pid, signal.SIGKILL)
+                                            os.killpg(job.pid, signal.SIGKILL)
                                         job.wait()
-                                        stdoutdata, stderrdata = job.communicate()
-                                        self.error('job (' + job_name + ') has been killed (STDOUT=' + stdoutdata.decode() + ' /STDERR=' + stderrdata.decode() + ')')
-                                        del self._jobList[index]
+                                    stdoutdata, stderrdata = job.communicate()
+                                    self.error('job (' + job_name + ') has been killed (STDOUT=' + stdoutdata.decode() + ' /STDERR=' + stderrdata.decode() + ')')
+                                    del self._jobList[index]
                                 else:
-                                    self._logger.debug('job (' + job_name + ') with PID ' + str(pid) + ' not yet finished -> ' + str(runtime_left-datetime.utcnow()) + ' time to run')
+                                    if SUBPROCESS_BUG_BYPASS:
+                                        self._logger.debug('job (' + job_name + ') not yet finished -> ' + str(runtime_left-datetime.utcnow()) + ' time to run')
+                                    else:
+                                        self._logger.debug('job (' + job_name + ') with PID ' + str(job.pid) + ' not yet finished -> ' + str(runtime_left-datetime.utcnow()) + ' time to run')
                         else:
                             stdoutdata, stderrdata = job.communicate()
                             if ret == 0:
@@ -157,15 +162,20 @@ class JobsObserverClass(Thread):
             if isPlugin:
                 self._backlogMain.pluginStop(job_name)
             else:
-                self.error('job (' + job_name + ') with PID ' + str(job.pid) + ' has not finished yet -> kill it')
-                os.killpg(job.pid, signal.SIGTERM)
-                self._logger.warning('wait for job (' + job_name + ') to be killed')
-                self._wait.wait(0.1)
-                if not job.poll():
-                    self._wait.wait(3)
-                if not job.poll():
-                    os.killpg(job.pid, signal.SIGKILL)
-                job.wait()
+                if SUBPROCESS_BUG_BYPASS:
+                    self.error('job (' + job_name + ') has not finished yet -> kill it')
+                    job.kill()
+                    self._logger.warning('wait for job (' + job_name + ') to be killed')
+                else:
+                    self.error('job (' + job_name + ') with PID ' + str(job.pid) + ' has not finished yet -> kill it')
+                    os.killpg(job.pid, signal.SIGTERM)
+                    self._logger.warning('wait for job (' + job_name + ') to be killed')
+                    self._wait.wait(0.1)
+                    if not job.poll():
+                        self._wait.wait(3)
+                    if not job.poll():
+                        os.killpg(job.pid, signal.SIGKILL)
+                    job.wait()
                 output = job.communicate()
                 self.error('job (' + job_name + ') has been killed (STDOUT=' + str(output[0]) + ' /STDERR=' + str(output[1]) + ')')
             
