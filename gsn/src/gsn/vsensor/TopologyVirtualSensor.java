@@ -42,8 +42,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	private static final long NODE_CONFIGURE_NEXT_TRY_TIMEOUT = 30000; // time to wait until next configuration enry is tried
 	private static final short EVENT_DATACONFIG = 40;
 	private static final short EVENT_PSB_POWER = 32;
-	private static final short EVENT_BB_POWER_OFF = 30;
-	private static final short EVENT_BB_POWER_ON = 31;
+	private static final short EVENT_BB_POWER_OFF = 31;
+	private static final short EVENT_BB_POWER_ON = 30;
 	public static final short DATA_CONTROL_CMD = 1;
 	public static final short NEW_DATA_CONTROL_CMD = 3;
 	public static final short GUMSTIX_CTRL_CMD = 14;
