@@ -615,7 +615,7 @@ $(document).ready(function() {
                 return "#a0ffa0";
             })
             .strokeStyle(function() {return this.fillStyle().darker()})
-            .lineWidth(function(d) { return d.nodetype==1?5:(d.corestation_running?5:1); }); /*
+            .lineWidth(function(d) { return d.nodetype==1?5:(d.corestation_running=="true"?5:1); }); /*
             .event("mousedown", pv.Behavior.drag())
             .event("drag", deployment_data[deployment_data.length-1].force);*/
         deployment_data[deployment_data.length-1].force
