@@ -48,15 +48,15 @@ class JobsObserverClass(Thread):
                     break
                 
                 for index, joblistentry in enumerate(self._jobList):
-                    isPlugin, job, job_name, runtime_left = joblistentry
+                    isPlugin, job, job_name, runtime_end = joblistentry
                     if isPlugin:
                         if job.isBusy():
-                            if runtime_left < datetime.utcnow():
+                            if runtime_end < datetime.utcnow():
                                 self._logger.warning('plugin (' + job_name + ') has not finished in time -> stop it')
                                 self._backlogMain.pluginStop(job_name)
                                 del self._jobList[index]
                             else:
-                                self._logger.debug('plugin (' + job_name + ') has not yet finished -> ' + str(runtime_left-datetime.utcnow()) + ' time to run')
+                                self._logger.debug('plugin (' + job_name + ') has not yet finished -> ' + str(runtime_end-datetime.utcnow()) + ' time to run')
                         else:
                             if self._backlogMain.duty_cycle_mode:
                                 self._logger.info('plugin (' + job_name + ') finished successfully')
@@ -67,8 +67,8 @@ class JobsObserverClass(Thread):
                     else:
                         ret = job.poll()
                         if ret == None:
-                            if runtime_left != -1:
-                                if runtime_left < datetime.utcnow():
+                            if runtime_end != -1:
+                                if runtime_end < datetime.utcnow():
                                     if SUBPROCESS_BUG_BYPASS:
                                         self.error('job (' + job_name + ') has not finished in time -> kill it')
                                         job.kill()
@@ -90,9 +90,9 @@ class JobsObserverClass(Thread):
                                     del self._jobList[index]
                                 else:
                                     if SUBPROCESS_BUG_BYPASS:
-                                        self._logger.debug('job (' + job_name + ') not yet finished -> ' + str(runtime_left-datetime.utcnow()) + ' time to run')
+                                        self._logger.debug('job (' + job_name + ') not yet finished -> ' + str(runtime_end-datetime.utcnow()) + ' time to run')
                                     else:
-                                        self._logger.debug('job (' + job_name + ') with PID ' + str(job.pid) + ' not yet finished -> ' + str(runtime_left-datetime.utcnow()) + ' time to run')
+                                        self._logger.debug('job (' + job_name + ') with PID ' + str(job.pid) + ' not yet finished -> ' + str(runtime_end-datetime.utcnow()) + ' time to run')
                         else:
                             stdoutdata, stderrdata = job.communicate()
                             if ret == 0:
@@ -144,10 +144,11 @@ class JobsObserverClass(Thread):
         if not self._jobList:
             return None
         overallMaxRuntime = timedelta()
-        for isPlugin, job, job_name, runtime_left in self._jobList:
-            if runtime_left == -1:
-                return runtime_left
+        for isPlugin, job, job_name, runtime_end in self._jobList:
+            if runtime_end == -1:
+                return runtime_end
             else:
+                runtime_left = runtime_end-datetime.utcnow()
                 if  overallMaxRuntime < runtime_left:
                     overallMaxRuntime = runtime_left
         return overallMaxRuntime.seconds + overallMaxRuntime.days * 86400 + overallMaxRuntime.microseconds/1000000.0
@@ -158,7 +159,7 @@ class JobsObserverClass(Thread):
         self._work.set()
         self._wait.set()
         
-        for isPlugin, job, job_name, runtime_left in self._jobList:
+        for isPlugin, job, job_name, runtime_end in self._jobList:
             if isPlugin:
                 self._backlogMain.pluginStop(job_name)
             else:
