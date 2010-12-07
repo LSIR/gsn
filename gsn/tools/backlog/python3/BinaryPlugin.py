@@ -88,7 +88,7 @@ class BinaryPluginClass(AbstractPluginClass):
     '''
     
     def __init__(self, parent, options):
-        AbstractPluginClass.__init__(self, parent, options)
+        AbstractPluginClass.__init__(self, parent, options, False)
         
         self._rootdir = self.getOptionValue('rootdir')
         
