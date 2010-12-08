@@ -127,7 +127,18 @@ $(document).ready(function() {
 			  $.P({},
 			  $.IMG({
 			    "src":"http://people.ee.ethz.ch/~perma/plots/"+deployments[i].toLowerCase()+"_QueueSize.png"
-			  }))
+			  })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/"+deployments[i].toLowerCase()+"_powerswitchevents.png"
+                          })),
+                          $.P({},
+                          $.A({
+                            "href":"http://people.ee.ethz.ch/~perma/plots/large_"+deployments[i].toLowerCase()+"_dozerevents.png"
+                          },
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/"+deployments[i].toLowerCase()+"_dozerevents.png"
+                          })))
 			));
 		    if (deployments[i]!=visible)
 			$("#health_"+deployments[i]).hide();
