@@ -115,6 +115,8 @@ function PacketRate() {
       else {
         current_deployment.sensornodes[index].timestamp = $(this).attr("timestamp");
         current_deployment.sensornodes[index].touched = true;
+        current_deployment.sensornodes[index].nodetype = $(this).attr("nodetype");
+        current_deployment.sensornodes[index].corestation_running = $(this).attr("corestation_running");
       }
     });
     var tmp = new Array();
