@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_CoreStationStatus__1950" priority="10" >
+<virtual-sensor name="Dirruhorn_GPS__1950" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -6,43 +6,38 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            <field name="V_PV" type="INTEGER" unit="mV"/>
-            <field name="I_PV" type="INTEGER" unit="µA"/>
-            <field name="V_12BAT" type="INTEGER" unit="mV"/>
-            <field name="I_V12DC_EXT" type="INTEGER" unit="µA"/>
-            <field name="V12DC_IN" type="INTEGER" unit="mV"/>
-            <field name="I_V12DC_IN" type="INTEGER" unit="µA"/>
-            <field name="VCC_5_0" type="INTEGER" unit="mV"/>
-            <field name="VCC_NODE" type="INTEGER" unit="mV"/>
-            <field name="I_VCC_NODE" type="INTEGER" unit="µA"/>
-            <field name="VCC_4_2" type="INTEGER" unit="mV"/>
+            <field name="GPS_TIME" type="INTEGER"/>
+            <field name="GPS_WEEK" type="SMALLINT" />
+            <field name="CARRIER_PHASE" type="DOUBLE" />
+            <field name="PSEUDO_RANGE" type="DOUBLE" />
+            <field name="DOPPLER" type="DOUBLE" />
+            <field name="SPACE_VEHICLE" type="SMALLINT" />
+            <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
+            <field name="SIGNAL_STRENGTH" type="SMALLINT" />
+            <field name="LLI" type="SMALLINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>show status information of the CoreStations from the Dirruhorn deployment</description>
+    <description>show GPS information from Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">PermaSense Dirruhorn deployment</predicate>
-        <predicate key="LATITUDE">46.119722</predicate>
-        <predicate key="LONGITUDE">7.848056</predicate>
-    </addressing>
+    <addressing />
     <storage />
     <streams>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-dh-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GPSPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data2">
+		<stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-dh-gps01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GPSPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

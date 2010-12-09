@@ -1,5 +1,4 @@
 Dirruhorn_BackLogStatus__mapped.xml
-#Dirruhorn_Binary__mapped.xml
 Dirruhorn_CoreStationStatus__conv.xml
 Dirruhorn_CoreStationStatus__mapped.xml
 Dirruhorn_Dozer_AdcComDiff__mapped.xml
@@ -32,9 +31,8 @@ Dirruhorn_Dozer_WXT520Sup__conv.xml
 Dirruhorn_Dozer_WXT520Sup__mapped.xml
 Dirruhorn_Dozer_WXT520WindPth__conv.xml
 Dirruhorn_Dozer_WXT520WindPth__mapped.xml
+Dirruhorn_GPS__mapped.xml
 Dirruhorn_Schedule__mapped.xml
-Dirruhorn_VaisalaWXT520__mapped.xml
-Dirruhorn_VaisalaWXT520__muxed__mapped.xml
 Dirruhorn_Topology__public.xml
 Jungfraujoch_BackLogStatus__mapped.xml
 Jungfraujoch_CoreStationStatus__conv.xml
