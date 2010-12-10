@@ -72,7 +72,7 @@ class BinaryPluginClass(AbstractPluginClass):
 
     data/instance attributes:
     _notifier
-    _stopped
+    _plugStop
     _filedeque
     _msgdeque
     _isBusy
@@ -88,9 +88,7 @@ class BinaryPluginClass(AbstractPluginClass):
     '''
     
     def __init__(self, parent, options):
-        AbstractPluginClass.__init__(self, parent, options)
-        
-        self._isBusy = True
+        AbstractPluginClass.__init__(self, parent, options, False)
         
         self._rootdir = self.getOptionValue('rootdir')
         
@@ -165,8 +163,8 @@ class BinaryPluginClass(AbstractPluginClass):
                     time = os.stat(f).st_mtime
                     filetime.append((time, f))
                     
-        for watch in self._watches:
-            self.debug('watch: ' + watch[0] + '  -  ' + str(watch[1]) + '  -  ' + watch[2])
+        for path, storage, time_format in self._watches:
+            self.debug('watch: ' + path + '  -  ' + str(storage) + '  -  ' + time_format)
         
         # sort the existing files by time
         filetime.sort()
@@ -174,11 +172,15 @@ class BinaryPluginClass(AbstractPluginClass):
         for file in filetime:
             self._filedeque.appendleft(file[1])
             self.debug('putting existing file into FIFO: ' + file[1])
-
+            
+        if self._filedeque:
+            self._isBusy = True
+        else:
+            self._isBusy = False
                 
         self._filedescriptor = None
         self._waitforack = True
-        self._stopped = False
+        self._plugStop = False
 
 
     def getMsgType(self):
@@ -219,10 +221,10 @@ class BinaryPluginClass(AbstractPluginClass):
         self._lastRecvPacketType = None
         self._lastSentPacketType = None
                 
-        while not self._stopped:
+        while not self._plugStop:
             # wait for the next file event to happen
             self._work.wait()
-            if self._stopped:
+            if self._plugStop:
                 break
             self._waitforack = False
                 
@@ -283,7 +285,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 elif pktType == INIT_PACKET:
                     if self._lastRecvPacketType == INIT_PACKET:
                         self.debug('init packet already received')
-                        self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._priority, self._backlog)
+                        self.processMsg(self.getTimeStamp(), struct.pack('<BB', ACK_PACKET, INIT_PACKET), self._priority, self._backlog)
                         if not self._msgdeque:
                             self._work.clear()
                         continue
@@ -299,12 +301,12 @@ class BinaryPluginClass(AbstractPluginClass):
                     
                     self._lastRecvPacketType = INIT_PACKET
                     self._lastSentPacketType = ACK_PACKET
-                    self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, INIT_PACKET), self._priority, self._backlog)
+                    self.processMsg(self.getTimeStamp(), struct.pack('<BB', ACK_PACKET, INIT_PACKET), self._priority, self._backlog)
                 # if the type is RESEND_PACKET we have to resend a part of a file...
                 elif pktType == RESEND_PACKET:
                     if self._lastRecvPacketType == RESEND_PACKET:
                         self.debug('binary retransmission request already received')
-                        self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._priority, self._backlog)
+                        self.processMsg(self.getTimeStamp(), struct.pack('<BB', ACK_PACKET, RESEND_PACKET), self._priority, self._backlog)
                         if not self._msgdeque:
                             self._work.clear()
                         continue
@@ -365,7 +367,7 @@ class BinaryPluginClass(AbstractPluginClass):
                     
                     self._lastRecvPacketType = RESEND_PACKET
                     self._lastSentPacketType = ACK_PACKET
-                    self.processMsg(self.getTimeStamp(), struct.pack('BB', ACK_PACKET, RESEND_PACKET), self._priority, self._backlog)
+                    self.processMsg(self.getTimeStamp(), struct.pack('<BB', ACK_PACKET, RESEND_PACKET), self._priority, self._backlog)
             except  IndexError:
                 pass
         
@@ -431,7 +433,7 @@ class BinaryPluginClass(AbstractPluginClass):
                     else:
                         crc = zlib.crc32(chunk)
                     
-                    if chunk == "":
+                    if not chunk:
                         # so we have reached the end of the file...
                         self.debug('binary completely sent')
                         
@@ -491,7 +493,7 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def stop(self):
         self._isBusy = False
-        self._stopped = True
+        self._plugStop = True
         self._notifier.stop()
         self._work.set()
         self._filedeque.clear()

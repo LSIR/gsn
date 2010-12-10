@@ -24,9 +24,11 @@ class AbstractPluginClass(Thread):
     _backlogMain
     _config
     _backlog
+    _priority
+    _maxruntime
     '''
 
-    def __init__(self, parent, config, backlog_default=False, priority_default=99):
+    def __init__(self, parent, config, backlog_default=True, priority_default=99):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
         self._backlogMain = parent
@@ -47,8 +49,17 @@ class AbstractPluginClass(Thread):
             self._priority = priority_default
         else:
             self._priority = int(value)
+        
+        value = self.getOptionValue('max_runtime')
+        if value is None:
+            self._maxruntime = None
+        else:
+            self._maxruntime = int(value)
+            
         self.info('backlog: ' + str(self._backlog))
         self.info('priority: ' + str(self._priority))
+        if self._maxruntime:
+            self.info('max_runtime: ' + str(self._maxruntime))
         
 
     def getOptionValue(self, key):
@@ -67,6 +78,21 @@ class AbstractPluginClass(Thread):
             if entry_key.startswith(key):
                 entries.append(entry_value)
         return entries
+    
+    
+    def action(self, parameters):
+        '''
+        This function will be fired by the schedule handler each time
+        this plugin is scheduled.
+        
+        The function should return as fast as possible. Thus, longer
+        calculation should be threaded!
+        
+        @param parameters: The parameters as one string given in the
+                            schedule file.
+        '''
+        pass
+    
 
     def getMsgType(self):
         '''
@@ -131,10 +157,35 @@ class AbstractPluginClass(Thread):
         return self._backlogMain.gsnpeer.processMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
     
     
+    def registerTOSListener(self):
+        '''
+        Register a plugin as a TOS listener.
+        
+        This function should be used by the plugins to register themselves as TOS listeners.
+        After registering all incoming TOS messages will be received with tosMsgReceived(...).
+        
+        @raise Exception: if the TOSPeerClass can not be started.
+        '''
+        self._backlogMain.registerTOSListener(self)
+    
+    
+    def deregisterTOSListener(self):
+        '''
+        Deregister a plugin from TOS peer.
+        
+        This function should be used by the plugins to deregister themselves from the TOS peer.
+        After deregistering no more TOS messages will be received with tosMsgReceived(...).
+        If a plugin registered itself with registerTOSListener(), this function has to be called
+        at least once, if stop() is called!
+        '''
+        self._backlogMain.deregisterTOSListener(self)
+    
+    
     def tosMsgReceived(self, timestamp, payload):
         '''
         This function will be executed if a TOS message has been received from the serial
-        port. If the plugin is interested in TOS messages it can process it.
+        port and this plugin has been registered as a TOS listener (using registerTOSListener()).
+        All incoming TOS messages will be received.
                    
         @return: This function should ONLY return True if the message has been processed
                  successfully. Thus, it will be acknowledged over the serial port.
@@ -156,28 +207,22 @@ class AbstractPluginClass(Thread):
         @param maxretries: 
                        
         @return: True if the message has been put into sendbuffer successfully.
-        
-        @raise TypeError: if the TOSPeerClass has not been started.
         '''
-        if not self._backlogMain.tospeer:
-            raise TypeError('TOSPeerClass has not been started')
-            return False
-        else:
-            return self._backlogMain.tospeer.sendTOSMsg(packet, amId, timeout, blocking, maxretries)
+        return self._backlogMain._tospeer.sendTOSMsg(packet, amId, timeout, blocking, maxretries)
        
         
     def run(self):
         '''
         This function will be executed as thread.
         '''
-        pass
+        self.info('started')
         
     
     def stop(self):
         '''
         This function have to stop the thread.
         '''
-        pass
+        self.info('stopped')
         
     
     def connectionToGSNestablished(self):
@@ -203,6 +248,15 @@ class AbstractPluginClass(Thread):
         Tells the BackLogDB class to resend all unacknowledged packets.
         '''
         self._backlogMain.backlog.resend()
+        
+        
+    def getUptime(self):
+        '''
+        Returns the uptime of the backlog program
+        
+        @return: uptime of the backlog program
+        '''
+        return self._backlogMain.getUptime()
 
 
     def getBackLogStatus(self):
@@ -234,6 +288,15 @@ class AbstractPluginClass(Thread):
         @raise NotImplementedError: if this function is not implemented by the plugin
         '''
         raise NotImplementedError('isBusy is not implemented')
+    
+    
+    def isDutyCycleMode(self):
+        '''
+        Returns True if this Core Station is in duty-cycle mode.
+        
+        @return: True if this Core Station is in duty-cycle mode otherwise False
+        '''
+        return self._backlogMain.duty_cycle_mode
 
 
     def isGSNConnected(self):
@@ -243,6 +306,17 @@ class AbstractPluginClass(Thread):
         @return: True if GSN is connected otherwise False
         '''
         return self._backlogMain.gsnpeer.isConnected()
+    
+    
+    def getMaxRuntime(self):
+        '''
+        Returns the 'max_runtime' value set in the configuration file or
+        None if inexistent.
+        
+        @return: 'max_runtime' value set in the configuration file or
+                 None if inexistent.
+        '''
+        return self._maxruntime
 
 
     def getExceptionCounter(self):

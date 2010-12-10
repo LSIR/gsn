@@ -25,14 +25,15 @@ class TOSPluginClass(AbstractPluginClass):
     
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
+        self.registerTOSListener()
         
-        self._stopped = False
+        self._plugstop = False
         self._ready = False
     
     
     def run(self):
         # open accessnode queue, just in case if we closed it before...
-        while not self._sendOpenQueueCommand() and not self._stopped:
+        while not self._sendOpenQueueCommand() and not self._plugstop:
             self.error('could not send OpenQueue command')
             time.sleep(5)
             
@@ -41,7 +42,8 @@ class TOSPluginClass(AbstractPluginClass):
     
     def stop(self):
         self._ready = False
-        self._stopped = True
+        self._plugstop = True
+        self.deregisterTOSListener()
         # send close queue cmd to access node
         self._sendCloseQueueCommand()
         self.info('stopped')
@@ -58,6 +60,10 @@ class TOSPluginClass(AbstractPluginClass):
     def msgReceived(self, message):
         if self._ready:
             self.sendTOSmsg(self._backlog2tos(message), 0x00, 1, True, 10)
+            
+            
+    def isBusy(self):
+        return False
 
 
     def _sendCloseQueueCommand(self):
