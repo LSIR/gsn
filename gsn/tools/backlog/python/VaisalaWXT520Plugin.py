@@ -117,7 +117,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
 
     def action(self, parameters):
         if not self._ready:
-            self.error('weather station not ready for action')
+            self.debug('weather station not ready for action')
             return
         else:
             try:

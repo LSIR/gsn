@@ -322,6 +322,13 @@ class BackLogMainClass(Thread):
                 del self._tosListeners[index]
                 self._logger.info(listener.__class__.__name__ + ' deregistered as TOS listener')
                 return
+        if not self._tosListeners:
+            self._logger.info('no more TOS listeners around -> stop TOSPeer')
+            self._tosPeerLock.acquire()
+            self._tospeer.stop()
+            self._tospeer.join()
+            self._tospeer = None
+            self._tosPeerLock.release()
         
         
     def processTOSMsg(self, timestamp, payload):

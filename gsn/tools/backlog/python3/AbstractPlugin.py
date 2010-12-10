@@ -13,9 +13,18 @@ from threading import Thread
 
 class AbstractPluginClass(Thread):
     '''
-    A plugin should extend this class.
+    A plugin has to extend this class. It offers the API for
+    plugins to communicate with the backlog core functionality and
+    vice versa.
     
-    The abstract functions have to be implemented by all plugins.
+    Some abstract functions have to be implemented by all plugins:
+        isBusy(self)
+        getMsgType(self)
+    
+    There should be no direct interaction to any core module
+    bypassing this API! If someone needs more functionality, please
+    make a request to the author. Thus, integrity and consistency
+    can be guaranteed.
     '''
 
     '''
@@ -63,6 +72,15 @@ class AbstractPluginClass(Thread):
         
 
     def getOptionValue(self, key):
+        '''
+        This function returns a specific value from the configuration
+        file specified by its key. There will be only key/value pairs
+        available which belong to this plugins configuration section.
+        
+        @param key: The key as written in the configuration file as string.
+                            
+        @return: The value specified by key as string
+        '''
         for entry in self._config:
             entry_key = entry[0]
             entry_value = entry[1]
@@ -70,12 +88,22 @@ class AbstractPluginClass(Thread):
                 return entry_value
         return None
     
-    def getOptionValues(self, key):
+    def getOptionValues(self, keystart):
+        '''
+        This function returns all values from the configuration
+        file of which the keys start with keystart string. There will
+        be only key/value pairs available which belong to this plugins
+        configuration section.
+        
+        @param keystart: The keystart as string.
+                            
+        @return: The values of keys starting with keystart
+        '''
         entries = []
         for entry in self._config:
             entry_key = entry[0]
             entry_value = entry[1]
-            if entry_key.startswith(key):
+            if entry_key.startswith(keystart):
                 entries.append(entry_value)
         return entries
     
@@ -83,10 +111,8 @@ class AbstractPluginClass(Thread):
     def action(self, parameters):
         '''
         This function will be fired by the schedule handler each time
-        this plugin is scheduled.
-        
-        The function should return as fast as possible. Thus, longer
-        calculation should be threaded!
+        this plugin is scheduled. The function is started in a new
+        thread.
         
         @param parameters: The parameters as one string given in the
                             schedule file.
@@ -100,7 +126,7 @@ class AbstractPluginClass(Thread):
         
         This function should be implemented as following:
             def getMsgType(self):
-                return gsn.BackLogMessage.'MESSAGENAME'_MESSAGE_TYPE
+                return BackLogMessage.'MESSAGENAME'_MESSAGE_TYPE
                 
         where 'MESSAGENAME' should be a unique name of the plugin.
         
@@ -112,7 +138,7 @@ class AbstractPluginClass(Thread):
         
         @raise NotImplementedError: if this function is not implemented by the plugin
         
-        @see: gsn.BackLogMessage
+        @see: BackLogMessage
         '''
         raise NotImplementedError('getMsgType is not implemented')
     
@@ -220,7 +246,7 @@ class AbstractPluginClass(Thread):
     
     def stop(self):
         '''
-        This function have to stop the thread.
+        This function has to stop the thread.
         '''
         self.info('stopped')
         
@@ -234,12 +260,17 @@ class AbstractPluginClass(Thread):
     
     def connectionToGSNlost(self):
         '''
-        This function is called if a the connection to GSN has been lost
+        This function is called if the connection to GSN has been lost
         '''
         pass
     
     
     def getTimeStamp(self):
+        '''
+        This function returns the system timestamp.
+        
+        @return: the system timestamp (UTC) in milliseconds as float
+        '''
         return int(time.time()*1000)
     
     
@@ -254,22 +285,38 @@ class AbstractPluginClass(Thread):
         '''
         Returns the uptime of the backlog program
         
-        @return: uptime of the backlog program
+        @return: uptime of the backlog program in seconds
         '''
         return self._backlogMain.getUptime()
 
 
     def getBackLogStatus(self):
         '''
-        Returns the status of the backlog database as tuple:
-        (number of database entries, database file size)
+        Returns the status of the backlog sqlite3 database as tuple:
+        (number of database entries,
+         database file size,
+         minimum store time,
+         maximum store time,
+         mean store time,
+         minimum remove time,
+         maximum remove time,
+         mean remove time)
         
-        @return: status of the backlog database as tuple (number of database entries, database file size)
+        @return: status of the backlog database as tuple
         '''
         return self._backlogMain.backlog.getStatus()
 
 
     def getGSNPeerStatus(self):
+        '''
+        Returns the status of the backlog sqlite3 database as tuple:
+        (number of incoming packages,
+         number of outgoing packages,
+         number of backlogged packages,
+         number of connection losses to GSN)
+        
+        @return: status of the backlog database as tuple
+        '''
         return self._backlogMain.gsnpeer.getStatus()
     
         
@@ -283,7 +330,7 @@ class AbstractPluginClass(Thread):
         function should only return True if it changes back to returning False again
         after a given time.
         
-        @return: True if this plugin has still work to do
+        @return: True if this plugin has still important work to do
         
         @raise NotImplementedError: if this function is not implemented by the plugin
         '''
@@ -321,36 +368,65 @@ class AbstractPluginClass(Thread):
 
     def getExceptionCounter(self):
         '''
-        Returns the number of errors occurred since the last program start
+        Returns the number of errors occurred since the last program start.
+        
+        @return: the number of errors
         '''
         return self._backlogMain.getExceptionCounter()
 
 
     def getErrorCounter(self):
         '''
-        Returns the number of errors occurred since the last program start
+        Returns the number of errors occurred since the last program start.
+        
+        @return: the number of errors
         '''
         return self._backlogMain.getErrorCounter()
 
     
     def exception(self, exception):
+        '''
+        This function should be used to log an exception.
+        
+        @param exception: the exception to be logged
+        '''
         self._backlogMain.incrementExceptionCounter()
         self._logger.exception(str(exception))
     
     
     def error(self, error):
+        '''
+        This function should be used to log an error.
+        
+        @param error: the error to be logged
+        '''
         self._backlogMain.incrementErrorCounter()
         self._logger.error(str(error))
         
 
     def warning(self, msg):
+        '''
+        This function should be used to log a warning.
+        
+        @param warning: the warning to be logged
+        '''
         self._logger.warning(msg)
         
     
     def info(self, msg):
+        '''
+        This function should be used to log an info.
+        
+        @param info: the info to be logged
+        '''
         self._logger.info(msg)
         
     
     def debug(self, msg):
+        '''
+        This function should be used to log a debug.
+        
+        @param debug: the debug to be logged
+        '''
         self._logger.debug(msg)
         
