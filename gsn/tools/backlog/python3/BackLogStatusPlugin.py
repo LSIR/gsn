@@ -12,6 +12,7 @@ import struct
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
+DEFAULT_STATUS_INTERVAL = 10.0
 DEFAULT_BACKLOG = True
 
 class BackLogStatusPluginClass(AbstractPluginClass):

@@ -1,8 +1,9 @@
-12,15,32	1-14/4	1		*		*		/home/acca/test/schedule/test1.sh
-0			22		*		*		1-5		/home/acca/test/schedule/test2.sh
-23			0-23/2	*		*		*		/home/acca/test/schedule/test3.sh
-5			4		*		*		sun		/home/acca/test/schedule/test4.sh
-5-45		*/13		3		3		1		/home/acca/test/schedule/test5.sh
-4,6,9		*		2		12		1		/home/acca/test/schedule/test6.sh
-*			*		2		3		7		/home/acca/test/schedule/test7.sh
-*			15		2,3,4,5		3		1		/home/acca/test/schedule/test8.sh
+*	*	*	*	*	plugin	TestPlugin	12 7 true go
+12,15,32	1-14/4	1		*		*		script	/home/acca/test/schedule/test1.sh
+0			22		*		*		1-5	backward_tolerance_minutes=10		plugin	TestPlugin	test=8	
+23			0-23/2	*		*		*		script	/home/acca/test/schedule/test3.sh
+5			4		*		*		sun		script	/home/acca/test/schedule/test4.sh
+5-45		*/13		3		3		1	max_runtime_minutes=10		script	/home/acca/test/schedule/test5.sh
+4,6,9		*		2		12		1		script	/home/acca/test/schedule/test6.sh
+*			*		2		3		7		script	/home/acca/test/schedule/test7.sh
+*			15		2,3,4,5		3		1	max_runtime_minutes=99	backward_tolerance_minutes=25		script	/home/acca/test/schedule/test8.sh

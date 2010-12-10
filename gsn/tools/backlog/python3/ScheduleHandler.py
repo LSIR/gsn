@@ -635,7 +635,7 @@ class TOSMessageHandler(Thread):
                     self._sentCmd = packet['command']
 
                 self._logger.debug('snd...')
-                self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(packet, AM_CONTROL_CMD_MSG, 0.2)
+                self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(packet, AM_CONTROL_CMD_MSG, 1)
                 
                 if blocking:
                     while True:
@@ -645,7 +645,7 @@ class TOSMessageHandler(Thread):
                             return
                         elif not self._ackEvent.isSet():
                             self._logger.info('resend command (' + str(self._sentCmd) + ') to TOS node')
-                            self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(packet, AM_CONTROL_CMD_MSG, 0.2)
+                            self._scheduleHandler._backlogMain._tospeer.sendTOSMsg(packet, AM_CONTROL_CMD_MSG, 1)
                         else:
                             self._sentCmd = None
                             self._ackEvent.clear()

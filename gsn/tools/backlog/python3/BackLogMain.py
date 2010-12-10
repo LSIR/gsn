@@ -375,7 +375,6 @@ class BackLogMainClass(Thread):
                 return
         
         
-        
     def pluginsBusy(self):
         for plugin_entry in self.plugins.items():
             try:
