@@ -340,7 +340,7 @@ class BackLogMainClass(Thread):
                     self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
                 else:
                     self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
-                _thread.start_new_thread(plugin.action, (parameters,))
+                thread.start_new_thread(plugin.action, (parameters,))
                 pluginactive = True
                 return plugin
                 
@@ -363,7 +363,7 @@ class BackLogMainClass(Thread):
             except Exception, e:
                 raise Exception('could not load plugin ' + pluginclassname + ': ' + str(e))
             plugin.start()
-            _thread.start_new_thread(plugin.action, (parameters,))
+            thread.start_new_thread(plugin.action, (parameters,))
             return plugin
         
         
