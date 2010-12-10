@@ -31,6 +31,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
     
+        self._ready = False
         self._sleeper = Event()
         
     
@@ -61,74 +62,96 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
         self._serial.flushOutput()
 
         self._serial.write('?\r\n')
-        id = self._serial.readline().strip()
-        self.info('device address: ' + id)
-        if len(id) != 1 or not id.isalnum():
+        self._id = self._serial.readline().strip()
+        self.info('device address: ' + self._id)
+        if len(self._id) != 1 or not self._id.isalnum():
             self.error('received invalid device address')
-            return
-        
-        self._serial.write(id + 'XZM\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'XZ\r\n')
-        self._serial.readline()
+        else:
+            self._serial.write(self._id + 'XZM\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'XZ\r\n')
+            self._serial.readline()
+    
+            self._serial.write(self._id + 'XU\r\n')
+            output = self._serial.readline().strip()
+            if output:
+                self.info(output)
+    
+            self._serial.write(self._id + 'WU,R=1111110000000000,I=30\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'WU,A=3,G=1,U=K,D=0,N=W,F=4\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'WU\r\n')
+            output = self._serial.readline().strip()
+            if output:
+                self.info(output)
+            self._serial.write(self._id + 'TU,R=1111000000000000,I=30\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'TU,P=H,T=C\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'TU\r\n')
+            output = self._serial.readline().strip()
+            if output:
+                self.info(output)
+            self._serial.write(self._id + 'RU,R=1111111100000000,I=30\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'RU,U=M,S=M,Z=M\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'RU,X=65535,Y=65535\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'RU\r\n')
+            output = self._serial.readline().strip()
+            if output:
+                self.info(output)
+            self._serial.write(self._id + 'SU,R=1111000000000000,I=30\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'SU,S=N,H=Y\r\n')
+            self._serial.readline()
+            self._serial.write(self._id + 'SU\r\n')
+            output = self._serial.readline().strip()
+            if output:
+                self.info(output)
+            
+            self._ready = True
 
-        self._serial.write(id + 'XU\r\n')
-        self.info(self._serial.readline().strip())
 
-        self._serial.write(id + 'WU,R=1111110000000000,I=30\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'WU,A=3,G=1,U=K,D=0,N=W,F=4\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'WU\r\n')
-        self.info(self._serial.readline().strip())
-        self._serial.write(id + 'TU,R=1111000000000000,I=30\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'TU,P=H,T=C\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'TU\r\n')
-        self.info(self._serial.readline().strip())
-        self._serial.write(id + 'RU,R=1111111100000000,I=30\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'RU,U=M,S=M,Z=M\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'RU,X=65535,Y=65535\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'RU\r\n')
-        self.info(self._serial.readline().strip())
-        self._serial.write(id + 'SU,R=1111000000000000,I=30\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'SU,S=N,H=Y\r\n')
-        self._serial.readline()
-        self._serial.write(id + 'SU\r\n')
-        self.info(self._serial.readline().strip())
-        
-        
     def action(self, parameters):
-        try:
-            self._serial.write(id + 'R1\r\n')
-            line = self._serial.readline().strip()
-            self.debug(line)
-            packet = self.packString(line)
-            
-            self._serial.write(id + 'R2\r\n')
-            line = self._serial.readline().strip()
-            self.debug(line)
-            packet += self.packString(line)
-            
-            self._serial.write(id + 'R3\r\n')
-            line = self._serial.readline().strip()
-            self.debug(line)
-            packet += self.packString(line)
-            
-            self._serial.write(id + 'R5\r\n')
-            line = self._serial.readline().strip()
-            self.debug(line)
-            packet += self.packString(line)
-            
-            self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
-        except Exception as e:
-            self.exception(e)
-            continue
+        if not self._ready:
+            self.error('weather station not ready for action')
+            return
+        else:
+            try:
+                packet = None
+                self._serial.write(self._id + 'R1\r\n')
+                line = self._serial.readline().strip()
+                if line:
+                    self.debug(line)
+                    packet = self.packString(line)
+                
+                self._serial.write(self._id + 'R2\r\n')
+                line = self._serial.readline().strip()
+                if line:
+                    self.debug(line)
+                    packet += self.packString(line)
+                
+                self._serial.write(self._id + 'R3\r\n')
+                line = self._serial.readline().strip()
+                if line:
+                    self.debug(line)
+                    packet += self.packString(line)
+                
+                self._serial.write(self._id + 'R5\r\n')
+                line = self._serial.readline().strip()
+                if line:
+                    self.debug(line)
+                    packet += self.packString(line)
+                
+                if packet:
+                    self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
+                else:
+                    self.error('Vaisala weather station not connected or wrongly configured')
+            except Exception as e:
+                self.exception(e)
 
 
     def packString(self, s):
@@ -136,7 +159,6 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
 
 
     def stop(self):
-        self._plugStop = True
         self._sleeper.set()
         self._serial.close()
         self.info('stopped')
