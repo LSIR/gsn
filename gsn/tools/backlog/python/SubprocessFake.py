@@ -1,10 +1,10 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 2453 $"
-__date__        = "$Date: 2010-12-07 14:09:01 +0100 (Die, 07. Dez 2010) $"
-__id__          = "$Id: SubprocessFake.py 2453 2010-12-07 13:09:01Z tgsell $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python3/SubprocessFake.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 
 import commands
 from threading import Thread, Event, Lock
