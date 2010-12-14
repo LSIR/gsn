@@ -58,7 +58,7 @@ public class PostGisTest {
     public static String getListOfSensorsDummy() {
         StringBuilder s = new StringBuilder();
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             Double longitude = 1.0 * i;
             Double latitude = 100.0 - i;
             Double altitude = 1.0 * i * i;
@@ -109,6 +109,11 @@ public class PostGisTest {
         String dbpass = properties.getProperty("dbpass");
         Connection conn = connect(dburl, dbuser, dbpass);
 
+        String envelope = "POLYGON ((100 -100,100 100, -100 100, -100 -100, 100 -100))";
+
+        String spatial_query = "select location from sensors\n" +
+                "where ST_CONTAINS(ST_GeomFromText('"+envelope+"'), location)";
+
         //((org.postgresql.PGConnection) conn).addDataType("geometry", "org.postgis.PGgeometry");
         //((org.postgresql.PGConnection) conn).addDataType("box3d", "org.postgis.PGbox3d");
 
@@ -139,6 +144,18 @@ public class PostGisTest {
             System.out.println("Geometry " + geom.toString() + " : " + name);
         }
         s.close();
+        //conn.close();
+
+        Statement s2 = conn.createStatement();
+        ResultSet r2 = s2.executeQuery(spatial_query);
+        int count = 0;
+        while (r2.next()) {
+            PGgeometry geom = (PGgeometry) r2.getObject(1);
+            System.out.println("* Geometry " + geom.toString());
+            count++;
+        }
+        System.out.println("count = "+count);
+        s2.close();
         conn.close();
     }
 
