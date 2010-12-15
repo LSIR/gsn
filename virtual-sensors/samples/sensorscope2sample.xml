@@ -5,7 +5,8 @@
         <init-params/>
 
         <output-structure>
-            <!--<field name="station_id" type="int"/>
+            <!--
+            <field name="station_id" type="int"/>
 
             <field name="int_batt_volt" type="double"/>
             <field name="ext_batt_volt" type="double"/>
@@ -95,8 +96,34 @@
             <field name="wind_speed_3" type="double"/>
             <field name="wind_speed_4" type="double"/>
             <field name="wind_speed_5" type="double"/>
+            
+            <field name="battery_board_voltage" type="double"/>
+            <field name="battery_board_voltage_2" type="double"/>
+            <field name="battery_board_voltage_3" type="double"/>
+            <field name="battery_board_voltage_4" type="double"/>
+            <field name="battery_board_voltage_5" type="double"/>
 
-            <field name="timestamp" type="bigint"/>-->
+            <field name="solar_rad_sp212" type="double"/>
+            <field name="solar_rad_sp212_2" type="double"/>
+            <field name="solar_rad_sp212_3" type="double"/>
+            <field name="solar_rad_sp212_4" type="double"/>
+            <field name="solar_rad_sp212_5" type="double"/>
+
+            <field name="decagon_10hs_mv" type="double"/>
+            <field name="decagon_10hs_mv_2" type="double"/>
+            <field name="decagon_10hs_mv_3" type="double"/>
+            <field name="decagon_10hs_mv_4" type="double"/>
+            <field name="decagon_10hs_mv_5" type="double"/>
+
+            <field name="decagon_10hs_vwc" type="double"/>
+            <field name="decagon_10hs_vwc_2" type="double"/>
+            <field name="decagon_10hs_vwc_3" type="double"/>
+            <field name="decagon_10hs_vwc_4" type="double"/>
+            <field name="decagon_10hs_vwc_5" type="double"/>
+
+            <field name="timestamp" type="bigint"/>
+
+            -->
 
             <field name="wind_direction" type="double"/>
             <field name="wind_speed" type="double"/>
