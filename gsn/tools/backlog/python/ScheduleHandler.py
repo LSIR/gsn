@@ -289,9 +289,7 @@ class ScheduleHandlerClass(Thread):
             if self._schedule:
                 # get the next schedule(s) in time
                 self._scheduleLock.acquire()
-                t = time.time()
                 nextschedules, error = self._schedule.getNextSchedules(dtnow, lookback)
-                self._logger.info('getNextSchedules time: ' + str(time.time()-t) + 's')
                 for e in error:
                     self.error('error while parsing the schedule file: ' + str(e))
                 self._scheduleEvent.clear()
@@ -776,10 +774,8 @@ class ScheduleCron(CronTab):
             commandstring = str(schedule.command).strip()
             
             try:
-#                t = time.time()
                 backwardmin, commandstring = self._getSpecialParameter(commandstring, BACKWARD_TOLERANCE_NAME)
                 runtimemax, commandstring = self._getSpecialParameter(commandstring, MAX_RUNTIME_NAME)
-#                error.append('2*_getSpecialParameter time: ' + str(time.time()-t))
             except TypeError, e:
                 error.append(e)
             
@@ -804,16 +800,11 @@ class ScheduleCron(CronTab):
             
             if look_backward and backwardmin:
                 td = timedelta(minutes=backwardmin)
-#                t = time.time()
                 nextdt = self._getNextSchedule(date_time - td, schedule)
-#                error.append('_getNextSchedule time: ' + str(time.time()-t))
                 if nextdt < now:
                     backward_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
-            
                 
-#            t = time.time()
             nextdt = self._getNextSchedule(date_time, schedule)
-#            error.append('_getNextSchedule time: ' + str(time.time()-t))
             if not future_schedules or nextdt < future_schedules[0][0]:
                 future_schedules = []
                 future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
@@ -901,7 +892,6 @@ class ScheduleCron(CronTab):
                                     hour = self._getFirst(schedule.hour())
                                     firsttimenottoday = False
                                     stop = True
-                                break
                             if stop:
                                 break
                     if stop:
