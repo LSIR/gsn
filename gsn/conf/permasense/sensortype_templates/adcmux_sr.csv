@@ -7,7 +7,7 @@
 "a0_6","sr_t4","thermistor44006","cal"
 "a0_7","sr_ref3","thermistor44006","cal"
 "a0_8","sr_ref4","thermistor44006","cal"
-"a0_9","sr_ref5","thermistor44006","cal"
+"a0_9","sr_ref5","resistivity",
 "a0_10","sr_r1","resistivity",
 "a0_11","sr_r2","resistivity",
 "a0_12","sr_r3","resistivity",
@@ -18,4 +18,4 @@
 "a0_17","sr_r31","resistivity",
 "a0_18","sr_r42","resistivity",
 "a0_19","sr_r41","resistivity",
-"a0_20","sr_ref6","thermistor44006","cal"
+"a0_20","sr_ref6","resistivity",
