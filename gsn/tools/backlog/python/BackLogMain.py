@@ -6,7 +6,11 @@ __version__     = "$Revision$"
 __date__        = "$Date$"
 __id__          = "$Id$"
 __source__      = "$URL$"
- 
+
+
+PROFILE = False
+PROFILE_FILE = '/tmp/backlog.profile'
+
 import os
 import subprocess
 import sys
@@ -17,6 +21,8 @@ import time
 import logging
 import logging.config
 import thread
+if PROFILE:
+    import yappi
 from threading import Thread, Lock, Event
 
 from BackLogDB import BackLogDBClass
@@ -24,10 +30,6 @@ from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
 from JobsObserver import JobsObserverClass
 from ScheduleHandler import ScheduleHandlerClass
-
-
-PROFILE = False
-PROFILE_FILE = '/media/card/backlog.profile'
 
 DEFAULT_CONFIG_FILE = '/etc/backlog.cfg'
 DEFAULT_PLUGINS = [ 'BackLogStatusPlugin' ]
@@ -480,6 +482,15 @@ class BackLogMainClass(Thread):
         counter = self._errorCounter
         self._errorCounterLock.release()
         return counter
+    
+if PROFILE:
+    def print_stats():
+        yappi.get_stats(yappi.SORTTYPE_TTOTAL)
+        file = open(PROFILE_FILE,'a')
+        for entry in yappi.get_stats(yappi.SORTTYPE_TAVG):
+            file.write(entry+'\n')
+        file.close()
+
 
 
 def main():
@@ -492,7 +503,7 @@ def main():
     
         # config file?
     if not os.path.isfile(options.config_file):
-        print 'config file not found'
+        print 'config file (' + options.config_file + ') not found'
         sys.exit(1)
 
     # read config file for logging options
@@ -505,6 +516,8 @@ def main():
         
     backlog = None
     try:
+        if PROFILE:
+            yappi.start()
         backlog = BackLogMainClass(options.config_file)
         backlog.start()
         signal.pause()
@@ -518,17 +531,19 @@ def main():
         if backlog and backlog.isAlive():
             backlog.stop()
         logging.shutdown()
+        if PROFILE:
+            yappi.stop()
+            print_stats()
         sys.exit(1)
         
     logging.shutdown()
+    if PROFILE:
+        yappi.stop()
+        print_stats()
     if backlog.shutdown:
         print 'shutdown now'
         subprocess.Popen(['shutdown', '-h', 'now'])
 
 
 if __name__ == '__main__':
-    if PROFILE:
-        import cProfile
-        cProfile.run('main()', PROFILE_FILE)
-    else:
-        main()
+    main()
