@@ -86,7 +86,7 @@ class JobsObserverClass(Thread):
                                             os.killpg(job.pid, signal.SIGKILL)
                                         job.wait()
                                     stdoutdata, stderrdata = job.communicate()
-                                    self.warning('job (' + job_name + ') has been killed (STDOUT=' + stdoutdata.decode() + ' /STDERR=' + stderrdata.decode() + ')')
+                                    self._logger.warning('job (' + job_name + ') has been killed (STDOUT=' + stdoutdata.decode() + ' /STDERR=' + stderrdata.decode() + ')')
                                     del self._jobList[index]
                                 else:
                                     if SUBPROCESS_BUG_BYPASS:
