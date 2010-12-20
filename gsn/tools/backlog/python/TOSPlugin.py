@@ -9,6 +9,7 @@ __source__      = "$URL$"
 
 import array
 import time
+from threading import Event
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
@@ -28,6 +29,7 @@ class TOSPluginClass(AbstractPluginClass):
         self.registerTOSListener()
         
         self._plugstop = False
+        self._stopevent = Event()
         self._ready = False
     
     
@@ -39,13 +41,16 @@ class TOSPluginClass(AbstractPluginClass):
             
         self._ready = True
         
+        self._stopevent.wait()
+        # send close queue cmd to access node
+        self._sendCloseQueueCommand()
+        
     
     def stop(self):
         self._ready = False
         self._plugstop = True
         self.deregisterTOSListener()
-        # send close queue cmd to access node
-        self._sendCloseQueueCommand()
+        self._stopevent.set()
         self.info('stopped')
     
     
