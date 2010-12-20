@@ -288,9 +288,7 @@ class ScheduleHandlerClass(Thread):
             if self._schedule:
                 # get the next schedule(s) in time
                 self._scheduleLock.acquire()
-#                t = time.time()
                 nextschedules, error = self._schedule.getNextSchedules(dtnow, lookback)
-#                self._logger.info('getNextSchedules time: ' + str(time.time()-t) + 's')
                 for e in error:
                     self.error('error while parsing the schedule file: ' + str(e))
                 self._scheduleEvent.clear()
@@ -774,10 +772,8 @@ class ScheduleCron(CronTab):
             commandstring = str(schedule.command).strip()
             
             try:
-#                t = time.time()
                 backwardmin, commandstring = self._getSpecialParameter(commandstring, BACKWARD_TOLERANCE_NAME)
                 runtimemax, commandstring = self._getSpecialParameter(commandstring, MAX_RUNTIME_NAME)
-#                error.append('2*_getSpecialParameter time: ' + str(time.time()-t))
             except TypeError as e:
                 error.append(e)
             
@@ -802,16 +798,11 @@ class ScheduleCron(CronTab):
             
             if look_backward and backwardmin:
                 td = timedelta(minutes=backwardmin)
-#                t = time.time()
                 nextdt = self._getNextSchedule(date_time - td, schedule)
-#                error.append('_getNextSchedule time: ' + str(time.time()-t))
                 if nextdt < now:
                     backward_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
-            
                 
-#            t = time.time()
             nextdt = self._getNextSchedule(date_time, schedule)
-#            error.append('_getNextSchedule time: ' + str(time.time()-t))
             if not future_schedules or nextdt < future_schedules[0][0]:
                 future_schedules = []
                 future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
@@ -859,55 +850,53 @@ class ScheduleCron(CronTab):
     def _getNextSchedule(self, date_time, schedule):
         second = 0
         year = date_time.year
-            
+        date_time = datetime(date_time.year, date_time.month, date_time.day, date_time.hour, date_time.minute)
+        
         firsttimenottoday = True
         stop = False
         while not stop:
             for month in self._getRange(schedule.month()):
-                for day in self._getRange(schedule.dom()):
-                    for weekday in self._getRange(schedule.dow()):
-                        try:
-                            nextdatetime = datetime(year, month, day)
-                        except ValueError:
-                            continue
-                        
-                        wd = weekday
-                        if wd == 0:
-                            wd = 7
-                        
-                        if nextdatetime < datetime(date_time.year, date_time.month, date_time.day) or wd != nextdatetime.isoweekday():
-                            continue
-                        
-                        try:
-                            dt = datetime(date_time.year, date_time.month, date_time.day+1)
-                        except ValueError:
+                if datetime(year, month, date_time.day, date_time.hour, date_time.minute) >= date_time:
+                    for day in self._getRange(schedule.dom()):
+                        if datetime(year, month, day, date_time.hour, date_time.minute) >= date_time:
                             try:
-                                dt = datetime(date_time.year, date_time.month+1, 1)
+                                nextdatetime = datetime(year, month, day)
                             except ValueError:
-                                dt = datetime(date_time.year+1, 1, 1)
-                        if nextdatetime < dt:
-                            for hour in self._getRange(schedule.hour()):
-                                for minute in self._getRange(schedule.minute()):
-                                    nextdatetime = datetime(year, month, day, hour, minute)
-                                    if nextdatetime < date_time:
-                                        continue
+                                continue
+                            
+                            if nextdatetime.isoweekday() in self._getRange(schedule.dow()):
+                                try:
+                                    dt = datetime(date_time.year, date_time.month, date_time.day+1)
+                                except ValueError:
+                                    try:
+                                        dt = datetime(date_time.year, date_time.month+1, 1)
+                                    except ValueError:
+                                        dt = datetime(date_time.year+1, 1, 1)
+                                        
+                                if nextdatetime < dt:
+                                    for hour in self._getRange(schedule.hour()):
+                                        if datetime(year, month, day, hour, date_time.minute) >= date_time:
+                                            for minute in self._getRange(schedule.minute()):
+                                                nextdatetime = datetime(year, month, day, hour, minute)
+                                                if nextdatetime < date_time+timedelta(seconds=59):
+                                                    continue
+                                                else:
+                                                    stop = True
+                                                    break
+                                        if stop:
+                                            break
+                                elif firsttimenottoday:
+                                    minute = self._getFirst(schedule.minute())
+                                    hour = self._getFirst(schedule.hour())
+                                    firsttimenottoday = False
                                     stop = True
-                                    break
-                                if stop:
-                                    break
-                        elif firsttimenottoday:
-                            minute = self._getFirst(schedule.minute())
-                            hour = self._getFirst(schedule.hour())
-                            firsttimenottoday = False
-                            stop = True
-                        break
+                            if stop:
+                                break
                     if stop:
                         break
-                if stop:
-                    break
             if stop:
                 break
-            else:          
+            else:
                 year += 1
         
         return datetime(year, month, day, hour, minute)
