@@ -230,13 +230,17 @@ class HDLC:
         #   (5)
 
         try:
+            if self._hdlcStop:
+                return None
             # Read bytes until we get to a HDLC_FLAG_BYTE value
             # (either the end of a packet, or the start of a new one)
             d = self._s.getByte()
             ts = time.time()
             if d != HDLC_FLAG_BYTE:
                 self._logger.debug("Skipping byte %d" % d)
-                while d != HDLC_FLAG_BYTE and not self._hdlcStop:
+                while d != HDLC_FLAG_BYTE:
+                    if self._hdlcStop:
+                        return None
                     d = self._s.getByte()
                     self._logger.debug("Skipping byte %d" % d)
                     ts = time.time()
@@ -245,9 +249,13 @@ class HDLC:
             # data:
             packet = [d]
 
+            if self._hdlcStop:
+                return None
             # Is the next byte also HDLC_FLAG_BYTE?
             d = self._s.getByte()
-            while d == HDLC_FLAG_BYTE and not self._hdlcStop:
+            while d == HDLC_FLAG_BYTE:
+                if self._hdlcStop:
+                    return None
                 d = self._s.getByte()
                 ts = time.time()
 
@@ -257,7 +265,9 @@ class HDLC:
 
             # Read bytes from serial until we read another HDLC_FLAG_BYTE
             # value (end of the current packet):
-            while d != HDLC_FLAG_BYTE and not self._hdlcStop:
+            while d != HDLC_FLAG_BYTE:
+                if self._hdlcStop:
+                    return None
                 d = self._s.getByte()
                 packet.append(d)
 
@@ -411,6 +421,8 @@ class SimpleAM(Thread):
     def run(self):
         while not self._simpleAMStop:
             f = self._hdlc.read()
+            if self._simpleAMStop:
+                break
             p = AckFrame(f)
             if p.protocol == SERIAL_PROTO_ACK:
                 self._AckLock.acquire()

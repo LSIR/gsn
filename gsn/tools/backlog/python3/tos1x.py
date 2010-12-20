@@ -139,7 +139,6 @@ class Serial:
 class SerialMIB600:
     def __init__(self, host, port=10002, readTimeout=None, ackTimeout=0.5):
         self._logger = logging.getLogger(self.__class__.__name__)
-        
         self.readTimeout = readTimeout
         self.ackTimeout = ackTimeout
         self._ts = None
@@ -207,7 +206,7 @@ class HDLC:
         #
 
         if self._s.getTimeout() != timeout and timeout != None:
-            self.log("Set the timeout to %s, previous one was %s" % (timeout, self._s.getTimeout()))
+            self._logger.debug("Set the timeout to %s, previous one was %s" % (timeout, self._s.getTimeout()))
             self._s.setTimeout(timeout)
 
         #    +--- FLAG -----+
@@ -231,24 +230,32 @@ class HDLC:
         #   (5)
 
         try:
+            if self._hdlcStop:
+                return None
             # Read bytes until we get to a HDLC_FLAG_BYTE value
             # (either the end of a packet, or the start of a new one)
             d = self._s.getByte()
             ts = time.time()
             if d != HDLC_FLAG_BYTE:
-                self.log("Skipping byte %d" % d)
-                while d != HDLC_FLAG_BYTE and not self._hdlcStop:
+                self._logger.debug("Skipping byte %d" % d)
+                while d != HDLC_FLAG_BYTE:
+                    if self._hdlcStop:
+                        return None
                     d = self._s.getByte()
-                    self.log("Skipping byte %d" % d)
+                    self._logger.debug("Skipping byte %d" % d)
                     ts = time.time()
 
             # Store HDLC_FLAG_BYTE at the start of the retrieved packet
             # data:
             packet = [d]
 
+            if self._hdlcStop:
+                return None
             # Is the next byte also HDLC_FLAG_BYTE?
             d = self._s.getByte()
-            while d == HDLC_FLAG_BYTE and not self._hdlcStop:
+            while d == HDLC_FLAG_BYTE:
+                if self._hdlcStop:
+                    return None
                 d = self._s.getByte()
                 ts = time.time()
 
@@ -258,12 +265,14 @@ class HDLC:
 
             # Read bytes from serial until we read another HDLC_FLAG_BYTE
             # value (end of the current packet):
-            while d != HDLC_FLAG_BYTE and not self._hdlcStop:
+            while d != HDLC_FLAG_BYTE:
+                if self._hdlcStop:
+                    return None
                 d = self._s.getByte()
                 packet.append(d)
 
             # Done reading a whole packet from serial
-            self.log("SimpleSerial:_read: unescaped %s" % packet)
+            self._logger.debug("SimpleSerial:_read: unescaped %s" % packet)
 
             # Decode the packet, and check CRC:
             packet = self._unescape(packet)
@@ -276,7 +285,7 @@ class HDLC:
                 return None
             if not self._s._ts:
                 self._s._ts = ts
-            #self.log("Serial:_read: %.4f (%.4f) Recv: %s" % (ts, ts - self._s._ts, self._format(packet[1:-3])))
+            self._logger.debug("Serial:_read: %.4f (%.4f) Recv: %s" % (ts, ts - self._s._ts, self._format(packet[1:-3])))
             self._ts = ts
 
             # Packet was successfully retrieved, so return it in a
@@ -308,7 +317,7 @@ class HDLC:
         packet.append((crc >> 8) & 0xff)
         packet = [HDLC_FLAG_BYTE] + self._escape(packet) + [HDLC_FLAG_BYTE]
 
-        self.log("Serial: write %s" % packet)
+        self._logger.debug("Serial: write %s" % packet)
         self._s.putBytes(packet)
         
     def sendAck(self, seqno):
@@ -322,7 +331,7 @@ class HDLC:
         packet.append((crc >> 8) & 0xff)
         packet = [HDLC_FLAG_BYTE] + self._escape(packet) + [HDLC_FLAG_BYTE]
 
-        self.log("Serial: write ACK %s" % packet)
+        self._logger.debug("Serial: write ACK %s" % packet)
         self._s.putBytes(packet)
 
     def _format(self, payload):
@@ -410,6 +419,8 @@ class SimpleAM(Thread):
     def run(self):
         while not self._simpleAMStop:
             f = self._hdlc.read()
+            if self._simpleAMStop:
+                break
             p = AckFrame(f)
             if p.protocol == SERIAL_PROTO_ACK:
                 self._AckLock.acquire()
@@ -469,7 +480,7 @@ class SimpleAM(Thread):
 
     def read(self, timeout=None):
         return self.readData(timeout)
-    
+
     def sendAck(self):
         if self._ackSeqno:
             self._WriteLock.acquire()
@@ -493,11 +504,11 @@ class SimpleAM(Thread):
         self.oobHook = oobHook
 
     def stop(self):
-         self._simpleAMStop = True
-         self._DataEvent.set()
-         self._hdlc.stop()
-         self._source.close()
-         self._logger.info("SimpleAM - stopped")
+        self._simpleAMStop = True
+        self._DataEvent.set()
+        self._hdlc.stop()
+        self._source.close()
+        self._logger.info("SimpleAM - stopped")
 
 def printfHook(packet):
 #    if packet == None:
@@ -527,17 +538,17 @@ class AM(SimpleAM):
                     try:
                         s = getSource(os.environ['MOTECOM'])
                     except:
-                        self._logger.error("ERROR: Please indicate a way to connect to the mote")
+                        self._logger.error("Please indicate a way to connect to the mote")
                         sys.exit(-1)
         if oobHook == None:
             oobHook = printfHook
         super(AM, self).__init__(s, oobHook)
+        
+    def sendAck(self):
+        super(AM, self).sendAck()
 
     def read(self, timeout=None):
         return self.oobHook(super(AM, self).read(timeout))
-
-    def sendAck(self):
-        super(AM, self).sendAck()
 
     def write(self, packet, amId, timeout=None, blocking=True, maxretries = None):
         retries = 0
@@ -545,6 +556,7 @@ class AM(SimpleAM):
            timeout=self._source.ackTimeout
         r = super(AM, self).write(packet, amId, timeout, blocking)
         while not r and not self._simpleAMStop and (maxretries == None or retries < maxretries):
+            retries += 1
             r = super(AM, self).write(packet, amId, timeout, blocking, inc=0)
         return r
 
