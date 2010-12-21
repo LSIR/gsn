@@ -513,7 +513,7 @@ class ScheduleHandlerClass(Thread):
     def _scheduleNextDutyWakeup(self, time_delta, schedule_name):
         if self._duty_cycle_mode:
             time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
-            self._tosMessageHandler.addMsg(CMD_NEXT_WAKEUP, argument=time_to_wakeup)
+            self._tosMessageHandler.addMsg(CMD_NEXT_WAKEUP, argument=time_to_wakeup, blocking=True)
             self._logger.info('successfully scheduled the next duty wakeup for >'+schedule_name+'< (that\'s in '+str(time_to_wakeup)+' seconds)')
             
 
