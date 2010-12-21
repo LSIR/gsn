@@ -477,8 +477,9 @@ function PacketRate() {
       $.ajax({
         type: "GET",
         url: "/field?vs="+current_deployment.topology_vs_name+"&field=DATA&pk=latest",
+        dataType: "xml",
         success: function(data){
-          updateConfigTable($("sensornodes",data), $(data).attr("configurable")=="true");
+          updateConfigTable($("sensornodes",data), $("network", data).attr("configurable")=="true");
           updateHealthTable($("sensornodes",data));
           updateGraph($("sensornodes",data));
           updateStatusBar($("sensornodes",data));
