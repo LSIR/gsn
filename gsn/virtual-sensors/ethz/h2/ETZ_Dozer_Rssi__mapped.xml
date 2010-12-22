@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_Dozer_Rssi__mapped__1946" priority="10" >
+<virtual-sensor name="ETZ_Dozer_Rssi__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -23,7 +23,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select * from ETZ_Dozer_Rssi__muxed__mapped__1946 
+                        select * from ETZ_Dozer_Rssi__muxed__mapped 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -38,7 +38,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select * from ETZ_Dozer_Rssi__muxed__mapped__1946 
+                        select * from ETZ_Dozer_Rssi__muxed__mapped 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -53,7 +53,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select * from ETZ_Dozer_Rssi__muxed__mapped__1946 
+                        select * from ETZ_Dozer_Rssi__muxed__mapped 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -68,7 +68,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select * from ETZ_Dozer_Rssi__muxed__mapped__1946 
+                        select * from ETZ_Dozer_Rssi__muxed__mapped 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -83,7 +83,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select * from ETZ_Dozer_Rssi__muxed__mapped__1946 
+                        select * from ETZ_Dozer_Rssi__muxed__mapped 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -98,7 +98,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select * from ETZ_Dozer_Rssi__muxed__mapped__1946 
+                        select * from ETZ_Dozer_Rssi__muxed__mapped 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
@@ -113,7 +113,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select * from ETZ_Dozer_Rssi__muxed__mapped__1946 
+                        select * from ETZ_Dozer_Rssi__muxed__mapped 
                     </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>

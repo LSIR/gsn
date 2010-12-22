@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_Dozer_WXT520Prec__conv__1946" priority="10" >
+<virtual-sensor name="ETZ_Dozer_WXT520Prec__conv" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -30,7 +30,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from ETZ_Dozer_WXT520Prec__mapped__1946</predicate>
+                    <predicate key="query"> select * from ETZ_Dozer_WXT520Prec__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,

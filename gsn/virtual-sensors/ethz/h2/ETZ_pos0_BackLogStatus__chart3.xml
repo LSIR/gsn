@@ -26,7 +26,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, DB_REMOVE_TIME_MIN, DB_REMOVE_TIME_MEAN, DB_REMOVE_TIME_MAX from ETZ_BackLogStatus__mapped__1946</predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, DB_REMOVE_TIME_MIN, DB_REMOVE_TIME_MEAN, DB_REMOVE_TIME_MAX from ETZ_BackLogStatus__mapped</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select GENERATION_TIME, 

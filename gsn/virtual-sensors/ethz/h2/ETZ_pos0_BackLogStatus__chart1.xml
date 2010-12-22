@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_pos2_BackLogStatus__chart" priority="10" >
+<virtual-sensor name="ETZ_pos0_BackLogStatus__chart1" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
@@ -14,18 +14,22 @@
             <field name="data" type="binary:image/jpeg"/>
         </output-structure>
     </processing-class>
-    <description>backlog health status from position 2 at ETZ deployment</description>
+    <description>backlog health status from position 0 at ETZ deployment</description>
     <life-cycle pool-size="10" />
-    <addressing />
+    <addressing>
+        <predicate key="type">PermaSense ETZ test deployment</predicate>
+        <predicate key="LATITUDE">47.377326</predicate>
+        <predicate key="LONGITUDE">8.552935</predicate>
+    </addressing>
     <storage history-size="1" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, BACKLOG_DB_ENTRIES from ETZ_BackLogStatus__mapped__1946</predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, BACKLOG_DB_ENTRIES from ETZ_BackLogStatus__mapped</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
-                <query> select GENERATION_TIME, BACKLOG_DB_ENTRIES from wrapper where POSITION = 2 and GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000 </query>
+                <query> select GENERATION_TIME, BACKLOG_DB_ENTRIES from wrapper where POSITION = 0 and GENERATION_TIME >= (DATEDIFF(second, '1970-01-01', NOW()) * 1000) - 604800000</query>
             </source>
             <query> select * from source </query>
         </stream>
