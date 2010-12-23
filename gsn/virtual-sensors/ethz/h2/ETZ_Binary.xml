@@ -50,7 +50,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzl-bs01/</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/dyn-01/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -61,7 +61,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzl-bs01/</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/dyn-02/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -72,7 +72,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzl-bs01/</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/dyn-03/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -83,7 +83,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/etzl-bs01/</predicate>
+                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/etz/dyn-04/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
