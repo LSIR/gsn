@@ -2177,35 +2177,24 @@ var GSN = {
                 */                    
         ,
         regroupByUnderscore: function(vsName){
-            var name, index, lastindex, arrindex, vsNameUnderscore;
+            var vsNameUnderscore;
 
 	    vsName.sort();
             vsNameUnderscore = new Array(vsName.length);
-            for(var i=0;i<vsName.length;++i)
-            {
-		lastindex = 0;
-                name = vsName[i];
+            var re = new RegExp("([^_])_([^_]|__)*$");
+
+            for(var i=0;i<vsName.length;++i) {
                 vsNameUnderscore[i] = new Array();
-		vsNameUnderscore[i][0] = name;
-
-                while (true) {
-		    index = name.indexOf("_", lastindex);
-
-		    if (index == -1)
-			break;
-		    else {
-			if( name[index+1] == "_" )
-			    break
-			else
-			    lastindex = index+1;
-		    }
-		}
-                if(index>=1) vsNameUnderscore[i][1] = name.substr(0,lastindex-1);
-                else vsNameUnderscore[i][1] = "others";
-            }
-            
+		vsNameUnderscore[i][0] = vsName[i];
+                var group = vsName[i].replace(re, function(str, p1, offset, s) {
+                  return p1;
+                });
+                if (group.length==0)
+                  vsNameUnderscore[i][1] = "others";
+                else
+                  vsNameUnderscore[i][1] = group;
+            }            
             vsNameUnderscore.sort(GSN.util.sort2Dimensional);
-
             return vsNameUnderscore;
         }
         
