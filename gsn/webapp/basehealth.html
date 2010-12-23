@@ -79,7 +79,7 @@ $(document).ready(function() {
 			    deployments.push(deploymentname);
                             weatherStation.push(false);
 			}
-                        if ($(this).attr("name").indexOf("vaisalawxt520")>0) {
+                        if ($(this).attr("name").toLowerCase().indexOf("wxt520")>0) {
                             var i;
                             for (i=0;i<deployments.length;i++)
                               if (deployments[i]==deploymentname)
@@ -106,15 +106,15 @@ $(document).ready(function() {
 			      },
 			  $.P({},
 			  $.IMG({
-			    "src":"http://people.ee.ethz.ch/~perma/plots/"+deployments[i].toLowerCase()+"_V12DCIN.png"
+			    "src":"http://people.ee.ethz.ch/~perma/plots/corestation_"+deployments[i].toLowerCase()+"_V12DCIN.png"
 			  })),
 			  $.P({},
 			  $.IMG({
-			    "src":"http://people.ee.ethz.ch/~perma/plots/"+deployments[i].toLowerCase()+"_BasestationTemperature.png"
+			    "src":"http://people.ee.ethz.ch/~perma/plots/corestation_"+deployments[i].toLowerCase()+"_BasestationTemperature.png"
 			  })),
 			  $.P({},
 			  $.IMG({
-			    "src":"http://people.ee.ethz.ch/~perma/plots/"+deployments[i].toLowerCase()+"_BasestationHumidity.png"
+			    "src":"http://people.ee.ethz.ch/~perma/plots/corestation_"+deployments[i].toLowerCase()+"_BasestationHumidity.png"
 			  }))
 			));
                     if (weatherStation[i]==true) {
@@ -122,35 +122,35 @@ $(document).ready(function() {
                           $.P({},"Weatherstation"),
                           $.P({},
                           $.IMG({
-                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Voltages.png"
+                            "src":"http://people.ee.ethz.ch/~perma/plots/vaisala_"+deployments[i].toLowerCase()+"_Voltages.png"
                           })),
                           $.P({},
                           $.IMG({
-                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Humidity.png"
+                            "src":"http://people.ee.ethz.ch/~perma/plots/vaisala_"+deployments[i].toLowerCase()+"_Humidity.png"
                           })),
                           $.P({},
                           $.IMG({
-                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Temperature.png"
+                            "src":"http://people.ee.ethz.ch/~perma/plots/vaisala_"+deployments[i].toLowerCase()+"_Temperature.png"
                           })),
                           $.P({},
                           $.IMG({
-                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Air-Pressure.png"
+                            "src":"http://people.ee.ethz.ch/~perma/plots/vaisala_"+deployments[i].toLowerCase()+"_Air-Pressure.png"
                           })),
                           $.P({},
                           $.IMG({
-                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Rain.png"
+                            "src":"http://people.ee.ethz.ch/~perma/plots/vaisala_"+deployments[i].toLowerCase()+"_Rain.png"
                           })),
                           $.P({},
                           $.IMG({
-                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Hail.png"
+                            "src":"http://people.ee.ethz.ch/~perma/plots/vaisala_"+deployments[i].toLowerCase()+"_Hail.png"
                           })),
                           $.P({},
                           $.IMG({
-                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Winddirection.png"
+                            "src":"http://people.ee.ethz.ch/~perma/plots/vaisala_"+deployments[i].toLowerCase()+"_Winddirection.png"
                           })),
                           $.P({},
                           $.IMG({
-                            "src":"http://people.ee.ethz.ch/~perma/plots/image_"+deployments[i].toLowerCase()+"_Windspeed.png"
+                            "src":"http://people.ee.ethz.ch/~perma/plots/vaisala_"+deployments[i].toLowerCase()+"_Windspeed.png"
                           })),
                           $.P({},
                           $.IMG({
@@ -220,16 +220,6 @@ function showHealth(id) {
 
 		<div id="healthcontainer"></div>
 		
-<!--		<p>Matterhorn Weatherstation</p>
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Voltages.png"/></p>
-	        <p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Humidity.png"/></p>
-	        <p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Temperature.png"/></p> 
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Air-Pressure.png"/></p>
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Rain.png"/></p>
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Hail.png"/></p>
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Winddirection.png"/></p>
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/image_matterhorn_Windspeed.png"/></p>
-		<p><img src="http://people.ee.ethz.ch/~perma/plots/rose_matterhorn_Winddirection.png"/></p>-->
 	</div>
 	<div class="separator">
 		<div id="footer">
