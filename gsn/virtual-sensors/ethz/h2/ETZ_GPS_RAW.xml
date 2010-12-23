@@ -1,0 +1,49 @@
+<virtual-sensor name="ETZ_GPS_RAW" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GPS_TIME" type="INTEGER"/>
+            <field name="GPS_WEEK" type="SMALLINT" />
+            <field name="CARRIER_PHASE" type="DOUBLE" />
+            <field name="PSEUDO_RANGE" type="DOUBLE" />
+            <field name="DOPPLER" type="DOUBLE" />
+            <field name="SPACE_VEHICLE" type="SMALLINT" />
+            <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
+            <field name="SIGNAL_STRENGTH" type="SMALLINT" />
+            <field name="LLI" type="SMALLINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>show RAW GPS information from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GPSPlugin</predicate>
+                    <predicate key="gps-data-type">raw</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+	<stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GPSPlugin</predicate>
+                    <predicate key="gps-data-type">raw</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
