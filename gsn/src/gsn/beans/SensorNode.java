@@ -31,6 +31,7 @@ public class SensorNode {
 	public Integer packet_count = 0;
 	
 	private Double vsys;
+	private Double vsdi;
 	public Double current;
 	public Double temperature;
 	public Double humidity;
@@ -93,7 +94,13 @@ public class SensorNode {
 			return df.format(vsys);
 		return null;
 	}
-
+	
+	public String getVsdi() {
+		if (vsdi!=null)
+			return df.format(vsdi);
+		return null;
+	}
+	
 	public String getCurrent() {
 		if (current!=null)
 			return df.format(current);
@@ -125,7 +132,19 @@ public class SensorNode {
 			updateVoltageHistory();
 		}
 	}
-	
+
+	public void setVsdi(Double vsdi) {
+		if (vsdi != null) {
+			this.vsdi = vsdi;
+		}
+	}
+
+	public void setVsdi(String vsdi) {
+		if (vsdi != null) {
+			this.vsdi = new Double(vsdi);
+		}
+	}
+
 	public Integer getBatteryLevel() {
 		Double mean=0d;
 		Double std=0d;

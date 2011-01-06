@@ -13,6 +13,7 @@
   	   <value name="nodetype" field="nodetype" style="attribute" usage="optional"/>
   	   <value name="packet_count" field="packet_count" style="attribute" usage="optional"/>
   	   <value name="vsys" style="attribute" usage="optional" get-method="getVsys" set-method="setVsys"/>
+  	   <value name="vsdi" style="attribute" usage="optional" get-method="getVsdi" set-method="setVsdi"/>
   	   <value name="current" style="attribute" usage="optional" get-method="getCurrent" set-method="setCurrent"/>
   	   <value name="temperature" style="attribute" usage="optional" get-method="getTemperature" set-method="setTemperature"/>
   	   <value name="humidity" style="attribute" usage="optional" get-method="getHumidity" set-method="setHumidity"/>

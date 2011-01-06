@@ -327,9 +327,10 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				node.uptime = (Integer)s;
 			s = data.getData(configuration[21]);
 			if (s instanceof Integer) {
+				Double vsdi = new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d);
+				node.setVsdi(vsdi);
 				if (node.isBBControl()) {
-					logger.debug("BBControl system voltage: "+(new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d))+"("+s+")");
-					node.setVsys(new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d));
+					node.setVsys(vsdi);
 				}
 			}
 		}
