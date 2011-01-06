@@ -329,7 +329,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			if (s instanceof Integer) {
 				Double vsdi = null;
 				if (node.isSibNode()) {
-					vsdi = new Double((Integer)s)  * (2.56d/65536d) * (180d/24d);
+					vsdi = new Double((Integer)s)  * (2.56d/65536d) * (204d/24d);
 				}
 				else if (node.isPowerSwitch()) {
 					vsdi = new Double((Integer)s)  * (2.5d / 4095d) * 12d;
