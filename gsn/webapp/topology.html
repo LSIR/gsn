@@ -34,7 +34,7 @@ var rssi_dist = 25;
 var topologyUpdateTimer;
 var unmarkTimer;
 var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520", "powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
-var healthitems=new Array("packet_count", "vsys", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
+var healthitems=new Array("packet_count", "vsys", "vsdi", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
 
 var GSN = {
   /**
@@ -227,8 +227,11 @@ function PacketRate() {
       var id = $(this).attr("node_id");
       var index = nodeindex(id);
       if (index < 0) {
+        var cols='';
+        for (i=0;i<healthitems.length;i++)
+          cols+='<td></td>';
         table.append("<tr>"+
-          "<td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
+          "<td>"+parseInt($(this).attr("node_id"))+'</td>'+cols+'<td></td>'+
           "</tr>");
       }
       var row = $("td:first-child", table).filter(function(index) { return $(this).text()==id;}).parent();
@@ -252,11 +255,11 @@ function PacketRate() {
             $(this).empty().text($(data).attr(healthitems[index-1])?$(data).attr(healthitems[index-1]):"");
             $(this).append('<img style="margin:0px 0px 0px 5px;vertical-align:middle;" src="img/batterylevels/battery_'+img+'.png">');
             break;
-          case 8:
           case 9:
+          case 10:
             $(this).text(formatTime($(data).attr(healthitems[index-1])));
             break;
-          case 10:
+          case 11:
             break;
           default:
             $(this).text($(data).attr(healthitems[index-1])?$(data).attr(healthitems[index-1]):"");
@@ -651,6 +654,7 @@ $(document).ready(function() {
             "<th class=\"header\" style=\"width:30px\">ID</th>"+
             "<th class=\"header\">Pkt Count</th>"+
             "<th class=\"header\">Vsys</th>"+
+            "<th class=\"header\">Vsdi</th>"+
             "<th class=\"header\">I</th>"+
             "<th class=\"header\">Temp</th>"+
             "<th class=\"header\">Hum</th>"+
@@ -672,7 +676,8 @@ $(document).ready(function() {
               5: { sorter: 'digit' },
               6: { sorter: 'digit' },
               7: { sorter: 'digit' },
-              10: { sorter: 'digit' }
+              8: { sorter: 'digit' },
+              11: { sorter: 'digit' }
             } 
         });
         // add config table
