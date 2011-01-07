@@ -275,6 +275,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		// health
 		// save always latest health information
 		if (node.timestamp == timestamp) {
+			// Vsys
 			s = data.getData(configuration[4]);
 			if (s instanceof Integer) {
 				if (node.isSibNode()) {
@@ -287,6 +288,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					node.setVsys(new Double((Integer)s)  * (3d / 4095d));
 				}
 			}
+			// Current
 			s = data.getData(configuration[5]);
 			if (s instanceof Integer) {
 				if ((Integer)s==0xffff || !node.isSibNode())
@@ -294,11 +296,13 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				else
 					node.current = new Double((Integer)s) * 2.56 / Math.pow(2, 16) / 0.15 * 10;
 			}
-			s = data.getData(configuration[18]); // valid
+			// Valid
+			s = data.getData(configuration[18]);
 			if (s instanceof Byte) {
 				valid = (Byte)s;
 				logger.debug("valid is "+valid);
 			}
+			// Temperature
 			s = data.getData(configuration[6]);
 			if (s instanceof Integer) {
 				if ((Integer)s==0xffff || (valid!=null && valid==0)) {
@@ -306,25 +310,37 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					node.humidity = null;
 				}
 				else {
-					node.temperature = new Double(-39.63d + (0.01d * (new Double((Integer)s))));
+					if (node.isBBControl() || node.isAccessNode())
+						node.temperature = new Double(-46.85 + 175.72 * (new Double((Integer)s))/Math.pow(2,14)); // SHT21
+					else 
+						node.temperature = new Double(-39.63d + (0.01d * (new Double((Integer)s)))); // SHT75
+					// Humidity
 					s = data.getData(configuration[7]);
 					if (s instanceof Integer) {
 						if ((Integer)s==0xffff)
 							node.humidity = null;
 						else {
-							Double d = new Double((Integer)s);
-							Double hum_rel = new Double(-4 + (0.0405d * d) - 0.0000028d * Math.pow(d, 2));				
-							node.humidity = new Double((node.temperature - 25) * (0.01d + (0.00008d * d)) + hum_rel);
+							if (node.isBBControl() || node.isAccessNode()) { // SHT21
+								node.humidity = -6d + 125d * new Double((Integer)s) / Math.pow(2, 12);
+							}
+							else { // SHT75
+								Double d = new Double((Integer)s);
+								Double hum_rel = new Double(-4 + (0.0405d * d) - 0.0000028d * Math.pow(d, 2));				
+								node.humidity = new Double((node.temperature - 25) * (0.01d + (0.00008d * d)) + hum_rel);
+							}
 						}
 					}
 				}
 			}
+			// Flash count
 			s = data.getData(configuration[8]);
 			if (s instanceof Integer)
 				node.flash_count = (Integer)s;
+			// Uptime
 			s = data.getData(configuration[9]);
 			if (s instanceof Integer)
 				node.uptime = (Integer)s;
+			// VSdi
 			s = data.getData(configuration[21]);
 			if (s instanceof Integer) {
 				Double vsdi = null;
