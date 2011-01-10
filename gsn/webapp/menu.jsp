@@ -4,6 +4,7 @@
     <li <%= "index".equals(selected) ? "class=\"selected\"" : "" %>><a href="index.html#home">home</a></li>
     <li <%= "data".equals(selected) ? "class=\"selected\"" : "" %>><a href="data.html#data">data browser</a></li>
     <li <%= "topology".equals(selected) ? "class=\"selected\"" : "" %>><a href="topology.html#topology">network topology</a></li>
+    <li <%= "systemhealth".equals(selected) ? "class=\"selected\"" : "" %>><a href="systemhealth.html#systemhealth">system</a></li>
     <li <%= "nodehealth".equals(selected) ? "class=\"selected\"" : "" %>><a href="nodehealth.html#nodehealth">node health</a></li>
     <li <%= "basehealth".equals(selected) ? "class=\"selected\"" : "" %>><a href="basehealth.html#basehealth">base health</a></li>
     <li <%= "weather".equals(selected) ? "class=\"selected\"" : "" %>><a href="weather.html#weather">on-site weather</a></li>

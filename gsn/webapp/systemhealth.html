@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<title>GSN</title>
+	
+	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
+	<script type="text/javascript" src="js/jquery-dom.js"></script>
+	<script type="text/javascript" src="js/jquery.history.js"></script>
+	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+
+	<script type="text/javascript" src="js/constants.js"></script>
+	<script type="text/javascript" src="js/functions.js"></script>
+	
+        <script type="text/javascript" src="js/uptime.js"></script>
+<script type="text/javascript">
+<!--//<![CDATA[
+
+var initialUpdateVal = 600;
+var nextUpdateVal = initialUpdateVal;
+
+function updateHealth()
+{
+  var d = new Date();
+  $("#systemhealthcontainer").find("img").each(function() {
+    $(this).attr('src',$(this).attr("src").split("?")[0]+"?date="+ d.getTime());
+  });
+}
+
+function nextUpdate() {
+	if(nextUpdateVal==0) nextUpdateVal=initialUpdateVal+1;
+	
+	nextUpdateVal--;
+	
+	$("#nextUpdate").text(nextUpdateVal);
+	
+	if(nextUpdateVal==0) 
+	{
+		updateHealth();
+	}
+	setTimeout("nextUpdate()",1000);
+}
+
+$(document).ready(function() {
+        $.get('/menu.jsp', {selected: "systemhealth"}, function(data) {
+          $('#navigation').html(data);
+        });
+	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+			
+	$("#nextUpdate").text(nextUpdateVal);
+	setTimeout("nextUpdate()",1000);
+	
+	$.ajax({
+	      type: "GET",
+	      url: "/gsn?structure",
+	      success: function(data){
+                if ($(document).attr("title")=="GSN") {
+                  var gsn = $("gsn",data);
+                  $(document).attr("title",$(gsn).attr("name"));
+                  $("#gsn-name").empty().append($(gsn).attr("name"));
+                  $("#gsn-desc").empty().append($(gsn).attr("description"));
+                  $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+                }
+                $("#gsn-name").show();
+                uptime.setTime($(gsn).attr("uptime"));
+
+                var gsnname = $(gsn).attr("name").replace(/.*::\s*GSN\s*-\s*/, "").replace(/\s/g,"").toLowerCase();
+                var systemhealth_available=false;
+                
+                var test = $("virtual-sensor[name^='statistics_']",data);//.find('[name^="statistics_"]');
+                $("virtual-sensor[name^='statistics_']",data).each(function(){
+                      systemhealth_available=true;
+                });
+                if (systemhealth_available) {
+		// display
+/*
+gsn_test-private_GSNCnt.png                                                                                                                                                                                                                  
+gsn_test-private_GSNMemoryUsage.png                                                                                                                                                                                                          
+gsn_test-private_GSNUptime.png                                                                                                                                                                                                               
+gsn_test-private_MySQLCnt.png                                                                                                                                                                                                                
+gsn_test-private_MySQLmaxavg.png  
+*/
+  // add div
+                $("#systemhealthcontainer").append(
+			  $.P({},
+			  $.IMG({
+			    "src":"http://people.ee.ethz.ch/~perma/plots/gsn_"+gsnname+"_GSNCnt.png"
+			  })),
+			  $.P({},
+			  $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/gsn_"+gsnname+"_GSNMemoryUsage.png"
+			  })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/gsn_"+gsnname+"_GSNUptime.png"
+                          })),
+                          $.P({},
+                          $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/gsn_"+gsnname+"_MySQLCnt.png"
+                          })),
+			  $.P({},
+			  $.IMG({
+                            "src":"http://people.ee.ethz.ch/~perma/plots/gsn_"+gsnname+"_MySQLmaxavg.png"
+			  }))
+			);
+                  updateHealth();
+                }
+	      }
+	});	
+});	
+
+//]]>-->
+</script>
+</head>
+<body>
+
+<div id="container">
+	<div id="header">
+		<h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
+	</div>
+	<div id="navigation">
+	</div>
+	
+	<div id="separator">
+		<div id="starttext">
+			<p>
+				Current basestation health data.
+			</p>
+		</div>
+	</div>
+	
+	
+	<div id="maindiv">
+
+		<p id="updatetext">next update in <span id="nextUpdate">??</span> seconds</p>
+
+                <div id="systemhealthcontainer">
+                </div>  
+		
+	</div>
+	<div class="separator">
+		<div id="footer">
+		      <table width="100%">
+				<tr>
+					<td style="width:50%;color:#444444;"><b>A Project of <a href="http://www.ethz.ch" target="_blank">ETH Zurich</a>, <a href="http://www.unibas.ch" target="_blank">Uni Basel</a> and <a href="http://www.uzh.ch" target="_blank">Uni Zurich</a></b></td>
+					<td style="text-align:right;width:50%;font-size:9px;">Powered by <a href="http://gsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-5632004-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+</body>
+</html>
