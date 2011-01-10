@@ -500,7 +500,9 @@ function PacketRate() {
   }
 
 $(document).ready(function() {
-
+  $.get('/menu.jsp', {selected: "topology"}, function(data) {
+    $('#navigation').html(data);
+  });
   $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 
   // load deployments
@@ -778,17 +780,6 @@ function showTopology(id) {
 		<h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
 	</div>
 	<div id="navigation">
-		<ul id="menu">
-			<li><a href="index.html#home">home</a></li>
-			<li><a href="data.html#data">data browser</a></li>
-			<li class="selected"><a href="topology.html#topology">network topology</a></li>
-			<li><a href="nodehealth.html#nodehealth">node health</a></li>
-            <li><a href="basehealth.html#basehealth">base health</a></li>
-			<li><a href="weather.html#weather">on-site weather</a></li>
-			<li><a href="map.html#map">map</a></li>
-            <!-- <li><a href="fullmap.html#fullmap">fullmap</a></li> -->
-		</ul>
-		<ul id="linkWebsite"><li><a href="http://www.permasense.ch" target="_blank">PermaSense Home</a></li></ul>
 	</div>
 		
 	<div id="maindiv">
