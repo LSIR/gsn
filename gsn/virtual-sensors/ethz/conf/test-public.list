@@ -49,10 +49,8 @@ ETZ_pos2_Camera__scaled.xml
 #ETZ_pos2_CoreStationStatus__chart2.xml
 #ETZ_pos2_CoreStationStatus__chart3.xml
 #ETZ_pos2_CoreStationStatus__chart4.xml
-ETZ_pos2_Dozer__Configuration.xml
 ETZ_pos2_Webcam_scaled.xml
 ETZ_pos3_Webcam__scaled.xml
-ETZ_pos22_Dozer__Configuration.xml
 ETZ_Schedule__mapped.xml
 ETZ_VaisalaWXT520__mapped.xml
 ETZ_VaisalaWXT520__muxed__mapped.xml
@@ -66,3 +64,4 @@ ETZ_Dozer_WXT520WindPth__mapped.xml
 ETZ_Dozer_WXT520Ident__mapped.xml
 ETZ_Dozer_WXT520Ident__conv.xml
 Statistics_MySQL.xml
+Statistics_GSN.xml
