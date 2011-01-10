@@ -107,10 +107,11 @@ class JobsObserverClass(Thread):
                 self._lock.acquire()
                 if not self._jobList:
                     self._work.clear()
-                    self._lock.release()
                     self._backlogMain.schedulehandler.allJobsFinished()
+                    self._lock.release()
                     break
-                self._lock.release()
+                else:
+                    self._lock.release()
  
         self._logger.info('died')
         
