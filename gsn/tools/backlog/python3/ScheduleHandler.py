@@ -850,19 +850,22 @@ class ScheduleCron(CronTab):
     def _getNextSchedule(self, date_time, schedule):
         second = 0
         year = date_time.year
-        date_time = datetime(date_time.year, date_time.month, date_time.day, date_time.hour, date_time.minute)
+        date_time_month = datetime(date_time.year, date_time.month, 1)
+        date_time_day = datetime(date_time.year, date_time.month, date_time.day)
+        date_time_hour = datetime(date_time.year, date_time.month, date_time.day, date_time.hour)
+        date_time_min = datetime(date_time.year, date_time.month, date_time.day, date_time.hour, date_time.minute)
         
         firsttimenottoday = True
         stop = False
         while not stop:
             for month in self._getRange(schedule.month()):
-                if datetime(year, month, date_time.day, date_time.hour, date_time.minute) >= date_time:
+                if datetime(year, month, 1) >= date_time_month:
                     for day in self._getRange(schedule.dom()):
-                        if datetime(year, month, day, date_time.hour, date_time.minute) >= date_time:
-                            try:
-                                nextdatetime = datetime(year, month, day)
-                            except ValueError:
-                                continue
+                        try:
+                            nextdatetime = datetime(year, month, day)
+                        except ValueError:
+                            continue
+                        if nextdatetime >= date_time_day:
                             
                             if nextdatetime.isoweekday() in self._getRange(schedule.dow()):
                                 try:
@@ -875,10 +878,10 @@ class ScheduleCron(CronTab):
                                         
                                 if nextdatetime < dt:
                                     for hour in self._getRange(schedule.hour()):
-                                        if datetime(year, month, day, hour, date_time.minute) >= date_time:
+                                        if datetime(year, month, day, hour) >= date_time_hour:
                                             for minute in self._getRange(schedule.minute()):
                                                 nextdatetime = datetime(year, month, day, hour, minute)
-                                                if nextdatetime < date_time+timedelta(seconds=59):
+                                                if nextdatetime < date_time_min+timedelta(seconds=59):
                                                     continue
                                                 else:
                                                     stop = True
