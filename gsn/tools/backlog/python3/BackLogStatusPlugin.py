@@ -8,11 +8,11 @@ __id__          = "$Id$"
 __source__      = "$URL$"
 
 import struct
+from threading import Timer
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
-DEFAULT_STATUS_INTERVAL = 10.0
 DEFAULT_BACKLOG = True
 
 class BackLogStatusPluginClass(AbstractPluginClass):
@@ -22,6 +22,14 @@ class BackLogStatusPluginClass(AbstractPluginClass):
     
     Any new status information coming from this program should be implemented here.
     '''
+
+    '''
+    _timer
+    '''
+    
+    def __init__(self, parent, options):
+        AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
+        self._timer = None
     
     
     def getMsgType(self):
@@ -39,6 +47,17 @@ class BackLogStatusPluginClass(AbstractPluginClass):
 
 
     def action(self, parameters):
+        if self._timer:
+            self._timer.cancel()
+        
+        paramlist = parameters.split()
+        if paramlist:
+            if paramlist[0].isdigit():
+                self._timer = Timer(int(paramlist[0]), self.action, [''])
+                self._timer.start()
+            else:
+                self.error('parameter has to be a digit (parameter=' + parameters + ')')
+            
         packet = struct.pack('<i', self.getErrorCounter())
         packet += struct.pack('<i', self.getExceptionCounter())
         backlogstatus = self.getBackLogStatus()
@@ -71,3 +90,9 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         packet += struct.pack('<i', meanremovetime)
         
         self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
+    
+    
+    def stop(self):
+        if self._timer:
+            self._timer.cancel()
+        self.info('stopped')

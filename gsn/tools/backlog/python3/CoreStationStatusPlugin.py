@@ -9,6 +9,7 @@ __source__      = "$URL$"
 
 import struct
 import os
+from threading import Timer
 
 from ScheduleHandler import SUBPROCESS_BUG_BYPASS
 if SUBPROCESS_BUG_BYPASS:
@@ -36,6 +37,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
     _conf_calibrate
     _ain4_cal
     _ain9_cal
+    _timer
     '''
 
     def __init__(self, parent, config):
@@ -67,6 +69,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         self._ain4_cal = None
         self._ain9_cal = None
         
+        self._timer = None
+        
     
     def getMsgType(self):
         return BackLogMessage.CORESTATION_STATUS_MESSAGE_TYPE
@@ -77,6 +81,17 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             
 
     def action(self, parameters):
+        if self._timer:
+            self._timer.cancel()
+        
+        paramlist = parameters.split()
+        if paramlist:
+            if paramlist[0].isdigit():
+                self._timer = Timer(int(paramlist[0]), self.action, [''])
+                self._timer.start()
+            else:
+                self.error('parameter has to be a digit (parameter=' + parameters + ')')
+            
         if not self._calibrated and os.path.isfile(CALIB_FILE) and self._conf_calibrate:
             # get the calibration data with channel offsets
             try:
@@ -205,3 +220,9 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         packet = struct.pack('<IIIIIIIIII', v1, v2, v3, v4, v5, v6, v7, v8, v9, v10)
         
         self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
+    
+    
+    def stop(self):
+        if self._timer:
+            self._timer.cancel()
+        self.info('stopped')
