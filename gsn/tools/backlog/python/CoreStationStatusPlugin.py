@@ -202,7 +202,6 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             v9 = int(round(v9 * 200 / 3))
             v10 = int(round(v10 * 2))
             if not self._calibrated and self._conf_calibrate:
-                v4 = 0xFFFFFFFF
                 v9 = 0xFFFFFFFF
         except Exception, e:
             self.warning(e.__str__())
