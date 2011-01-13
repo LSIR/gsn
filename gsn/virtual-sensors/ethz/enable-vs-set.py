@@ -36,6 +36,8 @@ fd = open(filepath, 'r')
 for line in fd:
   if line.startswith('#'):
     continue
+  if len(line) <= 1:
+    continue
   link = line.rstrip()
   if h2:
     source = 'ethz/h2/' + link 
