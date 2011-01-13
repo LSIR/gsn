@@ -508,6 +508,9 @@ class ScheduleHandlerClass(Thread):
             self._tosMessageAckEvent.set()
         else:
             self.error('received TOS message type (' + str(response['command']) + ') does not match the sent command type (' + str(self._tosSentCmd) + ')')
+            return False
+            
+        return True
         
         
     def tosMsgSend(self, cmd, argument=0):
