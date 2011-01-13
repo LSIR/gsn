@@ -34,6 +34,8 @@ Dirruhorn_Dozer_WXT520WindPth__conv.xml
 Dirruhorn_Dozer_WXT520WindPth__mapped.xml
 Dirruhorn_Schedule__mapped.xml
 Dirruhorn_Topology__public.xml
+Dirruhorn_VaisalaWXT520__mapped.xml
+Dirruhorn_VaisalaWXT520__muxed__mapped.xml
 Jungfraujoch_BackLogStatus__mapped.xml
 Jungfraujoch_CoreStationStatus__conv.xml
 Jungfraujoch_CoreStationStatus__mapped.xml
@@ -332,3 +334,5 @@ Thur_pos0_Webcam__scaled.xml
 #Thur_pos5_DozerDutyCycle__chart1.xml
 #Thur_pos6_DozerDutyCycle__chart1.xml
 Thur_Topology__public.xml
+Statistics_GSN.xml
+Statistics_MySQL.xml
