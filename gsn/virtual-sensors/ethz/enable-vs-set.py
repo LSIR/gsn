@@ -69,7 +69,7 @@ if sys.argv[3].lower() == "check":
     if (os.path.isfile(path) and path.endswith('.xml')):
       if (os.path.islink(path)):
         if not (os.readlink(path) in linklist):
-          print 'not in list: ' + path
+          print 'not in list: ' + os.readlink(path)
       else:
         print path + ' is not a symlink'
   exit(0)
