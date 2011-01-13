@@ -6,8 +6,11 @@ import time
 
 abort = False
 
-if len(sys.argv) != 3:
-  print 'usage: enable-vs-set.py <target> <db>'
+if len(sys.argv) != 4 or (sys.argv[3].lower() != "create" and sys.argv[3].lower() != "check" and sys.argv[3].lower() != "delete"):
+  print 'usage: enable-vs-set.py <target> <db> (create|check|delete)'
+  print '  create    Creates missing symlinks'
+  print '  check     Reports differences between existing links and configuration'
+  print '  delete    Removes obsolete symlinks'
   sys.exit(-1)
 
 filepath = sys.path[0] + '/conf/' + sys.argv[1] + '.list'
@@ -27,34 +30,57 @@ if not os.path.exists(filepath):
 # change to virtual-sensors
 os.chdir(sys.path[0] + '/..')
 
-# delete symlinks in virtual-sensors
-#for path in os.listdir('.'):
-#  if (os.path.isfile(path) and path.endswith('.xml')):
-#    if (os.path.islink(path)):
-#      print 'delete ' + path + '...'
-#      os.unlink(path)
-#    else:
-#      print path + ' is not a symlink, aborting...'
-#      abort = True
-
-if abort:
-  sys.exit(-1)
-
-# read list (given by argument)
+# read list file
+linklist = []
 fd = open(filepath, 'r')
 for line in fd:
   if line.startswith('#'):
     continue
   link = line.rstrip()
   if h2:
-      source = 'ethz/h2/' + link 
+    source = 'ethz/h2/' + link 
   else:
-      source = 'ethz/mysql/' + link 
-  if os.path.exists(source):
-    if not os.path.exists(link):
-      print link + ' -> ' + source
-      os.symlink(source, link)
-#      time.sleep(300)
-  else:
-    print 'cannot create symlink ' + link + '...'
+    source = 'ethz/mysql/' + link 
+  linklist.append(source)
 fd.close()
+
+# delete symlinks in virtual-sensors?
+if sys.argv[3].lower() == "delete":
+  for path in os.listdir('.'):
+    if (os.path.isfile(path) and path.endswith('.xml')):
+      if (os.path.islink(path)):
+        if not (os.readlink(path) in linklist):
+          print 'delete ' + path + '...'
+          os.unlink(path)
+      else:
+        print path + ' is not a symlink'
+  exit(0)
+
+# check symlinks in virtual-sensors
+if sys.argv[3].lower() == "check":
+  for source in linklist:
+    link = os.path.basename(source)
+    if os.path.exists(source):  
+      if not os.path.exists(link):
+        print "not linked: " + link + ' -> ' + source
+  for path in os.listdir('.'):
+    if (os.path.isfile(path) and path.endswith('.xml')):
+      if (os.path.islink(path)):
+        if not (os.readlink(path) in linklist):
+          print 'not in list: ' + path
+      else:
+        print path + ' is not a symlink'
+  exit(0)
+
+# create symlinks in virtual-sensors
+if sys.argv[3].lower() == "create":
+  for source in linklist:
+    link = os.path.basename(source)
+    if os.path.exists(source):
+      if not os.path.exists(link):
+        print link + ' -> ' + source
+        os.symlink(source, link)
+#      time.sleep(300)
+    else:
+      print 'cannot create symlink ' + link + '...'
+  exit(0)
