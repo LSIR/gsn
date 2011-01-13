@@ -138,7 +138,7 @@ class StatisticsClass:
             diff = datetime.utcnow() - self._timers[uniqueTimerId]
             if stopMeasurement:
                 del self._timers[uniqueTimerId]
-            return diff.total_seconds()
+            return (diff.microseconds + (diff.seconds + diff.days * 24 * 3600) * 10**6) / 10.0**6
         else:
             return None
     
