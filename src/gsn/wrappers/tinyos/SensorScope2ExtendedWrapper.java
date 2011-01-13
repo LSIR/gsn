@@ -848,7 +848,7 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                         case 20:
                                             long solar_rad_sp212_raw = reading[0] * 256 + reading[1];
 
-                                            sid20_solar_rad_sp212 = solar_rad_sp212_raw * 2.5 / 4095 * 0.5;
+                                            sid20_solar_rad_sp212 = solar_rad_sp212_raw * 2.5 / 4.095 * 0.5;
 
                                             buffer[OFFSET_SOLAR_RAD_SP212 + dupn] = new Double(sid20_solar_rad_sp212);
                                             buf[OFFSET_SOLAR_RAD_SP212 + dupn] = sid20_solar_rad_sp212;
