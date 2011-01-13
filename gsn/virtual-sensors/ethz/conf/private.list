@@ -22,6 +22,7 @@ Dirruhorn_Dozer_WXT520Sup.xml
 Dirruhorn_Dozer_WXT520WindPth.xml
 Dirruhorn_GPS.xml
 Dirruhorn_Schedule.xml
+Dirruhorn_VaisalaWXT520.xml
 Dirruhorn_Topology.xml
 Jungfraujoch_BackLogStatus.xml
 Jungfraujoch_CoreStationStatus.xml
@@ -81,3 +82,6 @@ Thur_Dozer_NodeInfo.xml
 Thur_Dozer_Rssi.xml
 Thur_Dozer_StateCounter.xml
 Thur_Topology.xml
+Statistics_MySQL.xml
+Statistics_GSN.xml
+
