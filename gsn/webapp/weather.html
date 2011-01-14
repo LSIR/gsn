@@ -111,7 +111,16 @@ $(document).ready(function() {
                     }
                 }
               }
-        });     
+        });
+        // add date magnifier
+        $(".webcamimage").each(function(){
+          var im = $(this);
+          var parent = im.parent();
+          var div = $('<div style="float:left;position:relative;margin:2px;padding:0;width:'+im.attr('width')+'px;height:'+im.attr('height')+'px"><div style="position:absolute;bottom:0px;width:150px;height:15px;background:url('+im.attr('src')+');background-position: 0px bottom;margin:0;padding:0"></div><a href="'+im.attr('src')+'"></a></div>');
+          $("a",div).append(im.clone());
+          im.after(div);
+          im.remove();
+        });
 });
 
 function showTopology(id) {
@@ -182,7 +191,7 @@ function showTopology(id) {
                                            <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069730.png"/></td>
                                         </tr>
                                 </table>
-                                <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=13" width="300" height="250">
+                                <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=13" width="300" height="250">
                         </td>
                         </tr>
                 </table>
@@ -228,23 +237,24 @@ function showTopology(id) {
                 
                 </p>
                 <p>
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=4" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=5" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=6" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=7" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=8" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=9" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=10" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=11" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=12" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=13" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=14" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=15" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=16" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=17" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=18" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=19" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=20" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=4" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=5" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=6" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=7" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=8" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=9" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=10" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=11" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=12" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=13" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=14" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=15" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=16" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=17" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=18" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=19" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=20" width="300" height="250">
+                  <div style="clear:left"/>
                 </p>
                 </div>
 
@@ -282,14 +292,14 @@ function showTopology(id) {
                       </div>
                       </div>
                       <div style="height:430px">
-                        <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=2" width="448" height="336">
+                        <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=2" width="448" height="336">
                       </div>
                 </div>
 
                 <div id="weather_Dirruhorn" style="display:none">
                 <table style="margin-left:150px">
                      <tr><td>Webcam</td><td>Weather-Info Randa</td></tr>
-                     <tr><td><img style="margin-top:10px" src="http://people.ee.ethz.ch/~perma/webcam.php?id=26" width="400" height="327"></td>
+                     <tr><td><img class="webcamimage" style="margin-top:10px" src="http://people.ee.ethz.ch/~perma/webcam.php?id=26" width="400" height="327"></td>
                          <td><img style="margin-top:10px" src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069141.png"/></td>
                      </tr>
                 </table>
@@ -298,12 +308,13 @@ function showTopology(id) {
                         <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/069141.png"/>
                 </p>
                 <p>
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=27" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=21" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=22" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=23" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=24" width="300" height="250">
-                  <img src="http://people.ee.ethz.ch/~perma/webcam.php?id=25" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=27" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=21" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=22" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=23" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=24" width="300" height="250">
+                  <img class="webcamimage" src="http://people.ee.ethz.ch/~perma/webcam.php?id=25" width="300" height="250">
+                  <div style="clear:left"/>
                 </p>
                 </div>
 
