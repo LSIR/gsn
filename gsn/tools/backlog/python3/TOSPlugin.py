@@ -9,11 +9,21 @@ __source__      = "$URL$"
 
 import array
 import time
+import tos
+from threading import Event
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_BACKLOG = True
+
+# Dozer Beacon Structure
+TOS_DOZER_BEACON_STRUCTURE = [('destination', 'int', 2), ('cmd', 'int', 2), ('repetitionCnt','int',1)]
+TOS_AM_COMMANDMSG = 0x50 
+ACCESSNODE_QUEUE_CTRL_CMD = 8
+ACCESSNODE_QUEUE_CTRL_CMD_VAL_CLOSE = 0
+ACCESSNODE_QUEUE_CTRL_CMD_VAL_OPEN = 1
+ACCESSNODE_QUEUE_CTRL_CMD_VAL_CLOSED = 2
 
 class TOSPluginClass(AbstractPluginClass):
     '''
@@ -29,7 +39,7 @@ class TOSPluginClass(AbstractPluginClass):
         
         self._plugstop = False
         self._ready = False
-    
+        self._QueueClosedEvent = Event()
     
     def run(self):
         # open accessnode queue, just in case if we closed it before...
@@ -43,13 +53,20 @@ class TOSPluginClass(AbstractPluginClass):
     def stop(self):
         self._ready = False
         self._plugstop = True
-        self.deregisterTOSListener()
         # send close queue cmd to access node
         self._sendCloseQueueCommand()
+        self.deregisterTOSListener()
         self.info('stopped')
     
     
     def tosMsgReceived(self, timestamp, packet):
+        if packet['type'] == TOS_AM_COMMANDMSG:
+            self._logger.debug('TOS_AM_COMMANDMSG')         
+            response = tos.Packet(TOS_DOZER_BEACON_STRUCTURE, packet['data'])
+            self._logger.debug('rcv (cmd=' + str(response['cmd']) + ', destination=' + str(response['destination']) + ', repetition count=' +  str(response['repetitionCnt']) +')')
+            if (response['cmd'] >> 12) == ACCESSNODE_QUEUE_CTRL_CMD and response['cmd'] & 0x0fff == ACCESSNODE_QUEUE_CTRL_CMD_VAL_CLOSED:
+                self._logger.debug('access node queue closed')
+                self._QueueClosedEvent.set()
         return self.processMsg(timestamp, self._tos2backlog(packet), self._priority, self._backlog)
         
         
@@ -67,14 +84,19 @@ class TOSPluginClass(AbstractPluginClass):
 
 
     def _sendCloseQueueCommand(self):
-        if self.sendTOSmsg(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x00, 0x00]).tolist(), 0x00, 1, True, 10):
-            self.info('waiting 35 seconds for close queue command to be complete')
-            time.sleep(35)
-
+        closecmd = tos.Packet(TOS_DOZER_BEACON_STRUCTURE, (self.getDeviceId(), (ACCESSNODE_QUEUE_CTRL_CMD << 12) + ACCESSNODE_QUEUE_CTRL_CMD_VAL_CLOSE, 1))
+        if self.sendTOSmsg(closecmd, TOS_AM_COMMANDMSG, 1, True, 10):
+            self.info('waiting for close queue command to be complete (timeout 35s)')
+            self._QueueClosedEvent.wait(35)
+            if self._QueueClosedEvent.isSet():
+                self.info('queue closed')
+            else:
+                self.warning('queue not closed')
 
     def _sendOpenQueueCommand(self):
-        return self.sendTOSmsg(array.array('B', [0x00, 0x00, 0x00, 0x00, 0x05, 0x22, 0x50, 0xff, 0xff, 0x80, 0x01, 0x00]).tolist(), 0x00, 1, True, 10)
-        
+        self._QueueClosedEvent.clear();
+        opencmd = tos.Packet(TOS_DOZER_BEACON_STRUCTURE, (self.getDeviceId(), (ACCESSNODE_QUEUE_CTRL_CMD << 12) + ACCESSNODE_QUEUE_CTRL_CMD_VAL_OPEN, 1))
+        return self.sendTOSmsg(opencmd, TOS_AM_COMMANDMSG, 1, True, 10)        
 
     def _backlog2tos(self, message):
         return array.array('B', message[1:]).tolist()

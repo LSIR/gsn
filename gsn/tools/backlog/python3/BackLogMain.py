@@ -103,7 +103,7 @@ class BackLogMainClass(Thread):
         gsn_port = DEFAULT_OPTION_GSN_PORT
         backlog_db = DEFAULT_OPTION_BACKLOG_DB
         
-        id = None
+        self.device_id = None
         tos_address = None
         tos_version = None
         dutycyclemode = None
@@ -122,7 +122,7 @@ class BackLogMainClass(Thread):
             elif name == 'backlog_db_resend_hr':
                 backlog_db_resend_hr = int(value)
             elif name == 'device_id':
-                id = int(value)
+                self.device_id = int(value)
             elif name == 'tos_source_addr':
                 tos_address = value
             elif name == 'tos_version':
@@ -134,9 +134,9 @@ class BackLogMainClass(Thread):
             elif name == 'folder_min_free_mb':
                 folder_min_free_mb = int(value)
                 
-        if id == None:
+        if self.device_id == None:
             raise TypeError('device_id has to be specified in the configuration file')
-        if id >= 65535 or id < 0:
+        if self.device_id >= 65535 or self.device_id < 0:
             raise TypeError('device_id has to be in the range of 0 and 65534 (both inclusive)')
 
         # printout info
@@ -170,7 +170,7 @@ class BackLogMainClass(Thread):
             self._logger.info('folder check succeeded (' + self._folder_to_check_size + ': ' + str(self.getFolderAvailableMb()) + ' MB available)')
         
         # printout options
-        self._logger.info('device_id: ' + str(id))
+        self._logger.info('device_id: ' + str(self.device_id))
         self._logger.info('gsn_port: ' + str(gsn_port))
         self._logger.info('backlog_db: ' + backlog_db)
         
@@ -192,7 +192,7 @@ class BackLogMainClass(Thread):
             self._logger.info('not running in duty-cycle mode')
             self.duty_cycle_mode = False
 
-        self.gsnpeer = GSNPeerClass(self, id, gsn_port)
+        self.gsnpeer = GSNPeerClass(self, self.device_id, gsn_port)
         self._logger.info('loaded GSNPeerClass')
         self.backlog = BackLogDBClass(self, backlog_db, backlog_db_resend_hr)
         self._logger.info('loaded BackLogDBClass')

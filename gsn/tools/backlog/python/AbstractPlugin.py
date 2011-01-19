@@ -382,6 +382,14 @@ class AbstractPluginClass(Thread):
         @return: the number of errors
         '''
         return self._backlogMain.getErrorCounter()
+    
+    def getDeviceId(self):
+        '''
+        Returns the device id.
+        
+        @return: the device id
+        '''
+        return self._backlogMain.device_id
 
     
     def exception(self, exception):
