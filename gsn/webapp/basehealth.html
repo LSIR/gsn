@@ -70,6 +70,8 @@ $(document).ready(function() {
                   $("#gsn-name").empty().append($(gsn).attr("name"));
                   $("#gsn-desc").empty().append($(gsn).attr("description"));
                   $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+                  var gsnname = $(gsn).attr("name").replace(/.*::\s*GSN\s*-\s*/, "").replace(/\s/g,"").toLowerCase();
+                  $('head', document).append('<link rel="shortcut icon" href="/img/favicon/permasense-'+gsnname+'.ico"><link rel="icon" href="/img/favicon/permasense-'+gsnname+'.ico">');
                 }
                 $("#gsn-name").show();
                 uptime.setTime($(gsn).attr("uptime"));
