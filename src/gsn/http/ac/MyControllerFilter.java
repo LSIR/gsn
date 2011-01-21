@@ -60,7 +60,7 @@ public class MyControllerFilter implements Filter {
                     }
 
 
-                if ( ("/gsn".equals(req.getServletPath()) && requestType == 0)
+                if ( ("/gsn".equals(req.getServletPath()) && (requestType == 0 || requestType == 901))
                         || ("/multidata".equals(req.getServletPath()))
                         || ("/field".equals(req.getServletPath())) 
                         ) {
