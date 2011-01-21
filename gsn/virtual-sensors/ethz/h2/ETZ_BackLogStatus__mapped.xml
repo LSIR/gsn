@@ -13,8 +13,6 @@
             <field name="UPTIME" type="INTEGER" unit="relatime" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
-            <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
-            <field name="BACKLOG_DB_SIZE" type="INTEGER" unit="kb" />
             <field name="GSN_PLUGIN_MSG_IN" type="DOUBLE" unit="msg/s" />
             <field name="GSN_PLUGIN_MSG_OUT" type="DOUBLE" unit="msg/s" />
             <field name="GSN_PLUGIN_MSG_IN_COUNTER" type="INTEGER" />
@@ -25,6 +23,8 @@
             <field name="GSN_PING_IN_COUNTER" type="INTEGER" />
             <field name="GSN_PING_ACK_OUT_COUNTER" type="INTEGER" />
             <field name="GSN_CONNECTION_LOSSES" type="INTEGER" />
+            <field name="DB_ENTRIES" type="INTEGER" />
+            <field name="DB_SIZE" type="INTEGER" unit="kb" />
             <field name="DB_STORE" type="DOUBLE" unit="msg/s" />
             <field name="DB_REMOVE" type="DOUBLE" unit="msg/s" />
             <field name="DB_STORE_COUNTER" type="INTEGER" />
