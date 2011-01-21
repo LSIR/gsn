@@ -75,7 +75,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 				if (!(data[index] instanceof Double))
 					data[index] = toInteger(data[index]);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				logger.error(e.getMessage() + " (index=" + index + "/value=" + data[index] + ")", e);
 				return true;
 			}
 		}

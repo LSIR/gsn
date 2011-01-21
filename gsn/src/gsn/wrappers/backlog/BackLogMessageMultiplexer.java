@@ -153,7 +153,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 				
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				if (!pktDestuffing(in, baos)) {
-					logger.warn("stuffing mark reached");
+					logger.debug("stuffing mark reached");
 					connecting = true;
 					conn = false;
 					newPacket = true;

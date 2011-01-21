@@ -56,7 +56,7 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 				try {
 					data[index] = toInteger(data[index]);
 				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
+					logger.error(e.getMessage() + " (index=" + index + "/value=" + data[index] + ")", e);
 					return true;
 				}
 			}
