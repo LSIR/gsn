@@ -298,7 +298,7 @@ class AbstractPluginClass(Thread):
         return self._backlogMain.getUptime()
 
 
-    def getBackLogStatus(self, intervalSec):
+    def getBackLogDBStatus(self, intervalSec):
         '''
         Returns the status of the backlog sqlite3 database as list:
         

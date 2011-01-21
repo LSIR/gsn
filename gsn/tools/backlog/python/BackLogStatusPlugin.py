@@ -59,7 +59,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
                 self.error('parameter has to be a digit (parameter=' + parameters + ')')
         
         # TODO: parameter?
-        backlogstatus = self.getBackLogStatus(30)
+        backlogstatus = self.getBackLogDBStatus(30)
         
         backlogdbentries = backlogstatus[0]
         backlogdbsize = backlogstatus[1]

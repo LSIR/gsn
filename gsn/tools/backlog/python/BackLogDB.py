@@ -218,7 +218,7 @@ class BackLogDBClass(Thread, StatisticsClass):
                                                  maximum remove time]
         '''
         dbentries = self.getCounterValue(self._dbNumberOfEntriesId)
-        dbsize = os.path.getsize(self._dbname)//1024
+        dbsize = int(os.path.getsize(self._dbname)/1024)
         stpersec = self.getAvgCounterIncPerSecond(self._storeCounterId, [intervalSec])[0]
         rmpersec = self.getAvgCounterIncPerSecond(self._removeCounterId, [intervalSec])[0]
         cntst = self.getCounterValue(self._storeCounterId)
