@@ -1,7 +1,6 @@
 package gsn.wrappers.backlog.plugins;
 
 import java.io.Serializable;
-import java.nio.*;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
@@ -94,48 +93,46 @@ public class GPSPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
+	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		if (logger.isDebugEnabled())
 			logger.debug("message received from CoreStation with DeviceId: " + deviceId);
 		
-		Serializable[] data = null;
+		Serializable[] out = null;
 
-		// Parse the Message
-		ByteBuffer buffer = ByteBuffer.allocate(packet.length);
-		buffer.put(packet);
-		
-		buffer.position(0);
-		buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-		short msgType = buffer.getShort();
-		
-		if (msgType == gpsNamingTable.get(gpsDataType).typeNumber) {
-			if (gpsDataType.equals(NAV_NAMING)) {
-				
-			}
-			else if (gpsDataType.equals(RAW_NAMING)) {
-				int gpsTime = buffer.getInt();
-				short gpsWeek = buffer.getShort();
-				double carrierPhase = buffer.getDouble();
-				double pseudorange = buffer.getDouble();
-				double doppler = (double) buffer.getFloat();
-				short spaceVehicle = (short) buffer.get();
-				short measurementQuality = buffer.getShort();
-				short signalStrength = buffer.getShort();
-				short lli = (short) buffer.get();
-				
-				data = new Serializable[]{timestamp, timestamp, deviceId, gpsTime, gpsWeek, carrierPhase, pseudorange, doppler, spaceVehicle, measurementQuality, signalStrength, lli};
-			}
-			else {
-				logger.warn("Wrong GPS data type spedified.");
-				return true;
-			}
+		try {
+			short msgType = toShort(data[0]);
 			
-			if( dataProcessed(System.currentTimeMillis(), data) ) {
-				ackMessage(timestamp, super.priority);
-			} else {
-				logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+			if (msgType == gpsNamingTable.get(gpsDataType).typeNumber) {
+				if (gpsDataType.equals(NAV_NAMING)) {
+					
+				}
+				else if (gpsDataType.equals(RAW_NAMING)) {
+					int gpsTime = toInteger(data[1]);
+					short gpsWeek = toShort(data[2]);
+					double carrierPhase = (Double) data[3];
+					double pseudorange = (Double) data[4];
+					double doppler = (Double) data[5];
+					short spaceVehicle = toShort(data[6]);
+					short measurementQuality = toShort(data[7]);
+					short signalStrength = toShort(data[8]);
+					short lli = toShort(data[9]);
+					
+					data = new Serializable[]{timestamp, timestamp, deviceId, gpsTime, gpsWeek, carrierPhase, pseudorange, doppler, spaceVehicle, measurementQuality, signalStrength, lli};
+				}
+				else {
+					logger.warn("Wrong GPS data type spedified.");
+					return true;
+				}
+				
+				if( dataProcessed(System.currentTimeMillis(), out) ) {
+					ackMessage(timestamp, super.priority);
+				} else {
+					logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+				}
 			}
+		} catch (Exception e) {
+			logger.warn(e.getMessage(), e);
+			return true;
 		}
 		
 		return true;

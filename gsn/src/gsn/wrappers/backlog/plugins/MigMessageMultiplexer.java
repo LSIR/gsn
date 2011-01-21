@@ -1,5 +1,6 @@
 package gsn.wrappers.backlog.plugins;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
@@ -176,14 +177,14 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	
 	
 	@Override
-	public boolean messageReceived(int deviceID, long timestamp, byte[] payload) {
+	public boolean messageReceived(int deviceID, long timestamp, Serializable[] data) {
 		// which TinyOS messages are we looking for?
 		if (tinyos1x_platform != null) {
 			// the following functionality has been extracted from net.tinyos1x.message.Receiver
 			// from the packetReceived function
 			
 			// create a TOS message (TinyOS1.x)
-			final TOSMsg msg = createTOSMsg ( payload ) ;
+			final TOSMsg msg = createTOSMsg ( (byte[]) data[0] ) ;
 
 			Integer type = new Integer ( msg.get_type () );
 
@@ -221,7 +222,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				MigMessagePlugin temp = en.nextElement();
 				
 				// send the message to the listener
-				if (temp.messageReceived(deviceID, timestamp, received.dataGet()) == true)
+				if (temp.messageReceived(deviceID, timestamp, new Serializable[] {received.dataGet()}) == true)
 					ReceiverCount++;
 			}
 			if (ReceiverCount == 0)
@@ -232,11 +233,11 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 			// the following functionality has been extracted from net.tinyos.message.Receiver
 			// from the packetReceived function
 			
-			if (payload[0] != Serial.TOS_SERIAL_ACTIVE_MESSAGE_ID)
+			if (((byte[]) data[0])[0] != Serial.TOS_SERIAL_ACTIVE_MESSAGE_ID)
 				return false; // not for us.
 	
 			// create a SerialPacket message
-			SerialPacket msg = new SerialPacket(payload, 1);
+			SerialPacket msg = new SerialPacket((byte[]) data[0], 1);
 			int type = msg.get_header_type();
 
 		    int length = msg.get_header_length();
@@ -266,7 +267,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 				MigMessagePlugin temp = en.nextElement();
 				
 				// send the message to the listener
-				if (temp.messageReceived(deviceID, timestamp, received.dataGet()) == true)
+				if (temp.messageReceived(deviceID, timestamp, new Serializable[] {received.dataGet()}) == true)
 					ReceiverCount++;
 			}
 			if (ReceiverCount == 0)

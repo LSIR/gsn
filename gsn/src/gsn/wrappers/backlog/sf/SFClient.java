@@ -5,6 +5,7 @@ import gsn.wrappers.backlog.BackLogMessageListener;
 import gsn.wrappers.backlog.BackLogMessageMultiplexer;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Iterator;
@@ -107,7 +108,8 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
 			byte[] packet = readPacket();
 		    BackLogMessage msg;
 			try {
-				msg = new BackLogMessage(BackLogMessage.TOS_MESSAGE_TYPE, 0, packet);
+				Serializable [] data = {packet};
+				msg = new BackLogMessage(BackLogMessage.TOS_MESSAGE_TYPE, 0, data);
 				
 				// TODO: to which DeviceId has the message to be sent to?
 			    if (!((BackLogMessageMultiplexer) listenServer.getSources().toArray()[0]).sendMessage(msg, null, SF_MESSAGE_PRIORITY))
@@ -123,9 +125,9 @@ public class SFClient extends SFProtocol implements Runnable, BackLogMessageList
     }
 
 	@Override
-	public boolean messageReceived(int deviceId, long timestamp, byte[] payload) {
+	public boolean messageReceived(int deviceId, long timestamp, Serializable[] payload) {
 		try {
-		    if(writeSourcePacket(payload)) {
+		    if(writeSourcePacket((byte[]) payload[0])) {
 				if (logger.isDebugEnabled())
 					logger.debug("Message with timestamp " + timestamp + " successfully written to sf client " + socket.getInetAddress().getHostName());
 		    }

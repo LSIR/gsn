@@ -36,34 +36,14 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
-		Serializable[] data = new Serializable[dataField.length];
+	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 
-		data[0] = timestamp;
-		data[1] = timestamp;
-		data[2] = deviceId;
-
-		int len;
-		int count = 2;
-		int start_index = 0;
-		for (int i = 0; i<packet.length; i++) {
-			if (packet[i] == 0) {
-				len = i - start_index;
-				if ((len == 0) || (len > 100)) break;
-				count++;
-				if (count >= dataField.length)
-					break;
-				data[count] = new String(packet, start_index, len);
-				start_index = i+1;
-			}
-		}
-
-		if (count != (dataField.length - 1)) {
+		if (data.length != (dataField.length - 3)) {
 			logger.error("The message with timestamp >" + timestamp + "< seems unparsable.");
 			return true;
 		}
 		
-		if( dataProcessed(System.currentTimeMillis(), data) )
+		if( dataProcessed(System.currentTimeMillis(), concat(new Serializable[] {timestamp, timestamp, deviceId}, data)) )
 			ackMessage(timestamp, super.priority);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");

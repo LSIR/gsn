@@ -8,6 +8,9 @@ __id__          = "$Id$"
 __source__      = "$URL$"
 
 import struct
+import re
+import math
+from types import *
 
 
 ### internal message types ###
@@ -62,6 +65,10 @@ GPS_MESSAGE_TYPE = 60
 MAX_PAYLOAD_SIZE = 4294967287
 
 
+    
+STRUCTMATCH = re.compile('^[cbB?hHiqdfsX]*$')
+
+
 class BackLogMessageClass:
     '''
     Defines a backlog message, used by the protocol communicated 
@@ -101,20 +108,29 @@ class BackLogMessageClass:
 
         @param type: message type
         @param timestamp: timestamp in milliseconds
-        @param payload: payload of the message. Should not be
-            bigger than MAX_PAYLOAD_SIZE.
+        @param payload: payload of the message as a byte array or a list.
+                         Should not be bigger than MAX_PAYLOAD_SIZE.
 
-        @throws IOException if firstArg can not be interpreted as a BackLog
+        @raise TypeError if firstArg can not be interpreted as a BackLog
             message or if the payload length exceeds MAX_PAYLOAD_SIZE
+                 
+        @raise ValueError: if something is wrong with the payload.
         '''
         
         self._type = type
         self._timestamp = timestamp
         try:
-            self._header = struct.pack('<Bq', type, timestamp)
+            self._header = struct.pack('>Bq', type, timestamp)
         except Exception, e:
             raise TypeError('cannot pack message: ' + e.__str__())
-        self._payload = payload
+
+        if payload == None:
+            self._payload = None
+        else:
+            if isinstance(payload, bytearray):
+                self._payload = self._packList([payload])
+            else:
+                self._payload = self._packList(payload)
         
         
     def __lt__(self, other):
@@ -134,8 +150,8 @@ class BackLogMessageClass:
         '''
         
         try:
-            self._type = int(struct.unpack('B', bytes[0])[0])
-            self._timestamp = int(struct.unpack('<q', bytes[1:9])[0])
+            self._type = int(struct.unpack('>B', bytes[0])[0])
+            self._timestamp = int(struct.unpack('>q', bytes[1:9])[0])
         except Exception, e:
             raise TypeError('cannot unpack message: ' + e.__str__())
        
@@ -165,10 +181,98 @@ class BackLogMessageClass:
         return self._timestamp
 
     
-    def getPayload(self):
+    def getData(self):
         '''
-        Get the payload of the message as byte array.
+        Get the data of the message as a list.
 
-        @return: the payload as byte array
+        @return: the data as a list
         '''
-        return self._payload
+        if self._payload == None:
+            return []
+        else:
+            return self._unpackPayload(self._payload)
+
+    
+    def getSize(self):
+        '''
+        Get size of the payload in bytes
+
+        @return: the size of the payload in bytes
+        '''
+        if self._payload == None:
+            return 0
+        else:
+            return len(self._payload)
+    
+    
+    def _unpackPayload(self, payload):
+        fmt_len = struct.unpack_from('>H', payload)[0]
+        fmt = struct.unpack_from('>%ds' % fmt_len, payload, 2)[0]
+        plength = struct.calcsize('>H%ds' % fmt_len)
+        
+        ret = []
+        for c in fmt:
+            if c == '0':
+                ret.append(None)
+            elif c == 'X':
+                l = struct.unpack_from('>H', payload, plength)[0]
+                ret.append(payload[plength+2:plength+2+l])
+                plength += 2+l
+            elif c == 's':
+                l = struct.unpack_from('>H', payload, plength)[0]
+                ret.append(struct.unpack_from('>%ds' % l, payload, plength+2)[0])
+                plength += struct.calcsize('>H%ds' % l)
+            else:
+                ret.append(struct.unpack_from('>'+c, payload, plength)[0])
+                plength += struct.calcsize(c)
+        return ret
+
+    
+    def _packList(self, values):
+        format = ''
+        data = ''
+        bitstr = ''
+        bitlist = []
+        for index, val in enumerate(values):
+            if val == None:
+                format += '0'
+            else:
+                if type(val) == bool:
+                    format += '?'
+                    data += struct.pack('>?', val)
+                elif type(val) == int:
+                    if val < 127 and val > -128:
+                        format += 'b'
+                        data += struct.pack('>b', val)
+                    elif val < 32767 and val > -32768:
+                        format += 'h'
+                        data += struct.pack('>h', val)
+                    elif val < 2147483647 and val > -2147483648:
+                        format += 'i'
+                        data += struct.pack('>i', val)
+                    elif val < 9223372036854775807 and val > -9223372036854775808:
+                        format += 'q'
+                        data += struct.pack('>q', val)
+                    else:
+                        raise ValueError('the passed integer value is too big to be transfered using 8 bytes')
+                elif type(val) == long:
+                    if val < 9223372036854775807 and val > -9223372036854775808:
+                        format += 'q'
+                        data += struct.pack('>q', val)
+                    else:
+                        raise ValueError('the passed long value is too big to be transfered using 8 bytes')
+                elif type(val) == float:
+                    format += 'd'
+                    data += struct.pack('>d', val)
+                elif type(val) == str:
+                    format += 's'
+                    data += struct.pack('>H', len(val))
+                    data += struct.pack('>%ds' % len(val), val)
+                elif type(val) == bytearray:
+                    format += 'X'
+                    data += struct.pack('>H', len(val)) + val
+                else:
+                    raise ValueError('value at index %d in passed list is of unsupported %s' % (index, str(type(val))))
+                    
+        return struct.pack('>H', len(format)) + struct.pack('>%ds' % len(format), format) + data
+    

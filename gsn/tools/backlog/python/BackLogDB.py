@@ -13,11 +13,13 @@ import os
 import logging
 from threading import Thread, Lock, Event
 
+from Statistics import StatisticsClass
+
 
 SLEEP_BEFORE_RESEND_ON_RECONNECT = 30
 
 
-class BackLogDBClass(Thread):
+class BackLogDBClass(Thread, StatisticsClass):
     '''
     Offers the backlog functionality.
     
@@ -35,17 +37,12 @@ class BackLogDBClass(Thread):
     _dbname
     _con
     _cur
-    _dbNumberOfEntries
-    _minStoreTime
-    _maxStoreTime
-    _meanStoreTime
-    _storeCounter
-    _minRemoveTime
-    _maxRemoveTime
-    _meanRemoveTime
-    _removeCounter
+    _dbNumberOfEntriesId
+    _storeCounterId
+    _storeTimeId
+    _removeCounterId
+    _removeTimeId
     _dblock
-    _counterlock
     _sleep
     _resend
     _resendtimer
@@ -65,14 +62,12 @@ class BackLogDBClass(Thread):
         @raise Exception: if there is a problem with the sqlite3 database.
         '''
         Thread.__init__(self)
-        self._minStoreTime = -1
-        self._maxStoreTime = -1
-        self._meanStoreTime = -1
-        self._storeCounter = 1
-        self._minRemoveTime = -1
-        self._maxRemoveTime = -1
-        self._meanRemoveTime = -1
-        self._removeCounter = 1
+        StatisticsClass.__init__(self)
+        
+        self._storeCounterId = self.createCounter(60)
+        self._storeTimeId = self.createCounter(60)
+        self._removeCounterId = self.createCounter(60)
+        self._removeTimeId = self.createCounter(60)
 
         self._logger = logging.getLogger(self.__class__.__name__)
         
@@ -82,7 +77,6 @@ class BackLogDBClass(Thread):
         
         # thread lock to coordinate access to the database
         self._dblock = Lock()
-        self._counterlock = Lock()
         self._resend = Event()
         self._sleepEvent = Event()
         
@@ -110,11 +104,11 @@ class BackLogDBClass(Thread):
             self._con.execute('CREATE INDEX IF NOT EXISTS type_index ON backlogmsg (type)')
             
             self._cur.execute('SELECT COUNT(1) FROM backlogmsg')
-            self._dbNumberOfEntries = self._cur.fetchone()[0]
+            self._dbNumberOfEntriesId = self.createCounter(initCounterValue=self._cur.fetchone()[0])
             self._dblock.release()
-            self._logger.info(str(self._dbNumberOfEntries) + ' entries in database')
+            self._logger.info(str(self.getCounterValue(self._dbNumberOfEntriesId)) + ' entries in database')
             
-            if self._dbNumberOfEntries > 0:
+            if self.getCounterValue(self._dbNumberOfEntriesId) > 0:
                 self._isBusy = True
             else:
                 self._isBusy = False
@@ -143,30 +137,23 @@ class BackLogDBClass(Thread):
         
         @param timestamp: the timestamp of the message
         @param type: the message type
-        @param data: the payload of the message
+        @param data: the whole message
         
         @return: True if the message has been stored in the buffer/database otherwise False
         '''
-        t = time.time()
+        id = self.timeMeasurementStart()
         
         try:
             self._dblock.acquire()
             self._con.execute('INSERT INTO backlogmsg VALUES (?,?,?)', (timestamp, msgType, sqlite3.Binary(data)))
             self._con.commit()
-            self._dbNumberOfEntries += 1
+            self.counterAction(self._dbNumberOfEntriesId)
             self._dblock.release()
-            storeTime = time.time() - t
-            self._counterlock.acquire()
-            if self._minStoreTime == -1 or storeTime*1000 < self._minStoreTime:
-                self._minStoreTime = storeTime*1000
-            if self._maxStoreTime == -1 or storeTime*1000 > self._maxStoreTime:
-                self._maxStoreTime = storeTime*1000
-            if self._meanStoreTime == -1:
-                self._meanStoreTime = storeTime*1000
-            else:
-                self._meanStoreTime += storeTime*1000
-                self._storeCounter += 1
-            self._counterlock.release()
+            
+            storeTime = self.timeMeasurementDiff(id)
+            self.counterAction(self._storeTimeId, storeTime)
+            self.counterAction(self._storeCounterId)
+
             self._logger.debug('store (%d,%d,%d): %f s' % (msgType, timestamp, len(data), storeTime))
             return True
         except sqlite3.Error, e:
@@ -185,7 +172,7 @@ class BackLogDBClass(Thread):
         
         @param timestamp: the timestamp of the message to be removed
         '''
-        t = time.time()
+        id = self.timeMeasurementStart()
 
         try:
             self._dblock.acquire()
@@ -194,48 +181,63 @@ class BackLogDBClass(Thread):
             if cnt >= 1:
                 self._con.execute('DELETE FROM backlogmsg WHERE timestamp = ? and type = ?', (timestamp,msgType))
                 self._con.commit()
-                self._dbNumberOfEntries -= cnt
+                
             self._dblock.release()
-            removeTime = time.time() - t
-            self._counterlock.acquire()
-            if self._minRemoveTime == -1 or removeTime*1000 < self._minRemoveTime:
-                self._minRemoveTime = removeTime*1000
-            if self._maxRemoveTime == -1 or removeTime*1000 > self._maxRemoveTime:
-                self._maxRemoveTime = removeTime*1000
-            if self._meanRemoveTime == -1:
-                self._meanRemoveTime = removeTime*1000
-            else:
-                self._meanRemoveTime += removeTime*1000
-                self._removeCounter += 1
-            self._counterlock.release()
+            removeTime = self.timeMeasurementDiff(id)
+            
+            if cnt >= 1:
+                self.counterAction(self._dbNumberOfEntriesId, -cnt)
+                self.counterAction(self._removeTimeId, removeTime)
+                self.counterAction(self._removeCounterId)
+
             self._logger.debug('del (%d,%d,?): %f s' % (msgType, timestamp, removeTime))
         except sqlite3.Error, e:
+            self.timeMeasurementDiff(id)
             self._dblock.release()
             if not self._stopped:
                 self.exception(e) 
             
             
-    def getStatus(self):
+    def getStatus(self, intervalSec):
         '''
-        Returns the status of the backlog database as tuple:
-        (number of database entries, database file size in KB)
+        Returns the status of the backlog database as list:
         
-        @return: status of the backlog database as tuple (number of database entries, database file size)
+        @param intervalSec: the passed n seconds over which min/mean/max is calculated.
+        
+        @return: status of the backlog database [number of database entries,
+                                                 database file size, 
+                                                 stores per second, 
+                                                 removes per second, 
+                                                 store counter, 
+                                                 remove counter, 
+                                                 minimum store time, 
+                                                 average store time, 
+                                                 maximum store time, 
+                                                 minimum remove time, 
+                                                 average remove time, 
+                                                 maximum remove time]
         '''
-        self._counterlock.acquire()
-        ret = (self._dbNumberOfEntries, os.path.getsize(self._dbname)//1024, self._minStoreTime, self._maxStoreTime, self._meanStoreTime//self._storeCounter, self._minRemoveTime, self._maxRemoveTime, self._meanRemoveTime//self._removeCounter)
+        dbentries = self.getCounterValue(self._dbNumberOfEntriesId)
+        dbsize = os.path.getsize(self._dbname)//1024
+        stpersec = self.getAvgCounterIncPerSecond(self._storeCounterId, [intervalSec])[0]
+        rmpersec = self.getAvgCounterIncPerSecond(self._removeCounterId, [intervalSec])[0]
+        cntst = self.getCounterValue(self._storeCounterId)
+        cntrm = self.getCounterValue(self._removeCounterId)
+        minst = self._convert(self.getMinCounterInc(self._storeTimeId, [intervalSec])[0])
+        maxst = self._convert(self.getMaxCounterInc(self._storeTimeId, [intervalSec])[0])
+        avgst = self._convert(self.getAvgCounterInc(self._storeTimeId, [intervalSec])[0])
+        minrm = self._convert(self.getMinCounterInc(self._removeTimeId, [intervalSec])[0])
+        maxrm = self._convert(self.getMaxCounterInc(self._removeTimeId, [intervalSec])[0])
+        avgrm = self._convert(self.getAvgCounterInc(self._removeTimeId, [intervalSec])[0])
         
-        self._minStoreTime = -1
-        self._maxStoreTime = -1
-        self._meanStoreTime = -1
-        self._storeCounter = 1
-        self._minRemoveTime = -1
-        self._maxRemoveTime = -1
-        self._meanRemoveTime = -1
-        self._removeCounter = 1
-        self._counterlock.release()
-        
-        return ret            
+        return [dbentries, dbsize, stpersec, rmpersec, cntst, cntrm, minst, maxst, avgst, minrm, maxrm, avgrm]
+    
+    
+    def _convert(self, value):
+        if value == None:
+            return None
+        else:
+            return int(value*1000)
             
                 
     def resend(self, sleep=False):

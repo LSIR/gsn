@@ -242,10 +242,10 @@ public class BinaryPlugin extends AbstractPlugin {
         	
     		long filelen = -1;
     		// get packet type
-    		byte pktType = msg.getPacket()[0];
+    		byte pktType = (Byte) msg.getData()[0];
     		
 			if (pktType == ACK_PACKET) {
-				byte ackType = msg.getPacket()[1];
+				byte ackType = (Byte) msg.getData()[1];
 				if (logger.isDebugEnabled())
 					logger.debug("acknowledge packet type >" + ackType + "< received");
 			}
@@ -257,25 +257,19 @@ public class BinaryPlugin extends AbstractPlugin {
 				else {
 					if (logger.isDebugEnabled())
 						logger.debug("init packet received");
-    				StringBuffer name = new StringBuffer();
     				
     				// get file info
-    				binaryTimestamp = arr2long(msg.getPacket(), 1);
-    				binaryLength = arr2uint(msg.getPacket(), 9);
-    				byte storage = msg.getPacket()[13];
-    				int i = 14;
-    				for (; i < msg.getPacket().length; i++) {
-    					if (msg.getPacket()[i] == 0) break;
-    					name.append((char) msg.getPacket()[i]);
-    				}
-    				remoteBinaryName = name.toString();
-    				name = new StringBuffer();
-    				i++;
-    				for (; i < msg.getPacket().length; i++) {
-    					if (msg.getPacket()[i] == 0) break;
-    					name.append((char) msg.getPacket()[i]);
-    				}
-    				String datetimefm = name.toString();
+    				try {
+						binaryTimestamp = toLong(msg.getData()[1]);
+						binaryLength = toLong(msg.getData()[2]);
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
+						dispose();
+						continue;
+					}
+    				byte storage = (Byte) msg.getData()[3];
+    				remoteBinaryName = (String) msg.getData()[4];
+    				String datetimefm = (String) msg.getData()[5];
     				try {
     					folderdatetimefm = new SimpleDateFormat(datetimefm);
     				} catch (IllegalArgumentException e) {
@@ -365,7 +359,14 @@ public class BinaryPlugin extends AbstractPlugin {
 			}
 			else if (pktType == CHUNK_PACKET) {
 				// get number of this chunk
-				long chunknum = arr2uint(msg.getPacket(), 1);
+				long chunknum;
+				try {
+					chunknum = toLong(msg.getData()[1]);
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+					dispose();
+					continue;
+				}
 				if (logger.isDebugEnabled())
 					logger.debug("Chunk for " + remoteBinaryName + " with number " + chunknum + " received");
 				
@@ -383,7 +384,7 @@ public class BinaryPlugin extends AbstractPlugin {
 							binarySender.requestRetransmissionOfBinary(remoteBinaryName);
 							continue;
 						}
-						byte [] chunk = java.util.Arrays.copyOfRange(msg.getPacket(), 5, msg.getPacket().length);
+						byte [] chunk = (byte[]) msg.getData()[2];
 						calculatedCRC.update(chunk);
 						if (logger.isDebugEnabled())
 							logger.debug("updated crc: " + calculatedCRC.getValue());
@@ -416,7 +417,14 @@ public class BinaryPlugin extends AbstractPlugin {
 	    		binarySender.sendChunkAck(lastChunkNumber);
 			}
 			else if (pktType == CRC_PACKET) {
-				long crc = arr2uint(msg.getPacket(), 1);
+				long crc;
+				try {
+					crc = toLong(msg.getData()[1]);
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+					dispose();
+					continue;
+				}
 				
 				if (lastRecvPacketType == CRC_PACKET) {
 					if (logger.isDebugEnabled())
@@ -504,7 +512,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	
 
 	@Override
-	public boolean messageReceived(int deviceID, long timestamp, byte[] packet) {
+	public boolean messageReceived(int deviceID, long timestamp, Serializable[] packet) {
 		try {
 			if (logger.isDebugEnabled())
 				logger.debug("message received with timestamp " + timestamp);
@@ -617,11 +625,11 @@ public class BinaryPlugin extends AbstractPlugin {
  */
 class Message {
 	protected long timestamp;
-	protected byte[] packet;
+	protected Serializable[] packet;
 	
 	Message() {	}
 	
-	Message(long t, byte[] pkt) {
+	Message(long t, Serializable[] pkt) {
 		timestamp = t;
 		packet = pkt.clone();
 	}
@@ -630,7 +638,7 @@ class Message {
 		return this.timestamp;
 	}
 	
-	public byte[] getPacket() {
+	public Serializable[] getData() {
 		return this.packet;
 	}
 }
@@ -728,7 +736,7 @@ class BinarySender extends Thread
 	private boolean stopped = false;
 	private boolean triggered = false;
 	private Object event = new Object();
-	private byte [] packet = null;
+	private Serializable [] packet = null;
 	
 	BinarySender(BinaryPlugin plug) {
 		setName("BinarySender-" + plug.coreStationName + "-Thread");
@@ -800,8 +808,8 @@ class BinarySender extends Thread
     		baos.write(BinaryPlugin.ACK_PACKET);
     		baos.write(BinaryPlugin.CHUNK_PACKET);
 			try {
-				baos.write(BinaryPlugin.uint2arr(ackNr));
-				parent.sendRemote(System.currentTimeMillis(), baos.toByteArray(), parent.priority);
+				Serializable [] ack = {ackNr};
+				parent.sendRemote(System.currentTimeMillis(), ack, parent.priority);
 			} catch (Exception e) {
 				parent.logger.error(e.getMessage(), e);
 			}
@@ -815,9 +823,7 @@ class BinarySender extends Thread
 		else {
 			if (parent.logger.isDebugEnabled())
 				parent.logger.debug("init acknowledge sent");
-			byte [] packet = new byte[2];
-			packet[0] = BinaryPlugin.ACK_PACKET;
-			packet[1] = BinaryPlugin.INIT_PACKET;
+			Serializable [] packet = {BinaryPlugin.ACK_PACKET, BinaryPlugin.INIT_PACKET};
 			try {
 				parent.sendRemote(System.currentTimeMillis(), packet, parent.priority);
 			} catch (Exception e) {
@@ -833,9 +839,7 @@ class BinarySender extends Thread
 		else {
 			if (parent.logger.isDebugEnabled())
 				parent.logger.debug("crc acknowledge sent");
-			byte [] packet = new byte[2];
-			packet[0] = BinaryPlugin.ACK_PACKET;
-			packet[1] = BinaryPlugin.CRC_PACKET;
+			Serializable [] packet = {BinaryPlugin.ACK_PACKET, BinaryPlugin.CRC_PACKET};
 			try {
 				parent.sendRemote(System.currentTimeMillis(), packet, parent.priority);
 			} catch (Exception e) {
@@ -853,8 +857,7 @@ class BinarySender extends Thread
 		if (triggered)
 			parent.logger.error("already sending a message");
 		else {
-			packet = new byte [1];
-			packet[0] = BinaryPlugin.INIT_PACKET;
+			packet = new Serializable[] {BinaryPlugin.INIT_PACKET};
 			trigger();
 		}
 	}
@@ -895,18 +898,7 @@ class BinarySender extends Thread
 		if (triggered)
 			parent.logger.error("already sending a message");
 		else {
-			// ask the deployment to resend the specified binary from the specified position
-			ByteArrayOutputStream baos = new ByteArrayOutputStream(remoteLocation.length() + 5);
-			baos.write(BinaryPlugin.RESEND_PACKET);
-			try {
-				baos.write(BinaryPlugin.uint2arr(sizeAlreadyDownloaded));
-				baos.write(BinaryPlugin.uint2arr(chunkNr));
-				baos.write(BinaryPlugin.uint2arr(crc));
-				baos.write(remoteLocation.getBytes());
-			} catch (IOException e) {
-				parent.logger.error(e.getMessage(), e);
-			}
-			packet = baos.toByteArray();
+			packet = new Serializable[] {BinaryPlugin.RESEND_PACKET, sizeAlreadyDownloaded, chunkNr, crc, remoteLocation};
 			
 			parent.lastChunkNumber = chunkNr-1;
 			

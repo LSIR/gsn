@@ -1,6 +1,13 @@
 package gsn.wrappers.backlog;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 
 
 /**
@@ -125,7 +132,7 @@ public class BackLogMessage {
 	 **/
 	public static double MAX_PAYLOAD_SIZE = Math.pow(2, 32) - 9;
 	
-	private byte[] payload = null;
+	private Serializable[] payload = {};
 	private long timestamp = 0;
 	private byte type = 0;
 	
@@ -159,16 +166,16 @@ public class BackLogMessage {
 	 * 
 	 * @param type of the message
 	 * @param timestamp in milliseconds
-	 * @param payload of the message. Should not be
-	 * 			bigger than MAX_PAYLOAD_SIZE.
+	 * @param payload of the message.
 	 * 
-	 * @throws IOException if the payload length exceeds MAX_PAYLOAD_SIZE
+	 * @throws IOException if the payload is too big
 	 */
-	public BackLogMessage(byte type, long timestamp, byte[] payload) throws Exception {
+	public BackLogMessage(byte type, long timestamp, Serializable[] payload) throws Exception {
 		if( payload == null )
 			throw new NullPointerException("The payload should not be null");
-		if( payload.length > MAX_PAYLOAD_SIZE )
-			throw new IOException("The payload exceeds the maximum size of " + MAX_PAYLOAD_SIZE + "bits.");
+		
+		checkPayload(payload);
+		
 		this.type = type;
 		this.timestamp = timestamp;
 		this.payload = payload;
@@ -178,15 +185,64 @@ public class BackLogMessage {
 	/** 
 	 * Class constructor specifying the message.
 	 * 
-	 * @param message as byte array.
+	 * @param binary message as byte array.
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
 	public BackLogMessage(byte[] message) throws IOException {
-		if( message.length > MAX_PAYLOAD_SIZE+9 )
-			throw new IOException("The message exceeds the maximum size of " + MAX_PAYLOAD_SIZE+9 + "bits.");
-		type = message[0];
-		timestamp = arr2long(message, 1);
-		payload = java.util.Arrays.copyOfRange(message, 9, message.length);
+		ByteArrayInputStream bin = new ByteArrayInputStream(message);
+		DataInputStream din = new DataInputStream(bin);
+		
+		type = din.readByte();
+		timestamp = din.readLong();
+		
+		String format = null;
+		
+		try {
+			format = din.readUTF();
+		}
+		catch (IOException e) {
+			return;
+		}
+
+		payload = new Serializable [format.length()];
+		int payloadIndex = 0;
+		CharacterIterator it = new StringCharacterIterator(format);
+		for (char ch=it.first(); ch != CharacterIterator.DONE; ch=it.next()) {
+			switch (ch) {
+			case '0':
+				payload[payloadIndex] = null;
+				break;
+			case 'b':
+				payload[payloadIndex] = din.readByte();
+				break;
+			case '?':
+				payload[payloadIndex] = din.readBoolean();
+				break;
+			case 'h':
+				payload[payloadIndex] = din.readShort();
+				break;
+			case 'i':
+				payload[payloadIndex] = din.readInt();
+				break;
+			case 'q':
+				payload[payloadIndex] = din.readLong();
+				break;
+			case 'd':
+				payload[payloadIndex] = din.readDouble();
+				break;
+			case 's':
+				payload[payloadIndex] = din.readUTF();
+				break;
+			case 'X':
+				byte [] data = new byte [din.readUnsignedShort()];
+				din.readFully(data);
+				payload[payloadIndex] = data;
+				break;
+			default:
+				throw new IOException("unrecognized format character received");
+			}
+			payloadIndex++;
+		}
 	}
 	
 	
@@ -195,17 +251,75 @@ public class BackLogMessage {
 	 * 
 	 * @return the message as byte array
 	 */
-	public byte[] getMessage() {
-		byte[] message;
-		if( payload == null )
-			message = new byte [8 + 1];
-		else
-			message = new byte [payload.length + 8 + 1];
-		message[0] = type;
-		System.arraycopy(long2arr(timestamp), 0, message, 1, 8);
-		if( payload != null )
-			System.arraycopy(payload, 0, message, 9, payload.length);
-		return message;
+	public byte[] getBinaryMessage() {
+		ByteArrayOutputStream bout = new ByteArrayOutputStream(9);
+		DataOutputStream dout = new DataOutputStream(bout);
+		ByteArrayOutputStream databout = new ByteArrayOutputStream(1);
+		DataOutputStream datadout = new DataOutputStream(databout);
+		try {
+			String format = "";
+
+			for (int i=0; i<payload.length; i++) {
+				if (payload[i] == null) {
+					format += "0";
+				}
+				else {
+					if (payload[i] instanceof Byte) {
+						datadout.writeByte((Byte)payload[i]);
+						format += "b";
+					}
+					else if (payload[i] instanceof Boolean) {
+						datadout.writeBoolean((Boolean)payload[i]);
+						format += "?";
+					}
+					else if (payload[i] instanceof Short) {
+						datadout.writeShort((Short)payload[i]);
+						format += "h";
+					}
+					else if (payload[i] instanceof Integer) {
+						datadout.writeInt((Integer)payload[i]);
+						format += "i";
+					}
+					else if (payload[i] instanceof Long) {
+						datadout.writeLong((Long)payload[i]);
+						format += "q";
+					}
+					else if (payload[i] instanceof Double) {
+						datadout.writeDouble((Double)payload[i]);
+						format += "d";
+					}
+					else if (payload[i] instanceof String) {
+						datadout.writeUTF((String)payload[i]);
+						format += "s";
+					}
+					else if (payload[i] instanceof byte[]) {
+						datadout.writeShort(((byte[])payload[i]).length);
+						datadout.write((byte[])payload[i]);
+						format += "X";
+					}
+					else if (payload[i] instanceof Byte[]) {
+						datadout.writeShort(((Byte[])payload[i]).length);
+						byte [] tmp = new byte [((Byte[])payload[i]).length];
+						for (int j=0; j<((Byte[])payload[i]).length; j++)
+							tmp[j] = ((Byte[])payload[i])[j];
+						datadout.write(tmp);
+						format += "X";
+					}
+					else
+						System.err.print("unsupported type");
+				}
+			}
+
+			dout.writeByte(type);
+			dout.writeLong(timestamp);
+			if (format != "") {
+				dout.writeUTF(format);
+				dout.write(databout.toByteArray());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bout.toByteArray();
 	}
 	
 	
@@ -252,9 +366,9 @@ public class BackLogMessage {
 	/** 
 	 * Get the payload of the message as byte array.
 	 * 
-	 * @return the payload as byte array
+	 * @return the payload as Serializable array
 	 */
-	public byte[] getPayload() {
+	public Serializable[] getPayload() {
 		return payload;
 	}
 	
@@ -267,53 +381,41 @@ public class BackLogMessage {
 	 * 
 	 * @throws IOException if the payload length exceeds MAX_PAYLOAD_SIZE
 	 */
-	public void setPayload(byte[] payload) throws IOException {
-		if( payload.length > MAX_PAYLOAD_SIZE )
-			throw new IOException("The payload exceeds the maximum size of " + MAX_PAYLOAD_SIZE + "bits.");
+	public void setPayload(Serializable[] payload) throws IOException {
+		checkPayload(payload);
+		
 		this.payload = payload;
 	}
 	
 	
-	/** 
-	 * Clones this message.
-	 * 
-	 * @return the cloned message
-	 */
-	public BackLogMessage clone() {
-		try {
-			return new BackLogMessage(this.getMessage());
-		} catch (IOException e) { return null; }
-	}
-
-	
-	private static long arr2long (byte[] arr, int start) {
-		int i = 0;
-		int len = 8;
-		int cnt = 0;
-		byte[] tmp = new byte[len];
-		for (i = start; i < (start + len); i++) {
-			tmp[cnt] = arr[i];
-			cnt++;
+	private void checkPayload(Serializable[] payload) throws IOException {
+		int length = 0;
+		for (int i=0; i<payload.length; i++) {
+			if (payload[i] == null)
+				continue;
+			else if (payload[i] instanceof Byte)
+				length += 1;
+			else if (payload[i] instanceof Boolean)
+				length += 1;
+			else if (payload[i] instanceof Short)
+				length += 2;
+			else if (payload[i] instanceof Integer)
+				length += 4;
+			else if (payload[i] instanceof Long)
+				length += 8;
+			else if (payload[i] instanceof Double)
+				length += 8;
+			else if (payload[i] instanceof String)
+				length += ((String)payload[i]).length()*2+2;
+			else if (payload[i] instanceof byte[])
+				length += ((byte[])payload[i]).length;
+			else if (payload[i] instanceof Byte[])
+				length += ((Byte[])payload[i]).length;
+			else
+				throw new IOException("unsupported type in payload.");
 		}
-		long accum = 0;
-		i = 0;
-		for ( int shiftBy = 0; shiftBy < 64; shiftBy += 8 ) {
-			accum |= ( (long)( tmp[i] & 0xff ) ) << shiftBy;
-			i++;
-		}
-		return accum;
-	}
 
-	
-	private static byte[] long2arr (long l) {
-		int len = 8;
-		byte[] arr = new byte[len];
-
-		int i = 0;
-		for ( int shiftBy = 0; shiftBy < 64; shiftBy += 8 ) {
-			arr[i] = (byte)( l >> shiftBy);
-			i++;
-		}
-		return arr;
+		if( length > MAX_PAYLOAD_SIZE )
+			throw new IOException("The payload exceeds the maximum size of " + MAX_PAYLOAD_SIZE + "bytes.");
 	}
 }

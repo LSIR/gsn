@@ -1,8 +1,7 @@
 package gsn.wrappers.backlog;
 
-import gsn.wrappers.backlog.plugins.AbstractPlugin;
-
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.BufferOverflowException;
@@ -469,10 +468,11 @@ public class AsyncCoreStationClient extends Thread  {
 						this.pendingData.put(socketChannel, queue);
 					}
 					if (stuff) {
-		        		ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length + 4);
-		        		baos.write(AbstractPlugin.uint2arr(data.length));
-						baos.write(data);
-						queue.offer(new PriorityDataElement(priority, pktStuffing(baos.toByteArray())));
+		        		ByteArrayOutputStream bout = new ByteArrayOutputStream(data.length + 4);
+		        		DataOutputStream dout = new DataOutputStream(bout);
+		        		dout.writeInt(data.length);
+		        		dout.write(data);
+						queue.offer(new PriorityDataElement(priority, pktStuffing(bout.toByteArray())));
 					}
 					else
 						queue.offer(new PriorityDataElement(priority, data));

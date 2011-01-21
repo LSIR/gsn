@@ -25,6 +25,7 @@ if PROFILE:
     import yappi
 from threading import Thread, Lock, Event
 
+from Statistics import StatisticsClass
 from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
@@ -39,7 +40,7 @@ DEFAULT_OPTION_BACKLOG_RESEND_SLEEP = 0.1
 DEFAULT_TOS_VERSION = 2
 DEFAULT_BACKLOG_DB_RESEND = 12
 
-class BackLogMainClass(Thread):
+class BackLogMainClass(Thread, StatisticsClass):
     '''
     The main thread class for the backlog functionality.
     
@@ -50,17 +51,15 @@ class BackLogMainClass(Thread):
     '''
     data/instance attributes:
     _logger
-    _startTime
+    _uptimeId
     jobsobserver
     schedulehandler
     gsnpeer
     backlog
     plugins
     duty_cycle_mode
-    _exceptionCounter
-    _exceptionCounterLock
-    _errorCounter
-    _errorCounterLock
+    _exceptionCounterId
+    _errorCounterId
     '''
     
     def __init__(self, config_file):
@@ -72,19 +71,18 @@ class BackLogMainClass(Thread):
         
         @param options: options from the OptionParser
         '''
-
-        self._startTime = time.time()
         Thread.__init__(self)
+        StatisticsClass.__init__(self)
+        
+        self._uptimeId = self.timeMeasurementStart()
 
         self._logger = logging.getLogger(self.__class__.__name__)
         
         self.shutdown = False
 
         self.jobsobserver = JobsObserverClass(self)
-        self._exceptionCounter = 0
-        self._exceptionCounterLock = Lock()
-        self._errorCounter = 0
-        self._errorCounterLock = Lock()
+        self._exceptionCounterId = self.createCounter()
+        self._errorCounterId = self.createCounter()
         self._stopEvent = Event()
 
         # read config file for other options
@@ -401,13 +399,13 @@ class BackLogMainClass(Thread):
     def gsnMsgReceived(self, msgType, message):
         msgTypeValid = False
         if msgType == self.schedulehandler.getMsgType():
-            self.schedulehandler.msgReceived(message.getPayload())
+            self.schedulehandler.msgReceived(message.getData())
             msgTypeValid = True
         else:
             # send the packet to all plugins which 'use' this message type
             for plugin in self.plugins.values():
                 if msgType == plugin.getMsgType():
-                    plugin.msgReceived(message.getPayload())
+                    plugin.msgReceived(message.getData())
                     msgTypeValid = True
                     break
         if not msgTypeValid:
@@ -449,39 +447,29 @@ class BackLogMainClass(Thread):
     
     
     def getUptime(self):
-        return int(time.time()-self._startTime)
+        return int(self.timeMeasurementDiff(self._uptimeId, False))
 
 
     def incrementExceptionCounter(self):
-        self._exceptionCounterLock.acquire()
-        self._exceptionCounter += 1
-        self._exceptionCounterLock.release()
+        self.counterAction(self._exceptionCounterId)
 
     
     def getExceptionCounter(self):
         '''
         Returns the number of exception occurred since the last program start
         '''
-        self._exceptionCounterLock.acquire()
-        counter = self._exceptionCounter
-        self._exceptionCounterLock.release()
-        return counter
+        return self.getCounterValue(self._exceptionCounterId)
 
     
     def incrementErrorCounter(self):
-        self._errorCounterLock.acquire()
-        self._errorCounter += 1
-        self._errorCounterLock.release()
+        self.counterAction(self._errorCounterId)
 
     
     def getErrorCounter(self):
         '''
         Returns the number of errors occurred since the last program start
         '''
-        self._errorCounterLock.acquire()
-        counter = self._errorCounter
-        self._errorCounterLock.release()
-        return counter
+        return self.getCounterValue(self._errorCounterId)
     
 if PROFILE:
     def print_stats():

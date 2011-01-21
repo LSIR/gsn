@@ -60,8 +60,8 @@ public class SchedulePlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int deviceId, long timestamp, byte[] payload) {
-		if (payload[0] == GSN_TYPE_GET_SCHEDULE) {
+	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
+		if (((Byte)data[0]) == GSN_TYPE_GET_SCHEDULE) {
 			Connection conn = null;
 			try {
 				// get the newest schedule from the SQL database
@@ -86,7 +86,7 @@ public class SchedulePlugin extends AbstractPlugin {
 						// to resend it
 						if (logger.isDebugEnabled())
 							logger.debug("no new schedule available");
-						byte [] pkt = {TYPE_SCHEDULE_SAME};
+						Serializable [] pkt = {TYPE_SCHEDULE_SAME};
 						sendRemote(System.currentTimeMillis(), pkt, super.priority);
 					}
 					else {
@@ -94,21 +94,18 @@ public class SchedulePlugin extends AbstractPlugin {
 						if (logger.isDebugEnabled())
 							logger.debug("send new schedule (" + new String(schedule) + ")");
 	
-						byte [] pkt = new byte [schedule.length + 9];
-						pkt[0] = TYPE_NEW_SCHEDULE;
-						System.arraycopy(long2arr(creationtime), 0, pkt, 1, 8);
-						System.arraycopy(schedule, 0, pkt, 9, schedule.length);
+						Serializable [] pkt = {TYPE_NEW_SCHEDULE, creationtime, schedule};
 						sendRemote(System.currentTimeMillis(), pkt, super.priority);
 						
 						if (transmissiontime == 0) {
 							long time = System.currentTimeMillis();
-							Serializable[] data = {id, creationtime, time, schedule};
-							dataProcessed(time, data);
+							Serializable[] out = {id, creationtime, time, schedule};
+							dataProcessed(time, out);
 						}
 					}
 				} else {
 					// we do not have any schedule available in the database
-					byte [] pkt = {TYPE_NO_SCHEDULE_AVAILABLE};
+					Serializable [] pkt = {TYPE_NO_SCHEDULE_AVAILABLE};
 					sendRemote(System.currentTimeMillis(), pkt, super.priority);
 					logger.warn("schedule request received but no schedule available in database");
 				}
@@ -141,10 +138,7 @@ public class SchedulePlugin extends AbstractPlugin {
 				}
 			}
 			
-			byte [] pkt = new byte [schedule.length + 9];
-			pkt[0] = TYPE_NEW_SCHEDULE;
-			System.arraycopy(long2arr(time), 0, pkt, 1, 8);
-			System.arraycopy(schedule, 0, pkt, 9, schedule.length);
+			Serializable [] pkt = {TYPE_NEW_SCHEDULE, time, schedule};
 			boolean sent = false;
 			// and try to send it to the deployment
 			try {

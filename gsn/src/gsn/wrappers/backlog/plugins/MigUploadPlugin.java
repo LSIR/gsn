@@ -82,7 +82,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int deviceID, long timestamp, byte[] packet) {
+	public boolean messageReceived(int deviceID, long timestamp, Serializable[] data) {
 		return true;
 	}
 
@@ -130,7 +130,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 			}
 			
 			try {
-				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data), super.priority);
+				ret = sendRemote(System.currentTimeMillis(), new Serializable[] {createTOSpacket(moteId, amType, data)}, super.priority);
 				if (logger.isDebugEnabled())
 					logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
 			} catch (Exception e) {
@@ -143,7 +143,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 				byte [] packet = ((String) paramValues[0]).getBytes();
 				if(packet.length > 0) {
 					try {
-						ret = sendRemote(System.currentTimeMillis(), packet, super.priority);
+						ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
 					} catch (Exception e) {
 						logger.error(e.getMessage());
 						return false;

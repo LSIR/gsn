@@ -143,13 +143,13 @@ class AbstractPluginClass(Thread):
         raise NotImplementedError('getMsgType is not implemented')
     
     
-    def msgReceived(self, message):
+    def msgReceived(self, data):
         '''
         This function is called if a message has been received this plugin is listening to from GSN.
         If this function is not implemented by the plugin, any incoming message from GSN will just
         be ignored.
         
-        @param message: The message to be processed by the plugin in string format
+        @param data: The message to be processed by the plugin as a list
         '''
         self.warning('msgReceived triggered but nothing implemented')
         
@@ -164,7 +164,7 @@ class AbstractPluginClass(Thread):
         pass
     
     
-    def processMsg(self, timestamp, payload, priority, backlogging=False):
+    def processMsg(self, timestamp, payload, priority=None, backlogging=None):
         '''
         Store the message in the backlog and backup database if needed and try to send
         it to GSN.
@@ -172,14 +172,22 @@ class AbstractPluginClass(Thread):
         This function should be used by the plugins to send any data to GSN.
         
         @param timestamp: the timestamp this message has been generated
-        @param payload: the raw data to be sent (no more than 4 Gb)
+        @param payload: payload of the message as a byte array or a list.
+                         Should not be bigger than MAX_PAYLOAD_SIZE.
         @param backLog: True if this message should be backlogged in the database, otherwise False.
                         BackLogMessageside has to send an acknowledge to remove this message from
                         the backlog database after successful processing if set to True.
                        
         @return: True if the message has been stored successfully into the backlog database if needed,
                  otherwise False.
+                 
+        @raise ValueError: if something is wrong with the format of the payload.
         '''
+        if backlogging == None:
+            backlogging = self._backlog
+        if priority == None:
+            priority = self._priority
+        
         return self._backlogMain.gsnpeer.processMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
     
     
@@ -290,34 +298,37 @@ class AbstractPluginClass(Thread):
         return self._backlogMain.getUptime()
 
 
-    def getBackLogStatus(self):
+    def getBackLogStatus(self, intervalSec):
         '''
-        Returns the status of the backlog sqlite3 database as tuple:
-        (number of database entries,
-         database file size,
-         minimum store time,
-         maximum store time,
-         mean store time,
-         minimum remove time,
-         maximum remove time,
-         mean remove time)
+        Returns the status of the backlog sqlite3 database as list:
         
-        @return: status of the backlog database as tuple
+        @param intervalSec: the passed n seconds over which min/mean/max is calculated.
+        
+        @return: status of the backlog database [number of database entries,
+                                                 database file size, 
+                                                 stores per second, 
+                                                 removes per second, 
+                                                 store counter, 
+                                                 remove counter, 
+                                                 minimum store time, 
+                                                 average store time, 
+                                                 maximum store time, 
+                                                 minimum remove time, 
+                                                 average remove time, 
+                                                 maximum remove time]
         '''
-        return self._backlogMain.backlog.getStatus()
+        return self._backlogMain.backlog.getStatus(intervalSec)
 
 
-    def getGSNPeerStatus(self):
+    def getGSNPeerStatus(self, intervalSec):
         '''
-        Returns the status of the backlog sqlite3 database as tuple:
-        (number of incoming packages,
-         number of outgoing packages,
-         number of backlogged packages,
-         number of connection losses to GSN)
+        Returns the status of the GSN peer as list.
         
-        @return: status of the backlog database as tuple
+        @param intervalSec: the passed n seconds over which messages per second is calculated.
+        
+        @return: status of the GSN peer as list
         '''
-        return self._backlogMain.gsnpeer.getStatus()
+        return self._backlogMain.gsnpeer.getStatus(intervalSec)
     
         
     def isBusy(self):

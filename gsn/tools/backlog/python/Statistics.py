@@ -23,39 +23,49 @@ class StatisticsClass:
     data/instance attributes:
     _timers
     _calcStats
-    _calcAvgMinMeanMax
     _counters
     _counterLocks
     _counterRingBuffers
     _counterRingBufSizeSec
-    _counterRingBufSizeDelta
+    _minTimerIds
     '''
 
-    def __init__(self, counterRingBufferSizeInSeconds=0):
-        '''
-        @param counterRingBufferSizeInSeconds: Specifies how old entries in the internal ringbuffer
-                                                can maximally get in seconds. If this parameter is
-                                                set to 0 no ringbuffer will be used. Thus, no
-                                                min/mean/max values can be requested. If min/mean/max
-                                                values are needed, it should be set at least to the
-                                                biggest period over which min/mean/max values should
-                                                be calculated.
-        '''
+    def __init__(self):
         self._timers = dict()
         self._counters = dict()
         self._counterLocks = dict()
+        self._counterRingBuffers = dict()
+        self._counterRingBufSizeSec = dict()
+        self._minTimerIds = dict()
         
         self._calcStats = True
+            
+            
+    def createCounter(self, ringBuffSize=0, initCounterValue=0):
+        '''
+        @param ringBuffSize: Specifies how old entries in the internal ringbuffer
+                              can maximally get in seconds. If this parameter is
+                              set to 0 no ringbuffer will be used. Thus, no
+                              min/mean/max values can be requested. If min/mean/max
+                              values are needed, it should be set at least to the
+                              biggest period over which min/mean/max values should
+                              be calculated (default=0)
+                              
+        @param initCounterValue: initialize the counter with this value (default=0)
+        '''
+        uniqueCounterId = uuid.uuid4()
+        self._counterLocks.update({uniqueCounterId: Lock()})
+        self._counterRingBufSizeSec.update({uniqueCounterId: ringBuffSize})
+        self._counters.update({uniqueCounterId: initCounterValue})
         
-        self._calcAvgMinMeanMax = False
-        if counterRingBufferSizeInSeconds > 0:
-            self._calcAvgMinMeanMax = True
-            self._counterRingBuffers = dict()
-            self._counterRingBufSizeSec = counterRingBufferSizeInSeconds
-            self._counterRingBufSizeDelta = timedelta(seconds=counterRingBufferSizeInSeconds)
+        if ringBuffSize > 0:
+            self._minTimerIds.update({uniqueCounterId: self.timeMeasurementStart()})
+            self._counterRingBuffers.update({uniqueCounterId: list()})
+            
+        return uniqueCounterId
         
         
-    def counterAction(self, uniqueCounterId=None, increaseBy=1):
+    def counterAction(self, uniqueCounterId, increaseBy=1):
         '''
         Should be called on a counter action.
         
@@ -77,32 +87,22 @@ class StatisticsClass:
         @raise KeyError: if the uniqueCounterId does not exist yet
         '''
         if self._calcStats:
-            if uniqueCounterId:
-                self._counterLocks[uniqueCounterId].acquire()
-                cnt = self._counters[uniqueCounterId]
-                self._counters.update({uniqueCounterId: cnt+increaseBy})
-                if self._calcAvgMinMeanMax:
-                    now = datetime.utcnow()
-                    buffer = self._counterRingBuffers[uniqueCounterId]
-                    buffer.append([now, increaseBy])
-                    self._counterRingBuffers.update({uniqueCounterId: buffer})
-            else:
-                uniqueCounterId = uuid.uuid4()
-                self._counterLocks.update({uniqueCounterId: Lock()})
-                self._counterLocks[uniqueCounterId].acquire()
-                self._counters.update({uniqueCounterId: increaseBy})
-                if self._calcAvgMinMeanMax:
-                    now = datetime.utcnow()
-                    buffer = [[now, increaseBy]]
-                    self._counterRingBuffers.update({uniqueCounterId: buffer})
-                    self._minTimerId = self.timeMeasurementStart()
+            self._counterLocks[uniqueCounterId].acquire()
+            cnt = self._counters[uniqueCounterId]
+            self._counters.update({uniqueCounterId: cnt+increaseBy})
+            if self._counterRingBufSizeSec[uniqueCounterId] > 0:
+                now = datetime.utcnow()
+                buffer = self._counterRingBuffers[uniqueCounterId]
+                buffer.append([now, increaseBy])
+                self._counterRingBuffers.update({uniqueCounterId: buffer})
                
-            if self._calcAvgMinMeanMax and self.timeMeasurementDiff(self._minTimerId, False) > MIN_RING_BUFFER_CLEAR_INTERVAL_SEC:
-                self.timeMeasurementDiff(self._minTimerId)
-                self._minTimerId = self.timeMeasurementStart()
+            if self._counterRingBufSizeSec[uniqueCounterId] > 0 and self.timeMeasurementDiff(self._minTimerIds[uniqueCounterId], False) > MIN_RING_BUFFER_CLEAR_INTERVAL_SEC:
+                counterRingBufSizeDelta = timedelta(seconds=self._counterRingBufSizeSec[uniqueCounterId])
+                self.timeMeasurementDiff(self._minTimerIds[uniqueCounterId])
+                self._minTimerIds.update({uniqueCounterId: self.timeMeasurementStart()})
                 newerEntries = False
                 for index, entry in enumerate(buffer):
-                    if entry[0] >= now - self._counterRingBufSizeDelta:
+                    if entry[0] >= now - counterRingBufSizeDelta:
                         newerEntries = True
                         break
                 if newerEntries:
@@ -111,8 +111,6 @@ class StatisticsClass:
                     self._counterRingBuffers.update({uniqueCounterId: list()})
                     
             self._counterLocks[uniqueCounterId].release()
-            
-        return uniqueCounterId
         
         
     def getCounterValue(self, uniqueCounterId):
@@ -156,13 +154,13 @@ class StatisticsClass:
         @raise KeyError: if the uniqueCounterId does not exist yet
         '''
         n = len(avgPerSecOverLastNSecondsList)
-        if self._calcAvgMinMeanMax and self._calcStats:
+        if self._counterRingBufSizeSec[uniqueCounterId] > 0 and self._calcStats:
             counters = [0]*n
             self._counterLocks[uniqueCounterId].acquire()
             now = datetime.utcnow()
             for dt, entry in self._counterRingBuffers[uniqueCounterId]:
                 for i in range(n):
-                    if avgPerSecOverLastNSecondsList[i] > self._counterRingBufSizeSec:
+                    if avgPerSecOverLastNSecondsList[i] > self._counterRingBufSizeSec[uniqueCounterId]:
                         raise Exception('avgPerSecOverLastNSecondsList entry can not be bigger than counterRingBufferSizeInSeconds')
                     if dt >= now - timedelta(seconds=avgPerSecOverLastNSecondsList[i]):
                         counters[i] += entry
@@ -195,14 +193,14 @@ class StatisticsClass:
         @raise KeyError: if the uniqueCounterId does not exist yet
         '''
         n = len(minOverLastNSecondsList)
-        if self._calcAvgMinMeanMax and self._calcStats:
+        if self._counterRingBufSizeSec[uniqueCounterId] > 0 and self._calcStats:
             min = [None]*n
             self._counterLocks[uniqueCounterId].acquire()
             now = datetime.utcnow()
             for dt, entry in self._counterRingBuffers[uniqueCounterId]:
                 for i in range(n):
-                    if minOverLastNSecondsList[i] > self._counterRingBufSizeSec:
-                        raise Exception('minOverLastNSecondsList entry can not be bigger than counterRingBufferSizeInSeconds')
+                    if minOverLastNSecondsList[i] > self._counterRingBufSizeSec[uniqueCounterId]:
+                        raise Exception('minOverLastNSecondsList entry can not be bigger than counterRingBufferSizeInSeconds (%d > %d)' % (minOverLastNSecondsList[i], self._counterRingBufSizeSec[uniqueCounterId]))
                     if dt >= now - timedelta(seconds=minOverLastNSecondsList[i]) and (min[i] == None or entry < min[i]):
                         min[i] = entry
             self._counterLocks[uniqueCounterId].release()
@@ -231,14 +229,14 @@ class StatisticsClass:
         @raise KeyError: if the uniqueCounterId does not exist yet
         '''
         n = len(avgOverLastNSecondsList)
-        if self._calcAvgMinMeanMax and self._calcStats:
+        if self._counterRingBufSizeSec[uniqueCounterId] > 0 and self._calcStats:
             counters = [0]*n
             entries = [0]*n
             self._counterLocks[uniqueCounterId].acquire()
             now = datetime.utcnow()
             for dt, entry in self._counterRingBuffers[uniqueCounterId]:
                 for i in range(n):
-                    if avgOverLastNSecondsList[i] > self._counterRingBufSizeSec:
+                    if avgOverLastNSecondsList[i] > self._counterRingBufSizeSec[uniqueCounterId]:
                         raise Exception('avgOverLastNSecondsList entry can not be bigger than counterRingBufferSizeInSeconds')
                     if dt >= now - timedelta(seconds=avgOverLastNSecondsList[i]):
                         counters[i] += entry
@@ -273,13 +271,13 @@ class StatisticsClass:
         @raise KeyError: if the uniqueCounterId does not exist yet
         '''
         n = len(maxOverLastNSecondsList)
-        if self._calcAvgMinMeanMax and self._calcStats:
+        if self._counterRingBufSizeSec[uniqueCounterId] > 0 and self._calcStats:
             max = [None]*n
             self._counterLocks[uniqueCounterId].acquire()
             now = datetime.utcnow()
             for dt, entry in self._counterRingBuffers[uniqueCounterId]:
                 for i in range(n):
-                    if maxOverLastNSecondsList[i] > self._counterRingBufSizeSec:
+                    if maxOverLastNSecondsList[i] > self._counterRingBufSizeSec[uniqueCounterId]:
                         raise Exception('maxOverLastNSecondsList entry can not be bigger than counterRingBufferSizeInSeconds')
                     if dt >= now - timedelta(seconds=maxOverLastNSecondsList[i]) and (max[i] == None or entry > max[i]):
                         max[i] = entry
@@ -294,8 +292,10 @@ class StatisticsClass:
     def removeCounter(self, uniqueCounterId):
         self._counterLocks[uniqueCounterId].acquire()
         del self._counters[uniqueCounterId]
-        if self._calcAvgMinMeanMax:
+        if self._counterRingBufSizeSec[uniqueCounterId] > 0:
+            del self._minTimerIds[uniqueCounterId]
             del self._counterRingBuffers[uniqueCounterId]
+        del self._counterRingBufSizeSec[uniqueCounterId]
         self._counterLocks[uniqueCounterId].release()
         del self._counterLocks[uniqueCounterId]
         

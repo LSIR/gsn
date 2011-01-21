@@ -1,9 +1,8 @@
 package gsn.wrappers.backlog;
 
-import gsn.wrappers.backlog.plugins.AbstractPlugin;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Collections;
@@ -123,6 +122,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	public void run() {
 		logger.info("thread started");
 		
+		//TODO: use DataInputStream to handle data
+		
 		pluginMessageHandler.start();
     	
 		try {
@@ -181,7 +182,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 							recvQueue.clear();
 						}
 						else {
-							coreStationDeviceId = AbstractPlugin.arr2int(tmp, 1);
+							coreStationDeviceId = arr2int(tmp, 1);
 							logger.info("connected successfully to core station with device id " + coreStationDeviceId + " at " + deploymentName + " deployment");
 							asyncCoreStationClient.addDeviceId(deploymentName, coreStationDeviceId, this);
 							connectionFinished();
@@ -196,7 +197,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 						if (pkt.size() >= 4) {
 							if (logger.isDebugEnabled())
 								logger.debug("rcv...");
-							packetLength = AbstractPlugin.arr2uint(pkt.toByteArray(), 0);
+							packetLength = arr2uint(pkt.toByteArray(), 0);
 							newPacket = false;
 						}
 						else
@@ -210,11 +211,11 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 						
 						if (tmp.length > packetLength+4)
 							pkt.write(java.util.Arrays.copyOfRange(tmp, (int) (packetLength+4), tmp.length));
-	
+						
 			    		BackLogMessage msg = null;
 						msg = new BackLogMessage(java.util.Arrays.copyOfRange(tmp, 4, (int) (packetLength+4)));
 						if (logger.isDebugEnabled())
-							logger.debug("rcv (" + msg.getType() + "," + msg.getTimestamp() + "," + msg.getMessage().length + ")");
+							logger.debug("rcv (" + msg.getType() + "," + msg.getTimestamp() + "," + msg.getBinaryMessage().length + ")");
 			    		if( msg.getType() == BackLogMessage.PING_MESSAGE_TYPE ) {
 			    			sendPingAck(msg.getTimestamp());
 			    		}
@@ -311,12 +312,12 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	 */
 	public boolean sendMessage(BackLogMessage message, Integer id, int priority) throws IOException {
 		if (logger.isDebugEnabled())
-			logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getMessage().length + ")");
+			logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getBinaryMessage().length + ")");
 		if (id == null) {
-			return asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, priority, message.getMessage());
+			return asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, priority, message.getBinaryMessage());
 		}
 		else {
-			return asyncCoreStationClient.send(deploymentName, id, this, priority, message.getMessage());
+			return asyncCoreStationClient.send(deploymentName, id, this, priority, message.getBinaryMessage());
 		}
 	}
 
@@ -398,12 +399,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		// send the message to all listeners
 		while (en.hasMoreElements()) {
 			BackLogMessageListener temp = en.nextElement();
-		
-			// clone the message
-			BackLogMessage received = message.clone();
-			
 			// send the message to the listener
-			if (temp.messageReceived(coreStationDeviceId, received.getTimestamp(), received.getPayload()) == true)
+			if (temp.messageReceived(coreStationDeviceId, message.getTimestamp(), message.getPayload()) == true)
 				ReceiverCount++;
 		}
 		if (ReceiverCount == 0)
@@ -427,7 +424,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		// send ACK with corresponding timestamp and message type
 		BackLogMessage ack;
 		try {
-			ack = new BackLogMessage(BackLogMessage.ACK_MESSAGE_TYPE, timestamp, AbstractPlugin.int2arr(msgType));
+			Serializable [] type = {msgType};
+			ack = new BackLogMessage(BackLogMessage.ACK_MESSAGE_TYPE, timestamp, type);
 			if (logger.isDebugEnabled())
 				logger.debug("Ack sent: (timestamp=" + timestamp + "/messageType=" + msgType + ")");
 
@@ -558,6 +556,42 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 	public Integer getDeviceID() {
 		return coreStationDeviceId;
+	}
+	
+	private static long arr2uint (byte[] arr, int start) {
+		int i = 0;
+		int len = 4;
+		int cnt = 0;
+		byte[] tmp = new byte[len];
+		for (i = start; i < (start + len); i++) {
+			tmp[cnt] = arr[i];
+			cnt++;
+		}
+		long accum = 0;
+		i = 0;
+		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
+			accum |= ( (long)( tmp[i] & 0xff ) ) << shiftBy;
+			i++;
+		}
+		return accum;
+	}
+	
+	private static int arr2int (byte[] arr, int start) {
+		int i = 0;
+		int len = 4;
+		int cnt = 0;
+		byte[] tmp = new byte[len];
+		for (i = start; i < (start + len); i++) {
+			tmp[cnt] = arr[i];
+			cnt++;
+		}
+		int accum = 0;
+		i = 0;
+		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
+			accum |= ( (int)( tmp[i] & 0xff ) ) << shiftBy;
+			i++;
+		}
+		return accum;
 	}
 }
 

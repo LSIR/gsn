@@ -40,9 +40,8 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         return False
     
     
-    def msgReceived(self, message):
-        resend = ord(message[0])
-        if resend == 1:
+    def msgReceived(self, data):
+        if data[0] == 1:
             self.info('received command resend')
             self._backlogMain.resend()
 
@@ -58,39 +57,44 @@ class BackLogStatusPluginClass(AbstractPluginClass):
                 self._timer.start()
             else:
                 self.error('parameter has to be a digit (parameter=' + parameters + ')')
-            
-        packet = struct.pack('<i', self.getErrorCounter())
-        packet += struct.pack('<i', self.getExceptionCounter())
-        backlogstatus = self.getBackLogStatus()
-        backlogdbentries = int(backlogstatus[0])
-        backlogdbsize = int(backlogstatus[1])
-        minstoretime = int(backlogstatus[2])
-        maxstoretime = int(backlogstatus[3])
-        meanstoretime = int(backlogstatus[4])
-        minremovetime = int(backlogstatus[5])
-        maxremovetime = int(backlogstatus[6])
-        meanremovetime = int(backlogstatus[7])
-        packet += struct.pack('<i', backlogdbentries)
-        packet += struct.pack('<i', backlogdbsize)
-        gsnpeerstatus = self.getGSNPeerStatus()
-        incounter = int(gsnpeerstatus[0])
-        outcounter = int(gsnpeerstatus[1])
-        backlogcounter = int(gsnpeerstatus[2])
-        connectionLosses = int(gsnpeerstatus[3])
-        uptime = self.getUptime()
-        packet += struct.pack('<i', incounter)
-        packet += struct.pack('<i', outcounter)
-        packet += struct.pack('<i', backlogcounter)
-        packet += struct.pack('<i', connectionLosses)
-        packet += struct.pack('<i', uptime)
-        packet += struct.pack('<i', minstoretime)
-        packet += struct.pack('<i', maxstoretime)
-        packet += struct.pack('<i', meanstoretime)
-        packet += struct.pack('<i', minremovetime)
-        packet += struct.pack('<i', maxremovetime)
-        packet += struct.pack('<i', meanremovetime)
         
-        self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
+        # TODO: parameter?
+        backlogstatus = self.getBackLogStatus(30)
+        
+        backlogdbentries = backlogstatus[0]
+        backlogdbsize = backlogstatus[1]
+        storepersec = backlogstatus[2]
+        removepersec = backlogstatus[3]
+        storecounter = backlogstatus[4]
+        removecounter = backlogstatus[5]
+        minstoretime = backlogstatus[6]
+        maxstoretime = backlogstatus[7]
+        meanstoretime = backlogstatus[8]
+        minremovetime = backlogstatus[9]
+        maxremovetime = backlogstatus[10]
+        meanremovetime = backlogstatus[11]
+
+        # TODO: parameter?
+        gsnpeerstatus = self.getGSNPeerStatus(30)
+        
+        msgInPerSec = gsnpeerstatus[0]
+        msgOutPerSec = gsnpeerstatus[1]
+        msgInCounter = gsnpeerstatus[2]
+        msgOutCounter = gsnpeerstatus[3]
+        msgAckInCounter = gsnpeerstatus[4]
+        pingOutCounter = gsnpeerstatus[5]
+        pingAckInCounter = gsnpeerstatus[6]
+        pingInCounter = gsnpeerstatus[7]
+        pingAckOutCounter = gsnpeerstatus[8]
+        connectionLosses = gsnpeerstatus[9]
+        uptime = self.getUptime()
+        
+        payload = [self.getErrorCounter(), self.getExceptionCounter()]
+        payload += [backlogdbentries, backlogdbsize]
+        payload += [msgInPerSec, msgOutPerSec, msgInCounter, msgOutCounter, msgAckInCounter, pingOutCounter, pingAckInCounter, pingInCounter, pingAckOutCounter, connectionLosses, uptime]
+        payload += [storepersec, removepersec, storecounter, removecounter, minstoretime, meanstoretime, maxstoretime, minremovetime, meanremovetime, meanremovetime]
+        
+        self.processMsg(self.getTimeStamp(), payload)
     
     
     def stop(self):

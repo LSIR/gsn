@@ -125,7 +125,7 @@ public class MigMessagePlugin extends AbstractPlugin
 
 	
 	@Override
-	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
+	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		Method getter = null;
 		Object res = null;
 
@@ -137,7 +137,7 @@ public class MigMessagePlugin extends AbstractPlugin
 		outputvaluesmap.put(parameters.getTinyosGetterPrefix() + outputstructurenames[2], null);
 		
 		try {
-			Object msg = (Object) messageConstructor.newInstance(packet);
+			Object msg = (Object) messageConstructor.newInstance((byte[])data[0]);
 
 			Iterator<Method> iter = parameters.getGetters().iterator();
 			while (iter.hasNext()) {
@@ -288,7 +288,7 @@ public class MigMessagePlugin extends AbstractPlugin
 			}
 			
 			try {
-				ret = sendRemote(System.currentTimeMillis(), createTOSpacket(moteId, amType, data), super.priority);
+				ret = sendRemote(System.currentTimeMillis(), new Serializable[] {createTOSpacket(moteId, amType, data)}, super.priority);
 				if (logger.isDebugEnabled())
 					logger.debug("Mig message sent to destination " + moteId + " with AM type " + amType);
 			} catch (Exception e) {
@@ -300,7 +300,7 @@ public class MigMessagePlugin extends AbstractPlugin
 				byte [] packet = ((String) paramValues[0]).getBytes();
 				if(packet.length > 0) {
 					try {
-						ret = sendRemote(System.currentTimeMillis(), packet, super.priority);
+						ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
 						if (logger.isDebugEnabled())
 							logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
 					} catch (Exception e) {
@@ -366,7 +366,7 @@ public class MigMessagePlugin extends AbstractPlugin
 					net.tinyos.message.Message tosmsg = (net.tinyos.message.Message)msg;
 					packet = createTOSpacket(0xffff, tosmsg.amType(), tosmsg.dataGet());
 				}
-				ret = sendRemote(System.currentTimeMillis(), packet, super.priority);
+				ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				return false;

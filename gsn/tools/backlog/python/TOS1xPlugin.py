@@ -40,4 +40,4 @@ class TOS1xPluginClass(TOSPluginClass, AbstractPluginClass):
 
 
     def _tos2backlog(self, packet):
-        return array.array('B', packet.payload()).tostring()
+        return bytearray(array.array('B', packet.payload()).tostring())

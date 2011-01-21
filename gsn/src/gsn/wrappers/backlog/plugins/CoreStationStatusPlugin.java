@@ -50,23 +50,23 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
-		Serializable[] data = new Serializable[dataField.length];
-		data[0] = timestamp;
-		data[1] = timestamp;
-		data[2] = deviceId;
-		if(packet.length == 40) {
-			for( int i=3; i<dataField.length; i++) {
-				Integer tmp = arr2int(packet, (i-3)*4);
-				if( tmp.compareTo(0xFFFFFFFF) == 0 )
-					tmp = null;
-				data[i] = tmp;
+	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
+		if(data.length == dataField.length-3) {
+			for (int index=0; index<data.length; index++) {
+				try {
+					data[index] = toInteger(data[index]);
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+					return true;
+				}
 			}
 		}
 		else
 			logger.error("received message length does not match");
+
+		Serializable[] header = {timestamp, timestamp, deviceId};
 		
-		if( dataProcessed(System.currentTimeMillis(), data) )
+		if( dataProcessed(System.currentTimeMillis(), concat(header, data)) )
 			ackMessage(timestamp, super.priority);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");

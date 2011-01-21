@@ -121,41 +121,50 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
             return
         else:
             try:
-                packet = None
+                send = False
+                packet = []
                 self._serial.write(self._id + 'R1\r\n')
                 line = self._serial.readline().strip()
                 if line:
                     self.debug(line)
-                    packet = self.packString(line)
+                    packet.append(line)
+                    send = True
+                else:
+                    packet.append(None)
                 
                 self._serial.write(self._id + 'R2\r\n')
                 line = self._serial.readline().strip()
                 if line:
                     self.debug(line)
-                    packet += self.packString(line)
+                    packet.append(line)
+                    send = True
+                else:
+                    packet.append(None)
                 
                 self._serial.write(self._id + 'R3\r\n')
                 line = self._serial.readline().strip()
                 if line:
                     self.debug(line)
-                    packet += self.packString(line)
+                    packet.append(line)
+                    send = True
+                else:
+                    packet.append(None)
                 
                 self._serial.write(self._id + 'R5\r\n')
                 line = self._serial.readline().strip()
                 if line:
                     self.debug(line)
-                    packet += self.packString(line)
+                    packet.append(line)
+                    send = True
+                else:
+                    packet.append(None)
                 
-                if packet:
+                if send:
                     self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
                 else:
                     self.error('Vaisala weather station not connected or wrongly configured')
             except Exception, e:
                 self.exception(e)
-
-
-    def packString(self, s):
-        return struct.pack(str(len(s)) + 'sx', s)
 
 
     def stop(self):

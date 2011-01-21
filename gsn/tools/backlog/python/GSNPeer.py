@@ -15,6 +15,7 @@ import Queue
 from threading import Thread, Event, Lock
 
 import BackLogMessage
+from Statistics import StatisticsClass
 
 # Ping request interval in seconds.
 PING_INTERVAL_SEC = 10.0
@@ -32,7 +33,7 @@ HELLO_BYTE = 0x7d
 SOL_IP = 0
 IP_MTU = 14
 
-class GSNPeerClass(Thread):
+class GSNPeerClass(Thread, StatisticsClass):
     '''
     Offers the server functionality for GSN.
     '''
@@ -47,10 +48,14 @@ class GSNPeerClass(Thread):
     _pingtimer
     _pingwatchdog
     _connected
-    _inCounter
-    _outCounter
-    _connectionLosses
-    _backlogCounter
+    _msgAckInCounterId
+    _pingAckInCounterId
+    _pingInCounterId
+    _msgInCounterId
+    _pingAckOutCounterId
+    _pingOutCounterId
+    _msgOutCounterId
+    _connectionLossesId
     _work
     _gsnPeerStop
     '''
@@ -65,6 +70,7 @@ class GSNPeerClass(Thread):
         @raise Exception: if there is a problem opening the server socket
         '''
         Thread.__init__(self)
+        StatisticsClass.__init__(self)
         
         self._logger = logging.getLogger(self.__class__.__name__)
         
@@ -73,10 +79,15 @@ class GSNPeerClass(Thread):
         self._deviceid = deviceid
         self._port = port
 
-        self._inCounter = 0
-        self._outCounter = 0
-        self._connectionLosses = 0
-        self._backlogCounter = 0
+        self._msgInCounterId = self.createCounter(60)
+        self._msgAckInCounterId = self.createCounter()
+        self._pingInCounterId = self.createCounter()
+        self._pingAckInCounterId = self.createCounter()
+        self._msgOutCounterId = self.createCounter(60)
+        self._pingOutCounterId = self.createCounter()
+        self._pingAckOutCounterId = self.createCounter()
+        self._connectionLossesId = self.createCounter()
+        
         self._connected = False
         self._gsnPeerStop = False
         self._work = Event()
@@ -129,8 +140,26 @@ class GSNPeerClass(Thread):
         self._logger.info('stopped')
 
 
-    def getStatus(self):
-        return (self._inCounter, self._outCounter, self._backlogCounter, self._connectionLosses)
+    def getStatus(self, intervalSec):
+        '''
+        Returns the status of the GSN peer as tuple:
+        
+        @param intervalSec: the passed n seconds over which messages per second is calculated.
+        
+        @return: status of the GSN peer
+        '''
+        stat = []
+        stat.append(self.getAvgCounterIncPerSecond(self._msgInCounterId, [intervalSec])[0])
+        stat.append(self.getAvgCounterIncPerSecond(self._msgOutCounterId, [intervalSec])[0])
+        stat.append(self.getCounterValue(self._msgInCounterId))
+        stat.append(self.getCounterValue(self._msgOutCounterId))
+        stat.append(self.getCounterValue(self._msgAckInCounterId))
+        stat.append(self.getCounterValue(self._pingOutCounterId))
+        stat.append(self.getCounterValue(self._pingAckInCounterId))
+        stat.append(self.getCounterValue(self._pingInCounterId))
+        stat.append(self.getCounterValue(self._pingAckOutCounterId))
+        stat.append(self.getCounterValue(self._connectionLossesId))
+        return stat
             
             
     def isConnected(self):
@@ -144,8 +173,7 @@ class GSNPeerClass(Thread):
         @param blMessage: the BackLogMessage to be sent to GSN
         
         @return: True if the message could have been sent to GSN otherwise False
-        '''        
-        self._outCounter += 1
+        '''
         if not self._connected:
             return False
         if resend:
@@ -162,26 +190,29 @@ class GSNPeerClass(Thread):
         msgType = msg.getType()
         
         self._logger.debug('rcv (%d,%d,%d)' % (msgType, msg.getTimestamp(), len(pkt)))
-        self._inCounter += 1
         
         # is it an answer to a ping?
         if msgType == BackLogMessage.PING_ACK_MESSAGE_TYPE:
+            self.counterAction(self._pingAckInCounterId)
             self._pingwatchdog.reset()
         # or is it a ping request
         elif msgType == BackLogMessage.PING_MESSAGE_TYPE:
+            self.counterAction(self._pingInCounterId)
             # answer with a ping ack
             self.pingAck(msg.getTimestamp())
         elif msgType == BackLogMessage.ACK_MESSAGE_TYPE:
+            self.counterAction(self._msgAckInCounterId)
             # if it is an acknowledge, tell BackLogMain to have received one
-            self._backlogMain.ackReceived(msg.getTimestamp(), int(struct.unpack('<I', msg.getPayload())[0]))
+            self._backlogMain.ackReceived(msg.getTimestamp(), msg.getData()[0])
         else:
+            self.counterAction(self._msgInCounterId)
             self._backlogMain.gsnMsgReceived(msgType, msg)
 
 
     def disconnect(self):
         self._logger.debug('disconnect')
         self._connected = False
-        self._connectionLosses += 1
+        self.counterAction(self._connectionLossesId)
         self._backlogMain.connectionToGSNlost()
         self._pingwatchdog.pause()
         self._pingtimer.pause()
@@ -200,11 +231,13 @@ class GSNPeerClass(Thread):
 
 
     def ping(self):
-        self.sendToGSN(BackLogMessage.BackLogMessageClass(BackLogMessage.PING_MESSAGE_TYPE, int(time.time()*1000)), 0)
+        if self.sendToGSN(BackLogMessage.BackLogMessageClass(BackLogMessage.PING_MESSAGE_TYPE, int(time.time()*1000)), 0):
+            self.counterAction(self._pingOutCounterId)
 
 
     def pingAck(self, timestamp):
-        self.sendToGSN(BackLogMessage.BackLogMessageClass(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp), 0)
+        if self.sendToGSN(BackLogMessage.BackLogMessageClass(BackLogMessage.PING_ACK_MESSAGE_TYPE, timestamp), 0):
+            self.counterAction(self._pingAckOutCounterId)
 
 
     def processMsg(self, msgType, timestamp, payload, priority, backlog=False):
@@ -217,7 +250,8 @@ class GSNPeerClass(Thread):
         
         @param msgType: the message type. The message type must be listed in BackLogMessage.
         @param timestamp: the timestamp this message has been generated
-        @param payload: the raw data to be sent (no more than 4 Gb)
+        @param payload: payload of the message as a byte array or a list.
+                         Should not be bigger than MAX_PAYLOAD_SIZE.
         @param backLog: True if this message should be backlogged in the database, otherwise False.
                         BackLogMessageside has to send an acknowledge to remove this message from
                         the backlog database after successful processing if set to True.
@@ -227,22 +261,28 @@ class GSNPeerClass(Thread):
                        
         @return: True if the message has been stored successfully into the backlog database if needed,
                  otherwise False.
+                 
+        @raise ValueError: if something is wrong with the format of the payload.
         '''
         ret = True
+        msg = BackLogMessage.BackLogMessageClass(msgType, timestamp, payload)
         
         if backlog:
-            self._backlogCounter += 1
             # back log the message
-            ret = self._backlogMain.backlog.storeMsg(timestamp, msgType, payload)
+            ret = self._backlogMain.backlog.storeMsg(timestamp, msgType, msg.getMessage())
             
         # send the message to the GSN backend
-        self.sendToGSN(BackLogMessage.BackLogMessageClass(msgType, timestamp, payload), priority)
+        if self.sendToGSN(msg, priority):
+            self.counterAction(self._msgOutCounterId)
                 
         return ret
 
 
-    def processResendMsg(self, msgType, timestamp, payload):
-        return self.sendToGSN(BackLogMessage.BackLogMessageClass(msgType, timestamp, payload), 99, True)
+    def processResendMsg(self, msgType, timestamp, msg):
+        ret = self.sendToGSN(msg, 99, True)
+        if ret:
+            self.counterAction(self._msgOutCounterId)
+        return ret
     
     
     
@@ -370,7 +410,7 @@ class GSNListener(Thread):
                             raise
                         break
                     
-                    pkt_len = int(struct.unpack('<I', pkt)[0])
+                    pkt_len = int(struct.unpack('>I', pkt)[0])
                     try:
                         pkt = self.pktReadAndDestuff(pkt_len)
                         if not pkt:
@@ -522,6 +562,13 @@ class GSNWriter(Thread):
     _work
     _gsnWriterStop
     '''
+    class HelloMessage:
+        def __init__(self, helloMsg):
+            self._helloMsg = helloMsg
+        def getMessage(self):
+            return self._helloMsg
+        
+    
 
     def __init__(self, parent):
         Thread.__init__(self)
@@ -552,19 +599,21 @@ class GSNWriter(Thread):
                     self._lock.release()
                     break
             
-                if msg.__class__.__name__ != BackLogMessage.__name__ + 'Class':
-                    pkt = msg
-                else:
+                if isinstance(msg, BackLogMessage.BackLogMessageClass):
                     message = msg.getMessage()
                     msglen = len(message)
                     pkt = self.pktStuffing(struct.pack('<I', msglen) + message)
+                elif isinstance(msg, self.HelloMessage):
+                    pkt = msg.getMessage()
+                else:
+                    pkt = self.pktStuffing(struct.pack('<I', len(msg)) + str(msg))
             
                 try:
                     self._gsnListener.clientsocket.sendall(pkt)
-                    if msg.__class__.__name__ != BackLogMessage.__name__ + 'Class':
-                        self._logger.debug('hello message sent')
-                    else:
+                    if isinstance(msg, BackLogMessage.BackLogMessageClass):
                         self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
+                    elif isinstance(msg, self.HelloMessage):
+                        self._logger.debug('hello message sent')
                 except (IOError, socket.error), e:
                     try:
                         self._sendqueue.task_done()
@@ -592,7 +641,7 @@ class GSNWriter(Thread):
         self.emptyQueue()
         helloMsg = chr(STUFFING_BYTE) + chr(HELLO_BYTE)
         helloMsg += self.pktStuffing(struct.pack('<I', self._gsnListener._gsnPeer._deviceid))
-        self.addMsg(helloMsg, 0)
+        self.addMsg(self.HelloMessage(helloMsg), 0)
 
 
     def stop(self):

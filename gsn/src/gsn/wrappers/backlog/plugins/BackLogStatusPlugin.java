@@ -1,9 +1,6 @@
 package gsn.wrappers.backlog.plugins;
 
 import java.io.Serializable;
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import org.apache.log4j.Logger;
 
@@ -27,12 +24,22 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 						new DataField("ERROR_COUNTER", "INTEGER"),
 						new DataField("EXCEPTION_COUNTER", "INTEGER"),
 						new DataField("BACKLOG_DB_ENTRIES", "INTEGER"),
-						new DataField("BACKLOG_DB_SIZE_KB", "INTEGER"),
-						new DataField("IN_COUNTER", "INTEGER"),
-						new DataField("OUT_COUNTER", "INTEGER"),
-						new DataField("BACKLOG_COUNTER", "INTEGER"),
-						new DataField("CONNECTION_LOSSES", "INTEGER"),
+						new DataField("BACKLOG_DB_SIZE", "INTEGER"),
+						new DataField("GSN_PLUGIN_MSG_IN", "DOUBLE"),
+						new DataField("GSN_PLUGIN_MSG_OUT", "DOUBLE"),
+						new DataField("GSN_PLUGIN_MSG_IN_COUNTER", "INTEGER"),
+						new DataField("GSN_PLUGIN_MSG_OUT_COUNTER", "INTEGER"),
+						new DataField("GSN_PLUGIN_MSG_ACK_IN_COUNTER", "INTEGER"),
+						new DataField("GSN_PING_OUT_COUNTER", "INTEGER"),
+						new DataField("GSN_PING_ACK_IN_COUNTER", "INTEGER"),
+						new DataField("GSN_PING_IN_COUNTER", "INTEGER"),
+						new DataField("GSN_PING_ACK_OUT_COUNTER", "INTEGER"),
+						new DataField("GSN_CONNECTION_LOSSES", "INTEGER"),
 						new DataField("UPTIME", "INTEGER"),
+						new DataField("DB_STORE", "DOUBLE"),
+						new DataField("DB_REMOVE", "DOUBLE"),
+						new DataField("DB_STORE_COUNTER", "INTEGER"),
+						new DataField("DB_REMOVE_COUNTER", "INTEGER"),
 						new DataField("DB_STORE_TIME_MIN", "INTEGER"),
 						new DataField("DB_STORE_TIME_MEAN", "INTEGER"),
 						new DataField("DB_STORE_TIME_MAX", "INTEGER"),
@@ -59,75 +66,28 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean messageReceived(int deviceId, long timestamp, byte[] packet) {
+	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		if (logger.isDebugEnabled())
 			logger.debug("message received from CoreStation with DeviceId: " + deviceId);
-
-		// Parse the Message
-		ByteBuffer buffer = ByteBuffer.allocate(packet.length);
-		buffer.put(packet);
 		
-		buffer.position(0);
-		buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-		Integer error_counter = null;
-		Integer exception_counter = null;
-		Integer backlog_db_entries = null;
-		Integer backlog_db_size = null;
-		Integer in_counter = null;
-		Integer out_counter = null;
-		Integer backlog_counter = null;
-		Integer connection_losses = null;
-		Integer backlog_uptime = null;
-		Integer minstoretime = null;
-		Integer maxstoretime = null;
-		Integer meanstoretime = null;
-		Integer minremovetime = null;
-		Integer maxremovetime = null;
-		Integer meanremovetime = null;
-		
-		try {
-			error_counter = buffer.getInt();
-			exception_counter = buffer.getInt();
-			backlog_db_entries = buffer.getInt();
-			backlog_db_size = buffer.getInt();
-			in_counter = buffer.getInt();
-			out_counter = buffer.getInt();
-			backlog_counter = buffer.getInt();
-			connection_losses = buffer.getInt();
-			backlog_uptime = buffer.getInt();
-			minstoretime = buffer.getInt();
-			maxstoretime = buffer.getInt();
-			meanstoretime = buffer.getInt();
-			minremovetime = buffer.getInt();
-			maxremovetime = buffer.getInt();
-			meanremovetime = buffer.getInt();
-		} catch (BufferUnderflowException e) {
-			logger.error(e.getMessage());
+		for (int index=0; index<data.length; index++) {
+			try {
+				if (!(data[index] instanceof Double))
+					data[index] = toInteger(data[index]);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				return true;
+			}
 		}
 
-		if (minstoretime != null && minstoretime == -1)
-			minstoretime = null;
-		if (maxstoretime != null && maxstoretime == -1)
-			maxstoretime = null;
-		if (meanstoretime != null && meanstoretime == -1)
-			meanstoretime = null;
-		if (minremovetime != null && minremovetime == -1)
-			minremovetime = null;
-		if (maxremovetime != null && maxremovetime == -1)
-			maxremovetime = null;
-		if (meanremovetime != null && meanremovetime == -1)
-			meanremovetime = null;
+		Serializable[] header = {timestamp, timestamp, deviceId};
 		
-		Serializable[] data = {timestamp, timestamp, deviceId, error_counter, exception_counter, backlog_db_entries, backlog_db_size, in_counter, out_counter, backlog_counter, connection_losses, backlog_uptime, minstoretime, meanstoretime, maxstoretime, minremovetime, meanremovetime, maxremovetime};
-		
-		if (dataProcessed(System.currentTimeMillis(), data))
+		if (dataProcessed(System.currentTimeMillis(), concat(header, data)))
 			ackMessage(timestamp, super.priority);
 		else
 			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 		return true;
 	}
-
 	
 	
 	/** 
@@ -141,7 +101,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	@Override
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		if( action.compareToIgnoreCase("resend_backlogged_data") == 0 ) {
-			byte[] command = {1};
+			Serializable[] command = {1};
 			try {
 				if( sendRemote(System.currentTimeMillis(), command, super.priority) ) {
 					if (logger.isDebugEnabled())

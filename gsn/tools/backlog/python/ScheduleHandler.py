@@ -15,7 +15,6 @@ SUBPROCESS_BUG_BYPASS = True
 import time
 import string
 import struct
-import re
 import os
 import signal
 import pickle
@@ -262,9 +261,9 @@ class ScheduleHandlerClass(Thread):
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
                 self._logger.debug('request schedule from gsn')
                 if self._schedule:
-                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY, False)
+                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
                 else:
-                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), struct.pack('<B', GSN_TYPE_GET_SCHEDULE), MESSAGE_PRIORITY, False)
+                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
                 self._scheduleEvent.wait(3)
                 if self._scheduleHandlerStop:
                     self._logger.info('died')
@@ -419,13 +418,13 @@ class ScheduleHandlerClass(Thread):
         return BackLogMessage.SCHEDULE_MESSAGE_TYPE
 
 
-    def msgReceived(self, message):
+    def msgReceived(self, data):
         '''
         Try to interpret a new received Config-Message from GSN
         '''
 
         # Is the Message filled with content or is it just an emty response?
-        pktType = struct.unpack('B', message[0])[0]
+        pktType = data[0]
         if pktType == GSN_TYPE_NO_SCHEDULE_AVAILABLE:
             self._logger.info('GSN has no schedule available')
         elif pktType == GSN_TYPE_SCHEDULE_SAME:
@@ -433,10 +432,10 @@ class ScheduleHandlerClass(Thread):
         elif pktType == GSN_TYPE_NEW_SCHEDULE:
             self._logger.info('new schedule from GSN received')
             # Get the schedule creation time
-            creationtime = struct.unpack('<q', message[1:9])[0]
+            creationtime = data[1]
             self._logger.debug('creation time: ' + str(creationtime))
             # Get the schedule
-            schedule = message[9:]
+            schedule = data[2]
             try:
                 sc = ScheduleCron(creationtime, fake_tab=schedule)
                 self._scheduleLock.acquire()   

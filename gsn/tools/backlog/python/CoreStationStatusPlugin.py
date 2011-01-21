@@ -192,33 +192,31 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 v9 = 0
 
             v1 = int(round(v1 * 11))
-            v2 = 0xFFFFFFFF
-            v3 = int(round(v3 * 23 / 3))
+            v2 = None
+            v3 = int(round(v3 * 23 / 3.0))
             v4 = int(round(v4 * 20000))
-            v5 = int(round(v5 * 23 / 3))
+            v5 = int(round(v5 * 23 / 3.0))
             v6 = int(round(v6 * 2000))
-            v7 = int(round(v7 * 151 / 51))
+            v7 = int(round(v7 * 151 / 51.0))
             v8 = int(round(v8 * 2))
-            v9 = int(round(v9 * 200 / 3))
+            v9 = int(round(v9 * 200 / 3.0))
             v10 = int(round(v10 * 2))
             if not self._calibrated and self._conf_calibrate:
-                v9 = 0xFFFFFFFF
+                v9 = None
         except Exception, e:
             self.warning(e.__str__())
-            v1 = 0xFFFFFFFF
-            v2 = 0xFFFFFFFF
-            v3 = 0xFFFFFFFF
-            v4 = 0xFFFFFFFF
-            v5 = 0xFFFFFFFF
-            v6 = 0xFFFFFFFF
-            v7 = 0xFFFFFFFF
-            v8 = 0xFFFFFFFF
-            v9 = 0xFFFFFFFF
-            v10 = 0xFFFFFFFF
+            v1 = None
+            v2 = None
+            v3 = None
+            v4 = None
+            v5 = None
+            v6 = None
+            v7 = None
+            v8 = None
+            v9 = None
+            v10 = None
         
-        packet = struct.pack('<IIIIIIIIII', v1, v2, v3, v4, v5, v6, v7, v8, v9, v10)
-        
-        self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
+        self.processMsg(self.getTimeStamp(), [v1, v2, v3, v4, v5, v6, v7, v8, v9, v10], self._priority, self._backlog)
     
     
     def stop(self):

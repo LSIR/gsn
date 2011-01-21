@@ -74,9 +74,9 @@ class TOSPluginClass(AbstractPluginClass):
         return BackLogMessage.TOS_MESSAGE_TYPE
     
             
-    def msgReceived(self, message):
+    def msgReceived(self, data):
         if self._ready:
-            self.sendTOSmsg(self._backlog2tos(message), 0x00, 1, True, 10)
+            self.sendTOSmsg(self._backlog2tos(data[0]), 0x00, 1, True, 10)
             
             
     def isBusy(self):
@@ -105,5 +105,5 @@ class TOSPluginClass(AbstractPluginClass):
 
     def _tos2backlog(self, packet):
         # TODO: append zero at start should not really happen here -> needs bugfix for tos.py
-        return array.array('B', [0] + packet.payload()).tostring()
+        return bytearray(array.array('B', [0] + packet.payload()).tostring())
     

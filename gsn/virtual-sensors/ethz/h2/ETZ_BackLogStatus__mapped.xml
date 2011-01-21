@@ -14,11 +14,21 @@
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
             <field name="BACKLOG_DB_ENTRIES" type="INTEGER" />
-            <field name="BACKLOG_DB_SIZE_KB" type="INTEGER" />
-            <field name="IN_COUNTER" type="INTEGER" />
-            <field name="OUT_COUNTER" type="INTEGER" />
-            <field name="BACKLOG_COUNTER" type="INTEGER" />
-            <field name="CONNECTION_LOSSES" type="INTEGER" />
+            <field name="BACKLOG_DB_SIZE" type="INTEGER" unit="kb" />
+            <field name="GSN_PLUGIN_MSG_IN" type="DOUBLE" unit="msg/s" />
+            <field name="GSN_PLUGIN_MSG_OUT" type="DOUBLE" unit="msg/s" />
+            <field name="GSN_PLUGIN_MSG_IN_COUNTER" type="INTEGER" />
+            <field name="GSN_PLUGIN_MSG_OUT_COUNTER" type="INTEGER" />
+            <field name="GSN_PLUGIN_MSG_ACK_IN_COUNTER" type="INTEGER" />
+            <field name="GSN_PING_OUT_COUNTER" type="INTEGER" />
+            <field name="GSN_PING_ACK_IN_COUNTER" type="INTEGER" />
+            <field name="GSN_PING_IN_COUNTER" type="INTEGER" />
+            <field name="GSN_PING_ACK_OUT_COUNTER" type="INTEGER" />
+            <field name="GSN_CONNECTION_LOSSES" type="INTEGER" />
+            <field name="DB_STORE" type="DOUBLE" unit="msg/s" />
+            <field name="DB_REMOVE" type="DOUBLE" unit="msg/s" />
+            <field name="DB_STORE_COUNTER" type="INTEGER" />
+            <field name="DB_REMOVE_COUNTER" type="INTEGER" />
             <field name="DB_STORE_TIME_MIN" type="INTEGER" unit="ms" />
             <field name="DB_STORE_TIME_MEAN" type="INTEGER" unit="ms" />
             <field name="DB_STORE_TIME_MAX" type="INTEGER" unit="ms" />

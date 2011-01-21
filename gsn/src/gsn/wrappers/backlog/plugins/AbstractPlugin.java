@@ -3,6 +3,7 @@ package gsn.wrappers.backlog.plugins;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -240,7 +241,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * 
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
-	public boolean sendRemote(long timestamp, byte[] data, Integer priority) throws Exception {
+	public boolean sendRemote(long timestamp, Serializable[] data, Integer priority) throws Exception {
 		if (priority == null)
 			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, DEFAULT_PRIORITY);
 		else
@@ -277,7 +278,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 * 			or the DeviceId does not exist.
 	 */
-	public boolean sendRemote(long timestamp, byte[] data, Integer id, Integer priority) throws Exception {
+	public boolean sendRemote(long timestamp, Serializable[] data, Integer id, Integer priority) throws Exception {
 		if (priority == null)
 			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id, DEFAULT_PRIORITY);
 		else
@@ -355,96 +356,53 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	public boolean isTimeStampUnique() {
 	  return activeBackLogWrapper.isTimeStampUnique();
 	}
-		
-	public static byte[] uint2arr (long l) {
-		int len = 4;
-		byte[] arr = new byte[len];
-
-		int i = 0;
-		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
-			arr[i] = (byte)( l >> shiftBy);
-			i++;
-		}
-		return arr;
+	
+	
+	protected static <T> T[] concat(T[] first, T[] second) {
+		T[] result = Arrays.copyOf(first, first.length + second.length);
+		System.arraycopy(second, 0, result, first.length, second.length);
+		return result;
 	}
 	
-	public static long arr2uint (byte[] arr, int start) {
-		int i = 0;
-		int len = 4;
-		int cnt = 0;
-		byte[] tmp = new byte[len];
-		for (i = start; i < (start + len); i++) {
-			tmp[cnt] = arr[i];
-			cnt++;
-		}
-		long accum = 0;
-		i = 0;
-		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
-			accum |= ( (long)( tmp[i] & 0xff ) ) << shiftBy;
-			i++;
-		}
-		return accum;
+	
+	protected static <T> Long toLong(T value) throws Exception {
+		if (value == null)
+			return null;
+		else if (value instanceof Byte)
+			return new Long((Byte)value & 0xFF);
+		else if (value instanceof Short)
+			return new Long((Short)value);
+		else if (value instanceof Integer)
+			return new Long((Integer)value);
+		else if (value instanceof Long)
+			return (Long) value;
+		else
+			throw new Exception("value can not be cast to Long.");
 	}
 	
-	public static int arr2int (byte[] arr, int start) {
-		int i = 0;
-		int len = 4;
-		int cnt = 0;
-		byte[] tmp = new byte[len];
-		for (i = start; i < (start + len); i++) {
-			tmp[cnt] = arr[i];
-			cnt++;
-		}
-		int accum = 0;
-		i = 0;
-		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
-			accum |= ( (int)( tmp[i] & 0xff ) ) << shiftBy;
-			i++;
-		}
-		return accum;
-	}
-		
-	public static byte[] int2arr (int l) {
-		int len = 4;
-		byte[] arr = new byte[len];
-
-		int i = 0;
-		for ( int shiftBy = 0; shiftBy < 32; shiftBy += 8 ) {
-			arr[i] = (byte)( l >> shiftBy);
-			i++;
-		}
-		return arr;
-	}
-
 	
-	public static long arr2long (byte[] arr, int start) {
-		int i = 0;
-		int len = 8;
-		int cnt = 0;
-		byte[] tmp = new byte[len];
-		for (i = start; i < (start + len); i++) {
-			tmp[cnt] = arr[i];
-			cnt++;
-		}
-		long accum = 0;
-		i = 0;
-		for ( int shiftBy = 0; shiftBy < 64; shiftBy += 8 ) {
-			accum |= ( (long)( tmp[i] & 0xff ) ) << shiftBy;
-			i++;
-		}
-		return accum;
+	protected static <T> Integer toInteger(T value) throws Exception {
+		if (value == null)
+			return null;
+		else if (value instanceof Byte)
+			return new Integer((Byte)value & 0xFF);
+		else if (value instanceof Short)
+			return new Integer((Short)value);
+		else if (value instanceof Integer)
+			return (Integer) value;
+		else
+			throw new Exception("value can not be cast to Integer.");
 	}
-
 	
-	public static byte[] long2arr (long l) {
-		int len = 8;
-		byte[] arr = new byte[len];
-
-		int i = 0;
-		for ( int shiftBy = 0; shiftBy < 64; shiftBy += 8 ) {
-			arr[i] = (byte)( l >> shiftBy);
-			i++;
-		}
-		return arr;
+	
+	protected static <T> Short toShort(T value) throws Exception {
+		if (value == null)
+			return null;
+		else if (value instanceof Byte)
+			return (new Integer(((Byte)value & 0xFF))).shortValue();
+		else if (value instanceof Short)
+			return (Short) value;
+		else
+			throw new Exception("value can not be cast to Integer.");
 	}
 }
