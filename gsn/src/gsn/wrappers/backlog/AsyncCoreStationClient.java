@@ -269,7 +269,7 @@ public class AsyncCoreStationClient extends Thread  {
 		try {
 			socketChannel.finishConnect();
 		} catch (IOException e) {
-			logger.warn("could not connect to " + socketToListenerList.get(socketChannel).getCoreStationName() + ": " + e.getMessage());
+			logger.debug("could not connect to " + socketToListenerList.get(socketChannel).getCoreStationName() + ": " + e.getMessage());
 			reconnect(socketToListenerList.get(socketChannel));
 			return;
 		}
