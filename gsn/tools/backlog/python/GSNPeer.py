@@ -410,7 +410,7 @@ class GSNListener(Thread):
                             raise
                         break
                     
-                    pkt_len = int(struct.unpack('>I', pkt)[0])
+                    pkt_len = int(struct.unpack('<i', pkt)[0])
                     try:
                         pkt = self.pktReadAndDestuff(pkt_len)
                         if not pkt:
@@ -602,11 +602,11 @@ class GSNWriter(Thread):
                 if isinstance(msg, BackLogMessage.BackLogMessageClass):
                     message = msg.getMessage()
                     msglen = len(message)
-                    pkt = self.pktStuffing(struct.pack('<I', msglen) + message)
+                    pkt = self.pktStuffing(struct.pack('<i', msglen) + message)
                 elif isinstance(msg, self.HelloMessage):
                     pkt = msg.getMessage()
                 else:
-                    pkt = self.pktStuffing(struct.pack('<I', len(msg)) + str(msg))
+                    pkt = self.pktStuffing(struct.pack('<i', len(msg)) + str(msg))
             
                 try:
                     self._gsnListener.clientsocket.sendall(pkt)
@@ -640,7 +640,7 @@ class GSNWriter(Thread):
     def sendHelloMsg(self):
         self.emptyQueue()
         helloMsg = chr(STUFFING_BYTE) + chr(HELLO_BYTE)
-        helloMsg += self.pktStuffing(struct.pack('<I', self._gsnListener._gsnPeer._deviceid))
+        helloMsg += self.pktStuffing(struct.pack('<i', self._gsnListener._gsnPeer._deviceid))
         self.addMsg(self.HelloMessage(helloMsg), 0)
 
 

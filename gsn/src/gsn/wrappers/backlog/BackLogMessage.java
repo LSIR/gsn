@@ -1,11 +1,10 @@
 package gsn.wrappers.backlog;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 
@@ -124,13 +123,9 @@ public class BackLogMessage {
 	
 
 	/** 
-	 * The maximum supported payload size (2^32-9bytes). This is due to
-	 * the sending mechanism. A sent message is defined by preceding
-	 * four bytes containing the message size. A message consists of
-	 * the type field (1byte), the timestamp (8byte) and the payload
-	 * (2^32-9bytes).
+	 * The maximum supported payload size (2^32bytes)
 	 **/
-	public static double MAX_PAYLOAD_SIZE = Math.pow(2, 32) - 9;
+	public static int MAX_PAYLOAD_SIZE = (int) (Math.pow(2, 16));
 	
 	private Serializable[] payload = {};
 	private long timestamp = 0;
@@ -189,59 +184,70 @@ public class BackLogMessage {
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
 	public BackLogMessage(byte[] message) throws IOException {
-		ByteArrayInputStream bin = new ByteArrayInputStream(message);
-		DataInputStream din = new DataInputStream(bin);
+		ByteBuffer bbuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
+		bbuffer.put(message);
 		
-		type = din.readByte();
-		timestamp = din.readLong();
+		bbuffer.position(0);
+		bbuffer.order(ByteOrder.LITTLE_ENDIAN);
+		byte [] arraybuffer = bbuffer.array();
 		
-		String format = null;
+		type = bbuffer.get();
+		timestamp = bbuffer.getLong();
 		
-		try {
-			format = din.readUTF();
-		}
-		catch (IOException e) {
-			return;
-		}
-
-		payload = new Serializable [format.length()];
-		int payloadIndex = 0;
-		CharacterIterator it = new StringCharacterIterator(format);
-		for (char ch=it.first(); ch != CharacterIterator.DONE; ch=it.next()) {
-			switch (ch) {
-			case '0':
-				payload[payloadIndex] = null;
-				break;
-			case 'b':
-				payload[payloadIndex] = din.readByte();
-				break;
-			case '?':
-				payload[payloadIndex] = din.readBoolean();
-				break;
-			case 'h':
-				payload[payloadIndex] = din.readShort();
-				break;
-			case 'i':
-				payload[payloadIndex] = din.readInt();
-				break;
-			case 'q':
-				payload[payloadIndex] = din.readLong();
-				break;
-			case 'd':
-				payload[payloadIndex] = din.readDouble();
-				break;
-			case 's':
-				payload[payloadIndex] = din.readUTF();
-				break;
-			case 'X':
-				byte [] data = new byte [din.readUnsignedShort()];
-				din.readFully(data);
-				payload[payloadIndex] = data;
-				break;
-			default:
-				throw new IOException("unrecognized format character received");
+		if (bbuffer.hasRemaining()) {
+			int format_len = bbuffer.getInt();
+			String format = new String(arraybuffer, bbuffer.position(), format_len);
+			bbuffer.position(bbuffer.position()+format_len);
+	
+			payload = new Serializable [format.length()];
+			int payloadIndex = 0;
+			CharacterIterator it = new StringCharacterIterator(format);
+			for (char ch=it.first(); ch != CharacterIterator.DONE; ch=it.next()) {
+				switch (ch) {
+				case '0':
+					payload[payloadIndex] = null;
+					break;
+				case 'b':
+					payload[payloadIndex] = bbuffer.get();
+					break;
+				case '?':
+					byte bool = bbuffer.get();
+					if (bool == 0)
+						payload[payloadIndex] = false;
+					else if (bool == 1)
+						payload[payloadIndex] = true;
+					else
+						throw new IOException("wrong boolean format");
+					break;
+				case 'h':
+					payload[payloadIndex] = bbuffer.getShort();
+					break;
+				case 'i':
+					payload[payloadIndex] = bbuffer.getInt();
+					break;
+				case 'q':
+					payload[payloadIndex] = bbuffer.getLong();
+					break;
+				case 'd':
+					payload[payloadIndex] = bbuffer.getDouble();
+					break;
+				case 's':
+					int len = bbuffer.getInt();
+					payload[payloadIndex] = new String(arraybuffer, bbuffer.position(), len);
+					bbuffer.position(bbuffer.position()+len);
+					break;
+				case 'X':
+					int l = bbuffer.getInt();
+					byte [] data = new byte [l];
+					System.arraycopy(arraybuffer, bbuffer.position(), data, 0, l);
+					payload[payloadIndex] = data;
+					bbuffer.position(bbuffer.position()+l);
+					break;
+				default:
+					throw new IOException("unrecognized format character received");
+				}
+				payloadIndex++;
 			}
-			payloadIndex++;
 		}
 	}
 	
@@ -252,74 +258,95 @@ public class BackLogMessage {
 	 * @return the message as byte array
 	 */
 	public byte[] getBinaryMessage() {
-		ByteArrayOutputStream bout = new ByteArrayOutputStream(9);
-		DataOutputStream dout = new DataOutputStream(bout);
-		ByteArrayOutputStream databout = new ByteArrayOutputStream(1);
-		DataOutputStream datadout = new DataOutputStream(databout);
-		try {
-			String format = "";
+		ByteBuffer bbuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
+		bbuffer.position(0);
+		bbuffer.order(ByteOrder.LITTLE_ENDIAN);
+		ByteBuffer outbuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
+		outbuffer.position(0);
+		outbuffer.order(ByteOrder.LITTLE_ENDIAN);
 
-			for (int i=0; i<payload.length; i++) {
-				if (payload[i] == null) {
-					format += "0";
+		String format = "";
+
+		for (int i=0; i<payload.length; i++) {
+			if (payload[i] == null) {
+				format += "0";
+			}
+			else {
+				if (payload[i] instanceof Byte) {
+					bbuffer.put((Byte)payload[i]);
+					format += "b";
 				}
-				else {
-					if (payload[i] instanceof Byte) {
-						datadout.writeByte((Byte)payload[i]);
-						format += "b";
-					}
-					else if (payload[i] instanceof Boolean) {
-						datadout.writeBoolean((Boolean)payload[i]);
-						format += "?";
-					}
-					else if (payload[i] instanceof Short) {
-						datadout.writeShort((Short)payload[i]);
-						format += "h";
-					}
-					else if (payload[i] instanceof Integer) {
-						datadout.writeInt((Integer)payload[i]);
-						format += "i";
-					}
-					else if (payload[i] instanceof Long) {
-						datadout.writeLong((Long)payload[i]);
-						format += "q";
-					}
-					else if (payload[i] instanceof Double) {
-						datadout.writeDouble((Double)payload[i]);
-						format += "d";
-					}
-					else if (payload[i] instanceof String) {
-						datadout.writeUTF((String)payload[i]);
-						format += "s";
-					}
-					else if (payload[i] instanceof byte[]) {
-						datadout.writeShort(((byte[])payload[i]).length);
-						datadout.write((byte[])payload[i]);
-						format += "X";
-					}
-					else if (payload[i] instanceof Byte[]) {
-						datadout.writeShort(((Byte[])payload[i]).length);
-						byte [] tmp = new byte [((Byte[])payload[i]).length];
-						for (int j=0; j<((Byte[])payload[i]).length; j++)
-							tmp[j] = ((Byte[])payload[i])[j];
-						datadout.write(tmp);
-						format += "X";
-					}
+				else if (payload[i] instanceof Boolean) {
+					if ((Boolean)payload[i])
+						bbuffer.put((byte) 1);
 					else
-						System.err.print("unsupported type");
+						bbuffer.put((byte) 0);
+					format += "?";
 				}
+				else if (payload[i] instanceof Short) {
+					bbuffer.putShort((Short)payload[i]);
+					format += "h";
+				}
+				else if (payload[i] instanceof Integer) {
+					bbuffer.putInt((Integer)payload[i]);
+					format += "i";
+				}
+				else if (payload[i] instanceof Long) {
+					bbuffer.putLong((Long)payload[i]);
+					format += "q";
+				}
+				else if (payload[i] instanceof Double) {
+					bbuffer.putDouble((Double)payload[i]);
+					format += "d";
+				}
+				else if (payload[i] instanceof String) {
+					bbuffer.putInt(((String)payload[i]).length());
+					try {
+						bbuffer.put(((String)payload[i]).getBytes("UTF-8"));
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					format += "s";
+				}
+				else if (payload[i] instanceof byte[]) {
+					bbuffer.putInt(((byte[])payload[i]).length);
+					bbuffer.put((byte[])payload[i]);
+					format += "X";
+				}
+				else if (payload[i] instanceof Byte[]) {
+					bbuffer.putInt(((Byte[])payload[i]).length);
+					byte [] tmp = new byte [((Byte[])payload[i]).length];
+					for (int j=0; j<((Byte[])payload[i]).length; j++)
+						tmp[j] = ((Byte[])payload[i])[j];
+					bbuffer.put(tmp);
+					format += "X";
+				}
+				else
+					System.err.print("unsupported type");
 			}
-
-			dout.writeByte(type);
-			dout.writeLong(timestamp);
-			if (format != "") {
-				dout.writeUTF(format);
-				dout.write(databout.toByteArray());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-		return bout.toByteArray();
+
+		outbuffer.put(type);
+		outbuffer.putLong(timestamp);
+		if (format != "") {
+			outbuffer.putInt(format.length());
+			try {
+				outbuffer.put(format.getBytes("UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+		byte [] out = new byte [outbuffer.position()+bbuffer.position()];
+		int outbufferpos = outbuffer.position();
+		outbuffer.position(0);
+		outbuffer.get(out, 0, outbufferpos);
+		if (format != "") {
+			int bbufferpos = bbuffer.position();
+			bbuffer.position(0);
+			bbuffer.get(out, outbufferpos, bbufferpos);
+		}
+		
+		return out;
 	}
 	
 	

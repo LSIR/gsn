@@ -120,7 +120,7 @@ class BackLogMessageClass:
         self._type = type
         self._timestamp = timestamp
         try:
-            self._header = struct.pack('>Bq', type, timestamp)
+            self._header = struct.pack('<Bq', type, timestamp)
         except Exception, e:
             raise TypeError('cannot pack message: ' + e.__str__())
 
@@ -150,8 +150,8 @@ class BackLogMessageClass:
         '''
         
         try:
-            self._type = int(struct.unpack('>B', bytes[0])[0])
-            self._timestamp = int(struct.unpack('>q', bytes[1:9])[0])
+            self._type = int(struct.unpack('<B', bytes[0])[0])
+            self._timestamp = int(struct.unpack('<q', bytes[1:9])[0])
         except Exception, e:
             raise TypeError('cannot unpack message: ' + e.__str__())
        
@@ -206,24 +206,24 @@ class BackLogMessageClass:
     
     
     def _unpackPayload(self, payload):
-        fmt_len = struct.unpack_from('>H', payload)[0]
-        fmt = struct.unpack_from('>%ds' % fmt_len, payload, 2)[0]
-        plength = struct.calcsize('>H%ds' % fmt_len)
+        fmt_len = struct.unpack_from('<i', payload)[0]
+        fmt = struct.unpack_from('<%ds' % fmt_len, payload, 4)[0]
+        plength = struct.calcsize('<i%ds' % fmt_len)
         
         ret = []
         for c in fmt:
             if c == '0':
                 ret.append(None)
             elif c == 'X':
-                l = struct.unpack_from('>H', payload, plength)[0]
-                ret.append(payload[plength+2:plength+2+l])
-                plength += 2+l
+                l = struct.unpack_from('<i', payload, plength)[0]
+                ret.append(payload[plength+4:plength+4+l])
+                plength += 4+l
             elif c == 's':
-                l = struct.unpack_from('>H', payload, plength)[0]
-                ret.append(struct.unpack_from('>%ds' % l, payload, plength+2)[0])
-                plength += struct.calcsize('>H%ds' % l)
+                l = struct.unpack_from('<i', payload, plength)[0]
+                ret.append(struct.unpack_from('<%ds' % l, payload, plength+4)[0])
+                plength += struct.calcsize('<i%ds' % l)
             else:
-                ret.append(struct.unpack_from('>'+c, payload, plength)[0])
+                ret.append(struct.unpack_from('<'+c, payload, plength)[0])
                 plength += struct.calcsize(c)
         return ret
 
@@ -239,40 +239,43 @@ class BackLogMessageClass:
             else:
                 if type(val) == bool:
                     format += '?'
-                    data += struct.pack('>?', val)
+                    if val:
+                        data += struct.pack('<b', 1)
+                    else:
+                        data += struct.pack('<b', 0)
                 elif type(val) == int:
                     if val < 127 and val > -128:
                         format += 'b'
-                        data += struct.pack('>b', val)
+                        data += struct.pack('<b', val)
                     elif val < 32767 and val > -32768:
                         format += 'h'
-                        data += struct.pack('>h', val)
+                        data += struct.pack('<h', val)
                     elif val < 2147483647 and val > -2147483648:
                         format += 'i'
-                        data += struct.pack('>i', val)
+                        data += struct.pack('<i', val)
                     elif val < 9223372036854775807 and val > -9223372036854775808:
                         format += 'q'
-                        data += struct.pack('>q', val)
+                        data += struct.pack('<q', val)
                     else:
                         raise ValueError('the passed integer value is too big to be transfered using 8 bytes')
                 elif type(val) == long:
                     if val < 9223372036854775807 and val > -9223372036854775808:
                         format += 'q'
-                        data += struct.pack('>q', val)
+                        data += struct.pack('<q', val)
                     else:
                         raise ValueError('the passed long value is too big to be transfered using 8 bytes')
                 elif type(val) == float:
                     format += 'd'
-                    data += struct.pack('>d', val)
+                    data += struct.pack('<d', val)
                 elif type(val) == str:
                     format += 's'
-                    data += struct.pack('>H', len(val))
-                    data += struct.pack('>%ds' % len(val), val)
+                    data += struct.pack('<i', len(val))
+                    data += struct.pack('<%ds' % len(val), val)
                 elif type(val) == bytearray:
                     format += 'X'
-                    data += struct.pack('>H', len(val)) + val
+                    data += struct.pack('<i', len(val)) + val
                 else:
                     raise ValueError('value at index %d in passed list is of unsupported %s' % (index, str(type(val))))
                     
-        return struct.pack('>H', len(format)) + struct.pack('>%ds' % len(format), format) + data
+        return struct.pack('<i', len(format)) + struct.pack('<%ds' % len(format), format) + data
     
