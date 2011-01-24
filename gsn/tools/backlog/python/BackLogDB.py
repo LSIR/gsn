@@ -230,7 +230,7 @@ class BackLogDBClass(Thread, StatisticsClass):
         maxrm = self._convert(self.getMaxCounterInc(self._removeTimeId, [intervalSec])[0])
         avgrm = self._convert(self.getAvgCounterInc(self._removeTimeId, [intervalSec])[0])
         
-        return [dbentries, dbsize, stpersec, rmpersec, cntst, cntrm, minst, maxst, avgst, minrm, maxrm, avgrm]
+        return [dbentries, dbsize, stpersec, rmpersec, cntst, cntrm, minst, avgst, maxst, minrm, avgrm, maxrm]
     
     
     def _convert(self, value):

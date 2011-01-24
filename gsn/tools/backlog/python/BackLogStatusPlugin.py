@@ -68,11 +68,11 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         storecounter = backlogstatus[4]
         removecounter = backlogstatus[5]
         minstoretime = backlogstatus[6]
-        maxstoretime = backlogstatus[7]
-        meanstoretime = backlogstatus[8]
+        meanstoretime = backlogstatus[7]
+        maxstoretime = backlogstatus[8]
         minremovetime = backlogstatus[9]
-        maxremovetime = backlogstatus[10]
-        meanremovetime = backlogstatus[11]
+        meanremovetime = backlogstatus[10]
+        maxremovetime = backlogstatus[11]
 
         # TODO: parameter?
         gsnpeerstatus = self.getGSNPeerStatus(30)
@@ -90,7 +90,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         
         payload = [self.getUptime(), self.getErrorCounter(), self.getExceptionCounter()]
         payload += [msgInPerSec, msgOutPerSec, msgInCounter, msgOutCounter, msgAckInCounter, pingOutCounter, pingAckInCounter, pingInCounter, pingAckOutCounter, connectionLosses]
-        payload += [backlogdbentries, backlogdbsize, storepersec, removepersec, storecounter, removecounter, minstoretime, meanstoretime, maxstoretime, minremovetime, meanremovetime, meanremovetime]
+        payload += [backlogdbentries, backlogdbsize, storepersec, removepersec, storecounter, removecounter, minstoretime, meanstoretime, maxstoretime, minremovetime, meanremovetime, maxremovetime]
         
         self.processMsg(self.getTimeStamp(), payload)
     
