@@ -128,6 +128,7 @@ public class BackLogMessage {
 	public static int MAX_PAYLOAD_SIZE = (int) (Math.pow(2, 16));
 	
 	private Serializable[] payload = {};
+	private byte [] payloadBin = null;
 	private long timestamp = 0;
 	private byte type = 0;
 	
@@ -174,6 +175,7 @@ public class BackLogMessage {
 		this.type = type;
 		this.timestamp = timestamp;
 		this.payload = payload;
+		this.payloadBin = null;
 	}
 	
 	
@@ -184,10 +186,8 @@ public class BackLogMessage {
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
 	public BackLogMessage(byte[] message) throws IOException {
-		ByteBuffer bbuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
-		bbuffer.put(message);
-		
-		bbuffer.position(0);
+		payloadBin = message;
+		ByteBuffer bbuffer = ByteBuffer.wrap(message);
 		bbuffer.order(ByteOrder.LITTLE_ENDIAN);
 		byte [] arraybuffer = bbuffer.array();
 		
@@ -258,95 +258,93 @@ public class BackLogMessage {
 	 * @return the message as byte array
 	 */
 	public byte[] getBinaryMessage() {
-		ByteBuffer bbuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
-		bbuffer.position(0);
-		bbuffer.order(ByteOrder.LITTLE_ENDIAN);
-		ByteBuffer outbuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
-		outbuffer.position(0);
-		outbuffer.order(ByteOrder.LITTLE_ENDIAN);
-
-		String format = "";
-
-		for (int i=0; i<payload.length; i++) {
-			if (payload[i] == null) {
-				format += "0";
-			}
-			else {
-				if (payload[i] instanceof Byte) {
-					bbuffer.put((Byte)payload[i]);
-					format += "b";
+		if (payloadBin == null) {
+			ByteBuffer bbuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
+			bbuffer.order(ByteOrder.LITTLE_ENDIAN);
+			ByteBuffer outbuffer = ByteBuffer.allocate(MAX_PAYLOAD_SIZE);
+			outbuffer.order(ByteOrder.LITTLE_ENDIAN);
+	
+			String format = "";
+	
+			for (int i=0; i<payload.length; i++) {
+				if (payload[i] == null) {
+					format += "0";
 				}
-				else if (payload[i] instanceof Boolean) {
-					if ((Boolean)payload[i])
-						bbuffer.put((byte) 1);
-					else
-						bbuffer.put((byte) 0);
-					format += "?";
-				}
-				else if (payload[i] instanceof Short) {
-					bbuffer.putShort((Short)payload[i]);
-					format += "h";
-				}
-				else if (payload[i] instanceof Integer) {
-					bbuffer.putInt((Integer)payload[i]);
-					format += "i";
-				}
-				else if (payload[i] instanceof Long) {
-					bbuffer.putLong((Long)payload[i]);
-					format += "q";
-				}
-				else if (payload[i] instanceof Double) {
-					bbuffer.putDouble((Double)payload[i]);
-					format += "d";
-				}
-				else if (payload[i] instanceof String) {
-					bbuffer.putInt(((String)payload[i]).length());
-					try {
-						bbuffer.put(((String)payload[i]).getBytes("UTF-8"));
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+				else {
+					if (payload[i] instanceof Byte) {
+						bbuffer.put((Byte)payload[i]);
+						format += "b";
 					}
-					format += "s";
+					else if (payload[i] instanceof Boolean) {
+						if ((Boolean)payload[i])
+							bbuffer.put((byte) 1);
+						else
+							bbuffer.put((byte) 0);
+						format += "?";
+					}
+					else if (payload[i] instanceof Short) {
+						bbuffer.putShort((Short)payload[i]);
+						format += "h";
+					}
+					else if (payload[i] instanceof Integer) {
+						bbuffer.putInt((Integer)payload[i]);
+						format += "i";
+					}
+					else if (payload[i] instanceof Long) {
+						bbuffer.putLong((Long)payload[i]);
+						format += "q";
+					}
+					else if (payload[i] instanceof Double) {
+						bbuffer.putDouble((Double)payload[i]);
+						format += "d";
+					}
+					else if (payload[i] instanceof String) {
+						bbuffer.putInt(((String)payload[i]).length());
+						try {
+							bbuffer.put(((String)payload[i]).getBytes("UTF-8"));
+						} catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+						format += "s";
+					}
+					else if (payload[i] instanceof byte[]) {
+						bbuffer.putInt(((byte[])payload[i]).length);
+						bbuffer.put((byte[])payload[i]);
+						format += "X";
+					}
+					else if (payload[i] instanceof Byte[]) {
+						bbuffer.putInt(((Byte[])payload[i]).length);
+						byte [] tmp = new byte [((Byte[])payload[i]).length];
+						for (int j=0; j<((Byte[])payload[i]).length; j++)
+							tmp[j] = ((Byte[])payload[i])[j];
+						bbuffer.put(tmp);
+						format += "X";
+					}
+					else
+						System.err.print("unsupported type");
 				}
-				else if (payload[i] instanceof byte[]) {
-					bbuffer.putInt(((byte[])payload[i]).length);
-					bbuffer.put((byte[])payload[i]);
-					format += "X";
+			}
+	
+			outbuffer.put(type);
+			outbuffer.putLong(timestamp);
+			if (format != "") {
+				outbuffer.putInt(format.length());
+				try {
+					outbuffer.put(format.getBytes("UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
 				}
-				else if (payload[i] instanceof Byte[]) {
-					bbuffer.putInt(((Byte[])payload[i]).length);
-					byte [] tmp = new byte [((Byte[])payload[i]).length];
-					for (int j=0; j<((Byte[])payload[i]).length; j++)
-						tmp[j] = ((Byte[])payload[i])[j];
-					bbuffer.put(tmp);
-					format += "X";
-				}
-				else
-					System.err.print("unsupported type");
+			}
+			payloadBin = new byte [outbuffer.position()+bbuffer.position()];
+			outbuffer.flip();
+			outbuffer.get(payloadBin, 0, outbuffer.limit());
+			if (format != "") {
+				bbuffer.flip();
+				bbuffer.get(payloadBin, outbuffer.limit(), bbuffer.limit());
 			}
 		}
 
-		outbuffer.put(type);
-		outbuffer.putLong(timestamp);
-		if (format != "") {
-			outbuffer.putInt(format.length());
-			try {
-				outbuffer.put(format.getBytes("UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-		}
-		byte [] out = new byte [outbuffer.position()+bbuffer.position()];
-		int outbufferpos = outbuffer.position();
-		outbuffer.position(0);
-		outbuffer.get(out, 0, outbufferpos);
-		if (format != "") {
-			int bbufferpos = bbuffer.position();
-			bbuffer.position(0);
-			bbuffer.get(out, outbufferpos, bbufferpos);
-		}
-		
-		return out;
+		return payloadBin;
 	}
 	
 	
