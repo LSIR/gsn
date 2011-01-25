@@ -29,11 +29,12 @@ public class GMLHandler implements RequestHandler {
 	public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
 		response.setStatus( HttpServletResponse.SC_OK );
 		String reqName = request.getParameter("name");
-		response.getWriter( ).write( buildOutput(reqName) );
+		String reqGroup = request.getParameter("group");
+		response.getWriter( ).write( buildOutput(reqName,reqGroup) );
 	}
 
 	//return only the requested sensor(s) if specified (otherwise use null)
-	public String buildOutput (String reqName) {
+	public String buildOutput (String reqName,String reqGroup) {
 		SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 		StringBuilder outsb = new StringBuilder( "<gsn:FeatureCollection xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"./gsn.xsd\" xmlns:gsn=\"http://gsn.ch/\" xmlns:gml=\"http://www.opengis.net/gml\"> \n" );
 		Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
@@ -48,6 +49,7 @@ public class GMLHandler implements RequestHandler {
 			String lon = null;
 			VSensorConfig sensorConfig = vsIterator.next( );
 			if ( reqName != null && !sensorsSet.contains(sensorConfig.getName()) ) continue;
+			if ( reqGroup != null && !(sensorConfig.getName().startsWith(reqGroup + "_"))) continue;
 			for ( KeyValue df : sensorConfig.getAddressing( )){
 				if (StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()).contentEquals("latitude"))
 					lat = new String ( StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ));
