@@ -39,9 +39,10 @@ public class GPSPlugin extends AbstractPlugin {
 			new DataField("DEVICE_ID", "INTEGER"),
 			new DataField("GPS_TIME", "INTEGER"),
 			new DataField("GPS_WEEK", "SMALLINT"),
+			new DataField("SVS", "SMALLINT"),
 			new DataField("CARRIER_PHASE", "DOUBLE"),
 			new DataField("PSEUDO_RANGE", "DOUBLE"),
-			new DataField("DOPPLER", "DOUBLE"),
+			new DataField("DOPPLER", "INTEGER"),
 			new DataField("SPACE_VEHICLE", "SMALLINT"),
 			new DataField("MEASUREMENT_QUALITY", "SMALLINT"),
 			new DataField("SIGNAL_STRENGTH", "SMALLINT"),
@@ -62,6 +63,7 @@ public class GPSPlugin extends AbstractPlugin {
 	
 	@Override
 	public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
+		super.activeBackLogWrapper = backlogwrapper;
 		try {
 			gpsDataType = getActiveAddressBean().getPredicateValueWithException(GPS_DATA_TYPE).toLowerCase();
 		} catch (Exception e) {
@@ -73,6 +75,10 @@ public class GPSPlugin extends AbstractPlugin {
 			return false;
 		}
 		logger.info("using GPS data type: " + gpsDataType);
+        
+        registerListener();
+
+        setName("GPSPlugin-" + coreStationName + "-Thread");
 		
 		return true;
 	}
@@ -103,21 +109,23 @@ public class GPSPlugin extends AbstractPlugin {
 			short msgType = toShort(data[0]);
 			
 			if (msgType == gpsNamingTable.get(gpsDataType).typeNumber) {
+				logger.debug("msgType: " + msgType);
 				if (gpsDataType.equals(NAV_NAMING)) {
 					
 				}
 				else if (gpsDataType.equals(RAW_NAMING)) {
 					int gpsTime = toInteger(data[1]);
 					short gpsWeek = toShort(data[2]);
-					double carrierPhase = (Double) data[3];
-					double pseudorange = (Double) data[4];
-					double doppler = (Double) data[5];
-					short spaceVehicle = toShort(data[6]);
-					short measurementQuality = toShort(data[7]);
-					short signalStrength = toShort(data[8]);
-					short lli = toShort(data[9]);
+					short svs = toShort(data[3]);
+					double carrierPhase = (Double) data[4];
+					double pseudorange = (Double) data[5];
+					int doppler = toInteger(data[6]);
+					short spaceVehicle = toShort(data[7]);
+					short measurementQuality = toShort(data[8]);
+					short signalStrength = toShort(data[9]);
+					short lli = toShort(data[10]);
 					
-					data = new Serializable[]{timestamp, timestamp, deviceId, gpsTime, gpsWeek, carrierPhase, pseudorange, doppler, spaceVehicle, measurementQuality, signalStrength, lli};
+					out = new Serializable[]{timestamp, timestamp, deviceId, gpsTime, gpsWeek, svs, carrierPhase, pseudorange, doppler, spaceVehicle, measurementQuality, signalStrength, lli};
 				}
 				else {
 					logger.warn("Wrong GPS data type spedified.");

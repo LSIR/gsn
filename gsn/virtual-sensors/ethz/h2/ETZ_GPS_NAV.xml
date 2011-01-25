@@ -19,6 +19,7 @@
             <field name="HEIGHT_DIF" type="SMALLINT" />
             <field name="AGE_DGPS" type="SMALLINT" />
             <field name="CHECKSUM" type="SMALLINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show Navigation GPS information from ETZ deployment</description>

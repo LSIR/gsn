@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS__mapped" priority="10" >
+<virtual-sensor name="ETZ_GPS_NAV__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -10,19 +10,23 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            <field name="GPS_TIME" type="INTEGER"/>
-            <field name="GPS_WEEK" type="SMALLINT" />
-            <field name="CARRIER_PHASE" type="DOUBLE" />
-            <field name="PSEUDO_RANGE" type="DOUBLE" />
-            <field name="DOPPLER" type="DOUBLE" />
-            <field name="SPACE_VEHICLE" type="SMALLINT" />
-            <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
-            <field name="SIGNAL_STRENGTH" type="SMALLINT" />
-            <field name="LLI" type="SMALLINT" />
+            <field name="UTC_POS_TIME" type="INTEGER"/>
+            <field name="LATITUDE" type="SMALLINT" />
+            <field name="LAT_HEMISPHERE" type="DOUBLE" />
+            <field name="LONGITUDE" type="DOUBLE" />
+            <field name="LONG_HEMISPHERE" type="DOUBLE" />
+            <field name="QUALITY" type="SMALLINT" />
+            <field name="NR_SATELLITES" type="SMALLINT" />
+            <field name="HDOP" type="SMALLINT" />
+            <field name="GEOID_HEIGHT" type="SMALLINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+            <field name="HEIGHT_DIF" type="SMALLINT" />
+            <field name="AGE_DGPS" type="SMALLINT" />
+            <field name="CHECKSUM" type="SMALLINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>GPS information from ETZ deployment</description>
+    <description>NAV GPS information from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -30,7 +34,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
-                    <predicate key="query">select * from ETZ_GPS</predicate>
+                    <predicate key="query">select * from ETZ_GPS_NAV</predicate>
                     <predicate key="remote-contact-point">http://tik31x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>

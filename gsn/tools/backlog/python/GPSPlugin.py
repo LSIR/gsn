@@ -27,6 +27,9 @@ defines
 
 DEFAULT_BACKLOG = True
 
+NAV_TYPE = 1
+RAW_TYPE = 2
+
 #Reads raw GPS messages from a u-blox device and sends them to GSN
 
 class GPSPluginClass(AbstractPluginClass):
@@ -54,7 +57,7 @@ class GPSPluginClass(AbstractPluginClass):
     	self._zombiesKilled = 0
     	
     	self._deviceStr = self.getOptionValue('gps_device')
-    	self._mode = self.getOptionValue('gps_mode') 
+    	self._mode = self.getOptionValue('gps_mode')
     	self.gps = GPSDriver.GPSDriver([self._deviceStr, self._interval,self._mode])
     
         #For quality measurement
@@ -90,6 +93,7 @@ class GPSPluginClass(AbstractPluginClass):
     		    dataPackage = self._parseNavMsg(rawMsg)
     	    elif (self._mode == "raw"):
     		    dataPackage = self._parseRawMsg(rawMsg)
+            self.processMsg(self.getTimeStamp(), dataPackage)
     	    self._runEv.wait(self._interval-1)
 
         # die...
@@ -111,28 +115,28 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     def _parseRawMsg(self, rawMsg):
     	if rawMsg!=0:   
-    		dataPackage = False
-    		payload = rawMsg[2]
-    		# the first 8 bytes are: GPS Time (4B), GPS week (2B), Number of satellites following (1B), Reserved (1B)
-    		payloadHeader = struct.unpack('ih2B', payload[0:8])
-    		self.info('GPS Time: '+str(payloadHeader[0])+":"+str(payloadHeader[1]))
-    		self.info('Number of satellites following: ' +str(payloadHeader[2]))
-    		# extract data for each SV 
-    		for i in range(0, payloadHeader[2]):
-    			#Byte offset for SV data
-    			startIndex = 8+i*24
-    			#Payload format: Carrier Phase (8B - double), Pseudorange (8B - double), 
-    			#                Doppler (4B - int), SV nbr (1B - unsigned char), 
-    			#                Quality (1B - signed char), C/No (1B - signed char), 
-    			#                LLI (1B - unsigned char)
-    		
-    			# We have to parse the meas-quality and signal strength fields because java does not support the corresponding data types
-    			tmpData = struct.unpack('2b', payload[(startIndex+21):(startIndex+23)])                
-    			dataPackage = payload[0:6] + payload[startIndex:(startIndex+21)] + struct.pack('2H', tmpData[0], tmpData[1]) + payload[(startIndex+23)]
-    			
-    			#if tmpData[0]>=int(self.getOptionValue('quality_threshold')) and tmpData[1]>=int(self.getOptionValue('signal_threshold')):
-    			#      self._goodSatelliteCounter=self._goodSatelliteCounter+1
-    			self._SatelliteCounter=self._SatelliteCounter+1
+            dataPackage = False
+            payload = rawMsg[2]
+            # the first 8 bytes are: GPS Time (4B), GPS week (2B), Number of satellites following (1B), Reserved (1B)
+            gps_time, gps_week, svs = struct.unpack('<ihB', payload[0:7])
+            self.info('GPS Time: '+str(gps_time)+":"+str(gps_week))
+            self.info('Number of satellites following: ' +str(svs))
+            # extract data for each SV 
+            for i in range(0, svs):
+                #Byte offset for SV data
+                startIndex = 8+i*24
+                #Payload format: Carrier Phase (8B - double), Pseudorange (8B - double), 
+                #                Doppler (4B - int), SV nbr (1B - unsigned char), 
+                #                Quality (1B - signed char), C/No (1B - signed char), 
+                #                LLI (1B - unsigned char)
+                
+                carrier_phase, pseudorange, doppler, sv, quality, cno, lli = struct.unpack_from('<2diB2bB', payload, startIndex)
+                
+                dataPackage = [RAW_TYPE, gps_time, gps_week, svs, carrier_phase, pseudorange, doppler, sv, quality, cno, lli]
+                
+                #if tmpData[0]>=int(self.getOptionValue('quality_threshold')) and tmpData[1]>=int(self.getOptionValue('signal_threshold')):
+                #      self._goodSatelliteCounter=self._goodSatelliteCounter+1
+                self._SatelliteCounter=self._SatelliteCounter+1
     			
     		if (dataPackage == False):
     			self.debug("parseMsg: WARNING! Function returned nothing!")
@@ -165,6 +169,7 @@ class GPSPluginClass(AbstractPluginClass):
     		self.info('Acc.: ' + str(p[11]) + "cm/s")
     		self.info('Num SVs: ' + str(sats[0]))
     		'''
+            dataPackage = [NAV_TYPE, ]
     	else:
     		self.info("WARNING: MSG packet was empty!")
         
