@@ -63,6 +63,9 @@ public class GMLHandler implements RequestHandler {
 			}
 			else continue;
 
+            if (lat.isEmpty() || lon.isEmpty()) // skip sensors with empty coordinates
+                continue;
+
 			ArrayList<StreamElement> ses = getMostRecentValueFor(sensorConfig.getName());
 			int counter = 1;
 			if (ses!=null ) {
