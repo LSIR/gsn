@@ -185,7 +185,7 @@ public class BackLogMessage {
 	 * @param binary message as byte array.
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
-	public BackLogMessage(byte[] message) throws IOException {
+	public BackLogMessage(byte[] message) throws Exception {
 		payloadBin = message;
 		ByteBuffer bbuffer = ByteBuffer.wrap(message);
 		bbuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -414,30 +414,30 @@ public class BackLogMessage {
 	
 	
 	private void checkPayload(Serializable[] payload) throws IOException {
-		int length = 0;
+		int length = 2;
 		for (int i=0; i<payload.length; i++) {
 			if (payload[i] == null)
-				continue;
+				length += 1;
 			else if (payload[i] instanceof Byte)
-				length += 1;
-			else if (payload[i] instanceof Boolean)
-				length += 1;
-			else if (payload[i] instanceof Short)
 				length += 2;
+			else if (payload[i] instanceof Boolean)
+				length += 2;
+			else if (payload[i] instanceof Short)
+				length += 3;
 			else if (payload[i] instanceof Integer)
-				length += 4;
+				length += 5;
 			else if (payload[i] instanceof Long)
-				length += 8;
+				length += 9;
 			else if (payload[i] instanceof Double)
-				length += 8;
+				length += 9;
 			else if (payload[i] instanceof String)
-				length += ((String)payload[i]).length()*2+2;
+				length += ((String)payload[i]).length()+3;
 			else if (payload[i] instanceof byte[])
-				length += ((byte[])payload[i]).length;
+				length += ((byte[])payload[i]).length+3;
 			else if (payload[i] instanceof Byte[])
-				length += ((Byte[])payload[i]).length;
+				length += ((Byte[])payload[i]).length+3;
 			else
-				throw new IOException("unsupported type in payload.");
+				throw new IOException("unsupported type in payload (index=" + i + ", type=" + payload[i].getClass().getName() + ").");
 		}
 
 		if( length > MAX_PAYLOAD_SIZE )

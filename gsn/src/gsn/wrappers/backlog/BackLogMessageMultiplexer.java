@@ -213,7 +213,12 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 							pkt.write(java.util.Arrays.copyOfRange(tmp, (int) (packetLength+4), tmp.length));
 						
 			    		BackLogMessage msg = null;
-						msg = new BackLogMessage(java.util.Arrays.copyOfRange(tmp, 4, (int) (packetLength+4)));
+						try {
+							msg = new BackLogMessage(java.util.Arrays.copyOfRange(tmp, 4, (int) (packetLength+4)));
+						} catch (Exception e) {
+							logger.error(e.getMessage(), e);
+							continue;
+						}
 						if (logger.isDebugEnabled())
 							logger.debug("rcv (" + msg.getType() + "," + msg.getTimestamp() + "," + msg.getBinaryMessage().length + ")");
 			    		if( msg.getType() == BackLogMessage.PING_MESSAGE_TYPE ) {
