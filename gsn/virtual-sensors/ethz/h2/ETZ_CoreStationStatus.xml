@@ -6,16 +6,16 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            <!--<field name="V_PV" type="INTEGER" unit="mV"/>-->
-            <field name="I_PV" type="INTEGER" unit="µA"/>
-            <field name="V_12BAT" type="INTEGER" unit="mV"/>
+            <field name="V_EXT2" type="INTEGER" unit="mV"/>
+            <field name="V_EXT1" type="INTEGER" unit="mV"/>
+            <field name="V_EXT3" type="INTEGER" unit="mV"/>
             <field name="I_V12DC_EXT" type="INTEGER" unit="µA"/>
             <field name="V12DC_IN" type="INTEGER" unit="mV"/>
             <field name="I_V12DC_IN" type="INTEGER" unit="µA"/>
             <field name="VCC_5_0" type="INTEGER" unit="mV"/>
             <field name="VCC_NODE" type="INTEGER" unit="mV"/>
             <field name="I_VCC_NODE" type="INTEGER" unit="µA"/>
-            <field name="VCC_4_2" type="INTEGER" unit="mV"/>
+            <field name="VCC_4_2" type="INTEGER" unit="mV"/>            
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
