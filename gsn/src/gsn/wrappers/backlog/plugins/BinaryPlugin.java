@@ -3,7 +3,6 @@ package gsn.wrappers.backlog.plugins;
 import org.apache.log4j.Logger;
 import org.h2.tools.Server;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -804,11 +803,8 @@ class BinarySender extends Thread
 		else {
 			if (parent.logger.isDebugEnabled())
 				parent.logger.debug("acknowledge for chunk number >" + ackNr + "< sent");
-    		ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
-    		baos.write(BinaryPlugin.ACK_PACKET);
-    		baos.write(BinaryPlugin.CHUNK_PACKET);
 			try {
-				Serializable [] ack = {ackNr};
+				Serializable [] ack = {BinaryPlugin.ACK_PACKET, BinaryPlugin.CHUNK_PACKET, ackNr};
 				parent.sendRemote(System.currentTimeMillis(), ack, parent.priority);
 			} catch (Exception e) {
 				parent.logger.error(e.getMessage(), e);
