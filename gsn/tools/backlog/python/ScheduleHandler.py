@@ -505,8 +505,9 @@ class ScheduleHandlerClass(Thread):
                   
             if response['command'] == self._tosSentCmd:
                 self._logger.debug('TOS packet acknowledge received')
+                self._tosSentCmd = None
                 self._tosMessageAckEvent.set()
-            else:
+            elif self._tosSentCmd != None:
                 self.error('received TOS message type (' + str(response['command']) + ') does not match the sent command type (' + str(self._tosSentCmd) + ')')
                 return False
                 
