@@ -8,7 +8,7 @@ __id__          = "$Id$"
 __source__      = "$URL$"
 
 import struct
-from threading import Timer
+from threading import Timer, Event
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
@@ -30,6 +30,17 @@ class BackLogStatusPluginClass(AbstractPluginClass):
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
         self._timer = None
+        
+        self._sleeper = Event()
+        self._stopped = False
+        
+        value = self.getOptionValue('poll_interval')
+        if value is None:
+            self._interval = None
+        else:
+            self._interval = float(value)
+        
+        self.info('interval: ' + str(self._interval))
     
     
     def getMsgType(self):
@@ -44,6 +55,17 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         if data[0] == 1:
             self.info('received command resend')
             self._backlogMain.resend()
+       
+        
+    def run(self):
+        self.info('started')
+        if self._interval != None:
+            while not self._stopped:
+                self._sleeper.wait(self._interval)
+                if self._sleeper.isSet():
+                    continue
+                self.action('')
+            self.info('died')
 
 
     def action(self, parameters):
@@ -96,6 +118,8 @@ class BackLogStatusPluginClass(AbstractPluginClass):
     
     
     def stop(self):
+        self._stopped = True
+        self._sleeper.set()
         if self._timer:
             self._timer.cancel()
         self.info('stopped')

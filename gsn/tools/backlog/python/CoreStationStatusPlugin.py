@@ -9,7 +9,7 @@ __source__      = "$URL$"
 
 import struct
 import os
-from threading import Timer
+from threading import Timer, Event
 
 from ScheduleHandler import SUBPROCESS_BUG_BYPASS
 if SUBPROCESS_BUG_BYPASS:
@@ -71,6 +71,17 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
         self._timer = None
         
+        self._sleeper = Event()
+        self._stopped = False
+        
+        value = self.getOptionValue('poll_interval')
+        if value is None:
+            self._interval = None
+        else:
+            self._interval = float(value)
+        
+        self.info('interval: ' + str(self._interval))
+        
     
     def getMsgType(self):
         return BackLogMessage.CORESTATION_STATUS_MESSAGE_TYPE
@@ -78,6 +89,17 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
     def isBusy(self):
         return False
+       
+        
+    def run(self):
+        self.info('started')
+        if self._interval != None:
+            while not self._stopped:
+                self._sleeper.wait(self._interval)
+                if self._sleeper.isSet():
+                    continue
+                self.action('')
+            self.info('died')
             
 
     def action(self, parameters):
@@ -220,6 +242,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
     
     
     def stop(self):
+        self._stopped = True
+        self._sleeper.set()
         if self._timer:
             self._timer.cancel()
         self.info('stopped')
