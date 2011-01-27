@@ -12,7 +12,7 @@ import os
 import logging
 import zlib
 from collections import deque
-from threading import Event
+from threading import Timer, Event
 from pyinotify import WatchManager, ThreadedNotifier, EventsCodes, ProcessEvent
 
 import BackLogMessage
@@ -93,6 +93,15 @@ class BinaryPluginClass(AbstractPluginClass):
         self._rootdir = self.getOptionValue('rootdir')
         
         watches = self.getOptionValues('watch')
+        
+        wait_min_for_file = self.getOptionValue('wait_min_for_file')
+        if wait_min_for_file:
+            self._waitforfile = True
+            self._waitforfiletimer = Timer(float(wait_min_for_file) * 60, self.checkForFileTimerAction)
+            self._waitforfiletimer.start()
+            self.info('waiting at least ' + wait_min_for_file + ' minutes for a file to arrive')
+        else:
+            self._waitforfile = False
 
         if self._rootdir is None:
             raise TypeError('no rootdir specified')
@@ -478,7 +487,8 @@ class BinaryPluginClass(AbstractPluginClass):
                 # fifo is empty
                 self.debug('file FIFO is empty waiting for next file to arrive')
                 self._work.clear()
-                self._isBusy = False
+                if not self._waitforfile:
+                    self._isBusy = False
             except Exception, e:
                 self.exception(e)
                 self._waitforack = False
@@ -487,23 +497,34 @@ class BinaryPluginClass(AbstractPluginClass):
 
         self.info('died')
         
+        
+    def checkForFileTimerAction(self):
+        self._waitforfile = False
+        if not self._filedeque and (not self._filedescriptor or self._filedescriptor.closed):
+            self._isBusy = False
+            self.info('checkForFileTimerAction: there is no file to be transmitted')
+        else:
+            self.info('checkForFileTimerAction: there are still files to be transmitted')
+        
          
     def isBusy(self):
         return self._isBusy
     
     
-    def stopIfNotDutyCycle(self):
+    def stopIfNotInDutyCycle(self):
         return False
         
         
     def beaconCleared(self):
-        if not self._filedeque:
+        if not self._filedeque and (not self._filedescriptor or self._filedescriptor.closed) and not self._waitforfile:
             self._isBusy = False
     
     
     def stop(self):
         self._isBusy = False
         self._plugStop = True
+        if self._waitforfile:
+            self._waitforfiletimer.cancel()
         self._notifier.stop()
         self._work.set()
         self._filedeque.clear()

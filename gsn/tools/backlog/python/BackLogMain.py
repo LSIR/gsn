@@ -377,7 +377,7 @@ class BackLogMainClass(Thread, StatisticsClass):
     def pluginStop(self, pluginclassname, stopAnyway=False):
         for plugin_name, plugin in self.plugins.items():
             if pluginclassname == plugin_name:
-                if ((self.schedulehandler._beacon or self.schedulehandler._duty_cycle_mode) and not plugin.stopIfNotDutyCycle() and not stopAnyway):
+                if ((self.schedulehandler._beacon or not self.schedulehandler._duty_cycle_mode) and not plugin.stopIfNotInDutyCycle() and not stopAnyway):
                     self._logger.info(pluginclassname + ' should not be stopped if not in duty-cycle mode (or beacon) => keep running')
                     return False
                 else:

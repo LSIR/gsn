@@ -11,7 +11,9 @@ import logging
 import time
 from threading import Thread
 
-class AbstractPluginClass(Thread):
+from Statistics import StatisticsClass
+
+class AbstractPluginClass(Thread, StatisticsClass):
     '''
     A plugin has to extend this class. It offers the API for
     plugins to communicate with the backlog core functionality and
@@ -40,6 +42,7 @@ class AbstractPluginClass(Thread):
     def __init__(self, parent, config, backlog_default=True, priority_default=99):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
+        StatisticsClass.__init__(self)
         self._backlogMain = parent
         self._config = config
         backlog = self.getOptionValue('backlog')
@@ -416,7 +419,7 @@ class AbstractPluginClass(Thread):
         '''
         pass
     
-    def stopIfNotDutyCycle(self):
+    def stopIfNotInDutyCycle(self):
         '''
         This function can be overwritten by a plugin if it wants a
         special treatment for its stopping behavior if we are not
