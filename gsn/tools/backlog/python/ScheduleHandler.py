@@ -9,7 +9,7 @@ __source__      = "$URL$"
 
 # as soon as the subprocess.Popen() bug has been fixed the functionality related
 # to this variable should be removed
-SUBPROCESS_BUG_BYPASS = True
+SUBPROCESS_BUG_BYPASS = False
 
 
 import time
@@ -50,6 +50,7 @@ GSN_TYPE_GET_SCHEDULE = 3
 
 # The AM Msg Type
 TOS_AM_CONTROLCOMMAND = 0x21
+TOS_AM_BEACONCOMMAND = 0x22
 
 # The Commands to send
 CMD_WAKEUP_QUERY = 1
@@ -117,6 +118,7 @@ class ScheduleHandlerClass(Thread):
     _max_job_runtime_min
     _pingThread
     _config
+    _beacon
     _logger
     _scheduleHandlerStop
     _tosMessageLock
@@ -231,7 +233,7 @@ class ScheduleHandlerClass(Thread):
             min += int(self.getOptionValue('max_next_schedule_wait_minutes'))
             min += int(self.getOptionValue('hard_shutdown_offset_minutes'))
             sec = int(self.getOptionValue('approximate_startup_seconds'))
-            maxruntime = self._backlogMain.jobsobserver.getOverallPluginMaxRuntime()
+            maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
             if maxruntime and maxruntime != -1:
                 sec += maxruntime
             td = timedelta(minutes=min, seconds=sec)
@@ -366,7 +368,6 @@ class ScheduleHandlerClass(Thread):
                     else:
                         self._logger.debug('executing >' + pluginclassname + '.action("' + commandstring + '")< now')
                     try:
-                        self._allJobsFinishedEvent.clear()
                         plugin = self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax)
                     except Exception, e:
                         self.error('error in scheduled plugin >' + pluginclassname + ' ' + commandstring + '<:' + str(e))
@@ -383,7 +384,6 @@ class ScheduleHandlerClass(Thread):
                     except Exception, e:
                         self.error('error in scheduled script >' + commandstring + '<:' + str(e))
                     else:
-                        self._allJobsFinishedEvent.clear()
                         self._backlogMain.jobsobserver.observeJob(job, commandstring, False, runtimemax)
                     
             if stop and self._duty_cycle_mode and not self._scheduleHandlerStop and not self._beacon:
@@ -410,8 +410,12 @@ class ScheduleHandlerClass(Thread):
         
         
     def allJobsFinished(self):
-        self._logger.debug('all jobs finished')
+        self._logger.info('all jobs finished')
         self._allJobsFinishedEvent.set()
+        
+        
+    def newJobStarted(self):
+        self._allJobsFinishedEvent.clear()
     
     
     def getMsgType(self):
@@ -466,7 +470,7 @@ class ScheduleHandlerClass(Thread):
             
             
     def tosMsgReceived(self, timestamp, payload):
-        if payload['type'] == TOS_AM_CONTROLCOMMAND:
+        if payload['type'] == TOS_AM_CONTROLCOMMAND or payload['type'] == TOS_AM_BEACONCOMMAND:
             response = tos.Packet(TOS_CONTROLCOMMAND_STRUCTURE, payload['data'])
             self._logger.debug('rcv (cmd=' + str(response['command']) + ', argument=' + str(response['argument']) + ')')
             if response['command'] == CMD_WAKEUP_QUERY:
@@ -480,11 +484,13 @@ class ScheduleHandlerClass(Thread):
                         s += 'SERVICE '
                     if (node_state & WAKEUP_TYPE_BEACON) == WAKEUP_TYPE_BEACON:
                         self._beacon = True
+                        self._backlogMain.beaconSet()
                         s += 'BEACON '
                     elif self._beacon:
                         self._beacon = False
                         self._scheduleEvent.set()
                         self._stopEvent.set()
+                        self._backlogMain.beaconCleared()
                     if (node_state & WAKEUP_TYPE_NODE_REBOOT) == WAKEUP_TYPE_NODE_REBOOT:
                         s += 'NODE_REBOOT'
                     self._logger.info(s)
@@ -502,14 +508,15 @@ class ScheduleHandlerClass(Thread):
             else:
                 self.error('unknown command type response received (' + str(response['command']) + ')')
             
-                  
-            if response['command'] == self._tosSentCmd:
-                self._logger.debug('TOS packet acknowledge received')
-                self._tosSentCmd = None
-                self._tosMessageAckEvent.set()
-            elif self._tosSentCmd != None:
-                self.error('received TOS message type (' + str(response['command']) + ') does not match the sent command type (' + str(self._tosSentCmd) + ')')
-                return False
+                 
+            if payload['type'] == TOS_AM_CONTROLCOMMAND:
+                if response['command'] == self._tosSentCmd:
+                    self._logger.debug('TOS packet acknowledge received')
+                    self._tosSentCmd = None
+                    self._tosMessageAckEvent.set()
+                elif self._tosSentCmd != None:
+                    self.error('received TOS message type (' + str(response['command']) + ') does not match the sent command type (' + str(self._tosSentCmd) + ')')
+                    return False
                 
         return True
         
@@ -585,6 +592,7 @@ class ScheduleHandlerClass(Thread):
             
 
     def _shutdown(self, sleepdelta=timedelta()):
+        self._logger.info('entering shutdown function')
         if self._duty_cycle_mode:
             now = datetime.utcnow()
             if now + sleepdelta > now:
@@ -598,7 +606,8 @@ class ScheduleHandlerClass(Thread):
                     return False
             
             # wait for jobs to finish
-            maxruntime = self._backlogMain.jobsobserver.getOverallPluginMaxRuntime()
+            maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
+            self._logger.info('max jobs runtime: ' + str(maxruntime))
             if not self._allJobsFinishedEvent.isSet() and maxruntime:
                 if maxruntime != -1:
                     self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(maxruntime) + ' seconds')

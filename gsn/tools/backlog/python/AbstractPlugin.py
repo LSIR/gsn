@@ -401,6 +401,32 @@ class AbstractPluginClass(Thread):
         @return: the device id
         '''
         return self._backlogMain.device_id
+        
+    def beaconSet(self):
+        '''
+        This function will be called if the tiny node received a
+        beacon set message. (duty-cycle mode)
+        '''
+        pass
+        
+    def beaconCleared(self):
+        '''
+        This function will be called if the tiny node received a
+        beacon clear message. (duty-cycle mode)
+        '''
+        pass
+    
+    def stopIfNotDutyCycle(self):
+        '''
+        This function can be overwritten by a plugin if it wants a
+        special treatment for its stopping behavior if we are not
+        in duty-cycle mode.
+        
+        @return: True if this plugin can be stopped by the scheduler if
+                  we are NOT in duty-cycle mode (or beacon mode), otherwise
+                  return False.
+        '''
+        return True
 
     
     def exception(self, exception):

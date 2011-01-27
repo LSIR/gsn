@@ -172,8 +172,10 @@ class BinaryPluginClass(AbstractPluginClass):
         for file in filetime:
             self._filedeque.appendleft(file[1])
             self.debug('putting existing file into FIFO: ' + file[1])
+        if filetime:
+            self.info('files to be transmitted: ' + str(len(filetime)))
             
-        if self._filedeque:
+        if self._filedeque or self.getMaxRuntime():
             self._isBusy = True
         else:
             self._isBusy = False
@@ -318,7 +320,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         # what chunk number are we at
                         chunkNumber = data[2]
                         # what crc do we have at GSN
-                        gsnCRC = data[3]
+                        gsnCRC = struct.unpack('i', struct.pack('I', data[3]))[0]
                         # what is the name of the file to resend
                         filenamenoprefix = data[4]
                         filename = os.path.join(self._rootdir, filenamenoprefix)
@@ -482,13 +484,21 @@ class BinaryPluginClass(AbstractPluginClass):
                 self._waitforack = False
                 os.chmod(filename, 0744)
                 self._filedescriptor.close()
-            
 
         self.info('died')
         
          
     def isBusy(self):
         return self._isBusy
+    
+    
+    def stopIfNotDutyCycle(self):
+        return False
+        
+        
+    def beaconCleared(self):
+        if not self._filedeque:
+            self._isBusy = False
     
     
     def stop(self):

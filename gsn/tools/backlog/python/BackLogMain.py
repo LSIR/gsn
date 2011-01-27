@@ -374,27 +374,22 @@ class BackLogMainClass(Thread, StatisticsClass):
             return plugin
         
         
-    def pluginStop(self, pluginclassname):
+    def pluginStop(self, pluginclassname, stopAnyway=False):
         for plugin_name, plugin in self.plugins.items():
             if pluginclassname == plugin_name:
-                plugin.stop()
-                del self.plugins[plugin_name]
-                return
-        
-        
-    def pluginsBusy(self):
-        for plugin_entry in self.plugins.items():
-            try:
-                if plugin_entry[1].isBusy():
+                if ((self.schedulehandler._beacon or self.schedulehandler._duty_cycle_mode) and not plugin.stopIfNotDutyCycle() and not stopAnyway):
+                    self._logger.info(pluginclassname + ' should not be stopped if not in duty-cycle mode (or beacon) => keep running')
+                    return False
+                else:
+                    plugin.stop()
+                    del self.plugins[plugin_name]
                     return True
-            except NotImplementedError, e:
-                self._logger.error(plugin_entry[0] + ': ' + str(e))
-                self.incrementErrorCounter()
-        return self.backlog.isBusy()
+        return False
         
     
     def resend(self):
         self.backlog.resend()
+        
         
     def gsnMsgReceived(self, msgType, message):
         msgTypeValid = False
@@ -421,6 +416,18 @@ class BackLogMainClass(Thread, StatisticsClass):
             
         # remove the message from the backlog database using its timestamp and message type
         self.backlog.removeMsg(timestamp, msgType)
+        
+    def beaconSet(self):
+        self._logger.info('beacon set')
+        # tell the plugins that beacon has been set
+        for plugin in self.plugins.values():
+            plugin.beaconSet()
+        
+    def beaconCleared(self):
+        self._logger.info('beacon cleared')
+        # tell the plugins that beacon has been cleared
+        for plugin in self.plugins.values():
+            plugin.beaconCleared()
         
     def connectionToGSNestablished(self):
         # tell the plugins that the connection to GSN has been established
