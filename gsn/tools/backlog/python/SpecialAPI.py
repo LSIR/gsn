@@ -12,7 +12,8 @@ from threading import Lock, Thread
 
 MIN_RING_BUFFER_CLEAR_INTERVAL_SEC = 5
 
-class StatisticsClass:
+
+class Statistics:
     '''
     This class can be used to generate statistics information. It offers counter
     and timing functionality.
@@ -325,4 +326,3 @@ class StatisticsClass:
     
     def restartAccumulation(self):
         self._calcStats = True
-        

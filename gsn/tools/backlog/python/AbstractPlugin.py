@@ -11,9 +11,9 @@ import logging
 import time
 from threading import Thread
 
-from Statistics import StatisticsClass
+from SpecialAPI import Statistics
 
-class AbstractPluginClass(Thread, StatisticsClass):
+class AbstractPluginClass(Thread, Statistics):
     '''
     A plugin has to extend this class. It offers the API for
     plugins to communicate with the backlog core functionality and
@@ -42,7 +42,7 @@ class AbstractPluginClass(Thread, StatisticsClass):
     def __init__(self, parent, config, backlog_default=True, priority_default=99):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
-        StatisticsClass.__init__(self)
+        Statistics.__init__(self)
         self._backlogMain = parent
         self._config = config
         backlog = self.getOptionValue('backlog')

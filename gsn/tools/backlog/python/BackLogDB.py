@@ -13,13 +13,13 @@ import os
 import logging
 from threading import Thread, Lock, Event
 
-from Statistics import StatisticsClass
+from SpecialAPI import Statistics
 
 
 SLEEP_BEFORE_RESEND_ON_RECONNECT = 30
 
 
-class BackLogDBClass(Thread, StatisticsClass):
+class BackLogDBClass(Thread, Statistics):
     '''
     Offers the backlog functionality.
     
@@ -62,7 +62,7 @@ class BackLogDBClass(Thread, StatisticsClass):
         @raise Exception: if there is a problem with the sqlite3 database.
         '''
         Thread.__init__(self)
-        StatisticsClass.__init__(self)
+        Statistics.__init__(self)
         
         self._storeCounterId = self.createCounter(60)
         self._storeTimeId = self.createCounter(60)

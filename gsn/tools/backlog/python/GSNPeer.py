@@ -15,7 +15,7 @@ import Queue
 from threading import Thread, Event, Lock
 
 import BackLogMessage
-from Statistics import StatisticsClass
+from SpecialAPI import Statistics
 
 # Ping request interval in seconds.
 PING_INTERVAL_SEC = 10.0
@@ -33,7 +33,7 @@ HELLO_BYTE = 0x7d
 SOL_IP = 0
 IP_MTU = 14
 
-class GSNPeerClass(Thread, StatisticsClass):
+class GSNPeerClass(Thread, Statistics):
     '''
     Offers the server functionality for GSN.
     '''
@@ -70,7 +70,7 @@ class GSNPeerClass(Thread, StatisticsClass):
         @raise Exception: if there is a problem opening the server socket
         '''
         Thread.__init__(self)
-        StatisticsClass.__init__(self)
+        Statistics.__init__(self)
         
         self._logger = logging.getLogger(self.__class__.__name__)
         

@@ -25,7 +25,7 @@ if PROFILE:
     import yappi
 from threading import Thread, Lock, Event
 
-from Statistics import StatisticsClass
+from SpecialAPI import Statistics
 from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
@@ -40,7 +40,7 @@ DEFAULT_OPTION_BACKLOG_RESEND_SLEEP = 0.1
 DEFAULT_TOS_VERSION = 2
 DEFAULT_BACKLOG_DB_RESEND = 12
 
-class BackLogMainClass(Thread, StatisticsClass):
+class BackLogMainClass(Thread, Statistics):
     '''
     The main thread class for the backlog functionality.
     
@@ -72,7 +72,7 @@ class BackLogMainClass(Thread, StatisticsClass):
         @param options: options from the OptionParser
         '''
         Thread.__init__(self)
-        StatisticsClass.__init__(self)
+        Statistics.__init__(self)
         
         self._uptimeId = self.timeMeasurementStart()
 
