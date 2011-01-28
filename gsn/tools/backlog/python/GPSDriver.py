@@ -95,12 +95,7 @@ class GPSDriver():
         self._initialized = False
     	#device is tested by config in that it tries to write to it.
     	self._logger.info("Config GPS device")
-    	ret = self._config_device()
-    	if (ret == True):
-            self._initialized = True
-            self._logger.info("Done GPS Driver init")
-    	else:
-            self._logger.warning("There was a problem initializing the GPS device")
+    	self._initialized = self._config_device()
 
 	
     '''
@@ -160,8 +155,15 @@ class GPSDriver():
                 self._logger.debug("pollGpsMessage: reading gps message didn't succeed")
                 return False
         return d
-
-
+    
+    '''
+    ##########################################################################################
+    _isInitialized(): 
+    ##########################################################################################
+    '''
+    def _isInitialized(self):
+        return self._initialized
+    
     '''
     #########################################################################
     #PRIVATE FUNCTIONS

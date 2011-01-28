@@ -21,6 +21,7 @@ import struct
 import time
 from threading import Event
 import GPSDriver
+from SpecialAPI import PowerControl
 '''
 defines
 '''
@@ -29,6 +30,10 @@ DEFAULT_BACKLOG = True
 
 NAV_TYPE = 1
 RAW_TYPE = 2
+
+#Which conversion must be applied to this data at the GSN end? 0 -> NONE, 1 -> RAW->ASCII
+RAW_DATA_VERSION = 1
+NAV_DATA_VERSION = 1
 
 #Reads raw GPS messages from a u-blox device and sends them to GSN
 
@@ -42,7 +47,7 @@ class GPSPluginClass(AbstractPluginClass):
     def __init__(self, parent, config):
     
     	AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
-    	
+    	self.power = PowerControl()
         self.info('Init GPSPlugin...')
         self._progStart = time.time()
         self._stopped = False
@@ -104,7 +109,8 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     def runPlugin(self,param):  
         self.gps = GPSDriver.GPSDriver([self._deviceStr, self._interval,self._mode])
-        if (not self.gps):
+        
+        if (not self.gps._isInitialized()):
             self.error('Initializing GPS Plugin failed!!')
             return
         
@@ -115,12 +121,20 @@ class GPSPluginClass(AbstractPluginClass):
         while time.time() <= self._endTime and not self._stopped:
             # Read that GPS RAW message
             rawMsg = self.gps._read("")
-            # Parse the raw message
-            if (self._mode == "nav"):
-                dataPackage = self._parseNavMsg(rawMsg)
-            elif (self._mode == "raw"):
-                dataPackage = self._parseRawMsg(rawMsg)
-            self.processMsg(self.getTimeStamp(), dataPackage)
+            self.info(str(rawMsg))
+            if (rawMsg):
+                # Parse the raw message
+                '''
+                if (self._mode == "nav"):
+                    dataPackage = self._parseNavMsg(rawMsg)
+                elif (self._mode == "raw"):
+                    dataPackage = self._parseRawMsg(rawMsg)
+                '''
+                if (self._mode == "nav"):
+                    #self.processMsg(self.getTimeStamp(), [NAV_TYPE, NAV_DATA_VERSION]+rawMsg[2])
+                    pass
+                elif (self._mode == "raw"):
+                    self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, rawMsg[2]])
             self._runEv.wait(self._interval-1)
 
         # die...
@@ -128,11 +142,11 @@ class GPSPluginClass(AbstractPluginClass):
         self.debug('GPSPlugin died...')
     
         end = time.time()
-        self.info('Number of measurements: ' + str(self._measurementNo))
-        self.info('Number of satellites: '+ str(self._SatelliteCounter))
-        self.info('Number of satellites above thresholds: '+str(self._goodSatelliteCounter))
-        self.info("Killed " + str(self._zombiesKilled))
-        self.info("Serial disconnected " + str(self._serialCount))
+        self.info('Number of measurements: ' + str(gps._measurementNo))
+        self.info('Number of satellites: '+ str(gps._SatelliteCounter))
+        self.info('Number of satellites above thresholds: '+str(gps._goodSatelliteCounter))
+        self.info("Killed " + str(gps._zombiesKilled))
+        self.info("Serial disconnected " + str(gps._serialCount))
         self.stop()
     
     '''
