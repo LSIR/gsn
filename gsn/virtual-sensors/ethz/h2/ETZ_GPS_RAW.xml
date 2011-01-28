@@ -6,16 +6,8 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            <field name="GPS_TIME" type="INTEGER"/>
-            <field name="GPS_WEEK" type="SMALLINT" />
-            <field name="SVS" type="SMALLINT" />
-            <field name="CARRIER_PHASE" type="DOUBLE" />
-            <field name="PSEUDO_RANGE" type="DOUBLE" />
-            <field name="DOPPLER" type="INTEGER" />
-            <field name="SPACE_VEHICLE" type="SMALLINT" />
-            <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
-            <field name="SIGNAL_STRENGTH" type="SMALLINT" />
-            <field name="LLI" type="SMALLINT" />
+            <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
+            <field name="GPS_RAW_DATA" type="binary"/>
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>

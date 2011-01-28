@@ -1,6 +1,6 @@
 <virtual-sensor name="ETZ_GPS_RAW__mapped" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.GPSRawDemuxBridgeVirtualSensor</class-name>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="position_mapping" />
@@ -10,16 +10,8 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            <field name="GPS_TIME" type="INTEGER"/>
-            <field name="GPS_WEEK" type="SMALLINT" />
-            <field name="SVS" type="SMALLINT" />
-            <field name="CARRIER_PHASE" type="DOUBLE" />
-            <field name="PSEUDO_RANGE" type="DOUBLE" />
-            <field name="DOPPLER" type="INTEGER" />
-            <field name="SPACE_VEHICLE" type="SMALLINT" />
-            <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
-            <field name="SIGNAL_STRENGTH" type="SMALLINT" />
-            <field name="LLI" type="SMALLINT" />
+            <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
+            <field name="GPS_RAW_DATA" type="binary"/>
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
@@ -30,8 +22,9 @@
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_RAW__muxed__mapped</predicate>
+                <address wrapper="remote-rest">
+                    <predicate key="query">select * from ETZ_GPS_RAW</predicate>
+                    <predicate key="remote-contact-point">http://tik31x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

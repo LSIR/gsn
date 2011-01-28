@@ -37,16 +37,8 @@ public class GPSPlugin extends AbstractPlugin {
 		    new DataField("TIMESTAMP", "BIGINT"),
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
-			new DataField("GPS_TIME", "INTEGER"),
-			new DataField("GPS_WEEK", "SMALLINT"),
-			new DataField("SVS", "SMALLINT"),
-			new DataField("CARRIER_PHASE", "DOUBLE"),
-			new DataField("PSEUDO_RANGE", "DOUBLE"),
-			new DataField("DOPPLER", "INTEGER"),
-			new DataField("SPACE_VEHICLE", "SMALLINT"),
-			new DataField("MEASUREMENT_QUALITY", "SMALLINT"),
-			new DataField("SIGNAL_STRENGTH", "SMALLINT"),
-			new DataField("LLI", "SMALLINT")
+			new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
+			new DataField("GPS_RAW_DATA", "BINARY")
 			};
 	
 	private static final Hashtable<String, NameDataFieldPair> gpsNamingTable = new Hashtable<String, NameDataFieldPair>();
@@ -114,18 +106,7 @@ public class GPSPlugin extends AbstractPlugin {
 					
 				}
 				else if (gpsDataType.equals(RAW_NAMING)) {
-					int gpsTime = toInteger(data[1]);
-					short gpsWeek = toShort(data[2]);
-					short svs = toShort(data[3]);
-					double carrierPhase = (Double) data[4];
-					double pseudorange = (Double) data[5];
-					int doppler = toInteger(data[6]);
-					short spaceVehicle = toShort(data[7]);
-					short measurementQuality = toShort(data[8]);
-					short signalStrength = toShort(data[9]);
-					short lli = toShort(data[10]);
-					
-					out = new Serializable[]{timestamp, timestamp, deviceId, gpsTime, gpsWeek, svs, carrierPhase, pseudorange, doppler, spaceVehicle, measurementQuality, signalStrength, lli};
+					out = new Serializable[]{timestamp, timestamp, deviceId, toShort(data[1]), data[2]};
 				}
 				else {
 					logger.warn("Wrong GPS data type spedified.");
