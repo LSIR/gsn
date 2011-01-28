@@ -353,6 +353,10 @@ class PowerControl:
 
     '''
     data/instance attributes:
+    _linkfolder
+    _wlanGPIOLink
+    _wlanGPIOLock
+    _wlanGPIOOnOnSet
     '''
 
     def __init__(self, linkFolder=DEFAULT_LINK_FOLDER):
@@ -379,7 +383,13 @@ class PowerControl:
     
     
     def wlanOn(self):
+        '''
+        Turns the wlan on
+        
+        @raise Exception: if no wlan GPIO link file exists
+        '''
         if self._wlanGPIOLink:
+            self._logger.info('turning wlan on')
             self._wlanGPIOLock.acquire()
             if self._wlanGPIOOnOnSet:
                 self._gpioLinkAction(self._wlanGPIOLink, True)
@@ -392,7 +402,13 @@ class PowerControl:
     
     
     def wlanOff(self):
+        '''
+        Turns the wlan off
+        
+        @raise Exception: if no wlan GPIO link file exists
+        '''
         if self._wlanGPIOLink:
+            self._logger.info('turning wlan off')
             self._wlanGPIOLock.acquire()
             if self._wlanGPIOOnOnSet:
                 self._gpioLinkAction(self._wlanGPIOLink, False)
@@ -404,16 +420,29 @@ class PowerControl:
     
     
     def getWlanStatus(self):
+        '''
+        Returns True if the wlan is on otherwise False
+        
+        @return: True if the wlan is on otherwise False
+        
+        @raise Exception: if no wlan GPIO link file exists
+        '''
         if self._wlanGPIOLink:
             self._wlanGPIOLock.acquire()
-            stat = self._getGPIOStatus(self._wlanGPIOLink)
+            stat = self._getGPIOStatus(self._wlanGPIOLink).rsplit(None, 1)[1]
             self._wlanGPIOLock.release()
-            return stat
+            if (self._wlanGPIOOnOnSet and stat == 'set') or (not self._wlanGPIOOnOnSet and stat == 'clear'):
+                return True
+            else:
+                return False
         else:
             raise Exception('Wlan GPIO link file is inexistent in >' + self._linkfolder + '<')
     
     
     def _gpioLinkAction(self, link, set):
+        '''
+        This function should not be used directly!
+        '''
         file = open(link, 'w')
         if set:
             file.write('set')
@@ -423,6 +452,9 @@ class PowerControl:
         
         
     def _getGPIOStatus(self, link):
+        '''
+        This function should not be used directly!
+        '''
         file = open(link, 'r')
         stat = file.read()
         file.close()
