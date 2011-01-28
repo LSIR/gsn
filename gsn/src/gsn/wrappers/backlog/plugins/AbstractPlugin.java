@@ -403,6 +403,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 		else if (value instanceof Short)
 			return (Short) value;
 		else
-			throw new Exception("value can not be cast to Integer.");
+			throw new Exception("value can not be cast to Short.");
 	}
 }
