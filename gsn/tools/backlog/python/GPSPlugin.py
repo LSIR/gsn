@@ -45,9 +45,12 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     
     def __init__(self, parent, config):
+        
+#        self.getPowerControlObject().wlanOff()
+#        self.getPowerControlObject().wlanOn()
+#        self.getPowerControlObject().getWlanStatus()
     
-    	AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
-    	self.power = PowerControl()
+    	AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG, needPowerControl=True)
         self.info('Init GPSPlugin...')
         self._progStart = time.time()
         self._stopped = False

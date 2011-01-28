@@ -337,6 +337,7 @@ class Statistics:
 DEFAULT_LINK_FOLDER = '/etc/gpio/'
 
 WLAN_GPIO_LINK_PREFIX = 'wlan_power'
+PHOTOCAM_GPIO_LINK_PREFIX = 'photocam_power'
 
 GPIO_RESET_ON_CLEAR_SUFFIX = 'reset_on_clear'
 GPIO_RESET_ON_SET_SUFFIX = 'reset_on_set'
@@ -370,13 +371,17 @@ class PowerControl:
         
         self._backlogMain = backlogMain
         
+        self._linkfolder = None
         if not os.path.isdir(linkFolder):
-            raise ValueError('linkFolder >' + linkFolder + '< is not an existing folder')
+            self._logger.warning('linkFolder >' + linkFolder + '< is not an existing folder => power control API can not be used')
+            raise
         
         self._linkfolder = linkFolder
         
         self._wlanGPIOLink = ''
         self._wlanGPIOLock = Lock()
+        self._photocamGPIOLink = ''
+        self._photocamGPIOLock = Lock()
         
         for file in os.listdir(linkFolder):
             if file.startswith(WLAN_GPIO_LINK_PREFIX):
@@ -387,6 +392,78 @@ class PowerControl:
                     self._wlanGPIOOnOnSet = False
                 else:
                     raise Exception('file >' + os.path.join(linkFolder, file) + '< does not end with a proper suffix')
+            elif file.startswith(PHOTOCAM_GPIO_LINK_PREFIX):
+                self._photocamGPIOLink = os.path.join(linkFolder, file)
+                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                    self._photocamGPIOOnOnSet = True
+                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                    self._photocamGPIOOnOnSet = False
+                else:
+                    raise Exception('file >' + os.path.join(linkFolder, file) + '< does not end with a proper suffix')
+                
+    
+    
+    def photoCamOn(self):
+        '''
+        Turns the photo camera power on
+        
+        @raise Exception: if no photo camera GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._photocamGPIOLink:
+            self._logger.info('turning photo camera on')
+            self._photocamGPIOLock.acquire()
+            if self._photocamGPIOOnOnSet:
+                self._gpioLinkAction(self._photocamGPIOLink, True)
+            else:
+                self._gpioLinkAction(self._photocamGPIOLink, False)
+            self._photocamGPIOLock.release()
+        else:
+            raise Exception('photo camera GPIO link file is inexistent in >' + self._linkfolder + '<')
+        
+    
+    
+    def photoCamOff(self):
+        '''
+        Turns the photo camera power off.
+        
+        @raise Exception: if no photo camera GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._photocamGPIOLink:
+            self._logger.warning('turning photo camera off')
+            self._photocamGPIOLock.acquire()
+            if self._photocamGPIOOnOnSet:
+                self._gpioLinkAction(self._photocamGPIOLink, False)
+            else:
+                self._gpioLinkAction(self._photocamGPIOLink, True)
+            self._photocamGPIOLock.release()
+        else:
+            raise Exception('photo camera GPIO link file is inexistent in >' + self._linkfolder + '<')
+    
+    
+    def getPhotoCamStatus(self):
+        '''
+        Returns True if the photo camera is on otherwise False
+        
+        @return: True if the photo camera is on otherwise False
+        
+        @raise Exception: if no photo camera GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._photocamGPIOLink:
+            self._photocamGPIOLock.acquire()
+            stat = self._getGPIOStatus(self._photocamGPIOLink).rsplit(None, 1)[1]
+            self._photocamGPIOLock.release()
+            if (self._photocamGPIOOnOnSet and stat == 'set') or (not self._photocamGPIOOnOnSet and stat == 'clear'):
+                return True
+            else:
+                return False
+        else:
+            raise Exception('photo camera GPIO link file is inexistent in >' + self._linkfolder + '<')
                 
     
     
@@ -396,6 +473,8 @@ class PowerControl:
         
         @raise Exception: if no wlan GPIO link file exists
         '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
         if self._wlanGPIOLink:
             self._logger.info('turning wlan on')
             self._wlanGPIOLock.acquire()
@@ -417,6 +496,8 @@ class PowerControl:
         
         @raise Exception: if no wlan GPIO link file exists
         '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
         if self._wlanGPIOLink:
             if self._backlogMain.wlanNeeded():
                 return False
@@ -441,6 +522,8 @@ class PowerControl:
         
         @raise Exception: if no wlan GPIO link file exists
         '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
         if self._wlanGPIOLink:
             self._wlanGPIOLock.acquire()
             stat = self._getGPIOStatus(self._wlanGPIOLink).rsplit(None, 1)[1]

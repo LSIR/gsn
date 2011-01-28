@@ -74,7 +74,6 @@ class BackLogMainClass(Thread, Statistics):
         '''
         Thread.__init__(self)
         Statistics.__init__(self)
-        self.powerControl = PowerControl(self)
         
         self._uptimeId = self.timeMeasurementStart()
 
@@ -192,6 +191,12 @@ class BackLogMainClass(Thread, Statistics):
             self._logger.info('not running in duty-cycle mode')
             self.duty_cycle_mode = False
 
+        try:
+            self.powerControl = PowerControl(self)
+        except:
+            pass
+        else:
+            self._logger.info('loaded PowerControl class')
         self.gsnpeer = GSNPeerClass(self, self.device_id, gsn_port)
         self._logger.info('loaded GSNPeerClass')
         self.backlog = BackLogDBClass(self, backlog_db, backlog_db_resend_hr)
