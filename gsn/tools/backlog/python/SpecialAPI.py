@@ -10,7 +10,7 @@ import os
 import uuid
 import logging
 from datetime import datetime, timedelta
-from threading import Lock, Thread, Event
+from threading import Lock, Thread
 
 MIN_RING_BUFFER_CLEAR_INTERVAL_SEC = 5
 
@@ -334,8 +334,6 @@ class Statistics:
 
 
 
-WLAN_SHOUTDOWN_CHECK_INTERVAL = 30
-
 DEFAULT_LINK_FOLDER = '/etc/gpio/'
 
 WLAN_GPIO_LINK_PREFIX = 'wlan_power'
@@ -360,7 +358,6 @@ class PowerControl:
     _wlanGPIOLink
     _wlanGPIOLock
     _wlanGPIOOnOnSet
-    _powerControlStopEvent
     '''
     
 #    make this class a singleton
@@ -370,8 +367,6 @@ class PowerControl:
         self.__dict__ = self.__shared_state
         
         self._logger = logging.getLogger(self.__class__.__name__)
-        
-        self._powerControlStopEvent = Event()
         
         self._backlogMain = backlogMain
         
@@ -423,13 +418,10 @@ class PowerControl:
         @raise Exception: if no wlan GPIO link file exists
         '''
         if self._wlanGPIOLink:
-            while self._backlogMain.wlanNeeded() and not self._powerControlStopEvent.isSet():
-                self._powerControlStopEvent.wait(WLAN_SHOUTDOWN_CHECK_INTERVAL)
-                
-            if self._powerControlStopEvent.isSet():
+            if self._backlogMain.wlanNeeded():
                 return False
             else:
-                self._logger.info('turning wlan off')
+                self._logger.warning('turning wlan off')
                 self._wlanGPIOLock.acquire()
                 if self._wlanGPIOOnOnSet:
                     self._gpioLinkAction(self._wlanGPIOLink, False)
@@ -459,11 +451,6 @@ class PowerControl:
                 return False
         else:
             raise Exception('Wlan GPIO link file is inexistent in >' + self._linkfolder + '<')
-        
-        
-    def stop(self):
-        self._powerControlStopEvent.set()
-        self._logger.info('stopped')
     
     
     def _gpioLinkAction(self, link, set):

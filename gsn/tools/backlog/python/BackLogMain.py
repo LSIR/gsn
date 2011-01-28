@@ -54,6 +54,7 @@ class BackLogMainClass(Thread, Statistics):
     _uptimeId
     jobsobserver
     schedulehandler
+    powerControl
     gsnpeer
     backlog
     plugins
@@ -274,7 +275,6 @@ class BackLogMainClass(Thread, Statistics):
 
 
     def stop(self):
-        self.powerControl.stop()
         self.schedulehandler.stop()
         self.jobsobserver.stop()
         
@@ -447,8 +447,9 @@ class BackLogMainClass(Thread, Statistics):
     
     def wlanNeeded(self):
         # check if one of the plugins still needs the wlan
-        for plugin in self.plugins.values():
+        for plugin_name, plugin in self.plugins.items():
             if plugin.needsWLAN():
+                self._logger.info('wlan is still needed by ' + plugin_name)
                 return True
         
         
