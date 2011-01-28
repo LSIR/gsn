@@ -57,8 +57,9 @@ public class GPSPlugin extends AbstractPlugin {
 	public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		super.activeBackLogWrapper = backlogwrapper;
 		try {
-			gpsDataType = getActiveAddressBean().getPredicateValueWithException(GPS_DATA_TYPE).toLowerCase();
+			gpsDataType = "raw"; //getActiveAddressBean().getPredicateValueWithException(GPS_DATA_TYPE).toLowerCase();
 		} catch (Exception e) {
+			logger.error(gpsDataType);
 			logger.error(e.getMessage());
 			return false;
 		}
