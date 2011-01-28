@@ -322,15 +322,9 @@ class ScheduleHandlerClass(Thread):
                         self._logger.debug('executing >' + pluginclassname + ' ' + commandstring  + '< now')
                     elif timediff < self._max_next_schedule_wait_delta or timediff < service_time:
                         if pluginclassname:
-                            if self._duty_cycle_mode:
-                                self._logger.info('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
-                            else:
-                                self._logger.debug('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                            self._logger.info('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         else:
-                            if self._duty_cycle_mode:
-                                self._logger.info('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
-                            else:
-                                self._logger.debug('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                            self._logger.info('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if self._scheduleHandlerStop:
                             break
@@ -339,9 +333,9 @@ class ScheduleHandlerClass(Thread):
                             break
                     else:
                         if service_time <= self._max_next_schedule_wait_delta:
-                            self._logger.debug('nothing more to do in the next ' + self.getOptionValue('max_next_schedule_wait_minutes') + ' minutes (max_next_schedule_wait_minutes)')
+                            self._logger.info('nothing more to do in the next ' + self.getOptionValue('max_next_schedule_wait_minutes') + ' minutes (max_next_schedule_wait_minutes)')
                         else:
-                            self._logger.debug('nothing more to do in the next ' + str(service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes'))) + ' minutes (rest of service time plus max_next_schedule_wait_minutes)')
+                            self._logger.info('nothing more to do in the next ' + str(service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes'))) + ' minutes (rest of service time plus max_next_schedule_wait_minutes)')
                         
                         self.tosMsgSend(CMD_WAKEUP_QUERY)
                         if self._scheduleHandlerStop:
@@ -353,9 +347,15 @@ class ScheduleHandlerClass(Thread):
                 else:
                     if nextdt > dtnow:
                         if pluginclassname:
-                            self._logger.debug('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                            if self._beacon:
+                                self._logger.info('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                            else:
+                                self._logger.debug('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         else:
-                            self._logger.debug('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                            if self._beacon:
+                                self._logger.info('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                            else:
+                                self._logger.debug('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if (self._scheduleHandlerStop or self._newSchedule) or (self._duty_cycle_mode and not self._beacon):
                             self._newSchedule = False
@@ -624,14 +624,12 @@ class ScheduleHandlerClass(Thread):
                     self._backlogMain.incrementErrorCounter()
                     self.error('not all jobs have been killed (should not happen)')
                     
-            # last possible moment to check if a beacon has been sent to the node
-            # (if so, we do not want to shutdown)
-            self._logger.info('get node wakeup states')
-            self.tosMsgSend(CMD_WAKEUP_QUERY)
-            if self._scheduleHandlerStop:
-                return True
-            if self._beacon:
-                return False
+            if self._schedule:
+                dtnow = datetime.utcnow()
+                nextschedules, error = self._schedule.getNextSchedules(dtnow)
+                if  nextschedules and nextschedules[0][0] - dtnow < self._max_next_schedule_wait_delta:
+                    self._logger.info('next schedule is coming soon => wait for it')
+                    return False
 
             # Synchronize Service Wakeup Time
             time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
@@ -660,6 +658,15 @@ class ScheduleHandlerClass(Thread):
                 return True
             if self._scheduleEvent.isSet():
                 self._scheduleEvent.clear()
+                return False
+                    
+            # last possible moment to check if a beacon has been sent to the node
+            # (if so, we do not want to shutdown)
+            self._logger.info('get node wakeup states')
+            self.tosMsgSend(CMD_WAKEUP_QUERY)
+            if self._scheduleHandlerStop:
+                return True
+            if self._beacon:
                 return False
                     
             # Tell TinyNode to shut us down in X seconds
