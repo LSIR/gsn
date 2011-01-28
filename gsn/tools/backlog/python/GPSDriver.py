@@ -92,15 +92,16 @@ class GPSDriver():
         self._SatelliteCounter=0
            
         self._runEv = Event()
-        
+        self._initialized = False
     	#device is tested by config in that it tries to write to it.
     	self._logger.info("Config GPS device")
     	ret = self._config_device()
     	if (ret == True):
-    		self._logger.info("Done GPS Driver init")
+            self._initialized = True
+            self._logger.info("Done GPS Driver init")
     	else:
-    		self._logger.warning("There was a problem initializing the GPS device")
-        return ret
+            self._logger.warning("There was a problem initializing the GPS device")
+
 	
     '''
     ##########################################################################################
