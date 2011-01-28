@@ -46,20 +46,17 @@ class GPSPluginClass(AbstractPluginClass):
         self.info('Init GPSPlugin...')
         self._progStart = time.time()
         self._stopped = False
-    
+        self._busy = True
+        
         # The measurement interval in seconds
         self._interval = float(self.getOptionValue('poll_interval'))
     	# The measurement time in seconds
         self._measTime = int(self.getOptionValue('measurement_time'))
-    	# serial port timeout
-    	self._serialTimeout = 1
-    	self._serialCount = 0
-    	self._zombiesKilled = 0
+        # The device identifier
+        self._deviceStr = self.getOptionValue('gps_device')
+        # The GPS Mode (nav or raw)
+        self._mode = self.getOptionValue('gps_mode')
     	
-    	self._deviceStr = self.getOptionValue('gps_device')
-    	self._mode = self.getOptionValue('gps_mode')
-    	self.gps = GPSDriver.GPSDriver([self._deviceStr, self._interval,self._mode])
-    
         #For quality measurement
         self._measurementNo=0
         self._goodSatelliteCounter=0
@@ -68,38 +65,68 @@ class GPSPluginClass(AbstractPluginClass):
         self._runEv = Event()
     
     	self._endTime = time.time() + self._measTime	
+        
         self.registerTOSListener()
-    	self.debug("Done init")
+    	
+        self.debug("Done init GPS Plugin")
 
 
     '''
     ##########################################################################################
-    run()
+    action():   This function will be fired by the schedule handler each time
+                this plugin is scheduled. The function is started in a new
+                thread.
+        
+                @param parameters:  The parameters as one string given in the
+                                    schedule file.
+    ##########################################################################################
+    '''
+    def action(self,parameters):
+        self.info("Action called!")
+        self.runPlugin(parameters)
+        
+    '''
+    ##########################################################################################
+    run():     This function gets called when the plugin is loaded. In duty-cycle mode the
+               action() function takes care of running the plugin
     ##########################################################################################
     '''
     def run(self):
-	
+        if (self.isDutyCycleMode()):
+            return
+        else:
+            self.runPlugin('')
+ 
+    '''
+    ##########################################################################################
+    runPlugin():  This function is essentially the run function
+    ##########################################################################################
+    '''
+    def runPlugin(self,param):  
+        self.gps = GPSDriver.GPSDriver([self._deviceStr, self._interval,self._mode])
+        if (not self.gps):
+            self.error('Initializing GPS Plugin failed!!')
+            return
+        
         self.info('GPSPlugin running...')
-	
-        self._measurementNo = 1
-
+    
         # Prepare for precise timing
         now = time.time()
         while time.time() <= self._endTime and not self._stopped:
             # Read that GPS RAW message
             rawMsg = self.gps._read("")
-    	    # Parse the raw message
-    	    if (self._mode == "nav"):
-    		    dataPackage = self._parseNavMsg(rawMsg)
-    	    elif (self._mode == "raw"):
-    		    dataPackage = self._parseRawMsg(rawMsg)
+            # Parse the raw message
+            if (self._mode == "nav"):
+                dataPackage = self._parseNavMsg(rawMsg)
+            elif (self._mode == "raw"):
+                dataPackage = self._parseRawMsg(rawMsg)
             self.processMsg(self.getTimeStamp(), dataPackage)
-    	    self._runEv.wait(self._interval-1)
+            self._runEv.wait(self._interval-1)
 
         # die...
 
         self.debug('GPSPlugin died...')
-	
+    
         end = time.time()
         self.info('Number of measurements: ' + str(self._measurementNo))
         self.info('Number of satellites: '+ str(self._SatelliteCounter))
@@ -107,7 +134,7 @@ class GPSPluginClass(AbstractPluginClass):
         self.info("Killed " + str(self._zombiesKilled))
         self.info("Serial disconnected " + str(self._serialCount))
         self.stop()
- 
+    
     '''
     ##########################################################################################
     parseRawMsg()
@@ -119,7 +146,7 @@ class GPSPluginClass(AbstractPluginClass):
             payload = rawMsg[2]
             # the first 8 bytes are: GPS Time (4B), GPS week (2B), Number of satellites following (1B), Reserved (1B)
             gps_time, gps_week, svs = struct.unpack('<ihB', payload[0:7])
-            self.info('GPS Time: '+str(gps_time)+":"+str(gps_week))
+            self.info('GPS Time: '+str(gps_time)+" - "+str(gps_week))
             self.info('Number of satellites following: ' +str(svs))
             # extract data for each SV 
             for i in range(0, svs):
@@ -134,17 +161,18 @@ class GPSPluginClass(AbstractPluginClass):
                 
                 dataPackage = [RAW_TYPE, gps_time, gps_week, svs, carrier_phase, pseudorange, doppler, sv, quality, cno, lli]
                 
-                #if tmpData[0]>=int(self.getOptionValue('quality_threshold')) and tmpData[1]>=int(self.getOptionValue('signal_threshold')):
-                #      self._goodSatelliteCounter=self._goodSatelliteCounter+1
+                if quality>=int(self.getOptionValue('quality_threshold')) and cno>=int(self.getOptionValue('signal_threshold')):
+                      self._goodSatelliteCounter=self._goodSatelliteCounter+1
                 self._SatelliteCounter=self._SatelliteCounter+1
     			
     		if (dataPackage == False):
-    			self.debug("parseMsg: WARNING! Function returned nothing!")
+    			self.warning("parseMsg: WARNING! Function returned nothing!")
     			return dataPackage
     		self._measurementNo += 1
     		return dataPackage
-        self.debug("parseMsg: WARNING! MSG packet was empty!")
-    	return False
+        else:
+            self.warning("parseMsg: WARNING! MSG packet was empty!")
+            return False
 
     '''
     ##########################################################################################
@@ -154,24 +182,9 @@ class GPSPluginClass(AbstractPluginClass):
     def _parseNavMsg(self, msg):
     	if (msg):
             self.info(str(msg[2]))
-            ''' 
-    		payload = msg[2]
-    		fixtype= ["No Fix", "Dead Reckoning Only", "2D Fix", "3D Fix", "GPS + DR", "Time only"]
-    		# the first 8 bytes are: GPS Time (4B), fractional time (4B), week (2B)
-    		p = struct.unpack('LlhB3lL3lL', payload[0:44])
-    		sats = struct.unpack('B', payload[47:48])
-    		print("###################################")
-    		self.info('GPS Time: '+str(p[0])+":"+str(p[2]))
-    		self.info('Fix: ' +str(fixtype[p[3]]))
-    		self.info('X,Y,Z: ' + str(p[4]) + "," + str(p[5]) + "," + str(p[6])+"cm")
-    		self.info('Acc.: ' + str(p[7]) + "cm")
-    		self.info('Vel. X,Y,Z: ' + str(p[8]) + "," + str(p[9]) + "," + str(p[10]) + "cm/s")
-    		self.info('Acc.: ' + str(p[11]) + "cm/s")
-    		self.info('Num SVs: ' + str(sats[0]))
-    		'''
-            dataPackage = [NAV_TYPE, ]
+            #dataPackage = [NAV_TYPE, ]
     	else:
-    		self.info("WARNING: MSG packet was empty!")
+    		self.warning("WARNING: MSG packet was empty!")
         
     '''
     ##########################################################################################
@@ -179,11 +192,11 @@ class GPSPluginClass(AbstractPluginClass):
     ##########################################################################################
     '''
     def stop(self):
-        self.debug('GPSPlugin stopping...')
+        self.info('GPSPlugin stopping...')
         self._stopped = True
+        self._busy = False
         self.deregisterTOSListener()
-        self.info('stopped')
-
+        self.info('GPSPlugin stopped')
 
     '''
     ##########################################################################################
@@ -193,3 +206,11 @@ class GPSPluginClass(AbstractPluginClass):
     
     def getMsgType(self):
         return BackLogMessage.GPS_MESSAGE_TYPE
+    
+    '''
+    ##########################################################################################
+    isBusy(): This function is required to let the parent know we're still alive and busy.
+    ##########################################################################################
+    '''
+    def isBusy(self):
+        return self._busy
