@@ -509,6 +509,10 @@ class BinaryPluginClass(AbstractPluginClass):
          
     def isBusy(self):
         return self._isBusy
+        
+        
+    def needsWLAN(self):
+        return self._isBusy
     
     
     def stopIfNotInDutyCycle(self):

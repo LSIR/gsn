@@ -37,12 +37,17 @@ class AbstractPluginClass(Thread, Statistics):
     _backlog
     _priority
     _maxruntime
+    _powerControl
     '''
 
-    def __init__(self, parent, config, backlog_default=True, priority_default=99):
+    def __init__(self, parent, config, backlog_default=True, priority_default=99, needPowerControl=False):
         Thread.__init__(self)
         self._logger = logging.getLogger(self.__class__.__name__)
         Statistics.__init__(self)
+        if needPowerControl:
+            self._powerControl = parent.powerControl
+        else:
+            self._powerControl = None
         self._backlogMain = parent
         self._config = config
         backlog = self.getOptionValue('backlog')
@@ -350,6 +355,22 @@ class AbstractPluginClass(Thread, Statistics):
         '''
         raise NotImplementedError('isBusy is not implemented')
     
+        
+    def needsWLAN(self):
+        '''
+        This function should return True if the plugin needs the WLAN to be powered on.
+        If it does not care if the WLAN is powered on it should return False.
+        
+        This function will get polled by the underlying software implementation if
+        someone wants to power off the WLAN. The WLAN will only be powered off if
+        all plugins return False.
+        
+        @return: True if this plugin needs the WLAN to be powered on otherwise False
+        
+        @raise NotImplementedError: if this function is not implemented by this plugin
+        '''
+        raise NotImplementedError('needsWLAN is not implemented')
+    
     
     def isDutyCycleMode(self):
         '''
@@ -430,6 +451,20 @@ class AbstractPluginClass(Thread, Statistics):
                   return False.
         '''
         return True
+    
+    def getPowerControlObject(self):
+        '''
+        Returns the singleton PowerControl object or None if not
+        explicitly enabled in init. The PowerControl object can be
+        used to control power supply of different hardware as specified
+        in its API.
+        
+        WARNING: use with special care!!!
+        
+        @return: the singleton PowerControl object or None if not explicitly
+                  enabled in init.
+        '''
+        return self._powerControl
 
     
     def exception(self, exception):

@@ -81,6 +81,10 @@ class TOSPluginClass(AbstractPluginClass):
             
     def isBusy(self):
         return False
+        
+        
+    def needsWLAN(self):
+        return False
 
 
     def _sendCloseQueueCommand(self):

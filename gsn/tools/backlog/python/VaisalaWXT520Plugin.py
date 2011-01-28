@@ -182,6 +182,14 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
                     self.error('Vaisala weather station not connected or wrongly configured')
             except Exception, e:
                 self.exception(e)
+        
+        
+    def isBusy(self):
+        return False
+        
+        
+    def needsWLAN(self):
+        return False
 
 
     def stop(self):

@@ -25,7 +25,7 @@ if PROFILE:
     import yappi
 from threading import Thread, Lock, Event
 
-from SpecialAPI import Statistics
+from SpecialAPI import Statistics, PowerControl
 from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
@@ -73,6 +73,7 @@ class BackLogMainClass(Thread, Statistics):
         '''
         Thread.__init__(self)
         Statistics.__init__(self)
+        self.powerControl = PowerControl(self)
         
         self._uptimeId = self.timeMeasurementStart()
 
@@ -273,6 +274,7 @@ class BackLogMainClass(Thread, Statistics):
 
 
     def stop(self):
+        self.powerControl.stop()
         self.schedulehandler.stop()
         self.jobsobserver.stop()
         
@@ -441,6 +443,13 @@ class BackLogMainClass(Thread, Statistics):
         for plugin in self.plugins.values():
             plugin.connectionToGSNlost()
         self.backlog.connectionToGSNlost()
+    
+    
+    def wlanNeeded(self):
+        # check if one of the plugins still needs the wlan
+        for plugin in self.plugins.values():
+            if plugin.needsWLAN():
+                return True
         
         
     def checkFolderUsage(self):

@@ -155,7 +155,7 @@ class GPSPluginClass(AbstractPluginClass):
     ##########################################################################################
     '''
     def _parseRawMsg(self, rawMsg):
-    	if rawMsg!=0:   
+    	if rawMsg!=0:
             dataPackage = False
             payload = rawMsg[2]
             # the first 8 bytes are: GPS Time (4B), GPS week (2B), Number of satellites following (1B), Reserved (1B)
@@ -228,3 +228,8 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     def isBusy(self):
         return self._busy
+        
+        
+    def needsWLAN(self):
+        # TODO: implement return value
+        return False

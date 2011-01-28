@@ -89,6 +89,10 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
     def isBusy(self):
         return False
+        
+        
+    def needsWLAN(self):
+        return False
        
         
     def run(self):

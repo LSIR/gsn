@@ -49,6 +49,10 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         
     def isBusy(self):
         return False
+        
+        
+    def needsWLAN(self):
+        return False
     
     
     def msgReceived(self, data):
