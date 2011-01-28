@@ -6,7 +6,9 @@ __date__        = "$Date$"
 __id__          = "$Id$"
 __source__      = "$URL$"
 
+import os
 import uuid
+import logging
 from datetime import datetime, timedelta
 from threading import Lock, Thread
 
@@ -326,3 +328,104 @@ class Statistics:
     
     def restartAccumulation(self):
         self._calcStats = True
+
+
+
+
+
+
+DEFAULT_LINK_FOLDER = '/etc/gpio/'
+
+WLAN_GPIO_LINK_PREFIX = 'wlan_power'
+
+GPIO_RESET_ON_CLEAR_SUFFIX = 'reset_on_clear'
+GPIO_RESET_ON_SET_SUFFIX = 'reset_on_set'
+GPIO_ON_ON_SET_SUFFIX = 'on_on_set'
+GPIO_OFF_ON_SET_SUFFIX = 'off_on_set'
+
+
+class PowerControl:
+    '''
+    This class can be used to control the power of different hardware
+    on a Core Station.
+    
+    '''
+
+    '''
+    data/instance attributes:
+    '''
+
+    def __init__(self, linkFolder=DEFAULT_LINK_FOLDER):
+        self._logger = logging.getLogger(self.__class__.__name__)
+        
+        if not os.path.isdir(linkFolder):
+            raise ValueError('linkFolder >' + linkFolder + '< is not an existing folder')
+        
+        self._linkfolder = linkFolder
+        
+        self._wlanGPIOLink = ''
+        self._wlanGPIOLock = Lock()
+        
+        for file in os.listdir(linkFolder):
+            if file.startswith(WLAN_GPIO_LINK_PREFIX):
+                self._wlanGPIOLink = os.path.join(linkFolder, file)
+                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                    self._wlanGPIOOnOnSet = True
+                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                    self._wlanGPIOOnOnSet = False
+                else:
+                    raise Exception('file >' + os.path.join(linkFolder, file) + '< does not end with a proper suffix')
+                
+    
+    
+    def wlanOn(self):
+        if self._wlanGPIOLink:
+            self._wlanGPIOLock.acquire()
+            if self._wlanGPIOOnOnSet:
+                self._gpioLinkAction(self._wlanGPIOLink, True)
+            else:
+                self._gpioLinkAction(self._wlanGPIOLink, False)
+            self._wlanGPIOLock.release()
+        else:
+            raise Exception('Wlan GPIO link file is inexistent in >' + self._linkfolder + '<')
+        
+    
+    
+    def wlanOff(self):
+        if self._wlanGPIOLink:
+            self._wlanGPIOLock.acquire()
+            if self._wlanGPIOOnOnSet:
+                self._gpioLinkAction(self._wlanGPIOLink, False)
+            else:
+                self._gpioLinkAction(self._wlanGPIOLink, True)
+            self._wlanGPIOLock.release()
+        else:
+            raise Exception('Wlan GPIO link file is inexistent in >' + self._linkfolder + '<')
+    
+    
+    def getWlanStatus(self):
+        if self._wlanGPIOLink:
+            self._wlanGPIOLock.acquire()
+            stat = self._getGPIOStatus(self._wlanGPIOLink)
+            self._wlanGPIOLock.release()
+            return stat
+        else:
+            raise Exception('Wlan GPIO link file is inexistent in >' + self._linkfolder + '<')
+    
+    
+    def _gpioLinkAction(self, link, set):
+        file = open(link, 'w')
+        if set:
+            file.write('set')
+        else:
+            file.write('clear')
+        file.close()
+        
+        
+    def _getGPIOStatus(self, link):
+        file = open(link, 'r')
+        stat = file.read()
+        file.close()
+        return stat
+        
+    

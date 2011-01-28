@@ -607,7 +607,6 @@ class ScheduleHandlerClass(Thread):
             
             # wait for jobs to finish
             maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
-            self._logger.info('max jobs runtime: ' + str(maxruntime))
             if not self._allJobsFinishedEvent.isSet() and maxruntime:
                 if maxruntime != -1:
                     self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(maxruntime) + ' seconds')
