@@ -221,7 +221,7 @@ private static final transient Logger         logger          = Logger.getLogger
 	}
 
 	private  ArrayOfSensorData transformToSensorDataArray(String vsName, StringBuilder query, boolean is_binary_linked) {
-		System.out.println("QUERY : "+query);
+		logger.debug("QUERY : "+query);
 		ArrayOfSensorData toReturn = new ArrayOfSensorData();
 		try {
 			DataEnumerator output = null;

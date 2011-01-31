@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project>
     <!-- UPDATE-ME: The name of your installer comes below in the gsn.name property -->
-    <property name="gsn.name" value="gsn-1.0.1"/>
+    <property name="gsn.name" value="gsn-1.1.0"/>
 
     <target name="build-gsn" depends="clean-installer">
 
@@ -39,6 +39,7 @@
             <exclude name="**/acquisition2/**"/>
             <exclude name="**/ieee1451/**"/>
             <exclude name="**/svn/**"/>
+            <exclude name="**/hibernate/**"/>
             <exclude name="**/WebCamWrapper.java"/>
             <exclude name="**/DemoVSensor.java"/>
         </javac>
@@ -50,8 +51,6 @@
         </java>
 
         <jar destfile="${dist}/lib/${gsn.name}.jar" basedir="${build.dir}">
-            <exclude name="**/msr/**"/>
-            <exclude name="**/acquisition2/**"/>
             <manifest>
                 <!-- UPDATE-ME: write the name of the person wrote the installer -->
                 <attribute name="Built-By" value="GSN Development Team."/>
@@ -73,6 +72,11 @@
 
         <copy file="${basedir}/conf/wrappers.properties" todir="${dist}/conf/"/>
         <copy file="${basedir}/conf/realm.properties" todir="${dist}/conf/"/>
+        <copy file="${basedir}/conf/clienttestkeystore" todir="${dist}/conf/"/>
+        <copy file="${basedir}/conf/emails.properties" todir="${dist}/conf/"/>
+        <copy file="${basedir}/conf/keystore" todir="${dist}/conf/"/>
+        <copy file="${basedir}/conf/servertestcer.cer" todir="${dist}/conf/"/>
+        <copy file="${basedir}/conf/servertestkeystore" todir="${dist}/conf/"/>
         <copy file="${basedir}/installer/log4j.properties" todir="${dist}/conf/"/>
         <copy file="${basedir}/installer/gsn.xml" todir="${dist}/conf/"/>
         <copy file="${basedir}/installer/logo.png" todir="${dist}/lib/"/>
@@ -90,6 +94,7 @@
                 <exclude name="**/safe-storage/**"/>
                 <exclude name="**/junit-jars/**"/>
                 <exclude name="**/compiling/**"/>
+                <exclude name="**/hibernate/**"/>
                 <exclude name="**/.svn/**"/>
             </fileset>
         </copy>
