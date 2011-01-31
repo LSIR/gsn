@@ -392,48 +392,50 @@
  -->
 
 
-    <!-- Source IP Filtering for webservices -->
 
     <!--
+    Source IP Filtering for Microsoft SensorMap webservice.
+    Authentication is removed but IP source filter is added.
+    Only the sensormap.org server can access the webservice.
+    sensormap.org IP: 131.107.151.211
+     -->
     <filter>
-        <display-name>IPSourceFilter</display-name>
-        <filter-name>IPSourceFilter</filter-name>
+        <display-name>Microsoft SensorMap Webservice IP Source Filter</display-name>
+        <filter-name>MSRIPSourceFilter</filter-name>
         <filter-class>gsn.http.IPSourceFilter</filter-class>
         <init-param>
             <param-name>allowedIps</param-name>
-            <param-value>131.107.151.211;195.176.244.27</param-value>
+            <!-- <param-value>127.0.0.1;10.0.2.15</param-value> -->
+            <param-value>131.107.151.211</param-value>
         </init-param>
     </filter>
-
     <filter-mapping>
-        <filter-name>IPSourceFilter</filter-name>
-        <url-pattern>/services/*</url-pattern>
+        <filter-name>MSRIPSourceFilter</filter-name>
+        <url-pattern>/services/Service/*</url-pattern>
     </filter-mapping>
-
-        <security-constraint >
+    <!-- The following remove all constraints as no auth-constraint is specified. -->
+    <security-constraint >
         <web-resource-collection>
-            <web-resource-name>Open WebService</web-resource-name>
-            <url-pattern>/services/*</url-pattern>
-            <http-method>POST</http-method>
-            <http-method>GET</http-method>
+            <web-resource-name>Open MSR WebService</web-resource-name>
+            <url-pattern>/services/Service/*</url-pattern>
         </web-resource-collection>
-  </security-constraint>
-
-    -->
+    </security-constraint>
  
     <!-- Filter for accesscontrol package -->
 
 
      <filter>
-     <display-name>MyControllerFilter</display-name>
-     <filter-name>MyControllerFilter</filter-name>
-     <filter-class>gsn.http.ac.MyControllerFilter</filter-class>
+        <display-name>MyControllerFilter</display-name>
+        <filter-name>MyControllerFilter</filter-name>
+        <filter-class>gsn.http.ac.MyControllerFilter</filter-class>
     </filter>
 
    <filter-mapping>
      <filter-name>MyControllerFilter</filter-name>
-     <url-pattern>/gsn</url-pattern>
-     <!--    <url-pattern>/streaming/*</url-pattern> -->
+       <url-pattern>/gsn</url-pattern>
+       <url-pattern>/field</url-pattern>
+       <url-pattern>/data</url-pattern>
+       <url-pattern>/multidata</url-pattern>
    </filter-mapping>
 
       
