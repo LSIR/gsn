@@ -52,6 +52,10 @@ public abstract class AbstractDataRequest {
 		qbuilder = new QueriesBuilder(requestParameters);
 	}
 
+    public QueriesBuilder getQueryBuilder() {
+        return qbuilder;
+    }
+
 	public abstract void process() throws DataRequestException ;
 
 	public abstract void outputResult (OutputStream os) ;

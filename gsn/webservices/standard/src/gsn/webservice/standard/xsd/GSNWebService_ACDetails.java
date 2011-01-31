@@ -1,31 +1,30 @@
 
 /**
- * UnregisterQuery.java
+ * GSNWebService_ACDetails.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
  */
             
-                package gsn.webservice.standard;
+                package gsn.webservice.standard.xsd;
             
 
             /**
-            *  UnregisterQuery bean class
+            *  GSNWebService_ACDetails bean class
             */
         
-        public  class UnregisterQuery
+        public  class GSNWebService_ACDetails
         implements org.apache.axis2.databinding.ADBBean{
-        
-                public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
-                "http://standard.webservice.gsn",
-                "unregisterQuery",
-                "ns3");
-
+        /* This type was generated from the piece of schema that had
+                name = GSNWebService_ACDetails
+                Namespace URI = http://standard.webservice.gsn/xsd
+                Namespace Prefix = ns1
+                */
             
 
         private static java.lang.String generatePrefix(java.lang.String namespace) {
-            if(namespace.equals("http://standard.webservice.gsn")){
-                return "ns3";
+            if(namespace.equals("http://standard.webservice.gsn/xsd")){
+                return "ns1";
             }
             return org.apache.axis2.databinding.utils.BeanUtil.getUniquePrefix();
         }
@@ -33,74 +32,60 @@
         
 
                         /**
-                        * field for AcDetails
+                        * field for Username
                         */
 
                         
-                                    protected gsn.webservice.standard.xsd.GSNWebService_ACDetails localAcDetails ;
-                                
-                           /*  This tracker boolean wil be used to detect whether the user called the set method
-                          *   for this attribute. It will be used to determine whether to include this field
-                           *   in the serialized XML
-                           */
-                           protected boolean localAcDetailsTracker = false ;
-                           
-
-                           /**
-                           * Auto generated getter method
-                           * @return gsn.webservice.standard.xsd.GSNWebService_ACDetails
-                           */
-                           public  gsn.webservice.standard.xsd.GSNWebService_ACDetails getAcDetails(){
-                               return localAcDetails;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param AcDetails
-                               */
-                               public void setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails param){
-                            
-                                       if (param != null){
-                                          //update the setting tracker
-                                          localAcDetailsTracker = true;
-                                       } else {
-                                          localAcDetailsTracker = false;
-                                              
-                                       }
-                                   
-                                            this.localAcDetails=param;
-                                    
-
-                               }
-                            
-
-                        /**
-                        * field for QueryName
-                        */
-
-                        
-                                    protected java.lang.String localQueryName ;
+                                    protected java.lang.String localUsername ;
                                 
 
                            /**
                            * Auto generated getter method
                            * @return java.lang.String
                            */
-                           public  java.lang.String getQueryName(){
-                               return localQueryName;
+                           public  java.lang.String getUsername(){
+                               return localUsername;
                            }
 
                            
                         
                             /**
                                * Auto generated setter method
-                               * @param param QueryName
+                               * @param param Username
                                */
-                               public void setQueryName(java.lang.String param){
+                               public void setUsername(java.lang.String param){
                             
-                                            this.localQueryName=param;
+                                            this.localUsername=param;
+                                    
+
+                               }
+                            
+
+                        /**
+                        * field for Password
+                        */
+
+                        
+                                    protected java.lang.String localPassword ;
+                                
+
+                           /**
+                           * Auto generated getter method
+                           * @return java.lang.String
+                           */
+                           public  java.lang.String getPassword(){
+                               return localPassword;
+                           }
+
+                           
+                        
+                            /**
+                               * Auto generated setter method
+                               * @param param Password
+                               */
+                               public void setPassword(java.lang.String param){
+                            
+                                            this.localPassword=param;
                                     
 
                                }
@@ -134,15 +119,15 @@
 
 
         
-                org.apache.axiom.om.OMDataSource dataSource =
-                       new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
+               org.apache.axiom.om.OMDataSource dataSource =
+                       new org.apache.axis2.databinding.ADBDataSource(this,parentQName){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       UnregisterQuery.this.serialize(MY_QNAME,factory,xmlWriter);
+                       GSNWebService_ACDetails.this.serialize(parentQName,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
-               MY_QNAME,factory,dataSource);
+               parentQName,factory,dataSource);
             
        }
 
@@ -189,55 +174,83 @@
                   if (serializeType){
                
 
-                   java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://standard.webservice.gsn");
+                   java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://standard.webservice.gsn/xsd");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":unregisterQuery",
+                           namespacePrefix+":GSNWebService_ACDetails",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "unregisterQuery",
+                           "GSNWebService_ACDetails",
                            xmlWriter);
                    }
 
                
                    }
-                if (localAcDetailsTracker){
-                                            if (localAcDetails==null){
-                                                 throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
-                                            }
-                                           localAcDetails.serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails"),
-                                               factory,xmlWriter);
-                                        }
-                                    namespace = "http://standard.webservice.gsn";
+               
+                                    namespace = "http://standard.webservice.gsn/xsd";
                                     if (! namespace.equals("")) {
                                         prefix = xmlWriter.getPrefix(namespace);
 
                                         if (prefix == null) {
                                             prefix = generatePrefix(namespace);
 
-                                            xmlWriter.writeStartElement(prefix,"queryName", namespace);
+                                            xmlWriter.writeStartElement(prefix,"username", namespace);
                                             xmlWriter.writeNamespace(prefix, namespace);
                                             xmlWriter.setPrefix(prefix, namespace);
 
                                         } else {
-                                            xmlWriter.writeStartElement(namespace,"queryName");
+                                            xmlWriter.writeStartElement(namespace,"username");
                                         }
 
                                     } else {
-                                        xmlWriter.writeStartElement("queryName");
+                                        xmlWriter.writeStartElement("username");
                                     }
                                 
 
-                                          if (localQueryName==null){
+                                          if (localUsername==null){
                                               // write the nil attribute
                                               
-                                                     throw new org.apache.axis2.databinding.ADBException("queryName cannot be null!!");
+                                                     throw new org.apache.axis2.databinding.ADBException("username cannot be null!!");
                                                   
                                           }else{
 
                                         
-                                                   xmlWriter.writeCharacters(localQueryName);
+                                                   xmlWriter.writeCharacters(localUsername);
+                                            
+                                          }
+                                    
+                                   xmlWriter.writeEndElement();
+                             
+                                    namespace = "http://standard.webservice.gsn/xsd";
+                                    if (! namespace.equals("")) {
+                                        prefix = xmlWriter.getPrefix(namespace);
+
+                                        if (prefix == null) {
+                                            prefix = generatePrefix(namespace);
+
+                                            xmlWriter.writeStartElement(prefix,"password", namespace);
+                                            xmlWriter.writeNamespace(prefix, namespace);
+                                            xmlWriter.setPrefix(prefix, namespace);
+
+                                        } else {
+                                            xmlWriter.writeStartElement(namespace,"password");
+                                        }
+
+                                    } else {
+                                        xmlWriter.writeStartElement("password");
+                                    }
+                                
+
+                                          if (localPassword==null){
+                                              // write the nil attribute
+                                              
+                                                     throw new org.apache.axis2.databinding.ADBException("password cannot be null!!");
+                                                  
+                                          }else{
+
+                                        
+                                                   xmlWriter.writeCharacters(localPassword);
                                             
                                           }
                                     
@@ -404,23 +417,23 @@
                  java.util.ArrayList elementList = new java.util.ArrayList();
                  java.util.ArrayList attribList = new java.util.ArrayList();
 
-                 if (localAcDetailsTracker){
-                            elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
-                                                                      "acDetails"));
-                            
-                            
-                                    if (localAcDetails==null){
-                                         throw new org.apache.axis2.databinding.ADBException("acDetails cannot be null!!");
-                                    }
-                                    elementList.add(localAcDetails);
-                                }
-                                      elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
-                                                                      "queryName"));
+                
+                                      elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd",
+                                                                      "username"));
                                  
-                                        if (localQueryName != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localQueryName));
+                                        if (localUsername != null){
+                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localUsername));
                                         } else {
-                                           throw new org.apache.axis2.databinding.ADBException("queryName cannot be null!!");
+                                           throw new org.apache.axis2.databinding.ADBException("username cannot be null!!");
+                                        }
+                                    
+                                      elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd",
+                                                                      "password"));
+                                 
+                                        if (localPassword != null){
+                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localPassword));
+                                        } else {
+                                           throw new org.apache.axis2.databinding.ADBException("password cannot be null!!");
                                         }
                                     
 
@@ -447,9 +460,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static UnregisterQuery parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            UnregisterQuery object =
-                new UnregisterQuery();
+        public static GSNWebService_ACDetails parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            GSNWebService_ACDetails object =
+                new GSNWebService_ACDetails();
 
             int event;
             java.lang.String nillableValue = null;
@@ -473,10 +486,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"unregisterQuery".equals(type)){
+                            if (!"GSNWebService_ACDetails".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (UnregisterQuery)gsn.webservice.standard.xsd.ExtensionMapper.getTypeObject(
+                                return (GSNWebService_ACDetails)gsn.webservice.standard.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -501,26 +514,30 @@
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","username").equals(reader.getName())){
                                 
-                                                object.setAcDetails(gsn.webservice.standard.xsd.GSNWebService_ACDetails.Factory.parse(reader));
+                                    java.lang.String content = reader.getElementText();
+                                    
+                                              object.setUsername(
+                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
                                               
                                         reader.next();
                                     
                               }  // End of if for expected property start element
                                 
-                                    else {
-                                        
-                                    }
-                                
+                                else{
+                                    // A start element we are not expecting indicates an invalid parameter was passed
+                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
+                                }
+                            
                                     
                                     while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
                                 
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","queryName").equals(reader.getName())){
+                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn/xsd","password").equals(reader.getName())){
                                 
                                     java.lang.String content = reader.getElementText();
                                     
-                                              object.setQueryName(
+                                              object.setPassword(
                                                     org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
                                               
                                         reader.next();

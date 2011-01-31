@@ -2,6 +2,12 @@
 <wsdl:definitions targetNamespace="http://standard.webservice.gsn" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://standard.webservice.gsn" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax23="http://datarequest.http.gsn/xsd" xmlns:ax21="http://standard.webservice.gsn/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/">
   <wsdl:types>
     <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://standard.webservice.gsn/xsd">
+            <xs:complexType name="GSNWebService_ACDetails">
+                <xs:sequence>
+                    <xs:element maxOccurs="1" minOccurs="1" name="username" nillable="false" type="xs:string"/>
+                    <xs:element maxOccurs="1" minOccurs="1" name="password" nillable="false" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
             <xs:complexType name="GSNWebService_ContainerDetails">
                 <xs:sequence>
                     <xs:element maxOccurs="1" minOccurs="1" name="port" type="xs:int"/>
@@ -143,6 +149,13 @@
     <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://standard.webservice.gsn" xmlns:ax22="http://standard.webservice.gsn/xsd" xmlns:ax24="http://datarequest.http.gsn/xsd">
             <xs:import namespace="http://standard.webservice.gsn/xsd"/>
             <xs:import namespace="http://datarequest.http.gsn/xsd"/>
+            <xs:element name="getContainerInfo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="getContainerInfoResponse">
                 <xs:complexType>
                     <xs:sequence>
@@ -154,6 +167,7 @@
                 <xs:complexType>
                     <xs:attribute name="timeFormat" type="xs:string" use="optional"/>
                     <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="fieldSelector" nillable="false" type="ax22:GSNWebService_FieldSelector"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -172,6 +186,7 @@
                     <xs:attribute name="nb" type="xs:int" use="optional"/>
                     <xs:attribute name="timeFormat" type="xs:string" use="optional"/>
                     <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="fieldSelector" nillable="false" type="ax22:GSNWebService_FieldSelector"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="conditions" nillable="false" type="ax24:StandardCriterion"/>
                         <xs:element maxOccurs="1" minOccurs="0" name="aggregation" nillable="false" type="ax24:AggregationCriterion"/>
@@ -188,6 +203,9 @@
             <xs:element name="getNextData">
                 <xs:complexType>
                     <xs:attribute name="sid" type="xs:string" use="required"/>
+                    <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
+                    </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="getNextDataResponse">
@@ -200,6 +218,7 @@
             <xs:element name="getVirtualSensorsDetails">
                 <xs:complexType>
                     <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="fieldSelector" nillable="false" type="ax22:GSNWebService_FieldSelector"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="detailsType" nillable="false" type="ax22:GSNWebService_DetailsType"/>
                     </xs:sequence>
@@ -212,10 +231,24 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="listVirtualSensorNames">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="listVirtualSensorNamesResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="virtualSensorName" nillable="false" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listWrapperURLs">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -230,6 +263,7 @@
                 <xs:complexType>
                     <xs:attribute name="vsname" type="xs:string" use="required"/>
                     <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element maxOccurs="1" minOccurs="1" name="descriptionFileContent" nillable="false" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -244,6 +278,9 @@
             <xs:element name="deleteVirtualSensor">
                 <xs:complexType>
                     <xs:attribute name="vsname" type="xs:string" use="required"/>
+                    <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
+                    </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="deleteVirtualSensorResponse">
@@ -258,6 +295,7 @@
                     <xs:attribute name="queryName" type="xs:string" use="required"/>
                     <xs:attribute name="query" type="xs:string" use="required"/>
                     <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="outputStructure" nillable="false" type="ax22:GSNWebService_DataField"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="vsnames" nillable="false" type="xs:string"/>
                     </xs:sequence>
@@ -273,6 +311,7 @@
             <xs:element name="unregisterQuery">
                 <xs:complexType>
                     <xs:sequence>
+                        <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element maxOccurs="1" minOccurs="1" name="queryName" nillable="false" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
@@ -291,8 +330,12 @@
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getContainerInfoRequest">
+    <wsdl:part name="parameters" element="ns:getContainerInfo">
+    </wsdl:part>
   </wsdl:message>
   <wsdl:message name="listWrapperURLsRequest">
+    <wsdl:part name="parameters" element="ns:listWrapperURLs">
+    </wsdl:part>
   </wsdl:message>
   <wsdl:message name="createVirtualSensorResponse">
     <wsdl:part name="parameters" element="ns:createVirtualSensorResponse">
@@ -367,6 +410,8 @@
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="listVirtualSensorNamesRequest">
+    <wsdl:part name="parameters" element="ns:listVirtualSensorNames">
+    </wsdl:part>
   </wsdl:message>
   <wsdl:portType name="GSNWebServicePortType">
     <wsdl:operation name="listVirtualSensorNames">

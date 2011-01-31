@@ -92,7 +92,7 @@ public class DownloadData extends AbstractDataRequest {
                 Connection connection = null;
 
                 connection = Main.getStorage(nextSqlQuery.getKey()).getConnection();
-                de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), false, connection);
+                de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, connection);
                 
                 logger.debug("Data Enumerator: " + de);
                 if (ot == AllowedOutputType.csv) {

@@ -1,6 +1,6 @@
 
 /**
- * UnregisterQuery.java
+ * ListWrapperURLs.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.4.1  Built on : Aug 13, 2008 (05:03:41 LKT)
@@ -10,15 +10,15 @@
             
 
             /**
-            *  UnregisterQuery bean class
+            *  ListWrapperURLs bean class
             */
         
-        public  class UnregisterQuery
+        public  class ListWrapperURLs
         implements org.apache.axis2.databinding.ADBBean{
         
                 public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
                 "http://standard.webservice.gsn",
-                "unregisterQuery",
+                "listWrapperURLs",
                 "ns3");
 
             
@@ -76,36 +76,6 @@
                                }
                             
 
-                        /**
-                        * field for QueryName
-                        */
-
-                        
-                                    protected java.lang.String localQueryName ;
-                                
-
-                           /**
-                           * Auto generated getter method
-                           * @return java.lang.String
-                           */
-                           public  java.lang.String getQueryName(){
-                               return localQueryName;
-                           }
-
-                           
-                        
-                            /**
-                               * Auto generated setter method
-                               * @param param QueryName
-                               */
-                               public void setQueryName(java.lang.String param){
-                            
-                                            this.localQueryName=param;
-                                    
-
-                               }
-                            
-
      /**
      * isReaderMTOMAware
      * @return true if the reader supports MTOM
@@ -138,7 +108,7 @@
                        new org.apache.axis2.databinding.ADBDataSource(this,MY_QNAME){
 
                  public void serialize(org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter xmlWriter) throws javax.xml.stream.XMLStreamException {
-                       UnregisterQuery.this.serialize(MY_QNAME,factory,xmlWriter);
+                       ListWrapperURLs.this.serialize(MY_QNAME,factory,xmlWriter);
                  }
                };
                return new org.apache.axiom.om.impl.llom.OMSourcedElementImpl(
@@ -192,11 +162,11 @@
                    java.lang.String namespacePrefix = registerPrefix(xmlWriter,"http://standard.webservice.gsn");
                    if ((namespacePrefix != null) && (namespacePrefix.trim().length() > 0)){
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           namespacePrefix+":unregisterQuery",
+                           namespacePrefix+":listWrapperURLs",
                            xmlWriter);
                    } else {
                        writeAttribute("xsi","http://www.w3.org/2001/XMLSchema-instance","type",
-                           "unregisterQuery",
+                           "listWrapperURLs",
                            xmlWriter);
                    }
 
@@ -209,40 +179,6 @@
                                            localAcDetails.serialize(new javax.xml.namespace.QName("http://standard.webservice.gsn","acDetails"),
                                                factory,xmlWriter);
                                         }
-                                    namespace = "http://standard.webservice.gsn";
-                                    if (! namespace.equals("")) {
-                                        prefix = xmlWriter.getPrefix(namespace);
-
-                                        if (prefix == null) {
-                                            prefix = generatePrefix(namespace);
-
-                                            xmlWriter.writeStartElement(prefix,"queryName", namespace);
-                                            xmlWriter.writeNamespace(prefix, namespace);
-                                            xmlWriter.setPrefix(prefix, namespace);
-
-                                        } else {
-                                            xmlWriter.writeStartElement(namespace,"queryName");
-                                        }
-
-                                    } else {
-                                        xmlWriter.writeStartElement("queryName");
-                                    }
-                                
-
-                                          if (localQueryName==null){
-                                              // write the nil attribute
-                                              
-                                                     throw new org.apache.axis2.databinding.ADBException("queryName cannot be null!!");
-                                                  
-                                          }else{
-
-                                        
-                                                   xmlWriter.writeCharacters(localQueryName);
-                                            
-                                          }
-                                    
-                                   xmlWriter.writeEndElement();
-                             
                     xmlWriter.writeEndElement();
                
 
@@ -414,15 +350,6 @@
                                     }
                                     elementList.add(localAcDetails);
                                 }
-                                      elementList.add(new javax.xml.namespace.QName("http://standard.webservice.gsn",
-                                                                      "queryName"));
-                                 
-                                        if (localQueryName != null){
-                                            elementList.add(org.apache.axis2.databinding.utils.ConverterUtil.convertToString(localQueryName));
-                                        } else {
-                                           throw new org.apache.axis2.databinding.ADBException("queryName cannot be null!!");
-                                        }
-                                    
 
                 return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(qName, elementList.toArray(), attribList.toArray());
             
@@ -447,9 +374,9 @@
         * Postcondition: If this object is an element, the reader is positioned at its end element
         *                If this object is a complex type, the reader is positioned at the end element of its outer element
         */
-        public static UnregisterQuery parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
-            UnregisterQuery object =
-                new UnregisterQuery();
+        public static ListWrapperURLs parse(javax.xml.stream.XMLStreamReader reader) throws java.lang.Exception{
+            ListWrapperURLs object =
+                new ListWrapperURLs();
 
             int event;
             java.lang.String nillableValue = null;
@@ -473,10 +400,10 @@
 
                     java.lang.String type = fullTypeName.substring(fullTypeName.indexOf(":")+1);
                     
-                            if (!"unregisterQuery".equals(type)){
+                            if (!"listWrapperURLs".equals(type)){
                                 //find namespace for the prefix
                                 java.lang.String nsUri = reader.getNamespaceContext().getNamespaceURI(nsPrefix);
-                                return (UnregisterQuery)gsn.webservice.standard.xsd.ExtensionMapper.getTypeObject(
+                                return (ListWrapperURLs)gsn.webservice.standard.xsd.ExtensionMapper.getTypeObject(
                                      nsUri,type,reader);
                               }
                         
@@ -512,26 +439,7 @@
                                     else {
                                         
                                     }
-                                
-                                    
-                                    while (!reader.isStartElement() && !reader.isEndElement()) reader.next();
-                                
-                                    if (reader.isStartElement() && new javax.xml.namespace.QName("http://standard.webservice.gsn","queryName").equals(reader.getName())){
-                                
-                                    java.lang.String content = reader.getElementText();
-                                    
-                                              object.setQueryName(
-                                                    org.apache.axis2.databinding.utils.ConverterUtil.convertToString(content));
-                                              
-                                        reader.next();
-                                    
-                              }  // End of if for expected property start element
-                                
-                                else{
-                                    // A start element we are not expecting indicates an invalid parameter was passed
-                                    throw new org.apache.axis2.databinding.ADBException("Unexpected subelement " + reader.getLocalName());
-                                }
-                              
+                                  
                             while (!reader.isStartElement() && !reader.isEndElement())
                                 reader.next();
                             

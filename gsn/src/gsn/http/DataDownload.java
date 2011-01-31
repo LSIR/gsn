@@ -2,6 +2,8 @@ package gsn.http;
 
 import gsn.Main;
 import gsn.beans.StreamElement;
+import gsn.http.ac.DataSource;
+import gsn.http.ac.User;
 import gsn.storage.DataEnumerator;
 
 import java.io.PrintWriter;
@@ -15,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
@@ -43,6 +46,16 @@ public class DataDownload extends HttpServlet {
      * param-name:
      */
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, java.io.IOException {
+
+        //
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
+
+        res.setHeader("Cache-Control","no-store");
+        res.setDateHeader("Expires", 0);
+        res.setHeader("Pragma","no-cache");
+        //
+
         PrintWriter respond = res.getWriter();
         DataEnumerator result = null;
         try {
@@ -51,6 +64,7 @@ public class DataDownload extends HttpServlet {
             TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
             boolean responseCVS = false;
             boolean wantTimeStamp = false;
+            boolean wantPk = false;
             boolean commonReq = true;
             boolean groupByTimed = false;
 
@@ -61,6 +75,14 @@ public class DataDownload extends HttpServlet {
                 res.sendError(WebConstants.MISSING_VSNAME_ERROR, "The virtual sensor name is missing");
                 return;
             }
+
+            if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)){
+                if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+                    res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+                    return;
+                }
+            }
+
             if (req.getParameter("display") != null && req.getParameter("display").equals("CSV")) {
                 responseCVS = true;
                 res.setContentType("text/csv");
@@ -93,8 +115,12 @@ public class DataDownload extends HttpServlet {
                         if (fields[i].equals("timed")) {
                             wantTimeStamp = true;
                         }
+                        if ("pk".equalsIgnoreCase(fields[i]))
+                            wantPk = true;
                         generated_request_query += ", " + fields[i];
                     }
+                    if ( ! wantPk )
+                        generated_request_query += ", pk";    
                 }
             } else {
                 if (req.getParameter("fields") == null) {
@@ -105,8 +131,12 @@ public class DataDownload extends HttpServlet {
                         if (fields[i].equals("timed")) {
                             wantTimeStamp = true;
                         }
+                        if ("pk".equalsIgnoreCase(fields[i]))
+                            wantPk = true;
                         generated_request_query += ", " + fields[i];
                     }
+                    if ( ! wantPk )
+                        generated_request_query += ", pk";
                 }
                 if (req.getParameter("groupby") != null) {
                     if (req.getParameter("groupby").equals("timed")) {
@@ -208,7 +238,7 @@ public class DataDownload extends HttpServlet {
 
 
                 try {
-                    result = Main.getStorage(vsName).streamedExecuteQuery(new String(generated_request_query), false);
+                    result = Main.getStorage(vsName).streamedExecuteQuery(generated_request_query, true);
                 } catch (SQLException e) {
                     logger.error("ERROR IN EXECUTING, query: " + generated_request_query);
                     logger.error(e.getMessage(), e);

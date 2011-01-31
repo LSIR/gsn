@@ -40,6 +40,16 @@
               
                   if (
                   "http://standard.webservice.gsn/xsd".equals(namespaceURI) &&
+                  "GSNWebService_ACDetails".equals(typeName)){
+                   
+                            return  gsn.webservice.standard.xsd.GSNWebService_ACDetails.Factory.parse(reader);
+                        
+
+                  }
+
+              
+                  if (
+                  "http://standard.webservice.gsn/xsd".equals(namespaceURI) &&
                   "GSNWebService_WrapperURL".equals(typeName)){
                    
                             return  gsn.webservice.standard.xsd.GSNWebService_WrapperURL.Factory.parse(reader);

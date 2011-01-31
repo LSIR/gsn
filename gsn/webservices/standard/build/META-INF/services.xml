@@ -5,7 +5,6 @@
     <service name="GSNWebService" scope="application">
         <messageReceivers>
             <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" class="gsn.webservice.standard.GSNWebServiceMessageReceiverInOut"/>
-            <!--<messageReceiver mep="http://www.w3.org/ns/wsdl/in-only" class="gsn.webservice.standard.GSNWebServiceMessageReceiverInOnly"/>-->
         </messageReceivers>
         <parameter name="ServiceClass">gsn.webservice.standard.GSNWebServiceSkeleton</parameter>
         <parameter name="useOriginalwsdl">true</parameter>
@@ -26,11 +25,11 @@
             <actionMapping>urn:getLatestMultiData</actionMapping>
             <outputActionMapping>urn:getLatestMultiDataResponse</outputActionMapping>
         </operation>
-        <operation name="unregisterQuery" mep="http://www.w3.org/ns/wsdl/in-only" namespace="http://standard.webservice.gsn">
+        <operation name="unregisterQuery" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:unregisterQuery</actionMapping>
             <outputActionMapping>urn:unregisterQueryResponse</outputActionMapping>
         </operation>
-        <operation name="createVirtualSensor" mep="http://www.w3.org/ns/wsdl/in-only" namespace="http://standard.webservice.gsn">
+        <operation name="createVirtualSensor" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:createVirtualSensor</actionMapping>
             <outputActionMapping>urn:createVirtualSensorResponse</outputActionMapping>
         </operation>
@@ -38,13 +37,9 @@
             <actionMapping>urn:getMultiData</actionMapping>
             <outputActionMapping>urn:getMultiDataResponse</outputActionMapping>
         </operation>
-        <operation name="registerQuery" mep="http://www.w3.org/ns/wsdl/in-only" namespace="http://standard.webservice.gsn">
+        <operation name="registerQuery" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:registerQuery</actionMapping>
             <outputActionMapping>urn:registerQueryResponse</outputActionMapping>
-        </operation>
-        <operation name="getVirtualSensorDetails" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://standard.webservice.gsn">
-            <actionMapping>urn:getVirtualSensorDetails</actionMapping>
-            <outputActionMapping>urn:getVirtualSensorDetailsResponse</outputActionMapping>
         </operation>
         <operation name="getContainerInfo" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:getContainerInfo</actionMapping>
@@ -54,7 +49,7 @@
             <actionMapping>urn:listVirtualSensorNames</actionMapping>
             <outputActionMapping>urn:listVirtualSensorNamesResponse</outputActionMapping>
         </operation>
-        <operation name="deleteVirtualSensor" mep="http://www.w3.org/ns/wsdl/in-only" namespace="http://standard.webservice.gsn">
+        <operation name="deleteVirtualSensor" mep="http://www.w3.org/ns/wsdl/in-out" namespace="http://standard.webservice.gsn">
             <actionMapping>urn:deleteVirtualSensor</actionMapping>
             <outputActionMapping>urn:deleteVirtualSensorResponse</outputActionMapping>
         </operation>

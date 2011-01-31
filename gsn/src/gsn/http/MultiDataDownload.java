@@ -1,8 +1,11 @@
 package gsn.http;
 
+import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
+import gsn.http.ac.DataSource;
+import gsn.http.ac.User;
 import gsn.http.datarequest.DataRequestException;
 import gsn.http.datarequest.DownloadReport;
 
@@ -20,7 +23,9 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import gsn.http.datarequest.QueriesBuilder;
 import org.apache.log4j.Logger;
 
 /**
@@ -37,7 +42,17 @@ public class MultiDataDownload extends HttpServlet {
 	}
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
-		SimpleDateFormat sdfWeb = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ; // 29/10/2008 22:25:07
+
+        //
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
+
+        res.setHeader("Cache-Control","no-store");
+        res.setDateHeader("Expires", 0);
+        res.setHeader("Pragma","no-cache");
+        //
+
+        SimpleDateFormat sdfWeb = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ; // 29/10/2008 22:25:07
         try {
 			logger.debug("Query string: " + req.getQueryString());
 
@@ -46,7 +61,16 @@ public class MultiDataDownload extends HttpServlet {
             Map<String, String[]> parameterMap = parseParameters(req, downloadFormat, sdfWeb);
 			if ("csv".equals(downloadFormat)) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
-				dd.process();
+                //
+                if (Main.getContainerConfig().isAcEnabled()) {
+                    ArrayList<String> noAccess = checkAccessControl(user, dd.getQueryBuilder());
+                    if (noAccess != null && noAccess.size() > 0) {
+                        res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsNames:" + noAccess + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+                        return;
+                    }
+                }
+                //
+                dd.process();
                 if (! "inline".equals(downloadMode)) {
 				    res.setContentType("application/x-download");
 				    res.setHeader("content-disposition","attachment; filename=data.csv");
@@ -58,7 +82,16 @@ public class MultiDataDownload extends HttpServlet {
 			}
 			else if ("xml".equals(downloadFormat)) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
-				dd.process();
+                //
+                if (Main.getContainerConfig().isAcEnabled()) {
+                    ArrayList<String> noAccess = checkAccessControl(user, dd.getQueryBuilder());
+                    if (noAccess != null && noAccess.size() > 0) {
+                        res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsNames:" + noAccess + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+                        return;
+                    }
+                }
+                //
+                dd.process();
 				res.setContentType("text/xml");
 				if (! "inline".equals(downloadMode)) 
                     res.setHeader("content-disposition","attachment; filename=data.xml");
@@ -67,6 +100,15 @@ public class MultiDataDownload extends HttpServlet {
 			}
 			else if ("pdf".equals(downloadFormat)) {
 				DownloadReport rpd = new DownloadReport (parameterMap) ;
+                //
+                if (Main.getContainerConfig().isAcEnabled()) {
+                    ArrayList<String> noAccess = checkAccessControl(user, rpd.getQueryBuilder());
+                    if (noAccess != null && noAccess.size() > 0) {
+                        res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsNames:" + noAccess + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+                        return;
+                    }
+                }
+                //
 				rpd.process();
 				res.setContentType("application/pdf");
 				res.setHeader("content-disposition","attachment; filename=data.pdf");
@@ -82,6 +124,21 @@ public class MultiDataDownload extends HttpServlet {
 			return;
 		}
 	}
+
+    public ArrayList<String> checkAccessControl (User user, QueriesBuilder qbuilder) {
+        if(Main.getContainerConfig().isAcEnabled()){
+            ArrayList<String> noAccess = new ArrayList<String>();
+            for (String vsname : qbuilder.getSqlQueries().keySet()) {
+                if (DataSource.isVSManaged(vsname)) {
+                    if ( (user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsname)))) {
+                        noAccess.add(vsname);
+                    }
+                }
+            }
+            return noAccess;
+        }
+        return null;
+    }
 	
 	private Map<String, String[]> parseParameters (HttpServletRequest req, String downloadFormat, SimpleDateFormat sdfWeb) {
 		
@@ -100,10 +157,16 @@ public class MultiDataDownload extends HttpServlet {
 			vsname = new StringBuilder();
 			vsname.append(vsAndFieldsEntry.getKey());
 			fieldsIterator = vsAndFieldsEntry.getValue().iterator();
-			while (fieldsIterator.hasNext()) {
+			boolean hasPk = false;
+            while (fieldsIterator.hasNext()) {
 				vsname.append(":");
-				vsname.append(fieldsIterator.next());
+				String n = fieldsIterator.next();
+                vsname.append(n);
+                if ("pk".equalsIgnoreCase(n)) 
+                    hasPk = true;
 			}
+            if (! hasPk) 
+                vsname.append(":pk");
 			vsnames.add(vsname.toString());
 		}
 		parameterMap.put("vsname", vsnames.toArray(new String[] {}));
