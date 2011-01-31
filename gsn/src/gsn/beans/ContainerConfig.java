@@ -179,6 +179,10 @@ public class ContainerConfig {
 	 * UTILITY METHODS, Used by the GUI mainly.
 	 ***************************************************************************/
 
+    private static final String   DEFAULT_SSL_KEYSTORE_PWD = "changeit";
+
+    private static final String   DEFAULT_SSL_KEY_PWD = "changeit";
+
 	private String                 directoryLoggingLevel;
 
 	public static final String     FIELD_NAME_directoryLoggingLevel   = "directoryLoggingLevel";
