@@ -1,6 +1,7 @@
 package gsn.http.rest;
 
 import gsn.Main;
+import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
@@ -10,9 +11,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.security.KeyStore;
-import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -80,20 +81,21 @@ public class RestRemoteWrapper extends AbstractWrapper {
 
     public boolean initialize() {
         try {
-	        initParams = new RemoteWrapperParamParser(getActiveAddressBean(), false);
-	        httpclient = new DefaultHttpClient(getHttpClientParams(initParams.getTimeout()));
-			
+            initParams = new RemoteWrapperParamParser(getActiveAddressBean(), false);
+            httpclient = new DefaultHttpClient(getHttpClientParams(initParams.getTimeout()));
             // Init the http client
-            if (Main.getContainerConfig().getSSLPort() > 0) {
+            if (initParams.isSSLRequired()) {
                 KeyStore trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
                 trustStore.load(new FileInputStream(new File("conf/servertestkeystore")), Main.getContainerConfig().getSSLKeyStorePassword().toCharArray());
                 SSLSocketFactory socketFactory = new SSLSocketFactory(trustStore);
                 socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-                Scheme sch = new Scheme("https", socketFactory, Main.getContainerConfig().getSSLPort());
-                Scheme plainsch = new Scheme("http", PlainSocketFactory.getSocketFactory(), Main.getContainerConfig().getContainerPort());
+                int sslPort = Main.getContainerConfig().getSSLPort() > 0 ? Main.getContainerConfig().getSSLPort() : ContainerConfig.DEFAULT_SSL_PORT;
+                Scheme sch = new Scheme("https", socketFactory, sslPort);
                 httpclient.getConnectionManager().getSchemeRegistry().register(sch);
-                httpclient.getConnectionManager().getSchemeRegistry().register(plainsch);
             }
+            Scheme plainsch = new Scheme("http", PlainSocketFactory.getSocketFactory(), Main.getContainerConfig().getContainerPort());
+            httpclient.getConnectionManager().getSchemeRegistry().register(plainsch);
+            //
 	        
 	        String startTime = getActiveAddressBean().getPredicateValue("start-time");
 			if (startTime != null && startTime.equals("continue")) {
@@ -287,5 +289,3 @@ public class RestRemoteWrapper extends AbstractWrapper {
         }
     }
 }
-
- 	  	 

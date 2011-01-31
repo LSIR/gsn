@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -35,8 +34,24 @@ public class FieldDownloadServlet extends HttpServlet {
 
 	public void doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 		String vsName = req.getParameter( "vs" );
-		Long pk = null;
-		if ( vsName == null || (vsName =vsName.trim( ).toLowerCase()).length( ) == 0 ) {
+
+        //
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
+
+        res.setHeader("Cache-Control","no-store");
+        res.setDateHeader("Expires", 0);
+        res.setHeader("Pragma","no-cache");
+
+        if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)) {
+            if(user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName))) {
+                res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+                return;
+            }
+        }
+        //
+
+        if ( vsName == null || (vsName =vsName.trim( ).toLowerCase()).length( ) == 0 ) {
 			res.sendError( WebConstants.MISSING_VSNAME_ERROR , "The virtual sensor name is missing" );
 			return;
 		}
@@ -55,6 +70,7 @@ public class FieldDownloadServlet extends HttpServlet {
 		primaryKey = primaryKey.trim( );
 		colName = colName.trim( );
 		StringBuilder query;
+		Long pk = null;
 		if (primaryKey.compareToIgnoreCase("latest")==0) {
 			query = new StringBuilder( ).append( prefix ).append( vsName ).append(" where timed = (select max(timed) from " ).append(vsName).append(")");
 		}

@@ -1,12 +1,11 @@
 package gsn.beans;
 
+import gsn.Main;
 import gsn.utils.CaseInsensitiveComparator;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
@@ -53,6 +52,9 @@ public class VSensorConfig implements Serializable {
 	private String                       fileName;
 
 	private StorageConfig storage;
+
+    private String timeZone;
+    private SimpleDateFormat sdf = null;
 
     private transient final Logger                 logger                                    = Logger.getLogger( VSensorConfig.class );
 
@@ -415,6 +417,21 @@ public class VSensorConfig implements Serializable {
 			return super.hashCode();
 		}
 	}
+
+    // time zone
+
+    public SimpleDateFormat getSDF() {
+        if (timeZone == null)
+            return null;
+        else {
+            if (sdf == null) {
+                sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
+                sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+            }
+        }
+        return sdf;
+    }
+
 
 
 

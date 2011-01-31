@@ -444,10 +444,10 @@ public class ContainerConfig {
 		return sslPort;
 	}
 	public String getSSLKeyStorePassword(){
-		return sslKeyStorePassword;
+		return sslKeyStorePassword == null ? DEFAULT_SSL_KEYSTORE_PWD : sslKeyStorePassword;
 	}
 	public String getSSLKeyPassword(){
-		return sslKeyPassword;
+		return sslKeyPassword == null ? DEFAULT_SSL_KEY_PWD : sslKeyPassword;
 	}
 	
 	/**
