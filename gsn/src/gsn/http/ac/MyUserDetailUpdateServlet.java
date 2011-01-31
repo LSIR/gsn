@@ -1,45 +1,38 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
 import org.apache.log4j.Logger;
 
-
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.Vector;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Behnaz Bostanipour
- * Date: Apr 18, 2010
- * Time: 7:31:12 PM
- * To change this template use File | Settings | File Templates.
- */
-public class MyUserCandidateRegistrationServlet extends HttpServlet
+public class MyUserDetailUpdateServlet extends HttpServlet
 {
-    private static transient Logger logger                             = Logger.getLogger( MyUserCandidateRegistrationServlet.class );
+    private static transient Logger logger                             = Logger.getLogger( MyUserDetailUpdateServlet.class );
     /****************************************** Servlet Methods*******************************************/
     /****************************************************************************************************/
     public void doGet(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
 	{
-        res.setContentType("text/html");
-		PrintWriter out = res.getWriter();
-		HttpSession session = req.getSession();
-        checkSessionScheme(req, res);
-        setSessionPrintWriter(req,out);
-		printHeader(out);
-        printLayoutMastHead(out);
-        printLayoutContent(out);
-		printForm(out);
-		printLayoutFooter(out);
-
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null)
+        {
+           this.redirectToLogin(req,res);
+        }
+        else {
+            res.setContentType("text/html");
+            PrintWriter out = res.getWriter();
+            checkSessionScheme(req, res);
+            setSessionPrintWriter(req,out);
+		    printHeader(out);
+            printLayoutMastHead(out);
+            printLayoutContent(out);
+		    printForm(out, user);
+		    printLayoutFooter(out);
+        }
 
     }
     public void doPost(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
@@ -101,9 +94,9 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
     private void printLinks(PrintWriter out)
     {
         out.println("<a class=linkclass href=\"/\">GSN home</a>");
-        out.println("<a class=linkclass href=/gsn/MyAccessRightsManagementServlet>access rights management</a>");   
+        out.println("<a class=linkclass href=/gsn/MyAccessRightsManagementServlet>access rights management</a>");
     }
-     private void printForm(PrintWriter out) throws ServletException
+     private void printForm(PrintWriter out, User user) throws ServletException
 	{
         Vector groupList = this.getGroupList();
         if(groupList==null)
@@ -118,20 +111,20 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
             //out.println("<div class=image_float>");
             out.println("<h2> Personal Information</h2>");
             //out.println("<br>");
-            this.printPersonalInputs(out);
+            this.printPersonalInputs(out, user);
             out.println("<br>");
             out.println("<br>");
             //out.println("</div>");
             out.println("<h2> Account Information</h2>");
             //out.println("<font class=myhead> Account Information</font>");
             //out.println("<br>");
-            this.printAccountInputs(out);
+            this.printAccountInputs(out, user);
             out.println("<br>");
             out.println("<BR>");
-            out.println("<h2> Choose your group(s)</h2>");
+            //out.println("<h2> Choose your group(s)</h2>");
             //out.println("<br>");
             //out.println("<font class=myhead> Choose your group(s)</font>");
-            this.printGroupList(out,groupList);
+            //this.printGroupList(out,groupList);
 
             out.println("<BR>");
             out.println("<BR>");
@@ -141,21 +134,22 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
         }
 
     }
-    private void printPersonalInputs(PrintWriter out)
+    private void printPersonalInputs(PrintWriter out, User user)
     {
         out.println("<table>");
-        out.println("<tr><th>first name</th><td><INPUT class=inputclass TYPE=TEXT NAME=firstname size=30></td></tr>");
-        out.println("<tr><th>last name</th><td><INPUT class=inputclass TYPE=TEXT NAME=lastname size=30></td></tr>");
-        out.println("<tr><th>E-mail</th><td><INPUT class=inputclass TYPE=TEXT NAME=email  size=30 ></td></tr>");
-        
+        out.println("<tr><th>first name</th><td><input class=\"inputclass\" type=\"text\" name=\"firstname\" size=\"30\" value=\"" + user.getFirstName() + "\" /></td></tr>");
+        out.println("<tr><th>last name</th><td><input class=\"inputclass\" type=\"text\" name=\"lastname\" size=\"30\" value=\"" + user.getLastName() + "\" /></td></tr>");
+        out.println("<tr><th>E-mail</th><td><input class=\"inputclass\" type=\"text\" name=\"email\"  size=\"30\" value=\"" + user.getEmail() + "\"/></td></tr>");
+
         out.println("</table>");
 
     }
-    private void printAccountInputs(PrintWriter out)
+    private void printAccountInputs(PrintWriter out, User user)
     {
         out.println("<table>");
-        out.println("<tr><th>username</th><td><INPUT class=inputclass TYPE=TEXT NAME=username size=30></td></tr>");
-        out.println("<tr><th>password</th><td><INPUT class=inputclass TYPE=PASSWORD NAME=password size=30></td></tr>");
+        out.println("<tr><th>username</th><td>" + user.getUserName() + "</td></tr>");
+        out.println("<tr><th>password</th><td><input class=\"inputclass\" type=\"password\" name=\"password\" size=\"30\" /></td></tr>");
+        out.println("<tr><th>new password</th><td><input class=\"inputclass\" type=\"password\" name=\"newpassword\" size=\"30\" /></td></tr>");
         out.println("</table>");
 
     }
@@ -167,63 +161,6 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
         //out.println("<td><INPUT TYPE=RESET class=changegroupbuttonstyle VALUE=\"Reset\"></td></tr>");
         out.println("</table>");
     }
-    private void printGroupList(PrintWriter out,Vector groupList)
-    {
-        Group gr=null;
-        String grname=null;
-        Vector grds=null;
-
-        if(groupList.size()==0)
-        {
-            out.println("<table class=invisibletable>");
-            out.println("<tr><td>No group is available.</td></tr>");
-            out.println("</table>");
-        }
-        else
-        {
-            out.println("<table border= 1 >");
-            out.println("<tr>");
-            out.println("<th>group name</th>");
-            out.println("<th>group structure</th>");
-            out.println("<th>choose this group</th>");
-            out.println("</tr>");
-
-            for(int i=0; i<groupList.size();i++)
-            {
-                out.println("<tr>");
-                gr=(Group)(groupList.get(i));
-                grname=gr.getGroupName();
-                grds=gr.getDataSourceList();
-                this.printGroupName(out, grname);
-                this.printGroupStructureLink(out, grname);
-                //this.printDataSourceList(out,gr);
-                this.printCheckBox(out, grname);
-                out.println("</tr>");
-            }
-            out.println("</table>");
-        }
-    } 
-    private void printGroupName(PrintWriter out, String groupname)
-    {
-        out.println("<td>"+groupname +"</td>");
-    }
-    private void printCheckBox(PrintWriter out, String groupname)
-    {
-        out.println("<td style=text-align:center><INPUT TYPE=CHECKBOX class=checkboxclass NAME= groupname VALUE= "+groupname+"></td>");
-    }
-    private void printGroupStructureLink(PrintWriter out, String groupname)
-    {
-        String groupurl="/gsn/MyGroupHtmlResultSetServlet?groupname="+groupname;                                                           
-        out.println("<ul class=displaylinkul >");
-
-        out.println("<td style=text-align:center><LI class=displaylinkli><a href="+groupurl+" onClick=\"poptastic(this.href); return false;\">&nbsp&nbsp&nbsp view &nbsp&nbsp&nbsp</a></LI>");
-        out.println("</td>");
-        out.println("</ul>");
-    }
-
-
-
-
 
     /****************************************** Client Session related Methods*******************************************/
    /********************************************************************************************************************/
@@ -265,7 +202,7 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
 		}
         catch(Exception e)
         {
-            
+
             logger.error("ERROR IN getGroupList");
 			logger.error(e.getMessage(),e);
         }
@@ -288,37 +225,38 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
         HttpSession session = req.getSession();
         PrintWriter out = (PrintWriter) session.getAttribute("out");
         ParameterSet pm = new ParameterSet(req);
-        //Vector groupnames= pm.getValuesForParam("groupname",req);
-        //groupVectorForGroupNames(pm.getValuesForParam("groupname",req));
-        User user=allowUserToRegister(pm, out,groupVectorForGroupNames(pm.getValuesForParam("groupname",req)));
-        if(user!= null)
+        if (session.getAttribute("user") != null)
+        {
+        User muser=allowUserToRegister(pm, out,new User((User)session.getAttribute("user")));
+        if(muser!= null)
         {
             try
-			{     //printRegistrationOk(out);
-				res.sendRedirect("/gsn/MyRegistrationOkServlet");
+			{
+				res.sendRedirect("/gsn/MyLogoutHandlerServlet");
 			}
 			catch (Exception ignored)
 			{
 				out.println("problem with redirecting to the target !");
 			}
         }
-        else
-        {
-            /*out.println("Failed to sign up"+"<BR>");
-			out.println("You may want to try again <BR>");*/
         }
     }
 
-    User allowUserToRegister(ParameterSet pm,PrintWriter out,Vector groupList)
+    private boolean isNotDefined (ParameterSet pm, String name) {
+        return pm.valueForName(name) == null || "".equals(pm.valueForName(name));
+    }
+
+    User allowUserToRegister(ParameterSet pm,PrintWriter out,User user)
     {
-		User waitinguser=null;
+		//User waitinguser=null;
 		ConnectToDB ctdb =null;
         EmailAddress emailadd=null;
         try
 		{
-			if(pm.hasEmptyParameter())
+			if(isNotDefined(pm,"password") || isNotDefined(pm,"firstname") || isNotDefined(pm,"lastname") || isNotDefined(pm,"email"))
 			{
 				//out.println("At least one of the input parameters is empty "+"<br>");
+                user = null;
                 this.managaeUserAlert(out, "At least one of the input parameters is empty " );
 			}
 			else
@@ -334,23 +272,36 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
                 else
                 {
                     ctdb =new ConnectToDB();
-	                if(ctdb.valueExistsForThisColumn(new Column("USERNAME",pm.valueForName("username")), "ACUSER")==false)
+	                if(ctdb.valueExistsForThisColumn(new Column("USERNAME",user.getUserName()), "ACUSER"))
                     {
-                        User temp=new User(pm.valueForName("username"),Protector.encrypt(pm.valueForName("password")),pm.valueForName("firstname"),pm.valueForName("lastname"),pm.valueForName("email"),groupList,"yes");
-                        if(ctdb.registerUserCandidate(temp)== true)
+                        String pwd = Protector.encrypt(pm.valueForName("password"));
+                        if(ctdb.isPasswordCorrectForThisUser(user.getUserName(), pwd)) // Check if the current password matchs
                         {
-                            waitinguser=temp;
+                            String newpwd = isNotDefined(pm, "newpassword") ? pwd : Protector.encrypt(pm.valueForName("newpassword"));
+                            user.setPassword(newpwd);
+                            user.setFirstName(pm.valueForName("firstname"));
+                            user.setLastName(pm.valueForName("lastname"));
+                            user.setEmail(pm.valueForName("email"));
+                            if(ctdb.updateUserDetails(user))
+                            {
+                                logger.debug("Successfully updated the user details.");
+                            }
+                            else
+                            {
+                                user = null;
+                                this.managaeUserAlert(out, "User Detail Update failed !" );
+                            }
                         }
                         else
                         {
-                            //out.println("Registration failed !");
-                            this.managaeUserAlert(out, "Registration failed !" );
+                            user = null;
+                            this.managaeUserAlert(out, "The password does not match the current password." );
                         }
                     }
                     else
                     {
-                        //out.println("This username exists already in DB, choose another one!");
-                        this.managaeUserAlert(out, "This username exists already in DB, choose another one!" );
+                        user = null;
+                        this.managaeUserAlert(out, "This username does not exist and thus can't be updated." );
                     }
                 }
             }
@@ -368,19 +319,10 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
             }
         }
 
-		return waitinguser;
+		return user;
 	 }
 
-    private Vector groupVectorForGroupNames(Vector groupNames)
-    {
-        Vector groupVector = new Vector();
-       for(int i=0;i<groupNames.size();i++)
-       {
-            groupVector.add(new Group((String)groupNames.get(i)));
-       }
-        return groupVector;
-    }
-
+    
     private void managaeUserAlert(PrintWriter out, String alertMessage)
     {
         this.createAlertBox(out, alertMessage);
@@ -394,10 +336,10 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
         out.println("<p>");
         out.println(alertMessage );
         out.println("</p>");
-        out.println("<p>");
-        out.println("Failed to sign up, ");
-        out.println("you may want to try again !");
-        out.println("</p>");
+        //out.println("<p>");
+        //out.println("Failed to sign up, ");
+        //out.println("you may want to try again !");
+        //out.println("</p>");
         out.println("<form style=\"text-align:right\">");
         out.println("<input");
         out.println("type=\"button\"");
@@ -418,7 +360,11 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
         out.println("</SCRIPT>");
     }
 
-
+    private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
+    {
+        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
+        res.sendRedirect("/gsn/MyLoginHandlerServlet");
+    }
 
 
 }

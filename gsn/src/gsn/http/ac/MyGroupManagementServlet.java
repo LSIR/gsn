@@ -7,6 +7,7 @@ package gsn.http.ac;
  * Time: 8:01:31 PM
  * To change this template use File | Settings | File Templates.
  */
+import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
 import org.apache.log4j.Logger;
@@ -232,7 +233,7 @@ public class MyGroupManagementServlet extends HttpServlet
             {
                 req.getSession().setAttribute("scheme","http");
             }
-            res.sendRedirect("https://"+req.getServerName()+":"+ ContainerConfig.DEFAULT_SSL_PORT+"/gsn/MyGroupManagementServlet");
+            res.sendRedirect("https://"+req.getServerName()+":"+ Main.getContainerConfig().getSSLPort()+"/gsn/MyGroupManagementServlet");
 
         }
     }

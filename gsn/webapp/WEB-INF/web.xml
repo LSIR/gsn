@@ -71,6 +71,12 @@
         <servlet-class>gsn.http.ac.MyCreateGroupServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>MyUserDetailUpdateServlet</servlet-name>
+        <display-name>MyUserDetailUpdateServlet</display-name>
+        <servlet-class>gsn.http.ac.MyUserDetailUpdateServlet</servlet-class>
+    </servlet>
+
 
      <servlet>
         <servlet-name>MyLoginHandlerServlet</servlet-name>
@@ -250,12 +256,15 @@
         <url-pattern>/menu.jsp</url-pattern>
     </servlet-mapping>
 
-      <servlet-mapping>
+     <servlet-mapping>
             <servlet-name>MyCreateGroupServlet</servlet-name>
             <url-pattern>/gsn/MyCreateGroupServlet</url-pattern>
      </servlet-mapping>
 
-     
+     <servlet-mapping>
+            <servlet-name>MyUserDetailUpdateServlet</servlet-name>
+            <url-pattern>/gsn/MyUserDetailUpdateServlet</url-pattern>
+     </servlet-mapping>
 
      <servlet-mapping>
             <servlet-name>MyLoginHandlerServlet</servlet-name>

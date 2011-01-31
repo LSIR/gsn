@@ -180,7 +180,7 @@ public class ConnectToDB
     {
 
         boolean insertOK=false;
-        String request = "INSERT INTO ACUSER(USERNAME,PASSWORD,FIRSTNAME,LASTNAME,EMAIL,ISCANDIDATE) VALUES ('Admin','"+ Protector.encrypt("changeit")+ "','Admin','Admin','behnaz.bostanipour@epfl.ch','no')";
+        String request = "INSERT INTO ACUSER(USERNAME,PASSWORD,FIRSTNAME,LASTNAME,EMAIL,ISCANDIDATE) VALUES ('Admin','"+ Protector.encrypt("changeit")+ "','Admin','Admin','gsn.administrator@host.com','no')";
         int f =statement.executeUpdate(request);
         if(f!=0)
         {
@@ -1244,6 +1244,25 @@ public class ConnectToDB
         this.updateOneColumnUnderTwoConditions(new Column("ISUSERWAITING",user.getIsWaiting()),new Column("USERNAME",user.getUserName()),new Column("DATASOURCENAME",ds.getDataSourceName()),"ACUSER_ACDATASOURCE");
         this.updateOneColumnUnderTwoConditions(new Column("DATASOURCETYPE",ds.getDataSourceType()),new Column("USERNAME",user.getUserName()),new Column("DATASOURCENAME",ds.getDataSourceName()),"ACUSER_ACDATASOURCE");
 
+    }
+    boolean updateUserDetails(User user) throws SQLException
+    {
+        StringBuilder query = new StringBuilder()
+            .append("UPDATE ACUSER SET FIRSTNAME='")
+            .append(user.getFirstName())
+            .append("', LASTNAME='")
+            .append(user.getLastName())
+            .append("', EMAIL='")
+            .append(user.getEmail())
+            .append("', PASSWORD='")
+            .append(user.getPassword())
+            .append("' WHERE USERNAME='")
+            .append(user.getUserName())
+            .append("'");
+       if(stmt.executeUpdate(query.toString()) !=0)
+           return true;
+       else
+           return false;
     }
 
     void updateOwnerDecision(String decision, String userName, String dataSourceName )throws SQLException

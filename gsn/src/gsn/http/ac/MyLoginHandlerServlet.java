@@ -1,5 +1,6 @@
 package gsn.http.ac;
 
+import gsn.Main;
 import gsn.beans.ContainerConfig;
 import org.apache.log4j.Logger;
 
@@ -117,7 +118,7 @@ public class MyLoginHandlerServlet extends HttpServlet
             {
                 req.getSession().setAttribute("scheme","http");
             }
-            res.sendRedirect("https://"+req.getServerName()+":"+ ContainerConfig.DEFAULT_SSL_PORT+"/gsn/MyLoginHandlerServlet");
+            res.sendRedirect("https://"+req.getServerName()+":"+ Main.getContainerConfig().getSSLPort()+"/gsn/MyLoginHandlerServlet");
 
         }
     }
@@ -155,7 +156,7 @@ public class MyLoginHandlerServlet extends HttpServlet
                 {
                     if(session.getAttribute("scheme").equals("http"))
                     {
-                        res.sendRedirect("http://"+req.getServerName()+":"+ ContainerConfig.DEFAULT_GSN_PORT+"/");
+                        res.sendRedirect("http://"+req.getServerName()+":"+ Main.getContainerConfig().getContainerPort()+"/");
                     }
                     else if(session.getAttribute("scheme").equals("https"))
                     {
@@ -214,7 +215,10 @@ public class MyLoginHandlerServlet extends HttpServlet
                     {
                         out.println("You are allowed to see the target!"+"<br>");
                         user = new User(pm.valueForName("username"),enc,ctdb.getDataSourceListForUserLogin(pm.valueForName("username")),ctdb.getGroupListForUser(pm.valueForName("username")));
-
+                        User userFromBD = ctdb.getUserForUserName(pm.valueForName("username"));
+                        user.setLastName(userFromBD.getLastName());
+                        user.setEmail(userFromBD.getEmail());
+                        user.setFirstName(userFromBD.getFirstName());
                     }
 
                 }

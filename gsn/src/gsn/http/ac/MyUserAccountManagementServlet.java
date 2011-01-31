@@ -1,5 +1,6 @@
 package gsn.http.ac;
 
+import gsn.Main;
 import gsn.beans.ContainerConfig;
 
 
@@ -114,6 +115,7 @@ public class MyUserAccountManagementServlet   extends HttpServlet
     {
         out.println("<p>Welcome to your account management ! you have the following options:</p>");
         out.println("<ul class=linklistul >");
+        out.println("<li class=linklistli><a href=\"/gsn/MyUserDetailUpdateServlet\">Update your user details</a></LI>");
         out.println("<LI class=linklistli><a href=\"/gsn/MyUserUpdateServlet\">Update your access rights</a></LI>");
         out.println("<LI class=linklistli><a href=\"/gsn/MyDataSourceCandidateRegistrationServlet\">Upload new virtual sensor files</a></LI>");
         out.println("<LI class=linklistli><a href=\"/gsn/MyOwnerWaitingListServlet\">Check the waiting list for your virtual sensor(s)</a></LI>");
@@ -140,7 +142,7 @@ public class MyUserAccountManagementServlet   extends HttpServlet
             {
                 req.getSession().setAttribute("scheme","http");
             }
-            res.sendRedirect("https://"+req.getServerName()+":"+ ContainerConfig.DEFAULT_SSL_PORT+"/gsn/MyUserAccountManagementServlet");
+            res.sendRedirect("https://"+req.getServerName()+":"+ Main.getContainerConfig().getSSLPort()+"/gsn/MyUserAccountManagementServlet");
 
         }
     }
