@@ -502,9 +502,9 @@ class BinaryPluginClass(AbstractPluginClass):
         self._waitforfile = False
         if not self._filedeque and (not self._filedescriptor or self._filedescriptor.closed):
             self._isBusy = False
-            self.info('checkForFileTimerAction: there is no file to be transmitted')
+            self.info('there is no file to be transmitted')
         else:
-            self.info('checkForFileTimerAction: there are still files to be transmitted')
+            self.info('there are still files to be transmitted')
         
          
     def isBusy(self):
