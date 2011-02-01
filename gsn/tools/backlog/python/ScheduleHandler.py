@@ -9,8 +9,7 @@ __source__      = "$URL$"
 
 # as soon as the subprocess.Popen() bug has been fixed the functionality related
 # to this variable should be removed
-SUBPROCESS_BUG_BYPASS = False
-
+SUBPROCESS_BUG_BYPASS = True
 
 import time
 import string
@@ -21,7 +20,8 @@ import pickle
 import shlex
 
 if SUBPROCESS_BUG_BYPASS:
-    from SubprocessFake import SubprocessFakeClass
+    import SubprocessFake
+    subprocess = SubprocessFake
 else:
     import subprocess
     
@@ -377,10 +377,7 @@ class ScheduleHandlerClass(Thread):
                     else:
                         self._logger.debug('executing >' + commandstring + '< now')
                     try:
-                        if SUBPROCESS_BUG_BYPASS:
-                            job = SubprocessFakeClass(commandstring)
-                        else:
-                            job = subprocess.Popen(shlex.split(commandstring), stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
+                        job = subprocess.Popen(shlex.split(commandstring), stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
                     except Exception, e:
                         self.error('error in scheduled script >' + commandstring + '<:' + str(e))
                     else:

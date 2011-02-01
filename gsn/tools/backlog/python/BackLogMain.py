@@ -7,12 +7,7 @@ __date__        = "$Date$"
 __id__          = "$Id$"
 __source__      = "$URL$"
 
-
-PROFILE = False
-PROFILE_FILE = '/tmp/backlog.profile'
-
 import os
-import subprocess
 import sys
 import signal
 import ConfigParser
@@ -21,8 +16,6 @@ import time
 import logging
 import logging.config
 import thread
-if PROFILE:
-    import yappi
 from threading import Thread, Lock, Event
 
 from SpecialAPI import Statistics, PowerControl
@@ -30,7 +23,14 @@ from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
 from JobsObserver import JobsObserverClass
-from ScheduleHandler import ScheduleHandlerClass
+from ScheduleHandler import ScheduleHandlerClass, SUBPROCESS_BUG_BYPASS
+
+
+if SUBPROCESS_BUG_BYPASS:
+    import SubprocessFake
+    subprocess = SubprocessFake
+else:
+    import subprocess
 
 DEFAULT_CONFIG_FILE = '/etc/backlog.cfg'
 DEFAULT_PLUGINS = [ 'BackLogStatusPlugin' ]
@@ -492,14 +492,6 @@ class BackLogMainClass(Thread, Statistics):
         Returns the number of errors occurred since the last program start
         '''
         return self.getCounterValue(self._errorCounterId)
-    
-if PROFILE:
-    def print_stats():
-        yappi.get_stats(yappi.SORTTYPE_TTOTAL)
-        file = open(PROFILE_FILE,'a')
-        for entry in yappi.get_stats(yappi.SORTTYPE_TAVG):
-            file.write(entry+'\n')
-        file.close()
 
 
 
@@ -526,8 +518,6 @@ def main():
         
     backlog = None
     try:
-        if PROFILE:
-            yappi.start()
         backlog = BackLogMainClass(options.config_file)
         backlog.start()
         signal.pause()
@@ -541,15 +531,10 @@ def main():
         if backlog and backlog.isAlive():
             backlog.stop()
         logging.shutdown()
-        if PROFILE:
-            yappi.stop()
-            print_stats()
         sys.exit(1)
         
     logging.shutdown()
-    if PROFILE:
-        yappi.stop()
-        print_stats()
+    
     if backlog.shutdown:
         print 'shutdown now'
         subprocess.Popen(['shutdown', '-h', 'now'])

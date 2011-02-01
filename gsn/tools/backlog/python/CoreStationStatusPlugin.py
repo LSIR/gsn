@@ -13,7 +13,8 @@ from threading import Timer, Event
 
 from ScheduleHandler import SUBPROCESS_BUG_BYPASS
 if SUBPROCESS_BUG_BYPASS:
-    from SubprocessFake import SubprocessFakeClass
+    import SubprocessFake
+    subprocess = SubprocessFake
 else:
     import subprocess
     
@@ -43,10 +44,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         
-        if SUBPROCESS_BUG_BYPASS:
-            p = SubprocessFakeClass('modprobe ad77x8')
-        else:
-            p = subprocess.Popen(['modprobe', 'ad77x8'])
+        p = subprocess.Popen(['modprobe', 'ad77x8'])
         self.info('wait for modprobe ad77x8 to finish')
         ret = p.wait()
         output = p.communicate()
