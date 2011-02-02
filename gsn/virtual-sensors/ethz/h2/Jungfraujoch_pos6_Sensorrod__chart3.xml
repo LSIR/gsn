@@ -3,11 +3,11 @@
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Sensorrod reference temperatures (Position 6, 7d)</param>
+            <param name="title">Sensorrod reference temperatures (Position 6)</param>
             <param name="height">400</param>
             <param name="width">610</param>
             <param name="vertical-axis">℃</param>
-            <param name="history-size">5020</param>
+            <param name="history-size">720</param>
             <param name="time-stream-name">GENERATION_TIME</param>
         </init-params>
         <output-structure>

@@ -3,12 +3,12 @@
         <class-name>gsn.vsensor.ChartVirtualSensorPermasense</class-name>
         <init-params>
             <param name="input-Stream">data</param>
-            <param name="title">Dozer duty cycle (Position 2, 7d)</param>
+            <param name="title">Dozer duty cycle (Position 2)</param>
             <param name="height">400</param>
             <param name="width">610</param>
             <param name="vertical-axis">‰</param>
             <param name="log-vertical-axis"/>
-            <param name="history-size">5040</param>
+            <param name="history-size">720</param>
             <param name="time-stream-name">GENERATION_TIME</param>
         </init-params>
         <output-structure>
