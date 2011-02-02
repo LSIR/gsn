@@ -1,5 +1,6 @@
 package gsn.vsensor;
 
+import java.awt.image.renderable.ParameterBlock;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,11 +9,17 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.TreeMap;
 
+import javax.imageio.ImageIO;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
+
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 
 import org.apache.log4j.Logger;
+
+import com.sun.media.jai.codec.SeekableStream;
 
 public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	
@@ -21,8 +28,9 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	private static final transient Logger logger = Logger.getLogger(FileGetterVirtualSensor.class);
 	
 	private String filetype = null;
+	private String nef_extraction_type = null;
 	private String dcraw_flip = null;
-	
+	private Double rotation = null;	
 	
 	@Override
 	public boolean initialize() {
@@ -34,8 +42,16 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 			logger.error("file_type has to be defined in the virtual sensors xml file");
 			return false;
 		}
+		if (filetype.equalsIgnoreCase("nef")) {
+			nef_extraction_type = params.get("nef_extraction_type");
+			if (nef_extraction_type == null || (!nef_extraction_type.equalsIgnoreCase("thumbnail") && !nef_extraction_type.equalsIgnoreCase("jpeg"))) {
+				logger.error("nef_extraction_type has to be defined in the virtual sensors xml file (valid values are \"thumbnail\" or \"jpeg\")");
+				return false;
+			}
+		}
 		dcraw_flip = params.get("dcraw_flip");
-		
+		if (params.get("rotation")!=null)
+			rotation = new Double(params.get("rotation"));
 		return super.initialize();
 	}
 	
@@ -63,26 +79,44 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 		}
 		else if (filetype.equalsIgnoreCase("nef")) {
 			logger.debug("exctracting jpeg from: " + file.getAbsolutePath());
+			Process p = null;
+			StringBuffer cmd = new StringBuffer(DCRAW + " -c");
+			if (nef_extraction_type.equalsIgnoreCase("thumbnail"))
+				cmd.append(" -e");
+			if (dcraw_flip != null)
+				cmd.append(" -t "+dcraw_flip);
+			cmd.append(" "+file.getAbsolutePath());
+			logger.debug("exec "+cmd);
 			try {
-				Process p;
-				if (dcraw_flip == null)
-					p = Runtime.getRuntime().exec(DCRAW + " -c -e " + file.getAbsolutePath());
-				else
-					p = Runtime.getRuntime().exec(DCRAW + " -c -t " + dcraw_flip + " -e " + file.getAbsolutePath());
+				p = Runtime.getRuntime().exec(cmd.toString());
 				is = p.getInputStream();
 			} catch (IOException e) {
-		    	logger.error(e.getMessage(), e);
+				logger.error(e.getMessage(), e);
 		    	return;
 			}
 		}
 		
-		byte[] b = new byte[1024];
-		int n;
+		SeekableStream s = SeekableStream.wrapInputStream(is, true);
+		RenderedOp image = JAI.create("stream", s);
+		if (rotation!=null) {
+			// rotate
+			logger.debug("rotate " + file.getAbsolutePath() + " by "+rotation);
+			// 	rotation center
+			float centerX = (float)image.getWidth() / 2;
+			float centerY = (float)image.getHeight() / 2;
+			ParameterBlock pb = new ParameterBlock();
+			pb.addSource(image);
+			pb.add(centerX);
+			pb.add(centerY);
+			pb.add((float)(rotation / 180d * Math.PI));
+			pb.add(new javax.media.jai.InterpolationBicubic(10));
+			// create a new, rotated image
+			image = JAI.create("rotate", pb);
+		}
 		try {
-			while ((n = is.read(b)) != -1)
-				os.write(b, 0, n);
+			ImageIO.write(image.getAsBufferedImage(), "jpg", os);
 		} catch (IOException e) {
-	    	logger.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 	    	return;
 		}
 		

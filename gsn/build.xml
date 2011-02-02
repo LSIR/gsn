@@ -126,6 +126,7 @@
         	<!-- disable Java's DNS caching to respect dynamic IPs from DynDns -->
             <jvmarg value="-Dsun.net.inetaddr.ttl=0"/>
             <jvmarg value="-Dsun.net.inetaddr.negative.ttl=0"/>
+            <jvmarg value="-Dcom.sun.media.jai.disableMediaLib=true"/>
         </java>
     </target>
 
