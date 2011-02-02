@@ -1,19 +1,18 @@
-<virtual-sensor name="Matterhorn_pos19_Camera__scaled" priority="10" >
+<virtual-sensor name="Matterhorn_pos19_Camera" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.FileGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
-            <param name="jpeg_scaled">JPEG_SCALED</param>
             <param name="file_type">nef</param>
             <param name="nef_extraction_type">thumbnail</param>
             <param name="rotation">270</param>
         </init-params>
         <output-structure>
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
-            <field name="JPEG_SCALED" type="binary:image/jpeg" />
+            <field name="JPEG_ORIGINAL" type="binary" />
         </output-structure>
     </processing-class>
-    <description>camera pictures from position 19 at Matterhorn deployment as thumbnail</description>
+    <description>camera pictures from position 19 at Matterhorn deployment as jpeg</description>
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Matterhorn deployment</predicate>
