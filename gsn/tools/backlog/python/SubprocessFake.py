@@ -38,7 +38,6 @@ class Popen(Thread):
                  startupinfo=None, creationflags=0):
         
         Thread.__init__(self)
-        self._logger = logging.getLogger(self.__class__.__name__)
         
         if startupinfo is not None:
             raise ValueError("startupinfo is only supported on Windows "
@@ -59,11 +58,10 @@ class Popen(Thread):
         self._notifier = ThreadedNotifier(wm, FinishFolderEventHandler(self))
         # tell the watch manager which folders to watch for newly written files
         wm.add_watch(SUBPROCESS_FAKE_FOLDER_NEW, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_DELETE'])
-        self._logger.info('enable IN_DELETE_SELF notification for ' + SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName)
         wm.add_watch(SUBPROCESS_FAKE_FOLDER_FINISH, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_CLOSE_WRITE'])
-        self._logger.info('enable IN_CLOSE_WRITE notification for ' + SUBPROCESS_FAKE_FOLDER_FINISH)
         self._notifier.start()
         
+        self.stdLock = Lock()
         self.stdout = ''.encode()
         self.stderr = ''.encode()
         self.pid = None
@@ -84,19 +82,22 @@ class Popen(Thread):
         self.start()
         self.pidEvent.wait(5)
         if not self.pidEvent.isSet():
-            if not self.finishEvent.isSet():
-                self._notifier.stop()
-            raise Exception('something went wrong in executing >' + args + '<')
+            self.finishEvent.set()
+            if os.path.exists(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName):
+                os.remove(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName)
+            raise Exception('SubprocessFake could not execute >' + args + '< (is subprocessfaked.sh running?)')
         
         
     def run(self):
         self.finishEvent.wait()
         self._notifier.stop()
-        self._logger.info('deleted')
         
         
     def poll(self):
-        return self.returncode
+        self.stdLock.acquire()
+        ret = self.returncode
+        self.stdLock.release()
+        return ret
     
     
     def kill(self):
@@ -112,36 +113,62 @@ class Popen(Thread):
         if input != None:
             raise ValueError("input is not supported by SubprocessFake")
         
-        return (self.stdout, self.stderr)
+        self.stdLock.acquire()
+        stdout = self.stdout
+        stderr = self.stderr
+        self.stdLock.release()
+        
+        return (stdout, stderr)
     
     
     def _fileFinishEvent(self, file):
         if (file == SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName):
-            self._logger.info('finish')
             
-            self.returncode = 0
+            stdout = ''
+            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.out'):
+                fout = open(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.out', 'r')
+                stdout = ''.join(fout.readlines()).rstrip('\n')
+                fout.close()
             
-            f = open(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName, 'r')
+            stderr = ''
+            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.err'):
+                ferr = open(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.err', 'r')
+                stderr = ''.join(ferr.readlines()).rstrip('\n')
+                ferr.close()
             
-            stdout = ''.join(f.readlines()[1:]).rstrip('\n')
+            ret = None
+            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.ret'):
+                fret = open(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.ret', 'r')
+                ret = fret.readline().strip('\n')
+                fret.close()
+            
+            self.stdLock.acquire()
             if stdout:
                 self.stdout = stdout.encode()
-            
-            f.close()
+            if stderr:
+                self.stderr = stderr.encode()
+            if ret != None:
+                self.returncode = int(ret)
+            self.stdLock.release()
             
             self.finishEvent.set()
-            os.remove(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName)
+            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.pid'):
+                os.remove(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.pid')
+            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.ret'):
+                os.remove(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.ret')
+            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.out'):
+                os.remove(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.out')
+            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.err'):
+                os.remove(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.err')
             
             
     def _pidEvent(self, file):
-        self._logger.info('pid event: ' + file)
         if self.pid == None and os.path.exists(file):
-            if file == SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName:
+            if file == SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.pid':
                 f = open(file, 'r')
                 pid = f.readline().strip('\n')
                 f.close()
                 if pid.isdigit():
-                    self._logger.info('pid: ' + pid)
                     self.pid = int(pid)
                     self.pidEvent.set()
 
@@ -163,7 +190,4 @@ class FinishFolderEventHandler(ProcessEvent):
         
     def process_IN_DELETE(self, event):
         self._subprocessFake._fileFinishEvent(event.pathname)
-
-    def process_default(self, event):
-        self._subprocessFake._logger.info(event.pathname + ' changed (event=' + event.name + ')')
         

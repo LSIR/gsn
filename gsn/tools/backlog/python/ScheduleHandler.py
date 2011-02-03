@@ -36,9 +36,6 @@ from crontab import CronTab
 
 ############################################
 # Some Constants
-DEFAULT_BACKLOG = False
-
-SEND_QUEUE_SIZE = 25
 
 MESSAGE_PRIORITY = 5
 
@@ -407,7 +404,10 @@ class ScheduleHandlerClass(Thread):
         
         
     def allJobsFinished(self):
-        self._logger.info('all jobs finished')
+        if self._duty_cycle_mode:
+            self._logger.info('all jobs finished')
+        else:
+            self._logger.debug('all jobs finished')
         self._allJobsFinishedEvent.set()
         
         

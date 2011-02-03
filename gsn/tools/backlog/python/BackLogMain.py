@@ -143,7 +143,6 @@ class BackLogMainClass(Thread, Statistics):
         self._logger.info(str(__date__))
         self._logger.info(str(__id__))
         self._logger.info(str(__source__))
-        
                 
         if not folder_to_check_size:
             raise TypeError('folder_to_check_size has to be specified in the configuration file')
