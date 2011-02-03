@@ -18,7 +18,6 @@ SUBPROCESS_FAKE_FOLDER_FINISH = '/tmp/subprocessfake/finish/'
 
 
 PIPE = -1
-STDOUT = -2
 
 class Popen(Thread):
     '''
@@ -101,7 +100,30 @@ class Popen(Thread):
     
     
     def kill(self):
-        pass
+        if not self.pidEvent.isSet():
+            self.finishEvent.wait()
+        try:
+            os.kill(self.pid, signal.SIGKILL)
+        except OSError:
+            pass
+
+
+    def terminate(self):
+        if not self.pidEvent.isSet():
+            self.finishEvent.wait()
+        try:
+            os.kill(self.pid, signal.SIGTERM)
+        except OSError:
+            pass
+        
+        
+    def send_signal(signal):
+        if not self.pidEvent.isSet():
+            self.finishEvent.wait()
+        try:
+            os.kill(self.pid, signal)
+        except OSError:
+            pass
     
     
     def wait(self):
