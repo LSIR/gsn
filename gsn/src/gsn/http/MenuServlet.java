@@ -19,8 +19,13 @@ public class MenuServlet extends HttpServlet {
         out.println("<ul id=\"menu\">");
         out.println("<li" + ("index".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"index.html#home\">home</a></li>");
         out.println("<li" + ("data".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"data.html#data\">data</a></li>");
+        out.println("<li" + ("topology".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"topology.html#topology\">network topology</a></li>");
+        out.println("<li" + ("systemhealth".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"systemhealth.html#systemhealth\">system</a></li>");
+        out.println("<li" + ("nodehealth".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"nodehealth.html#nodehealth\">node health</a></li>");
+        out.println("<li" + ("basehealth".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"basehealth.html#basehealth\">base health</a></li>");
+        out.println("<li" + ("weather".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"weather.html#weather\">on-site weather</a></li>");
         out.println("<li" + ("map".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"map.html#map\">map</a></li>");
-        out.println("<li" + ("fullmap".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"fullmap.html#fullmap\">fullmap</a></li>");
+        //out.println("<li" + ("fullmap".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"fullmap.html#fullmap\">fullmap</a></li>");
         if (Main.getContainerConfig().isAcEnabled()) {
             out.println("<li><a href=\"/gsn/MyAccessRightsManagementServlet\">access rights management</a></li>");
         }
