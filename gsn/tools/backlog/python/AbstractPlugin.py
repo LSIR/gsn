@@ -304,6 +304,16 @@ class AbstractPluginClass(Thread, Statistics):
         @return: uptime of the backlog program in seconds
         '''
         return self._backlogMain.getUptime()
+        
+        
+    def isResendingDB(self):
+        '''
+        Returns True if BackLog is resending the content of the sqlite3
+        database otherwise False.
+        
+        @return: True if BackLog is resending db entries
+        '''
+        return self._backlogMain.backlog.isBusy()
 
 
     def getBackLogDBStatus(self, intervalSec):
