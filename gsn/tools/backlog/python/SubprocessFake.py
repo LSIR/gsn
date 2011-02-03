@@ -10,7 +10,7 @@ import os
 import types
 import logging
 import uuid
-from threading import Thread, Event, Lock
+from threading import Thread, Timer, Event, Lock
 from pyinotify import WatchManager, ThreadedNotifier, EventsCodes, ProcessEvent
 
 SUBPROCESS_FAKE_FOLDER_NEW = '/tmp/subprocessfake/new/'
@@ -37,6 +37,7 @@ class Popen(Thread):
                  startupinfo=None, creationflags=0):
         
         Thread.__init__(self)
+        self._logger = logging.getLogger(self.__class__.__name__)
         
         if startupinfo is not None:
             raise ValueError("startupinfo is only supported on Windows "
@@ -74,17 +75,17 @@ class Popen(Thread):
         if shell:
             args = "/bin/sh -c " + args
 
+        try:
+            os.makedirs(SUBPROCESS_FAKE_FOLDER_NEW)
+        except:
+            pass
         f = open(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName,'w')
         f.write(args)
         f.close()
         
         self.start()
-        self.pidEvent.wait(5)
-        if not self.pidEvent.isSet():
-            self.finishEvent.set()
-            if os.path.exists(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName):
-                os.remove(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName)
-            raise Exception('SubprocessFake could not execute >' + args + '< (is subprocessfaked.sh running?)')
+        self._checkPidTimer = Timer(5.0, self._checkPidEvent, [args])
+        self._checkPidTimer.start()
         
         
     def run(self):
@@ -101,7 +102,7 @@ class Popen(Thread):
     
     def kill(self):
         if not self.pidEvent.isSet():
-            self.finishEvent.wait()
+            self.pidEvent.wait()
         try:
             os.kill(self.pid, signal.SIGKILL)
         except OSError:
@@ -110,7 +111,7 @@ class Popen(Thread):
 
     def terminate(self):
         if not self.pidEvent.isSet():
-            self.finishEvent.wait()
+            self.pidEvent.wait()
         try:
             os.kill(self.pid, signal.SIGTERM)
         except OSError:
@@ -119,7 +120,7 @@ class Popen(Thread):
         
     def send_signal(signal):
         if not self.pidEvent.isSet():
-            self.finishEvent.wait()
+            self.pidEvent.wait()
         try:
             os.kill(self.pid, signal)
         except OSError:
@@ -141,6 +142,18 @@ class Popen(Thread):
         self.stdLock.release()
         
         return (stdout, stderr)
+    
+    
+    def _checkPidEvent(self, args):
+        if not self.pidEvent.isSet():
+            self.stdLock.acquire()
+            self.returncode = 1
+            self.stdLock.release()
+            self.pidEvent.set()
+            self.finishEvent.set()
+            if os.path.exists(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName):
+                os.remove(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName)
+            self._logger.error('could not execute >' + args + '< (is subprocessfaked.sh running?)')
     
     
     def _fileFinishEvent(self, file):
@@ -192,6 +205,10 @@ class Popen(Thread):
                 f.close()
                 if pid.isdigit():
                     self.pid = int(pid)
+                    try:
+                        self._checkPidTimer.cancel()
+                    except:
+                        pass
                     self.pidEvent.set()
 
             

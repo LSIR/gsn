@@ -72,7 +72,7 @@ class JobsObserverClass(Thread):
                                     self.error('job (' + job_name + ') with PID ' + str(job.pid) + ' has not finished in time -> kill it')
                                     try:
                                         os.killpg(job.pid, signal.SIGTERM)
-                                    except OSError:
+                                    except:
                                         pass
                                     self._logger.warning('wait for job (' + job_name + ') to be killed')
                                     self._wait.wait(0.1)
@@ -83,7 +83,7 @@ class JobsObserverClass(Thread):
                                     if job.poll() == None:
                                         try:
                                             os.killpg(job.pid, signal.SIGKILL)
-                                        except OSError:
+                                        except:
                                             pass
                                     job.wait()
                                     stdoutdata, stderrdata = job.communicate()
@@ -166,7 +166,7 @@ class JobsObserverClass(Thread):
                 self.error('job (' + job_name + ') with PID ' + str(job.pid) + ' has not finished yet -> kill it')
                 try:
                     os.killpg(job.pid, signal.SIGTERM)
-                except OSError:
+                except:
                     pass
                 self._logger.warning('wait for job (' + job_name + ') to be killed')
                 self._wait.wait(0.1)
@@ -175,7 +175,7 @@ class JobsObserverClass(Thread):
                 if job.poll() == None:
                     try:
                         os.killpg(job.pid, signal.SIGKILL)
-                    except OSError:
+                    except:
                         pass
                 job.wait()
                 output = job.communicate()
