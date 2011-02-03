@@ -19,9 +19,16 @@ stdlib imports
 import struct
 #from time import gmtime, time, strftime
 import time
-from threading import Event
+from threading import Event, Thread
 import GPSDriver
 from SpecialAPI import PowerControl
+
+from ScheduleHandler import SUBPROCESS_BUG_BYPASS
+if SUBPROCESS_BUG_BYPASS:
+    import SubprocessFake
+    subprocess = SubprocessFake
+else:
+    import subprocess
 '''
 defines
 '''
@@ -45,14 +52,10 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     
     def __init__(self, parent, config):
-        
-#        self.getPowerControlObject().wlanOff()
-#        self.getPowerControlObject().wlanOn()
-#        self.getPowerControlObject().getWlanStatus()
+        Thread.__init__(self)
     
     	AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG, needPowerControl=True)
         self.info('Init GPSPlugin...')
-        self._progStart = time.time()
         self._stopped = False
         self._busy = True
         
@@ -76,6 +79,8 @@ class GPSPluginClass(AbstractPluginClass):
         
         self.registerTOSListener()
     	
+        self._WlanThread = WlanThread(self,10,10)
+        
         self.debug("Done init GPS Plugin")
 
 
@@ -91,6 +96,9 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     def action(self,parameters):
         self.info("Action called!")
+        if (not self.isDutyCycleMode()):
+            self.warning("GPSPlugin's action called even though we are not in duty-cycle mode!")
+            return
         self.runPlugin(parameters)
         
     '''
@@ -118,38 +126,45 @@ class GPSPluginClass(AbstractPluginClass):
             return
         
         self.info('GPSPlugin running...')
-    
+        self._WlanThread.start()
         # Prepare for precise timing
         now = time.time()
-        while time.time() <= self._endTime and not self._stopped:
+#        wlan_on = 10*60
+#        wlan_off = 40*60
+#        offset = now + wlan_on
+#        cycles = self.getMaxRuntime()/60
+        while (time.time() <= self._endTime and not self._stopped):
             # Read that GPS RAW message
+#            if (time.time() >= offset and time.time() < offset+2*60):
+#                self.info("Going to cycle wlan")
+#                if (self.getPowerControlObject().getWlanStatus()):
+#                    self.getPowerControlObject().wlanOff()
+#                    offset = now + wlan_on + wlan_off
+#                    self.info("Turned OFF WLAN")
+#                else:
+#                    self.getPowerControlObject().wlanOn()
+#                    offset = now + 2*wlan_on+wlan_off
+#                    self.info("Turned ON WLAN")
+                    
             rawMsg = self.gps._read("")
-            self.info(str(rawMsg))
             if (rawMsg):
-                # Parse the raw message
-                '''
-                if (self._mode == "nav"):
-                    dataPackage = self._parseNavMsg(rawMsg)
-                elif (self._mode == "raw"):
-                    dataPackage = self._parseRawMsg(rawMsg)
-                '''
                 if (self._mode == "nav"):
                     #self.processMsg(self.getTimeStamp(), [NAV_TYPE, NAV_DATA_VERSION]+rawMsg[2])
                     pass
                 elif (self._mode == "raw"):
-                    self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, rawMsg[2]])
+                    self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, bytearray(rawMsg[2])])
             self._runEv.wait(self._interval-1)
 
         # die...
-
+        self._WlanThread.join()
         self.debug('GPSPlugin died...')
     
         end = time.time()
-        self.info('Number of measurements: ' + str(gps._measurementNo))
-        self.info('Number of satellites: '+ str(gps._SatelliteCounter))
-        self.info('Number of satellites above thresholds: '+str(gps._goodSatelliteCounter))
-        self.info("Killed " + str(gps._zombiesKilled))
-        self.info("Serial disconnected " + str(gps._serialCount))
+        self.info('Number of measurements: ' + str(self.gps.measurementNo))
+        self.info('Number of satellites: '+ str(self.gps._SatelliteCounter))
+        self.info('Number of satellites above thresholds: '+str(self.gps._goodSatelliteCounter))
+        self.info("Killed " + str(self.gps._zombiesKilled))
+        self.info("Serial disconnected " + str(self.gps._serialCount))
         self.stop()
     
     '''
@@ -211,6 +226,7 @@ class GPSPluginClass(AbstractPluginClass):
     def stop(self):
         self.info('GPSPlugin stopping...')
         self._stopped = True
+        self._WlanThread.stop()
         self._busy = False
         self.deregisterTOSListener()
         self.info('GPSPlugin stopped')
@@ -236,3 +252,63 @@ class GPSPluginClass(AbstractPluginClass):
     def needsWLAN(self):
         # TODO: implement return value
         return False
+    
+    
+#############################################################
+# Class WlanThread
+#############################################################
+class WlanThread(Thread):
+
+    #*********************************************************
+    # init()
+    #*********************************************************
+    def __init__(self, parent,uptime=10,downtime=40):
+        Thread.__init__(self)
+        self._uptime=uptime*60
+        self._downtime=downtime*60
+        self._parent = parent
+        self._work = Event()
+        self._stopped = False
+        self._online = parent.getPowerControlObject().getWlanStatus()
+    
+    #*********************************************************
+    # run()
+    #*********************************************************
+    def run(self):
+        self._parent._logger.info('WlanThread: started')
+        while not self._stopped: 
+            self._parent._logger.info('WlanThread: Waiting for ' + str(self._uptime) + ' secs before cycling WLAN')
+            self._work.wait(self._uptime)
+            if (self._parent.getPowerControlObject().getWlanStatus()):
+                p = subprocess.Popen('/usr/bin/who')
+                p.wait()
+                user = p.communicate()[0]
+                self._parent._logger.info(str(user))
+                #self._parent._logger.info(str("HOST\nroot" in user))
+                start = time.time()
+                while ((("HOST\nroot" in user) or (self._parent.isResendingDB())) and not self._stopped):
+                    self._parent._logger.info("size: " + str(self._parent.isResendingDB))
+                    self._parent._logger.info('Someone is logged in or we are flushing DB... NOT power cycling WLAN!')
+                    self._parent._logger.info('Waiting for 10 sec')
+                    self._work.wait(10)
+                    p = subprocess.Popen('/usr/bin/who')
+                    p.wait()
+                    user = p.communicate()[0]
+                    #user = commands.getoutput('/usr/bin/who')
+                    #self._parent._logger.info(str(user))
+                duration = time.time() - start
+                self._parent.getPowerControlObject().wlanOff()
+                self._parent._logger.info('Waiting for ' + str(self._downtime-duration) + ' secs')
+                self._work.wait(self._downtime - duration)
+            #Todo: Turn Wlan on
+            self._parent._logger.info("We are not online, so turn on wlan")
+            self._parent.getPowerControlObject().wlanOn()  
+        self._parent._logger.info('WlanThread: died')
+
+    #*********************************************************
+    # stop()
+    #*********************************************************
+    def stop(self):
+        self._stopped = True
+        self._work.set()
+        self._parent._logger.info('WlanThread: stopped')

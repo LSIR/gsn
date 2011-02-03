@@ -87,7 +87,7 @@ class GPSDriver():
     	#STATS
     	self._serialCount = 0
     	self._zombiesKilled = 0
-        self._measurementNo=0
+        self.measurementNo=0
         self._goodSatelliteCounter=0
         self._SatelliteCounter=0
            
