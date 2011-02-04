@@ -133,19 +133,7 @@ class GPSPluginClass(AbstractPluginClass):
 #        wlan_off = 40*60
 #        offset = now + wlan_on
 #        cycles = self.getMaxRuntime()/60
-        while (time.time() <= self._endTime and not self._stopped):
-            # Read that GPS RAW message
-#            if (time.time() >= offset and time.time() < offset+2*60):
-#                self.info("Going to cycle wlan")
-#                if (self.getPowerControlObject().getWlanStatus()):
-#                    self.getPowerControlObject().wlanOff()
-#                    offset = now + wlan_on + wlan_off
-#                    self.info("Turned OFF WLAN")
-#                else:
-#                    self.getPowerControlObject().wlanOn()
-#                    offset = now + 2*wlan_on+wlan_off
-#                    self.info("Turned ON WLAN")
-                    
+        while (time.time() <= self._endTime and not self._stopped):                    
             rawMsg = self.gps._read("")
             if (rawMsg):
                 if (self._mode == "nav"):
@@ -225,10 +213,11 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     def stop(self):
         self.info('GPSPlugin stopping...')
-        self._stopped = True
+        self._runEv.set()
         self._WlanThread.stop()
-        self._busy = False
         self.deregisterTOSListener()
+        self._busy = False
+        self._stopped = True
         self.info('GPSPlugin stopped')
 
     '''
@@ -287,7 +276,7 @@ class WlanThread(Thread):
                 #self._parent._logger.info(str("HOST\nroot" in user))
                 start = time.time()
                 while ((("HOST\nroot" in user) or (self._parent.isResendingDB())) and not self._stopped):
-                    self._parent._logger.info("size: " + str(self._parent.isResendingDB))
+                    self._parent._logger.info("size: " + str(self._parent.isResendingDB()))
                     self._parent._logger.info('Someone is logged in or we are flushing DB... NOT power cycling WLAN!')
                     self._parent._logger.info('Waiting for 10 sec')
                     self._work.wait(10)
@@ -296,13 +285,15 @@ class WlanThread(Thread):
                     user = p.communicate()[0]
                     #user = commands.getoutput('/usr/bin/who')
                     #self._parent._logger.info(str(user))
-                duration = time.time() - start
-                self._parent.getPowerControlObject().wlanOff()
-                self._parent._logger.info('Waiting for ' + str(self._downtime-duration) + ' secs')
-                self._work.wait(self._downtime - duration)
+                if (not self._stopped):
+                    duration = time.time() - start
+                    self._parent.getPowerControlObject().wlanOff()
+                    self._parent._logger.info('Waiting for ' + str(self._downtime-duration) + ' secs')
+                    self._work.wait(self._downtime - duration)
             #Todo: Turn Wlan on
-            self._parent._logger.info("We are not online, so turn on wlan")
-            self._parent.getPowerControlObject().wlanOn()  
+            if (not self._stopped):
+                self._parent._logger.info("We are not online, so turn on wlan")
+                self._parent.getPowerControlObject().wlanOn()  
         self._parent._logger.info('WlanThread: died')
 
     #*********************************************************
