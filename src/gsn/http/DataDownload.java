@@ -4,6 +4,7 @@ import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
+import gsn.http.ac.UserUtils;
 import gsn.storage.DataEnumerator;
 
 import java.io.PrintWriter;
@@ -76,12 +77,14 @@ public class DataDownload extends HttpServlet {
                 return;
             }
 
-            if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)){
-                if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
-                    res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+            if (Main.getContainerConfig().isAcEnabled() == true) {
+            if (user != null) // meaning, that a login session is active, otherwise we couldn't get there
+                if (user.hasReadAccessRight(vsName) == false && user.isAdmin() == false)  // ACCESS_DENIED
+                {
+                    res.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified virtual sensor .");
                     return;
                 }
-            }
+        }
 
             if (req.getParameter("display") != null && req.getParameter("display").equals("CSV")) {
                 responseCVS = true;
@@ -119,8 +122,8 @@ public class DataDownload extends HttpServlet {
                             wantPk = true;
                         generated_request_query += ", " + fields[i];
                     }
-                    if ( ! wantPk )
-                        generated_request_query += ", pk";    
+                    if (!wantPk)
+                        generated_request_query += ", pk";
                 }
             } else {
                 if (req.getParameter("fields") == null) {
@@ -135,7 +138,7 @@ public class DataDownload extends HttpServlet {
                             wantPk = true;
                         generated_request_query += ", " + fields[i];
                     }
-                    if ( ! wantPk )
+                    if (!wantPk)
                         generated_request_query += ", pk";
                 }
                 if (req.getParameter("groupby") != null) {
@@ -346,8 +349,7 @@ public class DataDownload extends HttpServlet {
                 res.setContentType("text/html");
                 respond.println("Please select some fields");
             }
-        }
-        finally {
+        } finally {
             if (result != null) result.close();
             respond.flush();
         }

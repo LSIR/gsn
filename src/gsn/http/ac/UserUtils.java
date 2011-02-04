@@ -34,7 +34,7 @@ public class UserUtils {
 
             } else {
 
-                logger.warn("This username \""+username+"\" does not exist !");
+                logger.warn("This username \"" + username + "\" does not exist !");
             }
 
         } catch (Exception e) {
@@ -46,5 +46,16 @@ public class UserUtils {
             }
         }
         return user;
+    }
+
+    public static boolean userHasAccessToVirtualSensor(String username, String password, String vsname) {
+        User user = allowUserToLogin(username, password);
+        if (user == null)
+            return false;
+        else {
+            logger.warn("user.isAdmin => " + user.isAdmin());
+            logger.warn("user.hasReadAccessRight(" + vsname + ") => " + user.hasReadAccessRight(vsname));
+            return (user.hasReadAccessRight(vsname) || user.isAdmin());
+        }
     }
 }
