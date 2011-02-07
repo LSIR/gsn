@@ -101,7 +101,7 @@
             from etz_dozer_basestatus
           </predicate>
         </address>
-        <query>select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_MSPVOLTAGE as PAYLOAD_SYSVOLTAGE, PAYLOAD_UPTIME, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY from wrapper</query>
+        <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
     </stream>
