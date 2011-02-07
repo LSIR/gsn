@@ -65,11 +65,11 @@ public class MyControllerFilter implements Filter {
                 }
 
                 if ((reqUsername != null) && (reqPassword != null) && (reqVirtualSensorName != null)) {
-                    logger.warn("Detected URL-based login"); //TODO: DEBUG ONLY
-                    logger.warn("User: " + reqUsername);    //TODO: DEBUG ONLY
-                    logger.warn("Pass: " + reqPassword);      //TODO: DEBUG ONLY
-                    logger.warn("Name: " + reqVirtualSensorName);      //TODO: DEBUG ONLY
-                    logger.warn("Request type: " + requestType); //TODO: debug only
+                    //logger.debug("Detected URL-based login");
+                    //logger.debug("User: " + reqUsername);
+                    //logger.debug("Pass: " + reqPassword);
+                    //logger.debug("Name: " + reqVirtualSensorName);
+                    //logger.debug("Request type: " + requestType);
 
                     User userByURL = UserUtils.allowUserToLogin(reqUsername, reqPassword);
 
@@ -78,8 +78,8 @@ public class MyControllerFilter implements Filter {
                         return;
                     }
 
-                    boolean flag = UserUtils.userHasAccessToVirtualSensor(reqUsername, reqPassword, reqVirtualSensorName);
-                    logger.warn(flag);
+                    boolean flag = UserUtils.userHasAccessToVirtualSensor(reqUsername, reqPassword, reqVirtualSensorName) || !DataSource.isVSManaged(reqVirtualSensorName);
+
                     if (flag) {
                         chain.doFilter(request, response);
                         return;
