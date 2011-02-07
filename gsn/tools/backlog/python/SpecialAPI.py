@@ -550,6 +550,8 @@ class PowerControl:
         else:
             return False
         
+        return True
+        
         
     def stop(self):
         self._backlogMain.deregisterTOSListener(self)

@@ -69,9 +69,9 @@ class JobsObserverClass(Thread):
                         if ret == None:
                             if runtime_end != -1:
                                 if runtime_end < datetime.utcnow():
-                                    self.error('job (' + job_name + ') with PID ' + str(job.pid) + ' has not finished in time -> kill it')
+                                    self.error('job (' + job_name + ') with PID ' + str(job.pid()) + ' has not finished in time -> kill it')
                                     try:
-                                        os.killpg(job.pid, signal.SIGTERM)
+                                        os.killpg(job.pid(), signal.SIGTERM)
                                     except:
                                         pass
                                     self._logger.warning('wait for job (' + job_name + ') to be killed')
@@ -82,7 +82,7 @@ class JobsObserverClass(Thread):
                                         break
                                     if job.poll() == None:
                                         try:
-                                            os.killpg(job.pid, signal.SIGKILL)
+                                            os.killpg(job.pid(), signal.SIGKILL)
                                         except:
                                             pass
                                     job.wait()
@@ -90,7 +90,7 @@ class JobsObserverClass(Thread):
                                     self._logger.warning('job (' + job_name + ') has been killed (STDOUT=' + stdoutdata.decode() + ' /STDERR=' + stderrdata.decode() + ')')
                                     del self._jobList[index]
                                 else:
-                                    self._logger.debug('job (' + job_name + ') with PID ' + str(job.pid) + ' not yet finished -> ' + str(runtime_end-datetime.utcnow()) + ' time to run')
+                                    self._logger.debug('job (' + job_name + ') with PID ' + str(job.pid()) + ' not yet finished -> ' + str(runtime_end-datetime.utcnow()) + ' time to run')
                         else:
                             stdoutdata, stderrdata = job.communicate()
                             if ret == 0:
@@ -163,9 +163,9 @@ class JobsObserverClass(Thread):
             if isPlugin:
                 self._backlogMain.pluginStop(job_name, True)
             else:
-                self.error('job (' + job_name + ') with PID ' + str(job.pid) + ' has not finished yet -> kill it')
+                self.error('job (' + job_name + ') with PID ' + str(job.pid()) + ' has not finished yet -> kill it')
                 try:
-                    os.killpg(job.pid, signal.SIGTERM)
+                    os.killpg(job.pid(), signal.SIGTERM)
                 except:
                     pass
                 self._logger.warning('wait for job (' + job_name + ') to be killed')
@@ -174,7 +174,7 @@ class JobsObserverClass(Thread):
                     self._wait.wait(3)
                 if job.poll() == None:
                     try:
-                        os.killpg(job.pid, signal.SIGKILL)
+                        os.killpg(job.pid(), signal.SIGKILL)
                     except:
                         pass
                 job.wait()

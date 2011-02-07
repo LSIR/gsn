@@ -393,8 +393,8 @@ class ScheduleHandlerClass(Thread):
         self._allJobsFinishedEvent.set()
         self._stopEvent.set()
         if self._duty_cycle_mode:
-            self._backlogMain.deregisterTOSListener(self)
             self._pingThread.stop()
+            self._backlogMain.deregisterTOSListener(self)
             
         self._logger.info('stopped')
         
