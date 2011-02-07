@@ -544,7 +544,8 @@ class PowerControl:
         if response['command'] == TOSTypes.CONTROL_CMD_WLAN_ON:
             self.wlanOn()
         elif response['command'] == TOSTypes.CONTROL_CMD_WLAN_OFF:
-            self.wlanOff()
+            if not self.wlanOff():
+                self._logger.info('Wlan has not been turned off because it is still used by some plugins')
         else:
             return False
         
