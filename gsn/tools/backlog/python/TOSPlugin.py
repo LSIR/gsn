@@ -13,7 +13,7 @@ import tos
 from threading import Event
 
 import BackLogMessage
-import TOSAMTypes
+import TOSTypes
 from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_BACKLOG = True
@@ -36,7 +36,7 @@ class TOSPluginClass(AbstractPluginClass):
     
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
-        self.registerTOSListener([TOSAMTypes.AM_ALL])
+        self.registerTOSListener([TOSTypes.AM_ALL])
         
         self._plugstop = False
         self._ready = False

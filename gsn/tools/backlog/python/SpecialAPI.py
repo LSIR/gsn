@@ -331,7 +331,7 @@ class Statistics:
 
 
 
-
+import TOSTypes
 
 
 DEFAULT_LINK_FOLDER = '/etc/gpio/'
@@ -400,6 +400,8 @@ class PowerControl:
                     self._photocamGPIOOnOnSet = False
                 else:
                     raise Exception('file >' + os.path.join(linkFolder, file) + '< does not end with a proper suffix')
+        
+        self._backlogMain.registerTOSListener(self, [TOSTypes.AM_BEACONCOMMAND])
                 
     
     
@@ -534,6 +536,21 @@ class PowerControl:
                 return False
         else:
             raise Exception('Wlan GPIO link file is inexistent in >' + self._linkfolder + '<')
+            
+            
+    def tosMsgReceived(self, timestamp, payload):
+        response = tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, payload['data'])
+        self._logger.debug('rcv (cmd=' + str(response['command']) + ', argument=' + str(response['argument']) + ')')
+        if response['command'] == TOSTypes.CONTROL_CMD_WLAN_ON:
+            self.wlanOn()
+        elif response['command'] == TOSTypes.CONTROL_CMD_WLAN_OFF:
+            self.wlanOff()
+        else:
+            return False
+        
+        
+    def stop(self):
+        self._backlogMain.deregisterTOSListener(self)
     
     
     def _gpioLinkAction(self, link, set):

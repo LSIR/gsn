@@ -189,23 +189,17 @@ class BackLogMainClass(Thread, Statistics):
         else:
             self._logger.info('not running in duty-cycle mode')
             self.duty_cycle_mode = False
-
-        try:
-            self.powerControl = PowerControl(self)
-        except:
-            pass
-        else:
-            self._logger.info('loaded PowerControl class')
-        self.gsnpeer = GSNPeerClass(self, self.device_id, gsn_port)
-        self._logger.info('loaded GSNPeerClass')
-        self.backlog = BackLogDBClass(self, backlog_db, backlog_db_resend_hr)
-        self._logger.info('loaded BackLogDBClass')
         
         self._tospeer = None
         self._tos_address = tos_address
         self._tos_version = tos_version
         self._tosPeerLock = Lock()
         self._tosListeners = {}
+        
+        self.gsnpeer = GSNPeerClass(self, self.device_id, gsn_port)
+        self._logger.info('loaded GSNPeerClass')
+        self.backlog = BackLogDBClass(self, backlog_db, backlog_db_resend_hr)
+        self._logger.info('loaded BackLogDBClass')
 
         # get schedule section from config files
         try:
@@ -214,6 +208,13 @@ class BackLogMainClass(Thread, Statistics):
             raise TypeError('no [schedule] section specified in ' + config_file)
             
         self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, config_schedule)
+        
+        try:
+            self.powerControl = PowerControl(self)
+        except:
+            pass
+        else:
+            self._logger.info('loaded PowerControl class')
 
         # get plugins section from config files
         try:
@@ -279,6 +280,7 @@ class BackLogMainClass(Thread, Statistics):
 
 
     def stop(self):
+        self.powerControl.stop()
         self.schedulehandler.stop()
         self.jobsobserver.stop()
         
@@ -356,15 +358,23 @@ class BackLogMainClass(Thread, Statistics):
         if listeners != None:
             for listener in listeners:
                 self._logger.debug('forwarding TOS message to listener ' + listener.__class__.__name__ + ' (listening to all AM types)')
-                if listener.tosMsgReceived(timestamp, packet):
-                    ret = True
+                try:
+                    if listener.tosMsgReceived(timestamp, packet):
+                        ret = True
+                except Exception, e:
+                    self.incrementExceptionCounter()
+                    self._logger.exception(e)
             
         listeners = self._tosListeners.get(type)
         if listeners != None:
             for listener in listeners:
                 self._logger.debug('forwarding TOS message to listener ' + listener.__class__.__name__ + ' (listening only to some types)')
-                if listener.tosMsgReceived(timestamp, packet):
-                    ret = True
+                try:
+                    if listener.tosMsgReceived(timestamp, packet):
+                        ret = True
+                except Exception, e:
+                    self.incrementExceptionCounter()
+                    self._logger.exception(e)
         
         if not ret:
             self._logger.warning('TOS message with AM type ' + str(type) + ' has not been processed.')
@@ -433,8 +443,12 @@ class BackLogMainClass(Thread, Statistics):
             # send the packet to all plugins which 'use' this message type
             for plugin in self.plugins.values():
                 if msgType == plugin.getMsgType():
-                    plugin.msgReceived(message.getData())
-                    msgTypeValid = True
+                    try:
+                        plugin.msgReceived(message.getData())
+                        msgTypeValid = True
+                    except Exception, e:
+                        self.incrementExceptionCounter()
+                        self._logger.exception(e)
                     break
         if not msgTypeValid:
             self._logger.error('unknown message type ' + str(msgType) + ' received')

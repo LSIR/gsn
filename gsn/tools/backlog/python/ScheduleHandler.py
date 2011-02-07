@@ -32,7 +32,7 @@ from threading import Event, Lock, Thread
 
 import BackLogMessage
 import tos
-import TOSAMTypes
+import TOSTypes
 from crontab import CronTab
 
 ############################################
@@ -46,26 +46,9 @@ GSN_TYPE_SCHEDULE_SAME = 1
 GSN_TYPE_NEW_SCHEDULE = 2
 GSN_TYPE_GET_SCHEDULE = 3
 
-# The Commands to send
-CMD_WAKEUP_QUERY = 1
-CMD_SERVICE_WINDOW = 2
-CMD_NEXT_WAKEUP = 3
-CMD_SHUTDOWN = 4
-CMD_NET_STATUS = 5
-CMD_RESET_WATCHDOG = 6
-
-# The wakeup types
-WAKEUP_TYPE_SCHEDULED = 1
-WAKEUP_TYPE_SERVICE = 2
-WAKEUP_TYPE_BEACON = 4
-WAKEUP_TYPE_NODE_REBOOT = 8
-
 # ping and watchdog timing
 PING_INTERVAL_SEC = 30
 WATCHDOG_TIMEOUT_SEC = 300
-
-# Command Structure
-TOS_CONTROLCOMMAND_STRUCTURE = [('command', 'int', 1), ('argument', 'int', 4)]
 
 # Schedule file format
 SCHEDULE_TYPE_PLUGIN = 'plugin'
@@ -154,7 +137,7 @@ class ScheduleHandlerClass(Thread):
             raise TypeError('approximate_startup_seconds not specified in config file')
         
         if dutycyclemode:
-            self._backlogMain.registerTOSListener([TOSAMTypes.AM_CONTROLCOMMAND, TOSAMTypes.AM_BEACONCOMMAND])
+            self._backlogMain.registerTOSListener(self, [TOSTypes.AM_CONTROLCOMMAND, TOSTypes.AM_BEACONCOMMAND])
         
         self._connectionEvent = Event()
         self._scheduleEvent = Event()
@@ -211,7 +194,7 @@ class ScheduleHandlerClass(Thread):
         
         if self._duty_cycle_mode:
             self._pingThread.start()
-            self.tosMsgSend(CMD_WAKEUP_QUERY)
+            self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
             if self._scheduleHandlerStop:
                 self._logger.info('died')
                 return
@@ -331,7 +314,7 @@ class ScheduleHandlerClass(Thread):
                         else:
                             self._logger.info('nothing more to do in the next ' + str(service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes'))) + ' minutes (rest of service time plus max_next_schedule_wait_minutes)')
                         
-                        self.tosMsgSend(CMD_WAKEUP_QUERY)
+                        self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
                         if self._scheduleHandlerStop:
                             self._logger.info('died')
                             return
@@ -463,19 +446,19 @@ class ScheduleHandlerClass(Thread):
         self._scheduleEvent.set()
             
             
-    def tosMsgReceived(self, timestamp, payload):
-        response = tos.Packet(TOS_CONTROLCOMMAND_STRUCTURE, payload['data'])
+    def tosMsgReceived(self, timestamp, packet):
+        response = tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, packet['data'])
         self._logger.debug('rcv (cmd=' + str(response['command']) + ', argument=' + str(response['argument']) + ')')
-        if response['command'] == CMD_WAKEUP_QUERY:
+        if response['command'] == TOSTypes.CONTROL_CMD_WAKEUP_QUERY:
             node_state = response['argument']
-            self._logger.debug('CMD_WAKEUP_QUERY response received with argument: ' + str(node_state))
+            self._logger.debug('CONTROL_CMD_WAKEUP_QUERY response received with argument: ' + str(node_state))
             if node_state != self._tosNodeState:
                 s = 'TinyNode wakeup states are: '
-                if (node_state & WAKEUP_TYPE_SCHEDULED) == WAKEUP_TYPE_SCHEDULED:
+                if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED) == TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED:
                     s += 'SCHEDULE '
-                if (node_state & WAKEUP_TYPE_SERVICE) == WAKEUP_TYPE_SERVICE:
+                if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE) == TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE:
                     s += 'SERVICE '
-                if (node_state & WAKEUP_TYPE_BEACON) == WAKEUP_TYPE_BEACON:
+                if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_BEACON) == TOSTypes.CONTROL_WAKEUP_TYPE_BEACON:
                     self._beacon = True
                     self._backlogMain.beaconSet()
                     s += 'BEACON '
@@ -484,25 +467,25 @@ class ScheduleHandlerClass(Thread):
                     self._scheduleEvent.set()
                     self._stopEvent.set()
                     self._backlogMain.beaconCleared()
-                if (node_state & WAKEUP_TYPE_NODE_REBOOT) == WAKEUP_TYPE_NODE_REBOOT:
+                if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT) == TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT:
                     s += 'NODE_REBOOT'
                 self._logger.info(s)
                 self._tosNodeState = node_state
-        elif response['command'] == CMD_SERVICE_WINDOW:
-            self._logger.info('CMD_SERVICE_WINDOW response received with argument: ' + str(response['argument']))
-        elif response['command'] == CMD_NEXT_WAKEUP:
-            self._logger.info('CMD_NEXT_WAKEUP response received with argument: ' + str(response['argument']))
-        elif response['command'] == CMD_SHUTDOWN:
-            self._logger.info('CMD_SHUTDOWN response received with argument: ' + str(response['argument']))
-        elif response['command'] == CMD_NET_STATUS:
-            self._logger.info('CMD_NET_STATUS response received with argument: ' + str(response['argument']))
-        elif response['command'] == CMD_RESET_WATCHDOG:
-            self._logger.debug('CMD_RESET_WATCHDOG response received with argument: ' + str(response['argument']))
+        elif response['command'] == TOSTypes.CONTROL_CMD_SERVICE_WINDOW:
+            self._logger.info('CONTROL_CMD_SERVICE_WINDOW response received with argument: ' + str(response['argument']))
+        elif response['command'] == TOSTypes.CONTROL_CMD_NEXT_WAKEUP:
+            self._logger.info('CONTROL_CMD_NEXT_WAKEUP response received with argument: ' + str(response['argument']))
+        elif response['command'] == TOSTypes.CONTROL_CMD_SHUTDOWN:
+            self._logger.info('CONTROL_CMD_SHUTDOWN response received with argument: ' + str(response['argument']))
+        elif response['command'] == TOSTypes.CONTROL_CMD_NET_STATUS:
+            self._logger.info('CONTROL_CMD_NET_STATUS response received with argument: ' + str(response['argument']))
+        elif response['command'] == TOSTypes.CONTROL_CMD_RESET_WATCHDOG:
+            self._logger.debug('CONTROL_CMD_RESET_WATCHDOG response received with argument: ' + str(response['argument']))
         else:
-            self.error('unknown command type response received (' + str(response['command']) + ')')
+            return False
         
              
-        if payload['type'] == TOS_AM_CONTROLCOMMAND:
+        if packet['type'] == TOSTypes.AM_CONTROLCOMMAND:
             if response['command'] == self._tosSentCmd:
                 self._logger.debug('TOS packet acknowledge received')
                 self._tosSentCmd = None
@@ -526,7 +509,7 @@ class ScheduleHandlerClass(Thread):
         self._tosSentCmd = cmd
         while True:
             self._logger.debug('snd (cmd=' + str(cmd) + ', argument=' + str(argument) + ')')
-            self._backlogMain._tospeer.sendTOSMsg(tos.Packet(TOS_CONTROLCOMMAND_STRUCTURE, [cmd, argument]), TOS_AM_CONTROLCOMMAND, 1)
+            self._backlogMain._tospeer.sendTOSMsg(tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, [cmd, argument]), TOSTypes.AM_CONTROLCOMMAND, 1)
             self._tosMessageAckEvent.wait(3)
             if self._scheduleHandlerStop:
                 break
@@ -578,7 +561,7 @@ class ScheduleHandlerClass(Thread):
     def _scheduleNextDutyWakeup(self, time_delta, schedule_name):
         if self._duty_cycle_mode:
             time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
-            if self.tosMsgSend(CMD_NEXT_WAKEUP, time_to_wakeup):
+            if self.tosMsgSend(TOSTypes.CONTROL_CMD_NEXT_WAKEUP, time_to_wakeup):
                 self._logger.info('successfully scheduled the next duty wakeup for >'+schedule_name+'< (that\'s in '+str(time_to_wakeup)+' seconds)')
             else:
                 self.error('could not schedule the next duty wakeup for >'+schedule_name+'<')
@@ -629,7 +612,7 @@ class ScheduleHandlerClass(Thread):
             if time_to_service < 0-int(self.getOptionValue('approximate_startup_seconds')):
                 time_to_service += 86400
             self._logger.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
-            if self.tosMsgSend(CMD_SERVICE_WINDOW, time_to_service):
+            if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, time_to_service):
                 self._logger.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
             else:
                 self.error('could not schedule the next service window wakeup')
@@ -655,7 +638,7 @@ class ScheduleHandlerClass(Thread):
             # last possible moment to check if a beacon has been sent to the node
             # (if so, we do not want to shutdown)
             self._logger.info('get node wakeup states')
-            self.tosMsgSend(CMD_WAKEUP_QUERY)
+            self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
             if self._scheduleHandlerStop:
                 return True
             if self._beacon:
@@ -664,7 +647,7 @@ class ScheduleHandlerClass(Thread):
             # Tell TinyNode to shut us down in X seconds
             self._pingThread.stop()
             shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
-            if self.tosMsgSend(CMD_SHUTDOWN, shutdown_offset):
+            if self.tosMsgSend(TOSTypes.CONTROL_CMD_SHUTDOWN, shutdown_offset):
                 self._logger.info('we\'re going to do a hard shut down in '+str(shutdown_offset)+' seconds ...')
             else:
                 self.error('could not communicate the hard shut down time with the TOS node')
@@ -695,7 +678,7 @@ class PingThread(Thread):
     def run(self):
         self._logger.info('started')
         while not self._pingThreadStop:
-            self._scheduleHandler.tosMsgSend(CMD_RESET_WATCHDOG, self._watchdog_timeout_seconds)
+            self._scheduleHandler.tosMsgSend(TOSTypes.CONTROL_CMD_RESET_WATCHDOG, self._watchdog_timeout_seconds)
             self._logger.debug('reset watchdog')
             self._work.wait(self._ping_interval_seconds)
         self._logger.info('died')
