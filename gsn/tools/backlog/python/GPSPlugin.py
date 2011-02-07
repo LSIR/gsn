@@ -76,9 +76,7 @@ class GPSPluginClass(AbstractPluginClass):
         self._runEv = Event()
     
     	self._endTime = time.time() + self._measTime	
-        
-        self.registerTOSListener()
-    	
+            	
         self._WlanThread = WlanThread(self,10,10)
         
         self.debug("Done init GPS Plugin")
@@ -129,10 +127,6 @@ class GPSPluginClass(AbstractPluginClass):
         self._WlanThread.start()
         # Prepare for precise timing
         now = time.time()
-#        wlan_on = 10*60
-#        wlan_off = 40*60
-#        offset = now + wlan_on
-#        cycles = self.getMaxRuntime()/60
         while (time.time() <= self._endTime and not self._stopped):                    
             rawMsg = self.gps._read("")
             if (rawMsg):
@@ -215,7 +209,6 @@ class GPSPluginClass(AbstractPluginClass):
         self.info('GPSPlugin stopping...')
         self._runEv.set()
         self._WlanThread.stop()
-        self.deregisterTOSListener()
         self._busy = False
         self._stopped = True
         self.info('GPSPlugin stopped')
