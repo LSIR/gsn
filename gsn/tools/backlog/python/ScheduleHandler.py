@@ -32,6 +32,7 @@ from threading import Event, Lock, Thread
 
 import BackLogMessage
 import tos
+import TOSAMTypes
 from crontab import CronTab
 
 ############################################
@@ -44,10 +45,6 @@ GSN_TYPE_NO_SCHEDULE_AVAILABLE = 0
 GSN_TYPE_SCHEDULE_SAME = 1
 GSN_TYPE_NEW_SCHEDULE = 2
 GSN_TYPE_GET_SCHEDULE = 3
-
-# The AM Msg Type
-TOS_AM_CONTROLCOMMAND = 0x21
-TOS_AM_BEACONCOMMAND = 0x22
 
 # The Commands to send
 CMD_WAKEUP_QUERY = 1
@@ -157,7 +154,7 @@ class ScheduleHandlerClass(Thread):
             raise TypeError('approximate_startup_seconds not specified in config file')
         
         if dutycyclemode:
-            self._backlogMain.registerTOSListener(self)
+            self._backlogMain.registerTOSListener([TOSAMTypes.AM_CONTROLCOMMAND, TOSAMTypes.AM_BEACONCOMMAND])
         
         self._connectionEvent = Event()
         self._scheduleEvent = Event()
@@ -467,53 +464,52 @@ class ScheduleHandlerClass(Thread):
             
             
     def tosMsgReceived(self, timestamp, payload):
-        if payload['type'] == TOS_AM_CONTROLCOMMAND or payload['type'] == TOS_AM_BEACONCOMMAND:
-            response = tos.Packet(TOS_CONTROLCOMMAND_STRUCTURE, payload['data'])
-            self._logger.debug('rcv (cmd=' + str(response['command']) + ', argument=' + str(response['argument']) + ')')
-            if response['command'] == CMD_WAKEUP_QUERY:
-                node_state = response['argument']
-                self._logger.debug('CMD_WAKEUP_QUERY response received with argument: ' + str(node_state))
-                if node_state != self._tosNodeState:
-                    s = 'TinyNode wakeup states are: '
-                    if (node_state & WAKEUP_TYPE_SCHEDULED) == WAKEUP_TYPE_SCHEDULED:
-                        s += 'SCHEDULE '
-                    if (node_state & WAKEUP_TYPE_SERVICE) == WAKEUP_TYPE_SERVICE:
-                        s += 'SERVICE '
-                    if (node_state & WAKEUP_TYPE_BEACON) == WAKEUP_TYPE_BEACON:
-                        self._beacon = True
-                        self._backlogMain.beaconSet()
-                        s += 'BEACON '
-                    elif self._beacon:
-                        self._beacon = False
-                        self._scheduleEvent.set()
-                        self._stopEvent.set()
-                        self._backlogMain.beaconCleared()
-                    if (node_state & WAKEUP_TYPE_NODE_REBOOT) == WAKEUP_TYPE_NODE_REBOOT:
-                        s += 'NODE_REBOOT'
-                    self._logger.info(s)
-                    self._tosNodeState = node_state
-            elif response['command'] == CMD_SERVICE_WINDOW:
-                self._logger.info('CMD_SERVICE_WINDOW response received with argument: ' + str(response['argument']))
-            elif response['command'] == CMD_NEXT_WAKEUP:
-                self._logger.info('CMD_NEXT_WAKEUP response received with argument: ' + str(response['argument']))
-            elif response['command'] == CMD_SHUTDOWN:
-                self._logger.info('CMD_SHUTDOWN response received with argument: ' + str(response['argument']))
-            elif response['command'] == CMD_NET_STATUS:
-                self._logger.info('CMD_NET_STATUS response received with argument: ' + str(response['argument']))
-            elif response['command'] == CMD_RESET_WATCHDOG:
-                self._logger.debug('CMD_RESET_WATCHDOG response received with argument: ' + str(response['argument']))
-            else:
-                self.error('unknown command type response received (' + str(response['command']) + ')')
-            
-                 
-            if payload['type'] == TOS_AM_CONTROLCOMMAND:
-                if response['command'] == self._tosSentCmd:
-                    self._logger.debug('TOS packet acknowledge received')
-                    self._tosSentCmd = None
-                    self._tosMessageAckEvent.set()
-                elif self._tosSentCmd != None:
-                    self.error('received TOS message type (' + str(response['command']) + ') does not match the sent command type (' + str(self._tosSentCmd) + ')')
-                    return False
+        response = tos.Packet(TOS_CONTROLCOMMAND_STRUCTURE, payload['data'])
+        self._logger.debug('rcv (cmd=' + str(response['command']) + ', argument=' + str(response['argument']) + ')')
+        if response['command'] == CMD_WAKEUP_QUERY:
+            node_state = response['argument']
+            self._logger.debug('CMD_WAKEUP_QUERY response received with argument: ' + str(node_state))
+            if node_state != self._tosNodeState:
+                s = 'TinyNode wakeup states are: '
+                if (node_state & WAKEUP_TYPE_SCHEDULED) == WAKEUP_TYPE_SCHEDULED:
+                    s += 'SCHEDULE '
+                if (node_state & WAKEUP_TYPE_SERVICE) == WAKEUP_TYPE_SERVICE:
+                    s += 'SERVICE '
+                if (node_state & WAKEUP_TYPE_BEACON) == WAKEUP_TYPE_BEACON:
+                    self._beacon = True
+                    self._backlogMain.beaconSet()
+                    s += 'BEACON '
+                elif self._beacon:
+                    self._beacon = False
+                    self._scheduleEvent.set()
+                    self._stopEvent.set()
+                    self._backlogMain.beaconCleared()
+                if (node_state & WAKEUP_TYPE_NODE_REBOOT) == WAKEUP_TYPE_NODE_REBOOT:
+                    s += 'NODE_REBOOT'
+                self._logger.info(s)
+                self._tosNodeState = node_state
+        elif response['command'] == CMD_SERVICE_WINDOW:
+            self._logger.info('CMD_SERVICE_WINDOW response received with argument: ' + str(response['argument']))
+        elif response['command'] == CMD_NEXT_WAKEUP:
+            self._logger.info('CMD_NEXT_WAKEUP response received with argument: ' + str(response['argument']))
+        elif response['command'] == CMD_SHUTDOWN:
+            self._logger.info('CMD_SHUTDOWN response received with argument: ' + str(response['argument']))
+        elif response['command'] == CMD_NET_STATUS:
+            self._logger.info('CMD_NET_STATUS response received with argument: ' + str(response['argument']))
+        elif response['command'] == CMD_RESET_WATCHDOG:
+            self._logger.debug('CMD_RESET_WATCHDOG response received with argument: ' + str(response['argument']))
+        else:
+            self.error('unknown command type response received (' + str(response['command']) + ')')
+        
+             
+        if payload['type'] == TOS_AM_CONTROLCOMMAND:
+            if response['command'] == self._tosSentCmd:
+                self._logger.debug('TOS packet acknowledge received')
+                self._tosSentCmd = None
+                self._tosMessageAckEvent.set()
+            elif self._tosSentCmd != None:
+                self.error('received TOS message type (' + str(response['command']) + ') does not match the sent command type (' + str(self._tosSentCmd) + ')')
+                return False
                 
         return True
         

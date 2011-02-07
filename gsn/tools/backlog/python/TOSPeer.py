@@ -91,7 +91,7 @@ class TOSPeerClass(Thread):
 
             # tell PSBackLogMain to send the packet to the plugins
             # using the serial port we can guarantee flow control to the backlog database!
-            if self._backlogMain.processTOSMsg(timestamp, packet):
+            if self._backlogMain.processTOSMsg(timestamp, packet['type'], packet):
                 try:
                     self._serialsource.sendAck()
                 except Exception, e:

@@ -205,7 +205,7 @@ class BackLogMainClass(Thread, Statistics):
         self._tos_address = tos_address
         self._tos_version = tos_version
         self._tosPeerLock = Lock()
-        self._tosListeners = []
+        self._tosListeners = {}
 
         # get schedule section from config files
         try:
@@ -316,18 +316,30 @@ class BackLogMainClass(Thread, Statistics):
         self._tosPeerLock.release()
         
         
-    def registerTOSListener(self, listener):
+    def registerTOSListener(self, listener, types):
         self.instantiateTOSPeer()
-        self._tosListeners.append(listener)
-        self._logger.info(listener.__class__.__name__ + ' registered as TOS listener')
+        for type in types:
+            listeners = self._tosListeners.get(type)
+            if listeners == None:
+                self._tosListeners[type] = [listener]
+            else:
+                listeners.append(listener)
+                self._tosListeners.update({type: listeners})
+        self._logger.info(listener.__class__.__name__ + ' registered as TOS listener (types ' + str(types) + ')')
         
         
     def deregisterTOSListener(self, listener):
-        for index, listenerfromlist in enumerate(self._tosListeners):
-            if listener == listenerfromlist:
-                del self._tosListeners[index]
-                self._logger.info(listener.__class__.__name__ + ' deregistered as TOS listener')
-                return
+        for type, listeners in self._tosListeners.items():
+            for index, listenerfromlist in enumerate(listeners):
+                if listener == listenerfromlist:
+                    del listeners[index]
+                    if not listeners:
+                        del self._tosListeners[type]
+                    else:
+                        self._tosListeners.update({type: listeners})
+                    break
+            
+        self._logger.info(listener.__class__.__name__ + ' deregistered as TOS listener')
         if not self._tosListeners:
             self._logger.info('no more TOS listeners around -> stop TOSPeer')
             self._tosPeerLock.acquire()
@@ -337,11 +349,23 @@ class BackLogMainClass(Thread, Statistics):
             self._tosPeerLock.release()
         
         
-    def processTOSMsg(self, timestamp, payload):
+    def processTOSMsg(self, timestamp, type, packet):
         ret = False
-        for listener in self._tosListeners:
-            if listener.tosMsgReceived(timestamp, payload):
-                ret = True
+        listeners = self._tosListeners.get('all')
+        if listeners != None:
+            for listener in listeners:
+                if listener.tosMsgReceived(timestamp, packet):
+                    ret = True
+            
+        listeners = self._tosListeners.get(type)
+        if listeners != None:
+            for listener in listeners:
+                if listener.tosMsgReceived(timestamp, packet):
+                    ret = True
+        
+        if not ret:
+            self._logger.warning('TOS message with AM type ' + str(type) + ' has not been processed.')
+
         return ret
     
     
