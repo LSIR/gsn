@@ -120,11 +120,12 @@ class ScheduleHandlerClass(Thread):
         
         self._service_wakeup_disabled = False
         service_wakeup_disable = self.getOptionValue('service_wakeup_disable')
-        if service_wakeup_disable != None and int(service_wakeup_disable) != 1 and int(service_wakeup_disable) != 0:
+        if service_wakeup_disable == None or int(service_wakeup_disable) == 0:
+            self._logger.warning('service window is disabled')
+        elif int(service_wakeup_disable) != 1 and int(service_wakeup_disable) != 0:
             self._backlogMain.incrementErrorCounter()
             self._logger.error('service_wakeup_disable has to be set to 1 or 0 in config file => service window will be enabled')
-        elif int(service_wakeup_disable) == 1:
-            self._logger.warning('service window is disabled')
+        else:
             self._service_wakeup_disabled = True
         
         max_gsn_connect_wait_minutes = int(self.getOptionValue('max_gsn_connect_wait_minutes'))
