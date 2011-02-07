@@ -26,6 +26,14 @@ class Popen(Thread):
     leads to a illegal instruction. Probably resulting from the os.fork()
     call in subprocess.Popen() in some special thread state...
     
+    Differences between subprocess.Popen() and SubprocessFake.Popen():
+    - stdin can not be used to communicate with the new process
+    - Popen.pid() must be used instead of Popen.pid to get the pid of the
+      new process
+    - executable, preexec_fn, close_fds, cwd, env, universal_newlines,
+      startupinfo and creationflags parameter functionality is not
+      implemented
+    
     As soon as this bug has been fixed this module should be replaced by
     subprocess.Popen()!
     '''
@@ -64,7 +72,7 @@ class Popen(Thread):
         self.stdLock = Lock()
         self.stdout = ''.encode()
         self.stderr = ''.encode()
-        self.pid = None
+        self._pid = None
         self.returncode = None
         
         if isinstance(args, types.StringTypes):
@@ -93,6 +101,12 @@ class Popen(Thread):
         self._notifier.stop()
         
         
+    def pid(self):
+        if not self.pidEvent.isSet():
+            self.pidEvent.wait()
+        return self._pid
+        
+        
     def poll(self):
         self.stdLock.acquire()
         ret = self.returncode
@@ -104,7 +118,7 @@ class Popen(Thread):
         if not self.pidEvent.isSet():
             self.pidEvent.wait()
         try:
-            os.kill(self.pid, signal.SIGKILL)
+            os.kill(self._pid, signal.SIGKILL)
         except OSError:
             pass
 
@@ -113,7 +127,7 @@ class Popen(Thread):
         if not self.pidEvent.isSet():
             self.pidEvent.wait()
         try:
-            os.kill(self.pid, signal.SIGTERM)
+            os.kill(self._pid, signal.SIGTERM)
         except OSError:
             pass
         
@@ -122,7 +136,7 @@ class Popen(Thread):
         if not self.pidEvent.isSet():
             self.pidEvent.wait()
         try:
-            os.kill(self.pid, signal)
+            os.kill(self._pid, signal)
         except OSError:
             pass
     
@@ -198,13 +212,13 @@ class Popen(Thread):
             
             
     def _pidEvent(self, file):
-        if self.pid == None and os.path.exists(file):
+        if self._pid == None and os.path.exists(file):
             if file == SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.pid':
                 f = open(file, 'r')
                 pid = f.readline().strip('\n')
                 f.close()
                 if pid.isdigit():
-                    self.pid = int(pid)
+                    self._pid = int(pid)
                     try:
                         self._checkPidTimer.cancel()
                     except:
