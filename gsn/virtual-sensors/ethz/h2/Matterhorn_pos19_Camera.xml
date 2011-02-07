@@ -9,7 +9,7 @@
         </init-params>
         <output-structure>
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
-            <field name="JPEG_ORIGINAL" type="binary" />
+            <field name="JPEG_SCALED" type="binary" />
         </output-structure>
     </processing-class>
     <description>camera pictures from position 19 at Matterhorn deployment as jpeg</description>
