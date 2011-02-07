@@ -351,15 +351,18 @@ class BackLogMainClass(Thread, Statistics):
         
     def processTOSMsg(self, timestamp, type, packet):
         ret = False
+        self._logger.debug('received TOS message with AM type ' + str(type))
         listeners = self._tosListeners.get('all')
         if listeners != None:
             for listener in listeners:
+                self._logger.debug('forwarding TOS message to listener ' + listener.__class__.__name__ + ' (listening to all AM types)')
                 if listener.tosMsgReceived(timestamp, packet):
                     ret = True
             
         listeners = self._tosListeners.get(type)
         if listeners != None:
             for listener in listeners:
+                self._logger.debug('forwarding TOS message to listener ' + listener.__class__.__name__ + ' (listening only to some types)')
                 if listener.tosMsgReceived(timestamp, packet):
                     ret = True
         
