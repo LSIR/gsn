@@ -209,6 +209,7 @@ class BackLogMainClass(Thread, Statistics):
             
         self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, config_schedule)
         
+        self.powerControl = None
         try:
             self.powerControl = PowerControl(self)
         except:
@@ -280,7 +281,8 @@ class BackLogMainClass(Thread, Statistics):
 
 
     def stop(self):
-        self.powerControl.stop()
+        if self.powerControl:
+            self.powerControl.stop()
         self.schedulehandler.stop()
         self.jobsobserver.stop()
         
