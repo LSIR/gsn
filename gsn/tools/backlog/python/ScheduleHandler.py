@@ -91,11 +91,13 @@ class ScheduleHandlerClass(Thread):
     _schedule
     _newSchedule
     _duty_cycle_mode
+    _service_wakeup_disabled
     _max_next_schedule_wait_delta
     _max_job_runtime_min
     _pingThread
     _config
     _beacon
+    _servicewindow
     _logger
     _scheduleHandlerStop
     _tosMessageLock
@@ -115,6 +117,15 @@ class ScheduleHandlerClass(Thread):
         service_wakeup_minutes = int(self.getOptionValue('service_wakeup_minutes'))
         if service_wakeup_minutes is None:
             raise TypeError('service_wakeup_minutes not specified in config file')
+        
+        self._service_wakeup_disabled = False
+        service_wakeup_disable = int(self.getOptionValue('service_wakeup_disable'))
+        if service_wakeup_disable != 1 and service_wakeup_disable != 0:
+            self._backlogMain.incrementErrorCounter()
+            self._logger.error('service_wakeup_disable has to be set to 1 or 0 in config file => service window will be enabled')
+        elif service_wakeup_disable == 1:
+            self._logger.warning('service window is disabled')
+            self._service_wakeup_disabled = True
         
         max_gsn_connect_wait_minutes = int(self.getOptionValue('max_gsn_connect_wait_minutes'))
         if max_gsn_connect_wait_minutes is None:
@@ -155,6 +166,7 @@ class ScheduleHandlerClass(Thread):
         self._newSchedule = False
         self._scheduleHandlerStop = False
         self._beacon = False
+        self._servicewindow = False
             
         self._max_next_schedule_wait_delta = timedelta(minutes=max_next_schedule_wait_minutes)
             
@@ -294,7 +306,10 @@ class ScheduleHandlerClass(Thread):
                 dtnow = datetime.utcnow()
                 timediff = nextdt - dtnow
                 if self._duty_cycle_mode and not self._beacon:
-                    service_time = self._serviceTime()
+                    if self._service_wakeup_disabled and not self._servicewindow:
+                        service_time = timedelta()
+                    else:
+                        service_time = self._serviceTime()
                     if nextdt <= dtnow:
                         self._logger.debug('executing >' + pluginclassname + ' ' + commandstring  + '< now')
                     elif timediff < self._max_next_schedule_wait_delta or timediff < service_time:
@@ -458,6 +473,7 @@ class ScheduleHandlerClass(Thread):
                     s += 'SCHEDULE '
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE) == TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE:
                     s += 'SERVICE '
+                    self._servicewindow = True
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_BEACON) == TOSTypes.CONTROL_WAKEUP_TYPE_BEACON:
                     self._beacon = True
                     self._backlogMain.beaconSet()
@@ -607,15 +623,21 @@ class ScheduleHandlerClass(Thread):
                     return False
 
             # Synchronize Service Wakeup Time
-            time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
-            time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
-            if time_to_service < 0-int(self.getOptionValue('approximate_startup_seconds')):
-                time_to_service += 86400
-            self._logger.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
-            if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, time_to_service):
-                self._logger.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
+            if self._service_wakeup_disabled:
+                if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, 0xffffffff):
+                    self._logger.info('successfully disabled service window wakeups')
+                else:
+                    self.error('could not disable service window wakeups')
             else:
-                self.error('could not schedule the next service window wakeup')
+                time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
+                time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
+                if time_to_service < 0-int(self.getOptionValue('approximate_startup_seconds')):
+                    time_to_service += 86400
+                self._logger.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
+                if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, time_to_service):
+                    self._logger.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
+                else:
+                    self.error('could not schedule the next service window wakeup')
     
             # Schedule next duty wakeup
             if self._schedule:

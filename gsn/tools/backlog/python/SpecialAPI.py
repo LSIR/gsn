@@ -331,6 +331,7 @@ class Statistics:
 
 
 
+import tos
 import TOSTypes
 
 
