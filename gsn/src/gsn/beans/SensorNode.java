@@ -44,6 +44,9 @@ public class SensorNode {
 			
 	public ArrayList<Link> links;
 	
+	public Integer position;
+	public String geoposition;
+	
 	private Integer batterylevel; 
 	private LinkedList<Double> voltageHistory = new LinkedList<Double>();
 	private DecimalFormat df = new DecimalFormat("0.00");

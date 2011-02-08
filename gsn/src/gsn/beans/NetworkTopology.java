@@ -16,4 +16,6 @@ public class NetworkTopology {
 	
 	@SuppressWarnings("unused")
 	private boolean configurable = false;
+
+	public boolean mapped = false;
 }
