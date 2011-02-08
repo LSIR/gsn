@@ -27,6 +27,7 @@ else:
     
 import Queue
 import logging
+import thread
 from datetime import datetime, timedelta
 from threading import Event, Lock, Thread
 
@@ -121,12 +122,14 @@ class ScheduleHandlerClass(Thread):
         self._service_wakeup_disabled = False
         service_wakeup_disable = self.getOptionValue('service_wakeup_disable')
         if service_wakeup_disable == None or int(service_wakeup_disable) == 0:
-            self._logger.info('service window is enabled')
+            if dutycyclemode:
+                self._logger.info('service window is enabled')
         elif int(service_wakeup_disable) != 1 and int(service_wakeup_disable) != 0:
             self._backlogMain.incrementErrorCounter()
             self._logger.error('service_wakeup_disable has to be set to 1 or 0 in config file => service window will be enabled')
         else:
-            self._logger.warning('service window is disabled')
+            if dutycyclemode:
+                self._logger.warning('service window is disabled')
             self._service_wakeup_disabled = True
         
         max_gsn_connect_wait_minutes = int(self.getOptionValue('max_gsn_connect_wait_minutes'))
@@ -215,7 +218,7 @@ class ScheduleHandlerClass(Thread):
                 
           
         if self._schedule and self._duty_cycle_mode:  
-            # Schedule duty wakeup after this session, for safety reasons.
+            # Schedule duty wake-up after this session, for safety reasons.
             # (The scheduled time here could be in this session if schedules are following
             # each other in short intervals. In this case it could be possible, that
             # we have to wait for the next service window in case of an unexpected shutdown.)
@@ -235,41 +238,11 @@ class ScheduleHandlerClass(Thread):
             if nextschedule:
                 nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
                 self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), pluginclassname + ' ' + commandstring)
-            
-        # wait some time for GSN to connect
-        if self._backlogMain.gsnpeer.isConnected():
-            self._gsnconnected = True
+                
+        if self._schedule:
+            thread.start_new_thread(self.waitForGSN, (None,))
         else:
-            self._logger.info('waiting for gsn to connect for a maximum of ' + self.getOptionValue('max_gsn_connect_wait_minutes') + ' minutes')
-            self._connectionEvent.wait((int(self.getOptionValue('max_gsn_connect_wait_minutes')) * 60))
-            self._connectionEvent.clear()
-            if self._scheduleHandlerStop:
-                self._logger.info('died')
-                return
-        
-        # if GSN is connected try to get a new schedule for a while
-        if self._gsnconnected:
-            timeout = 0
-            self._logger.info('waiting for gsn to answer a schedule request for a maximum of ' + self.getOptionValue('max_gsn_get_schedule_wait_minutes') + ' minutes')
-            while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
-                self._logger.debug('request schedule from gsn')
-                if self._schedule:
-                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
-                else:
-                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
-                self._scheduleEvent.wait(3)
-                if self._scheduleHandlerStop:
-                    self._logger.info('died')
-                    return
-                if self._scheduleEvent.isSet():
-                    self._scheduleEvent.clear()
-                    break
-                timeout += 3
-            
-            if timeout >= int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
-                self._logger.warning('gsn has not answered on any schedule request')
-        else:
-            self._logger.warning('gsn has not connected')
+            self.waitForGSN()
         
         if self._duty_cycle_mode:
             lookback = True
@@ -324,6 +297,8 @@ class ScheduleHandlerClass(Thread):
                             break
                         if self._stopEvent.isSet():
                             self._stopEvent.clear()
+                            if self._newSchedule:
+                                self._newSchedule = False
                             break
                     else:
                         if service_time <= self._max_next_schedule_wait_delta:
@@ -352,7 +327,8 @@ class ScheduleHandlerClass(Thread):
                                 self._logger.debug('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if (self._scheduleHandlerStop or self._newSchedule) or (self._duty_cycle_mode and not self._beacon):
-                            self._newSchedule = False
+                            if self._newSchedule:
+                                self._newSchedule = False
                             self._stopEvent.clear()
                             break
                 
@@ -385,6 +361,41 @@ class ScheduleHandlerClass(Thread):
             self._pingThread.join()
                 
         self._logger.info('died')
+        
+        
+    def waitForGSN(self, param=None):
+        # wait some time for GSN to connect
+        if self._backlogMain.gsnpeer.isConnected():
+            self._gsnconnected = True
+        else:
+            self._logger.info('waiting for gsn to connect for a maximum of ' + self.getOptionValue('max_gsn_connect_wait_minutes') + ' minutes')
+            self._connectionEvent.wait((int(self.getOptionValue('max_gsn_connect_wait_minutes')) * 60))
+            self._connectionEvent.clear()
+            if self._scheduleHandlerStop:
+                return
+        
+        # if GSN is connected try to get a new schedule for a while
+        if self._gsnconnected:
+            timeout = 0
+            self._logger.info('waiting for gsn to answer a schedule request for a maximum of ' + self.getOptionValue('max_gsn_get_schedule_wait_minutes') + ' minutes')
+            while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
+                self._logger.debug('request schedule from gsn')
+                if self._schedule:
+                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+                else:
+                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+                self._scheduleEvent.wait(3)
+                if self._scheduleHandlerStop:
+                    return
+                if self._scheduleEvent.isSet():
+                    self._scheduleEvent.clear()
+                    break
+                timeout += 3
+            
+            if timeout >= int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
+                self._logger.warning('gsn has not answered on any schedule request')
+        else:
+            self._logger.warning('gsn has not connected')
     
     
     def stop(self):
@@ -470,7 +481,7 @@ class ScheduleHandlerClass(Thread):
             node_state = response['argument']
             self._logger.debug('CONTROL_CMD_WAKEUP_QUERY response received with argument: ' + str(node_state))
             if node_state != self._tosNodeState:
-                s = 'TinyNode wakeup states are: '
+                s = ''
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED) == TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED:
                     s += 'SCHEDULE '
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE) == TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE:
@@ -482,12 +493,12 @@ class ScheduleHandlerClass(Thread):
                     s += 'BEACON '
                 elif self._beacon:
                     self._beacon = False
-                    self._scheduleEvent.set()
                     self._stopEvent.set()
                     self._backlogMain.beaconCleared()
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT) == TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT:
                     s += 'NODE_REBOOT'
-                self._logger.info(s)
+                if s:
+                    self._logger.info('TinyNode wake-up states are: ' + s)
                 self._tosNodeState = node_state
         elif response['command'] == TOSTypes.CONTROL_CMD_SERVICE_WINDOW:
             self._logger.info('CONTROL_CMD_SERVICE_WINDOW response received with argument: ' + str(response['argument']))
@@ -580,9 +591,9 @@ class ScheduleHandlerClass(Thread):
         if self._duty_cycle_mode:
             time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
             if self.tosMsgSend(TOSTypes.CONTROL_CMD_NEXT_WAKEUP, time_to_wakeup):
-                self._logger.info('successfully scheduled the next duty wakeup for >'+schedule_name+'< (that\'s in '+str(time_to_wakeup)+' seconds)')
+                self._logger.info('successfully scheduled the next duty wake-up for >'+schedule_name+'< (that\'s in '+str(time_to_wakeup)+' seconds)')
             else:
-                self.error('could not schedule the next duty wakeup for >'+schedule_name+'<')
+                self.error('could not schedule the next duty wake-up for >'+schedule_name+'<')
             
 
     def _shutdown(self, sleepdelta=timedelta()):
@@ -625,23 +636,24 @@ class ScheduleHandlerClass(Thread):
                     return False
 
             # Synchronize Service Wakeup Time
+            time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
+            time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
+            if time_to_service < 0-int(self.getOptionValue('approximate_startup_seconds')):
+                time_to_service += 86400
+            if not self._service_wakeup_disabled:
+                self._logger.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
+            if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, time_to_service):
+                if not self._service_wakeup_disabled:
+                    self._logger.info('successfully scheduled the next service window wake-up (that\'s in '+str(time_to_service)+' seconds)')
+            else:
+                self.error('could not schedule the next service window wake-up')
             if self._service_wakeup_disabled:
                 if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, 0xffffffff):
-                    self._logger.info('successfully disabled service window wakeups')
+                    self._logger.info('successfully disabled service window wake-up')
                 else:
-                    self.error('could not disable service window wakeups')
-            else:
-                time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
-                time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
-                if time_to_service < 0-int(self.getOptionValue('approximate_startup_seconds')):
-                    time_to_service += 86400
-                self._logger.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
-                if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, time_to_service):
-                    self._logger.info('successfully scheduled the next service window wakeup (that\'s in '+str(time_to_service)+' seconds)')
-                else:
-                    self.error('could not schedule the next service window wakeup')
+                    self.error('could not disable service window wake-up')
     
-            # Schedule next duty wakeup
+            # Schedule next duty wake-up
             if self._schedule:
                 td = timedelta(seconds=int(self.getOptionValue('approximate_startup_seconds')))
                 nextschedule, error = self._schedule.getNextSchedules(datetime.utcnow() + td)
@@ -649,7 +661,7 @@ class ScheduleHandlerClass(Thread):
                     self.error('error while parsing the schedule file: ' + str(e))
                 if nextschedule:
                     nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
-                    self._logger.info('schedule next duty wakeup')
+                    self._logger.info('schedule next duty wake-up')
                     self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), pluginclassname + ' ' + commandstring)
                     
             # last time to check if a new schedule has been sent from GSN
@@ -661,7 +673,7 @@ class ScheduleHandlerClass(Thread):
                     
             # last possible moment to check if a beacon has been sent to the node
             # (if so, we do not want to shutdown)
-            self._logger.info('get node wakeup states')
+            self._logger.info('get node wake-up states')
             self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
             if self._scheduleHandlerStop:
                 return True

@@ -450,7 +450,7 @@ class GSNListener(Thread):
                     out += c
                     self._stuff = False
                 else:
-                    self._logger.warn('stuffing mark reached')
+                    self._logger.debug('stuffing mark reached')
                     self._stuff = False
                     self._stuffread = c
                     return None
