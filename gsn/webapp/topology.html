@@ -210,7 +210,7 @@ function PacketRate() {
   function removeIdFromTable(id) {
     var table = $("tbody", "#topology_"+current_deployment.name);
     $("tr", table).each(function() {
-      if ($(this).find(">:first-child").text()==id)
+      if ($(this).find(">:nth-child(2)").text()==id)
         $(this).remove();}
     );
   }
@@ -231,16 +231,19 @@ function PacketRate() {
         for (i=0;i<healthitems.length;i++)
           cols+='<td></td>';
         table.append("<tr>"+
-          "<td>"+parseInt($(this).attr("node_id"))+'</td>'+cols+'<td></td>'+
+          "<td style=\"display:none\"></td><td>"+parseInt($(this).attr("node_id"))+'</td>'+cols+'<td></td>'+
           "</tr>");
       }
-      var row = $("td:first-child", table).filter(function(index) { return $(this).text()==id;}).parent();
+      var row = $("td:nth-child(2)", table).filter(function(index) { return $(this).text()==id;}).parent();
       var data = this;
       if (index < 0 || ($(this).attr("timestamp") > current_deployment.sensornodes[index].timestamp)) {
         $("td", row).each(function(index,value) {
           switch (index) {
-          case 0: break;
-          case 2:
+          case 0:
+            $(this).empty().text($(data).attr("position")?$(data).attr("position"):"");
+            break;
+          case 1: break; // node id
+          case 3:
             var img;
             if (!$(data).attr('batterylevel'))
               img = 'none';
@@ -252,23 +255,23 @@ function PacketRate() {
               img = 'half';
             else
               img = 'full';
-            $(this).empty().text($(data).attr(healthitems[index-1])?$(data).attr(healthitems[index-1]):"");
+            $(this).empty().text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
             $(this).append('<img style="margin:0px 0px 0px 5px;vertical-align:middle;" src="img/batterylevels/battery_'+img+'.png">');
             break;
-          case 9:
           case 10:
-            $(this).text(formatTime($(data).attr(healthitems[index-1])));
-            break;
           case 11:
+            $(this).text(formatTime($(data).attr(healthitems[index-2])));
+            break;
+          case 12:
             break;
           default:
-            $(this).text($(data).attr(healthitems[index-1])?$(data).attr(healthitems[index-1]):"");
+            $(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
             break;
           }
         });
         $(row).addClass("newdata");
         $(row).removeClass("offline");
-        $("td:first-child", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().removeClass("offline");
+        $("td:nth-child(2)", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().removeClass("offline");
         tableChanged = true;
       }
       if ($(this).attr("packet_count")) {
@@ -279,9 +282,16 @@ function PacketRate() {
       }
       if (now - $(data).attr("timestamp") > STANDBY_TIMEOUT_MS) {
         $(row).addClass("offline");
-        $("td:first-child", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().addClass("offline");
+        $("td:nth-child(2)", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().addClass("offline");
       }
     });
+    if ($(network).parent().attr("mapped")=='true') {
+      $("td:first-child", table).each(function() {
+        $(this).css('display', '');
+      });
+      var test = tablesorter.find("th:first-child");
+      $(tablesorter.find("th:first-child")[0]).css('display', '');
+    }
     tablesorter.trigger("update");
     if (sortlist.length > 0)
       tablesorter.trigger("sorton", [sortlist]);
@@ -305,7 +315,7 @@ function PacketRate() {
       var index = nodeindex(id);
       if (index < 0) {
         table.append("<tr class=\"disabled\">"+
-          "<td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
+          "<td style=\"display:none\">"+($(this).attr("position")?$(this).attr("position"):"")+"</td><td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
           "<td></td><td></td><td></td><td></td><td></td></tr>");
         if (isConfigurable)
         $("tr:last", table).bind("click",function() {
@@ -337,19 +347,20 @@ function PacketRate() {
               var generated_config="<?xml version=\"1.0\" encoding=\"UTF-8\"?><network><sensornodes>";
               $(".configtable tbody>tr", "#topology_"+current_deployment.name).each(function() {
                 if (!$(this).hasClass("disabled")) {
-                  generated_config=generated_config+"<sensornode node_id=\""+$("td:first-child",this).text()+"\"><links />";
+                  generated_config=generated_config+"<sensornode node_id=\""+$("td:nth-child(2)",this).text()+"\"><links />";
                   var c = "";
                   $("td", this).each(function(index,value) {
                     switch (index) {
-                    case 0: break;
-                    case 2: // always enable health ..
-                    case 7: //  .. and event packets
-                      c = c + " "+configitems[index-1]+"=\"true\"";
+                    case 0:
+                    case 1: break;
+                    case 3: // always enable health ..
+                    case 8: //  .. and event packets
+                      c = c + " "+configitems[index-2]+"=\"true\"";
                       break;
-                    case 15: break;
+                    case 16: break;
                     default:
                       if ($(this).children().length > 0)
-                        c = c + " "+configitems[index-1]+"=\"" + ($("input:first", this).attr("checked")?"true":"false")+"\"";
+                        c = c + " "+configitems[index-2]+"=\"" + ($("input:first", this).attr("checked")?"true":"false")+"\"";
                     }
                   });
                   if (c.length>0)
@@ -372,7 +383,7 @@ function PacketRate() {
         });
         $("tr:last", table).hover(function() { $(this).parent().children().each(function(){$(this).removeClass("selected")});$(this).addClass("selected"); }, function() { $(this).removeClass("selected"); });
       }
-      var row = $("td:first-child", table).filter(function(index) { return $(this).text()==id;}).parent();
+      var row = $("td:nth-child(2)", table).filter(function(index) { return $(this).text()==id;}).parent();
       var hasConfig = $("configuration", this).length>0;
       var hasPendingConfig = $("pendingConfiguration", this).length>0;
       var update=false;
@@ -405,33 +416,34 @@ function PacketRate() {
         var data = $("configuration",this);
         $("td", row).each(function(index,value) {
             switch (index) {
-            case 0: break;
-            case 15:
-              $(this).text(formatTime($(data).attr(configitems[index-1])));
+            case 0:
+            case 1: break;
+            case 16:
+              $(this).text(formatTime($(data).attr(configitems[index-2])));
               break;
             default:
-              if ($(data).attr(configitems[index-1])) {
+              if ($(data).attr(configitems[index-2])) {
                 // fill empty cell
                 if ($(this).children().length == 0) {
                   $(this).append("<div><input type=\"checkbox\" disabled=\""+($(this).parent().hasClass("disabled")?"disabled":"")+"\"></div>");                  
                 }
-                $("input:first", this).data("enabled", $(data).attr(configitems[index-1]));
+                $("input:first", this).data("enabled", $(data).attr(configitems[index-2]));
                 var pending = $(data).parent().children("pendingConfiguration");
-                if (pending.length>0 && pending.attr(configitems[index-1]))
-                  $("input:first", this).data("enabled_pending", pending.attr(configitems[index-1]));
+                if (pending.length>0 && pending.attr(configitems[index-2]))
+                  $("input:first", this).data("enabled_pending", pending.attr(configitems[index-2]));
                 else
                   $("input:first", this).data("enabled_pending","");
                 if ($(this).parent().hasClass("disabled")) { // if not changeable, just update
-                  if (pending.length>0 && pending.attr(configitems[index-1]) && pending.attr(configitems[index-1]) != $(data).attr(configitems[index-1]))
+                  if (pending.length>0 && pending.attr(configitems[index-2]) && pending.attr(configitems[index-2]) != $(data).attr(configitems[index-2]))
                     $(this).addClass("changing");
                   else
                     $(this).removeClass("changing");
-                  $("input:first", this).attr("checked", $(data).attr(configitems[index-1])=="true"?"checked":"");
-                  $("input:first", this).attr("name", $(data).attr(configitems[index-1])=="true"?"checked":"none");
+                  $("input:first", this).attr("checked", $(data).attr(configitems[index-2])=="true"?"checked":"");
+                  $("input:first", this).attr("name", $(data).attr(configitems[index-2])=="true"?"checked":"none");
                 }
                 else {// compare to current status
-                  if ($("input:first", this).attr("checked") && $(data).attr(configitems[index-1])=="true" ||
-                      !$("input:first", this).attr("checked") && $(data).attr(configitems[index-1])=="false")
+                  if ($("input:first", this).attr("checked") && $(data).attr(configitems[index-2])=="true" ||
+                      !$("input:first", this).attr("checked") && $(data).attr(configitems[index-2])=="false")
                     $(this).removeClass("changing");
                   else
                     $(this).addClass("changing");
@@ -448,6 +460,13 @@ function PacketRate() {
         tableChanged = true;
       }
     });
+    if ($(network).parent().attr("mapped")=='true') {
+      $("td:first-child", table).each(function() {
+        $(this).css('display', '');
+      });
+      var test = tablesorter.find("th:first-child");
+      $(tablesorter.find("th:first-child")[0]).css('display', '');
+    }
     if (tableChanged) {
       tablesorter.trigger("update");
       if (sortlist.length > 0)
@@ -642,7 +661,6 @@ $(document).ready(function() {
           }, 
           format: function(s) { 
             // format your data for normalization 
-            var test = s;
             if (s.length==0)
               return 0;
             else if (s.indexOf("checked")==-1)
@@ -655,6 +673,7 @@ $(document).ready(function() {
         }); 
         // add health table
         $($(".healthtable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
+            "<th class=\"header\" style=\"display:none\">Position</th>"+
             "<th class=\"header\" style=\"width:30px\">ID</th>"+
             "<th class=\"header\">Pkt Count</th>"+
             "<th class=\"header\">Vsys</th>"+
@@ -681,11 +700,13 @@ $(document).ready(function() {
               6: { sorter: 'digit' },
               7: { sorter: 'digit' },
               8: { sorter: 'digit' },
-              11: { sorter: 'digit' }
+              9: { sorter: 'digit' },
+              12: { sorter: 'digit' }
             } 
         });
         // add config table
         $($(".configtable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
+            "<th class=\"header\" style=\"display:none\">Position</th>"+
             "<th class=\"header\" style=\"width:30px\">ID</th>"+
             "<th class=\"header\">info</th>"+
             "<th class=\"header\">health</th>"+
@@ -708,7 +729,7 @@ $(document).ready(function() {
           headers:
             { 
               0: { sorter: 'digit' },
-              1: { sorter: 'checkbox' },
+              1: { sorter: 'digit' },
               2: { sorter: 'checkbox' },
               3: { sorter: 'checkbox' },
               4: { sorter: 'checkbox' },
@@ -722,6 +743,7 @@ $(document).ready(function() {
               12: { sorter: 'checkbox' },
               13: { sorter: 'checkbox' },
               14: { sorter: 'checkbox' },
+              15: { sorter: 'checkbox' },
             } 
         });
         // add status bar
