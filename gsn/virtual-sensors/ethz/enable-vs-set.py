@@ -6,8 +6,8 @@ import time
 
 abort = False
 
-if len(sys.argv) != 4 or (sys.argv[3].lower() != "create" and sys.argv[3].lower() != "check" and sys.argv[3].lower() != "delete"):
-  print 'usage: enable-vs-set.py <target> <db> (create|check|delete)'
+if len(sys.argv) != 3 or (sys.argv[2].lower() != "create" and sys.argv[2].lower() != "check" and sys.argv[2].lower() != "delete"):
+  print 'usage: enable-vs-set.py <target> (create|check|delete)'
   print '  create    Creates missing symlinks'
   print '  check     Reports differences between existing links and configuration'
   print '  delete    Removes obsolete symlinks'
@@ -15,12 +15,7 @@ if len(sys.argv) != 4 or (sys.argv[3].lower() != "create" and sys.argv[3].lower(
 
 filepath = sys.path[0] + '/conf/' + sys.argv[1] + '.list'
 
-h2 = False
-if sys.argv[2].lower() == "h2":
-    h2 = True
-elif sys.argv[2].lower() != "mysql":
-    print 'usage: <db> can only be h2 or mysql'
-    sys.exit(-1)
+h2 = True
 
 # check if first arguments points to valid file
 if not os.path.exists(filepath):
@@ -47,7 +42,7 @@ for line in fd:
 fd.close()
 
 # delete symlinks in virtual-sensors?
-if sys.argv[3].lower() == "delete":
+if sys.argv[2].lower() == "delete":
   for path in os.listdir('.'):
     if (os.path.isfile(path) and path.endswith('.xml')):
       if (os.path.islink(path)):
@@ -59,7 +54,7 @@ if sys.argv[3].lower() == "delete":
   exit(0)
 
 # check symlinks in virtual-sensors
-if sys.argv[3].lower() == "check":
+if sys.argv[2].lower() == "check":
   for source in linklist:
     link = os.path.basename(source)
     if os.path.exists(source):  
@@ -75,7 +70,7 @@ if sys.argv[3].lower() == "check":
   exit(0)
 
 # create symlinks in virtual-sensors
-if sys.argv[3].lower() == "create":
+if sys.argv[2].lower() == "create":
   for source in linklist:
     link = os.path.basename(source)
     if os.path.exists(source):
