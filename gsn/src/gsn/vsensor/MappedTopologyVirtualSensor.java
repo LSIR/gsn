@@ -12,6 +12,8 @@ import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 import gsn.beans.NetworkTopology;
 import gsn.beans.SensorNode;
 import gsn.beans.StreamElement;
@@ -40,6 +42,7 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 					for (SensorNode n: topology.sensornodes) {
 						if (n.node_id !=null && n.generation_time != null) {
 							n.position = DataMapping.getPosition(deployment, n.node_id.intValue(), new Timestamp(n.generation_time));
+							n.coordinate = DataMapping.getCoordinate(deployment, n.node_id.intValue(), new Timestamp(n.generation_time));
 						}
 					}
 					topology.mapped = true;

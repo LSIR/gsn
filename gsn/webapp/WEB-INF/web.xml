@@ -37,6 +37,11 @@
         <display-name>GSN Field Get</display-name>
         <servlet-class>gsn.http.FieldDownloadServlet</servlet-class>
     </servlet>
+        <servlet>
+        <servlet-name>XsltServlet</servlet-name>
+        <display-name>GSN Field Get XML Transformed</display-name>
+        <servlet-class>gsn.http.XsltServlet</servlet-class>
+    </servlet>    
 	<servlet>
         <servlet-name>FieldUpload</servlet-name>
         <display-name>GSN Field Upload</display-name>
@@ -234,6 +239,10 @@
         <servlet-name>FieldDownloadServlet</servlet-name>
         <url-pattern>/field</url-pattern>
     </servlet-mapping>
+        <servlet-mapping>
+        <servlet-name>XsltServlet</servlet-name>
+        <url-pattern>/xslt</url-pattern>
+    </servlet-mapping>        
 	<servlet-mapping>
         <servlet-name>FieldUpload</servlet-name>
         <url-pattern>/upload</url-pattern>

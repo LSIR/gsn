@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
+import org.codehaus.groovy.tools.shell.ParseStatus;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
 * @author Roman Lim
@@ -50,6 +53,8 @@ public class SensorNode {
 	private Integer batterylevel; 
 	private LinkedList<Double> voltageHistory = new LinkedList<Double>();
 	private DecimalFormat df = new DecimalFormat("0.00");
+	
+	public Coordinate coordinate = null;
 	
 	public SensorNode() {
 		links = new ArrayList<Link>();
@@ -237,5 +242,50 @@ public class SensorNode {
 			this.humidity = new Double(humidity);
 	}
 	
+	// coordinate
+	public void setCoordinateLongitude(String l) {
+		if (l != null) {
+			if (coordinate == null) {
+				coordinate = new Coordinate();
+			}
+			coordinate.x = new Double(l);
+		}
+	}
 	
+	public void setCoordinateLatitude(String l) {
+		if (l != null) {
+			if (coordinate == null) {
+				coordinate = new Coordinate();
+			}
+			coordinate.y = new Double(l);
+		}
+	}
+
+	public void setCoordinateAltitude(String a) {
+		if (a != null) {
+			if (coordinate == null) {
+				coordinate = new Coordinate();
+			}
+			coordinate.z = new Double(a);
+		}
+	}
+	
+	public String getCoordinateLongitude() {
+		if (coordinate == null)
+			return null;
+		return new Double(coordinate.x).toString();
+	}
+	
+	public String getCoordinateLatitude() {
+		if (coordinate == null)
+			return null;
+		return new Double(coordinate.y).toString();
+	}
+
+	public String getCoordinateAltitude() {
+		if (coordinate == null)
+			return null;
+		return new Double(coordinate.z).toString();
+	}
+
 }

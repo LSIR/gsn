@@ -3,7 +3,7 @@
         <class-name>gsn.vsensor.MappedTopologyVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
-            <field name="DATA" type="BINARY" />
+            <field name="DATA" type="BINARY:application/vnd.google-earth.kml+xml"/>
         </output-structure>
     </processing-class>
     <description>Sensornode Topology of ETZ deployment</description>

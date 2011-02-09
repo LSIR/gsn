@@ -19,6 +19,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.h2.tools.Server;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.vsensor.permasense.Converter;
@@ -67,7 +69,7 @@ public class DataMapping {
 				logger.info("connected to jdbc:h2:mem:" + deployment + "...");
 
 				Statement stat = conn.createStatement();
-				stat.execute("CREATE TABLE positionmapping(device_id INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, position INT NOT NULL, comment CLOB, PRIMARY KEY(device_id, begin, end))");
+				stat.execute("CREATE TABLE positionmapping(device_id INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, position INT NOT NULL, longitude DOUBLE, latitude DOUBLE, altitude DOUBLE, comment CLOB, PRIMARY KEY(device_id, begin, end))");
 				logger.info("create positionmapping table for " + deployment + " deployment");
 				s = "conf/permasense/" + deployment + "-positionmapping.csv";
 				if (new File(s).exists()) {
@@ -158,6 +160,33 @@ public class DataMapping {
 				ResultSet rs = position_query.executeQuery();
 				if (rs.next()) {
 					res = rs.getInt(1);
+					if (rs.wasNull())
+						res = null;
+				}
+			}
+		} catch (SQLException e) {
+			logger.warn(e.getMessage(), e);
+		}
+		if (logger.isDebugEnabled())
+			logger.debug("getPosition: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		return res;
+	}
+	
+	public static Coordinate getCoordinate(String deployment, int device_id, Timestamp generation_time) {
+		Coordinate res = null;
+		long start = System.nanoTime();
+		try {
+			synchronized (deployments) {
+				if (!deployments.containsKey(deployment)) {
+					logger.error("Position mapping data not available for deployment "+deployment);
+					return null;
+				}
+				PreparedStatement coordinate_query = deployments.get(deployment).coordinate_query;
+				coordinate_query.setInt(1, device_id);
+				coordinate_query.setTimestamp(2, generation_time);
+				ResultSet rs = coordinate_query.executeQuery();
+				if (rs.next()) {
+					res = new Coordinate(rs.getDouble(1), rs.getDouble(2), rs.getDouble(3));
 					if (rs.wasNull())
 						res = null;
 				}
@@ -282,6 +311,7 @@ public class DataMapping {
 	class Mappings {
 		public Connection conn = null;
 		public PreparedStatement position_query = null;
+		public PreparedStatement coordinate_query = null;
 		public PreparedStatement sensortype_query = null;
 		public PreparedStatement serialid_query = null;
 		public PreparedStatement conversion_query = null;
@@ -290,6 +320,7 @@ public class DataMapping {
 		public Mappings(Connection conn) throws SQLException {
 			this.conn = conn;
 			position_query = this.conn.prepareStatement("SELECT position FROM positionmapping WHERE device_id = ? AND ? BETWEEN begin AND end LIMIT 1");
+			coordinate_query = this.conn.prepareStatement("SELECT longitude, latitude, altitude FROM positionmapping WHERE device_id = ? AND ? BETWEEN begin AND end LIMIT 1");
 			sensortype_query = this.conn.prepareStatement("SELECT sensortype, sensortype_args FROM sensormapping WHERE position = ? AND ? BETWEEN begin AND end AND sensortype != 'serialid'");
 			serialid_query = this.conn.prepareStatement("SELECT sensortype_args AS sensortype_serialid FROM sensormapping WHERE position = ? AND ? BETWEEN begin AND end AND sensortype = 'serialid' LIMIT 1");
 			conversion_query = this.conn.prepareStatement("SELECT st.physical_signal AS physical_signal, st.conversion AS conversion, st.input as input, CASEWHEN(st.input IS NULL OR sm.sensortype_args IS NULL,NULL,sta.value) as value " +

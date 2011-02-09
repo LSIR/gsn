@@ -8,7 +8,9 @@
    <mapping name="sensornode" class="gsn.beans.SensorNode" >   
   	   <value name="node_id" field="node_id" style="attribute"/>
        <value name="position" field="position" style="attribute" usage="optional"/>
-       <value name="geoposition" field="geoposition" style="attribute" usage="optional"/>       
+       <value name="longitude" style="attribute" get-method="getCoordinateLongitude" set-method="setCoordinateLongitude" usage="optional"/>      
+       <value name="latitude" style="attribute" get-method="getCoordinateLatitude" set-method="setCoordinateLatitude" usage="optional"/>
+       <value name="altitude" style="attribute" get-method="getCoordinateAltitude" set-method="setCoordinateAltitude" usage="optional"/>
   	   <value name="parent_id" field="parent_id" style="attribute" usage="optional"/>
   	   <value name="timestamp" field="timestamp" style="attribute" usage="optional"/>
   	   <value name="generation_time" field="generation_time" style="attribute" usage="optional"/>
