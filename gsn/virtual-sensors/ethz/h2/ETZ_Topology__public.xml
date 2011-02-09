@@ -1,6 +1,6 @@
 <virtual-sensor name="ETZ_Topology__public" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <class-name>gsn.vsensor.MappedTopologyVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="DATA" type="BINARY" />
