@@ -51,7 +51,7 @@ public class ContainerInfoHandler implements RequestHandler {
   
   //return only the requested sensor if specified (otherwise use null)
   //Added by Behnaz. New parameter User user to method buildOutput.
-  public String buildOutput (String reqName, User user, Boolean structure) {
+  public static String buildOutput (String reqName, User user, Boolean structure) {
 	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 	  
 	  
