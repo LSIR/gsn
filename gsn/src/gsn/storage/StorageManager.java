@@ -17,6 +17,8 @@ import org.apache.commons.dbcp.*;
 import org.apache.log4j.Logger;
 
 public abstract class StorageManager {
+	
+	private static final long TIME_BETWEEN_EVICTION_RUNS_MILLIS = 1000 * 60 * 30;
 
     private static final transient Logger logger = Logger.getLogger(StorageManager.class);
 
@@ -29,6 +31,15 @@ public abstract class StorageManager {
         pool = DataSources.getDataSource(new DBConnectionInfo(databaseDriver,databaseURL,username,password));
         pool.setMaxActive(maxDBConnections);
         pool.setMaxIdle(maxDBConnections);
+        
+        pool.setMinEvictableIdleTimeMillis(TIME_BETWEEN_EVICTION_RUNS_MILLIS);
+        pool.setTimeBetweenEvictionRunsMillis(TIME_BETWEEN_EVICTION_RUNS_MILLIS);
+        pool.setNumTestsPerEvictionRun(3);
+
+        pool.setTestOnBorrow(true);
+        pool.setTestWhileIdle(true);
+        pool.setTestOnReturn(false);
+        pool.setValidationQuery("SELECT 1");
         //
         Connection con = null;
         try {
@@ -743,9 +754,6 @@ public abstract class StorageManager {
     public StringBuilder getStatementCreateView(CharSequence viewName,CharSequence selectQuery) {
         return new StringBuilder("create view ").append(viewName).append(" AS ( ").append(selectQuery).append(" ) ");
     }
-
-    private String driver = null;
-
 
     /**
      * The prefix is in lower case
