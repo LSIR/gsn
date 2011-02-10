@@ -36,6 +36,22 @@
             <field name="DB_REMOVE_TIME_MIN" type="INTEGER" unit="ms" />
             <field name="DB_REMOVE_TIME_MEAN" type="INTEGER" unit="ms" />
             <field name="DB_REMOVE_TIME_MAX" type="INTEGER" unit="ms" />
+            <field name="RUSAGE_UTIME" type="DOUBLE" />
+            <field name="RUSAGE_STIME" type="DOUBLE" />
+            <field name="RUSAGE_MAXRSS" type="INTEGER" />
+            <field name="RUSAGE_IXRSS" type="INTEGER" />
+            <field name="RUSAGE_IDRSS" type="INTEGER" />
+            <field name="RUSAGE_ISRSS" type="INTEGER" />
+            <field name="RUSAGE_MINFLT" type="INTEGER" />
+            <field name="RUSAGE_MAJFLT" type="INTEGER" />
+            <field name="RUSAGE_NSWAP" type="INTEGER" />
+            <field name="RUSAGE_INBLOCK" type="INTEGER" />
+            <field name="RUSAGE_OUBLOCK" type="INTEGER" />
+            <field name="RUSAGE_MSGSND" type="INTEGER" />
+            <field name="RUSAGE_MSGRCV" type="INTEGER" />
+            <field name="RUSAGE_NSIGNALS" type="INTEGER" />
+            <field name="RUSAGE_NVCSW" type="INTEGER" />
+            <field name="RUSAGE_NIVCSW" type="INTEGER" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
