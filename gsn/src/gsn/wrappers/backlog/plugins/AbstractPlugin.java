@@ -9,6 +9,7 @@ import javax.naming.OperationNotSupportedException;
 
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
+import gsn.beans.DataTypes;
 import gsn.wrappers.BackLogWrapper;
 import gsn.wrappers.backlog.BackLogMessage;
 import gsn.wrappers.backlog.BackLogMessageListener;
@@ -355,6 +356,39 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 
 	public boolean isTimeStampUnique() {
 	  return activeBackLogWrapper.isTimeStampUnique();
+	}
+	
+	
+	protected static Serializable[] checkAndCastData(Serializable[] data, DataField[] datafields, int offset) throws Exception {
+		if (data.length != datafields.length-offset)
+			throw new Exception("data length does not correspond with the datafield length");
+		
+		Serializable [] ret = new Serializable [data.length];
+		for (int i=0; i<data.length; i++) {
+			int type = datafields[i+offset].getDataTypeID();
+			switch (type) {
+			case DataTypes.INTEGER:
+				ret[i] = toInteger(data[i]);
+				break;
+			case DataTypes.BIGINT:
+				ret[i] = toLong(data[i]);
+				break;
+			case DataTypes.SMALLINT:
+				ret[i] = toShort(data[i]);
+				break;
+			case DataTypes.TINYINT:
+				ret[i] = toShort(data[i]);
+				break;
+			case DataTypes.DOUBLE:
+				ret[i] = (Double)data[i];
+				break;
+			default:
+				ret[i] = data[i];
+				break;
+			}
+		}
+		
+		return ret;
 	}
 	
 	

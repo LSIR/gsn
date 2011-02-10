@@ -24,6 +24,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 						new DataField("UPTIME", "INTEGER"),
 						new DataField("ERROR_COUNTER", "INTEGER"),
 						new DataField("EXCEPTION_COUNTER", "INTEGER"),
+						new DataField("ACTIVE_THREAD_COUNTER", "INTEGER"),
 						new DataField("GSN_PLUGIN_MSG_IN", "DOUBLE"),
 						new DataField("GSN_PLUGIN_MSG_OUT", "DOUBLE"),
 						new DataField("GSN_PLUGIN_MSG_IN_COUNTER", "INTEGER"),
@@ -45,7 +46,23 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 						new DataField("DB_STORE_TIME_MAX", "INTEGER"),
 						new DataField("DB_REMOVE_TIME_MIN", "INTEGER"),
 						new DataField("DB_REMOVE_TIME_MEAN", "INTEGER"),
-						new DataField("DB_REMOVE_TIME_MAX", "INTEGER")};
+						new DataField("DB_REMOVE_TIME_MAX", "INTEGER"),
+						new DataField("RUSAGE_UTIME", "DOUBLE"),
+						new DataField("RUSAGE_STIME", "DOUBLE"),
+						new DataField("RUSAGE_MAXRSS", "INTEGER"),
+						new DataField("RUSAGE_IXRSS", "INTEGER"),
+						new DataField("RUSAGE_IDRSS", "INTEGER"),
+						new DataField("RUSAGE_ISRSS", "INTEGER"),
+						new DataField("RUSAGE_MINFLT", "INTEGER"),
+						new DataField("RUSAGE_MAJFLT", "INTEGER"),
+						new DataField("RUSAGE_NSWAP", "INTEGER"),
+						new DataField("RUSAGE_INBLOCK", "INTEGER"),
+						new DataField("RUSAGE_OUBLOCK", "INTEGER"),
+						new DataField("RUSAGE_MSGSND", "INTEGER"),
+						new DataField("RUSAGE_MSGRCV", "INTEGER"),
+						new DataField("RUSAGE_NSIGNALS", "INTEGER"),
+						new DataField("RUSAGE_NVCSW", "INTEGER"),
+						new DataField("RUSAGE_NIVCSW", "INTEGER")};
 
 	private final transient Logger logger = Logger.getLogger( BackLogStatusPlugin.class );
 

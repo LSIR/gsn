@@ -259,11 +259,20 @@ class BackLogMessageClass:
                     else:
                         raise ValueError('the passed integer value is too big to be transfered using 8 bytes')
                 elif type(val) == long:
-                    if val < 9223372036854775807 and val > -9223372036854775808:
+                    if val < 127 and val > -128:
+                        format += 'b'
+                        data += struct.pack('<b', val)
+                    elif val < 32767 and val > -32768:
+                        format += 'h'
+                        data += struct.pack('<h', val)
+                    elif val < 2147483647 and val > -2147483648:
+                        format += 'i'
+                        data += struct.pack('<i', val)
+                    elif val < 9223372036854775807 and val > -9223372036854775808:
                         format += 'q'
                         data += struct.pack('<q', val)
                     else:
-                        raise ValueError('the passed long value is too big to be transfered using 8 bytes')
+                        raise ValueError('the passed integer value is too big to be transfered using 8 bytes')
                 elif type(val) == float:
                     format += 'd'
                     data += struct.pack('<d', val)

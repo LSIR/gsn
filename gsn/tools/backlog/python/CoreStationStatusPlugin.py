@@ -43,21 +43,20 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
-        
-        p = subprocess.Popen(['modprobe', 'ad77x8'])
-        self.info('wait for modprobe ad77x8 to finish')
-        ret = p.wait()
-        output = p.communicate()
-        if output[0]:
-            if output[1]:
-                self.info('modprobe ad77x8: (STDOUT=' + output[0] + 'STDERR=' + output[1] + ')')
-            else:
-                self.info('modprobe ad77x8: (STDOUT=' + output[0] + ')')
-        elif output[1]:
-                self.info('modprobe ad77x8: (STDERR=' + output[1] + ')')
-                
-        if ret != 0:
-            raise Exception('module ad77x8 is not available (modprobe ad77x8 returned with code ' + str(ret) + ')')
+#        p = subprocess.Popen(['modprobe', 'ad77x8'])
+#        self.info('wait for modprobe ad77x8 to finish')
+#        ret = p.wait()
+#        output = p.communicate()
+#        if output[0]:
+#            if output[1]:
+#                self.info('modprobe ad77x8: (STDOUT=' + output[0] + 'STDERR=' + output[1] + ')')
+#            else:
+#                self.info('modprobe ad77x8: (STDOUT=' + output[0] + ')')
+#        elif output[1]:
+#                self.info('modprobe ad77x8: (STDERR=' + output[1] + ')')
+#                
+#        if ret != 0:
+#            raise Exception('module ad77x8 is not available (modprobe ad77x8 returned with code ' + str(ret) + ')')
             
         self._conf_calibrate = False
         if int(self.getOptionValue('calibrate')) == 1:
@@ -115,7 +114,875 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 self._timer.start()
             else:
                 self.error('parameter has to be a digit (parameter=' + parameters + ')')
+        
+#        print '##########################################################################'
+#        print '_getNumberOfUsers :' + self._getNumberOfUsers()
+#        print '_getLastLog :' + str(self._getLastLog())
+#        print '_getChronyStats :' + str(self._getChronyStats())
+#        print '_getStatVFS :' + str(self._getStatVFS())
+#        print '_getDiskStats :' + str(self._getDiskStats())
+#        print '_getInterrupts :' + str(self._getInterrupts())
+#        print '_getLoadAvg :' + str(self._getLoadAvg())
+#        print '_getMemInfo :' + str(self._getMemInfo())
+#        print '_getSchedStat :' + str(self._getSchedStat())
+#        print '_getNetDev :' + str(self._getNetDev())
+#        print '_getNetSNMP :' + str(self._getNetSNMP())
+#        print '_getNetStat :' + str(self._getNetStat())
+#        print '_getSockStat :' + str(self._getSockStat())
+#        print '_getSoftIRQ :' + str(self._getSoftIRQ())
+#        print '_getStat :' + str(self._getStat())
+#        print '_getUptime :' + str(self._getUptime())
+#        print '_getLM92Temp :' + str(self._getLM92Temp())
+        
+        data_list = self._getNumberOfUsers()
+        data_list += self._getLastLog()
+        data_list += self._getChronyStats()
+        data_list += self._getStatVFS()
+        data_list += self._getDiskStats()
+        data_list += self._getInterrupts()
+        data_list += self._getLoadAvg()
+        data_list += self._getMemInfo()
+        data_list += self._getSchedStat()
+        data_list += self._getNetDev()
+        data_list += self._getNetSNMP()
+        data_list += self._getNetStat()
+        data_list += self._getSockStat()
+        data_list += self._getSoftIRQ()
+        data_list += self._getStat()
+        data_list += self._getUptime()
+        data_list += self._getLM92Temp()
+        data_list += self._getAD77x8()
+        
+        self.processMsg(self.getTimeStamp(), data_list, self._priority, self._backlog)
             
+    
+    
+    def _sendInitStats(self):
+        # TODO: what exactly to read
+        os.uname()
+    
+    
+    def _getNumberOfUsers(self):
+        # TODO: implement
+        ret = [None]
+        return ret
+        
+        
+    def _getLastLog(self):
+        '''
+            [last user logged into the system (string)]
+        '''
+        ret = [None]
+        try:
+            file = open("/var/log/lastlog", "r")
+            str = file.read()
+#            print '#############################################################################'
+#            print '/var/log/lastlog'
+#            print '[last user logged into the system (string)]'
+#            print ''
+#            print str
+#            print ''
+            file.close()
+            ret = [str[36:str.index('\0', 36)]]
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+    def _getChronyStats(self):
+        '''
+            [stratum (int),
+             system time (float),
+             frequency (float),
+             skew (float),
+             RTC is fast/slow in seconds (float),
+             RTC gains/loses time in ppm (float)]
+        '''
+        ret = [None]*6
+        
+        try:
+            p = subprocess.Popen(['chronyc', 'tracking'])
+            p.wait()
+            output = p.communicate()
+#            print '#############################################################################'
+#            print 'chronyc tracking'
+#            print '[stratum (int), system time (float), frequency (float), skew (float), RTC is fast/slow in seconds (float), RTC gains/loses time in ppm (float)]'
+#            print ''
+#            print output[0]
+#            print ''
+            if output[0]:
+                lines = output[0].split('\n')
+                for line in lines:
+                    if line.strip().startswith('Stratum'):
+                        lst = line.split()
+                        if len(lst) != 3:
+                            self.exception('splitted line containing Stratum from chronyc tracking did not return 3 values')
+                        else:
+                            ret[0] = int(lst[2])
+                    elif line.strip().startswith('System time'):
+                        lst = line.split()
+                        if len(lst) != 9:
+                            self.exception('splitted line containing System time from chronyc tracking did not return 9 values')
+                        elif lst[4] != 'seconds':
+                            self.exception('System time value from chronyc tracking is not in seconds')
+                        else:
+                            if lst[5] == 'fast':
+                                ret[1] = float(lst[3])
+                            elif lst[5] == 'slow':
+                                ret[1] = -float(lst[3])
+                            else:
+                                self.exception('System time value from chronyc tracking is not slow or fast')
+                    elif line.strip().startswith('Frequency'):
+                        lst = line.split()
+                        if len(lst) != 5:
+                            self.exception('splitted line containing Frequency from chronyc tracking did not return 5 values')
+                        elif lst[3] != 'ppm':
+                            self.exception('Frequency value from chronyc tracking is not in ppm')
+                        else:
+                            if lst[4] == 'fast':
+                                ret[2] = float(lst[2])
+                            elif lst[4] == 'slow':
+                                ret[2] = -float(lst[2])
+                            else:
+                                self.exception('Frequency value from chronyc tracking is not slow or fast')
+                    elif line.strip().startswith('Skew'):
+                        lst = line.split()
+                        if len(lst) != 4:
+                            self.exception('splitted line containing Skew from chronyc tracking did not return 4 values')
+                        elif lst[3] != 'ppm':
+                            self.exception('Skew value from chronyc tracking is not in ppm')
+                        else:
+                            ret[3] = float(lst[2])
+            elif not output[1]:
+                self.error('chronyc tracking has not generated any output')
+            if output[1]:
+                self.error('chronyc tracking: (STDERR=' + output[1] + ')')
+        except Exception, e:
+            self.exception(e)
+        
+        try:
+            p = subprocess.Popen(['chronyc', 'rtcdata'])
+            p.wait()
+            output = p.communicate()
+#            print ''
+#            print 'chronyc rtcdata'
+#            print ''
+#            print output[0]
+#            print ''
+            if output[0]:
+                lines = output[0].split('\n')
+                if len(lines) != 6:
+                    self.exception('chronyc rtcdata did not return the expected output')
+                else:
+                    line = lines[4]
+                    lst = line.split()
+                    if lst[0] != 'RTC':
+                        self.exception('chronyc rtcdata: RTC expected')
+                    elif lst[-1] != 'seconds':
+                        self.exception('chronyc rtcdata: seconds expected')
+                    else:
+                        ret[4] = float(lst[-2])
+                        
+                    line = lines[5]
+                    lst = line.split()
+                    if lst[0] != 'RTC':
+                        self.exception('chronyc rtcdata: RTC expected')
+                    elif lst[-1] != 'ppm':
+                        self.exception('chronyc rtcdata: ppm expected')
+                    else:
+                        ret[5] = float(lst[-2])
+            elif not output[1]:
+                self.error('chronyc tracking has not generated any output')
+            if output[1]:
+                self.error('chronyc tracking: (STDERR=' + output[1] + ')')
+        except Exception, e:
+            self.exception(e)
+
+        return ret
+        
+        
+    def _getStatVFS(self):
+        '''
+            [statvfs f_blocks * f_frsize for / (long),
+             statvfs f_bfree * f_frsize for / (long),
+             statvfs f_files * f_frsize for / (long),
+             statvfs f_ffree * f_frsize for / (long),
+             statvfs f_blocks * f_frsize for /var/volatile/ (long),
+             statvfs f_bfree * f_frsize for /var/volatile/ (long),
+             statvfs f_files * f_frsize for /var/volatile/ (long),
+             statvfs f_ffree * f_frsize for /var/volatile/ (long),
+             statvfs f_blocks * f_frsize for /media/card/ (long),
+             statvfs f_bfree * f_frsize for /media/card/ (long),
+             statvfs f_files * f_frsize for /media/card/ (long),
+             statvfs f_ffree * f_frsize for /media/card/ (long)]
+        '''
+        ret = [None]*12
+        try:
+            file = open("/proc/self/mounts", "r")
+            lines = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print 'os.statvfs'
+#            print '[statvfs f_blocks * f_frsize for / (long), statvfs f_bfree * f_frsize for / (long), statvfs f_files * f_frsize for / (long), statvfs f_ffree * f_frsize for / (long), statvfs f_blocks * f_frsize for /var/volatile/ (long), statvfs f_bfree * f_frsize for /var/volatile/ (long), statvfs f_files * f_frsize for /var/volatile/ (long), statvfs f_ffree * f_frsize for /var/volatile/ (long), statvfs f_blocks * f_frsize for /media/card/ (long), statvfs f_bfree * f_frsize for /media/card/ (long), statvfs f_files * f_frsize for /media/card/ (long), statvfs f_ffree * f_frsize for /media/card/ (long)]'
+#            print ''
+#            print str(lines)
+#            print ''
+            for line in lines:
+                if line.find(' / ') != -1:
+                    stats = os.statvfs('/')
+                    ret[0] = stats.f_blocks * stats.f_frsize
+                    ret[1] = stats.f_bfree * stats.f_frsize
+                    ret[2] = stats.f_files * stats.f_frsize
+                    ret[3] = stats.f_ffree * stats.f_frsize
+                elif line.find(' /var/volatile ') != -1:
+                    stats = os.statvfs('/var/volatile/')
+                    ret[4] = stats.f_blocks * stats.f_frsize
+                    ret[5] = stats.f_bfree * stats.f_frsize
+                    ret[6] = stats.f_files * stats.f_frsize
+                    ret[7] = stats.f_ffree * stats.f_frsize
+                elif line.find(' /media/card ') != -1:
+                    stats = os.statvfs('/media/card/')
+                    ret[8] = stats.f_blocks * stats.f_frsize
+                    ret[9] = stats.f_bfree * stats.f_frsize
+                    ret[10] = stats.f_files * stats.f_frsize
+                    ret[11] = stats.f_ffree * stats.f_frsize
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+    def _getDiskStats(self):
+        '''
+            [# of reads issued (long),
+             # of sectors read (long),
+             # of milliseconds spent reading (long),
+             # of writes completed (long),
+             # of sectors written (long),
+             # of milliseconds spent writing (long),
+             # of I/Os currently in progress (int),
+             # of milliseconds spent doing I/Os (long),
+             weighted # of milliseconds spent doing I/Os (long)]
+        '''
+        ret = [None]*9
+        try:
+            file = open("/proc/diskstats", "r")
+            lines = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/diskstats'
+#            print '[# of reads issued (long), # of sectors read (long), # of milliseconds spent reading (long), # of writes completed (long), # of sectors written (long), # of milliseconds spent writing (long), # of I/Os currently in progress (long), # of milliseconds spent doing I/Os (long), weighted # of milliseconds spent doing I/Os (long)]'
+#            print ''
+#            print str(lines)
+#            print ''
+            statsAvailable = False
+            for line in lines:
+                if line.find('mmcblk0p1') != -1:
+                    statsAvailable = True
+                    lst = line.split()
+                    if len(lst) != 14:
+                        self.exception('splitted line containing mmcblk0p1 from /proc/diskstats did not return 14 values')
+                    else:
+                        ret = [long(lst[3]), long(lst[5]), long(lst[6]), long(lst[7]), long(lst[9]), long(lst[10]), long(lst[11]), long(lst[12]), long(lst[13])]
+                    break
+            if not statsAvailable:
+                self.exception('mmcblk0p1 could not be found in /proc/diskstats')
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+    def _getInterrupts(self):
+        '''
+            [# of ohci_hcd:usb1 interrupts (long),
+             # of pxa2xx-spi.2 interrupts (long),
+             # of pxa_i2c-i2c.0 interrupts (long),
+             # of STUART interrupts (long),
+             # of BTUART interrupts (long),
+             # of FFUART interrupts (long),
+             # of pxa2xx-mci interrupts (long),
+             # of DMA interrupts (long),
+             # of ost0 interrupts (long)]
+        '''
+        names = ['ohci_hcd:usb1', 'pxa2xx-spi.2', 'pxa_i2c-i2c.0', 'STUART', 'BTUART', 'FFUART', 'pxa2xx-mci', 'DMA', 'ost0']
+        ret = [None]*len(names)
+        exists = [False]*len(names)
+        try:
+            file = open("/proc/interrupts", "r")
+            lst = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/interrupts'
+#            print '[# of ohci_hcd:usb1 interrupts (long), # of pxa2xx-spi.2 interrupts (long), # of pxa_i2c-i2c.0 interrupts (long), # of STUART interrupts (long), # of BTUART interrupts (long), # of FFUART interrupts (long), # of pxa2xx-mci interrupts (long), # of DMA interrupts (long), # of ost0 interrupts (long)]'
+#            print ''
+#            print str(lst)
+#            print ''
+            for index, name in enumerate(names):
+                for line in lst:
+                    if line.find(name) != -1:
+                        linelist = line.split()
+                        value = None
+                        if len(linelist) != 4:
+                            self.exception('splitted line /proc/interrupts containing ' + name + ' did not return 4 values')
+                        elif linelist[2] != 'SC':
+                            self.exception('/proc/interrupts ' + name + ' does not contain SC on 3. position')
+                        else:
+                            try:
+                                value = long(linelist[1])
+                            except Exception, e:
+                                self.exception('/proc/interrupts ' + name + ' value can not be converted to a long')
+                        ret[index] = value
+                        exists[index] = True
+                        break
+        except Exception, e:
+            self.exception(e)
+            
+        for index, b in enumerate(exists):
+            if not b:
+                self.debug('/proc/interrupts ' + names[index] + ' could not be found')
+        return ret
+        
+        
+    def _getLoadAvg(self):
+        '''
+            [# of processes in the system run queue averaged over the last 1 (float),
+             # of processes in the system run queue averaged over the last 5 (float),
+             # of processes in the system run queue averaged over the last 15 (float),
+             # of runnable processes (int)]
+        '''
+        ret = [None]*4
+        try:
+            file = open("/proc/loadavg", "r")
+            string = file.read()
+            file.close()
+            lst = string.split()
+#            print '#############################################################################'
+#            print '/proc/loadavg'
+#            print '[# of processes in the system run queue averaged over the last 1 (float), # of processes in the system run queue averaged over the last 5 (float), # of processes in the system run queue averaged over the last 15 (float), # of runnable processes (int)]'
+#            print ''
+#            print string
+#            print ''
+            if len(lst) != 5:
+                self.exception('reading /proc/loadavg did not return 5 values')
+            else:
+                ret = [float(lst[0]), float(lst[1]), float(lst[2]), int(lst[3].split('/')[1])]
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+    def _getMemInfo(self):
+        '''
+            [MemTotal in kB (int),
+             MemFree in kB (int),
+             Buffers in kB (int),
+             Cached in kB (int),
+             Shmem in kB (int),
+             KernelStack in kB (int),
+             Slab in kB (int),
+             Mapped in kB (int)]
+        '''
+        names = ['MemTotal', 'MemFree', 'Buffers', 'Cached', 'Shmem', 'KernelStack', 'Slab', 'Mapped']
+        ret = [None]*len(names)
+        exists = [False]*len(names)
+        try:
+            file = open("/proc/meminfo", "r")
+            lst = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/meminfo'
+#            print '[MemTotal in kB (int), MemFree in kB (int), Buffers in kB (int), Cached in kB (int), Shmem in kB (int), KernelStack in kB (int), Slab in kB (int), Mapped in kB (int)]'
+#            print ''
+#            print str(lst)
+#            print ''
+            for index, name in enumerate(names):
+                for line in lst:
+                    if line.strip().startswith(name):
+                        linelist = line.split()
+                        value = None
+                        if len(linelist) != 3:
+                            self.exception('splitted line /proc/meminfo containing ' + name + ' did not return 3 values')
+                        elif linelist[2] != 'kB':
+                            self.exception('/proc/meminfo ' + name + ' does not end with kB')
+                        else:
+                            try:
+                                value = int(linelist[1])
+                            except Exception, e:
+                                self.exception('/proc/meminfo ' + name + ' value can not be converted to an integer')
+                        ret[index] = value
+                        exists[index] = True
+                        break
+        except Exception, e:
+            self.exception(e)
+            
+        for index, b in enumerate(exists):
+            if not b:
+                self.exception('/proc/meminfo ' + names[index] + ' could not be found')
+        return ret
+        
+        
+    def _getSchedStat(self):
+        '''
+            [# of times sched_yield() was called (int),
+             sum of all time spent running by tasks on this processor (in ms) (long),
+             sum of all time spent waiting to run by tasks on this processor (in ms) (long),
+             # of tasks (not necessarily unique) given to the processor (long)]
+        '''
+        ret = [None]*4
+        try:
+            file = open("/proc/schedstat", "r")
+            lines = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/schedstat'
+#            print '[# of times sched_yield() was called (int), sum of all time spent running by tasks on this processor (in ms) (long), sum of all time spent waiting to run by tasks on this processor (in ms) (long), # of tasks (not necessarily unique) given to the processor (long)]'
+#            print ''
+#            print str(lines)
+#            print ''
+            statsAvailable = False
+            for line in lines:
+                if line.strip().startswith('cpu0'):
+                    statsAvailable = True
+                    lst = line.split()
+                    if len(lst) != 10:
+                        self.exception('splitted line containing cpu0 from /proc/schedstat did not return 10 values')
+                    else:
+                        try:
+                            ret = [int(lst[1]), long(lst[7]), long(lst[8]), long(lst[9])]
+                        except Exception, e:
+                            self.exception('/proc/interrupts ' + name + ' value can not be converted to an integer')
+                    break
+            if not statsAvailable:
+                self.exception('cpu0 could not be found in /proc/schedstat')
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+        
+    def _getNetDev(self):
+        '''
+            [# of interfaces (smallint),
+             eth0 in octets (long),
+             eth0 out octets (long),
+             ppp0 in octets (long),
+             ppp0 out octets (long),
+             wlan0 in octets (long),
+             wlan0 out octets (long)]
+        '''
+        ret = [None]*7
+        
+        try:
+            file = open("/proc/net/dev", "r")
+            lines = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/net/dev'
+#            print '[# of interfaces (smallint), eth0 in octets (long), eth0 out octets (long), ppp0 in octets (long), ppp0 out octets (long), wlan0 in octets (long), wlan0 out octets (long)]'
+#            print ''
+#            print str(lines)
+#            print ''
+            ret[0] = len(lines)-3
+            for line in lines:
+                lst = line.split()
+                if lst[0].strip().startswith('eth0:'):
+                    ret[1] = long(lst[1])
+                    ret[2] = long(lst[9])
+                elif lst[0].strip().startswith('ppp0:'):
+                    ret[3] = long(lst[1])
+                    ret[4] = long(lst[9])
+                elif lst[0].strip().startswith('wlan0:'):
+                    ret[5] = long(lst[1])
+                    ret[6] = long(lst[9])
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+    def _getNetSNMP(self):
+        '''
+            [Ip InReceives (long),
+             Ip InHdrErrors (int),
+             Ip InAddrErrors (int),
+             Ip InUnknownProtos (int),
+             Ip InDiscards (int),
+             Ip InDelivers (long),
+             Ip OutRequests (long),
+             Ip OutDiscards (int),
+             Ip OutNoRoutes (int),
+             Icmp InMsgs (int),
+             Icmp InErrors (int),
+             Icmp InDestUnreachs (int),
+             Icmp InEchos (int),
+             Icmp InEchoReps (int),
+             Icmp OutMsgs (int),
+             Icmp OutErrors (int),
+             Icmp OutDestUnreachs (int),
+             Icmp OutEchos (int),
+             Icmp OutEchoReps (int),
+             Tcp ActiveOpens (int),
+             Tcp PassiveOpens (int),
+             Tcp AttemptFails (int),
+             Tcp EstabResets (int),
+             Tcp CurrEstab (int),
+             Tcp InSegs (long),
+             Tcp OutSegs (long),
+             Tcp RetransSegs (int),
+             Tcp InErrs (int),
+             Tcp OutRsts (int),
+             Udp InDatagrams (long),
+             Udp NoPorts (int),
+             Udp InErrors (int),
+             Udp OutDatagrams (long),
+             Udp RcvbufErrors (int),
+             Udp SndbufErrors (int)]
+        '''
+        names = ['InReceives', 'InHdrErrors', 'InAddrErrors', 'InUnknownProtos', 'InDiscards', 'InDelivers', 'OutRequests', 'OutDiscards', 'OutNoRoutes', 'InMsgs', 'InErrors', 'InDestUnreachs', 'InEchos', 'InEchoReps', 'OutMsgs', 'OutErrors', 'OutDestUnreachs', 'OutEchos', 'OutEchoReps', 'ActiveOpens', 'PassiveOpens', 'AttemptFails', 'EstabResets', 'CurrEstab', 'InSegs', 'OutSegs', 'RetransSegs', 'InErrs', 'OutRsts', 'InDatagrams', 'NoPorts', 'InErrors', 'OutDatagrams', 'RcvbufErrors', 'SndbufErrors']
+        ret = [None]*len(names)
+        
+        try:
+            file = open("/proc/net/snmp", "r")
+            lines = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/net/snmp'
+#            print '[Ip InReceives (long), Ip InHdrErrors (int), Ip InAddrErrors (int), Ip InUnknownProtos (int), Ip InDiscards (int), Ip InDelivers (long), Ip OutRequests (long), Ip OutDiscards (int), Ip OutNoRoutes (int), Icmp InMsgs (int), Icmp InErrors (int), Icmp InDestUnreachs (int), Icmp InEchos (int), Icmp InEchoReps (int), Icmp OutMsgs (int), Icmp OutErrors (int), Icmp OutDestUnreachs (int), Icmp OutEchos (int), Icmp OutEchoReps (int), Tcp ActiveOpens (int), Tcp PassiveOpens (int), Tcp AttemptFails (int), Tcp EstabResets (int), Tcp CurrEstab (int), Tcp InSegs (long), Tcp OutSegs (long), Tcp RetransSegs (int), Tcp InErrs (int), Tcp OutRsts (int), Udp InDatagrams (long), Udp NoPorts (int), Udp InErrors (int), Udp OutDatagrams (long), Udp RcvbufErrors (int), Udp SndbufErrors (int)]'
+#            print ''
+#            print str(lines)
+#            print ''
+            first = True
+            netstatnamelist = []
+            netstatdict = {}
+            for line in lines:
+                if line.strip().startswith('Ip:') or line.strip().startswith('Icmp:') or line.strip().startswith('Tcp:') or line.strip().startswith('Udp:'):
+                    if first:
+                        lst = line.split()
+                        for index, entry in enumerate(lst):
+                            if index != 0:
+                                netstatnamelist.append(entry)
+                        first = False
+                    else:
+                        lst = line.split()
+                        for index, entry in enumerate(lst):
+                            if index != 0:
+                                netstatdict.update({netstatnamelist[index-1]: long(entry)})
+                        first = True
+                        netstatnamelist = []
+
+            for index, name in enumerate(names):
+                value = netstatdict.get(name)
+                if value == None:
+                    self.exception('/proc/net/snmp ' + name + ' could not be found')
+                ret[index] = value
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+        
+    def _getNetStat(self):
+        '''
+            [TCPLoss (int),
+             TCPLossUndo (int),
+             InNoRoutes (long),
+             InMcastOctets (long),
+             OutMcastOctets (long),
+             OutBcastPkts (long),
+             OutOctets (long),
+             InOctets (long),
+             InBcastOctets (long),
+             InMcastPkts (long),
+             OutBcastOctets (long),
+             InBcastPkts (long),
+             OutMcastPkts (long),
+             InTruncatedPkts (long)]
+        '''
+        names = ['TCPLoss', 'TCPLossUndo', 'InNoRoutes', 'InMcastOctets', 'OutMcastOctets', 'OutBcastPkts', 'OutOctets', 'InOctets', 'InBcastOctets', 'InMcastPkts', 'OutBcastOctets', 'InBcastPkts', 'OutMcastPkts', 'InTruncatedPkts']
+        ret = [None]*len(names)
+        
+        try:
+            file = open("/proc/net/netstat", "r")
+            lines = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/net/netstat'
+#            print '[TCPLoss (int), TCPLossUndo (int), InNoRoutes (long), InMcastOctets (long), OutMcastOctets (long), OutBcastPkts (long), OutOctets (long), InOctets (long), InBcastOctets (long), InMcastPkts (long), OutBcastOctets (long), InBcastPkts (long), OutMcastPkts (long), InTruncatedPkts (long)]'
+#            print ''
+#            print str(lines)
+#            print ''
+            first = True
+            netstatnamelist = []
+            netstatdict = {}
+            for line in lines:
+                if line.strip().startswith('TcpExt:') or line.strip().startswith('IpExt:'):
+                    if first:
+                        lst = line.split()
+                        for index, entry in enumerate(lst):
+                            if index != 0:
+                                netstatnamelist.append(entry)
+                        first = False
+                    else:
+                        lst = line.split()
+                        for index, entry in enumerate(lst):
+                            if index != 0:
+                                netstatdict.update({netstatnamelist[index-1]: long(entry)})
+                        first = True
+                        netstatnamelist = []
+
+            for index, name in enumerate(names):
+                value = netstatdict.get(name)
+                if value == None:
+                    self.exception('/proc/net/netstat ' + name + ' could not be found')
+                ret[index] = value
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+    def _getSockStat(self):
+        '''
+            [# of used sockets (int),
+             TCP inuse (int),
+             TCP orphan (int),
+             TCP tw (int),
+             TCP alloc (int),
+             TCP mem (int),
+             UDP inuse (int),
+             UDP mem (int)]
+        '''
+        ret = [None]*8
+        try:
+            file = open("/proc/net/sockstat", "r")
+            lines = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/net/sockstat'
+#            print '[# of used sockets (int), TCP inuse (int), TCP orphan (int), TCP tw (int), TCP alloc (int), TCP mem (int), UDP inuse (int), UDP mem (int)]'
+#            print ''
+#            print str(lines)
+#            print ''
+            socketsAvailable = False
+            tcpAvailable = False
+            udpAvailable = False
+            for line in lines:
+                if line.strip().startswith('sockets:'):
+                    socketsAvailable = True
+                    lst = line.split()
+                    if len(lst) != 3:
+                        self.exception('splitted line containing sockets from /proc/net/sockstat did not return 3 values')
+                    else:
+                        ret[0] = int(lst[2])
+                elif line.strip().startswith('TCP:'):
+                    tcpAvailable = True
+                    lst = line.split()
+                    if len(lst) != 11:
+                        self.exception('splitted line containing TCP from /proc/net/sockstat did not return 11 values')
+                    else:
+                        ret[1] = int(lst[2])
+                        ret[2] = int(lst[4])
+                        ret[3] = int(lst[6])
+                        ret[4] = int(lst[8])
+                        ret[5] = int(lst[10])
+                elif line.strip().startswith('UDP:'):
+                    udpAvailable = True
+                    lst = line.split()
+                    if len(lst) != 5:
+                        self.exception('splitted line containing UDP from /proc/net/sockstat did not return 5 values')
+                    else:
+                        ret[6] = int(lst[2])
+                        ret[7] = int(lst[4])
+            if not socketsAvailable:
+                self.exception('sockets could not be found in /proc/net/sockstat')
+            if not tcpAvailable:
+                self.exception('TCP could not be found in /proc/net/sockstat')
+            if not udpAvailable:
+                self.exception('UDP could not be found in /proc/net/sockstat')
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+    def _getSoftIRQ(self):
+        '''
+            [TIMER (long),
+             TASKLET (long),
+             HRTIMER (long)]
+        '''
+        names = ['TIMER', 'TASKLET', 'HRTIMER']
+        ret = [None]*len(names)
+        exists = [False]*len(names)
+        try:
+            file = open("/proc/softirqs", "r")
+            lst = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/softirqs'
+#            print '[TIMER (long), TASKLET (long), HRTIMER (long)]'
+#            print ''
+#            print str(lst)
+#            print ''
+            for index, name in enumerate(names):
+                for line in lst:
+                    if line.strip().startswith(name):
+                        linelist = line.split()
+                        value = None
+                        if len(linelist) != 2:
+                            self.exception('splitted line /proc/softirqs containing ' + name + ' did not return 2 values')
+                        else:
+                            try:
+                                value = long(linelist[1])
+                            except Exception, e:
+                                self.exception('/proc/softirqs ' + name + ' value can not be converted to a long')
+                        ret[index] = value
+                        exists[index] = True
+                        break
+        except Exception, e:
+            self.exception(e)
+            
+        for index, b in enumerate(exists):
+            if not b:
+                self.exception('/proc/softirqs ' + names[index] + ' could not be found')
+        return ret
+        
+        
+    def _getStat(self):
+        '''
+            [cpu0 user: normal processes executing in user mode (long),
+             cpu0 nice: niced processes executing in user mode (long),
+             cpu0 system: processes executing in kernel mode (long),
+             cpu0 idle: twiddling thumbs (long),
+             cpu0 iowait: waiting for I/O to complete (long),
+             cpu0 irq: servicing interrupts (long),
+             cpu0 softirq: servicing softirqs (long),
+             # of context switches across all CPUs (long),
+             # of processes and threads created (int),
+             # of processes currently blocked, waiting for I/O to complete (int)]
+        '''
+        ret = [None]*10
+        try:
+            file = open("/proc/stat", "r")
+            lines = file.readlines()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/stat'
+#            print '[cpu0 user: normal processes executing in user mode (long), cpu0 nice: niced processes executing in user mode (long), cpu0 system: processes executing in kernel mode (long), cpu0 idle: twiddling thumbs (long), cpu0 iowait: waiting for I/O to complete (long), cpu0 irq: servicing interrupts (long), cpu0 softirq: servicing softirqs (long), # of context switches across all CPUs (long), # of processes and threads created (int), # of processes currently blocked, waiting for I/O to complete (int)]'
+#            print ''
+#            print str(lines)
+#            print ''
+            cpu0Available = False
+            ctxtAvailable = False
+            processesAvailable = False
+            procsBlockedAvailable = False
+            for line in lines:
+                if line.strip().startswith('cpu0'):
+                    cpu0Available = True
+                    lst = line.split()
+                    if len(lst) != 11:
+                        self.exception('splitted line containing cpu0 from /proc/stat did not return 11 values')
+                    else:
+                        ret[0] = long(lst[1])
+                        ret[1] = long(lst[2])
+                        ret[2] = long(lst[3])
+                        ret[3] = long(lst[4])
+                        ret[4] = long(lst[5])
+                        ret[5] = long(lst[6])
+                        ret[6] = long(lst[7])
+                elif line.strip().startswith('ctxt'):
+                    ctxtAvailable = True
+                    lst = line.split()
+                    if len(lst) != 2:
+                        self.exception('splitted line containing ctxt from /proc/stat did not return 2 values')
+                    else:
+                        ret[7] = long(lst[1])
+                elif line.strip().startswith('processes'):
+                    processesAvailable = True
+                    lst = line.split()
+                    if len(lst) != 2:
+                        self.exception('splitted line containing processes from /proc/stat did not return 2 values')
+                    else:
+                        ret[8] = long(lst[1])
+                elif line.strip().startswith('procs_blocked'):
+                    procsBlockedAvailable = True
+                    lst = line.split()
+                    if len(lst) != 2:
+                        self.exception('splitted line containing procs_blocked from /proc/stat did not return 2 values')
+                    else:
+                        ret[9] = long(lst[1])
+            if not cpu0Available:
+                self.exception('cpu0 could not be found in /proc/stat')
+            if not ctxtAvailable:
+                self.exception('ctxt could not be found in /proc/stat')
+            if not processesAvailable:
+                self.exception('processes could not be found in /proc/stat')
+            if not procsBlockedAvailable:
+                self.exception('procs_blocked could not be found in /proc/stat')
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+    def _getUptime(self):
+        '''
+            [# of seconds the system has been up (double),
+             # of seconds the system has been idle (double)]
+        '''
+        ret = [None]*2
+        try:
+            file = open("/proc/uptime", "r")
+            str = file.read()
+            file.close()
+#            print '#############################################################################'
+#            print '/proc/uptime'
+#            print '[# of seconds the system has been up (double), # of seconds the system has been idle (double)]'
+#            print ''
+#            print str
+#            print ''
+            lst = str.split()
+            if len(lst) != len(ret):
+                self.exception('reading /proc/uptime did not return ' + str(len(ret)) + ' values')
+            else:
+                ret = [float(lst[0]), float(lst[1])]
+        except Exception, e:
+            self.exception(e)
+        return ret
+    
+    
+    def _getLM92Temp(self):
+        '''
+            [LM92 temperature (int)]
+        '''
+        ret = [None]
+        try:
+            file = open("/sys/bus/i2c/devices/0-004b/temp1_input", "r")
+            str = file.read()
+            file.close()
+#            print '#############################################################################'
+#            print '/sys/bus/i2c/devices/0-004b/temp1_input'
+#            print '[LM92 (int)]'
+#            print ''
+#            print str
+#            print ''
+            val = int(str.strip())
+            if val == -240000:
+                val = None
+            ret = [val]
+        except Exception, e:
+            self.exception(e)
+        return ret
+        
+        
+    def _getAD77x8(self):
+        '''
+            [ad77x8_1 (int),
+             ad77x8_2 (int),
+             ad77x8_3 (int),
+             ad77x8_4 (int),
+             ad77x8_5 (int),
+             ad77x8_6 (int),
+             ad77x8_7 (int),
+             ad77x8_8 (int),
+             ad77x8_9 (int),
+             ad77x8_10 (int)]
+        '''
         if not self._calibrated and os.path.isfile(CALIB_FILE) and self._conf_calibrate:
             # get the calibration data with channel offsets
             try:
@@ -171,16 +1038,16 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             f9 = open('/proc/ad77x8/ain9', 'r')
             f10 = open('/proc/ad77x8/ain10', 'r')
         
-            v1 = f1.read()
-            v2 = f2.read()
-            v3 = f3.read()
-            v4 = f4.read()
-            v5 = f5.read()
-            v6 = f6.read()
-            v7 = f7.read()
-            v8 = f8.read()
-            v9 = f9.read()
-            v10 = f10.read()
+            ad77x8_1 = f1.read()
+            ad77x8_2 = f2.read()
+            ad77x8_3 = f3.read()
+            ad77x8_4 = f4.read()
+            ad77x8_5 = f5.read()
+            ad77x8_6 = f6.read()
+            ad77x8_7 = f7.read()
+            ad77x8_8 = f8.read()
+            ad77x8_9 = f9.read()
+            ad77x8_10 = f10.read()
             
             f1.close()
             f2.close()
@@ -193,54 +1060,55 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             f9.close()
             f10.close()
 
-            v1 = float(v1.split(' ')[0])
-            v2 = float(v2.split(' ')[0])
-            v3 = float(v3.split(' ')[0])
-            v4 = float(v4.split(' ')[0])
-            v5 = float(v5.split(' ')[0])
-            v6 = float(v6.split(' ')[0])
-            v7 = float(v7.split(' ')[0])
-            v8 = float(v8.split(' ')[0])
-            v9 = float(v9.split(' ')[0])
-            v10 = float(v10.split(' ')[0])
+            ad77x8_1 = float(ad77x8_1.split(' ')[0])
+            ad77x8_2 = float(ad77x8_2.split(' ')[0])
+            ad77x8_3 = float(ad77x8_3.split(' ')[0])
+            ad77x8_4 = float(ad77x8_4.split(' ')[0])
+            ad77x8_5 = float(ad77x8_5.split(' ')[0])
+            ad77x8_6 = float(ad77x8_6.split(' ')[0])
+            ad77x8_7 = float(ad77x8_7.split(' ')[0])
+            ad77x8_8 = float(ad77x8_8.split(' ')[0])
+            ad77x8_9 = float(ad77x8_9.split(' ')[0])
+            ad77x8_10 = float(ad77x8_10.split(' ')[0])
 
             if self._calibrated and self._conf_calibrate:
-                v6 = v6 - 0.3
-                v4 = v4 - self._ain4_cal
-                v9 = v9 - self._ain9_cal
-            if v4 < 0:
-                v4 = 0
-            if v6 < 0:
-                v6 = 0
-            if v9 < 0:
-                v9 = 0
+                ad77x8_6 = ad77x8_6 - 0.3
+                ad77x8_4 = ad77x8_4 - self._ain4_cal
+                ad77x8_9 = ad77x8_9 - self._ain9_cal
+            if ad77x8_4 < 0:
+                ad77x8_4 = 0
+            if ad77x8_6 < 0:
+                ad77x8_6 = 0
+            if ad77x8_9 < 0:
+                ad77x8_9 = 0
 
-            v1 = int(round(v1 * 11))
-            v2 = None
-            v3 = int(round(v3 * 23 / 3.0))
-            v4 = int(round(v4 * 20000))
-            v5 = int(round(v5 * 23 / 3.0))
-            v6 = int(round(v6 * 2000))
-            v7 = int(round(v7 * 151 / 51.0))
-            v8 = int(round(v8 * 2))
-            v9 = int(round(v9 * 200 / 3.0))
-            v10 = int(round(v10 * 2))
+            ad77x8_1 = int(round(ad77x8_1 * 11))
+            ad77x8_2 = None
+            ad77x8_3 = int(round(ad77x8_3 * 23 / 3.0))
+            ad77x8_4 = int(round(ad77x8_4 * 10000))
+            ad77x8_5 = int(round(ad77x8_5 * 23 / 3.0))
+            ad77x8_6 = int(round(ad77x8_6 * 2000))
+            ad77x8_7 = int(round(ad77x8_7 * 151 / 51.0))
+            ad77x8_8 = int(round(ad77x8_8 * 2))
+            ad77x8_9 = int(round(ad77x8_9 * 200 / 3.0))
+            ad77x8_10 = int(round(ad77x8_10 * 2))
             if not self._calibrated and self._conf_calibrate:
-                v9 = None
+                ad77x8_9 = None
         except Exception, e:
             self.warning(e.__str__())
-            v1 = None
-            v2 = None
-            v3 = None
-            v4 = None
-            v5 = None
-            v6 = None
-            v7 = None
-            v8 = None
-            v9 = None
-            v10 = None
-        
-        self.processMsg(self.getTimeStamp(), [v1, v2, v3, v4, v5, v6, v7, v8, v9, v10], self._priority, self._backlog)
+            ad77x8_1 = None
+            ad77x8_2 = None
+            ad77x8_3 = None
+            ad77x8_4 = None
+            ad77x8_5 = None
+            ad77x8_6 = None
+            ad77x8_7 = None
+            ad77x8_8 = None
+            ad77x8_9 = None
+            ad77x8_10 = None
+            
+        return [ad77x8_1, ad77x8_2, ad77x8_3, ad77x8_4, ad77x8_5, ad77x8_6, ad77x8_7, ad77x8_8, ad77x8_9, ad77x8_10]
+
     
     
     def stop(self):

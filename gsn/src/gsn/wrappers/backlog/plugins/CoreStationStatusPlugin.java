@@ -17,9 +17,164 @@ import gsn.beans.DataField;
  */
 public class CoreStationStatusPlugin extends AbstractPlugin {
 	
-	private DataField[] dataField = {	new DataField("TIMESTAMP", "BIGINT"),
+	private DataField[] dataField = {new DataField("TIMESTAMP", "BIGINT"),
 						new DataField("GENERATION_TIME", "BIGINT"),
 						new DataField("DEVICE_ID", "INTEGER"),
+
+						new DataField("USERS", "SMALLINT"),
+
+						new DataField("LASTLOG", "VARCHAR(255)"),
+			             
+						new DataField("CHRONY_STRATUM", "INTEGER"),
+						new DataField("CHRONY_SYSTIME_ERROR", "DOUBLE"),
+						new DataField("CHRONY_FREQUENCY", "DOUBLE"),
+						new DataField("CHRONY_SKEW", "DOUBLE"),
+						new DataField("CHRONY_RTC_ERROR", "DOUBLE"),
+						new DataField("CHRONY_RTC_GAIN_RATE", "DOUBLE"),
+
+						new DataField("STATVFS_ROOT_SIZE", "BIGINT"),
+						new DataField("STATVFS_ROOT_FREE", "BIGINT"),
+						new DataField("STATVFS_ROOT_INODES_SIZE", "BIGINT"),
+						new DataField("STATVFS_ROOT_INODES_FREE", "BIGINT"),
+						new DataField("STATVFS_VOL_SIZE", "BIGINT"),
+						new DataField("STATVFS_VOL_FREE", "BIGINT"),
+						new DataField("STATVFS_VOL_INODES_SIZE", "BIGINT"),
+						new DataField("STATVFS_VOL_INODES_FREE", "BIGINT"),
+						new DataField("STATVFS_CARD_SIZE", "BIGINT"),
+						new DataField("STATVFS_CARD_FREE", "BIGINT"),
+						new DataField("STATVFS_CARD_INODES_SIZE", "BIGINT"),
+						new DataField("STATVFS_CARD_INODES_FREE", "BIGINT"),
+
+						new DataField("DISKSTATS_READS_ISSUED", "BIGINT"),
+						new DataField("DISKSTATS_SECTORS_READ", "BIGINT"),
+						new DataField("DISKSTATS_SPENT_READING", "BIGINT"),
+						new DataField("DISKSTATS_WRITES_COMPLETED", "BIGINT"),
+						new DataField("DISKSTATS_SECTORS_WRITTEN", "BIGINT"),
+						new DataField("DISKSTATS_SPENT_WRITING", "BIGINT"),
+						new DataField("DISKSTATS_IO_IN_PROGRESS", "INTEGER"),
+						new DataField("DISKSTATS_SPENT_DOING_IO", "BIGINT"),
+						new DataField("DISKSTATS_WEIGHTED_DOING_IO", "BIGINT"),
+
+						new DataField("INTERRUPT_OHCI_HCD_USB1", "BIGINT"),
+						new DataField("INTERRUPT_PXA2XX_SPI2", "BIGINT"),
+						new DataField("INTERRUPT_PXA_I2C_I2C0", "BIGINT"),
+						new DataField("INTERRUPT_STUART", "BIGINT"),
+						new DataField("INTERRUPT_BTUART", "BIGINT"),
+						new DataField("INTERRUPT_FFUART", "BIGINT"),
+						new DataField("INTERRUPT_PXA2XX_MCI", "BIGINT"),
+						new DataField("INTERRUPT_DMA", "BIGINT"),
+						new DataField("INTERRUPT_OST0", "BIGINT"),
+
+						new DataField("LOADAVG_1_MIN", "DOUBLE"),
+						new DataField("LOADAVG_5_MIN", "DOUBLE"),
+						new DataField("LOADAVG_15_MIN", "DOUBLE"),
+						new DataField("LOADAVG_RUNNABLE_PROCS", "INTEGER"),
+
+						new DataField("MEMINFO_TOTAL", "INTEGER"),
+						new DataField("MEMINFO_FREE", "INTEGER"),
+						new DataField("MEMINFO_BUFFERS", "INTEGER"),
+						new DataField("MEMINFO_CACHED", "INTEGER"),
+						new DataField("MEMINFO_SHARED", "INTEGER"),
+						new DataField("MEMINFO_KERNEL_STACK", "INTEGER"),
+						new DataField("MEMINFO_SLAB", "INTEGER"),
+						new DataField("MEMINFO_MAPPED", "INTEGER"),
+
+						new DataField("SCHEDSTAT_YIELD_CALLED", "INTEGER"),
+						new DataField("SCHEDSTAT_TASK_RUN_TIME", "BIGINT"),
+						new DataField("SCHEDSTAT_TASK_WAIT_TIME", "BIGINT"),
+						new DataField("SCHEDSTAT_TASKS_GIVEN", "BIGINT"),
+
+						new DataField("INTERFACES", "SMALLINT"),
+						new DataField("ETH0_IN", "BIGINT"),
+						new DataField("ETH0_OUT", "BIGINT"),
+						new DataField("PPP0_IN", "BIGINT"),
+						new DataField("PPP0_OUT", "BIGINT"),
+						new DataField("WLAN0_IN", "BIGINT"),
+						new DataField("WLAN0_OUT", "BIGINT"),
+
+						new DataField("IP_IN_RECEIVES", "BIGINT"),
+						new DataField("IP_IN_HDR_ERRORS", "INTEGER"),
+						new DataField("IP_IN_ADDR_ERRORS", "INTEGER"),
+						new DataField("IP_IN_UNKNOWN_PROTOS", "INTEGER"),
+						new DataField("IP_IN_DISCARDS", "INTEGER"),
+						new DataField("IP_IN_DELIVERS", "BIGINT"),
+						new DataField("IP_OUT_REQUESTS", "BIGINT"),
+						new DataField("IP_OUT_DISCARDS", "INTEGER"),
+						new DataField("IP_OUT_NO_ROUTES", "INTEGER"),
+
+						new DataField("ICMP_IN_MESSAGES", "INTEGER"),
+						new DataField("ICMP_IN_ERRORS", "INTEGER"),
+						new DataField("ICMP_IN_DEST_UNREACHS", "INTEGER"),
+						new DataField("ICMP_IN_ECHOS", "INTEGER"),
+						new DataField("ICMP_IN_ECHOS_REPS", "INTEGER"),
+						new DataField("ICMP_OUT_MESSAGES", "INTEGER"),
+						new DataField("ICMP_OUT_ERRORS", "INTEGER"),
+						new DataField("ICMP_OUT_DEST_UNREACHS", "INTEGER"),
+						new DataField("ICMP_OUT_ECHOS", "INTEGER"),
+						new DataField("ICMP_OUT_ECHOS_REPS", "INTEGER"),
+
+						new DataField("TCP_ACTIVE_OPENS", "INTEGER"),
+						new DataField("TCP_PASSIVE_OPENS", "INTEGER"),
+						new DataField("TCP_ATTEMPT_FAILS", "INTEGER"),
+						new DataField("TCP_ESTAB_RESETS", "INTEGER"),
+						new DataField("TCP_CURR_ESTAB", "INTEGER"),
+						new DataField("TCP_IN_SEGMENTS", "BIGINT"),
+						new DataField("TCP_OUT_SEGMENTS", "BIGINT"),
+						new DataField("TCP_RETRANS_SEGMENTS", "INTEGER"),
+						new DataField("TCP_IN_ERRORS", "INTEGER"),
+						new DataField("TCP_OUT_RSTS", "INTEGER"),
+
+						new DataField("UDP_IN_DATAGRAMS", "BIGINT"),
+						new DataField("UDP_NO_PORTS", "INTEGER"),
+						new DataField("UDP_IN_ERRORS", "INTEGER"),
+						new DataField("UDP_OUT_DATAGRAMS", "BIGINT"),
+						new DataField("UDP_RCV_BUF_ERRORS", "INTEGER"),
+						new DataField("UDP_SND_BUF_ERRORS", "INTEGER"),
+
+						new DataField("TCP_LOSS", "INTEGER"),
+						new DataField("TCP_LOSS_UNDO", "INTEGER"),
+						new DataField("IP_IN_NO_ROUTES", "BIGINT"),
+						new DataField("IP_IN_MCAST_OCTETS", "BIGINT"),
+						new DataField("IP_OUT_MCAST_OCTETS", "BIGINT"),
+						new DataField("IP_OUT_BCAST_PKTS", "BIGINT"),
+						new DataField("IP_OUT_OCTETS", "BIGINT"),
+						new DataField("IP_IN_OCTETS", "BIGINT"),
+						new DataField("IP_IN_BCAST_OCTETS", "BIGINT"),
+						new DataField("IP_IN_MCAST_PKTS", "BIGINT"),
+						new DataField("IP_OUT_BCAST_OCTETS", "BIGINT"),
+						new DataField("IP_IN_BCAST_PKTS", "BIGINT"),
+						new DataField("IP_OUT_MCAST_PKTS", "BIGINT"),
+						new DataField("IP_IN_TRUNCATED_PKTS", "BIGINT"),
+
+						new DataField("SOCKSTAT_USED_SOCKETS", "INTEGER"),
+						new DataField("SOCKSTAT_TCP_IN_USE", "INTEGER"),
+						new DataField("SOCKSTAT_TCP_ORPHAN", "INTEGER"),
+						new DataField("SOCKSTAT_TCP_TW", "INTEGER"),
+						new DataField("SOCKSTAT_TCP_ALLOC", "INTEGER"),
+						new DataField("SOCKSTAT_TCP_MEM", "INTEGER"),
+						new DataField("SOCKSTAT_UDP_IN_USE", "INTEGER"),
+						new DataField("SOCKSTAT_UPD_MEM", "INTEGER"),
+
+						new DataField("SOFTIRQ_TIMER", "BIGINT"),
+						new DataField("SOFTIRQ_TASKLET", "BIGINT"),
+						new DataField("SOFTIRQ_HRTIMER", "BIGINT"),
+
+						new DataField("STAT_PROCS_IN_USER_MODE", "BIGINT"),
+						new DataField("STAT_NICED_IN_USER_MODE", "BIGINT"),
+						new DataField("STAT_PROCS_IN_KERNEL_MODE", "BIGINT"),
+						new DataField("STAT_PROCS_IDLE", "BIGINT"),
+						new DataField("STAT_PROCS_IO_WAIT", "BIGINT"),
+						new DataField("STAT_PROCS_SERVICING_IRQS", "BIGINT"),
+						new DataField("STAT_PROCS_SERVICING_SOFTIRQS", "BIGINT"),
+						new DataField("STAT_CONTEXT_SWITCHES", "BIGINT"),
+						new DataField("STAT_PROCS_THREADS_CREATED", "INTEGER"),
+						new DataField("STAT_PROCS_BLOCKED", "INTEGER"),
+
+						new DataField("UPTIME", "DOUBLE"),
+						new DataField("IDLETIME", "DOUBLE"),
+
+						new DataField("LM92_TEMP", "INTEGER"),
+						
 						new DataField("V_EXT2", "INTEGER"),
 						new DataField("V_EXT1", "INTEGER"),
 						new DataField("V_EXT3", "INTEGER"),
@@ -51,25 +206,20 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
-		if(data.length == dataField.length-3) {
-			for (int index=0; index<data.length; index++) {
-				try {
-					data[index] = toInteger(data[index]);
-				} catch (Exception e) {
-					logger.error(e.getMessage() + " (index=" + index + ", value=" + data[index] + ", type=" + data[index].getClass().getName() + ")", e);
-					return true;
-				}
-			}
-		}
-		else
-			logger.error("received message length does not match");
 
 		Serializable[] header = {timestamp, timestamp, deviceId};
 		
-		if( dataProcessed(System.currentTimeMillis(), concat(header, data)) )
-			ackMessage(timestamp, super.priority);
-		else
-			logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+		try {
+			data = checkAndCastData(data, dataField, 3);
+			
+			if( dataProcessed(System.currentTimeMillis(), concat(header, data)) )
+				ackMessage(timestamp, super.priority);
+			else
+				logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		
 		return true;
 	}
 }
