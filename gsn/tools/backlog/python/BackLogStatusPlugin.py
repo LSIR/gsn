@@ -8,7 +8,9 @@ __id__          = "$Id$"
 __source__      = "$URL$"
 
 import struct
-from threading import Timer, Event
+import sys
+#import resource
+import threading
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
@@ -25,13 +27,14 @@ class BackLogStatusPluginClass(AbstractPluginClass):
 
     '''
     _timer
+    _interval
     '''
     
     def __init__(self, parent, options):
         AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
         self._timer = None
         
-        self._sleeper = Event()
+        self._sleeper = threading.Event()
         self._stopped = False
         
         value = self.getOptionValue('poll_interval')
@@ -79,7 +82,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         paramlist = parameters.split()
         if paramlist:
             if paramlist[0].isdigit():
-                self._timer = Timer(int(paramlist[0]), self.action, [''])
+                self._timer = threading.Timer(int(paramlist[0]), self.action, [''])
                 self._timer.start()
             else:
                 self.error('parameter has to be a digit (parameter=' + parameters + ')')
@@ -114,11 +117,26 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         pingAckOutCounter = gsnpeerstatus[8]
         connectionLosses = gsnpeerstatus[9]
         
-        payload = [self.getUptime(), self.getErrorCounter(), self.getExceptionCounter()]
+        usage = [None]*16
+#        try:
+#            r = resource.getrusage(resource.RUSAGE_SELF)
+#            for i in range(len(r)):
+#                usage[i] = r[i]
+#        except Exception, e:
+#            self.exception(e)
+        
+        payload = [self.getUptime(), self.getErrorCounter(), self.getExceptionCounter(), threading.active_count()]
         payload += [msgInPerSec, msgOutPerSec, msgInCounter, msgOutCounter, msgAckInCounter, pingOutCounter, pingAckInCounter, pingInCounter, pingAckOutCounter, connectionLosses]
         payload += [backlogdbentries, backlogdbsize, storepersec, removepersec, storecounter, removecounter, minstoretime, meanstoretime, maxstoretime, minremovetime, meanremovetime, maxremovetime]
+        payload += usage
         
         self.processMsg(self.getTimeStamp(), payload)
+            
+    
+    
+    def _sendInitStats(self):
+        # TODO: what exactly to read
+        sys.version
     
     
     def stop(self):
