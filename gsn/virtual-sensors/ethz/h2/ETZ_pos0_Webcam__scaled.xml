@@ -16,6 +16,13 @@
         <predicate key="type">PermaSense ETZ test deployment</predicate>
         <predicate key="LATITUDE">47.377326</predicate>
         <predicate key="LONGITUDE">8.552935</predicate>
+        <predicate key="ALTITUDE">4.600000001463493</predicate>
+        <predicate key="HEADING">148.26</predicate>
+        <predicate key="TILT">73.78037981281604</predicate>
+        <predicate key="ROLL">0</predicate>
+        <predicate key="HORFOV">55</predicate>
+        <predicate key="VERFOV">46.965</predicate>
+        <predicate key="NEAR">1.61</predicate>
     </addressing>
     <storage history-size="1"/>
     <streams>

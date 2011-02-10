@@ -14,7 +14,17 @@
     </processing-class>
     <description>camera pictures from position 2 at ETZ deployment as thumbnail</description>
     <life-cycle pool-size="10" />
-    <addressing />
+    <addressing>
+        <predicate key="LONGITUDE">8.552661</predicate>
+        <predicate key="LATITUDE">47.377982</predicate>
+        <predicate key="ALTITUDE">4</predicate>
+        <predicate key="HEADING">316.27</predicate>
+        <predicate key="TILT">95.54</predicate>
+        <predicate key="ROLL">0</predicate>
+        <predicate key="HORFOV">55</predicate>
+        <predicate key="VERFOV">46.965</predicate>
+        <predicate key="NEAR">1.61</predicate>
+    </addressing>
     <storage history-size="1"/>
     <streams>
         <stream name="data">
