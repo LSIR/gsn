@@ -19,7 +19,7 @@
             <field name="KERNEL_COMPILE_TIME" type="VARCHAR(255)" />
             <field name="PROCESSOR" type="VARCHAR(255)" />
             <field name="DISTRIBUTION_NAME" type="VARCHAR(255)" />
-            <field name="DISTRIBUTION_TIMESTAMP" type="VARCHAR(255)" />
+            <field name="DISTRIBUTION_VERSION" type="VARCHAR(255)" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
