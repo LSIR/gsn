@@ -158,6 +158,8 @@
 
             <field name="UPTIME" type="DOUBLE" unit="relatime" />
             <field name="IDLETIME" type="DOUBLE" unit="relatime" />
+            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show software status information of the CoreStations from the ETZ deployment</description>
