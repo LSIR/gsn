@@ -7,7 +7,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="SENSORTYPE" type="VARCHAR(30)" />
+            <field name="SENSORTYPE" type="VARCHAR(100)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
