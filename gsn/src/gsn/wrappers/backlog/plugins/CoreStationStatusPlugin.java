@@ -259,13 +259,10 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			short msgType = toShort(data[0]);
 			
 			if (msgType == statusNamingTable.get(statusDataType).typeNumber) {
-				logger.info("msgType: " + msgType);
 				if (statusDataType.equalsIgnoreCase(HW_NAMING)) {
-					logger.info("hardware");
 					data = checkAndCastData(data, 1, hwDataField, 3);
 				}
 				else if (statusDataType.equalsIgnoreCase(SW_NAMING)) {
-					logger.info("software");
 					data = checkAndCastData(data, 1, swDataField, 3);
 				}
 				else {
@@ -279,11 +276,6 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 					logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 				}
 			}
-			
-			if( dataProcessed(System.currentTimeMillis(), concat(header, data)) )
-				ackMessage(timestamp, super.priority);
-			else
-				logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
