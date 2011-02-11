@@ -284,9 +284,6 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				else if (node.isPowerSwitch()) {
 					node.setVsys(new Double((Integer)s)  * (1.5d / 4095d) * (8d/3d));
 				} 
-				else if (node.isAccessNode()) {
-					node.setVsys(new Double((Integer)s)  * (3d / 4095d));
-				}
 			}
 			// Current
 			s = data.getData(configuration[5]);
@@ -350,7 +347,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				else if (node.isPowerSwitch()) {
 					vsdi = new Double((Integer)s)  * (1.5d / 4095d) * 12d;
 				}
-				else if (node.isBBControl()) {
+				else if (node.isBBControl() || node.isAccessNode()) {
 					vsdi = new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d);
 					node.setVsys(vsdi);
 				}
