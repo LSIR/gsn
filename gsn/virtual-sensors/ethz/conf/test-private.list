@@ -1,5 +1,6 @@
 ETZ_BackLogStatus.xml
-ETZ_CoreStationStatus.xml
+ETZ_CoreStationStatus_Software.xml
+ETZ_CoreStationStatus_Hardware.xml
 ETZ_Binary.xml
 ETZ_Dozer_AdcComDiff.xml
 ETZ_Dozer_AdcMux1.xml

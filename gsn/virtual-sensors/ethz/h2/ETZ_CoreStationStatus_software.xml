@@ -185,6 +185,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">software</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -195,6 +196,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">software</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -205,6 +207,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">software</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -215,6 +218,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">software</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -225,6 +229,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">software</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -235,6 +240,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">software</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -245,6 +251,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">software</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -255,6 +262,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">software</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
