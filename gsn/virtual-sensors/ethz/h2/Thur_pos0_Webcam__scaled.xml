@@ -14,8 +14,15 @@
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Thur deployment</predicate>
-        <predicate key="LATITUDE">47.589889</predicate>
-        <predicate key="LONGITUDE">8.773874</predicate>
+        <predicate key="LONGITUDE">8.773881132</predicate>
+        <predicate key="LATITUDE">47.590297861</predicate>
+        <predicate key="ALTITUDE">10</predicate>
+        <predicate key="HEADING">24.28</predicate>
+        <predicate key="TILT">80.98</predicate>
+        <predicate key="ROLL">0</predicate>
+        <predicate key="HORFOV">55</predicate>
+        <predicate key="VERFOV">46.965</predicate>
+        <predicate key="NEAR">1.61</predicate>
     </addressing>
     <storage history-size="1"/>
     <streams>
