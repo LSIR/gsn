@@ -8,9 +8,9 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-            <field name="V_EXT1" type="INTEGER" unit="V"/>
-            <field name="V_EXT2" type="INTEGER" unit="V"/>
-            <field name="V_EXT3" type="INTEGER" unit="V"/>
+            <field name="V_EXT1" type="VARCHAR(30)" unit="V"/>
+            <field name="V_EXT2" type="VARCHAR(30)" unit="V"/>
+            <field name="V_EXT3" type="VARCHAR(30)" unit="V"/>
             <field name="I_V12DC_EXT" type="VARCHAR(30)" unit="mA"/>
             <field name="V12DC_IN" type="VARCHAR(30)" unit="V"/>
             <field name="I_V12DC_IN" type="VARCHAR(30)" unit="mA"/>
