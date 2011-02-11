@@ -20,8 +20,24 @@ import gsn.wrappers.BackLogWrapper;
 public class CoreStationStatusPlugin extends AbstractPlugin {
 	private static final String STATUS_DATA_TYPE = "status-data-type";
 
+	private static final String STATIC_NAMING = "static";
 	private static final String SW_NAMING = "software";
 	private static final String HW_NAMING = "hardware";
+	
+	private static DataField[] staticDataField = {
+			new DataField("TIMESTAMP", "BIGINT"),
+			new DataField("GENERATION_TIME", "BIGINT"),
+			new DataField("DEVICE_ID", "INTEGER"),
+
+			new DataField("OS", "VARCHAR(255)"),
+			new DataField("HOSTNAME", "VARCHAR(255)"),
+			new DataField("KERNEL_VERSION", "VARCHAR(255)"),
+			new DataField("KERNEL_COMPILED_BY", "VARCHAR(255)"),
+			new DataField("GCC_VERSION", "VARCHAR(255)"),
+			new DataField("KERNEL_COMPILE_TIME", "VARCHAR(255)"),
+			new DataField("PROCESSOR", "VARCHAR(255)"),
+			new DataField("DISTRIBUTION_NAME", "VARCHAR(255)"),
+			new DataField("DISTRIBUTION_TIMESTAMP", "VARCHAR(255)")};
 	
 	private static DataField[] hwDataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
@@ -200,8 +216,9 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 	private static final Hashtable<String, NameDataFieldPair> statusNamingTable = new Hashtable<String, NameDataFieldPair>();
 	static
 	{
-		statusNamingTable.put(HW_NAMING, new NameDataFieldPair(1, hwDataField));
-		statusNamingTable.put(SW_NAMING, new NameDataFieldPair(2, swDataField));
+		statusNamingTable.put(STATIC_NAMING, new NameDataFieldPair(1, staticDataField));
+		statusNamingTable.put(HW_NAMING, new NameDataFieldPair(2, hwDataField));
+		statusNamingTable.put(SW_NAMING, new NameDataFieldPair(3, swDataField));
 	}
 
 	private final transient Logger logger = Logger.getLogger( CoreStationStatusPlugin.class );
@@ -227,7 +244,9 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
         
         registerListener();
 
-        if (statusDataType.equalsIgnoreCase(HW_NAMING))
+        if (statusDataType.equalsIgnoreCase(STATIC_NAMING))
+        	setName("CoreStationStatusPlugin-Static-" + coreStationName + "-Thread");
+        else if (statusDataType.equalsIgnoreCase(HW_NAMING))
         	setName("CoreStationStatusPlugin-HW-" + coreStationName + "-Thread");
         else if (statusDataType.equalsIgnoreCase(SW_NAMING))
         	setName("CoreStationStatusPlugin-SW-" + coreStationName + "-Thread");
@@ -259,7 +278,10 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			short msgType = toShort(data[0]);
 			
 			if (msgType == statusNamingTable.get(statusDataType).typeNumber) {
-				if (statusDataType.equalsIgnoreCase(HW_NAMING)) {
+				if (statusDataType.equalsIgnoreCase(STATIC_NAMING)) {
+					data = checkAndCastData(data, 1, staticDataField, 3);
+				}
+				else if (statusDataType.equalsIgnoreCase(HW_NAMING)) {
 					data = checkAndCastData(data, 1, hwDataField, 3);
 				}
 				else if (statusDataType.equalsIgnoreCase(SW_NAMING)) {
@@ -267,11 +289,12 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 				}
 				else {
 					logger.warn("Wrong CoreStationStatus data type spedified.");
-					return true;
+					return false;
 				}
 				
 				if( dataProcessed(System.currentTimeMillis(), concat(header, data)) ) {
 					ackMessage(timestamp, super.priority);
+					return true;
 				} else {
 					logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 				}
@@ -279,7 +302,6 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-		
-		return true;
+		return false;
 	}
 }

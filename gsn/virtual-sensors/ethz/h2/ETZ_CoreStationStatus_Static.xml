@@ -7,21 +7,19 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-            <field name="V_EXT2" type="INTEGER" unit="mV"/>
-            <field name="V_EXT1" type="INTEGER" unit="mV"/>
-            <field name="V_EXT3" type="INTEGER" unit="mV"/>
-            <field name="I_V12DC_EXT" type="INTEGER" unit="µA"/>
-            <field name="V12DC_IN" type="INTEGER" unit="mV"/>
-            <field name="I_V12DC_IN" type="INTEGER" unit="µA"/>
-            <field name="VCC_5_0" type="INTEGER" unit="mV"/>
-            <field name="VCC_NODE" type="INTEGER" unit="mV"/>
-            <field name="I_VCC_NODE" type="INTEGER" unit="µA"/>
-            <field name="VCC_4_2" type="INTEGER" unit="mV"/>
-            <field name="LM92_TEMP" type="INTEGER" unit="m°C" />
+            <field name="OS" type="VARCHAR(255)" />
+            <field name="HOSTNAME" type="VARCHAR(255)" />
+            <field name="KERNEL_VERSION" type="VARCHAR(255)" />
+            <field name="KERNEL_COMPILED_BY" type="VARCHAR(255)" />
+            <field name="GCC_VERSION" type="VARCHAR(255)" />
+            <field name="KERNEL_COMPILE_TIME" type="VARCHAR(255)" />
+            <field name="PROCESSOR" type="VARCHAR(255)" />
+            <field name="DISTRIBUTION_NAME" type="VARCHAR(255)" />
+            <field name="DISTRIBUTION_TIMESTAMP" type="VARCHAR(255)" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>show hardware status information of the CoreStations from the ETZ deployment</description>
+    <description>show static status information of the CoreStations from the ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense ETZ test deployment</predicate>
@@ -35,7 +33,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">hardware</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -46,7 +44,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">hardware</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -57,7 +55,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">hardware</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -68,7 +66,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">hardware</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -79,7 +77,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">hardware</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -90,7 +88,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">hardware</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -101,7 +99,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">hardware</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -112,7 +110,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">hardware</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -123,7 +121,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">hardware</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

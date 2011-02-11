@@ -10,9 +10,8 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            
-            <field name="V_EXT2" type="INTEGER" unit="mV"/>
             <field name="V_EXT1" type="INTEGER" unit="mV"/>
+            <field name="V_EXT2" type="INTEGER" unit="mV"/>
             <field name="V_EXT3" type="INTEGER" unit="mV"/>
             <field name="I_V12DC_EXT" type="INTEGER" unit="µA"/>
             <field name="V12DC_IN" type="INTEGER" unit="mV"/>
@@ -37,7 +36,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
-                    <predicate key="query"> select * from ETZ_CoreStationStatus_Hardware </predicate>
+                    <predicate key="query"> select * from ETZ_CoreStationStatus_Hardware</predicate>
                     <predicate key="remote-contact-point">http://tik31x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>

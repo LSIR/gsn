@@ -9,7 +9,7 @@ __source__      = "$URL$"
 
 import struct
 import sys
-#import resource
+import resource
 import threading
 
 import BackLogMessage
@@ -118,12 +118,13 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         connectionLosses = gsnpeerstatus[9]
         
         usage = [None]*16
-#        try:
-#            r = resource.getrusage(resource.RUSAGE_SELF)
-#            for i in range(len(r)):
-#                usage[i] = r[i]
-#        except Exception, e:
-#            self.exception(e)
+        
+        try:
+            r = resource.getrusage(resource.RUSAGE_SELF)
+            for i in range(len(r)):
+                usage[i] = r[i]
+        except Exception, e:
+            self.exception(e)
         
         payload = [self.getUptime(), self.getErrorCounter(), self.getExceptionCounter(), threading.active_count()]
         payload += [msgInPerSec, msgOutPerSec, msgInCounter, msgOutCounter, msgAckInCounter, pingOutCounter, pingAckInCounter, pingInCounter, pingAckOutCounter, connectionLosses]

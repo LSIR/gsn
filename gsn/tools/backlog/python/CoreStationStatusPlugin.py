@@ -23,8 +23,9 @@ from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_BACKLOG = True
 
-HW_TYPE = 1
-SW_TYPE = 2
+STATIC_TYPE = 1
+HW_TYPE = 2
+SW_TYPE = 3
 
 RTC_USR = '/sys/class/i2c-adapter/i2c-0/0-006f/usr'
 CALIB_FILE = '/etc/i_sense.cal'
@@ -97,6 +98,9 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
     def run(self):
         self.info('started')
+        
+        self.processMsg(self.getTimeStamp(), [STATIC_TYPE] + self._getInitStats())
+        
         if self._interval != None:
             while not self._stopped:
                 self._sleeper.wait(self._interval)
@@ -138,10 +142,10 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #        print '_getLM92Temp :' + str(self._getLM92Temp())
         
         data_list = [HW_TYPE]
-        data_list += self._getLM92Temp()
         data_list += self._getAD77x8()
+        data_list += self._getLM92Temp()
         
-        self.processMsg(self.getTimeStamp(), data_list, self._priority, self._backlog)
+        self.processMsg(self.getTimeStamp(), data_list)
         
         data_list = [SW_TYPE]
         data_list += self._getNumberOfUsers()
@@ -161,16 +165,83 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         data_list += self._getStat()
         data_list += self._getUptime()
         
-        self.processMsg(self.getTimeStamp(), data_list, self._priority, self._backlog)
+        self.processMsg(self.getTimeStamp(), data_list)
             
     
     
-    def _sendInitStats(self):
-        # TODO: what exactly to read
-        os.uname()
+    def _getInitStats(self):
+        '''
+            [OS (string),
+             hostname (string),
+             kernel version (string),
+             compiled by  (string),
+             gcc version (string),
+             compile time (string),
+             processor (string),
+             distribution name  (string),
+             distribution timestamp  (string)]
+        '''
+        ret = [None]*9
+        
+        uname = os.uname()
+#            print '#############################################################################'
+#            print 'init stats'
+#            print '[last user logged into the system (string)]'
+#            print ''
+#            print 'os.uname'
+#            print str(uname)
+#            print ''
+        
+        ret[0] = uname[0]
+        ret[1] = uname[1]
+        ret[2] = uname[2]
+        
+        try:
+            file = open("/proc/version", "r")
+            line = file.read()
+#            print '/proc/version'
+#            print ''
+#            print line
+#            print ''
+            file.close()
+            lst = line.split()
+            
+            ret[3] = lst[3][1:-1]
+            if lst[4].find('gcc') != -1:
+                ret[4] = lst[6]
+            else:
+                self.exception('os has not been compiled by gcc')
+        except Exception, e:
+            self.exception(e)
+            
+        ret[5] = uname[3]
+        ret[6] = uname[4]
+        
+        try:
+            file = open("/etc/version", "r")
+            line = file.read()
+#            print '/etc/version'
+#            print ''
+#            print line
+#            print ''
+            file.close()
+            lst = line.split()
+            
+            if len(lst) == 2:
+                ret[7] = lst[0]
+                ret[8] = lst[1]
+            else:
+                self.exception()
+        except Exception, e:
+            self.exception(e)
+        
+        return ret
     
     
     def _getNumberOfUsers(self):
+        '''
+            [number of users logged into the system (smallint)]
+        '''
         # TODO: implement
         ret = [None]
         return ret
@@ -193,7 +264,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             file.close()
             ret = [str[36:str.index('\0', 36)]]
         except Exception, e:
-            self.exception(e)
+            self.debug(str(e))
         return ret
         
         
