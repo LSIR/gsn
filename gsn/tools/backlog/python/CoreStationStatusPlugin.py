@@ -23,6 +23,9 @@ from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_BACKLOG = True
 
+HW_TYPE = 1
+SW_TYPE = 2
+
 RTC_USR = '/sys/class/i2c-adapter/i2c-0/0-006f/usr'
 CALIB_FILE = '/etc/i_sense.cal'
 
@@ -43,20 +46,20 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
-#        p = subprocess.Popen(['modprobe', 'ad77x8'])
-#        self.info('wait for modprobe ad77x8 to finish')
-#        ret = p.wait()
-#        output = p.communicate()
-#        if output[0]:
-#            if output[1]:
-#                self.info('modprobe ad77x8: (STDOUT=' + output[0] + 'STDERR=' + output[1] + ')')
-#            else:
-#                self.info('modprobe ad77x8: (STDOUT=' + output[0] + ')')
-#        elif output[1]:
-#                self.info('modprobe ad77x8: (STDERR=' + output[1] + ')')
-#                
-#        if ret != 0:
-#            raise Exception('module ad77x8 is not available (modprobe ad77x8 returned with code ' + str(ret) + ')')
+        p = subprocess.Popen(['modprobe', 'ad77x8'])
+        self.info('wait for modprobe ad77x8 to finish')
+        ret = p.wait()
+        output = p.communicate()
+        if output[0]:
+            if output[1]:
+                self.info('modprobe ad77x8: (STDOUT=' + output[0] + 'STDERR=' + output[1] + ')')
+            else:
+                self.info('modprobe ad77x8: (STDOUT=' + output[0] + ')')
+        elif output[1]:
+                self.info('modprobe ad77x8: (STDERR=' + output[1] + ')')
+                
+        if ret != 0:
+            raise Exception('module ad77x8 is not available (modprobe ad77x8 returned with code ' + str(ret) + ')')
             
         self._conf_calibrate = False
         if int(self.getOptionValue('calibrate')) == 1:
@@ -134,7 +137,14 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #        print '_getUptime :' + str(self._getUptime())
 #        print '_getLM92Temp :' + str(self._getLM92Temp())
         
-        data_list = self._getNumberOfUsers()
+        data_list = [HW_TYPE]
+        data_list += self._getLM92Temp()
+        data_list += self._getAD77x8()
+        
+        self.processMsg(self.getTimeStamp(), data_list, self._priority, self._backlog)
+        
+        data_list = [SW_TYPE]
+        data_list += self._getNumberOfUsers()
         data_list += self._getLastLog()
         data_list += self._getChronyStats()
         data_list += self._getStatVFS()
@@ -150,8 +160,6 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         data_list += self._getSoftIRQ()
         data_list += self._getStat()
         data_list += self._getUptime()
-        data_list += self._getLM92Temp()
-        data_list += self._getAD77x8()
         
         self.processMsg(self.getTimeStamp(), data_list, self._priority, self._backlog)
             
