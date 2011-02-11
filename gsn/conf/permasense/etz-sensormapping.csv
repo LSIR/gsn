@@ -1,5 +1,5 @@
 "POSITION","BEGIN","END","SENSORTYPE","SENSORTYPE_ARGS","COMMENT"
-"0","1970-01-01 00:00:00","9999-01-01 00:00:00","nodehealth_sht21","0","BaseBoard v2 r2.0"
+"0","1970-01-01 00:00:00","9999-01-01 00:00:00","nodehealth_sht11","0","BaseBoard v2 r1.0"
 "1","1970-01-01 00:00:00","9999-01-01 00:00:00","nodehealth_sht21","0","BaseBoard v2 r2.0"
 "2","1970-01-01 00:00:00","9999-01-01 00:00:00","nodehealth_sht21","0","BaseBoard v2 r2.0"
 "3","1970-01-01 00:00:00","9999-01-01 00:00:00","nodehealth_sht21","0","BaseBoard v2 r2.0"
