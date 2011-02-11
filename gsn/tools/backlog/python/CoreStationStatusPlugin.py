@@ -10,6 +10,7 @@ __source__      = "$URL$"
 import struct
 import os
 from threading import Timer, Event
+from pyutmp import UtmpFile
 
 from ScheduleHandler import SUBPROCESS_BUG_BYPASS
 if SUBPROCESS_BUG_BYPASS:
@@ -244,6 +245,14 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         '''
         # TODO: implement
         ret = [None]
+        try:
+            users = 0
+            for utmp in UtmpFile():
+                if utmp.ut_user_process:
+                    users += 1
+            ret = [users]
+        except Exception, e:
+            self.info(e)
         return ret
         
         
