@@ -12,8 +12,6 @@ import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 import gsn.beans.NetworkTopology;
 import gsn.beans.SensorNode;
 import gsn.beans.StreamElement;
@@ -80,6 +78,7 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dispose() {
+		DataMapping.removeVS(this);
 	}
 
 	@Override

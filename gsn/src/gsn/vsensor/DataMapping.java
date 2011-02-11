@@ -33,7 +33,7 @@ public class DataMapping {
 	private static final FilenameFilter filter = mappings.new MappingFilenameFilter();
 	
 	private static HashMap<String, Mappings> deployments = new HashMap<String, Mappings>();
-	private static HashMap<Object, String> vsmappings = new HashMap<Object, String>();
+	private static HashMap<AbstractVirtualSensor, String> vsmappings = new HashMap<AbstractVirtualSensor, String>();
 	private static Server web;
 	
 	/**
@@ -45,7 +45,7 @@ public class DataMapping {
 	 * @throws SQLException 
 	 * @throws ClassNotFoundException 
 	 */
-	public static void registerVS(Object vs, String deployment) throws SQLException, ClassNotFoundException {
+	public static void registerVS(AbstractVirtualSensor vs, String deployment) throws SQLException, ClassNotFoundException {
 		String s;
 		Connection conn;
 		synchronized (deployments) {
@@ -124,13 +124,18 @@ public class DataMapping {
 
 	}
 	
-	public static void removeVS (Object vs) {
+	public static void removeVS (AbstractVirtualSensor vs) {
 		String vsdeployment;
 		synchronized (deployments) {
 			if(vsmappings.containsKey(vs)) {
 				if (deployments.containsKey(vsmappings.get(vs))) {
 					vsdeployment = vsmappings.get(vs);					
 					vsmappings.remove(vs);
+					if (logger.isDebugEnabled()) {
+						for (AbstractVirtualSensor v: vsmappings.keySet()) {
+							logger.debug("vs using mappings for deployment "+vsdeployment+":"+v.getVirtualSensorConfiguration().getName());
+						}
+					}
 					if (!vsmappings.containsValue(vsdeployment)) {
 						// this was the last vs that needed this resource
 						logger.debug("remove deployment mappings for " + vsdeployment);
