@@ -97,7 +97,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_MSPVOLTAGE, PAYLOAD_UPTIME, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
             from etz_dozer_basestatus
           </predicate>
         </address>
