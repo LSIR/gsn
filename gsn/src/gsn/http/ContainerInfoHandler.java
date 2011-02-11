@@ -13,6 +13,7 @@ import gsn.storage.DataEnumerator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -141,7 +142,12 @@ public class ContainerInfoHandler implements RequestHandler {
               }
               else if (relatime) {
             	  try {
-            		  Integer seconds = (Integer)se.getData(StringEscapeUtils.escapeXml( df.getName( ) ));
+            		  Integer seconds = null;
+            		  Serializable ser = se.getData(StringEscapeUtils.escapeXml( df.getName( ) ));
+            		  if (ser instanceof Double)
+            			  seconds = ((Double)ser).intValue();
+            		  else
+            			  seconds = (Integer)ser;
             		  if(seconds != null) {
             			  Integer minutes = (Integer) ((seconds / 60) % 60);
             			  Integer hours = (Integer) ((seconds / 3600) % 24);
