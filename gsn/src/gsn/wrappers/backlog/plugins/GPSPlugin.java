@@ -57,7 +57,7 @@ public class GPSPlugin extends AbstractPlugin {
 	public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
 		super.activeBackLogWrapper = backlogwrapper;
 		try {
-			gpsDataType = "raw"; //getActiveAddressBean().getPredicateValueWithException(GPS_DATA_TYPE).toLowerCase();
+			gpsDataType = getActiveAddressBean().getPredicateValueWithException(GPS_DATA_TYPE).toLowerCase();
 		} catch (Exception e) {
 			logger.error(gpsDataType);
 			logger.error(e.getMessage());
@@ -71,7 +71,10 @@ public class GPSPlugin extends AbstractPlugin {
         
         registerListener();
 
-        setName("GPSPlugin-" + coreStationName + "-Thread");
+        if (gpsDataType.equalsIgnoreCase(RAW_NAMING))
+        	setName("GPSPlugin-RAW-" + coreStationName + "-Thread");
+        else if (gpsDataType.equalsIgnoreCase(NAV_NAMING))
+    		setName("GPSPlugin-NAV-" + coreStationName + "-Thread");
 		
 		return true;
 	}
@@ -103,10 +106,10 @@ public class GPSPlugin extends AbstractPlugin {
 			
 			if (msgType == gpsNamingTable.get(gpsDataType).typeNumber) {
 				logger.debug("msgType: " + msgType);
-				if (gpsDataType.equals(NAV_NAMING)) {
+				if (gpsDataType.equalsIgnoreCase(NAV_NAMING)) {
 					
 				}
-				else if (gpsDataType.equals(RAW_NAMING)) {
+				else if (gpsDataType.equalsIgnoreCase(RAW_NAMING)) {
 					out = new Serializable[]{timestamp, timestamp, deviceId, toShort(data[1]), data[2]};
 				}
 				else {
@@ -126,15 +129,5 @@ public class GPSPlugin extends AbstractPlugin {
 		}
 		
 		return true;
-	}
-}
-
-class NameDataFieldPair {
-	protected Integer typeNumber;
-	protected DataField[] dataField;
-	
-	NameDataFieldPair(Integer typeNumber, DataField[] dataField) {
-		this.typeNumber = typeNumber;
-		this.dataField = dataField;
 	}
 }

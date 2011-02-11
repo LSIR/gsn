@@ -359,31 +359,31 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	}
 	
 	
-	protected static Serializable[] checkAndCastData(Serializable[] data, DataField[] datafields, int offset) throws Exception {
-		if (data.length != datafields.length-offset)
+	protected static Serializable[] checkAndCastData(Serializable[] data, int dataoffset, DataField[] datafields, int datafieldoffset) throws Exception {
+		if (data.length-dataoffset != datafields.length-datafieldoffset)
 			throw new Exception("data length does not correspond with the datafield length");
 		
-		Serializable [] ret = new Serializable [data.length];
-		for (int i=0; i<data.length; i++) {
-			int type = datafields[i+offset].getDataTypeID();
+		Serializable [] ret = new Serializable [data.length-dataoffset];
+		for (int i=dataoffset; i<data.length; i++) {
+			int type = datafields[i-dataoffset+datafieldoffset].getDataTypeID();
 			switch (type) {
 			case DataTypes.INTEGER:
-				ret[i] = toInteger(data[i]);
+				ret[i-dataoffset] = toInteger(data[i]);
 				break;
 			case DataTypes.BIGINT:
-				ret[i] = toLong(data[i]);
+				ret[i-dataoffset] = toLong(data[i]);
 				break;
 			case DataTypes.SMALLINT:
-				ret[i] = toShort(data[i]);
+				ret[i-dataoffset] = toShort(data[i]);
 				break;
 			case DataTypes.TINYINT:
-				ret[i] = toShort(data[i]);
+				ret[i-dataoffset] = toShort(data[i]);
 				break;
 			case DataTypes.DOUBLE:
-				ret[i] = (Double)data[i];
+				ret[i-dataoffset] = (Double)data[i];
 				break;
 			default:
-				ret[i] = data[i];
+				ret[i-dataoffset] = data[i];
 				break;
 			}
 		}
@@ -438,5 +438,15 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 			return (Short) value;
 		else
 			throw new Exception("value can not be cast to Short.");
+	}
+}
+
+class NameDataFieldPair {
+	protected Integer typeNumber;
+	protected DataField[] dataField;
+	
+	NameDataFieldPair(Integer typeNumber, DataField[] dataField) {
+		this.typeNumber = typeNumber;
+		this.dataField = dataField;
 	}
 }
