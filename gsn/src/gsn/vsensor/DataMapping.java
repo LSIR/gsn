@@ -203,7 +203,7 @@ public class DataMapping {
 			logger.warn(e.getMessage(), e);
 		}
 		if (logger.isDebugEnabled())
-			logger.debug("getPosition: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+			logger.debug("getCoordinate: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
 		return res;
 	}
 
