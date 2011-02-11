@@ -42,7 +42,7 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 					for (SensorNode n: topology.sensornodes) {
 						if (n.node_id !=null && n.generation_time != null) {
 							n.position = DataMapping.getPosition(deployment, n.node_id.intValue(), new Timestamp(n.generation_time));
-							n.coordinate = DataMapping.getCoordinate(deployment, n.node_id.intValue(), new Timestamp(n.generation_time));
+							n.coordinate = DataMapping.getCoordinate(deployment, n.position.intValue());
 						}
 					}
 					topology.mapped = true;
