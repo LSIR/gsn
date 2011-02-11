@@ -1,2 +1,9 @@
 "SENSORTYPE_ARGS","PHYSICAL_SIGNAL","VALUE","COMMENT"
-"0","","",
+# nodehealth
+"0","sdivoltage","0.0046805046805","BaseBoard v2 r2.0"
+"0","sysvoltage","0.0007326007326","BaseBoard v2 r2.0"
+"1","sdivoltage","0.00033203125","sib"
+"1","sysvoltage","0.0000634765625","sib"
+"2","sdivoltage","0.0043956043956","powerswitch"
+"2","sysvoltage","0.0009768009768","powerswitch"
+
