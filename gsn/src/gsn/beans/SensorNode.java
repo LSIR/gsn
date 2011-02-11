@@ -158,11 +158,11 @@ public class SensorNode {
 		Double std=0d;
 		Double noiseupper=0d;Double uppercount = 0d;
 		Double noiselower=0d;Double lowercount = 0d;
-		if (!isSibNode() && !isBBControl()) {
+		if (!isSibNode() && !isBBControl() && !isAccessNode()) {
 			batterylevel = null;
 			return batterylevel;
 		}
-		else if (isBBControl() && voltageHistory.size()>0) {
+		else if ((isBBControl() || isAccessNode()) && voltageHistory.size()>0) {
 			if (voltageHistory.getLast()<11.5)
 				batterylevel=50;
 			else if (voltageHistory.getLast()<12)
