@@ -69,6 +69,7 @@ public class DataMapping {
 				logger.info("connected to jdbc:h2:mem:" + deployment + "...");
 
 				Statement stat = conn.createStatement();
+				stat.execute("DROP TABLE IF EXISTS positionmapping");				
 				stat.execute("CREATE TABLE positionmapping(device_id INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, position INT NOT NULL, comment CLOB, PRIMARY KEY(device_id, begin, end))");
 				logger.info("create positionmapping table for " + deployment + " deployment");
 				s = "conf/permasense/" + deployment + "-positionmapping.csv";
@@ -78,6 +79,7 @@ public class DataMapping {
 					logger.warn("positionmapping not available");
 				}
 				
+				stat.execute("DROP TABLE IF EXISTS geomapping");
 				stat.execute("CREATE TABLE geomapping(position INT NOT NULL, longitude DOUBLE, latitude DOUBLE, altitude DOUBLE, comment CLOB, PRIMARY KEY(position))");
 				logger.info("create geomapping table for " + deployment + " deployment");
 				s = "conf/permasense/" + deployment + "-geomapping.csv";
@@ -87,6 +89,7 @@ public class DataMapping {
 					logger.warn("Geographic coordinate not available");
 				}
 
+				stat.execute("DROP TABLE IF EXISTS sensormapping");
 				stat.execute("CREATE TABLE sensormapping(position INT NOT NULL, begin DATETIME(23,0) NOT NULL, end DATETIME(23,0) NOT NULL, sensortype VARCHAR(30) NOT NULL, sensortype_args BIGINT, comment CLOB, PRIMARY KEY(position, begin, end, sensortype))");
 				logger.info("create sensormapping table for " + deployment + " deployment");
 				s = "conf/permasense/" + deployment + "-sensormapping.csv";
@@ -97,6 +100,7 @@ public class DataMapping {
 				}
 
 				// TODO: sensortype dont depends on deployment...
+				stat.execute("DROP TABLE IF EXISTS sensortype");
 				stat.execute("CREATE TABLE sensortype(sensortype VARCHAR(30) NOT NULL, signal_name VARCHAR(30) NOT NULL, physical_signal VARCHAR(30) NOT NULL, conversion VARCHAR(30), input VARCHAR(30), PRIMARY KEY(sensortype, signal_name, physical_signal))");
 				logger.info("create sensortype table for " + deployment + " deployment");
 				String[] files = new File("conf/permasense/sensortype_templates").list(filter);
@@ -107,6 +111,7 @@ public class DataMapping {
 							"' AS sensortype, * FROM CSVREAD('conf/permasense/sensortype_templates/" + s + "')");
 				}
 
+				stat.execute("DROP TABLE IF EXISTS sensortype_args");
 				stat.execute("CREATE TABLE sensortype_args(sensortype_args BIGINT NOT NULL, physical_signal VARCHAR(30) NOT NULL, value VARCHAR(255) NOT NULL, comment CLOB, PRIMARY KEY(sensortype_args, physical_signal))");
 				logger.info("create sensortype_args table for " + deployment + " deployment");
 				s = "conf/permasense/" + deployment + "-sensortype_args.csv";
@@ -150,6 +155,7 @@ public class DataMapping {
 						if (deployments.isEmpty() && web != null) {
 							logger.debug("shut down h2 webserver");
 							web.shutdown();
+							web.stop();
 							web = null;
 						}
 					}
