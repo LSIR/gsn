@@ -16,8 +16,15 @@
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Matterhorn deployment</predicate>
-        <predicate key="LATITUDE">45.980126</predicate>
-        <predicate key="LONGITUDE">7.670109</predicate>
+        <predicate key="LATITUDE">45.98103726200003</predicate>
+        <predicate key="LONGITUDE">7.671217388000011</predicate>
+        <predicate key="ALTITUDE">28.06000000086887</predicate>
+        <predicate key="HEADING">-122.28</predicate>
+        <predicate key="TILT">104.5097921306319</predicate>
+        <predicate key="ROLL">-1.670011136226304</predicate>
+        <predicate key="HORFOV">13.91</predicate>
+        <predicate key="VERFOV">20.455</predicate>
+        <predicate key="NEAR">9.821</predicate>
     </addressing>
     <storage history-size="1"/>
     <streams>
