@@ -36,8 +36,8 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			new DataField("GCC_VERSION", "VARCHAR(255)"),
 			new DataField("KERNEL_COMPILE_TIME", "VARCHAR(255)"),
 			new DataField("PROCESSOR", "VARCHAR(255)"),
-			new DataField("DISTRIBUTION_VERSION", "VARCHAR(255)"),
-			new DataField("DISTRIBUTION_TIMESTAMP", "VARCHAR(255)")};
+			new DataField("DISTRIBUTION_NAME", "VARCHAR(255)"),
+			new DataField("DISTRIBUTION_VERSION", "VARCHAR(255)")};
 	
 	private static DataField[] hwDataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
