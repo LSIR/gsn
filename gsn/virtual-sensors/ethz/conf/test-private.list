@@ -1,4 +1,7 @@
-ETZ_BackLogStatus.xml
+ETZ_BackLogStatus_Static.xml
+ETZ_BackLogStatus_Revision.xml
+ETZ_BackLogStatus_Dynamic.xml
+ETZ_CoreStationStatus_Static.xml
 ETZ_CoreStationStatus_Software.xml
 ETZ_CoreStationStatus_Hardware.xml
 ETZ_Binary.xml

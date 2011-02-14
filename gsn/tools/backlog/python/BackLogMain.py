@@ -548,7 +548,6 @@ class BackLogMainClass(Thread, Statistics):
                             md5 = hashlib.md5()
                             fd.seek(0)
                             block_size = 128*md5.block_size
-                            print 'block_size: ' + str(block_size)
                             while True:
                                 data = fd.read(block_size)
                                 if not data:

@@ -73,7 +73,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         self.processMsg(self.getTimeStamp(), [STATIC_TYPE] + self._getInitStats())
         
         for entry in self._backlogMain.getCodeRevisionList():
-            self.processMsg(self.getTimeStamp(), [VERSION_TYPE] + entry)
+            self.processMsg(self.getTimeStamp(), [REVISION_TYPE] + entry)
             
         
         if self._interval != None:
@@ -210,10 +210,10 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             ret[0] = r[0]
             ret[1] = r[1]
             ret[2] = r[2]
-            ret[6] = r[6]
-            ret[7] = r[7]
-            ret[14] = r[14]
-            ret[15] = r[15]
+            ret[3] = r[6]
+            ret[4] = r[7]
+            ret[5] = r[14]
+            ret[6] = r[15]
         except Exception, e:
             self.exception(e)
         return ret

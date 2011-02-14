@@ -215,18 +215,18 @@ class BackLogDBClass(Thread, Statistics):
                                                  average remove time, 
                                                  maximum remove time]
         '''
-        dbentries = self.getCounterValue(self._dbNumberOfEntriesId)
-        dbsize = int(os.path.getsize(self._dbname)/1024)
-        cntst = self.getCounterValue(self._storeCounterId)
-        cntrm = self.getCounterValue(self._removeCounterId)
-        minst = self._convert(self.getMinCounterInc(self._storeTimeId, [intervalSec])[0])
-        maxst = self._convert(self.getMaxCounterInc(self._storeTimeId, [intervalSec])[0])
-        avgst = self._convert(self.getAvgCounterInc(self._storeTimeId, [intervalSec])[0])
-        minrm = self._convert(self.getMinCounterInc(self._removeTimeId, [intervalSec])[0])
-        maxrm = self._convert(self.getMaxCounterInc(self._removeTimeId, [intervalSec])[0])
-        avgrm = self._convert(self.getAvgCounterInc(self._removeTimeId, [intervalSec])[0])
-        
-        return [dbentries, dbsize, stpersec, rmpersec, cntst, cntrm, minst, avgst, maxst, minrm, avgrm, maxrm]
+        stat = []
+        stat.append(self.getCounterValue(self._dbNumberOfEntriesId))
+        stat.append(int(os.path.getsize(self._dbname)/1024))
+        stat.append(self.getCounterValue(self._storeCounterId))
+        stat.append(self.getCounterValue(self._removeCounterId))
+        stat.append(self._convert(self.getMinCounterInc(self._storeTimeId, [intervalSec])[0]))
+        stat.append(self._convert(self.getMaxCounterInc(self._storeTimeId, [intervalSec])[0]))
+        stat.append(self._convert(self.getAvgCounterInc(self._storeTimeId, [intervalSec])[0]))
+        stat.append(self._convert(self.getMinCounterInc(self._removeTimeId, [intervalSec])[0]))
+        stat.append(self._convert(self.getMaxCounterInc(self._removeTimeId, [intervalSec])[0]))
+        stat.append(self._convert(self.getAvgCounterInc(self._removeTimeId, [intervalSec])[0]))
+        return stat
     
     
     def _convert(self, value):
