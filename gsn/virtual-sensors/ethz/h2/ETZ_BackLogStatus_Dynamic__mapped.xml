@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_BackLogStatus__mapped" priority="10" >
+<virtual-sensor name="ETZ_BackLogStatus_Dynamic__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -10,11 +10,11 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
             <field name="UPTIME" type="INTEGER" unit="relatime" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
-            <field name="GSN_PLUGIN_MSG_IN" type="DOUBLE" unit="msg/s" />
-            <field name="GSN_PLUGIN_MSG_OUT" type="DOUBLE" unit="msg/s" />
+            
             <field name="GSN_PLUGIN_MSG_IN_COUNTER" type="INTEGER" />
             <field name="GSN_PLUGIN_MSG_OUT_COUNTER" type="INTEGER" />
             <field name="GSN_PLUGIN_MSG_ACK_IN_COUNTER" type="INTEGER" />
@@ -23,10 +23,9 @@
             <field name="GSN_PING_IN_COUNTER" type="INTEGER" />
             <field name="GSN_PING_ACK_OUT_COUNTER" type="INTEGER" />
             <field name="GSN_CONNECTION_LOSSES" type="INTEGER" />
+            
             <field name="DB_ENTRIES" type="INTEGER" />
-            <field name="DB_SIZE" type="INTEGER" unit="kb" />
-            <field name="DB_STORE" type="DOUBLE" unit="msg/s" />
-            <field name="DB_REMOVE" type="DOUBLE" unit="msg/s" />
+            <field name="DB_SIZE" type="INTEGER" unit="kB" />
             <field name="DB_STORE_COUNTER" type="INTEGER" />
             <field name="DB_REMOVE_COUNTER" type="INTEGER" />
             <field name="DB_STORE_TIME_MIN" type="INTEGER" unit="ms" />
@@ -35,26 +34,32 @@
             <field name="DB_REMOVE_TIME_MIN" type="INTEGER" unit="ms" />
             <field name="DB_REMOVE_TIME_MEAN" type="INTEGER" unit="ms" />
             <field name="DB_REMOVE_TIME_MAX" type="INTEGER" unit="ms" />
-            <field name="RUSAGE_UTIME" type="DOUBLE" />
-            <field name="RUSAGE_STIME" type="DOUBLE" />
-            <field name="RUSAGE_MAXRSS" type="INTEGER" />
-            <field name="RUSAGE_IXRSS" type="INTEGER" />
-            <field name="RUSAGE_IDRSS" type="INTEGER" />
-            <field name="RUSAGE_ISRSS" type="INTEGER" />
+
+            <field name="VM_PEAK" type="INTEGER" unit="kB" />
+            <field name="VM_SIZE" type="INTEGER" unit="kB" />
+            <field name="VM_LCK" type="INTEGER" unit="kB" />
+            <field name="VM_HWM" type="INTEGER" unit="kB" />
+            <field name="VM_RSS" type="INTEGER" unit="kB" />
+            <field name="VM_DATA" type="INTEGER" unit="kB" />
+            <field name="VM_STK" type="INTEGER" unit="kB" />
+            <field name="VM_EXE" type="INTEGER" unit="kB" />
+            <field name="VM_LIB" type="INTEGER" unit="kB" />
+            <field name="VM_PTE" type="INTEGER" unit="kB" />
+            <field name="THREADS" type="INTEGER" />
+            <field name="VOLUNTARY_CTXT_SWITCHES" type="INTEGER" />
+            <field name="NONVOLUNTARY_CTXT_SWITCHES" type="INTEGER" />
+			
+            <field name="RUSAGE_UTIME" type="DOUBLE" unit="relatime" />
+            <field name="RUSAGE_STIME" type="DOUBLE" unit="relatime" />
+            <field name="RUSAGE_MAXRSS" type="INTEGER" unit="kB" />
             <field name="RUSAGE_MINFLT" type="INTEGER" />
             <field name="RUSAGE_MAJFLT" type="INTEGER" />
-            <field name="RUSAGE_NSWAP" type="INTEGER" />
-            <field name="RUSAGE_INBLOCK" type="INTEGER" />
-            <field name="RUSAGE_OUBLOCK" type="INTEGER" />
-            <field name="RUSAGE_MSGSND" type="INTEGER" />
-            <field name="RUSAGE_MSGRCV" type="INTEGER" />
-            <field name="RUSAGE_NSIGNALS" type="INTEGER" />
             <field name="RUSAGE_NVCSW" type="INTEGER" />
             <field name="RUSAGE_NIVCSW" type="INTEGER" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>status information of BackLog from ETZ deployment</description>
+    <description>dynamic status information of BackLog from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense ETZ test deployment</predicate>
@@ -66,7 +71,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
-                    <predicate key="query"> select * from ETZ_BackLogStatus </predicate>
+                    <predicate key="query"> select * from ETZ_BackLogStatus_Dynamic</predicate>
                     <predicate key="remote-contact-point">http://tik31x.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>

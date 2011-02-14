@@ -205,9 +205,7 @@ class BackLogDBClass(Thread, Statistics):
         @param intervalSec: the passed n seconds over which min/mean/max is calculated.
         
         @return: status of the backlog database [number of database entries,
-                                                 database file size, 
-                                                 stores per second, 
-                                                 removes per second, 
+                                                 database file size,
                                                  store counter, 
                                                  remove counter, 
                                                  minimum store time, 
@@ -219,8 +217,6 @@ class BackLogDBClass(Thread, Statistics):
         '''
         dbentries = self.getCounterValue(self._dbNumberOfEntriesId)
         dbsize = int(os.path.getsize(self._dbname)/1024)
-        stpersec = self.getAvgCounterIncPerSecond(self._storeCounterId, [intervalSec])[0]
-        rmpersec = self.getAvgCounterIncPerSecond(self._removeCounterId, [intervalSec])[0]
         cntst = self.getCounterValue(self._storeCounterId)
         cntrm = self.getCounterValue(self._removeCounterId)
         minst = self._convert(self.getMinCounterInc(self._storeTimeId, [intervalSec])[0])

@@ -8,8 +8,10 @@ __id__          = "$Id$"
 __source__      = "$URL$"
 
 import os
+import re
 import sys
 import signal
+import hashlib
 import ConfigParser
 import optparse
 import time
@@ -40,6 +42,9 @@ DEFAULT_OPTION_BACKLOG_RESEND_SLEEP = 0.1
 DEFAULT_TOS_VERSION = 2
 DEFAULT_BACKLOG_DB_RESEND = 12
 
+SHUTDOWN_CHECK_FILE = '/media/card/backlog/.backlog_shutdown'
+BACKLOG_PYTHON_DIRECTORY = '/usr/lib/python2.6/backlog/'
+
 class BackLogMainClass(Thread, Statistics):
     '''
     The main thread class for the backlog functionality.
@@ -52,6 +57,7 @@ class BackLogMainClass(Thread, Statistics):
     data/instance attributes:
     _logger
     _uptimeId
+    _last_clean_shutdown
     jobsobserver
     schedulehandler
     powerControl
@@ -172,6 +178,11 @@ class BackLogMainClass(Thread, Statistics):
         self._logger.info('gsn_port: ' + str(gsn_port))
         self._logger.info('backlog_db: ' + backlog_db)
         
+        # create the backlog root directory if inexistent
+        if not os.path.exists(os.path.dirname(backlog_db)):
+            os.makedirs(os.path.dirname(backlog_db))
+        # and change working directory
+        os.chdir(os.path.dirname(backlog_db))
                 
         if backlog_db_resend_hr == None:
             backlog_db_resend_hr = DEFAULT_BACKLOG_DB_RESEND
@@ -189,6 +200,19 @@ class BackLogMainClass(Thread, Statistics):
         else:
             self._logger.info('not running in duty-cycle mode')
             self.duty_cycle_mode = False
+
+        # get schedule section from config files
+        try:
+            config_schedule = self._config.items('schedule')
+        except ConfigParser.NoSectionError:
+            raise TypeError('no [schedule] section specified in ' + config_file)
+        
+        # check for proper shutdown
+        self._last_clean_shutdown = None
+        if os.path.exists(SHUTDOWN_CHECK_FILE):
+            fd = open(SHUTDOWN_CHECK_FILE, 'r')
+            self._last_clean_shutdown = long(fd.readline())
+            fd.close()
         
         self._tospeer = None
         self._tos_address = tos_address
@@ -200,12 +224,6 @@ class BackLogMainClass(Thread, Statistics):
         self._logger.info('loaded GSNPeerClass')
         self.backlog = BackLogDBClass(self, backlog_db, backlog_db_resend_hr)
         self._logger.info('loaded BackLogDBClass')
-
-        # get schedule section from config files
-        try:
-            config_schedule = self._config.items('schedule')
-        except ConfigParser.NoSectionError:
-            raise TypeError('no [schedule] section specified in ' + config_file)
             
         self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, config_schedule)
         
@@ -512,6 +530,34 @@ class BackLogMainClass(Thread, Statistics):
     
     def getUptime(self):
         return int(self.timeMeasurementDiff(self._uptimeId, False))
+    
+    
+    def lastCleanShutdown(self):
+        return self._last_clean_shutdown
+    
+    
+    def getCodeRevisionList(self):
+        m = re.compile('.+\$Id: ([\w.:\- ]+)\$')
+        ret = []
+        for root, dirs, files in os.walk(BACKLOG_PYTHON_DIRECTORY):
+            for file in files:
+                if file.endswith('.py'):
+                    fd = open(os.path.join(root, file), 'r')
+                    for line in fd:
+                        if line.strip().startswith('__id__'):
+                            md5 = hashlib.md5()
+                            fd.seek(0)
+                            block_size = 128*md5.block_size
+                            print 'block_size: ' + str(block_size)
+                            while True:
+                                data = fd.read(block_size)
+                                if not data:
+                                    break
+                                md5.update(data)
+                            ret.append([m.match(line.strip()).group(1), md5.hexdigest()])
+                            break
+        return ret
+
 
 
     def incrementExceptionCounter(self):
@@ -576,6 +622,10 @@ def main():
         sys.exit(1)
         
     logging.shutdown()
+    
+    fd = open(SHUTDOWN_CHECK_FILE, 'w')
+    fd.write(str(long(time.time()*1000)))
+    fd.close()
     
     if backlog.shutdown:
         print 'shutdown now'

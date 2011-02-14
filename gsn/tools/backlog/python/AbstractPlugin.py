@@ -316,39 +316,6 @@ class AbstractPluginClass(Thread, Statistics):
         @return: True if BackLog is resending db entries
         '''
         return self._backlogMain.backlog.isBusy()
-
-
-    def getBackLogDBStatus(self, intervalSec):
-        '''
-        Returns the status of the backlog sqlite3 database as list:
-        
-        @param intervalSec: the passed n seconds over which min/mean/max is calculated.
-        
-        @return: status of the backlog database [number of database entries,
-                                                 database file size, 
-                                                 stores per second, 
-                                                 removes per second, 
-                                                 store counter, 
-                                                 remove counter, 
-                                                 minimum store time, 
-                                                 average store time, 
-                                                 maximum store time, 
-                                                 minimum remove time, 
-                                                 average remove time, 
-                                                 maximum remove time]
-        '''
-        return self._backlogMain.backlog.getStatus(intervalSec)
-
-
-    def getGSNPeerStatus(self, intervalSec):
-        '''
-        Returns the status of the GSN peer as list.
-        
-        @param intervalSec: the passed n seconds over which messages per second is calculated.
-        
-        @return: status of the GSN peer as list
-        '''
-        return self._backlogMain.gsnpeer.getStatus(intervalSec)
     
         
     def isBusy(self):

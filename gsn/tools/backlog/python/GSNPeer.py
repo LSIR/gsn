@@ -79,11 +79,11 @@ class GSNPeerClass(Thread, Statistics):
         self._deviceid = deviceid
         self._port = port
 
-        self._msgInCounterId = self.createCounter(60)
+        self._msgInCounterId = self.createCounter()
         self._msgAckInCounterId = self.createCounter()
         self._pingInCounterId = self.createCounter()
         self._pingAckInCounterId = self.createCounter()
-        self._msgOutCounterId = self.createCounter(60)
+        self._msgOutCounterId = self.createCounter()
         self._pingOutCounterId = self.createCounter()
         self._pingAckOutCounterId = self.createCounter()
         self._connectionLossesId = self.createCounter()
@@ -140,17 +140,13 @@ class GSNPeerClass(Thread, Statistics):
         self._logger.info('stopped')
 
 
-    def getStatus(self, intervalSec):
+    def getStatus(self):
         '''
-        Returns the status of the GSN peer as tuple:
-        
-        @param intervalSec: the passed n seconds over which messages per second is calculated.
+        Returns the status of the GSN peer as a list:
         
         @return: status of the GSN peer
         '''
         stat = []
-        stat.append(self.getAvgCounterIncPerSecond(self._msgInCounterId, [intervalSec])[0])
-        stat.append(self.getAvgCounterIncPerSecond(self._msgOutCounterId, [intervalSec])[0])
         stat.append(self.getCounterValue(self._msgInCounterId))
         stat.append(self.getCounterValue(self._msgOutCounterId))
         stat.append(self.getCounterValue(self._msgAckInCounterId))

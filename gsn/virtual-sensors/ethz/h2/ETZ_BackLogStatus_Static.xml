@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_BackLogStatus" priority="10" >
+<virtual-sensor name="ETZ_BackLogStatus_Static" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -11,51 +11,18 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            <field name="UPTIME" type="INTEGER" unit="relatime" />
-            <field name="ERROR_COUNTER" type="INTEGER" />
-            <field name="EXCEPTION_COUNTER" type="INTEGER" />
-            <field name="GSN_PLUGIN_MSG_IN" type="DOUBLE" unit="msg/s" />
-            <field name="GSN_PLUGIN_MSG_OUT" type="DOUBLE" unit="msg/s" />
-            <field name="GSN_PLUGIN_MSG_IN_COUNTER" type="INTEGER" />
-            <field name="GSN_PLUGIN_MSG_OUT_COUNTER" type="INTEGER" />
-            <field name="GSN_PLUGIN_MSG_ACK_IN_COUNTER" type="INTEGER" />
-            <field name="GSN_PING_OUT_COUNTER" type="INTEGER" />
-            <field name="GSN_PING_ACK_IN_COUNTER" type="INTEGER" />
-            <field name="GSN_PING_IN_COUNTER" type="INTEGER" />
-            <field name="GSN_PING_ACK_OUT_COUNTER" type="INTEGER" />
-            <field name="GSN_CONNECTION_LOSSES" type="INTEGER" />
-            <field name="DB_ENTRIES" type="INTEGER" />
-            <field name="DB_SIZE" type="INTEGER" unit="kb" />
-            <field name="DB_STORE" type="DOUBLE" unit="msg/s" />
-            <field name="DB_REMOVE" type="DOUBLE" unit="msg/s" />
-            <field name="DB_STORE_COUNTER" type="INTEGER" />
-            <field name="DB_REMOVE_COUNTER" type="INTEGER" />
-            <field name="DB_STORE_TIME_MIN" type="INTEGER" unit="ms" />
-            <field name="DB_STORE_TIME_MEAN" type="INTEGER" unit="ms" />
-            <field name="DB_STORE_TIME_MAX" type="INTEGER" unit="ms" />
-            <field name="DB_REMOVE_TIME_MIN" type="INTEGER" unit="ms" />
-            <field name="DB_REMOVE_TIME_MEAN" type="INTEGER" unit="ms" />
-            <field name="DB_REMOVE_TIME_MAX" type="INTEGER" unit="ms" />
-            <field name="RUSAGE_UTIME" type="DOUBLE" />
-            <field name="RUSAGE_STIME" type="DOUBLE" />
-            <field name="RUSAGE_MAXRSS" type="INTEGER" />
-            <field name="RUSAGE_IXRSS" type="INTEGER" />
-            <field name="RUSAGE_IDRSS" type="INTEGER" />
-            <field name="RUSAGE_ISRSS" type="INTEGER" />
-            <field name="RUSAGE_MINFLT" type="INTEGER" />
-            <field name="RUSAGE_MAJFLT" type="INTEGER" />
-            <field name="RUSAGE_NSWAP" type="INTEGER" />
-            <field name="RUSAGE_INBLOCK" type="INTEGER" />
-            <field name="RUSAGE_OUBLOCK" type="INTEGER" />
-            <field name="RUSAGE_MSGSND" type="INTEGER" />
-            <field name="RUSAGE_MSGRCV" type="INTEGER" />
-            <field name="RUSAGE_NSIGNALS" type="INTEGER" />
-            <field name="RUSAGE_NVCSW" type="INTEGER" />
-            <field name="RUSAGE_NIVCSW" type="INTEGER" />
+            
+            <field name="PYTHON_IMPLEMENTATION" type="VARCHAR(255)" />
+            <field name="PYTHON_VERSION" type="VARCHAR(255)" />
+            <field name="PYTHON_COMPILER" type="VARCHAR(255)" />
+            <field name="PYTHON_BUILD" type="VARCHAR(255)" />
+            <field name="PYTHON_BUILD_DATE" type="VARCHAR(255)" />
+            <field name="LAST_CLEAN_SHUTDOWN" type="BIGINT" unit="unixtime" />
+            
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>show status information of the BackLogs and send commands to the ETZ deployment</description>
+    <description>show static status information of the BackLogs and send commands to the ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense ETZ test deployment</predicate>
@@ -69,6 +36,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -79,6 +47,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -89,6 +58,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -99,6 +69,7 @@
                 <address wrapper="backlog">
                      <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
                      <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -109,6 +80,7 @@
                 <address wrapper="backlog">
                      <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
                      <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -119,6 +91,7 @@
                 <address wrapper="backlog">
                      <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
                      <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -129,6 +102,7 @@
                 <address wrapper="backlog">
                      <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
                      <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -139,6 +113,7 @@
                 <address wrapper="backlog">
                      <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
                      <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -149,6 +124,7 @@
                 <address wrapper="backlog">
                      <predicate key="remote-connection">nb-tgsell.ethz.ch:9003</predicate>
                      <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -159,6 +135,7 @@
                 <address wrapper="backlog">
                      <predicate key="remote-connection">pc-5225.ethz.ch:9003</predicate>
                      <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -169,6 +146,7 @@
                 <address wrapper="backlog">
                      <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
                      <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

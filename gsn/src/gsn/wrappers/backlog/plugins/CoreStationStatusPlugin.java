@@ -267,7 +267,14 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 
 	@Override
 	public String getPluginName() {
-		return "CoreStationStatusPlugin";
+        if (statusDataType.equalsIgnoreCase(STATIC_NAMING))
+        	return "CoreStationStatusPlugin-Static";
+        else if (statusDataType.equalsIgnoreCase(HW_NAMING))
+        	return "CoreStationStatusPlugin-HW";
+        else if (statusDataType.equalsIgnoreCase(SW_NAMING))
+        	return "CoreStationStatusPlugin-SW";
+        else
+        	return "CoreStationStatusPlugin";
 	}
 
 	@Override
