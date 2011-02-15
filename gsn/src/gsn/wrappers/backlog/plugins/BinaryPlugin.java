@@ -455,7 +455,7 @@ public class BinaryPlugin extends AbstractPlugin {
 		    			    	relativeName = remoteBinaryName;
 		    			    else
 		    			    	relativeName = localBinaryName.replaceAll(rootBinaryDir, "");
-							Serializable[] data = {binaryTimestamp, getDeviceID(), binaryLength, filelen, binaryTransmissionTime, (int)(System.currentTimeMillis()-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relativeName, null, null};
+							Serializable[] data = {binaryTimestamp, getDeviceID(), binaryLength, filelen, binaryTransmissionTime, (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relativeName, null, null};
 							if(!dataProcessed(System.currentTimeMillis(), data)) {
 								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
 							}

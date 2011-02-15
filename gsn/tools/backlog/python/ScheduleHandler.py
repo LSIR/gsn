@@ -202,6 +202,11 @@ class ScheduleHandlerClass(Thread):
     def connectionToGSNestablished(self):
         self._logger.debug('connection established')
         self._gsnconnected = True
+        self._logger.debug('request schedule from gsn')
+        if self._schedule:
+            self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+        else:
+            self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
         self._connectionEvent.set()
         
         
@@ -379,17 +384,17 @@ class ScheduleHandlerClass(Thread):
             timeout = 0
             self._logger.info('waiting for gsn to answer a schedule request for a maximum of ' + self.getOptionValue('max_gsn_get_schedule_wait_minutes') + ' minutes')
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
-                self._logger.debug('request schedule from gsn')
-                if self._schedule:
-                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
-                else:
-                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
                 self._scheduleEvent.wait(3)
                 if self._scheduleHandlerStop:
                     return
                 if self._scheduleEvent.isSet():
                     self._scheduleEvent.clear()
                     break
+                self._logger.debug('request schedule from gsn')
+                if self._schedule:
+                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+                else:
+                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
                 timeout += 3
             
             if timeout >= int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
