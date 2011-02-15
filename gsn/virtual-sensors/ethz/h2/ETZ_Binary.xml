@@ -8,6 +8,14 @@
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+
+            <field name="FILE_SIZE" type="BIGINT" unit="bytes" />
+            <field name="TRANSMITTED" type="BIGINT" unit="bytes" />
+            <field name="TRANSMISSION_TIME_EFF" type="INTEGER" unit="ms" />
+            <field name="TRANSMISSION_TIME_TOT" type="INTEGER" unit="ms" />
+            <field name="CHUNK_RETRANSMISSIONS" type="INTEGER" />
+            <field name="FILE_QUEUE_SIZE" type="INTEGER" />
+			
             <field name="RELATIVE_FILE" type="VARCHAR(255)" />
             <field name="STORAGE_DIRECTORY" type="VARCHAR(255)" />
             <field name="DATA" type="binary" />

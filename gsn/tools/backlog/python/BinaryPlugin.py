@@ -81,6 +81,7 @@ class BinaryPluginClass(AbstractPluginClass):
     _rootdir
     _filedescriptor
     _watches
+    _resendcounter
     _lastRecvPacketType
     _lastSentPacketType
     
@@ -192,6 +193,7 @@ class BinaryPluginClass(AbstractPluginClass):
         self._filedescriptor = None
         self._waitforack = True
         self._plugStop = False
+        self._resendcounter = 0
 
 
     def getMsgType(self):
@@ -424,8 +426,10 @@ class BinaryPluginClass(AbstractPluginClass):
                         os.chmod(filename, 0744)
                         self._filedescriptor.close()
                         continue
+                    
+                    self._resendcounter = 0
                         
-                    packet = [INIT_PACKET, long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
+                    packet = [INIT_PACKET, len(self._filedeque), self._resendcounter, long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
                     packet.append(filenamenoprefix)
                     packet.append(watch[2])
                     
@@ -449,7 +453,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         self.debug('binary completely sent')
                         
                         # create the crc packet [type, crc]
-                        packet = [CRC_PACKET, struct.unpack('I', struct.pack('i', crc))[0]]
+                        packet = [CRC_PACKET, len(self._filedeque), self._resendcounter, struct.unpack('I', struct.pack('i', crc))[0]]
                         
                         filename = self._filedescriptor.name
                         os.chmod(filename, 0744)
@@ -463,7 +467,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         self._lastSentPacketType = CRC_PACKET
                     else:
                         # create the packet [type, chunk number (4bytes)]
-                        packet = [CHUNK_PACKET, chunkNumber]
+                        packet = [CHUNK_PACKET, len(self._filedeque), self._resendcounter, chunkNumber]
                         packet.append(bytearray(chunk))
                         
                         self._lastSentPacketType = CHUNK_PACKET
@@ -478,6 +482,8 @@ class BinaryPluginClass(AbstractPluginClass):
                 while (not self._work.isSet() or first) and self.isGSNConnected():
                     if not first:
                         self.debug('resend message')
+                        self._resendcounter += 1
+                        packet[2] += 1
                     self._waitforack = True
                     self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
                     # and resend it if no ack has been received
