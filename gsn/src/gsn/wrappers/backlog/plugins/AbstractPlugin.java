@@ -242,7 +242,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * 
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
-	public boolean sendRemote(long timestamp, Serializable[] data, Integer priority) throws Exception {
+	public boolean sendRemote(long timestamp, Serializable[] data, Integer priority) throws IOException {
 		if (priority == null)
 			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, DEFAULT_PRIORITY);
 		else
@@ -277,9 +277,9 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * @return false if not connected to the deployment
 	 * 
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
-	 * 			or the DeviceId does not exist.
+	 * 			or the DeviceId is not connected or does not exist.
 	 */
-	public boolean sendRemote(long timestamp, Serializable[] data, Integer id, Integer priority) throws Exception {
+	public boolean sendRemote(long timestamp, Serializable[] data, Integer id, Integer priority) throws IOException {
 		if (priority == null)
 			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id, DEFAULT_PRIORITY);
 		else

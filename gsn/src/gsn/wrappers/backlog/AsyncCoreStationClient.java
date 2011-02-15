@@ -296,7 +296,7 @@ public class AsyncCoreStationClient extends Thread  {
 			if (!this.isAlive())
 				this.start();
 		} catch (IllegalThreadStateException e) {
-			logger.error("thread already running");
+			logger.debug("thread already running");
 		}
 		
 		try {

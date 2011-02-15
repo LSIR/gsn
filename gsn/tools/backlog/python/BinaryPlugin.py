@@ -253,21 +253,21 @@ class BinaryPluginClass(AbstractPluginClass):
                         self.debug('acknowledge received for init packet')
                         chunkNumber = 0
                     elif ackType == INIT_PACKET and self._lastSentPacketType == CHUNK_PACKET and chunkNumber-1 == 0:
-                        self.info('acknowledge for init packet already received')
+                        self.debug('acknowledge for init packet already received')
                         alreadyReceived = True
                     elif ackType == CHUNK_PACKET and self._lastSentPacketType == CHUNK_PACKET:
                         chkNr = data[2]
                         if chkNr == chunkNumber-1:
                             self.debug('acknowledge for chunk number >' + str(chkNr) + '< received')
                         elif chkNr == chunkNumber-2:
-                            self.info('acknowledge for chunk number >' + str(chkNr) + '< already received')
+                            self.debug('acknowledge for chunk number >' + str(chkNr) + '< already received')
                             alreadyReceived = True
                         else:
                             self.error('acknowledge received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
                             continue
                     elif ackType == CHUNK_PACKET and self._lastSentPacketType == CRC_PACKET:
                         chkNr = data[2]
-                        self.info('acknowledge for chunk number >' + str(chkNr) + '< already received')
+                        self.debug('acknowledge for chunk number >' + str(chkNr) + '< already received')
                         alreadyReceived = True
                     elif ackType == CRC_PACKET and self._lastSentPacketType == CRC_PACKET:
                         if os.path.isfile(filename):
@@ -279,7 +279,7 @@ class BinaryPluginClass(AbstractPluginClass):
                             self.debug('crc acknowledge for ' + filename + ' already received')
                             alreadyReceived = True
                     elif ackType == CRC_PACKET and self._lastSentPacketType == INIT_PACKET:
-                        self.info('acknowledge for crc packet already received')
+                        self.debug('acknowledge for crc packet already received')
                         alreadyReceived = True
                     else:
                         self.error('received acknowledge type >' + str(ackType) + '< does not match the sent packet type >' + str(self._lastSentPacketType) + '<')
@@ -477,7 +477,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 self._work.clear()
                 while (not self._work.isSet() or first) and self.isGSNConnected():
                     if not first:
-                        self.info('resend message')
+                        self.debug('resend message')
                     self._waitforack = True
                     self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
                     # and resend it if no ack has been received

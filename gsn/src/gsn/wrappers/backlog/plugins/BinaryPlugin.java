@@ -765,8 +765,8 @@ class BinarySender extends Thread
 				try {
 					if(!parent.sendRemote(System.currentTimeMillis(), packet, parent.priority))
 						stopSending();
-				} catch (Exception e) {
-					parent.logger.error(e.getMessage(), e);
+				} catch (IOException e) {
+					parent.logger.warn(e.getMessage());
 				}
 			}
 		}
@@ -806,8 +806,8 @@ class BinarySender extends Thread
 			try {
 				Serializable [] ack = {BinaryPlugin.ACK_PACKET, BinaryPlugin.CHUNK_PACKET, ackNr};
 				parent.sendRemote(System.currentTimeMillis(), ack, parent.priority);
-			} catch (Exception e) {
-				parent.logger.error(e.getMessage(), e);
+			} catch (IOException e) {
+				parent.logger.warn(e.getMessage());
 			}
 		}
 	}
@@ -822,8 +822,8 @@ class BinarySender extends Thread
 			Serializable [] packet = {BinaryPlugin.ACK_PACKET, BinaryPlugin.INIT_PACKET};
 			try {
 				parent.sendRemote(System.currentTimeMillis(), packet, parent.priority);
-			} catch (Exception e) {
-				parent.logger.error(e.getMessage(), e);
+			} catch (IOException e) {
+				parent.logger.warn(e.getMessage());
 			}
 		}
 	}
@@ -838,8 +838,8 @@ class BinarySender extends Thread
 			Serializable [] packet = {BinaryPlugin.ACK_PACKET, BinaryPlugin.CRC_PACKET};
 			try {
 				parent.sendRemote(System.currentTimeMillis(), packet, parent.priority);
-			} catch (Exception e) {
-				parent.logger.error(e.getMessage(), e);
+			} catch (IOException e) {
+				parent.logger.warn(e.getMessage());
 			}
 		}
 	}

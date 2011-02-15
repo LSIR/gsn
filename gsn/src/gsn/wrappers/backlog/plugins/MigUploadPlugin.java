@@ -133,8 +133,8 @@ public class MigUploadPlugin extends AbstractPlugin {
 				ret = sendRemote(System.currentTimeMillis(), new Serializable[] {createTOSpacket(moteId, amType, data)}, super.priority);
 				if (logger.isDebugEnabled())
 					logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
-			} catch (Exception e) {
-				logger.error(e.getMessage());
+			} catch (IOException e) {
+				logger.warn(e.getMessage());
 				return false;
 			}
 		}
@@ -144,8 +144,8 @@ public class MigUploadPlugin extends AbstractPlugin {
 				if(packet.length > 0) {
 					try {
 						ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
-					} catch (Exception e) {
-						logger.error(e.getMessage());
+					} catch (IOException e) {
+						logger.warn(e.getMessage());
 						return false;
 					}
 					if (logger.isDebugEnabled())

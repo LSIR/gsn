@@ -1,5 +1,6 @@
 package gsn.wrappers.backlog.plugins;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -87,7 +88,11 @@ public class SchedulePlugin extends AbstractPlugin {
 						if (logger.isDebugEnabled())
 							logger.debug("no new schedule available");
 						Serializable [] pkt = {TYPE_SCHEDULE_SAME};
-						sendRemote(System.currentTimeMillis(), pkt, super.priority);
+						try {
+							sendRemote(System.currentTimeMillis(), pkt, super.priority);
+						} catch (IOException e) {
+							logger.warn(e.getMessage());
+						}
 					}
 					else {
 						// send the new schedule to the deployment
@@ -95,19 +100,27 @@ public class SchedulePlugin extends AbstractPlugin {
 							logger.debug("send new schedule (" + new String(schedule) + ")");
 	
 						Serializable [] pkt = {TYPE_NEW_SCHEDULE, creationtime, schedule};
-						sendRemote(System.currentTimeMillis(), pkt, super.priority);
-						
-						if (transmissiontime == 0) {
-							long time = System.currentTimeMillis();
-							Serializable[] out = {id, creationtime, time, schedule};
-							dataProcessed(time, out);
+						try {
+							sendRemote(System.currentTimeMillis(), pkt, super.priority);
+							
+							if (transmissiontime == 0) {
+								long time = System.currentTimeMillis();
+								Serializable[] out = {id, creationtime, time, schedule};
+								dataProcessed(time, out);
+							}
+						} catch (IOException e) {
+							logger.warn(e.getMessage());
 						}
 					}
 				} else {
-					// we do not have any schedule available in the database
-					Serializable [] pkt = {TYPE_NO_SCHEDULE_AVAILABLE};
-					sendRemote(System.currentTimeMillis(), pkt, super.priority);
-					logger.warn("schedule request received but no schedule available in database");
+					try {
+						// we do not have any schedule available in the database
+						Serializable [] pkt = {TYPE_NO_SCHEDULE_AVAILABLE};
+						sendRemote(System.currentTimeMillis(), pkt, super.priority);
+						logger.warn("schedule request received but no schedule available in database");
+					} catch (IOException e) {
+						logger.warn(e.getMessage());
+					}
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
@@ -143,7 +156,7 @@ public class SchedulePlugin extends AbstractPlugin {
 			// and try to send it to the deployment
 			try {
 				sent = sendRemote(System.currentTimeMillis(), pkt, super.priority);
-			} catch (Exception e) {
+			} catch (IOException e) {
 				logger.warn(e.getMessage());
 			}
 			if (sent) {

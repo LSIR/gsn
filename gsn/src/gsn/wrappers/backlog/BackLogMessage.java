@@ -166,7 +166,7 @@ public class BackLogMessage {
 	 * 
 	 * @throws IOException if the payload is too big
 	 */
-	public BackLogMessage(byte type, long timestamp, Serializable[] payload) throws Exception {
+	public BackLogMessage(byte type, long timestamp, Serializable[] payload) throws IOException, NullPointerException {
 		if( payload == null )
 			throw new NullPointerException("The payload should not be null");
 		

@@ -291,8 +291,8 @@ public class MigMessagePlugin extends AbstractPlugin
 				ret = sendRemote(System.currentTimeMillis(), new Serializable[] {createTOSpacket(moteId, amType, data)}, super.priority);
 				if (logger.isDebugEnabled())
 					logger.debug("Mig message sent to destination " + moteId + " with AM type " + amType);
-			} catch (Exception e) {
-				logger.error(e.getMessage());
+			} catch (IOException e) {
+				logger.warn(e.getMessage());
 			}
 		}
 		else if( action.compareToIgnoreCase("binary_packet") == 0 ) {
@@ -303,8 +303,8 @@ public class MigMessagePlugin extends AbstractPlugin
 						ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
 						if (logger.isDebugEnabled())
 							logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
-					} catch (Exception e) {
-						logger.error(e.getMessage());
+					} catch (IOException e) {
+						logger.warn(e.getMessage());
 					}
 				}
 				else {
@@ -366,7 +366,11 @@ public class MigMessagePlugin extends AbstractPlugin
 					net.tinyos.message.Message tosmsg = (net.tinyos.message.Message)msg;
 					packet = createTOSpacket(0xffff, tosmsg.amType(), tosmsg.dataGet());
 				}
-				ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
+				try {
+					ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
+				} catch (IOException e) {
+					logger.warn(e.getMessage());
+				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				return false;

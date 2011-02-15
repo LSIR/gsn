@@ -1,5 +1,6 @@
 package gsn.wrappers.backlog.plugins;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Hashtable;
 
@@ -216,8 +217,8 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 					logger.warn("Upload command (resend backlogged data)");
 					return false;
 				}
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+			} catch (IOException e) {
+				logger.warn(e.getMessage());
 			}
 		}
 		
