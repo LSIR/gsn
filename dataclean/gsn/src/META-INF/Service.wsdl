@@ -1,0 +1,1465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://tempuri.org/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s1="http://microsoft.com/wsdl/types/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:import namespace="http://microsoft.com/wsdl/types/"/>
+      <s:element name="GetPassCode">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="userName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="password" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPassCodeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="1" name="GetPassCodeResult" type="s1:guid"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DebugUserManager">
+        <s:complexType/>
+      </s:element>
+      <s:element name="DebugUserManagerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="DebugUserManagerResult" type="tns:ArrayOfString"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element maxOccurs="unbounded" minOccurs="0" name="string" nillable="true" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="CreateSensorType">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorType" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="uri" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CreateSensorTypeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="CreateSensorTypeResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CreateVectorSensorType">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="vectorType" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="componentTypes" type="tns:ArrayOfString"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CreateVectorSensorTypeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="CreateVectorSensorTypeResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="InsertSensor">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="Sensor" type="tns:SensorInfo"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="SensorInfo">
+        <s:sequence>
+          <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+          <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+          <s:element maxOccurs="1" minOccurs="1" name="longitude" type="s:double"/>
+          <s:element maxOccurs="1" minOccurs="1" name="latitude" type="s:double"/>
+          <s:element maxOccurs="1" minOccurs="1" name="altitude" type="s:double"/>
+          <s:element maxOccurs="1" minOccurs="0" name="unit" type="s:string"/>
+          <s:element maxOccurs="1" minOccurs="0" name="sensorType" type="s:string"/>
+          <s:element maxOccurs="1" minOccurs="0" name="url" type="s:string"/>
+          <s:element maxOccurs="1" minOccurs="0" name="keywords" type="s:string"/>
+          <s:element maxOccurs="1" minOccurs="0" name="description" type="s:string"/>
+          <s:element maxOccurs="1" minOccurs="0" name="dataType" type="s:string"/>
+          <s:element maxOccurs="1" minOccurs="1" name="samplingPeriod" type="s:double"/>
+          <s:element maxOccurs="1" minOccurs="1" name="reportPeriod" type="s:double"/>
+          <s:element maxOccurs="1" minOccurs="1" name="entryTime" type="s:dateTime"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="InsertSensorResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="InsertSensorResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="InsertVectorSensor">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="Sensor" type="tns:SensorInfo"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="InsertVectorSensorResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="InsertVectorSensorResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteSensor">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteSensorResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="DeleteSensorResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteVectorSensor">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorType" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteVectorSensorResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="DeleteVectorSensorResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSensorDescriptionByName">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSensorDescriptionByNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="GetSensorDescriptionByNameResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSensorsByPublisher">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSensorsByPublisherResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="GetSensorsByPublisherResult" type="tns:ArrayOfSensorInfo"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfSensorInfo">
+        <s:sequence>
+          <s:element maxOccurs="unbounded" minOccurs="0" name="SensorInfo" nillable="true" type="tns:SensorInfo"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="UpdateSensorLocation">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="latitude" type="s:double"/>
+            <s:element maxOccurs="1" minOccurs="1" name="longitude" type="s:double"/>
+            <s:element maxOccurs="1" minOccurs="1" name="altitude" type="s:double"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateSensorLocationResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="UpdateSensorLocationResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SensorsInsidePolygon">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="polygon" type="tns:ArrayOfPointF"/>
+            <s:element maxOccurs="1" minOccurs="0" name="viewport" type="tns:ArrayOfPointF"/>
+            <s:element maxOccurs="1" minOccurs="0" name="searchStr" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorTypes" type="tns:ArrayOfSensorTypeEnum"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfPointF">
+        <s:sequence>
+          <s:element maxOccurs="unbounded" minOccurs="0" name="PointF" nillable="true" type="tns:PointF"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="PointF">
+        <s:sequence>
+          <s:element maxOccurs="1" minOccurs="1" name="x" type="s:double"/>
+          <s:element maxOccurs="1" minOccurs="1" name="y" type="s:double"/>
+          <s:element maxOccurs="1" minOccurs="1" name="lat" type="s:double"/>
+          <s:element maxOccurs="1" minOccurs="1" name="lon" type="s:double"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfSensorTypeEnum">
+        <s:sequence>
+          <s:element maxOccurs="unbounded" minOccurs="0" name="SensorTypeEnum" type="tns:SensorTypeEnum"/>
+        </s:sequence>
+      </s:complexType>
+      <s:simpleType name="SensorTypeEnum">
+        <s:restriction base="s:string">
+          <s:enumeration value="Unknown"/>
+          <s:enumeration value="Generic"/>
+          <s:enumeration value="Temperature"/>
+          <s:enumeration value="Video"/>
+          <s:enumeration value="Traffic"/>
+          <s:enumeration value="Parking"/>
+          <s:enumeration value="Pressure"/>
+          <s:enumeration value="Humidity"/>
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="SensorsInsidePolygonResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="SensorsInsidePolygonResult" type="tns:ArrayOfSensorInfo"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DebugVectorSensorManager">
+        <s:complexType/>
+      </s:element>
+      <s:element name="DebugVectorSensorManagerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="DebugVectorSensorManagerResult" type="tns:ArrayOfString"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DebugSensorManager">
+        <s:complexType/>
+      </s:element>
+      <s:element name="DebugSensorManagerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="DebugSensorManagerResult" type="tns:ArrayOfString"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreScalarData">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="data" type="tns:SensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="SensorData">
+        <s:sequence>
+          <s:element maxOccurs="1" minOccurs="1" name="Timestamp" type="s:dateTime"/>
+          <s:element maxOccurs="1" minOccurs="0" name="Timeseries" type="tns:ArrayOfDateTime"/>
+          <s:element maxOccurs="1" minOccurs="0" name="Data"/>
+          <s:element maxOccurs="1" minOccurs="1" name="SensorType" type="s:int"/>
+          <s:element maxOccurs="1" minOccurs="0" name="SensorTypeString" type="s:string"/>
+          <s:element maxOccurs="1" minOccurs="1" name="DataType" type="tns:DataType"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfDateTime">
+        <s:sequence>
+          <s:element maxOccurs="unbounded" minOccurs="0" name="dateTime" type="s:dateTime"/>
+        </s:sequence>
+      </s:complexType>
+      <s:simpleType name="DataType">
+        <s:restriction base="s:string">
+          <s:enumeration value="Unknown"/>
+          <s:enumeration value="Scalar"/>
+          <s:enumeration value="BMP"/>
+          <s:enumeration value="JPG"/>
+          <s:enumeration value="GIF"/>
+          <s:enumeration value="VECTOR"/>
+          <s:enumeration value="HTML"/>
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="StoreScalarDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="StoreScalarDataResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreScalarDataBatch">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherNames" type="tns:ArrayOfString"/>
+            <s:element maxOccurs="1" minOccurs="0" name="passCodes" type="tns:ArrayOfGuid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorNames" type="tns:ArrayOfString"/>
+            <s:element maxOccurs="1" minOccurs="0" name="data" type="tns:ArrayOfSensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfGuid">
+        <s:sequence>
+          <s:element maxOccurs="unbounded" minOccurs="0" name="guid" type="s1:guid"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfSensorData">
+        <s:sequence>
+          <s:element maxOccurs="unbounded" minOccurs="0" name="SensorData" nillable="true" type="tns:SensorData"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="StoreScalarDataBatchResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="StoreScalarDataBatchResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetLatestScalarData">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetLatestScalarDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="GetLatestScalarDataResult" type="tns:SensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetScalarData">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="startTime" type="s:dateTime"/>
+            <s:element maxOccurs="1" minOccurs="1" name="endTime" type="s:dateTime"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetScalarDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="GetScalarDataResult" type="tns:SensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetLatestScalarDataBatch">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherNames" type="tns:ArrayOfString"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorNames" type="tns:ArrayOfString"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetLatestScalarDataBatchResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="GetLatestScalarDataBatchResult" type="tns:ArrayOfSensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreVectorData">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="data" type="tns:SensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreVectorDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="StoreVectorDataResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreVectorComponentData">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="componentIndex" type="s:int"/>
+            <s:element maxOccurs="1" minOccurs="0" name="data" type="tns:SensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreVectorComponentDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="StoreVectorComponentDataResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetVectorData">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="vectorType" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetVectorDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="GetVectorDataResult" type="tns:ArrayOfSensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetVectorComponentData">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="componentIndex" type="s:int"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetVectorComponentDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="GetVectorComponentDataResult" type="tns:SensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreBinaryData">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="passCode" type="s1:guid"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="data" type="tns:SensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="StoreBinaryDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="StoreBinaryDataResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetLatestBinarySensorData">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="publisherName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="0" name="sensorName" type="s:string"/>
+            <s:element maxOccurs="1" minOccurs="1" name="type" type="tns:DataType"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetLatestBinarySensorDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="GetLatestBinarySensorDataResult" type="tns:SensorData"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DebugScalarDataManager">
+        <s:complexType/>
+      </s:element>
+      <s:element name="DebugScalarDataManagerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="DebugScalarDataManagerResult" type="tns:ArrayOfString"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DebugBinaryDataManager">
+        <s:complexType/>
+      </s:element>
+      <s:element name="DebugBinaryDataManagerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="DebugBinaryDataManagerResult" type="tns:ArrayOfString"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DebugVectorDataManager">
+        <s:complexType/>
+      </s:element>
+      <s:element name="DebugVectorDataManagerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element maxOccurs="1" minOccurs="0" name="DebugVectorDataManagerResult" type="tns:ArrayOfString"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://microsoft.com/wsdl/types/">
+      <s:simpleType name="guid">
+        <s:restriction base="s:string">
+          <s:pattern value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"/>
+        </s:restriction>
+      </s:simpleType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetPassCodeSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPassCode">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreScalarDataBatchSoapIn">
+    <wsdl:part name="parameters" element="tns:StoreScalarDataBatch">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugUserManagerSoapOut">
+    <wsdl:part name="parameters" element="tns:DebugUserManagerResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InsertVectorSensorSoapOut">
+    <wsdl:part name="parameters" element="tns:InsertVectorSensorResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CreateSensorTypeSoapIn">
+    <wsdl:part name="parameters" element="tns:CreateSensorType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InsertSensorSoapOut">
+    <wsdl:part name="parameters" element="tns:InsertSensorResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetScalarDataSoapOut">
+    <wsdl:part name="parameters" element="tns:GetScalarDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVectorDataSoapIn">
+    <wsdl:part name="parameters" element="tns:GetVectorData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugBinaryDataManagerSoapIn">
+    <wsdl:part name="parameters" element="tns:DebugBinaryDataManager">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugVectorDataManagerSoapIn">
+    <wsdl:part name="parameters" element="tns:DebugVectorDataManager">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetLatestBinarySensorDataSoapOut">
+    <wsdl:part name="parameters" element="tns:GetLatestBinarySensorDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetLatestScalarDataBatchSoapOut">
+    <wsdl:part name="parameters" element="tns:GetLatestScalarDataBatchResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreVectorDataSoapOut">
+    <wsdl:part name="parameters" element="tns:StoreVectorDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugUserManagerSoapIn">
+    <wsdl:part name="parameters" element="tns:DebugUserManager">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetScalarDataSoapIn">
+    <wsdl:part name="parameters" element="tns:GetScalarData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreBinaryDataSoapOut">
+    <wsdl:part name="parameters" element="tns:StoreBinaryDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugVectorSensorManagerSoapIn">
+    <wsdl:part name="parameters" element="tns:DebugVectorSensorManager">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteVectorSensorSoapIn">
+    <wsdl:part name="parameters" element="tns:DeleteVectorSensor">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CreateVectorSensorTypeSoapOut">
+    <wsdl:part name="parameters" element="tns:CreateVectorSensorTypeResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetLatestScalarDataBatchSoapIn">
+    <wsdl:part name="parameters" element="tns:GetLatestScalarDataBatch">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreVectorComponentDataSoapOut">
+    <wsdl:part name="parameters" element="tns:StoreVectorComponentDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreBinaryDataSoapIn">
+    <wsdl:part name="parameters" element="tns:StoreBinaryData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugSensorManagerSoapOut">
+    <wsdl:part name="parameters" element="tns:DebugSensorManagerResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugVectorDataManagerSoapOut">
+    <wsdl:part name="parameters" element="tns:DebugVectorDataManagerResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugBinaryDataManagerSoapOut">
+    <wsdl:part name="parameters" element="tns:DebugBinaryDataManagerResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugSensorManagerSoapIn">
+    <wsdl:part name="parameters" element="tns:DebugSensorManager">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InsertVectorSensorSoapIn">
+    <wsdl:part name="parameters" element="tns:InsertVectorSensor">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetLatestScalarDataSoapOut">
+    <wsdl:part name="parameters" element="tns:GetLatestScalarDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreScalarDataBatchSoapOut">
+    <wsdl:part name="parameters" element="tns:StoreScalarDataBatchResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetSensorDescriptionByNameSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSensorDescriptionByNameResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CreateVectorSensorTypeSoapIn">
+    <wsdl:part name="parameters" element="tns:CreateVectorSensorType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InsertSensorSoapIn">
+    <wsdl:part name="parameters" element="tns:InsertSensor">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetPassCodeSoapOut">
+    <wsdl:part name="parameters" element="tns:GetPassCodeResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CreateSensorTypeSoapOut">
+    <wsdl:part name="parameters" element="tns:CreateSensorTypeResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVectorDataSoapOut">
+    <wsdl:part name="parameters" element="tns:GetVectorDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreScalarDataSoapOut">
+    <wsdl:part name="parameters" element="tns:StoreScalarDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetLatestBinarySensorDataSoapIn">
+    <wsdl:part name="parameters" element="tns:GetLatestBinarySensorData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteVectorSensorSoapOut">
+    <wsdl:part name="parameters" element="tns:DeleteVectorSensorResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugScalarDataManagerSoapOut">
+    <wsdl:part name="parameters" element="tns:DebugScalarDataManagerResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteSensorSoapIn">
+    <wsdl:part name="parameters" element="tns:DeleteSensor">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetSensorsByPublisherSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSensorsByPublisherResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVectorComponentDataSoapOut">
+    <wsdl:part name="parameters" element="tns:GetVectorComponentDataResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SensorsInsidePolygonSoapIn">
+    <wsdl:part name="parameters" element="tns:SensorsInsidePolygon">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugScalarDataManagerSoapIn">
+    <wsdl:part name="parameters" element="tns:DebugScalarDataManager">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetVectorComponentDataSoapIn">
+    <wsdl:part name="parameters" element="tns:GetVectorComponentData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreVectorComponentDataSoapIn">
+    <wsdl:part name="parameters" element="tns:StoreVectorComponentData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DebugVectorSensorManagerSoapOut">
+    <wsdl:part name="parameters" element="tns:DebugVectorSensorManagerResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetSensorsByPublisherSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSensorsByPublisher">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetSensorDescriptionByNameSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSensorDescriptionByName">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SensorsInsidePolygonSoapOut">
+    <wsdl:part name="parameters" element="tns:SensorsInsidePolygonResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateSensorLocationSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateSensorLocation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetLatestScalarDataSoapIn">
+    <wsdl:part name="parameters" element="tns:GetLatestScalarData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreScalarDataSoapIn">
+    <wsdl:part name="parameters" element="tns:StoreScalarData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="StoreVectorDataSoapIn">
+    <wsdl:part name="parameters" element="tns:StoreVectorData">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteSensorSoapOut">
+    <wsdl:part name="parameters" element="tns:DeleteSensorResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="UpdateSensorLocationSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateSensorLocationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ServiceSoap">
+    <wsdl:operation name="GetPassCode">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Authenticates a user and gets a token that he can use in place of password for certain period.</wsdl:documentation>
+      <wsdl:input message="tns:GetPassCodeSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetPassCodeSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugUserManager">
+      <wsdl:input message="tns:DebugUserManagerSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:DebugUserManagerSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateSensorType">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Dynamically creates a new sensor type</wsdl:documentation>
+      <wsdl:input message="tns:CreateSensorTypeSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:CreateSensorTypeSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateVectorSensorType">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Dynamically creates a new vector sensor type</wsdl:documentation>
+      <wsdl:input message="tns:CreateVectorSensorTypeSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:CreateVectorSensorTypeSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InsertSensor">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Registers a new sensor</wsdl:documentation>
+      <wsdl:input message="tns:InsertSensorSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:InsertSensorSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InsertVectorSensor">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Registers a new sensor</wsdl:documentation>
+      <wsdl:input message="tns:InsertVectorSensorSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:InsertVectorSensorSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteSensor">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Deletes an existing sensor</wsdl:documentation>
+      <wsdl:input message="tns:DeleteSensorSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:DeleteSensorSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteVectorSensor">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Deletes an existing sensor</wsdl:documentation>
+      <wsdl:input message="tns:DeleteVectorSensorSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:DeleteVectorSensorSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSensorDescriptionByName">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Retreives metadata of an existing sensor</wsdl:documentation>
+      <wsdl:input message="tns:GetSensorDescriptionByNameSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetSensorDescriptionByNameSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSensorsByPublisher">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns metadata of all the sensors published by a given publisher</wsdl:documentation>
+      <wsdl:input message="tns:GetSensorsByPublisherSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetSensorsByPublisherSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSensorLocation">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Modifies location of a sensor</wsdl:documentation>
+      <wsdl:input message="tns:UpdateSensorLocationSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:UpdateSensorLocationSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SensorsInsidePolygon">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns all the sensors within a polygon. Use the null to ignore some parameter.</wsdl:documentation>
+      <wsdl:input message="tns:SensorsInsidePolygonSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:SensorsInsidePolygonSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugVectorSensorManager">
+      <wsdl:input message="tns:DebugVectorSensorManagerSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:DebugVectorSensorManagerSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugSensorManager">
+      <wsdl:input message="tns:DebugSensorManagerSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:DebugSensorManagerSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreScalarData">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Stores a sensordata in datahub</wsdl:documentation>
+      <wsdl:input message="tns:StoreScalarDataSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:StoreScalarDataSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreScalarDataBatch">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Stores a series of sensor data in datahub</wsdl:documentation>
+      <wsdl:input message="tns:StoreScalarDataBatchSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:StoreScalarDataBatchSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLatestScalarData">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Gets the latest data published by a sensor</wsdl:documentation>
+      <wsdl:input message="tns:GetLatestScalarDataSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetLatestScalarDataSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetScalarData">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Gets the data published by a sensor within a specified time window</wsdl:documentation>
+      <wsdl:input message="tns:GetScalarDataSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetScalarDataSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLatestScalarDataBatch">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Gets latest data published by a set of sensors</wsdl:documentation>
+      <wsdl:input message="tns:GetLatestScalarDataBatchSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetLatestScalarDataBatchSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreVectorData">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Stores data from a vector sensor</wsdl:documentation>
+      <wsdl:input message="tns:StoreVectorDataSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:StoreVectorDataSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreVectorComponentData">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Stores data from one component sensor of a vector sensor</wsdl:documentation>
+      <wsdl:input message="tns:StoreVectorComponentDataSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:StoreVectorComponentDataSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVectorData">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Gets data from a vector sensor</wsdl:documentation>
+      <wsdl:input message="tns:GetVectorDataSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetVectorDataSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVectorComponentData">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Gets data from one component sensor of a vector sensor</wsdl:documentation>
+      <wsdl:input message="tns:GetVectorComponentDataSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetVectorComponentDataSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreBinaryData">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Send binary sensor data such as images, sound or video. Data are treated as a binary file. Time parameter is the time stamp of the first data.</wsdl:documentation>
+      <wsdl:input message="tns:StoreBinaryDataSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:StoreBinaryDataSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLatestBinarySensorData">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns the latest image data reported by a sensor</wsdl:documentation>
+      <wsdl:input message="tns:GetLatestBinarySensorDataSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetLatestBinarySensorDataSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugScalarDataManager">
+      <wsdl:input message="tns:DebugScalarDataManagerSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:DebugScalarDataManagerSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugBinaryDataManager">
+      <wsdl:input message="tns:DebugBinaryDataManagerSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:DebugBinaryDataManagerSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugVectorDataManager">
+      <wsdl:input message="tns:DebugVectorDataManagerSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:DebugVectorDataManagerSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServiceSoap" type="tns:ServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetPassCode">
+      <soap:operation soapAction="http://tempuri.org/GetPassCode" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugUserManager">
+      <soap:operation soapAction="http://tempuri.org/DebugUserManager" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateSensorType">
+      <soap:operation soapAction="http://tempuri.org/CreateSensorType" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateVectorSensorType">
+      <soap:operation soapAction="http://tempuri.org/CreateVectorSensorType" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InsertSensor">
+      <soap:operation soapAction="http://tempuri.org/InsertSensor" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InsertVectorSensor">
+      <soap:operation soapAction="http://tempuri.org/InsertVectorSensor" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteSensor">
+      <soap:operation soapAction="http://tempuri.org/DeleteSensor" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteVectorSensor">
+      <soap:operation soapAction="http://tempuri.org/DeleteVectorSensor" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSensorDescriptionByName">
+      <soap:operation soapAction="http://tempuri.org/GetSensorDescriptionByName" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSensorsByPublisher">
+      <soap:operation soapAction="http://tempuri.org/GetSensorsByPublisher" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSensorLocation">
+      <soap:operation soapAction="http://tempuri.org/UpdateSensorLocation" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SensorsInsidePolygon">
+      <soap:operation soapAction="http://tempuri.org/SensorsInsidePolygon" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugVectorSensorManager">
+      <soap:operation soapAction="http://tempuri.org/DebugVectorSensorManager" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugSensorManager">
+      <soap:operation soapAction="http://tempuri.org/DebugSensorManager" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreScalarData">
+      <soap:operation soapAction="http://tempuri.org/StoreScalarData" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreScalarDataBatch">
+      <soap:operation soapAction="http://tempuri.org/StoreScalarDataBatch" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLatestScalarData">
+      <soap:operation soapAction="http://tempuri.org/GetLatestScalarData" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetScalarData">
+      <soap:operation soapAction="http://tempuri.org/GetScalarData" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLatestScalarDataBatch">
+      <soap:operation soapAction="http://tempuri.org/GetLatestScalarDataBatch" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreVectorData">
+      <soap:operation soapAction="http://tempuri.org/StoreVectorData" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreVectorComponentData">
+      <soap:operation soapAction="http://tempuri.org/StoreVectorComponentData" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVectorData">
+      <soap:operation soapAction="http://tempuri.org/GetVectorData" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVectorComponentData">
+      <soap:operation soapAction="http://tempuri.org/GetVectorComponentData" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreBinaryData">
+      <soap:operation soapAction="http://tempuri.org/StoreBinaryData" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLatestBinarySensorData">
+      <soap:operation soapAction="http://tempuri.org/GetLatestBinarySensorData" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugScalarDataManager">
+      <soap:operation soapAction="http://tempuri.org/DebugScalarDataManager" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugBinaryDataManager">
+      <soap:operation soapAction="http://tempuri.org/DebugBinaryDataManager" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugVectorDataManager">
+      <soap:operation soapAction="http://tempuri.org/DebugVectorDataManager" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceSoap12" type="tns:ServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetPassCode">
+      <soap12:operation soapAction="http://tempuri.org/GetPassCode" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugUserManager">
+      <soap12:operation soapAction="http://tempuri.org/DebugUserManager" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateSensorType">
+      <soap12:operation soapAction="http://tempuri.org/CreateSensorType" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateVectorSensorType">
+      <soap12:operation soapAction="http://tempuri.org/CreateVectorSensorType" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InsertSensor">
+      <soap12:operation soapAction="http://tempuri.org/InsertSensor" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InsertVectorSensor">
+      <soap12:operation soapAction="http://tempuri.org/InsertVectorSensor" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteSensor">
+      <soap12:operation soapAction="http://tempuri.org/DeleteSensor" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteVectorSensor">
+      <soap12:operation soapAction="http://tempuri.org/DeleteVectorSensor" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSensorDescriptionByName">
+      <soap12:operation soapAction="http://tempuri.org/GetSensorDescriptionByName" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSensorsByPublisher">
+      <soap12:operation soapAction="http://tempuri.org/GetSensorsByPublisher" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSensorLocation">
+      <soap12:operation soapAction="http://tempuri.org/UpdateSensorLocation" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SensorsInsidePolygon">
+      <soap12:operation soapAction="http://tempuri.org/SensorsInsidePolygon" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugVectorSensorManager">
+      <soap12:operation soapAction="http://tempuri.org/DebugVectorSensorManager" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugSensorManager">
+      <soap12:operation soapAction="http://tempuri.org/DebugSensorManager" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreScalarData">
+      <soap12:operation soapAction="http://tempuri.org/StoreScalarData" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreScalarDataBatch">
+      <soap12:operation soapAction="http://tempuri.org/StoreScalarDataBatch" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLatestScalarData">
+      <soap12:operation soapAction="http://tempuri.org/GetLatestScalarData" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetScalarData">
+      <soap12:operation soapAction="http://tempuri.org/GetScalarData" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLatestScalarDataBatch">
+      <soap12:operation soapAction="http://tempuri.org/GetLatestScalarDataBatch" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreVectorData">
+      <soap12:operation soapAction="http://tempuri.org/StoreVectorData" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreVectorComponentData">
+      <soap12:operation soapAction="http://tempuri.org/StoreVectorComponentData" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVectorData">
+      <soap12:operation soapAction="http://tempuri.org/GetVectorData" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVectorComponentData">
+      <soap12:operation soapAction="http://tempuri.org/GetVectorComponentData" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StoreBinaryData">
+      <soap12:operation soapAction="http://tempuri.org/StoreBinaryData" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLatestBinarySensorData">
+      <soap12:operation soapAction="http://tempuri.org/GetLatestBinarySensorData" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugScalarDataManager">
+      <soap12:operation soapAction="http://tempuri.org/DebugScalarDataManager" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugBinaryDataManager">
+      <soap12:operation soapAction="http://tempuri.org/DebugBinaryDataManager" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DebugVectorDataManager">
+      <soap12:operation soapAction="http://tempuri.org/DebugVectorDataManager" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service">
+    <wsdl:port name="ServiceSoap" binding="tns:ServiceSoap">
+      <soap:address location="http://atom.research.microsoft.com/SenseWebV3/DataHub/Service.asmx"/>
+    </wsdl:port>
+    <wsdl:port name="ServiceSoap12" binding="tns:ServiceSoap12">
+      <soap12:address location="http://atom.research.microsoft.com/SenseWebV3/DataHub/Service.asmx"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

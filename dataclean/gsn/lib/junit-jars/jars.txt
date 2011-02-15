@@ -1,0 +1,13 @@
+Jars used:
+
+(runtime)
+junit   3.8
+servlet 2.3
+xerces  2.5
+jtidy   04aug2000r7
+rhino   1.5R4.1
+NekoHTML 0.9.1
+
+(for testing HttpUnit only)
+mail        (javamail 1.2)
+activation  (jaf 1.0.1)

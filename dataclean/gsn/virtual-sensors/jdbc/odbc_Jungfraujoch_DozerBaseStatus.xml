@@ -1,0 +1,41 @@
+<virtual-sensor name="odbc_Jungfraujoch_Dozer_Base_Status" priority="10">
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="GEN_TIME" type="BIGINT"/>
+            <field name="HEADER_SEQNR" type="INTEGER"/>
+            <field name="HEADER_ORIGINATORID" type="INTEGER"/>
+            <field name="HEADER_ATIME_HIGH" type="SMALLINT"/>
+            <field name="HEADER_ATIME_LOW" type="INTEGER"/>
+            <field name="PAYLOAD_UPTIME_HIGH" type="SMALLINT"/>
+            <field name="PAYLOAD_UPTIME_LOW" type="INTEGER"/>
+            <field name="PAYLOAD_TEMPERATURE" type="INTEGER"/>
+            <field name="PAYLOAD_MSPTEMPERATURE" type="INTEGER"/>
+            <field name="PAYLOAD_MSPVOLTAGE" type="INTEGER"/>
+            <field name="PAYLOAD_SAMPLENO" type="INTEGER"/>
+            <field name="PAYLOAD_RSSI" type="SMALLINT"/>
+            <field name="PAYLOAD_QUEUESIZE" type="SMALLINT"/>
+            <field name="PAYLOAD_PACKETSRECEIVED" type="INTEGER"/>
+            <field name="PAYLOAD_PACKETSSENT" type="INTEGER"/>
+            <field name="PAYLOAD_HUMIDITY" type="INTEGER"/>
+            <field name="PAYLOAD_CHILDCOUNT" type="SMALLINT"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerBaseStatusMsg) from Jungfraujoch deployment</description>
+    <life-cycle pool-size="10"/>
+    <addressing/>
+    <storage/>
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="jdbc">
+                    <predicate key="table-name">permasense.Jungfraujoch_DozerBaseStatus_3933</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query>select * from wrapper</query>
+            </source>
+            <query>select * from source</query>
+        </stream>
+    </streams>
+</virtual-sensor>

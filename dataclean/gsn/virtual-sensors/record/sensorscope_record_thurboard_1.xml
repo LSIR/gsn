@@ -1,0 +1,60 @@
+<virtual-sensor name="record_sensorscope_1" priority="10" >
+	<processing-class>
+		<class-name>gsn.vsensor.SensorscopeVS</class-name>
+		<output-structure>
+			<field name="REPORTERID"		type="SMALLINT" />
+			<field name="TIMESTAMP"			type="BIGINT" />
+			<field name="WINDSPEED"			type="DOUBLE" />
+			<field name="WINDDIRECTION"		type="DOUBLE" />
+			<field name="SOLARRADIATION"	type="DOUBLE" />
+			<field name="SOILCONDUCTIVITY1"	type="DOUBLE" />
+			<field name="SOILCONDUCTIVITY2"	type="DOUBLE" />
+			<field name="SOILCONDUCTIVITY3"	type="DOUBLE" />
+			<field name="SOILMOISTURE1"		type="SMALLINT" />
+			<field name="SOILMOISTURE2"		type="SMALLINT" />
+			<field name="SOILMOISTURE3"		type="SMALLINT" />
+			<field name="SOILTEMPERATURE1"	type="DOUBLE" />
+			<field name="SOILTEMPERATURE2"	type="DOUBLE" />
+			<field name="SOILTEMPERATURE3"	type="DOUBLE" />
+		</output-structure>
+	</processing-class>
+	<description>Node 1 from the Record Sensorscope deployment</description>
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">Node 1 from the Record Sensorscope deployment</predicate>
+		<predicate key="LATITUDE">47.591567</predicate>
+		<predicate key="LONGITUDE">8.770053</predicate>
+	</addressing>
+	<storage />
+	<streams>
+    	<stream name="data">
+			<source alias="record" storage-size="1" sampling-rate="1">
+				<address wrapper="ss_tinyos-mig">
+					<predicate key="ss-host">localhost</predicate>
+					<predicate key="ss-port">25000</predicate>
+					<predicate key="continue-on-error">true</predicate>
+					<predicate key="wrapper-name">mig2</predicate>
+					<predicate key="wrapper-keep-processed-ss-entries">false</predicate>
+					<predicate key="source">sf@micssrv32.epfl.ch:2106</predicate>
+					<predicate key="message-classname">gsn.wrappers.tinyos.ThurBoard1Data</predicate>
+				</address>
+				<query>select * from wrapper where REPORTER_ID = 1</query>
+			</source>
+			<query>select TIMED							AS TIMED,
+						  REPORTER_ID					AS REPORTERID,
+						  TIMESTAMP						AS TIMESTAMP,
+						  WIND_SPEED					AS WINDSPEED,
+						  WIND_DIRECTION				AS WINDDIRECTION,
+						  SOLAR_RADIATION				AS SOLARRADIATION,
+			              SOIL_CONDUCTIVITY_1 			AS SOILCONDUCTIVITY1,
+			              SOIL_CONDUCTIVITY_2			AS SOILCONDUCTIVITY2,
+			              SOIL_CONDUCTIVITY_3			AS SOILCONDUCTIVITY3,
+			              SOIL_MOISTURE_1				AS SOILMOISTURE1,
+			              SOIL_MOISTURE_2				AS SOILMOISTURE2,
+			              SOIL_MOISTURE_3				AS SOILMOISTURE3,
+			              SOIL_TEMPERATURE_1			AS SOILTEMPERATURE1,
+			              SOIL_TEMPERATURE_2			AS SOILTEMPERATURE2,
+			              SOIL_TEMPERATURE_3			AS SOILTEMPERATURE3 from record</query>
+		</stream>
+	</streams>
+</virtual-sensor>

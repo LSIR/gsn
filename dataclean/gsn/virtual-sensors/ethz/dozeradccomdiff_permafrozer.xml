@@ -1,0 +1,48 @@
+<virtual-sensor name="Permafrozer_Dozer_AdcComDiff_1410" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>true</unique-timestamps>
+        <output-structure>
+                <field name="SEQNR" type="INTEGER" />
+                <field name="ORIGINATORID" type="INTEGER" />
+
+                <field name="ATIME" type="INTEGER" />
+                <field name="GENTIME" type="BIGINT" />
+
+                <field name="SAMPLENO" type="INTEGER" />
+
+                <field name="SIBADCDIFF0" type="INTEGER" />
+                <field name="SIBADCDIFF1" type="INTEGER" />
+                <field name="SIBADCDIFF2" type="INTEGER" />
+                <field name="SIBADCDIFF3" type="INTEGER" />
+
+                <field name="SIBADCCOM0" type="INTEGER" />
+                <field name="SIBADCCOM1" type="INTEGER" />
+                <field name="SIBADCCOM2" type="INTEGER" />
+
+                <field name="TIMESTAMP" type="BIGINT" />
+       </output-structure>
+    </processing-class>
+    <description>sensor node packets (differential ADC sampling with SIB) from permafrozer WSN </description>
+    <life-cycle pool-size="10" />
+    <addressing/>
+    <storage />
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="ss_tinyos-mig">
+          <predicate key="ss-host">localhost</predicate>
+          <predicate key="ss-port">25000</predicate>
+          <predicate key="continue-on-error">true</predicate>
+          <predicate key="wrapper-name">mig2</predicate>
+          <predicate key="wrapper-keep-processed-ss-entries">false</predicate>
+          <predicate key="source">sf@permafrozer.ethz.ch:9001</predicate>
+          <predicate key="message-classname">ch.ethz.permafrozer.DozerAdcComDiffMsg</predicate>
+          <predicate key="getter-prefix">get</predicate>
+        </address>
+        <query> select * from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor>

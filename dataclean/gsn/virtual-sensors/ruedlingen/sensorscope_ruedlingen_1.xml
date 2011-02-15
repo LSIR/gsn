@@ -1,0 +1,87 @@
+<virtual-sensor name="ruedlingen_sensorscope_s1" priority="10" >
+	<processing-class>
+		<class-name>gsn.vsensor.SensorscopeVS</class-name>
+		<init-params>
+            <param name="sampling">30000</param>
+			<!-- If you want to rename any field in the output structure,
+			you need to uncomment it and rename it here too.
+			Field names in the query should also be renamed -->
+			<!--<param name="NTWSENDERID">NTWSENDERID</param> -->
+    		<!-- <param name="NTWDISTTOBS">NTWDISTTOBS</param> -->
+			<!-- <param name="TSPHOPCOUNT">TSPHOPCOUNT</param> -->
+			<!-- <param name="TSPPACKETSN">TSPPACKETSN</param> -->
+			<!-- <param name="REPORTERID">REPORTERID</param> -->
+			<!-- <param name="TIMESTAMP">TIMESTAMP</param> -->
+			<!-- <param name="RAINMETER">RAINMETER</param> -->
+			<!-- <param name="WINDSPEED">WINDSPEED</param> -->
+			<!-- <param name="WATERMARK">WATERMARK</param> -->
+			<!-- <param name="SOLARRADIATION">SOLARRADIATION</param> -->
+			<!-- <param name="AIRTEMPERATURE">AIRTEMPERATURE</param> -->
+			<!-- <param name="AIRHUMIDITY">AIRHUMIDITY</param> -->
+			<!-- <param name="SKINTEMPERATURE">SKINTEMPERATURE</param> -->
+			<!-- <param name="SOILMOISTURE">SOILMOISTURE</param> -->
+			<!-- <param name="WINDDIRECTION">WINDDIRECTION</param> -->
+			<!-- <param name="WINDDIRECTION2">WINDDIRECTION2</param> -->
+			<!-- <param name="SOILCONDUCTIVITY1">SOILCONDUCTIVITY1</param> -->
+			<!-- <param name="SOILCONDUCTIVITY2">SOILCONDUCTIVITY2</param> -->
+			<!-- <param name="SOILCONDUCTIVITY3">SOILCONDUCTIVITY3</param> -->
+			<!-- <param name="SOILMOISTURE1">SOILMOISTURE1</param> -->
+			<!-- <param name="SOILMOISTURE2">SOILMOISTURE2</param> -->
+			<!-- <param name="SOILMOISTURE3">SOILMOISTURE3</param> -->
+			<!-- <param name="SOILTEMPERATURE1">SOILTEMPERATURE1</param> -->
+			<!-- <param name="SOILTEMPERATURE2">SOILTEMPERATURE2</param> -->
+			<!-- <param name="SOILTEMPERATURE3">SOILTEMPERATURE3</param> -->
+			<!-- <param name="FOO">FOO</param> -->
+        </init-params>
+		<output-structure>
+			<field name="REPORTERID"		type="SMALLINT" />
+			<field name="TIMESTAMP"			type="BIGINT" />
+			<field name="AIRHUMIDITY"		type="DOUBLE" />
+			<field name="AIRTEMPERATURE"	type="DOUBLE" />
+			<field name="RAINMETER"			type="DOUBLE" />
+			<field name="SKINTEMPERATURE"	type="DOUBLE" />
+			<field name="SOILMOISTURE"		type="DOUBLE" />
+			<field name="SOLARRADIATION"	type="DOUBLE" />
+			<field name="WATERMARK"			type="DOUBLE" />
+			<field name="WINDDIRECTION2"	type="DOUBLE" />
+			<field name="WINDSPEED"			type="DOUBLE" />
+		</output-structure>
+	</processing-class>
+	<description>Node 1 from the Ruedlingen deployment</description>
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">Node 1 from the Ruedlingen Sensorscope deployment</predicate>
+		<predicate key="LATITUDE">46.52</predicate>
+		<predicate key="LONGITUDE">6.5666</predicate>
+	</addressing>
+	<storage />
+	<streams>
+    	<stream name="data">
+			<source alias="ruedlingen" storage-size="1" sampling-rate="1">
+				<address wrapper="ss_tinyos-mig">
+					<predicate key="ss-host">localhost</predicate>
+					<predicate key="ss-port">25000</predicate>
+					<predicate key="continue-on-error">true</predicate>
+					<predicate key="wrapper-name">sensmig2</predicate>
+					<predicate key="wrapper-keep-processed-ss-entries">false</predicate>
+					<predicate key="source">sf@micssrv32.epfl.ch:2233</predicate>
+					<predicate key="message-classname">gsn.wrappers.tinyos.RuedlingenData</predicate>
+				</address>
+                <query>select TIMESTAMP * 1000		AS TIMED,
+                              REPORTER_ID           AS REPORTERID,
+                              TIMESTAMP             AS TIMESTAMP,
+                              AIRHUMIDITY           AS AIRHUMIDITY,
+                              AIRTEMPERATURE        AS AIRTEMPERATURE,
+                              RAINMETER             AS RAINMETER,
+                              SKINTEMPERATURE       AS SKINTEMPERATURE,
+                              SOILMOISTURE          AS SOILMOISTURE,
+                              SOLARRADIATION        AS SOLARRADIATION,
+                              WATERMARK             AS WATERMARK,
+                              WINDDIRECTION         AS WINDDIRECTION2,
+                              WINDSPEED             AS WINDSPEED from wrapper where REPORTER_ID = 1</query>
+                        </source>
+                        <query>select * from ruedlingen</query>
+		</stream>
+	</streams>
+</virtual-sensor>
+

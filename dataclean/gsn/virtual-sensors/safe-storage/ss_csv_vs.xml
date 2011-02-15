@@ -1,0 +1,297 @@
+<virtual-sensor name="tramm_csv_vs" priority="10" >
+    <processing-class>
+       <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+       <unique-timestamps>false</unique-timestamps>
+        <output-structure>        
+			<field name="TIMESTAMP" type="BIGINT" />
+			<field name="RECORD" type="INTEGER" />
+			<field name="STATIONNAME" type="VARCHAR(20)" />
+			<field name="MUXCHAN" type="INTEGER" />
+			<field name="WAVEPT_1" type="DOUBLE" />
+			<field name="WAVEPT_2" type="DOUBLE" />
+			<field name="WAVEPT_3" type="DOUBLE" />
+			<field name="WAVEPT_4" type="DOUBLE" />
+			<field name="WAVEPT_5" type="DOUBLE" />
+			<field name="WAVEPT_6" type="DOUBLE" />
+			<field name="WAVEPT_7" type="DOUBLE" />
+			<field name="WAVEPT_8" type="DOUBLE" />
+			<field name="WAVEPT_9" type="DOUBLE" />
+			<field name="WAVEPT_10" type="DOUBLE" />
+			<field name="WAVEPT_11" type="DOUBLE" />
+			<field name="WAVEPT_12" type="DOUBLE" />
+			<field name="WAVEPT_13" type="DOUBLE" />
+			<field name="WAVEPT_14" type="DOUBLE" />
+			<field name="WAVEPT_15" type="DOUBLE" />
+			<field name="WAVEPT_16" type="DOUBLE" />
+			<field name="WAVEPT_17" type="DOUBLE" />
+			<field name="WAVEPT_18" type="DOUBLE" />
+			<field name="WAVEPT_19" type="DOUBLE" />
+			<field name="WAVEPT_20" type="DOUBLE" />
+			<field name="WAVEPT_21" type="DOUBLE" />
+			<field name="WAVEPT_22" type="DOUBLE" />
+			<field name="WAVEPT_23" type="DOUBLE" />
+			<field name="WAVEPT_24" type="DOUBLE" />
+			<field name="WAVEPT_25" type="DOUBLE" />
+			<field name="WAVEPT_26" type="DOUBLE" />
+			<field name="WAVEPT_27" type="DOUBLE" />
+			<field name="WAVEPT_28" type="DOUBLE" />
+			<field name="WAVEPT_29" type="DOUBLE" />
+			<field name="WAVEPT_30" type="DOUBLE" />
+			<field name="WAVEPT_31" type="DOUBLE" />
+			<field name="WAVEPT_32" type="DOUBLE" />
+			<field name="WAVEPT_33" type="DOUBLE" />
+			<field name="WAVEPT_34" type="DOUBLE" />
+			<field name="WAVEPT_35" type="DOUBLE" />
+			<field name="WAVEPT_36" type="DOUBLE" />
+			<field name="WAVEPT_37" type="DOUBLE" />
+			<field name="WAVEPT_38" type="DOUBLE" />
+			<field name="WAVEPT_39" type="DOUBLE" />
+			<field name="WAVEPT_40" type="DOUBLE" />
+			<field name="WAVEPT_41" type="DOUBLE" />
+			<field name="WAVEPT_42" type="DOUBLE" />
+			<field name="WAVEPT_43" type="DOUBLE" />
+			<field name="WAVEPT_44" type="DOUBLE" />
+			<field name="WAVEPT_45" type="DOUBLE" />
+			<field name="WAVEPT_46" type="DOUBLE" />
+			<field name="WAVEPT_47" type="DOUBLE" />
+			<field name="WAVEPT_48" type="DOUBLE" />
+			<field name="WAVEPT_49" type="DOUBLE" />
+			<field name="WAVEPT_50" type="DOUBLE" />
+			<field name="WAVEPT_51" type="DOUBLE" />
+			<field name="WAVEPT_52" type="DOUBLE" />
+			<field name="WAVEPT_53" type="DOUBLE" />
+			<field name="WAVEPT_54" type="DOUBLE" />
+			<field name="WAVEPT_55" type="DOUBLE" />
+			<field name="WAVEPT_56" type="DOUBLE" />
+			<field name="WAVEPT_57" type="DOUBLE" />
+			<field name="WAVEPT_58" type="DOUBLE" />
+			<field name="WAVEPT_59" type="DOUBLE" />
+			<field name="WAVEPT_60" type="DOUBLE" />
+			<field name="WAVEPT_61" type="DOUBLE" />
+			<field name="WAVEPT_62" type="DOUBLE" />
+			<field name="WAVEPT_63" type="DOUBLE" />
+			<field name="WAVEPT_64" type="DOUBLE" />
+			<field name="WAVEPT_65" type="DOUBLE" />
+			<field name="WAVEPT_66" type="DOUBLE" />
+			<field name="WAVEPT_67" type="DOUBLE" />
+			<field name="WAVEPT_68" type="DOUBLE" />
+			<field name="WAVEPT_69" type="DOUBLE" />
+			<field name="WAVEPT_70" type="DOUBLE" />
+			<field name="WAVEPT_71" type="DOUBLE" />
+			<field name="WAVEPT_72" type="DOUBLE" />
+			<field name="WAVEPT_73" type="DOUBLE" />
+			<field name="WAVEPT_74" type="DOUBLE" />
+			<field name="WAVEPT_75" type="DOUBLE" />
+			<field name="WAVEPT_76" type="DOUBLE" />
+			<field name="WAVEPT_77" type="DOUBLE" />
+			<field name="WAVEPT_78" type="DOUBLE" />
+			<field name="WAVEPT_79" type="DOUBLE" />
+			<field name="WAVEPT_80" type="DOUBLE" />
+			<field name="WAVEPT_81" type="DOUBLE" />
+			<field name="WAVEPT_82" type="DOUBLE" />
+			<field name="WAVEPT_83" type="DOUBLE" />
+			<field name="WAVEPT_84" type="DOUBLE" />
+			<field name="WAVEPT_85" type="DOUBLE" />
+			<field name="WAVEPT_86" type="DOUBLE" />
+			<field name="WAVEPT_87" type="DOUBLE" />
+			<field name="WAVEPT_88" type="DOUBLE" />
+			<field name="WAVEPT_89" type="DOUBLE" />
+			<field name="WAVEPT_90" type="DOUBLE" />
+			<field name="WAVEPT_91" type="DOUBLE" />
+			<field name="WAVEPT_92" type="DOUBLE" />
+			<field name="WAVEPT_93" type="DOUBLE" />
+			<field name="WAVEPT_94" type="DOUBLE" />
+			<field name="WAVEPT_95" type="DOUBLE" />
+			<field name="WAVEPT_96" type="DOUBLE" />
+			<field name="WAVEPT_97" type="DOUBLE" />
+			<field name="WAVEPT_98" type="DOUBLE" />
+			<field name="WAVEPT_99" type="DOUBLE" />
+			<field name="WAVEPT_100" type="DOUBLE" />
+			<field name="WAVEPT_101" type="DOUBLE" />
+			<field name="WAVEPT_102" type="DOUBLE" />
+			<field name="WAVEPT_103" type="DOUBLE" />
+			<field name="WAVEPT_104" type="DOUBLE" />
+			<field name="WAVEPT_105" type="DOUBLE" />
+			<field name="WAVEPT_106" type="DOUBLE" />
+			<field name="WAVEPT_107" type="DOUBLE" />
+			<field name="WAVEPT_108" type="DOUBLE" />
+			<field name="WAVEPT_109" type="DOUBLE" />
+			<field name="WAVEPT_110" type="DOUBLE" />
+			<field name="WAVEPT_111" type="DOUBLE" />
+			<field name="WAVEPT_112" type="DOUBLE" />
+			<field name="WAVEPT_113" type="DOUBLE" />
+			<field name="WAVEPT_114" type="DOUBLE" />
+			<field name="WAVEPT_115" type="DOUBLE" />
+			<field name="WAVEPT_116" type="DOUBLE" />
+			<field name="WAVEPT_117" type="DOUBLE" />
+			<field name="WAVEPT_118" type="DOUBLE" />
+			<field name="WAVEPT_119" type="DOUBLE" />
+			<field name="WAVEPT_120" type="DOUBLE" />
+			<field name="WAVEPT_121" type="DOUBLE" />
+			<field name="WAVEPT_122" type="DOUBLE" />
+			<field name="WAVEPT_123" type="DOUBLE" />
+			<field name="WAVEPT_124" type="DOUBLE" />
+			<field name="WAVEPT_125" type="DOUBLE" />
+			<field name="WAVEPT_126" type="DOUBLE" />
+			<field name="WAVEPT_127" type="DOUBLE" />
+			<field name="WAVEPT_128" type="DOUBLE" />
+			<field name="WAVEPT_129" type="DOUBLE" />
+			<field name="WAVEPT_130" type="DOUBLE" />
+			<field name="WAVEPT_131" type="DOUBLE" />
+			<field name="WAVEPT_132" type="DOUBLE" />
+			<field name="WAVEPT_133" type="DOUBLE" />
+			<field name="WAVEPT_134" type="DOUBLE" />
+			<field name="WAVEPT_135" type="DOUBLE" />
+			<field name="WAVEPT_136" type="DOUBLE" />
+			<field name="WAVEPT_137" type="DOUBLE" />
+			<field name="WAVEPT_138" type="DOUBLE" />
+			<field name="WAVEPT_139" type="DOUBLE" />
+			<field name="WAVEPT_140" type="DOUBLE" />
+			<field name="WAVEPT_141" type="DOUBLE" />
+			<field name="WAVEPT_142" type="DOUBLE" />
+			<field name="WAVEPT_143" type="DOUBLE" />
+			<field name="WAVEPT_144" type="DOUBLE" />
+			<field name="WAVEPT_145" type="DOUBLE" />
+			<field name="WAVEPT_146" type="DOUBLE" />
+			<field name="WAVEPT_147" type="DOUBLE" />
+			<field name="WAVEPT_148" type="DOUBLE" />
+			<field name="WAVEPT_149" type="DOUBLE" />
+			<field name="WAVEPT_150" type="DOUBLE" />
+			<field name="WAVEPT_151" type="DOUBLE" />
+			<field name="WAVEPT_152" type="DOUBLE" />
+			<field name="WAVEPT_153" type="DOUBLE" />
+			<field name="WAVEPT_154" type="DOUBLE" />
+			<field name="WAVEPT_155" type="DOUBLE" />
+			<field name="WAVEPT_156" type="DOUBLE" />
+			<field name="WAVEPT_157" type="DOUBLE" />
+			<field name="WAVEPT_158" type="DOUBLE" />
+			<field name="WAVEPT_159" type="DOUBLE" />
+			<field name="WAVEPT_160" type="DOUBLE" />
+			<field name="WAVEPT_161" type="DOUBLE" />
+			<field name="WAVEPT_162" type="DOUBLE" />
+			<field name="WAVEPT_163" type="DOUBLE" />
+			<field name="WAVEPT_164" type="DOUBLE" />
+			<field name="WAVEPT_165" type="DOUBLE" />
+			<field name="WAVEPT_166" type="DOUBLE" />
+			<field name="WAVEPT_167" type="DOUBLE" />
+			<field name="WAVEPT_168" type="DOUBLE" />
+			<field name="WAVEPT_169" type="DOUBLE" />
+			<field name="WAVEPT_170" type="DOUBLE" />
+			<field name="WAVEPT_171" type="DOUBLE" />
+			<field name="WAVEPT_172" type="DOUBLE" />
+			<field name="WAVEPT_173" type="DOUBLE" />
+			<field name="WAVEPT_174" type="DOUBLE" />
+			<field name="WAVEPT_175" type="DOUBLE" />
+			<field name="WAVEPT_176" type="DOUBLE" />
+			<field name="WAVEPT_177" type="DOUBLE" />
+			<field name="WAVEPT_178" type="DOUBLE" />
+			<field name="WAVEPT_179" type="DOUBLE" />
+			<field name="WAVEPT_180" type="DOUBLE" />
+			<field name="WAVEPT_181" type="DOUBLE" />
+			<field name="WAVEPT_182" type="DOUBLE" />
+			<field name="WAVEPT_183" type="DOUBLE" />
+			<field name="WAVEPT_184" type="DOUBLE" />
+			<field name="WAVEPT_185" type="DOUBLE" />
+			<field name="WAVEPT_186" type="DOUBLE" />
+			<field name="WAVEPT_187" type="DOUBLE" />
+			<field name="WAVEPT_188" type="DOUBLE" />
+			<field name="WAVEPT_189" type="DOUBLE" />
+			<field name="WAVEPT_190" type="DOUBLE" />
+			<field name="WAVEPT_191" type="DOUBLE" />
+			<field name="WAVEPT_192" type="DOUBLE" />
+			<field name="WAVEPT_193" type="DOUBLE" />
+			<field name="WAVEPT_194" type="DOUBLE" />
+			<field name="WAVEPT_195" type="DOUBLE" />
+			<field name="WAVEPT_196" type="DOUBLE" />
+			<field name="WAVEPT_197" type="DOUBLE" />
+			<field name="WAVEPT_198" type="DOUBLE" />
+			<field name="WAVEPT_199" type="DOUBLE" />
+			<field name="WAVEPT_200" type="DOUBLE" />
+			<field name="WAVEPT_201" type="DOUBLE" />
+			<field name="WAVEPT_202" type="DOUBLE" />
+			<field name="WAVEPT_203" type="DOUBLE" />
+			<field name="WAVEPT_204" type="DOUBLE" />
+			<field name="WAVEPT_205" type="DOUBLE" />
+			<field name="WAVEPT_206" type="DOUBLE" />
+			<field name="WAVEPT_207" type="DOUBLE" />
+			<field name="WAVEPT_208" type="DOUBLE" />
+			<field name="WAVEPT_209" type="DOUBLE" />
+			<field name="WAVEPT_210" type="DOUBLE" />
+			<field name="WAVEPT_211" type="DOUBLE" />
+			<field name="WAVEPT_212" type="DOUBLE" />
+			<field name="WAVEPT_213" type="DOUBLE" />
+			<field name="WAVEPT_214" type="DOUBLE" />
+			<field name="WAVEPT_215" type="DOUBLE" />
+			<field name="WAVEPT_216" type="DOUBLE" />
+			<field name="WAVEPT_217" type="DOUBLE" />
+			<field name="WAVEPT_218" type="DOUBLE" />
+			<field name="WAVEPT_219" type="DOUBLE" />
+			<field name="WAVEPT_220" type="DOUBLE" />
+			<field name="WAVEPT_221" type="DOUBLE" />
+			<field name="WAVEPT_222" type="DOUBLE" />
+			<field name="WAVEPT_223" type="DOUBLE" />
+			<field name="WAVEPT_224" type="DOUBLE" />
+			<field name="WAVEPT_225" type="DOUBLE" />
+			<field name="WAVEPT_226" type="DOUBLE" />
+			<field name="WAVEPT_227" type="DOUBLE" />
+			<field name="WAVEPT_228" type="DOUBLE" />
+			<field name="WAVEPT_229" type="DOUBLE" />
+			<field name="WAVEPT_230" type="DOUBLE" />
+			<field name="WAVEPT_231" type="DOUBLE" />
+			<field name="WAVEPT_232" type="DOUBLE" />
+			<field name="WAVEPT_233" type="DOUBLE" />
+			<field name="WAVEPT_234" type="DOUBLE" />
+			<field name="WAVEPT_235" type="DOUBLE" />
+			<field name="WAVEPT_236" type="DOUBLE" />
+			<field name="WAVEPT_237" type="DOUBLE" />
+			<field name="WAVEPT_238" type="DOUBLE" />
+			<field name="WAVEPT_239" type="DOUBLE" />
+			<field name="WAVEPT_240" type="DOUBLE" />
+			<field name="WAVEPT_241" type="DOUBLE" />
+			<field name="WAVEPT_242" type="DOUBLE" />
+			<field name="WAVEPT_243" type="DOUBLE" />
+			<field name="WAVEPT_244" type="DOUBLE" />
+			<field name="WAVEPT_245" type="DOUBLE" />
+			<field name="WAVEPT_246" type="DOUBLE" />
+			<field name="WAVEPT_247" type="DOUBLE" />
+			<field name="WAVEPT_248" type="DOUBLE" />
+			<field name="WAVEPT_249" type="DOUBLE" />
+			<field name="WAVEPT_250" type="DOUBLE" />
+			<field name="WAVEPT_251" type="DOUBLE" />
+			<field name="WAVEPT_252" type="DOUBLE" />
+			<field name="WAVEPT_253" type="DOUBLE" />
+			<field name="WAVEPT_254" type="DOUBLE" />
+			<field name="WAVEPT_255" type="DOUBLE" />
+			<field name="WAVEPT_256" type="DOUBLE" />
+			<field name="WAVEPT_257" type="DOUBLE" />
+			<field name="WAVEPT_258" type="DOUBLE" />
+			<field name="WAVEPT_259" type="DOUBLE" />
+			<field name="WAVEPT_260" type="DOUBLE" />
+       </output-structure>
+    </processing-class>
+    <description> CSV VS for Safe Storage Test </description>
+    <life-cycle pool-size="10" />
+    <addressing/>
+    <storage history-size="10"/>
+    <streams>
+    <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="ss_csv">
+          <predicate key="ss-host">localhost</predicate>
+          <predicate key="ss-port">25000</predicate>
+          <predicate key="continue-on-error">true</predicate>
+          <predicate key="wrapper-name">csv2</predicate>
+          <predicate key="csv-format-file-path">/home/marett/tramm/CR1000_SMALLREL_RADIO_TDR_Wave.dat</predicate>
+          <predicate key="csv-skip-lines">5</predicate>
+          <predicate key="csv-separator">,</predicate>
+          <predicate key="csv-source-file-path">/home/marett/tramm/CR1000_SMALLREL_RADIO_TDR_Wave.dat</predicate>
+          <predicate key="csv-format-line-names">2</predicate>
+          <predicate key="csv-format-line-descriptions">3,4</predicate>
+          <predicate key="csv-format-line-format">5</predicate>
+        </address>
+        <query> select * from wrapper </query>
+      </source>
+      <query> select * from source</query>
+    </stream>
+  </streams>
+</virtual-sensor> 

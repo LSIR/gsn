@@ -1,0 +1,46 @@
+<virtual-sensor name="WAN6" priority="10" >
+    <processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		  <init-params/>
+	    <output-structure>
+			<field name="record"     type="double" />
+			<field name="RH"     type="double" />
+			<field name="TA"     type="double" />
+			<field name="VW_S_WVT"    type="double" />
+			<field name="VW_U_WVT"    type="double" />
+			<field name="DW_DU_WVT"    type="double" />
+			<field name="DW_SDU_WVT"    type="double" />
+			<field name="VW_MAX"    type="double" />
+			<field name="VW_U"    type="double" />
+			<field name="VW_V"   type="double" />
+			<field name="VW_W"   type="double" />
+			<field name="HS1"   type="double" />
+	    </output-structure>
+    </processing-class>
+    <description>Wannengrat weather station 6 in Davos, Switzerland. Copyright owner of the data is SLF.</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+		<predicate key="geographical">Davos, Switzerland.</predicate>
+	 	<predicate key="LATITUDE">46.806527777</predicate>
+		<predicate key="LONGITUDE">9.78595</predicate>
+		<predicate key="ALTITUDE">2434</predicate>
+		<predicate key="NAME">WAN6</predicate>
+		<predicate key="GPS_Percision">10</predicate>
+		<predicate key="SLOPE">0</predicate>
+		<predicate key="exposition">NULL</predicate>
+	</addressing>
+	<storage/>
+    <streams>
+	    <stream name="DATA" >
+	         <source alias="source" storage-size="1" sampling-rate="1">
+	            <address wrapper="toa5">
+	               <predicate key="file">Wan_6.met</predicate>
+	               <predicate key="not_a_number">NaN,7999,-7999</predicate>
+	               <predicate key="sampling">600</predicate> <!-- 10 mins, the value is in msc.-->
+	            </address>
+	            <query>select * from wrapper</query>
+	         </source>
+	         <query>select * from source</query>
+	    </stream>
+    </streams>
+</virtual-sensor> 
