@@ -198,22 +198,20 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         '''
             [ru_utime (double),
              ru_stime (double),
-             ru_maxrss (int),
              ru_minflt (int),
              ru_majflt (int),
              ru_nvcsw (int),
              ru_nivcsw (int)]
         '''
-        ret = [None]*7
+        ret = [None]*6
         try:
             r = resource.getrusage(resource.RUSAGE_SELF)
             ret[0] = r[0]
             ret[1] = r[1]
-            ret[2] = r[2]
-            ret[3] = r[6]
-            ret[4] = r[7]
-            ret[5] = r[14]
-            ret[6] = r[15]
+            ret[2] = r[6]
+            ret[3] = r[7]
+            ret[4] = r[14]
+            ret[5] = r[15]
         except Exception, e:
             self.exception(e)
         return ret

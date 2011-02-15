@@ -90,7 +90,6 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 			
 			new DataField("RUSAGE_UTIME", "DOUBLE"),
 			new DataField("RUSAGE_STIME", "DOUBLE"),
-			new DataField("RUSAGE_MAXRSS", "INTEGER"),
 			new DataField("RUSAGE_MINFLT", "INTEGER"),
 			new DataField("RUSAGE_MAJFLT", "INTEGER"),
 			new DataField("RUSAGE_NVCSW", "INTEGER"),

@@ -52,7 +52,6 @@
 			
             <field name="RUSAGE_UTIME" type="DOUBLE" unit="relatime" />
             <field name="RUSAGE_STIME" type="DOUBLE" unit="relatime" />
-            <field name="RUSAGE_MAXRSS" type="INTEGER" unit="kB" />
             <field name="RUSAGE_MINFLT" type="INTEGER" />
             <field name="RUSAGE_MAJFLT" type="INTEGER" />
             <field name="RUSAGE_NVCSW" type="INTEGER" />

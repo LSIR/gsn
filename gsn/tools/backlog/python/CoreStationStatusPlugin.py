@@ -263,17 +263,17 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         ret = [None]
         try:
             file = open("/var/log/lastlog", "r")
-            str = file.read()
+            line = file.read()
 #            print '#############################################################################'
 #            print '/var/log/lastlog'
 #            print '[last user logged into the system (string)]'
 #            print ''
-#            print str
+#            print line
 #            print ''
             file.close()
-            ret = [str[36:str.index('\0', 36)]]
+            ret = [line[36:line.index('\0', 36)]]
         except Exception, e:
-            self.debug(str(e))
+            self.debug(e)
         return ret
         
         
@@ -1016,15 +1016,15 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         ret = [None]*2
         try:
             file = open("/proc/uptime", "r")
-            str = file.read()
+            line = file.read()
             file.close()
 #            print '#############################################################################'
 #            print '/proc/uptime'
 #            print '[# of seconds the system has been up (double), # of seconds the system has been idle (double)]'
 #            print ''
-#            print str
+#            print line
 #            print ''
-            lst = str.split()
+            lst = line.split()
             if len(lst) != len(ret):
                 self.exception('reading /proc/uptime did not return ' + str(len(ret)) + ' values')
             else:
@@ -1041,15 +1041,15 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         ret = [None]
         try:
             file = open("/sys/bus/i2c/devices/0-004b/temp1_input", "r")
-            str = file.read()
+            line = file.read()
             file.close()
 #            print '#############################################################################'
 #            print '/sys/bus/i2c/devices/0-004b/temp1_input'
 #            print '[LM92 (int)]'
 #            print ''
-#            print str
+#            print line
 #            print ''
-            val = int(str.strip())
+            val = int(line.strip())
             if val == -240000:
                 val = None
             ret = [val]
