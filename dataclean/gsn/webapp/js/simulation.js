@@ -281,10 +281,11 @@ var Sim = {
     },
 
     selectUnselect: function(stationName) {
-        var list_sensors = document.getElementById("stations");
+        var list_sensors = document.getElementById("vs");
+
         for (var i = 0; i < list_sensors.length; i++) {
             if (list_sensors.options[i].value == stationName) {
-                list_sensors.options[i].selected = !list_sensors.options[i].selected ;
+                list_sensors.selectedIndex = i ;
             }
 }
     }
