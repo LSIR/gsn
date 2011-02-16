@@ -359,8 +359,9 @@ public class BinaryPlugin extends AbstractPlugin {
 					lastChunkNumber = -1;
 					lastChunkResend = 0;
     	
-					binaryTransmissionStartTime = lastTransmissionTimestamp = System.currentTimeMillis();
-					binaryTransmissionTime = (int) (lastTransmissionTimestamp-msg.getTimestamp());
+					binaryTransmissionStartTime = msg.getTimestamp();
+					lastTransmissionTimestamp = System.currentTimeMillis();
+					binaryTransmissionTime = 0;
 					
     			    // write the new binary info to the property file
     				configFile.setProperty(PROPERTY_REMOTE_BINARY, remoteBinaryName);
@@ -437,7 +438,7 @@ public class BinaryPlugin extends AbstractPlugin {
 						filelen = file.length();
 
 						long timenow = System.currentTimeMillis();
-						binaryTransmissionTime = (int) (binaryTransmissionTime+timenow-lastTransmissionTimestamp);
+						binaryTransmissionTime += (int) (timenow-lastTransmissionTimestamp);
 						lastTransmissionTimestamp = timenow;
 						
 						// write the actual binary length and chunk number to the property file
