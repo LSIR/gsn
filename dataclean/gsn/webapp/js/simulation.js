@@ -42,7 +42,7 @@ var Sim = {
     PARAM_FILTERS : "filters",
     PARAM_WINDOWSIZE : "window",
 
-    SEPARATOR : ",",
+    SEPARATOR : ";",
 
     SIM_PROGRESS_DELAY : 60000, // every minute
 
@@ -59,10 +59,12 @@ var Sim = {
                     $.getJSON(arg,
                         function(data){
 				        document.getElementById("txt").value = data.message;
-				        if (data.finished) { 
+				        if (data.finished) {
 				            var img = document.getElementById('image');
-        	                img.src = "";
-                        }
+        	                            img.src = "";
+                                            img.width = 1;
+                                            img.height = 1;
+                                       }
                     } );
                     //document.getElementById("txt").value = Sim.c;
                     //Sim.c = Sim.c+1;
@@ -87,7 +89,7 @@ var Sim = {
                     "lafouly_st_1040","lafouly_st_1041",
                     "lafouly_st_1042","lafouly_st_1043",
                     "lafouly_st_1044"],
-                    
+
     station_longs : [7.106459, 7.116046,
                      7.12273, 7.119712,
                      7.129109, 7.117759,
@@ -125,21 +127,21 @@ var Sim = {
         $.getJSON(arg,
             function(data){
 				//alert(data.message);
-				alert("Simulation initialized.");
+				//alert("Simulation initialized.");
             } );
         //alert("List of stations: "+Sim.getListOfStation());
         Sim.doTimer();
     },
-    
+
     startSimulation: function () {
         var arg = "simulation?REQUEST=202";
         //alert(arg);
 
         $.getJSON(arg,
             function(data){
-				alert(data.message);
+				//alert(data.message);
             } );
-        alert("Now, starting simulation "+ Sim.getListOfStation());
+        //alert("Now, starting simulation "+ Sim.getListOfStation());
 
         var img = document.getElementById('image');
         	img.src = "style/ajax-loader.gif";
@@ -180,7 +182,7 @@ var Sim = {
         var filterType = document.getElementById("filterType");
         var filterArg = document.getElementById("filterArg");
 
-        s = field.value + "::filter1 = " + filterType.value+ "," + field.value + "::arg1 = " + filterArg.value;
+        s = field.value + "::filter1 = " + filterType.value+ ";" + field.value + "::arg1 = " + filterArg.value;
 
         var listFilters = document.getElementById("listFilters");
         var opt = document.createElement("option");

@@ -22,7 +22,52 @@
 <script language="javascript" type="text/javascript" src="js/jquery.flot.patched.js"></script>
 <script language="javascript" type="text/javascript" src="js/jquery.flot.selection.js"></script>
 
+<script type="text/javascript" src="js/simulation.js"></script>
+
 <script type="text/javascript" src="js/datePicker.js"></script>
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAMzANHtD0lZRRVCrPbKFfkRQgjQ95GGF6hnonCeqYiElIWyu18hSCTuhmhIfYuWivVq8y0t9zgqbuIQ"
+                type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    function initialize() {
+
+      if (GBrowserIsCompatible()) {
+        var map = new GMap2(document.getElementById("map_canvas"));
+        map.setCenter(new GLatLng(Sim.station_lats[0],Sim.station_longs[0]), 12);
+
+      function createMarker(point, index) {
+
+          var marker = new GMarker(point);
+
+          GEvent.addListener(marker, "click", function() {
+            marker.openInfoWindowHtml(index);
+            Sim.selectUnselect(index);
+          });
+          return marker;
+        }
+
+
+        // Add  markers to the map
+        var bounds = map.getBounds();
+        var southWest = bounds.getSouthWest();
+        var northEast = bounds.getNorthEast();
+        var lngSpan = northEast.lng() - southWest.lng();
+        var latSpan = northEast.lat() - southWest.lat();
+        for (var i = 0; i < 11; i++) {
+
+          var latlng = new GLatLng(Sim.station_lats[i],Sim.station_longs[i]);
+          var marker = createMarker(latlng, Sim.station_names[i]); //new GMarker(latlng);
+          var name = "Station "+i;
+          map.addOverlay(marker);
+
+        }
+          map.addControl(new GSmallMapControl());
+          map.addControl(new GMapTypeControl());
+      }
+    }
+
+</script>
 
 
 <script id="getJSON" language="javascript" type="text/javascript">
@@ -83,7 +128,7 @@
         $("#preview").bind("plotselected", function (event, ranges) {
             DataClean.plot.setSelection(ranges);
         });
-    
+
 
 
 
@@ -190,14 +235,14 @@
                     var i;
                     DataClean.orderOfDirtyPoint = new Array();
                     DataClean.errorOfDirtyPoint = new Array();
-        
+
                     for (i in data) {
 
                         // init combo box
                         var optn = document.createElement("OPTION");
                         var d = data[j][3] - data[j][2];
 
-                        DataClean.errorOfDirtyPoint[i] = d;    
+                        DataClean.errorOfDirtyPoint[i] = d;
                         DataClean.orderOfDirtyPoint[i] = data[j][0]
 
                         optn.text = data[j][0] + " : " + data[j][2] + " (" + d.toPrecision(2) + ")";
@@ -307,19 +352,19 @@
 </script>
 
 <script type="text/javascript" charset="utf-8">
-    
+
 
     $(function()
     {
         $('.date-pick').datePicker({startDate:'01/01/1996'});
 
-        
+
     });
 </script>
 
 
 </head>
-<body>
+<body onload="initialize()" onunload="GUnload()">
 
 <div id="container">
     <div id="header">
@@ -356,6 +401,11 @@
 
                 <input name="date2" id="date2" class="date-pick"/>-->
 
+                <!--
+
+
+                -->
+                <div id="map_canvas" style="width: 600px; height: 400px"></div>
 
                 <!--<p>Sensor <input id="vs" name="vs" size="16" type="text" value="lafouly_st_1043"/></p>-->
                 <p>Sensor <select id="vs" name="vs">
@@ -371,8 +421,8 @@
                     <option value="lafouly_st_1043">lafouly_st_1043</option>
 					<option value="lafouly_st_1044">lafouly_st_1044</option>
                 </select></p>
-				
-				<!-- 
+
+				<!--
 				hist_1033.xml  hist_1036.xml  hist_1040.xml  hist_1043.xm_
 hist_1034.xml  hist_1037.xml  hist_1041.xml  hist_1044.xml
 hist_1035.xml  hist_1039.xml  hist_1042.xm_
@@ -449,7 +499,7 @@ hist_1035.xml  hist_1039.xml  hist_1042.xm_
                         <TD>
                             <p>
                             order:value (error)</p>
-                            <p> 
+                            <p>
                             <select id="dirty_select" name="dirty_select" size="24" multiple="" style="display: block;" onclick="highlightIt()">
 
                               <option value="-1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
@@ -467,7 +517,7 @@ hist_1035.xml  hist_1039.xml  hist_1042.xm_
                   </TR>
                     <TR>
                         <td>
-                            <div id="preview" style="width:150px;height:125px;background-color:#fff"></div> 
+                            <div id="preview" style="width:150px;height:125px;background-color:#fff"></div>
                         </td>
                      <!--   <td><p><input id="enableTooltip" type="checkbox">Enable tooltip</p></td> -->
                     </TR>
