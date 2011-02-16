@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -291,6 +292,7 @@ public class BinaryPlugin extends AbstractPlugin {
     				String datetimefm = (String) msg.getData()[7];
     				try {
     					folderdatetimefm = new SimpleDateFormat(datetimefm);
+    					folderdatetimefm.setTimeZone(TimeZone.getTimeZone("UTC"));
     				} catch (IllegalArgumentException e) {
     					logger.error("the received init packet does contain a mallformed date time format >" + datetimefm + "<! Please check your backlog configuration on the deployment -> drop this binary");
     					binarySender.requestNewBinary();
@@ -650,6 +652,7 @@ public class BinaryPlugin extends AbstractPlugin {
 
 				lastTransmissionTimestamp = System.currentTimeMillis();
 				folderdatetimefm = new SimpleDateFormat(prop);
+				folderdatetimefm.setTimeZone(TimeZone.getTimeZone("UTC"));
 			    if (storeInDatabase) {
 			    	localBinaryName = rootBinaryDir + TEMP_BINARY_NAME;
 			    }
