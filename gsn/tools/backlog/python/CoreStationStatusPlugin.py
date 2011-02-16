@@ -100,6 +100,20 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
     def run(self):
         self.info('started')
         
+        self.info('checking status providers for correctness')
+        self._checkChronyStats()
+        self._checkStatVFS()
+        self._checkDiskStats()
+        self._checkInterrupts()
+        self._checkMemInfo()
+        self._checkSchedStat()
+        self._checkNetDev()
+        self._checkNetSNMP()
+        self._checkNetStat()
+        self._checkSockStat()
+        self._checkSoftIRQ()
+        self._checkStat()
+        
         self.processMsg(self.getTimeStamp(), [STATIC_TYPE] + self._getInitStats())
         
         if self._interval != None:
@@ -277,6 +291,88 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         return ret
         
         
+    def _checkChronyStats(self):
+        self._chronyTrackingLineIndexes = [None]*4
+        self._chronyRTCDataAvailable = [False]*2
+        
+        try:
+            p = subprocess.Popen(['chronyc', 'tracking'])
+            p.wait()
+            output = p.communicate()
+            if output[0]:
+                lines = output[0].split('\n')
+                for lineindex, line in enumerate(lines):
+                    if line.strip().startswith('Stratum'):
+                        lst = line.split()
+                        if len(lst) != 3:
+                            self.exception('splitted line containing Stratum from chronyc tracking did not return 3 values')
+                        else:
+                            self._chronyTrackingLineIndexes[0] = lineindex
+                    elif line.strip().startswith('System time'):
+                        lst = line.split()
+                        if len(lst) != 9:
+                            self.exception('splitted line containing System time from chronyc tracking did not return 9 values')
+                        elif lst[4] != 'seconds':
+                            self.exception('System time value from chronyc tracking is not in seconds')
+                        else:
+                            self._chronyTrackingLineIndexes[1] = lineindex
+                    elif line.strip().startswith('Frequency'):
+                        lst = line.split()
+                        if len(lst) != 5:
+                            self.exception('splitted line containing Frequency from chronyc tracking did not return 5 values')
+                        elif lst[3] != 'ppm':
+                            self.exception('Frequency value from chronyc tracking is not in ppm')
+                        else:
+                            self._chronyTrackingLineIndexes[2] = lineindex
+                    elif line.strip().startswith('Skew'):
+                        lst = line.split()
+                        if len(lst) != 4:
+                            self.exception('splitted line containing Skew from chronyc tracking did not return 4 values')
+                        elif lst[3] != 'ppm':
+                            self.exception('Skew value from chronyc tracking is not in ppm')
+                        else:
+                            self._chronyTrackingLineIndexes[3] = lineindex
+            elif not output[1]:
+                self.error('chronyc tracking has not generated any output')
+            if output[1]:
+                self.error('chronyc tracking: (STDERR=' + output[1] + ')')
+        except Exception, e:
+            self.exception(e)
+        
+        try:
+            p = subprocess.Popen(['chronyc', 'rtcdata'])
+            p.wait()
+            output = p.communicate()
+            if output[0]:
+                lines = output[0].split('\n')
+                if len(lines) != 6:
+                    self.exception('chronyc rtcdata did not return the expected output')
+                else:
+                    line = lines[4]
+                    lst = line.split()
+                    if lst[0] != 'RTC':
+                        self.exception('chronyc rtcdata: RTC expected')
+                    elif lst[-1] != 'seconds':
+                        self.exception('chronyc rtcdata: seconds expected')
+                    else:
+                        self._chronyRTCDataAvailable[0] = True
+                        
+                    line = lines[5]
+                    lst = line.split()
+                    if lst[0] != 'RTC':
+                        self.exception('chronyc rtcdata: RTC expected')
+                    elif lst[-1] != 'ppm':
+                        self.exception('chronyc rtcdata: ppm expected')
+                    else:
+                        self._chronyRTCDataAvailable[1] = True
+            elif not output[1]:
+                self.error('chronyc tracking has not generated any output')
+            if output[1]:
+                self.error('chronyc tracking: (STDERR=' + output[1] + ')')
+        except Exception, e:
+            self.exception(e)
+        
+        
     def _getChronyStats(self):
         '''
             [stratum (int),
@@ -300,47 +396,27 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print ''
             if output[0]:
                 lines = output[0].split('\n')
-                for line in lines:
-                    if line.strip().startswith('Stratum'):
+                for lineindex, line in enumerate(lines):
+                    if self._chronyTrackingLineIndexes[0] == lineindex:
+                        ret[0] = int(line.split()[2])
+                    if self._chronyTrackingLineIndexes[1] == lineindex:
                         lst = line.split()
-                        if len(lst) != 3:
-                            self.exception('splitted line containing Stratum from chronyc tracking did not return 3 values')
+                        if lst[5] == 'fast':
+                            ret[1] = float(lst[3])
+                        elif lst[5] == 'slow':
+                            ret[1] = -float(lst[3])
                         else:
-                            ret[0] = int(lst[2])
-                    elif line.strip().startswith('System time'):
+                            self.exception('System time value from chronyc tracking is not slow or fast')
+                    if self._chronyTrackingLineIndexes[2] == lineindex:
                         lst = line.split()
-                        if len(lst) != 9:
-                            self.exception('splitted line containing System time from chronyc tracking did not return 9 values')
-                        elif lst[4] != 'seconds':
-                            self.exception('System time value from chronyc tracking is not in seconds')
+                        if lst[4] == 'fast':
+                            ret[2] = float(lst[2])
+                        elif lst[4] == 'slow':
+                            ret[2] = -float(lst[2])
                         else:
-                            if lst[5] == 'fast':
-                                ret[1] = float(lst[3])
-                            elif lst[5] == 'slow':
-                                ret[1] = -float(lst[3])
-                            else:
-                                self.exception('System time value from chronyc tracking is not slow or fast')
-                    elif line.strip().startswith('Frequency'):
-                        lst = line.split()
-                        if len(lst) != 5:
-                            self.exception('splitted line containing Frequency from chronyc tracking did not return 5 values')
-                        elif lst[3] != 'ppm':
-                            self.exception('Frequency value from chronyc tracking is not in ppm')
-                        else:
-                            if lst[4] == 'fast':
-                                ret[2] = float(lst[2])
-                            elif lst[4] == 'slow':
-                                ret[2] = -float(lst[2])
-                            else:
-                                self.exception('Frequency value from chronyc tracking is not slow or fast')
-                    elif line.strip().startswith('Skew'):
-                        lst = line.split()
-                        if len(lst) != 4:
-                            self.exception('splitted line containing Skew from chronyc tracking did not return 4 values')
-                        elif lst[3] != 'ppm':
-                            self.exception('Skew value from chronyc tracking is not in ppm')
-                        else:
-                            ret[3] = float(lst[2])
+                            self.exception('Frequency value from chronyc tracking is not slow or fast')
+                    if self._chronyTrackingLineIndexes[3] == lineindex:
+                        ret[3] = float(line.split()[2])
             elif not output[1]:
                 self.error('chronyc tracking has not generated any output')
             if output[1]:
@@ -362,23 +438,11 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 if len(lines) != 6:
                     self.exception('chronyc rtcdata did not return the expected output')
                 else:
-                    line = lines[4]
-                    lst = line.split()
-                    if lst[0] != 'RTC':
-                        self.exception('chronyc rtcdata: RTC expected')
-                    elif lst[-1] != 'seconds':
-                        self.exception('chronyc rtcdata: seconds expected')
-                    else:
-                        ret[4] = float(lst[-2])
+                    if self._chronyRTCDataAvailable[0]:
+                        ret[4] = float(lines[4].split()[-2])
                         
-                    line = lines[5]
-                    lst = line.split()
-                    if lst[0] != 'RTC':
-                        self.exception('chronyc rtcdata: RTC expected')
-                    elif lst[-1] != 'ppm':
-                        self.exception('chronyc rtcdata: ppm expected')
-                    else:
-                        ret[5] = float(lst[-2])
+                    if self._chronyRTCDataAvailable[1]:
+                        ret[5] = float(lines[5].split()[-2])
             elif not output[1]:
                 self.error('chronyc tracking has not generated any output')
             if output[1]:
@@ -387,6 +451,24 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             self.exception(e)
 
         return ret
+        
+        
+    def _checkStatVFS(self):
+        self._statVFSAvailabe = [False]*3
+        try:
+            file = open("/proc/self/mounts", "r")
+            lines = file.readlines()
+            file.close()
+
+            for lineindex, line in enumerate(lines):
+                if line.find(' / ') != -1:
+                    self._statVFSAvailabe[0] = True
+                elif line.find(' /var/volatile ') != -1:
+                    self._statVFSAvailabe[1] = True
+                elif line.find(' /media/card ') != -1:
+                    self._statVFSAvailabe[2] = True
+        except Exception, e:
+            self.exception(e)
         
         
     def _getStatVFS(self):
@@ -406,37 +488,44 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         '''
         ret = [None]*12
         try:
-            file = open("/proc/self/mounts", "r")
-            lines = file.readlines()
-            file.close()
-#            print '#############################################################################'
-#            print 'os.statvfs'
-#            print '[statvfs f_blocks * f_frsize for / (long), statvfs f_bfree * f_frsize for / (long), statvfs f_files * f_frsize for / (long), statvfs f_ffree * f_frsize for / (long), statvfs f_blocks * f_frsize for /var/volatile/ (long), statvfs f_bfree * f_frsize for /var/volatile/ (long), statvfs f_files * f_frsize for /var/volatile/ (long), statvfs f_ffree * f_frsize for /var/volatile/ (long), statvfs f_blocks * f_frsize for /media/card/ (long), statvfs f_bfree * f_frsize for /media/card/ (long), statvfs f_files * f_frsize for /media/card/ (long), statvfs f_ffree * f_frsize for /media/card/ (long)]'
-#            print ''
-#            print str(lines)
-#            print ''
-            for line in lines:
-                if line.find(' / ') != -1:
-                    stats = os.statvfs('/')
-                    ret[0] = stats.f_blocks * stats.f_frsize
-                    ret[1] = stats.f_bfree * stats.f_frsize
-                    ret[2] = stats.f_files * stats.f_frsize
-                    ret[3] = stats.f_ffree * stats.f_frsize
-                elif line.find(' /var/volatile ') != -1:
-                    stats = os.statvfs('/var/volatile/')
-                    ret[4] = stats.f_blocks * stats.f_frsize
-                    ret[5] = stats.f_bfree * stats.f_frsize
-                    ret[6] = stats.f_files * stats.f_frsize
-                    ret[7] = stats.f_ffree * stats.f_frsize
-                elif line.find(' /media/card ') != -1:
-                    stats = os.statvfs('/media/card/')
-                    ret[8] = stats.f_blocks * stats.f_frsize
-                    ret[9] = stats.f_bfree * stats.f_frsize
-                    ret[10] = stats.f_files * stats.f_frsize
-                    ret[11] = stats.f_ffree * stats.f_frsize
+            if self._statVFSAvailabe[0]:
+                stats = os.statvfs('/')
+                ret[0] = stats.f_blocks * stats.f_frsize
+                ret[1] = stats.f_bfree * stats.f_frsize
+                ret[2] = stats.f_files * stats.f_frsize
+                ret[3] = stats.f_ffree * stats.f_frsize
+            if self._statVFSAvailabe[1]:
+                stats = os.statvfs('/var/volatile/')
+                ret[4] = stats.f_blocks * stats.f_frsize
+                ret[5] = stats.f_bfree * stats.f_frsize
+                ret[6] = stats.f_files * stats.f_frsize
+                ret[7] = stats.f_ffree * stats.f_frsize
+            if self._statVFSAvailabe[2]:
+                stats = os.statvfs('/media/card/')
+                ret[8] = stats.f_blocks * stats.f_frsize
+                ret[9] = stats.f_bfree * stats.f_frsize
+                ret[10] = stats.f_files * stats.f_frsize
+                ret[11] = stats.f_ffree * stats.f_frsize
         except Exception, e:
             self.exception(e)
         return ret
+    
+    
+    def _checkDiskStats(self):
+        self._diskStatsLineIndex = None
+        try:
+            file = open("/proc/diskstats", "r")
+            lines = file.readlines()
+            file.close()
+            for index, line in enumerate(lines):
+                if line.find('mmcblk0p1') != -1:
+                    lst = line.split()
+                    if len(lst) != 14:
+                        self.exception('splitted line containing mmcblk0p1 from /proc/diskstats did not return 14 values')
+                    else:
+                        self._diskStatsLineIndex = index
+        except Exception, e:
+            self.exception(e)
         
         
     def _getDiskStats(self):
@@ -452,31 +541,48 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
              weighted # of milliseconds spent doing I/Os (long)]
         '''
         ret = [None]*9
+        if self._diskStatsLineIndex != None:
+            try:
+                file = open("/proc/diskstats", "r")
+                line = file.readlines()[self._diskStatsLineIndex]
+                file.close()
+#                print '#############################################################################'
+#                print '/proc/diskstats'
+#                print '[# of reads issued (long), # of sectors read (long), # of milliseconds spent reading (long), # of writes completed (long), # of sectors written (long), # of milliseconds spent writing (long), # of I/Os currently in progress (long), # of milliseconds spent doing I/Os (long), weighted # of milliseconds spent doing I/Os (long)]'
+#                print ''
+#                print str(line)
+#                print ''
+                lst = line.split()
+                ret = [long(lst[3]), long(lst[5]), long(lst[6]), long(lst[7]), long(lst[9]), long(lst[10]), long(lst[11]), long(lst[12]), long(lst[13])]
+            except Exception, e:
+                self.exception(e)
+        return ret
+    
+    
+    def _checkInterrupts(self):
+        names = ['ohci_hcd:usb1', 'pxa2xx-spi.2', 'pxa_i2c-i2c.0', 'STUART', 'BTUART', 'FFUART', 'pxa2xx-mci', 'DMA', 'ost0']
+        self._interruptsLineIndexes = [None]*len(names)
         try:
-            file = open("/proc/diskstats", "r")
-            lines = file.readlines()
+            file = open("/proc/interrupts", "r")
+            lst = file.readlines()
             file.close()
-#            print '#############################################################################'
-#            print '/proc/diskstats'
-#            print '[# of reads issued (long), # of sectors read (long), # of milliseconds spent reading (long), # of writes completed (long), # of sectors written (long), # of milliseconds spent writing (long), # of I/Os currently in progress (long), # of milliseconds spent doing I/Os (long), weighted # of milliseconds spent doing I/Os (long)]'
-#            print ''
-#            print str(lines)
-#            print ''
-            statsAvailable = False
-            for line in lines:
-                if line.find('mmcblk0p1') != -1:
-                    statsAvailable = True
-                    lst = line.split()
-                    if len(lst) != 14:
-                        self.exception('splitted line containing mmcblk0p1 from /proc/diskstats did not return 14 values')
-                    else:
-                        ret = [long(lst[3]), long(lst[5]), long(lst[6]), long(lst[7]), long(lst[9]), long(lst[10]), long(lst[11]), long(lst[12]), long(lst[13])]
-                    break
-            if not statsAvailable:
-                self.exception('mmcblk0p1 could not be found in /proc/diskstats')
+            for nameindex, name in enumerate(names):
+                for lineindex, line in enumerate(lst):
+                    if line.find(name) != -1:
+                        linelist = line.split()
+                        if len(linelist) != 4:
+                            self.exception('splitted line /proc/interrupts containing ' + name + ' did not return 4 values')
+                        elif linelist[2] != 'SC':
+                            self.exception('/proc/interrupts ' + name + ' does not contain SC on 3. position')
+                        else:
+                            self._interruptsLineIndexes[nameindex] = lineindex
+                        break
         except Exception, e:
             self.exception(e)
-        return ret
+            
+        for index, b in enumerate(self._interruptsLineIndexes):
+            if b == None:
+                self.error('/proc/interrupts ' + names[index] + ' could not be found')
         
         
     def _getInterrupts(self):
@@ -491,9 +597,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
              # of DMA interrupts (long),
              # of ost0 interrupts (long)]
         '''
-        names = ['ohci_hcd:usb1', 'pxa2xx-spi.2', 'pxa_i2c-i2c.0', 'STUART', 'BTUART', 'FFUART', 'pxa2xx-mci', 'DMA', 'ost0']
-        ret = [None]*len(names)
-        exists = [False]*len(names)
+        ret = [None]*len(self._interruptsLineIndexes)
         try:
             file = open("/proc/interrupts", "r")
             lst = file.readlines()
@@ -504,29 +608,12 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print ''
 #            print str(lst)
 #            print ''
-            for index, name in enumerate(names):
-                for line in lst:
-                    if line.find(name) != -1:
-                        linelist = line.split()
-                        value = None
-                        if len(linelist) != 4:
-                            self.exception('splitted line /proc/interrupts containing ' + name + ' did not return 4 values')
-                        elif linelist[2] != 'SC':
-                            self.exception('/proc/interrupts ' + name + ' does not contain SC on 3. position')
-                        else:
-                            try:
-                                value = long(linelist[1])
-                            except Exception, e:
-                                self.exception('/proc/interrupts ' + name + ' value can not be converted to a long')
-                        ret[index] = value
-                        exists[index] = True
-                        break
+            for index, lineindex in enumerate(self._interruptsLineIndexes):
+                if lineindex != None:
+                    ret[index] = long(lst[lineindex].split()[1])
         except Exception, e:
             self.exception(e)
             
-        for index, b in enumerate(exists):
-            if not b:
-                self.debug('/proc/interrupts ' + names[index] + ' could not be found')
         return ret
         
         
@@ -558,6 +645,32 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         return ret
         
         
+    def _checkMemInfo(self):
+        names = ['MemTotal', 'MemFree', 'Buffers', 'Cached', 'Shmem', 'KernelStack', 'Slab', 'Mapped']
+        self._memInfoLineIndexes = [None]*len(names)
+        try:
+            file = open("/proc/meminfo", "r")
+            lst = file.readlines()
+            file.close()
+            for nameindex, name in enumerate(names):
+                for lineindex, line in enumerate(lst):
+                    if line.strip().startswith(name):
+                        linelist = line.split()
+                        if len(linelist) != 3:
+                            self.exception('splitted line /proc/meminfo containing ' + name + ' did not return 3 values')
+                        elif linelist[2] != 'kB':
+                            self.exception('/proc/meminfo ' + name + ' does not end with kB')
+                        else:
+                            self._memInfoLineIndexes[nameindex] = lineindex
+                        break
+        except Exception, e:
+            self.exception(e)
+            
+        for index, b in enumerate(self._memInfoLineIndexes):
+            if b == None:
+                self.exception('/proc/meminfo ' + names[index] + ' could not be found')
+        
+        
     def _getMemInfo(self):
         '''
             [MemTotal in kB (int),
@@ -569,9 +682,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
              Slab in kB (int),
              Mapped in kB (int)]
         '''
-        names = ['MemTotal', 'MemFree', 'Buffers', 'Cached', 'Shmem', 'KernelStack', 'Slab', 'Mapped']
-        ret = [None]*len(names)
-        exists = [False]*len(names)
+        ret = [None]*len(self._memInfoLineIndexes)
         try:
             file = open("/proc/meminfo", "r")
             lst = file.readlines()
@@ -582,30 +693,36 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print ''
 #            print str(lst)
 #            print ''
-            for index, name in enumerate(names):
-                for line in lst:
-                    if line.strip().startswith(name):
-                        linelist = line.split()
-                        value = None
-                        if len(linelist) != 3:
-                            self.exception('splitted line /proc/meminfo containing ' + name + ' did not return 3 values')
-                        elif linelist[2] != 'kB':
-                            self.exception('/proc/meminfo ' + name + ' does not end with kB')
-                        else:
-                            try:
-                                value = int(linelist[1])
-                            except Exception, e:
-                                self.exception('/proc/meminfo ' + name + ' value can not be converted to an integer')
-                        ret[index] = value
-                        exists[index] = True
-                        break
+            for index, lineindex in enumerate(self._memInfoLineIndexes):
+                if lineindex != None:
+                    ret[index] = int(lst[lineindex].split()[1])
         except Exception, e:
             self.exception(e)
-            
-        for index, b in enumerate(exists):
-            if not b:
-                self.exception('/proc/meminfo ' + names[index] + ' could not be found')
         return ret
+        
+        
+    def _checkSchedStat(self):
+        self._schedstatLineIndex = None
+        try:
+            file = open("/proc/schedstat", "r")
+            lines = file.readlines()
+            file.close()
+            for index, line in enumerate(lines):
+                if index == 0:
+                    lst = line.split()
+                    if lst[1] != '15':
+                        self.exception('/proc/schedstat is not using version 15')
+                if line.strip().startswith('cpu0'):
+                    lst = line.split()
+                    if len(lst) != 10:
+                        self.exception('splitted line containing cpu0 from /proc/schedstat did not return 10 values')
+                    else:
+                        self._schedstatLineIndex = index
+                    break
+            if self._schedstatLineIndex == None:
+                self.exception('cpu0 could not be found in /proc/schedstat')
+        except Exception, e:
+            self.exception(e)
         
         
     def _getSchedStat(self):
@@ -616,34 +733,41 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
              # of tasks (not necessarily unique) given to the processor (long)]
         '''
         ret = [None]*4
+        if self._schedstatLineIndex != None:
+            try:
+                file = open("/proc/schedstat", "r")
+                line = file.readlines()[self._schedstatLineIndex]
+                file.close()
+#                print '#############################################################################'
+#                print '/proc/schedstat'
+#                print '[# of times sched_yield() was called (int), sum of all time spent running by tasks on this processor (in ms) (long), sum of all time spent waiting to run by tasks on this processor (in ms) (long), # of tasks (not necessarily unique) given to the processor (long)]'
+#                print ''
+#                print str(line)
+#                print ''
+                lst = line.split()
+                ret = [int(lst[1]), long(lst[7]), long(lst[8]), long(lst[9])]
+            except Exception, e:
+                self.exception(e)
+        return ret
+        
+        
+        
+    def _checkNetDev(self):
+        self._netDevLineIndexes = [None]*3
         try:
-            file = open("/proc/schedstat", "r")
+            file = open("/proc/net/dev", "r")
             lines = file.readlines()
             file.close()
-#            print '#############################################################################'
-#            print '/proc/schedstat'
-#            print '[# of times sched_yield() was called (int), sum of all time spent running by tasks on this processor (in ms) (long), sum of all time spent waiting to run by tasks on this processor (in ms) (long), # of tasks (not necessarily unique) given to the processor (long)]'
-#            print ''
-#            print str(lines)
-#            print ''
-            statsAvailable = False
-            for line in lines:
-                if line.strip().startswith('cpu0'):
-                    statsAvailable = True
-                    lst = line.split()
-                    if len(lst) != 10:
-                        self.exception('splitted line containing cpu0 from /proc/schedstat did not return 10 values')
-                    else:
-                        try:
-                            ret = [int(lst[1]), long(lst[7]), long(lst[8]), long(lst[9])]
-                        except Exception, e:
-                            self.exception('/proc/interrupts ' + name + ' value can not be converted to an integer')
-                    break
-            if not statsAvailable:
-                self.exception('cpu0 could not be found in /proc/schedstat')
+            for index, line in enumerate(lines):
+                lst = line.split()
+                if lst[0].strip().startswith('eth0:'):
+                    self._netDevLineIndexes[0] = index
+                elif lst[0].strip().startswith('ppp0:'):
+                    self._netDevLineIndexes[1] = index
+                elif lst[0].strip().startswith('wlan0:'):
+                    self._netDevLineIndexes[2] = index
         except Exception, e:
             self.exception(e)
-        return ret
         
         
         
@@ -670,20 +794,40 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print str(lines)
 #            print ''
             ret[0] = len(lines)-3
-            for line in lines:
-                lst = line.split()
-                if lst[0].strip().startswith('eth0:'):
-                    ret[1] = long(lst[1])
-                    ret[2] = long(lst[9])
-                elif lst[0].strip().startswith('ppp0:'):
-                    ret[3] = long(lst[1])
-                    ret[4] = long(lst[9])
-                elif lst[0].strip().startswith('wlan0:'):
-                    ret[5] = long(lst[1])
-                    ret[6] = long(lst[9])
+            index = 1
+            for lineindex in self._netDevLineIndexes:
+                if lineindex != None:
+                    lst = lines[lineindex].split()
+                    ret[index] = long(lst[1])
+                    ret[index+1] = long(lst[9])
+                index += 2
         except Exception, e:
             self.exception(e)
         return ret
+        
+        
+    def _checkNetSNMP(self):
+        names = ['InReceives', 'InHdrErrors', 'InAddrErrors', 'InUnknownProtos', 'InDiscards', 'InDelivers', 'OutRequests', 'OutDiscards', 'OutNoRoutes', 'InMsgs', 'InErrors', 'InDestUnreachs', 'InEchos', 'InEchoReps', 'OutMsgs', 'OutErrors', 'OutDestUnreachs', 'OutEchos', 'OutEchoReps', 'ActiveOpens', 'PassiveOpens', 'AttemptFails', 'EstabResets', 'CurrEstab', 'InSegs', 'OutSegs', 'RetransSegs', 'InErrs', 'OutRsts', 'InDatagrams', 'NoPorts', 'InErrors', 'OutDatagrams', 'RcvbufErrors', 'SndbufErrors']
+        self._netSNMPLineIndexPair = [None]*len(names)
+        
+        try:
+            file = open("/proc/net/snmp", "r")
+            lines = file.readlines()
+            file.close()
+            
+            for nameindex, name in enumerate(names):
+                for lineindex, line in enumerate(lines):
+                    if line.strip().startswith('Ip:') or line.strip().startswith('Icmp:') or line.strip().startswith('Tcp:') or line.strip().startswith('Udp:') and line.find(name) != -1:
+                        lst = line.split()
+                        for valueindex, entry in enumerate(lst):
+                            if entry == name:
+                                self._netSNMPLineIndexPair[nameindex] = [lineindex+1, valueindex]
+        except Exception, e:
+            self.exception(e)
+            
+        for index, b in enumerate(self._netSNMPLineIndexPair):
+            if b == None:
+                self.exception('/proc/net/snmp ' + names[index] + ' could not be found')
         
         
     def _getNetSNMP(self):
@@ -724,8 +868,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
              Udp RcvbufErrors (int),
              Udp SndbufErrors (int)]
         '''
-        names = ['InReceives', 'InHdrErrors', 'InAddrErrors', 'InUnknownProtos', 'InDiscards', 'InDelivers', 'OutRequests', 'OutDiscards', 'OutNoRoutes', 'InMsgs', 'InErrors', 'InDestUnreachs', 'InEchos', 'InEchoReps', 'OutMsgs', 'OutErrors', 'OutDestUnreachs', 'OutEchos', 'OutEchoReps', 'ActiveOpens', 'PassiveOpens', 'AttemptFails', 'EstabResets', 'CurrEstab', 'InSegs', 'OutSegs', 'RetransSegs', 'InErrs', 'OutRsts', 'InDatagrams', 'NoPorts', 'InErrors', 'OutDatagrams', 'RcvbufErrors', 'SndbufErrors']
-        ret = [None]*len(names)
+        ret = [None]*len(self._netSNMPLineIndexPair)
         
         try:
             file = open("/proc/net/snmp", "r")
@@ -737,33 +880,40 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print ''
 #            print str(lines)
 #            print ''
-            first = True
-            netstatnamelist = []
-            netstatdict = {}
-            for line in lines:
-                if line.strip().startswith('Ip:') or line.strip().startswith('Icmp:') or line.strip().startswith('Tcp:') or line.strip().startswith('Udp:'):
-                    if first:
-                        lst = line.split()
-                        for index, entry in enumerate(lst):
-                            if index != 0:
-                                netstatnamelist.append(entry)
-                        first = False
-                    else:
-                        lst = line.split()
-                        for index, entry in enumerate(lst):
-                            if index != 0:
-                                netstatdict.update({netstatnamelist[index-1]: long(entry)})
-                        first = True
-                        netstatnamelist = []
-
-            for index, name in enumerate(names):
-                value = netstatdict.get(name)
-                if value == None:
-                    self.exception('/proc/net/snmp ' + name + ' could not be found')
-                ret[index] = value
+            splittedlines = [None]*len(lines)
+            for i, line in enumerate(lines):
+                splittedlines[i] = line.split()
+            for index, linepair in enumerate(self._netSNMPLineIndexPair):
+                if linepair != None:
+                    ret[index] = long(splittedlines[linepair[0]][linepair[1]])
         except Exception, e:
             self.exception(e)
         return ret
+        
+        
+        
+    def _checkNetStat(self):
+        names = ['TCPLoss', 'TCPLossUndo', 'InNoRoutes', 'InMcastOctets', 'OutMcastOctets', 'OutBcastPkts', 'OutOctets', 'InOctets', 'InBcastOctets', 'InMcastPkts', 'OutBcastOctets', 'InBcastPkts', 'OutMcastPkts', 'InTruncatedPkts']
+        self._netStatLineIndexPair = [None]*len(names)
+        
+        try:
+            file = open("/proc/net/netstat", "r")
+            lines = file.readlines()
+            file.close()
+            
+            for nameindex, name in enumerate(names):
+                for lineindex, line in enumerate(lines):
+                    if line.strip().startswith('TcpExt:') or line.strip().startswith('IpExt:') and line.find(name) != -1:
+                        lst = line.split()
+                        for valueindex, value in enumerate(lst):
+                            if name == value:
+                                self._netStatLineIndexPair[nameindex] = [lineindex+1, valueindex]
+        except Exception, e:
+            self.exception(e)
+            
+        for index, b in enumerate(self._netStatLineIndexPair):
+            if b == None:
+                self.exception('/proc/net/netstat ' + names[index] + ' could not be found')
         
         
         
@@ -784,8 +934,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
              OutMcastPkts (long),
              InTruncatedPkts (long)]
         '''
-        names = ['TCPLoss', 'TCPLossUndo', 'InNoRoutes', 'InMcastOctets', 'OutMcastOctets', 'OutBcastPkts', 'OutOctets', 'InOctets', 'InBcastOctets', 'InMcastPkts', 'OutBcastOctets', 'InBcastPkts', 'OutMcastPkts', 'InTruncatedPkts']
-        ret = [None]*len(names)
+        ret = [None]*len(self._netStatLineIndexPair)
         
         try:
             file = open("/proc/net/netstat", "r")
@@ -797,33 +946,58 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print ''
 #            print str(lines)
 #            print ''
-            first = True
-            netstatnamelist = []
-            netstatdict = {}
-            for line in lines:
-                if line.strip().startswith('TcpExt:') or line.strip().startswith('IpExt:'):
-                    if first:
-                        lst = line.split()
-                        for index, entry in enumerate(lst):
-                            if index != 0:
-                                netstatnamelist.append(entry)
-                        first = False
-                    else:
-                        lst = line.split()
-                        for index, entry in enumerate(lst):
-                            if index != 0:
-                                netstatdict.update({netstatnamelist[index-1]: long(entry)})
-                        first = True
-                        netstatnamelist = []
-
-            for index, name in enumerate(names):
-                value = netstatdict.get(name)
-                if value == None:
-                    self.exception('/proc/net/netstat ' + name + ' could not be found')
-                ret[index] = value
+            splittedlines = [None]*len(lines)
+            for i, line in enumerate(lines):
+                splittedlines[i] = line.split()
+            for index, linepair in enumerate(self._netStatLineIndexPair):
+                if linepair != None:
+                    ret[index] = long(splittedlines[linepair[0]][linepair[1]])
         except Exception, e:
             self.exception(e)
         return ret
+        
+        
+    def _checkSockStat(self):
+        self._sockStatLineIndexes = [None]*3
+
+        try:
+            file = open("/proc/net/sockstat", "r")
+            lines = file.readlines()
+            file.close()
+
+            socketsAvailable = False
+            tcpAvailable = False
+            udpAvailable = False
+            for lineindex, line in enumerate(lines):
+                if line.strip().startswith('sockets:'):
+                    socketsAvailable = True
+                    lst = line.split()
+                    if len(lst) != 3:
+                        self.exception('splitted line containing sockets from /proc/net/sockstat did not return 3 values')
+                    else:
+                        self._sockStatLineIndexes[0] = lineindex
+                elif line.strip().startswith('TCP:'):
+                    tcpAvailable = True
+                    lst = line.split()
+                    if len(lst) != 11:
+                        self.exception('splitted line containing TCP from /proc/net/sockstat did not return 11 values')
+                    else:
+                        self._sockStatLineIndexes[1] = lineindex
+                elif line.strip().startswith('UDP:'):
+                    udpAvailable = True
+                    lst = line.split()
+                    if len(lst) != 5:
+                        self.exception('splitted line containing UDP from /proc/net/sockstat did not return 5 values')
+                    else:
+                        self._sockStatLineIndexes[2] = lineindex
+            if not socketsAvailable:
+                self.exception('sockets could not be found in /proc/net/sockstat')
+            if not tcpAvailable:
+                self.exception('TCP could not be found in /proc/net/sockstat')
+            if not udpAvailable:
+                self.exception('UDP could not be found in /proc/net/sockstat')
+        except Exception, e:
+            self.exception(e)
         
         
     def _getSockStat(self):
@@ -848,45 +1022,49 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print ''
 #            print str(lines)
 #            print ''
-            socketsAvailable = False
-            tcpAvailable = False
-            udpAvailable = False
-            for line in lines:
-                if line.strip().startswith('sockets:'):
-                    socketsAvailable = True
+            for lineindex, line in enumerate(lines):
+                if self._sockStatLineIndexes[0] == lineindex:
+                    ret[0] = int(line.split()[2])
+                elif self._sockStatLineIndexes[1] == lineindex:
                     lst = line.split()
-                    if len(lst) != 3:
-                        self.exception('splitted line containing sockets from /proc/net/sockstat did not return 3 values')
-                    else:
-                        ret[0] = int(lst[2])
-                elif line.strip().startswith('TCP:'):
-                    tcpAvailable = True
-                    lst = line.split()
-                    if len(lst) != 11:
-                        self.exception('splitted line containing TCP from /proc/net/sockstat did not return 11 values')
-                    else:
-                        ret[1] = int(lst[2])
-                        ret[2] = int(lst[4])
-                        ret[3] = int(lst[6])
-                        ret[4] = int(lst[8])
-                        ret[5] = int(lst[10])
-                elif line.strip().startswith('UDP:'):
+                    ret[1] = int(lst[2])
+                    ret[2] = int(lst[4])
+                    ret[3] = int(lst[6])
+                    ret[4] = int(lst[8])
+                    ret[5] = int(lst[10])
+                elif self._sockStatLineIndexes[2] == lineindex:
                     udpAvailable = True
                     lst = line.split()
-                    if len(lst) != 5:
-                        self.exception('splitted line containing UDP from /proc/net/sockstat did not return 5 values')
-                    else:
-                        ret[6] = int(lst[2])
-                        ret[7] = int(lst[4])
-            if not socketsAvailable:
-                self.exception('sockets could not be found in /proc/net/sockstat')
-            if not tcpAvailable:
-                self.exception('TCP could not be found in /proc/net/sockstat')
-            if not udpAvailable:
-                self.exception('UDP could not be found in /proc/net/sockstat')
+                    ret[6] = int(lst[2])
+                    ret[7] = int(lst[4])
         except Exception, e:
             self.exception(e)
         return ret
+        
+        
+    def _checkSoftIRQ(self):
+        names = ['TIMER', 'TASKLET', 'HRTIMER']
+        self._softIRQLineIndexes = [None]*len(names)
+        try:
+            file = open("/proc/softirqs", "r")
+            lst = file.readlines()
+            file.close()
+            
+            for nameindex, name in enumerate(names):
+                for lineindex, line in enumerate(lst):
+                    if line.strip().startswith(name):
+                        linelist = line.split()
+                        if len(linelist) != 2:
+                            self.exception('splitted line /proc/softirqs containing ' + name + ' did not return 2 values')
+                        else:
+                            self._softIRQLineIndexes[nameindex] = lineindex
+                        break
+        except Exception, e:
+            self.exception(e)
+            
+        for index, b in enumerate(self._softIRQLineIndexes):
+            if b == None:
+                self.exception('/proc/softirqs ' + names[index] + ' could not be found')
         
         
     def _getSoftIRQ(self):
@@ -895,12 +1073,10 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
              TASKLET (long),
              HRTIMER (long)]
         '''
-        names = ['TIMER', 'TASKLET', 'HRTIMER']
-        ret = [None]*len(names)
-        exists = [False]*len(names)
+        ret = [None]*len(self._softIRQLineIndexes)
         try:
             file = open("/proc/softirqs", "r")
-            lst = file.readlines()
+            lines = file.readlines()
             file.close()
 #            print '#############################################################################'
 #            print '/proc/softirqs'
@@ -908,28 +1084,65 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print ''
 #            print str(lst)
 #            print ''
-            for index, name in enumerate(names):
-                for line in lst:
-                    if line.strip().startswith(name):
-                        linelist = line.split()
-                        value = None
-                        if len(linelist) != 2:
-                            self.exception('splitted line /proc/softirqs containing ' + name + ' did not return 2 values')
-                        else:
-                            try:
-                                value = long(linelist[1])
-                            except Exception, e:
-                                self.exception('/proc/softirqs ' + name + ' value can not be converted to a long')
-                        ret[index] = value
-                        exists[index] = True
-                        break
+            for index, lineindex in enumerate(self._softIRQLineIndexes):
+                if lineindex != None:
+                    ret[index] = long(lines[lineindex].split()[1])
         except Exception, e:
             self.exception(e)
-            
-        for index, b in enumerate(exists):
-            if not b:
-                self.exception('/proc/softirqs ' + names[index] + ' could not be found')
         return ret
+        
+        
+    def _checkStat(self):
+        self._statLineIndexes = [None]*4
+        
+        try:
+            file = open("/proc/stat", "r")
+            lines = file.readlines()
+            file.close()
+            
+            cpu0Available = False
+            ctxtAvailable = False
+            processesAvailable = False
+            procsBlockedAvailable = False
+            for lineindex, line in enumerate(lines):
+                if line.strip().startswith('cpu0'):
+                    cpu0Available = True
+                    lst = line.split()
+                    if len(lst) != 11:
+                        self.exception('splitted line containing cpu0 from /proc/stat did not return 11 values')
+                    else:
+                        self._statLineIndexes[0] = lineindex
+                elif line.strip().startswith('ctxt'):
+                    ctxtAvailable = True
+                    lst = line.split()
+                    if len(lst) != 2:
+                        self.exception('splitted line containing ctxt from /proc/stat did not return 2 values')
+                    else:
+                        self._statLineIndexes[1] = lineindex
+                elif line.strip().startswith('processes'):
+                    processesAvailable = True
+                    lst = line.split()
+                    if len(lst) != 2:
+                        self.exception('splitted line containing processes from /proc/stat did not return 2 values')
+                    else:
+                        self._statLineIndexes[2] = lineindex
+                elif line.strip().startswith('procs_blocked'):
+                    procsBlockedAvailable = True
+                    lst = line.split()
+                    if len(lst) != 2:
+                        self.exception('splitted line containing procs_blocked from /proc/stat did not return 2 values')
+                    else:
+                        self._statLineIndexes[3] = lineindex
+            if not cpu0Available:
+                self.exception('cpu0 could not be found in /proc/stat')
+            if not ctxtAvailable:
+                self.exception('ctxt could not be found in /proc/stat')
+            if not processesAvailable:
+                self.exception('processes could not be found in /proc/stat')
+            if not procsBlockedAvailable:
+                self.exception('procs_blocked could not be found in /proc/stat')
+        except Exception, e:
+            self.exception(e)
         
         
     def _getStat(self):
@@ -956,53 +1169,22 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print ''
 #            print str(lines)
 #            print ''
-            cpu0Available = False
-            ctxtAvailable = False
-            processesAvailable = False
-            procsBlockedAvailable = False
-            for line in lines:
-                if line.strip().startswith('cpu0'):
-                    cpu0Available = True
+            for lineindex, line in enumerate(lines):
+                if self._statLineIndexes[0] == lineindex:
                     lst = line.split()
-                    if len(lst) != 11:
-                        self.exception('splitted line containing cpu0 from /proc/stat did not return 11 values')
-                    else:
-                        ret[0] = long(lst[1])
-                        ret[1] = long(lst[2])
-                        ret[2] = long(lst[3])
-                        ret[3] = long(lst[4])
-                        ret[4] = long(lst[5])
-                        ret[5] = long(lst[6])
-                        ret[6] = long(lst[7])
-                elif line.strip().startswith('ctxt'):
-                    ctxtAvailable = True
-                    lst = line.split()
-                    if len(lst) != 2:
-                        self.exception('splitted line containing ctxt from /proc/stat did not return 2 values')
-                    else:
-                        ret[7] = long(lst[1])
-                elif line.strip().startswith('processes'):
-                    processesAvailable = True
-                    lst = line.split()
-                    if len(lst) != 2:
-                        self.exception('splitted line containing processes from /proc/stat did not return 2 values')
-                    else:
-                        ret[8] = long(lst[1])
-                elif line.strip().startswith('procs_blocked'):
-                    procsBlockedAvailable = True
-                    lst = line.split()
-                    if len(lst) != 2:
-                        self.exception('splitted line containing procs_blocked from /proc/stat did not return 2 values')
-                    else:
-                        ret[9] = long(lst[1])
-            if not cpu0Available:
-                self.exception('cpu0 could not be found in /proc/stat')
-            if not ctxtAvailable:
-                self.exception('ctxt could not be found in /proc/stat')
-            if not processesAvailable:
-                self.exception('processes could not be found in /proc/stat')
-            if not procsBlockedAvailable:
-                self.exception('procs_blocked could not be found in /proc/stat')
+                    ret[0] = long(lst[1])
+                    ret[1] = long(lst[2])
+                    ret[2] = long(lst[3])
+                    ret[3] = long(lst[4])
+                    ret[4] = long(lst[5])
+                    ret[5] = long(lst[6])
+                    ret[6] = long(lst[7])
+                if self._statLineIndexes[1] == lineindex:
+                    ret[7] = long(line.split()[1])
+                if self._statLineIndexes[2] == lineindex:
+                    ret[8] = long(line.split()[1])
+                if self._statLineIndexes[3] == lineindex:
+                    ret[9] = long(line.split()[1])
         except Exception, e:
             self.exception(e)
         return ret

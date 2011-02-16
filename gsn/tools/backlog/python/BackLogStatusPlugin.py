@@ -70,6 +70,8 @@ class BackLogStatusPluginClass(AbstractPluginClass):
     def run(self):
         self.info('started')
         
+        self._checkStatus()
+        
         self.processMsg(self.getTimeStamp(), [STATIC_TYPE] + self._getInitStats())
         
         for entry in self._backlogMain.getCodeRevisionList():
@@ -130,6 +132,42 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         return ret
         
         
+    def _checkStatus(self):
+        names = ['VmPeak:', 'VmSize:', 'VmLck:', 'VmHWM:', 'VmRSS:', 'VmData:', 'VmStk:', 'VmExe:', 'VmLib:', 'VmPTE:', 'Threads:', 'voluntary_ctxt_switches:', 'nonvoluntary_ctxt_switches:']
+        self._statusLineIndexes = [None]*len(names)
+        try:
+            file = open("/proc/self/status", "r")
+            lst = file.readlines()
+            file.close()
+            for nameindex, name in enumerate(names):
+                for lineindex, line in enumerate(lst):
+                    if line.strip().startswith(name):
+                        linelist = line.split()
+                        value = None
+                        check = False
+                        if nameindex <= 9:
+                            if len(linelist) != 3:
+                                self.exception('splitted line /proc/self/status containing ' + name + ' did not return 3 values')
+                            elif linelist[2] != 'kB':
+                                self.exception('/proc/self/status ' + name + ' does not end with kB')
+                            else:
+                                check = True
+                        else:
+                            if len(linelist) != 2:
+                                self.exception('splitted line /proc/self/status containing ' + name + ' did not return 2 values')
+                            else:
+                                check = True
+                        if check:
+                            self._statusLineIndexes[nameindex] = lineindex
+                        break
+        except Exception, e:
+            self.exception(e)
+            
+        for index, b in enumerate(self._statusLineIndexes):
+            if b == None:
+                self.exception('/proc/self/status ' + names[index] + ' could not be found')
+        
+        
     def _getStatus(self):
         '''
             [VmPeak in kB (int),
@@ -146,51 +184,22 @@ class BackLogStatusPluginClass(AbstractPluginClass):
              voluntary_ctxt_switches (int),
              nonvoluntary_ctxt_switches (int)]
         '''
-        names = ['VmPeak:', 'VmSize:', 'VmLck:', 'VmHWM:', 'VmRSS:', 'VmData:', 'VmStk:', 'VmExe:', 'VmLib:', 'VmPTE:', 'Threads:', 'voluntary_ctxt_switches:', 'nonvoluntary_ctxt_switches:']
-        ret = [None]*len(names)
-        exists = [False]*len(names)
+        ret = [None]*len(self._statusLineIndexes)
         try:
             file = open("/proc/self/status", "r")
-            lst = file.readlines()
+            lines = file.readlines()
             file.close()
 #            print '#############################################################################'
 #            print '/proc/self/status'
 #            print '[VmPeak in kB (int), VmSize in kB (int), VmLck in kB (int), VmHWM in kB (int), VmRSS in kB (int), VmData in kB (int), VmStk in kB (int), VmExe in kB (int), VmLib in kB (int), VmPTE in kB (int), # of threads (int), voluntary_ctxt_switches (int), nonvoluntary_ctxt_switches (int)]'
 #            print ''
-#            print str(lst)
+#            print str(lines)
 #            print ''
-            for index, name in enumerate(names):
-                for line in lst:
-                    if line.strip().startswith(name):
-                        linelist = line.split()
-                        value = None
-                        check = False
-                        if index <= 9:
-                            if len(linelist) != 3:
-                                self.exception('splitted line /proc/self/status containing ' + name + ' did not return 3 values')
-                            elif linelist[2] != 'kB':
-                                self.exception('/proc/self/status ' + name + ' does not end with kB')
-                            else:
-                                check = True
-                        else:
-                            if len(linelist) != 2:
-                                self.exception('splitted line /proc/self/status containing ' + name + ' did not return 2 values')
-                            else:
-                                check = True
-                        if check:
-                            try:
-                                value = int(linelist[1])
-                            except Exception, e:
-                                self.exception('/proc/self/status ' + name + ' value can not be converted to an integer')
-                        ret[index] = value
-                        exists[index] = True
-                        break
+            for index, lineindex in enumerate(self._statusLineIndexes):
+                if lineindex != None:
+                    ret[index] = int(lines[lineindex].split()[1])
         except Exception, e:
             self.exception(e)
-            
-        for index, b in enumerate(exists):
-            if not b:
-                self.exception('/proc/self/status ' + names[index] + ' could not be found')
         return ret
     
     
