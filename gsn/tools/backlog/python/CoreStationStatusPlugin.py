@@ -157,15 +157,15 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #        print '_getLM92Temp :' + str(self._getLM92Temp())
         
         data_list = [HW_TYPE]
-        data_list += self._getAD77x8()
+        timestamp = self.getTimeStamp()
         data_list += self._getLM92Temp()
-        
-        self.processMsg(self.getTimeStamp(), data_list)
+        data_list += self._getAD77x8()
+        self.processMsg(timestamp, data_list)
         
         data_list = [SW_TYPE]
+        timestamp = self.getTimeStamp()
         data_list += self._getNumberOfUsers()
         data_list += self._getLastLog()
-        data_list += self._getChronyStats()
         data_list += self._getStatVFS()
         data_list += self._getDiskStats()
         data_list += self._getInterrupts()
@@ -179,8 +179,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         data_list += self._getSoftIRQ()
         data_list += self._getStat()
         data_list += self._getUptime()
-        
-        self.processMsg(self.getTimeStamp(), data_list)
+        data_list += self._getChronyStats()
+        self.processMsg(timestamp, data_list)
             
     
     

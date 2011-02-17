@@ -44,6 +44,7 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			
+			new DataField("LM92_TEMP", "INTEGER"),
 			new DataField("V_EXT2", "INTEGER"),
 			new DataField("V_EXT1", "INTEGER"),
 			new DataField("V_EXT3", "INTEGER"),
@@ -53,8 +54,7 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			new DataField("VCC_5_0", "INTEGER"),
 			new DataField("VCC_NODE", "INTEGER"),
 			new DataField("I_VCC_NODE", "INTEGER"),
-			new DataField("VCC_4_2", "INTEGER"),
-			new DataField("LM92_TEMP", "INTEGER")};
+			new DataField("VCC_4_2", "INTEGER")};
 
 	private static DataField[] swDataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
@@ -64,13 +64,6 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			new DataField("USERS", "SMALLINT"),
 
 			new DataField("LASTLOG", "VARCHAR(255)"),
-             
-			new DataField("CHRONY_STRATUM", "INTEGER"),
-			new DataField("CHRONY_SYSTIME_ERROR", "DOUBLE"),
-			new DataField("CHRONY_FREQUENCY", "DOUBLE"),
-			new DataField("CHRONY_SKEW", "DOUBLE"),
-			new DataField("CHRONY_RTC_ERROR", "DOUBLE"),
-			new DataField("CHRONY_RTC_GAIN_RATE", "DOUBLE"),
 
 			new DataField("STATVFS_ROOT_SIZE", "BIGINT"),
 			new DataField("STATVFS_ROOT_FREE", "BIGINT"),
@@ -211,7 +204,14 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			new DataField("STAT_PROCS_BLOCKED", "INTEGER"),
 
 			new DataField("UPTIME", "DOUBLE"),
-			new DataField("IDLETIME", "DOUBLE")};
+			new DataField("IDLETIME", "DOUBLE"),
+             
+			new DataField("CHRONY_STRATUM", "INTEGER"),
+			new DataField("CHRONY_SYSTIME_ERROR", "DOUBLE"),
+			new DataField("CHRONY_FREQUENCY", "DOUBLE"),
+			new DataField("CHRONY_SKEW", "DOUBLE"),
+			new DataField("CHRONY_RTC_ERROR", "DOUBLE"),
+			new DataField("CHRONY_RTC_GAIN_RATE", "DOUBLE")};
 	
 	private static final Hashtable<String, NameDataFieldPair> statusNamingTable = new Hashtable<String, NameDataFieldPair>();
 	static
