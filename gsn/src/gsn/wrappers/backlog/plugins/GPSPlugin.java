@@ -2,6 +2,7 @@ package gsn.wrappers.backlog.plugins;
 
 import java.io.Serializable;
 import java.util.Hashtable;
+import java.lang.Integer;
 
 import org.apache.log4j.Logger;
 
@@ -38,6 +39,8 @@ public class GPSPlugin extends AbstractPlugin {
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
+			new DataField("GPS_SAMPLE_COUNT", "INTEGER"),
+			new DataField("GPS_SATS", "INTEGER"),
 			new DataField("GPS_RAW_DATA", "BINARY")
 			};
 	
@@ -110,7 +113,7 @@ public class GPSPlugin extends AbstractPlugin {
 					
 				}
 				else if (gpsDataType.equalsIgnoreCase(RAW_NAMING)) {
-					out = new Serializable[]{timestamp, timestamp, deviceId, toShort(data[1]), data[2]};
+					out = new Serializable[]{timestamp, timestamp, deviceId, toShort(data[1]), toInteger(data[2]), toInteger(data[3]), data[4]};
 				}
 				else {
 					logger.warn("Wrong GPS data type spedified.");
