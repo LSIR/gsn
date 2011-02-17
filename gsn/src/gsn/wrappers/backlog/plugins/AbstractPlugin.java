@@ -23,7 +23,8 @@ import gsn.wrappers.backlog.BackLogMessageListener;
  */
 public abstract class AbstractPlugin extends Thread implements BackLogMessageListener {
 	
-	private static final int DEFAULT_PRIORITY = 99;
+	private static final int DEFAULT_PACKET_SEND_PRIORITY = 10;
+	private static final int DEFAULT_ACK_PRIORITY = 90;
 
 	protected BackLogWrapper activeBackLogWrapper = null;
 	protected Integer priority = null;
@@ -246,7 +247,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 */
 	public boolean sendRemote(long timestamp, Serializable[] data, Integer priority) throws IOException {
 		if (priority == null)
-			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, DEFAULT_PRIORITY);
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, DEFAULT_PACKET_SEND_PRIORITY);
 		else
 			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, priority);
 	}
@@ -283,7 +284,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 */
 	public boolean sendRemote(long timestamp, Serializable[] data, Integer id, Integer priority) throws IOException {
 		if (priority == null)
-			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id, DEFAULT_PRIORITY);
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id, DEFAULT_PACKET_SEND_PRIORITY);
 		else
 			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id, priority);
 	}
@@ -314,7 +315,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 */
 	public void ackMessage(long timestamp, Integer priority) {
 		if (priority == null)
-			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), DEFAULT_PRIORITY);
+			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), DEFAULT_ACK_PRIORITY);
 		else
 			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), priority);
 	}
@@ -347,9 +348,10 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 
 
 	/**
-	 * This function returns the DeviceId of the CoreStation this plugin is connected to.
+	 * This function returns the DeviceId of the CoreStation this plugin is connected to
+	 * or null if it has not yet been connected to a CoreStation.
 	 * 
-	 * @return the DeviceId of the connected CoreStation
+	 * @return the DeviceId of the connected CoreStation or null if not yet connected.
 	 */
 	public Integer getDeviceID() {
 		return activeBackLogWrapper.getBLMessageMultiplexer().getDeviceID();

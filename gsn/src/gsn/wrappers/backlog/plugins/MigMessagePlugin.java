@@ -43,6 +43,9 @@ import org.apache.log4j.Logger;
  */
 public class MigMessagePlugin extends AbstractPlugin
 {
+	private int ACCESS_NODE_ID_BOUNDARY = 1024;
+	
+	
 	private MigMessageParameters parameters = null;
 
 	private Constructor<?> messageConstructor = null;
@@ -246,140 +249,147 @@ public class MigMessagePlugin extends AbstractPlugin
 
 	@Override
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
-		boolean ret = false;
-		if (logger.isDebugEnabled())
-			logger.debug("action: " + action);
-		if( action.compareToIgnoreCase("payload") == 0 ) {
-			int moteId = -257;
-			int amType = -257;
-			byte[] data = null;
-			
-			if( paramNames.length != 3 ) {
-				logger.error("upload action must have three parameter names: 'destination', 'amtype' and 'data'");
-				return false;
-			}
-			if( paramValues.length != 3 ) {
-				logger.error("upload action must have three parameter values");
-				return false;
-			}
-			
-			for( int i=0; i<3; i++ ) {
-				try {
-					String tmp = paramNames[i];
-					if( tmp.compareToIgnoreCase("destination") == 0 )
-						moteId = Integer.parseInt((String) paramValues[i]);
-					else if( tmp.compareToIgnoreCase("am_type") == 0 )
-						amType = Integer.parseInt((String) paramValues[i]);
-					else if( tmp.compareToIgnoreCase("data") == 0 )
-						data = ((String) paramValues[i]).getBytes();
-				} catch(Exception e) {
-					logger.error("Could not interprete upload arguments: " + e.getMessage());
-					return false;
-				}
-			}
-			
-			if( moteId < -256 | amType < -256 | data == null ) {
-				logger.error("upload action must contain all three parameter names: 'destination', 'am type' and 'data'");
-				return false;
-			}
-			
-			if(data.length == 0) {
-				logger.warn("Upload message's data field is empty");
-			}
-			
-			try {
-				ret = sendRemote(System.currentTimeMillis(), new Serializable[] {createTOSpacket(moteId, amType, data)}, super.priority);
-				if (logger.isDebugEnabled())
-					logger.debug("Mig message sent to destination " + moteId + " with AM type " + amType);
-			} catch (IOException e) {
-				logger.warn(e.getMessage());
-			}
-		}
-		else if( action.compareToIgnoreCase("binary_packet") == 0 ) {
-			if(((String)paramNames[0]).compareToIgnoreCase("binary packet") == 0) {
-				byte [] packet = ((String) paramValues[0]).getBytes();
-				if(packet.length > 0) {
-					try {
-						ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
-						if (logger.isDebugEnabled())
-							logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
-					} catch (IOException e) {
-						logger.warn(e.getMessage());
-					}
-				}
-				else {
-					logger.error("Upload failed due to empty 'binary packet' field");
-				}
-			}
-			else {
-				logger.error("binary_packet upload action needs a 'binary packet' field.");
-			}
-		}
-		else if( action.compareToIgnoreCase("tosmsg") == 0 ) {
-			// compose tos packet for sending
-			Method setter = null;
-			
-			if (parseMapping==null) {
-				try {
-					buildMappings();
-				}
-				catch (Exception e) {
-					logger.error(e);
-					return false;
-				}
-			}
+		if (getDeviceID() != null && getDeviceID() <= ACCESS_NODE_ID_BOUNDARY) {
+			boolean ret = false;
+			if (logger.isDebugEnabled())
+				logger.debug("action: " + action);
+			if( action.compareToIgnoreCase("payload") == 0 ) {
+				int moteId = -257;
+				int amType = -257;
+				byte[] data = null;
 				
-			try {
-				Object msg = (Object) voidMessageConstructor.newInstance();
-
-				Iterator<Method> iter = parameters.getSetters().iterator();
-				while (iter.hasNext()) {
-					setter = iter.next();
-					setter.setAccessible(true);
-					for (int i=0; i<paramNames.length;i++) {
-						String name = setter.getName();
-						if (paramNames[i].compareToIgnoreCase(name.substring(parameters.getTinyosSetterPrefix().length()))==0) {
-							Class<?>[] setterparams = setter.getParameterTypes();
-							if (setterparams.length==1) {
-								Class<?> param = setterparams[0];
-								if (logger.isDebugEnabled())
-									logger.debug("set field "+name+" to "+ (String)paramValues[i]);
-								Method parser = parseMapping.get(param);
-								setter.invoke(msg, parser.invoke(null, paramValues[i]));
-							}
-							else {
-								logger.warn("Unknown setter with "+ setterparams.length +" parameters");
-							}	
-							break;
-						}
+				if( paramNames.length != 3 ) {
+					logger.error("upload action must have three parameter names: 'destination', 'amtype' and 'data'");
+					return false;
+				}
+				if( paramValues.length != 3 ) {
+					logger.error("upload action must have three parameter values");
+					return false;
+				}
+				
+				for( int i=0; i<3; i++ ) {
+					try {
+						String tmp = paramNames[i];
+						if( tmp.compareToIgnoreCase("destination") == 0 )
+							moteId = Integer.parseInt((String) paramValues[i]);
+						else if( tmp.compareToIgnoreCase("am_type") == 0 )
+							amType = Integer.parseInt((String) paramValues[i]);
+						else if( tmp.compareToIgnoreCase("data") == 0 )
+							data = ((String) paramValues[i]).getBytes();
+					} catch(Exception e) {
+						logger.error("Could not interprete upload arguments: " + e.getMessage());
+						return false;
 					}
 				}
-				if (logger.isDebugEnabled())
-					logger.debug(msg);
-				// switch tos version
-				byte[] packet;
-				if (tinyos1x_platform != null) {
-					net.tinyos1x.message.Message tosmsg = (net.tinyos1x.message.Message)msg;
-					packet = createTOSpacket(0xffff, tosmsg.amType(), tosmsg.dataGet());
+				
+				if( moteId < -256 | amType < -256 | data == null ) {
+					logger.error("upload action must contain all three parameter names: 'destination', 'am type' and 'data'");
+					return false;
 				}
-				else {
-					net.tinyos.message.Message tosmsg = (net.tinyos.message.Message)msg;
-					packet = createTOSpacket(0xffff, tosmsg.amType(), tosmsg.dataGet());
+				
+				if(data.length == 0) {
+					logger.warn("Upload message's data field is empty");
 				}
+				
 				try {
-					ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
+					ret = sendRemote(System.currentTimeMillis(), new Serializable[] {createTOSpacket(moteId, amType, data)}, super.priority);
+					if (logger.isDebugEnabled())
+						logger.debug("Mig message sent to destination " + moteId + " with AM type " + amType);
 				} catch (IOException e) {
 					logger.warn(e.getMessage());
 				}
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				return false;
 			}
+			else if( action.compareToIgnoreCase("binary_packet") == 0 ) {
+				if(((String)paramNames[0]).compareToIgnoreCase("binary packet") == 0) {
+					byte [] packet = ((String) paramValues[0]).getBytes();
+					if(packet.length > 0) {
+						try {
+							ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
+							if (logger.isDebugEnabled())
+								logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
+						} catch (IOException e) {
+							logger.warn(e.getMessage());
+						}
+					}
+					else {
+						logger.error("Upload failed due to empty 'binary packet' field");
+					}
+				}
+				else {
+					logger.error("binary_packet upload action needs a 'binary packet' field.");
+				}
+			}
+			else if( action.compareToIgnoreCase("tosmsg") == 0 ) {
+				// compose tos packet for sending
+				Method setter = null;
+				
+				if (parseMapping==null) {
+					try {
+						buildMappings();
+					}
+					catch (Exception e) {
+						logger.error(e);
+						return false;
+					}
+				}
+					
+				try {
+					Object msg = (Object) voidMessageConstructor.newInstance();
+	
+					Iterator<Method> iter = parameters.getSetters().iterator();
+					while (iter.hasNext()) {
+						setter = iter.next();
+						setter.setAccessible(true);
+						for (int i=0; i<paramNames.length;i++) {
+							String name = setter.getName();
+							if (paramNames[i].compareToIgnoreCase(name.substring(parameters.getTinyosSetterPrefix().length()))==0) {
+								Class<?>[] setterparams = setter.getParameterTypes();
+								if (setterparams.length==1) {
+									Class<?> param = setterparams[0];
+									if (logger.isDebugEnabled())
+										logger.debug("set field "+name+" to "+ (String)paramValues[i]);
+									Method parser = parseMapping.get(param);
+									setter.invoke(msg, parser.invoke(null, paramValues[i]));
+								}
+								else {
+									logger.warn("Unknown setter with "+ setterparams.length +" parameters");
+								}	
+								break;
+							}
+						}
+					}
+					if (logger.isDebugEnabled())
+						logger.debug(msg);
+					// switch tos version
+					byte[] packet;
+					if (tinyos1x_platform != null) {
+						net.tinyos1x.message.Message tosmsg = (net.tinyos1x.message.Message)msg;
+						packet = createTOSpacket(0xffff, tosmsg.amType(), tosmsg.dataGet());
+					}
+					else {
+						net.tinyos.message.Message tosmsg = (net.tinyos.message.Message)msg;
+						packet = createTOSpacket(0xffff, tosmsg.amType(), tosmsg.dataGet());
+					}
+					try {
+						ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
+					} catch (IOException e) {
+						logger.warn(e.getMessage());
+					}
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+					return false;
+				}
+			}
+			else
+				logger.error("Unknown action");
+			
+			return ret;
 		}
-		else
-			logger.error("Unknown action");
-		
-		return ret;
+		else {
+			if (getDeviceID() != null)
+				logger.debug("device ID (" + getDeviceID() + ") bigger than " + ACCESS_NODE_ID_BOUNDARY);
+			return true;
+		}
 	}
 
 	private static void buildMappings () throws SecurityException, NoSuchMethodException {

@@ -236,7 +236,7 @@ public class BinaryPlugin extends AbstractPlugin {
 		long lastRecvPacketType = -1;
 		
 		if (firstConnect && activeBackLogWrapper.getBLMessageMultiplexer().isConnected()) {
-			remoteConnEstablished(activeBackLogWrapper.getBLMessageMultiplexer().getDeviceID());
+			remoteConnEstablished(getDeviceID());
 		}
 
     	Message msg;
