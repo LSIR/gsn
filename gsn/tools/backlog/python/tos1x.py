@@ -418,7 +418,11 @@ class SimpleAM(Thread):
 
     def run(self):
         while not self._simpleAMStop:
-            f = self._hdlc.read()
+            try:
+                f = self._hdlc.read()
+            except Exception, e:
+                if not self._simpleAMStop:
+                    self._logger.exception(e)
             if self._simpleAMStop:
                 break
             p = AckFrame(f)
@@ -538,8 +542,7 @@ class AM(SimpleAM):
                     try:
                         s = getSource(os.environ['MOTECOM'])
                     except:
-                        self._logger.error("Please indicate a way to connect to the mote")
-                        sys.exit(-1)
+                        raise Exception("Please indicate a way to connect to the mote")
         if oobHook == None:
             oobHook = printfHook
         super(AM, self).__init__(s, oobHook)
