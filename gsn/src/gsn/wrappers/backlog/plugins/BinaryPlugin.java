@@ -584,10 +584,8 @@ public class BinaryPlugin extends AbstractPlugin {
 
 	@Override
 	public boolean messageReceived(int deviceID, long timestamp, Serializable[] packet) {
-		if (this.deviceID != deviceID) {
-    		logger.error("device ID should not change during existing connection -> drop message");
-    		return false;
-		}
+		checkDeviceID(deviceID);
+
 		try {
 			if (logger.isDebugEnabled())
 				logger.debug("message received with timestamp " + timestamp);
@@ -602,29 +600,14 @@ public class BinaryPlugin extends AbstractPlugin {
 
 	@Override
 	public void remoteConnEstablished(Integer deviceID) {
+		checkDeviceID(deviceID);
+		
 		if (logger.isDebugEnabled())
 			logger.debug("Connection established");
 		if (connectionTestTimer != null)
 			connectionTestTimer.cancel();
 		else
 			connectionTestTimer = new Timer("ConnectionCheck");
-		
-		if (this.deviceID == null || this.deviceID != deviceID) {
-			String dir = rootBinaryDir + deploymentName + "/" + Integer.toString(deviceID) + "/";
-			File f = new File(dir);
-			if (!f.isDirectory()) {
-		    	if (!f.mkdirs()) {
-		    		logger.error("could not mkdir >" + dir + "<  -> drop message");
-				}
-		    	else
-		    		logger.info("created new storage directory >" + dir + "<");
-			}
-			if (this.deviceID != deviceID && this.deviceID != null)
-	    		logger.warn("device ID changed for deployment " + deploymentName + " and CoreStation " + coreStationName + " -> using new storage directory >" + dir + "/" + "<");
-			this.deviceID = deviceID;
-			binaryDir = dir;
-			logger.debug("storage directory for deployment " + deploymentName + " and CoreStation " + coreStationName + " is >" + binaryDir + "<");
-		}
 		
 		File sf = new File(binaryDir + PROPERTY_FILE_NAME);
 		if (sf.exists()) {
@@ -718,6 +701,25 @@ public class BinaryPlugin extends AbstractPlugin {
 
 		msgQueue.clear();
 		binarySender.stopSending();
+	}
+	
+	private void checkDeviceID(int deviceID) {
+		if (this.deviceID == null || this.deviceID != deviceID) {
+			String dir = rootBinaryDir + deploymentName + "/" + Integer.toString(deviceID) + "/";
+			File f = new File(dir);
+			if (!f.isDirectory()) {
+		    	if (!f.mkdirs()) {
+		    		logger.error("could not mkdir >" + dir + "<  -> drop message");
+				}
+		    	else
+		    		logger.info("created new storage directory >" + dir + "<");
+			}
+			if (this.deviceID != deviceID && this.deviceID != null)
+	    		logger.warn("device ID changed for deployment " + deploymentName + " and CoreStation " + coreStationName + " -> using new storage directory >" + dir + "/" + "<");
+			this.deviceID = deviceID;
+			binaryDir = dir;
+			logger.debug("storage directory for deployment " + deploymentName + " and CoreStation " + coreStationName + " is >" + binaryDir + "<");
+		}
 	}
 }
 
