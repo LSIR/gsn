@@ -18,6 +18,8 @@ from SpecialAPI import Statistics
 
 SLEEP_BEFORE_RESEND_ON_RECONNECT = 30
 
+SLEEP_BETWEEN_RESEND = 0.01
+
 
 class BackLogDBClass(Thread, Statistics):
     '''
@@ -221,11 +223,11 @@ class BackLogDBClass(Thread, Statistics):
         stat.append(self.getCounterValue(self._storeCounterId))
         stat.append(self.getCounterValue(self._removeCounterId))
         stat.append(self._convert(self.getMinCounterInc(self._storeTimeId, [intervalSec])[0]))
-        stat.append(self._convert(self.getMaxCounterInc(self._storeTimeId, [intervalSec])[0]))
         stat.append(self._convert(self.getAvgCounterInc(self._storeTimeId, [intervalSec])[0]))
+        stat.append(self._convert(self.getMaxCounterInc(self._storeTimeId, [intervalSec])[0]))
         stat.append(self._convert(self.getMinCounterInc(self._removeTimeId, [intervalSec])[0]))
-        stat.append(self._convert(self.getMaxCounterInc(self._removeTimeId, [intervalSec])[0]))
         stat.append(self._convert(self.getAvgCounterInc(self._removeTimeId, [intervalSec])[0]))
+        stat.append(self._convert(self.getMaxCounterInc(self._removeTimeId, [intervalSec])[0]))
         return stat
     
     
@@ -288,6 +290,10 @@ class BackLogDBClass(Thread, Statistics):
                     self._logger.info('resend interrupted')
                     self._isBusy = False
                     break
+                
+                # TODO: make it adaptive to CPU load
+                if SLEEP_BETWEEN_RESEND > 0:
+                    self._sleepEvent.wait(SLEEP_BETWEEN_RESEND)
 
             self._resend.clear()
 
