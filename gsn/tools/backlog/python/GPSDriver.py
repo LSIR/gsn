@@ -191,26 +191,26 @@ class GPSDriver():
             		recMsgId = self._serialAccess(self._device,2,'r')
             	# Is it the right Msg Type? 
             	if (recMsgId == msgId):	
-            		header = struct.unpack('2B', recMsgId)
-            		rawPayloadLength = self._serialAccess(self._device,2,'r')
-            		payloadLength = struct.unpack('H', rawPayloadLength)[0]
-            		payload = self._serialAccess(self._device,payloadLength,'r')
-            		ck = self._serialAccess(self._device,2,'r')
-            		while (ck == False):
-            			ck = self._serialAccess(self._device,2,'r')
-            		submitChecksum = struct.unpack('2B', ck)
-            
-            		calculatedChecksum = self._calculateChecksum(recMsgId + rawPayloadLength + payload)
-            	
-            		if( submitChecksum == calculatedChecksum): 
-            			success = True
-            		else:
-            			self._logger.warning('The submitted checksum did not match the expected one')
-            			self._logger.warning('Expected: ' +str(calculatedChecksum) + ' got: ' +str(submitChecksum))
-            			success = False
+                    header = struct.unpack('2B', recMsgId)
+                    rawPayloadLength = self._serialAccess(self._device,2,'r')
+                    payloadLength = struct.unpack('H', rawPayloadLength)[0]
+                    payload = self._serialAccess(self._device,payloadLength,'r')
+                    ck = self._serialAccess(self._device,2,'r')
+                    while (ck == False):
+                    	ck = self._serialAccess(self._device,2,'r')
+                    submitChecksum = struct.unpack('2B', ck)
+                    
+                    calculatedChecksum = self._calculateChecksum(recMsgId + rawPayloadLength + payload)
+                    
+                    if( submitChecksum == calculatedChecksum): 
+                    	success = True
+                    else:
+                    	self._logger.warning('The submitted checksum did not match the expected one')
+                    	self._logger.warning('Expected: ' +str(calculatedChecksum) + ' got: ' +str(submitChecksum))
+                    	success = False
 
         if (success):
-            return (header[0], header[1], payload) #ID, class, payload
+            return (header[0], header[1], payload, payloadLength) #ID, class, payload
         else:
             self._logger.warning("readGpsMessage: returned nothing!")
             return False

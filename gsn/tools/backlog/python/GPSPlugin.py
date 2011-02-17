@@ -29,6 +29,8 @@ if SUBPROCESS_BUG_BYPASS:
     subprocess = SubprocessFake
 else:
     import subprocess
+    
+from SpecialAPI import Statistics
 '''
 defines
 '''
@@ -37,11 +39,9 @@ DEFAULT_BACKLOG = True
 
 NAV_TYPE = 1
 RAW_TYPE = 2
-
 #Which conversion must be applied to this data at the GSN end? 0 -> NONE, 1 -> RAW->ASCII
 RAW_DATA_VERSION = 1
 NAV_DATA_VERSION = 1
-
 #Reads raw GPS messages from a u-blox device and sends them to GSN
 
 class GPSPluginClass(AbstractPluginClass):
@@ -67,6 +67,11 @@ class GPSPluginClass(AbstractPluginClass):
         self._deviceStr = self.getOptionValue('gps_device')
         # The GPS Mode (nav or raw)
         self._mode = self.getOptionValue('gps_mode')
+        # The GPS loggin Mode (binary or ascii)
+        self._logMode = self.getOptionValue('gps_log_mode')
+
+        if (self._logMode == "ascii"):
+            RAW_DATA_VERSION = 0
     	
         #For quality measurement
         self._measurementNo=0
@@ -74,10 +79,21 @@ class GPSPluginClass(AbstractPluginClass):
         self._SatelliteCounter=0
            
         self._runEv = Event()
-    
-    	self._endTime = time.time() + self._measTime	
-            	
+                	
         self._WlanThread = WlanThread(self,10,10)
+        
+        #counter
+        fp = open("/media/card/backlog/GPS_cnt.txt","rw")
+        cnt = int(fp.readline())
+        if (cnt >= (pow(2,32)-1) or cnt == ""):
+            self._cnt = 0
+        else:
+            self._cnt = cnt
+        fp.close()
+        
+        self._stats = Statistics()
+        self.info("Starting with " + str(self._cnt))
+        self._counterID = self._stats.createCounter(0,self._cnt)
         
         self.debug("Done init GPS Plugin")
 
@@ -118,6 +134,8 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     def runPlugin(self,param):  
         self.gps = GPSDriver.GPSDriver([self._deviceStr, self._interval,self._mode])
+        # scheduling my death...
+        self._endTime = time.time() + self._measTime
         
         if (not self.gps._isInitialized()):
             self.error('Initializing GPS Plugin failed!!')
@@ -133,8 +151,13 @@ class GPSPluginClass(AbstractPluginClass):
                 if (self._mode == "nav"):
                     #self.processMsg(self.getTimeStamp(), [NAV_TYPE, NAV_DATA_VERSION]+rawMsg[2])
                     pass
-                elif (self._mode == "raw"):
-                    self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, bytearray(rawMsg[2])])
+                elif (self._mode == "raw" and self._logMode == "binary"):
+                    self._stats.counterAction(self._counterID)
+                    self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, self._stats.getCounterValue(self._counterID), ((rawMsg[3]-8)/24), bytearray(rawMsg[2])])
+                elif (self._mode == "raw" and self._logMode == "ascii"):
+                    self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, parseRawMsg(rawMsg[2])])
+                self.info("GPS Sample Nr: " + str(self._stats.getCounterValue(self._counterID)))
+                self.info(str((rawMsg[3]-8)/24) + " Satellites (" + str(rawMsg[3]) + " Bytes)")
             self._runEv.wait(self._interval-1)
 
         # die...
@@ -142,11 +165,13 @@ class GPSPluginClass(AbstractPluginClass):
         self.debug('GPSPlugin died...')
     
         end = time.time()
+        '''
         self.info('Number of measurements: ' + str(self.gps.measurementNo))
         self.info('Number of satellites: '+ str(self.gps._SatelliteCounter))
         self.info('Number of satellites above thresholds: '+str(self.gps._goodSatelliteCounter))
         self.info("Killed " + str(self.gps._zombiesKilled))
         self.info("Serial disconnected " + str(self.gps._serialCount))
+        '''
         self.stop()
     
     '''
@@ -206,6 +231,9 @@ class GPSPluginClass(AbstractPluginClass):
     ##########################################################################################
     '''
     def stop(self):
+        fp = open("/media/card/backlog/GPS_cnt.txt","w")
+        fp.write(str(self._stats.getCounterValue(self._counterID)))
+        fp.close()
         self.info('GPSPlugin stopping...')
         self._runEv.set()
         self._WlanThread.stop()
@@ -269,7 +297,7 @@ class WlanThread(Thread):
                 #self._parent._logger.info(str("HOST\nroot" in user))
                 start = time.time()
                 while ((("HOST\nroot" in user) or (self._parent.isResendingDB())) and not self._stopped):
-                    self._parent._logger.info("size: " + str(self._parent.isResendingDB()))
+                    self._parent._logger.info("Flushing: " + str(self._parent.isResendingDB()))
                     self._parent._logger.info('Someone is logged in or we are flushing DB... NOT power cycling WLAN!')
                     self._parent._logger.info('Waiting for 10 sec')
                     self._work.wait(10)
