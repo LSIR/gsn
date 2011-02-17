@@ -595,7 +595,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	@Override
 	public void remoteConnEstablished(Integer deviceID) {
 		firstConnect = false;
-		if (this.deviceID == null || this.deviceID != deviceID) {
+		if (this.deviceID == null || this.deviceID.compareTo(deviceID) != 0) {
 			String dir = rootBinaryDir + deploymentName + "/" + Integer.toString(deviceID) + "/";
 			File f = new File(dir);
 			if (!f.isDirectory()) {
@@ -605,7 +605,7 @@ public class BinaryPlugin extends AbstractPlugin {
 		    	else
 		    		logger.info("created new storage directory >" + dir + "<");
 			}
-			if (this.deviceID != null && this.deviceID != deviceID)
+			if (this.deviceID != null && this.deviceID.compareTo(deviceID) != 0)
 	    		logger.warn("device ID changed for deployment " + deploymentName + " and CoreStation " + coreStationName + " -> using new storage directory >" + dir + "/" + "< (" + this.deviceID + "!=" + deviceID + ")");
 			this.deviceID = deviceID;
 			binaryDir = dir;
