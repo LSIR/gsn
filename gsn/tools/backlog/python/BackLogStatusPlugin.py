@@ -100,13 +100,14 @@ class BackLogStatusPluginClass(AbstractPluginClass):
                 self.error('parameter has to be a digit (parameter=' + parameters + ')')
         
         payload = [DYNAMIC_TYPE]
+        timestamp = self.getTimeStamp()
         payload += [self.getUptime(), self.getErrorCounter(), self.getExceptionCounter()]
         payload += self._backlogMain.gsnpeer.getStatus()
         payload += self._backlogMain.backlog.getStatus(30)
         payload += self._getStatus()
         payload += self._getRUsage()
         
-        self.processMsg(self.getTimeStamp(), payload)
+        self.processMsg(timestamp, payload)
             
     
     
