@@ -98,8 +98,10 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	/**
 	 * This function is called if the remote connection to the deployment has
 	 * been established.
+     * 
+     * @param deviceID the device ID of the connecting CoreStation
 	 */
-	public void remoteConnEstablished() { }
+	public void remoteConnEstablished(Integer deviceID) { }
 
 
 	/**

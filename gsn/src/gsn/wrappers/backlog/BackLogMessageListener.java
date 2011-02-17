@@ -36,6 +36,8 @@ public interface BackLogMessageListener extends java.util.EventListener {
      * This method is called to signal remote connection establishment. It must be
      * implemented by any listener which likes to register itself at
      * a {@link AsyncCoreStationClient}.
+     * 
+     * @param deviceID the device ID of the connecting CoreStation
      */
-    public void remoteConnEstablished();
+    public void remoteConnEstablished(Integer deviceID);
 }

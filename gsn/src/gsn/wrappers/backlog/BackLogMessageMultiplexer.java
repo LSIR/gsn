@@ -458,7 +458,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 				Enumeration<BackLogMessageListener> en = iter.next().elements();
 				// send the message to all listeners
 				while (en.hasMoreElements()) {
-					en.nextElement().remoteConnEstablished();
+					en.nextElement().remoteConnEstablished(coreStationDeviceId);
 				}
 			}
 		}

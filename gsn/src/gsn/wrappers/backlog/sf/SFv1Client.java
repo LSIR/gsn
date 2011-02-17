@@ -148,7 +148,7 @@ public class SFv1Client extends SFProtocol implements Runnable, BackLogMessageLi
 	}
 
 	@Override
-	public void remoteConnEstablished() {
+	public void remoteConnEstablished(Integer devicID) {
 	}
 
 	@Override

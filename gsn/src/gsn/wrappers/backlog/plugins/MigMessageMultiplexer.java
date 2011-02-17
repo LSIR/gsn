@@ -277,7 +277,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	}
 
 	@Override
-	public void remoteConnEstablished() { }
+	public void remoteConnEstablished(Integer deviceID) { }
 
 	@Override
 	public void remoteConnLost() {	}
