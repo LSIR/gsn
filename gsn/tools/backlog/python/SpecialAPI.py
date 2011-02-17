@@ -402,7 +402,8 @@ class PowerControl:
                 else:
                     raise Exception('file >' + os.path.join(linkFolder, file) + '< does not end with a proper suffix')
         
-        self._backlogMain.registerTOSListener(self, [TOSTypes.AM_BEACONCOMMAND])
+        if self._backlogMain.duty_cycle_mode:
+            self._backlogMain.registerTOSListener(self, [TOSTypes.AM_BEACONCOMMAND])
                 
     
     
@@ -501,6 +502,8 @@ class PowerControl:
         '''
         if not self._linkfolder:
             raise Exception('link folder does not exist')
+        if not self._backlogMain.duty_cycle_mode:
+            raise Exception('wlan can only be turned off in duty-cycle mode')
         if self._wlanGPIOLink:
             if self._backlogMain.wlanNeeded():
                 return False
@@ -554,7 +557,8 @@ class PowerControl:
         
         
     def stop(self):
-        self._backlogMain.deregisterTOSListener(self)
+        if self._backlogMain.duty_cycle_mode:
+            self._backlogMain.deregisterTOSListener(self)
     
     
     def _gpioLinkAction(self, link, set):
