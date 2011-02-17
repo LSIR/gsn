@@ -1270,6 +1270,21 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                     fcalib.close()
                 if frtc:
                     frtc.close()
+                    
+            fc = open('/proc/ad77x8/config', 'w')
+            fc.write('format mV')
+            fc.flush()                
+            fc.write('chopping on')
+            fc.flush()
+            fc.write('negbuf on')
+            fc.flush()
+            fc.write('sf 13')
+            fc.flush()
+            fc.write('range 7')
+            fc.flush()
+            fc.write('calibrate')
+            fc.flush()
+            fc.close()
         
         
     def _getAD77x8(self):
@@ -1298,8 +1313,6 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             fc.flush()
             fc.write('range 7')
             fc.flush()
-#            fc.write('calibrate')
-#            fc.flush()
             fc.close()
             
             f1 = open('/proc/ad77x8/ain1', 'r')
