@@ -100,6 +100,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
     def run(self):
         self.info('started')
         
+        self._initAD77x8()
+        
         self.info('checking status providers for correctness')
         self._checkChronyStats()
         self._checkStatVFS()
@@ -140,7 +142,6 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #        print '##########################################################################'
 #        print '_getNumberOfUsers :' + self._getNumberOfUsers()
 #        print '_getLastLog :' + str(self._getLastLog())
-#        print '_getChronyStats :' + str(self._getChronyStats())
 #        print '_getStatVFS :' + str(self._getStatVFS())
 #        print '_getDiskStats :' + str(self._getDiskStats())
 #        print '_getInterrupts :' + str(self._getInterrupts())
@@ -154,33 +155,35 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #        print '_getSoftIRQ :' + str(self._getSoftIRQ())
 #        print '_getStat :' + str(self._getStat())
 #        print '_getUptime :' + str(self._getUptime())
+#        print '_getChronyStats :' + str(self._getChronyStats())
 #        print '_getLM92Temp :' + str(self._getLM92Temp())
         
-        data_list = [HW_TYPE]
-        timestamp = self.getTimeStamp()
-        data_list += self._getLM92Temp()
-        data_list += self._getAD77x8()
-        self.processMsg(timestamp, data_list)
+        hw_data_list = [HW_TYPE]
+        hw_timestamp = self.getTimeStamp()
+        hw_data_list += self._getLM92Temp()
+        hw_data_list += self._getAD77x8()
         
-        data_list = [SW_TYPE]
-        timestamp = self.getTimeStamp()
-        data_list += self._getNumberOfUsers()
-        data_list += self._getLastLog()
-        data_list += self._getStatVFS()
-        data_list += self._getDiskStats()
-        data_list += self._getInterrupts()
-        data_list += self._getLoadAvg()
-        data_list += self._getMemInfo()
-        data_list += self._getSchedStat()
-        data_list += self._getNetDev()
-        data_list += self._getNetSNMP()
-        data_list += self._getNetStat()
-        data_list += self._getSockStat()
-        data_list += self._getSoftIRQ()
-        data_list += self._getStat()
-        data_list += self._getUptime()
-        data_list += self._getChronyStats()
-        self.processMsg(timestamp, data_list)
+        sw_data_list = [SW_TYPE]
+        sw_timestamp = self.getTimeStamp()
+        sw_data_list += self._getNumberOfUsers()
+        sw_data_list += self._getLastLog()
+        sw_data_list += self._getStatVFS()
+        sw_data_list += self._getDiskStats()
+        sw_data_list += self._getInterrupts()
+        sw_data_list += self._getLoadAvg()
+        sw_data_list += self._getMemInfo()
+        sw_data_list += self._getSchedStat()
+        sw_data_list += self._getNetDev()
+        sw_data_list += self._getNetSNMP()
+        sw_data_list += self._getNetStat()
+        sw_data_list += self._getSockStat()
+        sw_data_list += self._getSoftIRQ()
+        sw_data_list += self._getStat()
+        sw_data_list += self._getUptime()
+        sw_data_list += self._getChronyStats()
+        
+        self.processMsg(hw_timestamp, hw_data_list)
+        self.processMsg(sw_timestamp, sw_data_list)
             
     
     
@@ -213,7 +216,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
         try:
             file = open("/proc/version", "r")
-            line = file.read()
+            line = file.readline()
 #            print '/proc/version'
 #            print ''
 #            print line
@@ -234,7 +237,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
         try:
             file = open("/etc/version", "r")
-            line = file.read()
+            line = file.readline()
 #            print '/etc/version'
 #            print ''
 #            print line
@@ -627,14 +630,14 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         ret = [None]*4
         try:
             file = open("/proc/loadavg", "r")
-            string = file.read()
+            line = file.readline()
             file.close()
-            lst = string.split()
+            lst = line.split()
 #            print '#############################################################################'
 #            print '/proc/loadavg'
 #            print '[# of processes in the system run queue averaged over the last 1 (float), # of processes in the system run queue averaged over the last 5 (float), # of processes in the system run queue averaged over the last 15 (float), # of runnable processes (int)]'
 #            print ''
-#            print string
+#            print line
 #            print ''
             if len(lst) != 5:
                 self.exception('reading /proc/loadavg did not return 5 values')
@@ -1223,7 +1226,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         ret = [None]
         try:
             file = open("/sys/bus/i2c/devices/0-004b/temp1_input", "r")
-            line = file.read()
+            line = file.readline()
             file.close()
 #            print '#############################################################################'
 #            print '/sys/bus/i2c/devices/0-004b/temp1_input'
@@ -1231,28 +1234,15 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #            print ''
 #            print line
 #            print ''
-            val = int(line.strip())
-            if val == -240000:
-                val = None
-            ret = [val]
+            val = int(line)
+            if val != -240000:
+                ret = [val]
         except Exception, e:
             self.exception(e)
         return ret
         
         
-    def _getAD77x8(self):
-        '''
-            [ad77x8_1 (int),
-             ad77x8_2 (int),
-             ad77x8_3 (int),
-             ad77x8_4 (int),
-             ad77x8_5 (int),
-             ad77x8_6 (int),
-             ad77x8_7 (int),
-             ad77x8_8 (int),
-             ad77x8_9 (int),
-             ad77x8_10 (int)]
-        '''
+    def _initAD77x8(self):
         if not self._calibrated and os.path.isfile(CALIB_FILE) and self._conf_calibrate:
             # get the calibration data with channel offsets
             try:
@@ -1268,9 +1258,9 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 if seed_rtc != '0x0000' and seed == seed_rtc:
                     for line in fcalib:
                         if line.split('=')[0] == 'avg_ain4':
-                            self._ain4_cal = float(line.split('=')[1].split(' ')[0])
+                            self._ain4_cal = float(line.split('=')[1].split()[0])
                         if line.split('=')[0] == 'avg_ain9':
-                            self._ain9_cal = float(line.split('=')[1].split(' ')[0])
+                            self._ain9_cal = float(line.split('=')[1].split()[0])
                     fcalib.close()
                     if self._ain4_cal and self._ain9_cal:
                         self._calibrated = True
@@ -1280,6 +1270,21 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                     fcalib.close()
                 if frtc:
                     frtc.close()
+        
+        
+    def _getAD77x8(self):
+        '''
+            [ad77x8_1 (int),
+             ad77x8_2 (int),
+             ad77x8_3 (int),
+             ad77x8_4 (int),
+             ad77x8_5 (int),
+             ad77x8_6 (int),
+             ad77x8_7 (int),
+             ad77x8_8 (int),
+             ad77x8_9 (int),
+             ad77x8_10 (int)]
+        '''
         
         try:
             fc = open('/proc/ad77x8/config', 'w')
@@ -1293,8 +1298,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             fc.flush()
             fc.write('range 7')
             fc.flush()
-            fc.write('calibrate')
-            fc.flush()
+#            fc.write('calibrate')
+#            fc.flush()
             fc.close()
             
             f1 = open('/proc/ad77x8/ain1', 'r')
@@ -1330,16 +1335,16 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             f9.close()
             f10.close()
 
-            ad77x8_1 = float(ad77x8_1.split(' ')[0])
-            ad77x8_2 = float(ad77x8_2.split(' ')[0])
-            ad77x8_3 = float(ad77x8_3.split(' ')[0])
-            ad77x8_4 = float(ad77x8_4.split(' ')[0])
-            ad77x8_5 = float(ad77x8_5.split(' ')[0])
-            ad77x8_6 = float(ad77x8_6.split(' ')[0])
-            ad77x8_7 = float(ad77x8_7.split(' ')[0])
-            ad77x8_8 = float(ad77x8_8.split(' ')[0])
-            ad77x8_9 = float(ad77x8_9.split(' ')[0])
-            ad77x8_10 = float(ad77x8_10.split(' ')[0])
+            ad77x8_1 = float(ad77x8_1.split()[0])
+            ad77x8_2 = float(ad77x8_2.split()[0])
+            ad77x8_3 = float(ad77x8_3.split()[0])
+            ad77x8_4 = float(ad77x8_4.split()[0])
+            ad77x8_5 = float(ad77x8_5.split()[0])
+            ad77x8_6 = float(ad77x8_6.split()[0])
+            ad77x8_7 = float(ad77x8_7.split()[0])
+            ad77x8_8 = float(ad77x8_8.split()[0])
+            ad77x8_9 = float(ad77x8_9.split()[0])
+            ad77x8_10 = float(ad77x8_10.split()[0])
 
             if self._calibrated and self._conf_calibrate:
                 ad77x8_6 = ad77x8_6 - 0.3
