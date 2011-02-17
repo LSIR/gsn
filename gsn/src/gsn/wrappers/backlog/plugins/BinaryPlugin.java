@@ -606,7 +606,7 @@ public class BinaryPlugin extends AbstractPlugin {
 		    		logger.info("created new storage directory >" + dir + "<");
 			}
 			if (this.deviceID != null && this.deviceID != deviceID)
-	    		logger.warn("device ID changed for deployment " + deploymentName + " and CoreStation " + coreStationName + " -> using new storage directory >" + dir + "/" + "<");
+	    		logger.warn("device ID changed for deployment " + deploymentName + " and CoreStation " + coreStationName + " -> using new storage directory >" + dir + "/" + "< (" + this.deviceID + "!=" + deviceID + ")");
 			this.deviceID = deviceID;
 			binaryDir = dir;
 			logger.debug("storage directory for deployment " + deploymentName + " and CoreStation " + coreStationName + " is >" + binaryDir + "<");
