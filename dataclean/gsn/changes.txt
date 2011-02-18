@@ -1,2 +1,0 @@
-1. Updating the JUnit tasks to report the failed tests as soon as possible. (build.xml)
-2. Fixing the failed tests in the TestDataPropogation

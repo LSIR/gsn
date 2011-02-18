@@ -1,5 +1,0 @@
-"","","","","","","","","","","","","","","","","","",""
-"STATION_ID","YEAR","JDAY","TIME","TA","RH","WS_MEAN","WS_MAX","WD","SWR_REFL","HS","TSS","TS1","TS2","TS3","PLUVIO","VENTILATION","U_BATTERY","T_LOGGER"
-"","","","","","","","","","","","","","","","","","",""
-"","","","","","","","","","","","","","","","","","",""
-"integer","TS:y","TS:D","TS:HHmm","double","double","double","double","double","double","double","double","double","double","double","double","double","double","double"
