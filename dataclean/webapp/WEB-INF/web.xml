@@ -3,8 +3,8 @@
 
 <web-app>
     <display-name>GSN Server</display-name>
-<!-- 
-     *******************************************************************************     
+<!--
+     *******************************************************************************
       WEB SERVICES CALL [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] ; there is
       another part down in this file which has to be uncommented to have the axis working.
      ******************************************************************************* -->
@@ -17,10 +17,10 @@
     </servlet>
  -->
 
-<!-- *******************************************************************************     
+<!-- *******************************************************************************
       GSN's Main Servlets, Must be enabled for any kind of HTTP based access
      ******************************************************************************* -->
-    
+
 	<!-- GSN START -->
 	<servlet>
         <servlet-name>ControllerServlet</servlet-name>
@@ -58,6 +58,12 @@
         <display-name>Sensor Data with Geo Location</display-name>
         <servlet-class>gsn.http.GeoDataServlet</servlet-class>
     </servlet>
+
+    <servlet>
+        <servlet-name>DataClean</servlet-name>
+        <display-name>GSN Data clean</display-name>
+        <servlet-class>gsn.http.DataCleanServlet</servlet-class>
+	</servlet>
 
     <servlet>
         <servlet-name>MenuServlet</servlet-name>
@@ -225,9 +231,9 @@
 
 
 
-   
+
 	<!-- mapping for GSN -->
-	
+
 	<servlet-mapping>
         <servlet-name>ControllerServlet</servlet-name>
         <url-pattern>/gsn</url-pattern>
@@ -261,6 +267,11 @@
         <servlet-name>GridDataServlet</servlet-name>
         <url-pattern>/griddata</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>DataClean</servlet-name>
+        <url-pattern>/dataclean</url-pattern>
+	</servlet-mapping>
 
 
     <servlet-mapping>
@@ -398,14 +409,14 @@
      </servlet-mapping>
 
 
-     
+
 
 
 	<!-- GSN END -->
-	
-	<!-- 
-     *******************************************************************************     
-      WEB SERVICES CALL MAPPING [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] 
+
+	<!--
+     *******************************************************************************
+      WEB SERVICES CALL MAPPING [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ]
      ******************************************************************************* -->
 <!--     <servlet-mapping>
         <servlet-name>AxisServlet</servlet-name>
@@ -453,7 +464,7 @@
             <url-pattern>/menu.jsp</url-pattern>
         </web-resource-collection>
     </security-constraint>
- 
+
     <!-- Filter for accesscontrol package -->
 
 
@@ -473,8 +484,8 @@
        <url-pattern>/griddata</url-pattern>
    </filter-mapping>
 
-      
-     
+
+
     <mime-mapping>
         <extension>inc</extension>
         <mime-type>text/plain</mime-type>

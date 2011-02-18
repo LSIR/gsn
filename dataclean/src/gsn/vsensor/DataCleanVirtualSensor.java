@@ -86,7 +86,7 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
 
     private int bufferCount = 0;
     private boolean logging_timestamps = false;
-    private long logging_interval;
+    private long logging_interval = 1;
     private long logging_counter = 0;
 
 
@@ -185,7 +185,7 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
 
     public void dataAvailable(String inputStreamName, StreamElement data) {
 
-        if (logging_counter % logging_interval == 0) {
+        if (logging_timestamps && logging_counter % logging_interval == 0) {
             logger.warn(getVirtualSensorConfiguration().getName() + " , " + logging_counter + " , " + System.currentTimeMillis());
         }
 
