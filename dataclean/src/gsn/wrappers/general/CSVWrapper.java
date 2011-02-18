@@ -104,12 +104,16 @@ public class CSVWrapper extends AbstractWrapper {
 					output = handler.work(reader, checkPointDir);
 					for (TreeMap<String, Serializable> se : output) {
 						StreamElement streamElement = new StreamElement(se,getOutputFormat());
+                        //logger.warn(streamElement);
 						boolean insertionSuccess = postStreamElement(streamElement);
 						handler.updateCheckPointFile(streamElement.getTimeStamp());
 					}
 				}
-				if (output==null || output.size()==0) //More intelligent sleeping, being more proactive once the wrapper receives huge files.
-					Thread.sleep(samplingPeriodInMsc);
+                if (output!=null)
+                    logger.warn (dataFile + " => "+output.size());
+				// if (output==null || output.size()==0) //More intelligent sleeping, being more proactive once the wrapper receives huge files.
+                // disabled for performance issue
+			    Thread.sleep(samplingPeriodInMsc);
 			}catch (Exception e) {
 				if (preivousError!=null && preivousError.getMessage().equals(e.getMessage()))
 					continue;
