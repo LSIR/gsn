@@ -34,6 +34,11 @@ public class Helpers {
 		return fmt.parseDateTime(time).getMillis();
 	}
 
+    public static long convertTimeFromIsoToLong(String time, String format) throws Exception {
+		DateTimeFormatter fmt = DateTimeFormat.forPattern(format);
+		return fmt.parseDateTime(time).getMillis();
+	}
+
     public static String convertTimeFromLongToIso(long timestamp) {
         DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
         DateTime dt = new DateTime(timestamp);
