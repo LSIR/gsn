@@ -184,7 +184,7 @@ public class DataCleanServlet extends HttpServlet {
         String str_format = request.getParameter("format");
 
         String vsname = vs + "_" + fieldname + "_model_" + ModelFitting.MODEL_NAMES[model];
-        String filename = "virtual-sensors/test.xml";
+        String filename = "virtual-sensors/test.xml~";
         String description = "Data Cleaning Virtual Sensor for Station " + vs + ", "
                 + "Sensor: " + fieldname + ". Model: "
                 + ModelFitting.MODEL_NAMES[model]
@@ -426,6 +426,8 @@ public class DataCleanServlet extends HttpServlet {
 
     private String applyModel(HttpServletRequest request) {
 
+        String result = "";
+
         String vs = request.getParameter("vs");
         String fieldname = request.getParameter("fieldname");
 
@@ -517,8 +519,10 @@ public class DataCleanServlet extends HttpServlet {
             ModelFitting.FitAndMarkDirty(model, errorbound, windowsize, _stream, _timed, _processed, _dirtyness);
             logger.warn("done.");
         }
-        else
+        else {
             logger.warn("Not enough data to run model");
+            result = "Not enough data point in the selected time interval to run model.";
+        }
 
         String insertSQL = "INSERT INTO " + tablename + "(pk, timed, " + fieldname + ", processed, dirtyness) VALUES (?,?,?,?,?)";
 
@@ -580,7 +584,8 @@ public class DataCleanServlet extends HttpServlet {
                 */
 
         //String jsonReturn = "{\"data\":[["+jsonTimed+"],[" + jsonProcessed + "]]}";
-        String jsonReturn = "{\"data\":[[" + jsonStream + "],[" + jsonProcessed + "],[" + jsonDirtyness + "]]}";
+
+        String jsonReturn = "{\"data\":[[" + jsonStream + "],[" + jsonProcessed + "],[" + jsonDirtyness + "]],\"message\":\""+result+"\"}";
 
         //return sbCSV.toString();
         return jsonReturn;

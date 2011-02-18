@@ -109,6 +109,8 @@
                     DataClean.theData = data.data;
                     DataClean.plot = $.plot($("#placeholder"), data.data, options);
                     DataClean.previewPlot = $.plot($("#preview"), data.data,options);
+                    if (data.message != "")
+                        alert(data.message);
                 });
 
         $("#placeholder").bind("plotselected", function (event, ranges) {
