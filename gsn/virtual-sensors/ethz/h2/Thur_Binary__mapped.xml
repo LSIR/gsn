@@ -8,7 +8,7 @@
         <output-structure>
             <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
-            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="RELATIVE_FILE" type="VARCHAR(255)" />
             <field name="STORAGE_DIRECTORY" type="VARCHAR(255)" />
             <field name="DATA" type="binary" />

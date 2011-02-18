@@ -4,7 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
-            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
             <field name="OS" type="VARCHAR(255)" />

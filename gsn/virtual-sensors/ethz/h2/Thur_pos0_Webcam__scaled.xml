@@ -6,7 +6,7 @@
             <param name="jpeg_scaled">JPEG_SCALED</param>
         </init-params>
         <output-structure>
-            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>

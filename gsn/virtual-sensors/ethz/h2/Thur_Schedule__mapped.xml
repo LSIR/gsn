@@ -8,7 +8,7 @@
        	<output-structure>
             <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
-			<field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+			<field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="TRANSMISSION_TIME" type="BIGINT" unit="unixtime" />
 			<field name="SCHEDULE" type="binary" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />

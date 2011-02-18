@@ -7,7 +7,7 @@
         </init-params>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
-            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 
             <field name="FILE_SIZE" type="BIGINT" unit="bytes" />
             <field name="TRANSMITTED" type="BIGINT" unit="bytes" />

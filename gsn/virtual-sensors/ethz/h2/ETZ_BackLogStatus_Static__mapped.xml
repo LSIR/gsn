@@ -8,7 +8,7 @@
         <output-structure>
             <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
-            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
             <field name="PYTHON_IMPLEMENTATION" type="VARCHAR(255)" />
