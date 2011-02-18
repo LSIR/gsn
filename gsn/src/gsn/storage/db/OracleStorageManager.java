@@ -218,12 +218,25 @@ public class OracleStorageManager extends StorageManager {
         executeCommand(oracleSeq, connection);
         executeCommand(oracleTrigger, connection);
 
-        sql = getStatementCreateIndexOnTimed(tableName, unique);
+        sql = getStatementCreateDescIndexOnField(tableName, "timed", unique);
         if (logger.isDebugEnabled())
             logger.debug(new StringBuilder().append(
                     "The create index statement is : ").append(sql).toString());
         prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
+        prepareStatement.close();
+        
+        for (DataField field : structure) {
+        	if (!field.getIndex())
+        		continue;
+        	sql = getStatementCreateIndexOnField(tableName, field.getName().toUpperCase(), false);
+            if (logger.isDebugEnabled())
+                logger.debug(new StringBuilder().append(
+                        "The create index statement is : ").append(sql).toString());
+            prepareStatement = connection.prepareStatement(sql.toString());
+            prepareStatement.execute();
+            prepareStatement.close();
+        }        
 
     }
 

@@ -16,6 +16,8 @@ public final class DataField implements Serializable {
    
    private String            type, unit, defaultvalue;
    
+   private boolean	index = false;
+   
    private DataField ( ) {}
    
    public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {
@@ -109,6 +111,21 @@ public final class DataField implements Serializable {
     */
    public String getDefaultValue ( ) {
       return this.defaultvalue;
+   }
+
+   public void setIndex(String index) {
+	   if (index.compareToIgnoreCase("true")==0)
+		   this.index = true;
+	   else
+		   this.index = false;
+   }
+   
+   public void setIndex(boolean index) {
+	   this.index = index;
+   }
+   
+   public boolean getIndex() {
+	   return index;
    }
    
 }

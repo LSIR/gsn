@@ -441,13 +441,24 @@ public abstract class StorageManager {
         PreparedStatement prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
         prepareStatement.close();
-        sql = getStatementCreateIndexOnTimed(tableName, unique);
+        sql = getStatementCreateDescIndexOnField(tableName, "timed", unique);
         if (logger.isDebugEnabled())
             logger.debug(new StringBuilder().append(
                     "The create index statement is : ").append(sql).toString());
         prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
-
+        prepareStatement.close();
+        for (DataField field : structure) {
+        	if (!field.getIndex())
+        		continue;
+        	sql = getStatementCreateIndexOnField(tableName, field.getName().toUpperCase(), false);
+            if (logger.isDebugEnabled())
+                logger.debug(new StringBuilder().append(
+                        "The create index statement is : ").append(sql).toString());
+            prepareStatement = connection.prepareStatement(sql.toString());
+            prepareStatement.execute();
+            prepareStatement.close();
+        }        
     }
 
     public ResultSet executeQueryWithResultSet(StringBuilder query,Connection connection) throws SQLException {
@@ -736,12 +747,22 @@ public abstract class StorageManager {
         return new StringBuilder(getStatementDropView().replace("#NAME",viewName));
     }
 
-    public StringBuilder getStatementCreateIndexOnTimed(
-            CharSequence tableName, boolean unique) throws SQLException {
+    public StringBuilder getStatementCreateDescIndexOnField(
+            CharSequence tableName, String field, boolean unique) throws SQLException {
+    	return getStatementCreateIndexOnField(tableName, field, unique, "DESC");	
+    }
+
+    public StringBuilder getStatementCreateIndexOnField(
+            CharSequence tableName, String field, boolean unique) throws SQLException {
+    	return getStatementCreateIndexOnField(tableName, field, unique, "");	
+    }
+
+    private StringBuilder getStatementCreateIndexOnField(
+            CharSequence tableName, String field, boolean unique, String order) throws SQLException {
         StringBuilder toReturn = new StringBuilder("CREATE ");
         if (unique)
             toReturn.append(" UNIQUE ");
-        toReturn.append(" INDEX ").append(tableNamePostFixAppender(tableName, "_INDEX")).append(" ON ").append(tableName).append(" (timed DESC)");
+        toReturn.append(" INDEX ").append(tableNamePostFixAppender(tableName, "_INDEX")).append(" ON ").append(tableName).append(" (").append(field).append(" ").append(order).append(")");
         return toReturn;
     }
 
