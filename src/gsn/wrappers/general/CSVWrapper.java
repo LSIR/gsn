@@ -22,7 +22,7 @@ public class CSVWrapper extends AbstractWrapper {
 
 	private final transient Logger               logger        = Logger.getLogger( CSVWrapper.class );
 
-	private int                                  threadCounter = 0;
+	private static int                                  threadCounter = 0;
 
 	private DataField [] dataField  ;
 
