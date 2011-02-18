@@ -762,7 +762,7 @@ public abstract class StorageManager {
         StringBuilder toReturn = new StringBuilder("CREATE ");
         if (unique)
             toReturn.append(" UNIQUE ");
-        toReturn.append(" INDEX \"").append(field).append("_INDEX\"").append(" ON ").append(tableName).append(" (").append(field).append(" ").append(order).append(")");
+        toReturn.append(" INDEX \"").append(tableNamePostFixAppender(tableName, "_"+field+"_INDEX")).append(" ON ").append(tableName).append(" (").append(field).append(" ").append(order).append(")");
         return toReturn;
     }
 
