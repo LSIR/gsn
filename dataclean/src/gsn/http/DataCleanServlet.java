@@ -1,11 +1,17 @@
 package gsn.http;
 
 import gsn.Main;
+import gsn.Mappings;
+import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 import gsn.utils.Helpers;
 import gsn.utils.models.ModelFitting;
+import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,9 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
 
 public class DataCleanServlet extends HttpServlet {
     private static transient Logger logger = Logger.getLogger(DataCleanServlet.class);
@@ -46,6 +50,7 @@ public class DataCleanServlet extends HttpServlet {
     public static final int REQUEST_GET_CLEANED_DATA = 203; // returns the cleaned data (stream, processed and dirtyness)
     public static final int REQUEST_GET_DIRTY_DATA_ONLY = 204; // returns only the data considered as dirty
     public static final int REQUEST_CREATE_NEW_DATACLEAN_VS = 205; // creates a DataClean VS
+    public static final int REQUEST_GET_SENSORS_INFO = 206; // creates a DataClean VS
 
     private static final String DEFAULT_TIME_FORMAT = "d/M/y H:m:s";
 
@@ -160,6 +165,15 @@ public class DataCleanServlet extends HttpServlet {
                 response.setContentType("text/plain");
 
                 result = createDataCleanVS(request);
+
+                response.getWriter().write(result);
+                break;
+
+            case REQUEST_GET_SENSORS_INFO:
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.setContentType("text/plain");
+
+                result = getSensorsInfoAsJSON();
 
                 response.getWriter().write(result);
                 break;
@@ -518,8 +532,7 @@ public class DataCleanServlet extends HttpServlet {
         if (n > 0) {
             ModelFitting.FitAndMarkDirty(model, errorbound, windowsize, _stream, _timed, _processed, _dirtyness);
             logger.warn("done.");
-        }
-        else {
+        } else {
             logger.warn("Not enough data to run model");
             result = "Not enough data point in the selected time interval to run model.";
         }
@@ -585,7 +598,7 @@ public class DataCleanServlet extends HttpServlet {
 
         //String jsonReturn = "{\"data\":[["+jsonTimed+"],[" + jsonProcessed + "]]}";
 
-        String jsonReturn = "{\"data\":[[" + jsonStream + "],[" + jsonProcessed + "],[" + jsonDirtyness + "]],\"message\":\""+result+"\"}";
+        String jsonReturn = "{\"data\":[[" + jsonStream + "],[" + jsonProcessed + "],[" + jsonDirtyness + "]],\"message\":\"" + result + "\"}";
 
         //return sbCSV.toString();
         return jsonReturn;
@@ -709,7 +722,6 @@ public class DataCleanServlet extends HttpServlet {
                 timestamps.add(timestamp);
             }
 
-
             logger.warn("stream => " + stream.size());
             logger.warn("timestamps => " + timestamps.size());
 
@@ -723,6 +735,65 @@ public class DataCleanServlet extends HttpServlet {
         return true;
     }
 
+    public String getSensorsInfoAsJSON() {
+
+        JSONArray sensorsInfo = new JSONArray();
+
+        Iterator<VSensorConfig> vsIterator = Mappings.getAllVSensorConfigs();
+
+        while (vsIterator.hasNext()) {
+
+            JSONObject aSensor = new JSONObject();
+
+            VSensorConfig sensorConfig = vsIterator.next();
+
+            String vs_name = sensorConfig.getName();
+
+            aSensor.put("name", vs_name);
+
+            JSONArray listOfFields = new JSONArray();
+
+            for (DataField df : sensorConfig.getOutputStructure()) {
+
+                String field_name = df.getName().toLowerCase();
+                String field_type = df.getType().toLowerCase();
+
+                if (field_type.indexOf("double") >= 0) {
+                    listOfFields.add(field_name);
+                }
+            }
+
+            aSensor.put("fields", listOfFields);
+
+            Double alt = 0.0;
+            Double lat = 0.0;
+            Double lon = 0.0;
+
+            for (KeyValue df : sensorConfig.getAddressing()) {
+
+                String adressing_key = df.getKey().toString().toLowerCase().trim();
+                String adressing_value = df.getValue().toString().toLowerCase().trim();
+
+                if (adressing_key.indexOf("altitude") >= 0)
+                    alt = Double.parseDouble(adressing_value);
+
+                if (adressing_key.indexOf("longitude") >= 0)
+                    lon = Double.parseDouble(adressing_value);
+
+                if (adressing_key.indexOf("latitude") >= 0)
+                    lat = Double.parseDouble(adressing_value);
+            }
+
+            aSensor.put("lat", lat);
+            aSensor.put("lon", lat);
+            aSensor.put("alt", lat);
+
+            sensorsInfo.add(aSensor);
+
+        }
+
+        return sensorsInfo.toJSONString();
+    }
 
 }
 
