@@ -83,10 +83,29 @@ var DataClean = {
     populateSensorsOptions: function() {
         alert("populateSensorsOptions " + DataClean.n_sensors);
         var options = document.getElementById("vs");
+        options.options.length = 0;
+        options.options.length = DataClean.n_sensors;
         var i = 0;
         for (i = 0; i < DataClean.n_sensors; i++) {
-            options[i].text = DataClean.station_names[i];
+            options.options[i].text = DataClean.station_names[i];
         }
+
+
+
+        /*
+        arrTexts = new Array();
+
+        for (i = 0; i < lb.length; i++) {
+            arrTexts[i] = lb.options[i].text;
+        }
+
+        arrTexts.sort();
+
+        for (i = 0; i < lb.length; i++) {
+            lb.options[i].text = arrTexts[i];
+            lb.options[i].value = arrTexts[i];
+        }
+        */
 
 
     }

@@ -82,7 +82,7 @@
                          map.addControl(new GSmallMapControl());
                          map.addControl(new GMapTypeControl());
                      }
-                     //DataClean.populateSensorsOptions();
+                     DataClean.populateSensorsOptions();
                  });
     }
 
@@ -425,8 +425,8 @@
                 -->
                 <div id="map_canvas" style="width: 600px; height: 400px"></div>
 
-                <!--<p>Sensor <input id="vs" name="vs" size="16" type="text" value="lafouly_st_1043"/></p>-->
                 <p>Sensor <select id="vs" name="vs">
+                    <!--
                     <option value="lafouly_st_1033">lafouly_st_1033</option>
                     <option value="lafouly_st_1034">lafouly_st_1034</option>
                     <option value="lafouly_st_1035">lafouly_st_1035</option>
@@ -437,17 +437,10 @@
                     <option value="lafouly_st_1041">lafouly_st_1041</option>
                     <option value="lafouly_st_1042" selected="true">lafouly_st_1042</option>
                     <option value="lafouly_st_1043">lafouly_st_1043</option>
-                    <option value="lafouly_st_1044">lafouly_st_1044</option>
+                    <option value="lafouly_st_1044">lafouly_st_1044</option>     -->
                 </select></p>
 
-                <!--
-                    hist_1033.xml  hist_1036.xml  hist_1040.xml  hist_1043.xm_
-    hist_1034.xml  hist_1037.xml  hist_1041.xml  hist_1044.xml
-    hist_1035.xml  hist_1039.xml  hist_1042.xm_
 
-                    -->
-
-                <!--<p>Field <input id="fieldname" name="fieldname" size="16" type="text" value="air_temp"/></p>-->
 
                 <p>Sensor <select id="fieldname" name="fieldname">
                     <option value="air_temp">air_temp</option>
