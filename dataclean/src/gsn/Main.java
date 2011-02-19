@@ -95,7 +95,7 @@ public final class Main {
 		try {
 			controlSocket = new GSNController(null, gsnControllerPort);
 			containerConfig = loadContainerConfiguration();
-			updateSplashIfNeeded(new String[] {"GSN is starting at port:"+containerConfig.getContainerPort(),"All GSN logs are available at: logs/gsn.log"});
+			//updateSplashIfNeeded(new String[] {"GSN is starting at port:"+containerConfig.getContainerPort(),"All GSN logs are available at: logs/gsn.log"});
 			System.out.println("Global Sensor Networks (GSN) is Starting on port "+containerConfig.getContainerPort()+"...");
             System.out.println("The logs of GSN server are available in logs/gsn.log file.");
 			System.out.println("To Stop GSN execute the gsn-stop script.");
@@ -239,18 +239,18 @@ public final class Main {
 
 	public static void main ( String [ ]  args)  {
 		Main.gsnControllerPort = Integer.parseInt(args[0]) ;
-		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
+		//updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
 		try {
 			Main.getInstance();
 		}catch (Exception e) {
-			updateSplashIfNeeded(new String[] {"Starting GSN failed! Look at logs/gsn.log for more information."});
+			//updateSplashIfNeeded(new String[] {"Starting GSN failed! Look at logs/gsn.log for more information."});
 			try {
 				Thread.sleep(4000);
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
 		}
-		closeSplashIfneeded();
+		//closeSplashIfneeded();
 	}
 
 	/**
