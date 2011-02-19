@@ -109,8 +109,8 @@ public class CSVWrapper extends AbstractWrapper {
 						handler.updateCheckPointFile(streamElement.getTimeStamp());
 					}
 				}
-                if (output!=null)
-                    logger.warn (dataFile + " => "+output.size());
+                //if (output!=null)
+                //    logger.warn (dataFile + " => "+output.size());
 				// if (output==null || output.size()==0) //More intelligent sleeping, being more proactive once the wrapper receives huge files.
                 // disabled for performance issue
 			    Thread.sleep(samplingPeriodInMsc);
