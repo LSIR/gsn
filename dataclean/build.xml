@@ -1,8 +1,8 @@
 <project name="gsn" default="build" basedir=".">
 
-    <property name="safe-storage-port" value="25700"/>
-    <property name="safe-storage-controller-port" value="25712"/>
-    <property name="gsn-controller-port" value="22932"/>
+    <property name="safe-storage-port" value="26111"/>
+    <property name="safe-storage-controller-port" value="26123"/>
+    <property name="gsn-controller-port" value="23343"//>
     <property name="max-servlets" value="20"/>
     <property name="max-db-connections" value="8"/>
     <property name="max-sliding-db-connections" value="8"/>
