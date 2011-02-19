@@ -27,6 +27,7 @@
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAMzANHtD0lZRRVCrPbKFfkRQgjQ95GGF6hnonCeqYiElIWyu18hSCTuhmhIfYuWivVq8y0t9zgqbuIQ"
         type="text/javascript"></script>
 
+
 <script type="text/javascript">
 
     function initialize() {
@@ -36,6 +37,7 @@
         DataClean.station_names = new Array();
         DataClean.station_lats = new Array();
         DataClean.station_longs = new Array();
+        DataClean.station_fields = new Array();
 
         $.getJSON("dataclean?REQUEST=206",
                  function(sensorsInfo) {
@@ -47,6 +49,7 @@
                          DataClean.station_names.push(sensorsInfo[i].name);
                          DataClean.station_lats.push(sensorsInfo[i].lat);
                          DataClean.station_longs.push(sensorsInfo[i].lon);
+                         DataClean.station_fields.push(sensorsInfo[i].fields);
                          txt = txt + i + " " + DataClean.station_names[i] + " : " + DataClean.station_lats[i] + " : " + DataClean.station_longs[i] + "\n";
                      }
                      //alert(DataClean.n_sensors + " sensors\n" + txt);
@@ -72,17 +75,27 @@
                          var northEast = bounds.getNorthEast();
                          var lngSpan = northEast.lng() - southWest.lng();
                          var latSpan = northEast.lat() - southWest.lat();
+
+                         DataClean.map_markers = new Array();
+
                          for (var i = 0; i < DataClean.n_sensors; i++) {
 
                              var latlng = new GLatLng(DataClean.station_lats[i], DataClean.station_longs[i]);
                              var marker = createMarker(latlng, DataClean.station_names[i]); //new GMarker(latlng);
+                             DataClean.map_markers[i] = createMarker(latlng, DataClean.station_names[i]);
                              var name = "Station " + i;
-                             map.addOverlay(marker);
+                             map.addOverlay(DataClean.map_markers[i]);
                          }
                          map.addControl(new GSmallMapControl());
                          map.addControl(new GMapTypeControl());
                      }
                      DataClean.populateSensorsOptions();
+
+                     DataClean.map_markers[0].openInfoWindowHtml(DataClean.station_names[0]);
+                     DataClean.initSensorsComboBox(0);
+
+                     $("#vs").change(DataClean.onSelectChange);
+
                  });
     }
 
@@ -425,7 +438,7 @@
                 -->
                 <div id="map_canvas" style="width: 600px; height: 400px"></div>
 
-                <p>Sensor <select id="vs" name="vs">
+                <p>Station <select id="vs" name="vs">
                     <!--
                     <option value="lafouly_st_1033">lafouly_st_1033</option>
                     <option value="lafouly_st_1034">lafouly_st_1034</option>
@@ -443,12 +456,12 @@
 
 
                 <p>Sensor <select id="fieldname" name="fieldname">
-                    <option value="air_temp">air_temp</option>
+                    <!-- <option value="air_temp">air_temp</option>
                     <option value="air_humid">air_humid</option>
                     <option value="wind_speed">wind_speed</option>
                     <option value="rain_meter">rain_meter</option>
                     <option value="air_temp_tnx">air_temp_tnx</option>
-                    <option value="ground_temp_tnx">ground_temp_tnx</option>
+                    <option value="ground_temp_tnx">ground_temp_tnx</option>     -->
                 </select></p>
 
                 <p>From <input id="from" name="from" size="16" type="text" value="09/09/2009 09:00:00"/>
