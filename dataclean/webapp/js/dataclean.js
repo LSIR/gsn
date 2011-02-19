@@ -34,11 +34,11 @@ var DataClean = {
 
     station_names2 :
             ["lafouly_st_1033","lafouly_st_1034",
-        "lafouly_st_1035","lafouly_st_1036",
-        "lafouly_st_1037","lafouly_st_1039",
-        "lafouly_st_1040","lafouly_st_1041",
-        "lafouly_st_1042","lafouly_st_1043",
-        "lafouly_st_1044"],
+                "lafouly_st_1035","lafouly_st_1036",
+                "lafouly_st_1037","lafouly_st_1039",
+                "lafouly_st_1040","lafouly_st_1041",
+                "lafouly_st_1042","lafouly_st_1043",
+                "lafouly_st_1044"],
 
     station_names : null,
     station_longs : null,
@@ -78,6 +78,17 @@ var DataClean = {
                 list_sensors.selectedIndex = i;
             }
         }
+    },
+
+    populateSensorsOptions: function() {
+        alert("populateSensorsOptions " + DataClean.n_sensors);
+        var options = document.getElementById("vs");
+        var i = 0;
+        for (i = 0; i < DataClean.n_sensors; i++) {
+            options[i].text = DataClean.station_names[i];
+        }
+
+
     }
 
 };

@@ -55,8 +55,6 @@
                          var map = new GMap2(document.getElementById("map_canvas"));
                          map.setCenter(new GLatLng(DataClean.station_lats[0], DataClean.station_longs[0]), 12);
 
-                         //alert(DataClean.n_sensors + " sensors\n");
-
                          function createMarker(point, index) {
 
                              var marker = new GMarker(point);
@@ -67,7 +65,6 @@
                              });
                              return marker;
                          }
-
 
                          // Add  markers to the map
                          var bounds = map.getBounds();
@@ -85,6 +82,7 @@
                          map.addControl(new GSmallMapControl());
                          map.addControl(new GMapTypeControl());
                      }
+                     //DataClean.populateSensorsOptions();
                  });
     }
 
