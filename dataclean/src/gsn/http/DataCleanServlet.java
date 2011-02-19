@@ -785,8 +785,8 @@ public class DataCleanServlet extends HttpServlet {
             }
 
             aSensor.put("lat", lat);
-            aSensor.put("lon", lat);
-            aSensor.put("alt", lat);
+            aSensor.put("lon", lon);
+            aSensor.put("alt", alt);
 
             sensorsInfo.add(aSensor);
 
