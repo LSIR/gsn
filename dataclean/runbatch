@@ -1,0 +1,32 @@
+#!/bin/sh
+
+BIN_DIR=/home/user/Desktop/jgarch/bin
+LIB_DIR=/home/user/Desktop/jgarch/jgarch/lib
+
+R_HOME=/usr/lib/R
+
+R_SHARE_DIR=/usr/share/R/share
+export R_SHARE_DIR
+R_INCLUDE_DIR=/usr/share/R/include
+export R_INCLUDE_DIR
+R_DOC_DIR=/usr/share/R/doc
+export R_DOC_DIR
+
+JRI_LD_PATH=${R_HOME}/lib:${R_HOME}/bin:
+if test -z "$LD_LIBRARY_PATH"; then
+  LD_LIBRARY_PATH=$JRI_LD_PATH
+else
+  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JRI_LD_PATH
+fi
+JAVA=/usr/bin/java
+
+JAVA_CLASSPATH=.:/home/user/Desktop/jgarch/jgarch/lib/JRI.jar:${LIB_DIR}/flanagan.jar:${LIB_DIR}/opencsv-2.1.jar:${BIN_DIR}
+
+export R_HOME
+export LD_LIBRARY_PATH
+export CLASSPATH=${JAVA_CLASSPATH}
+
+ant datacleanbatch -Ddatafile=$1 -Dtimedfile=$2 -Dmodel=$3 -Dwindow=$4 -Derror=$5 -Doutfile=$6
+
+# example of call:
+# ./runbatch scripts/table2_wind_direction.csv scripts/table2_timed.csv 1 5 0.4 out.txt
