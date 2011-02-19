@@ -30,21 +30,29 @@ var DataClean = {
     orderOfDirtyPoint : null, // array for order of dirty point
     errorOfDirtyPoint : null, // array for order of dirty point
 
-    station_names : ["lafouly_st_1033","lafouly_st_1034",
+    n_sensors : 0,
+
+    station_names2 :
+            ["lafouly_st_1033","lafouly_st_1034",
         "lafouly_st_1035","lafouly_st_1036",
         "lafouly_st_1037","lafouly_st_1039",
         "lafouly_st_1040","lafouly_st_1041",
         "lafouly_st_1042","lafouly_st_1043",
         "lafouly_st_1044"],
 
-    station_longs : [7.106459, 7.116046,
+    station_names : null,
+    station_longs : null,
+    station_lats : null,
+
+
+    station_longs2 : [7.106459, 7.116046,
         7.12273, 7.119712,
         7.129109, 7.117759,
         7.107333, 7.108824,
         7.104324, 7.108735,
         7.115372],
 
-    station_lats : [45.89898, 45.906143,
+    station_lats2 : [45.89898, 45.906143,
         45.904561, 45.90511,
         45.904381, 45.866703,
         45.898031, 45.896434,

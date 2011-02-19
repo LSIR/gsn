@@ -25,45 +25,67 @@
 
 <script type="text/javascript" src="js/datePicker.js"></script>
 <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAMzANHtD0lZRRVCrPbKFfkRQgjQ95GGF6hnonCeqYiElIWyu18hSCTuhmhIfYuWivVq8y0t9zgqbuIQ"
-                type="text/javascript"></script>
+        type="text/javascript"></script>
 
 <script type="text/javascript">
 
     function initialize() {
 
-      if (GBrowserIsCompatible()) {
-        var map = new GMap2(document.getElementById("map_canvas"));
-        map.setCenter(new GLatLng(DataClean.station_lats[0],DataClean.station_longs[0]), 12);
+        // get sensors info, in order o initialize options
 
-      function createMarker(point, index) {
+        DataClean.station_names = new Array();
+        DataClean.station_lats = new Array();
+        DataClean.station_longs = new Array();
 
-          var marker = new GMarker(point);
+        $.getJSON("dataclean?REQUEST=206",
+                 function(sensorsInfo) {
+                     DataClean.n_sensors = sensorsInfo.length;
+                     var i = 0;
+                     var txt = "";
 
-          GEvent.addListener(marker, "click", function() {
-            marker.openInfoWindowHtml(index);
-            DataClean.selectUnselect(index);
-          });
-          return marker;
-        }
+                     for (i = 0; i < DataClean.n_sensors; i++) {
+                         DataClean.station_names.push(sensorsInfo[i].name);
+                         DataClean.station_lats.push(sensorsInfo[i].lat);
+                         DataClean.station_longs.push(sensorsInfo[i].lon);
+                         txt = txt + i + " " + DataClean.station_names[i] + " : " + DataClean.station_lats[i] + " : " + DataClean.station_longs[i] + "\n";
+                     }
+                     //alert(DataClean.n_sensors + " sensors\n" + txt);
+
+                     if (GBrowserIsCompatible()) {
+                         var map = new GMap2(document.getElementById("map_canvas"));
+                         map.setCenter(new GLatLng(DataClean.station_lats[0], DataClean.station_longs[0]), 12);
+
+                         //alert(DataClean.n_sensors + " sensors\n");
+
+                         function createMarker(point, index) {
+
+                             var marker = new GMarker(point);
+
+                             GEvent.addListener(marker, "click", function() {
+                                 marker.openInfoWindowHtml(index);
+                                 DataClean.selectUnselect(index);
+                             });
+                             return marker;
+                         }
 
 
-        // Add  markers to the map
-        var bounds = map.getBounds();
-        var southWest = bounds.getSouthWest();
-        var northEast = bounds.getNorthEast();
-        var lngSpan = northEast.lng() - southWest.lng();
-        var latSpan = northEast.lat() - southWest.lat();
-        for (var i = 0; i < 11; i++) {
+                         // Add  markers to the map
+                         var bounds = map.getBounds();
+                         var southWest = bounds.getSouthWest();
+                         var northEast = bounds.getNorthEast();
+                         var lngSpan = northEast.lng() - southWest.lng();
+                         var latSpan = northEast.lat() - southWest.lat();
+                         for (var i = 0; i < 11; i++) {
 
-          var latlng = new GLatLng(DataClean.station_lats[i],DataClean.station_longs[i]);
-          var marker = createMarker(latlng, DataClean.station_names[i]); //new GMarker(latlng);
-          var name = "Station "+i;
-          map.addOverlay(marker);
-
-        }
-          map.addControl(new GSmallMapControl());
-          map.addControl(new GMapTypeControl());
-      }
+                             var latlng = new GLatLng(DataClean.station_lats[i], DataClean.station_longs[i]);
+                             var marker = createMarker(latlng, DataClean.station_names[i]); //new GMarker(latlng);
+                             var name = "Station " + i;
+                             map.addOverlay(marker);
+                         }
+                         map.addControl(new GSmallMapControl());
+                         map.addControl(new GMapTypeControl());
+                     }
+                 });
     }
 
 </script>
@@ -103,27 +125,27 @@
         //console.log(getRequest);
 
         $.getJSON(getRequest,
-                function(data) {
-                    //console.log(data.data);
-                    //alert(data.data);
-                    DataClean.theData = data.data;
-                    DataClean.plot = $.plot($("#placeholder"), data.data, options);
-                    DataClean.previewPlot = $.plot($("#preview"), data.data,options);
-                    if (data.message != "")
-                        alert(data.message);
-                });
+                 function(data) {
+                     //console.log(data.data);
+                     //alert(data.data);
+                     DataClean.theData = data.data;
+                     DataClean.plot = $.plot($("#placeholder"), data.data, options);
+                     DataClean.previewPlot = $.plot($("#preview"), data.data, options);
+                     if (data.message != "")
+                         alert(data.message);
+                 });
 
         $("#placeholder").bind("plotselected", function (event, ranges) {
 
-        // do the zooming
-        DataClean.plot = $.plot($("#placeholder"), DataClean.theData,
-                      $.extend(true, {}, options, {
-                          xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
-                          yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
-                      }));
+            // do the zooming
+            DataClean.plot = $.plot($("#placeholder"), DataClean.theData,
+                    $.extend(true, {}, options, {
+                        xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+                        yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+                    }));
 
-        // don't fire event on the overview to prevent eternal loop
-        DataClean.previewPlot.setSelection(ranges, true);
+            // don't fire event on the overview to prevent eternal loop
+            DataClean.previewPlot.setSelection(ranges, true);
         });
 
         $("#preview").bind("plotselected", function (event, ranges) {
@@ -131,9 +153,8 @@
         });
 
 
-
-
     }
+
     ;
 </script>
 
@@ -166,101 +187,98 @@
 
         var getAllData = "dataclean?REQUEST=203&vs=" + vs + "&fieldname=" + fieldname + "&model=" + model + "&errorbound=" + errorbound + "&windowsize=" + windowsize + "&from=" + from + "&to=" + to;
         $.getJSON(getAllData,
-                function(data) {
-                    //console.log(data);
+                 function(data) {
+                     //console.log(data);
 
-                    var pltStream = [];
-                    var pltProcessed = [];
-                    var pltDirtyness = [];
+                     var pltStream = [];
+                     var pltProcessed = [];
+                     var pltDirtyness = [];
 
-                    var j = 0;
-                    var i;
-                    for (i in data) {
+                     var j = 0;
+                     var i;
+                     for (i in data) {
 
-                        // init chart
-                        pltStream.push([data[j][1],data[j][2]]);
-                        pltProcessed.push([data[j][1],data[j][3]]);
-                        pltDirtyness.push([data[j][1],data[j][4]]);
+                         // init chart
+                         pltStream.push([data[j][1],data[j][2]]);
+                         pltProcessed.push([data[j][1],data[j][3]]);
+                         pltDirtyness.push([data[j][1],data[j][4]]);
 
-                        // increment counter
-                        j = j + 1;
-                    }
+                         // increment counter
+                         j = j + 1;
+                     }
 
-                    DataClean.plot = $.plot($("#placeholder"),
-                            [
-
-
-                                {
-                                    data:pltStream,
-                                    label:fieldname ,
-                                    points:{ show: false, radius:3 },
-                                    lines: { show: true},
-                                    highlightColor : "#FF0000"
-                                },
-                                {
-                                    data:pltProcessed,
-                                    lines: { show: true, fill:false, color:6 },
-                                    label:"processed"
-                                },
-                                {
-                                    data:pltDirtyness,
-                                    bars:{show:true, fill:true},
-                                    label:"dirtiness",
-                                    yaxis:2
-                                }
-                            ],
-                            options);
-
-                });
+                     DataClean.plot = $.plot($("#placeholder"),
+                             [
 
 
+                                 {
+                                     data:pltStream,
+                                     label:fieldname ,
+                                     points:{ show: false, radius:3 },
+                                     lines: { show: true},
+                                     highlightColor : "#FF0000"
+                                 },
+                                 {
+                                     data:pltProcessed,
+                                     lines: { show: true, fill:false, color:6 },
+                                     label:"processed"
+                                 },
+                                 {
+                                     data:pltDirtyness,
+                                     bars:{show:true, fill:true},
+                                     label:"dirtiness",
+                                     yaxis:2
+                                 }
+                             ],
+                             options);
+
+                 });
 
 
         var getDirtyOnly = "dataclean?REQUEST=204&vs=" + vs + "&fieldname=" + fieldname + "&model=" + model + "&errorbound=" + errorbound + "&windowsize=" + windowsize + "&from=" + from + "&to=" + to;
         $.getJSON(getDirtyOnly,
-                function(data) {
-                    //console.log(data);
+                 function(data) {
+                     //console.log(data);
 
-                    //alert(data.data);
-                    var selectbox = document.getElementById("dirty_select");
+                     //alert(data.data);
+                     var selectbox = document.getElementById("dirty_select");
 
-                    // first, clean all
-                    var k;
-                    for (k = selectbox.options.length - 1; k >= 0; k--)
-                    {
-                        selectbox.remove(k);
-                    }
+                     // first, clean all
+                     var k;
+                     for (k = selectbox.options.length - 1; k >= 0; k--) {
+                         selectbox.remove(k);
+                     }
 
 
-                    var j = 0;
-                    var i;
-                    DataClean.orderOfDirtyPoint = new Array();
-                    DataClean.errorOfDirtyPoint = new Array();
+                     var j = 0;
+                     var i;
+                     DataClean.orderOfDirtyPoint = new Array();
+                     DataClean.errorOfDirtyPoint = new Array();
 
-                    for (i in data) {
+                     for (i in data) {
 
-                        // init combo box
-                        var optn = document.createElement("OPTION");
-                        var d = data[j][3] - data[j][2];
+                         // init combo box
+                         var optn = document.createElement("OPTION");
+                         var d = data[j][3] - data[j][2];
 
-                        DataClean.errorOfDirtyPoint[i] = d;
-                        DataClean.orderOfDirtyPoint[i] = data[j][0]
+                         DataClean.errorOfDirtyPoint[i] = d;
+                         DataClean.orderOfDirtyPoint[i] = data[j][0]
 
-                        optn.text = data[j][0] + " : " + data[j][2] + " (" + d.toPrecision(2) + ")";
-                        optn.value = data[j][0];
-                        selectbox.options.add(optn);
+                         optn.text = data[j][0] + " : " + data[j][2] + " (" + d.toPrecision(2) + ")";
+                         optn.value = data[j][0];
+                         selectbox.options.add(optn);
 
-                        // increment counter
-                        j = j + 1;
-                    }
-                });
+                         // increment counter
+                         j = j + 1;
+                     }
+                 });
         /*
-        $("#placeholder").bind("plotclick", function (event, pos, item) {
-            if (item) {
-                alert("You clicked point " + item.dataIndex + " in " + item.series.label + ".");
-                DataClea.plot.highlight(item.series, item.datapoint);
-            }
-        });     */
+         $("#placeholder").bind("plotclick", function (event, pos, item) {
+         if (item) {
+         alert("You clicked point " + item.dataIndex + " in " + item.series.label + ".");
+         DataClea.plot.highlight(item.series, item.datapoint);
+         }
+         });     */
     }
     ;
 </script>
@@ -289,9 +307,9 @@
 
         var getCall = "dataclean?REQUEST=202&vs=" + vs + "&fieldname=" + fiedname + "&model=" + model + "&todelete=" + todelete;
         $.getJSON(getCall,
-                function(data) {
-                    alert(data);
-                });
+                 function(data) {
+                     alert(data);
+                 });
     }
     ;
 </script>
@@ -302,14 +320,15 @@
 
         for (var i = 0; i < selectbox.length; i++) {
             if (selectbox.options[i].selected) {
-                DataClean.plot.highlight(0,DataClean.orderOfDirtyPoint[i]);
+                DataClean.plot.highlight(0, DataClean.orderOfDirtyPoint[i]);
             } else {
-                DataClean.plot.unhighlight(0,DataClean.orderOfDirtyPoint[i]);
+                DataClean.plot.unhighlight(0, DataClean.orderOfDirtyPoint[i]);
             }
         }
         //alert("You have selected:" + todelete);
         ;
-    };
+    }
+    ;
 
 </script>
 
@@ -319,21 +338,22 @@
         var t = Number(document.getElementById("threshold").value);
         for (var i = 0; i < selectbox.length; i++) {
             //console.log(i+" : "+DataClean.orderOfDirtyPoint[i]+" ("+DataClean.errorOfDirtyPoint[i]+") ? "+t);
-            if (DataClean.errorOfDirtyPoint[i]>=t | DataClean.errorOfDirtyPoint[i]<=-t) {
-                DataClean.plot.highlight(0,DataClean.orderOfDirtyPoint[i]);
+            if (DataClean.errorOfDirtyPoint[i] >= t | DataClean.errorOfDirtyPoint[i] <= -t) {
+                DataClean.plot.highlight(0, DataClean.orderOfDirtyPoint[i]);
 
             } else {
-                DataClean.plot.unhighlight(0,DataClean.orderOfDirtyPoint[i]);
+                DataClean.plot.unhighlight(0, DataClean.orderOfDirtyPoint[i]);
             }
         }
 
         alert(t);
-    };
+    }
+    ;
 
 </script>
 
 <script id="createVS " language="javascript" type="text/javascript">
-    function createVS () {
+    function createVS() {
 
         var vs = document.getElementById("vs").value;
         var fieldname = document.getElementById("fieldname").value;
@@ -345,9 +365,9 @@
 
         var getCall = "dataclean?REQUEST=205&vs=" + vs + "&fieldname=" + fieldname + "&model=" + model + "&errorbound=" + errorbound + "&windowsize=" + windowsize + "&from=" + from + "&to=" + to;
         $.getJSON(getCall,
-                function(data) {
-                    alert(data);
-                });
+                 function(data) {
+                     alert(data);
+                 });
     }
     ;
 </script>
@@ -355,8 +375,7 @@
 <script type="text/javascript" charset="utf-8">
 
 
-    $(function()
-    {
+    $(function() {
         $('.date-pick').datePicker({startDate:'01/01/1996'});
 
 
@@ -396,11 +415,11 @@
 
                 <h3 class="ui-accordion-header"><a href="#">Input stream</a></h3>
 
-               <!-- <label for="date1">From</label>
-                <input name="date1" id="date1" class="date-pick"/>
-                <label for="date2">To</label>
+                <!-- <label for="date1">From</label>
+             <input name="date1" id="date1" class="date-pick"/>
+             <label for="date2">To</label>
 
-                <input name="date2" id="date2" class="date-pick"/>-->
+             <input name="date2" id="date2" class="date-pick"/>-->
 
                 <!--
 
@@ -410,25 +429,25 @@
 
                 <!--<p>Sensor <input id="vs" name="vs" size="16" type="text" value="lafouly_st_1043"/></p>-->
                 <p>Sensor <select id="vs" name="vs">
-					<option value="lafouly_st_1033">lafouly_st_1033</option>
-					<option value="lafouly_st_1034">lafouly_st_1034</option>
-					<option value="lafouly_st_1035">lafouly_st_1035</option>
-					<option value="lafouly_st_1036">lafouly_st_1036</option>
-					<option value="lafouly_st_1037">lafouly_st_1037</option>
-					<option value="lafouly_st_1039">lafouly_st_1039</option>
-					<option value="lafouly_st_1040">lafouly_st_1040</option>
+                    <option value="lafouly_st_1033">lafouly_st_1033</option>
+                    <option value="lafouly_st_1034">lafouly_st_1034</option>
+                    <option value="lafouly_st_1035">lafouly_st_1035</option>
+                    <option value="lafouly_st_1036">lafouly_st_1036</option>
+                    <option value="lafouly_st_1037">lafouly_st_1037</option>
+                    <option value="lafouly_st_1039">lafouly_st_1039</option>
+                    <option value="lafouly_st_1040">lafouly_st_1040</option>
                     <option value="lafouly_st_1041">lafouly_st_1041</option>
-                    <option value="lafouly_st_1042"  selected="true">lafouly_st_1042</option>
+                    <option value="lafouly_st_1042" selected="true">lafouly_st_1042</option>
                     <option value="lafouly_st_1043">lafouly_st_1043</option>
-					<option value="lafouly_st_1044">lafouly_st_1044</option>
+                    <option value="lafouly_st_1044">lafouly_st_1044</option>
                 </select></p>
 
-				<!--
-				hist_1033.xml  hist_1036.xml  hist_1040.xml  hist_1043.xm_
-hist_1034.xml  hist_1037.xml  hist_1041.xml  hist_1044.xml
-hist_1035.xml  hist_1039.xml  hist_1042.xm_
+                <!--
+                    hist_1033.xml  hist_1036.xml  hist_1040.xml  hist_1043.xm_
+    hist_1034.xml  hist_1037.xml  hist_1041.xml  hist_1044.xml
+    hist_1035.xml  hist_1039.xml  hist_1042.xm_
 
-				-->
+                    -->
 
                 <!--<p>Field <input id="fieldname" name="fieldname" size="16" type="text" value="air_temp"/></p>-->
 
@@ -496,36 +515,41 @@ hist_1035.xml  hist_1039.xml  hist_1042.xm_
                 <TABLE BORDER=0>
                     <TR>
                         <TD>
-                            <div id="placeholder" style="width:600px;height:500px;background-color:#fff"></div>                        </TD>
+                            <div id="placeholder" style="width:600px;height:500px;background-color:#fff"></div>
+                        </TD>
                         <TD>
                             <p>
-                            order:value (error)</p>
-                            <p>
-                            <select id="dirty_select" name="dirty_select" size="24" multiple="" style="display: block;" onclick="highlightIt()">
+                                order:value (error)</p>
 
-                              <option value="-1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
-                            </select>
-                          </p>
-                            <p>Thresh.
-                              <label>
-                              <input name="threshold" type="text" id="threshold" size="6" />
-                              </label>
-                              <label>
-                              <input type="button" name="select" id="select" value="select (thres)" onclick="selectWithThreshold()"/>
-                              </label>
+                            <p>
+                                <select id="dirty_select" name="dirty_select" size="24" multiple=""
+                                        style="display: block;" onclick="highlightIt()">
+
+                                    <option value="-1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                                </select>
                             </p>
-                        <p>Use ctrl/shift to select multiple items</p></TD>
-                  </TR>
+                            <p>Thresh.
+                                <label>
+                                    <input name="threshold" type="text" id="threshold" size="6"/>
+                                </label>
+                                <label>
+                                    <input type="button" name="select" id="select" value="select (thres)"
+                                           onclick="selectWithThreshold()"/>
+                                </label>
+                            </p>
+
+                            <p>Use ctrl/shift to select multiple items</p></TD>
+                    </TR>
                     <TR>
                         <td>
                             <div id="preview" style="width:150px;height:125px;background-color:#fff"></div>
                         </td>
-                     <!--   <td><p><input id="enableTooltip" type="checkbox">Enable tooltip</p></td> -->
+                        <!--   <td><p><input id="enableTooltip" type="checkbox">Enable tooltip</p></td> -->
                     </TR>
                 </TABLE>
 
 
-          </div>
+            </div>
 
         </div>
 
