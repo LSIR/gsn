@@ -510,12 +510,18 @@ public class DataCleanServlet extends HttpServlet {
 
         while (itr.hasNext()) {
             StreamElement se = itr.next();
-            pk.add(se.getInternalPrimayKey());
-            timed.add(se.getTimeStamp());
-            stream.add((Double) se.getData(fieldname));
+            Double value = (Double) se.getData(fieldname);
+            if (value != null) {
+                pk.add(se.getInternalPrimayKey());
+                timed.add(se.getTimeStamp());
+                stream.add(value);
+            }
         }
 
         int n = timed.size();
+        int n2 = stream.size();
+
+        logger.warn("Trying to run model... (timed:" + n + ", data:" + n2 + ") ");
 
         long[] _timed = new long[n];
         double[] _stream = new double[n];
@@ -527,7 +533,6 @@ public class DataCleanServlet extends HttpServlet {
             _stream[i] = stream.elementAt(i);
         }
 
-        logger.warn("Trying to run model...");
 
         if (n > 0) {
             ModelFitting.FitAndMarkDirty(model, errorbound, windowsize, _stream, _timed, _processed, _dirtyness);
