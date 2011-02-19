@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# for R-engine, see http://www.rforge.net/JRI/
+
 BIN_DIR=/home/user/Desktop/jgarch/bin
 LIB_DIR=/home/user/Desktop/jgarch/jgarch/lib
 

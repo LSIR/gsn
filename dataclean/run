@@ -26,5 +26,5 @@ export R_HOME
 export LD_LIBRARY_PATH
 export CLASSPATH=${JAVA_CLASSPATH}
 
-ant dataclean
+ant gsn-R
 #ant modelfit
