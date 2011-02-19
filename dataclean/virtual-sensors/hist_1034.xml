@@ -1,0 +1,47 @@
+<virtual-sensor name="lafouly_st_1034">
+   <processing-class>
+      <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>  
+      <unique-timestamps>true</unique-timestamps> 
+      <init-params/>
+      <output-structure>
+	<field name="wind_direction" type="DOUBLE"/>
+	<field name="wind_speed" type="DOUBLE"/>
+	<field name="rain_meter" type="DOUBLE"/>
+	<field name="solar_rad" type="DOUBLE"/>
+	<field name="soil_water_potential" type="DOUBLE"/>
+	<field name="soil_moisture_ectm" type="DOUBLE"/>
+	<field name="soil_temp_ectm" type="DOUBLE"/>
+	<field name="air_humid" type="DOUBLE"/>
+	<field name="air_temp" type="DOUBLE"/>
+	<field name="air_temp_tnx" type="DOUBLE"/>
+	<field name="ground_temp_tnx" type="DOUBLE"/>
+      </output-structure>
+   </processing-class>
+   <description>La Fouly station 1034 (historical data)</description>
+   <life-cycle pool-size="10"/> 
+   <addressing>
+      <predicate key="geographical">La Fouly station 1034</predicate> 
+      <predicate key="LATITUDE">45.906143</predicate> 
+      <predicate key="LONGITUDE">7.116046</predicate> 
+      <predicate key="ALTITUDE">1782</predicate> 
+   </addressing>
+   <storage/> 
+   <streams>
+   <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+      <address wrapper="csv">
+         <predicate key="file">data/1034.csv</predicate>
+         <predicate key="fields">station_id,time1,timed,wind_direction,wind_speed,rain_meter,solar_rad,soil_water_potential,soil_moisture_ectm,soil_temp_ectm,air_humid,air_temp,air_temp_tnx,ground_temp_tnx,cpu_temp,cpu_volt,ext_batt_volt,int_batt_volt</predicate>
+         <predicate key="formats">numeric,numeric,timestamp(y-M-d H:m:s),numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric</predicate>
+         <predicate key="bad-values">-999</predicate> 
+         <predicate key="timezone">Etc/GMT</predicate> 
+         <predicate key="sampling">60000</predicate>
+         <predicate key="skip-first-lines">1</predicate> 
+         <predicate key="check-point-directory">csv-check-points</predicate> 
+      </address>
+      <query>select timed,wind_direction,wind_speed,rain_meter,solar_rad,soil_water_potential,soil_moisture_ectm,soil_temp_ectm,air_humid,air_temp,air_temp_tnx,ground_temp_tnx from wrapper</query> 
+      </source>
+   <query>select * from source</query>
+   </stream>
+   </streams>
+</virtual-sensor>

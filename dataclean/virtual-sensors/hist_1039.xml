@@ -1,0 +1,42 @@
+<virtual-sensor name="lafouly_st_1039">
+   <processing-class>
+      <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>  
+      <unique-timestamps>true</unique-timestamps> 
+      <init-params/>
+      <output-structure>
+	<field name="wind_direction" type="DOUBLE"/>
+	<field name="wind_speed" type="DOUBLE"/>
+	<field name="rain_meter" type="DOUBLE"/>
+	<field name="solar_rad" type="DOUBLE"/>
+	<field name="air_humid" type="DOUBLE"/>
+	<field name="air_temp" type="DOUBLE"/>
+      </output-structure>
+   </processing-class>
+   <description>La Fouly station 1039 (historical data)</description>
+   <life-cycle pool-size="10"/> 
+   <addressing>
+      <predicate key="geographical">La Fouly station 1039</predicate> 
+      <predicate key="LATITUDE">45.866703</predicate> 
+      <predicate key="LONGITUDE">7.117759</predicate> 
+      <predicate key="ALTITUDE">2496</predicate> 
+   </addressing>
+   <storage/> 
+   <streams>
+   <stream name="data">
+      <source alias="source" storage-size="1" sampling-rate="1">
+      <address wrapper="csv">
+         <predicate key="file">data/1039.csv</predicate>
+         <predicate key="fields">station_id,time1,timed,wind_direction,wind_speed,rain_meter,solar_rad,air_humid,air_temp,cpu_temp,cpu_volt,ext_batt_volt,int_batt_volt</predicate>
+         <predicate key="formats">numeric,numeric,timestamp(y-M-d H:m:s),numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric</predicate>
+         <predicate key="bad-values">-999</predicate> 
+         <predicate key="timezone">Etc/GMT</predicate> 
+         <predicate key="sampling">60000</predicate>
+         <predicate key="skip-first-lines">1</predicate> 
+         <predicate key="check-point-directory">csv-check-points</predicate> 
+      </address>
+      <query>select timed,wind_direction,wind_speed,rain_meter,solar_rad,air_humid,air_temp from wrapper</query> 
+      </source>
+   <query>select * from source</query>
+   </stream>
+   </streams>
+</virtual-sensor>

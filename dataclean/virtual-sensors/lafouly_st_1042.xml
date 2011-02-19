@@ -1,0 +1,52 @@
+<virtual-sensor name="lafouly_st_1042" >
+  <processing-class>
+    <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+    <unique-timestamps>true</unique-timestamps>
+    <init-params/>
+   <output-structure>
+       
+       <field name="wind_direction" type="DOUBLE"/>
+       <field name="wind_speed" type="DOUBLE"/>
+       <field name="rain_meter" type="DOUBLE"/>
+       <field name="solar_rad" type="DOUBLE"/>
+       <field name="soil_water_potential" type="DOUBLE"/>
+       <field name="soil_moisture_ectm" type="DOUBLE"/>
+       <field name="soil_temp_ectm" type="DOUBLE"/>
+       <field name="air_humid" type="DOUBLE"/>
+       <field name="air_temp" type="DOUBLE"/>
+       <field name="air_temp_tnx" type="DOUBLE"/>
+       <field name="ground_temp_tnx" type="DOUBLE"/>
+     </output-structure>
+  </processing-class>
+
+  <description>La Fouly station ST1042_2, Switzerland.</description>
+  <life-cycle pool-size="10" />
+  <addressing>
+	<predicate key='geographical'>La Fouly station ST1042_2, Switzerland.</predicate>
+	<predicate key='LATITUDE'>45.899146</predicate>
+	<predicate key='LONGITUDE'>7.104324</predicate>
+	<predicate key='ALTITUDE'>2432</predicate>
+
+	</addressing>
+  <storage />
+
+  <streams>
+    <stream name="data" >
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="csv">
+          <predicate key="file">data/lafouly_1042_120d_processed.csv</predicate>
+	        <predicate key="fields">wind_direction,wind_speed,rain_meter,solar_rad,soil_water_potential,soil_moisture_ectm,soil_temp_ectm,air_humid,air_temp,air_temp_tnx,ground_temp_tnx,timed</predicate>
+	        <predicate key="formats">numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric, timestamp(M/d/y H:m)</predicate>
+	        <predicate key="bad-values">NaN,7999,-7999,null</predicate>
+	        <predicate key="timezone">Etc/GMT+1</predicate>
+	        <predicate key="sampling">60000</predicate> <!-- every 1 minutes -->
+	        <predicate key="skip-first-lines">2</predicate>
+	        <predicate key="check-point-directory">csv-check-points</predicate>
+	      </address>
+	      <query>select * from wrapper</query>
+	    </source>
+	    <query>select * from source</query>
+	  </stream>
+  </streams>
+
+</virtual-sensor>
