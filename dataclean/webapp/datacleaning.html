@@ -72,7 +72,7 @@
                          var northEast = bounds.getNorthEast();
                          var lngSpan = northEast.lng() - southWest.lng();
                          var latSpan = northEast.lat() - southWest.lat();
-                         for (var i = 0; i < 11; i++) {
+                         for (var i = 0; i < DataClean.n_sensors; i++) {
 
                              var latlng = new GLatLng(DataClean.station_lats[i], DataClean.station_longs[i]);
                              var marker = createMarker(latlng, DataClean.station_names[i]); //new GMarker(latlng);
@@ -464,6 +464,7 @@
                     <option value="3">Chebyshev degree 1</option>
                     <option value="4">Chebyshev degree 2</option>
                     <option value="5">Chebyshev degree 3</option>
+                    <option value="6">ARMA Garch</option>
                 </select></p>
 
 

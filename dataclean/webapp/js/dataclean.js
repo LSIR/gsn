@@ -81,7 +81,7 @@ var DataClean = {
     },
 
     populateSensorsOptions: function() {
-        alert("populateSensorsOptions " + DataClean.n_sensors);
+        //alert("populateSensorsOptions " + DataClean.n_sensors);
         var options = document.getElementById("vs");
         options.options.length = 0;
         options.options.length = DataClean.n_sensors;
