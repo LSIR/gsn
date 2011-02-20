@@ -111,8 +111,8 @@ var DataClean = {
     stopSpin: function() {
          var img = document.getElementById('imageholder');
         	img.src = "";
-        	img.width = 32;
-        	img.height = 32;
+        	img.width = 0;
+        	img.height = 0;
     }
 };
 
