@@ -83,7 +83,7 @@ public class ArmaGarchModel implements IModel {
             if (predUVar != 0.0)
                 quality = 1 - (stream[currIdx] - predValue) / (3 * predUVar);
 
-            logger.warn("quality : " + currIdx + " : " + quality);
+            logger.warn("quality : " + currIdx + " : " + quality + "U-var: "+ predUVar + "L-var: " + predLVar);
 
             if (predUVar > minVar) {
                 if ((stream[currIdx] <= predValue + errorBound * Math.sqrt(predUVar)) &&
