@@ -4,10 +4,13 @@ import gsn.utils.models.jgarch.armamodel.ARModel;
 import gsn.utils.models.jgarch.garchmodel.GarchModel;
 import gsn.utils.models.jgarch.util.ArrayUtils;
 import gsn.utils.models.jgarch.wrappers.REngineManager;
+import org.apache.log4j.Logger;
 
 import java.util.List;
 
 public class ArmaGarchModel implements IModel {
+
+    private final transient Logger logger        = Logger.getLogger( ArmaGarchModel.class );
     private double[] stream;
 
     private int windowSize;
@@ -46,12 +49,14 @@ public class ArmaGarchModel implements IModel {
 
             System.arraycopy(stream, i, tseries, 0, windowSize);
 
+            /*
             for (double t : tseries) {
                 System.out.print(t + ",");
             }
+            */
 
-            System.out.println();
-            System.out.println(i + windowSize);
+            //System.out.println();
+            //System.out.println(i + windowSize);
 
 
             // create and execute AR model
@@ -71,12 +76,14 @@ public class ArmaGarchModel implements IModel {
             double predUVar = gm.getPredUVar();  // sigma
             double predLVar = gm.getPredLVar();
 
-            System.out.println(gm.getPredUVar());
-            System.out.println(gm.getPredLVar());
+            //System.out.println(gm.getPredUVar());
+            //System.out.println(gm.getPredLVar());
 
             double quality = 0;
             if (predUVar != 0.0)
                 quality = 1 - (stream[currIdx] - predValue) / (3 * predUVar);
+
+            logger.warn("quality : " + currIdx + " : " + quality);
 
             if (predUVar > minVar) {
                 if ((stream[currIdx] <= predValue + errorBound * Math.sqrt(predUVar)) &&
