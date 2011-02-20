@@ -351,7 +351,8 @@ public class DataCleanServlet extends HttpServlet {
                     + timed.elementAt(i) + ","
                     + stream.elementAt(i) + ","
                     + processed.elementAt(i) + ","
-                    + dirtyness.elementAt(i) + "]");
+                    + dirtyness.elementAt(i) + ","
+                    + quality.elementAt(i) + "]");
             if (i != n - 1)
                 sb.append(",\n");
         }
@@ -434,7 +435,8 @@ public class DataCleanServlet extends HttpServlet {
                     + timed.elementAt(i) + ","
                     + stream.elementAt(i) + ","
                     + processed.elementAt(i) + ","
-                    + dirtyness.elementAt(i) + "]");
+                    + dirtyness.elementAt(i) + ","
+                    + quality.elementAt(i) + "]");
             if (i != n - 1)
                 sb.append(",\n");
         }
@@ -555,6 +557,7 @@ public class DataCleanServlet extends HttpServlet {
         StringBuilder jsonStream = new StringBuilder();
         StringBuilder jsonProcessed = new StringBuilder();
         StringBuilder jsonDirtyness = new StringBuilder();
+        StringBuilder jsonQuality = new StringBuilder();
 
         StringBuilder jsonData = new StringBuilder();
 
@@ -575,11 +578,17 @@ public class DataCleanServlet extends HttpServlet {
                     .append(", ")
                     .append(_dirtyness[i])
                     .append("]");
+            jsonQuality.append("[")
+                    .append(_timed[i])
+                    .append(", ")
+                    .append(_quality[i])
+                    .append("]");
 
             if (i != n - 1) {
                 jsonStream.append(",");
                 jsonProcessed.append(",");
                 jsonDirtyness.append(",");
+                jsonQuality.append(",");
             }
 
             //executePreparedSQL(insertSQL, pk.elementAt(i), _timed[i], _stream[i], _processed[i], _dirtyness[i]);
@@ -594,6 +603,8 @@ public class DataCleanServlet extends HttpServlet {
                     .append(_processed[i])
                     .append(", ")
                     .append(_dirtyness[i])
+                    .append(", ")
+                    .append(_quality[i])
                     .append("\n")
             ;
         }
@@ -608,7 +619,7 @@ public class DataCleanServlet extends HttpServlet {
 
         //String jsonReturn = "{\"data\":[["+jsonTimed+"],[" + jsonProcessed + "]]}";
 
-        String jsonReturn = "{\"data\":[[" + jsonStream + "],[" + jsonProcessed + "],[" + jsonDirtyness + "]],\"message\":\"" + result + "\"}";
+        String jsonReturn = "{\"data\":[[" + jsonStream + "],[" + jsonProcessed + "],[" + jsonDirtyness + "],[" + jsonQuality + "]],\"message\":\"" + result + "\"}";
 
         //return sbCSV.toString();
         return jsonReturn;

@@ -120,7 +120,7 @@
             } },
             selection: { mode: "xy" },
 
-            colors: ["#22F722","#111111",  "#ff0000"]
+            colors: ["#22F722","#111111",  "#ff0000", "#0000ff"]
         };
 
         var vs = document.getElementById("vs").value;
@@ -184,7 +184,7 @@
                 return []
             } },
             selection: { mode: "xy" } ,
-            colors: ["#22F722", "#111111", "#ff0000"]
+            colors: ["#22F722", "#111111", "#ff0000", "#0000ff"]
         };
 
         var vs = document.getElementById("vs").value;
@@ -207,6 +207,7 @@
                      var pltStream = [];
                      var pltProcessed = [];
                      var pltDirtyness = [];
+                     var pltQuality = [];
 
                      var j = 0;
                      var i;
@@ -216,6 +217,7 @@
                          pltStream.push([data[j][1],data[j][2]]);
                          pltProcessed.push([data[j][1],data[j][3]]);
                          pltDirtyness.push([data[j][1],data[j][4]]);
+                         pltQuality.push([data[j][1],data[j][5]]);
 
                          // increment counter
                          j = j + 1;
@@ -241,6 +243,12 @@
                                      data:pltDirtyness,
                                      bars:{show:true, fill:true},
                                      label:"dirtiness",
+                                     yaxis:2
+                                 },
+                                     {
+                                     data:pltQuality,
+                                     bars:{show:true, fill:true},
+                                     label:"quality",
                                      yaxis:2
                                  }
                              ],
