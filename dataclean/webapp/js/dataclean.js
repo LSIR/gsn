@@ -99,6 +99,20 @@ var DataClean = {
          lb.options[i].value = arrTexts[i];
          }
          */
+    },
+
+    startSpin: function() {
+        var img = document.getElementById('imageholder');
+        	img.src = "style/ajax-loader.gif";
+        	img.width = 32;
+        	img.height = 32;
+    },
+
+    stopSpin: function() {
+         var img = document.getElementById('imageholder');
+        	img.src = "";
+        	img.width = 32;
+        	img.height = 32;
     }
 };
 

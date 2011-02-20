@@ -24,8 +24,8 @@
 
 
 <script type="text/javascript" src="js/datePicker.js"></script>
-<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAMzANHtD0lZRRVCrPbKFfkRQgjQ95GGF6hnonCeqYiElIWyu18hSCTuhmhIfYuWivVq8y0t9zgqbuIQ"
-        type="text/javascript"></script>
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=true_or_false&amp;key=ABQIAAAAMzANHtD0lZRRVCrPbKFfkRSiLMwtoAe8N62rHHwJd2Z92azAxxTQpshA7Ihr3-9roaS9P2vN-un--g" type="text/javascript"></script>
+
 
 
 <script type="text/javascript">
@@ -110,6 +110,8 @@
         //var toDate = new Date(document.getElementById("date2").value);
         //alert(fromDate + "\n" +   " => " + toDate);
 
+        DataClean.startSpin();
+
         var options = {
             series: { points: { show: false  }, lines: { show: true }, shadowSize: 0 },
             xaxis: { mode: "time", timeformat: "%y/%m/%d %h:%M:%s" },
@@ -144,6 +146,7 @@
                      DataClean.previewPlot = $.plot($("#preview"), data.data, options);
                      if (data.message != "")
                          alert(data.message);
+                     DataClean.stopSpin();
                  });
 
         $("#placeholder").bind("plotselected", function (event, ranges) {
