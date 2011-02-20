@@ -45,7 +45,7 @@ public class ModelFitting {
         return result;
     }
 
-    public static boolean FitAndMarkDirty(int model, double errorBound, int windowSize, double[] stream, long[] timestamps, double[] processed, double[] dirtyness) {
+    public static boolean FitAndMarkDirty(int model, double errorBound, int windowSize, double[] stream, long[] timestamps, double[] processed, double[] dirtyness, double[] quality) {
 
 
         long[] _timestamps = new long[timestamps.length];
@@ -84,7 +84,7 @@ public class ModelFitting {
         }
 
         //fit
-        boolean result = m.FitAndMarkDirty(processed, dirtyness);
+        boolean result = m.FitAndMarkDirty(processed, dirtyness, quality);
 
         return result;
     }
@@ -205,11 +205,12 @@ public class ModelFitting {
 
             double[] processed = new double[window];
             double[] dirtyness = new double[window];
+            double[] quality = new double[window];
 
             if (use_ARMA_GARCH)
-                FitAndMarkDirty(model, error, window - 1, stream, timestamps, processed, dirtyness);
+                FitAndMarkDirty(model, error, window - 1, stream, timestamps, processed, dirtyness, quality);
             else
-                FitAndMarkDirty(model, error, window, stream, timestamps, processed, dirtyness);
+                FitAndMarkDirty(model, error, window, stream, timestamps, processed, dirtyness, quality);
 
             cursor += window;
 

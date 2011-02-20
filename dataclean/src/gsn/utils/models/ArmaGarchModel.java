@@ -26,7 +26,7 @@ public class ArmaGarchModel implements IModel {
     }
 
 
-    public boolean FitAndMarkDirty(double[] processed, double[] dirtyness) {
+    public boolean FitAndMarkDirty(double[] processed, double[] dirtyness, double[] quality) {
         boolean allClean = true;
         //double [] predUVar = new double[stream.length+1];
         //double [] predLVar = new double[stream.length+1];
@@ -79,11 +79,13 @@ public class ArmaGarchModel implements IModel {
             //System.out.println(gm.getPredUVar());
             //System.out.println(gm.getPredLVar());
 
-            double quality = 0;
+            double quality_metric = 0;
             if (predUVar != 0.0)
-                quality = 1 - (stream[currIdx] - predValue) / (3 * predUVar);
+                quality_metric = 1 - (stream[currIdx] - predValue) / (3 * predUVar);
 
-            logger.warn("quality : " + currIdx + " : " + quality + "U-var: "+ predUVar + "L-var: " + predLVar);
+            quality[currIdx] = quality_metric;
+
+            logger.warn("quality : " + currIdx + " : " + quality_metric + "U-var: "+ predUVar + "L-var: " + predLVar);
 
             if (predUVar > minVar) {
                 if ((stream[currIdx] <= predValue + errorBound * Math.sqrt(predUVar)) &&
@@ -105,6 +107,5 @@ public class ArmaGarchModel implements IModel {
 
         return allClean;
     }
-
 
 }

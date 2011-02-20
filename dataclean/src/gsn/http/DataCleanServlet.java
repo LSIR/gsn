@@ -322,7 +322,7 @@ public class DataCleanServlet extends HttpServlet {
         //delete table if exists, create table, copy data inside
         String tablename = vs + "_" + fieldname + "_model_" + model;
 
-        ArrayList<StreamElement> values = getValuesFor(tablename, fieldname + ",processed,dirtyness", from, to);
+        ArrayList<StreamElement> values = getValuesFor(tablename, fieldname + ",processed,dirtyness,quality", from, to);
 
         Iterator<StreamElement> itr = values.iterator();
 
@@ -331,6 +331,7 @@ public class DataCleanServlet extends HttpServlet {
         Vector<Double> stream = new Vector<Double>();
         Vector<Double> processed = new Vector<Double>();
         Vector<Double> dirtyness = new Vector<Double>();
+        Vector<Double> quality = new Vector<Double>();
 
         while (itr.hasNext()) {
             StreamElement se = itr.next();
@@ -339,6 +340,7 @@ public class DataCleanServlet extends HttpServlet {
             stream.add((Double) se.getData(fieldname));
             processed.add((Double) se.getData("processed"));
             dirtyness.add((Double) se.getData("dirtyness"));
+            quality.add((Double) se.getData("quality"));
         }
 
         StringBuilder sb = new StringBuilder();
@@ -401,7 +403,7 @@ public class DataCleanServlet extends HttpServlet {
         //delete table if exists, create table, copy data inside
         String tablename = vs + "_" + fieldname + "_model_" + model;
 
-        ArrayList<StreamElement> values = getValuesFor(tablename, fieldname + ",processed,dirtyness", from, to);
+        ArrayList<StreamElement> values = getValuesFor(tablename, fieldname + ",processed,dirtyness,quality", from, to);
 
         Iterator<StreamElement> itr = values.iterator();
 
@@ -410,6 +412,7 @@ public class DataCleanServlet extends HttpServlet {
         Vector<Double> stream = new Vector<Double>();
         Vector<Double> processed = new Vector<Double>();
         Vector<Double> dirtyness = new Vector<Double>();
+        Vector<Double> quality = new Vector<Double>();
 
         while (itr.hasNext()) {
             StreamElement se = itr.next();
@@ -419,6 +422,7 @@ public class DataCleanServlet extends HttpServlet {
                 stream.add((Double) se.getData(fieldname));
                 processed.add((Double) se.getData("processed"));
                 dirtyness.add((Double) se.getData("dirtyness"));
+                quality.add((Double) se.getData("quality"));
             }
         }
 
@@ -485,7 +489,7 @@ public class DataCleanServlet extends HttpServlet {
         String tablename = vs + "_" + fieldname + "_model_" + model;
 
         String dropSQL = "drop table if exists " + tablename + ";";
-        String createSQL = "create table " + tablename + " (pk BIGINT, timed BIGINT, " + fieldname + " DOUBLE, processed DOUBLE, dirtyness DOUBLE);";
+        String createSQL = "create table " + tablename + " (pk BIGINT, timed BIGINT, " + fieldname + " DOUBLE, processed DOUBLE, dirtyness DOUBLE, quality DOUBLE);";
 
         logger.warn(dropSQL);
         executeSQL(dropSQL);
@@ -527,6 +531,7 @@ public class DataCleanServlet extends HttpServlet {
         double[] _stream = new double[n];
         double[] _processed = new double[n];
         double[] _dirtyness = new double[n];
+        double[] _quality = new double[n];
 
         for (int i = 0; i < n; i++) {
             _timed[i] = timed.elementAt(i);
@@ -535,14 +540,14 @@ public class DataCleanServlet extends HttpServlet {
 
 
         if (n > 0) {
-            ModelFitting.FitAndMarkDirty(model, errorbound, windowsize, _stream, _timed, _processed, _dirtyness);
+            ModelFitting.FitAndMarkDirty(model, errorbound, windowsize, _stream, _timed, _processed, _dirtyness, _quality);
             logger.warn("done.");
         } else {
             logger.warn("Not enough data to run model");
             result = "Not enough data point in the selected time interval to run model.";
         }
 
-        String insertSQL = "INSERT INTO " + tablename + "(pk, timed, " + fieldname + ", processed, dirtyness) VALUES (?,?,?,?,?)";
+        String insertSQL = "INSERT INTO " + tablename + "(pk, timed, " + fieldname + ", processed, dirtyness, quality) VALUES (?,?,?,?,?,?)";
 
         StringBuilder sbCSV = new StringBuilder();
         StringBuilder jsonPk = new StringBuilder();
@@ -578,7 +583,7 @@ public class DataCleanServlet extends HttpServlet {
             }
 
             //executePreparedSQL(insertSQL, pk.elementAt(i), _timed[i], _stream[i], _processed[i], _dirtyness[i]);
-            executePreparedSQL(insertSQL, i, _timed[i], _stream[i], _processed[i], _dirtyness[i]);
+            executePreparedSQL(insertSQL, i, _timed[i], _stream[i], _processed[i], _dirtyness[i], _quality[i]);
 
             sbCSV.append(pk.elementAt(i))
                     .append(", ")
@@ -611,7 +616,7 @@ public class DataCleanServlet extends HttpServlet {
         //return "{\"data\":[[[1258216500000,4.91],[1258212240000,4.39],[1258216920000,4.46],[1258211640000,4.39],[1258210980000,4.82] ]]}";
     }
 
-    private boolean executePreparedSQL(String sql, long pk, long timed, double value, double pvalue, double dirt) {
+    private boolean executePreparedSQL(String sql, long pk, long timed, double value, double pvalue, double dirt, double quality) {
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -623,6 +628,7 @@ public class DataCleanServlet extends HttpServlet {
             pstmt.setDouble(3, value);
             pstmt.setDouble(4, pvalue);
             pstmt.setDouble(5, dirt);
+            pstmt.setDouble(6, quality);
             pstmt.executeUpdate();
         } catch (SQLException error) {
             logger.error(error.getMessage() + " FOR: " + sql, error);
@@ -636,7 +642,7 @@ public class DataCleanServlet extends HttpServlet {
             }
         }
 
-        return false;  //To change body of created methods use File | Settings | File Templates.
+        return false;
     }
 
     private boolean executeSQL(String sql) {

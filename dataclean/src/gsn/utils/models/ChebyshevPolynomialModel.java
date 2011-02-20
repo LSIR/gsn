@@ -30,8 +30,7 @@ public class ChebyshevPolynomialModel implements IModel, RealFunction{
 		this.coefs = new double[degree + 1];
 	}
 	
-	@Override
-	public boolean FitAndMarkDirty(double[] processed, double[] dirtyness) {
+	public boolean FitAndMarkDirty(double[] processed, double[] dirtyness, double[] quality) {
 		
 		//fit piecewise
 		this.currentPos = 0;
@@ -83,7 +82,6 @@ public class ChebyshevPolynomialModel implements IModel, RealFunction{
 		return retval;
 	}
 
-	@Override
 	public double valueAt(double x) {
 		double retval = 0.0;
 		
