@@ -76,7 +76,8 @@ class BinaryPluginClass(AbstractPluginClass):
     _filedeque
     _msgdeque
     _isBusy
-    _work
+    _msgEvent
+    _workEvent
     _waitforack
     _rootdir
     _filedescriptor
@@ -120,7 +121,8 @@ class BinaryPluginClass(AbstractPluginClass):
         wm = WatchManager()
         self._notifier = ThreadedNotifier(wm, BinaryChangedProcessing(self))
         
-        self._work = Event()
+        self._msgEvent = Event()
+        self._workEvent = Event()
         self._filedeque = deque()
         self._msgdeque = deque()
         
@@ -203,7 +205,8 @@ class BinaryPluginClass(AbstractPluginClass):
     def msgReceived(self, data):
         self.debug('message received')
         self._msgdeque.appendleft(data)
-        self._work.set()
+        self._msgEvent.set()
+        self._workEvent.set()
         
     
     def connectionToGSNestablished(self):
@@ -236,7 +239,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 
         while not self._plugStop:
             # wait for the next file event to happen
-            self._work.wait()
+            self._workEvent.wait()
             if self._plugStop:
                 break
             self._waitforack = False
@@ -289,7 +292,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         
                     if alreadyReceived:
                         if not self._msgdeque:
-                            self._work.clear()
+                            self._workEvent.clear()
                         continue
                         
                     self._lastRecvPacketType = ACK_PACKET
@@ -300,7 +303,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         self.debug('init packet already received')
                         self.processMsg(self.getTimeStamp(), [ACK_PACKET, INIT_PACKET], self._priority, self._backlog)
                         if not self._msgdeque:
-                            self._work.clear()
+                            self._workEvent.clear()
                         continue
                     else:
                         self.debug('new binary request received')
@@ -321,7 +324,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         self.debug('binary retransmission request already received')
                         self.processMsg(self.getTimeStamp(), [ACK_PACKET, RESEND_PACKET], self._priority, self._backlog)
                         if not self._msgdeque:
-                            self._work.clear()
+                            self._workEvent.clear()
                         continue
                     else:
                         self.debug('binary retransmission request received')
@@ -478,8 +481,8 @@ class BinaryPluginClass(AbstractPluginClass):
             
                 # tell BackLogMain to send the packet to GSN
                 first = True
-                self._work.clear()
-                while (not self._work.isSet() or first) and self.isGSNConnected():
+                self._msgEvent.clear()
+                while (not self._msgEvent.isSet() or first) and self.isGSNConnected():
                     if not first:
                         self.debug('resend message')
                         self._resendcounter += 1
@@ -487,12 +490,12 @@ class BinaryPluginClass(AbstractPluginClass):
                     self._waitforack = True
                     self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
                     # and resend it if no ack has been received
-                    self._work.wait(RESEND_INTERVAL_SEC)
+                    self._msgEvent.wait(RESEND_INTERVAL_SEC)
                     first = False
             except IndexError:
                 # fifo is empty
                 self.debug('file FIFO is empty waiting for next file to arrive')
-                self._work.clear()
+                self._workEvent.clear()
                 if not self._waitforfile:
                     self._isBusy = False
             except Exception, e:
@@ -536,7 +539,8 @@ class BinaryPluginClass(AbstractPluginClass):
         if self._waitforfile:
             self._waitforfiletimer.cancel()
         self._notifier.stop()
-        self._work.set()
+        self._msgEvent.set()
+        self._workEvent.set()
         self._filedeque.clear()
         if self._filedescriptor and not self._filedescriptor.closed:
             os.chmod(self._filedescriptor.name, 0744)
@@ -564,4 +568,4 @@ class BinaryChangedProcessing(ProcessEvent):
         self._binaryPlugin._filedeque.appendleft(event.pathname)
         if self._binaryPlugin.isGSNConnected() and not self._binaryPlugin._waitforack:
             self._binaryPlugin._isBusy = True
-            self._binaryPlugin._work.set()
+            self._binaryPlugin._workEvent.set()
