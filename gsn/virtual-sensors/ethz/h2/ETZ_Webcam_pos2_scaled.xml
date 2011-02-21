@@ -1,6 +1,6 @@
 <virtual-sensor name="ETZ_Webcam_pos2__scaled" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <class-name>gsn.vsensor.FileGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="jpeg_scaled">JPEG_SCALED</param>
