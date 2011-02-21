@@ -74,7 +74,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 			}
 		}
 		else {
-			file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("position"))).getPath(), (String) data.getData("relative_file"));
+			file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), (String) data.getData("relative_file"));
 		}
 		file = file.getAbsoluteFile();
 
