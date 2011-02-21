@@ -35,6 +35,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	
 	@Override
 	public boolean initialize() {
+		boolean ret = super.initialize();
 		VSensorConfig vsensor = getVirtualSensorConfiguration();
 		TreeMap<String,String> params = vsensor.getMainClassInitialParams();
 
@@ -58,7 +59,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 		dcraw_flip = params.get("dcraw_flip");
 		if (params.get("rotation")!=null)
 			rotation = new Double(params.get("rotation"));
-		return super.initialize();
+		return ret;
 	}
 	
 	

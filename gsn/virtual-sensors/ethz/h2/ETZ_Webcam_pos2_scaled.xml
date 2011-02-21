@@ -20,9 +20,9 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select timed, POSITION, GENERATION_TIME, RELATIVE_FILE from ETZ_Binary__mapped where RELATIVE_FILE like 'webcam1/%'</predicate>
+                    <predicate key="query">select timed, POSITION, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from ETZ_Binary__mapped where RELATIVE_FILE like 'webcam1/%'</predicate>
                 </address>
-                <query> select timed, POSITION, GENERATION_TIME, RELATIVE_FILE from wrapper where POSITION = 2</query>
+                <query> select timed, POSITION, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 2</query>
             </source>
             <query> select * from source </query>
         </stream>
