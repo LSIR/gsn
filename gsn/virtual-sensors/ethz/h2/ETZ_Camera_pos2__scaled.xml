@@ -1,9 +1,10 @@
-<virtual-sensor name="ETZ_pos2_Camera__scaled" priority="10" >
+<virtual-sensor name="ETZ_Camera_pos2__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.FileGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="jpeg_scaled">JPEG_SCALED</param>
+            <param name="storage_directory">/home/perma/gsn-test-binaries/</param>
             <param name="file_type">nef</param>
             <param name="nef_extraction_type">thumbnail</param>
         </init-params>
@@ -30,9 +31,9 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select timed, POSITION, GENERATION_TIME, RELATIVE_FILE, STORAGE_DIRECTORY from ETZ_Binary__mapped where RELATIVE_FILE like 'camera1/%'</predicate>
+                    <predicate key="query">select timed, POSITION, GENERATION_TIME, RELATIVE_FILE from ETZ_Binary__mapped where RELATIVE_FILE like 'camera1/%'</predicate>
                 </address>
-                <query> select timed, GENERATION_TIME, concat(STORAGE_DIRECTORY,RELATIVE_FILE) as FILE from wrapper where POSITION = 2</query>
+                <query> select timed, POSITION, GENERATION_TIME, RELATIVE_FILE from wrapper where POSITION = 2</query>
             </source>
             <query> select * from source </query>
         </stream>

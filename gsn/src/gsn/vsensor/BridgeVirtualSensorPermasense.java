@@ -39,7 +39,7 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 	
 	private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensorPermasense.class);
 
-	private String deployment;
+	protected String deployment;
 	private int width;
 	private List<AbstractWrapper> backlogWrapperList = new LinkedList<AbstractWrapper>();
 	private Vector<String> jpeg_scaled;

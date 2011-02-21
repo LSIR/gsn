@@ -26,8 +26,9 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	private static final String DCRAW = "/home/perma/dcraw-x64/dcraw";
 
 	private static final transient Logger logger = Logger.getLogger(FileGetterVirtualSensor.class);
-	
+
 	private String filetype = null;
+	private String storage_directory = null;
 	private String nef_extraction_type = null;
 	private String dcraw_flip = null;
 	private Double rotation = null;	
@@ -36,7 +37,11 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	public boolean initialize() {
 		VSensorConfig vsensor = getVirtualSensorConfiguration();
 		TreeMap<String,String> params = vsensor.getMainClassInitialParams();
-		
+
+		storage_directory = params.get("storage_directory");
+		if (storage_directory != null) {
+			storage_directory = new File(storage_directory, deployment).getPath();
+		}
 		filetype = params.get("file_type");
 		if (filetype == null) {
 			logger.error("file_type has to be defined in the virtual sensors xml file");
@@ -49,6 +54,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 				return false;
 			}
 		}
+		
 		dcraw_flip = params.get("dcraw_flip");
 		if (params.get("rotation")!=null)
 			rotation = new Double(params.get("rotation"));
@@ -58,10 +64,16 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
-		File file = new File((String) data.getData("file"));
-		if (!file.exists()) {
-			logger.error(file.getAbsolutePath() + " does not exist");
-			return;
+		File file;
+		if (storage_directory == null) {
+			file = new File((String) data.getData("file"));
+			if (!file.exists()) {
+				logger.error(file.getAbsolutePath() + " does not exist");
+				return;
+			}
+		}
+		else {
+			file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("position"))).getPath(), (String) data.getData("relative_file"));
 		}
 		file = file.getAbsoluteFile();
 
