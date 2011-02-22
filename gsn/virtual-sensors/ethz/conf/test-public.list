@@ -37,7 +37,7 @@ ETZ_Dozer_StateCounter__mapped.xml
 #ETZ_pos0_CoreStationStatus__chart2.xml
 #ETZ_pos0_CoreStationStatus__chart3.xml
 #ETZ_pos0_CoreStationStatus__chart4.xml
-ETZ_Webcam_pos0__scaled.xml
+ETZ_Camera_pos0__scaled.xml
 #ETZ_pos1_BackLogStatus__chart.xml
 #ETZ_pos1_BackLogStatus__chart2.xml
 #ETZ_pos1_BackLogStatus__chart3.xml
@@ -45,7 +45,7 @@ ETZ_Webcam_pos0__scaled.xml
 #ETZ_pos1_CoreStationStatus__chart2.xml
 #ETZ_pos1_CoreStationStatus__chart3.xml
 #ETZ_pos1_CoreStationStatus__chart4.xml
-ETZ_Webcam_pos1__scaled.xml
+ETZ_Camera_pos1__scaled.xml
 #ETZ_pos2_BackLogStatus__chart.xml
 #ETZ_pos2_BackLogStatus__chart2.xml
 #ETZ_pos2_BackLogStatus__chart3.xml
@@ -54,8 +54,7 @@ ETZ_Camera_pos2__scaled.xml
 #ETZ_pos2_CoreStationStatus__chart2.xml
 #ETZ_pos2_CoreStationStatus__chart3.xml
 #ETZ_pos2_CoreStationStatus__chart4.xml
-ETZ_Webcam_pos2_scaled.xml
-ETZ_Webcam_pos3__scaled.xml
+ETZ_Camera_pos3__scaled.xml
 ETZ_Schedule__mapped.xml
 ETZ_VaisalaWXT520__mapped.xml
 ETZ_VaisalaWXT520__muxed__mapped.xml

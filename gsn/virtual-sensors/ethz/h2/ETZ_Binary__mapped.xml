@@ -19,7 +19,7 @@
 			
             <field name="RELATIVE_FILE" type="VARCHAR(255)" />
             <field name="FILE_COMPLETE" type="SMALLINT" />
-            <field name="DATA" type="binary" />
+            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
@@ -30,7 +30,7 @@
         <predicate key="LATITUDE">47.377326</predicate>
         <predicate key="LONGITUDE">8.552935</predicate>
     </addressing>
-    <storage />
+    <storage storage-directory="/home/perma/gsn-test-binaries/" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">

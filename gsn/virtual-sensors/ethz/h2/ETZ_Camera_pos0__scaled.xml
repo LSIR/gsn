@@ -1,10 +1,9 @@
-<virtual-sensor name="ETZ_Webcam_pos2__scaled" priority="10" >
+<virtual-sensor name="ETZ_Camera_pos0__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.FileGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="jpeg_scaled">JPEG_SCALED</param>
-            <param name="storage_directory">/home/perma/gsn-test-binaries/</param>
             <param name="file_type">jpeg</param>
         </init-params>
         <output-structure>
@@ -12,17 +11,28 @@
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>webcam pictures from position 2 at ETZ deployment as thumbnails</description>
+    <description>webcam pictures from position 0 at ETZ deployment as thumbnails</description>
     <life-cycle pool-size="10" />
-    <addressing />
-    <storage history-size="1"/>
+    <addressing>
+        <predicate key="type">PermaSense ETZ test deployment</predicate>
+        <predicate key="LATITUDE">47.377326</predicate>
+        <predicate key="LONGITUDE">8.552935</predicate>
+        <predicate key="ALTITUDE">4.600000001463493</predicate>
+        <predicate key="HEADING">148.26</predicate>
+        <predicate key="TILT">73.78037981281604</predicate>
+        <predicate key="ROLL">0</predicate>
+        <predicate key="HORFOV">55</predicate>
+        <predicate key="VERFOV">46.965</predicate>
+        <predicate key="NEAR">1.61</predicate>
+    </addressing>
+    <storage storage-directory="/home/perma/gsn-test-binaries/" history-size="1" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from ETZ_Binary__mapped where RELATIVE_FILE like 'webcam1/%'</predicate>
                 </address>
-                <query> select timed, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 2</query>
+                <query> select timed, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 0</query>
             </source>
             <query> select * from source </query>
         </stream>
