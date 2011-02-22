@@ -15,10 +15,9 @@
             <field name="TRANSMISSION_TIME_TOT" type="INTEGER" unit="ms" />
             <field name="CHUNK_RETRANSMISSIONS" type="INTEGER" />
             <field name="FILE_QUEUE_SIZE" type="INTEGER" />
-			
             <field name="RELATIVE_FILE" type="VARCHAR(255)" />
             <field name="FILE_COMPLETE" type="SMALLINT" />
-            <field name="DATA" type="binary" />
+            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE"/>
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
@@ -29,14 +28,13 @@
         <predicate key="LATITUDE">47.377326</predicate>
         <predicate key="LONGITUDE">8.552935</predicate>
     </addressing>
-    <storage />
+    <storage storage-directory="/home/perma/gsn-test-binaries/" />
     <streams>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -47,7 +45,6 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -58,7 +55,6 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -69,7 +65,6 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -80,7 +75,6 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -91,7 +85,6 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -102,7 +95,6 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">nb-tgsell.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -113,7 +105,6 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">pc-5225.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -124,7 +115,6 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                    <predicate key="storage-directory">/home/perma/gsn-test-binaries/</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
