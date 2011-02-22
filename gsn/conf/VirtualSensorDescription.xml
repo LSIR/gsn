@@ -74,6 +74,7 @@
    	<value name="unit" field="unit" style="attribute" usage="optional"/>
    	<value name="defaultvalue" field="defaultvalue" style="attribute" usage="optional"/>
    	<value name="index" get-method="getIndex" set-method="setIndex" style="attribute" usage="optional"/>
+   	<value name="data-path-field" field="dataPathField" style="attribute" usage="optional"/>
    	<value field="description" style="text" usage="optional"/>
    </mapping>
 
@@ -89,5 +90,6 @@
         <value name="password" field="jdbcPassword" usage="optional" style="attribute" />
         <value name="url" field="jdbcURL" usage="optional" style="attribute" />
         <value name="identifier" field="identifier" usage="optional" style="attribute" />
+        <value name="storage-directory" field="storageDirectory" usage="optional" style="attribute" />
     </mapping>
 </binding>

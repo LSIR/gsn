@@ -167,7 +167,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 							output[ innerIndex ] = resultSet.getBytes( actualColIndex );
 						break;
 					}
-					if (resultSet.wasNull())
+					if (resultSet.wasNull() && !(linkBinaryData && dataFieldTypes[ innerIndex ] == DataTypes.BINARY))
 						output[innerIndex]=null;
 					innerIndex++;
 				}

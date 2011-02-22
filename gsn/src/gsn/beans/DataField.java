@@ -14,7 +14,7 @@ public final class DataField implements Serializable {
    
    private byte               dataTypeID       = -1;
    
-   private String            type, unit, defaultvalue;
+   private String            type, unit, defaultvalue,dataPathField;
    
    private boolean	index = false;
    
@@ -126,6 +126,14 @@ public final class DataField implements Serializable {
    
    public boolean getIndex() {
 	   return index;
+   }
+
+   public void setDataPathField(String dataPathField) {
+	   this.dataPathField = dataPathField;
+   }
+
+   public String getDataPathField() {
+	   return dataPathField;
    }
    
 }

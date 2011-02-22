@@ -18,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
+import gsn.Mappings;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.wrappers.BackLogWrapper;
@@ -33,7 +34,7 @@ import gsn.wrappers.BackLogWrapper;
  * can be stored on disk or in the database. This will be configured on side of the
  * deployment.
  * <p>
- * The 'storage-directory' predicate (defined in the virtual sensor's XML file) has
+ * The 'storage-directory' attribute (defined in the storage section of the virtual sensor's XML file) has
  * to be used to specify the storage location. If the binaries are stored in the
  * database the directory is only used to store the partly downloaded binary. If
  * the binaries are stored on disk, it defines the root directory in which the
@@ -51,9 +52,7 @@ import gsn.wrappers.BackLogWrapper;
 public class BinaryPlugin extends AbstractPlugin {
 	
 	protected static final int RESEND_INTERVAL_SEC = 30;
-	
-	private static final String STORAGE_DIRECTORY = "storage-directory";
-	
+		
 	private static final String PROPERTY_DEVICE_ID = "device_id";
 	private static final String PROPERTY_REMOTE_BINARY = "remote_binary";
 	private static final String PROPERTY_DOWNLOADED_SIZE = "downloaded_size";
@@ -141,8 +140,8 @@ public class BinaryPlugin extends AbstractPlugin {
 		binarySender = new BinarySender(this);
 		
 		try {
-			rootBinaryDir = addressBean.getPredicateValueWithException(STORAGE_DIRECTORY);
-		} catch (Exception e) {
+			rootBinaryDir = addressBean.getVirtualSensorConfig().getStorage().getStorageDirectory();
+		} catch (NullPointerException e){
 			logger.error(e.getMessage());
 			return false;
 		}

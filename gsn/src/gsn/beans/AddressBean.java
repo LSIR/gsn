@@ -146,6 +146,7 @@ public final class AddressBean implements Serializable{
 
 	private String inputStreamName;
 	private String virtualSensorName;
+	private VSensorConfig vsconfig;
 
 	public String getInputStreamName() {
 		return inputStreamName;
@@ -163,5 +164,12 @@ public final class AddressBean implements Serializable{
 		this.virtualSensorName = virtualSensorName;
 	}
 
+	public void setVirtualSensorConfig(VSensorConfig vsconfig) {
+		this.vsconfig = vsconfig;
+	}
+
+	public VSensorConfig getVirtualSensorConfig() {
+		return vsconfig;
+	}
 
 }

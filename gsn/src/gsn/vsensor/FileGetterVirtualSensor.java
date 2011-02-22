@@ -39,7 +39,7 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 		VSensorConfig vsensor = getVirtualSensorConfiguration();
 		TreeMap<String,String> params = vsensor.getMainClassInitialParams();
 
-		storage_directory = params.get("storage_directory");
+		storage_directory = vsensor.getStorage().getStorageDirectory();
 		if (storage_directory != null) {
 			storage_directory = new File(storage_directory, deployment).getPath();
 		}

@@ -4,13 +4,18 @@ import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
+import gsn.beans.InputStream;
 import gsn.beans.VSensorConfig;
 
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -87,17 +92,34 @@ public class FieldDownloadServlet extends HttpServlet {
 				res.sendError( res.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
 			}else {
 				boolean binary = false;
+				String filename = null;
 				for ( DataField df : sensorConfig.getOutputStructure( ) )
-					if ( df.getName( ).toLowerCase( ).equals( colName.trim( ).toLowerCase( ) ) ) if ( df.getDataTypeID( ) == DataTypes.BINARY ) {
-						StringTokenizer st = new StringTokenizer( df.getType( ) , ":" );
-						binary = true;
-						if ( st.countTokens( ) != 2 ) break;
-						st.nextToken( );// Ignoring the first token.
-						res.setContentType( st.nextToken( ) );
-						// if ( type.equalsIgnoreCase( "svg" ) ) res.setContentType( "" );
+					if ( df.getName( ).toLowerCase( ).equals( colName.trim( ).toLowerCase( ) ) ) {
+						if ( df.getDataTypeID( ) == DataTypes.BINARY ) {
+							StringTokenizer st = new StringTokenizer( df.getType( ) , ":" );
+							binary = true;
+							if ( st.countTokens( ) == 2 ) {
+								st.nextToken( );// Ignoring the first token.
+								res.setContentType( st.nextToken( ) );
+							}
+							filename = df.getDataPathField();							
+						}
 					}
-				if ( binary )
-					res.getOutputStream( ).write( rs.getBytes( colName ) );
+				if ( binary ) {
+					byte [] data = rs.getBytes(colName);
+					if (data == null && filename!=null) {
+						byte[] buffer = new byte[1024];
+						int bytesRead;
+						logger.debug("open file specified in "+filename);
+						FileInputStream is= new FileInputStream(new StringBuilder(Mappings.getVSensorConfig(vsName).getStorage().getStorageDirectory()).append("/").append(vsName.substring(0, vsName.indexOf("_"))).append("/").append(rs.getString("DEVICE_ID")).append("/").append(rs.getString(filename)).toString());
+						while ((bytesRead=is.read(buffer)) != -1) {
+							res.getOutputStream( ).write(buffer, 0, bytesRead);
+					    }						
+					}
+					else {
+						res.getOutputStream( ).write( rs.getBytes( colName ) );
+					}
+				}
 				else {
 					res.setContentType( "text/xml" );
 					res.getWriter( ).write( rs.getString( colName ) );
