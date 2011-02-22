@@ -145,7 +145,7 @@ public class GSNWebServiceClient {
         }
     }
 
-    public static void getVirtualSensorDetails(String EPR, String vsName) {
+    public static void getVirtualSensorAddressing(String EPR, String vsName) {
 
         try {
             GSNWebServiceStub stub = new GSNWebServiceStub(EPR);
@@ -187,6 +187,50 @@ public class GSNWebServiceClient {
         }
     }
 
+    public static void getVirtualSensorStructure(String EPR, String vsName) {
+
+        try {
+            GSNWebServiceStub stub = new GSNWebServiceStub(EPR);
+            GSNWebServiceStub.GetVirtualSensorsDetails request = new GSNWebServiceStub.GetVirtualSensorsDetails();
+
+            GSNWebServiceStub.GSNWebService_FieldSelector virtualSensors = new GSNWebServiceStub.GSNWebService_FieldSelector();
+            virtualSensors.setVsname(vsName);
+            request.addFieldSelector(virtualSensors);
+            System.out.println(request.getFieldSelector()[0].getVsname());
+
+            GSNWebServiceStub.GSNWebService_DetailsType detailsType = new GSNWebServiceStub.GSNWebService_DetailsType(GSNWebServiceStub.GSNWebService_DetailsType._OUTPUTSTRUCTURE, true);
+            System.out.println(detailsType.getValue());
+            request.addDetailsType(detailsType);
+
+            GSNWebServiceStub.GetVirtualSensorsDetailsResponse response = stub.getVirtualSensorsDetails(request);
+
+            GSNWebServiceStub.GSNWebService_VirtualSensorDetails[] virtualSensorDetails = response.getVirtualSensorDetails();
+
+            if (virtualSensorDetails != null) {
+                System.out.println(virtualSensorDetails.length);
+
+                for (int i = 0; i < response.getVirtualSensorDetails().length; i++) {
+                    String vs_name = response.getVirtualSensorDetails()[i].getVsname();
+                    int predicates_length = 0;
+                    int output_structure_length = 0;
+                    if (response.getVirtualSensorDetails()[i].getOutputStructure() != null && response.getVirtualSensorDetails()[i].getOutputStructure().getFields() != null)
+                        output_structure_length = response.getVirtualSensorDetails()[i].getOutputStructure().getFields().length;
+
+                    System.out.println(vs_name + " : " + output_structure_length);
+                    for (int j = 0; j < output_structure_length; j++) {
+                        String field_name = response.getVirtualSensorDetails()[i].getOutputStructure().getFields()[j].getName();
+                        String field_type = response.getVirtualSensorDetails()[i].getOutputStructure().getFields()[j].getType();
+                        System.out.println("   "+field_name + " : " + field_type);
+                    }
+                }
+            }
+        } catch (AxisFault axisFault) {
+            axisFault.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void main(String[] args) {
 
@@ -210,7 +254,9 @@ public class GSNWebServiceClient {
         else
             System.out.println("No sensors found.");
 
-        getVirtualSensorDetails(EPR, "ALL");
+        getVirtualSensorStructure(EPR, "ALL");
+
+        getVirtualSensorAddressing(EPR, "ALL");
 
         getLatestMultiData(EPR, "ALL");
 
