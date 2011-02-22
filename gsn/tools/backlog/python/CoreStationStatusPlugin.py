@@ -1256,8 +1256,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             line = file.read()
             file.close()
             lst = line.split()
-            if len(lst) != len(ret):
-                self.exception('reading /proc/uptime did not return ' + str(len(ret)) + ' values')
+            if len(lst) != 2:
+                self.exception('reading /proc/uptime did not return 2 values')
                 self._uptime = False
         except Exception, e:
             self._uptime = False
