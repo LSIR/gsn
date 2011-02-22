@@ -25,6 +25,68 @@ public class GSNWebServiceClient {
         return sensors;
     }
 
+    public static void getMultiData(String EPR, String vsName, long from, long to, int nb) {
+        try {
+            GSNWebServiceStub stub = new GSNWebServiceStub(EPR);
+            GSNWebServiceStub.GetMultiData request = new GSNWebServiceStub.GetMultiData();
+            GSNWebServiceStub.GSNWebService_FieldSelector virtualSensors = new GSNWebServiceStub.GSNWebService_FieldSelector();
+            virtualSensors.setVsname(vsName);
+            request.addFieldSelector(virtualSensors);
+            request.setFrom(from);
+            request.setTo(to);
+            request.setNb(nb);
+            System.out.println(request.getFieldSelector()[0].getVsname());
+
+            GSNWebServiceStub.GetMultiDataResponse response = stub.getMultiData(request);
+            if (response.getQueryResult() != null) {
+                GSNWebServiceStub.GSNWebService_QueryResult[] query_result = response.getQueryResult();
+                int query_result_length = query_result.length;
+                System.out.println("Result length: " + query_result_length);
+
+                for (int i = 0; i < query_result_length; i++) {
+                    String executed_query = query_result[i].getExecutedQuery();
+                    String vs_name = query_result[i].getVsname();
+                    System.out.println(i + " : " + vs_name);
+                    System.out.println("   " + executed_query);
+
+                    if (query_result[i].getFormat().getField() != null) {
+                        int fields_length = query_result[i].getFormat().getField().length;
+                        System.out.println("fields: " + fields_length);
+                        for (int k = 0; k < fields_length; k++) {
+                            String field_name = query_result[i].getFormat().getField()[k].getName();
+                            String field_description = query_result[i].getFormat().getField()[k].getDescription();
+                            String field_type = query_result[i].getFormat().getField()[k].getType();
+                            System.out.println("   " + field_name + "(" + field_type + ") : " + field_description);
+                        }
+                    }
+
+                    if (query_result[i].getStreamElements() != null) {
+                        int stream_elements_length = query_result[i].getStreamElements().length;
+                        for (int j = 0; j < stream_elements_length; j++) {
+                            String timed = query_result[i].getStreamElements()[j].getTimed();
+                            System.out.println("timed: " + timed);
+                            if (query_result[i].getStreamElements()[j].getField() != null) {
+                                int fields_length = query_result[i].getStreamElements()[j].getField().length;
+                                for (int k = 0; k < fields_length; k++) {
+                                    String field_string = query_result[i].getStreamElements()[j].getField()[k].getString();
+                                    System.out.println(field_string);
+                                }
+
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+        } catch (AxisFault axisFault) {
+            axisFault.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void getLatestMultiData(String EPR, String vsName) {
         try {
@@ -150,9 +212,14 @@ public class GSNWebServiceClient {
 
         getVirtualSensorDetails(EPR, "ALL");
 
-
-
         getLatestMultiData(EPR, "ALL");
 
+        long from = 0;
+        long to = 12811638922851L;
+        int nb = 5;
+        getMultiData(EPR, "ALL", from, to, nb);
+
     }
+
+
 }
