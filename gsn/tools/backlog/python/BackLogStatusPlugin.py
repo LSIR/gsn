@@ -39,6 +39,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         
         self._sleeper = threading.Event()
         self._stopped = False
+        self._initFinish = False
         
         value = self.getOptionValue('poll_interval')
         if value is None:
@@ -76,7 +77,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         
         for entry in self._backlogMain.getCodeRevisionList():
             self.processMsg(self.getTimeStamp(), [REVISION_TYPE] + entry)
-            
+        self._initFinish = True
         
         if self._interval != None:
             while not self._stopped:
@@ -99,15 +100,16 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             else:
                 self.error('parameter has to be a digit (parameter=' + parameters + ')')
         
-        payload = [DYNAMIC_TYPE]
-        timestamp = self.getTimeStamp()
-        payload += [self.getUptime(), self.getErrorCounter(), self.getExceptionCounter()]
-        payload += self._backlogMain.gsnpeer.getStatus()
-        payload += self._backlogMain.backlog.getStatus(30)
-        payload += self._getStatus()
-        payload += self._getRUsage()
-        
-        self.processMsg(timestamp, payload)
+        if self._initFinish:
+            payload = [DYNAMIC_TYPE]
+            timestamp = self.getTimeStamp()
+            payload += [self.getUptime(), self.getErrorCounter(), self.getExceptionCounter()]
+            payload += self._backlogMain.gsnpeer.getStatus()
+            payload += self._backlogMain.backlog.getStatus(30)
+            payload += self._getStatus()
+            payload += self._getRUsage()
+            
+            self.processMsg(timestamp, payload)
             
     
     

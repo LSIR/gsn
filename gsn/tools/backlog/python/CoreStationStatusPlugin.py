@@ -52,6 +52,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         self._conf_calibrate = False
         if int(self.getOptionValue('calibrate')) == 1:
             self._conf_calibrate = True
+            
+        self._initFinish = False
     
         self._calibrated = False
         self._ain4_cal = None
@@ -108,6 +110,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         self._initAD77x8()
         
         self.processMsg(self.getTimeStamp(), [STATIC_TYPE] + self._getInitStats())
+        self._initFinish = True
         
         if self._interval != None:
             while not self._stopped:
@@ -149,32 +152,33 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #        print '_getChronyStats :' + str(self._getChronyStats())
 #        print '_getLM92Temp :' + str(self._getLM92Temp())
         
-        hw_data_list = [HW_TYPE]
-        hw_timestamp = self.getTimeStamp()
-        hw_data_list += self._getLM92Temp()
-        hw_data_list += self._getAD77x8()
-        
-        sw_data_list = [SW_TYPE]
-        sw_timestamp = self.getTimeStamp()
-        sw_data_list += self._getNumberOfUsers()
-        sw_data_list += self._getLastLog()
-        sw_data_list += self._getStatVFS()
-        sw_data_list += self._getDiskStats()
-        sw_data_list += self._getInterrupts()
-        sw_data_list += self._getLoadAvg()
-        sw_data_list += self._getMemInfo()
-        sw_data_list += self._getSchedStat()
-        sw_data_list += self._getNetDev()
-        sw_data_list += self._getNetSNMP()
-        sw_data_list += self._getNetStat()
-        sw_data_list += self._getSockStat()
-        sw_data_list += self._getSoftIRQ()
-        sw_data_list += self._getStat()
-        sw_data_list += self._getUptime()
-        sw_data_list += self._getChronyStats()
-        
-        self.processMsg(hw_timestamp, hw_data_list)
-        self.processMsg(sw_timestamp, sw_data_list)
+        if self._initFinish:
+            hw_data_list = [HW_TYPE]
+            hw_timestamp = self.getTimeStamp()
+            hw_data_list += self._getLM92Temp()
+            hw_data_list += self._getAD77x8()
+            
+            sw_data_list = [SW_TYPE]
+            sw_timestamp = self.getTimeStamp()
+            sw_data_list += self._getNumberOfUsers()
+            sw_data_list += self._getLastLog()
+            sw_data_list += self._getStatVFS()
+            sw_data_list += self._getDiskStats()
+            sw_data_list += self._getInterrupts()
+            sw_data_list += self._getLoadAvg()
+            sw_data_list += self._getMemInfo()
+            sw_data_list += self._getSchedStat()
+            sw_data_list += self._getNetDev()
+            sw_data_list += self._getNetSNMP()
+            sw_data_list += self._getNetStat()
+            sw_data_list += self._getSockStat()
+            sw_data_list += self._getSoftIRQ()
+            sw_data_list += self._getStat()
+            sw_data_list += self._getUptime()
+            sw_data_list += self._getChronyStats()
+            
+            self.processMsg(hw_timestamp, hw_data_list)
+            self.processMsg(sw_timestamp, sw_data_list)
             
     
     
