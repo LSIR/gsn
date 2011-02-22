@@ -79,8 +79,10 @@ class GPSPluginClass(AbstractPluginClass):
         self._SatelliteCounter=0
            
         self._runEv = Event()
-                	
-        self._WlanThread = WlanThread(self,10,10)
+            
+        #Wlan must only be cycled when in dc mode!!
+        if (self.isDutyCycleMode()):    	
+            self._WlanThread = WlanThread(self,10,10)
         
         #counter
         fp = open("/media/card/backlog/GPS_cnt.txt","rw")
@@ -142,7 +144,8 @@ class GPSPluginClass(AbstractPluginClass):
             return
         
         self.info('GPSPlugin running...')
-        self._WlanThread.start()
+        if (self.isDutyCycleMode()):  
+            self._WlanThread.start()
         # Prepare for precise timing
         now = time.time()
         while (time.time() <= self._endTime and not self._stopped):                    
@@ -153,15 +156,18 @@ class GPSPluginClass(AbstractPluginClass):
                     pass
                 elif (self._mode == "raw" and self._logMode == "binary"):
                     self._stats.counterAction(self._counterID)
-                    self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, self._stats.getCounterValue(self._counterID), ((rawMsg[3]-8)/24), bytearray(rawMsg[2])])
+                    cnt = self._stats.getCounterValue(self._counterID)
+                    self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, cnt, ((rawMsg[4]-8)/24), bytearray(rawMsg[2])])
                 elif (self._mode == "raw" and self._logMode == "ascii"):
                     self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, parseRawMsg(rawMsg[2])])
-                self.info("GPS Sample Nr: " + str(self._stats.getCounterValue(self._counterID)))
-                self.info(str((rawMsg[3]-8)/24) + " Satellites (" + str(rawMsg[3]) + " Bytes)")
+                self.info("GPS Sample Nr: " + str(cnt))
+                self.writeToFile(cnt)
+                self.info(str((rawMsg[4]-8)/24) + " Satellites (" + str(rawMsg[4]) + " Bytes)")
             self._runEv.wait(self._interval-1)
 
         # die...
-        self._WlanThread.join()
+        if (self.isDutyCycleMode()):  
+            self._WlanThread.join()
         self.debug('GPSPlugin died...')
     
         end = time.time()
@@ -198,7 +204,7 @@ class GPSPluginClass(AbstractPluginClass):
                 
                 carrier_phase, pseudorange, doppler, sv, quality, cno, lli = struct.unpack_from('<2diB2bB', payload, startIndex)
                 
-                dataPackage = [RAW_TYPE, gps_time, gps_week, svs, carrier_phase, pseudorange, doppler, sv, quality, cno, lli]
+                dataPackage = [gps_time, gps_week, svs, carrier_phase, pseudorange, doppler, sv, quality, cno, lli]
                 
                 if quality>=int(self.getOptionValue('quality_threshold')) and cno>=int(self.getOptionValue('signal_threshold')):
                       self._goodSatelliteCounter=self._goodSatelliteCounter+1
@@ -231,12 +237,10 @@ class GPSPluginClass(AbstractPluginClass):
     ##########################################################################################
     '''
     def stop(self):
-        fp = open("/media/card/backlog/GPS_cnt.txt","w")
-        fp.write(str(self._stats.getCounterValue(self._counterID)))
-        fp.close()
         self.info('GPSPlugin stopping...')
         self._runEv.set()
-        self._WlanThread.stop()
+        if (self.isDutyCycleMode()):  
+            self._WlanThread.stop()
         self._busy = False
         self._stopped = True
         self.info('GPSPlugin stopped')
@@ -258,11 +262,15 @@ class GPSPluginClass(AbstractPluginClass):
     def isBusy(self):
         return self._busy
         
-        
+    
     def needsWLAN(self):
         # TODO: implement return value
         return False
     
+    def writeToFile(self, val):
+        fp = open("/media/card/backlog/GPS_cnt.txt","w")
+        fp.write(str(val))
+        fp.close()
     
 #############################################################
 # Class WlanThread
@@ -324,3 +332,4 @@ class WlanThread(Thread):
         self._stopped = True
         self._work.set()
         self._parent._logger.info('WlanThread: stopped')
+        

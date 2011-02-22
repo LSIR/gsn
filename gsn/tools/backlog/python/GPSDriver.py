@@ -210,7 +210,8 @@ class GPSDriver():
                     	success = False
 
         if (success):
-            return (header[0], header[1], payload, payloadLength) #ID, class, payload
+            rawPayload = self._gpsHeader + struct.pack('2B', 0x02, 0x10) + rawPayloadLength + payload + ck
+            return (header[0], header[1], rawPayload, payload, payloadLength) #ID, class, payload
         else:
             self._logger.warning("readGpsMessage: returned nothing!")
             return False
@@ -374,7 +375,7 @@ class GPSDriver():
     	old = ''
     	while (not old):
             old = self._pollGpsMessage(self._prtMessageId)
-            rec=struct.unpack('20B',old[2])
+            rec=struct.unpack('20B',old[3])
             want=struct.unpack('19B',newport)
             prtchange=False
             if want[0]!=rec[0]:
@@ -409,8 +410,8 @@ class GPSDriver():
             rate = False
             while (not rate):
                 rate = self._pollGpsMessage(self._rateMessageId)
-            if rate[2] != newrate:
-                self._logger.debug('Rate changed from ' + str(struct.unpack('3H',rate[2])[0]) + " to " + str(self._interval*1000))
+            if rate[3] != newrate:
+                self._logger.debug('Rate changed from ' + str(struct.unpack('3H',rate[3])[0]) + " to " + str(self._interval*1000))
                 cnt=0
                 ACK=0
                 while not ACK and cnt<=3:
