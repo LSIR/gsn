@@ -46,24 +46,29 @@ class BinaryPluginClass(AbstractPluginClass):
         watch#:         The relative directory based on the root directory to be watched.
                         The second part (after the comma) specifies where it has to be
                         stored on side of GSN. In the database or in the filesystem.
-                        If filesystem is chosen, the third part can optionally be set
+                        The third part can be used to define a device id this binary data
+                        is coming from. If it is not set the device id of this Core Station
+                        is used.
+                        If filesystem has been chosen, the fourth part can optionally be set
                         to format the subfolders based on the modification time. Please
                         refer to Java SimpleDateFormat Class for possible formatting information.
                         The different watch options have to be followed by an incrementing number
                         (e.g. watch1 = ..., watch2 = ..., etc.)
                         If no watch is specified, the root directory will be watched for
-                        binary modifications (this is the same as setting 'watch1 = ./,filesystem').
+                        binary modifications (this is the same as setting 'watch1 = ./,filesystem,,').
 
     For example:
         rootdir = /media/
-        watch1 = webcam1,database
-        watch2 = webcam2,filesystem
-        watch3 = camera,filesystem,yyyy-MM
+        watch1 = webcam1,database,,
+        watch2 = webcam2,filesystem,666,
+        watch3 = camera,filesystem,,yyyy-MM
         
         In this example the three folders '/media/webcam1', '/media/webcam2' and
         '/media/camera' will be watched for any new binary modifications. Changing binaries
         in '/media/webcam1' will be stored in the database in GSN. Whereas changed ones in the
         folders '/media/webcam2' and '/media/camera' will be stored on disk on side of GSN.
+        Binaries from '/media/webcam2' will be linked to device id 666. While binaries from
+        '/media/webcam1' and '/media/camera' will be linked to the device id of this CoreStation.
         Binaries from '/media/webcam2' will be separated into standardly named subfolders
         corresponding to the default set by DEFAULT_DATE_TIME_FORMATE. While binaries from
         '/media/camera' will be sorted into monthly based subfolders.
@@ -116,7 +121,7 @@ class BinaryPluginClass(AbstractPluginClass):
             os.makedirs(self._rootdir)
 
         if not watches:
-            watches.append('.,filesystem')
+            watches.append('.,filesystem,,')
 
         wm = WatchManager()
         self._notifier = ThreadedNotifier(wm, BinaryChangedProcessing(self))
@@ -130,29 +135,36 @@ class BinaryPluginClass(AbstractPluginClass):
         filetime = []
         for watch in watches:
             w = watch.split(',')
+            for index, entry in enumerate(w):
+                w[index] = entry.strip()
         
             if not w[0].endswith('/'):
                 w[0] += '/'
                 
-            if len(w) == 1:
+            if len(w) != 4:
                 raise TypeError('watch >' + watch + '< in the configuration file is not well formatted')
-            elif len(w) == 2 or len(w) == 3:
+            else:
                 w[1] = w[1].lower()
                 if w[1] == 'database':
                     w[1] = 1
-                    if len(w) == 2:
-                        w.append('')
                 elif w[1] == 'filesystem':
                     w[1] = 0
-                    if len(w) == 2:
-                        w.append(DEFAULT_DATE_TIME_FORMATE)
-                    elif len(w) == 3:
-                        if len(w[2]) > 255:
-                            raise TypeError('the date time format in watch >' + watch + '< is longer than 255 characters')
                 else:
                     raise TypeError('the second part of watch >' + watch + '< in the configuration file has to be database or filesystem')
-            else:
-                raise TypeError('watch >' + watch + '< in the configuration file has too many commas')
+                    
+                if not w[2]:
+                    w[2] = self.getDeviceId()
+                else:
+                    if not w[2].isdigit():
+                        raise TypeError('the device id in watch >' + watch + '< has to be a number')
+                    else:
+                        w[2] = int(w[2])
+                        
+                if not w[3]:
+                    w[3] = DEFAULT_DATE_TIME_FORMATE
+                else:
+                    if len(w[3]) > 255:
+                        raise TypeError('the date time format in watch >' + watch + '< is longer than 255 characters')
             
             dir = w[0]
             pathname = os.path.join(self._rootdir, dir)
@@ -175,8 +187,8 @@ class BinaryPluginClass(AbstractPluginClass):
                     time = os.stat(f).st_mtime
                     filetime.append((time, f))
                     
-        for path, storage, time_format in self._watches:
-            self.debug('watch: ' + path + '  -  ' + str(storage) + '  -  ' + time_format)
+        for path, storage, device_id, time_format in self._watches:
+            self.debug('watch: ' + path + '  -  ' + str(storage) + '  -  ' + str(device_id) + ' - ' + time_format)
         
         # sort the existing files by time
         filetime.sort()
@@ -432,11 +444,11 @@ class BinaryPluginClass(AbstractPluginClass):
                     
                     self._resendcounter = 0
                         
-                    packet = [INIT_PACKET, len(self._filedeque), self._resendcounter, long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
+                    packet = [INIT_PACKET, watch[2], len(self._filedeque), self._resendcounter, long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
                     packet.append(filenamenoprefix)
-                    packet.append(watch[2])
+                    packet.append(watch[3])
                     
-                    self.debug('sending initial binary packet for ' + self._filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '< and time date format >' + watch[2] + '<')
+                    self.debug('sending initial binary packet for ' + self._filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '<, device id >' + str(watch[2]) + ' and time date format >' + watch[3] + '<')
                 
                     crc = None
                         

@@ -54,6 +54,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	
 	private static final String STORAGE_DIRECTORY = "storage-directory";
 	
+	private static final String PROPERTY_DEVICE_ID = "device_id";
 	private static final String PROPERTY_REMOTE_BINARY = "remote_binary";
 	private static final String PROPERTY_DOWNLOADED_SIZE = "downloaded_size";
 	private static final String PROPERTY_TRANS_START = "transmission_start";
@@ -77,7 +78,6 @@ public class BinaryPlugin extends AbstractPlugin {
 	private SimpleDateFormat folderdatetimefm;
 
 	private String rootBinaryDir;
-	private String binaryDir = null;
 
 	protected final transient Logger logger = Logger.getLogger( BinaryPlugin.class );
 	
@@ -96,7 +96,7 @@ public class BinaryPlugin extends AbstractPlugin {
 			new DataField("DATA", "binary")};
 	
 	private LinkedBlockingQueue<Message> msgQueue = new LinkedBlockingQueue<Message>();
-	protected Integer deviceID = null;
+	private Integer deviceID = null;
 	private Boolean firstConnect = true;
 	private boolean storeInDatabase;
 	protected Properties configFile = new Properties();
@@ -274,18 +274,20 @@ public class BinaryPlugin extends AbstractPlugin {
 					int filequeuesize;
 					int chunkresend;
     				try {
-    					filequeuesize = toInteger(msg.getData()[1]);
-    					chunkresend = toInteger(msg.getData()[2]);
-						binaryTimestamp = toLong(msg.getData()[3]);
-						binaryLength = toLong(msg.getData()[4]);
+    					deviceID = toInteger(msg.getData()[1]);
+    					filequeuesize = toInteger(msg.getData()[2]);
+    					chunkresend = toInteger(msg.getData()[3]);
+						binaryTimestamp = toLong(msg.getData()[4]);
+						binaryLength = toLong(msg.getData()[5]);
 					} catch (Exception e) {
 						logger.error(e.getMessage(), e);
 						dispose();
 						continue;
 					}
-    				byte storage = (Byte) msg.getData()[5];
-    				remoteBinaryName = (String) msg.getData()[6];
-    				String datetimefm = (String) msg.getData()[7];
+    				byte storage = (Byte) msg.getData()[6];
+    				remoteBinaryName = (String) msg.getData()[7];
+    				String datetimefm = (String) msg.getData()[8];
+    				
     				try {
     					folderdatetimefm = new SimpleDateFormat(datetimefm);
     					folderdatetimefm.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -312,14 +314,26 @@ public class BinaryPlugin extends AbstractPlugin {
 	    					logger.debug("   store on disk");
 	    				logger.debug("   folder date time format: " + datetimefm);
     				}
-    	
-    			    File f = new File(remoteBinaryName);
-    			    
 
+    			    String binaryDir = null;
     			    if (storeInDatabase) {
-    			    	localBinaryName = binaryDir + TEMP_BINARY_NAME;
+    			    	localBinaryName = rootBinaryDir + deploymentName + "/" + TEMP_BINARY_NAME;
     			    }
     			    else {
+        				binaryDir = rootBinaryDir + deploymentName + "/" + Integer.toString(deviceID) + "/";
+        				File f = new File(binaryDir);
+    					if (!f.isDirectory()) {
+    				    	if (!f.mkdirs()) {
+    				    		logger.error("could not mkdir >" + binaryDir + "< -> drop this binary");
+    				    		binarySender.requestNewBinary();
+    	    					continue;
+    	    				}
+    				    	else
+    				    		logger.info("created new storage directory >" + binaryDir + "<");
+    					}
+    					logger.debug("storage directory is >" + binaryDir + "<");
+    					
+    					f = new File(remoteBinaryName);
     			    	String subpath = f.getParent();
     			    	if (subpath == null	)
     			    		subpath = "";
@@ -345,7 +359,7 @@ public class BinaryPlugin extends AbstractPlugin {
     				filelen = 0;
     				
     				// delete the file if it already exists
-    				f = new File(localBinaryName);
+    				File f = new File(localBinaryName);
     			    if (f.exists()) {
     					if (logger.isDebugEnabled())
     						logger.debug("overwrite already existing binary >" + localBinaryName + "<");
@@ -360,6 +374,7 @@ public class BinaryPlugin extends AbstractPlugin {
 					binaryTransmissionTime = 0;
 					
     			    // write the new binary info to the property file
+    				configFile.setProperty(PROPERTY_DEVICE_ID, Integer.toString(deviceID));
     				configFile.setProperty(PROPERTY_REMOTE_BINARY, remoteBinaryName);
     				configFile.setProperty(PROPERTY_DOWNLOADED_SIZE, Long.toString(0));
     				configFile.setProperty(PROPERTY_TRANS_START, Long.toString(binaryTransmissionStartTime));
@@ -372,7 +387,7 @@ public class BinaryPlugin extends AbstractPlugin {
     				configFile.setProperty(PROPERTY_TIME_DATE_FORMAT, datetimefm);
 
     				try {
-						configFile.store(new FileOutputStream(binaryDir + PROPERTY_FILE_NAME), null);
+						configFile.store(new FileOutputStream(rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME), null);
 					} catch (Exception e) {
 						logger.error(e.getMessage(), e);
 						dispose();
@@ -385,7 +400,7 @@ public class BinaryPlugin extends AbstractPlugin {
     			    	relativeName = remoteBinaryName;
     			    else
     			    	relativeName = localBinaryName.replaceAll(binaryDir, "");
-					Serializable[] data = {binaryTimestamp, getDeviceID(), binaryLength, (long)0, binaryTransmissionTime, binaryTransmissionTime, chunkresend, filequeuesize, relativeName, (short)0, null};
+					Serializable[] data = {binaryTimestamp, deviceID, binaryLength, (long)0, binaryTransmissionTime, binaryTransmissionTime, chunkresend, filequeuesize, relativeName, (short)0, null};
 					percentDownloaded = 0;
 					if(!dataProcessed(System.currentTimeMillis(), data)) {
 						logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
@@ -443,7 +458,7 @@ public class BinaryPlugin extends AbstractPlugin {
 						configFile.setProperty(PROPERTY_CHUNK_NUMBER, Long.toString(chunknum));
 						configFile.setProperty(PROPERTY_CHUNK_RESEND, Integer.toString(chunkresend));
 	    				configFile.setProperty(PROPERTY_TRANS_TIME, Integer.toString(binaryTransmissionTime));
-						configFile.store(new FileOutputStream(binaryDir + PROPERTY_FILE_NAME), null);
+						configFile.store(new FileOutputStream(rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME), null);
 
 						if (logger.isDebugEnabled())
 							logger.debug("actual length of concatenated binary is " + filelen + " bytes");
@@ -453,8 +468,8 @@ public class BinaryPlugin extends AbstractPlugin {
 		    			    if (storeInDatabase)
 		    			    	relativeName = remoteBinaryName;
 		    			    else
-		    			    	relativeName = localBinaryName.replaceAll(binaryDir, "");
-							Serializable[] data = {binaryTimestamp, getDeviceID(), binaryLength, filelen, binaryTransmissionTime, (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relativeName, (short)0, null};
+		    			    	relativeName = localBinaryName.replaceAll(rootBinaryDir + deploymentName + "/" + Integer.toString(deviceID) + "/", "");
+							Serializable[] data = {binaryTimestamp, deviceID, binaryLength, filelen, binaryTransmissionTime, (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relativeName, (short)0, null};
 							if(!dataProcessed(System.currentTimeMillis(), data)) {
 								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
 							}
@@ -528,7 +543,7 @@ public class BinaryPlugin extends AbstractPlugin {
 
     							String relDir = remoteBinaryName;
     							long timenow = System.currentTimeMillis();
-    							Serializable[] data = {binaryTimestamp, getDeviceID(), binaryLength, binaryLength, (int)(binaryTransmissionTime+timenow-lastTransmissionTimestamp), (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relDir, (short)1, tmp};
+    							Serializable[] data = {binaryTimestamp, deviceID, binaryLength, binaryLength, (int)(binaryTransmissionTime+timenow-lastTransmissionTimestamp), (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relDir, (short)1, tmp};
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data  (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") could not be stored in the database.");
     							}
@@ -540,9 +555,9 @@ public class BinaryPlugin extends AbstractPlugin {
     							file.delete();
     						}
     						else {
-    							String relLocalName = localBinaryName.replaceAll(binaryDir, "");
+    							String relLocalName = localBinaryName.replaceAll(rootBinaryDir + deploymentName + "/" + Integer.toString(deviceID) + "/", "");
     							long timenow = System.currentTimeMillis();
-    							Serializable[] data = {binaryTimestamp, getDeviceID(), binaryLength, binaryLength, (int)(binaryTransmissionTime+timenow-lastTransmissionTimestamp), (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relLocalName, (short)1, null};
+    							Serializable[] data = {binaryTimestamp, deviceID, binaryLength, binaryLength, (int)(binaryTransmissionTime+timenow-lastTransmissionTimestamp), (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relLocalName, (short)1, null};
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
     							}
@@ -552,7 +567,7 @@ public class BinaryPlugin extends AbstractPlugin {
     								logger.debug("binary data (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") successfully stored on disk");
     						}
     					
-    						File stat = new File(binaryDir + PROPERTY_FILE_NAME);
+    						File stat = new File(rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
     						stat.delete();
     						
     						localBinaryName = null;
@@ -595,27 +610,11 @@ public class BinaryPlugin extends AbstractPlugin {
 	@Override
 	public void remoteConnEstablished(Integer deviceID) {
 		firstConnect = false;
-		if (this.deviceID == null || this.deviceID.compareTo(deviceID) != 0) {
-			String dir = rootBinaryDir + deploymentName + "/" + Integer.toString(deviceID) + "/";
-			File f = new File(dir);
-			if (!f.isDirectory()) {
-		    	if (!f.mkdirs()) {
-		    		logger.error("could not mkdir >" + dir + "<  -> drop message");
-				}
-		    	else
-		    		logger.info("created new storage directory >" + dir + "<");
-			}
-			if (this.deviceID != null && this.deviceID.compareTo(deviceID) != 0)
-	    		logger.warn("device ID changed for deployment " + deploymentName + " and CoreStation " + coreStationName + " -> using new storage directory >" + dir + "/" + "< (" + this.deviceID + "!=" + deviceID + ")");
-			this.deviceID = deviceID;
-			binaryDir = dir;
-			logger.debug("storage directory for deployment " + deploymentName + " and CoreStation " + coreStationName + " is >" + binaryDir + "<");
-		}
 		
-		File sf = new File(binaryDir + PROPERTY_FILE_NAME);
+		File sf = new File(rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
 		if (sf.exists()) {
 			try {
-				configFile.load(new FileInputStream(binaryDir + PROPERTY_FILE_NAME));
+				configFile.load(new FileInputStream(rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME));
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				dispose();
@@ -623,46 +622,50 @@ public class BinaryPlugin extends AbstractPlugin {
 			}
 			
 			try {
+				String prop = configFile.getProperty(PROPERTY_DEVICE_ID);
+				if (prop == null)
+					throw new Exception("property >" + PROPERTY_DEVICE_ID + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
+				this.deviceID = Integer.valueOf(prop).intValue();
 				remoteBinaryName = configFile.getProperty(PROPERTY_REMOTE_BINARY);
 				if (remoteBinaryName == null)
-					throw new Exception("property >" + PROPERTY_REMOTE_BINARY + "< not found in " + binaryDir + PROPERTY_FILE_NAME);
-				String prop = configFile.getProperty(PROPERTY_DOWNLOADED_SIZE);
+					throw new Exception("property >" + PROPERTY_REMOTE_BINARY + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
+				prop = configFile.getProperty(PROPERTY_DOWNLOADED_SIZE);
 				if (prop == null)
-					throw new Exception("property >" + PROPERTY_DOWNLOADED_SIZE + "< not found in " + binaryDir + PROPERTY_FILE_NAME);
+					throw new Exception("property >" + PROPERTY_DOWNLOADED_SIZE + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
 				downloadedSize = Long.valueOf(prop).longValue();
 				prop = configFile.getProperty(PROPERTY_BINARY_TIMESTAMP);
 				if (prop == null)
-					throw new Exception("property >" + PROPERTY_BINARY_TIMESTAMP + "< not found in " + binaryDir + PROPERTY_FILE_NAME);
+					throw new Exception("property >" + PROPERTY_BINARY_TIMESTAMP + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
 				binaryTimestamp = Long.valueOf(prop).longValue();
 				prop = configFile.getProperty(PROPERTY_BINARY_SIZE);
 				if (prop == null)
-					throw new Exception("property >" + PROPERTY_BINARY_SIZE + "< not found in " + binaryDir + PROPERTY_FILE_NAME);
+					throw new Exception("property >" + PROPERTY_BINARY_SIZE + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
 				binaryLength = Long.valueOf(prop).longValue();
 				prop = configFile.getProperty(PROPERTY_TRANS_START);
 				if (prop == null)
-					throw new Exception("property >" + PROPERTY_TRANS_START + "< not found in " + binaryDir + PROPERTY_FILE_NAME);
+					throw new Exception("property >" + PROPERTY_TRANS_START + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
 				binaryTransmissionStartTime = Long.valueOf(prop).longValue();
 				prop = configFile.getProperty(PROPERTY_TRANS_TIME);
 				if (prop == null)
-					throw new Exception("property >" + PROPERTY_TRANS_TIME + "< not found in " + binaryDir + PROPERTY_FILE_NAME);
+					throw new Exception("property >" + PROPERTY_TRANS_TIME + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
 				binaryTransmissionTime = Integer.valueOf(prop).intValue();
 				prop = configFile.getProperty(PROPERTY_CHUNK_RESEND);
 				if (prop == null)
-					throw new Exception("property >" + PROPERTY_CHUNK_RESEND + "< not found in " + binaryDir + PROPERTY_FILE_NAME);
+					throw new Exception("property >" + PROPERTY_CHUNK_RESEND + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
 				lastChunkResend = Integer.valueOf(prop).intValue();
 				prop = configFile.getProperty(PROPERTY_STORAGE_TYPE);
 				if (prop == null)
-					throw new Exception("property >" + PROPERTY_STORAGE_TYPE + "< not found in " + binaryDir + PROPERTY_FILE_NAME);
+					throw new Exception("property >" + PROPERTY_STORAGE_TYPE + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
 				storeInDatabase = Boolean.valueOf(prop).booleanValue();
 				prop = configFile.getProperty(PROPERTY_TIME_DATE_FORMAT);
 				if (prop == null)
-					throw new Exception("property >" + PROPERTY_TIME_DATE_FORMAT + "< not found in " + binaryDir + PROPERTY_FILE_NAME);
+					throw new Exception("property >" + PROPERTY_TIME_DATE_FORMAT + "< not found in " + rootBinaryDir + deploymentName + "/" + PROPERTY_FILE_NAME);
 
 				lastTransmissionTimestamp = System.currentTimeMillis();
 				folderdatetimefm = new SimpleDateFormat(prop);
 				folderdatetimefm.setTimeZone(TimeZone.getTimeZone("UTC"));
 			    if (storeInDatabase) {
-			    	localBinaryName = binaryDir + TEMP_BINARY_NAME;
+			    	localBinaryName = rootBinaryDir + deploymentName + "/" + TEMP_BINARY_NAME;
 			    }
 			    else {
 				    File f = new File(remoteBinaryName);
@@ -675,7 +678,7 @@ public class BinaryPlugin extends AbstractPlugin {
 					if (logger.isDebugEnabled())
 						logger.debug("subpath: " + subpath);
 			    	
-				    String datedir = binaryDir + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
+				    String datedir = rootBinaryDir + deploymentName + "/" + Integer.toString(this.deviceID) + "/" + subpath + folderdatetimefm.format(new java.util.Date(binaryTimestamp)) + "/";
 				    String filename = f.getName();
 				    localBinaryName = datedir + filename;
 			    }
