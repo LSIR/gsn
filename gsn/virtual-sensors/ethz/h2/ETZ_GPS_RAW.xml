@@ -7,8 +7,8 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
-	    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
-	    <field name="GPS_SATS" type="INTEGER"/>
+		    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
+		    <field name="GPS_SATS" type="INTEGER"/>
             <field name="GPS_RAW_DATA" type="binary"/>
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
@@ -21,7 +21,7 @@
       <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GPSPlugin</predicate>
                     <predicate key="gps-data-type">raw</predicate>
                 </address>
@@ -29,7 +29,8 @@
             </source>
             <query> select * from source </query>
         </stream>
-	<stream name="data2">
+
+      <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps04.ethz.ch:9003</predicate>
@@ -40,10 +41,11 @@
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data3">
+
+      <stream name="data3">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GPSPlugin</predicate>
                     <predicate key="gps-data-type">raw</predicate>
                 </address>
@@ -51,5 +53,6 @@
             </source>
             <query> select * from source </query>
         </stream>
-    </streams>
+
+      </streams>
 </virtual-sensor>

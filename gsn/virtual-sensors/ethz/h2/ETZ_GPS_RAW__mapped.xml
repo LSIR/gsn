@@ -10,6 +10,9 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
+		    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
+		    <field name="GPS_SATS" type="INTEGER"/>
             <field name="GPS_TIME" type="INTEGER"/>
             <field name="GPS_WEEK" type="SMALLINT" />
             <field name="SVS" type="SMALLINT" />

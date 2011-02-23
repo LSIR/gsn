@@ -104,6 +104,7 @@
             </source>
             <query> select * from source </query>
         </stream>
+
         <stream name="data8">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
@@ -115,6 +116,7 @@
             </source>
             <query> select * from source </query>
         </stream>
+
         <stream name="data9">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
@@ -126,5 +128,5 @@
             </source>
             <query> select * from source </query>
         </stream>
-</streams>
+        </streams>
 </virtual-sensor>

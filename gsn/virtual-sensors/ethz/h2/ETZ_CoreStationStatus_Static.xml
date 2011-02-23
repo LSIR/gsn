@@ -61,17 +61,6 @@
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data3">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">static</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
         <stream name="data4">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
@@ -130,6 +119,18 @@
         <stream name="data9">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
+                    <predicate key="remote-connection">pc-5225.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+        <stream name="data10">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps04.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                     <predicate key="status-data-type">static</predicate>
@@ -138,7 +139,8 @@
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data10">
+
+        <stream name="data11">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
@@ -149,16 +151,5 @@
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data11">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">pc-5225.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
-                    <predicate key="status-data-type">static</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-	</streams>
+        </streams>
 </virtual-sensor>

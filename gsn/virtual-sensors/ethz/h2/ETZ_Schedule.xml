@@ -25,7 +25,6 @@
     </addressing>
     <storage />
     <streams>
-<!--
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
@@ -50,16 +49,6 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-        <stream name="data4">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -126,7 +115,19 @@
             </source>
             <query> select * from source </query>
         </stream>
--->        <stream name="data11">
+
+        <stream name="data11">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps04.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+        <stream name="data12">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
@@ -136,6 +137,5 @@
             </source>
             <query> select * from source </query>
         </stream>
-
-    </streams>
+        </streams>
 </virtual-sensor>
