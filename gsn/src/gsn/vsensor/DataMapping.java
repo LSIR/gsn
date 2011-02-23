@@ -143,7 +143,7 @@ public class DataMapping {
 					}
 					if (!vsmappings.containsValue(vsdeployment)) {
 						// this was the last vs that needed this resource
-						logger.debug("remove deployment mappings for " + vsdeployment);
+						logger.info("remove deployment mappings for " + vsdeployment);
 						Connection conn = deployments.get(vsdeployment).conn;
 						if (conn != null) {
 							try {
