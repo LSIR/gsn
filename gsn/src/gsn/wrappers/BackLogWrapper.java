@@ -51,7 +51,7 @@ public class BackLogWrapper extends AbstractWrapper {
 	 */
 	private static final String BACKLOG_PLUGIN = "plugin-classname";
 
-	private static final long WAIT_FOR_STARTUP = 20;
+	private static final long WAIT_FOR_STARTUP = 15;
 	
 	private BackLogMessageMultiplexer blMsgMultiplexer = null;
 	private String plugin = null;
