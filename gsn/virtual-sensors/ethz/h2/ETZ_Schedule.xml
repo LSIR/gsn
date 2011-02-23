@@ -25,6 +25,7 @@
     </addressing>
     <storage />
     <streams>
+<!--
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
@@ -125,15 +126,16 @@
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data11">
+-->        <stream name="data11">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
+
     </streams>
 </virtual-sensor>
