@@ -39,6 +39,20 @@ $(document).ready(function() {
     $.get('/menu.jsp', {selected: "index"}, function(data) {
         $('#navigation').html(data);
     });
+
+        //bind vs search field
+        $("#vssearch").val("");
+        $("#vssearch").bind("focus",function() {
+          this.select();
+        });
+        $("#vssearch_clear").bind("click",function() {
+          $("#vssearch").val("");
+          GSN.util.filterVs($("#vssearch").val());
+        });
+
+        $("#vssearch").bind("keyup",function() {
+          GSN.util.filterVs($("#vssearch").val());
+        });
 });	
 //]]>-->
 </script>
@@ -85,7 +99,8 @@ $(document).ready(function() {
 		<p id="gsn-desc">none</p>
 		<h3>Author</h3>
 		<p id="gsn-author">none</p> -->
-		<h3>Virtual sensors</h3>
+                <img id="vssearch_clear" style="float:right;margin-top:5px;" src="img/button_cancel_grey.png">
+		<input id="vssearch" title="Enter search string to filter virtual sensors" style="float:right;width:180px;margin-top:5px;border-style:inset;border-width:1px; " type="text"><h3>Virtual sensors</h3>
         <ul id="vsmenu">
          <li><a href="#">not loaded</a></li>
         </ul>

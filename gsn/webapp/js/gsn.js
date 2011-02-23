@@ -2228,8 +2228,45 @@ var GSN = {
             }
             return unescape(strReturn);
         }
-		
-		
+	
+	,
+        filterVs: function(teststring){
+          // hide all
+          $("#sidebar .sensorName").hide();
+          $("#sidebar .sensorName").parent().each(function(){
+            if (!$(this).attr("class").match(/_hidden$/))
+              $(this).attr("class",$(this).attr("class")+"_hidden");
+          });
+          // hide rubrics and subrubrics
+          $("#sidebar div.subrubric").each(function(){
+            if (!$(this).attr("class").match(/_hidden/))
+              $(this).attr("class",$(this).attr("class").replace("subrubric", "subrubric_hidden"));
+            $(this).hide();
+          });
+          // make only matched names visible
+          $("#sidebar .sensorName").each(function() {
+            if ($(this).attr('id').indexOf(teststring) != -1) {
+              $(this).show();
+              // make subrubric visible
+              $($(this).parent().get(0)).attr('class', $($(this).parent().get(0)).attr('class').replace(/_hidden$/, ""));
+              var p = $($(this).parent().get(0)).parent().get(0);
+              var pc = $(p).attr("class");
+              while(pc && pc.match(/subrubric/)) {
+                test = p;
+                $(p).show();
+                $(p).find(">a").show();
+                $(p).attr("class", $(p).attr("class").replace("subrubric_hidden","subrubric"));
+                p = $(p).parent().get(0);
+                pc = $(p).attr("class");
+                var test3 = p;
+              }
+            }
+            else {
+              $(this).hide();
+            }
+          });
+      }
+
     }
 };
 
