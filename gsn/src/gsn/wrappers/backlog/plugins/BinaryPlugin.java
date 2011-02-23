@@ -175,7 +175,7 @@ public class BinaryPlugin extends AbstractPlugin {
         
         registerListener();
 
-        setName("BinaryPlugin-" + coreStationName + "-Thread");
+        this.setName("BinaryPlugin-" + coreStationName + "-Thread");
 		
 		return true;
 	}

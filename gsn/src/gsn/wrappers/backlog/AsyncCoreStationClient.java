@@ -302,7 +302,7 @@ public class AsyncCoreStationClient extends Thread  {
 		try {
 			SocketChannel socketChannel = SocketChannel.open();
 			socketChannel.configureBlocking(false);
-			logger.info("trying to connect to core station: " + listener.getCoreStationName());
+			logger.debug("trying to connect to core station: " + listener.getCoreStationName());
 			socketChannel.connect(new InetSocketAddress(listener.getInetAddress(), listener.getPort()));
 
 			synchronized(listenerToSocketList) {
