@@ -28,7 +28,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 
 	protected BackLogWrapper activeBackLogWrapper = null;
 	protected Integer priority = null;
-	private volatile Thread pluginThread;
 
 
 	/**
@@ -57,12 +56,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 		registerListener();
 		return true;
 	}
-
-	
-	public void start() {
-        pluginThread = new Thread(this);
-        pluginThread.start();
-    }
 	
 	
 	public void registerListener(BackLogMessageListener listener) {
@@ -83,9 +76,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	public void deregisterListener(BackLogMessageListener listener) {
 		activeBackLogWrapper.getBLMessageMultiplexer().deregisterListener(getMessageType(), listener, true);
 	}
-	
-	
-	public void run() { }
 	
 	
 	public void dispose() {
