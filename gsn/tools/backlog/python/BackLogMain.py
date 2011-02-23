@@ -281,12 +281,20 @@ class BackLogMainClass(Thread, Statistics):
 
         for plugin_name, plugin in self.plugins.items():
             self._logger.info('starting ' + plugin_name)
-            plugin.start()
+            try:
+                plugin.start()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
             
         self._stopEvent.wait()
         
         for plugin in self.plugins.values():
-            plugin.join()
+            try:
+                plugin.join()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
         
         self.jobsobserver.join()
         self.schedulehandler.join()
@@ -304,8 +312,12 @@ class BackLogMainClass(Thread, Statistics):
         self.schedulehandler.stop()
         self.jobsobserver.stop()
         
-        for plugin in self.plugins.values():  
-            plugin.stop()
+        for plugin in self.plugins.values():
+            try:
+                plugin.stop()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
             
         self._stopEvent.set()
 
@@ -432,8 +444,12 @@ class BackLogMainClass(Thread, Statistics):
                 self._logger.info('loaded plugin ' + pluginclassname)
             except Exception, e:
                 raise Exception('could not load plugin ' + pluginclassname + ': ' + str(e))
-            plugin.start()
-            thread.start_new_thread(plugin.action, (parameters,))
+            try:
+                plugin.start()
+                thread.start_new_thread(plugin.action, (parameters,))
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
             return plugin
         
         
@@ -444,7 +460,12 @@ class BackLogMainClass(Thread, Statistics):
                     self._logger.info(pluginclassname + ' should not be stopped if not in duty-cycle mode (or beacon) => keep running')
                     return False
                 else:
-                    plugin.stop()
+                    try:
+                        plugin.stop()
+                    except Exception, e:
+                        self.incrementExceptionCounter()
+                        self._logger.exception(e)
+                        
                     del self.plugins[plugin_name]
                     return True
         return False
@@ -479,7 +500,11 @@ class BackLogMainClass(Thread, Statistics):
         # tell the plugins to have received an acknowledge message
         for plugin in self.plugins.values():
             if plugin.getMsgType() == msgType:
-                plugin.ackReceived(timestamp)
+                try:
+                    plugin.ackReceived(timestamp)
+                except Exception, e:
+                    self.incrementExceptionCounter()
+                    self._logger.exception(e)
             
         # remove the message from the backlog database using its timestamp and message type
         self.backlog.removeMsg(timestamp, msgType)
@@ -488,34 +513,54 @@ class BackLogMainClass(Thread, Statistics):
         self._logger.info('beacon set')
         # tell the plugins that beacon has been set
         for plugin in self.plugins.values():
-            plugin.beaconSet()
+            try:
+                plugin.beaconSet()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
         
     def beaconCleared(self):
         self._logger.info('beacon cleared')
         # tell the plugins that beacon has been cleared
         for plugin in self.plugins.values():
-            plugin.beaconCleared()
+            try:
+                plugin.beaconCleared()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
         
     def connectionToGSNestablished(self):
         # tell the plugins that the connection to GSN has been established
         for plugin in self.plugins.values():
-            plugin.connectionToGSNestablished()
+            try:
+                plugin.connectionToGSNestablished()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
         self.schedulehandler.connectionToGSNestablished()
         self.backlog.connectionToGSNestablished()
         
     def connectionToGSNlost(self):
         # tell the plugins that the connection to GSN has been lost
         for plugin in self.plugins.values():
-            plugin.connectionToGSNlost()
+            try:
+                plugin.connectionToGSNlost()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
         self.backlog.connectionToGSNlost()
     
     
     def wlanNeeded(self):
         # check if one of the plugins still needs the wlan
         for plugin_name, plugin in self.plugins.items():
-            if plugin.needsWLAN():
-                self._logger.info('wlan is still needed by ' + plugin_name)
-                return True
+            try:
+                if plugin.needsWLAN():
+                    self._logger.info('wlan is still needed by ' + plugin_name)
+                    return True
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
         
         
     def checkFolderUsage(self):
