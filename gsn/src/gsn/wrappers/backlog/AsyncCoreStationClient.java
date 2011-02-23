@@ -373,7 +373,7 @@ public class AsyncCoreStationClient extends Thread  {
 				if (id != null)
 					list.remove(id);
 				else
-					logger.error("id is null");
+					logger.error("id is null for " + deployment + " deployment");
 			
 				if (list.isEmpty())
 					deploymentToIdListenerMapList.remove(deployment);
