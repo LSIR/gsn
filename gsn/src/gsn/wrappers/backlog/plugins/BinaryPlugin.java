@@ -88,7 +88,8 @@ public class BinaryPlugin extends AbstractPlugin {
 			new DataField("TRANSMISSION_TIME_EFF", "INTEGER"),
 			new DataField("TRANSMISSION_TIME_TOT", "INTEGER"),
 			new DataField("CHUNK_RETRANSMISSIONS", "INTEGER"),
-			new DataField("FILE_QUEUE_SIZE", "INTEGER"),
+			new DataField("FILE_QUEUE_LENGTH", "INTEGER"),
+			new DataField("FILE_QUEUE_SIZE", "BIGINT"),
 			new DataField("RELATIVE_FILE", "VARCHAR(255)"),
 			new DataField("FILE_COMPLETE", "SMALLINT"),
 			new DataField("DATA", "binary")};
@@ -270,22 +271,24 @@ public class BinaryPlugin extends AbstractPlugin {
 						logger.debug("init packet received");
     				
     				// get file info
-					int filequeuesize;
+					long filequeuesize;
+					int filequeuelength;
 					int chunkresend;
     				try {
-    					binaryDeviceID = toInteger(msg.getData()[1]);
-    					filequeuesize = toInteger(msg.getData()[2]);
+    					filequeuesize = toLong(msg.getData()[1]);
+    					filequeuelength = toInteger(msg.getData()[2]);
     					chunkresend = toInteger(msg.getData()[3]);
-						binaryTimestamp = toLong(msg.getData()[4]);
-						binaryLength = toLong(msg.getData()[5]);
+    					binaryDeviceID = toInteger(msg.getData()[4]);
+						binaryTimestamp = toLong(msg.getData()[5]);
+						binaryLength = toLong(msg.getData()[6]);
 					} catch (Exception e) {
 						logger.error(e.getMessage(), e);
 						dispose();
 						continue;
 					}
-    				byte storage = (Byte) msg.getData()[6];
-    				remoteBinaryName = (String) msg.getData()[7];
-    				String datetimefm = (String) msg.getData()[8];
+    				byte storage = (Byte) msg.getData()[7];
+    				remoteBinaryName = (String) msg.getData()[8];
+    				String datetimefm = (String) msg.getData()[9];
     				
     				try {
     					folderdatetimefm = new SimpleDateFormat(datetimefm);
@@ -399,7 +402,7 @@ public class BinaryPlugin extends AbstractPlugin {
     			    	relativeName = remoteBinaryName;
     			    else
     			    	relativeName = localBinaryName.replaceAll(binaryDir, "");
-					Serializable[] data = {binaryTimestamp, binaryDeviceID, binaryLength, (long)0, binaryTransmissionTime, binaryTransmissionTime, chunkresend, filequeuesize, relativeName, (short)0, null};
+					Serializable[] data = {binaryTimestamp, binaryDeviceID, binaryLength, (long)0, binaryTransmissionTime, binaryTransmissionTime, chunkresend, filequeuelength, filequeuesize, relativeName, (short)0, null};
 					percentDownloaded = 0;
 					if(!dataProcessed(System.currentTimeMillis(), data)) {
 						logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
@@ -412,11 +415,13 @@ public class BinaryPlugin extends AbstractPlugin {
 				// get number of this chunk
 				long chunknum;
 				int chunkresend;
-				int filequeuesize;
+				long filequeuesize;
+				int filequeuelength;
 				try {
-					filequeuesize = toInteger(msg.getData()[1]);
-					chunkresend = toInteger(msg.getData()[2]);
-					chunknum = toLong(msg.getData()[3]);
+					filequeuesize = toLong(msg.getData()[1]);
+					filequeuelength = toInteger(msg.getData()[2]);
+					chunkresend = toInteger(msg.getData()[3]);
+					chunknum = toLong(msg.getData()[4]);
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 					dispose();
@@ -439,7 +444,7 @@ public class BinaryPlugin extends AbstractPlugin {
 							binarySender.requestRetransmissionOfBinary(remoteBinaryName);
 							continue;
 						}
-						byte [] chunk = (byte[]) msg.getData()[4];
+						byte [] chunk = (byte[]) msg.getData()[5];
 						calculatedCRC.update(chunk);
 						if (logger.isDebugEnabled())
 							logger.debug("updated crc: " + calculatedCRC.getValue());
@@ -468,7 +473,7 @@ public class BinaryPlugin extends AbstractPlugin {
 		    			    	relativeName = remoteBinaryName;
 		    			    else
 		    			    	relativeName = localBinaryName.replaceAll(rootBinaryDir + deploymentName + "/" + Integer.toString(binaryDeviceID) + "/", "");
-							Serializable[] data = {binaryTimestamp, binaryDeviceID, binaryLength, filelen, binaryTransmissionTime, (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relativeName, (short)0, null};
+							Serializable[] data = {binaryTimestamp, binaryDeviceID, binaryLength, filelen, binaryTransmissionTime, (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuelength, filequeuesize, relativeName, (short)0, null};
 							if(!dataProcessed(System.currentTimeMillis(), data)) {
 								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
 							}
@@ -493,12 +498,14 @@ public class BinaryPlugin extends AbstractPlugin {
 			}
 			else if (pktType == CRC_PACKET) {
 				long crc;
-				int filequeuesize;
+				long filequeuesize;
+				int filequeuelength;
 				int chunkresend;
 				try {
-					filequeuesize = toInteger(msg.getData()[1]);
-					chunkresend = toInteger(msg.getData()[2]);
-					crc = toLong(msg.getData()[3]);
+					filequeuesize = toLong(msg.getData()[1]);
+					filequeuelength = toInteger(msg.getData()[2]);
+					chunkresend = toInteger(msg.getData()[3]);
+					crc = toLong(msg.getData()[4]);
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 					dispose();
@@ -542,7 +549,7 @@ public class BinaryPlugin extends AbstractPlugin {
 
     							String relDir = remoteBinaryName;
     							long timenow = System.currentTimeMillis();
-    							Serializable[] data = {binaryTimestamp, binaryDeviceID, binaryLength, binaryLength, (int)(binaryTransmissionTime+timenow-lastTransmissionTimestamp), (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relDir, (short)1, tmp};
+    							Serializable[] data = {binaryTimestamp, binaryDeviceID, binaryLength, binaryLength, (int)(binaryTransmissionTime+timenow-lastTransmissionTimestamp), (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuelength, filequeuesize, relDir, (short)1, tmp};
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data  (timestamp=" + binaryTimestamp + "/length=" + binaryLength + "/name=" + remoteBinaryName + ") could not be stored in the database.");
     							}
@@ -556,7 +563,7 @@ public class BinaryPlugin extends AbstractPlugin {
     						else {
     							String relLocalName = localBinaryName.replaceAll(rootBinaryDir + deploymentName + "/" + Integer.toString(binaryDeviceID) + "/", "");
     							long timenow = System.currentTimeMillis();
-    							Serializable[] data = {binaryTimestamp, binaryDeviceID, binaryLength, binaryLength, (int)(binaryTransmissionTime+timenow-lastTransmissionTimestamp), (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuesize, relLocalName, (short)1, null};
+    							Serializable[] data = {binaryTimestamp, binaryDeviceID, binaryLength, binaryLength, (int)(binaryTransmissionTime+timenow-lastTransmissionTimestamp), (int)(timenow-binaryTransmissionStartTime), lastChunkResend+chunkresend, filequeuelength, filequeuesize, relLocalName, (short)1, null};
     							if(!dataProcessed(System.currentTimeMillis(), data)) {
     								logger.warn("The binary data with >" + binaryTimestamp + "< could not be stored in the database.");
     							}
@@ -610,7 +617,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	public void remoteConnEstablished(Integer deviceID) {
 		firstConnect = false;
 		
-		if (this.deviceID != null && this.deviceID != deviceID) {
+		if (this.deviceID != null && this.deviceID.compareTo(deviceID) != 0) {
 			logger.warn("device id has changed from " + Integer.toString(this.deviceID) + " to " + deviceID);
 			String propertyfile = rootBinaryDir + deploymentName + "/." + Integer.toString(this.deviceID) + "_" + PROPERTY_FILE_NAME;
 			File sf = new File(propertyfile);

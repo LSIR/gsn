@@ -194,7 +194,7 @@ class BinaryPluginClass(AbstractPluginClass):
         filetime.sort()
         # and put it into the fifo
         for file in filetime:
-            self._filedeque.appendleft(file[1])
+            self._filedeque.appendleft([file[1], os.path.getsize(file[1])])
             self.debug('putting existing file into FIFO: ' + file[1])
         if filetime:
             self.info('files to be transmitted: ' + str(len(filetime)))
@@ -226,7 +226,7 @@ class BinaryPluginClass(AbstractPluginClass):
         self._lastRecvPacketType = None
         self._lastSentPacketType = None
         if self._filedescriptor:
-            self._filedeque.append(self._filedescriptor.name)
+            self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
             self._filedescriptor.close()
         self._msgdeque.clear()
         self._backlogMain._waitforack = False
@@ -357,6 +357,12 @@ class BinaryPluginClass(AbstractPluginClass):
                         
                         try:
                             if downloaded > 0:
+                                try:
+                                    self._filedeque.remove([filename, os.path.getsize(filename)])
+                                except:
+                                    pass
+                                else:
+                                    self.debug('copy >' + filename + '< removed from file queue')
                                 # open the specified file
                                 self._filedescriptor = open(filename, 'rb')
                                 os.chmod(filename, 0444)
@@ -383,13 +389,13 @@ class BinaryPluginClass(AbstractPluginClass):
                                 if crc != gsnCRC:
                                     self.warning('crc received from gsn >' + str(gsnCRC) + '< does not match local one >' + str(crc) + '< -> resend complete binary')
                                     os.chmod(filename, 0744)
-                                    self._filedeque.append(filename)
+                                    self._filedeque.append([filename, os.path.getsize(filename)])
                                     self._filedescriptor.close()
                                 else:
                                     self.debug('crc received from gsn matches local one -> resend following part of binary')
                             else:
                                 # resend the whole binary
-                                self._filedeque.append(filename)
+                                self._filedeque.append([filename, os.path.getsize(filename)])
                         except IOError, e:
                             self.warning(e)
                     
@@ -402,7 +408,8 @@ class BinaryPluginClass(AbstractPluginClass):
             try:
                 if not self._filedescriptor or self._filedescriptor.closed:
                     # get the next file to send out of the fifo
-                    filename = self._filedeque.pop()
+                    fileobj = self._filedeque.pop()
+                    filename = fileobj[0]
                     
                     if os.path.isfile(filename):
                         # open the file
@@ -413,7 +420,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         continue
                     
                     # get the size of the file
-                    filelen = os.path.getsize(filename)
+                    filelen = fileobj[1]
                     
                     if filelen == 0:
                         # if the file is empty we ignore it and continue in the fifo
@@ -444,7 +451,7 @@ class BinaryPluginClass(AbstractPluginClass):
                     
                     self._resendcounter = 0
                         
-                    packet = [INIT_PACKET, watch[2], len(self._filedeque), self._resendcounter, long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
+                    packet = [INIT_PACKET, self._getFileQueueSize(), len(self._filedeque), self._resendcounter, watch[2], long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
                     packet.append(filenamenoprefix)
                     packet.append(watch[3])
                     
@@ -468,7 +475,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         self.debug('binary completely sent')
                         
                         # create the crc packet [type, crc]
-                        packet = [CRC_PACKET, len(self._filedeque), self._resendcounter, struct.unpack('I', struct.pack('i', crc))[0]]
+                        packet = [CRC_PACKET, self._getFileQueueSize(), len(self._filedeque), self._resendcounter, struct.unpack('I', struct.pack('i', crc))[0]]
                         
                         filename = self._filedescriptor.name
                         os.chmod(filename, 0744)
@@ -482,7 +489,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         self._lastSentPacketType = CRC_PACKET
                     else:
                         # create the packet [type, chunk number (4bytes)]
-                        packet = [CHUNK_PACKET, len(self._filedeque), self._resendcounter, chunkNumber]
+                        packet = [CHUNK_PACKET, self._getFileQueueSize(), len(self._filedeque), self._resendcounter, chunkNumber]
                         packet.append(bytearray(chunk))
                         
                         self._lastSentPacketType = CHUNK_PACKET
@@ -498,7 +505,7 @@ class BinaryPluginClass(AbstractPluginClass):
                     if not first:
                         self.debug('resend message')
                         self._resendcounter += 1
-                        packet[2] += 1
+                        packet[3] += 1
                     self._waitforack = True
                     self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
                     # and resend it if no ack has been received
@@ -517,6 +524,13 @@ class BinaryPluginClass(AbstractPluginClass):
                 self._filedescriptor.close()
 
         self.info('died')
+        
+        
+    def _getFileQueueSize(self):
+        counter = 0
+        for file, size in self._filedeque:
+            counter += size
+        return counter
         
         
     def checkForFileTimerAction(self):
@@ -577,7 +591,7 @@ class BinaryChangedProcessing(ProcessEvent):
     def process_default(self, event):
         self._logger.debug(event.pathname + ' changed')
         
-        self._binaryPlugin._filedeque.appendleft(event.pathname)
+        self._binaryPlugin._filedeque.appendleft([event.pathname, os.path.getsize(event.pathname)])
         if self._binaryPlugin.isGSNConnected() and not self._binaryPlugin._waitforack:
             self._binaryPlugin._isBusy = True
             self._binaryPlugin._workEvent.set()
