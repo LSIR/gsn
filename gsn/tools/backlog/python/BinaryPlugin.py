@@ -226,7 +226,8 @@ class BinaryPluginClass(AbstractPluginClass):
         self._lastRecvPacketType = None
         self._lastSentPacketType = None
         if self._filedescriptor:
-            self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
+            if os.path.exists(self._filedescriptor.name):
+                self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
             self._filedescriptor.close()
         self._msgdeque.clear()
         self._backlogMain._waitforack = False
