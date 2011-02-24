@@ -57,6 +57,12 @@ class Popen(Thread):
         if stdin != None:
             raise ValueError("stdin is not supported by SubprocessFake")
         
+        self.stdLock = Lock()
+        self.stdout = ''.encode()
+        self.stderr = ''.encode()
+        self._pid = None
+        self.returncode = None
+        
         self.finishEvent = Event()
         self.pidEvent = Event()
         
@@ -68,12 +74,6 @@ class Popen(Thread):
         wm.add_watch(SUBPROCESS_FAKE_FOLDER_NEW, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_DELETE'])
         wm.add_watch(SUBPROCESS_FAKE_FOLDER_FINISH, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_CLOSE_WRITE'])
         self._notifier.start()
-        
-        self.stdLock = Lock()
-        self.stdout = ''.encode()
-        self.stderr = ''.encode()
-        self._pid = None
-        self.returncode = None
         
         if isinstance(args, types.StringTypes):
             args = args
