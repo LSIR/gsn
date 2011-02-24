@@ -206,7 +206,7 @@ class GSNPeerClass(Thread, Statistics):
 
 
     def disconnect(self):
-        self._logger.debug('disconnect')
+        self._logger.info('connection to GSN lost')
         self._connected = False
         self.counterAction(self._connectionLossesId)
         self._backlogMain.connectionToGSNlost()
@@ -422,7 +422,7 @@ class GSNListener(Thread):
                     self._gsnPeer.pktReceived(pkt)
         except Exception, e:
             self.disconnect()
-            self._logger.error(str(e))
+            self._logger.debug(str(e))
             
         self._gsnwriter.join()
 
