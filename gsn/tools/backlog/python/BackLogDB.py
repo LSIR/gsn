@@ -261,8 +261,7 @@ class BackLogDBClass(Thread, Statistics):
 
             timestamp = 0
 
-            self._logger.info('resend')
-
+            first = True
             while not self._stopped:
                 try:
                     self._dblock.acquire()
@@ -273,9 +272,14 @@ class BackLogDBClass(Thread, Statistics):
                     self._dblock.release()
                     self.exception(e)
                     break
+
+                if first and row != None:
+                    self._logger.info('resend')
+                    first = False
                     
                 if row is None:
-                    self._logger.info('all packets are sent')
+                    if not first:
+                        self._logger.info('all packets are sent')
                     self._isBusy = False
                     break
 
