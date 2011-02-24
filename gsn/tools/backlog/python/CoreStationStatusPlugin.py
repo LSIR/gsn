@@ -606,7 +606,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             
         for index, b in enumerate(self._interruptsLineIndexes):
             if b == None:
-                self.error('/proc/interrupts ' + names[index] + ' could not be found')
+                self.warning('/proc/interrupts ' + names[index] + ' could not be found')
         
         
     def _getInterrupts(self):
