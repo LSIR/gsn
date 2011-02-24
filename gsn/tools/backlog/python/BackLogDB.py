@@ -260,8 +260,12 @@ class BackLogDBClass(Thread, Statistics):
                 break
 
             timestamp = 0
-
-            first = True
+            
+            logresend = False
+            if self.getCounterValue(self._dbNumberOfEntriesId) > 10:
+                self._logger.info('resend')
+                logresend = True
+                
             while not self._stopped:
                 try:
                     self._dblock.acquire()
@@ -272,13 +276,9 @@ class BackLogDBClass(Thread, Statistics):
                     self._dblock.release()
                     self.exception(e)
                     break
-
-                if first and row != None:
-                    self._logger.info('resend')
-                    first = False
                     
                 if row is None:
-                    if not first:
+                    if logresend:
                         self._logger.info('all packets are sent')
                     self._isBusy = False
                     break
