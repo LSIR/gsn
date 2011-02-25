@@ -4,7 +4,6 @@
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="jpeg_scaled">JPEG_SCALED</param>
-            <param name="storage_directory">/home/perma/gsn-test-binaries/</param>
             <param name="file_type">nef</param>
             <param name="nef_extraction_type">thumbnail</param>
         </init-params>
