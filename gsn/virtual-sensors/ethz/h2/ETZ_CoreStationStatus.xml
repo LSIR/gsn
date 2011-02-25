@@ -1,45 +1,58 @@
-<virtual-sensor name="ETZ_Dozer_WXT520Sup" priority="10" >
+<virtual-sensor name="ETZ_CoreStationStatus" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
-            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="HEADER_SEQNR" type="INTEGER" />
-            <field name="HEADER_ORIGINATORID" type="INTEGER" />
-            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
-            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
-            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />            
-            <field name="PAYLOAD_SU_TH" type="INTEGER" />
-            <field name="PAYLOAD_SU_VH" type="INTEGER" />
-            <field name="PAYLOAD_SU_VS" type="INTEGER" />
-            <field name="PAYLOAD_SU_VR" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="V_EXT2" type="INTEGER" unit="mV"/>
+            <field name="V_EXT1" type="INTEGER" unit="mV"/>
+            <field name="V_EXT3" type="INTEGER" unit="mV"/>
+            <field name="I_V12DC_EXT" type="INTEGER" unit="µA"/>
+            <field name="V12DC_IN" type="INTEGER" unit="mV"/>
+            <field name="I_V12DC_IN" type="INTEGER" unit="µA"/>
+            <field name="VCC_5_0" type="INTEGER" unit="mV"/>
+            <field name="VCC_NODE" type="INTEGER" unit="mV"/>
+            <field name="I_VCC_NODE" type="INTEGER" unit="µA"/>
+            <field name="VCC_4_2" type="INTEGER" unit="mV"/>            
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerWxt520SupMsg) from ETZ deployment</description>
+    <description>show status information of the CoreStations from the ETZ deployment</description>
     <life-cycle pool-size="10" />
-    <addressing />
+    <addressing>
+        <predicate key="type">PermaSense ETZ test deployment</predicate>
+        <predicate key="LATITUDE">47.377326</predicate>
+        <predicate key="LONGITUDE">8.552935</predicate>
+    </addressing>
     <storage />
     <streams>
-        <stream name="data1">
+        <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data2">
+        <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream> -->
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -49,8 +62,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -60,8 +72,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -71,8 +82,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -82,8 +92,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -93,55 +102,37 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
-        </stream>
-
+        </stream> 
         <stream name="data8">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etz-gps04.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
-        </stream>
-
+        </stream> 
         <stream name="data9">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="remote-connection">permasense-etz-gps04.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
-
         <stream name="data10">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">pc-5225.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-        <stream name="data11">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps05.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWxt520SupMsg</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
