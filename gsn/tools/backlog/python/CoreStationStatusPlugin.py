@@ -798,20 +798,11 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
         
     def _checkNetDev(self):
-        self._netDevLineIndexes = [None]*3
         self._netDev = True
         try:
             file = open("/proc/net/dev", "r")
             lines = file.readlines()
             file.close()
-            for index, line in enumerate(lines):
-                lst = line.split()
-                if lst[0].strip().startswith('eth0:'):
-                    self._netDevLineIndexes[0] = index
-                elif lst[0].strip().startswith('ppp0:'):
-                    self._netDevLineIndexes[1] = index
-                elif lst[0].strip().startswith('wlan0:'):
-                    self._netDevLineIndexes[2] = index
         except Exception, e:
             self._netDev = False
             self.exception(str(e))
@@ -842,13 +833,20 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #                print str(lines)
 #                print ''
                 ret[0] = len(lines)-3
-                index = 1
-                for lineindex in self._netDevLineIndexes:
-                    if lineindex != None:
-                        lst = lines[lineindex].split()
-                        ret[index] = long(lst[1])
-                        ret[index+1] = long(lst[9])
-                    index += 2
+                for line in lines:
+                    line = line.strip()
+                    if line.startswith('eth0:'):
+                        lst = line.split()
+                        ret[1] = long(lst[1])
+                        ret[2] = long(lst[9])
+                    elif line.startswith('ppp0:'):
+                        lst = line.split()
+                        ret[3] = long(lst[1])
+                        ret[4] = long(lst[9])
+                    elif line.startswith('wlan0:'):
+                        lst = line.split()
+                        ret[5] = long(lst[1])
+                        ret[6] = long(lst[9])
             except Exception, e:
                 self.exception(e)
         return ret
