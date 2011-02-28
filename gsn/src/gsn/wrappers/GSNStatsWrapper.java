@@ -75,7 +75,6 @@ public class GSNStatsWrapper extends AbstractWrapper
 		short thread_blocked_cnt, thread_new_cnt, thread_runnable_cnt, thread_terminated_cnt, thread_timed_waiting_cnt, thread_waiting_cnt;
 		long timestamp, diff, blockedCount, blockedTime, waitedCount, waitedTime;
 		long old_timestamp = 0;
-		long[] ids;
 		double thread_blocked_acc, thread_blocked_acc_time, thread_waited_acc, thread_waited_acc_time;
 		ThreadInfo[] threads;
 		ThreadEntry te;
@@ -110,55 +109,60 @@ public class GSNStatsWrapper extends AbstractWrapper
 			
 			threads = threadBean.getThreadInfo(threadBean.getAllThreadIds());
 			for (int t=0; t<threads.length; t++) {
-				switch (threads[t].getThreadState()) {
-				case BLOCKED:
-					thread_blocked_cnt++;
-					break;
-				case NEW:
-					thread_new_cnt++;
-					break;					
-				case RUNNABLE:
-					thread_runnable_cnt++;
-					break;
-				case TERMINATED:
-					thread_terminated_cnt++;
-					break;
-				case TIMED_WAITING:
-					thread_timed_waiting_cnt++;
-					break;
-				case WAITING:
-					thread_waiting_cnt++;
-					break;
+				try {
+					switch (threads[t].getThreadState()) {
+					case BLOCKED:
+						thread_blocked_cnt++;
+						break;
+					case NEW:
+						thread_new_cnt++;
+						break;					
+					case RUNNABLE:
+						thread_runnable_cnt++;
+						break;
+					case TERMINATED:
+						thread_terminated_cnt++;
+						break;
+					case TIMED_WAITING:
+						thread_timed_waiting_cnt++;
+						break;
+					case WAITING:
+						thread_waiting_cnt++;
+						break;
+					}
+					blockedCount = threads[t].getBlockedCount();
+					blockedTime = threads[t].getBlockedTime();
+					waitedCount = threads[t].getWaitedCount();
+					waitedTime = threads[t].getWaitedTime();
+					if (thread_states.containsKey(threads[t].getThreadId())) {
+						te = thread_states.get(threads[t].getThreadId());
+						diff = blockedCount - te.blockedCount;
+						te.blockedCount = blockedCount;
+						blockedCount = diff;
+						diff = blockedTime - te.blockedTime;
+						te.blockedTime = blockedTime;
+						blockedTime = diff;
+						diff = waitedCount - te.waitedCount;
+						te.waitedCount = waitedCount;
+						waitedCount = diff;
+						diff = waitedTime - te.waitedTime;
+						te.waitedTime = waitedTime;
+						waitedTime = diff;
+						te.valid = true;
+					} else {
+						thread_states.put(threads[t].getThreadId(), new ThreadEntry(blockedCount, blockedTime, waitedCount, waitedTime));
+					}
+					if (logger.isInfoEnabled()) {
+						logger.info(threads[t].getThreadName()+" blocked:"+blockedCount+":"+blockedTime+"ms waited:"+waitedCount+":"+waitedTime+"ms");
+					}					
+					thread_blocked_acc += blockedCount;
+					thread_blocked_acc_time += blockedTime;
+					thread_waited_acc += waitedCount;
+					thread_waited_acc_time += waitedTime;
 				}
-				blockedCount = threads[t].getBlockedCount();
-				blockedTime = threads[t].getBlockedTime();
-				waitedCount = threads[t].getWaitedCount();
-				waitedTime = threads[t].getWaitedTime();
-				if (thread_states.containsKey(threads[t].getThreadId())) {
-					te = thread_states.get(threads[t].getThreadId());
-					diff = blockedCount - te.blockedCount;
-					te.blockedCount = blockedCount;
-					blockedCount = diff;
-					diff = blockedTime - te.blockedTime;
-					te.blockedTime = blockedTime;
-					blockedTime = diff;
-					diff = waitedCount - te.waitedCount;
-					te.waitedCount = waitedCount;
-					waitedCount = diff;
-					diff = waitedTime - te.waitedTime;
-					te.waitedTime = waitedTime;
-					waitedTime = diff;
-					te.valid = true;
-				} else {
-					thread_states.put(threads[t].getThreadId(), new ThreadEntry(blockedCount, blockedTime, waitedCount, waitedTime));
+				catch (Exception e) {
+					logger.error(e);
 				}
-				if (logger.isInfoEnabled()) {
-					logger.info(threads[t].getThreadName()+" blocked:"+blockedCount+":"+blockedTime+"ms waited:"+waitedCount+":"+waitedTime+"ms");
-				}					
-				thread_blocked_acc += blockedCount;
-				thread_blocked_acc_time += blockedTime;
-				thread_waited_acc += waitedCount;
-				thread_waited_acc_time += waitedTime;
 			}
 
 			output[3] = thread_blocked_cnt;
