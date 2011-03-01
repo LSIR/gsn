@@ -11,6 +11,7 @@ import gsn.utils.ValidityTools;
 
 import java.io.Serializable;
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.apache.commons.dbcp.*;
@@ -25,6 +26,8 @@ public abstract class StorageManager {
     private String databaseDriver;
 
     private BasicDataSource pool;
+    
+    private int Idcounter=0;
 
     public void init(String databaseDriver, String username, String password, String databaseURL, int maxDBConnections) {
         this.databaseDriver = databaseDriver;
@@ -762,7 +765,7 @@ public abstract class StorageManager {
         StringBuilder toReturn = new StringBuilder("CREATE ");
         if (unique)
             toReturn.append(" UNIQUE ");
-        toReturn.append(" INDEX ").append(field).append("__INDEX").append(" ON ").append(tableName).append(" (").append(field).append(" ").append(order).append(")");
+        toReturn.append(" INDEX ").append(field).append(System.currentTimeMillis()).append("_").append(Idcounter++).append("_INDEX").append(" ON ").append(tableName).append(" (").append(field).append(" ").append(order).append(")");
         return toReturn;
     }
 
