@@ -1,4 +1,4 @@
-<virtual-sensor name="Matterhorn_Dozer_Rssi__conv__1950" priority="10" >
+<virtual-sensor name="Matterhorn_Dozer_Rssi__conv" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -22,7 +22,7 @@
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from Matterhorn_Dozer_Rssi__mapped__1950 </predicate>
+                    <predicate key="query">select * from Matterhorn_Dozer_Rssi__mapped </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, TIMESTAMP, GENERATION_TIME, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, RSSI_NODEID,

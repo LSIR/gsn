@@ -22,7 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select timed, POSITION, GENERATION_TIME, DATA from Matterhorn_Binary__mapped__1950 where RELATIVE_FILE like 'webcam1/%'</predicate>
+                    <predicate key="query">select timed, POSITION, GENERATION_TIME, DATA from Matterhorn_Binary__mapped where RELATIVE_FILE like 'webcam1/%'</predicate>
                 </address>
                 <query> select timed, GENERATION_TIME, DATA as JPEG_SCALED from wrapper where POSITION = 19</query>
             </source>

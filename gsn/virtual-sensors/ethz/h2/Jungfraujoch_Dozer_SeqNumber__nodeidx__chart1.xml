@@ -22,7 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select timed, HEADER_ORIGINATORID, GENERATION_TIME, HEADER_SEQNR from Jungfraujoch_dozer_adcmux2__mapped__1950 </predicate>
+                    <predicate key="query"> select timed, HEADER_ORIGINATORID, GENERATION_TIME, HEADER_SEQNR from Jungfraujoch_dozer_adcmux2__mapped </predicate>
                 </address>
                 <query> select timed, GENERATION_TIME, HEADER_SEQNR as SEQNR from wrapper where HEADER_ORIGINATORID = 2010 </query>
             </source>

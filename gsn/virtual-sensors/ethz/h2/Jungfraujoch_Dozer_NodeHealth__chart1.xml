@@ -22,7 +22,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, TEMPERATURE from Jungfraujoch_Dozer_NodeHealth__conv__1950</predicate>
+                    <predicate key="query"> select timed, POSITION, GENERATION_TIME, TEMPERATURE from Jungfraujoch_Dozer_NodeHealth__conv</predicate>
                     <predicate key="start-time">-604800000</predicate>
                 </address>
                 <query> select GENERATION_TIME, 
