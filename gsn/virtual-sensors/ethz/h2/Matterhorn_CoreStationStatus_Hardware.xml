@@ -1,42 +1,41 @@
-<virtual-sensor name="Matterhorn_Binary" priority="10" >
+<virtual-sensor name="Matterhorn_CoreStationStatus_Hardware" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="maxrows">10</param>
-        </init-params>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-
-            <field name="FILE_SIZE" type="BIGINT" unit="bytes" />
-            <field name="TRANSMITTED" type="BIGINT" unit="bytes" />
-            <field name="TRANSMISSION_TIME_EFF" type="INTEGER" unit="ms" />
-            <field name="TRANSMISSION_TIME_TOT" type="INTEGER" unit="ms" />
-            <field name="CHUNK_RETRANSMISSIONS" type="INTEGER" />
-            <field name="FILE_QUEUE_LENGTH" type="INTEGER" />
-            <field name="FILE_QUEUE_SIZE" type="BIGINT" unit="bytes" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-            <field name="RELATIVE_FILE" type="VARCHAR(255)" />
-            <field name="FILE_COMPLETE" type="SMALLINT" />
-            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE"/>
+            <field name="V_EXT1" type="INTEGER" unit="mV"/>
+            <field name="V_EXT2" type="INTEGER" unit="mV"/>
+            <field name="V_EXT3" type="INTEGER" unit="mV"/>
+            <field name="I_V12DC_EXT" type="INTEGER" unit="µA"/>
+            <field name="V12DC_IN" type="INTEGER" unit="mV"/>
+            <field name="I_V12DC_IN" type="INTEGER" unit="µA"/>
+            <field name="VCC_5_0" type="INTEGER" unit="mV"/>
+            <field name="VCC_NODE" type="INTEGER" unit="mV"/>
+            <field name="I_VCC_NODE" type="INTEGER" unit="µA"/>
+            <field name="VCC_4_2" type="INTEGER" unit="mV"/>
+            <field name="LM92_TEMP" type="INTEGER" unit="m°C" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>binaries from the Matterhorn deployment</description>
+    <description>show hardware status information of the CoreStations from the Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Matterhorn deployment</predicate>
         <predicate key="LATITUDE">45.980126</predicate>
         <predicate key="LONGITUDE">7.670109</predicate>
     </addressing>
-    <storage storage-directory="/home/perma/gsn-binaries/" />
+    <storage />
     <streams>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-mh-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">hardware</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -46,7 +45,8 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-mh-cam01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
+                    <predicate key="status-data-type">hardware</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

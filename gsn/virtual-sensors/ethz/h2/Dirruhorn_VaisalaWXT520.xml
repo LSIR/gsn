@@ -17,26 +17,15 @@
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Dirruhorn deployment</predicate>
-        <predicate key="LATITUDE">46.119722</predicate>
-        <predicate key="LONGITUDE">7.848056</predicate>
+        <predicate key="LATITUDE">46.121808</predicate>
+        <predicate key="LONGITUDE">7.821777</predicate>
     </addressing>
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-dh-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.VaisalaWXT520Plugin</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-
-        <stream name="data0">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-rd-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.VaisalaWXT520Plugin</predicate>
                 </address>
                 <query> select * from wrapper </query>

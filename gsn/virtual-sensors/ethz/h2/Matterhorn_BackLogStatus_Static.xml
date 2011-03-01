@@ -1,42 +1,42 @@
-<virtual-sensor name="Matterhorn_Binary" priority="10" >
+<virtual-sensor name="Matterhorn_BackLogStatus_Static" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="maxrows">10</param>
-        </init-params>
+        <web-input password="test">
+            <command name="resend_backlogged_data">
+                <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
+            </command>
+        </web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-
-            <field name="FILE_SIZE" type="BIGINT" unit="bytes" />
-            <field name="TRANSMITTED" type="BIGINT" unit="bytes" />
-            <field name="TRANSMISSION_TIME_EFF" type="INTEGER" unit="ms" />
-            <field name="TRANSMISSION_TIME_TOT" type="INTEGER" unit="ms" />
-            <field name="CHUNK_RETRANSMISSIONS" type="INTEGER" />
-            <field name="FILE_QUEUE_LENGTH" type="INTEGER" />
-            <field name="FILE_QUEUE_SIZE" type="BIGINT" unit="bytes" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-            <field name="RELATIVE_FILE" type="VARCHAR(255)" />
-            <field name="FILE_COMPLETE" type="SMALLINT" />
-            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE"/>
+            <field name="PYTHON_IMPLEMENTATION" type="VARCHAR(255)" />
+            <field name="PYTHON_VERSION" type="VARCHAR(255)" />
+            <field name="PYTHON_COMPILER" type="VARCHAR(255)" />
+            <field name="PYTHON_BUILD" type="VARCHAR(255)" />
+            <field name="PYTHON_BUILD_DATE" type="VARCHAR(255)" />
+            <field name="LAST_CLEAN_SHUTDOWN" type="BIGINT" unit="unixtime" />
+            
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>binaries from the Matterhorn deployment</description>
+    <description>show static status information of the BackLogs and send commands to the Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Matterhorn deployment</predicate>
         <predicate key="LATITUDE">45.980126</predicate>
         <predicate key="LONGITUDE">7.670109</predicate>
     </addressing>
-    <storage storage-directory="/home/perma/gsn-binaries/" />
+    <storage />
     <streams>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-mh-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -46,7 +46,8 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-mh-cam01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogStatusPlugin</predicate>
+                    <predicate key="status-data-type">static</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
