@@ -570,7 +570,10 @@ public class GSNWebServiceSkeleton {
                 gse.setTimed(String.valueOf(se.getTimeStamp()));
                 for (String field : se.getFieldNames()) {
                     GSNWebService_DataField df = new GSNWebService_DataField();
-                    df.setString(se.getData(field).toString());
+                    if (se.getData(field) != null)
+                        df.setString(se.getData(field).toString());
+                    else
+                        df.setString("NULL");
                     gse.addField(df);
                 }
                 result.addStreamElements(gse);
