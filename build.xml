@@ -102,6 +102,8 @@
             <jvmarg value="-DmaxSlidingDBConnections=${max-sliding-db-connections}"/>
             <jvmarg value="-Dsalt=${aes-enc-salt}"/>
             <jvmarg value="-DremoteKeepAlivePeriod=${remote-keep-alive-period}"/>
+            <!-- <jvmarg value="-Djava.library.path=/usr/local/lib/R/site-library/rJava/jri"/>  uncomment this under Linux to load rJava lib -->
+            <!-- <jvmarg value="-Djava.library.path=C:\\users\\admin\\Documents/R/win-library/2.12/rJava/jri"/>  uncomment this under Windows to load rJava lib -->
             <arg id="gsnc-port" value="${gsn-controller-port}"/>
             <!-- <jvmarg value="-server"/> Sometimes on windows compaines about a missing dll.-->
             <!-- For profiling using JConsole <jvmarg value="-Dcom.sun.management.jmxremote"/> -->
