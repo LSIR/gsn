@@ -1,4 +1,4 @@
-<virtual-sensor name="Thur_pos0_Camera__scaled" priority="10" >
+<virtual-sensor name="Matterhorn_Camera_pos23_Path3__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.FileGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -11,21 +11,21 @@
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>camera pictures from position 0 at Thur deployment as thumbnail</description>
+    <description>camera pictures from position 23 at Matterhorn deployment showing Path3 as thumbnail</description>
     <life-cycle pool-size="10" />
     <addressing>
-        <predicate key="type">PermaSense Thur deployment</predicate>
-        <predicate key="LATITUDE">47.589889</predicate>
-        <predicate key="LONGITUDE">8.773874</predicate>
+        <predicate key="type">PermaSense Matterhorn deployment</predicate>
+        <predicate key="LATITUDE">45.98103726200003</predicate>
+        <predicate key="LONGITUDE">7.671217388000011</predicate>
     </addressing>
     <storage history-size="1"/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select timed, POSITION, GENERATION_TIME, RELATIVE_FILE, STORAGE_DIRECTORY from Thur_Binary__mapped where RELATIVE_FILE like 'camera1/%'</predicate>
+                    <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from Matterhorn_Binary__mapped where RELATIVE_FILE like 'webcam2/%Path3%'</predicate>
                 </address>
-                <query> select timed, GENERATION_TIME, concat(STORAGE_DIRECTORY,RELATIVE_FILE) as FILE from wrapper where POSITION = 0</query>
+                <query> select timed, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 23</query>
             </source>
             <query> select * from source </query>
         </stream>
