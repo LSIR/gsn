@@ -20,6 +20,7 @@
             <field name="processed" type="double"/>
             <field name="dirtiness" type="double"/>
             <field name="distance" type="double"/>
+            <field name="quality" type="double"/>
         </output-structure>
     </processing-class>
     <description>This virtual sensor uses data cleaning engine for marking dirty data</description>

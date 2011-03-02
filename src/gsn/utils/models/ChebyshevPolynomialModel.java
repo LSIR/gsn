@@ -14,11 +14,11 @@ public class ChebyshevPolynomialModel implements IModel, RealFunction{
 	double errorBound;
 	long[] timestamps;
 	double[] stream;
-	
+
 	double c, d; //input boundaries
 	double[] coefs;
 	int currentPos;
-	
+
 	public ChebyshevPolynomialModel(int degree, int windowSize, double errorBound, long[] timestamps, double[] stream)
 	{
 		this.degree = degree;
@@ -26,13 +26,12 @@ public class ChebyshevPolynomialModel implements IModel, RealFunction{
 		this.timestamps = timestamps;
 		this.stream = stream;
 		this.errorBound = errorBound;
-		
+
 		this.coefs = new double[degree + 1];
 	}
-	
-	@Override
-	public boolean FitAndMarkDirty(double[] processed, double[] dirtyness) {
-		
+
+	public boolean FitAndMarkDirty(double[] processed, double[] dirtyness, double[] quality) {
+
 		//fit piecewise
 		this.currentPos = 0;
 		do
@@ -42,9 +41,9 @@ public class ChebyshevPolynomialModel implements IModel, RealFunction{
 				this.d = this.timestamps[currentPos + this.windowSize - 1];
 			else
 				this.d = this.timestamps[this.timestamps.length - 1];
-			
+
 			ChebyshevApproximation.fit(this.coefs, this);
-			
+
 			//build processed
 			for(int i = currentPos; i <= this.currentPos + this.windowSize - 1 && i < this.timestamps.length; i++)
 			{
@@ -56,7 +55,7 @@ public class ChebyshevPolynomialModel implements IModel, RealFunction{
 				else
 					dirtyness[i] = 1;
 			}
-				
+
 			this.currentPos += this.windowSize;
 		}
 		while(currentPos < this.timestamps.length - 1 - this.degree);
@@ -65,31 +64,30 @@ public class ChebyshevPolynomialModel implements IModel, RealFunction{
 			processed[i] = stream[i];
 			dirtyness[i] = 0;
 		}
-		
+
 		return true;
 	}
-	
+
 	double ComputeValue(double input) {
 		double retval = 0.0;
-		
-		
+
+
 		//transform the input in [-1, 1]
 		//it may fall outside, it will always fall outside, so we must compute manually
 		double new_input = 2/(d - c) * input + (c + d)/(c - d);
 		ChebyshevPolynomial cp = new ChebyshevPolynomial(this.degree, this.coefs);
 		retval = cp.Calculate(new_input);
 		//retval = ChebyshevApproximation.evaluate(this.coefs, new_input);
-		
+
 		return retval;
 	}
 
-	@Override
 	public double valueAt(double x) {
 		double retval = 0.0;
-		
+
 		//transform the input in [c, d]
 		double new_x = (d-c)/2 * x + (c+d)/2;
-		
+
 		//locate the new_x in the window
 		double min = Double.MAX_VALUE;
 		int i = this.currentPos;
@@ -102,10 +100,10 @@ public class ChebyshevPolynomialModel implements IModel, RealFunction{
 				poz = i;
 			}
 		}
-		
+
 		//new_x is between i - 1 and i
 		retval = this.stream[poz];
-		
+
 		return retval;
 	}
 

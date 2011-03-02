@@ -69,6 +69,7 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
     private long[] timestamps;
     private double[] processed;
     private double[] dirtiness;
+    private double[] quality;
 
     private String metadata_server_url;
     private String username;
@@ -168,6 +169,7 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
         timestamps = new long[window_size];
         processed = new double[window_size];
         dirtiness = new double[window_size];
+        quality = new double[window_size];
 
         String logging_interval_str = params.get(PARAM_LOGGING_INTERVAL);
         if (logging_interval_str != null) {
@@ -196,12 +198,12 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
             stream[bufferCount] = (Double) data.getData()[0];
             bufferCount++;
         } else {
-            ModelFitting.FitAndMarkDirty(model, error_bound, window_size, stream, timestamps, processed, dirtiness);
+            ModelFitting.FitAndMarkDirty(model, error_bound, window_size, stream, timestamps, processed, dirtiness, quality);
 
             for (int j = 0; j < processed.length; j++) {
-                StreamElement se = new StreamElement(new String[]{"stream", "processed", "dirtiness", "distance"},
-                        new Byte[]{DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE},
-                        new Serializable[]{stream[j], processed[j], dirtiness[j], processed[j] - stream[j]},
+                StreamElement se = new StreamElement(new String[]{"stream", "processed", "dirtiness", "distance", "quality"},
+                        new Byte[]{DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE},
+                        new Serializable[]{stream[j], processed[j], dirtiness[j], processed[j] - stream[j], quality[j]},
                         timestamps[j]);
                 dataProduced(se);
                 if ((dirtiness[j] > 0) && publish_to_metadata_server) {
