@@ -67,9 +67,16 @@ public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		File file;
 		if (storage_directory == null) {
-			file = new File((String) data.getData("file"));
-			if (!file.exists()) {
-				logger.error(file.getAbsolutePath() + " does not exist");
+			String filename = (String) data.getData("file");
+			if (filename != null) {
+				file = new File(filename);
+				if (!file.exists()) {
+					logger.error(file.getAbsolutePath() + " does not exist");
+					return;
+				}
+			}
+			else {
+				logger.error("no file specified");
 				return;
 			}
 		}

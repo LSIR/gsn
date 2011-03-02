@@ -18,7 +18,7 @@
         <predicate key="LATITUDE">45.98103726200003</predicate>
         <predicate key="LONGITUDE">7.671217388000011</predicate>
     </addressing>
-    <storage history-size="1"/>
+    <storage storage-directory="/home/perma/gsn-binaries/" history-size="1"/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
