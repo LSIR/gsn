@@ -82,12 +82,16 @@ class GPSPluginClass(AbstractPluginClass):
             
         #Wlan must only be cycled when in dc mode!!
         if (self.isDutyCycleMode()):    	
-            self._WlanThread = WlanThread(self,10,10)
+            self._WlanThread = WlanThread(self,self.getOptionValue('wlan_on_time'),self.getOptionValue('wlan_off_time'))
         
         #counter
-        fp = open("/media/card/backlog/GPS_cnt.txt","rw")
+        try:
+            fp = open(str(self.getOptionValue('cnt_file')),"rw")
+        except Exception as e:
+            self.exception( "could not open sample count file: " + str(self.getOptionValue('cnt_file')) + " " + str(e))
         cnt = int(fp.readline())
         if (cnt >= (pow(2,32)-1) or cnt == ""):
+            self._logger.warning("Sample counter wrapped around! " + str(cnt))
             self._cnt = 0
         else:
             self._cnt = cnt
@@ -171,66 +175,8 @@ class GPSPluginClass(AbstractPluginClass):
         self.debug('GPSPlugin died...')
     
         end = time.time()
-        '''
-        self.info('Number of measurements: ' + str(self.gps.measurementNo))
-        self.info('Number of satellites: '+ str(self.gps._SatelliteCounter))
-        self.info('Number of satellites above thresholds: '+str(self.gps._goodSatelliteCounter))
-        self.info("Killed " + str(self.gps._zombiesKilled))
-        self.info("Serial disconnected " + str(self.gps._serialCount))
-        '''
         self.stop()
     
-    '''
-    ##########################################################################################
-    parseRawMsg()
-    ##########################################################################################
-    '''
-    def _parseRawMsg(self, rawMsg):
-    	if rawMsg!=0:
-            dataPackage = False
-            payload = rawMsg[2]
-            # the first 8 bytes are: GPS Time (4B), GPS week (2B), Number of satellites following (1B), Reserved (1B)
-            gps_time, gps_week, svs = struct.unpack('<ihB', payload[0:7])
-            self.info('GPS Time: '+str(gps_time)+" - "+str(gps_week))
-            self.info('Number of satellites following: ' +str(svs))
-            # extract data for each SV 
-            for i in range(0, svs):
-                #Byte offset for SV data
-                startIndex = 8+i*24
-                #Payload format: Carrier Phase (8B - double), Pseudorange (8B - double), 
-                #                Doppler (4B - int), SV nbr (1B - unsigned char), 
-                #                Quality (1B - signed char), C/No (1B - signed char), 
-                #                LLI (1B - unsigned char)
-                
-                carrier_phase, pseudorange, doppler, sv, quality, cno, lli = struct.unpack_from('<2diB2bB', payload, startIndex)
-                
-                dataPackage = [gps_time, gps_week, svs, carrier_phase, pseudorange, doppler, sv, quality, cno, lli]
-                
-                if quality>=int(self.getOptionValue('quality_threshold')) and cno>=int(self.getOptionValue('signal_threshold')):
-                      self._goodSatelliteCounter=self._goodSatelliteCounter+1
-                self._SatelliteCounter=self._SatelliteCounter+1
-    			
-    		if (dataPackage == False):
-    			self.warning("parseMsg: WARNING! Function returned nothing!")
-    			return dataPackage
-    		self._measurementNo += 1
-    		return dataPackage
-        else:
-            self.warning("parseMsg: WARNING! MSG packet was empty!")
-            return False
-
-    '''
-    ##########################################################################################
-    parseNavMsg()
-    ##########################################################################################
-    '''
-    def _parseNavMsg(self, msg):
-    	if (msg):
-            self.info(str(msg[2]))
-            #dataPackage = [NAV_TYPE, ]
-    	else:
-    		self.warning("WARNING: MSG packet was empty!")
-        
     '''
     ##########################################################################################
     stop()
@@ -268,7 +214,7 @@ class GPSPluginClass(AbstractPluginClass):
         return False
     
     def writeToFile(self, val):
-        fp = open("/media/card/backlog/GPS_cnt.txt","w")
+        fp = open(str(self.getOptionValue('cnt_file')),"w")
         fp.write(str(val))
         fp.close()
     
@@ -301,11 +247,11 @@ class WlanThread(Thread):
                 p = subprocess.Popen('/usr/bin/who')
                 p.wait()
                 user = p.communicate()[0]
-                self._parent._logger.info(str(user))
+                #self._parent._logger.info(str(user))
                 #self._parent._logger.info(str("HOST\nroot" in user))
                 start = time.time()
                 while ((("HOST\nroot" in user) or (self._parent.isResendingDB())) and not self._stopped):
-                    self._parent._logger.info("Flushing: " + str(self._parent.isResendingDB()))
+                    #self._parent._logger.info("Flushing: " + str(self._parent.isResendingDB()))
                     self._parent._logger.info('Someone is logged in or we are flushing DB... NOT power cycling WLAN!')
                     self._parent._logger.info('Waiting for 10 sec')
                     self._work.wait(10)
