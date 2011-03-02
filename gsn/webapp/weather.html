@@ -118,7 +118,7 @@ $(document).ready(function() {
         $(".webcamimage").each(function(){
           var im = $(this);
           var parent = im.parent();
-          var div = $('<div style="float:left;position:relative;margin:2px;padding:0;width:'+im.attr('width')+'px;height:'+im.attr('height')+'px"><div style="position:absolute;bottom:0px;width:150px;height:15px;background:url('+im.attr('src')+');background-position: 0px bottom;margin:0;padding:0"></div><a href="'+im.attr('src')+'"></a></div>');
+          var div = $('<div style="float:left;position:relative;margin:2px;padding:0;width:'+im.attr('width')+'px;height:'+im.attr('height')+'px"><div style="position:absolute;bottom:0px;width:171px;height:12px;background:url('+im.attr('src')+');background-position: -63px top;margin:0;padding:0"></div><a href="'+im.attr('src')+'"></a></div>');
           $("a",div).append(im.clone());
           im.after(div);
           im.remove();
@@ -294,7 +294,7 @@ function showTopology(id) {
                       </div>
                       </div>
                       <div style="height:430px">
-                        <img class="webcamimage" src="http://data.permasense.ch/field?vs=thur_camera_pos0__scaled&field=JPEG_SCALED&pk=latest" width="448" height="336">
+                        <a href="http://data.permasense.ch/field?vs=thur_camera_pos0__scaled&field=JPEG_SCALED&pk=latest"><img src="http://data.permasense.ch/field?vs=thur_camera_pos0__scaled&field=JPEG_SCALED&pk=latest" width="448" height="336">
                       </div>
                 </div>
 
@@ -311,7 +311,7 @@ function showTopology(id) {
                         <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/069141.png"/>
                 </p>
                 <p>
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos8__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
+                  <div style="float:left;position:relative;margin:2px;padding:0"><a href="http://data.permasense.ch/field?vs=dirruhorn_camera_pos8__scaled&field=JPEG_SCALED&pk=latest"><img src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos8__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250"></div>
                   <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_basestation__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
                   <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_dirrubottom__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
                   <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_position7__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
