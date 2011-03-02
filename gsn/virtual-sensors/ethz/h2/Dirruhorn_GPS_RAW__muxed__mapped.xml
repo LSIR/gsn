@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_GPS_RAW__mapped" priority="10" >
+<virtual-sensor name="Dirruhorn_GPS_RAW__muxed__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -17,7 +17,7 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>RAW GPS information from Dirruhorn deployment</description>
+    <description>muxed RAW GPS information from Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Dirruhorn deployment</predicate>
